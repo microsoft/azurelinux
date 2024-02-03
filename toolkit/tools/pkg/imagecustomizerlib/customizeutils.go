@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -87,6 +88,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		partitionsCustomized)
 	if err != nil {
 		return fmt.Errorf("failed to add extra kernel command line: %w", err)
+	}
+
+	err = handleSELinux(config.SystemConfig.KernelCommandLine.SELinux, partitionsCustomized, imageChroot)
+	if err != nil {
+		return err
 	}
 
 	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
@@ -390,6 +396,80 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 	err = file.WriteLines(lines, customizerReleaseFilePath)
 	if err != nil {
 		return fmt.Errorf("error writing customizer release file (%s): %w", customizerReleaseFilePath, err)
+	}
+
+	return nil
+}
+
+func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized bool, imageChroot *safechroot.Chroot,
+) error {
+	var err error
+
+	// Resolve the default SELinux mode.
+	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	// If the partitions were customized, then the grub.cfg file will have been recreated from scratch and therefore
+	// the SELinux args will already be correct and don't need to be updated.
+	if !partitionsCustomized {
+		// Update the SELinux kernel command-line args.
+		err := updateSELinuxCommandLine(selinuxMode, imageChroot)
+		if err != nil {
+			return fmt.Errorf("failed to update SELinux args in grub.cfg:\n%w", err)
+		}
+	}
+
+	if selinuxMode != imagecustomizerapi.SELinuxDisabled {
+		err = updateSELinuxMode(selinuxMode, imageChroot)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinux, imageChroot *safechroot.Chroot) error {
+	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
+	if err != nil {
+		return err
+	}
+
+	// Ensure an SELinux policy has been installed.
+	// Typically, this is provided by the 'selinux-policy' package.
+	selinuxConfigFileFullPath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
+	selinuxConfigFileExists, err := file.PathExists(selinuxConfigFileFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to check if (%s) file exists:\n%w", installutils.SELinuxConfigFile, err)
+	}
+
+	if !selinuxConfigFileExists {
+		return fmt.Errorf("SELinux is enabled but the (%s) file is missing:\n"+
+			"please ensure an SELinux policy is installed:\n"+
+			"the '%s' package provides the default policy",
+			installutils.SELinuxConfigFile, configuration.SELinuxPolicyDefault)
+	}
+
+	// Get the list of mount points.
+	mountPointToFsTypeMap := make(map[string]string, 0)
+	for _, mountPoint := range imageChroot.GetMountPoints() {
+		switch mountPoint.GetTarget() {
+		case "/dev", "/proc", "/sys", "/run", "/dev/pts":
+			// Skip special directories.
+			continue
+		}
+
+		mountPointToFsTypeMap[mountPoint.GetTarget()] = mountPoint.GetFSType()
+	}
+
+	// Set the SELinux config file and relabel all the files.
+	err = installutils.SELinuxConfigure(imagerSELinuxMode, imageChroot, mountPointToFsTypeMap, false)
+	if err != nil {
+		return err
 	}
 
 	return nil

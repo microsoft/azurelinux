@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+const (
+	SELinuxPolicyDefault = "selinux-policy"
+)
+
 // KernelCommandLine holds extra command line parameters which can be
 // added to the grub config file.
 //   - ImaPolicy: A list of IMA policies which will be used together

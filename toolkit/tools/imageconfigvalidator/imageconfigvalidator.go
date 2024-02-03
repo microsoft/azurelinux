@@ -134,7 +134,7 @@ func validatePackages(config configuration.Config) (err error) {
 		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
 		selinuxPkgName := systemConfig.KernelCommandLine.SELinuxPolicy
 		if selinuxPkgName == "" {
-			selinuxPkgName = "selinux-policy"
+			selinuxPkgName = configuration.SELinuxPolicyDefault
 		}
 
 		for _, pkg := range packageList {

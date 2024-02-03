@@ -86,6 +86,15 @@ func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMod
 	return copyWithPermissions(src, dst, dirmode, true, filemode)
 }
 
+// Read reads a string from the file src.
+func Read(src string) (data string, err error) {
+	logger.Log.Debugf("Reading from (%s)", src)
+
+	bytes, err := os.ReadFile(src)
+	data = string(bytes)
+	return
+}
+
 // readLines reads file under path and returns lines as strings and any error encountered
 func ReadLines(path string) (lines []string, err error) {
 	handle, err := os.Open(path)
@@ -119,13 +128,7 @@ func Create(dst string, perm os.FileMode) (err error) {
 func Write(data string, dst string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", dst)
 
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer dstFile.Close()
-
-	_, err = dstFile.WriteString(data)
+	err = os.WriteFile(dst, []byte(data), 0o666)
 	return
 }
 

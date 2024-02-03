@@ -607,7 +607,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 
 	// Preconfigure SELinux labels now since all the changes to the filesystem should be done
 	if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
-		err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+		err = installutils.SELinuxConfigure(systemConfig.KernelCommandLine.SELinux, installChroot,
+			mountPointToFsTypeMap, isRootFS)
 		if err != nil {
 			err = fmt.Errorf("failed to configure selinux: %w", err)
 			return

@@ -21,6 +21,11 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 	defer existingImageConnection.Close()
 
+	currentSELinuxMode, err := getCurrentSELinuxMode(existingImageConnection.Chroot())
+	if err != nil {
+		return err
+	}
+
 	diskConfig := (*config.Disks)[0]
 
 	installOSFunc := func(imageChroot *safechroot.Chroot) error {
@@ -28,7 +33,8 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 
 	err = createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
-		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot", installOSFunc)
+		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot",
+		currentSELinuxMode, installOSFunc)
 	if err != nil {
 		return err
 	}
