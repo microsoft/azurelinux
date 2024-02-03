@@ -24,13 +24,13 @@ or library.  It can change the dynamic loader ("ELF interpreter")
 of an executable and change the RPATH of an executable or library.
 
 %prep
-%setup -q
-autoreconf -fi
+%autosetup -p1
 
 # package ships elf.h - delete to use glibc-headers one
 rm src/elf.h
 
 %build
+autoreconf -fi
 %configure
 %make_build
 
