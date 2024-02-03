@@ -20,8 +20,8 @@ Summary:        An optimized BLAS library based on GotoBLAS2
 # The same spec is also used on the EPEL branches, meaninng that some
 # "obsoleted" features are still kept in the spec.
 Name:           openblas
-Version:        0.3.21
-Release:        3%{?dist}
+Version:        0.3.23
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -561,6 +561,9 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p64_.a
 
 %changelog
+* Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.23-1
+- Auto-upgrade to 0.3.23 - Upgrade to 0.3.23
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.3.21-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

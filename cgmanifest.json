@@ -14964,8 +14964,8 @@
         "type": "other",
         "other": {
           "name": "openblas",
-          "version": "0.3.21",
-          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.21/openblas-0.3.21.tar.gz"
+          "version": "0.3.23",
+          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.23/openblas-0.3.23.tar.gz"
         }
       }
     },
