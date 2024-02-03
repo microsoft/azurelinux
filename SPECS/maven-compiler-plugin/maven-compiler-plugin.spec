@@ -1,8 +1,8 @@
 %bcond_without bootstrap
 Summary:        Maven Compiler Plugin
 Name:           maven-compiler-plugin
-Version:        3.8.1
-Release:        12%{?dist}
+Version:        3.11.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -46,6 +46,9 @@ sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar juni
 %license LICENSE NOTICE
 
 %changelog
+* Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11.0-1
+- Auto-upgrade to 3.11.0 - azl 3.0
+
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.1-13
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

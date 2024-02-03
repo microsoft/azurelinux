@@ -12651,8 +12651,8 @@
         "type": "other",
         "other": {
           "name": "maven-compiler-plugin",
-          "version": "3.8.1",
-          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
+          "version": "3.11.0",
+          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.11.0-source-release.zip"
         }
       }
     },
