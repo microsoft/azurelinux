@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "5.3.2",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/5.3.2/bazel-5.3.2-dist.zip"
+          "version": "7.0.2",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/7.0.2/bazel-7.0.2-dist.zip"
         }
       }
     },
@@ -7811,8 +7811,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz"
         }
       }
     },
@@ -14193,8 +14193,8 @@
         "type": "other",
         "other": {
           "name": "ntp",
-          "version": "4.2.8p15",
-          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p15.tar.gz"
+          "version": "4.2.8p17",
+          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p17.tar.gz"
         }
       }
     },
@@ -27907,8 +27907,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.0.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.0.1.tar.gz"
+          "version": "103.4.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.1.tar.gz"
         }
       }
     },
@@ -27917,8 +27917,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.0.tar.gz"
         }
       }
     },

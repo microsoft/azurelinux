@@ -1,0 +1,82 @@
+From 97edba1a35e1cc40b8b700aef75dd8904bcb2f33 Mon Sep 17 00:00:00 2001
+From: Maxwell Moyer-McKee <mamckee@microsoft.com>
+Date: Thu, 25 Jan 2024 16:48:47 -0800
+Subject: [PATCH] Load the symcrypt provider by default if fips flag or
+ symcrypt_prov.cnf is present
+
+---
+ crypto/provider_conf.c | 44 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
+index 058fb58837..d4948555d7 100644
+--- a/crypto/provider_conf.c
++++ b/crypto/provider_conf.c
+@@ -10,6 +10,8 @@
+ #include <string.h>
+ #include <openssl/trace.h>
+ #include <openssl/err.h>
++#include <openssl/evp.h>
++#include <unistd.h>
+ #include <openssl/conf.h>
+ #include <openssl/safestack.h>
+ #include <openssl/provider.h>
+@@ -169,7 +171,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
+         if (path != NULL)
+             ossl_provider_set_module_path(prov, path);
+ 
+-        ok = provider_conf_params(prov, NULL, NULL, value, cnf);
++        ok = cnf ? provider_conf_params(prov, NULL, NULL, value, cnf) : 1;
+ 
+         if (ok) {
+             if (!ossl_provider_activate(prov, 1, 0)) {
+@@ -309,6 +311,46 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+             return 0;
+     }
+ 
++#  define SYMCRYPT_PROV_CONF           OPENSSLDIR "/symcrypt_prov.cnf"
++    OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
++    PROVIDER_CONF_GLOBAL *pcgbl
++        = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
++    int symcrypt_prov_activated;
++    int default_prov_activated;
++
++    if (pcgbl == NULL || !CRYPTO_THREAD_write_lock(pcgbl->lock)) {
++        ERR_raise(ERR_LIB_CRYPTO, ERR_R_INTERNAL_ERROR);
++        return 0;
++    }
++
++    // Trying to activate either provider again will fail.
++    symcrypt_prov_activated = prov_already_activated("symcryptprovider", pcgbl->activated_providers);
++    default_prov_activated = prov_already_activated("default", pcgbl->activated_providers);
++
++    CRYPTO_THREAD_unlock(pcgbl->lock);
++
++    if (!symcrypt_prov_activated)
++    {
++        if (access(SYMCRYPT_PROV_CONF, R_OK) == 0) {
++            CONF *symcrypt_prov_conf = NCONF_new_ex(libctx, NCONF_default());
++            if (NCONF_load(symcrypt_prov_conf, SYMCRYPT_PROV_CONF, NULL) <= 0)
++                return 0;
++
++            if (provider_conf_load(libctx, "symcryptprovider", "symcrypt_prov_sect", symcrypt_prov_conf) != 1) {
++                NCONF_free(symcrypt_prov_conf);
++                return 0;
++            }
++            NCONF_free(symcrypt_prov_conf);
++        // Always load the symcrypt provider for fips mode
++        } else if (ossl_get_kernel_fips_flag()
++                   && provider_conf_activate(libctx, "symcryptprovider", NULL, NULL, 0, NULL) != 1)
++            return 0;
++
++        if ((!default_prov_activated && provider_conf_activate(libctx, "default", NULL, NULL, 0, NULL) != 1)
++            || !EVP_set_default_properties(libctx, "?provider=symcrypt"))
++            return 0;
++    }
++
+     return 1;
+ }
+ 
+-- 
+2.34.1
+

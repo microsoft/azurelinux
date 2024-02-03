@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           acpica-tools
 Version:        20190509
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        ACPICA tools for the development and debug of ACPI tables
 
 License:        GPLv2
@@ -41,9 +41,10 @@ Patch11:        cve-2017-13693.patch
 Patch12:        cve-2017-13694.patch
 Patch13:        cve-2017-13695.patch
 Patch14:        str-trunc-warn.patch
-Patch15:	ptr-cast.patch
-Patch16:	aslcodegen.patch
-Patch17:	facp.patch
+Patch15:        ptr-cast.patch
+Patch16:        aslcodegen.patch
+Patch17:        facp.patch
+Patch18:        gcc-fix-dangling-pointer-error.patch
 
 BuildRequires:  bison patchutils flex gcc
 
@@ -93,26 +94,27 @@ This version of the tools is being released under GPLv2 license.
 %setup -q -n acpica-unix2-%{version}
 gzip -dc %{SOURCE1} | tar -x --strip-components=1 -f -
 
-%patch0 -p1 -b .big-endian
-%patch1 -p1 -b .unaligned
-%patch2 -p1 -b .OPT_LDFLAGS
-%patch3 -p1 -b .int-format
-%patch4 -p1 -b .f23-harden
+%patch 0 -p1 -b .big-endian
+%patch 1 -p1 -b .unaligned
+%patch 2 -p1 -b .OPT_LDFLAGS
+%patch 3 -p1 -b .int-format
+%patch 4 -p1 -b .f23-harden
 # do not preserve a backup for this patch; it alters the results
 # of the template test case and forces it to fail
-%patch5 -p1
-%patch6 -p1 -b .ppc64le
-%patch7 -p1 -b .arm7hl
-%patch8 -p1 -b .big-endian-v2
-%patch9 -p1 -b .simple-64bit
-%patch10 -p1 -b .mips-be-fix
-%patch11 -p1 -b .cve-2017-13693
-%patch12 -p1 -b .cve-2017-13694
-%patch13 -p1 -b .cve-2017-13695
-%patch14 -p1 -b .str-trunc-warn
-%patch15 -p1 -b .ptr-cast
-%patch16 -p1 -b .aslcodegen
-%patch17 -p1 -b .facp
+%patch 5 -p1
+%patch 6 -p1 -b .ppc64le
+%patch 7 -p1 -b .arm7hl
+%patch 8 -p1 -b .big-endian-v2
+%patch 9 -p1 -b .simple-64bit
+%patch 10 -p1 -b .mips-be-fix
+%patch 11 -p1 -b .cve-2017-13693
+%patch 12 -p1 -b .cve-2017-13694
+%patch 13 -p1 -b .cve-2017-13695
+%patch 14 -p1 -b .str-trunc-warn
+%patch 15 -p1 -b .ptr-cast
+%patch 16 -p1 -b .aslcodegen
+%patch 17 -p1 -b .facp
+%patch 18 -p1 -b .gcc-fix-dangling-pointer-error
 
 cp -p %{SOURCE2} README.Fedora
 cp -p %{SOURCE3} iasl.1
@@ -241,6 +243,9 @@ fi
 
 
 %changelog
+* Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 20190509-8
+- Add patch to fix issue compiling with gcc 13
+
 * Tue May 02 2023 Cameron Baird <cameronbaird@microsoft.com> - 20190509-7
 - Moved to SPECS
 - License verified
@@ -321,7 +326,7 @@ fi
 
 * Tue May 22 2018 Al Stone <ahs3@redhat.com> - 20180508-2
 - %%pre and %%post scriptlets fail -- stupid thinko where I inadvertently
-  tested for alternatives not existing, vs existing 
+  tested for alternatives not existing, vs existing
 
 * Tue May 15 2018 Al Stone <ahs3@redhat.com> - 20180508-1
 - Update to 20180508 source tree, including patch refeshes. Closes BZ#1544048
@@ -741,4 +746,3 @@ fi
 - Set up acpixtract from this package as an alternative to the same command
   in the pmtools package
 - Run the check step once built
-
