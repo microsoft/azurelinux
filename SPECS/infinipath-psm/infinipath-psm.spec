@@ -3,7 +3,7 @@
 Summary:        Intel Performance Scaled Messaging (PSM) Libraries
 Name:           infinipath-psm
 Version:        3.3
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        GPLv2 OR BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,15 +47,15 @@ Development files for the %{name} library.
 
 %prep
 %setup -q -n psm-%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6
+%patch 7 -p1
+%patch 8 -p1
+%patch 9 -p1
 find libuuid -type f -not -name 'psm_uuid.[c|h]' -not -name Makefile -delete
 
 %build
@@ -63,6 +63,11 @@ find libuuid -type f -not -name 'psm_uuid.[c|h]' -not -name Makefile -delete
 # are "leaking".  SuSE has already disabled LTO for this package, but no real
 # details about why those symbols are "leaking".
 %define _lto_cflags %{nil}
+
+# Use 'uname -m' to properly determine architecture (x86_64)
+sed -i "s/(arch)/(shell uname -m)/g" Makefile
+sed -i "s/(arch)/(shell uname -m)/g" ipath/Makefile
+sed -i "s/uname -p/uname -m/g" buildflags.mak
 
 %{set_build_flags}
 %make_build PSM_USE_SYS_UUID=1 %{MAKEARG} CC=gcc
@@ -88,6 +93,9 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_udevrulesdir}/60-ipath.rules
 %{_includedir}/psm_mq.h
 
 %changelog
+* Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 3.3-30
+- Fix build errors due to unknown architecture.
+
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.3-29
 - Move from extended to Core.
 

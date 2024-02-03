@@ -7811,8 +7811,8 @@
         "type": "other",
         "other": {
           "name": "jq",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/stedolan/jq/releases/download/jq-1.6/jq-1.6.tar.gz"
+          "version": "1.7.1",
+          "downloadUrl": "https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz"
         }
       }
     },
@@ -9071,8 +9071,8 @@
         "type": "other",
         "other": {
           "name": "libedit",
-          "version": "3.1.20210910",
-          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20210910-3.1.tar.gz"
+          "version": "3.1.20230828",
+          "downloadUrl": "https://www.thrysoee.dk/editline/libedit-20230828-3.1.tar.gz"
         }
       }
     },
@@ -13723,8 +13723,8 @@
         "type": "other",
         "other": {
           "name": "nbd",
-          "version": "3.20",
-          "downloadUrl": "http://downloads.sourceforge.net/project/nbd/nbd/3.20/nbd-3.20.tar.xz"
+          "version": "3.25",
+          "downloadUrl": "https://github.com/NetworkBlockDevice/nbd/releases/download/nbd-3.25/nbd-3.25.tar.xz"
         }
       }
     },
@@ -14193,8 +14193,8 @@
         "type": "other",
         "other": {
           "name": "ntp",
-          "version": "4.2.8p15",
-          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p15.tar.gz"
+          "version": "4.2.8p17",
+          "downloadUrl": "https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-4.2.8p17.tar.gz"
         }
       }
     },
@@ -26345,8 +26345,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http1",
-          "version": "0.15.1",
-          "downloadUrl": "https://github.com/socketry/protocol-http1/archive/refs/tags/v0.15.1.tar.gz"
+          "version": "0.18.0",
+          "downloadUrl": "https://github.com/socketry/protocol-http1/archive/refs/tags/v0.18.0.tar.gz"
         }
       }
     },
@@ -26355,8 +26355,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-protocol-http2",
-          "version": "0.14.2",
-          "downloadUrl": "https://github.com/socketry/protocol-http2/archive/refs/tags/v0.14.2.tar.gz"
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/socketry/protocol-http2/archive/refs/tags/v0.15.1.tar.gz"
         }
       }
     },
@@ -26995,8 +26995,8 @@
         "type": "other",
         "other": {
           "name": "scons",
-          "version": "3.0.1",
-          "downloadUrl": "http://downloads.sourceforge.net/scons/scons-3.0.1.tar.gz"
+          "version": "4.6.0",
+          "downloadUrl": "https://sourceforge.net/projects/scons/files/scons/4.6.0/SCons-4.6.0.tar.gz/download"
         }
       }
     },
@@ -30029,8 +30029,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-util-macros",
-          "version": "1.19.2",
-          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.19.2.tar.bz2"
+          "version": "1.20.0",
+          "downloadUrl": "https://www.x.org/pub/individual/util/util-macros-1.20.0.tar.xz"
         }
       }
     },
@@ -30079,8 +30079,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xtrans-devel",
-          "version": "1.4.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.4.0.tar.bz2"
+          "version": "1.5.0",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/xtrans-1.5.0.tar.gz"
         }
       }
     },

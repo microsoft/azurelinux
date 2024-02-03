@@ -1,7 +1,7 @@
 Summary:        Azure Linux release files
 Name:           mariner-release
 Version:        3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Microsoft Azure Linux
@@ -19,8 +19,8 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/mariner-release
-echo "MARINER_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/mariner-release
+echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
@@ -54,7 +54,7 @@ EOF
 
 %files
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/mariner-release
+%config(noreplace) %{_sysconfdir}/azurelinux-release
 %config(noreplace) %{_sysconfdir}/lsb-release
 %config(noreplace) %{_libdir}/os-release
 %config(noreplace) %{_sysconfdir}/os-release
@@ -62,6 +62,10 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Feb 01 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
+- Renamed mariner-release to azurelinux-release file
+- Renamed MARINER_BUILD_NUMBER property to AZURELINUX_BUILD_NUMBER
+
 * Wed Jan 31 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-2
 - Remove kernel info from welcome banner for security compliance.
 
