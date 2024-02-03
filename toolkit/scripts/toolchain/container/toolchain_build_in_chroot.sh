@@ -672,6 +672,16 @@ ls -la /usr/lib/python3.12/site-packages
 
 # https://www.linuxfromscratch.org/lfs/downloads/development/LFS-BOOK-r12.0-190-NOCHUNKS.html#ch-system-Python
 
+# 8.54. Setuptools-69.0.3
+echo setuptools-69.0.3
+tar xf setuptools-69.0.3.tar.gz
+pushd setuptools-69.0.3
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --find-links dist setuptools
+popd
+rm -rf setuptools-69.0.3
+touch /logs/status_setuptools_6903_complete
+
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
 pushd coreutils-9.4
