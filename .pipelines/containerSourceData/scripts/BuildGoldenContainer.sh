@@ -362,7 +362,7 @@ function distroless_container {
     fi
 
     # shellcheck source=/dev/null
-    source "$CONTAINER_SRC_DIR/scripts/BuildDistrolessContainer.sh"
+    source "$CONTAINER_SRC_DIR/scripts/BuildGoldenDistrolessContainer.sh"
     create_distroless_container
 }
 
