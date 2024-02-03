@@ -36,10 +36,10 @@ rm -rf test/with_dummyserver/
 rm -rf test/contrib/
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 pip3 install --user --upgrade nox
