@@ -313,15 +313,15 @@ function finalize {
 }
 
 function publish_to_acr {
+    CONTAINER_IMAGE=$1
     if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
         echo "+++ Skip publishing to ACR"
         return
     fi
-
-    echo "+++ Publish container $GOLDEN_IMAGE_NAME_FINAL"
+    echo "+++ Publish container $CONTAINER_IMAGE"
     echo "login into ACR: $ACR"
     az acr login --name "$ACR"
-    docker image push "$GOLDEN_IMAGE_NAME_FINAL"
+    docker image push "$CONTAINER_IMAGE"
 }
 
 function generate_image_sbom {
@@ -372,6 +372,6 @@ prepare_docker_directory
 docker_build
 set_image_tag
 finalize
-publish_to_acr
+publish_to_acr "$GOLDEN_IMAGE_NAME_FINAL"
 generate_image_sbom
 distroless_container
