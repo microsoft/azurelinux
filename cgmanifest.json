@@ -15574,8 +15574,8 @@
         "type": "other",
         "other": {
           "name": "patchelf",
-          "version": "0.14.3",
-          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.14.3/patchelf-0.14.3.tar.gz"
+          "version": "0.18.0",
+          "downloadUrl": "https://github.com/NixOS/patchelf/archive/0.18.0/patchelf-0.18.0.tar.gz"
         }
       }
     },

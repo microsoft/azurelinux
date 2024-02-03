@@ -1,6 +1,6 @@
 Summary:        A utility for patching ELF binaries
 Name:           patchelf
-Version:        0.14.3
+Version:        0.18.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -51,6 +51,9 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 %{_mandir}/man1/patchelf.1*
 
 %changelog
+* Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.18.0-1
+- Auto-upgrade to 0.18.0 - Upgrade to 1.18.0 in Mariner 3.0
+
 * Wed Jan 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.14.3-1
 - Upgraded to v0.14.3
 - Removed patch to disable set-interpreter-long test.
