@@ -16,6 +16,7 @@ import (
 	"github.com/klauspost/pgzip"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -32,6 +33,7 @@ const (
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
 type IsoMaker struct {
 	enableBiosBoot     bool                 // Flag deciding whether to include BIOS bootloaders or not in the generated ISO image.
+	enableRpmRepo      bool                 // Flag deciding whether to include the contents of the Rpm repo folder in the generated ISO image.
 	unattendedInstall  bool                 // Flag deciding if the installer should run in unattended mode.
 	config             configuration.Config // Configuration for the built ISO image and its installer.
 	configSubDirNumber int                  // Current number for the subdirectories storing files mentioned in the config.
@@ -69,6 +71,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 
 	isoMaker = &IsoMaker{
 		enableBiosBoot:     true,
+		enableRpmRepo:      true,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
 		baseDirPath:        baseDirPath,
@@ -85,7 +88,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 	return isoMaker, nil
 }
 
-func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
 
 	if imageNameBase == "" {
 		imageNameBase = defaultImageNameBase
@@ -98,6 +101,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot bool, baseDirPath, 
 
 	isoMaker = &IsoMaker{
 		enableBiosBoot:     enableBiosBoot,
+		enableRpmRepo:      enableRpmRepo,
 		unattendedInstall:  unattendedInstall,
 		config:             config,
 		baseDirPath:        baseDirPath,
@@ -374,6 +378,10 @@ func (im *IsoMaker) createVmlinuzImage() error {
 // createIsoRpmsRepo initializes the RPMs repo on the ISO image
 // later accessed by the ISO installer.
 func (im *IsoMaker) createIsoRpmsRepo() (err error) {
+	if !im.enableRpmRepo {
+		return
+	}
+
 	isoRpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
 
 	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRpmsRepoDirPath)
@@ -463,7 +471,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 	// im.grubCfgPath allows the user to overwrite the default grub.cfg that is
 	// copied from the resource folder.
 	if im.grubCfgPath != "" {
-		targetGrubCfg := filepath.Join(im.buildDirPath, "boot/grub2/grub.cfg")
+		targetGrubCfg := filepath.Join(im.buildDirPath, installutils.GrubCfgFile)
 		targetGrubCfgDir := filepath.Dir(targetGrubCfg)
 		err := os.MkdirAll(targetGrubCfgDir, os.ModePerm)
 		if err != nil {
