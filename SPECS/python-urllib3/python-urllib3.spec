@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        1.26.18
-Release:        2%{?dist}
+Version:        2.0.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,9 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 2.0.4-1
+- Upgrade to version 2.0.4
+
 * Wed Jan 17 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.26.18-2
 - Fix test_recent_date test by updating the hard-coded date used for test
 
