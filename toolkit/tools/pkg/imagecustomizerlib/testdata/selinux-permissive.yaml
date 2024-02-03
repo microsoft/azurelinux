@@ -1,0 +1,9 @@
+SystemConfig:
+  KernelCommandLine:
+    SELinux: permissive
+
+  PackagesInstall:
+  - selinux-policy
+  - selinux-policy-modules
+  - setools-console
+  - policycoreutils-python-utils
