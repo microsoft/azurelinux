@@ -672,6 +672,26 @@ ls -la /usr/lib/python3.12/site-packages
 
 # https://www.linuxfromscratch.org/lfs/downloads/development/LFS-BOOK-r12.0-190-NOCHUNKS.html#ch-system-Python
 
+# 8.52. Flit-Core-3.9.0
+echo Flit-Core-3.9.0
+tar xf flit_core-3.9.0.tar.gz
+pushd flit_core-3.9.0
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --no-user --find-links dist flit_core
+popd
+rm -rf flit_core-3.9.0
+touch /logs/status_flit_core_390_complete
+
+# 8.53. Wheel-0.42.0
+echo wheel-0.42.0
+tar xf wheel-0.42.0.tar.gz
+pushd wheel-0.42.0
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --find-links=dist wheel
+popd
+rm -rf wheel-0.42.0
+touch /logs/status_wheel_0420_complete
+
 # 8.54. Setuptools-69.0.3
 echo setuptools-69.0.3
 tar xf setuptools-69.0.3.tar.gz

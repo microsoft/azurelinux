@@ -57,6 +57,8 @@ https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.69.t
 https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.7.tar.gz
 https://www.openssl.org/source/openssl-3.1.4.tar.gz
 https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz
+https://pypi.org/packages/source/w/wheel/wheel-0.42.0.tar.gz
+https://pypi.org/packages/source/f/flit-core/flit_core-3.9.0.tar.gz
 https://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz
 https://www.sqlite.org/2023/sqlite-autoconf-3440000.tar.gz
 https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.39/util-linux-2.39.2.tar.xz
