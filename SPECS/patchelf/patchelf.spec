@@ -30,7 +30,7 @@ of an executable and change the RPATH of an executable or library.
 rm src/elf.h
 
 %build
-sh ./bootstrap.sh
+
 %configure
 make %{?_smp_mflags}
 
@@ -49,10 +49,13 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 %doc README.md
 %{_bindir}/patchelf
 %{_mandir}/man1/patchelf.1*
+%dir %{_datadir}/zsh            
+%dir %{_datadir}/zsh/site-functions            
+%{_datadir}/zsh/site-functions/_patchelf
 
 %changelog
 * Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.18.0-1
-- Auto-upgrade to 0.18.0 - Upgrade to 1.18.0 in Mariner 3.0
+- Upgrade to 1.18.0 in Mariner 3.0
 
 * Wed Jan 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.14.3-1
 - Upgraded to v0.14.3
