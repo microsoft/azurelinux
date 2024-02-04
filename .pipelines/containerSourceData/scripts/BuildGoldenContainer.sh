@@ -196,7 +196,7 @@ function initialization {
 
     BASE_IMAGE_NAME=${BASE_IMAGE_NAME_FULL%:*}  # mcr.microsoft.com/cbl-mariner/base/core
     BASE_IMAGE_TAG=${BASE_IMAGE_NAME_FULL#*:}   # 2.0
-    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%%.*}.0 # 2.0
+    AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}    # 2.0
 
     # For Azure Linux 2.0, we have shipped the container images with
     # the below value of DISTRO_IDENTIFIER in the image tag.
