@@ -366,27 +366,27 @@ stages:
       - task: DownloadPipelineArtifact@2
         displayName: 'Download $(baseContainerFile) - ${{ parameters.architecture }}'
         inputs:
-          buildType: specific
-          project: mariner
-          definition: $(baseContainersPipelineId)
-          buildVersionToDownload: specific
-          pipelineId: $(baseContainersBuildId)
-          artifactName: $(artifactName)
-          itemPattern: $(containerArtifactDir)/$(baseContainerFile)
-          targetPath: $(artifactsDownloadDir)
+          source: specific
+          project: 'mariner'
+          pipeline: '$(baseContainersPipelineId)'
+          runVersion: specific
+          runId: $(baseContainersBuildId)
+          artifact: $(artifactName)
+          patterns: $(containerArtifactDir)/$(baseContainerFile)
+          path: '$(artifactsDownloadDir)'
         condition: eq(variables['proceed'], 'true')
 
       - task: DownloadPipelineArtifact@2
         displayName: 'Download $(rpmsTarball) - ${{ parameters.architecture }}'
         inputs:
-          buildType: specific
-          project: mariner
-          definition: $(baseContainersPipelineId)
-          buildVersionToDownload: specific
-          pipelineId: $(baseContainersBuildId)
-          artifactName: $(artifactName)
-          itemPattern: $(buildArtifactsDir)/$(rpmsTarball)
-          targetPath: $(artifactsDownloadDir)
+          source: specific
+          project: 'mariner'
+          pipeline: '$(baseContainersPipelineId)'
+          runVersion: specific
+          runId: $(baseContainersBuildId)
+          artifact: $(artifactName)
+          patterns: $(buildArtifactsDir)/$(rpmsTarball)
+          path: '$(artifactsDownloadDir)'
         condition: eq(variables['proceed'], 'true')
 
       - task: Bash@3
