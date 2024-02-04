@@ -62,9 +62,7 @@ function create_distroless_container {
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
     pushd "$WORK_DIR" > /dev/null
 
-    # TODO: Get the marinara image from the latest build
-    # MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/$marinara}
-    MARINARA_IMAGE="mcr.microsoft.com/cbl-mariner/$marinara:2.0"
+    MARINARA_IMAGE=${BASE_IMAGE_NAME_FULL/base\/core/$marinara}
     echo "MARINARA_IMAGE -> $MARINARA_IMAGE"
 
     sed -E "s|^FROM .*builder$|FROM $MARINARA_IMAGE as builder|g" -i "$marinaraSrcDir/dockerfiles/dockerfile-new-image"
