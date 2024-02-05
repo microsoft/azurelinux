@@ -1,14 +1,15 @@
 # Got the intial spec from Fedora and modified it
 Summary:        An enhanced version of csh, the C shell
 Name:           tcsh
-Version:        6.22.03
-Release:        2%{?dist}
+%define underscored_version 6_24_10
+Version:        6.24.10
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Shells
 URL:            https://www.tcsh.org/
-Source0:        https://astron.com/pub/%{name}/old/%{name}-%{version}.tar.gz
+Source0:        https://github.com/tcsh-org/tcsh/archive/refs/tags/TCSH6_24_10.tar.gz
 BuildRequires:  ncurses-devel
 BuildRequires:  libxcrypt-devel
 %if %{with_check}
@@ -33,7 +34,7 @@ spelling correction, a history mechanism, job control and a C language
 like syntax.
 
 %prep
-%autosetup
+%autosetup -n %{name}-TCSH%{underscored_version}
 
 %build
 sed -i -e 's|\$\*|#&|' -e 's|fR/g|&m|' tcsh.man2html &&
@@ -117,6 +118,9 @@ fi
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Jan 31 2023 Bala <balakumaran.kannan@microsoft.com> - 6.24.10-1
+- Update version to 6.24.10
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 6.22.03-2
 - Link with libxcrypt
 
