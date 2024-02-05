@@ -1,5 +1,5 @@
 # Version of bundled lapack
-%global lapackver 3.9.1
+%global lapackver 3.11.0
 # Do we have execstack?
 %global execstack 1
 %bcond_without cpp_thread_check
@@ -22,25 +22,20 @@ Summary:        An optimized BLAS library based on GotoBLAS2
 Name:           openblas
 Version:        0.3.26
 Release:        1%{?dist}
-License:        BSD
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-URL:            https://github.com/xianyi/OpenBLAS/
-Source0:        https://github.com/xianyi/OpenBLAS/archive/v%{version}/openblas-%{version}.tar.gz
+URL:            https://github.com/OpenMathLib/OpenBLAS
+Source0:        https://github.com/OpenMathLib/OpenBLAS/archive/v%{version}/openblas-%{version}.tar.gz
 # Use system lapack
 Patch0:         openblas-0.2.15-system_lapack.patch
 # Drop extra p from threaded library name
 Patch1:         openblas-0.2.5-libname.patch
 # Don't use constructor priorities on too old architectures
 Patch2:         openblas-0.2.15-constructor.patch
-# Fix SBGEMM test to work with INTERFACE64
-# patch imported from Fedora
-Patch3:         openblas-0.3.21-sbgemm-test.patch
 # Supply the proper flags to the test makefile
 # patch imported from Fedora
-Patch4:         openblas-0.3.11-tests.patch
-# keep this patch to build from a containerized environment
-Patch5:         No-Fortran-Build.patch
+Patch3:         openblas-0.3.11-tests.patch
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -197,9 +192,7 @@ cd OpenBLAS-%{version}
 %patch0 -p1 -b .system_lapack
 %endif
 %patch1 -p1 -b .libname
-%patch3 -p1 -b .sbgem
-%patch4 -p1 -b .tests
-%patch5 -p1
+%patch3 -p1 -b .tests
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;
