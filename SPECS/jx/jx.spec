@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.2.236
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,9 @@ Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{na
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
+# patches for vendored code >= 1000
+Patch1000: CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.17.1
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -36,10 +39,14 @@ BuildRequires:  golang >= 1.17.1
 Command line tool for working with Jenkins X.
 
 %prep
-%autosetup -p1
+%autosetup -N
+
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No download use vednor cache locally
 sed -i 's/go mod download/# go mod download/' ./Makefile
@@ -60,6 +67,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.236-15
+- Patch CVE-2021-44716
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-14
 - Bump release to rebuild with go 1.20.9
 
