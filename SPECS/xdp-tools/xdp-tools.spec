@@ -1,14 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:             xdp-tools
-Version:          1.4.1
-Release:          2%{?dist}
+Version:          1.4.2
+Release:          1%{?dist}
 Summary:          Utilities and example programs for use with XDP
 %global _soversion 1.4.0
 
 License:          GPL-2.0-only
 URL:              https://github.com/xdp-project/%{name}
-Source0:          https://github.com/xdp-project/xdp-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:          https://github.com/xdp-project/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 %global azl 3
 BuildRequires:    libbpf-devel
@@ -144,6 +144,10 @@ make install V=1
 %{_libdir}/pkgconfig/libxdp.pc
 
 %changelog
+* Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.2-1
+- Upgrade to version 1.4.2
+- Fixes for building with clang/llvm 17.x
+
 * Mon Jan 29 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.1-2
 - Initial CBL-Mariner import from Fedora 40 (license: MIT)
 - License Verified
