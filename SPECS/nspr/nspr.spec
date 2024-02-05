@@ -1,7 +1,7 @@
 Summary:        Platform-neutral API
 Name:           nspr
-Version:        4.30
-Release:        2%{?dist}
+Version:        4.9.6
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,12 +24,12 @@ It contains the libraries and header files to create applications
 
 %prep
 %autosetup
-cd nspr
+cd mozilla/nsprpub
 sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
 sed -i 's#$(LIBRARY) ##' config/rules.mk
 
 %build
-cd nspr
+cd mozilla/nsprpub
 %configure \
     --with-mozilla \
     --with-pthreads \
@@ -39,14 +39,14 @@ cd nspr
 %make_build
 
 %install
-cd nspr
+cd mozilla/nsprpub
 %make_install
 
 %ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license nspr/LICENSE
+%license mozilla/nsprpub/LICENSE
 %{_bindir}/*
 %{_libdir}/*.so
 
@@ -57,6 +57,9 @@ cd nspr
 %{_datarootdir}/aclocal/*
 
 %changelog
+* Tue Jan 23 2024 Archana Choudhary <archana1@microsoft.com> - 4.9.6-1
+- Upgrade to 4.9.6
+
 * Tue Jun 14 2022 Olivia Crain <oliviacrain@microsoft.com> - 4.30-2
 - Add explicit build requirements
 - Lint spec

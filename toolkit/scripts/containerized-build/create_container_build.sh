@@ -23,7 +23,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=1.0|2.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -32,7 +32,7 @@ Optional arguments:
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
-    VERISION        1.0 or 2.0. default: "2.0"
+    VERSION         2.0 or 3.0. default: "3.0"
     MOUNTS          Mount a host directory into container. Should be of form '/host/dir:/container/dir'. For multiple mounts, please use space (\" \") as delimiter
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
     BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
@@ -73,8 +73,8 @@ build_graph() {
 
 # exit if not running as root
 if [ "$EUID" -ne 0 ]; then
-  echo -e "\033[31mThis requires running as root\033[0m "
-  exit
+  print_error "This requires running as root"
+  exit 1
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
@@ -101,7 +101,7 @@ done
 [[ -z "${repo_path}" ]] && repo_path=${script_dir} && repo_path=${repo_path%'/toolkit'*}
 [[ ! -d "${repo_path}" ]] && { print_error " Directory ${repo_path} does not exist"; exit 1; }
 [[ -z "${mode}" ]] && mode="build"
-[[ -z "${version}" ]] && version="2.0"
+[[ -z "${version}" ]] && version="3.0"
 
 # Set relevant folder definitions using Mariner Makefile that can be overriden by user
 # Default values are populated from toolkit/Makefile
@@ -115,6 +115,8 @@ BUILD_SRPMS_DIR=$(make --no-print-directory -s printvar-BUILD_SRPMS_DIR 2> /dev/
 RPMS_DIR=$(make --no-print-directory -s printvar-RPMS_DIR 2> /dev/null)                 # default: $repo_path/out/RPMS
 TOOL_BINS_DIR=$(make --no-print-directory -s printvar-TOOL_BINS_DIR 2> /dev/null)       # default: $repo_path/toolkit/out/tools
 PKGBUILD_DIR=$(make --no-print-directory -s printvar-PKGBUILD_DIR 2> /dev/null)         # default: $repo_path/build/pkg_artifacts
+TOOLCHAIN_RPMS_DIR=$(make --no-print-directory -s printvar-TOOLCHAIN_RPMS_DIR 2> /dev/null) # default: $repo_path/build/toolchain_rpms
+build_arch=$(make --no-print-directory -s printvar-build_arch 2> /dev/null)
 popd
 
 # Assign remaining default values based on folder definitions
@@ -122,8 +124,28 @@ tmp_dir=${BUILD_DIR}/containerized-rpmbuild/tmp
 mkdir -p ${tmp_dir}
 [[ -z "${build_mount_dir}" ]] && build_mount_dir="$BUILD_DIR"
 [[ ! -d "${build_mount_dir}" ]] && { print_error " Directory ${build_mount_dir} does not exist"; exit 1; }
+# TODO: Modify toolchain make command when DAILY_BUILD_ID is discontinued
+if [[ ( ! -d "${TOOLCHAIN_RPMS_DIR}" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/${build_arch})" ) || ( -z "$(ls -A ${TOOLCHAIN_RPMS_DIR}/noarch)" ) ]]; then
+    print_error "Toolchain RPMS are not populated. Run sudo make toolchain REBUILD_TOOLS=y DAILY_BUILD_ID=<daily_build_id>"
+    exit 1
+fi
 
-cd "${script_dir}"  || { echo "ERROR: Could not change directory to ${script_dir}"; exit 1; }
+# TODO: Remove when PMC is available for 3.0
+lkg_url="https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json"
+lkg_file="${tmp_dir}/lkg-3.0-dev.json"
+if [[ "${version}" == "3.0" ]]; then
+    if [[ -z "${DAILY_BUILD_ID}" ]]; then
+        echo "Downloading latest daily-repo-id ..."
+        rm -f ${lkg_file}*
+        wget -nv -P ${tmp_dir} ${lkg_url}
+        DAILY_BUILD_ID=$(cat ${lkg_file} | jq -r .date | tr -d '-')
+        [[ "$DAILY_BUILD_ID" = "null" ]] && { print_error "Unable to fetch latest daily-repo-id, please provide DAILY_REPO_ID"; exit 1; }
+        DAILY_BUILD_ID="3-0-"$DAILY_BUILD_ID
+    fi
+    echo "Using Daily Build $DAILY_BUILD_ID"
+fi
+
+cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir}"; exit 1; }
 
 # ==================== Setup ====================
 
@@ -204,11 +226,22 @@ sed -i "s~<REPO_BRANCH>~${repo_branch}~" $tmp_dir/welcome.txt
 sed -i "s~<AARCH>~$(uname -m)~" $tmp_dir/welcome.txt
 cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
+# TODO: Remove when PMC is available for 3.0
+if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
+    cp resources/mariner-3_repo $tmp_dir/mariner-3_repo
+    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/mariner-3_repo
+    if [[ $(uname -m) == "x86_64" ]]; then
+        sed -i "s~<ARCH>~x86-64~" $tmp_dir/mariner-3_repo
+    else
+        sed -i "s~<ARCH>~aarch64~" $tmp_dir/mariner-3_repo
+    fi
+fi
 
 # ============ Build the image ============
 dockerfile="${script_dir}/resources/mariner.Dockerfile"
 
-if [[ "${mode}" == "build" ]]; then # Configure base image
+# TODO: Remove test mode when image is available for 3.0
+if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base image
     echo "Importing chroot into docker..."
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi

@@ -1,17 +1,15 @@
+%global lld_srcdir llvm-project-llvmorg-%{version}
+
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
-Version:        12.0.1
+Version:        17.0.6
 Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
-URL:            https://clang.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/lld-%{version}.src.tar.xz
-# The `lld` build needs access to `mach-o/compact_unwind_encoding.h` which LLVM
-# packages with the `libunwind` source.  We fetch and unpack both sources then
-# pass an additional `-I` to `CMAKE` to allow the build to find the header.
-Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/libunwind-%{version}.src.tar.xz
+URL:            https://lld.llvm.org/
+Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 BuildRequires:  build-essential
 BuildRequires:  cmake
 BuildRequires:  file
@@ -38,7 +36,7 @@ programs that use the LLD infrastructure.
 Shared libraries for LLD.
 
 %prep
-%setup -q -b 1 -n lld-%{version}.src
+%setup -q -n %{lld_srcdir}
 
 %build
 mkdir -p build
@@ -51,7 +49,8 @@ cd build
        -DCMAKE_CXX_FLAGS=-I../../libunwind-%{version}.src/include \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=on                             \
        -DLLVM_DYLIB_COMPONENTS="all"                              \
-       -Wno-dev
+       -Wno-dev ../lld
+
 %ninja_build
 
 %install
@@ -59,6 +58,7 @@ cd build
 %ninja_install
 
 %files
+%license LICENSE.TXT
 %{_bindir}/*
 
 %files devel
@@ -68,9 +68,12 @@ cd build
 
 %files libs
 %license LICENSE.TXT
-%{_libdir}/*.so.12*
+%{_libdir}/*.so.*
 
 %changelog
+* Tue Jan 16 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
+- Upgrade to 17.0.6
+
 *   Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  12.0.1-1
 -   Original version for CBL-Mariner.
 -   License verified

@@ -2,7 +2,7 @@
 %global gem_name timers
 Summary:        Pure Ruby one-shot and periodic timers
 Name:           rubygem-%{gem_name}
-Version:        4.3.2
+Version:        4.3.5
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -19,6 +19,7 @@ use with event loops such as async.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%gemspec_clear_signing
 
 %build
 gem build %{gem_name}
@@ -31,6 +32,12 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Mon Jan 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.3.5-2
+- Switched to using the 'gemspec_clear_signing' macro.
+
+* Fri Jan 26 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.3.5-1
+- Upgrade to 4.3.5 for AZL 3.0
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.3.2-2
 - Build from .tar.gz source.
 

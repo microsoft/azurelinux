@@ -1,0 +1,14 @@
+diff --git a/libglusterfs/src/glusterfs/events.h b/libglusterfs/src/glusterfs/events.h
+index 68b7996519..8874698bb2 100644
+--- a/libglusterfs/src/glusterfs/events.h
++++ b/libglusterfs/src/glusterfs/events.h
+@@ -11,8 +11,8 @@
+ #ifndef __EVENTS_H__
+ #define __EVENTS_H__
+ 
+-#ifdef USE_EVENTS
+ #include "eventtypes.h"
++#ifdef USE_EVENTS
+ int
+ _gf_event(eventtypes_t event, const char *fmt, ...)
+     __attribute__((__format__(__printf__, 2, 3)));

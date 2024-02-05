@@ -4,9 +4,12 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 
 ### Operation ordering
 
-1. Override the `/etc/resolv.conf` file with the version from the host OS.
+1. If partitions were specified in the config, customize the disk partitions and reset
+   the boot-loader.
 
-2. Update packages:
+2. Override the `/etc/resolv.conf` file with the version from the host OS.
+
+3. Update packages:
 
    1. Remove packages ([PackageListsRemove](#packagelistsremove-string),
    [PackagesRemove](#packagesremove-string))
@@ -19,23 +22,29 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
    4. Update packages ([PackageListsUpdate](#packagelistsupdate-string),
    [PackagesUpdate](#packagesupdate-string))
 
-3. Update hostname. ([Hostname](#hostname-string))
+4. Update hostname. ([Hostname](#hostname-string))
 
-4. Copy additional files. ([AdditionalFiles](#additionalfiles-mapstring-fileconfig))
+5. Copy additional files. ([AdditionalFiles](#additionalfiles-mapstring-fileconfig))
 
-5. Add/update users. ([Users](#users-user))
+6. Add/update users. ([Users](#users-user))
 
-6. Enable/disable services. ([Services](#services-type))
+7. Enable/disable services. ([Services](#services-type))
 
-7. Configure kernel modules.
+8. Configure kernel modules.
 
-8. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
+9. Write the `/etc/mariner-customizer-release` file.
 
-9. Run finalize image scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+10. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
 
-10. Delete `/etc/resolv.conf` file.
+11. Apply kernel command-line args, if the partitions weren't customized.
 
-11. Enable dm-verity root protection.
+12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
+
+13. Run finalize image scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+
+14. Delete `/etc/resolv.conf` file.
+
+15. Enable dm-verity root protection.
 
 ### /etc/resolv.conf
 
@@ -225,6 +234,64 @@ So, any existing ExtraCommandLine value in the base image will be replaced.
 
 If the partitions are not customized, then the `ExtraCommandLine` value will be appended
 to the existing `grub.cfg` file.
+
+### SELinux
+
+Specifies the mode to set SELinux to.
+
+If this field is not specified, then the existing SELinux mode in the base image is
+maintained.
+Otherwise, the image is modified to match the requested SELinux mode.
+
+The Mariner Image Customizer tool can enable SELinux on a base image with SELinux
+disabled and it can disable SELinux on a base image that has SELinux enabled.
+However, using a base image that already has the required SELinux mode will speed-up the
+customization process.
+
+If SELinux is enabled, then all the file-systems that support SELinux will have their
+file labels updated/reset (using the `setfiles` command).
+
+Supported options:
+
+- `disabled`: Disables SELinux.
+
+- `permissive`: Enables SELinux but only logs access rule violations.
+
+- `enforcing`: Enables SELinux and enforces all the access rules.
+
+- `force-enforcing`: Enables SELinux and sets it to enforcing in the kernel
+  command-line.
+  This means that SELinux can't be set to `permissive` using the `/etc/selinux/config`
+  file.
+
+Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
+This package contains the default SELinux rules and is required for SELinux-enabled
+images to be functional.
+The Mariner Image Customizer tool will report an error if the package is missing from
+the image.
+
+Note: If you wish to apply additional SELinux policies on top of the base SELinux
+policy, then it is recommended to apply these new policies using
+([PostInstallScripts](#postinstallscripts-script)).
+After applying the policies, you do not need to call `setfiles` manually since it will
+called automatically after the `PostInstallScripts` are run.
+
+Example:
+
+```yaml
+SystemConfig:
+  KernelCommandLine:
+    SELinux: enforcing
+
+  PackagesInstall:
+  # Required packages for SELinux.
+  - selinux-policy
+  - selinux-policy-modules
+  
+  # Optional packages that contain useful SELinux utilities.
+  - setools-console
+  - policycoreutils-python-utils
+```
 
 ## Module type
 

@@ -31,6 +31,8 @@ Patch3:   0003-Do-not-install-html-docs.patch
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
+# # Add check to see if fips flag is enabled in kernel
+Patch9: 0009-Add-Kernel-FIPS-mode-flag-support.patch
 # # Add support for PROFILE=SYSTEM system default cipherlist
 # AZL: NOTE: We do not use crypto-policies, so this patch does not apply.
 # Patch7:   0007-Add-support-for-PROFILE-SYSTEM-system-default-cipher.patch
@@ -47,6 +49,9 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
+# # Load the SymCrypt provider by default if present in non-FIPS mode,
+# # and always load it implicitly in FIPS mode
+Patch32:  0032-Force-fips.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -365,6 +370,7 @@ install -m644 %{SOURCE9} \
 - Remove handling of different architectures -- we always build on the target architecture
 - Align config options with Marinver version 2.0
 - Remove fips-related patches and config options
+- Add patches to load SymCrypt provider by default
 
 * Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
 - Rebase to upstream version 3.1.4

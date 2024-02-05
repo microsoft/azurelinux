@@ -1,4 +1,4 @@
-%define byaccdate 20220109
+%define byaccdate 20240109
 
 Summary:      Berkeley Yacc, a parser generator
 Name:         byacc
@@ -53,6 +53,9 @@ echo ====================TESTING END=====================
 %{_mandir}/man1/byacc.1*
 
 %changelog
+* Thu Jan 25 2024 Bala <balakumaran.kannan@microsoft.com> - 1.9.20240109-1
+- Upgrade to 1.9.20240109
+
 * Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.9.20220109-1
 - Upgrade to 1.9.20220109
 

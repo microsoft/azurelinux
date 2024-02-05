@@ -1,12 +1,12 @@
 Summary:        Simple SSL certificate generator
 Name:           sscg
-Version:        2.6.2
-Release:        2%{?dist}
+Version:        3.0.5
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/sgallagher/sscg
-Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
+Source0:        %{url}/archive/refs/tags/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  help2man
@@ -26,7 +26,7 @@ up a full PKI environment and without exposing the machine to a risk of
 false signatures from the service certificate.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{name}-%{name}-%{version}
 
 
 %build
@@ -46,6 +46,9 @@ false signatures from the service certificate.
 %{_mandir}/man8/%{name}.8*
 
 %changelog
+* Wed Jan 24 2024 Sindhu Karri <lakarri@microsoft.com> - 3.0.5-1
+- Upgrade to 3.0.5
+
 * Wed Sep 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

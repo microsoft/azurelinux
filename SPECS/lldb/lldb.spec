@@ -1,14 +1,15 @@
+%global lldb_srcdir llvm-project-llvmorg-%{version}
+
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        12.0.1
-Release:        2%{?dist}
+Version:        17.0.6
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://lldb.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
-Patch1:         0001-Silence-GCC-warnings-about-format-not-being-a-string.patch
+Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
 BuildRequires:  clang-devel = %{version}
 BuildRequires:  cmake
 BuildRequires:  libxml2-devel
@@ -43,8 +44,7 @@ Requires:       python3-six
 The package contains the LLDB Python module.
 
 %prep
-%setup -q -n %{name}-%{version}.src
-%patch1 -p1
+%setup -q -n %{lldb_srcdir}
 
 %build
 # Disable symbol generation
@@ -53,23 +53,32 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 
 mkdir -p build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr           \
-      -DCMAKE_BUILD_TYPE=Release            \
-      -DLLDB_PATH_TO_LLVM_BUILD=%{_prefix}  \
-      -DLLDB_PATH_TO_CLANG_BUILD=%{_prefix} \
-      -DLLVM_DIR=%{_libdir}/cmake/llvm        \
-      -DLLVM_BUILD_LLVM_DYLIB=ON ..         \
-      -DLLDB_DISABLE_LIBEDIT:BOOL=ON        \
-      -DPYTHON_EXECUTABLE:STRING=%{__python3} \
-      -DPYTHON_VERSION_MAJOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.major)") \
-      -DPYTHON_VERSION_MINOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.minor)")
+%cmake -DCMAKE_INSTALL_PREFIX=%{_prefix}     \
+       -DCMAKE_BUILD_TYPE=Release            \
+       -DLLDB_PATH_TO_LLVM_BUILD=%{_prefix}  \
+       -DLLDB_PATH_TO_CLANG_BUILD=%{_prefix} \
+       -DLLVM_DIR=%{_libdir}/cmake/llvm      \
+       -DLLVM_BUILD_LLVM_DYLIB=ON            \
+ 	-DCLANG_LINK_CLANG_DYLIB=ON           \
+	-DLLVM_LINK_LLVM_DYLIB:BOOL=ON        \
+       -DLLDB_DISABLE_LIBEDIT:BOOL=ON        \
+       -DPYTHON_EXECUTABLE:STRING=%{__python3} \
+       -DPYTHON_VERSION_MAJOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.major)") \
+       -DPYTHON_VERSION_MINOR:STRING=$(%{__python3} -c "import sys; print(sys.version_info.minor)") \
+       -Wno-dev ../lldb
 
-make %{?_smp_mflags}
+%cmake_build
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
 cd build
 make DESTDIR=%{buildroot} install
+
+#Remove bundled python-six files
+rm -f %{buildroot}%{python3_sitelib}/six.*
+
+# remove static libraries
+rm -fv %{buildroot}%{_libdir}/*.a
 
 #Remove bundled python-six files
 rm -f %{buildroot}%{python3_sitelib}/six.*
@@ -83,21 +92,23 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 %files
 %defattr(-,root,root)
 %license LICENSE.TXT
-%{_bindir}/*
+%{_bindir}/lldb*
 %{_libdir}/liblldb.so.*
 %{_libdir}/liblldbIntelFeatures.so.*
 
 %files devel
 %defattr(-,root,root)
-%{_libdir}/liblldb.so
-%{_libdir}/liblldbIntelFeatures.so
-%{_includedir}/*
+%{_includedir}/lldb
+%{_libdir}/*.so
 
 %files -n python3-lldb
 %defattr(-,root,root)
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 16 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
+- Upgrade to 17.0.6
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.0.1-2
 - Removing the explicit %%clean stage.
 
