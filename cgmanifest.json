@@ -10901,8 +10901,8 @@
         "type": "other",
         "other": {
           "name": "libsodium",
-          "version": "1.0.18",
-          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz"
+          "version": "1.0.19",
+          "downloadUrl": "https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz"
         }
       }
     },
@@ -27907,8 +27907,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt",
-          "version": "103.0.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.0.1.tar.gz"
+          "version": "103.4.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.1.tar.gz"
         }
       }
     },
@@ -27917,8 +27917,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.0.tar.gz"
         }
       }
     },
