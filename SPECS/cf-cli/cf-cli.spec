@@ -66,7 +66,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
-* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.27-3
+* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.4.0-15
 - Patch CVE-2021-44716
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-14
