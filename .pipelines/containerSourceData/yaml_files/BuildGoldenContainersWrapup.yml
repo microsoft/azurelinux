@@ -18,9 +18,9 @@ stages:
 
     variables:
       ob_outputDirectory: $(Build.ArtifactStagingDirectory)
-      ob_artifactBaseName: build_container_artifacts
+      ob_artifactBaseName: build_golden_container_artifacts
       artifactsDownloadDir: $(Build.Repository.LocalPath)/downloaded-artifacts
-    
+
     steps:
     - ${{ each containerImage in parameters.containerImages }}:
       - task: DownloadPipelineArtifact@2
