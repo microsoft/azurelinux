@@ -1,24 +1,4 @@
-# -*- rpm-spec -*-
-
-# Define mariner version to define mariner-specific settings/changes from
-# fedora spec
-%define mariner 3
-
-
-# This spec file assumes you are building on a Fedora or RHEL version
-# that's still supported by the vendor. It may work on other distros
-# or versions, but no effort will be made to ensure that going forward.
-%define min_rhel 8
-%define min_fedora 37
-
 %define arches_qemu_kvm         %{ix86} x86_64 %{power64} %{arm} aarch64 s390x
-%if 0%{?rhel}
-    %if 0%{?rhel} > 8
-        %define arches_qemu_kvm     x86_64 aarch64 s390x
-    %else
-        %define arches_qemu_kvm     x86_64 %{power64} aarch64 s390x
-    %endif
-%endif
 
 %define arches_64bit            x86_64 %{power64} aarch64 s390x riscv64
 %define arches_x86              %{ix86} x86_64
@@ -26,9 +6,6 @@
 %define arches_systemtap_64bit  %{arches_64bit}
 %define arches_dmidecode        %{arches_x86}
 %define arches_xen              %{arches_x86} aarch64
-%if 0%{?fedora}
-    %define arches_xen          x86_64 aarch64
-%endif
 %define arches_vbox             %{arches_x86}
 %define arches_ceph             %{arches_64bit}
 %define arches_zfs              %{arches_x86} %{power64} %{arm}
@@ -49,11 +26,6 @@
 
 %define with_qemu_tcg      %{with_qemu}
 
-# RHEL disables TCG on all architectures
-%if 0%{?rhel}
-    %define with_qemu_tcg 0
-%endif
-
 %if ! %{with_qemu_tcg} && ! %{with_qemu_kvm}
     %define with_qemu 0
 %endif
@@ -64,45 +36,21 @@
 %define with_esx           0%{!?_without_esx:1}
 %define with_hyperv        0%{!?_without_hyperv:1}
 
-%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly disable curl
 # and enable driver_esx by setting with_esx=0
 %define with_esx           0
-%endif
 
 # Then the secondary host drivers, which run inside libvirtd
 %define with_storage_rbd      0%{!?_without_storage_rbd:1}
 
 %define with_storage_gluster 0%{!?_without_storage_gluster:1}
-%if 0%{?rhel}
-    # Glusterfs has been dropped in RHEL-9, and before that
-    # was only enabled on arches where KVM exists
-    %if 0%{?rhel} > 8
-        %define with_storage_gluster 0
-    %else
-        %ifnarch %{arches_qemu_kvm}
-            %define with_storage_gluster 0
-        %endif
-    %endif
-%endif
 
-# Fedora has zfs-fuse
-%if 0%{?fedora}
-    %define with_storage_zfs      0%{!?_without_storage_zfs:1}
-%else
-    %define with_storage_zfs      0
-%endif
+%define with_storage_zfs      0
 
 %define with_storage_iscsi_direct 0%{!?_without_storage_iscsi_direct:1}
-# libiscsi has been dropped in RHEL-9
-%if 0%{?rhel} > 8
-    %define with_storage_iscsi_direct 0
-%endif
-%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly disable iscsi
 # by setting with_storage_iscsi_direct=0
-    %define with_storage_iscsi_direct 0
-%endif
+%define with_storage_iscsi_direct 0
 
 # Other optional features
 %define with_numactl          0%{!?_without_numactl:1}
@@ -139,74 +87,43 @@
     %define with_storage_rbd 0
 %endif
 
-# RHEL doesn't ship many hypervisor drivers
-%if 0%{?rhel} || 0%{?mariner}
-    %define with_openvz 0
-    %define with_vbox 0
-    %define with_vmware 0
-    %define with_libxl 0
-    %define with_hyperv 0
-    %define with_lxc 0
-%endif
+%define with_openvz 0
+%define with_vbox 0
+%define with_vmware 0
+%define with_libxl 0
+%define with_hyperv 0
+%define with_lxc 0
 
-%if 0%{!?mariner}
-    %define with_firewalld_zone 0%{!?_without_firewalld_zone:1}
-%endif
-
-%if 0%{?rhel} && 0%{?rhel} < 9
-    %define with_netcf 0%{!?_without_netcf:1}
-%endif
-%if 0%{?mariner}
-    %define with_netcf 0
-%endif
+%define with_netcf 0
 
 # fuse is used to provide virtualized /proc for LXC
 %if %{with_lxc}
     %define with_fuse      0%{!?_without_fuse:1}
 %endif
-%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly enable fuse
 # by setting with_fuse=1
-    %define with_fuse 1
-%endif
+%define with_fuse 1
 
 # Enable sanlock library for lock management with QEMU
 # Sanlock is available only on arches where kvm is available for RHEL
-%if 0%{?fedora}
-    %define with_sanlock 0%{!?_without_sanlock:1}
-%endif
-%if 0%{?rhel}
-    %ifarch %{arches_qemu_kvm}
-        %define with_sanlock 0%{!?_without_sanlock:1}
-    %endif
-%endif
-%if 0%{?mariner}
-    %define with_sanlock 0%{!?_without_sanlock:1}
-%endif
+%define with_sanlock 0%{!?_without_sanlock:1}
 
 # Enable libssh2 transport for new enough distros
-%if 0%{?fedora}
-    %define with_libssh2 0%{!?_without_libssh2:1}
-%endif
-%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly enable libssh2
 # by setting with_libssh2=1
-    %define with_libssh2 1
-%endif
+%define with_libssh2 1
 
 # Enable wireshark plugins for all distros
-%if 0%{!?mariner}
-%define with_wireshark 0%{!?_without_wireshark:1}
-%endif
+# bfjelds: to maintain previous mariner settings, explicitly disnable wireshark
+# by setting _with_wireshark=0
+%define with_wireshark 0
 %define wireshark_plugindir %(pkg-config --variable plugindir wireshark)/epan
 
 # Enable libssh transport for all distros
 %define with_libssh 0%{!?_without_libssh:1}
-%if 0%{?mariner}
 # bfjelds: to maintain previous mariner settings, explicitly disable libssh
 # by setting with_libssh=0
-    %define with_libssh 0
-%endif
+%define with_libssh 0
 
 %if %{with_qemu} || %{with_lxc}
 # numad is used to manage the CPU and memory placement dynamically,
@@ -221,20 +138,8 @@
 # Right now that's not the case anywhere, but things should be fine by the time
 # Fedora 40 is released.
 %if %{with_qemu}
-    # rhel-8 lacks pidfd_open
-    %if 0%{?fedora} || 0%{?rhel} >= 9
-        # bfjelds: DO WE NEED THIS TOO???
-        %define with_nbdkit 0%{!?_without_nbdkit:1}
-
-        # setting 'with_nbdkit_config_default' must be done only when compiling
-        # in nbdkit support
-        #
-        # TODO: add RHEL 9 once a minor release that contains the necessary SELinux
-        #       bits exists (we only support the most recent minor release)
-        %if 0%{?fedora} >= 40
-            %define with_nbdkit_config_default 0%{!?_without_nbdkit_config_default:1}
-        %endif
-    %endif
+    # bfjelds: DO WE NEED THIS TOO???
+    # %define with_nbdkit 0%{!?_without_nbdkit:1}
 %endif
 
 %ifarch %{arches_dmidecode}
@@ -242,9 +147,6 @@
 %endif
 
 %define with_modular_daemons 0
-%if 0%{?fedora} || 0%{?rhel} >= 9
-    %define with_modular_daemons 1
-%endif
 
 # Force QEMU to run as non-root
 %define qemu_user  qemu
@@ -260,18 +162,6 @@
 %define with_mingw32 0
 %define with_mingw64 0
 
-%if 0%{?fedora}
-    %if 0%{!?_without_mingw:1}
-        %define with_mingw32 0%{!?_without_mingw32:1}
-        %define with_mingw64 0%{!?_without_mingw64:1}
-    %endif
-
-    # These tell the other mingw macros whether to perform or
-    # skip the 32-bit and 64-bit specific steps respectively
-    %define mingw_build_win32 %{with_mingw32}
-    %define mingw_build_win64 %{with_mingw64}
-%endif
-
 %if !%{with_native}
     # Building the debugsource package apparently only works if the
     # native build is enabled. debuginfo packages don't have this
@@ -279,14 +169,7 @@
     %global debug_package %{nil}
 %endif
 
-# RHEL releases provide stable tool chains and so it is safe to turn
-# compiler warning into errors without being worried about frequent
-# changes in reported warnings
-%if 0%{?rhel}
-    %define enable_werror -Dwerror=true
-%else
-    %define enable_werror -Dwerror=false -Dgit_werror=disabled
-%endif
+%define enable_werror -Dwerror=false -Dgit_werror=disabled
 
 %define tls_priority "@LIBVIRT,SYSTEM"
 
@@ -583,11 +466,7 @@ Requires: dbus
 # For uid creation during pre
 Requires(pre): shadow-utils
 # Needed by /usr/libexec/libvirt-guests.sh script.
-    %if 0%{?fedora}
-Requires: gettext-runtime
-    %else
 Requires: gettext
-    %endif
 
 # Ensure smooth upgrades
 Obsoletes: libvirt-admin < 7.3.0
@@ -808,14 +687,7 @@ multipath storage using device mapper.
 Summary: Storage driver plugin for gluster
 Requires: libvirt-daemon-driver-storage-core = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
-        %if 0%{?fedora} || 0%{?mariner}
 Requires: glusterfs-client >= 2.0.1
-        %endif
-        %if 0%{!?mariner}
-        %if 0%{?fedora} || 0%{?with_storage_gluster}
-Requires: /usr/sbin/gluster
-        %endif
-        %endif
 
 %description daemon-driver-storage-gluster
 The storage driver backend adding implementation of the storage APIs for gluster
@@ -900,11 +772,9 @@ Requires: swtpm-tools
         %if %{with_numad}
 Requires: numad
         %endif
-        %if 0%{?fedora} || 0%{?rhel} >= 9
 # bfjelds: DO WE NEED THIS TOO???
-Recommends: passt
-Recommends: passt-selinux
-        %endif
+# Recommends: passt
+# Recommends: passt-selinux
         %if %{with_nbdkit}
 Recommends: nbdkit
 Recommends: nbdkit-curl-plugin
@@ -1212,16 +1082,6 @@ MinGW Windows libvirt virtualization library.
 %autosetup -S git_am
 
 %build
-%if 0%{?fedora} >= %{min_fedora} || 0%{?rhel} >= %{min_rhel} || 0%{?mariner}
-    %define supported_platform 1
-%else
-    %define supported_platform 0
-%endif
-
-%if ! %{supported_platform}
-echo "This RPM requires either Fedora >= %{min_fedora} or RHEL >= %{min_rhel}"
-exit 1
-%endif
 
 %if %{with_qemu}
     %define arg_qemu -Ddriver_qemu=enabled
