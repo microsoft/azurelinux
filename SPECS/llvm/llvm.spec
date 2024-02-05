@@ -98,7 +98,7 @@ ninja check-all
 
 %changelog
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
-- Readd 'bPF' as target-to-build
+- Re-add 'BPF' as target-to-build
 
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
