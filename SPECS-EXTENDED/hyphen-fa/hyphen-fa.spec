@@ -20,7 +20,7 @@ Farsi hyphenation rules.
 
 %prep
 %setup -q -n fahyph
-%patch0 -p1 -b .clean
+%patch 0 -p1 -b .clean
 cp %{SOURCE1} ./LICENSE.txt
 
 %build

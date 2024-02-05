@@ -67,7 +67,7 @@ contains the python3 version of this module.
 
 %prep
 %setup -q -n mongo-python-driver-%{version}
-%patch01 -p1 -b .ssl
+%patch 01 -p1 -b .ssl
 
 # Remove the bundled ssl.match_hostname library as it was vulnerable to CVE-2013-7440
 # and CVE-2013-2099, and isn't needed anyway since Fedora >= 22 has the needed module in the Python

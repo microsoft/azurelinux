@@ -83,7 +83,7 @@ bound to Python and was later bound to Ruby.
 # Unbundled libyaml, the source files are the same as in libyaml-0.2.2
 # It was determined by comparing commits in upstream repo:
 # https://github.com/yaml/libyaml/
-%patch0 -p1 -b .orig
+%patch 0 -p1 -b .orig
 for file in api.c dumper.c emitter.c loader.c parser.c reader.c scanner.c \
     writer.c yaml.h yaml_private.h; do
     rm LibYAML/$file

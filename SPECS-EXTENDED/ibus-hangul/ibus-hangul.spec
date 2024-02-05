@@ -36,7 +36,7 @@ libhangul.
 
 %prep
 %setup -q
-%patch1 -p1 -b .setup-abspath
+%patch 1 -p1 -b .setup-abspath
 
 # autopoint -f
 # AUTOPOINT='intltoolize --automake --copy' autoreconf -fi

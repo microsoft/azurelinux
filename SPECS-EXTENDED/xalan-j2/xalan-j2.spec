@@ -136,10 +136,10 @@ This package contains demonstration and sample files for Xalan.
 %setup -q -n xalan-j_%{cvs_version}
 patch -u %{SOURCE5} -i %{SOURCE6}
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 # Remove all binary libs, except ones needed to build docs and N/A elsewhere.
 for j in $(find . -name "*.jar"); do
         mv $j $j.no

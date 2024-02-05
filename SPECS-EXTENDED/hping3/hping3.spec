@@ -31,13 +31,13 @@ Since version 3, hping implements scripting capabilties
 %prep
 
 %setup -q -n hping3-20051105
-%patch0  -b .include
-%patch1  -b .bytesex
-%patch2 -p1 -b .getifnamedebug
-%patch3  -b .cflags
-%patch4  -b .man
-%patch5 -p1
-%patch6 -p1 -b .common
+%patch 0  -b .include
+%patch 1  -b .bytesex
+%patch 2 -p1 -b .getifnamedebug
+%patch 3  -b .cflags
+%patch 4  -b .man
+%patch 5 -p1
+%patch 6 -p1 -b .common
 
 %build
 %configure --force-libpcap

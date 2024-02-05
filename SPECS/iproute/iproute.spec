@@ -37,7 +37,7 @@ you will need to install %{name}-devel.
 sed -i /ARPD/d Makefile
 sed -i 's/arpd.8//' man/man8/Makefile
 sed -i 's/m_ipt.o//' tc/Makefile
-%patch0 -p1
+%patch 0 -p1
 
 %build
 # Not an autoconf configure file

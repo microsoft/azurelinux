@@ -22,7 +22,7 @@ of filenames, e.g. from Latin1 to UTF-8.
 
 %prep
 %setup -q
-%patch0 -p1 -b .preserve-timestamps
+%patch 0 -p1 -b .preserve-timestamps
 tar -xf testsuite.tar
 
 %build

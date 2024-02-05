@@ -27,7 +27,7 @@ use this application.
 
 %prep
 %setup -q
-%patch0 -p1 -b .cflags
+%patch 0 -p1 -b .cflags
 
 %build
 # can't use smp_flags because -j4 makes the build fail

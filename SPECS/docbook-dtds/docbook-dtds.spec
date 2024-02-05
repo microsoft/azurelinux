@@ -91,25 +91,25 @@ eval mkdir %{version_list}
 # DocBook V3.0
 cd 3.0-sgml
 unzip %{SOURCE0}
-%patch0  -b docbook.cat
+%patch 0  -b docbook.cat
 cd ..
 
 # DocBook V3.1
 cd 3.1-sgml
 unzip %{SOURCE1}
-%patch1  -b docbook.cat
+%patch 1  -b docbook.cat
 cd ..
 
 # DocBook V4.0
 cd 4.0-sgml
 unzip %{SOURCE2}
-%patch2  -b docbook.cat
+%patch 2  -b docbook.cat
 cd ..
 
 # DocBook V4.1
 cd 4.1-sgml
 unzip %{SOURCE3}
-%patch3  -b docbook.cat
+%patch 3  -b docbook.cat
 cd ..
 
 # DocBook XML V4.1.2
@@ -120,7 +120,7 @@ cd ..
 # DocBook V4.2
 cd 4.2-sgml
 unzip %{SOURCE5}
-%patch4  -b docbook.cat
+%patch 4  -b docbook.cat
 cd ..
 
 # DocBook XML V4.2
@@ -199,16 +199,16 @@ unzip %{SOURCE20}
 cd ..
 
 # Fix &euro; in SGML.
-%patch5 -p1
+%patch 5 -p1
 
 # Fix ISO entities in 4.3/4.4/4.5 SGML
-%patch6 -p1
+%patch 6 -p1
 
 # Rewrite SYSTEM to use local catalog instead web ones (#478680)
-%patch7 -p1
+%patch 7 -p1
 
 # Add XML to the end of public identificators of 4.1.2 XML entities
-%patch8 -p1
+%patch 8 -p1
 
 # Increase NAMELEN (bug #36058, bug #159382).
 sed -e's,\(NAMELEN\s\+\)44\(\s\*\)\?,\1256,' -i.namelen */docbook.dcl

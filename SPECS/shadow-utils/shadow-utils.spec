@@ -70,9 +70,9 @@ Libraries and headers for libsubid
 
 %prep
 %setup -q -n shadow-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 autoreconf -fiv
 

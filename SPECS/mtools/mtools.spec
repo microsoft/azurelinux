@@ -25,7 +25,7 @@ Mtools should be installed if you need to use MS-DOS disks
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .conf
+%patch 0 -p1 -b .conf
 
 %build
 autoreconf -fiv

@@ -20,8 +20,8 @@ Intel SGPIO enclosure management utility
 %prep
 %setup -q -n sgpio
 dos2unix --keepdate Makefile README
-%patch0 -p1 -b .makefile
-%patch1 -p1 -b .coverity
+%patch 0 -p1 -b .makefile
+%patch 1 -p1 -b .coverity
 chmod a-x *
 
 %build

@@ -125,7 +125,7 @@ reach the latter goal it was written in C.
 perl -pi -e 's|^#!/opt/bin/perl|#!/usr/bin/perl|' eg/*
 
 # Skip the signature check as we've tweaked some files
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"

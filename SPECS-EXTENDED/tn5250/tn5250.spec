@@ -40,7 +40,7 @@ Libraries and header files to use with lib5250.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fedora
+%patch 0 -p1 -b .fedora
 
 autoreconf -vfi
 

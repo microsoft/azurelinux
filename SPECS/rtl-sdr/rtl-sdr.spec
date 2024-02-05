@@ -27,7 +27,7 @@ Development files for rtl-sdr.
 
 %prep
 %setup -q -n librtlsdr-%{version}
-%patch0 -p1
+%patch 0 -p1
 rm -f src/getopt/*
 rmdir src/getopt
 

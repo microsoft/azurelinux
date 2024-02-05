@@ -45,7 +45,7 @@ protocols should be able to share.
 
 %prep
 %setup -q -n Authen-SASL-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 # Remove bundled libraries
 rm -r inc

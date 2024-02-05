@@ -22,7 +22,7 @@ tables, and the ability to convert MBR disks to GPT format.
 
 %prep
 %setup -q -n gptfdisk-%{version}
-%patch0 -p1 -b .orig
+%patch 0 -p1 -b .orig
 
 %build
 make CXXFLAGS="%{optflags} -D_FILE_OFFSET_BITS=64" LDFLAGS="%{build_ldflags}"

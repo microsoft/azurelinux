@@ -120,12 +120,12 @@ find . -name "*.jar" -exec rm -f {} \;
 find . -name "*.exe" -exec rm -f {} \;
 find . -name "*.dll" -exec rm -f {} \;
 find . -name Makefile.in | xargs chmod 0644
-%patch0
+%patch 0
 cp -p %{SOURCE1} build.xml
 #Fix the source so that it compiles with GCC 4.5
-%patch1 -p1
+%patch 1 -p1
 #Ensure that the manuals are installed in the correct openSUSE docpath
-%patch2
+%patch 2
 # check for license problematic files:
 find | grep "\(ShowString.java$\|StreamConverter.java$\)" && exit 42 || :
 

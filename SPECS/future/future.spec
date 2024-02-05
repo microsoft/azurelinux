@@ -59,11 +59,11 @@ Obsoletes: python34-%{name} < 0:%{version}-%{release}
 %prep
 %setup -q -n python-future-%{version}
 
-%patch0 -p1 -b .backup
-%patch1 -p1 -b .backup
+%patch 0 -p1 -b .backup
+%patch 1 -p1 -b .backup
 %if 0%{?python3_version_nodots} >= 311
-%patch2 -p1 -b .backup
-%patch3 -p1 -b .backup
+%patch 2 -p1 -b .backup
+%patch 3 -p1 -b .backup
 %endif
 
 find . -name '*.py' | xargs %{_pathfix} -pn -i "%{__python3}"

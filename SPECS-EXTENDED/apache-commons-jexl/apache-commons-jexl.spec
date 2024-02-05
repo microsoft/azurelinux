@@ -58,9 +58,9 @@ This package contains the API documentation for %{name}.
 cp %{SOURCE1} .
 cp %{SOURCE2} .
 cp %{SOURCE3} jexl2-compat/build.xml
-%patch0 -p1 -b .test
-%patch1 -p1 -b .javadoc
-%patch2 -p1
+%patch 0 -p1 -b .test
+%patch 1 -p1 -b .javadoc
+%patch 2 -p1
 
 # Java 1.6 contains bsf 3.0, so we don't need the dependency in the pom.xml file
 %pom_remove_dep org.apache.bsf:bsf-api

@@ -31,7 +31,7 @@ status of East Asian characters, as specified in
 
 %prep
 %setup -q -n Unicode-EastAsianWidth-%{version}
-%patch0 -p1 -b .noinc
+%patch 0 -p1 -b .noinc
 rm -rf inc/*
 
 %build

@@ -83,12 +83,12 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 
 %prep
 %setup -q -n develop
-%patch1 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 3 -p1
 # remove all binary files
 find -name "*.class" -delete
 find -name "*.jar" -delete
-%patch4 -p1
+%patch 4 -p1
 perl -pi -e 's/1\.2/1.6/g' build.xml
 mkdir -p classes dist
 cp %{SOURCE2} license.txt

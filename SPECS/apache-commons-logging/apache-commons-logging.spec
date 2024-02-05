@@ -56,9 +56,9 @@ logging implementation.
 
 %prep
 %setup -q -n %{short_name}-%{version}-src
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 sed -i 's/\r//' RELEASE-NOTES.txt LICENSE.txt
 

@@ -71,7 +71,7 @@ JAXP specification (SAX part), only without the javaness.
 
 %prep
 %setup -q -n XML-SAX-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 echo N | %{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1

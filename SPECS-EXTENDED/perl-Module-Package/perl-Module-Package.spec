@@ -35,7 +35,7 @@ Module::Install does, but just a bit better.
 
 %prep
 %setup -q -n Module-Package-%{version}
-%patch0 -p1
+%patch 0 -p1
 # XXX: Do not unbundle ./inc/ because of bootstrap
 
 %build

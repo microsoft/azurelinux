@@ -72,7 +72,7 @@ on system restart.
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

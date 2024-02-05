@@ -68,8 +68,8 @@ another library.
 
 %prep
 %setup -q
-%patch0
-%patch1 -p1
+%patch 0
+%patch 1 -p1
 # remove all binary libs
 rm -f lib/*.jar
 # maven plugin

@@ -45,7 +45,7 @@ applications that run under EFI (Extensible Firmware Interface).
 
 %prep
 %setup -q -n gnu-efi-%{version}
-%patch0001 -p1
+%patch 0001 -p1
 
 %build
 # Remove gcc's ldflags because gnu-efi uses ld directly.

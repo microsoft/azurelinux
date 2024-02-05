@@ -24,7 +24,7 @@ fabric software library.
 
 %prep
 %setup -q -n %{name}-%{version}%{__rc}
-%patch0 -p2
+%patch 0 -p2
 
 %build
 %configure --with-valgrind

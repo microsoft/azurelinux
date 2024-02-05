@@ -30,7 +30,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch0
+%patch 0
 
 rm -rf sqlite3
 

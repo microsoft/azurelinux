@@ -53,7 +53,7 @@ might as well use it directly.
 
 # We need to patch the test suite if we have old versions of Test::More
 %if %{old_test_more}
-%patch1
+%patch 1
 %endif
 
 %build

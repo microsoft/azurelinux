@@ -33,7 +33,7 @@ much as possible.
 %prep
 %setup -q
 
-%patch0 -p1
+%patch 0 -p1
 rm -rf go.mod
 mv vendor %{_builddir}/src
 mkdir -p "%{_builddir}/src/github.com/go-delve/"

@@ -97,11 +97,11 @@ QPDF Manual
 %setup -q
 
 # fix 'complete manual location' note in man pages
-%patch0 -p1 -b .doc
+%patch 0 -p1 -b .doc
 %ifarch aarch64
-%patch2 -p1 -b .erase-tests-with-generated-object-stream
+%patch 2 -p1 -b .erase-tests-with-generated-object-stream
 %endif
-%patch3 -p1 -b .relax
+%patch 3 -p1 -b .relax
 
 %build
 # work-around check-rpaths errors

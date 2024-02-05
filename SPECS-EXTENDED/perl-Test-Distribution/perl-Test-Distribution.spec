@@ -47,7 +47,7 @@ that they all define a $VERSION.
 %setup -q -n Test-Distribution-%{version}
 
 # Fix character encoding of documentation
-%patch0
+%patch 0
 
 %build
 perl Build.PL --installdirs=vendor

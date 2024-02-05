@@ -61,8 +61,8 @@ Summary: Documentation and examples for building app that use %{name}
 
 %prep
 %setup -q -n openexr-%{version}
-%patch0 -p2 -b .bigendian
-%patch1 -p2 -b .tests
+%patch 0 -p2 -b .bigendian
+%patch 1 -p2 -b .tests
 
 
 %build

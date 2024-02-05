@@ -21,7 +21,7 @@ command-line frontend, parted, which can also be used in scripts.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 #Add a header to allow building with glibc-2.28 or later

@@ -43,9 +43,9 @@ commands.
 %prep
 %setup -q -n acct-%{version}
 
-%patch1 -p1 -b .subsubsec
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1 -b .subsubsec
+%patch 2 -p1
+%patch 3 -p1
 
 # fixing 'gets' undeclared
 sed -i 's|.*(gets,.*||g' lib/stdio.in.h

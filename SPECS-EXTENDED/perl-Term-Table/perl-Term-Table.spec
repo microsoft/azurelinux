@@ -63,7 +63,7 @@ This Perl module is able to format rows of data into tables.
 
 %prep
 %setup -q -n Term-Table-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Delete bundled Object::HashBase
 for F in lib/Term/Table/HashBase.pm t/HashBase.t; do
     perl -e 'unlink $ARGV[0] or die $!' "$F"

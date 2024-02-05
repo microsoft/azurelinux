@@ -35,7 +35,7 @@ port (generally in the init script).
 %setup -q
 
 # Avoid a race during start-up if there are no configured ports (bug #1034139).
-%patch1 -p1 -b .pid-file
+%patch 1 -p1 -b .pid-file
 
 %build
 %configure --sbindir=/sbin

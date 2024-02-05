@@ -26,10 +26,10 @@ developing applications that use libieee1284.
 %prep
 %setup -q
 # Fixed strict aliasing warnings (bug #605170).
-%patch1 -p1 -b .strict-aliasing
+%patch 1 -p1 -b .strict-aliasing
 
 # Add support for building on aarch64 (bug #925774).
-%patch2 -p1 -b .aarch64
+%patch 2 -p1 -b .aarch64
 
 %build
 touch doc/interface.xml

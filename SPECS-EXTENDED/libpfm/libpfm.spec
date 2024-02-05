@@ -67,7 +67,7 @@ Python bindings for libpfm4 and perf_event_open system call.
 
 %prep
 %setup -q
-%patch2 -p1 -b .python3
+%patch 2 -p1 -b .python3
 
 %build
 %if %{with python}

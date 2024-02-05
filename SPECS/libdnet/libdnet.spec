@@ -22,7 +22,7 @@ It contains the libraries and header files to create applications.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 ./configure --prefix=/usr "CFLAGS=-fPIC" \

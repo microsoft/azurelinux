@@ -85,8 +85,8 @@ This package provides integration scripts for grub2 bootloader.
 %prep
 %setup -n boom-%{version}
 # NOTE: Do not use backup extension - MANIFEST.in is picking them
-%patch1 -p1
-%patch2 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %if 0%{?sphinx_docs}

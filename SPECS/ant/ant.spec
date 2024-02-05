@@ -98,9 +98,9 @@ find -name build.xml -o -name pom.xml | xargs sed -i -e s/-SNAPSHOT//
 find -name \*.jar -print -delete
 
 # When bootstrapping, we don't have junit
-%patch0 -p1
+%patch 0 -p1
 # Explicitly set sourcepath when compiling bootstrap
-%patch1 -p1
+%patch 1 -p1
 
 # clean jar files
 find . -name "*.jar" -print -delete

@@ -44,7 +44,7 @@ you will need to install %{name}-devel.
 %prep
 %setup -q -n %{name}-%{longver}
 
-%patch1 -p1 -b .soname
+%patch 1 -p1 -b .soname
 
 %build
 # The -pthread flag issue has been submitted upstream:

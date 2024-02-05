@@ -53,9 +53,9 @@ but that don't need to be included in main package.
 
 %prep
 %setup -q
-%patch0 -p1 -b .umask
-%patch1 -p1 -b .xmldir
-%patch2 -p1 -b .quotes
+%patch 0 -p1 -b .umask
+%patch 1 -p1 -b .xmldir
+%patch 2 -p1 -b .quotes
 
 # replace bogus links with files
 automakedir=`ls -1d /usr/share/automake* | head -n +1`

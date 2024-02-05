@@ -60,8 +60,8 @@ Install the %{name}-text package if you need to access IBM hosts using an IBM
 
 %prep
 %setup -q -n suite3270-%{majorver}
-%patch0 -p1 -b .paths
-%patch1 -p1 -b .ibmhosts
+%patch 0 -p1 -b .paths
+%patch 1 -p1 -b .ibmhosts
 
 for d in c3270 pr3287 s3270 x3270; do
     for f in LICENSE README html; do

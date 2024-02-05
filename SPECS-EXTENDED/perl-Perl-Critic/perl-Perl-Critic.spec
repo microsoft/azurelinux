@@ -127,10 +127,10 @@ of Perl code were mixed directly in the test script. That sucked.
 %setup -q -n Perl-Critic-%{version}
 
 # Switch spell checker tool from aspell to hunspell
-%patch0 -p1
+%patch 0 -p1
 
 # Fix shellbang in ppidump tool
-%patch3
+%patch 3
 
 # Drop exec bits from samples/docs to avoid dependency bloat
 find tools examples -type f -exec chmod -c -x {} ';'

@@ -114,13 +114,13 @@ This package provides the development files for dovecot.
 
 %prep
 %setup -q -n %{name}-%{version}%{?prever} -a 8
-%patch1 -p1 -b .default-settings
-%patch2 -p1 -b .mkcert-permissions
-%patch3 -p1 -b .mkcert-paths
-%patch6 -p1 -b .waitonline
-%patch8 -p1 -b .initbysystemd
-%patch9 -p1 -b .systemd_w_protectsystem
-%patch15 -p1 -b .bigkey
+%patch 1 -p1 -b .default-settings
+%patch 2 -p1 -b .mkcert-permissions
+%patch 3 -p1 -b .mkcert-paths
+%patch 6 -p1 -b .waitonline
+%patch 8 -p1 -b .initbysystemd
+%patch 9 -p1 -b .systemd_w_protectsystem
+%patch 15 -p1 -b .bigkey
 
 #pushd dovecot-2*3-pigeonhole-%{pigeonholever}
 #popd

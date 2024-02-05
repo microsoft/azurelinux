@@ -42,7 +42,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n calendar-%{version}
-%patch1 -p1
+%patch 1 -p1
 
 
 %build

@@ -61,7 +61,7 @@ This package contains the dynamic libraries for dietlibc.
 %prep
 %setup -q
 
-%patch1
+%patch 1
 
 %if %{without ssp}
 sed -i -e 's!^#define WANT_SSP$!// \0!g;

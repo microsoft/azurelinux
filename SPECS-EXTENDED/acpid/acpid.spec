@@ -34,7 +34,7 @@ acpid is a daemon that dispatches ACPI events to user-space programs.
 
 %prep
 %setup -q
-%patch0 -p1 -b .kacpimon-dynamic-connections
+%patch 0 -p1 -b .kacpimon-dynamic-connections
 
 %build
 %configure

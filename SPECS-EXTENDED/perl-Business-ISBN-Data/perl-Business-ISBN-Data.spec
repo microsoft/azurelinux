@@ -41,7 +41,7 @@ Most of the interesting stuff is in Business::ISBN.
 %setup -q -n Business-ISBN-Data-%{version}
 
 # Fix shellbang and script permissions for make_data.pl
-%patch0
+%patch 0
 chmod -c +x make_data.pl
 
 %build

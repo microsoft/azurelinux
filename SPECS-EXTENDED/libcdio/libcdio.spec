@@ -39,7 +39,7 @@ This package contains header files and libraries for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 iconv -f ISO88591 -t utf-8 -o THANKS.utf8 THANKS && mv THANKS.utf8 THANKS
 

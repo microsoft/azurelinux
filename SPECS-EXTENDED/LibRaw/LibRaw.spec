@@ -58,8 +58,8 @@ LibRaw sample programs
 %prep
 %setup -q
 
-%patch0 -p0 -b .pkgconfig
-%patch1 -p1 -b .cve-2020-15503
+%patch 0 -p0 -b .pkgconfig
+%patch 1 -p1 -b .cve-2020-15503
 
 %build
 autoreconf -if

@@ -40,12 +40,12 @@ This module contains python3 bindings.
 %prep
 %setup -q -n %{srcname}-%{version}-0
 chmod -x examples/*.py
-%patch0 -p1 -b .no-init
-%patch1 -p1 -b .clean-sockets
-%patch2 -p0 -b .ipv6
-%patch3 -p0 -b .sha-deprecation
-%patch4 -p1 -b .proxy
-%patch5 -p1 -b .python3
+%patch 0 -p1 -b .no-init
+%patch 1 -p1 -b .clean-sockets
+%patch 2 -p0 -b .ipv6
+%patch 3 -p0 -b .sha-deprecation
+%patch 4 -p1 -b .proxy
+%patch 5 -p1 -b .python3
 
 mv %{SOURCE1} ./LICENSE.txt
 

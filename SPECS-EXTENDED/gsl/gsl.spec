@@ -31,9 +31,9 @@ developing programs using the GSL (GNU Scientific Library).
 
 %prep
 %setup -q
-%patch0 -p1 -b .lib64
-%patch1 -p1 -b .tol
-%patch2 -p1 -b .test
+%patch 0 -p1 -b .lib64
+%patch 1 -p1 -b .tol
+%patch 2 -p1 -b .test
 
 iconv -f windows-1252 -t utf-8 THANKS  > THANKS.aux
 touch -r THANKS THANKS.aux

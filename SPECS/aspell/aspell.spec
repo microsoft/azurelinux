@@ -45,10 +45,10 @@ and header files needed for Aspell development.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fc
-%patch1 -p1 -b .mlib
-%patch2 -p1 -b .ai
-%patch3 -p1 -b .obs
+%patch 0 -p1 -b .fc
+%patch 1 -p1 -b .mlib
+%patch 2 -p1 -b .ai
+%patch 3 -p1 -b .obs
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
 mv manual/aspell.info.aux manual/aspell.info
 

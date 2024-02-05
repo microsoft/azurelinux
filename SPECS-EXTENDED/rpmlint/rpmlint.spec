@@ -62,8 +62,8 @@ and source packages as well as spec files can be checked.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
-%patch199 -p1
-%patch212 -p1
+%patch 199 -p1
+%patch 212 -p1
 
 
 # Remove binary write mode

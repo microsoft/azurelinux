@@ -99,7 +99,7 @@ surrounding scope.
 %setup -q -n B-Hooks-EndOfScope-%{version}
 
 # Remove shellbangs from tests to placate rpmlint
-%patch0
+%patch 0
 
 # British-English spelling LICENCE upsets US spell checker
 echo LICENCE >> xt/author/pod-spell.t

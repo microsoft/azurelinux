@@ -49,7 +49,7 @@ Manual and sample code for %{name}.
 
 %prep
 %setup -q -n %{project_folder}
-%patch0 -p1 -b .fix-for-java-11-openjdk
+%patch 0 -p1 -b .fix-for-java-11-openjdk
 
 dos2unixConversion() {
         fileName=$1

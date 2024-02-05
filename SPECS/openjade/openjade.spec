@@ -42,12 +42,12 @@ XML, RTF, TeX, MIF (FrameMaker), SGML, or XML.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1 -b .deplibs
-%patch3 -p1 -b .nola
-%patch4 -p1 -b .gcc46
-%patch5 -p1 -b .getopt
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1 -b .deplibs
+%patch 3 -p1 -b .nola
+%patch 4 -p1 -b .gcc46
+%patch 5 -p1 -b .getopt
 
 
 %build

@@ -86,8 +86,8 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n Coro-Multicore-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 export CORO_MULTICORE_CHECK=0 PERL_CANARY_STABILITY_NOPROMPT=1

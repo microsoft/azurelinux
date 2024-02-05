@@ -53,7 +53,7 @@ allows you to build rules that specify the desired files and directories.
 %setup -qn File-Find-Object-Rule-%{version}
 
 # Avoid use of /usr/bin/env
-%patch0
+%patch 0
 
 %build
 perl Build.PL --installdirs=vendor

@@ -77,7 +77,7 @@ kured container in a kubernetes cluster.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 # create vendor folder from the vendor tarball and set vendor mode

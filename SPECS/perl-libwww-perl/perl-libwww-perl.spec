@@ -144,7 +144,7 @@ use and even classes that help you implement simple HTTP servers.
 
 %prep
 %setup -q -n libwww-perl-%{version} 
-%patch0 -p1
+%patch 0 -p1
 %if !%{with perl_libwww_perl_enables_internet_test}
 rm t/leak/no_leak.t t/redirect.t
 perl -i -ne 'print $_ unless m{^(?:t/leak/no_leak\.t|t/redirect\.t)}' MANIFEST
