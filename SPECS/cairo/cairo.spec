@@ -7,12 +7,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://cairographics.org
+# Including additional URL that points directly to the source code. Source repo was difficult to locate.
+#URL:           https://gitlab.freedesktop.org/cairo/cairo
 Source0:        https://cairographics.org/releases/%{name}-%{version}.tar.xz
 
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkgconfig(expat)
 BuildRequires:  pkgconfig(pixman-1)
@@ -23,6 +24,10 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(xcb-render)
 BuildRequires:  pkgconfig(xrender)
+Requires:       expat
+Requires:       glib
+Requires:       libpng
+Requires:       pixman
 
 %description
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -37,6 +42,10 @@ Summary:        Development files for cairo
 License:        (LGPLv2 OR MPLv1.1) AND MIT AND Public Domain
 
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       fontconfig-devel
+Requires:       freetype-devel
+Requires:       libpng-devel
+Requires:       pixman-devel
 
 %description    devel
 Cairo is a 2D graphics library designed to provide high-quality display
@@ -91,16 +100,18 @@ This package contains tools for working with the cairo graphics library.
 %build
 
 %meson \
+  -Dglib=enabled \
+  -Dgtk_doc=false \
+  -Dsymbol-lookup=disabled \
   -Dfreetype=enabled \
   -Dfontconfig=enabled \
-  -Dglib=enabled \
-  -Dgtk_doc=true \
+  -Dpng=enabled \
   -Dspectre=disabled \
-  -Dsymbol-lookup=disabled \
   -Dtee=enabled \
   -Dtests=disabled \
   -Dxcb=enabled \
   -Dxlib=enabled \
+  -Dzlib=enabled \
   %{nil}
 %meson_build
 %install
@@ -144,7 +155,6 @@ This package contains tools for working with the cairo graphics library.
 %{_libdir}/pkgconfig/cairo-script.pc
 %{_libdir}/pkgconfig/cairo-xcb-shm.pc
 %{_libdir}/pkgconfig/cairo-xcb.pc
-%{_datadir}/gtk-doc/html/cairo
  
 %files gobject
 %{_libdir}/libcairo-gobject.so.2*
@@ -155,12 +165,21 @@ This package contains tools for working with the cairo graphics library.
 %{_libdir}/pkgconfig/cairo-gobject.pc
  
 %files tools
+%license util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
 %{_bindir}/cairo-trace
 %{_libdir}/cairo/
  
 %changelog
 * Mon Jan 29 2024 Sean Dougherty <sdougherty@microsoft.com> - 1.18.0-1
 - Upgrading to 1.18.0 for Mariner 3.0
+- License verified
+- Added png=enabled to add support for png, and to continue support for svg surfaces
+- Added zlib=enabled to continue supporting pdf surfaces, as well as adding support for script, ps, and xml surfaces 
+- Added glib=enabled to continue supporting gobject subpackages
+- Prefer_static is defaulted to False by meson, so the configure flag has been removed
+- The win32 and gobject flags are not present in meson, so they have been removed
+- Added spectre=disabled to configuration
+- Used Fedora 40 spec (license: MIT) for guidance
 
 * Wed Oct 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.17.4-3
 - Adding X components from "UI-cairo".
