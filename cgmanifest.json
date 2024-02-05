@@ -28467,8 +28467,8 @@
         "type": "other",
         "other": {
           "name": "systemtap",
-          "version": "4.5",
-          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-4.5.tar.gz"
+          "version": "5.14",
+          "downloadUrl": "https://sourceware.org/systemtap/ftp/releases/systemtap-0.5.14.tar.gz"
         }
       }
     },

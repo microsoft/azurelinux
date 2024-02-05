@@ -8,8 +8,8 @@
 %define        with_sqlite    1
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
-Version:        4.5
-Release:        3%{?dist}
+Version:        5.14
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -349,6 +349,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.14-1
+- Auto-upgrade to 5.14 - Dependency for tuned package
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
