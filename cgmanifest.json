@@ -29603,7 +29603,7 @@
         "other": {
           "name": "xdp-tools",
           "version": "1.4.2",
-          "downloadUrl": "https://github.com/xdp-project/xdp-tools/archive/refs/tags/v1.4.1.tar.gz"
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/releases/download/v1.4.2/xdp-tools-1.4.2.tar.gz"
         }
       }
     },

@@ -146,7 +146,7 @@ make install V=1
 %changelog
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.2-1
 - Upgrade to version 1.4.2
-- Fixes for building with clang/llvm 17.x
+- Builds with clang/llvm 17.x
 
 * Mon Jan 29 2024 Kanika Nema <kanikanema@microsoft.com> 1.4.1-2
 - Initial CBL-Mariner import from Fedora 40 (license: MIT)
