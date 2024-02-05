@@ -22974,8 +22974,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "0.8.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-0.8.3.tar.gz"
+          "version": "3.0.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ef/c8/f0173fe3bf85fd891aee2e7bcd8207dfe26c2c683d727c5a6cc3aec7b628/mistune-3.0.2.tar.gz"
         }
       }
     },
