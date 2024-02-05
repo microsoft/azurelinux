@@ -51,7 +51,7 @@ License:        GPLv2 and GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            http://sourceforge.net/projects/linuxquota/
-Source0:        http://downloads.sourceforge.net/linuxquota/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/project/linuxquota/quota-tools/%{version}/%{name}-%{version}.tar.gz
 Source1:        quota_nld.service
 Source2:        quota_nld.sysconfig
 Source3:        rpc-rquotad.service

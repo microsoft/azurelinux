@@ -25005,7 +25005,7 @@
         "other": {
           "name": "quota",
           "version": "4.09",
-          "downloadUrl": "http://downloads.sourceforge.net/linuxquota/quota-4.09.tar.gz"
+          "downloadUrl": "https://downloads.sourceforge.net/project/linuxquota/quota-tools/4.09/quota-4.09.tar.gz"
         }
       }
     },
