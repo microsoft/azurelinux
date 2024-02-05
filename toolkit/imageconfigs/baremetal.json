@@ -57,6 +57,11 @@
             "KernelOptions": {
                 "default": "kernel"
             },
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]
