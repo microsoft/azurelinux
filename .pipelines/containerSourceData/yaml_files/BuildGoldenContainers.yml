@@ -371,7 +371,7 @@ stages:
           definition: $(baseContainersPipelineId)
           buildVersionToDownload: specific
           pipelineId: $(baseContainersBuildId)
-          artifactName: $(artifactName)
+          artifactName: $(containerArtifactName)
           itemPattern: $(containerArtifactDir)/$(baseContainerFile)
           targetPath: $(artifactsDownloadDir)
         condition: eq(variables['proceed'], 'true')
