@@ -11,6 +11,8 @@ import sys
 
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
+# Checking for the deprecated '%patch[number]' format.
+# For more info, see: https://rpm-software-management.github.io/rpm/manual/spec.html.
 invalid_patch_macro_regex = re.compile(
     r'^\s*%patch\d', re.MULTILINE)
 
