@@ -156,7 +156,7 @@
 %define qemu_moddir %{_libdir}/qemu
 %define qemu_datadir %{_datadir}/qemu
 
-# Native / MinGW builds
+# Native builds
 %define with_native 0%{!?_without_native:1}
 
 %if !%{with_native}
