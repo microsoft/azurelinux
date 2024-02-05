@@ -25,7 +25,6 @@ BuildRequires: python3-configobj
 BuildRequires: python3-dbus
 BuildRequires: python3-decorator
 BuildRequires: python3-pyudev
-BuildRequires: systemtap-sdt-devel
 
 Requires: dbus
 Requires: ethtool
