@@ -30,9 +30,7 @@ Requires: xz
 %define OUR_GOPATH  %{_topdir}/.gopath
 
 %prep
-%autosetup -N -n %{upstream_name}-%{version}
-%patch 0 -p1
-%patch 1 -p1 -d vendor/github.com/prometheus/client_golang
+%autosetup -p1 -n %{upstream_name}-%{version}
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
 ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
 
