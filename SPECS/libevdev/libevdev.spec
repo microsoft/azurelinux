@@ -1,6 +1,6 @@
 Summary:        Kernel Evdev Device Wrapper Library
 Name:           libevdev
-Version:        1.9.1
+Version:        1.13.1
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ Utilities to handle and/or debug evdev devices.
 %{_bindir}/libevdev-tweak-device
 
 %changelog
+* Mon Feb 05 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.13.1
+- Upgrade to 1.13.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.9.1-7
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
