@@ -24,7 +24,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  python-flit_core
+BuildRequires:  python-flit-core
 Requires:       python3
 
 %description -n python3-urllib3
