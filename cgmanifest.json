@@ -25866,7 +25866,7 @@
         "other": {
           "name": "rubygem-ffi",
           "version": "1.16.3",
-          "downloadUrl": "https://github.com/ffi/ffi/archive/refs/tags/v1.16.3.tar.gz"
+          "downloadUrl": "https://rubygems.org/gems/ffi-1.16.3.gem"
         }
       }
     },

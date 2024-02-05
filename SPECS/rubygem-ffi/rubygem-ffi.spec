@@ -11,13 +11,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://github.com/ffi/ffi
-Source0:        https://github.com/ffi/ffi/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-# The default build steps are relying on building from within upstream's git repository,
-# which have valid .git directories as well as a 'libffi' submodule pointing to the 'libffi' repository.
-# This is done to enable a built-in version of libffi.
-# We want to use our version of 'libffi' and we don't have upstream's git repository, so
-# we can safely remove the code responsible for the built-in 'libffi'.
-Patch0:         disable-built-in-libffi.patch
+# Using the source code from the gem to include the 'libffi' submodule.
+# The upstream depends on the existence of the 'libffi' submodule, even
+# if the system's version of 'libffi' ends up being used.
+# Submodules are not included in GitHub release tarballs.
+Source0:        https://rubygems.org/gems/%{gem_name}-%{version}.gem
 
 BuildRequires:  git
 BuildRequires:  libffi-devel
@@ -37,7 +35,7 @@ a Ruby-FFI extension works without changes on CRuby (MRI), JRuby, Rubinius and T
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem -- --enable-system-libffi
 
 %files
 %defattr(-,root,root,-)
@@ -47,6 +45,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %changelog
 * Wed Jan 31 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.3-1
 - Upgrading to the latest version.
+- Switched to using the gem as source to include the 'libffi' submodule.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.5-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
