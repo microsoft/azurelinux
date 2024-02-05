@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
@@ -21,6 +22,16 @@ import (
 const (
 	tmpParitionDirName = "tmppartition"
 
+	// supported input formats
+	ImageFormatVhd   = "vhd"
+	ImageFormatVhdx  = "vhdx"
+	ImageFormatQCow2 = "qcow2"
+	ImageFormatIso   = "iso"
+	ImageFormatRaw   = "raw"
+
+	// qemu-specific formats
+	QemuFormatVpc = "vpc"
+
 	BaseImageName                = "image.raw"
 	PartitionCustomizedImageName = "image2.raw"
 )
@@ -33,7 +44,7 @@ var (
 
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
-	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 
@@ -51,7 +62,7 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	}
 
 	err = CustomizeImage(buildDir, absBaseConfigPath, &config, imageFile, rpmsSources, outputImageFile, outputImageFormat,
-		outputSplitPartitionsFormat, useBaseImageRpmRepos)
+		outputSplitPartitionsFormat, useBaseImageRpmRepos, enableShrinkFilesystems)
 	if err != nil {
 		return err
 	}
@@ -60,13 +71,17 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
-	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string, useBaseImageRpmRepos bool,
+	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string,
+	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
 	var err error
 	var qemuOutputImageFormat string
 
+	outputImageBase := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
+	outputImageDir := filepath.Dir(outputImageFile)
+
 	// Validate 'outputImageFormat' value if specified.
-	if outputImageFormat != "" {
+	if outputImageFormat != "" && outputImageFormat != ImageFormatIso {
 		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
 		if err != nil {
 			return err
@@ -92,52 +107,74 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	}
 
 	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
-	buildImageFile := filepath.Join(buildDirAbs, BaseImageName)
+	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
+	defer func() {
+		cleanupErr := file.RemoveFileIfExists(rawImageFile)
+		if cleanupErr != nil {
+			if err != nil {
+				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, rawImageFile, cleanupErr)
+			} else {
+				err = fmt.Errorf("failed to clean-up (%s): %w", rawImageFile, cleanupErr)
+			}
+		}
+	}()
 
-	logger.Log.Infof("Mounting base image: %s", buildImageFile)
-	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, buildImageFile)
+	logger.Log.Infof("Creating raw base image: %s", rawImageFile)
+	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
 
 	// Customize the partitions.
-	partitionsCustomized, buildImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, buildImageFile)
+	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos,
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
+	// Shrink the filesystems.
+	if enableShrinkFilesystems {
+		err = shrinkFilesystemsHelper(rawImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
+		}
+	}
+
 	if config.SystemConfig.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, buildImageFile, rpmsSources, useBaseImageRpmRepos)
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
 	}
 
 	// Create final output image file if requested.
-	if outputImageFormat != "" {
+	switch outputImageFormat {
+	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
 		logger.Log.Infof("Writing: %s", outputImageFile)
 
-		outDir := filepath.Dir(outputImageFile)
-		os.MkdirAll(outDir, os.ModePerm)
-
-		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, buildImageFile, outputImageFile)
+		os.MkdirAll(outputImageDir, os.ModePerm)
+		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		}
+	case ImageFormatIso:
+		err = createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
+		if err != nil {
+			return err
 		}
 	}
 
 	// If outputSplitPartitionsFormat is specified, extract the partition files.
 	if outputSplitPartitionsFormat != "" {
 		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(buildImageFile, outputImageFile, outputSplitPartitionsFormat)
+		err = extractPartitionsHelper(rawImageFile, outputImageDir, outputImageBase, outputSplitPartitionsFormat)
 		if err != nil {
 			return err
 		}
@@ -150,10 +187,10 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 func toQemuImageFormat(imageFormat string) (string, error) {
 	switch imageFormat {
-	case "vhd":
-		return "vpc", nil
+	case ImageFormatVhd:
+		return QemuFormatVpc, nil
 
-	case "vhdx", "raw", "qcow2":
+	case ImageFormatVhdx, ImageFormatRaw, ImageFormatQCow2:
 		return imageFormat, nil
 
 	default:
@@ -290,9 +327,9 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 }
 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	buildImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	imageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", true)
+	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
 	if err != nil {
 		return err
 	}
@@ -313,15 +350,36 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	return nil
 }
 
-func extractPartitionsHelper(buildImageFile string, outputImageFile string, outputSplitPartitionsFormat string) error {
-	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
+func extractPartitionsHelper(rawImageFile string, outputDir string, outputBasename string, outputSplitPartitionsFormat string) error {
+	imageLoopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
 		return err
 	}
 	defer imageLoopback.Close()
 
 	// Extract the partitions as files.
-	err = extractPartitions(imageLoopback.DevicePath(), outputImageFile, outputSplitPartitionsFormat)
+	err = extractPartitions(imageLoopback.DevicePath(), outputDir, outputBasename, outputSplitPartitionsFormat)
+	if err != nil {
+		return err
+	}
+
+	err = imageLoopback.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func shrinkFilesystemsHelper(buildImageFile string) error {
+	imageLoopback, err := safeloopback.NewLoopback(buildImageFile)
+	if err != nil {
+		return err
+	}
+	defer imageLoopback.Close()
+
+	// Shrink the filesystems.
+	err = shrinkFilesystems(imageLoopback.DevicePath())
 	if err != nil {
 		return err
 	}

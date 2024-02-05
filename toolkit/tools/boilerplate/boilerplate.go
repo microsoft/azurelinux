@@ -19,9 +19,7 @@ import (
 var (
 	app = kingpin.New("boilerplate", "A sample golang tool for Mariner.")
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
-
+	logFlags      = exe.SetupLogFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
@@ -29,7 +27,7 @@ func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	timestamp.BeginTiming("boilerplate", *timestampFile)
 	defer timestamp.CompleteTiming()

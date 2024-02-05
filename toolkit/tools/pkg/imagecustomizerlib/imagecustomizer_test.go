@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -48,7 +49,7 @@ func TestCustomizeImageEmptyConfig(t *testing.T) {
 
 	// Customize image.
 	err = CustomizeImage(buildDir, buildDir, &imagecustomizerapi.Config{}, diskFilePath, nil, outImageFilePath,
-		"vhd", "", false)
+		"vhd", "", false, false)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -83,7 +84,7 @@ func TestCustomizeImageCopyFiles(t *testing.T) {
 	}
 
 	// Customize image.
-	err = CustomizeImageWithConfigFile(buildDir, configFile, diskFilePath, nil, outImageFilePath, "raw", "", false)
+	err = CustomizeImageWithConfigFile(buildDir, configFile, diskFilePath, nil, outImageFilePath, "raw", "", false, false)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -235,7 +236,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 		},
 	}
 
-	err = CustomizeImage(buildDir, buildDir, config, diskFilePath, nil, outImageFilePath, "raw", "", false)
+	err = CustomizeImage(buildDir, buildDir, config, diskFilePath, nil, outImageFilePath, "raw", "", false, false)
 	if !assert.NoError(t, err) {
 		return
 	}
@@ -248,7 +249,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Read the grub.cfg file.
-	grub2ConfigFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
+	grub2ConfigFilePath := filepath.Join(imageConnection.Chroot().RootDir(), installutils.GrubCfgFile)
 
 	grub2ConfigFile, err := os.ReadFile(grub2ConfigFilePath)
 	if !assert.NoError(t, err) {
@@ -318,7 +319,8 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	}
 
 	err = createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
-		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, installOS)
+		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxDisabled,
+		installOS)
 	if err != nil {
 		return "", err
 	}

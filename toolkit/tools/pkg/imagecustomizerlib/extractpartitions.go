@@ -6,20 +6,12 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 // Extract all partitions of connected image into separate files with specified format.
-func extractPartitions(imageLoopDevice string, outputImageFile string, partitionFormat string) error {
-
-	// Extract basename from outputImageFile. E.g. if outputImageFile is "image.qcow2", then basename is "image".
-	basename := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
-
-	// Get output directory path.
-	outDir := filepath.Dir(outputImageFile)
+func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
 
 	// Get partition info.
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
@@ -67,6 +59,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 		fmt.Sprintf("if=%s", devicePath),       // Input file.
 		fmt.Sprintf("of=%s", fullPath),         // Output file.
 		fmt.Sprintf("bs=%d", defaultBlockSize), // Size of one copied block.
+		"conv=sparse",
 	}
 
 	err = shell.ExecuteLive(squashErrors, "dd", ddArgs...)
@@ -80,8 +73,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 // Compress file from raw to raw-zstd format using zstd.
 func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, err error) {
 	// Using -f to overwrite a file with same name if it exists.
-	cmd := exec.Command("zstd", "-f", "-9", "-T0", partitionRawFilepath)
-	_, err = cmd.Output()
+	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
