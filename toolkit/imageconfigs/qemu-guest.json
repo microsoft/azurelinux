@@ -55,6 +55,11 @@
             "KernelOptions": {
                 "default": "kernel-hci"
             },
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]
