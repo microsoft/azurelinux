@@ -22924,8 +22924,8 @@
         "type": "other",
         "other": {
           "name": "python-markdown",
-          "version": "3.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.2.2.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/11/28/c5441a6642681d92de56063fa7984df56f783d3f1eba518dc3e7a253b606/Markdown-3.5.2.tar.gz"
         }
       }
     },
