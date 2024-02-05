@@ -11,9 +11,6 @@ import sys
 
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
 
-invalid_patch_macro_regex = re.compile(
-    r'^\s*%patch\d', re.MULTILINE)
-
 license_regex = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
 
@@ -21,25 +18,6 @@ valid_release_tag_regex = re.compile(
     r'^[1-9]\d*%\{\?dist\}$')
 
 valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
-
-
-def check_patch_macro(spec_path: str):
-    """Checks if the 'patch' macro is not in the format deprecated in RPM 4.18+. """
-    with open(spec_path) as file:
-        contents = file.read()
-
-    if invalid_patch_macro_regex.search(contents) is not None:
-        print(f"""
-ERROR: use of deprecated '%patch[number]' format (no space between '%patch' and the number of the patch).
-
-    Accepted formats are:
-
-        - %patch [number]
-        - %patch -P [number]
-""")
-        return False
-
-    return True
 
 
 def check_release_tag(spec_path: str):
@@ -103,9 +81,6 @@ def check_spec(spec_path):
     spec_correct = True
 
     print(f"Checking {spec_path}")
-
-    if not check_patch_macro(spec_path):
-        spec_correct = False
 
     if not check_release_tag(spec_path):
         spec_correct = False
