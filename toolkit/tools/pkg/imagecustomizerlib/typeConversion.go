@@ -158,6 +158,51 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 		return configuration.MountIdentifierPartLabel, nil
 
 	default:
-		return "", fmt.Errorf("unknwon MountIdentifierType value (%s)", mountIdentifierType)
+		return "", fmt.Errorf("unknown MountIdentifierType value (%s)", mountIdentifierType)
+	}
+}
+
+func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelCommandLine,
+	currentSELinuxMode imagecustomizerapi.SELinux,
+) (configuration.KernelCommandLine, error) {
+	imagerSELinux, err := selinuxModeMaybeDefaultToImager(kernelCommandLine.SELinux, currentSELinuxMode)
+	if err != nil {
+		return configuration.KernelCommandLine{}, err
+	}
+
+	imagerKernelCommandLine := configuration.KernelCommandLine{
+		ExtraCommandLine: kernelCommandLine.ExtraCommandLine,
+		SELinux:          imagerSELinux,
+		SELinuxPolicy:    "",
+	}
+	return imagerKernelCommandLine, nil
+}
+
+func selinuxModeMaybeDefaultToImager(selinuxMode imagecustomizerapi.SELinux,
+	currentSELinuxMode imagecustomizerapi.SELinux,
+) (configuration.SELinux, error) {
+	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+		selinuxMode = currentSELinuxMode
+	}
+
+	return selinuxModeToImager(selinuxMode)
+}
+
+func selinuxModeToImager(selinuxMode imagecustomizerapi.SELinux) (configuration.SELinux, error) {
+	switch selinuxMode {
+	case imagecustomizerapi.SELinuxDisabled:
+		return configuration.SELinuxOff, nil
+
+	case imagecustomizerapi.SELinuxEnforcing:
+		return configuration.SELinuxEnforcing, nil
+
+	case imagecustomizerapi.SELinuxPermissive:
+		return configuration.SELinuxPermissive, nil
+
+	case imagecustomizerapi.SELinuxForceEnforcing:
+		return configuration.SELinuxForceEnforcing, nil
+
+	default:
+		return "", fmt.Errorf("unknown SELinux value (%s)", selinuxMode)
 	}
 }

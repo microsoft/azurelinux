@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,6 +49,12 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Sat Jan 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-3
+- Making 'Release' match with 'ca-certificates'
+
+* Fri Jan 19 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.0-2
+- Making 'Release' match with 'ca-certificates'
+
 * Tue Jan 09 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0.0-1
 - Initial version for AzureLinux 3.0.
 

@@ -1,3 +1,28 @@
+Name: libiscsi
+Summary: iSCSI client library
+Version: 1.19.0
+Release: 1%{?dist}
+License: LGPLv2+
+URL: https://github.com/sahlberg/%{name}
+
+Source: https://github.com/sahlberg/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires: make
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
+BuildRequires: popt-devel
+BuildRequires: CUnit-devel
+BuildRequires: libgcrypt-devel
+%ifnarch %{arm}
+BuildRequires: rdma-core-devel
+%endif
+
+%description
+libiscsi is a library for attaching to iSCSI resources across
+a network.
+
+
 #######################################################################
 
 # Conflict with iscsi-initiator-utils.
@@ -5,94 +30,42 @@
 %global libiscsi_includedir %{_includedir}/iscsi
 %global libiscsi_libdir %{_libdir}/iscsi
 
-Summary:        iSCSI client library
-Name:           libiscsi
-Version:        1.18.0
-Release:        11%{?dist}
-License:        GPLv2+ AND LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://github.com/sahlberg/%{name}
-Source:         https://github.com/sahlberg/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Fix gcc7 warnings
-Patch0001:      0001-Fix-compiler-warning-error-under-gcc7.patch
-Patch0002:      0002-Fix-another-compiler-warning.patch
-# Fix 32bit build
-Patch0003:      0003-Fix-32bit-build.patch
-# Fix build with latest rdma-core
-# Submitted upstream: https://github.com/sahlberg/libiscsi/pull/265
-Patch0004:      0004-iser-Use-local-container_of-definition.patch
-Patch0005:      0005-fix-ipv6.patch
-Patch0006:      0006-fix-coverity-report.patch
-BuildRequires:  CUnit-devel
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libgcrypt-devel
-BuildRequires:  libtool
-BuildRequires:  popt-devel
-%ifnarch %{arm}
-BuildRequires:  rdma-core-devel
-%endif
-
-%description
-libiscsi is a library for attaching to iSCSI resources across
-a network.
-
-%package devel
-Summary:        iSCSI client development libraries
-License:        GPLv2+ AND LGPLv2+
-Requires:       %{name} = %{version}-%{release}
-
-%description devel
-The libiscsi-devel package includes the header files for libiscsi.
-
-%package utils
-Summary:        iSCSI Client Utilities
-License:        GPLv2+
-Requires:       %{name} = %{version}-%{release}
-
-%description utils
-The libiscsi-utils package provides a set of assorted utilities to connect
-to iSCSI servers without having to set up the Linux iSCSI initiator.
-
 %prep
-%autosetup -p1
+%setup -q
+%autopatch -p1
 
 %build
 sh autogen.sh
 %configure --libdir=%{libiscsi_libdir} --disable-werror
-%make_build
+make %{?_smp_mflags}
 
 %install
-%make_install pkgconfigdir=%{_libdir}/pkgconfig
+make DESTDIR=$RPM_BUILD_ROOT install pkgconfigdir=%{_libdir}/pkgconfig %{?_smp_mflags}
+mkdir -p $RPM_BUILD_ROOT/etc/ld.so.conf.d
+echo %{libiscsi_libdir} > $RPM_BUILD_ROOT/etc/ld.so.conf.d/%{name}-%{_arch}.conf
+rm $RPM_BUILD_ROOT/%{libiscsi_libdir}/libiscsi.a
+rm $RPM_BUILD_ROOT/%{libiscsi_libdir}/libiscsi.la
 
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
-echo %{libiscsi_libdir} > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
 
-rm %{buildroot}/%{libiscsi_libdir}/libiscsi.a
-rm %{buildroot}/%{libiscsi_libdir}/libiscsi.la
+%post -p /sbin/ldconfig
 
-# Remove "*.old" files
-find %{buildroot} -name "*.old" -exec rm -f {} \;
-
-# Remove library put in /usr/bin
-rm %{buildroot}/%{_bindir}/ld_iscsi.so
-
-%ldconfig_scriptlets
+%postun -p /sbin/ldconfig
 
 %files
 %license COPYING LICENCE-LGPL-2.1.txt
 %doc README TODO
 %dir %{libiscsi_libdir}
 %{libiscsi_libdir}/libiscsi.so.*
-%config %{_sysconfdir}/ld.so.conf.d/*
+%config /etc/ld.so.conf.d/*
 
-%files devel
-%dir %{libiscsi_includedir}
-%{libiscsi_includedir}/iscsi.h
-%{libiscsi_includedir}/scsi-lowlevel.h
-%{libiscsi_libdir}/libiscsi.so
-%{_libdir}/pkgconfig/libiscsi.pc
+%package utils
+Summary: iSCSI Client Utilities
+License: GPLv2+
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description utils
+The libiscsi-utils package provides a set of assorted utilities to connect
+to iSCSI servers without having to set up the Linux iSCSI initiator.
 
 %files utils
 %license LICENCE-GPL-2.txt
@@ -102,12 +75,30 @@ rm %{buildroot}/%{_bindir}/ld_iscsi.so
 %{_bindir}/iscsi-swp
 %{_bindir}/iscsi-perf
 %{_bindir}/iscsi-test-cu
+%{_bindir}/ld_iscsi.so
 %{_mandir}/man1/iscsi-ls.1.gz
 %{_mandir}/man1/iscsi-inq.1.gz
 %{_mandir}/man1/iscsi-swp.1.gz
 %{_mandir}/man1/iscsi-test-cu.1.gz
 
+%package devel
+Summary: iSCSI client development libraries
+Requires: %{name}%{?_isa} = %{version}-%{release}
+
+%description devel
+The libiscsi-devel package includes the header files for libiscsi.
+
+%files devel
+%dir %{libiscsi_includedir}
+%{libiscsi_includedir}/iscsi.h
+%{libiscsi_includedir}/scsi-lowlevel.h
+%{libiscsi_libdir}/libiscsi.so
+%{_libdir}/pkgconfig/libiscsi.pc
+
 %changelog
+* Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.19.0-1
+- Upgrade to 1.19 from Fedora
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.18.0-11
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

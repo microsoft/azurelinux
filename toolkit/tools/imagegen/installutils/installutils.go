@@ -25,17 +25,47 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"golang.org/x/sys/unix"
 )
 
 const (
 	PackageManifestRelativePath = "image_pkg_manifest_installroot.json"
 
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
-	NullDevice     = "/dev/null"
+	NullDevice = "/dev/null"
+
+	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
+	CmdlineSELinuxSettings = "security=selinux selinux=1"
+
+	// CmdlineSELinuxForceEnforcing is the kernel command-line args for enabling SELinux and force it to be in
+	// enforcing mode.
+	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " enforcing=1"
+
+	// SELinuxConfigFile is the file path of the SELinux config file.
+	SELinuxConfigFile = "/etc/selinux/config"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to enforcing in the /etc/selinux/config file.
+	SELinuxConfigEnforcing = "enforcing"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to permissive in the /etc/selinux/config file.
+	SELinuxConfigPermissive = "permissive"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to disabled in the /etc/selinux/config file.
+	SELinuxConfigDisabled = "disabled"
+
+	// GrubCfgFile is the filepath of the grub config file.
+	GrubCfgFile = "/boot/grub2/grub.cfg"
+
+	// GrubDefFile is the filepath of the config file used by grub-mkconfig.
+	GrubDefFile = "/etc/default/grub"
+)
+
+const (
 	overlay        = "overlay"
 	rootMountPoint = "/"
 
@@ -1072,15 +1102,13 @@ func InstallGrubEnv(installRoot string) (err error) {
 func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
 		assetGrubcfgFile = "assets/grub2/grub.cfg"
-		grubCfgFile      = "boot/grub2/grub.cfg"
 		assetGrubDefFile = "assets/grub2/grub"
-		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
-	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
+	installGrubCfgFile := filepath.Join(installRoot, GrubCfgFile)
 
-	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+	installGrubDefFile := filepath.Join(installRoot, GrubDefFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
 		bootDirectoryFileMode)
@@ -1178,7 +1206,7 @@ func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
 
 	ReportActionf("Running grub2-mkconfig...")
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", "/boot/grub2/grub.cfg")
+		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", GrubCfgFile)
 	})
 
 	return
@@ -1262,7 +1290,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
 		if err != nil {
 			return
 		}
@@ -1497,7 +1525,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1538,8 +1566,10 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
+	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+
+	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
-		logger.Log.Infof("Adding ssh key (%s) to user (%s)", filepath.Base(pubKey), username)
 		relativeDst := filepath.Join(userSSHKeyDir, filepath.Base(pubKey))
 
 		fileToCopy := safechroot.FileToCopy{
@@ -1552,21 +1582,26 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 			return
 		}
 
-		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
 		pubKeyData, err = file.ReadLines(pubKey)
 		if err != nil {
 			logger.Log.Warnf("Failed to read from SSHPubKey : %v", err)
 			return
 		}
 
-		// Append to the tmp/authorized_users file
-		for _, sshkey := range pubKeyData {
-			sshkey += "\n"
-			err = file.Append(sshkey, authorizedKeysTempFile)
-			if err != nil {
-				logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
-				return
-			}
+		allSSHKeys = append(allSSHKeys, pubKeyData...)
+	}
+
+	// Add direct SSH keys
+	allSSHKeys = append(allSSHKeys, sshPubKeys...)
+
+	for _, pubKey := range allSSHKeys {
+		logger.Log.Infof("Adding ssh key (%s) to user (%s) .ssh/authorized_users", filepath.Base(pubKey), username)
+		pubKey += "\n"
+
+		err = file.Append(pubKey, authorizedKeysTempFile)
+		if err != nil {
+			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+			return
 		}
 	}
 
@@ -1610,17 +1645,19 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 }
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
-func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
+func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot,
+	mountPointToFsTypeMap map[string]string, isRootFS bool,
+) (err error) {
 	timestamp.StartEvent("SELinux", nil)
 	defer timestamp.StopEvent(nil)
-	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
+	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(systemConfig, installChroot)
+	err = selinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		logger.Log.Errorf("Failed to update SELinux config")
 		return
 	}
-	err = selinuxRelabelFiles(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		logger.Log.Errorf("Failed to label SELinux files")
 		return
@@ -1628,30 +1665,29 @@ func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *sa
 	return
 }
 
-func selinuxUpdateConfig(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot) (err error) {
+func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
 	const (
-		configFile     = "etc/selinux/config"
 		selinuxPattern = "^SELINUX=.*"
 	)
 	var mode string
 
-	switch systemConfig.KernelCommandLine.SELinux {
+	switch selinuxMode {
 	case configuration.SELinuxEnforcing, configuration.SELinuxForceEnforcing:
-		mode = configuration.SELinuxEnforcing.String()
+		mode = SELinuxConfigEnforcing
 	case configuration.SELinuxPermissive:
-		mode = configuration.SELinuxPermissive.String()
+		mode = SELinuxConfigPermissive
 	}
 
-	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
-	selinuxMode := fmt.Sprintf("SELINUX=%s", mode)
-	err = sed(selinuxPattern, selinuxMode, "`", selinuxConfigPath)
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
+	selinuxProperty := fmt.Sprintf("SELINUX=%s", mode)
+	err = sed(selinuxPattern, selinuxProperty, "`", selinuxConfigPath)
 	return
 }
 
-func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
+func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+) (err error) {
 	const (
 		squashErrors        = false
-		configFile          = "etc/selinux/config"
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
 	)
 	var listOfMountsToLabel []string
@@ -1676,7 +1712,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	}
 
 	// Find the type of policy we want to label with
-	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
 	stdout, stderr, err := shell.Execute("sed", "-n", "s/^SELINUXTYPE=\\(.*\\)$/\\1/p", selinuxConfigPath)
 	if err != nil {
 		logger.Log.Errorf("Could not find an SELINUXTYPE in %s", selinuxConfigPath)
@@ -1686,29 +1722,63 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	selinuxType := strings.TrimSpace(stdout)
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
-	logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", listOfMountsToLabel)
-	err = installChroot.UnsafeRun(func() error {
-		args := []string{"-m", "-v", fileContextPath}
-		args = append(args, listOfMountsToLabel...)
+	targetRootPath := "/mnt/_bindmountroot"
 
-		// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
-		files := 0
-		lastFile := ""
-		onStdout := func(args ...interface{}) {
-			if len(args) > 0 {
-				files++
-				lastFile = fmt.Sprintf("%v", args)
-			}
-			if (files % 1000) == 0 {
-				ReportActionf("SELinux: labelled %d files", files)
-			}
-		}
-		err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", args...)
+	for _, mountToLabel := range listOfMountsToLabel {
+		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
+
+		// The chroot environment has a bunch of special filesystems (e.g. /dev, /proc, etc.) mounted within the OS
+		// image. In addition, an image may have placed system directories on separate partitions, and these partitions
+		// will also be mounted within the OS image. These mounts hide the underlying directory that is used as a mount
+		// point, which prevents that directory from receiving an SELinux label from the setfiles command. A well known
+		// way to get an unobstructed view of a filesystem, free from other mount-points, is to create a bind-mount for
+		// that filesystem. Therefore, bind mounts are used to ensure that all directories receive an SELinux label.
+		sourceFullPath := filepath.Join(installChroot.RootDir(), mountToLabel)
+		targetPath := filepath.Join(targetRootPath, mountToLabel)
+		targetFullPath := filepath.Join(installChroot.RootDir(), targetPath)
+
+		bindMount, err := safemount.NewMount(sourceFullPath, targetFullPath, "", unix.MS_BIND, "", true)
 		if err != nil {
-			return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			return fmt.Errorf("failed to bind mount (%s) while SELinux labeling:\n%w", mountToLabel, err)
 		}
-		return err
-	})
+		defer bindMount.Close()
+
+		err = installChroot.UnsafeRun(func() error {
+			// We only want to print basic info, filter out the real output unless at trace level (Execute call handles that)
+			files := 0
+			lastFile := ""
+			onStdout := func(args ...interface{}) {
+				if len(args) > 0 {
+					files++
+					lastFile = fmt.Sprintf("%v", args)
+				}
+				if (files % 1000) == 0 {
+					ReportActionf("SELinux: labelled %d files", files)
+				}
+			}
+			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
+				targetRootPath, fileContextPath, targetPath)
+			if err != nil {
+				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
+			}
+			ReportActionf("SELinux: labelled %d files", files)
+			return err
+		})
+		if err != nil {
+			return err
+		}
+
+		err = bindMount.CleanClose()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Cleanup temporary directory.
+	err = os.RemoveAll(targetRootPath)
+	if err != nil {
+		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+	}
 
 	return
 }
@@ -2122,17 +2192,15 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 
 func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
-		selinuxPattern        = "{{.SELinux}}"
-		selinuxSettings       = "security=selinux selinux=1"
-		selinuxForceEnforcing = "enforcing=1"
+		selinuxPattern = "{{.SELinux}}"
 	)
 	var selinux string
 
 	switch kernelCommandline.SELinux {
 	case configuration.SELinuxForceEnforcing:
-		selinux = fmt.Sprintf("%s %s", selinuxSettings, selinuxForceEnforcing)
+		selinux = CmdlineSELinuxForceEnforcing
 	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
-		selinux = selinuxSettings
+		selinux = CmdlineSELinuxSettings
 	case configuration.SELinuxOff:
 		selinux = ""
 	}

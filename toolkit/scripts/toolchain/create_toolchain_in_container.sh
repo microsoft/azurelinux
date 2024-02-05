@@ -27,10 +27,6 @@ if [ "$INCREMENTAL_TOOLCHAIN" != "y" ] || [ -z "$(docker images -q marinertoolch
     # docker rmi $(docker images -a -q)
     # docker rmi $(docker history marinertoolchain -q)
 
-    # Coreutils aarch64 patch
-    cp -v $MARINER_SPECS_DIR/coreutils/coreutils-fix-get-sys_getdents-aarch64.patch ./container
-    # Binutils readonly patch
-    cp -v $MARINER_SPECS_DIR/binutils/linker-script-readonly-keyword-support.patch ./container
     # RPM LD_FLAGS patch
     cp -v $MARINER_SPECS_DIR/rpm/define-RPM_LD_FLAGS.patch ./container/rpm-define-RPM-LD-FLAGS.patch
     # GCC patch

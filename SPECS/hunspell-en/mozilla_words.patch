@@ -1,66 +1,47 @@
 --- scowl/r/special/proper-names	2008-02-08 11:53:27.000000000 +0000
 +++ scowl/r/special/proper-names	2008-02-08 12:06:00.000000000 +0000
-@@ -8,6 +8,8 @@
- BitTorrent
- Bluetooth
+@@ -18,7 +18,9 @@
  Bugzilla
+ CSS
+ CVS
 +Camino
+ Celgene
 +ChatZilla
+ Clojure
  Closure
- Debian
- Dropbox
-@@ -19,23 +21,28 @@
- GNU
- Gentoo
+ Cordova
+@@ -45,6 +47,7 @@
  GitHub
+ HBase
+ Hadoop
 +Haskell
+ Heroku
  Hunspell
- ISO
- Instagram
- Ispell
+ Hurd
+@@ -55,11 +58,13 @@
+ Kotlin
  LibreOffice
  LyX
 +Mandriva
+ MariaDB
+ Matlab
+ Memcached
+ MongoDB
  Mozilla
 +MySpell
+ MySQL
  NSA
- Netflix
- OpenOffice
- PayPal
- PowerPC
- Roku
-+SeaMonkey
- SUSE
+ NVIDIA
+@@ -83,10 +88,12 @@
+ SVN
+ Salesforce
  Scala
++SeaMonkey
+ Seeger
+ SharePoint
  Slackware
  Sourceforge
 +Sunbird
+ TensorFlow
  Thunderbird
- Twitter
- Ubuntu
---- scowl/speller/en.aff	2008-02-08 20:28:24.000000000 +0000
-+++ scowl/speller/en.aff	2008-02-08 20:28:45.000000000 +0000
-@@ -110,13 +110,17 @@
- SFX L Y 1
- SFX L   0     ment       .
- 
--REP 88
-+SFX i N 1
-+SFX i   us    i          us
-+
-+REP 90
- REP a ei
- REP ei a
- REP a ey
- REP ey a
- REP ai ie
- REP ie ai
-+REP alot a_lot
- REP are air
- REP are ear
- REP are eir
-@@ -199,3 +203,4 @@
- REP shun tion
- REP shun sion
- REP shun cion
-+REP sitted sat
+ Troilus
