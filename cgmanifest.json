@@ -14965,7 +14965,7 @@
         "other": {
           "name": "openblas",
           "version": "0.3.26",
-          "downloadUrl": "https://github.com/xianyi/OpenBLAS/archive/v0.3.26/openblas-0.3.26.tar.gz"
+          "downloadUrl": "https://github.com/OpenMathLib/OpenBLAS/archive/v0.3.26/openblas-0.3.26.tar.gz"
         }
       }
     },
