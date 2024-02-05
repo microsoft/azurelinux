@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "open-vm-tools-11.3.0-18090558.tar.gz": "9bad3ee755340853bf7990e92f3d3880959a73e0749e8aaae62730854368bd2c",
+  "open-vm-tools-12.3.5-22544099.tar.gz": "6003eb5643098a43ff116497891a9875d208841667d15894eeceec28b4f1c3cf",
   "open-vm-tools.conf": "c4dd7cab2c42d9d4996a9a8eff44dc5c35f9e4c60bbb423a5dae62688b01927c",
   "vgauthd.service": "a8d40ce52a23c50f58f159af0bbb24450a55ea2944c8d75656ec9bccb489daa0",
   "vmblock.mount": "4869b965f6f1cdefc60c19b48430486b8fdcc77b14201b0588fc37306d455967",
