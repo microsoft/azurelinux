@@ -14954,8 +14954,8 @@
         "type": "other",
         "other": {
           "name": "open-vm-tools",
-          "version": "11.3.0",
-          "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-11.3.0/open-vm-tools-11.3.0-18090558.tar.gz"
+          "version": "12.3.5",
+          "downloadUrl": "https://github.com/vmware/open-vm-tools/releases/download/stable-12.3.5/open-vm-tools-12.3.5-22544099.tar.gz"
         }
       }
     },
