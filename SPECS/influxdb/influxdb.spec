@@ -17,11 +17,11 @@
 
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
-Version:        2.6.1
-Release:        12%{?dist}
+Version:        2.7.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influxdb
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -63,7 +63,7 @@ BuildRequires:  rust >= 1.60.0
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  tzdata
 # IMPORTANT:  when upgrading this, make sure the flux version matches what is required by go.mod file in the soure code of influxdb.
-BuildRequires:  pkgconfig(flux) >= 0.191.0
+BuildRequires:  pkgconfig(flux) >= 0.194.5
 Requires:       tzdata
 Requires(post): systemd
 Conflicts:      influxdb
@@ -144,6 +144,9 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.3-1
+- Upgrade to version 2.7.3
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-12
 - Bump release to rebuild with go 1.20.10
 
