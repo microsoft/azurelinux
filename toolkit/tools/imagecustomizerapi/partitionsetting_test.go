@@ -18,5 +18,5 @@ func TestPartitionIsValidInvalidMountIdentifier(t *testing.T) {
 	err := partition.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "MountIdentifierType")
+	assert.ErrorContains(t, err, "mountIdentifierType")
 }

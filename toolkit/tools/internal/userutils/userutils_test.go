@@ -41,13 +41,13 @@ func TestUIDIsValidRoot(t *testing.T) {
 func TestUIDIsValidNegative(t *testing.T) {
 	err := UIDIsValid(-1)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "UID")
+	assert.ErrorContains(t, err, "uid")
 }
 
 func TestUIDIsValidTooLarge(t *testing.T) {
 	err := UIDIsValid(60001)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "UID")
+	assert.ErrorContains(t, err, "uid")
 }
 
 func TestPasswordExpiresDaysIsValidNoExpiry(t *testing.T) {
@@ -58,13 +58,13 @@ func TestPasswordExpiresDaysIsValidNoExpiry(t *testing.T) {
 func TestPasswordExpiresDaysIsValidNegative(t *testing.T) {
 	err := PasswordExpiresDaysIsValid(-2)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "PasswordExpiresDays")
+	assert.ErrorContains(t, err, "passwordExpiresDays")
 }
 
 func TestPasswordExpiresDaysIsValidTooLarge(t *testing.T) {
 	err := PasswordExpiresDaysIsValid(100000)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "PasswordExpiresDays")
+	assert.ErrorContains(t, err, "passwordExpiresDays")
 }
 
 func TestHashPasswordEmpty(t *testing.T) {

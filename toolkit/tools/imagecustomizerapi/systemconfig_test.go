@@ -39,7 +39,7 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 
 	err := value.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
+	assert.ErrorContains(t, err, "duplicate partitionSettings ID")
 }
 
 func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
@@ -51,5 +51,5 @@ func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
 
 	err := value.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ExtraCommandLine")
+	assert.ErrorContains(t, err, "extraCommandLine")
 }
