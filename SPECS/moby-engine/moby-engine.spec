@@ -68,9 +68,7 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -N -n %{upstream_name}-%{version}
-%patch 0 -p1
-%patch 1 -p1 -d vendor/github.com/prometheus/client_golang
+%autosetup -p1 -n %{upstream_name}-%{version}
 
 tar xf %{SOURCE1} --no-same-owner
 
