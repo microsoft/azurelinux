@@ -432,6 +432,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
 - Config changes to converge kernel-hci config with kernel
+- Remove no-vmw-sta kernel argument inherited from Photon OS
 
 * Sat Jan 27 11:07:05 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
 - use "bootstrap" systemd macros
