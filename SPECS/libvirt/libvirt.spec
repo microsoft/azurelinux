@@ -159,9 +159,6 @@
 # Native / MinGW builds
 %define with_native 0%{!?_without_native:1}
 
-%define with_mingw32 0
-%define with_mingw64 0
-
 %if !%{with_native}
     # Building the debugsource package apparently only works if the
     # native build is enabled. debuginfo packages don't have this
@@ -297,11 +294,7 @@ BuildRequires: util-linux
 # For managing ACLs
 BuildRequires: libacl-devel
 # From QEMU RPMs, used by virstoragetest
-%if 0%{?mariner}
 BuildRequires: qemu-img
-%else
-BuildRequires: /usr/bin/qemu-img
-%endif
     %endif
 # nbdkit support requires libnbd
     %if %{with_nbdkit}
@@ -321,13 +314,8 @@ BuildRequires: parted-devel
 # For Multipath support
 BuildRequires: device-mapper-devel
     %if %{with_storage_rbd}
-%if 0%{?mariner}
 BuildRequires: librados2-devel
 BuildRequires: librbd1-devel
-%else
-BuildRequires: librados-devel
-BuildRequires: librbd-devel
-%endif
     %endif
     %if %{with_storage_gluster}
 BuildRequires: glusterfs-api-devel >= 3.4.1
@@ -377,33 +365,6 @@ BuildRequires: libtirpc-devel
 # Needed for the firewalld_reload macro
 BuildRequires: firewalld-filesystem
     %endif
-%endif
-
-%if %{with_mingw32}
-BuildRequires: mingw32-filesystem
-BuildRequires: mingw32-gcc
-BuildRequires: mingw32-binutils
-BuildRequires: mingw32-glib2 >= 2.48
-BuildRequires: mingw32-gnutls
-BuildRequires: mingw32-gettext
-BuildRequires: mingw32-libxml2
-BuildRequires: mingw32-portablexdr
-BuildRequires: mingw32-dlfcn
-BuildRequires: mingw32-libssh2
-BuildRequires: mingw32-curl
-%endif
-%if %{with_mingw64}
-BuildRequires: mingw64-filesystem
-BuildRequires: mingw64-gcc
-BuildRequires: mingw64-binutils
-BuildRequires: mingw64-glib2 >= 2.48
-BuildRequires: mingw64-gnutls
-BuildRequires: mingw64-gettext
-BuildRequires: mingw64-libxml2
-BuildRequires: mingw64-portablexdr
-BuildRequires: mingw64-dlfcn
-BuildRequires: mingw64-libssh2
-BuildRequires: mingw64-curl
 %endif
 
 %description
@@ -605,11 +566,7 @@ Requires: util-linux
 Requires: scrub
     %if %{with_qemu}
 # From QEMU RPMs
-%if 0%{?mariner}
 Requires: qemu-img
-%else
-Requires: /usr/bin/qemu-img
-%endif
     %endif
     %if !%{with_storage_rbd}
 Obsoletes: libvirt-daemon-driver-storage-rbd < 5.2.0
@@ -751,19 +708,12 @@ Summary: QEMU driver plugin for the libvirtd daemon
 Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-daemon-log = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
-%if 0%{?mariner}
 Requires: qemu-img
-%else
-Requires: /usr/bin/qemu-img
-%endif
 # For image compression
 Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
-%if 0%{!?mariner}
-Requires: systemd-container
-%endif
 %if 0%{!?mariner}
 # bfjelds: FOR NOW ... to see if things build
 # bfjelds: NEW
@@ -853,11 +803,7 @@ Requires: libvirt-daemon-driver-nodedev = %{version}-%{release}
 Requires: libvirt-daemon-driver-nwfilter = %{version}-%{release}
 Requires: libvirt-daemon-driver-secret = %{version}-%{release}
 Requires: libvirt-daemon-driver-storage = %{version}-%{release}
-%if 0%{?mariner}
 Requires: qemu-kvm
-%else
-Requires: qemu
-%endif
 
 %description daemon-qemu
 Server side daemon and driver required to manage the virtualization
@@ -1052,30 +998,6 @@ Requires: libvirt-daemon-driver-network = %{version}-%{release}
 
 %description nss
 Libvirt plugin for NSS for translating domain names into IP addresses.
-%endif
-
-%if %{with_mingw32}
-%package -n mingw32-libvirt
-Summary: %{summary}
-Obsoletes: mingw32-libvirt-static < 7.0.0
-BuildArch: noarch
-
-%description -n mingw32-libvirt
-MinGW Windows libvirt virtualization library.
-
-%{?mingw32_debug_package}
-%endif
-
-%if %{with_mingw64}
-%package -n mingw64-libvirt
-Summary: %{summary}
-Obsoletes: mingw64-libvirt-static < 7.0.0
-BuildArch: noarch
-
-%description -n mingw64-libvirt
-MinGW Windows libvirt virtualization library.
-
-%{?mingw64_debug_package}
 %endif
 
 %prep
@@ -1319,85 +1241,6 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
 %meson_build
 %endif
 
-%if %{with_mingw32} || %{with_mingw64}
-%mingw_meson \
-  --auto-features=enabled \
-  -Ddriver_remote=enabled \
-  -Ddriver_test=enabled \
-  -Ddriver_esx=enabled \
-  -Dcurl=enabled \
-  -Ddocs=enabled \
-  -Dapparmor=disabled \
-  -Dapparmor_profiles=disabled \
-  -Dattr=disabled \
-  -Daudit=disabled \
-  -Dbash_completion=disabled \
-  -Dblkid=disabled \
-  -Dcapng=disabled \
-  -Ddriver_bhyve=disabled \
-  -Ddriver_hyperv=disabled \
-  -Ddriver_interface=disabled \
-  -Ddriver_libvirtd=disabled \
-  -Ddriver_libxl=disabled \
-  -Ddriver_lxc=disabled \
-  -Ddriver_network=disabled \
-  -Ddriver_openvz=disabled \
-  -Ddriver_qemu=disabled \
-  -Ddriver_secrets=disabled \
-  -Ddriver_vbox=disabled \
-  -Ddriver_vmware=disabled \
-  -Ddriver_vz=disabled \
-  -Ddtrace=disabled \
-  -Dexpensive_tests=disabled \
-  -Dfirewalld=disabled \
-  -Dfirewalld_zone=disabled \
-  -Dfuse=disabled \
-  -Dglusterfs=disabled \
-  -Dhost_validate=disabled \
-  -Dlibiscsi=disabled \
-  -Dnbdkit=disabled \
-  -Dnbdkit_config_default=disabled \
-  -Dlibnl=disabled \
-  -Dlibpcap=disabled \
-  -Dlibssh2=disabled \
-  -Dlibssh=disabled \
-  -Dlogin_shell=disabled \
-  -Dnetcf=disabled \
-  -Dnls=enabled \
-  -Dnss=disabled \
-  -Dnumactl=disabled \
-  -Dnumad=disabled \
-  -Dopenwsman=disabled \
-  -Dpciaccess=disabled \
-  -Dpm_utils=disabled \
-  -Dpolkit=disabled \
-  -Dreadline=disabled \
-  -Drpath=disabled \
-  -Dsanlock=disabled \
-  -Dsasl=disabled \
-  -Dsecdriver_apparmor=disabled \
-  -Dsecdriver_selinux=disabled \
-  -Dselinux=disabled \
-  -Dstorage_dir=disabled \
-  -Dstorage_disk=disabled \
-  -Dstorage_fs=disabled \
-  -Dstorage_gluster=disabled \
-  -Dstorage_iscsi_direct=disabled \
-  -Dstorage_iscsi=disabled \
-  -Dstorage_lvm=disabled \
-  -Dstorage_mpath=disabled \
-  -Dstorage_rbd=disabled \
-  -Dstorage_scsi=disabled \
-  -Dstorage_vstorage=disabled \
-  -Dstorage_zfs=disabled \
-  -Dsysctl_config=disabled \
-  -Dtests=disabled \
-  -Dudev=disabled \
-  -Dwireshark_dissector=disabled \
-  -Dyajl=disabled
-    %mingw_ninja
-%endif
-
 %install
 rm -fr %{buildroot}
 
@@ -1466,33 +1309,6 @@ mv $RPM_BUILD_ROOT%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
    $RPM_BUILD_ROOT%{_datadir}/systemtap/tapset/libvirt_qemu_probes-64.stp
         %endif
     %endif
-%endif
-
-%if %{with_mingw32} || %{with_mingw64}
-%mingw_ninja_install
-%endif
-
-%if %{with_mingw32}
-rm -rf $RPM_BUILD_ROOT%{mingw32_sysconfdir}/libvirt/nwfilter
-rm -rf $RPM_BUILD_ROOT%{mingw32_datadir}/doc/*
-rm -rf $RPM_BUILD_ROOT%{mingw32_datadir}/gtk-doc/*
-rm -rf $RPM_BUILD_ROOT%{mingw32_libexecdir}/libvirt_iohelper.exe
-rm -rf $RPM_BUILD_ROOT%{mingw32_libexecdir}/libvirt-guests.sh
-%endif
-
-%if %{with_mingw64}
-rm -rf $RPM_BUILD_ROOT%{mingw64_sysconfdir}/libvirt/nwfilter
-rm -rf $RPM_BUILD_ROOT%{mingw64_datadir}/doc/*
-rm -rf $RPM_BUILD_ROOT%{mingw64_datadir}/gtk-doc/*
-rm -rf $RPM_BUILD_ROOT%{mingw64_libexecdir}/libvirt_iohelper.exe
-rm -rf $RPM_BUILD_ROOT%{mingw64_libexecdir}/libvirt-guests.sh
-%endif
-
-%if %{with_mingw32} || %{with_mingw64}
-%mingw_debug_install_post
-
-%mingw_find_lang %{name}
-
 %endif
 
 %check
@@ -2395,124 +2211,6 @@ exit 0
 %{_datadir}/libvirt/api/libvirt-admin-api.xml
 %{_datadir}/libvirt/api/libvirt-qemu-api.xml
 %{_datadir}/libvirt/api/libvirt-lxc-api.xml
-%endif
-
-%if %{with_mingw32}
-%files -n mingw32-libvirt -f mingw32-libvirt.lang
-%dir %{mingw32_sysconfdir}/libvirt/
-%config(noreplace) %{mingw32_sysconfdir}/libvirt/libvirt.conf
-%config(noreplace) %{mingw32_sysconfdir}/libvirt/libvirt-admin.conf
-%{mingw32_bindir}/libvirt-0.dll
-%{mingw32_bindir}/virsh.exe
-%{mingw32_bindir}/virt-admin.exe
-%{mingw32_bindir}/virt-xml-validate
-%{mingw32_bindir}/virt-pki-query-dn.exe
-%{mingw32_bindir}/virt-pki-validate
-%{mingw32_bindir}/libvirt-lxc-0.dll
-%{mingw32_bindir}/libvirt-qemu-0.dll
-%{mingw32_bindir}/libvirt-admin-0.dll
-%{mingw32_libdir}/libvirt.dll.a
-%{mingw32_libdir}/pkgconfig/libvirt.pc
-%{mingw32_libdir}/pkgconfig/libvirt-qemu.pc
-%{mingw32_libdir}/pkgconfig/libvirt-lxc.pc
-%{mingw32_libdir}/pkgconfig/libvirt-admin.pc
-%{mingw32_libdir}/libvirt-lxc.dll.a
-%{mingw32_libdir}/libvirt-qemu.dll.a
-%{mingw32_libdir}/libvirt-admin.dll.a
-%dir %{mingw32_datadir}/libvirt/
-%dir %{mingw32_datadir}/libvirt/schemas/
-%{mingw32_datadir}/libvirt/schemas/*.rng
-%dir %{mingw32_datadir}/libvirt/api/
-%{mingw32_datadir}/libvirt/api/libvirt-api.xml
-%{mingw32_datadir}/libvirt/api/libvirt-lxc-api.xml
-%{mingw32_datadir}/libvirt/api/libvirt-qemu-api.xml
-%{mingw32_datadir}/libvirt/api/libvirt-admin-api.xml
-%{mingw32_datadir}/libvirt/cpu_map/*.xml
-%{mingw32_datadir}/libvirt/test-screenshot.png
-%dir %{mingw32_includedir}/libvirt
-%{mingw32_includedir}/libvirt/libvirt.h
-%{mingw32_includedir}/libvirt/libvirt-common.h
-%{mingw32_includedir}/libvirt/libvirt-domain.h
-%{mingw32_includedir}/libvirt/libvirt-domain-checkpoint.h
-%{mingw32_includedir}/libvirt/libvirt-domain-snapshot.h
-%{mingw32_includedir}/libvirt/libvirt-event.h
-%{mingw32_includedir}/libvirt/libvirt-host.h
-%{mingw32_includedir}/libvirt/libvirt-interface.h
-%{mingw32_includedir}/libvirt/libvirt-network.h
-%{mingw32_includedir}/libvirt/libvirt-nodedev.h
-%{mingw32_includedir}/libvirt/libvirt-nwfilter.h
-%{mingw32_includedir}/libvirt/libvirt-secret.h
-%{mingw32_includedir}/libvirt/libvirt-storage.h
-%{mingw32_includedir}/libvirt/libvirt-stream.h
-%{mingw32_includedir}/libvirt/virterror.h
-%{mingw32_includedir}/libvirt/libvirt-lxc.h
-%{mingw32_includedir}/libvirt/libvirt-qemu.h
-%{mingw32_includedir}/libvirt/libvirt-admin.h
-%{mingw32_mandir}/man1/virsh.1*
-%{mingw32_mandir}/man1/virt-admin.1*
-%{mingw32_mandir}/man1/virt-xml-validate.1*
-%{mingw32_mandir}/man1/virt-pki-query-dn.1*
-%{mingw32_mandir}/man1/virt-pki-validate.1*
-%{mingw32_mandir}/man7/virkey*.7*
-%endif
-
-%if %{with_mingw64}
-%files -n mingw64-libvirt -f mingw64-libvirt.lang
-%dir %{mingw64_sysconfdir}/libvirt/
-%config(noreplace) %{mingw64_sysconfdir}/libvirt/libvirt.conf
-%config(noreplace) %{mingw64_sysconfdir}/libvirt/libvirt-admin.conf
-%{mingw64_bindir}/libvirt-0.dll
-%{mingw64_bindir}/virsh.exe
-%{mingw64_bindir}/virt-admin.exe
-%{mingw64_bindir}/virt-xml-validate
-%{mingw64_bindir}/virt-pki-query-dn.exe
-%{mingw64_bindir}/virt-pki-validate
-%{mingw64_bindir}/libvirt-lxc-0.dll
-%{mingw64_bindir}/libvirt-qemu-0.dll
-%{mingw64_bindir}/libvirt-admin-0.dll
-%{mingw64_libdir}/libvirt.dll.a
-%{mingw64_libdir}/pkgconfig/libvirt.pc
-%{mingw64_libdir}/pkgconfig/libvirt-qemu.pc
-%{mingw64_libdir}/pkgconfig/libvirt-lxc.pc
-%{mingw64_libdir}/pkgconfig/libvirt-admin.pc
-%{mingw64_libdir}/libvirt-lxc.dll.a
-%{mingw64_libdir}/libvirt-qemu.dll.a
-%{mingw64_libdir}/libvirt-admin.dll.a
-%dir %{mingw64_datadir}/libvirt/
-%dir %{mingw64_datadir}/libvirt/schemas/
-%{mingw64_datadir}/libvirt/schemas/*.rng
-%dir %{mingw64_datadir}/libvirt/api/
-%{mingw64_datadir}/libvirt/api/libvirt-api.xml
-%{mingw64_datadir}/libvirt/api/libvirt-lxc-api.xml
-%{mingw64_datadir}/libvirt/api/libvirt-qemu-api.xml
-%{mingw64_datadir}/libvirt/api/libvirt-admin-api.xml
-%{mingw64_datadir}/libvirt/cpu_map/*.xml
-%{mingw64_datadir}/libvirt/test-screenshot.png
-%dir %{mingw64_includedir}/libvirt
-%{mingw64_includedir}/libvirt/libvirt.h
-%{mingw64_includedir}/libvirt/libvirt-common.h
-%{mingw64_includedir}/libvirt/libvirt-domain.h
-%{mingw64_includedir}/libvirt/libvirt-domain-checkpoint.h
-%{mingw64_includedir}/libvirt/libvirt-domain-snapshot.h
-%{mingw64_includedir}/libvirt/libvirt-event.h
-%{mingw64_includedir}/libvirt/libvirt-host.h
-%{mingw64_includedir}/libvirt/libvirt-interface.h
-%{mingw64_includedir}/libvirt/libvirt-network.h
-%{mingw64_includedir}/libvirt/libvirt-nodedev.h
-%{mingw64_includedir}/libvirt/libvirt-nwfilter.h
-%{mingw64_includedir}/libvirt/libvirt-secret.h
-%{mingw64_includedir}/libvirt/libvirt-storage.h
-%{mingw64_includedir}/libvirt/libvirt-stream.h
-%{mingw64_includedir}/libvirt/virterror.h
-%{mingw64_includedir}/libvirt/libvirt-lxc.h
-%{mingw64_includedir}/libvirt/libvirt-qemu.h
-%{mingw64_includedir}/libvirt/libvirt-admin.h
-%{mingw64_mandir}/man1/virsh.1*
-%{mingw64_mandir}/man1/virt-admin.1*
-%{mingw64_mandir}/man1/virt-xml-validate.1*
-%{mingw64_mandir}/man1/virt-pki-query-dn.1*
-%{mingw64_mandir}/man1/virt-pki-validate.1*
-%{mingw64_mandir}/man7/virkey*.7*
 %endif
 
 %changelog
