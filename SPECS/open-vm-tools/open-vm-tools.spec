@@ -19,13 +19,13 @@
 ################################################################################
 
 %global _hardened_build 1
-%global toolsbuild      18090558
+%global toolsbuild      22544099
 %global toolsdaemon     vmtoolsd
 %global vgauthdaemon    vgauthd
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
-Version:        11.3.0
-Release:        2%{?dist}
+Version:        12.3.5
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -303,6 +303,7 @@ fi
 %{_libdir}/%{name}/plugins/vmsvc/libvmbackup.so
 %{_libdir}/%{name}/plugins/vmsvc/libgdp.so
 %{_libdir}/%{name}/plugins/vmsvc/libguestStore.so
+%{_libdir}/%{name}/plugins/vmsvc/libcomponentMgr.so
 #Usually in desktop package
 %{_bindir}/vmware-vmblock-fuse
 
@@ -332,6 +333,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Wed Jan 31 2024 Bala <balakumaran.kannan@microsoft.com> - 12.3.5-1
+- Upgrade to version 12.3.5
+
 * Wed Mar 16 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
 - Reinstate ConditionVirtualization service option so that the services only run on VMware.
 

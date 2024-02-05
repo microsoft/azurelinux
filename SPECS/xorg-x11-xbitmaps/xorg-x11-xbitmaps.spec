@@ -2,15 +2,17 @@
 %global debug_package %{nil}
 Summary:        X.Org X11 application bitmaps
 Name:           xorg-x11-%{pkgname}
-Version:        1.1.1
-Release:        20%{?dist}
+Version:        1.1.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.x.org
-Source0:        https://xorg.freedesktop.org/archive/individual/data/%{pkgname}-%{version}.tar.bz2
+Source0:        https://xorg.freedesktop.org/archive/individual/data/%{pkgname}-%{version}.tar.gz
 BuildRequires:  automake
 BuildRequires:  gcc
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(xorg-macros) >= 1.20
 Requires:       pkg-config
 BuildArch:      noarch
 
@@ -18,7 +20,7 @@ BuildArch:      noarch
 X.Org X11 application bitmaps
 
 %prep
-%setup -q -n xbitmaps-%{version}
+%autosetup -p1 -n %{pkgname}-%{version}
 
 %build
 %configure
@@ -29,10 +31,14 @@ X.Org X11 application bitmaps
 
 %files
 %license COPYING
+%doc ChangeLog README.md
 %{_includedir}/X11
 %{_datadir}/pkgconfig/xbitmaps.pc
 
 %changelog
+* Fri Feb 02 2024 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.3-1
+- Upgrade to version 1.1.3
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.1-20
 - License verified
 - Lint spec

@@ -32,14 +32,13 @@ var (
 
 	testOnly = app.Flag("test-only", "Whether or not to run the filter out specs which don't run tests.").Bool()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	packagesToBuild := exe.ParseListArgument(*pkgsToBuild)
 	packagesToRebuild := exe.ParseListArgument(*pkgsToRebuild)
