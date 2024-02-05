@@ -12,6 +12,7 @@ Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
 #Source0:       https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+Patch0:         CVE-2021-44717.patch
 
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
