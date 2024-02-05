@@ -55,6 +55,8 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 %changelog
 * Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 2.0.4-1
 - Upgrade to version 2.0.4
+- Add patch to change backend build system to python-flit-core
+- Add python-flit-core as BR
 
 * Wed Jan 17 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.26.18-2
 - Fix test_recent_date test by updating the hard-coded date used for test
