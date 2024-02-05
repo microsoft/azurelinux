@@ -23144,8 +23144,8 @@
         "type": "other",
         "other": {
           "name": "python-oauthlib",
-          "version": "2.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://github.com/oauthlib/oauthlib/archive/refs/tags/v3.2.2.tar.gz"
         }
       }
     },
@@ -24854,8 +24854,8 @@
         "type": "other",
         "other": {
           "name": "PyYAML",
-          "version": "5.3.1",
-          "downloadUrl": "https://pyyaml.org/download/pyyaml/PyYAML-5.3.1.tar.gz"
+          "version": "6.0.1",
+          "downloadUrl": "https://github.com/yaml/pyyaml/archive/refs/tags/6.0.1.tar.gz"
         }
       }
     },
@@ -27977,8 +27977,8 @@
         "type": "other",
         "other": {
           "name": "syslog-ng",
-          "version": "3.33.2",
-          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-3.33.2/syslog-ng-3.33.2.tar.gz"
+          "version": "4.3.1",
+          "downloadUrl": "https://github.com/balabit/syslog-ng/releases/download/syslog-ng-4.3.1/syslog-ng-4.3.1.tar.gz"
         }
       }
     },
