@@ -1,7 +1,7 @@
 {
     "Signatures": {
-        "flux-0.191.0.tar.gz": "907fbcd7b6e46dfe9406c284660ef73340b09e1974316bcc86844cc9b0de23b4",
-        "flux-0.191.0-cargo.tar.gz": "4a2f94a27f617e8cc18bf5449031439c3e70a1d7c9e944e427d1a9649b19b02c",
+        "flux-0.194.5.tar.gz": "85229c86d307fdecccc7d940902fb83bfbd7cff7a308ace831e2487d36a6a8ca",
+        "flux-0.194.5-cargo.tar.gz": "bb0be85bb3134a9e1c84f82e6906d892fd9fed8939139c33994962aa46151955",
         "cargo_config": "6eecdb513f92e130bb05679b32eb54d67aaefbf6a2086e275c3048ebcc972128"
     }
 }

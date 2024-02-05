@@ -3648,8 +3648,8 @@
         "type": "other",
         "other": {
           "name": "flux",
-          "version": "0.191.0",
-          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.191.0.tar.gz"
+          "version": "0.194.5",
+          "downloadUrl": "https://github.com/influxdata/flux/archive/refs/tags/v0.194.5.tar.gz"
         }
       }
     },
@@ -7161,8 +7161,8 @@
         "type": "other",
         "other": {
           "name": "influx-cli",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.3",
+          "downloadUrl": "https://github.com/influxdata/influx-cli/archive/refs/tags/v2.7.3.tar.gz"
         }
       }
     },
@@ -7171,8 +7171,8 @@
         "type": "other",
         "other": {
           "name": "influxdb",
-          "version": "2.6.1",
-          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.6.1.tar.gz"
+          "version": "2.7.3",
+          "downloadUrl": "https://github.com/influxdata/influxdb/archive/refs/tags/v2.7.3.tar.gz"
         }
       }
     },
