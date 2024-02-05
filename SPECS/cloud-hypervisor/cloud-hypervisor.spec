@@ -151,8 +151,8 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %license LICENSE-BSD-3-Clause
 
 %changelog
-* Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 37.0-1
-- Auto-upgrade to 37.0 - for 3.0 release
+* Mon Feb 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 37.0-1
+- Update to v37.0
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 35.0-1
 - Auto-upgrade to 35.0 - Azure Linux 3.0 - package upgrades
