@@ -554,8 +554,10 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p64_.a
 
 %changelog
-* Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.26-1
-- Auto-upgrade to 0.3.26 - Upgrade to 0.3.26
+* Mon Feb 05 2024 Nan Liu <liunan@microsoft.com> - 0.3.26-1
+- Upgrade to 0.3.26
+- Update License to BSD-3-Clause
+- Remove uneeded patches
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.3.21-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
