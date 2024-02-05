@@ -16,8 +16,8 @@
 
 Summary:        Google Core Libraries for Java
 Name:           guava
-Version:        25.0
-Release:        7%{?dist}
+Version:        33.0.0
+Release:        1%{?dist}
 License:        Apache-2.0 AND CC0-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,7 +26,6 @@ URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
 Patch0:         %{name}-%{version}-java8compat.patch
-Patch1:         CVE-2020-8908.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -64,7 +63,6 @@ guava-testlib provides additional functionality for conveninent unit testing
 %prep
 %setup -q -a1
 %patch0 -p1
-%patch1 -p1
 
 find . -name '*.jar' -delete
 
@@ -142,6 +140,9 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 %files testlib -f .mfiles-guava-testlib
 
 %changelog
+* Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 33.0.0-1
+- Auto-upgrade to 33.0.0 - 3.0 - Upgrade
+
 * Wed Aug 23 2023 Dallas Delaney <dadelan@microsoft.com> 25.0-7
 - Add patch for CVE-2020-8908
 

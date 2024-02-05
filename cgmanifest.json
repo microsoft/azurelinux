@@ -4980,8 +4980,8 @@
         "type": "other",
         "other": {
           "name": "guava",
-          "version": "25.0",
-          "downloadUrl": "https://github.com/google/guava/archive/v25.0.tar.gz"
+          "version": "33.0.0",
+          "downloadUrl": "https://github.com/google/guava/archive/refs/tags/v33.0.0.tar.gz"
         }
       }
     },
