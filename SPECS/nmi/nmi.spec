@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        Node Managed Identity
 Name:           nmi
-Version:        1.8.7
-Release:        15%{?dist}
+Version:        1.8.11
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,7 +12,7 @@ URL:            https://github.com/Azure/aad-pod-identity
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
+# How to re-build this file (note the version number will be -v2, etc):
 #   1. wget https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%%{version}.tar.gz -O aad-pod-identity-%%{version}.tar.gz
 #   2. tar -xf aad-pod-identity-%%{version}.tar.gz
 #   3. cd aad-pod-identity-%%{version}
@@ -23,7 +23,7 @@ Source0:        %{name}-%{version}.tar.gz
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         modify-go-build-option.patch
 BuildRequires:  golang >= 1.15
 
@@ -34,14 +34,12 @@ NMI is the resource that is used when your pods look to use their identity.
 %autosetup -c -N -n %{name}-%{version}
 pushd aad-pod-identity-%{version}
 %patch0 -p1
+# create vendor folder from the vendor tarball and set vendor mode
+tar -xf %{SOURCE1} --no-same-owner
 popd
 
 %build
 pushd aad-pod-identity-%{version}
-
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-
 make build-nmi
 popd
 
@@ -63,6 +61,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 1.8.11-1
+- Upgrade to version 1.8.11 to CVE-2022-21698 
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-15
 - Bump release to rebuild with go 1.20.9
 
