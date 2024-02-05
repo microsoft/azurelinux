@@ -24,8 +24,12 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+
+# patches for vendored code >= 1000
 # If upstream ever upgrades client_goland to 1.11.1, we can get rid of this patch.
-Patch0:         CVE-2022-21698.patch
+Patch1000:      CVE-2022-21698.patch
+Patch1001:      CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.13
 
 %description
@@ -36,7 +40,8 @@ to act as the ingress for an AKS cluster.
 %autosetup -N
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
-%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1000 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1001 -p1
 
 %build
 export VERSION=%{version}
