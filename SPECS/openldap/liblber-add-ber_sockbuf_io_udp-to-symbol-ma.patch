@@ -1,0 +1,26 @@
+Patch extracted from https://bugs.openldap.org/show_bug.cgi?id=9982 - Linker error when building with LDAP_CONNECTIONLESS
+
+From eb1c067b99045af6bf2442ed899fce5ceac26976 Mon Sep 17 00:00:00 2001
+From: Souvik Sen <invokesus@gmail.com>
+Date: Fri, 13 Jan 2023 09:22:31 -0500
+Subject: [PATCH] ITS#9982 liblber: add ber_sockbuf_io_udp to symbol map
+
+---
+ libraries/liblber/lber.map | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libraries/liblber/lber.map b/libraries/liblber/lber.map
+index 9a4094b0f..083cd1f32 100644
+--- a/libraries/liblber/lber.map
++++ b/libraries/liblber/lber.map
+@@ -121,6 +121,7 @@ OPENLDAP_2.200
+     ber_sockbuf_io_fd;
+     ber_sockbuf_io_readahead;
+     ber_sockbuf_io_tcp;
++    ber_sockbuf_io_udp;
+     ber_sockbuf_remove_io;
+     ber_sos_dump;
+     ber_start;
+--
+2.38.1
+
