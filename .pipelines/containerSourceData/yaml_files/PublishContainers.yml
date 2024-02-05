@@ -29,26 +29,26 @@ stages:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download $(buildConfigDir) - AMD64'
       inputs:
-        source: specific
-        project: 'mariner'
-        pipeline: '$(amd64ContainersPipelineId)'
-        runVersion: specific
-        runId: $(amd64ContainersBuildId)
-        artifact: $(configArtifactName)
-        patterns: $(buildConfigDir)/*
-        path: '$(amd64ArtifactsDownloadDir)'
+        buildType: specific
+        project: mariner
+        definition: $(amd64ContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(amd64ContainersBuildId)
+        artifactName: $(configArtifactName)
+        itemPattern: $(buildConfigDir)/*
+        targetPath: $(amd64ArtifactsDownloadDir)
 
     - task: DownloadPipelineArtifact@2
       displayName: 'Download $(buildConfigDir) - ARM64'
       inputs:
-        source: specific
-        project: 'mariner'
-        pipeline: '$(arm64ContainersPipelineId)'
-        runVersion: specific
-        runId: $(arm64ContainersBuildId)
-        artifact: $(configArtifactName)
-        patterns: $(buildConfigDir)/*
-        path: '$(arm64ArtifactsDownloadDir)'
+        buildType: specific
+        project: mariner
+        definition: $(arm64ContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(arm64ContainersBuildId)
+        artifactName: $(configArtifactName)
+        itemPattern: $(buildConfigDir)/*
+        targetPath: $(arm64ArtifactsDownloadDir)
 
     - task: Bash@3
       displayName: 'Validate Build Numbers'
@@ -140,14 +140,14 @@ stages:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download $(containerArtifactDir) - AMD64'
       inputs:
-        source: specific
-        project: 'mariner'
-        pipeline: '$(amd64ContainersPipelineId)'
-        runVersion: specific
-        runId: $(amd64ContainersBuildId)
-        artifact: $(containersArtifactName)
-        patterns: $(containerArtifactDir)/$(containerFilesPrefix)*$(containerFilesSuffix)
-        path: '$(amd64ArtifactsDownloadDir)'
+        buildType: specific
+        project: mariner
+        definition: $(amd64ContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(amd64ContainersBuildId)
+        artifactName: $(containersArtifactName)
+        itemPattern: $(containerArtifactDir)/$(containerFilesPrefix)*$(containerFilesSuffix)
+        targetPath: $(amd64ArtifactsDownloadDir)
 
     # This task's downloaded artifacts are not used.
     # It is just to implicitly validate that the corresponding ARM64 containers exist.
@@ -155,15 +155,16 @@ stages:
     # Therefore, we can continue on error but would still like to direct attention to this task's failure.
     - task: DownloadPipelineArtifact@2
       displayName: 'Download $(containerArtifactDir) - ARM64'
+      continueOnError: True
       inputs:
-        source: specific
-        project: 'mariner'
-        pipeline: '$(arm64ContainersPipelineId)'
-        runVersion: specific
-        runId: $(arm64ContainersBuildId)
-        artifact: $(containersArtifactName)
-        patterns: $(containerArtifactDir)/$(containerFilesPrefix)*$(containerFilesSuffix)
-        path: '$(arm64ArtifactsDownloadDir)'
+        buildType: specific
+        project: mariner
+        definition: $(arm64ContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(arm64ContainersBuildId)
+        artifactName: $(containersArtifactName)
+        itemPattern: $(containerArtifactDir)/$(containerFilesPrefix)*$(containerFilesSuffix)
+        targetPath: $(arm64ArtifactsDownloadDir)
 
     - task: Bash@3
       displayName: 'Publish Containers'

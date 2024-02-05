@@ -27,14 +27,14 @@ stages:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download $(buildConfigDir)'
       inputs:
-        source: specific
-        project: 'mariner'
-        pipeline: '$(baseContainersPipelineId)'
-        runVersion: specific
-        runId: $(baseContainersBuildId)
-        artifact: $(artifactName)
-        patterns: $(buildConfigDir)/*
-        path: '$(artifactsDownloadDir)'
+        buildType: specific
+        project: mariner
+        definition: $(baseContainersPipelineId)
+        buildVersionToDownload: specific
+        pipelineId: $(baseContainersBuildId)
+        artifactName: $(artifactName)
+        itemPattern: $(buildConfigDir)/*
+        targetPath: $(artifactsDownloadDir)
 
     - task: Bash@3
       displayName: 'Set Build Number'
