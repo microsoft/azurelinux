@@ -4,7 +4,7 @@ Release:        11%{?dist}
 Summary:        Create README.mkdn from POD
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-ReadmeMarkdownFromPod
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MATTN/Module-Install-ReadmeMarkdownFromPod-%{version}.tar.gz#/perl-Module-Install-ReadmeMarkdownFromPod-%{version}.tar.gz
 BuildArch:      noarch

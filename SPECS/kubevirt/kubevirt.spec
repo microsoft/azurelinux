@@ -22,7 +22,7 @@ Version:        0.59.0
 Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

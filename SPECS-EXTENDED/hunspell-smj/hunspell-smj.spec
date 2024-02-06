@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-smj
 Summary: Lule Saami hunspell dictionaries
 Version: 1.0

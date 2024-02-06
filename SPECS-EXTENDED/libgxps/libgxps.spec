@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libgxps
 Version:        0.3.1
 Release:        8%{?dist}

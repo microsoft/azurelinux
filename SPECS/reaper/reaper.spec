@@ -17,7 +17,7 @@ Version:        3.1.1
 Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://cassandra-reaper.io/
 Source0:        https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/%{version}.tar.gz#/cassandra-reaper-%{version}.tar.gz

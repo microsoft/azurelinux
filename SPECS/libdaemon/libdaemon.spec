@@ -4,7 +4,7 @@ Version:        0.14
 Release:        21%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://0pointer.de/lennart/projects/libdaemon/
 Source0:        https://0pointer.de/lennart/projects/libdaemon/%{name}-%{version}.tar.gz
 # Requires lynx to build the docs

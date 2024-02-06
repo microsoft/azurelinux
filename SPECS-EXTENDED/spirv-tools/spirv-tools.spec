@@ -5,7 +5,7 @@ Summary:        API and commands for processing SPIR-V modules
 
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/SPIRV-Tools
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/SPIRV-Tools-%{version}.tar.gz
 

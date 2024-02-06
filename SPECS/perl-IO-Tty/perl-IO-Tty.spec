@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # Mostly licensed same as Perl. IO-Tty-1.14/Tty.xs is licensed under BSD.
 License:        (GPL+ OR Artistic) AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-Tty
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Tty-%{version}.tar.gz#/perl-IO-Tty-%{version}.tar.gz
 

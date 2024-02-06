@@ -4,7 +4,7 @@ Version:        0.6.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/lcp/mokutil
 Source0:        https://github.com/lcp/mokutil/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

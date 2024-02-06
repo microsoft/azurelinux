@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-or
 Summary: Odia hyphenation rules
 Version: 0.7.0

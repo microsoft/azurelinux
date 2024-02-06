@@ -4,7 +4,7 @@ Version:        23.3.3
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

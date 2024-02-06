@@ -4,7 +4,7 @@ Version:        3.3
 Release:        1%{?dist}
 License:        BSD-like
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/kjd/idna
 #Source0:       https://github.com/kjd/idna/archive/refs/tags/v%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-pa
 Summary: Punjabi hunspell dictionaries
 Version: 1.0.0

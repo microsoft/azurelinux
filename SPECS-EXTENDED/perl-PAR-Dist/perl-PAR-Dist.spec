@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-PAR-Dist
 Version:        0.51
 Release:        2%{?dist}

@@ -5,7 +5,7 @@ Version:        3.5.2
 Release:        1%{?dist}
 Summary:        Modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 License:        BSL-1.0
 URL:            https://github.com/catchorg/Catch2

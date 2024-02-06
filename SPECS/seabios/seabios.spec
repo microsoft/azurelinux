@@ -21,7 +21,7 @@ Version:        1.16.3
 Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.seabios.org/SeaBIOS
 Source0:        https://www.seabios.org/downloads/%{name}-%{version}.tar.gz
 Source10:       config.vga-cirrus

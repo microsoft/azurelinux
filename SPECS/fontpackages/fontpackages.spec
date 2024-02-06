@@ -13,7 +13,7 @@ Release:        28%{?dist}
 # license of the packages they're inserted in.
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pnemade/fontpackages
 Source0:        https://github.com/pnemade/fontpackages/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         dnf.patch

@@ -20,7 +20,7 @@ Version:        1.26
 Release:        3%{?dist}
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/%{name}
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz

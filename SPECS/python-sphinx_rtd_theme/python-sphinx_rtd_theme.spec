@@ -5,7 +5,7 @@ Version:        1.0.0
 Release:        2%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rtfd/%{srcname}
 Source0:        https://github.com/rtfd/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The koji builders do not have network access, and this file is not included

@@ -4,7 +4,7 @@ Version:        1.06
 Release:        1%{?dist}
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/dist/Test-NoWarnings
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-NoWarnings-%{version}.tar.gz#/perl-Test-NoWarnings-%{version}.tar.gz
 BuildArch:      noarch

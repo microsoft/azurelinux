@@ -6,7 +6,7 @@ Version:        8.9.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.elastic.co/guide/en/elasticsearch/client/ruby-api/current/index.html
 Source0:        https://github.com/elastic/elasticsearch-ruby/archive/refs/tags/v%{version}.tar.gz#/elasticsearch-ruby-%{version}.tar.gz

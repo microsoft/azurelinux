@@ -6,7 +6,7 @@ Version:        1.1.0
 Release:        30%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/termcolor/
 Source0:        https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel

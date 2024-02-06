@@ -8,7 +8,7 @@ URL:            https://github.com/openSUSE/libsolv
 Source0:        %{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
 Requires:       expat-libs

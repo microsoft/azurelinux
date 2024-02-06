@@ -4,7 +4,7 @@ Version:        1.10.0
 Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libosinfo.org/
 Source:         https://releases.pagure.org/libosinfo/%{name}-1.10.0.tar.xz
 BuildRequires:  %{_bindir}/pod2man

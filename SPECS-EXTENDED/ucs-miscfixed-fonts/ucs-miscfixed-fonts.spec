@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global fontname ucs-miscfixed
 %global fontconf 66-%{fontname}.conf
 

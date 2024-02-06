@@ -4,7 +4,7 @@ Version:        2023.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pytz
 Source0:        https://files.pythonhosted.org/packages/5e/32/12032aa8c673ee16707a9b6cdda2b09c0089131f35af55d443b6a9c69c1d/%{name}-%{version}.tar.gz

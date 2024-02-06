@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-pl
 Summary: Polish hyphenation rules
 %global upstreamid 20060726

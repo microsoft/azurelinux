@@ -11,7 +11,7 @@ Release:    24%{?dist}
 # LICENSE, lib/DateTime/Format/ISO8601.pod -> GPL+ or Artistic
 License:    GPL+ or Artistic 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:    Parses ISO8601 formats 
 URL:        https://metacpan.org/release/DateTime-Format-ISO8601
 Source:     https://cpan.metacpan.org/authors/id/J/JH/JHOBLITT/DateTime-Format-ISO8601-%{version}.tar.gz 
