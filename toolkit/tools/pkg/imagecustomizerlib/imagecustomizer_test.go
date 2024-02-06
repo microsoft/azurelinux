@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
@@ -248,7 +249,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 	defer imageConnection.Close()
 
 	// Read the grub.cfg file.
-	grub2ConfigFilePath := filepath.Join(imageConnection.Chroot().RootDir(), "/boot/grub2/grub.cfg")
+	grub2ConfigFilePath := filepath.Join(imageConnection.Chroot().RootDir(), installutils.GrubCfgFile)
 
 	grub2ConfigFile, err := os.ReadFile(grub2ConfigFilePath)
 	if !assert.NoError(t, err) {
@@ -318,7 +319,8 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	}
 
 	err = createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
-		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, installOS)
+		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxDisabled,
+		installOS)
 	if err != nil {
 		return "", err
 	}

@@ -1,13 +1,13 @@
 Summary:        C library that provide processing for data in the UTF-8 encoding
 Name:           utf8proc
-Version:        2.6.1
-Release:        2%{?dist}
+Version:        2.9.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
-URL:            https://github.com/JuliaStrings/utf8proc
-# Source0:  https://github.com/JuliaStrings/utf8proc/archive/v%{version}.tar.gz
+URL:            https://github.com/juliastrings/utf8proc
+# Source0:  https://github.com/juliastrings/utf8proc/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 %if %{with_check}
@@ -34,6 +34,7 @@ mkdir -p build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_BUILD_TYPE=Release        \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DBUILD_SHARED_LIBS=ON            \
       ..
 make %{?_smp_mflags}
@@ -53,6 +54,7 @@ LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 %license LICENSE.md
 %doc lump.md NEWS.md README.md
 %{_libdir}/libutf8proc.so.*
+%{_libdir}/pkgconfig/libutf8proc.pc
 
 %files devel
 %defattr(-,root,root,-)
@@ -60,6 +62,9 @@ LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make check
 %{_libdir}/libutf8proc.so
 
 %changelog
+* Fri Jan 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.9.0-1
+- Auto-upgrade to 2.9.0 - none
+
 * Tue Mar 01 2022 Bala <balakumaran.kannan@microsoft.com> - 2.6.1-2
 - BR ruby for ptest
 - Set Locale before running ptest

@@ -102,7 +102,8 @@ $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \
-		--log-file="$(rpms_snapshot_logs_path)"
+		--log-file="$(rpms_snapshot_logs_path)" \
+		--log-color="$(LOG_COLOR)""
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
@@ -124,4 +125,5 @@ $(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) 
 		--dist-tag=$(DIST_TAG) \
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \
-		--log-file="$(valid_arch_spec_names_logs_path)"
+		--log-file="$(valid_arch_spec_names_logs_path)" \
+		--log-color="$(LOG_COLOR)"
