@@ -157,7 +157,7 @@ The test package contains all regression tests for Python as well as the modules
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
-%patch0 -p1
+%patch -P 0 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
