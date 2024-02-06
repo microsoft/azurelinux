@@ -64,7 +64,7 @@ make -C icu/icu4c/source DESTDIR=%{buildroot} install
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Feb 1 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 72.1.0.3-1
+* Thu Feb 05 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 72.1.0.3-1
 - Update to version  "72.1.0.3".
 - Add check section.
 
