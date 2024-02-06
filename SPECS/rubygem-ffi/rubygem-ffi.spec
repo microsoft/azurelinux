@@ -30,6 +30,12 @@ a Ruby-FFI extension works without changes on CRuby (MRI), JRuby, Rubinius and T
 
 %prep
 %autosetup -p1 -n %{gem_name}-%{version}
+# Making sure gemspec finds the git repositories it's relying on for listing the files.
+submodule_dir="ext/ffi_c/libffi"
+git init .
+git init $submodule_dir
+git add . -- ":!$submodule_dir"
+git -C $submodule_dir add .
 
 %build
 gem build %{gem_name}
