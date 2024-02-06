@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
-
 set -eux
 
 # cleanup symlinks created by the toolkit that are not needed for base images
@@ -14,7 +11,7 @@ else
 fi
 
 # cleanup any logs that may have been created during the build
-if [ -L /var/log ]; then
+if [ -d /var/log ]; then
   echo "Clearing /var/log"
   rm -rf /var/log/*
 else
