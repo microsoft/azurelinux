@@ -61,7 +61,7 @@ popd
 %{_bindir}/%{name}
 
 %changelog
-* Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 1.8.11-1
+* Fri Feb 06 2024 Tobias Brick <tobiasb@microsoft.com> - 1.8.11-1
 - Upgrade to version 1.8.11 to CVE-2022-21698 
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-15
