@@ -4,7 +4,7 @@ Version:        0.7.28
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
-Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
