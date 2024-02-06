@@ -299,7 +299,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 
 		_, logFile, buildErr = agent.BuildPackage(basePackageName, srpmFile, logBaseName, outArch, runCheck, dependencies)
 		if buildErr != nil {
-			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s, for details see: %s", srpmFile, buildErr, logFile)
+			logger.Log.Warnf("Test build for '%s' failed on a non-test build issue. Error: %s", srpmFile, buildErr)
 			return
 		}
 
@@ -309,7 +309,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 	}, checkAttempts, retryDuration)
 
 	if err != nil && checkFailed {
-		logger.Log.Warnf("Tests failed for '%s'. Error: %s, for details see: %s", srpmFile, err, logFile)
+		logger.Log.Warnf("Tests failed for '%s'. Error: %s", srpmFile, err)
 		err = nil
 	}
 	return
