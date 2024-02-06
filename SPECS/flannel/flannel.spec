@@ -49,7 +49,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
-* Mon Feb 5 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.14.0-21
+* Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.14.0-21
 - Patching CVE-2021-44716
 
 * Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 0.14.0-20
