@@ -4160,8 +4160,8 @@
         "type": "other",
         "other": {
           "name": "geos",
-          "version": "3.11.1",
-          "downloadUrl": "https://download.osgeo.org/geos/geos-3.11.1.tar.bz2"
+          "version": "3.12.0",
+          "downloadUrl": "https://download.osgeo.org/%{name}/geos-3.12.0.tar.bz2"
         }
       }
     },

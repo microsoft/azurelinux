@@ -1,7 +1,7 @@
 Summary:        GEOS is a C++ port of the Java Topology Suite
 Name:           geos
-Version:        3.11.1
-Release:        4%{?dist}
+Version:        3.12.0
+Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -70,6 +70,9 @@ make docs -C %{__cmake_builddir}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.12.0-1
+- Auto-upgrade to 3.12.0 - 3.0-dev-upgrade
+
 * Tue Feb 14 2023 Sindhu Karri <lakarri@microsoft.com> - 3.11.1-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - Removed building for mingw environment
