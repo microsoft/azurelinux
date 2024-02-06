@@ -16,9 +16,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/linux-test-project/ltp
-Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/linux-test-project/ltp/releases/download/%{version}/ltp-full-%{version}.tar.xz#/%{name}-%{version}.tar.gz
 # Use the generate_submodules_tarball.sh script to create a tarball during version updates.
-Source1:        %{name}_submodules-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -62,7 +61,7 @@ BuildArch:      noarch
 LTP documentation and manuals.
 
 %prep
-%autosetup -a 1
+%autosetup -n ltp-full-%{version}
 
 %build
 make autotools
@@ -76,8 +75,6 @@ make autotools
 %make_install
 
 %check
-# Disabling cloning of git submodules - already provided in Source1
-sed -i "s/git submodule.*/@echo 'Skipping submodule init - already provided.'/" tools/sparse/Makefile
 make check
 
 %preun
