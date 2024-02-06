@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "ksh",
-          "version": "1.0.0~beta.1",
-          "downloadUrl": "https://github.com/ksh93/ksh/archive/v1.0.0-beta.1/ksh-1.0.0-beta.1.tar.gz"
+          "version": "1.0.8",
+          "downloadUrl": "https://github.com/ksh93/ksh/archive/refs/tags/v1.0.8.tar.gz"
         }
       }
     },
