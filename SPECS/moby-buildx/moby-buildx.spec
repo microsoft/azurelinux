@@ -5,13 +5,15 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        0.7.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fixed in upstream v0.8.0. Can remove when we upgrade to that version.
+Patch0:         CVE-2022-21698.patch
 
 BuildRequires: bash
 BuildRequires: golang >= 1.17
@@ -25,6 +27,7 @@ A Docker CLI plugin for extended build capabilities with BuildKit
 
 %prep
 %setup -q -n %{upstream_name}-%{version}
+%patch 0 -p1 -d vendor/github.com/prometheus/client_golang
 
 %build
 export CGO_ENABLED=0
@@ -42,6 +45,9 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Thu Feb 01 2024 Tobias Brick <tobiasb@microsoft.com> - 0.7.1-16
+- Fix CVE-2022-21698
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-15
 - Bump release to rebuild with go 1.20.9
 

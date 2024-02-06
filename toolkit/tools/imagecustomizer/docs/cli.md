@@ -29,11 +29,11 @@ The file path to write the final customized image to.
 
 ## --output-image-format=FORMAT
 
-Required.
-
 The image format of the the final customized image.
 
 Options: vhd, vhdx, qcow2, and raw.
+
+At least one of --output-image-format and --output-split-partitions-format is required.
 
 ## --output-split-partitions-format=FORMAT
 

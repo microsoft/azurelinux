@@ -65,6 +65,7 @@
 /SPECS/moby-runc/* @microsoft/cbl-mariner-container-runtime
 /SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
+/SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
 /SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers

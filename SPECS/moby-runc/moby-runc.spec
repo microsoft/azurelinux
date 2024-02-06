@@ -5,7 +5,7 @@ Summary:        CLI tool for spawning and running containers per OCI spec.
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        1.1.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
@@ -13,6 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-21626.patch
 
 BuildRequires:  git
 BuildRequires:  golang => 1.16
@@ -35,7 +36,7 @@ Obsoletes: runc-io
 runC is a CLI tool for spawning and running containers according to the OCI specification. Containers are started as a child process of runC and can be embedded into various other systems without having to run a daemon.
 
 %prep
-%setup -q -n %{upstream_name}-%{version}
+%autosetup -n %{upstream_name}-%{version} -p1
 
 %build
 export CGO_ENABLED=1
@@ -57,6 +58,10 @@ make install-man DESTDIR="%{buildroot}" PREFIX="%{_prefix}"
 %{_mandir}/*
 
 %changelog
+* Tue Jan 23 2024 Muhammad Falak <mwani@microsoft.com> - 1.1.9-4
+- Address CVE-2024-21626
+- Switch to autosetup
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.9-3
 - Bump release to rebuild with go 1.20.9
 

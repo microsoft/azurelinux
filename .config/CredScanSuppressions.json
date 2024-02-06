@@ -28,10 +28,6 @@
         {
             "file": "\\toolkit\\tools\\imagecustomizer\\docs\\configuration.md",
             "_justification": "Secrets from documentation samples. No production secrets."
-        },
-        {
-            "file": "\\toolkit\\tools\\pkg\\imagecustomizerlib\\testdata\\addusers-config.yaml",
-            "_justification": "Dummy secrets used to unit test configuration code."
         }
     ]
 }

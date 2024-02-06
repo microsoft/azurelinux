@@ -1,0 +1,82 @@
+From f405787a0abaf14e332aa6d1d924e75970332e68 Mon Sep 17 00:00:00 2001
+From: Vlad Buslov <vladbu@nvidia.com>
+Date: Thu, 1 Jun 2023 09:34:35 +0200
+Subject: [PATCH 82/84] net/mlx5: Create eswitch debugfs root directory
+
+Following patch in series uses the new directory for bridge FDB debugfs.
+The new directory is intended for all future eswitch-specific debugfs
+files.
+
+Conflicts:
+ - drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+   Context diff due to missing:
+   fbd43b7259bc ("net/mlx5: E-switch, Introduce flag to indicate if fdb table is created")
+
+ - drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+   Context diff due to missing:
+   3f90840305e2 ("net/mlx5: Move esw multiport devlink param to eswitch code")
+   Also commit 66771a1c729e ("net/mlx5: Move debugfs entries to separate struct")
+   is missing. Pass dev->priv.dbg_root instead of mlx5_debugfs_get_dev_root()
+   to function mlx5_eswitch_init()
+
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c | 4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.h | 3 +++
+ 2 files changed, 7 insertions(+)
+
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+@@ -31,6 +31,7 @@
+  */
+ 
+ #include <linux/etherdevice.h>
++#include <linux/debugfs.h>
+ #include <linux/mlx5/driver.h>
+ #include <linux/mlx5/mlx5_ifc.h>
+ #include <linux/mlx5/vport.h>
+@@ -1560,6 +1561,7 @@ int mlx5_eswitch_init(struct mlx5_core_d
+ 	esw->manager_vport = mlx5_eswitch_manager_vport(dev);
+ 	esw->first_host_vport = mlx5_eswitch_first_host_vport_num(dev);
+ 
++	esw->debugfs_root = debugfs_create_dir("esw", dev->priv.dbg_root);
+ 	esw->work_queue = create_singlethread_workqueue("mlx5_esw_wq");
+ 	if (!esw->work_queue) {
+ 		err = -ENOMEM;
+@@ -1611,6 +1613,7 @@ reps_err:
+ abort:
+ 	if (esw->work_queue)
+ 		destroy_workqueue(esw->work_queue);
++	debugfs_remove_recursive(esw->debugfs_root);
+ 	kfree(esw);
+ 	return err;
+ }
+@@ -1634,6 +1637,7 @@ void mlx5_eswitch_cleanup(struct mlx5_es
+ 	mutex_destroy(&esw->offloads.decap_tbl_lock);
+ 	esw_offloads_cleanup_reps(esw);
+ 	mlx5_esw_vports_cleanup(esw);
++	debugfs_remove_recursive(esw->debugfs_root);
+ 	kfree(esw);
+ }
+ 
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -283,6 +283,8 @@ enum {
+ 
+ struct mlx5_esw_bridge_offloads;
+ 
++struct dentry;
++
+ struct mlx5_eswitch {
+ 	struct mlx5_core_dev    *dev;
+ 	struct mlx5_nb          nb;
+@@ -291,6 +293,7 @@ struct mlx5_eswitch {
+ 	struct hlist_head       mc_table[MLX5_L2_ADDR_HASH_SIZE];
+ 	struct esw_mc_addr mc_promisc;
+ 	/* end of legacy */
++	struct dentry *debugfs_root;
+ 	struct workqueue_struct *work_queue;
+ 	struct xarray vports;
+ 	u32 flags;
