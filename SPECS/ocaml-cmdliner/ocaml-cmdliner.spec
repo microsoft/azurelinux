@@ -6,7 +6,7 @@ Version:        1.0.4
 Release:        20%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/dbuenzli/cmdliner/
 Source0:        https://github.com/dbuenzli/%{libname}/archive/v%{version}/%{name}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-hil
 Summary: Hiligaynon hunspell dictionaries
 Version: 0.14

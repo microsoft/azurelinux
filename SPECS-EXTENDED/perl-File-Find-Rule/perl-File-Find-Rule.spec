@@ -4,7 +4,7 @@ Release: 	15%{?dist}
 Summary: 	Perl module implementing an alternative interface to File::Find
 License: 	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: 		https://metacpan.org/release/File-Find-Rule
 Source0: 	https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/File-Find-Rule-%{version}.tar.gz#/perl-File-Find-Rule-%{version}.tar.gz
 

@@ -4,7 +4,7 @@ Version:        5.45
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.darwinsys.com/file
 Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz

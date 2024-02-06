@@ -4,7 +4,7 @@ Version:        3.16.2
 Release:        1%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libfuse/libfuse
 Source0:        https://github.com/libfuse/libfuse/archive/fuse-%{version}.tar.gz
 Source1:        fuse.conf

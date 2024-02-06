@@ -9,7 +9,7 @@ License: ASL 2.0
 Group: Tools/Container
 URL: https://github.com/docker/cli
 Vendor: Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 Source0: https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

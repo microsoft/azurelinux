@@ -18,7 +18,7 @@ Version:        3.24.28
 Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gtk.org
 Source0:        https://download.gnome.org/sources/gtk+/3.24/gtk+-%{version}.tar.xz
 # https://bugzilla.redhat.com/show_bug.cgi?id=1946133

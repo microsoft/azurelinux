@@ -5,7 +5,7 @@ Version:        1.4.0
 Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/app/%{pkgname}-%{version}.tar.bz2
 Source10:       xinitrc-common

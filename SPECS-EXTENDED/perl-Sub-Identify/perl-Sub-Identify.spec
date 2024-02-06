@@ -11,7 +11,7 @@ Release:	13%{?dist}
 Summary:	Retrieve names of code references
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Sub-Identify
 Source0:	https://cpan.metacpan.org/authors/id/R/RG/RGARCIA/Sub-Identify-%{version}.tar.gz#/perl-Sub-Identify-%{version}.tar.gz
 # Module Build

@@ -4,7 +4,7 @@ Version:       2.6
 Release:       1%{?dist}
 License:       GPLv2
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Group:         Development/Tools
 URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
 Source0:       https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz

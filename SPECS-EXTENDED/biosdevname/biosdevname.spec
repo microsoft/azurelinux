@@ -4,7 +4,7 @@ Release:	7%{?dist}
 Summary:	Udev helper for naming devices per BIOS names
 License:	GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://github.com/dell/biosdevname
 # SMBIOS only exists on these arches.  It's also likely that other
 # arches don't expect the PCI bus to be sorted breadth-first, or of

@@ -6,7 +6,7 @@ Version:        1.4.5
 Release:        1%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libpwquality/libpwquality/
 Source0:        https://github.com/libpwquality/libpwquality/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 %global _pwqlibdir %{_libdir}

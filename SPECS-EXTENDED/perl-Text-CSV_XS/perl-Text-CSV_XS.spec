@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Text-CSV_XS
 Version:        1.41
 Release:        2%{?dist}

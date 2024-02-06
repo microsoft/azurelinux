@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-tpi
 Summary: Tok Pisin hunspell dictionaries
 Version: 0.07

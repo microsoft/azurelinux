@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ga
 Summary: Irish hyphenation rules
 %global upstreamid 20040220

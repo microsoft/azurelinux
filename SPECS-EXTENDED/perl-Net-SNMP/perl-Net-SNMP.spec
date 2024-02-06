@@ -5,7 +5,7 @@ Summary:        Object oriented interface to SNMP
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Net-SNMP
 Source0:        https://cpan.metacpan.org/authors/id/D/DT/DTOWN/Net-SNMP-v%{version}.tar.gz#/perl-Net-SNMP-v%{version}.tar.gz
 

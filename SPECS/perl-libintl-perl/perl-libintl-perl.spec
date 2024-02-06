@@ -8,7 +8,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/libintl-perl/
 Source:         https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)

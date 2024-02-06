@@ -7,7 +7,7 @@ Version:        1.5.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xkbcommon.org/download/%{name}-%{version}.tar.xz
 

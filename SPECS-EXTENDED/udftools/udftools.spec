@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Linux UDF Filesystem userspace utilities
 Name: udftools
 Version: 2.1

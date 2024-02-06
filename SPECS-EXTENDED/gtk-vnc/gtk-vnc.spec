@@ -2,7 +2,7 @@
 %global verdir 1.3
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A GTK widget for VNC clients
 Name: gtk-vnc
 Version: 1.3.0

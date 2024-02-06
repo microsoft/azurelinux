@@ -7,7 +7,7 @@ Release:        10%{?dist}
 # The source code is LGPLv2+ except eng_back.c and eng_parse.c which are BSD
 License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/OpenSC/libp11
 Source0:        https://github.com/OpenSC/libp11/releases/download/libp11-%{version}/libp11-%{version}.tar.gz
 Patch0:         openssl-pkcs11-0.4.10-various-bug-fixes.patch

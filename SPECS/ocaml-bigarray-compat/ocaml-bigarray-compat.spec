@@ -10,7 +10,7 @@ Version:        1.1.0
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mirage/bigarray-compat
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # https://github.com/mirage/bigarray-compat/pull/5

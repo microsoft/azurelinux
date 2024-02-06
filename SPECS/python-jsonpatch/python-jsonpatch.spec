@@ -5,7 +5,7 @@ Version:        1.32
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonpatch
 Source0:        https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v%{version}.tar.gz#/python-json-patch-%{version}.tar.gz

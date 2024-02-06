@@ -4,7 +4,7 @@ Version:        0.46.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hanslub42/rlwrap
 Source:         https://github.com/hanslub42/rlwrap/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

@@ -4,7 +4,7 @@ Version:        2.0.32
 Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
 Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz

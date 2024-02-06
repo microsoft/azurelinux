@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:       List or change SCSI/SATA disk parameters
 Name:          sdparm
 Version:       1.11

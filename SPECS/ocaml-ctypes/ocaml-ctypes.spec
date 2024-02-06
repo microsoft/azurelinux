@@ -4,7 +4,7 @@ Version:        0.18.0
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
