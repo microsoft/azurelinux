@@ -60,9 +60,13 @@ pushd python
 popd
 
 %files -n python3-flatbuffers -f %{pyproject_files}
-%license LICENSE.txt
+%license LICENSE
 
 %changelog
+* Tue Feb 06 2024 Henry Li <lihl@microsoft.com> - 23.5.26-1
+- Upgrade to version 23.5.26
+- Fix incorrect file name
+
 * Mon Oct 24 2022 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.8-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
