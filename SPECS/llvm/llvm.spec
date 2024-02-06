@@ -49,7 +49,7 @@ cmake -G Ninja                              \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
       -DLLVM_BUILD_TESTS=ON                 \
-      -DLLVM_TARGETS_TO_BUILD="host;BPF"    \
+      -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
       -Wno-dev ../llvm
@@ -98,7 +98,7 @@ ninja check-all
 
 %changelog
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
-- Re-add 'BPF' as target-to-build
+- Re-add 'BPF' and 'AMDGPU' as target-to-build
 
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
