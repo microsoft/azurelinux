@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,7 @@ BuildRequires:  flex
 BuildRequires:  fontconfig-devel
 BuildRequires:  freefont
 BuildRequires:  freetype-devel >= 2
+BuildRequires:  gc-devel
 BuildRequires:  gd-devel
 BuildRequires:  gmp-devel
 BuildRequires:  guile-devel
@@ -250,9 +251,7 @@ Requires:       tcl >= 8.3
 Various tcl packages (extensions) for the graphviz tools.
 
 %prep
-%setup -q
-%patch0 -p1 -b .dotty-menu-fix
-%patch1 -p1 -b .coverity-scan-fixes
+%autosetup -p1
 
 # Attempt to fix rpmlint warnings about executable sources
 find -type f -regex '.*\.\(c\|h\)$' -exec chmod a-x {} ';'
@@ -518,6 +517,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Tue Feb 06 2024 Dan Streetman <ddstreet@ieee.org> - 2.42.4-10
+- add build dep gc-devel
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.42.4-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
