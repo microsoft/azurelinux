@@ -17,7 +17,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/linux-test-project/ltp
 Source0:        https://github.com/linux-test-project/ltp/releases/download/%{version}/ltp-full-%{version}.tar.xz#/%{name}-%{version}.tar.gz
-# Use the generate_submodules_tarball.sh script to create a tarball during version updates.
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -89,8 +88,8 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20240129-1
-- Auto-upgrade to 20240129 - Mariner 3.0 release
+* Tue Feb 06 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240129-1
+- Upgrade to 20240129 for Mariner 3.0 release
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20230127-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
