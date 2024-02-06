@@ -12761,8 +12761,8 @@
         "type": "other",
         "other": {
           "name": "mcstrans",
-          "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/mcstrans-3.2.tar.gz"
+          "version": "3.6",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.6/mcstrans-3.6.tar.gz"
         }
       }
     },
