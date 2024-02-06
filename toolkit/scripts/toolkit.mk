@@ -103,7 +103,7 @@ $(rpms_snapshot_per_specs): $(go-rpmssnapshot) $(chroot_worker) $(local_specs) $
 		--worker-tar="$(chroot_worker)" \
 		--log-level=$(LOG_LEVEL) \
 		--log-file="$(rpms_snapshot_logs_path)" \
-		--log-color="$(LOG_COLOR)""
+		--log-color="$(LOG_COLOR)"
 
 print-build-summary:
 	sed -E -n 's:^.+level=info msg="Built \(([^\)]+)\) -> \[(.+)\].+$:\1\t\2:gp' $(LOGS_DIR)/pkggen/rpmbuilding/* | tee $(LOGS_DIR)/pkggen/build-summary.csv
@@ -114,7 +114,7 @@ run-specarchchecker: $(valid_arch_spec_names)
 	@cat $(valid_arch_spec_names) && echo "" # File doesn't have a newline at the end, so add one via echo.
 	@echo "Valid arch spec names generated under '$(valid_arch_spec_names)'."
 
-$(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) 
+$(valid_arch_spec_names): $(go-specarchchecker) $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST)
 	$(go-specarchchecker) \
 		--input="$(SPECS_DIR)" \
 		--output="$@" \
