@@ -10,7 +10,7 @@ Version:        1.0.2
 Release:        15%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://erratique.ch/software/uutf
 Source0:        https://github.com/dbuenzli/uutf/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # The uchar package is a forward compatibility package for OCaml versions prior

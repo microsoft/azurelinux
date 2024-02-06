@@ -11,7 +11,7 @@ Version:        1.3.0
 Release:        3%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mirage/alcotest
 Source0:        %{URL}/archive/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 # We neither need nor want the stdlib-shims package.  It is a forward

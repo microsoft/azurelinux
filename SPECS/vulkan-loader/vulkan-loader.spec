@@ -4,7 +4,7 @@ Version:        1.2.148.1
 Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/Vulkan-Loader
 #WARNING: the source file downloads as 'sdk-%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
 #Source0:       %%{url}/archive/sdk-%%{version}.tar.gz

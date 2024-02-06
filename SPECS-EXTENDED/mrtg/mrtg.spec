@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _use_internal_dependency_generator 0
 
 %global contentdir       %{_localstatedir}/www/%{name}

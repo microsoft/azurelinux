@@ -9,7 +9,7 @@ Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
 Vendor:           Microsoft Corporation
-Distribution:     Mariner
+Distribution:   Azure Linux
 
 Source0:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-words-%{version}.gz

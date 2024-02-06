@@ -4,7 +4,7 @@ Version:        1.8.7
 Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.netfilter.org/projects/iptables
 Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.bz2

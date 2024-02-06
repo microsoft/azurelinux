@@ -7,7 +7,7 @@ Release:        19%{?dist}
 # License is LGPL 2.1 with standard OCaml exceptions
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mirage/mmap
 Source0:        https://github.com/mirage/mmap/archive/v%{version}/mmap-v%{version}.tar.gz
 

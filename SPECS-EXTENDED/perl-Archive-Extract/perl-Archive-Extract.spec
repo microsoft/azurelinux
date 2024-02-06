@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Enable LZMA and XZ support via pure-Perl implementation
 %if 0%{?rhel}
 %bcond_with perl_Archive_Extract_enables_perl_xz

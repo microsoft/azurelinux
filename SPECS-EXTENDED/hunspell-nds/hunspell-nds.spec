@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-nds
 Summary: Lowlands Saxon hunspell dictionaries
 Version: 0.1

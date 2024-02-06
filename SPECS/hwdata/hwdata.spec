@@ -4,7 +4,7 @@ Version:        0.356
 Release:        1%{?dist}
 License:        GPLv2+ OR XFree86 1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/vcrhonek/hwdata
 #WARNING: the source file downloads as 'v%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
 #Source0:       %%{url}/archive/v%%{version}.tar.gz

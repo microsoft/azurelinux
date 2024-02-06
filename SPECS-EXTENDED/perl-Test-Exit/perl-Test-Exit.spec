@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Test that some code calls exit without terminating testing
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Exit
 Source0:        https://cpan.metacpan.org/authors/id/A/AR/ARODLAND/Test-Exit-%{version}.tar.gz#/perl-Test-Exit-%{version}.tar.gz
 BuildArch:      noarch

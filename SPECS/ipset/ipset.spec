@@ -4,7 +4,7 @@ Version:        7.17
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/tools
 URL:            https://ipset.netfilter.org/
 Source0:        https://ipset.netfilter.org/%{name}-%{version}.tar.bz2

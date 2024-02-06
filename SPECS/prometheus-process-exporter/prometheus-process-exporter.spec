@@ -8,7 +8,7 @@ Version:        0.7.10
 Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ncabatoff/process-exporter
 Source0:        https://github.com/ncabatoff/process-exporter/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.

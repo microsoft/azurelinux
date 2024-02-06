@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           qperf
 Summary:        Measure socket and RDMA performance
 Version:        0.4.9

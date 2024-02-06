@@ -18,7 +18,7 @@ Version:        3.6.3
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gdal.org
 Source0:        https://github.com/OSGeo/gdal/releases/download/v3.6.3/%{name}-%{version}.tar.gz
 Source1:        %{name}autotest-%{version}.tar.gz

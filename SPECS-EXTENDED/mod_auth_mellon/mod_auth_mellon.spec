@@ -5,7 +5,7 @@ Version:        0.16.0
 Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/latchset/mod_auth_mellon
 Source0:        https://github.com/latchset/mod_auth_mellon/releases/download/v0_16_0/mod_auth_mellon-0.16.0.tar.gz
 Source1:        auth_mellon.conf

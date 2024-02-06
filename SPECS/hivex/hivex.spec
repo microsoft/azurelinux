@@ -11,7 +11,7 @@ Version:        1.3.21
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libguestfs.org/
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: The NIS (Network Information Service) server
 Url: https://github.com/thkukuk/ypserv
 Name: ypserv

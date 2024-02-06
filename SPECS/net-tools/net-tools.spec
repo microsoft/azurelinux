@@ -4,7 +4,7 @@ Version:        2.10
 Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/net-tools/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}-%{version}.tar.xz

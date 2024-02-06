@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Replaces random number generation with non-random number generation
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-MockRandom
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Test-MockRandom-%{version}.tar.gz#/perl-Test-MockRandom-%{version}.tar.gz
 BuildArch:      noarch

@@ -11,7 +11,7 @@ Name: openssl
 Version: 3.1.4
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
@@ -91,6 +91,7 @@ BuildRequires: perl(Test::More)
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: coreutils
 Requires: perl
+Requires: SymCrypt
 
 %description
 The OpenSSL toolkit provides support for secure communications between

@@ -4,7 +4,7 @@ Version:        0.2.2
 Release:        4%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libsndfile.github.io/libsamplerate/
 Source0:        https://github.com/libsndfile/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  alsa-lib-devel

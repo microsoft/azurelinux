@@ -10,7 +10,7 @@ BuildArch:      noarch
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fedoraproject.org/wiki/User:Patches/PackagingDrafts/Web_Assets
 
 Source1:        LICENSE

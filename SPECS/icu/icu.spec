@@ -10,7 +10,7 @@ License:        BSD and MIT and Public Domain and naist-2003
 URL:            https://github.com/microsoft/icu
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/icu/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  python3

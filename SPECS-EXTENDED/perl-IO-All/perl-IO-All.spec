@@ -19,7 +19,7 @@ Release:        11%{?dist}
 Summary:        IO::All Perl module
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-All
 Source0:        https://cpan.metacpan.org/authors/id/F/FR/FREW/IO-All-%{version}.tar.gz#/perl-IO-All-%{version}.tar.gz
 BuildArch:      noarch

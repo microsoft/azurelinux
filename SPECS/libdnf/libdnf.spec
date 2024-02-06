@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

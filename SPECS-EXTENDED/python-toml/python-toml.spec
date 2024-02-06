@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pypi_name toml
 %global desc TOML aims to be a minimal configuration file format that's easy to read due to \
 obvious semantics. TOML is designed to map unambiguously to a hash table. TOML \

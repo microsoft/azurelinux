@@ -17,7 +17,7 @@ Release:        1%{?dist}
 # The files in sympy/parsing/latex are MIT.
 License:        BSD-3-Clause AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sympy.org/
 Source0:        https://github.com/%{name}/%{name}/archive/%{name}-%{version}.tar.gz
 # Skip tests that require a display

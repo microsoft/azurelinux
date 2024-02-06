@@ -5,7 +5,7 @@ Version:        6.0.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/yaml/pyyaml
 Source0:        https://github.com/yaml/pyyaml/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

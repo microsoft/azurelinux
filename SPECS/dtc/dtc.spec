@@ -4,7 +4,7 @@ Version:        1.6.1
 Release:        1%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://devicetree.org/
 Source0:        https://kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz

@@ -5,7 +5,7 @@ Version:        1.0.5
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://msgpack.org/
 Source0:        https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz#/msgpack-python-%{version}.tar.gz

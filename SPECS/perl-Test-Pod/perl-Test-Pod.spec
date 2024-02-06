@@ -7,7 +7,7 @@ Version:        1.52
 Release:        9%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Pod
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Pod-%{version}.tar.gz#/perl-Test-Pod-%{version}.tar.gz
 

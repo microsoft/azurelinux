@@ -6,7 +6,7 @@ Version:        0.22.0
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/pyudev
 Source0:        https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/%{srcname}-%{version}.tar.gz
 

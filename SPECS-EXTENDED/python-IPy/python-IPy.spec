@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define oname IPy
 Summary:        Python module for handling IPv4 and IPv6 Addresses and Networks
 Name:           python-%{oname}
