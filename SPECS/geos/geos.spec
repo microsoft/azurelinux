@@ -4,7 +4,7 @@ Version:        3.11.1
 Release:        4%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://trac.osgeo.org/geos/
 Source0:        https://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
 # Fix doxygen errors

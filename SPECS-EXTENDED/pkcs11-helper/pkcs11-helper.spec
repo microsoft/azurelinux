@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           pkcs11-helper
 Version:        1.22
 Release:        11%{?dist}

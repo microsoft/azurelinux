@@ -6,7 +6,7 @@ License:        LGPLv2+
 URL:            https://github.com/aperezdc/nss-altfiles
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #Source0:       https://github.com/aperezdc/nss-altfiles/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  glibc-devel

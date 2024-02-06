@@ -5,7 +5,7 @@ Version:        5.0.0
 Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ionelmc/python-fields
 Source0:        https://github.com/ionelmc/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Compatibility with python-sphinx >= 1.3, already applied upstream

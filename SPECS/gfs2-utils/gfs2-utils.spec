@@ -15,7 +15,7 @@ Version:        3.2.0
 Release:        12%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/gfs2-utils
 Source:         https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar.gz
 Patch0:         0-Fix_libuuid_linking.patch

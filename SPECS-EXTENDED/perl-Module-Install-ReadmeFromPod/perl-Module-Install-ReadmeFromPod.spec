@@ -9,7 +9,7 @@ Version:        0.30
 Release:        13%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-ReadmeFromPod
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BINGOS/Module-Install-ReadmeFromPod-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Regenerate README in UTF-8

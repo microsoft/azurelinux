@@ -9,7 +9,7 @@ License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/glibmm/%{BaseVersion}/glibmm-%{version}.tar.xz
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++

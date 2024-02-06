@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _root_libdir	/%{_lib}
 %global _root_sbindir 	/sbin
 

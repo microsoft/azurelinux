@@ -7,7 +7,7 @@ Group:          System Environment/Daemons
 URL:            https://www.thekelleys.org.uk/dnsmasq/
 Source0:        https://www.thekelleys.org.uk/%{name}/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Patch0:         fix-missing-ioctl-SIOCGSTAMP-add-sockios-header-linux-5.2.patch
 Patch1:         CVE-2023-28450.patch
 

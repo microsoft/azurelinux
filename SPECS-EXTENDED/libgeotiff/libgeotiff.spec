@@ -4,7 +4,7 @@ Version:        1.7.1
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://trac.osgeo.org/geotiff/
 Source:         https://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
 # Honour LIB_SUFFIX

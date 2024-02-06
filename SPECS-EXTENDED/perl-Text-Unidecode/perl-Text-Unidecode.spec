@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Text-Unidecode
 Version:        1.30
 Release:        12%{?dist}

@@ -6,7 +6,7 @@ Version:        1.0.2
 Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
 

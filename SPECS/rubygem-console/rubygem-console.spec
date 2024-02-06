@@ -8,7 +8,7 @@ Version:        1.23.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://socketry.github.io/console/
 Source0:        https://github.com/socketry/console/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

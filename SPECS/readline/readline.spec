@@ -4,7 +4,7 @@ Version:        8.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://tiswww.case.edu/php/chet/readline/rltop.html
 Source0:        https://ftp.gnu.org/gnu/readline/%{name}-%{version}.tar.gz

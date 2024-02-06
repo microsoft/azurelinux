@@ -4,7 +4,7 @@ Version:        2.8
 Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.zlib.net/pigz
 Source0:        https://github.com/madler/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

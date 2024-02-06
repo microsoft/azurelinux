@@ -6,7 +6,7 @@ Version:        4.1
 Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.kernel.org/pub/linux/utils/raid/mdadm/
 Source0:        http://www.kernel.org/pub/linux/utils/raid/mdadm/%{name}-%{version}.tar.xz
 Source1:        raid-check

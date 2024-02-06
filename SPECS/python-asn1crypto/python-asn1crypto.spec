@@ -4,7 +4,7 @@ Version:        1.5.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/wbond/asn1crypto
 Source0:        https://github.com/wbond/asn1crypto/archive/refs/tags/%{version}.tar.gz#/asn1crypto-%{version}.tar.gz

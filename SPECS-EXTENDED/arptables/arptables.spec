@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: User space tool to set up tables of ARP rules in kernel
 Name:    arptables
 Version: 0.0.5

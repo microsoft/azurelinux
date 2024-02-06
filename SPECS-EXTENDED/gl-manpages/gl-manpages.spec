@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # FIXME:  Figure out what to do about the gles* manpages, maybe different conflicting packages...
 %global codate 20190306
 %global commit 4547332f0f27d98601a8f5732ce8e85e09dbdb93

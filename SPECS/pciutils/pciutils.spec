@@ -6,7 +6,7 @@ Version:        3.7.0
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/System Utilities
 URL:            https://mj.ucw.cz/sw/pciutils
 Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz

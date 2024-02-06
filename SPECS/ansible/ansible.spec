@@ -4,7 +4,7 @@ Version:        2.15.3
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

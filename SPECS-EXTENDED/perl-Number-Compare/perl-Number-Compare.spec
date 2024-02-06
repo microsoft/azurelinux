@@ -4,7 +4,7 @@ Release: 	26%{?dist}
 Summary: 	Perl module for numeric comparisons
 License: 	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: 		https://metacpan.org/release/Number-Compare
 Source0: 	https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Number-Compare-%{version}.tar.gz#/perl-Number-Compare-%{version}.tar.gz
 

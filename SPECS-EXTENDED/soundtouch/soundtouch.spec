@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           soundtouch
 Version:        2.1.1
 Release:        5%{?dist}

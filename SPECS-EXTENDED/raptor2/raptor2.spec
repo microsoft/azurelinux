@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Summary: RDF Parser Toolkit for Redland
 Name:    raptor2

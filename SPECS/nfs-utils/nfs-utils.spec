@@ -14,7 +14,7 @@ Source5:        nfs-utils.defaults
 Source6:        nfs-server.service
 Source7:        nfs-mountd.service
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  device-mapper-devel

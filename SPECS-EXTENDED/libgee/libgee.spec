@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libgee
 Version:        0.20.3
 Release:        2%{?dist}

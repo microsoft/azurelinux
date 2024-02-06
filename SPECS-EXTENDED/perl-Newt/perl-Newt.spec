@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Perl bindings for the Newt library
 Name: perl-Newt
 Version: 1.08

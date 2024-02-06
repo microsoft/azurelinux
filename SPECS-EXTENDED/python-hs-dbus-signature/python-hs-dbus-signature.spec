@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %{?python_enable_dependency_generator}
 %global srcname hs-dbus-signature
 

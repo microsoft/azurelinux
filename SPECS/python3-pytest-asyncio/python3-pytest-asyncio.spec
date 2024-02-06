@@ -9,7 +9,7 @@ Version:        0.14.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/pytest-asyncio
 Source0:        https://github.com/%{project_owner}/%{github_name}/archive/v%{version}/%{github_name}-%{version}.tar.gz
 BuildRequires:  python3-devel

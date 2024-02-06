@@ -7,7 +7,7 @@ Release:        2%{?dist}
 # minitest source is licensed under MIT and minitest.gemspec is taken from ruby source, licensed under the rest
 License:        MIT AND (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/minitest
 Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

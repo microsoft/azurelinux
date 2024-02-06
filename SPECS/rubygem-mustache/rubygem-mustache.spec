@@ -5,7 +5,7 @@ Version:        1.1.1
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mustache/mustache
 Source0:        https://github.com/mustache/mustache/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 # Fix test race condition.

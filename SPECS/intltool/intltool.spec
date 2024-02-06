@@ -7,7 +7,7 @@ URL:           https://freedesktop.org/wiki/Software/intltool/
 Source0:       https://launchpad.net/%{name}/trunk/%{version}/+download/%{name}-%{version}.tar.gz
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Requires:      perl-XML-Parser
 BuildRequires: perl-XML-Parser
 BuildArch:     noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-de
 Summary: German hunspell dictionaries
 %global upstreamid 20161207

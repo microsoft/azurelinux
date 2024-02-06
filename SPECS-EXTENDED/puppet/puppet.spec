@@ -8,7 +8,7 @@ Version:        7.12.1
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://puppet.com
 Source0:        https://downloads.puppetlabs.com/puppet/%{name}-%{version}.tar.gz
 # Get these by checking out the right tag from https://github.com/puppetlabs/puppet-agent and:

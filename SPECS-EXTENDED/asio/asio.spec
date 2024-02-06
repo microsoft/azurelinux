@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # asio only ships headers, so no debuginfo package is needed
 %global debug_package %{nil}
 

@@ -6,7 +6,7 @@ License:        GPL+ and LGPLv2+
 URL:            https://xfs.wiki.kernel.org/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  readline-devel

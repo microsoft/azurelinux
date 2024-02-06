@@ -4,7 +4,7 @@ Version:        2.3.3
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.jedsoft.org/slang/index.html
 Source0:        https://www.jedsoft.org/releases/%{name}/%{name}-%{version}.tar.bz2

@@ -4,7 +4,7 @@ Version:        5.4.1
 Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ocsigen.org/lwt
 Source0:        https://github.com/ocsigen/lwt/archive/refs/tags/%{version}.tar.gz#/lwt-%{version}.tar.gz
 

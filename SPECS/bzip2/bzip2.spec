@@ -6,7 +6,7 @@ License:        BSD
 URL:            https://sourceware.org/bzip2/index.html
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.gz
 Provides:       libbz2.so.1()(64bit)
 Patch0:         https://www.linuxfromscratch.org/patches/lfs/11.0/bzip2-1.0.8-install_docs-1.patch

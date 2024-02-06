@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-sk
 Summary: Slovak thesaurus
 %global upstreamid 20130130

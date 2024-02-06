@@ -9,7 +9,7 @@ Version:        2.06
 Release:        14%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.gnu.org/software/grub
 Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{version}.tar.gz

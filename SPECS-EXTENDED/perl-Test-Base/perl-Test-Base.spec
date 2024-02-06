@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Report a difference on string nonequivalnce
 %bcond_without perl_Test_Base_enables_diff
 # Run extra test

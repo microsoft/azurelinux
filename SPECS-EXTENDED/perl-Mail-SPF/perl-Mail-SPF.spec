@@ -4,7 +4,7 @@ Version:        2.9.0
 Release:        23%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mail-SPF
 Source0:        https://cpan.metacpan.org/authors/id/J/JM/JMEHNLE/mail-spf/Mail-SPF-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 # Fix broken POD (CPAN RT#86060)

@@ -4,7 +4,7 @@ Version:        5.0.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pmix.org/
 Source0:        https://github.com/openpmix/openpmix/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf

@@ -4,7 +4,7 @@ Version:        1.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/
 Source0:        https://git.kernel.org/pub/scm/fs/fsverity/fsverity-utils.git/snapshot/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

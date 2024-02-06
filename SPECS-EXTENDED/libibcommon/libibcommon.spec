@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: OpenFabrics Alliance InfiniBand management common library
 Name: libibcommon
 Version: 1.2.0

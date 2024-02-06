@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libcdio
 Version: 2.0.0
 Release: 8%{?dist}

@@ -4,7 +4,7 @@ Version:        1.17.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz

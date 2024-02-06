@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Perl4-CoreLibs
 Version:        0.004
 Release:        11%{?dist}

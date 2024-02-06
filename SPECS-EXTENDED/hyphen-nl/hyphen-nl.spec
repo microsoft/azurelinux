@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-nl
 Summary: Dutch hyphenation rules
 %global upstreamid 20050617

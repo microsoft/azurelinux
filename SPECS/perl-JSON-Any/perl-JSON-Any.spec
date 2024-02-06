@@ -7,7 +7,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
 Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators

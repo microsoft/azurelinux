@@ -6,7 +6,7 @@ Version:        3.8.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/jaraco/zipp
 Source0:        %{pypi_source}
 

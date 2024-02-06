@@ -12,7 +12,7 @@ Version:        %{refpolicy_major}.%{refpolicy_minor}
 Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/SELinuxProject/refpolicy
 Source0:        %{url}/releases/download/RELEASE_%{refpolicy_major}_%{refpolicy_minor}/refpolicy-%{version}.tar.bz2
 Source1:        Makefile.devel

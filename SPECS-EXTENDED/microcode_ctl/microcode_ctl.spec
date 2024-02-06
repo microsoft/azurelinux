@@ -7,7 +7,7 @@ Version:        2.1
 Release:        41%{?dist}
 License:        GPLv2+ and Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/microcode_ctl
 Source0:        https://releases.pagure.org/microcode_ctl/%{name}-%{upstream_version}.tar.xz
 Patch0:         enable-wildcards-in-tar.patch

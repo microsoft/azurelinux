@@ -14,7 +14,7 @@ Summary:        Time zone object base class and factory
 # upstream or locally:                  Public Domain
 License:        (GPL+ or Artistic) and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-TimeZone
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-%{version}.tar.gz
 %if %{defined tzversion}

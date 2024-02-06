@@ -6,7 +6,7 @@ Version:        2.4.2
 Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-pool/
 Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz

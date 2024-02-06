@@ -15,7 +15,7 @@ Release:        1%{?dist}
 # - src/greenlet/platform/ directory
 License:        MIT AND Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/python-greenlet/greenlet
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 

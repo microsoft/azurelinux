@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Efficient Reading/Writing of Complete Files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Slurp
 Source0:        https://cpan.metacpan.org/modules/by-module/File/File-Slurp-%{version}.tar.gz#/perl-File-Slurp-%{version}.tar.gz
 

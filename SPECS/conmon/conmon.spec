@@ -11,7 +11,7 @@ Version:        2.1.8
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/containers/conmon
 #Source0:       https://github.com/containers/conmon/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

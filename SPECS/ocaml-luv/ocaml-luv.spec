@@ -10,7 +10,7 @@ Version:        0.5.10
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/aantron/luv
 Source0:        %{url}/releases/download/%{version}/%{srcname}-%{version}.tar.gz
 

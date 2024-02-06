@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global message_level 6
 %global ibus_tables_dir %{_datadir}/ibus-table/tables
 %global ibus_icons_dir %{_datadir}/ibus-table/icons

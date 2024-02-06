@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-is
 Summary: Icelandic hyphenation rules
 %global upstreamid 20030920

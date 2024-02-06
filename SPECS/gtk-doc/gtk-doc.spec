@@ -9,7 +9,7 @@ URL:            https://www.gtk.org/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Requires:       libxslt
 Requires:       docbook-dtd-xml

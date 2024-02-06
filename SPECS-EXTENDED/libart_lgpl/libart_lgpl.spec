@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libart_lgpl
 Version: 2.3.21
 Release: 24%{?dist}

@@ -6,7 +6,7 @@ Release:        27%{?dist}
 # Wording in CBC.pm is less than clear, but still.
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Crypt-CBC
 Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-CBC-%{version}.tar.gz#/perl-Crypt-CBC-%{version}.tar.gz
 BuildArch:      noarch

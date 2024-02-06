@@ -4,7 +4,7 @@ Version:        1.6.3
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/about/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/%{name}-%{version}.tar.gz

@@ -4,7 +4,7 @@ Release:        27%{?dist}
 Summary:        Choose a variant to serve
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTTP-Negotiate
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/HTTP-Negotiate-%{version}.tar.gz#/perl-HTTP-Negotiate-%{version}.tar.gz
 BuildArch:      noarch

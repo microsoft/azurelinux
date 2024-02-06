@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname keycloak-httpd-client-install
 %global summary Tools to configure Apache HTTPD as Keycloak client
 

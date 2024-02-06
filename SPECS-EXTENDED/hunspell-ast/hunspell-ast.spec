@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ast
 Summary: Asturian hunspell dictionaries
 Version: 2.0

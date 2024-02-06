@@ -4,7 +4,7 @@ Version:        5.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.fping.org/
 Source0:        https://github.com/schweikert/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz

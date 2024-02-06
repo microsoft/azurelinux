@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: perl-Encode-Detect
 Version: 1.01
 Release: 33%{?dist}

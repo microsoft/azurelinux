@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: perl-Net-Telnet
 Summary: Interact with TELNET port or other TCP ports
 Version: 3.04

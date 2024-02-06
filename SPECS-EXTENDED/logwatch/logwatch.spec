@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _unitdir /usr/lib/systemd/system
 Summary: A log file analysis program
 Name: logwatch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _hardened_build 1
 
 Summary: The client program for the Telnet remote login protocol

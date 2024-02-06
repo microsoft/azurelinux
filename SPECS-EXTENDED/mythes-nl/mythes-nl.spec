@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-nl
 Summary: Dutch thesaurus
 %global upstreamid 20130131

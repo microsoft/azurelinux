@@ -4,7 +4,7 @@ Release: 	6%{?dist}
 Summary: 	Optimized module loading for forking or non-forking processes
 License: 	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: 		https://metacpan.org/release/prefork
 Source0: 	https://cpan.metacpan.org/authors/id/E/ET/ETHER/prefork-%{version}.tar.gz#/perl-prefork-%{version}.tar.gz
 

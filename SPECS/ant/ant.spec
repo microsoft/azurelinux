@@ -26,7 +26,7 @@ Version:        1.10.14
 Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
 Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz

@@ -7,7 +7,7 @@ Summary:	USB Modeswitch gets mobile broadband cards in operational mode
 Summary(de):	USB Modeswitch aktiviert UMTS-Karten
 License:	GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://www.draisberghof.de/usb_modeswitch/
 
 Source0:	http://www.draisberghof.de/%{name}/%{source_name}-%{version}.tar.bz2

@@ -10,7 +10,7 @@ Version:        4.63.1
 Release:        2%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/tqdm/tqdm
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

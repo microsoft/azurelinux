@@ -4,7 +4,7 @@ Version:        2.14
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # digip.org now redirects to https://github.com/akheron/jansson
 URL:            http://www.digip.org/jansson
 Source0:        https://github.com/akheron/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz

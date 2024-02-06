@@ -6,7 +6,7 @@ Release:        1%{?dist}
 # Some files are GPL, others LGPL. Info in source.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://talloc.samba.org
 Source0:        https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz

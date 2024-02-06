@@ -7,7 +7,7 @@ Version:        4.13.1
 Release:        2%{?dist}
 License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ocaml.org
 Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{version}.tar.xz
 Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch

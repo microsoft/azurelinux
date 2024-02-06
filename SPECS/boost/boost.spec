@@ -5,7 +5,7 @@ Version:        1.83.0
 Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2

@@ -4,7 +4,7 @@ Version:        2.2.2
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gflags.github.io/gflags/
 #Source0:       https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

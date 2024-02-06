@@ -4,7 +4,7 @@ Version:        1.15.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/rpm-software-management/librepo
 #Source0:       https://github.com/rpm-software-management/librepo/archive/%{version}.tar.gz

@@ -11,7 +11,7 @@ Version:        8.1.7
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mitsuhiko/click
 Source0:        https://github.com/mitsuhiko/click/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch

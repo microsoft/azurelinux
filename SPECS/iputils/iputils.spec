@@ -4,7 +4,7 @@ Version:        20211215
 Release:        2%{?dist}
 License:        BSD-3 AND GPLv2+ AND Rdisc
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Communications
 URL:            https://github.com/iputils/iputils
 Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz

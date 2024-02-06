@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Turn off automatic python byte compilation because these are Ansible
 # roles and the files are transferred to the node and compiled there with
 # the python version used in the node

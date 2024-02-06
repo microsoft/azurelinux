@@ -9,7 +9,7 @@ Release:        11%{?dist}
 # License specified at http://dev.maxmind.com/geoip/legacy/geolite/#License
 License:        CC-BY-SA
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dev.maxmind.com/geoip/legacy/geolite/
 Source0:        %{_mariner_sources_url}/GeoIP.dat.gz
 Source1:        %{_mariner_sources_url}/GeoIPv6.dat.gz

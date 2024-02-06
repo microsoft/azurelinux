@@ -4,7 +4,7 @@ Release:	17%{?dist}
 Summary:	Perl module to test long strings
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-LongString
 Source0:	https://cpan.metacpan.org/authors/id/R/RG/RGARCIA/Test-LongString-%{version}.tar.gz#/perl-Test-LongString-%{version}.tar.gz
 

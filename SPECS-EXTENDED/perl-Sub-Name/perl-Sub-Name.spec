@@ -8,7 +8,7 @@ Release:	3%{?dist}
 Summary:	Name - or rename - a sub
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Sub-Name
 Source0:	https://cpan.metacpan.org/modules/by-module/Sub/Sub-Name-%{version}.tar.gz#/perl-Sub-Name-%{version}.tar.gz
 # Module Build

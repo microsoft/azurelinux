@@ -4,7 +4,7 @@ Release:        16%{?dist}
 Summary:        Compute `intelligent' differences between two files/lists
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Algorithm-Diff
 Source0:        https://cpan.metacpan.org/authors/id/T/TY/TYEMQ/Algorithm-Diff-%{version}.tar.gz#/perl-Algorithm-Diff-%{version}.tar.gz
 Patch0:         Algorithm-Diff-1.1903-provides.patch

@@ -6,7 +6,7 @@ License:        GPLv3+
 URL:            https://www.gnu.org/software/tar
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
 %description

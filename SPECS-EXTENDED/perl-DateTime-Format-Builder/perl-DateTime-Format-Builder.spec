@@ -11,7 +11,7 @@ Summary:        Create DateTime parser classes and objects
 # LICENSE:                          Artistic 2.0 text
 License:        Artistic 2.0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-Format-Builder            
 Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Builder-%{real_version}.tar.gz#/perl-DateTime-Format-Builder-%{real_version}.tar.gz
 BuildArch:      noarch

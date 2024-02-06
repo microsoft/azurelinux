@@ -4,7 +4,7 @@ Version:        0.2.0
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/google/pasta/
 Source0:        https://github.com/google/pasta/archive/v%{version}.tar.gz#/google-pasta-%{version}.tar.gz

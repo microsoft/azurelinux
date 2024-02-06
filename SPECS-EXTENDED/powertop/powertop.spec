@@ -5,7 +5,7 @@ Summary:          Power consumption monitor
 
 License:          GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:              http://01.org/powertop/
 Source0:          http://github.com/fenrus75/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:          powertop.service

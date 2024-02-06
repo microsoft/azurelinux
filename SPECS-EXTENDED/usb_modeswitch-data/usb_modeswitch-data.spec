@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global source_name	usb-modeswitch-data
 
 Name:		usb_modeswitch-data

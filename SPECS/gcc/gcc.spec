@@ -59,7 +59,7 @@ Version:        13.2.0
 Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz

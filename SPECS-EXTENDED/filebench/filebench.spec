@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           filebench
 Version:        1.4.9.1
 Release:        14%{?dist}

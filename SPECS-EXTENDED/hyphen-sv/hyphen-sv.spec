@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-sv
 Summary: Swedish hyphenation rules
 Version: 1.00.1

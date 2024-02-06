@@ -4,7 +4,7 @@ Version:        2.2.4
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.com/craftyguy/networkd-dispatcher
 Source0:        https://gitlab.com/craftyguy/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %global debug_package %{nil}

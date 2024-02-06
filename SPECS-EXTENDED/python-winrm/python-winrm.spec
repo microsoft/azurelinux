@@ -5,7 +5,7 @@ Version:        0.4.1
 Release:        6%{?dist}
 Summary:        Python libraries for interacting with windows remote management
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 License:        MIT
 URL:            https://pypi.python.org/pypi/pywinrm
 Source0:        https://github.com/diyan/pywinrm/archive/v%{version}/%{srcname}-%{version}.tar.gz

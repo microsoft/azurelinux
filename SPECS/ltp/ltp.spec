@@ -13,7 +13,7 @@ Version:        20230127
 Release:        2%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/linux-test-project/ltp
 Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

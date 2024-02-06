@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global source_name libwnck
 
 Summary: Window Navigator Construction Kit

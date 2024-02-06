@@ -4,7 +4,7 @@ Version:        2.2.14
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/AbiWord/enchant
 Source0:        https://github.com/AbiWord/enchant/releases/download/v%{version}/enchant-%{version}.tar.gz
 # Look for aspell using pkg-config, instead of AC_CHECK_LIB which adds -laspell

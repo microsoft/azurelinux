@@ -4,7 +4,7 @@ Release:	13%{?dist}
 Summary:	XS speedups for Class::C3
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Class-C3-XS
 Source0:	https://cpan.metacpan.org/authors/id/E/ET/ETHER/Class-C3-XS-%{version}.tar.gz#/perl-Class-C3-XS-%{version}.tar.gz
 # Module Build

@@ -7,7 +7,7 @@ License:        GPLv2+
 URL:            http://www.oberhumer.com/opensource/lzo/
 Source0:        http://www.oberhumer.com/opensource/lzo/download/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  zlib-devel
 
 %description

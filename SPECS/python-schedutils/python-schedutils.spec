@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Linux scheduler python bindings
 Name: python-schedutils
 Version: 0.6

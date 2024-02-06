@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		twolame
 Version:	0.3.13
 Release:	16%{?dist}

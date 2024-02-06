@@ -4,7 +4,7 @@ Version:        3.0.27
 Release:        15%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://developer.gnome.org/clutter-gst/stable/
 Source0:        https://download.gnome.org/sources/clutter-gst/3.0/clutter-gst-%{version}.tar.xz
 Patch0:         remove-rgbx-bgrx-support.patch

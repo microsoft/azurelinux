@@ -4,7 +4,7 @@ Version:        0.78
 Release:        15%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.corpit.ru/mjt/tinycdb.html
 Source0:        https://www.corpit.ru/mjt/%{name}/%{name}-%{version}.tar.gz
 # taken from the 0.77 tarball

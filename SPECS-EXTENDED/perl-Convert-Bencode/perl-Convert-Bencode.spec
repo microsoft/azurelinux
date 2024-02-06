@@ -4,7 +4,7 @@ Version:        1.03
 Release:        33%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Convert-Bencode
 Source0:        https://cpan.metacpan.org/modules/by-module/Convert/Convert-Bencode-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global docs_hash 20131007a
 
 Name:		tcl-pgtcl

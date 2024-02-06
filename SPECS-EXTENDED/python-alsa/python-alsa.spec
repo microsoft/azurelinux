@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define		baseversion 1.1.6
 
 Summary:	Python binding for the ALSA library

@@ -4,7 +4,7 @@ Version:        3.16
 Release:        1%{?dist}
 License:        BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/esnet/iperf
 Source0:        https://github.com/esnet/iperf/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

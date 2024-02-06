@@ -4,7 +4,7 @@ Version:        2.0.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Tools/Container
 URL:            https://github.com/cpuguy83/go-md2man
 Source0:        https://github.com/cpuguy83/go-md2man/archive/v%{version}.tar.gz#/go-md2man-%{version}.tar.gz
@@ -20,7 +20,7 @@ Converts markdown into roff (man pages)
 
 %define OUR_GOPATH %{_topdir}/.gopath
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %prep
 %setup -q -n %{name}-%{version} -c

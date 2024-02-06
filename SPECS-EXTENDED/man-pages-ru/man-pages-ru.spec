@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global mpr_version 5.03-2390-2390-20191017
 Summary: Russian man pages from the Linux Documentation Project
 Name: man-pages-ru

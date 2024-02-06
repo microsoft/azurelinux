@@ -7,7 +7,7 @@ Version:        7.0.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://bazel.io/
 # do not use the github tar.gz use the ...-dist.zip instead
 Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{version}/%{name}-%{version}-dist.zip

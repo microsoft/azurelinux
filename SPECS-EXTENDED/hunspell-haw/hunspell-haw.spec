@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-haw
 Summary: Hawaiian hunspell dictionaries
 Version: 0.03

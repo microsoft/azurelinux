@@ -9,7 +9,7 @@ Version:        2.4.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/sphinx_py3doc_enhanced_theme
 Source0:        https://pypi.io/packages/source/s/%{pypi_name}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

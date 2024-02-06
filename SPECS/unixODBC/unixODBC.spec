@@ -4,7 +4,7 @@ Version:        2.3.12
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            http://www.unixodbc.org/
 Source0:        http://www.unixodbc.org/%{name}-%{version}.tar.gz

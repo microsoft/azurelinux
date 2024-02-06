@@ -9,7 +9,7 @@ Summary:        Perl modules to handle various Unicode issues
 # in String.xs is mentioned "same terms as Perl itself" which is this
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-String
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Unicode-String-%{version}.tar.gz#/perl-Unicode-String-%{version}.tar.gz
 Patch0:         perl-Unicode-String-2.09-utf8doc.patch

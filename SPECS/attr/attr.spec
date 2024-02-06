@@ -4,7 +4,7 @@ Version:        2.5.2
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://savannah.nongnu.org/projects/attr
 Source:         https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz

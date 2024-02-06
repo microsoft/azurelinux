@@ -4,7 +4,7 @@ Version:        2.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/jsonpointer/
 Source0:        https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v%{version}.tar.gz#/python-json-pointer-%{version}.tar.gz

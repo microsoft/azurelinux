@@ -4,7 +4,7 @@ Version:        6.16
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/nhorman/rng-tools
 Source0:        https://github.com/nhorman/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz

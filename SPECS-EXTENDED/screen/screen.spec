@@ -7,7 +7,7 @@ Version:        4.9.1
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnu.org/software/screen
 Source0:        https://ftp.gnu.org/gnu/screen/screen-%{version}.tar.gz
 Source1:        screen.pam

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-UNIVERSAL-can
 Version:        1.20140328
 Release:        17%{?dist}

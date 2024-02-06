@@ -22,7 +22,7 @@ Version:        %{base_version}+%{git_version}
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://javax-inject.github.io/javax-inject/
 # git clone --bare git@github.com:javax-inject/javax-inject

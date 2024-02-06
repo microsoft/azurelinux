@@ -4,7 +4,7 @@ Version:        1.9.5
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pcsclite.apdu.fr/
 Source0:        https://pcsclite.apdu.fr/files/%{name}-%{version}.tar.bz2
 Source1:        org.debian.pcsc-lite.policy

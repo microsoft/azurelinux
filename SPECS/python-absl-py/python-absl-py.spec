@@ -16,7 +16,7 @@ Version:        1.4.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/abseil/abseil-py
 Source0:        %{url}/archive/v%{version}/abseil-py-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch

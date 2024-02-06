@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-pl
 Summary: Polish thesaurus
 Version: 1.5

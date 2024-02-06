@@ -4,7 +4,7 @@ Version:        0.14.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://liburcu.org
 #Source0:       https://github.com/urcu/userspace-rcu/archive/v%{version}.tar.gz

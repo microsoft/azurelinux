@@ -6,7 +6,7 @@ Version:        2.30
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/XKeyboardConfig
 Source0:        https://xorg.freedesktop.org/archive/individual/data/%{name}/%{name}-%{version}.tar.bz2
 

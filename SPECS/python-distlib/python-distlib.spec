@@ -5,7 +5,7 @@ Version:        0.3.6
 Release:        2%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://readthedocs.org/projects/distlib/
 Source0:        https://files.pythonhosted.org/packages/source/d/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros

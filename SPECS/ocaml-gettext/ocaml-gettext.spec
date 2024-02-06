@@ -8,7 +8,7 @@ Version:        0.4.2
 Release:        2%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ocaml-gettext
 Source0:        https://github.com/gildor478/ocaml-gettext/releases/download/v%{version}/gettext-v%{version}.tbz
 

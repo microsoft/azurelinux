@@ -9,7 +9,7 @@ Version:        1.26.4
 Release:        10%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.clutter-project.org/
 Source0:        https://download.gnome.org/sources/%{name}/1.26/%{name}-%{version}.tar.xz
 BuildRequires:  gettext

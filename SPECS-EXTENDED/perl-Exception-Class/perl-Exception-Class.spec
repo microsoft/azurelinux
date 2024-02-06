@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Module that allows you to declare real exception classes in Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Exception-Class
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Exception-Class-%{version}.tar.gz#/perl-Exception-Class-%{version}.tar.gz
 BuildArch:      noarch

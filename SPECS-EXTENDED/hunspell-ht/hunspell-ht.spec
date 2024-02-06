@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ht
 Summary: Haitian Creole hunspell dictionaries
 Version: 0.06

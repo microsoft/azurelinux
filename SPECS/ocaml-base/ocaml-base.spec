@@ -9,7 +9,7 @@ Version:        0.15.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://opensource.janestreet.com/base/
 Source0:        https://github.com/janestreet/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 Patch0:         %{name}-ocaml413compat.patch

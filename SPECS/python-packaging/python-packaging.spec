@@ -4,7 +4,7 @@ Version:        21.3
 Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
 Source0:        https://github.com/pypa/packaging/releases/download/%{version}/packaging-%{version}.tar.gz

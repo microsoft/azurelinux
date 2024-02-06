@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           tofrodos
 Version:        1.7.13
 Release:        16%{?dist}

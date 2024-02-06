@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-uk
 Summary: Ukrainian thesaurus
 Version: 1.6.5

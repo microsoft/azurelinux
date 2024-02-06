@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Tool for inspecting Perl subroutines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sub-Info
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Sub-Info-%{version}.tar.gz#/perl-Sub-Info-%{version}.tar.gz
 BuildArch:      noarch

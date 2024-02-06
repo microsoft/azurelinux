@@ -4,7 +4,7 @@ Version:        2.0.0
 Release:        2%{?dist}
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/thkukuk/libnsl
 Source0:        https://github.com/thkukuk/libnsl/archive/v%{version}/libnsl-%{version}.tar.gz

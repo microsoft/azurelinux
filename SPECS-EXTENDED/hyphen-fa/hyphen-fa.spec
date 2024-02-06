@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-fa
 Summary: Farsi hyphenation rules
 %global upstreamid 20130404

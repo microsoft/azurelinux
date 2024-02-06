@@ -1,7 +1,7 @@
 %bcond_with tex_docs
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:    A GNU program for formatting C code
 Name:       indent
 Version:    2.2.12

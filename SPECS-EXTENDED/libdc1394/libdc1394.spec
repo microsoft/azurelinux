@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 #define svn_snapshot .svn459  
 #define real_version 2.1.0

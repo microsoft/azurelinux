@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           liblockfile
 Version:        1.14
 Release:        6%{?dist}

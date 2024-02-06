@@ -4,7 +4,7 @@ Version:        2.1.54
 Release:        1%{?dist}
 License:        Public Domain AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/mailcap
 Source0:        https://pagure.io/releases/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  perl

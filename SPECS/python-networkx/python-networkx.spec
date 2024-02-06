@@ -4,7 +4,7 @@ Version:        2.8.8
 Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://networkx.org/
 Source0:        https://github.com/networkx/networkx/archive/networkx-%{version}.tar.gz
 Patch0:         %{name}-doc.patch

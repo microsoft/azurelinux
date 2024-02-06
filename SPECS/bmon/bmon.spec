@@ -4,7 +4,7 @@ Version:        4.0
 Release:        1%{?dist}
 License:        BSD-2-Clause AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/tgraf/bmon
 Source0:        https://github.com/tgraf/bmon/archive/%{name}-%{version}.tar.gz

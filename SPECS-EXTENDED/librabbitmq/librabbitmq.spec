@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Fedora spec file for librabbitmq
 #
 # Copyright (c) 2012-2019 Remi Collet

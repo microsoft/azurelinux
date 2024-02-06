@@ -10,7 +10,7 @@ Version:        1.3.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://people.redhat.com/sgrubb/fapolicyd
 Source0:        https://people.redhat.com/sgrubb/fapolicyd/%{name}-%{version}.tar.gz
 

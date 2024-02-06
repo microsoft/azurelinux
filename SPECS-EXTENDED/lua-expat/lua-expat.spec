@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %{!?lua_version: %global lua_version %{lua: print(string.sub(_VERSION, 5))}}
 %{!?lua_libdir: %global lua_libdir %{_libdir}/lua/%{lua_version}}
 %{!?lua_pkgdir: %global lua_pkgdir %{_datadir}/lua/%{lua_version}}

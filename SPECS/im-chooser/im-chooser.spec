@@ -5,7 +5,7 @@ Version:        1.7.4
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/im-chooser/
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
 Source1:        %{name}-LGPLv2.txt

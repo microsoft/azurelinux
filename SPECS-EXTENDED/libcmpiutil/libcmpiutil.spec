@@ -5,7 +5,7 @@ Version:        0.5.7
 Release:        20%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.com/libvirt/libvirt-cim
 Source:         https://libvirt.org/sources/CIM/libcmpiutil-%{version}.tar.gz
 Patch0:         libcmpiutil-0.5.6-cast-align.patch

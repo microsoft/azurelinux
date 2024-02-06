@@ -14,7 +14,7 @@ Version:        0.66.2
 Release:        2%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org/
 Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version}.tar.xz
 # https://bugzilla.gnome.org/show_bug.cgi?id=711059

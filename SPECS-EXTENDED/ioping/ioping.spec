@@ -3,7 +3,7 @@ Version:        1.1
 Release:        7%{?dist}
 Summary:        Simple disk I/O latency monitoring tool
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv3+
 URL:            https://github.com/koct9i/ioping
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz

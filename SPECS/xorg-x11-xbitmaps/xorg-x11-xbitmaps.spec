@@ -6,7 +6,7 @@ Version:        1.1.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/data/%{pkgname}-%{version}.tar.gz
 BuildRequires:  automake

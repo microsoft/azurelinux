@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ga
 Summary: Irish hunspell dictionaries
 Version: 5.0

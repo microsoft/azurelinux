@@ -8,7 +8,7 @@ Summary:        Interface to gettext family of functions
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/gettext
 Source0:        https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/%{tarname}-%{version}.tar.gz#/perl-%{tarname}-%{version}.tar.gz
 

@@ -5,7 +5,7 @@ Version:        3.8.1
 Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-compiler-plugin
 Source0:        https://archive.apache.org/dist/maven/plugins/%{name}-%{version}-source-release.zip
 # port to plexus-languages 1.0.3

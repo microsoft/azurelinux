@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: 		perl-Test-ClassAPI
 Version: 	1.07
 Release: 	11%{?dist}

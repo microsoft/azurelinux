@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-eo
 Summary: Esperanto thesaurus
 %global upstreamid 20180330

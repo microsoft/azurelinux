@@ -11,7 +11,7 @@ Release:	3%{?dist}
 Summary:	Critique Perl source code for best-practices
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Perl-Critic
 Source0:	https://cpan.metacpan.org/modules/by-module/Perl/Perl-Critic-%{version}.tar.gz
 Patch0:		0001-Change-default-spell-check-tool-from-aspell-to-hunsp.patch

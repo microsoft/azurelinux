@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-cy
 Summary: Welsh hunspell dictionaries
 %global upstreamid 20040425

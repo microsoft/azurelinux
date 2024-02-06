@@ -21,7 +21,7 @@ Release:        1%{?dist}
 # interpret this as an overall license of GPL-3.0-only.
 License:        GPL-3.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.advancemame.it/
 Source0:        https://github.com/amadvance/advancecomp/archive/v%{version}/advancecomp-%{version}.tar.gz
 BuildRequires:  autoconf

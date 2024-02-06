@@ -20,7 +20,7 @@ Release:        9%{?dist}
 Summary:        MIME types module for Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/MIME-Types
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MARKOV/MIME-Types-%{version}.tar.gz#/perl-MIME-Types-%{version}.tar.gz
 BuildArch:      noarch

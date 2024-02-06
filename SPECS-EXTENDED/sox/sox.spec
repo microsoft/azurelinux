@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A general purpose sound file conversion tool
 Name: sox
 # A mistake in naming, 14.4.2rc2 breaks upgrade path.

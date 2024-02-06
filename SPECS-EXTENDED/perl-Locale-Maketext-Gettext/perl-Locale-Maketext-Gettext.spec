@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Locale-Maketext-Gettext
 Version:        1.30
 Release:        3%{?dist}

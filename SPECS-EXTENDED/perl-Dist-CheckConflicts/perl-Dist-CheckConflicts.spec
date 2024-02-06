@@ -13,7 +13,7 @@ Release:	18%{?dist}
 Summary:	Declare version conflicts for your dist
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Dist-CheckConflicts
 Source0:	https://cpan.metacpan.org/authors/id/D/DO/DOY/Dist-CheckConflicts-%{version}.tar.gz#/perl-Dist-CheckConflicts-%{version}.tar.gz
 Patch0:		Dist-CheckConflicts-0.11-old-Test-More.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # note this duplicates native anthy IMEs
 %bcond_with anthy
 

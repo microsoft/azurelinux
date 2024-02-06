@@ -24,7 +24,7 @@ Version:        5.4.0
 Release:        5%{?dist}
 License:        (LGPLv2+ OR BSD) AND LGPLv2+ AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://faculty.cse.tamu.edu/davis/suitesparse.html
 Source0:        https://faculty.cse.tamu.edu/davis/SuiteSparse/SuiteSparse-%{version}.tar.gz
 BuildRequires:  gcc

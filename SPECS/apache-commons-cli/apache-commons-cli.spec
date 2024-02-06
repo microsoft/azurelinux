@@ -21,7 +21,7 @@ Version:        1.4
 Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}/
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/commons-cli-%{version}-src.tar.gz

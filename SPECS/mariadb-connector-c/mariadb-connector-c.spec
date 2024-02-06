@@ -6,7 +6,7 @@ Version:        3.1.10
 Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://mariadb.org/
 Source0:        https://archive.mariadb.org/connector-c-%{version}/%{name}-%{version}-src.tar.gz
 Source2:        my.cnf

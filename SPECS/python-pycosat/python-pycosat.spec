@@ -11,7 +11,7 @@ Version:        0.6.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ContinuumIO/pycosat
 Source0:        https://github.com/ContinuumIO/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc

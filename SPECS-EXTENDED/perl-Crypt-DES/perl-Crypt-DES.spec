@@ -4,7 +4,7 @@ Release:        21%{?dist}
 Summary:        Perl DES encryption module
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Crypt-DES
 Source0:        https://cpan.metacpan.org/authors/id/D/DP/DPARIS/Crypt-DES-%{version}.tar.gz#/perl-Crypt-DES-%{version}.tar.gz
 BuildRequires:  perl-interpreter

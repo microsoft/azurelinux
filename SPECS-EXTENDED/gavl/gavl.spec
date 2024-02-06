@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           gavl
 Version:        1.4.0
 Release:        21%{?dist}

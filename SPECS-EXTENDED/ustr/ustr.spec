@@ -31,7 +31,7 @@ Release: 31%{?dist}
 Summary: String library, very low memory overhead, simple to import
 License: MIT or LGPLv2+ or BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.and.org/ustr/
 Source0: http://www.and.org/ustr/%{version}/%{name}-%{version}.tar.bz2
 Patch0: c99-inline.patch

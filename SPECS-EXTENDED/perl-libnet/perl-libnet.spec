@@ -15,7 +15,7 @@ Release:        443%{?dist}
 # lib/Net/libnetFAQ.pod:    Artistic    (CPAN RT#117888)
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/libnet
 # Origin source archive contains Artistic only files, CPAN RT#117888.
 # Local archive produced by "./repackage.sh %%{version}" command.

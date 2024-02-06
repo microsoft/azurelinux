@@ -19,7 +19,7 @@ Release:        3%{?dist}
 # - vendor/re
 License:        MIT AND LGPLv2 AND LGPLv2 WITH exceptions AND ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dune.build
 Source0:        https://github.com/ocaml/%{libname}/archive/%{version}/%{libname}-%{version}.tar.gz
 

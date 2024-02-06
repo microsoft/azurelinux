@@ -8,7 +8,7 @@ Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/tkem/cachetools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.python.org/packages/source/c/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
 BuildArch:  noarch

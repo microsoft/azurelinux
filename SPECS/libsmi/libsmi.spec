@@ -4,7 +4,7 @@ Version:        0.4.8
 Release:        28%{?dist}
 License:        TCL AND BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
 #Upstream Source0 url is dead
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz

@@ -12,7 +12,7 @@ Release: 5%{?dist}
 License: BSD
 Requires: papi-libs = %{version}-%{release}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://icl.cs.utk.edu/papi/
 Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRequires: autoconf

@@ -6,7 +6,7 @@ Version:        4.2.1
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/prometheus/client_ruby
 Source0:        https://github.com/prometheus/client_ruby/archive/refs/tags/v%{version}.tar.gz#/client_ruby-%{version}.tar.gz

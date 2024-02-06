@@ -21,7 +21,7 @@ Version:        2.5.2
 Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-classworlds
 Source0:        https://github.com/sonatype/%{name}/archive/%{name}-%{version}.tar.gz

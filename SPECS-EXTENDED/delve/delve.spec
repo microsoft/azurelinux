@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:                   delve
 Version:                1.5.0
 Release:                16%{?dist}

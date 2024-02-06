@@ -4,7 +4,7 @@ Version:        0.9.2
 Release:        2%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/bolt/bolt
 Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  asciidoc

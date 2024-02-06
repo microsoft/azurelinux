@@ -5,7 +5,7 @@
 %bcond_with blkio
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %undefine _package_note_flags
 %global _hardened_build 1
 

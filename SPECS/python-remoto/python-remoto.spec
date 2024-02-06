@@ -5,7 +5,7 @@ Version:        1.2.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/alfredodeza/remoto
 Source0:        https://pypi.io/packages/source/r/%{pkgname}/%{pkgname}-%{version}.tar.gz
 BuildRequires:  python3-devel

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Old version of libpng, needed to run old binaries
 Name: libpng15
 Version: 1.5.30

@@ -4,7 +4,7 @@ Version:        2.4.0
 Release:        19%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/bsf/
 Source0:        https://downloads.apache.org/commons/%{name}/source/%{name}-src-%{version}.tar.gz

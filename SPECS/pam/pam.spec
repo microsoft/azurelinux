@@ -7,7 +7,7 @@ URL:            https://github.com/linux-pam/linux-pam
 Source0:        https://github.com/linux-pam/linux-pam/releases/download/v%{version}/Linux-PAM-%{version}.tar.xz
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  cracklib-devel
 BuildRequires:  libxcrypt-devel
 BuildRequires:  libselinux-devel

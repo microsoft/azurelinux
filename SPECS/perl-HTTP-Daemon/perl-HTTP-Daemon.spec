@@ -4,7 +4,7 @@ Release:        4%{?dist}
 Summary:        Simple HTTP server class
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTTP-Daemon
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-%{version}.tar.gz#/perl-HTTP-Daemon-%{version}.tar.gz
 # Use Makefile.PL without unneeded dependencies

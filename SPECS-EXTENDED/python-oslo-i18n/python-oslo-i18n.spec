@@ -11,7 +11,7 @@ Version:        5.1.0
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/openstack/%{pypi_name}
 Source0:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  git-core

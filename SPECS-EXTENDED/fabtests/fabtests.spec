@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           fabtests
 Version:        1.12.0
 %global         __rc  rc1

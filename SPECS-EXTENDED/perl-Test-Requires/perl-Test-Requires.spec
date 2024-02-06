@@ -10,7 +10,7 @@ Version:	0.10
 Release:	20%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-Requires
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Requires-%{version}.tar.gz#/perl-Test-Requires-%{version}.tar.gz
 BuildArch:	noarch

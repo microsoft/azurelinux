@@ -61,7 +61,7 @@ Version:        %{vmajor}.%{vminor}.%{vpatch}
 Release:        3%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.chronox.de/%{name}.html
 Source0:        https://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
 Source1:        sha512hmac-openssl.sh

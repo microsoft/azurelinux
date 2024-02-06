@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Czech man pages from the Linux Documentation Project
 Name: man-pages-cs
 Version: 0.18.20090209

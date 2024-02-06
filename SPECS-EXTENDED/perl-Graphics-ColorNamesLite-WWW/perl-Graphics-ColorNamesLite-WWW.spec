@@ -4,7 +4,7 @@ Version:        1.14.000
 Release:        6%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Graphics-ColorNamesLite-WWW/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Graphics-ColorNamesLite-WWW-%{version}.tar.gz
 

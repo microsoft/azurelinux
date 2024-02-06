@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %ifarch %{valgrind_arches}
 %global has_valgrind 1
 %endif

@@ -4,7 +4,7 @@ Release:        25%{?dist}
 Summary:        Keyed-Hashing for Message Authentication
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Digest-HMAC
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Digest-HMAC-%{version}.tar.gz#/perl-Digest-HMAC-%{version}.tar.gz
 BuildArch:      noarch

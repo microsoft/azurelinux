@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define _hardened_build 1
 
 Summary: TCP port reservation utility

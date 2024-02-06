@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Track the number of times subs are called
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-SubCalls
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-SubCalls-%{version}.tar.gz#/perl-Test-SubCalls-%{version}.tar.gz
 BuildArch:      noarch

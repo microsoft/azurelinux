@@ -7,7 +7,7 @@ Version:        4
 Release:        6%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rhboot/%{name}/
 Source0:        https://github.com/rhboot/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

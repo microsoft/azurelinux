@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname s3transfer
 %global _description \
 S3transfer is a Python library for managing Amazon S3 transfers.

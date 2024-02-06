@@ -4,7 +4,7 @@ Version:        1.0.0
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        installkernel
 Source1:        COPYING

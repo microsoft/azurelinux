@@ -4,7 +4,7 @@ Release:        43%{?dist}
 Summary:        Utility for looking for perl objects that are not reclaimed
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-Leak
 Source0:        https://cpan.metacpan.org/modules/by-module/Devel/Devel-Leak-%{version}.tar.gz#/perl-Devel-Leak-%{version}.tar.gz
 # Build:

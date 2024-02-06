@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-tet
 Summary: Tetum hunspell dictionaries
 %global upstreamid 20050108

@@ -4,7 +4,7 @@ Version:       20230723
 Release:       1%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://ftp.netbsd.org/pub/NetBSD/misc/sjg/
 Source0:       %{url}/bmake-%{version}.tar.gz
 BuildRequires: gcc

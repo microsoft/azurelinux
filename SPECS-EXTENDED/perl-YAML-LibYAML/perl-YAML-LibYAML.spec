@@ -11,7 +11,7 @@ Release:        3%{?dist}
 Summary:        Perl YAML Serialization using XS and libyaml
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-LibYAML
 Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-LibYAML-%{version}.tar.gz#/perl-YAML-LibYAML-%{version}.tar.gz
 Patch0:         YAML-LibYAML-0.79-Unbundled-libyaml.patch

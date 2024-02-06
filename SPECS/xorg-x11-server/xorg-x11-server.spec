@@ -24,7 +24,7 @@ Version:        1.20.10
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/xserver/%{pkgname}-%{version}.tar.bz2
 Source1:        gitignore

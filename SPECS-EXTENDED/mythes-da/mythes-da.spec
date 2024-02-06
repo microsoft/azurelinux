@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-da
 Summary: Danish thesaurus
 %global upstreamid 20100629.15.16

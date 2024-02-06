@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-sq
 Summary: Albanian hunspell dictionaries
 Version: 1.6.4

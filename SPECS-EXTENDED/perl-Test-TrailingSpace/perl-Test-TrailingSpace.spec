@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Test-TrailingSpace
 Version:        0.0302
 Release:        4%{?dist}

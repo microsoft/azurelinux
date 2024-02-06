@@ -11,7 +11,7 @@ Release:        4%{?dist}
 Summary:        Parse, Analyze and Manipulate Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PPI
 Source0:        https://cpan.metacpan.org/modules/by-module/PPI/PPI-%{version}.tar.gz#/perl-PPI-%{version}.tar.gz
 BuildArch:      noarch

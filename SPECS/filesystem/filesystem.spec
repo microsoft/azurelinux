@@ -6,7 +6,7 @@ License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
 URL:          http://www.linuxfromscratch.org
-Distribution: Mariner
+Distribution:   Azure Linux
 
 %description
 The filesystem package is one of the basic packages that is installed

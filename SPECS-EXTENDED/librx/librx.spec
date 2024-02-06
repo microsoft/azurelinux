@@ -4,7 +4,7 @@ Version: 1.5
 Release: 37%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.gnu.org/software/rx/rx.html
 # Originally downloaded from ftp://ftp.gnu.org/gnu/rx/rx-1.5.tar.bz2
 # The FSF no longer offers this code.

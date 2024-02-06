@@ -12,7 +12,7 @@ License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Source0: https://github.com/Azure/%{name}/archive/refs/tags/LTS_08_2023.tar.gz
 # The below tarball includes all submodules.
 

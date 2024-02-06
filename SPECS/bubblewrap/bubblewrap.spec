@@ -4,7 +4,7 @@ Version:        0.8.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/containers/bubblewrap/
 Source0:        https://github.com/containers/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz

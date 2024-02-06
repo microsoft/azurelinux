@@ -49,7 +49,7 @@ Summary:    System administration tools for monitoring users' disk usage
 # mkinstalldirs:                    Public Domain
 License:        GPLv2 and GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sourceforge.net/projects/linuxquota/
 Source0:        https://downloads.sourceforge.net/project/linuxquota/quota-tools/%{version}/%{name}-%{version}.tar.gz
 Source1:        quota_nld.service

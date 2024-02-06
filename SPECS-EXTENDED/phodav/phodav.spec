@@ -5,7 +5,7 @@ Version:        3.0
 Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/phodav
 Source0:        https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
 %if %{with gtk_doc}

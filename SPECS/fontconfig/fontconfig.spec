@@ -6,7 +6,7 @@ License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.freedesktop.org/software/fontconfig/release/%{name}-%{version}.tar.gz
 BuildRequires:  freetype-devel
 BuildRequires:  libxml2

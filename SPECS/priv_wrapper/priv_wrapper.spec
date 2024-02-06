@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           priv_wrapper
 Version:        1.0.1
 Release:        5%{?dist}

@@ -6,7 +6,7 @@ Version:        0.7.3
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            http://tagaholic.me/hirb/
 Source0:        https://github.com/cldwalker/hirb/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

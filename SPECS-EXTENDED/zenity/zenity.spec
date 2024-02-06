@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          zenity
 Version:       3.32.0
 Release:       4%{?dist}

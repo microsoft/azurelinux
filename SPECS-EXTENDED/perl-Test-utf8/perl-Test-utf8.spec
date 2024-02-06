@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Handy utf8 tests
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-utf8
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-utf8-%{version}.tar.gz#/perl-Test-utf8-%{version}.tar.gz
 Source1:        LICENSE.PTR

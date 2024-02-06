@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global tarball libXres
 #global gitdate 20130524
 #global gitversion f46818496

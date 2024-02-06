@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ro
 Summary: Romanian hunspell dictionaries
 Version: 3.3.7

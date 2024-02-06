@@ -15,7 +15,7 @@ Version:        2.3.3%{OP_VER}
 Release:        5%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.cups.org/
 # Apple stopped uploading the new versions into github, use OpenPrinting fork
 Source0:        https://github.com/OpenPrinting/cups/releases/download/v%{VERSION}/cups-%{VERSION}-source.tar.gz

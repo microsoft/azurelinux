@@ -9,7 +9,7 @@ Summary:        Guess media type for a file or a URL
 # lib/LWP/MediaTypes.pm:    GPL+ or Artistic
 License:        (GPL+ or Artistic) and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/LWP-MediaTypes
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/LWP-MediaTypes-%{version}.tar.gz#/perl-LWP-MediaTypes-%{version}.tar.gz
 BuildArch:      noarch

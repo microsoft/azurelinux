@@ -4,7 +4,7 @@ Version:        2.10.11
 Release:        14%{?dist}
 License:        MPLv1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.opalvoip.org/
 Source0:        https://download.gnome.org/sources/%{name}/2.10/%{name}-%{version}.tar.xz
 Patch1:         ptlib-2.10.10-mga-bison-parameter.patch

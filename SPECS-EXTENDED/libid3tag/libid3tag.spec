@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libid3tag
 Version:        0.15.1b
 Release:        33%{?dist}

@@ -4,7 +4,7 @@ Version:        2.11.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/pycodestyle/
 Source0:        https://github.com/PyCQA/pycodestyle/archive/refs/tags/%{version}.tar.gz#/pycodestyle-%{version}.tar.gz

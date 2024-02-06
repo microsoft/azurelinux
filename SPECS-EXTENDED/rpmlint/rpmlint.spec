@@ -14,7 +14,7 @@ Release:        8%{?dist}
 Summary:        Tool for checking common errors in RPM packages
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/rpmlint
 Source0:        %{url}/archive/rpmlint-%{version}.tar.gz
 Source1:        %{name}.config

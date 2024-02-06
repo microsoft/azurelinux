@@ -4,7 +4,7 @@ Release:	15%{?dist}
 Summary:	Check whether your code requires a newer perl
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-MinimumVersion
 Source0:	https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-MinimumVersion-%{version}.tar.gz
 

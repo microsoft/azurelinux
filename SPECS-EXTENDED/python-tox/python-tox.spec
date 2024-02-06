@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Tests requiring Internet connections are disabled by default
 # pass --with internet to run them (e.g. when doing a local rebuild
 # for sanity checks before committing). Example:

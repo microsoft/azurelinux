@@ -5,7 +5,7 @@ Version:        1.5.5
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/matze/pkgconfig
 Source:         %{pypi_source}
 BuildArch:      noarch

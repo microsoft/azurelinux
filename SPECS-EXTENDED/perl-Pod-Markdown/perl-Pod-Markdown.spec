@@ -4,7 +4,7 @@ Release:        4%{?dist}
 Summary:        Convert POD to Markdown
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Markdown
 Source0:        https://cpan.metacpan.org/authors/id/R/RW/RWSTAUNER/Pod-Markdown-%{version}.tar.gz#/perl-Pod-Markdown-%{version}.tar.gz
 BuildArch:      noarch

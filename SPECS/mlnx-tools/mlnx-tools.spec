@@ -35,7 +35,7 @@ Version:        5.2.0
 Release:        2%{?dist}
 License:        CPL 1.0 or BSD or GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://github.com/Mellanox/mlnx-tools
 Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz

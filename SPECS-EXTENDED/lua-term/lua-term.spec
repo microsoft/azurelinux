@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global luaminver 5.2
 
 #global commit 76d7c992a22d4481969a977ad36d6d35d3b2ca6f

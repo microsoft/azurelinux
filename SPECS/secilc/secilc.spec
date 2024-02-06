@@ -5,7 +5,7 @@ Version:        3.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         Allow-setting-arguments-to-xmlto-via-environmental-var.patch

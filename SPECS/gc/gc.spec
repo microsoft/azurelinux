@@ -9,7 +9,7 @@ Source0:        https://www.hboehm.info/gc/gc_source/%{name}-%{version}.tar.gz
 Source1:        http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.6.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 The Boehm-Demers-Weiser conservative garbage collector can be

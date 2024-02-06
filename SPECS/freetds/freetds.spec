@@ -5,7 +5,7 @@ Version:        1.4.10
 Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freetds.org/
 Source0:        ftp://ftp.freetds.org/pub/freetds/stable/freetds-%{version}.tar.bz2
 Source1:        freetds-tds_sysdep_public.h

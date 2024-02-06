@@ -6,7 +6,7 @@ Version:        1.11.1
 Release:        1%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/coredns/coredns
 #Source0:       https://github.com/coredns/coredns/archive/v%%{version}.tar.gz

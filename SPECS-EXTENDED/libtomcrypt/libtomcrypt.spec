@@ -4,7 +4,7 @@ Version:        1.18.2
 Release:        9%{?dist}
 License:        Public Domain OR WTFPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2019-17362.patch

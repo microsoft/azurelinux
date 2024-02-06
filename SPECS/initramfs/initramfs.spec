@@ -4,7 +4,7 @@ Version:        2.0
 Release:        15%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 Source0:        fscks.conf
 BuildRequires:  grub2-rpm-macros

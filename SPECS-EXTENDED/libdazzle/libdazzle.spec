@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global glib2_version 2.57.2
 %global gtk3_version 3.24.0
 

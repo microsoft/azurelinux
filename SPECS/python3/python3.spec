@@ -15,7 +15,7 @@ Version:        3.9.14
 Release:        8%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz

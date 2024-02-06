@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ml
 Summary: Malayalam hunspell dictionaries
 Version: 0.1

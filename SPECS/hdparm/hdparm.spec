@@ -7,7 +7,7 @@ URL:		    http://sourceforge.net/projects/%{name}/
 Source0:	    http://downloads.sourceforge.net/hdparm/%{name}-%{version}.tar.gz
 Group:		    Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 The Hdparm package contains a utility that is useful for controlling ATA/IDE

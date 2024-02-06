@@ -7,7 +7,7 @@ URL:		http://freedesktop.org/wiki/Software/%{name}l/
 Source0:	http://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 Gperf generates a perfect hash function from a key set.

@@ -22,7 +22,7 @@ Release:        1%{?dist}
 Summary:        A toolchain to help packaging golang
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Golang
 URL:            https://github.com/openSUSE/%{name}
 #Source0:       https://github.com/openSUSE/%{name}/archive/refs/tags/v%{version}.tar.gz

@@ -10,7 +10,7 @@ Release:        1%{?dist}
 # plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MXParser.java
 License:        Apache-2.0 AND MIT AND xpp
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-containers
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz

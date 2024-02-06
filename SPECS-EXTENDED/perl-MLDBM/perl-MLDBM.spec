@@ -4,7 +4,7 @@ Release:        22%{?dist}
 Summary:        Store multi-level hash structure in single level tied hash
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/MLDBM
 Source0:        https://cpan.metacpan.org/authors/id/C/CH/CHORNY/MLDBM-%{version}.tar.gz#/perl-MLDBM-%{version}.tar.gz
 Source1:        LICENSE.PTR

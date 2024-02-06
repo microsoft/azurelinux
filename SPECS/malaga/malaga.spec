@@ -4,7 +4,7 @@ Version:        7.12
 Release:        32%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dynalabs.de/mxp/malaga/
 Source0:        https://dynalabs.de/mxp/assets/malaga-7.12.tgz
 # Fix map_file symbol conflict with samba. Upstream can be considered

@@ -6,7 +6,7 @@ Version:        1.16.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Ruby
 URL:            https://www.fluentd.org/
 Source0:        https://github.com/fluent/fluentd/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

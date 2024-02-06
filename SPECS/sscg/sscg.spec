@@ -4,7 +4,7 @@ Version:        3.0.5
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sgallagher/sscg
 Source0:        %{url}/archive/refs/tags/%{name}-%{version}.tar.gz
 

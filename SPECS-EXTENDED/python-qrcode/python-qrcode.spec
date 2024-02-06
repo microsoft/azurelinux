@@ -1,7 +1,7 @@
 %bcond_with missing_dependencies
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pkgname qrcode
 
 Name:           python-%{pkgname}

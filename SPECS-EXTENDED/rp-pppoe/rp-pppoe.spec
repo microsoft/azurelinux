@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: rp-pppoe
 Version: 3.12
 Release: 16%{?dist}

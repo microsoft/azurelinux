@@ -53,7 +53,7 @@ Version:        2.4.116
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dri.freedesktop.org
 Source0:        %{url}/libdrm/%{name}-%{version}.tar.xz
 Source1:        README.rst

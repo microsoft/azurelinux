@@ -4,7 +4,7 @@ Version:        5.5
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tools
 

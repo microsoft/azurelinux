@@ -7,7 +7,7 @@ Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://azure.github.io/azure-storage-cpp/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/Azure/azure-storage-cpp/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  util-linux-devel

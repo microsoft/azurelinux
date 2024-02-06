@@ -6,7 +6,7 @@ License:        GPLv3+
 URL:            http://www.gnu.org/software/diffutils
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/diffutils/%{name}-%{version}.tar.xz
 BuildRequires:  coreutils
 Conflicts:      toybox

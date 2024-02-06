@@ -4,7 +4,7 @@ Version:        0.80
 Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/williamh/espeakup
 #Source0:       https://github.com/williamh/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

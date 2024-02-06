@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # ghc has been bootstrapped on all Fedora archs except aarch64.
 # The ghc interpreter ghci is only supported on a subset of archs.
 

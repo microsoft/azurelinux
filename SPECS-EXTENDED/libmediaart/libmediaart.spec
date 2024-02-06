@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libmediaart
 Version:        1.9.4
 Release:        10%{?dist}

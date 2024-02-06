@@ -4,7 +4,7 @@ Version:        1.4.2
 Release:        6%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.xiph.org/
 Source:         https://ftp.osuosl.org/pub/xiph/releases/vorbis/%{name}-%{version}.tar.gz
 # http://lists.xiph.org/pipermail/vorbis-dev/2021-January/020538.html

@@ -8,7 +8,7 @@ Release:	11%{?dist}
 Summary:	Mro::* interface compatibility for Perls < 5.9.5
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/MRO-Compat
 Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-%{version}.tar.gz#/perl-MRO-Compat-%{version}.tar.gz
 BuildArch:	noarch

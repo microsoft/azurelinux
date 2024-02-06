@@ -4,7 +4,7 @@ Version:        0.006
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Regexp-Pattern-Perl/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Regexp-Pattern-Perl-%{version}.tar.gz
 

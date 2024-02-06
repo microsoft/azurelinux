@@ -6,7 +6,7 @@ Version:        3.0.11
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/dell/dkms
 Source0:        https://github.com/dell/dkms/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

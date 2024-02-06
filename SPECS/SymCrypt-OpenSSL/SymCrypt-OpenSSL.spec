@@ -4,7 +4,7 @@ Version:        1.4.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 #Source0:       https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz

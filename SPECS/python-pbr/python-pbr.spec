@@ -4,7 +4,7 @@ Version:        5.8.1
 Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://docs.openstack.org/developer/pbr/
 Source0:        https://pypi.io/packages/source/p/pbr/pbr-%{version}.tar.gz

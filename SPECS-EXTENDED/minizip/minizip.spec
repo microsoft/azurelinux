@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           minizip
 Version:        2.10.1
 Release:        2%{?dist}

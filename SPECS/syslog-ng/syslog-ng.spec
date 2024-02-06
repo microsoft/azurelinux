@@ -4,7 +4,7 @@ Version:        4.3.1
 Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://syslog-ng.org/
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz

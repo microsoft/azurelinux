@@ -8,7 +8,7 @@ URL:            https://github.com/KDE/kpmcore
 #Source0:       http://download.kde.org/stable/%{name}/%{version}/src/%{name}-%{version}.tar.xz
 Source0:        %{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 ## admin gui build currently busted, FIXME?
 #define _enable_gui --enable-gui

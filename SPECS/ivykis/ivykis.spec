@@ -4,7 +4,7 @@ Version:        0.42.4
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/buytenh/ivykis
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

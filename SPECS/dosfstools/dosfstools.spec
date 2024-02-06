@@ -6,7 +6,7 @@ License:	GPLv3+
 URL:		http://github.com/dosfstools/dosfstools
 Group:		Filesystem Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	https://github.com/dosfstools/dosfstools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: acl

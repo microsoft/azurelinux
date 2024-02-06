@@ -6,7 +6,7 @@ Version:        3.3
 Release:        30%{?dist}
 License:        GPLv2 OR BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/01org/psm
 Source0:        https://github.com/intel/psm/archive/refs/tags/v%{version}.tar.gz#/psm-%{version}.tar.gz
 Source1:        ipath.rules

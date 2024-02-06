@@ -2,7 +2,7 @@
 
 Summary:        Test utilities for code working with files and commands
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{pypi_name}
 Version:        0.5.0
 Release:        4%{?dist}

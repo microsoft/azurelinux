@@ -8,7 +8,7 @@ Release:        1%{?dist}
 License:        ASL 2.0
 URL:            https://stuvel.eu/software/rsa/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/aa/65/7d973b89c4d2351d7fb232c2e452547ddfa243e93131e7cfa766da627b52/%{pkgname}-%{version}.tar.gz
 BuildArch:  noarch
 

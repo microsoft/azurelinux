@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global upstream_commit cec10c6cad4804d391df31d0be8e429e2231feb5
 %global upstreamid 20110915
 

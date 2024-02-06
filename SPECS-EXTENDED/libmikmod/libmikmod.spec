@@ -4,7 +4,7 @@ Version:        3.3.11.1
 Release:        14%{?dist}
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://mikmod.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/mikmod/libmikmod-%{version}.tar.gz
 Patch0:         libmikmod-64bit.patch

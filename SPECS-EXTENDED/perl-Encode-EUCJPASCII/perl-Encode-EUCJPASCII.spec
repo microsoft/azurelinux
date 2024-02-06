@@ -4,7 +4,7 @@ Release:        30%{?dist}
 Summary:        EucJP-ascii - An eucJP-open mapping
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Encode-EUCJPASCII
 Source0:        https://cpan.metacpan.org/modules/by-module/Encode/Encode-EUCJPASCII-%{version}.tar.gz#/perl-Encode-EUCJPASCII-%{version}.tar.gz
 BuildRequires:  gcc

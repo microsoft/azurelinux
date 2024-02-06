@@ -4,7 +4,7 @@ Version:        29.1
 Release:        1%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.gnu.org/software/emacs/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz

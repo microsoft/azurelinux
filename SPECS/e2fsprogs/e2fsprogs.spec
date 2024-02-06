@@ -4,7 +4,7 @@ Version:        1.47.0
 Release:        1%{?dist}
 License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            http://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz

@@ -15,7 +15,7 @@ Version:        1.12.1
 Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/display/HDF5/HDF5
 Source0:        https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-%{version_main}/hdf5-%{version}/src/hdf5-%{version}.tar.bz2
 Source1:        h5comp

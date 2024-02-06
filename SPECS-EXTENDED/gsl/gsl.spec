@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: The GNU Scientific Library for numerical analysis
 Name: gsl
 Version: 2.6

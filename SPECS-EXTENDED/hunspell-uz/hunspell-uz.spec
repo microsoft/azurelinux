@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-uz
 Summary: Uzbek hunspell dictionaries
 Version: 0.6

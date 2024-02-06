@@ -4,7 +4,7 @@ Version:        3.5
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/archive/refs/tags/%{version}.tar.gz#/selinux-%{version}.tar.gz

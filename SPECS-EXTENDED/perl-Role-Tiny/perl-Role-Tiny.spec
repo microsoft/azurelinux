@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        A nouvelle cuisine portion size slice of Moose
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Role-Tiny
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-%{version}.tar.gz#/perl-Role-Tiny-%{version}.tar.gz
 BuildArch:      noarch

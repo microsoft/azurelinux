@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Programs for accessing MS-DOS disks without mounting the disks
 Name: mtools
 Version: 4.0.43

@@ -5,7 +5,7 @@ Version:        2.36.1
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/at-spi2-core
 Source0:        http://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 # https://gitlab.gnome.org/GNOME/at-spi2-core/-/issues/25

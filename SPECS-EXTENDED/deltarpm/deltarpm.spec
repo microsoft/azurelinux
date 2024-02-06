@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           deltarpm
 Summary:        Create deltas between rpms
 Version:        3.6.2

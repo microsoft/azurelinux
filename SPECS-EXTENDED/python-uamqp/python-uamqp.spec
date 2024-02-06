@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname uamqp
 %global _description %{expand:An AMQP 1.0 client library for Python.}
 

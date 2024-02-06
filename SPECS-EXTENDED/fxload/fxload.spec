@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: fxload
 Version: 2008_10_13
 Release: 16%{?dist}

@@ -8,7 +8,7 @@ Version:        37.0
 Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

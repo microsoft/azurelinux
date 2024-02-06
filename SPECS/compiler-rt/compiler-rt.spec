@@ -8,7 +8,7 @@ Version:        17.0.6
 Release:        2%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://compiler-rt.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz

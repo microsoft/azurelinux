@@ -9,7 +9,7 @@ Release:        1%{?dist}
 # scowl/speller/aspell/en_phonet.dat is LGPLv2
 License:        LGPLv2+ AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wordlist.sourceforge.net/
 Source0:        https://github.com/en-wl/wordlist/archive/refs/tags/rel-2020.12.07.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://download.services.openoffice.org/contrib/dictionaries/en_GB.zip

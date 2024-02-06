@@ -4,7 +4,7 @@ Release:        21%{?dist}
 Summary:        Generate fast XS accessors without run-time compilation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-XSAccessor
 Source0:        https://cpan.metacpan.org/authors/id/S/SM/SMUELLER/Class-XSAccessor-%{version}.tar.gz#/perl-Class-XSAccessor-%{version}.tar.gz
 # Build:

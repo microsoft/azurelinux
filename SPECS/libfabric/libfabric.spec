@@ -6,7 +6,7 @@ Version:        1.18.2
 Release:        1%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ofiwg/libfabric
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 

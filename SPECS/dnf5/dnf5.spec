@@ -40,7 +40,7 @@ Version:        %{project_version_major}.%{project_version_minor}.%{project_vers
 Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
 # ========== build requires ==========

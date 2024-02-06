@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           pylint
 Version:        2.4.4
 Release:        4%{?dist}

@@ -6,7 +6,7 @@ Version:        1.0.5
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/fluent-plugin-systemd/fluent-plugin-systemd
 Source0:        https://github.com/fluent-plugin-systemd/fluent-plugin-systemd/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

@@ -9,7 +9,7 @@ Release:        7%{?dist}
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
 Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/%{name}-%{version}.tar.xz

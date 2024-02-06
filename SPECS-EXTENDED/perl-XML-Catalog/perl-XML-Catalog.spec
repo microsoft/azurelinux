@@ -7,7 +7,7 @@ Release:        18%{?dist}
 Summary:        Resolve public identifiers and remap system identifiers
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-Catalog
 Source0:        https://cpan.metacpan.org/authors/id/J/JF/JFEARN/XML-Catalog-%{cpan_version}.tar.gz#/perl-XML-Catalog-%{cpan_version}.tar.gz
 BuildArch:      noarch

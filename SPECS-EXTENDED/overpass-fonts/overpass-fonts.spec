@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global fontname overpass
 %global fontconf 60-%{fontname}.conf
 %global monofontconf 60-%{fontname}-mono.conf

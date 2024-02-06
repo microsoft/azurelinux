@@ -9,7 +9,7 @@ Release:        1%{?dist}
 # the rest: GPLv3+
 License:        GPLv3+ AND LGPLv2+ AND (GPL+ OR Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tracker.debian.org/pkg/fakeroot
 Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
 # Debian package patches, from debian.tar.xz

@@ -6,7 +6,7 @@ Version:        7.0.0
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/workhorsy/py-cpuinfo
 Source0:        https://files.pythonhosted.org/packages/source/p/py-%{srcname}/py-%{srcname}-%{version}.tar.gz
 # https://github.com/workhorsy/py-cpuinfo/issues/55

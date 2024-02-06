@@ -4,7 +4,7 @@ Version:        1.0.8
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Filesystem and Disk management
 URL:            https://sourceforge.net/projects/gptfdisk/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz

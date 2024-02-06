@@ -4,7 +4,7 @@ Version:        0.6.8
 Release:        13%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://netsniff-ng.org/
 Source0:        http://www.netsniff-ng.org/pub/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  make

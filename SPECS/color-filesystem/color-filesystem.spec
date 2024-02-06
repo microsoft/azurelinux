@@ -4,7 +4,7 @@ Version:        3
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Requires:       filesystem
 Requires:       rpm
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        1.9.4
 Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/hashicorp/packer
 Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

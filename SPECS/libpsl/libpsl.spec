@@ -4,7 +4,7 @@ Version:        0.21.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://github.com/rockdaboot/libpsl
 Source0:        https://github.com/rockdaboot/libpsl/releases/download/%{version}/%{name}-%{version}.tar.gz

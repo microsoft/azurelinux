@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ca
 Summary: Catalan hyphenation rules
 Version: 0.9.3

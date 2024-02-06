@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		pps-tools
 Version:	1.0.2
 Release:	6%{?dist}

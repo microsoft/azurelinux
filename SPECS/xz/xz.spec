@@ -6,7 +6,7 @@ URL:            https://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
 Group:          Applications/File
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://tukaani.org/xz/%{name}-%{version}.tar.xz
 Provides:       xz-lzma-compat = %{version}-%{release}
 Provides:       lzma = %{version}-%{release}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Summary: Open implementation of Service Location Protocol V2
 Name:    openslp

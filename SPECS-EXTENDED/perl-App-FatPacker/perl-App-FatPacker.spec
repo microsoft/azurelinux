@@ -4,7 +4,7 @@ Release:        6%{?dist}
 Summary:        Pack dependencies onto a script file
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/App-FatPacker
 Source0:        https://cpan.metacpan.org/authors/id/M/MS/MSTROUT/App-FatPacker-%{version}.tar.gz#/perl-App-FatPacker-%{version}.tar.gz
 BuildArch:      noarch

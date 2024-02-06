@@ -9,7 +9,7 @@ Version:        2.0.27
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/horms/kexec-tools
 

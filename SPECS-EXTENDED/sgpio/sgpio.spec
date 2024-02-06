@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: SGPIO captive backplane tool
 Name: sgpio
 Version: 1.2.0.10

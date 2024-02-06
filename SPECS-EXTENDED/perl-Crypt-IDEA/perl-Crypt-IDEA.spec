@@ -4,7 +4,7 @@ Version:	1.10
 Release:	18%{?dist}
 License:	BSD with advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Crypt-IDEA
 Source0:	https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-IDEA-%{version}.tar.gz#/perl-Crypt-IDEA-%{version}.tar.gz
 # Build

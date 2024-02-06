@@ -10,7 +10,7 @@ BuildArch: noarch
 License: BSD
 Summary: Character encoding for the web
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/gsnedders/python-%{srcname}
 Source0: %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

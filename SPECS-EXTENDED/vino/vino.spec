@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:    vino
 Version: 3.22.0
 Release: 20%{?dist}

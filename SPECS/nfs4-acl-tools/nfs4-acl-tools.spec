@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        The nfs4 ACL tools
 License:        BSD and GPLv2 and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.linux-nfs.org/?p=bfields/nfs4-acl-tools.git;a=summary
 Source0:        https://linux-nfs.org/~bfields/nfs4-acl-tools/%{name}-%{version}.tar.gz
 

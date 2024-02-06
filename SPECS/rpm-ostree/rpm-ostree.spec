@@ -4,7 +4,7 @@ Version:        2022.1
 Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         rpm-ostree-libdnf-build.patch

@@ -4,7 +4,7 @@ Version:        0.13.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.spice-space.org/usbredir.html
 Source0:        https://spice-space.org/download/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  g++

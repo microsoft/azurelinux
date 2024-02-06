@@ -4,7 +4,7 @@ Version:        0.26
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/software/desktop-file-utils
 Source0:        https://www.freedesktop.org/software/desktop-file-utils/releases/%{name}-%{version}.tar.xz
 BuildRequires:  gcc

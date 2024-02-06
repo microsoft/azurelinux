@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global build_py3   1
 
 Summary: Python libraries for the Spacewalk project

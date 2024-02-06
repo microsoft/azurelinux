@@ -1,7 +1,7 @@
 %bcond_with wayland
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global commit0 edd1ad15e383d32c8d67bdc9198c834b6acebca5
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 

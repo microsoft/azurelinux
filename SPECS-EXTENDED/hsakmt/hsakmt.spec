@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global rocm_version 2.0.0
 Name:           hsakmt
 Version:        1.0.6

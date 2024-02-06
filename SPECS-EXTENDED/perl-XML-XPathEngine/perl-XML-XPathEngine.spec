@@ -4,7 +4,7 @@ Release:        18%{?dist}
 Summary:        Re-usable XPath engine for DOM-like trees
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-XPathEngine
 Source0:        https://cpan.metacpan.org/modules/by-module/XML/XML-XPathEngine-%{version}.tar.gz#/perl-XML-XPathEngine-%{version}.tar.gz
 BuildArch:      noarch

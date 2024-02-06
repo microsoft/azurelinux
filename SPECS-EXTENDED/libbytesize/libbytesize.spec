@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define realname bytesize
 %define with_python3 1
 %define with_gtk_doc 0

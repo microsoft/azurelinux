@@ -6,7 +6,7 @@ Version:        17.0.6
 Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://lldb.llvm.org
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz

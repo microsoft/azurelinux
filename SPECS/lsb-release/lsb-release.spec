@@ -4,7 +4,7 @@ Version:        3.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.linuxfoundation.org/lsb/start
 #Source0:      https://github.com/thkukuk/lsb-release_os-release/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}_os-release-%{version}.tar.gz

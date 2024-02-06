@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define utempter_compat_ver 0.5.2
 
 Summary: A privileged helper for utmp/wtmp updates

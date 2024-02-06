@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Test case module for Perl
 Name:           perl-Test-Manifest
 Version:        2.021

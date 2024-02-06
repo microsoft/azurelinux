@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-vi
 Summary: Vietnamese hunspell dictionaries
 %global upstreamid 20120418

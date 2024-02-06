@@ -6,7 +6,7 @@ Version:        %{vers}
 Release:        6%{?dist}
 License:        TCL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tcl.sourceforge.net
 Source0:        https://download.sourceforge.net/sourceforge/tcl/%{name}%{version}-src.tar.gz
 Patch0:         tk-8.6.10-make.patch

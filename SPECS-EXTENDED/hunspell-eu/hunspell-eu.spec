@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-eu
 Summary: Basque hunspell dictionaries
 %global upstreamid 20080507

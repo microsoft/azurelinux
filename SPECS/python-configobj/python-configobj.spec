@@ -4,7 +4,7 @@ Version:        5.0.6
 Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/DiffSK/configobj
 # Source to be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.

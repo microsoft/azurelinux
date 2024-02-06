@@ -5,7 +5,7 @@ Version:        5.9.1
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Networking/Other
 URL:            https://net-snmp.sourceforge.io/
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz

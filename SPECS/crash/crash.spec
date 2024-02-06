@@ -4,7 +4,7 @@ Release:       1%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/crash-utility/crash
 Source0:       https://github.com/crash-utility/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # crash requires gdb tarball for the build. There is no option to use the host gdb. For crash 8.0.1 the newest supported gdb version is 10.2.

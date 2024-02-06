@@ -17,7 +17,7 @@ Version:        3.96.1
 Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
 Source0:        https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_96_1_RTM/src/%{name}-%{version}.tar.gz

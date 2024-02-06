@@ -10,7 +10,7 @@ License:        ASL 2.0
 URL:            https://github.com/opencontainers/runc
 Group:          Virtualization/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Source0:        https://github.com/opencontainers/runc/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

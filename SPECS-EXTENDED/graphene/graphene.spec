@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           graphene
 Version:        1.10.4
 Release:        3%{?dist}

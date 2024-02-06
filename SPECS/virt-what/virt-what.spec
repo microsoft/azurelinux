@@ -5,7 +5,7 @@ Summary:        Detect if we are running in a virtual machine
 License:        GPLv2+
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://people.redhat.com/~rjones/virt-what/
 Source0:        http://people.redhat.com/~rjones/virt-what/files/%{name}-%{version}.tar.gz
 

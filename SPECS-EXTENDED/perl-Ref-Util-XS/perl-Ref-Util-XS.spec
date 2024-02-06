@@ -11,7 +11,7 @@ Release:	9%{?dist}
 Summary:	Utility functions for checking references
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Ref-Util-XS
 Source0:	https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Ref-Util-XS-%{version}.tar.gz#/perl-Ref-Util-XS-%{version}.tar.gz
 # Build

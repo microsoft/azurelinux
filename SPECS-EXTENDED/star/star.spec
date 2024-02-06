@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global ALTERNATIVES %{_sbindir}/alternatives
 
 Summary:  An archiving tool with ACL support

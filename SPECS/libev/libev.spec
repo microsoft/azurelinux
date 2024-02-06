@@ -7,7 +7,7 @@ Version:        4.33
 Release:        5%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://software.schmorp.de/pkg/libev.html
 Source0:        http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 

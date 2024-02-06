@@ -24,7 +24,7 @@ Version:        0.3.21
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/xianyi/OpenBLAS/
 Source0:        https://github.com/xianyi/OpenBLAS/archive/v%{version}/openblas-%{version}.tar.gz
 # Use system lapack

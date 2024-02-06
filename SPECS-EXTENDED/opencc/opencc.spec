@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       opencc
 Version:    1.1.1
 Release:    3%{?dist}

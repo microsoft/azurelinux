@@ -4,7 +4,7 @@ Version:        1.0
 Release:        13%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.khronos.org/registry/cl/
 BuildArch:      noarch
 

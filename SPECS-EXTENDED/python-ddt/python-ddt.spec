@@ -13,7 +13,7 @@ different test data, and make it appear as multiple test cases. It is used in
 combination with other testing frameworks like unittest and nose.}
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{pkgname}
 Version:        1.4.2
 Release:        6%{?dist}

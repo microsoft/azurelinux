@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6

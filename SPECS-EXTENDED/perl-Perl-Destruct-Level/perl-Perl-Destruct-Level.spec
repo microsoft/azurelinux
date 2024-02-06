@@ -4,7 +4,7 @@ Version:	0.02
 Release:	27%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Perl-Destruct-Level
 Source0:	https://cpan.metacpan.org/authors/id/R/RG/RGARCIA/Perl-Destruct-Level-%{version}.tar.gz#/perl-Perl-Destruct-Level-%{version}.tar.gz
 # Module Build

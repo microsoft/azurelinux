@@ -4,7 +4,7 @@ Version:        3.8.5
 Release:        1%{?dist}
 License:        GPLv2 AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/sanlock/
 Source0:        https://releases.pagure.org/sanlock/%{name}-%{version}.tar.gz
 

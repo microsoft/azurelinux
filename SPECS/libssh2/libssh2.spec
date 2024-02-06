@@ -8,7 +8,7 @@ License:        BSD
 URL:            https://www.libssh2.org/
 Group:          System Environment/NetworkingLibraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.libssh2.org/download/libssh2-%{version}.tar.gz
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel

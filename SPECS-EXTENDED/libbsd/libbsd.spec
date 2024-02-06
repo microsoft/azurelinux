@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libbsd
 Version:        0.10.0
 Release:        3%{?dist}

@@ -4,7 +4,7 @@ Version:        3.2.7
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Appication/Internet
 URL:            https://rsync.samba.org/
 Source0:        https://download.samba.org/pub/rsync/src/%{name}-%{version}.tar.gz

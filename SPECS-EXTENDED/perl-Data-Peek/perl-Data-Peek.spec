@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Run optional test
 %{bcond_without perl_Data_Peek_enables_option_test}
 

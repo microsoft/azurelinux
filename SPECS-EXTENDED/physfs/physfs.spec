@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		physfs
 Version:	3.0.2
 Release:	4%{?dist}

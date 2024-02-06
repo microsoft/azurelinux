@@ -4,7 +4,7 @@ Release:	12%{?dist}
 Summary:	Check the correct line endings in your project
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-EOL
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-EOL-%{version}.tar.gz#/perl-Test-EOL-%{version}.tar.gz
 BuildArch:	noarch

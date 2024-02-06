@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: dropwatch
 Version: 1.5.3
 Release: 6%{?dist}

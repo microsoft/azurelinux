@@ -4,7 +4,7 @@ Release: 3%{?dist}
 Summary: Library for controlling team network device
 License: LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.libteam.org
 Source: http://www.libteam.org/files/libteam-%{version}.tar.gz
 

@@ -4,7 +4,7 @@ Version:        1.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/pcaudiolib
 #Source0:       https://github.com/espeak-ng/%{name}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

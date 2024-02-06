@@ -4,7 +4,7 @@ Version:        3.0.0
 Release:        2%{?dist}
 License:        BSD 2-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-abrmd/releases/
 Source0:        https://github.com/tpm2-software/tpm2-abrmd/releases/download/%{version}/%{name}-%{version}.tar.gz

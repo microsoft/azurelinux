@@ -8,7 +8,7 @@ Summary:        Database clustering system for horizontal scaling of MySQL
 # Upstream license specification: MIT and Apache-2.0
 License:        MIT and ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/vitessio/vitess
 #Source0:       https://github.com/vitessio/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

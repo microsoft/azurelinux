@@ -17,7 +17,7 @@ Version:        %{major_version}.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.lua.org/
 Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz

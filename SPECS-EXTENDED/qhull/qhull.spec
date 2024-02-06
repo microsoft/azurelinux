@@ -9,7 +9,7 @@ Patch1: 0001-Link-executables-against-shared-libs.patch
 Patch2: 0002-Install-docs-into-subdirs.patch
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.qhull.org
 
 BuildRequires: gcc

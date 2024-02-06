@@ -7,7 +7,7 @@ Release:        6%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ WITH exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.qt.io
 Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
 # No gui add no patch

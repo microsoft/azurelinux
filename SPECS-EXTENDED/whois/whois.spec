@@ -8,7 +8,7 @@ Version:        5.5.15
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.linux.it/~md/software/
 Source0:        http://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
 BuildRequires:  coreutils

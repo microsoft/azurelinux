@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		sblim-sfcCommon
 Version:	1.0.1
 Release:	16%{?dist}

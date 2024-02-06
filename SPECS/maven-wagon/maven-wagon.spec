@@ -5,7 +5,7 @@ Version:        3.5.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/wagon
 Source0:        https://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/%{version}/wagon-%{version}-source-release.zip
 BuildRequires:  javapackages-bootstrap

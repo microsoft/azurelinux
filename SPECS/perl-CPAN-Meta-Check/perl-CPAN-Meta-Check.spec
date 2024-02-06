@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CPAN-Meta-Check
 Source0:        http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
 BuildArch:      noarch

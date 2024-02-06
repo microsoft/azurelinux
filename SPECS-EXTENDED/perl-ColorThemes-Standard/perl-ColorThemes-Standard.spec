@@ -6,7 +6,7 @@ Version:        0.003
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/ColorThemes-Standard/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemes-Standard-%{version}.tar.gz
 

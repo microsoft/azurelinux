@@ -8,7 +8,7 @@ Version:        %{ver_major}.%{ver_minor}.%{ver_patch}
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.quut.com/gsm/
 Source0:        https://www.quut.com/gsm/%{name}-%{version}.tar.gz
 

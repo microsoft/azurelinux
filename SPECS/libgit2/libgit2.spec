@@ -4,7 +4,7 @@ Version:        1.4.5
 Release:        2%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
 

@@ -6,7 +6,7 @@ URL:            https://metacpan.org/release/Try-Tiny
 License:        MIT
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-%{version}.tar.gz
 
 BuildArch:      noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pypi_name sphinx-epytext
 Name:           python-%{pypi_name}
 Version:        0.0.4

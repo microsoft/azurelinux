@@ -11,7 +11,7 @@ Release:        6%{?dist}
 Summary:        General-purpose retrying library in Python
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rholder/retrying
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch

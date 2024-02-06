@@ -8,7 +8,7 @@ Release:        5%{?dist}
 Summary:        Test strings and data structures and show differences if not OK
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Differences
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Differences-%{module_version}.tar.gz#/perl-Test-Differences-%{module_version}.tar.gz
 BuildArch:      noarch

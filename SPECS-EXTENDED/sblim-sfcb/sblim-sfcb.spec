@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # $Id: sblim-sfcb.spec,v 1.5 2010/06/23 10:31:02 vcrhonek Exp $
 #

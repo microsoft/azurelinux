@@ -10,7 +10,7 @@ Version:        2.0.1
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.org/project/%{pypi_name}/
 Source0:        https://github.com/hukkin/%{pypi_name}/archive/refs/tags/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 

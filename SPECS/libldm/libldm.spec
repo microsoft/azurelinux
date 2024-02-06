@@ -4,7 +4,7 @@ Version:        0.2.5
 Release:        1%{?dist}
 License:        LGPLv3+ AND GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mdbooth/libldm
 Source0:        https://github.com/mdbooth/libldm/archive/%{name}-%{version}.tar.gz
 

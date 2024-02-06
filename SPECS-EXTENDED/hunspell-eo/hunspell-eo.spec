@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-eo
 Summary: Esperanto hunspell dictionaries
 %global upstreamid 20100218

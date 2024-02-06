@@ -4,7 +4,7 @@ Version:        0.32
 Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://launchpad.net/cloud-utils
 Source0:        https://launchpad.net/cloud-utils/trunk/%{version}/+download/cloud-utils-%{version}.tar.gz

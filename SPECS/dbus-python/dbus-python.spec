@@ -4,7 +4,7 @@ Version:        1.2.16
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/DBusBindings/
 Source0:        https://dbus.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 # borrow centos7 patch to use sitearch properly

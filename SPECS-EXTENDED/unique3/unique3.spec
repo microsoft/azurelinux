@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           unique3
 Version:        3.0.2
 Release:        22%{?dist}

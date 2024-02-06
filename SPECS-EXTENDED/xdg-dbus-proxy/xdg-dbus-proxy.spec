@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           xdg-dbus-proxy
 Version:        0.1.2
 Release:        3%{?dist}

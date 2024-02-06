@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global gem_name rouge
 
 Name:           rubygem-%{gem_name}

@@ -4,7 +4,7 @@ Version:        2.101
 Release:        4%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Compress-Raw-Lzma
 Source0:        https://cpan.metacpan.org/modules/by-module/Compress/Compress-Raw-Lzma-%{version}.tar.gz
 Source1:        LICENSE.PTR

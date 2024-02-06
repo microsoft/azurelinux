@@ -7,7 +7,7 @@ URL:            https://www.docbook.org
 Source0:        https://docbook.org/xml/4.5/docbook-xml-%{version}.zip
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Requires:       libxml2
 BuildRequires:  libxml2
 BuildRequires:  unzip

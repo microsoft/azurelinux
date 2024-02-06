@@ -10,7 +10,7 @@ Version:        4.2.15
 Release:        13%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://portal.hdfgroup.org/
 Source0:        https://support.hdfgroup.org/ftp/HDF/releases/HDF%{version}/src/%{name}-%{version}.tar.bz2
 Source1:        h4comp

@@ -5,7 +5,7 @@ Version:        22.10.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
 Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.tar.gz

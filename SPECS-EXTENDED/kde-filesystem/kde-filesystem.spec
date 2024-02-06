@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define _kde4_prefix %_prefix
 %define _kde4_sysconfdir %_sysconfdir
 %define _kde4_libdir %_libdir

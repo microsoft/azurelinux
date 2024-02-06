@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # noarch, but to avoid debug* files interfering with manifest test:
 %global debug_package %{nil}
 

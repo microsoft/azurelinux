@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # The library is licensed as LGPLv2+, the protocol definition is BSD
 License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sahlberg/libnfs
 Source0:        %{url}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  automake

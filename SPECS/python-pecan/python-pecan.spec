@@ -10,7 +10,7 @@ Release:        2%{?dist}
 License:        BSD
 Url:            https://www.pecanpy.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/p/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
 BuildArch:      noarch

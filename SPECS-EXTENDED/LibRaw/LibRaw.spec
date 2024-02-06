@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # feature macro to enable samples (or not)
 %if 0%{?rhel} != 7

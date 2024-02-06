@@ -6,7 +6,7 @@ Version:        0.12.2
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pytoolz/cytoolz/
 Source0:	https://github.com/pytoolz/cytoolz/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc

@@ -4,7 +4,7 @@ Release:	12%{?dist}
 Summary:	Facility for creating read-only scalars, arrays, hashes
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Readonly
 Source0:	https://cpan.metacpan.org/authors/id/S/SA/SANKO/Readonly-%{version}.tar.gz#/perl-Readonly-%{version}.tar.gz
 Patch0:		Readonly-2.05-interpreter.patch

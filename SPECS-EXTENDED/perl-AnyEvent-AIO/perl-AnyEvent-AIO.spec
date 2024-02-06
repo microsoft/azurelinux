@@ -4,7 +4,7 @@ Version:        1.1
 Release:        35%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/AnyEvent-AIO
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/AnyEvent-AIO-%{version}.tar.gz
 

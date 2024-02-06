@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-id
 Summary: Indonesian hyphenation rules
 %global upstreamid 20040812

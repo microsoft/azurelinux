@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		xcb-util-renderutil
 Version:	0.3.9
 Release:	16%{?dist}

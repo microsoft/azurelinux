@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libmodplug
 Version:        0.8.9.0
 Release:        12%{?dist}

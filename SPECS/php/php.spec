@@ -43,7 +43,7 @@ Release:        2%{?dist}
 # Zend/asm is Boost
 License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.php.net/
 Source0:        https://www.php.net/distributions/php-%{version}.tar.xz
 Source1:        php.conf

@@ -8,7 +8,7 @@ Version:        1.0.128+nmu2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.debian.org/Debootstrap
 Source0:        https://deb.debian.org/debian/pool/main/d/%{name}/%{name}_%{version}.tar.gz
 BuildRequires:  fakeroot

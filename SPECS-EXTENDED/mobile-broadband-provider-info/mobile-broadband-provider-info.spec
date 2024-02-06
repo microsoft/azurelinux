@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Mobile broadband provider database
 Name: mobile-broadband-provider-info
 Version: 20190618

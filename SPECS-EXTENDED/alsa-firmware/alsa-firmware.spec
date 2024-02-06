@@ -8,7 +8,7 @@ Release:        8%{?dist}
 # See later in the spec for a breakdown of licensing
 License:        GPL+ AND BSD AND GPLv2+ AND GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.alsa-project.org/
 Source:         ftp://ftp.alsa-project.org/pub/firmware/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf

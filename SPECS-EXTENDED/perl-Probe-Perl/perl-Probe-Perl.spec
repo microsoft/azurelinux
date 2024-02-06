@@ -4,7 +4,7 @@ Release:        18%{?dist}
 Summary:        Information about the currently running perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Probe-Perl
 Source0:        https://cpan.metacpan.org/authors/id/K/KW/KWILLIAMS/Probe-Perl-%{version}.tar.gz#/perl-Probe-Perl-%{version}.tar.gz
 BuildArch:      noarch

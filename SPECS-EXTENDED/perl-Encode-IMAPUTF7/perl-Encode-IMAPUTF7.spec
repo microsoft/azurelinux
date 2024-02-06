@@ -6,7 +6,7 @@ Version:        1.05
 Release:        18%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Encode-IMAPUTF7
 Source0:        https://cpan.metacpan.org/authors/id/P/PM/PMAKHOLM/Encode-IMAPUTF7-%{version}.tar.gz
 BuildArch:      noarch

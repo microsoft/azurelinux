@@ -4,7 +4,7 @@ Version:        3.17.3
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz

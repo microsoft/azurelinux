@@ -6,7 +6,7 @@ Version:        1.0.1
 Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
 Patch0:         test_jsmath_path_fix.patch

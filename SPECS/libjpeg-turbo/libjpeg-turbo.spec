@@ -4,7 +4,7 @@ Version:        3.0.0
 Release:        1%{?dist}
 License:        IJG
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://sourceforge.net/projects/libjpeg-turbo
 Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version}.tar.gz

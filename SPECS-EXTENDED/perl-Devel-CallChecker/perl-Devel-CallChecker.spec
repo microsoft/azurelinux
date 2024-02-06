@@ -13,7 +13,7 @@ Release:        10%{?dist}
 Summary:        Custom op checking attached to subroutines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-CallChecker
 Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Devel-CallChecker-%{version}.tar.gz#/perl-Devel-CallChecker-%{version}.tar.gz
 BuildRequires:  findutils

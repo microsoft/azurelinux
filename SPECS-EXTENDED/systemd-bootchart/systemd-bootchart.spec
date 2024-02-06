@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           systemd-bootchart
 Version:        233
 Release:        8%{?dist}

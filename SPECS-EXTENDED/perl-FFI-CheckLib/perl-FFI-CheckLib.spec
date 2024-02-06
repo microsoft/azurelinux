@@ -7,7 +7,7 @@ Release:        3%{?dist}
 Summary:        Check that a library is available for FFI
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/FFI-CheckLib
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/FFI-CheckLib-%{version}.tar.gz#/perl-FFI-CheckLib-%{version}.tar.gz
 BuildArch:      noarch

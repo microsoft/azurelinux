@@ -4,7 +4,7 @@ Release:        8%{?dist}
 Summary:        Ensure that a platform has weaken support
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Task-Weaken
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Task-Weaken-%{version}.tar.gz#/perl-Task-Weaken-%{version}.tar.gz
 BuildArch:      noarch

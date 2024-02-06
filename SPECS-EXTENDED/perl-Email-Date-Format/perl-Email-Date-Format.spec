@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Email-Date-Format
 Version:        1.005
 Release:        16%{?dist}

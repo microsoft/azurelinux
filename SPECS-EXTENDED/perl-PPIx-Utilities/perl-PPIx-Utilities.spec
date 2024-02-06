@@ -11,7 +11,7 @@ Release:	37%{?dist}
 Summary:	Extensions to PPI
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/PPIx-Utilities
 Source0:	https://cpan.metacpan.org/authors/id/E/EL/ELLIOTJS/PPIx-Utilities-%{version}.tar.gz#/perl-PPIx-Utilities-%{version}.tar.gz
 BuildArch:	noarch

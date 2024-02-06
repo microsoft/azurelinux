@@ -129,7 +129,7 @@ Version:        11.1
 Release:        1%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://docs.gluster.org/
 Source0:        https://download.gluster.org/pub/gluster/%{name}/11/%{version}/%{name}-%{version}.tar.gz
 Source1:        glusterd.sysconfig

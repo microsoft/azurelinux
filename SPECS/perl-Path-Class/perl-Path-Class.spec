@@ -6,7 +6,7 @@ URL:            http://search.cpan.org/~kwilliams/Path-Class-0.37/
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class-%{version}.tar.gz
 
 BuildArch:      noarch

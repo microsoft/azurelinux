@@ -4,7 +4,7 @@ Release:        7%{?dist}
 Summary:        A MySQL interface for Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DBD-mysql
 Source0:        https://cpan.metacpan.org/authors/id/D/DV/DVEEDEN/DBD-mysql-%{version}.tar.gz#/perl-DBD-mysql-%{version}.tar.gz
 BuildRequires:  coreutils

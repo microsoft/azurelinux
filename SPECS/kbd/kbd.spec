@@ -4,7 +4,7 @@ Version:        2.2.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            http://ftp.altlinux.org/pub/people/legion/kbd
 Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz

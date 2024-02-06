@@ -23,7 +23,7 @@ Release:        7%{?dist}
 # are licensed under CC-BY license, see: $ grep -r Creative .
 License:        BSD AND CC-BY
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://code.google.com/archive/p/jsr-305
 # There has been no official release yet.  This is a snapshot of the Subversion

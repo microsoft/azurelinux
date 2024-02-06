@@ -6,7 +6,7 @@ Version:        1.19
 Release:        13%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release source URLs
 Source0:        http://www.puimula.org/voikko-sources/suomi-malaga/suomi-malaga-%{version}.tar.gz

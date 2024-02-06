@@ -7,7 +7,7 @@ URL:            https://www.gnu.org/software/pth/
 Group:          System Environment/Libraries.
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 

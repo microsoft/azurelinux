@@ -16,7 +16,7 @@ Version:        16.1
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.freedesktop.org/wiki/Software/PulseAudio
 Source0:        https://freedesktop.org/software/%{name}/releases/%{name}-%{version}.tar.gz
 # revert upstream commit to rely solely on autospawn for autostart, instead

@@ -4,7 +4,7 @@ Version:        3.3.0
 Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://msgpack.org
 #Source0:       https://github.com/%{name}/%{name}-c/archive/cpp-%{version}.tar.gz
 Source0:        %{name}-c-cpp-%{version}.tar.gz

@@ -11,7 +11,7 @@ Name: openssl
 Version: 3.1.4
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches

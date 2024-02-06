@@ -10,7 +10,7 @@ Release:        5%{?dist}
 License:        BSD
 URL:            https://github.com/repoze/repoze.lru
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/r/%{pypiname}/%{pypiname}-%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 
 BuildArch:      noarch

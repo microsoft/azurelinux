@@ -31,7 +31,7 @@ Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Group:          Development/Tools/Building
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ant.apache.org/
 Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        apache-ant-1.8.ant.conf

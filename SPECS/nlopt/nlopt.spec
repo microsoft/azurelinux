@@ -13,7 +13,7 @@ Name:              nlopt
 Version:           2.7.1
 Release:           13%{?dist}
 Vendor:            Microsoft Corporation
-Distribution:      Mariner
+Distribution:   Azure Linux
 
 # The detailed license-breakdown of the sources is:
 #

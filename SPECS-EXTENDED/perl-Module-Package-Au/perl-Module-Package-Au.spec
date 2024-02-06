@@ -4,7 +4,7 @@ Release:	18%{?dist}
 Summary:	Reusable Module::Install bits
 License:	CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Module-Package-Au
 Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Module-Package-Au-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:		perl-Module-Package-Au-no-bundle.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %bcond_without  dafsa
 
 Name:           publicsuffix-list

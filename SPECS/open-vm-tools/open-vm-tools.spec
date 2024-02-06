@@ -28,7 +28,7 @@ Version:        12.3.5
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/vmware/%{name}
 Source0:        https://github.com/vmware/%{name}/releases/download/stable-%{version}/%{name}-%{version}-%{toolsbuild}.tar.gz
 Source1:        %{toolsdaemon}.service

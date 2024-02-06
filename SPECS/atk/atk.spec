@@ -5,7 +5,7 @@ Version:        2.36.0
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/atk
 Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 BuildRequires:  gettext

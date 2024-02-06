@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global snapshot 0
 Summary: Off-The-Record Messaging library and toolkit
 Name: libotr

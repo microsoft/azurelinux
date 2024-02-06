@@ -4,7 +4,7 @@ Version:        1.18.0
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://cairographics.org
 # Including additional URL that points directly to the source code. Source repo was difficult to locate.

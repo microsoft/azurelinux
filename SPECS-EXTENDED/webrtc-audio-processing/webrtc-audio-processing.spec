@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           webrtc-audio-processing
 Version:        0.3.1
 Release:        5%{?dist}

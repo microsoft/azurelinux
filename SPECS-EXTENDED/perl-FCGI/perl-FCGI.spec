@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-FCGI
 Summary:        FastCGI Perl bindings
 Version:        0.79

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           egl-wayland
 Version:        1.1.6
 Release:        2%{?dist}

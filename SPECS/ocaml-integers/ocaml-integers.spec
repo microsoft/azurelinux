@@ -6,7 +6,7 @@ Version:        0.4.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/%{name}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 

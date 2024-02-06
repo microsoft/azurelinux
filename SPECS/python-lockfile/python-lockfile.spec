@@ -4,7 +4,7 @@ Version:        0.12.2
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/openstack/pylockfile
 Source0:        https://pypi.python.org/packages/source/l/lockfile/lockfile-%{version}.tar.gz

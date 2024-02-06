@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 License:        MIT
 URL:            https://jqlang.github.io/jq/
 Source0:        https://github.com/jqlang/jq/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
 BuildRequires:  flex

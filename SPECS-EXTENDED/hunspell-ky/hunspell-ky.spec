@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ky
 Summary: Kirghiz hunspell dictionaries
 %global upstreamid 20090415

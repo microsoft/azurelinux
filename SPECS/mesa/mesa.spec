@@ -55,7 +55,7 @@ Version:        21.0.0
 Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.mesa3d.org
 
 Source0:        https://mesa.freedesktop.org/archive/%{name}-%{version}.tar.xz

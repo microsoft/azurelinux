@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %{?nodejs_find_provides_and_requires}
 %global npm_name nodemon
 

@@ -4,7 +4,7 @@ Version:        1.8.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/WebOb
 Source0:        https://github.com/Pylons/webob/archive/refs/tags/%{version}.tar.gz#/webob-%{version}.tar.gz

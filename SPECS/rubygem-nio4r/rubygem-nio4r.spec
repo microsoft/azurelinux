@@ -6,7 +6,7 @@ Version:        2.5.9
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/socketry/nio4r
 Source0:        https://github.com/socketry/nio4r/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

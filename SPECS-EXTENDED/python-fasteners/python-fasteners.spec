@@ -3,7 +3,7 @@
 %bcond_with diskcache
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-fasteners
 Version:        0.18
 Release:        2%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # what it's called on pypi
 %global srcname python-mimeparse
 # what it's imported as

@@ -5,7 +5,7 @@ Version:       3.4.1
 Release:       1%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 License:       MIT
 URL:           https://github.com/git-lfs/git-lfs
 Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

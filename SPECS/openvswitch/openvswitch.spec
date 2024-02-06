@@ -11,7 +11,7 @@ Version:           2.17.5
 Release:           3%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
-Distribution:      Mariner
+Distribution:   Azure Linux
 Group:             System Environment/Daemons
 URL:               https://www.openvswitch.org/
 Source0:           http://openvswitch.org/releases/%{name}-%{version}.tar.gz

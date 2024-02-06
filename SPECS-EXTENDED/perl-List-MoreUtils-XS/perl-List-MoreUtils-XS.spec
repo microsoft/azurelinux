@@ -8,7 +8,7 @@ Summary:	Provide compiled List::MoreUtils functions
 # determine the license of any particular chunk of code
 License:	(GPL+ or Artistic) and ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/List-MoreUtils-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-XS-%{version}.tar.gz#/perl-List-MoreUtils-XS-%{version}.tar.gz
 Patch0:		List-MoreUtils-XS-0.428-unbundle.patch

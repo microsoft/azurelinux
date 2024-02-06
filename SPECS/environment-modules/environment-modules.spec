@@ -5,7 +5,7 @@ Version:        5.3.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://modules.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/modules/modules-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  dejagnu

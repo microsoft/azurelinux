@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:      lpsolve
 Summary:   A Mixed Integer Linear Programming (MILP) solver
 Version:   5.5.2.0

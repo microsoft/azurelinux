@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           rasqal
 Version:        0.9.33
 Release:        13%{?dist}

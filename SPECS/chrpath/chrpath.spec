@@ -6,7 +6,7 @@ License:        GPLv2
 URL:            https://chrpath.alioth.debian.org/
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://alioth-archive.debian.org/releases/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
 
 %description

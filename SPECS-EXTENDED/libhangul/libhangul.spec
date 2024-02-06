@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		libhangul
 Version:	0.1.0
 Release:	22%{?dist}

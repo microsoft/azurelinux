@@ -4,7 +4,7 @@ Version:        2.0.32
 Release:        3%{?dist}
 License:        JasPer
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ece.uvic.ca/~frodo/jasper/
 Source0:        https://github.com/jasper-software/jasper/archive/version-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # skip hard-coded prefix/lib rpath

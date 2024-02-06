@@ -6,7 +6,7 @@ Url:            https://pypi.python.org/pypi/pyasn1-modules
 License:        BSD
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/etingof/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 %if %{with_check}

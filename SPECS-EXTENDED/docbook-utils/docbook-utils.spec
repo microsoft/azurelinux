@@ -4,7 +4,7 @@ Release: 50%{?dist}
 
 Summary: Shell scripts for managing DocBook documents
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://sources.redhat.com/docbook-tools/
 
 License: GPLv2+

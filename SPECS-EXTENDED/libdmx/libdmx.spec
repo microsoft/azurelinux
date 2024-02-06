@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global tarball libdmx
 #global gitdate 20130524
 %global gitversion 5074d9d64

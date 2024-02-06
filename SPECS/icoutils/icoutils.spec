@@ -4,7 +4,7 @@ Version:        0.32.3
 Release:        8%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.nongnu.org/icoutils/
 Source0:        http://savannah.nongnu.org/download/%{name}/%{name}-%{version}.tar.bz2
 # Possible security fix, at minimum it's a DoS.

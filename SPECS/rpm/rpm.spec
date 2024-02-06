@@ -4,7 +4,7 @@ Version:        4.18.1
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://rpm.org
 Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2

@@ -6,7 +6,7 @@ Version:        3.0.0
 Release:        1%{?dist}
 License:        ASL 2.0 AND CPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz

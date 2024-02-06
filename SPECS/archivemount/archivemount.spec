@@ -3,7 +3,7 @@ Version:       0.9.1
 Release:       5%{?dist}
 Summary:       FUSE based filesystem for mounting compressed archives
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 License:       LGPLv2+
 URL:           https://www.cybernoia.de/software/archivemount.html
 Source0:       https://www.cybernoia.de/software/archivemount/%{name}-%{version}.tar.gz

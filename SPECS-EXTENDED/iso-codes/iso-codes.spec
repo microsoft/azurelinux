@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       iso-codes
 Summary:    ISO code lists and translations
 Version:    4.4

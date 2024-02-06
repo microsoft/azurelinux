@@ -4,7 +4,7 @@ Version:        3.1.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://jinja.pocoo.org/
 Source0:        https://files.pythonhosted.org/packages/source/j/jinja2/Jinja2-%{version}.tar.gz

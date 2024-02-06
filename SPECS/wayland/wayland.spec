@@ -4,7 +4,7 @@ Version:        1.21.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wayland.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/%{name}/%{name}/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
 BuildRequires:  docbook-style-xsl

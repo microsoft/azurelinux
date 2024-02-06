@@ -25,7 +25,7 @@ Patch2: websocketpp-0.8.1-cmake-configversion-compatibility-anynewerversion.patc
 Patch3: websocketpp-0.7.0-disable-test_transport-test_transport_asio_timers.patch
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  boost-devel
 BuildRequires:  cmake

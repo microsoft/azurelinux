@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Decode camera RAW files
 Name:		libopenraw
 Version:	0.1.3

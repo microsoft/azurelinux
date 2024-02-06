@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           smc-tools
 Version:        1.2.0
 Release:        4%{?dist}

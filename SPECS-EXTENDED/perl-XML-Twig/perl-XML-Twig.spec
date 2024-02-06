@@ -4,7 +4,7 @@ Release:        13%{?dist}
 Summary:        Perl module for processing huge XML documents in tree mode
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-Twig
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIROD/XML-Twig-%{version}.tar.gz#/perl-XML-Twig-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        1.10.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Networking/Libraries
 URL:            https://www.tcpdump.org/
 #Source0:       https://github.com/the-tcpdump-group/%{name}/archive/%{name}-%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        5.6.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.wavpack.com/
 Source:         https://www.wavpack.com/%{name}-%{version}.tar.bz2
 BuildRequires:  autoconf

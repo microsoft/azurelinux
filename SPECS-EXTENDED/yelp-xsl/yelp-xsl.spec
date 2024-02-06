@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           yelp-xsl
 Version:        3.36.0
 Release:        2%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-hy
 Summary: Armenian hunspell dictionaries
 Version: 0.20.0

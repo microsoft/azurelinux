@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           celt051
 Version:        0.5.1.3
 Release:        20%{?dist}

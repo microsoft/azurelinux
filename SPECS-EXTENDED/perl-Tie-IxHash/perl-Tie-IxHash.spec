@@ -12,7 +12,7 @@ Summary:        Ordered associative arrays for Perl
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Tie-IxHash
 Source0:        https://cpan.metacpan.org/authors/id/C/CH/CHORNY/Tie-IxHash-%{version}.tar.gz#/perl-Tie-IxHash-%{version}.tar.gz
 

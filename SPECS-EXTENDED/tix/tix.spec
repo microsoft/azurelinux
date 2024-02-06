@@ -9,7 +9,7 @@ Version:        %{tixmajor}.3
 Release:        35%{?dist}
 License:        TCL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tix.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/Tix%{version}-src.tar.gz
 #  0: Fixes BZ#81297 (soname of libraries)

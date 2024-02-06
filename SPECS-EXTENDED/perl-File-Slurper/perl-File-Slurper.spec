@@ -4,7 +4,7 @@ Release:        8%{?dist}
 Summary:        Simple, sane and efficient module to slurp a file
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Slurper
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/File-Slurper-%{version}.tar.gz#/perl-File-Slurper-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        3.10.11
 Release:        13%{?dist}
 License:        MPLv1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.opalvoip.org/
 Source0:        https://sourceforge.net/projects/opalvoip/files/v3.10%20Luyten/Stable%2011/%{name}-%{version}.tar.bz2
 Patch0:         opal-3.10-fix-cflags.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ts
 Summary: Tsonga hunspell dictionaries
 %global upstreamid 20110323.1

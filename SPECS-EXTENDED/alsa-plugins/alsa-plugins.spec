@@ -7,7 +7,7 @@ Release:        3%{?dist}
 # pph plugin is BSD-like licensed
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.alsa-project.org/
 Source0:        https://github.com/alsa-project/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  alsa-lib-devel

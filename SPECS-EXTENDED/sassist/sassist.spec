@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		sassist
 Version:	0.8.5
 Release:	5%{?dist}

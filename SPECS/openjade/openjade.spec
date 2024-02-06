@@ -4,7 +4,7 @@ Version:        1.3.2
 Release:        64%{?dist}
 License:        DMIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://openjade.sourceforge.net/
 Source:         http://download.sourceforge.net/openjade/openjade-%{version}.tar.gz
 #config.sub and config.guess from upstream sources (Mar 25th 2013).

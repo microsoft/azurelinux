@@ -4,7 +4,7 @@ Version:        0.19.0
 Release:        12%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/krallin/tini
 Source0:        https://github.com/krallin/tini/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  binutils

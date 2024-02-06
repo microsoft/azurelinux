@@ -6,7 +6,7 @@ Version:        1.8.1
 Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://projects.camlcity.org/projects/findlib.html
 Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
 Patch0:         bytes-lib-detection.patch

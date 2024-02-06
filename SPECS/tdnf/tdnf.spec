@@ -8,7 +8,7 @@ Version:        3.5.2
 Release:        2%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/RPM
 URL:            https://github.com/vmware/tdnf/wiki
 #Source0:       https://github.com/vmware/tdnf/archive/v%{version}.tar.gz

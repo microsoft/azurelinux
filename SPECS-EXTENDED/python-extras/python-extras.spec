@@ -15,7 +15,7 @@ Release:        15%{?dist}
 License:        MIT
 URL:            https://github.com/testing-cabal/extras
 Vendor:         Microsoft
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/e/extras/extras-%{version}.tar.gz
 BuildArch:      noarch
 

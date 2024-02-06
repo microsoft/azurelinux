@@ -7,7 +7,7 @@ License:    GPLv2+
 URL:        http://btrfs.wiki.kernel.org/index.php/Main_Page
 Source0:    https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/%{name}-v%{version}.tar.xz#/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  lzo-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  libacl-devel

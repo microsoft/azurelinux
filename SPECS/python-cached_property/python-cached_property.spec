@@ -6,7 +6,7 @@ Version:        1.5.2
 Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pydanny/%{projectname}
 Source0:        https://github.com/pydanny/%{projectname}/archive/%{version}/%{projectname}-%{version}.tar.gz
 # Disable a couple of test checks that fail with freezegun 0.3.11

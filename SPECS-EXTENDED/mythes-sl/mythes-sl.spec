@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-sl
 Summary: Slovenian thesaurus
 %global upstreamid 20130130

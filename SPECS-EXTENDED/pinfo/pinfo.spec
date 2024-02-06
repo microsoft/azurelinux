@@ -4,7 +4,7 @@ Version: 0.6.10
 Release: 26%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/baszoetekouw/pinfo
 # Source: https://github.com/baszoetekouw/pinfo/archive/refs/tags/v0.6.10.tar.gz
 Source: https://github.com/baszoetekouw/pinfo/archive/refs/tags/pinfo-0.6.10.tar.bz2

@@ -4,7 +4,7 @@ Version:        965
 Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://fmv.jku.at/picosat/
 Source0:        http://fmv.jku.at/picosat/%{name}-%{version}.tar.gz
 # Thanks to David Wheeler for the man page.

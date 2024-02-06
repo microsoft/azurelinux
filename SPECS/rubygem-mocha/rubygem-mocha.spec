@@ -5,7 +5,7 @@ Version:        1.13.0
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

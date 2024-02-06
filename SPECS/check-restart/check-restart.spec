@@ -5,7 +5,7 @@ Version:        1.0.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        check-restart.service
 Source1:        check-restart.sh
 Source2:        check-restart.timer

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           t1lib
 Version:        5.1.2
 Release:        28%{?dist}

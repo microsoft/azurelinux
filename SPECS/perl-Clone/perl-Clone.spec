@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Recursively copy perl data types
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/dist/Clone
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GARU/Clone-%{version}.tar.gz#/perl-Clone-%{version}.tar.gz
 # Build

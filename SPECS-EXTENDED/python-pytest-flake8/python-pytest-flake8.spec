@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Enable Python dependency generation
 %{?python_enable_dependency_generator}
 

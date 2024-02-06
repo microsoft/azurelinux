@@ -4,7 +4,7 @@ Version:        2.0.5
 Release:        1%{?dist}
 License:        MIT AND GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://babeltrace.org/
 Source0:        https://www.efficios.com/files/babeltrace/%{name}-%{version}.tar.bz2

@@ -6,7 +6,7 @@ Version: 0.112
 Release: 32%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:     https://github.com/vathpela/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7

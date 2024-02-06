@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-sl
 Summary: Slovenian hunspell dictionaries
 %global upstreamid 20070127

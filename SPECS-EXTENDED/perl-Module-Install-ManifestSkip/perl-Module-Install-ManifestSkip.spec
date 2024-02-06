@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        Generate a MANIFEST.SKIP file
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-ManifestSkip
 Source0:        https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Install-ManifestSkip-%{version}.tar.gz#/perl-Module-Install-ManifestSkip-%{version}.tar.gz
 BuildArch:      noarch

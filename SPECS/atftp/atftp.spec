@@ -6,7 +6,7 @@ URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://sourceforge.net/projects/atftp/files/latest/download/%{name}-%{version}.tar.gz
 
 BuildRequires:  systemd

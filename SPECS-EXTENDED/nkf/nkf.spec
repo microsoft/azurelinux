@@ -3,7 +3,7 @@ Version:	2.1.4
 Release:	18%{?dist}
 License:	BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://nkf.osdn.jp/
 Source0:	http://iij.dl.osdn.jp/nkf/64158/%{name}-%{version}.tar.gz
 ## snippet from the source code

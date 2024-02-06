@@ -6,7 +6,7 @@ Version:        0.36.0
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/dconf
 Source0:        https://download.gnome.org/sources/dconf/%{majmin}/%{name}-%{version}.tar.xz
 Patch1:         dconf-override.patch

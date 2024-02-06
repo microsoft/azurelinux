@@ -6,7 +6,7 @@ License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel

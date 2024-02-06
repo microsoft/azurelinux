@@ -6,7 +6,7 @@ Version:        0.3.0
 Release:        8%{?dist}
 License:        LGPL-2.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://01.org/dleyna/
 Source0:        https://01.org/sites/default/files/downloads/dleyna/%{name}-%{version}.tar_2.gz
 BuildRequires:  autoconf

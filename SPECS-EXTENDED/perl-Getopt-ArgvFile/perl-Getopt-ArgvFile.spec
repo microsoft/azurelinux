@@ -4,7 +4,7 @@ Release:        32%{?dist}
 Summary:        Interpolates script options from files into @ARGV or another array
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Getopt-ArgvFile
 Source0:        https://cpan.metacpan.org/authors/id/J/JS/JSTENZEL/Getopt-ArgvFile-%{version}.tar.gz#/perl-Getopt-ArgvFile-%{version}.tar.gz
 Source1:        license.txt

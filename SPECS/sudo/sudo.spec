@@ -6,7 +6,7 @@ License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
 BuildRequires:  audit-devel
 BuildRequires:  man-db

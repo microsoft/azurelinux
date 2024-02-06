@@ -11,7 +11,7 @@ Release:	4%{?dist}
 Summary:	Perl module for reading and writing .ini style configuration files
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Config-Tiny
 Source0:	https://cpan.metacpan.org/modules/by-module/Config/Config-Tiny-%{version}.tgz
 BuildArch:	noarch

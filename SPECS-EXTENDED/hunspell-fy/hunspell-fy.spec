@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-fy
 Summary: Frisian hunspell dictionaries
 Version: 3.0.0

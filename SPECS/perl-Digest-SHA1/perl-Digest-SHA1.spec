@@ -5,7 +5,7 @@ Summary:        Digest-SHA1 Perl module
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Digest-SHA1
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Digest-SHA1-%{version}.tar.gz#/perl-Digest-SHA1-%{version}.tar.gz
 BuildRequires:  findutils

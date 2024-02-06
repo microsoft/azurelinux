@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ku
 Summary: Kurdish hunspell dictionaries
 Version: 0.21

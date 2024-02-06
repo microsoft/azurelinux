@@ -3,7 +3,7 @@ Name:         qt5-qtdeclarative
 Version:      5.12.5
 Release:      5%{?dist}
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 License: LGPLv2 with exceptions or GPLv3 with exceptions

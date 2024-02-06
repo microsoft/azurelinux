@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           speexdsp
 Version:        1.2.0
 Release:        2%{?dist}

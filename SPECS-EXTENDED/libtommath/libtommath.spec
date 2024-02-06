@@ -4,7 +4,7 @@ Version:        1.1.0
 Release:        5%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.libtom.net/
 Source0:        https://github.com/libtom/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-36328.patch

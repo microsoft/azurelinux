@@ -11,7 +11,7 @@ Release:        5%{?dist}
 Summary:        Lexically warn about using the indirect object syntax
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/indirect
 Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/indirect-%{version}.tar.gz#/perl-indirect-%{version}.tar.gz
 # Module Build

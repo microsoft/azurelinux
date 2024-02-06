@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pypi_name funcsigs
 
 # when bootstrapping Python 3, funcsigs needs to be rebuilt before sphinx

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          yelp-tools
 Version:       3.32.2
 Release:       5%{?dist}

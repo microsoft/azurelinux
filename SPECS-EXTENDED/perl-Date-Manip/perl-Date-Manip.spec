@@ -4,7 +4,7 @@ Release:        2%{?dist}
 Summary:        Date manipulation routines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Date-Manip
 Source0:        https://cpan.metacpan.org/authors/id/S/SB/SBECK/Date-Manip-%{version}.tar.gz#/perl-Date-Manip-%{version}.tar.gz
 BuildArch:      noarch

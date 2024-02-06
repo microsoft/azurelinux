@@ -4,7 +4,7 @@ Release:        4%{?dist}
 Summary:        HTTP cookie jars
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTTP-Cookies
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Cookies-%{version}.tar.gz#/perl-HTTP-Cookies-%{version}.tar.gz
 BuildArch:      noarch

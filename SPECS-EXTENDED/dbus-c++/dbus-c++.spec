@@ -7,7 +7,7 @@ Summary:       Native C++ bindings for D-Bus
 
 License:       LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:           http://sourceforge.net/projects/dbus-cplusplus/
 Source0:       http://downloads.sourceforge.net/dbus-cplusplus/lib%{name}-%{version}.tar.gz
 

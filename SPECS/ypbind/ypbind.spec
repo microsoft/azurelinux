@@ -4,7 +4,7 @@ Version:        2.7.2
 Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/thkukuk/ypbind-mt
 Source0:        https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
 #Source1: ypbind.init

@@ -4,7 +4,7 @@ Version:        15.1.0
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/twisted/constantly
 # Source to be fixed as part of https://microsoft.visualstudio.com/OS/_workitems/edit/25936171.

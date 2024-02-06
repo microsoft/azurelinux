@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-fj
 Summary: Fijian hunspell dictionaries
 Version: 1.2

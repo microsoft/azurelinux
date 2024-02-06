@@ -7,7 +7,7 @@ Version:        0.5.0
 Release:        21%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # work around for missing upstream tarball with latest checkin
 URL:            https://github.com/keszybz/prelink
 Source0:        https://github.com/keszybz/prelink/archive/%{commit}.tar.gz#/prelink-%{shortcommit}.tar.gz

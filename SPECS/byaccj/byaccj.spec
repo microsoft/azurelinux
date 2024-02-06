@@ -24,7 +24,7 @@ Release:        26%{?dist}
 License:        Public Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://byaccj.sourceforge.net/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}%{version}_src.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build

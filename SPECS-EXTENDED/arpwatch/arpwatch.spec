@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _vararpwatch %{_localstatedir}/lib/arpwatch
 %global _hardened_build 1
 

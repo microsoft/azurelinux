@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-pt
 Summary: Portuguese hyphenation rules
 %global upstreamid 20021021

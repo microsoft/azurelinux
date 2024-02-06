@@ -14,7 +14,7 @@ Version:        0.24.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-ppx/ppxlib
 Source0:        https://github.com/ocaml-ppx/ppxlib/releases/download/%{version}/%{srcname}-%{version}.tbz
 # We do not have 'stdlib-shims'.

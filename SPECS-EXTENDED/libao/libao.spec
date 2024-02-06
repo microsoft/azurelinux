@@ -4,7 +4,7 @@ Version:        1.2.0
 Release:        24%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xiph.org/ao/
 Source0:        https://downloads.xiph.org/releases/ao/%{name}-%{version}.tar.gz
 Patch1:         0001-ao_pulse.c-fix-latency-calculation.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ru
 Summary: Russian hyphenation rules
 %global upstreamid 20020727

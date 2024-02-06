@@ -4,7 +4,7 @@ Version:        1.2.20
 Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/tklauser/libtar/
 #Source0:       https://github.com/tklauser/%{name}/archive/v%{version}.tar.gz

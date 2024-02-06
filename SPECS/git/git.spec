@@ -4,7 +4,7 @@ Version:        2.42.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz

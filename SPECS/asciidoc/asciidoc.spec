@@ -6,7 +6,7 @@ License:        GPLv2
 URL:            https://asciidoc.org/
 Group:          System Environment/Development
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/%{name}-py/%{name}-py/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3

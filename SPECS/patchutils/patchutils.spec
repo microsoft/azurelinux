@@ -4,7 +4,7 @@ Version: 0.4.2
 Release: 4%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://cyberelk.net/tim/patchutils/
 Source0: http://cyberelk.net/tim/data/patchutils/stable/%{name}-%{version}.tar.xz
 Obsoletes: interdiff <= 0.0.10

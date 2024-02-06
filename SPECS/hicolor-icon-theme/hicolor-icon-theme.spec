@@ -4,7 +4,7 @@ Version:        0.17
 Release:        10%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/icon-theme/
 Source0:        https://icon-theme.freedesktop.org/releases/%{name}-%{version}.tar.xz
 BuildArch:      noarch

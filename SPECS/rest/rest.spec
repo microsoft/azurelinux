@@ -4,7 +4,7 @@ Version:        0.9.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org
 Source0:        https://download.gnome.org/sources/%{name}/0.9/%{name}-%{version}.tar.xz
 BuildRequires:  glib2-devel

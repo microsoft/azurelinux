@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Tree-DAG_Node
 Version:        1.31
 Release:        8%{?dist}

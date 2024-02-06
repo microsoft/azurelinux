@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Run optional test
 %if ! (0%{?rhel})
 %bcond_without perl_IO_CaptureOutput_enables_optional_test

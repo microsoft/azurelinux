@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-fo
 Summary: Faroese hunspell dictionaries
 Version: 0.4.2

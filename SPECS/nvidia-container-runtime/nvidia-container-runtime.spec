@@ -5,7 +5,7 @@ Version:        3.13.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/NVIDIA/nvidia-container-runtime
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

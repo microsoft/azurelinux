@@ -4,7 +4,7 @@ Version:        9.0.0
 Release:        1%{?dist}
 License:        zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/leethomason/tinyxml2/
 Source0:        https://github.com/leethomason/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  build-essential

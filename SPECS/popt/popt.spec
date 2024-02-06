@@ -6,7 +6,7 @@ License:	MIT
 URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	http://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
 %description
 The popt package contains the popt libraries which are used by

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          gupnp-av
 Version:       0.12.11
 Release:       4%{?dist}

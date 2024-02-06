@@ -12,7 +12,7 @@ Release:        1%{?dist}
 # files like src/rdhdrhistogram.c are under MIT
 License:        BSD AND zlib AND ISC AND Public Domain AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://github.com/edenhill/librdkafka
 #Source0:        https://github.com/edenhill/%{name}/archive/v%{version}.tar.gz

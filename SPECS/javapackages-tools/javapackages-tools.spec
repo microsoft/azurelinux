@@ -12,7 +12,7 @@ Version:        6.0.0
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fedora-java/javapackages
 Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch

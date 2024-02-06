@@ -4,7 +4,7 @@ Release:        8%{?dist}
 Summary:        Disables multidimensional array emulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/multidimensional
 Source0:        https://cpan.metacpan.org/authors/id/I/IL/ILMARI/multidimensional-%{version}.tar.gz#/perl-multidimensional-%{version}.tar.gz
 BuildRequires:  findutils

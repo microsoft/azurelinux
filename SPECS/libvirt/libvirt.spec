@@ -12,7 +12,7 @@ Version:        7.10.0
 Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Virtualization/Libraries
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz

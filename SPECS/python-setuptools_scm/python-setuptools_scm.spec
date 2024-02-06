@@ -8,7 +8,7 @@ Release:        1%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            https://pypi.python.org/pypi/setuptools_scm
 Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
 

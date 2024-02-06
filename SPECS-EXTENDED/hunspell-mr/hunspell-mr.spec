@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-mr
 Summary: Marathi hunspell dictionaries
 Version: 1.0.0

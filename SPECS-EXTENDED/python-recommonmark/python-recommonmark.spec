@@ -21,7 +21,7 @@ Summary:        %{sum}
 License:        MIT
 URL:            https://github.com/%{project_owner}/%{github_name}
 Vendor:         Microsoft
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/%{project_owner}/%{github_name}/archive/%{version}/%{github_name}-%{version}.tar.gz
 BuildArch:      noarch
 

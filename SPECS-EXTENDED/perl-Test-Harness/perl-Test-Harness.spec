@@ -10,7 +10,7 @@ Version:        3.42
 Release:        444%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Harness
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Test-Harness-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove hard-coded shell bangs

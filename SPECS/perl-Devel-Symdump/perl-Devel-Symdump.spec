@@ -4,7 +4,7 @@ Version:        2.18
 Release:        16%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-Symdump
 Source0:        https://cpan.metacpan.org/authors/id/A/AN/ANDK/Devel-Symdump-%{version}.tar.gz#/perl-Devel-Symdump-%{version}.tar.gz
 

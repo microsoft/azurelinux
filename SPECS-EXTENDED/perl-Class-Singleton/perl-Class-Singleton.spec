@@ -4,7 +4,7 @@ Release:        16%{?dist}
 Summary:        Implementation of a "Singleton" class
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Singleton
 Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHAY/Class-Singleton-%{version}.tar.gz#/perl-Class-Singleton-%{version}.tar.gz
 BuildArch:      noarch

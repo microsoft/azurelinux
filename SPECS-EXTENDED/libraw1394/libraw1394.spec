@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Library providing low-level IEEE-1394 access - 2.1.2-
 Name:           libraw1394
 Version:        2.1.2

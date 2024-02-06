@@ -6,7 +6,7 @@ Release:        5%{?dist}
 Epoch:          7
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.squid-cache.org
 Source0:        http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
 Source1:        squid.logrotate

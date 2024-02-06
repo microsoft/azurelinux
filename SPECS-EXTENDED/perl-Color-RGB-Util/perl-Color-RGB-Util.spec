@@ -6,7 +6,7 @@ Version:        0.606
 Release:        3%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Color-RGB-Util/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-RGB-Util-%{version}.tar.gz
 

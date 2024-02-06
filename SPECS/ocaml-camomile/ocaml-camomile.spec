@@ -10,7 +10,7 @@ Release:        9%{?dist}
 # https://www.redhat.com/archives/fedora-legal-list/2008-March/msg00005.html
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/yoriyuki/Camomile
 Source0:        https://github.com/yoriyuki/Camomile/archive/refs/tags/%{version}.tar.gz#/camomile-%{version}.tar.gz
 

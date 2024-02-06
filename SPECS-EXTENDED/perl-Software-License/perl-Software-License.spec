@@ -17,7 +17,7 @@ Release:        7%{?dist}
 Summary:        Package that provides templated software licenses
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Software-License
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Software-License-%{version}.tar.gz#/perl-Software-License-%{version}.tar.gz
 BuildArch:      noarch

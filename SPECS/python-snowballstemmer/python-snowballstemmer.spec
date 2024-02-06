@@ -9,7 +9,7 @@ Version:        2.2.0
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://snowballstem.org/
 Source0:        https://files.pythonhosted.org/packages/44/7b/af302bebf22c749c56c9c3e8ae13190b5b5db37a33d9068652e8f73b7089/snowballstemmer-%{version}.tar.gz#/snowballstemmer-%{version}.tar.gz

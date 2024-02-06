@@ -4,7 +4,7 @@ Version:        1.14.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Utilities/System
 URL:            https://subversion.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2

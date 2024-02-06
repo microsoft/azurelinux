@@ -6,7 +6,7 @@ Version:        1.1.0
 Release:        18%{?dist}
 Summary:        NTLM module for python requests
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        ISC
 URL:            https://pypi.python.org/pypi/requests_ntlm
 Source0:        https://github.com/requests/requests-ntlm/archive/v%{version}/%{srcname}-%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_IO_Socket_INET6_enables_optional_test}
 %else

@@ -6,7 +6,7 @@ Version:        2.0.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.firewalld.org
 Source0:        https://github.com/firewalld/firewalld/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 Source1:        FedoraServer.xml

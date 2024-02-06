@@ -4,7 +4,7 @@ Release:       1%{?dist}
 Summary:       Programmable completion for bash
 Group:         Applications/Shells
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/scop/bash-completion
 Source0:       https://github.com/scop/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 License:       GPLv2+

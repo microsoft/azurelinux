@@ -5,7 +5,7 @@ Version:        1.1.39
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/General Libraries
 URL:            http://xmlsoft.org/libxslt/
 Source0:        https://download.gnome.org/sources/libxslt/%{majminorver}/%{name}-%{version}.tar.xz

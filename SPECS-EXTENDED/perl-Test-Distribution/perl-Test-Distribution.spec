@@ -4,7 +4,7 @@ Release:	34%{?dist}
 Summary:	Perform tests on all modules of a distribution
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-Distribution
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Distribution-%{version}.tar.gz#/perl-Test-Distribution-%{version}.tar.gz
 Patch0:		Test-Distribution-2.00-utf8.patch

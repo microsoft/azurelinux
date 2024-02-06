@@ -4,7 +4,7 @@ Version:        1.16.4
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/madmurphy/libconfini
 Source0:        https://github.com/madmurphy/libconfini/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

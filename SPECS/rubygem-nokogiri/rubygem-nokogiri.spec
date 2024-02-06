@@ -6,7 +6,7 @@ Version:        1.15.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://nokogiri.org/
 Source0:        https://github.com/sparklemotion/nokogiri/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

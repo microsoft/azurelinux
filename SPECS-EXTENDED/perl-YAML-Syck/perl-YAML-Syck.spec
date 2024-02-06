@@ -11,7 +11,7 @@ Release:        2%{?dist}
 Summary:        Fast, lightweight YAML loader and dumper
 License:        BSD and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-Syck
 Source0:        https://cpan.metacpan.org/modules/by-module/YAML/YAML-Syck-%{version}.tar.gz#/perl-YAML-Syck-%{version}.tar.gz
 # Module Build

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           icc-profiles-openicc
 Version:        1.3.1
 Release:        19%{?dist}

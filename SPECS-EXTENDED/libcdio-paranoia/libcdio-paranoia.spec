@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libcdio-paranoia
 Version: 10.2+2.0.0
 Release: 5%{?dist}

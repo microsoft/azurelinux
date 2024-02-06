@@ -4,7 +4,7 @@ Version:        1.4.4
 Release:        1%{?dist}
 License:        BSD-3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/thkukuk/rpcsvc-proto
 Source0:        https://github.com/thkukuk/rpcsvc-proto/releases/download/v%{version}/%{name}-%{version}.tar.xz

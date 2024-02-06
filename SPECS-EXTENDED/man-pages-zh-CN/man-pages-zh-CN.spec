@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global origname manpages-zh
 
 Summary: Chinese Man Pages from Chinese Man Pages Project

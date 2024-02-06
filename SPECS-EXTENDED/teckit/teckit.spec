@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           teckit
 Version:        2.5.9
 Release:        4%{?dist}

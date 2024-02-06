@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if 0%{?rhel} && 0%{?rhel} <= 7
 %bcond_without python2
 %else

@@ -6,7 +6,7 @@ Version:        3.16.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            http://www.ohler.com/oj/
 Source0:        https://github.com/ohler55/oj/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

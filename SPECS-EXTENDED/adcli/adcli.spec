@@ -5,7 +5,7 @@ Version:        0.9.2
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/realmd/adcli
 Source0:        https://gitlab.freedesktop.org/realmd/adcli/uploads/ea560656ac921b3fe0d455976aaae9be/adcli-%{version}.tar.gz
 BuildRequires:  cyrus-sasl-devel

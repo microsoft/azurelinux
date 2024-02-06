@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-mi
 Summary: Maori thesaurus
 %global upstreamid 20080630

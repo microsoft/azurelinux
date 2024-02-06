@@ -6,7 +6,7 @@ Version:        0.2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.org/project/ruamel.yaml.clib/
 Source0:        https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  gcc

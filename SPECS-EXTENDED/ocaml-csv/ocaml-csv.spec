@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           ocaml-csv
 Version:        1.7
 Release:        17%{?dist}

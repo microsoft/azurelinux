@@ -5,7 +5,7 @@ Version:        1.14.4
 Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/NVIDIA/nvidia-container-toolkit
 #Source0:       https://github.com/NVIDIA/%%{name}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

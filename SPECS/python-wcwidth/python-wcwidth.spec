@@ -4,7 +4,7 @@ Version:        0.2.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/wcwidth
 Source0:        https://github.com/jquast/wcwidth/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

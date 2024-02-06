@@ -5,7 +5,7 @@ Version:        1.2.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
 Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_%{version_tag}.tar.gz#/%{name}-%{version}.tar.gz

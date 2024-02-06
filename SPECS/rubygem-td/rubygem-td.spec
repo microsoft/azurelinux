@@ -7,7 +7,7 @@ Version:        0.16.8
 Release:        2%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.treasuredata.com/
 Source0:        https://github.com/treasure-data/td/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

@@ -7,7 +7,7 @@ Version:        1.8.0
 Release:        1%{?dist}
 License:        GPLv2 OR GPLv2 WITH FLOSS License Exception
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://oss.oetiker.ch/rrdtool/
 Source0:        https://github.com/oetiker/rrdtool-1.x/releases/download/v%{version}/%{name}-%{version}.tar.gz

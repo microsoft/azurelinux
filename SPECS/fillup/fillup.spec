@@ -21,7 +21,7 @@ Version:        1.42
 Release:        278%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Base
 URL:            https://github.com/openSUSE/fillup
 #Source0:       https://github.com/openSUSE/%{name}/archive/refs/tags/%{version}.tar.gz

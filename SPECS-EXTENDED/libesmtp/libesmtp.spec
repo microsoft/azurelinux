@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define plugindir %{_libdir}/esmtp-plugins
 
 Summary:        SMTP client library

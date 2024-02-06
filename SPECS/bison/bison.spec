@@ -4,7 +4,7 @@ Version:        3.8.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bison
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz

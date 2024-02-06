@@ -6,7 +6,7 @@ License:    LGPLv2+
 URL:        http://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:     http://netfilter.org/projects/libmnl/files/%{name}-%{version}.tar.bz2
 Obsoletes:  libmnl-static
 

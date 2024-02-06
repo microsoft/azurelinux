@@ -4,7 +4,7 @@ Version:        1.3
 Release:        2%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml/num
 Source0:        https://github.com/ocaml/num/archive/v%{version}/%{name}-%{version}.tar.gz#/num-%{version}.tar.gz
 # All patches since 1.3 was released.

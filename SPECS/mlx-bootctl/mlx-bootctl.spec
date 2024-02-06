@@ -41,7 +41,7 @@ Version:        1.5
 Release:        1%{?dist}
 License:        GPLv2 or BSD or CPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.mellanox.com/
 Source:         https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/SOURCES/%{name}-%{version}.tar.gz

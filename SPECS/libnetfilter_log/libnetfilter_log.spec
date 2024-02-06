@@ -6,7 +6,7 @@ Release:        22%{?dist}
 Summary:        Netfilter logging userspace library
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://netfilter.org
 Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
 Patch0:		libnetfilter_log-sysheader.patch

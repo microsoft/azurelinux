@@ -7,7 +7,7 @@ Release:        2%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://cppcheck.wiki.sourceforge.net/
 Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

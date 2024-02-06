@@ -11,7 +11,7 @@ Version:        2.37
 Release:        2%{?dist}
 License:        Bistream Vera Font AND Arev Fonts
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://dejavu-fonts.github.io/
 Source0:        https://sourceforge.net/projects/dejavu/files/dejavu/%{version}/%{name}-ttf-%{version}.tar.bz2

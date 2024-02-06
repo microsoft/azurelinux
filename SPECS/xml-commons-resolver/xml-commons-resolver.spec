@@ -24,7 +24,7 @@ Summary:        Resolver subproject of xml-commons
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://xerces.apache.org/xml-commons/components/resolver/
 Source0:        http://www.apache.org/dist/xerces/xml-commons/%{name}-%{version}.tar.gz
 Source1:        %{name}-pom.xml

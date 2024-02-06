@@ -4,7 +4,7 @@ Version:        9.4
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Intrusion detection environment
 Name:           aide
 Version:        0.18.6

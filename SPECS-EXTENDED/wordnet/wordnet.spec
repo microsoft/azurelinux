@@ -4,7 +4,7 @@ Version:        3.0
 Release:        43%{?dist}
 License:        MIT AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wordnet.princeton.edu/
 Source0:        https://wordnetcode.princeton.edu/%{version}/WordNet-%{version}.tar.gz
 # Updated database

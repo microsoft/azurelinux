@@ -8,7 +8,7 @@ Version:        2.1.28
 Release:        5%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{_base_name}/releases/download/%{_base_name}-%{version}/%{_base_name}-%{version}.tar.gz

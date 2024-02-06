@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global gitfullver e0580929f451e685d92cd10d80b76f39e9b09a97
 %global gitver %(c=%{gitfullver}; echo ${c:0:6})
 %global _hardened_build 1

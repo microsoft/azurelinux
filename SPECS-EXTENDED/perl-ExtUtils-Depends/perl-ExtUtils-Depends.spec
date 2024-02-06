@@ -4,7 +4,7 @@ Release:        5%{?dist}
 Summary:        Easily build XS extensions that depend on XS extensions
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/ExtUtils-Depends
 Source0:        https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-Depends-%{version}.tar.gz#/perl-ExtUtils-Depends-%{version}.tar.gz
 BuildArch:      noarch

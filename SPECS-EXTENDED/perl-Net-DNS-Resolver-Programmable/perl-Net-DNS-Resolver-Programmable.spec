@@ -4,7 +4,7 @@ Version:        0.009
 Release:        10%{?dist}
 License:        GPLv2+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Net-DNS-Resolver-Programmable
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BIGPRESH/Net-DNS-Resolver-Programmable-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

@@ -4,7 +4,7 @@ Version:        0.42.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/pixman/pixman
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 

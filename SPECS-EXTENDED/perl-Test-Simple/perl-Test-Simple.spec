@@ -6,7 +6,7 @@ Version:        1.302174
 Release:        4%{?dist}
 License:        (GPL+ OR Artistic) AND CC0 AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Simple
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Simple-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

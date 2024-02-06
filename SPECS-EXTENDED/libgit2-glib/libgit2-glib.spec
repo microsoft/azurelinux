@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global libgit2_version 0.25.0
 %global glib2_version 2.44.0
 

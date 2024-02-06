@@ -4,7 +4,7 @@ Version:        2.1.0
 Release:        19%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://lloyd.github.com/yajl/
 #
 # NB, upstream does not provide pre-built tar.gz downloads. Instead

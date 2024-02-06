@@ -2,7 +2,7 @@
 %global upstreamid 20110620
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-tk
 Summary: Turkmen hyphenation rules
 Version: 0.%{upstreamid}

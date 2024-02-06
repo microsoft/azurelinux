@@ -26,7 +26,7 @@ Version:        4.2.0
 Release:        6%{?dist}
 License:        PSF-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.org/project/typing-extensions/
 Source0:        %{pypi_source typing_extensions}#/typing-extensions-%{version}.tar.gz
 BuildRequires:  python3-devel

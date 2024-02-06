@@ -4,7 +4,7 @@ Version:        3.1.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://people.redhat.com/sgrubb/audit/
 Source0:        https://people.redhat.com/sgrubb/audit/%{name}-%{version}.tar.gz

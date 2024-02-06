@@ -5,7 +5,7 @@ Version:        5.1.8
 Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git/
 Source0:        https://www.kernel.org/pub/linux/daemons/%{name}/v5/%{name}-%{version}.tar.xz

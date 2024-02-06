@@ -4,7 +4,7 @@ Version:        2.10
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Communications
 URL:            https://w1.fi
 Source0:        https://w1.fi/releases/%{name}-%{version}.tar.gz

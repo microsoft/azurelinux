@@ -4,7 +4,7 @@ Version:        1.8.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.gz
 

@@ -16,7 +16,7 @@ Summary:        File System Library for the Lua Programming Language
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://keplerproject.github.io/luafilesystem/
 Source0:	https://github.com/keplerproject/luafilesystem/archive/%{commit}/luafilesystem-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		pptp
 Version:	1.10.0
 Release:	10%{?dist}

@@ -6,7 +6,7 @@ Version:        8.2308.0
 Release:        2%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.rsyslog.com/
 Source0:        https://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz

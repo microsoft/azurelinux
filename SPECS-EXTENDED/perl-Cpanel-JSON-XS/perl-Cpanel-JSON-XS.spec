@@ -4,7 +4,7 @@ Version:        4.27
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Cpanel-JSON-XS
 Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Cpanel-JSON-XS-%{version}.tar.gz
 Patch0:         Cpanel-JSON-XS-4.20-signature.patch

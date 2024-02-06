@@ -4,7 +4,7 @@ Version:        1.7.4.4
 Release:        1%{?dist}
 License:        GPL2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Internet
 URL:            http://www.dest-unreach.org/socat
 Source0:        http://www.dest-unreach.org/socat/download/%{name}-%{version}.tar.gz

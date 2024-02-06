@@ -6,7 +6,7 @@ Release:        1%{?dist}
 # BSD license applies only to Windows code- does not apply here
 License:        GPLv3 AND Unicode
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/espeak-ng/espeak-ng
 Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tgz
 Patch0:         espeak-ng-1.51-CVE-2023-49990-4.patch

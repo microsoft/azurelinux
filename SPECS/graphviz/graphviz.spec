@@ -48,7 +48,7 @@ Version:        2.42.4
 Release:        9%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.graphviz.org/
 Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 # rhbz#1505230

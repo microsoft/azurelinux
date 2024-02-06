@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Pretty printing of data structures
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Dump
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GARU/Data-Dump-%{version}.tar.gz#/perl-Data-Dump-%{version}.tar.gz
 BuildArch:      noarch

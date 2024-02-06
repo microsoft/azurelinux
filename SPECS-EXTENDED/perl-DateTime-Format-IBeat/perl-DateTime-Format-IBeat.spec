@@ -4,7 +4,7 @@ Release:        37%{?dist}
 Summary:        Format times in .beat notation 
 License:        GPL+ or Artistic 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/EMARTIN/DateTime-Format-IBeat-0.161
 Source0:        https://backpan.perl.org/authors/id/E/EM/EMARTIN/DateTime-Format-IBeat-0.161.tar.gz
 BuildArch:      noarch 

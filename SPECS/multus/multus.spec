@@ -22,7 +22,7 @@ Version:        3.8
 Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/intel/multus-cni
 Source0:        https://github.com/k8snetworkplumbingwg/multus-cni/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global commit0 49f07d313344ddb22701847ea5c18cb7db03b0d7
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cl_hpp_ver 2.0.10

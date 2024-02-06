@@ -6,7 +6,7 @@ License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}

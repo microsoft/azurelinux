@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-hi
 Summary: Hindi hyphenation rules
 Version: 0.7.0

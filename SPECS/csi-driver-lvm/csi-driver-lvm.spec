@@ -4,7 +4,7 @@ Version:        0.4.1
 Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/metal-stack/csi-driver-lvm
 Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.

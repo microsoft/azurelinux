@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-PPI-HTML
 Version:        1.08
 Release:        24%{?dist}

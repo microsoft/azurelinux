@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		xcb-util-wm
 Version:	0.4.1
 Release:	18%{?dist}

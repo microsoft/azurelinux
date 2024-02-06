@@ -16,7 +16,7 @@ Requires: libtdb%{?_isa} >= %{tdb_version}
 Requires: libtevent%{?_isa} >= %{tevent_version}
 License: LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://ldb.samba.org/
 Source0: https://www.samba.org/ftp/ldb/ldb-%{version}.tar.gz
 Source1: https://www.samba.org/ftp/ldb/ldb-%{version}.tar.asc

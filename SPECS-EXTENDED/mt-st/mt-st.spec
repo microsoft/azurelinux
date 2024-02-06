@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tool for controlling tape drives
 Name: mt-st
 Version: 1.1

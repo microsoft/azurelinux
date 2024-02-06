@@ -4,7 +4,7 @@ Version:        30
 Release:        1%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.kernel.org/pub/linux/utils/kernel/kmod
 Source0:        http://www.kernel.org/pub/linux/utils/kernel/kmod/%{name}-%{version}.tar.xz

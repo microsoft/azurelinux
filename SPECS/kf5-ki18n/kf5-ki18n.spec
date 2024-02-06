@@ -9,7 +9,7 @@ License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 ## upstream patches
 

@@ -4,7 +4,7 @@ Version:        1.30.8
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.freedesktop.org/wiki/Software/libqmi/
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz

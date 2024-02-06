@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # hardened build if not overridden
 %{!?_hardened_build:%global _hardened_build 1}
 

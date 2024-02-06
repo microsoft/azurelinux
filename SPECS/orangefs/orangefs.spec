@@ -26,7 +26,7 @@ Release:        3%{?dist}
 # zlib src/common/misc/md5.h
 License:        ASL 2.0 AND BSD AND GPLv2 AND LGPLv2+ AND LGPLv2 AND MIT AND OpenLDAP AND Public Domain AND zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.orangefs.org/
 Source0:        https://s3.amazonaws.com/download.orangefs.org/current/source/%{name}-%{version}.tar.gz
 Source1:        orangefs-server.service

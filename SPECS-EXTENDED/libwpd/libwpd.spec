@@ -6,7 +6,7 @@ Version:        0.10.3
 Release:        6%{?dist}
 License:        LGPLv2+ OR MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://libwpd.sf.net/
 Source:         https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 Patch0:         libwpd-gcc11.patch

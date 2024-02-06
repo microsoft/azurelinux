@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       m17n-db
 Summary:    Multilingualization datafiles for m17n-lib
 Version:    1.8.0

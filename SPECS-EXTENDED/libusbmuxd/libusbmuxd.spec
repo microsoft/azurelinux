@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          libusbmuxd
 Version:       2.0.0
 Release:       3%{?dist}

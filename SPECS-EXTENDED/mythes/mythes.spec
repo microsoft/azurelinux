@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:      mythes
 Summary:   A thesaurus library
 Version:   1.2.4

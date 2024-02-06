@@ -4,7 +4,7 @@ Version:        0.9.31
 Release:        1%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://symas.com/lmdb
 Source0:        https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz

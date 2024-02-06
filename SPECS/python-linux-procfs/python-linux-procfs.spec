@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: python-linux-procfs
 Version: 0.6.1
 Release: 9%{?dist}

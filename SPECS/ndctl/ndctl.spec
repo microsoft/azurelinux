@@ -8,7 +8,7 @@ Group:          System Environment/Base
 Url:            https://github.com/pmem/ndctl
 Source0:        https://github.com/pmem/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  asciidoc
 BuildRequires:  which

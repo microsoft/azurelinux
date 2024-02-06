@@ -11,7 +11,7 @@ Release:        7%{?dist}
 Summary:        UAX #14 Unicode Line Breaking Algorithm
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-LineBreak
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/Unicode-LineBreak-%{version}.tar.gz#/perl-Unicode-LineBreak-%{version}.tar.gz
 

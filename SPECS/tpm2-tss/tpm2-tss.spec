@@ -4,7 +4,7 @@ Version:        4.0.1
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tss
 

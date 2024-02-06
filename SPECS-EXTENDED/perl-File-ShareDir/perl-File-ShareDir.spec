@@ -7,7 +7,7 @@ Summary:        Locate per-dist and per-module shared files
 # inc/latest/private.pm:    ASL 2.0
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-ShareDir
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-ShareDir-%{version}.tar.gz#/perl-File-ShareDir-%{version}.tar.gz
 BuildArch:      noarch

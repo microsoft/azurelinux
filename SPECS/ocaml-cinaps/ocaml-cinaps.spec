@@ -13,7 +13,7 @@ Version:        0.15.1
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-ppx/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

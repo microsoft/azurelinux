@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libmodulemd1
 Version:        1.8.16
 Release:        4%{?dist}

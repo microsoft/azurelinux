@@ -15,7 +15,7 @@ Version:        4.2.5
 Release:        2%{?dist}
 Summary:        Command and ruby library for gathering system information
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 License:        ASL 2.0
 URL:            https://github.com/puppetlabs/facter
 Source0:        https://downloads.puppetlabs.com/%{name}/%{name}-%{version}.gem

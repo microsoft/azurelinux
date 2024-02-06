@@ -20,7 +20,7 @@ Version:        0.7.7
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz

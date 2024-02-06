@@ -5,7 +5,7 @@ Summary:        Create and use a local lib/ for perl modules
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            https://metacpan.org/release/local-lib
 Source:         https://cpan.metacpan.org/authors/id/H/HA/HAARG/local-lib-%{version}.tar.gz
 Source10:       perl-homedir.sh

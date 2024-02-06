@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           rhash
 Version:        1.3.8
 Release:        4%{?dist}

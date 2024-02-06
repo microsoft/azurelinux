@@ -3,7 +3,7 @@ Version:        2.08
 Release:        8%{?dist}
 Summary:        Automatic password generation
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPL+
 URL:            https://sf.net/projects/pwgen
 Source0:        https://download.sf.net/pwgen/%{name}-%{version}.tar.gz

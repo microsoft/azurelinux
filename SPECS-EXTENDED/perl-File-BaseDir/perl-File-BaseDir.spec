@@ -6,7 +6,7 @@ Release:        9%{?dist}
 Summary:        Use the Freedesktop.org base directory specification
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-BaseDir
 Source0:        https://cpan.metacpan.org/authors/id/K/KI/KIMRYAN/File-BaseDir-%{version}.tar.gz#/perl-File-BaseDir-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        0.3.2
 Release:        26%{?dist}
 License:        LGPLv3 AND CC-BY-SA
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://lensfun.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 ## upstream patches

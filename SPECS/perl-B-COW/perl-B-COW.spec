@@ -4,7 +4,7 @@ Release:	      5%{?dist}
 Summary:	      Additional B helpers to check Copy On Write status
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		        https://metacpan.org/release/B-COW
 Source0:	      https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/B-COW-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Module Build

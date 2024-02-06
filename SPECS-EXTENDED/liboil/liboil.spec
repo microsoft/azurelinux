@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Library of Optimized Inner Loops, CPU optimized functions
 Name: liboil
 Version: 0.3.16

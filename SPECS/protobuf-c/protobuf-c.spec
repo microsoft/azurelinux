@@ -4,7 +4,7 @@ Version:        1.4.1
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/protobuf-c/protobuf-c
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz

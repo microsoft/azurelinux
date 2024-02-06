@@ -4,7 +4,7 @@ Version:        3.2.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/oauthlib/oauthlib
 Source0:        https://github.com/oauthlib/oauthlib/archive/refs/tags/v%{version}.tar.gz#/oauthlib-%{version}.tar.gz

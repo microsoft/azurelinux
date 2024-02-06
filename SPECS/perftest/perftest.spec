@@ -8,7 +8,7 @@ Version:        4.5
 Release:        2%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
 Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz

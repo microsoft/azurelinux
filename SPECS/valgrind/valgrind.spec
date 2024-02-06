@@ -5,7 +5,7 @@ Version:        3.21.0
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Debuggers
 URL:            https://valgrind.org
 Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.bz2

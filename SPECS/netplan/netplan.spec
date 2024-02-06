@@ -17,7 +17,7 @@ Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv3
 URL:            https://netplan.io/
 # Source0:      https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz

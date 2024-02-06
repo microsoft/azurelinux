@@ -5,7 +5,7 @@ Version:        6.08
 Release:        4%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Carp-Clan
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Carp-Clan-%{version}.tar.gz#/perl-Carp-Clan-%{version}.tar.gz
 BuildRequires:  make

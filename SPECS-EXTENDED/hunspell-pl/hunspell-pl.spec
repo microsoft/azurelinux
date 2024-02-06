@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-pl
 Summary: Polish hunspell dictionaries
 %global upstreamid 20180707

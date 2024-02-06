@@ -4,7 +4,7 @@ Version:        1.12.0
 Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://augeas.net/
 Source0:        http://download.augeas.net/%{name}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: openoffice-lv
 Summary: Latvian linguistic dictionaries
 Version: 1.0.0

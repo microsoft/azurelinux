@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Generated from bson-1.3.1.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name bson
 

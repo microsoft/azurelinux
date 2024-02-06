@@ -10,7 +10,7 @@ URL:            https://github.com/nodejs/http-parser
 Source0:        https://github.com/nodejs/http-parser/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz     
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  gcc
 
 %description

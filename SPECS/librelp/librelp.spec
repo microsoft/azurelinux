@@ -4,7 +4,7 @@ Version:        1.11.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/rsyslog/librelp
 Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz

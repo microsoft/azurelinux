@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global glib2_version 2.45.8
 %global json_glib_version 1.1.1
 

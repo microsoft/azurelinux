@@ -7,7 +7,7 @@ Url:            http://www.gnu.org/software/libunistring/
 Source0:        http://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Undefine _ld_as_needed to fix test-thread_create test case
 %undefine _ld_as_needed

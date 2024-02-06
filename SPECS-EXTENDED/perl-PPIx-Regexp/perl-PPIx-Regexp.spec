@@ -7,7 +7,7 @@ Release:        2%{?dist}
 Summary:        Represent a regular expression of some sort
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PPIx-Regexp
 Source0:        https://cpan.metacpan.org/authors/id/W/WY/WYANT/PPIx-Regexp-%{version}.tar.gz#/perl-PPIx-Regexp-%{version}.tar.gz
 BuildArch:      noarch

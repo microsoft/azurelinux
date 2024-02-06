@@ -2,7 +2,7 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global forgeurl  https://pagure.io/go-rpm-macros
 Version:   3.0.9
 %forgemeta

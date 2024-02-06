@@ -4,7 +4,7 @@ Version:        2021.04
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sbabic.github.io/swupdate/
 Source0:        https://github.com/sbabic/swupdate/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

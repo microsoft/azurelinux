@@ -4,7 +4,7 @@ Version:        2.6.4
 Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/westes/flex
 Source0:        https://github.com/westes/flex/releases/download/v%{version}/%{name}-%{version}.tar.gz

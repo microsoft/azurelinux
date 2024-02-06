@@ -6,7 +6,7 @@ Version:        1.1.0
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://github.com/intel/openlldp
 Source0:        https://github.com/intel/openlldp/archive/v%{majmin}.tar.gz#/openlldp-%{majmin}.tar.gz

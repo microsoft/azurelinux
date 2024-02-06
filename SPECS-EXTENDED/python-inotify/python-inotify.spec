@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global oname  pyinotify
 
 Summary:       Monitor filesystem events with Python under Linux

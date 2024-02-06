@@ -5,7 +5,7 @@ Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # leveldb git repo contains submodules that must be part of source tarball (adapt version number)
 # 1) clone git repo                           => 'git clone https://github.com/google/leveldb.git'

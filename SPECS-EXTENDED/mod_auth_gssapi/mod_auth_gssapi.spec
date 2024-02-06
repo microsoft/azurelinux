@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           mod_auth_gssapi
 Version:        1.6.1
 Release:        9%{?dist}

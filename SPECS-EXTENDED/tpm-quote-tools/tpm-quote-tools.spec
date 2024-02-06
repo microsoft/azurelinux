@@ -4,7 +4,7 @@ Release:	6%{?dist}
 Source0:	http://downloads.sourceforge.net/tpmquotetools/%{name}-%{version}.tar.gz
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://sf.net/projects/tpmquotetools
 
 Summary:	TPM-based attestation using the TPM quote operation (tools)

@@ -4,7 +4,7 @@ Version:        2.0.7
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            http://itstool.org
 Source0:        http://files.itstool.org/itstool/%{name}-%{version}.tar.bz2

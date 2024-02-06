@@ -9,7 +9,7 @@ Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 URL:            https://rubygems.org/gems/%{gem_name}/versions/%{version}
 Source0:        https://github.com/puppetlabs/puppet-resource_api/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby

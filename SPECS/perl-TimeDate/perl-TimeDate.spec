@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        A Perl module for time and date manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/TimeDate
 Source0:        https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/TimeDate-%{version}.tar.gz#/perl-TimeDate-%{version}.tar.gz
 BuildArch:      noarch

@@ -6,7 +6,7 @@ Version:        8.9.1
 Release:        1%{?dist}
 License:        GPLv2+ and ASL 2.0 and BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://rocksdb.org
 Source0:        https://github.com/facebook/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

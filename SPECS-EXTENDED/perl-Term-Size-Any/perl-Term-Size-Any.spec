@@ -7,7 +7,7 @@ Release:        31%{?dist}
 Summary:        Retrieve terminal size
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Term-Size-Any
 Source0:        https://cpan.metacpan.org/authors/id/F/FE/FERREIRA/Term-Size-Any-%{version}.tar.gz#/perl-Term-Size-Any-%{version}.tar.gz
 BuildArch:      noarch

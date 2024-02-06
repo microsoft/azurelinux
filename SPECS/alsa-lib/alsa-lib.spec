@@ -4,7 +4,7 @@ Version:        1.2.9
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Internet
 URL:            https://alsa-project.org
 Source0:        https://www.alsa-project.org/files/pub/lib/%{name}-%{version}.tar.bz2

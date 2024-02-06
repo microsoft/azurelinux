@@ -6,7 +6,7 @@ Version:        1.6
 Release:        1%{?dist}
 License:        LGPL-2.1-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.com/gsasl/libntlm/
 Source0:        https://gitlab.com/gsasl/libntlm/-/archive/%{name}-%{version_with_hyphens}/%{name}-%{name}-%{version_with_hyphens}.tar.gz
 

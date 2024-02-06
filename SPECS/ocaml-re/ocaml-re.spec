@@ -10,7 +10,7 @@ Version:        1.9.0
 Release:        21%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml/ocaml-re
 Source0:        https://github.com/ocaml/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 

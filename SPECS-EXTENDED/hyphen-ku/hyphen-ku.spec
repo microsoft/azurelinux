@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ku
 Summary: Kurdish hyphenation rules
 Version: 1.71.2

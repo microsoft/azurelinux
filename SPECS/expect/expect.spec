@@ -7,7 +7,7 @@ URL:            https://sourceforge.net/projects/expect
 Source0:        https://sourceforge.net/projects/%{name}/files/Expect/%{version}/%{name}%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Requires:       tcl
 BuildRequires:  tcl-devel
 

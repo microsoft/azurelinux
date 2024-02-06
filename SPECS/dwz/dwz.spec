@@ -4,7 +4,7 @@ Version:        0.14
 Release:        2%{?dist}
 License:        GPLv2+ and GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sourceware.org/dwz
 Source0:        https://sourceware.org/ftp/dwz/releases/%{name}-%{version}.tar.xz
 BuildRequires:  elfutils-libelf-devel

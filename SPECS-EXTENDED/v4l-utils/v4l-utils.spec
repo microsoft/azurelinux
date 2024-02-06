@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           v4l-utils
 Version:        1.22.1
 Release:        1%{?dist}

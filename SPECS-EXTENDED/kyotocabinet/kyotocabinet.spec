@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        A straightforward implementation of DBM
 Name:           kyotocabinet
 Version:        1.2.78

@@ -5,7 +5,7 @@ Version:        2.9.0
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.atoptool.nl
 Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d

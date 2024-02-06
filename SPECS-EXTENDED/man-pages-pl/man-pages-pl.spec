@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Polish man pages from the Linux Documentation Project
 Name: man-pages-pl
 Version: 0.7

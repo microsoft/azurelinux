@@ -21,7 +21,7 @@ Version:        1.7.30
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz

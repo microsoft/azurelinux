@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Korean(Hangul) Man(manual) Pages from the Korean Manpage Project
 Name: man-pages-ko
 Version: 20050219

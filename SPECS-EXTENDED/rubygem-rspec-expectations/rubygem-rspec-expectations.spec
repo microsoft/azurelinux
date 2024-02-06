@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global	majorver	3.12.0
 %global	fullver	%{majorver}%{?preminorver}
 

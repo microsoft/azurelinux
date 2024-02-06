@@ -6,7 +6,7 @@ Version:        8.00.02
 Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://camlp5.github.io/
 Source0:        https://github.com/camlp5/camlp5/archive/rel%{version}.tar.gz#/camlp5-rel%{version}.tar.gz
 BuildRequires:  make

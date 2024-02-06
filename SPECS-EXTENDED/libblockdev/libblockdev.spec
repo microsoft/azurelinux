@@ -85,7 +85,7 @@ Version:        2.28
 Release:        3%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/storaged-project/libblockdev
 Source0:        https://github.com/storaged-project/libblockdev/releases/download/%{version}-1/%{name}-%{version}.tar.gz
 BuildRequires:  make

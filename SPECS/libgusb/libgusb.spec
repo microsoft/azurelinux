@@ -4,7 +4,7 @@ Version:        0.3.5
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hughsie/libgusb
 Source0:        https://people.freedesktop.org/~hughsient/releases/%{name}-%{version}.tar.xz
 BuildRequires:  glib2-devel >= 2.38.0

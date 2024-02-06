@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           jbigkit
 Version:        2.1
 Release:        19%{?dist}

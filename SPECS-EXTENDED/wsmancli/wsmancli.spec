@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           wsmancli
 Version:        2.6.0
 Release:        13%{?dist}

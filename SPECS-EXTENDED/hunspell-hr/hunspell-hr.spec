@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-hr
 Summary: Croatian hunspell dictionaries
 %global upstreamid 20040608

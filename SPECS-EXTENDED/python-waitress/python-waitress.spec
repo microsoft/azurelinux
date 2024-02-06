@@ -3,7 +3,7 @@
 
 Summary:        Waitress WSGI server
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{srcname}
 Version:        1.4.4
 Release:        7%{?dist}

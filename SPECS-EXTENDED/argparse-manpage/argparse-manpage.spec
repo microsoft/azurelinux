@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %global sum()   Build manual page from %* ArgumentParser object
 %global desc \

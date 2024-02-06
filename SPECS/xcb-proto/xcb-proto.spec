@@ -6,7 +6,7 @@ Version:        1.16.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xcb.freedesktop.org/
 Source0:        https://xorg.freedesktop.org/archive/individual/proto/%{name}-%{version}.tar.gz
 

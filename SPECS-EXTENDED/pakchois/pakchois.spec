@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A wrapper library for PKCS#11
 Name: pakchois
 Version: 0.4

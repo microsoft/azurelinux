@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            https://alsa-project.org
 Group:          Applications/Internet
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.alsa-project.org/files/pub/utils/%{name}-%{version}.tar.bz2
 Patch0:         ens1371.patch
 BuildRequires:  alsa-lib-devel >= %{version}

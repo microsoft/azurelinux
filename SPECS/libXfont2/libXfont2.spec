@@ -4,7 +4,7 @@ Version:        2.0.3
 Release:        10%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.bz2
 

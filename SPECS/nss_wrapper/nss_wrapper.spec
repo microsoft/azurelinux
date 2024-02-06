@@ -2,7 +2,7 @@ Name:           nss_wrapper
 Version:        1.1.15
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        BSD
 Summary:        A wrapper for the user, group and hosts NSS API
 URL:            https://cwrap.org/

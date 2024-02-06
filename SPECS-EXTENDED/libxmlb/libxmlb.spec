@@ -6,7 +6,7 @@ Version:        0.3.11
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hughsie/%{name}
 Source0:        https://github.com/hughsie/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  glib2-devel >= %{glib2_version}

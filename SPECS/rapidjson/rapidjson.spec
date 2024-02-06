@@ -4,7 +4,7 @@ Version:        1.1.0
 Release:        7%{?dist}
 License:        BSD and JSON and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/Tencent/rapidjson
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

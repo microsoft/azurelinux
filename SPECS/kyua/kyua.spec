@@ -8,7 +8,7 @@ Summary:        Testing framework for infrastructure software
 
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/jmmv/kyua
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 

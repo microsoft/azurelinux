@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global git0 https://github.com/rootless-containers/%{name}
 %global commit0 4367de7c3361c344155220a4e999ffd7432dad81
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})

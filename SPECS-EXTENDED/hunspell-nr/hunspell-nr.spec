@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-nr
 Summary: Southern Ndebele hunspell dictionaries
 %global upstreamid 20091030

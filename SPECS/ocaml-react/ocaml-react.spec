@@ -4,7 +4,7 @@ Version:        1.2.1
 Release:        8%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://erratique.ch/software/react
 Source0:        http://erratique.ch/software/react/releases/react-%{version}.tbz
 

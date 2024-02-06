@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-hu
 Summary: Hungarian hyphenation rules
 %global upstreamid 20090612

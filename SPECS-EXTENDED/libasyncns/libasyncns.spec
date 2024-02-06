@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libasyncns
 Version: 0.8
 Release: 19%{?dist}

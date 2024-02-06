@@ -4,7 +4,7 @@ Release:       2%{?dist}
 Summary:       gcore extension module for crash utility
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/crash-utility/crash-extensions
 Source0:       https://github.com/crash-utility/crash-extensions/raw/master/%{name}-%{version}.tar.gz
 Source1:       gcore_defs.patch

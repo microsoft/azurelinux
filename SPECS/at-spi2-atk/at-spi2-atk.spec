@@ -7,7 +7,7 @@ Version:        2.34.2
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.linuxfoundation.org/en/AT-SPI_on_D-Bus
 Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 BuildRequires:  at-spi2-core-devel >= %{at_spi2_core_version}

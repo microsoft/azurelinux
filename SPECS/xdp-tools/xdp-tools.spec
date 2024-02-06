@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:             xdp-tools
 Version:          1.4.2
 Release:          1%{?dist}

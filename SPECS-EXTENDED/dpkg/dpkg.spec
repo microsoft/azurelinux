@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pkgconfdir      %{_sysconfdir}/dpkg
 %global pkgdatadir      %{_datadir}/dpkg
 

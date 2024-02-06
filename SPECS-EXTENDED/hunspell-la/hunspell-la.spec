@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-la
 Summary: Latin hunspell dictionaries
 %global upstreamid 20130331

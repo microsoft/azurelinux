@@ -4,7 +4,7 @@ Version:        2023.05.07
 Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://certifi.io/
 Source:         https://github.com/certifi/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         certifi-2022.12.07-use-system-cert.patch

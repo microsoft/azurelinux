@@ -7,7 +7,7 @@ Release:        8%{?dist}
 Summary:        Perl extension for generating and using LALR parsers
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Parse-Yapp
 Source0:        https://cpan.metacpan.org/authors/id/W/WB/WBRASWELL/Parse-Yapp-%{cpan_version}.tar.gz#/perl-Parse-Yapp-%{cpan_version}.tar.gz
 BuildArch:      noarch

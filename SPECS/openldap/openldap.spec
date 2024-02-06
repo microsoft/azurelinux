@@ -6,7 +6,7 @@ Version:        2.6.7
 Release:        1%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.openldap.org/
 # Using Canadian mirror. Original source link didn't work: ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/%%{name}-%%{version}.tgz

@@ -4,7 +4,7 @@ Version:        2.11
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://humdi.net/vnstat/
 Source0:        https://github.com/vergoh/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

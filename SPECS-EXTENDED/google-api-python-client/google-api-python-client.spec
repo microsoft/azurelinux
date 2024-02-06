@@ -3,7 +3,7 @@
 
 Summary:        %{sum}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           google-api-python-client
 Version:        2.73.0
 Release:        2%{?dist}

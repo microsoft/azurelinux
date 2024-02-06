@@ -4,7 +4,7 @@ Version:        1.6.2
 Release:        50%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.ossp.org/pkg/lib/uuid/
 Source0:        ftp://ftp.ossp.org/pkg/lib/uuid/uuid-%{version}.tar.gz
 Patch0:         uuid-1.6.1-ossp.patch

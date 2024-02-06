@@ -11,7 +11,7 @@ Release:        21%{?dist}
 Summary:        Validation of the META.yml file in a CPAN distribution
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-CPAN-Meta
 Source0:        https://cpan.metacpan.org/authors/id/B/BA/BARBIE/Test-CPAN-Meta-%{version}.tar.gz#/perl-Test-CPAN-Meta-%{version}.tar.gz
 Patch0:         Test-CPAN-Meta-0.25-utf8.patch

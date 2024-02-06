@@ -11,7 +11,7 @@ Release:        36%{?dist}
 Summary:        Inheritable, overridable class data
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc

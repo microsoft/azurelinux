@@ -4,7 +4,7 @@ Version:        0.32
 Release:        4%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Scope-Upper-%{version}.tar.gz 
 URL:            https://metacpan.org/release/Scope-Upper
 # Build

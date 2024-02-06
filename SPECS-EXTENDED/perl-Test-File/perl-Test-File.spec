@@ -8,7 +8,7 @@ Version:	%{rpmversion}
 Release:	11%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-File
 Source0:	https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-File-%{cpanversion}.tar.gz#/perl-Test-File-%{cpanversion}.tar.gz
 BuildArch:	noarch

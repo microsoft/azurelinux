@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-da
 Summary: Danish hyphenation rules
 %global upstreamid 20070903

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Component versions
 %global xdpyinfo 1.3.2
 %global xev 1.2.2

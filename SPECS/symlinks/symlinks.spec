@@ -1,7 +1,7 @@
 Summary:        A utility which maintains a system's symbolic links
 Name:           symlinks
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Version:        1.7
 Release:        7%{?dist}
 License:        Copyright only

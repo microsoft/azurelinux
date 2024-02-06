@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	A library for integrity verification of FIPS validated modules
 Name:		fipscheck
 Version:	1.5.0

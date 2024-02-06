@@ -14,7 +14,7 @@ Version:        1.3.0
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://mpmath.org
 # Source code
 Source0:        https://github.com/fredrik-johansson/mpmath/archive/%{version}/%{name}-%{version}.tar.gz

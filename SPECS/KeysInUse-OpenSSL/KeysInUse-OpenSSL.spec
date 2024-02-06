@@ -4,7 +4,7 @@ Version:        0.3.4
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/KeysInUse-OpenSSL
 Source0:        https://github.com/microsoft/KeysInUse-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

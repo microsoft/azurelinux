@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           gphoto2
 Version:        2.5.27
 Release:        2%{?dist}

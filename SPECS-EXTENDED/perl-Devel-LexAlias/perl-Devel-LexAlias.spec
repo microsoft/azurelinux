@@ -4,7 +4,7 @@ Release:        23%{?dist}
 Summary:        Alias lexical variables
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-LexAlias
 Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-LexAlias-%{version}.tar.gz#/perl-Devel-LexAlias-%{version}.tar.gz
 # Module Build

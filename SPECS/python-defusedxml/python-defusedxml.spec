@@ -4,7 +4,7 @@ Version:        0.7.1
 Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/defusedxml
 Source0:        https://github.com/tiran/defusedxml/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

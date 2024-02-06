@@ -6,7 +6,7 @@ Version:        0.6.1
 Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/mccabe
 Source0:        https://files.pythonhosted.org/packages/source/m/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 

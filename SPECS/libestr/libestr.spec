@@ -4,7 +4,7 @@ Version:        0.1.11
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://libestr.adiscon.com/
 Source0:        https://%{name}.adiscon.com/files/download/%{name}-%{version}.tar.gz

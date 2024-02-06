@@ -5,7 +5,7 @@ Version:        2.7.2
 Release:        28%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://mcpp.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         mcpp-manual.html.patch

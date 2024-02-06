@@ -8,7 +8,7 @@ Summary:        Programming language designed for the analysis of computer langu
 License:        MIT AND LGPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.colm.net/open-source/colm/
 Source0:        https://github.com/adrian-thurston/colm/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         Colm-NoStatic.patch

@@ -6,7 +6,7 @@ URL:            https://www.gnu.org/software/ed/
 License:        GPLv3
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Official source under https://ftp.gnu.org/gnu/ed/ed-1.14.2.tar.lz.
 # We don't have lzip to decompress it.
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/sha512/de838a6df785c7dc80f4b5ba84330bbe743983fd81218321d4ab84c4c3688fdafb4c005502f3228f0bfa2b6bcf342d64d9523ab73ee440b4f305a033f567cbc2/%{name}-%{version}.tar.xz

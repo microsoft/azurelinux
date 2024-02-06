@@ -3,7 +3,7 @@ Version:        2.1.0
 Release:        29%{?dist}
 Summary:        Utilities for interfacing with sysfs
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sourceforge.net/projects/linux-diag/
 License:        GPLv2
 

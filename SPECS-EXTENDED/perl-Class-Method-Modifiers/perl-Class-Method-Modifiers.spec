@@ -11,7 +11,7 @@ Version:        2.13
 Release:        3%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Method-Modifiers
 Source0:        https://cpan.metacpan.org/modules/by-module/Class/Class-Method-Modifiers-%{version}.tar.gz#/perl-Class-Method-Modifiers-%{version}.tar.gz
 BuildArch:      noarch

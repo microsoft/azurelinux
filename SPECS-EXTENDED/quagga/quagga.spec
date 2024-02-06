@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define quagga_uid  92
 %define quagga_gid  92
 %define vty_group   quaggavt

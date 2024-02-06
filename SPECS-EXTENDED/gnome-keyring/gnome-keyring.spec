@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global glib2_version 2.44.0
 %global gcr_version 3.27.90
 %global gcrypt_version 1.2.2

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          usbmuxd
 Version:       1.1.0
 Release:       20%{?dist}

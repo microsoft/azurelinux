@@ -4,7 +4,7 @@ Version:        1.22
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.kernel.org/pub/scm/network/wireless/iwd.git/
 Source0:        https://www.kernel.org/pub/linux/network/wireless/%{name}-%{version}.tar.xz
 BuildRequires:  asciidoc

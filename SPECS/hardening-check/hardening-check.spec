@@ -8,7 +8,7 @@ License:        GPLv2+
 URL:            http://packages.debian.org/hardening-wrapper
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 
 Source0:        http://ftp.debian.org/debian/pool/main/h/hardening-wrapper/hardening-wrapper_%{version}.tar.xz

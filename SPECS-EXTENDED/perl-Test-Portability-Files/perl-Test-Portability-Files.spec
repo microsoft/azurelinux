@@ -4,7 +4,7 @@ Release:        7%{?dist}
 Summary:        Check file names portability
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Portability-Files
 Source0:        https://cpan.metacpan.org/authors/id/A/AB/ABRAXXA/Test-Portability-Files-%{version}.tar.gz#/perl-Test-Portability-Files-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Release: 3%{?dist}
 Summary: Pure C implementation of Go channels
 License: ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/tylertreat/%{name}
 Source0: https://github.com/tylertreat/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 

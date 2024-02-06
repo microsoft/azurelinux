@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-ru
 Summary: Russian thesaurus
 %global upstreamid 20070613

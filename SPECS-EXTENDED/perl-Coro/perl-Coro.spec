@@ -18,7 +18,7 @@ Release:        5%{?dist}
 # Rest of package: GPL+ or Artistic
 License:        (GPL+ OR Artistic) AND (GPLv2 OR BSD)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Coro
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-%{cpan_version}.tar.gz
 Patch0:         %{name}-5.25-ucontext-default.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname faker
 %global _description\
 Faker is a Python package that generates fake data for you. Whether you need\

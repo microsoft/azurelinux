@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global use_nss 1
 %global mailrc %{_sysconfdir}/mail.rc
 

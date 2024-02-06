@@ -4,7 +4,7 @@ Version:        0.06
 Release:        25%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-Repository
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/Module-Install-Repository-%{version}.tar.gz#/perl-Module-Install-Repository-%{version}.tar.gz
 Source1:        LICENSE.PTR

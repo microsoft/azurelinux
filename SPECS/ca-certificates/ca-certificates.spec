@@ -48,7 +48,7 @@ Version:        3.0.0
 Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://docs.microsoft.com/en-us/security/trusted-root/program-requirements
 Source2:        update-ca-trust

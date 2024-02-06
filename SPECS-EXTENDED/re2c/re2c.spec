@@ -4,7 +4,7 @@ Version:        2.0
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://re2c.org/
 Source:         https://github.com/skvadrik/re2c/releases/download/%{version}/re2c-%{version}.tar.xz
 BuildRequires:  gcc

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-mn
 Summary: Mongolian hyphenation rules
 %global upstreamid 20100531

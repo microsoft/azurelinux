@@ -4,7 +4,7 @@ Version:        4.4.1
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/make
 Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz

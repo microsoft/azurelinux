@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A library for interfacing IEEE 1284-compatible devices
 Name: libieee1284
 Version: 0.2.11

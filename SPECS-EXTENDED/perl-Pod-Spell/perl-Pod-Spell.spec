@@ -4,7 +4,7 @@ Release:        15%{?dist}
 Summary:        A formatter for spell-checking POD
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Spell
 Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Spell-%{version}.tar.gz#/perl-Pod-Spell-%{version}.tar.gz
 BuildArch:      noarch

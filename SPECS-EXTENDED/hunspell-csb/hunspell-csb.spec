@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-csb
 Summary: Kashubian hunspell dictionaries
 %global upstreamid 20050311

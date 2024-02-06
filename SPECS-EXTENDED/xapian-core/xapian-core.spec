@@ -4,7 +4,7 @@ Version:        1.4.20
 Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.xapian.org/
 Source0:        https://www.oligarchy.co.uk/xapian/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  gcc

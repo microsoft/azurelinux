@@ -4,7 +4,7 @@ Version:        0.8.2
 Release:        1%{?dist}
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.xxhash.com/
 Source0:        https://github.com/Cyan4973/xxHash/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  doxygen

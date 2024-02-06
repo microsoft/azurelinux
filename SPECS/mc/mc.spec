@@ -4,7 +4,7 @@ Version:        4.8.30
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.midnight-commander.org
 Source0:        http://ftp.midnight-commander.org/%{name}-%{version}.tar.xz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       cldr-emoji-annotation
 Version:    37.0_13.0_0_1
 Release:    2%{?dist}

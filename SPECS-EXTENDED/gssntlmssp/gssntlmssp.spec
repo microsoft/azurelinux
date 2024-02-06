@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		gssntlmssp
 Version:	0.9.0
 Release:	2%{?dist}

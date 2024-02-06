@@ -11,7 +11,7 @@ Release:        4%{?dist}
 Summary:        Lists of reserved barewords and symbol names
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/B-Keywords
 Source0:        https://cpan.metacpan.org/modules/by-module/B/B-Keywords-%{version}.tar.gz#/perl-B-Keywords-%{version}.tar.gz
 BuildArch:      noarch

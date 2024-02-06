@@ -6,7 +6,7 @@ Version:        45.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # no homepage exists for this component
 URL:            https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas
 Source0:        https://download.gnome.org/sources/%{name}/45/%{name}-%{version}.tar.xz

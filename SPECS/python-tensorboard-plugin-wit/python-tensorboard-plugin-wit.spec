@@ -9,7 +9,7 @@ Version:        1.8.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pair-code.github.io/what-if-tool/
 Source0:        https://github.com/PAIR-code/what-if-tool/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-pip

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # For deep debugging we need to build binaries with extra debug info
 %bcond_with     debug
 

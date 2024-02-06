@@ -10,7 +10,7 @@ Release:        45%{?dist}
 # <https://www.mccaughan.org.uk/software/qsort.c-1.14>, bug #1381888.
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.libsdl.org/
 Source0:        https://github.com/libsdl-org/%{name}-1.2/archive/refs/tags/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        SDL_config.h

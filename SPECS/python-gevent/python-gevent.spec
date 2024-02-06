@@ -4,7 +4,7 @@ Version:        23.9.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.gevent.org
 Source0:        https://github.com/gevent/gevent/archive/%{version}.tar.gz#/gevent-%{version}.tar.gz

@@ -10,7 +10,7 @@ Version:        0.8.9
 Release:        4%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
 # We neither need nor want the stdlib-shims package.  It is a forward

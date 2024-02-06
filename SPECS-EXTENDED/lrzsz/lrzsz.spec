@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: The lrz and lsz modem communications programs
 Name: lrzsz
 Version: 0.12.20

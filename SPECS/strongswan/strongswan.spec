@@ -4,7 +4,7 @@ Version:        5.9.11
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.strongswan.org/
 Source0:        https://download.strongswan.org/%{name}-%{version}.tar.bz2

@@ -4,7 +4,7 @@ Version:        7.2.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://redis.io/
 Source0:        https://download.redis.io/releases/%{name}-%{version}.tar.gz

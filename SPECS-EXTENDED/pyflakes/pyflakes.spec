@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           pyflakes
 # WARNING: When updating pyflakes, check not to break flake8!
 Version:        2.5.0

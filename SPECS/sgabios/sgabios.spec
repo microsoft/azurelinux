@@ -9,7 +9,7 @@ Version:        0.%{date}git
 Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/qemu/sgabios
 # There are no upstream releases.  This archive is prepared as follows:
 #

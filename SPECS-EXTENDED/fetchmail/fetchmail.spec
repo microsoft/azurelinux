@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # For a breakdown of the licensing, see COPYING
 License:        GPL+ AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.fetchmail.info/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 # systemd service file

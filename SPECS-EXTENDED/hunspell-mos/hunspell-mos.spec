@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-mos
 Summary: Mossi hunspell dictionaries
 %global upstreamid 20101130

@@ -4,7 +4,7 @@ Version:        1.35.0
 Release:        9%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://busybox.net/
 Source:         https://www.busybox.net/downloads/%{name}-%{version}.tar.bz2
 Source1:        busybox-static.config

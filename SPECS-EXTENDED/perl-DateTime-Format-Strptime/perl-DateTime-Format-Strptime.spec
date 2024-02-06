@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Parse and format strptime and strftime patterns
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-Format-Strptime
 Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-Format-Strptime-%{version}.tar.gz#/perl-DateTime-Format-Strptime-%{version}.tar.gz
 BuildArch:      noarch

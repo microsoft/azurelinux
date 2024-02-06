@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-PerlIO-gzip
 Version:        0.20
 Release:        12%{?dist}

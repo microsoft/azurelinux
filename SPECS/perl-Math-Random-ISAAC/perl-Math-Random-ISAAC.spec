@@ -4,7 +4,7 @@ Version:        1.004
 Release:        34%{?dist}
 License:        Public Domain OR MIT OR GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Math-Random-ISAAC
 Source0:        https://cpan.metacpan.org/authors/id/J/JA/JAWNSY/Math-Random-ISAAC-%{version}.tar.gz
 BuildArch:      noarch

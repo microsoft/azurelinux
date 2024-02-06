@@ -4,7 +4,7 @@ Version:        0.11.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://alastairs-place.net/netifaces/
 Source0:        https://pypi.python.org/packages/source/n/netifaces/netifaces-%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        0.30
 Release:        24%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://0pointer.de/lennart/projects/libcanberra/
 Source0:        https://0pointer.de/lennart/projects/%{name}/%{name}-%{version}.tar.xz
 Patch0:         0001-gtk-Don-t-assume-all-GdkDisplays-are-GdkX11Displays-.patch

@@ -4,7 +4,7 @@ Version:        0.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/microsoft/tracelogging
 Source0:        https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

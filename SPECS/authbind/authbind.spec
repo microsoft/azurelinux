@@ -6,7 +6,7 @@ Release:        1%{?dist}
 Summary:        Allow non-root users to open restricted ports
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.chiark.greenend.org.uk/ucgi/~ian/git/authbind.git/
 Source0:        https://deb.debian.org/debian/pool/main/a/%{name}/%{name}_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         authbind-makefile-fixes.patch

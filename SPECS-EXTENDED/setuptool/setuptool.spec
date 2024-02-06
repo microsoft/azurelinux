@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: setuptool
 Version: 1.19.11
 Release: 22%{?dist}

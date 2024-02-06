@@ -11,7 +11,7 @@ Release:        8%{?dist}
 Summary:        Turn on strict and make most warnings fatal
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/strictures
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/strictures-%{version}.tar.gz#/perl-strictures-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-bn
 Summary: Bengali hunspell dictionaries
 Version: 1.0.0

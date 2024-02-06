@@ -4,7 +4,7 @@ Version:        3.2.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/bcrypt/
 Source0:        https://pypi.io/packages/source/b/bcrypt/bcrypt-%{version}.tar.gz

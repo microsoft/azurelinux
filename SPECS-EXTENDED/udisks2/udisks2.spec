@@ -20,7 +20,7 @@ Version:        2.9.4
 Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/storaged-project/udisks
 Source0:        https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
 Patch0:         ignore-apple-boot-part.patch

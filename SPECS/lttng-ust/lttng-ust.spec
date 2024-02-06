@@ -7,7 +7,7 @@ URL:            https://lttng.org
 Source0:        https://lttng.org/files/%{name}/%{name}-%{version}.tar.bz2
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires: libnuma-devel
 BuildRequires: userspace-rcu-devel

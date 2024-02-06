@@ -4,7 +4,7 @@ Version:        1.15
 Release:        1%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://jplesnik.fedorapeople.org/generators
 Source0:        %{url}/generators-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        LICENSE.PTR

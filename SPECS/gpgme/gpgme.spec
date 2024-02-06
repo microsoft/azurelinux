@@ -4,7 +4,7 @@ Version:        1.23.2
 Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2

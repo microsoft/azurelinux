@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # The libs and devel package is GPLv3+ and LGPLv3+ where as the main package is GPLv3 only.
 License:        GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dun.github.io/munge/
 Source0:        https://github.com/dun/munge/releases/download/munge-%{version}/munge-%{version}.tar.xz
 Source1:        create-munge-key

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           ocaml-libvirt
 Version:        0.6.1.5
 Release:        8%{?dist}

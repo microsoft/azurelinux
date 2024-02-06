@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Parallel-Iterator
 Version:        1.00
 Release:        26%{?dist}

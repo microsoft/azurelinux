@@ -12,7 +12,7 @@ Version:        1.15.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/GrahamDumpleton/wrapt
 Source0:        https://github.com/GrahamDumpleton/%{sname}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

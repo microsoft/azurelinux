@@ -11,7 +11,7 @@ Release:	2%{?dist}
 Summary:	File path utility
 License:	ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Path-Tiny
 Source0:	https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Path-Tiny-%{version}.tar.gz#/perl-Path-Tiny-%{version}.tar.gz
 BuildArch:	noarch

@@ -4,7 +4,7 @@ Release: 	11%{?dist}
 Summary: 	Perl module to match globbing patterns against text
 License: 	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: 		https://metacpan.org/release/Text-Glob
 Source0: 	https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Text-Glob-%{version}.tar.gz#/perl-Text-Glob-%{version}.tar.gz
 

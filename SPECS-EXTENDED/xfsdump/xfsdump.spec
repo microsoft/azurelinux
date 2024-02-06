@@ -6,7 +6,7 @@ Release: 2%{?dist}
 # in source, with no mention of version.
 License: GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://git.kernel.org/pub/scm/fs/xfs/xfsdump-dev.git/about
 Source0: https://kernel.org/pub/linux/utils/fs/xfs/%{name}/%{name}-%{version}.tar.xz
 BuildRequires: gcc

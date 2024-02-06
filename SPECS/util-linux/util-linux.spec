@@ -5,7 +5,7 @@ Version:        2.39.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
 Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v%{majminorver}/%{name}-%{version}.tar.xz

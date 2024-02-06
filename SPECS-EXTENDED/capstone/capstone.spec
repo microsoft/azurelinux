@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           capstone
 Version:        4.0.2
 Release:        4%{?dist}

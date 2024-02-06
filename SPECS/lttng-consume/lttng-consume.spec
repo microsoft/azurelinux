@@ -4,7 +4,7 @@ Version:        0.2.1
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/microsoft/lttng-consume
 #Source0:       https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz

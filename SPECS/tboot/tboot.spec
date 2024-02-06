@@ -4,7 +4,7 @@ Version:        1.11.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://sourceforge.net/projects/tboot/
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz

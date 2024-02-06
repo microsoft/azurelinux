@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Various ancient mail-related perl modules
 Name:		perl-MailTools
 Version:	2.21

@@ -6,7 +6,7 @@ Version:        1.20.0
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gstreamer.freedesktop.org/
 Source0:        https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-%{version}.tar.xz
 Patch0:         0001-missing-plugins-Remove-the-mpegaudioversion-field.patch

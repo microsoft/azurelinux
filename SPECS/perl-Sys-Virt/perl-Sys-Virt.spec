@@ -4,7 +4,7 @@ Version:        6.1.0
 Release:        4%{?dist}
 License:        GPLv2+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sys-Virt
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 

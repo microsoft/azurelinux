@@ -4,7 +4,7 @@ Version:        6.14
 Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Nfs-utils-client
 URL:            https://wiki.samba.org/index.php/LinuxCIFS_utils
 Source0:        https://download.samba.org/pub/linux-cifs/%{name}/%{name}-%{version}.tar.bz2

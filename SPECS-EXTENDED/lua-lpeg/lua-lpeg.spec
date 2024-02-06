@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global lua_pkg_name lpeg
 
 %global lua_version 5.4

@@ -6,7 +6,7 @@ Version:        14.0.6
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sighingnow/libclang
 Source0:        %{pypi_source}
 BuildRequires:  python3-devel

@@ -4,7 +4,7 @@ Version:        1.1.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://github.com/google/brotli
 Source0:        https://github.com/google/brotli/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

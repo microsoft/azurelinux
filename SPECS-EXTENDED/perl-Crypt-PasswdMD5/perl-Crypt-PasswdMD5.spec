@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global cpan_version 1.40
 
 Name:           perl-Crypt-PasswdMD5

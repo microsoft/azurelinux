@@ -4,7 +4,7 @@ Version:        0.22
 Release:        10%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-OP-Check-%{version}.tar.gz#/perl-B-Hooks-OP-Check-%{version}.tar.gz
 URL:            https://metacpan.org/release/B-Hooks-OP-Check
 # Module Build

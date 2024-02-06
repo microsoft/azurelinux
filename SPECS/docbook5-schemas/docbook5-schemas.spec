@@ -5,7 +5,7 @@ Release:        3%{?dist}
 License:        Freely redistributable without restriction
 URL:            https://docbook.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #Source0:       https://www.docbook.org/xml/%{version}/docbook-v%{version}-os.zip
 Source0:        %{name}-%{version}.zip
 Source1:        https://www.docbook.org/xml/5.0/docbook-5.0.zip

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A program for faxing using a Class 1, 2 or 2.0 fax modem
 Name: efax
 Version: 0.9a

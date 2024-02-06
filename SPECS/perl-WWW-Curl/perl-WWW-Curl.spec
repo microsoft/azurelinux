@@ -10,7 +10,7 @@ Version:        4.17
 Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://search.cpan.org/dist/WWW-Curl/
 Source0:        https://search.cpan.org/CPAN/authors/id/S/SZ/SZBALINT/WWW-Curl-%{version}.tar.gz

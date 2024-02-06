@@ -6,7 +6,7 @@ Version:        1.0.1
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sarugaku/resolvelib
 Source0:        %{pypi_source}#/python-resolvelib-1.0.1.tar.gz
 BuildRequires:  python3-devel

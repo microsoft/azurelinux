@@ -4,7 +4,7 @@ Version:        7.94
 Release:        1%{?dist}
 License:        Nmap
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://nmap.org/
 Source0:        https://nmap.org/dist/%{name}-%{version}.tar.bz2

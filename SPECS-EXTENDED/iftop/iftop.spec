@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Command line tool that displays bandwidth usage on an interface
 Name:		iftop
 Version:	1.0

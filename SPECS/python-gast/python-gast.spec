@@ -9,7 +9,7 @@ Version:        0.5.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/serge-sans-paille/gast
 Source0:        %{url}/archive/%{version}/gast-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros

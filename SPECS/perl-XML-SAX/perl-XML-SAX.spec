@@ -5,7 +5,7 @@ Release:        6%{?dist}
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-SAX
 # Original source
 # http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz

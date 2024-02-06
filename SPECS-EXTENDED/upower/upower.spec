@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global commit  93cfe7c8d66ed486001c4f3f55399b7a
 Summary:        Power Management Service
 Name:           upower

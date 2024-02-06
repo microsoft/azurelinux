@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tools to manage the Linux NetLabel subsystem
 Name: netlabel_tools
 Version: 0.30.0

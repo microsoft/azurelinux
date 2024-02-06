@@ -6,7 +6,7 @@ Summary:        A library providing Unicode character names and annotations
 
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fontforge/libuninameslist
 Source0:        https://github.com/fontforge/libuninameslist/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

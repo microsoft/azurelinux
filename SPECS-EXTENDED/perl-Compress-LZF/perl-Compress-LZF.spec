@@ -4,7 +4,7 @@ Version:        3.8
 Release:        21%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 ## Not in the binary packages
 # liblzf files:     BSD or GPLv2+
 # perlmulticore.h:  Public Domain or CC0

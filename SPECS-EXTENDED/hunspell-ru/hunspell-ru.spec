@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ru
 Summary: Russian hunspell dictionaries
 Version: 0.99g5

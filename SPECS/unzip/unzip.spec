@@ -4,7 +4,7 @@ Version:        6.0
 Release:        20%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Utilities
 URL:            https://infozip.sourceforge.net/UnZip.html
 Source0:        https://downloads.sourceforge.net/infozip/unzip60.tar.gz

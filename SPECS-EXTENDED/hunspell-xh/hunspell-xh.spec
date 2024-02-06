@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-xh
 Summary: Xhosa hunspell dictionaries
 %global upstreamid 20091030

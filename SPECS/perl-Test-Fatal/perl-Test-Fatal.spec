@@ -9,7 +9,7 @@ Version:	0.017
 Release:	1%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-Fatal
 Source0:	https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Test-Fatal-%{version}.tar.gz#/perl-Test-Fatal-%{version}.tar.gz
 BuildArch:	noarch

@@ -4,7 +4,7 @@ Version:        0.5.0
 Release:        30%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://augeas.net
 Source0:        http://download.augeas.net/ruby/%{name}-%{version}.tgz
 

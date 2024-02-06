@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           woff2
 Version:        1.0.2
 Release:        9%{?dist}

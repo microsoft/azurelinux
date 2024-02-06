@@ -3,7 +3,7 @@ Version:       0.4
 Release:       17%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/jmmv/lutok
 Summary:       Lightweight C++ API library for Lua
 

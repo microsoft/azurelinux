@@ -9,7 +9,7 @@ Release:        1%{?dist}
 # Everything is BSD except for class SafeEval in numpy/lib/utils.py which is Python
 License:        BSD AND Python AND ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.numpy.org/
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://numpy.org/doc/%{majmin}/numpy-html.zip#/numpy-html-%{version}.zip

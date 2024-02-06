@@ -29,7 +29,7 @@ Version:        4.7
 Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 Url:            https://libreswan.org/
 Source0:        https://github.com/libreswan/libreswan/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

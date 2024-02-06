@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Tests require network access so fail in koji; build using --with tests to run them yourself
 %bcond_with tests
 

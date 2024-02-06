@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # skip tests known to be problematic in a specific version
 %global skip_checks_version 0.1.58
 %ifarch ppc64 ppc64le

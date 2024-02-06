@@ -4,7 +4,7 @@ Version:        2.3.1
 Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://savannah.nongnu.org/projects/acl/
 Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz

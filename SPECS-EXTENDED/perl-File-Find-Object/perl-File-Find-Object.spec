@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Object oriented File::Find replacement
 License:        GPLv2+ or Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Find-Object
 Source0:        https://cpan.metacpan.org/modules/by-module/File/File-Find-Object-%{version}.tar.gz#/perl-File-Find-Object-%{version}.tar.gz
 BuildArch:      noarch

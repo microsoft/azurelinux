@@ -4,7 +4,7 @@ Version:        3.3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/opt-einsum
 Source0:        https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-%{version}.tar.gz#/opt-einsum-%{version}.tar.gz

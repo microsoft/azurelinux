@@ -8,7 +8,7 @@ URL:            http://scons.org
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/SCons-%{version}.tar.gz/download#/%{name}-%{version}.tar.gz
 Patch0:         0001-Remove-unnecessary-build-deps.patch
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  python3-devel
 Requires:       python3
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Cross-platform basic tests for scripts
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Script
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Test-Script-%{version}.tar.gz#/perl-Test-Script-%{version}.tar.gz
 BuildArch:      noarch

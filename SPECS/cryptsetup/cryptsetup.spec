@@ -5,7 +5,7 @@ Version:        2.4.3
 Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://gitlab.com/cryptsetup/cryptsetup
 Source0:        https://www.kernel.org/pub/linux/utils/cryptsetup/v2.4/%{name}-%{version}.tar.xz

@@ -7,7 +7,7 @@ Url:            https://pypi.python.org/pypi/psycopg2
 License:        LGPLv3+ with exceptions
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-%{version}.tar.gz
 Patch0:         psycopg2-py38.patch
 

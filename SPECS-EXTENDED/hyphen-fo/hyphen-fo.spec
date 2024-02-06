@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-fo
 Summary: Faroese hyphenation rules
 %global upstreamid 20040420

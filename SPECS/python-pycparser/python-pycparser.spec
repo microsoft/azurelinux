@@ -4,7 +4,7 @@ Version:        2.21
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/pycparser
 Source0:        https://github.com/eliben/pycparser/archive/refs/tags/release_v%{version}.tar.gz#/pycparser-release_v%{version}.tar.gz

@@ -7,7 +7,7 @@ Release:        8%{?dist}
 #       perl-EV is instead built against the system-provided libev.
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/EV
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/EV-%{version}.tar.gz
 Patch0:         perl-EV-4.03-Don-t-ask-questions-at-build-time.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-cv
 Summary: Chuvash hunspell dictionaries
 Version: 1.06

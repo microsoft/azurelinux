@@ -6,7 +6,7 @@ License:    BSD
 URL:        https://github.com/tpm2-software/tpm2-pytss
 Group:      System Environment/Security
 Vendor:     Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 Source0: https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

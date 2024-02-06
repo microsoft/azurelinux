@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Copyright 2015, International Business Machines
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

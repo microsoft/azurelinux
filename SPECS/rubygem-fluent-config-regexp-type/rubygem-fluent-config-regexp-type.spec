@@ -6,7 +6,7 @@ Version:        1.0.0
 Release:        2%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/okkez/fluent-config-regexp-type
 Source0:        https://github.com/okkez/fluent-config-regexp-type/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

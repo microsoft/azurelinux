@@ -4,7 +4,7 @@ Version:        5.10.1
 Release:        4%{?dist}
 License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnu.org/software/rcs/
 Source:         https://ftp.gnu.org/gnu/rcs/%{name}-%{version}.tar.lz
 BuildRequires:  autoconf

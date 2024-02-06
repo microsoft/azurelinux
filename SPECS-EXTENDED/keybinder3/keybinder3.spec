@@ -4,7 +4,7 @@ Release:	11%{?dist}
 Summary:	A library for registering global keyboard shortcuts
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://github.com/kupferlauncher/keybinder
 Source0:	%{url}/releases/download/keybinder-3.0-v%{version}/keybinder-3.0-%{version}.tar.gz
 Patch0:     %{url}/pull/18.patch#/fix_gtkdoc.patch

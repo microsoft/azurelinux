@@ -6,7 +6,7 @@ Version:        1.15.5
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/ffi/ffi
 Source0:        https://github.com/ffi/ffi/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

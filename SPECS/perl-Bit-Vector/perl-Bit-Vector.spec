@@ -8,7 +8,7 @@ Release:        21%{?dist}
 # Clarified by a private mail from the author:
 License:        (GPL+ or Artistic) and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Bit-Vector
 Source0:        https://cpan.metacpan.org/authors/id/S/ST/STBEY/Bit-Vector-%{version}.tar.gz#/perl-Bit-Vector-%{version}.tar.gz
 BuildRequires:  findutils

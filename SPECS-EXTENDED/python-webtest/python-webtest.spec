@@ -11,7 +11,7 @@ Version:        3.0.0
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/Pylons/webtest
 Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-om
 Summary: Oromo hunspell dictionaries
 Version: 0.04

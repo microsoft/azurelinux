@@ -6,7 +6,7 @@ Version:        1.25
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://acmel.wordpress.com
 Source:         https://fedorapeople.org/~acme/dwarves/%{name}-%{version}.tar.xz
 BuildRequires:  cmake >= 2.8.12

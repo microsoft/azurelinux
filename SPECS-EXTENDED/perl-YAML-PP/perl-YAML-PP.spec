@@ -8,7 +8,7 @@ Version:        0.031
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-PP/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:    GNOME icon theme
 Name:       gnome-icon-theme
 Version:    3.12.0

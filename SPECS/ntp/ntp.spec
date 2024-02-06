@@ -4,7 +4,7 @@ Version:        4.2.8p17
 Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/NetworkingPrograms
 URL:            https://www.ntp.org/
 Source0:        https://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/%{name}-%{version}.tar.gz

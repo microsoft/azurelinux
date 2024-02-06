@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Sys-MemInfo
 Version:        0.99
 Release:        13%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:      plotutils
 Version:   2.6
 Release:   25%{?dist}

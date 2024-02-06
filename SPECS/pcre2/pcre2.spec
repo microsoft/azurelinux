@@ -4,7 +4,7 @@ Version:        10.42
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://www.pcre.org/
 Source0:        https://github.com/PhilipHazel/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2

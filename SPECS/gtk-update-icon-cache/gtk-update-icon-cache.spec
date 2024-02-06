@@ -6,7 +6,7 @@ Version:        3.24.39
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gtk.org
 Source0:        https://gitlab.gnome.org/Community/gentoo/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  libxslt

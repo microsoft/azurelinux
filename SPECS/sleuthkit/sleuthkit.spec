@@ -4,7 +4,7 @@ Version:        4.12.1
 Release:        1%{?dist}
 License:        BSD AND CPL AND GPLv2+ AND IBM AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.sleuthkit.org
 Source0:        https://github.com/sleuthkit/sleuthkit/releases/download/sleuthkit-%{version}/sleuthkit-%{version}.tar.gz
 BuildRequires:  gcc-c++

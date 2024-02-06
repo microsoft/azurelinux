@@ -6,7 +6,7 @@ Release:        36%{?dist}
 Summary:        Small, fast speech synthesis engine (text-to-speech)
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.speech.cs.cmu.edu/flite/
 
 Source0:        http://www.speech.cs.cmu.edu/flite/packed/%{name}-%{version}/%{name}-%{version}-release.tar.gz

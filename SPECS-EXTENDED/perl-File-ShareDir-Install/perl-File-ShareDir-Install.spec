@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Install shared files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-ShareDir-Install
 Source0:        https://cpan.metacpan.org/modules/by-module/File/File-ShareDir-Install-%{version}.tar.gz#/perl-File-ShareDir-Install-%{version}.tar.gz
 BuildArch:      noarch

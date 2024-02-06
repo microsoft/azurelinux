@@ -4,7 +4,7 @@ Version:        1.25
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/fedora-sysv/chkconfig
 Source0:        https://github.com/fedora-sysv/chkconfig/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

@@ -24,7 +24,7 @@ Version:        5.2.1
 Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Microsoft Azure Linux
+Distribution:   Azure Linux
 URL:            https://github.com/libguestfs/supermin
 Source0:        https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
 # For automatic RPM dependency generation.

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-UNIVERSAL-isa
 Version:        1.20171012
 Release:        9%{?dist}

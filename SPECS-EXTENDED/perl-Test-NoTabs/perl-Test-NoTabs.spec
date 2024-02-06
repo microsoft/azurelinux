@@ -4,7 +4,7 @@ Release:	9%{?dist}
 Summary:	Check the presence of tabs in your project
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-NoTabs
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-NoTabs-%{version}.tar.gz#/perl-Test-NoTabs-%{version}.tar.gz
 BuildArch:	noarch

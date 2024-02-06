@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %bcond_with gp2ddb
 
 %global udevdir %(pkg-config --variable=udevdir udev)

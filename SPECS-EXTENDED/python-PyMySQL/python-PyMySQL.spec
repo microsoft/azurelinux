@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global pypi_name PyMySQL
 
 Name:           python-%{pypi_name}

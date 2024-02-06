@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 1.1

@@ -4,7 +4,7 @@ Version:        2.113
 Release:        4%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-stringy
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Stringy-%{version}.tar.gz#/perl-IO-Stringy-%{version}.tar.gz
 

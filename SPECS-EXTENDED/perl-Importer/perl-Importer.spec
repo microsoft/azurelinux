@@ -4,7 +4,7 @@ Release:        8%{?dist}
 Summary:        Alternative interface to modules that export symbols
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Importer
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Importer-%{version}.tar.gz#/perl-Importer-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global ver_date 2014-11-08
 
 Summary: Arabic hunspell dictionaries

@@ -4,7 +4,7 @@ Version:        0.6.13
 Release:        6%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/Archive/libcroco
 Source:         https://gitlab.gnome.org/Archive/libcroco/-/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.xz
 BuildRequires:  gcc

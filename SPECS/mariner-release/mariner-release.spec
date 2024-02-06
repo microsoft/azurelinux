@@ -4,7 +4,7 @@ Version:        3.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Microsoft Azure Linux
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/azurelinux
 # Allows package management tools to find and set the default value

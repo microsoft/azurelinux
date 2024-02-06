@@ -4,7 +4,7 @@ Release:        15%{?dist}
 Summary:        Check for memory leaks and circular memory references
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Memory-Cycle
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Memory-Cycle-%{version}.tar.gz#/perl-Test-Memory-Cycle-%{version}.tar.gz
 BuildArch:      noarch

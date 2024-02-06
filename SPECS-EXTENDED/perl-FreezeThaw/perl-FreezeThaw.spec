@@ -4,7 +4,7 @@ Release:        30%{?dist}
 Summary:        Convert Perl structures to strings and back
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/FreezeThaw
 Source0:        https://cpan.metacpan.org/authors/id/I/IL/ILYAZ/modules/FreezeThaw-%{version}.tar.gz#/perl-FreezeThaw-%{version}.tar.gz
 BuildArch:      noarch

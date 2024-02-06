@@ -7,7 +7,7 @@ Summary:        Main loop abstraction library
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            %{homepage}
 Source0:        %{homepage}/releases/download/%{version}/%{name}-%{version}.tar.gz
 

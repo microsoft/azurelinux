@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Module-Install-TestBase
 Version:        0.86
 Release:        18%{?dist}

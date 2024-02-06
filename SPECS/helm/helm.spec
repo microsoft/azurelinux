@@ -7,7 +7,7 @@ Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Url:           https://helm.sh/
 Source0:       https://github.com/helm/helm/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.

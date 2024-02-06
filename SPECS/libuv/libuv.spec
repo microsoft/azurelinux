@@ -4,7 +4,7 @@ Version:        1.46.0
 Release:        1%{?dist}
 License:        MIT AND CC-BY
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://libuv.org/
 Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        0.13.72
 Release:        3%{?dist}
 License:        LGPLv2+ OR MPLv1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://zziplib.sourceforge.net/
 Source:         https://github.com/gdraheim/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  SDL-devel

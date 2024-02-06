@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		ibus-kkc
 Version:	1.5.22
 Release:	16%{?dist}

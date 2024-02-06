@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        SAX2 Writer
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-SAX-Writer
 Source0:        https://cpan.metacpan.org/modules/by-module/XML/XML-SAX-Writer-%{version}.tar.gz#/perl-XML-SAX-Writer-%{version}.tar.gz
 BuildArch:      noarch

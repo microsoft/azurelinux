@@ -4,7 +4,7 @@ Release:	30%{?dist}
 Summary:	Simple standalone parameter-checking functions
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Params-Util
 Source0:	https://cpan.metacpan.org/authors/id/A/AD/ADAMK/Params-Util-%{version}.tar.gz#/perl-Params-Util-%{version}.tar.gz
 

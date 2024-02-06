@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-th
 Summary: Thai hunspell dictionaries
 %global upstreamid 20061212

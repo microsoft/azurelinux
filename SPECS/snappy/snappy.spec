@@ -4,7 +4,7 @@ Version:        1.1.9
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/google/snappy
 

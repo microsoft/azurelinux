@@ -4,7 +4,7 @@ Version:        4.6.0
 Release:        1%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-no
 Summary: Norwegian hunspell dictionaries
 Version: 2.0.10

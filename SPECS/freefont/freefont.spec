@@ -7,7 +7,7 @@ License:        GPLv3
 URL:            https://ftp.gnu.org/pub/gnu/freefont/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/pub/gnu/%{name}/%{name}-ttf-%{version}.zip
 
 BuildRequires: unzip

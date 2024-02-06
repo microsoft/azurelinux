@@ -4,7 +4,7 @@ Version:        2.9.7
 Release:        10%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/libfuse/libfuse
 Source0:        https://github.com/libfuse/libfuse/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz

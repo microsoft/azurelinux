@@ -4,7 +4,7 @@ Release:        23%{?dist}
 Summary:        Declare author-only dependencies
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-AuthorRequires
 Source0:        https://cpan.metacpan.org/authors/id/F/FL/FLORA/Module-Install-AuthorRequires-%{version}.tar.gz#/perl-Module-Install-AuthorRequires-%{version}.tar.gz
 BuildArch:      noarch

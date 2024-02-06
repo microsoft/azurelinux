@@ -4,7 +4,7 @@ Release:	3%{?dist}
 Summary:	Get information about a class and its structure
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Class-Inspector
 Source0:	https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Class-Inspector-%{version}.tar.gz#/perl-Class-Inspector-%{version}.tar.gz
 

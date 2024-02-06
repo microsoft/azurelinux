@@ -5,7 +5,7 @@ Release:        13%{?dist}
 # One file is GPL+ or Artistics (c/ppport.h)
 License:        Artistic 2.0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Params-Validate
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Params-Validate-%{version}.tar.gz#/perl-Params-Validate-%{version}.tar.gz
 

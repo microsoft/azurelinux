@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libgexiv2
 Version:        0.14.2
 Release:        1%{?dist}

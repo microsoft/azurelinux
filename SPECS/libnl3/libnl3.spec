@@ -4,7 +4,7 @@ Version:        3.7.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.infradead.org/~tgr/libnl/
 # It seems like the website no longer has the latest version of the source; this seems to be the correct source.

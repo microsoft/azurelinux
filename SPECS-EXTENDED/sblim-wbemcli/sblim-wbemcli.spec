@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           sblim-wbemcli
 Version:        1.6.3
 Release:        18%{?dist}

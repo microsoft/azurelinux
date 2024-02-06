@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ms
 Summary: Malay hunspell dictionaries
 %global upstreamid 20050117

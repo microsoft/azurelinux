@@ -4,7 +4,7 @@ Version:        1.4.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/untitaker/python-atomicwrites
 Source0:        https://github.com/untitaker/python-atomicwrites/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

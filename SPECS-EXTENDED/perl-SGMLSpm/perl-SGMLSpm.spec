@@ -5,7 +5,7 @@ Summary:        Perl library for parsing the output of nsgmls
 
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/SGMLSpm
 Source0:        https://cpan.metacpan.org/authors/id/D/DM/DMEGG/SGMLSpm-%{version}.tar.gz#/perl-SGMLSpm-%{version}.tar.gz
 

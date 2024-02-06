@@ -6,7 +6,7 @@ Version:        0.33.6
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 %global pypi_name wheel

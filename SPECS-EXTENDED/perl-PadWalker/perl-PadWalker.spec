@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Play with other people's lexical variables
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PadWalker
 Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROBIN/PadWalker-%{version}.tar.gz#/perl-PadWalker-%{version}.tar.gz
 # Build:

@@ -6,7 +6,7 @@ Version:        2.0.0
 Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
 # Upstream fix: https://github.com/sphinx-doc/sphinxcontrib-htmlhelp/pull/16

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_File_Find_Object_Rule_enables_optional_test}
 %else

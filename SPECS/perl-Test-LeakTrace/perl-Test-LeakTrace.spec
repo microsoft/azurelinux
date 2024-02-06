@@ -11,7 +11,7 @@ Version:        0.17
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-LeakTrace
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-LeakTrace-%{version}.tar.gz#/perl-Test-LeakTrace-%{version}.tar.gz
 Source1:        LICENSE.PTR

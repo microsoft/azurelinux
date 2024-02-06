@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          perl-Net-IMAP-Simple
 Version:       1.2212
 Release:       6%{?dist}

@@ -7,7 +7,7 @@ Release:        11%{?dist}
 Summary:        Utilities to test STDOUT and STDERR messages
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Output
 Source0:        https://cpan.metacpan.org/authors/id/B/BD/BDFOY/Test-Output-%{cpan_version}.tar.gz#/perl-Test-Output-%{cpan_version}.tar.gz
 BuildArch:      noarch

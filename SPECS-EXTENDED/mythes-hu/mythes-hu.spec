@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-hu
 Summary: Hungarian thesaurus
 %global upstreamid 20101019

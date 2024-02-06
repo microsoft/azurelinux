@@ -4,7 +4,7 @@ Release:	3%{?dist}
 Summary:	Fail if tests warn
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test2-Plugin-NoWarnings
 Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Test2-Plugin-NoWarnings-%{version}.tar.gz#/perl-Test2-Plugin-NoWarnings-%{version}.tar.gz
 BuildArch:	noarch

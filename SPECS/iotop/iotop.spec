@@ -4,7 +4,7 @@ Version:        0.6
 Release:        10%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Monitoring
 URL:            http://guichaz.free.fr/iotop/
 Source0:        http://guichaz.free.fr/iotop/files/%{name}-%{version}.tar.gz

@@ -5,7 +5,7 @@ Summary:        Check that a library is available
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-CheckLib
 Source0:        https://cpan.metacpan.org/modules/by-module/Devel/Devel-CheckLib-%{version}.tar.gz#/perl-Devel-CheckLib-%{version}.tar.gz
 

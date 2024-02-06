@@ -16,7 +16,7 @@ Name:          perl-Net-DNS
 Version:       1.21
 Release:       4%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Other files:          MIT
 # demo/mresolv:         GPL+ or Artistic
 ## Not in a binary package

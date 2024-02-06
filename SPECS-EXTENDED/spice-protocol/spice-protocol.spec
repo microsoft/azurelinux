@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           spice-protocol
 Version:        0.14.3
 Release:        2%{?dist}

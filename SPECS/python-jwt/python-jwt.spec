@@ -22,7 +22,7 @@ Release:        2%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/jpadilla/pyjwt
 Source0:        https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

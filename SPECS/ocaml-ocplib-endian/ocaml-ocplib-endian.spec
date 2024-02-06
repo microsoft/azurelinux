@@ -8,7 +8,7 @@ Release:        8%{?dist}
 # License is LGPL 2.1 with standard OCaml exceptions
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/OCamlPro/ocplib-endian
 Source0:        https://github.com/OCamlPro/ocplib-endian/archive/%{version}/ocplib-endian-%{version}.tar.gz
 

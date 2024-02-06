@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           js-jquery
 Version:        3.5.0
 Release:        3%{?dist}

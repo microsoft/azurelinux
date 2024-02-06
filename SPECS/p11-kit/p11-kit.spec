@@ -5,7 +5,7 @@ Version:        0.25.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://p11-glue.freedesktop.org/p11-kit.html
 Source0:        https://github.com/p11-glue/p11-kit/releases/download/%{version}/p11-kit-%{version}.tar.xz
 Source1:        trust-extract-compat
@@ -57,7 +57,7 @@ feature is still experimental.
 %define alt_ckbi  libnssckbi.so
 %endif
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %prep
 %setup -q

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:			rasdaemon
 Version:		0.6.4
 Release:		2%{?dist}

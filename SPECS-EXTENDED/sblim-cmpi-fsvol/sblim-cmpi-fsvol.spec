@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global provider_dir %{_libdir}/cmpi
 
 Summary:        SBLIM fsvol instrumentation

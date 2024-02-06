@@ -9,7 +9,7 @@ Version:        2.0
 Release:        24%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/System
 Source0:        macros
 Source1:        rpmrc

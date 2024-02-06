@@ -4,7 +4,7 @@ Version:	7.4
 Release:	1%{?dist}
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://smartmontools.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source2:	smartmontools.sysconf

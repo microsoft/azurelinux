@@ -11,7 +11,7 @@ License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service

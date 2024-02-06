@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-km
 Summary: Khmer hunspell dictionaries
 Version: 1.82

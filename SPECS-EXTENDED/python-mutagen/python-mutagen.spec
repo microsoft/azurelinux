@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global modname mutagen
 # Share doc between python2- and python3-
 %global _docdir_fmt %{name}

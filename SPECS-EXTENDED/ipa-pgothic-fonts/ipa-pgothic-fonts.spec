@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global		priority	68
 %global		fontname	ipa-pgothic
 %global		fontconf	%{priority}-%{fontname}.conf

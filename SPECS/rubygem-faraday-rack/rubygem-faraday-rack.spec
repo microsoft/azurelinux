@@ -6,7 +6,7 @@ Version:        2.0.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-rack
 Source0:        https://github.com/lostisland/faraday-rack/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

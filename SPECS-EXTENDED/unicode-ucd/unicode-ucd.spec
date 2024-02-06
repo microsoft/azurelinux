@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # for other future directories from http://www.unicode.org/Public
 %global unicodedir %{_datadir}/unicode
 %global ucddir %{unicodedir}/ucd

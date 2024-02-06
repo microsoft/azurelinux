@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Fast and correct UTF-8 I/O
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PerlIO-utf8_strict
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/PerlIO-utf8_strict-%{version}.tar.gz#/perl-PerlIO-utf8_strict-%{version}.tar.gz
 # Build:

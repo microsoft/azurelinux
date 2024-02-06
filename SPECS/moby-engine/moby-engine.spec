@@ -9,7 +9,7 @@ License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # docker-proxy binary comes from libnetwork

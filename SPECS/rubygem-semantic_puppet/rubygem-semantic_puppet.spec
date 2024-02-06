@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/puppetlabs/semantic_puppet
 Source0:        https://github.com/puppetlabs/semantic_puppet/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 Patch0:         fix-file_list.patch

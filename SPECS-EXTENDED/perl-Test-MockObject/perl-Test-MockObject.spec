@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Test-MockObject
 Version:        1.20200122
 Release:        3%{?dist}

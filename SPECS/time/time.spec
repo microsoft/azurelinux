@@ -40,7 +40,7 @@ Release:        10%{?dist}
 # tests/time-posix-quiet.sh:    GPLv3+
 License:        GPLv3+ AND GFDL AND FSFULLR AND GPLV2+ AND MIT AND FSFAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.gnu.org/software/%{name}/
 Source:         ftp://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 # Fix measuring time when a clock experiences a jump, bug #1004416,

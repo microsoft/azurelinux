@@ -15,7 +15,7 @@ Patch4:         CVE-2019-13638.nopatch
 Patch5:         CVE-2019-13636.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Conflicts:      toybox
 
 %description

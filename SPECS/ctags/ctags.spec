@@ -7,7 +7,7 @@ Version:        %{majorversion}.%{upstreamversion}
 Release:        7%{?dist}
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv2+
 URL:            https://ctags.io/
 Source0:        https://github.com/universal-ctags/%{name}/archive/refs/tags/p%{version}.tar.gz#/%{name}-p%{version}.tar.gz

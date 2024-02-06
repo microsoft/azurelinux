@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tools for certain user account management tasks
 Name: usermode
 Version: 1.112

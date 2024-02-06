@@ -4,7 +4,7 @@ Version:        0.8.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/netaddr/netaddr
 Source0:        https://github.com/netaddr/netaddr/archive/refs/tags/%{version}.tar.gz#/netaddr-%{version}.tar.gz

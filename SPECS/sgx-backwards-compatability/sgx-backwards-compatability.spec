@@ -4,7 +4,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 Source0:        99-sgx-backwards-compatability.rules
 Source1:        LICENSE

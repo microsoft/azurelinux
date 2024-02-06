@@ -6,7 +6,7 @@ Version:        1.2.1
 Release:        9%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://marlam.de/gta/
 Source0:        https://marlam.de/gta/releases/%{name}-%{version}.tar.xz
 BuildRequires:  cmake

@@ -4,7 +4,7 @@ Release:        39%{?dist}
 Summary:        Runtime enable taint checking
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Taint-Runtime
 Source0:        https://cpan.metacpan.org/authors/id/R/RH/RHANDOM/Taint-Runtime-%{version}.tar.gz#/perl-Taint-Runtime-%{version}.tar.gz
 BuildRequires:  gcc

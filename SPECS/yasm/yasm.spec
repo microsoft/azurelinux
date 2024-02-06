@@ -5,7 +5,7 @@ Release:        14%{?dist}
 License:        BSD and (GPLv2+ or Artistic or LGPLv2+) and LGPLv2
 URL:            https://yasm.tortall.net/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.tortall.net/projects/%{name}/releases/%{name}-%{version}.tar.gz
 Patch1:         0001-Update-elf-objfmt.c.patch
 Patch2:         CVE-2023-31975.patch

@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Open an HTML file with automatic character set detection
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-HTML
 Source0:        https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-%{version}.tar.gz#/perl-IO-HTML-%{version}.tar.gz
 BuildArch:      noarch

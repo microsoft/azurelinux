@@ -6,7 +6,7 @@ Version:        2.03.23
 Release:        1%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceware.org/lvm2/
 Source0:        https://sourceware.org/pub/lvm2/LVM2.%{version}.tgz

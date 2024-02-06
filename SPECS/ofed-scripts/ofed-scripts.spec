@@ -35,7 +35,7 @@ Version:        5.6
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.openfabrics.org
 Source0:        https://linux.mellanox.com/public/repo/doca/1.3.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/ofed-scripts_5.6.orig.tar.gz#/%{name}-%{version}.tar.gz

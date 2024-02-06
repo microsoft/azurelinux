@@ -7,7 +7,7 @@ Version:        0.164
 Release:        6%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Color-ANSI-Util/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/Color-ANSI-Util-%{version}.tar.gz
 

@@ -6,7 +6,7 @@ License:       GPLv2
 URL:           http://www.kernel.org/
 Group:         System Environment/tools
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Source0:       https://www.kernel.org/pub/linux/utils/kernel/ipvsadm/%{name}-%{version}.tar.xz
 BuildRequires: libnl3-devel
 BuildRequires: popt-devel

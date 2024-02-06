@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       generic-logos
 Version:    18.0.0
 Release:    11%{?dist}

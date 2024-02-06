@@ -4,7 +4,7 @@ Version:        250.3
 Release:        14%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
 Source0:        https://github.com/systemd/systemd-stable/archive/v%{version}.tar.gz#/systemd-%{version}.tar.gz

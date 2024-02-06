@@ -4,7 +4,7 @@ Version:        0.46
 Release:        17%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/boolean
 Source0:        https://cpan.metacpan.org/authors/id/I/IN/INGY/boolean-%{version}.tar.gz
 BuildArch:      noarch

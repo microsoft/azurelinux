@@ -4,7 +4,7 @@ Version:        2.2.0
 Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz

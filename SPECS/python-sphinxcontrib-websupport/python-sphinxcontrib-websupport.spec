@@ -5,7 +5,7 @@ Version:        1.2.4
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
 Source0:        https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch

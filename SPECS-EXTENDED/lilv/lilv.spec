@@ -7,7 +7,7 @@ Version:        0.24.14
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://drobilla.net/software/lilv
 Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
 BuildRequires:  doxygen

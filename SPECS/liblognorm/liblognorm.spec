@@ -5,7 +5,7 @@ Version:        2.0.6
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.liblognorm.com
 Source0:        https://www.liblognorm.com/files/download/%{name}-%{version}.tar.gz
 BuildRequires:  chrpath

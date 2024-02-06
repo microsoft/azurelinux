@@ -4,7 +4,7 @@ Version:        20230802.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

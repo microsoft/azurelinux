@@ -8,7 +8,7 @@ Version:        9.30
 Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://software.schmorp.de/pkg/libecb.html
 # Below link points to the correct revision of the sources but doesn't give tarballs with reproducible hashes.
 # How to re-build this file for CBL-Mariner in a reproducible way:

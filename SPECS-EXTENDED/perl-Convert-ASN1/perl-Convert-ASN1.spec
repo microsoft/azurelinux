@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Perform optional tests
 %bcond_without perl_Convert_ASN1_enables_optional_test
 

@@ -4,7 +4,7 @@ Version:        3.2.2
 Release:        7%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pyenchant/pyenchant
 Source0:        https://files.pythonhosted.org/packages/source/p/py%{srcname}/py%{srcname}-%{version}.tar.gz
 %global srcname enchant

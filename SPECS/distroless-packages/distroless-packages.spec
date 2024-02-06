@@ -4,7 +4,7 @@ Version:        3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/cbl-mariner
 

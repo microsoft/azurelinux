@@ -11,7 +11,7 @@ Release:        1%{?dist}
 Summary:        Low-level HTTP connection (client)
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Net-HTTP
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/Net-HTTP-%{version}.tar.gz#/perl-Net-HTTP-%{version}.tar.gz
 BuildArch:      noarch

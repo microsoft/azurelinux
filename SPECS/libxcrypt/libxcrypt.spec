@@ -107,7 +107,7 @@ Release:        1%{?dist}
 # LICENSING file in the source tarball.
 License:        LGPLv2+ AND BSD AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/besser82/%{name}
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

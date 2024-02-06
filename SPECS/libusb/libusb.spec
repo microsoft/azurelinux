@@ -4,7 +4,7 @@ Version:        1.0.26
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://libusb.info/
 Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2

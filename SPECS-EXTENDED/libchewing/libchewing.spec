@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global libchewing_python_dir %{python3_sitelib}
 
 %global im_name_zh_TW 新酷音輸入法

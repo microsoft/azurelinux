@@ -4,7 +4,7 @@ Version:        1.16
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xcb.freedesktop.org/
 Source0:        https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.gz
 # This is taken straight from the pthread-stubs source:

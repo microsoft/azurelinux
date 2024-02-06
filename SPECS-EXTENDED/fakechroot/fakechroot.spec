@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           fakechroot
 Version:        2.20.1
 Release:        4%{?dist}

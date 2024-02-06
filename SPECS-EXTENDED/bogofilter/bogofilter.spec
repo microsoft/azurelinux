@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Fast anti-spam filtering by Bayesian statistical analysis
 Name: bogofilter
 Version: 1.2.5

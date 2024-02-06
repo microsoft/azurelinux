@@ -5,7 +5,7 @@ Version:        2.40.0
 Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/gdk-pixbuf
 Source0:        https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-%{version}.tar.xz
 BuildRequires:  gettext

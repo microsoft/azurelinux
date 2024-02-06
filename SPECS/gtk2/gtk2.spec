@@ -18,7 +18,7 @@ Version:        2.24.32
 Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gtk.org
 Source0:        https://download.gnome.org/sources/gtk+/2.24/gtk+-%{version}.tar.xz
 Source2:        update-gtk-immodules

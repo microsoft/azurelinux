@@ -1,7 +1,7 @@
 %global         _hardened_build 1
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Summary:        Optimizer for PNG (Portable Network Graphics) files
 Name:           pngcrush

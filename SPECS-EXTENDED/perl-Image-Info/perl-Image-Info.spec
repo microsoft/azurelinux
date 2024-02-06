@@ -4,7 +4,7 @@ Version:        1.42
 Release:        4%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Image-Info
 Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/Image-Info-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

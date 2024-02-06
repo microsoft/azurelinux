@@ -6,7 +6,7 @@ Version:        1.6.3
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz

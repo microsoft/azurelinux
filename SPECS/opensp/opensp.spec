@@ -4,7 +4,7 @@ Version:        1.5.2
 Release:        36%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://openjade.sourceforge.net/
 Source:         http://download.sourceforge.net/openjade/OpenSP-%{version}.tar.gz
 Patch0:         opensp-multilib.patch

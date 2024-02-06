@@ -6,7 +6,7 @@ License:	    GPLv2
 URL:		    https://www.kernel.org/pub/software/network/ethtool/
 Group:		    Productivity/Networking/Diagnostic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	    https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: libmnl-devel

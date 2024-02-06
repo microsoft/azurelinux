@@ -17,7 +17,7 @@ Release:        12%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/sigmavirus24/%{srcname}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 Source0:        https://github.com/sigmavirus24/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

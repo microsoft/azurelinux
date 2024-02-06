@@ -8,7 +8,7 @@ Version:        5.8.0
 Release:        6%{?dist}
 License:        W3C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.html-tidy.org/
 Source0:        https://github.com/htacg/%{upname}/archive/%{version}.tar.gz#/%{upname}-%{version}.tar.gz
 Patch0:         CVE-2021-33391.patch

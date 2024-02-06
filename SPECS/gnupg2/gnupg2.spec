@@ -4,7 +4,7 @@ Version:        2.4.3
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Cryptography.
 URL:            https://gnupg.org/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2

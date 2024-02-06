@@ -5,7 +5,7 @@ Version:        1.8.2
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tagoh.bitbucket.org/%{name}/
 Source0:        https://bitbucket.org/tagoh/%{name}/downloads/%{name}-%{version}.tar.bz2
 ## Fedora specific: run IM for certain languages only

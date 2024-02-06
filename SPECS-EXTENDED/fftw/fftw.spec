@@ -19,7 +19,7 @@ Version:        3.3.10
 Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.fftw.org
 Source0:        https://www.fftw.org/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-gfortran

@@ -23,7 +23,7 @@ Version:        7.7
 Release:        37%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/app/iceauth-%{iceauth}.tar.bz2
 Source1:        https://www.x.org/pub/individual/app/rgb-%{rgb}.tar.bz2

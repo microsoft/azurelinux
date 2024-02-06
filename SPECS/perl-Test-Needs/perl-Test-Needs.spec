@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Skip tests when modules not available
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 URL:            https://metacpan.org/release/Test-Needs
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-Needs-%{version}.tar.gz#/perl-Test-Needs-%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        1.13
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gzip
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz

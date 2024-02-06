@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://log4cpp.sourceforge.net/
 Source:         https://sourceforge.net/projects/%{name}/files/%{name}-1.1.x%20%28new%29/%{name}-1.1/%{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64

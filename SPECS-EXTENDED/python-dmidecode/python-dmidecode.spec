@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: python-dmidecode
 Summary: Python module to access DMI data
 Version: 3.12.2

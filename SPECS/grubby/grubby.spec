@@ -4,7 +4,7 @@ Version:        8.40
 Release:        46%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rhinstaller/grubby
 # we only pull git snaps at the moment
 # git clone git@github.com:rhinstaller/grubby.git

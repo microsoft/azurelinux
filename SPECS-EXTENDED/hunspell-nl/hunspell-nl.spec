@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-nl
 Summary: Dutch hunspell dictionaries
 Version: 2.10

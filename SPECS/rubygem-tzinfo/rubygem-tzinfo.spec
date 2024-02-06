@@ -6,7 +6,7 @@ Version:        2.0.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://tzinfo.github.io/
 Source0:        https://github.com/tzinfo/tzinfo/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

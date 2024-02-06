@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: pyusb
 Version: 1.0.2
 Release: 7%{?dist}

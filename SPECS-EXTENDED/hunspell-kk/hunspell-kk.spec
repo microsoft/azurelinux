@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-kk
 Summary: Kazakh hunspell dictionaries
 Version: 1.1

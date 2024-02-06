@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-sk
 Summary: Slovak hyphenation rules
 %global upstreamid 20031227

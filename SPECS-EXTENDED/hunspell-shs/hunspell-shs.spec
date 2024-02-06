@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-shs
 Summary: Shuswap hunspell dictionaries
 %global upstreamid 20090828

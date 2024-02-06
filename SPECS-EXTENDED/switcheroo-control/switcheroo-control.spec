@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           switcheroo-control
 Version:        2.4
 Release:        3%{?dist}

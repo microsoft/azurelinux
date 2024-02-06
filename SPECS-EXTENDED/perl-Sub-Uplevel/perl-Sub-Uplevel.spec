@@ -4,7 +4,7 @@ Version:        0.2800
 Release:        12%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sub-Uplevel
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Sub-Uplevel-%{version}.tar.gz 
 BuildArch:      noarch

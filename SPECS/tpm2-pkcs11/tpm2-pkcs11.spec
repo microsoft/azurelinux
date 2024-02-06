@@ -6,7 +6,7 @@ License:        BSD 2-Clause
 URL:            https://github.com/tpm2-software/tpm2-pkcs11
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Source0: https://github.com/tpm2-software/tpm2-pkcs11/releases/download/%{version}/%{name}-%{version}.tar.gz
 

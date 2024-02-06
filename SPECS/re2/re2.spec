@@ -6,7 +6,7 @@ Version:        %{shortver}
 Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/google/%{name}/
 Source0:        https://github.com/google/%{name}/archive/%{longver}.tar.gz#/%{name}-%{longver}.tar.gz
 # downstream patch to change soname .0 => .0a

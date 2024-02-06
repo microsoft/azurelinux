@@ -4,7 +4,7 @@ Release:        35%{?dist}
 Summary:        Mapping table between 8-bit chars and Unicode for Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-Map8
 Source0:        https://cpan.metacpan.org/modules/by-module/Unicode/Unicode-Map8-%{version}.tar.gz#/perl-Unicode-Map8-%{version}.tar.gz
 Patch0:         perl-Unicode-Map8-0.12-declaration.patch

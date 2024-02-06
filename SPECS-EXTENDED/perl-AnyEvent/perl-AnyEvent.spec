@@ -12,7 +12,7 @@ Release:        3%{?dist}
 Summary:        Framework for multiple event loops
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/AnyEvent
 Source0:        https://cpan.metacpan.org/modules/by-module/AnyEvent/AnyEvent-%{version}%{?subver}.tar.gz#/perl-AnyEvent-%{version}%{?subver}.tar.gz
 

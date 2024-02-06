@@ -8,7 +8,7 @@ URL:            https://github.com/Masterminds/glide
 Source0:        %{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  git
 BuildRequires:  golang
 BuildRequires:  perl

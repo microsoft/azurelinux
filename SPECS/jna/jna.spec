@@ -28,7 +28,7 @@ Release:        1%{?dist}
 # which is pure Apache License 2.0.
 License:        ASL 2.0 AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/java-native-access/jna
 Source0:        https://github.com/java-native-access/jna/archive/%{version}/%{name}-%{version}.tar.gz

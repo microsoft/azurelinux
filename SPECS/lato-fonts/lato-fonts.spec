@@ -7,7 +7,7 @@ Version:        2.015
 Release:        11%{?dist}
 License:        OFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.latofonts.com/
 # Fonts retrieved 2015-08-07.
 Source0:        https://www.latofonts.com/download/Lato2OFL.zip#/%{name}-%{version}.zip

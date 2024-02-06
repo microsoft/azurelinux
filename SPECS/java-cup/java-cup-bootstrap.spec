@@ -25,7 +25,7 @@ Release:        32%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://www2.cs.tum.edu/projects/cup/
 # TODO the version of our 11a source is no longer published
 Source0:        %{_mariner_sources_url}/develop.tar.bz2

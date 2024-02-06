@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		perl-Class-Load-XS
 Version:	0.10
 Release:	12%{?dist}

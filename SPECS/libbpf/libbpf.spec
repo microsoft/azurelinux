@@ -4,7 +4,7 @@ Version:        1.2.2
 Release:        1%{?dist}
 License:        LGPLv2 OR BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/%{name}/%{name}
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  elfutils-devel

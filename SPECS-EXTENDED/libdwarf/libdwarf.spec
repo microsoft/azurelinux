@@ -5,7 +5,7 @@ Summary:       Library to access the DWARF Debugging file format
 
 License:       LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:           http://www.prevanders.net/dwarf.html
 Source0:       http://www.prevanders.net/%{name}-%{version}.tar.gz
 

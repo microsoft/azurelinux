@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global qt_module qtsensors
 
 Summary: Qt5 - Sensors component

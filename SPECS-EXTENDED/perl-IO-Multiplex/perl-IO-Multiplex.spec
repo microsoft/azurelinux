@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Manage IO on many file handles
 Name:		perl-IO-Multiplex
 Version:	1.16

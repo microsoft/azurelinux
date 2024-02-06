@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Minimalist Object Orientation (with Moose compatibility)
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Moo
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Moo-%{version}.tar.gz#/perl-Moo-%{version}.tar.gz
 BuildArch:      noarch

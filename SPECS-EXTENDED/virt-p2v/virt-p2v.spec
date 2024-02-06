@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # So far there are no ELF binaries in this package, so the list
 # of files in the debuginfo package will be empty, triggering

@@ -5,7 +5,7 @@ Version:        0.54.6
 Release:        1%{?dist}
 License:        LGPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://wiki.gnome.org/Projects/Vala
 Source0:        http://download.gnome.org/sources/vala/%{majver}/vala-%{version}.tar.xz

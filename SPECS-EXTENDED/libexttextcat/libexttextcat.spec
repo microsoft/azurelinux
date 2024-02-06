@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libexttextcat
 Version: 3.4.5
 Release: 7%{?dist}

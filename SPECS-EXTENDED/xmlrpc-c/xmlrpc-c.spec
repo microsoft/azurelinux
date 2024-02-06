@@ -4,7 +4,7 @@ Version:        1.54.06
 Release:        2%{?dist}
 License:        BSD-3-Clause AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://xmlrpc-c.sourceforge.net/
 Source0:        https://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/%{version}/xmlrpc-c-%{version}.tgz

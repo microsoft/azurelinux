@@ -5,7 +5,7 @@ Version:        3.2.2
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-jar-plugin/
 Source0:        https://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
 BuildRequires:  javapackages-bootstrap

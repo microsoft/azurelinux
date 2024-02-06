@@ -6,7 +6,7 @@ Version:        1.4
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
 Source0:        %{url}/archive/refs/tags/sec-dispatcher-%{version}.tar.gz#/%{name}-%{version}.tar.gz

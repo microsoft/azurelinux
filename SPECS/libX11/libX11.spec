@@ -4,7 +4,7 @@ Version:        1.8.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.gz
 Patch2:         dont-forward-keycode-0.patch

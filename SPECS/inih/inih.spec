@@ -6,7 +6,7 @@ License:  BSD
 URL:      https://github.com/benhoyt/inih
 Source0:  https://github.com/benhoyt/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-r%{version}.tar.gz
 Vendor:   Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: meson

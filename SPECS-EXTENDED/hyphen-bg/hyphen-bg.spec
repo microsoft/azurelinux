@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-bg
 Summary: Bulgarian hyphenation rules
 Version: 4.3

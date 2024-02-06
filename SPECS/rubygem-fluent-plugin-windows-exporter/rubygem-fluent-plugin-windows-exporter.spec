@@ -6,7 +6,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:	        Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fluent-plugins-nursery/fluent-plugin-windows-exporter
 Source0:        https://github.com/fluent-plugins-nursery/fluent-plugin-windows-exporter/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git

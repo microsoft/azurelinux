@@ -4,7 +4,7 @@ Version:        1.10.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libzip.org/
 Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
 BuildRequires:  bzip2-devel

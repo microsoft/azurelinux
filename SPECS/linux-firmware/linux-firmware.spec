@@ -8,7 +8,7 @@ Version:        20230804
 Release:        1%{?dist}
 License:        GPL+ AND GPLv2+ AND MIT AND Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://www.kernel.org/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/firmware/%{name}.git/snapshot/%{name}-%{version}.tar.gz

@@ -6,7 +6,7 @@ Version:        3.0.5
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.cython.org
 Source0:        https://github.com/cython/cython/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

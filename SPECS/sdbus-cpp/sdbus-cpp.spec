@@ -4,7 +4,7 @@ Version:        1.3.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          SystemUtilities
 URL:            https://github.com/Kistler-Group/sdbus-cpp
 Source0:        https://github.com/Kistler-Group/sdbus-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

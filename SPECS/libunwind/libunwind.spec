@@ -4,7 +4,7 @@ Version:        1.6.2
 Release:        2%{?dist}
 License:        X11
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Utilities/Libraries
 URL:            https://www.nongnu.org/libunwind/
 Source0:        http://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz

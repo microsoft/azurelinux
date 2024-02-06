@@ -16,7 +16,7 @@ Summary:	Type constraints and coercions for Perl
 # other files:			Artistic 2.0
 License:	Artistic 2.0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Specio
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Specio-%{version}.tar.gz#/perl-Specio-%{version}.tar.gz
 BuildArch:	noarch

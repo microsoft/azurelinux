@@ -7,7 +7,7 @@ License:        GPLv2+
 URL:            https://www.syslinux.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.kernel.org/pub/linux/utils/boot/%{name}/Testing/%{version}/%{name}-%{version}-pre1.tar.xz
 Patch0:         0001-Add-install-all-target-to-top-side-of-HAVE_FIRMWARE.patch
 Patch1:         0006-Replace-builtin-strlen-that-appears-to-get-optimized.patch

@@ -14,7 +14,7 @@ Release:        13%{?dist}
 Summary:        Parse and validate simple name/value option pairs
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-OptList
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Data-OptList-%{version}.tar.gz#/perl-Data-OptList-%{version}.tar.gz
 BuildArch:      noarch

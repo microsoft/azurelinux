@@ -7,7 +7,7 @@ Version:        0.189
 Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://sourceware.org/elfutils
 Source0:        https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
