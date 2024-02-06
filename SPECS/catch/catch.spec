@@ -1,18 +1,19 @@
 %global debug_package %{nil}
 
 Name:           catch
-Version:        2.13.8
+Version:        3.5.2
 Release:        1%{?dist}
 Summary:        Modern, C++-native, header-only, framework for unit-tests, TDD and BDD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/File
-License:        Boost
+License:        BSL-1.0
 URL:            https://github.com/catchorg/Catch2
 Source0:        https://github.com/catchorg/Catch2/archive/refs/tags/v%{version}.tar.gz#/Catch2-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  make
 BuildRequires:  python3
+BuildRequires:  gcc-c++
 
 %description
 Catch stands for C++ Automated Test Cases in Headers and is a
@@ -23,7 +24,7 @@ is packaged up as a single header for extra convenience.
 
 %package        devel
 Summary:        Development files for %{name}
-Provides:       %{name}-static = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description    devel
 Catch stands for C++ Automated Test Cases in Headers and is a
@@ -35,26 +36,37 @@ is packaged up as a single header for extra convenience.
 %autosetup -n Catch2-%{version}
 
 %build
-%cmake . -Bbuild -DCATCH_ENABLE_WERROR=OFF
+%cmake . -Bbuild -DCMAKE_BUILD_TYPE=Release -DCATCH_BUILD_EXTRA_TESTS=ON -DCATCH_ENABLE_WERROR=OFF -DCATCH_INSTALL_DOCS=OFF -DBUILD_SHARED_LIBS=ON
 %make_build -Cbuild
 
 %install
 %make_install -Cbuild
-rm -rf %{buildroot}/%{_docdir}
 
 %check
 cd build
 ctest -V %{?_smp_mflags}
 
+%files            
+%license LICENSE.txt         
+%{_libdir}/libCatch2.so.%{version}   
+%{_libdir}/libCatch2Main.so.%{version}
+
 %files devel
-%license LICENSE.txt
 %doc README.md CODE_OF_CONDUCT.md docs
 %{_includedir}/catch2/
+%{_libdir}/libCatch2.so
+%{_libdir}/libCatch2Main.so
+%{_libdir}/cmake/Catch2/
 %{_datadir}/Catch2/
 %{_datadir}/pkgconfig/catch2.pc
-%{_libdir}/cmake/Catch2/
+%{_datadir}/pkgconfig/catch2-with-main.pc
 
 %changelog
+* Thu Feb 06 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.5.2-1
+- Upgrade to 3.5.2
+- Do not install docs at all instead of removing them afterwards
+- Switch License tag to SPDX
+
 * Tue Jan 11 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.13.8-1
 - Upgrade to 2.13.8
 
