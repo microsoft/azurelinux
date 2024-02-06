@@ -32,6 +32,7 @@ The Kube-Vip cloud provider functions as a general-purpose cloud provider for on
 %autosetup -N
 tar -xvf %{SOURCE1}
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1 -p1
 
 %build 
 go build -mod=vendor
