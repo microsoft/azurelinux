@@ -67,7 +67,6 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 %systemd_postun mcstransd.service
 
 %files
-%license COPYING
 %{_mandir}/man8/mcs.8.gz
 %{_mandir}/man8/mcstransd.8.gz
 %{_mandir}/man5/setrans.conf.5.gz
