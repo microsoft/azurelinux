@@ -683,8 +683,11 @@ BuildRequires: pipewire-devel
 %endif
 # Used by cryptodev-backend-lkcf
 BuildRequires: keyutils-libs-devel
+#xdp-tools is available only for x86_64 on Azure Linux
+%ifarch x86_64
 # Used by net AF_XDP
 BuildRequires: libxdp-devel
+%endif
 # used by virtio-gpu-rutabaga
 %if %{have_rutabaga_gfx}
 BuildRequires: rutabaga-gfx-ffi-devel
@@ -1879,7 +1882,9 @@ run_configure \
 %if %{defined block_drivers_ro_list}
   --block-drv-ro-whitelist=%{block_drivers_ro_list} \
 %endif
+%ifarch x86_64
   --enable-af-xdp \
+%endif
   --enable-alsa \
   --enable-attr \
 %ifarch %{ix86} x86_64
