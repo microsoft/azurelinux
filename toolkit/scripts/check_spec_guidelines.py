@@ -45,7 +45,6 @@ ERROR: detected an invalid 'Distribution' tag.
     return True
 
 
-
 def check_patch_macro(spec_path: str):
     """Checks if the 'patch' macro is not in the format deprecated in RPM 4.18+. """
     with open(spec_path) as file:
