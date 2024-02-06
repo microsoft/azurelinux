@@ -98,8 +98,9 @@ ninja check-all
 
 %changelog
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
-- Re-add 'BPF' and 'AMDGPU' as target-to-build
-
+- Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
+  compile files for the specified targets.
+ 
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
 
