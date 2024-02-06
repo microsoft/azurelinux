@@ -1,7 +1,7 @@
 Summary:        A free, distributed source control management tool.
 Name:           mercurial
-Version:        6.0.3
-Release:        2%{?dist}
+Version:        6.5.1
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
@@ -59,6 +59,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.5.1-1
+- Auto-upgrade to 6.5.1 - 3.0 package upgrade
+
 * Tue Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0.3-2
 - Remove unwanted check-time dependency on python-setuptools (replace with py3 version)
 
