@@ -62,7 +62,7 @@ ctest -V %{?_smp_mflags}
 %{_datadir}/pkgconfig/catch2-with-main.pc
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.2-1
+* Thu Feb 06 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.5.2-1
 - Upgrade to 3.5.2
 - Do not install docs at all instead of removing them afterwards
 - Switch License tag to SPDX
