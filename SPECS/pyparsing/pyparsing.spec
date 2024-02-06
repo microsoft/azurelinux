@@ -7,11 +7,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyparsing/pyparsing
-Source0:        https://github.com/pyparsing/pyparsing/releases/download/%{name}_%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/pyparsing/pyparsing/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
+BuildRequires:  python3-wheel
+BuildRequires:  pyproject-rpm-macros
 BuildArch:      noarch
 
 %description
@@ -30,10 +33,10 @@ definitions for any number of text parsing applications.
 %autosetup -n pyparsing-%{version}
 
 %build
-%py3_build
+%{pyproject_wheel}
 
 %install
-%py3_install
+%{pyproject_install}
 
 %check
 pip3 install -r tests/requirements.txt
@@ -45,8 +48,8 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
-* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.1-1
-- Auto-upgrade to 3.1.1 - for 3.0 release
+* Tue Feb 06 2024 Mitch Zhu <mitchzhu@microsoft.com> - 3.1.1-1
+- Upgrade to 3.1.1
 
 * Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.7-1
 - Upgrade to latest upstream version
