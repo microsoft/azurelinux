@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        17.0.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -49,7 +49,7 @@ cmake -G Ninja                              \
       -DLLVM_LINK_LLVM_DYLIB=ON             \
       -DLLVM_INCLUDE_TESTS=ON               \
       -DLLVM_BUILD_TESTS=ON                 \
-      -DLLVM_TARGETS_TO_BUILD="host"        \
+      -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
       -Wno-dev ../llvm
@@ -97,6 +97,10 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
+- Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
+  compile files for the specified targets.
+ 
 * Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Address %check issues
 
