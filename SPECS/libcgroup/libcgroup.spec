@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
-Version:        2.0.1
-Release:        2%{?dist}
+Version:        3.1.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,13 +9,13 @@ URL:            https://github.com/libcgroup/libcgroup
 
 # libcgroup git repo contains submodules that must be part of source tarball (adapt version number)
 # 1) clone git repo                           => 'git clone https://github.com/libcgroup/libcgroup.git'
-# 2) checkout tag corresponding to version    => 'git checkout v2.0.1'
+# 2) checkout tag corresponding to version    => 'git checkout v3.1.0'
 # 3) get submodule                            => 'git submodule init' then 'git submodule update'
 # 4) create source tarball                    => 'tar --sort=name \
 #                                                     --mtime="2021-04-26 00:00Z" \
 #                                                     --owner=0 --group=0 --numeric-owner \
 #                                                     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#                                                     -czf libcgroup-2.0.1.tar.gz libcgroup'
+#                                                     -czf libcgroup-3.1.0.tar.gz libcgroup'
 Source0:        https://github.com/libcgroup/libcgroup/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        cgconfig.service
 
