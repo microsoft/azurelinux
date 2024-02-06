@@ -1,32 +1,34 @@
 %global framework ki18n
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
-Name:           kf5-%{framework}
-Version:        5.61.0
-Release:        5%{?dist}
-Summary:        KDE Frameworks 5 Tier 1 addon for localization
+Name:           kf-%{framework}
+Version:        5.249.0
+Release:        1%{?dist}
+Summary:        KDE Frameworks 6 Tier 1 addon for localization
 License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 ## upstream patches
 
 # filter plugin provides
-%global __provides_exclude_from ^(%{_kf5_plugindir}/.*\\.so)$
+%global __provides_exclude_from ^(%{_kf_plugindir}/.*\\.so)$
 
+BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules >= %{majmin}
+BuildRequires:  gcc-c++
 BuildRequires:  gettext
-BuildRequires:  kf5-rpm-macros >= %{majmin}
+BuildRequires:  kf-rpm-macros >= %{majmin}
 BuildRequires:  python3
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qtdeclarative-devel
+BuildRequires:  qtbase-devel
+BuildRequires:  qtdeclarative-devel
 
-Requires:       kf5-filesystem >= %{majmin}
+Requires:       kf-filesystem >= %{majmin}
 
 %description
-KDE Frameworks 5 Tier 1 addon for localization.
+KDE Frameworks 6 Tier 1 addon for localization.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -40,56 +42,52 @@ developing applications that use %{name}.
 
 
 %prep
-%setup -q -n %{framework}-%{version}
-
+%autosetup -n %{framework}-%{version} -p1
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} .. -DPYTHON_EXECUTABLE=%{python3}
-popd
-
-%make_build -C %{_target_platform}
-
+%cmake_kf
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
-
+%cmake_install
 %find_lang %{name} --all-name
-
-
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
 %doc README.md
-%license COPYING.LIB
-%{_kf5_libdir}/libKF5I18n.so.*
-%{_kf5_qtplugindir}/kf5/ktranscript.so
-%lang(ca) %{_datadir}/locale/ca/LC_SCRIPTS/ki18n5/
-%lang(ca@valencia) %{_datadir}/locale/ca@valencia/LC_SCRIPTS/ki18n5/
-%lang(fi) %{_datadir}/locale/fi/LC_SCRIPTS/ki18n5/
-%lang(gd) %{_datadir}/locale/gd/LC_SCRIPTS/ki18n5/
-%lang(ja) %{_datadir}/locale/ja/LC_SCRIPTS/ki18n5/
-%lang(ko) %{_datadir}/locale/ko/LC_SCRIPTS/ki18n5/
-%lang(nb) %{_datadir}/locale/nb/LC_SCRIPTS/ki18n5/
-%lang(nn) %{_datadir}/locale/nn/LC_SCRIPTS/ki18n5/
-%lang(ru) %{_datadir}/locale/ru/LC_SCRIPTS/ki18n5/
-%lang(sr) %{_datadir}/locale/sr/LC_SCRIPTS/ki18n5/
-%lang(sr@ijekavian) %{_datadir}/locale/sr@ijekavian/LC_SCRIPTS/ki18n5/
-%lang(sr@ijekavianlatin) %{_datadir}/locale/sr@ijekavianlatin/LC_SCRIPTS/ki18n5/
-%lang(sr@latin) %{_datadir}/locale/sr@latin/LC_SCRIPTS/ki18n5/
-%lang(sr) %{_datadir}/locale/uk/LC_SCRIPTS/ki18n5/
+%license LICENSES/*.txt
+%{_kf_datadir}/qlogging-categories6/*%{framework}*
+%{_kf_libdir}/libKF6I18n.so.*
+%{_kf_libdir}/libKF6I18nLocaleData.so.*
+%{_kf_qmldir}/org/kde/i18n/localeData/
+%{_kf_qtplugindir}/kf6/ktranscript.so
+%lang(ca) %{_datadir}/locale/ca/LC_SCRIPTS/ki18n6/
+%lang(ca@valencia) %{_datadir}/locale/ca@valencia/LC_SCRIPTS/ki18n6/
+%lang(fi) %{_datadir}/locale/fi/LC_SCRIPTS/ki18n6/
+%lang(gd) %{_datadir}/locale/gd/LC_SCRIPTS/ki18n6/
+%lang(ja) %{_datadir}/locale/ja/LC_SCRIPTS/ki18n6/
+%lang(ko) %{_datadir}/locale/ko/LC_SCRIPTS/ki18n6/
+%lang(nb) %{_datadir}/locale/nb/LC_SCRIPTS/ki18n6/
+%lang(nn) %{_datadir}/locale/nn/LC_SCRIPTS/ki18n6/
+%lang(ru) %{_datadir}/locale/ru/LC_SCRIPTS/ki18n6/
+%lang(sr) %{_datadir}/locale/sr/LC_SCRIPTS/ki18n6/
+%lang(sr) %{_datadir}/locale/uk/LC_SCRIPTS/ki18n6/
+%lang(sr@ijekavian) %{_datadir}/locale/sr@ijekavian/LC_SCRIPTS/ki18n6/
+%lang(sr@ijekavianlatin) %{_datadir}/locale/sr@ijekavianlatin/LC_SCRIPTS/ki18n6/
+%lang(sr@latin) %{_datadir}/locale/sr@latin/LC_SCRIPTS/ki18n6/
 
 %files devel
-%{_kf5_includedir}/ki18n_version.h
-%{_kf5_includedir}/KI18n/
-%{_kf5_libdir}/libKF5I18n.so
-%{_kf5_libdir}/cmake/KF5I18n/
-%{_kf5_archdatadir}/mkspecs/modules/qt_KI18n.pri
+%{_kf_includedir}/KI18n/
+%{_kf_includedir}/KI18nLocaleData/
+%{_kf_libdir}/cmake/KF6I18n/
+%{_kf_libdir}/libKF6I18n.so
+%{_kf_libdir}/libKF6I18nLocaleData.so
+%{_qt_docdir}/*.tags
 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.61.0-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

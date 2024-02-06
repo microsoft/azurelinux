@@ -1,6 +1,6 @@
 Name:         extra-cmake-modules
 Summary:      Additional modules for CMake build system
-Version:      5.109.0
+Version:      5.249.0
 Release:      1%{?dist}
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
@@ -8,43 +8,42 @@ License:      BSD
 URL:          https://github.com/KDE/extra-cmake-modules
 
 %global versiondir %(echo %{version} | cut -d. -f1-2)
+%global docs 1
+%global tests 1
 
-Source0:   https://download.kde.org/stable/frameworks/%{versiondir}/%{name}-%{version}.tar.xz
+Source0:   https://invent.kde.org/stable/frameworks/%{versiondir}/%{name}-%{version}.tar.xz
 BuildArch: noarch
 
 # bundle clang python bindings here, at least until they are properly packaged elsewhere, see:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1490997
 Source1: clang-python-4.0.1.tar.gz
 
-BuildRequires: kf5-rpm-macros
-Requires: kf5-rpm-macros
+BuildRequires: kf-rpm-macros
+BuildRequires: qttools-devel
+BuildRequires: qtbase-devel
+Requires: kf-rpm-macros
 
-# use pkgname instead of cmake since el7 qt5 pkgs currently do not include cmake() provides
-Requires: qt5-linguist
+# use pkgname instead of cmake since el7 qt pkgs currently do not include cmake() provides
+Requires: qt-linguist
 
 %description
 Additional modules for CMake build system needed by KDE Frameworks.
 
 %prep
 # Setup Source0
-%setup -q
+%autosetup -n %{name}-%version} -p1
 # Setup Source1
 %setup -q -T -D -a 1
 
 %build
-
-PYTHONPATH=`pwd`/python
-export PYTHONPATH
-
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
-
-%make_build -C %{_target_platform}
+%cmake_kf \
+  -DBUILD_HTML_DOCS:BOOL=%{?docs:ON}%{!?docs:OFF} \
+  -DBUILD_MAN_DOCS:BOOL=%{?docs:ON}%{!?docs:OFF} \
+  -DBUILD_TESTING:BOOL=%{?tests:ON}%{!?tests:OFF} 
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
+%cmake_install
 
 # hack clang-python install
 mkdir -p %{buildroot}%{_datadir}/ECM/python/clang
@@ -57,15 +56,17 @@ make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 
 %files
 %doc README.rst
-%license COPYING-CMAKE-SCRIPTS
+%license LICENSES/*.txt
 %{_datadir}/ECM/
 %if 0%{?docs}
-%{_kf5_docdir}/ECM/html/
-%{_kf5_mandir}/man7/ecm*.7*
+%{_kf6_docdir}/ECM/html/
+%{_kf6_mandir}/man7/ecm*.7*
 %endif
 
-
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.109.0-1
 - Auto-upgrade to 5.109.0 - Azure Linux 3.0 - package upgrades
 

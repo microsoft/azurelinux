@@ -1,6 +1,6 @@
-Name:         kf5
-Version:      5.61.0
-Release:      5%{?dist}
+Name:         kf
+Version:      5.249.0
+Release:      1%{?dist}
 Summary:      Filesystem and RPM macros for KDE Frameworks 5
 License:      BSD
 URL:          http://www.kde.org
@@ -8,72 +8,84 @@ Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
 BuildArch: noarch
-Source0: macros.kf5
+Source0: macros.kf
 
 Requires: %{name}-filesystem
 Requires: %{name}-rpm-macros
 
 %description
-Filesystem and RPM macros for KDE Frameworks 5
+Filesystem and RPM macros for KDE Frameworks 6
 
 %package filesystem
-Summary: Filesystem for KDE Frameworks 5
+Summary: Filesystem for KDE Frameworks 6
 # noarch -> arch transition
-Obsoletes: kf5-filesystem < 5.10.0-2
-%{?_qt5_version:Requires: qt5-qtbase%{?_isa} >= %{_qt5_version}}
+%{?_qt_version:Requires: qtbase%{?_isa} >= %{_qt_version}}
 %description filesystem
-Filesystem for KDE Frameworks 5.
+Filesystem for KDE Frameworks 6.
 
 %package rpm-macros
-Summary: RPM macros for KDE Frameworks 5
+Summary: RPM macros for KDE Frameworks 6
 Requires: cmake
-Requires: qt5-qtbase-devel >= 5.11
+Requires: qtbase-devel >= 6.6.1
 
 %description rpm-macros
-RPM macros for building KDE Frameworks 5 packages.
+RPM macros for building KDE Frameworks 6 packages.
 
 %install
-# See macros.kf5 where the directories are specified
-mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/qt5/plugins/kf5/
-mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/kconf_update_bin
-mkdir -p %{buildroot}%{_includedir}/KF5
-mkdir -p %{buildroot}%{_datadir}/{config.kcfg,kconf_update,kf5,kservicetypes5}
+# See macros.kf where the directories are specified
+mkdir -p %{buildroot}%{_datadir}/{config.kcfg,kconf_update}
+mkdir -p %{buildroot}%{_datadir}/{kf6,kservices6,kservicetypes6}
+mkdir -p %{buildroot}%{_datadir}/kf6/
+mkdir -p %{buildroot}%{_datadir}/kio/servicemenus
 mkdir -p %{buildroot}%{_datadir}/kpackage/{genericqml,kcms}
-mkdir -p %{buildroot}%{_datadir}/kservices5/ServiceMenus
-mkdir -p %{buildroot}%{_datadir}/qlogging-categories5/
+mkdir -p %{buildroot}%{_datadir}/locale/tok
+mkdir -p %{buildroot}%{_datadir}/qlogging-categories6/
 mkdir -p %{buildroot}%{_datadir}/solid/{actions,devices}
-mkdir -p %{buildroot}%{_libexecdir}/kf5
+mkdir -p %{buildroot}%{_docdir}/qt6
+mkdir -p %{buildroot}%{_includedir}/kf6
+mkdir -p %{buildroot}%{_includedir}/KF6
+mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/kconf_update_bin
+mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/qt6/plugins/kf6/
+mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/qt6/qml/org/kde/
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
 
-install -Dpm644 %{SOURCE0} %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf5
+install -Dpm644 %{_sourcedir}/macros.kf %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf
+install -Dpm644 %{_sourcedir}/LICENSE %{buildroot}%{_datadir}/kf6/LICENSE
 sed -i \
-  -e "s|@@KF5_VERSION@@|%{version}|g" \
-  %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf5
-
-%files
+  -e "s|@@KF_VERSION@@|%{version}|g" \
+  %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf
 
 %files filesystem
-%{_sysconfdir}/xdg/plasma-workspace/
-%{_prefix}/lib/qt5/plugins/kf5/
-%{_prefix}/%{_lib}/qt5/plugins/kf5/
-%{_prefix}/lib/kconf_update_bin/
-%{_prefix}/%{_lib}/kconf_update_bin/
-%{_includedir}/KF5/
-%{_libexecdir}/kf5/
 %{_datadir}/config.kcfg/
 %{_datadir}/kconf_update/
-%{_datadir}/kf5/
+%{_datadir}/kf6/
+%{_datadir}/kio/
 %{_datadir}/kpackage/
-%{_datadir}/kservices5/
-%{_datadir}/kservicetypes5/
-%{_datadir}/qlogging-categories5/
+%{_datadir}/kservices6/
+%{_datadir}/kservicetypes6/
+%{_datadir}/locale/tok
+%{_datadir}/qlogging-categories6/
 %{_datadir}/solid/
+%{_docdir}/qt6/
+%{_includedir}/kf6/
+%{_includedir}/KF6/
+%{_libexecdir}/kf6/
+%{_prefix}/%{_lib}/kconf_update_bin/
+%{_prefix}/%{_lib}/qt6/plugins/kf6/
+%{_prefix}/%{_lib}/qt6/qml/org/kde/
+%{_prefix}/lib/kconf_update_bin/
+%{_prefix}/lib/qt6/plugins/kf6/
+%{_prefix}/lib/qt6/qml/org/kde/
+%{_sysconfdir}/xdg/plasma-workspace/
 
 %files rpm-macros
-%{_rpmconfigdir}/macros.d/macros.kf5
+%{_rpmconfigdir}/macros.d/macros.kf
 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Fri May 26 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.61.0-5
 - License verified.
 

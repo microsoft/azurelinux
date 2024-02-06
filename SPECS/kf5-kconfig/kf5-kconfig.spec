@@ -2,13 +2,13 @@
 
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
-Name:           kf5-%{framework}
-Version:        5.61.0
-Release:        3%{?dist}
+Name:           kf-%{framework}
+Version:        5.249.0
+Release:        1%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with advanced configuration system
 License:        LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -16,100 +16,70 @@ Distribution:   Azure Linux
 
 ## upstreamable patches
 
-BuildRequires:  ninja-build
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
+BuildRequires:  make
 
-BuildRequires:  extra-cmake-modules >= %{majmin}
-BuildRequires:  kf5-rpm-macros >= %{majmin}
+BuildRequires:  extra-cmake-modules
+BuildRequires:  kf-rpm-macros
 
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qttools-devel
+BuildRequires:  qtbase-devel
+BuildRequires:  qttools-devel
 
-Requires:       kf5-filesystem >= %{majmin}
-Requires:       %{name}-core%{?_isa} = %{version}-%{release}
-Requires:       %{name}-gui%{?_isa} = %{version}-%{release}
+Requires:       kf-filesystem
 
 %description
-KDE Frameworks 5 Tier 1 addon with advanced configuration system made of two
-parts: KConfigCore and KConfigGui.
+KCoreAddons provides classes built on top of QtCore to perform various tasks
+such as manipulating mime types, autosaving files, creating backup files,
+generating random sequences, performing text manipulations such as macro
+replacement, accessing user information and many more.
 
-%package        devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt5-qtbase-devel
-%description    devel
+%package	devel
+Summary:	Development files for %{name}
+Requires:	%{name} = %{version}-%{release}
+Requires:	qtbase-devel
+%description	devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-%package        core
-Summary:        Non-GUI part of KConfig framework
-Requires:       kde-settings
-%description    core
-KConfigCore provides access to the configuration files themselves. It features
-centralized definition and lock-down (kiosk) support.
-
-%package        gui
-Summary:        GUI part of KConfig framework
-Requires:       %{name}-core%{?_isa} = %{version}-%{release}
-%description    gui
-KConfigGui provides a way to hook widgets to the configuration so that they are
-automatically initialized from the configuration and automatically propagate
-their changes to their respective configuration files.
-
-
+ 
 %prep
-%setup -q -n %{framework}-%{version}
-
+%autosetup -n %{framework}-%{version} -p1
 
 %build
-
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} .. \
-  -G Ninja \
-  %{?tests:-DBUILD_TESTING:BOOL=ON}
-popd
-
-%ninja_build -C %{_target_platform}
-
+%cmake_kf
+%cmake_build
 
 %install
-%ninja_install -C %{_target_platform}
+%cmake_install
+%find_lang_kf kcoreaddons6_qt
+%find_lang_kf kde6_xml_mimetypes
+cat *.lang > all.lang
 
-%find_lang_kf5 kconfig5_qt
+%files -f all.lang
+%doc README.md
+%license LICENSES/*.txt
+%{_datadir}/kf6/jsonschema/kpluginmetadata.schema.json
+%{_kf_datadir}/kf6/licenses/
+%{_kf_datadir}/mime/packages/kde6.xml
+%{_kf_datadir}/qlogging-categories6/%{framework}.*
+%{_kf_libdir}/libKF6CoreAddons.so.*
+%{_kf_libdir}/qt6/qml/org/kde/coreaddons/libkcoreaddonsplugin.so
+%{_kf_libdir}/qt6/qml/org/kde/coreaddons/qmldir
+%{_libdir}/qt6/qml/org/kde/coreaddons/kcoreaddonsplugin.qmltypes
+%{_libdir}/qt6/qml/org/kde/coreaddons/kde-qmlmodule.version
 
-
-%files
-%doc DESIGN README.md TODO
-%license COPYING.LIB
-
-%post   core -p /sbin/ldconfig
-%postun core -p /sbin/ldconfig
-
-%files core -f kconfig5_qt.lang
-%{_kf5_bindir}/kreadconfig5
-%{_kf5_bindir}/kwriteconfig5
-%{_kf5_libdir}/libKF5ConfigCore.so.*
-%{_kf5_libexecdir}/kconfig_compiler_kf5
-%{_kf5_libexecdir}/kconf_update
-
-%post   gui -p /sbin/ldconfig
-%postun gui -p /sbin/ldconfig
-
-%files gui
-%{_kf5_libdir}/libKF5ConfigGui.so.*
 
 %files devel
-%{_kf5_includedir}/kconfig_version.h
-%{_kf5_includedir}/KConfigCore/
-%{_kf5_includedir}/KConfigGui/
-%{_kf5_libdir}/libKF5ConfigCore.so
-%{_kf5_libdir}/libKF5ConfigGui.so
-%{_kf5_libdir}/cmake/KF5Config/
-%{_kf5_archdatadir}/mkspecs/modules/qt_KConfigCore.pri
-%{_kf5_archdatadir}/mkspecs/modules/qt_KConfigGui.pri
-
+%{_kf_includedir}/KCoreAddons/
+%{_kf_libdir}/cmake/KF6CoreAddons/
+%{_kf_libdir}/libKF6CoreAddons.so
+%{_qt_docdir}/*.tags
+ 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.

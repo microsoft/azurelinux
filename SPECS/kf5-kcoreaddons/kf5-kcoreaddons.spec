@@ -1,7 +1,7 @@
-Name:         kf5-kcoreaddons
-Version:      5.61.0
-Release:      4%{?dist}
-Summary:      KDE Frameworks 5 Tier 1 addon with various classes on top of QtCore
+Name:         kf-kcoreaddons
+Version:      5.249.0
+Release:      1%{?dist}
+Summary:      KDE Frameworks 6 Tier 1 addon with various classes on top of QtCore
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -10,15 +10,19 @@ URL:     https://cgit.kde.org/kcoreaddons.git
 
 %global majmin %(echo %{version} | cut -d. -f1-2)
 
-Source0: https://download.kde.org/stable/frameworks/%{majmin}/kcoreaddons-%{version}.tar.xz
+Source0: https://invent.kde.org/stable/frameworks/%{majmin}/kcoreaddons-%{version}.tar.xz
 
 ## upstream patches
 
+BuildRequires:  cmake
+BuildRequires:  make
+BuildRequires:  gcc-c++
 BuildRequires:  extra-cmake-modules >= %{majmin}
-BuildRequires:  kf5-rpm-macros >= %{majmin}
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qttools-devel
-Requires:       kf5-filesystem >= %{majmin}
+BuildRequires:  kf-rpm-macros >= %{majmin}
+BuildRequires:  qtbase-devel
+BuildRequires:  qttools-devel
+BuildRequires:  systemd-devel
+Requires:       kf-filesystem >= %{majmin}
 
 %description
 KCoreAddons provides classes built on top of QtCore to perform various tasks
@@ -28,29 +32,26 @@ replacement, accessing user information and many more.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt5-qtbase-devel
+Requires:       %{name} = %{version}-%{release}
+Requires:       qtbase-devel
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 
 %prep
-%setup -q -n kcoreaddons-%{version}
+%autosetup -n kcoreaddons-%{version}
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
-
-%make_build -C %{_target_platform}
+%cmake_kf
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
+%cmake_install
 
-%find_lang_kf5 kcoreaddons5_qt
-
+%find_lang_kf kcoreaddons6_qt
+%find_lang_kf kde6_xml_mimetypes
+cat *.lang > all.lang
 
 %check
 export CTEST_OUTPUT_ON_FAILURE=1
@@ -59,33 +60,29 @@ dbus-launch --exit-with-session \
 time \
 %make_build test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
 
-
-%postun
-if [ $1 -eq 0 ] ; then
-update-mime-database %{_datadir}/mime &> /dev/null || :
-fi
-
-%posttrans
-update-mime-database %{_datadir}/mime &> /dev/null || :
-
-%files -f kcoreaddons5_qt.lang
+%files -f all.lang
 %doc README.md
-%license COPYING.LIB
-%{_kf5_datadir}/qlogging-categories5/kcoreaddons.*
-%{_kf5_bindir}/desktoptojson
-%{_kf5_libdir}/libKF5CoreAddons.so.*
-%{_kf5_datadir}/mime/packages/kde5.xml
-%{_kf5_datadir}/kf5/licenses/
+%license LICENSES/*.txt
+%{_kf_datadir}/kf6/licenses/
+%{_kf_datadir}/mime/packages/kde6.xml
+%{_kf_datadir}/qlogging-categories6/%{framework}.*
+%{_kf_libdir}/libKF6CoreAddons.so.*
+%{_kf_libdir}/qt6/qml/org/kde/coreaddons/libkcoreaddonsplugin.so
+%{_kf_libdir}/qt6/qml/org/kde/coreaddons/qmldir
+%{_datadir}/kf6/jsonschema/kpluginmetadata.schema.json
+%{_libdir}/qt6/qml/org/kde/coreaddons/kcoreaddonsplugin.qmltypes
+%{_libdir}/qt6/qml/org/kde/coreaddons/kde-qmlmodule.version
 
 %files devel
-%{_kf5_includedir}/kcoreaddons_version.h
-%{_kf5_includedir}/KCoreAddons/
-%{_kf5_libdir}/libKF5CoreAddons.so
-%{_kf5_libdir}/cmake/KF5CoreAddons/
-%{_kf5_archdatadir}/mkspecs/modules/qt_KCoreAddons.pri
-
+%{_kf_includedir}/KCoreAddons/
+%{_kf_libdir}/cmake/KF6CoreAddons/
+%{_kf_libdir}/libKF6CoreAddons.so
+%{_qt_docdir}/*.tags
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Fri May 25 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.61.0-4
 - License verified.
 

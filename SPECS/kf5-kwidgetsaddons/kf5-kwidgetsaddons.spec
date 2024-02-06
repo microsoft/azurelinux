@@ -1,73 +1,69 @@
 %global framework kwidgetsaddons
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
-Name:           kf5-%{framework}
-Version:        5.61.0
-Release:        3%{?dist}
-Summary:        KDE Frameworks 5 Tier 1 addon with various classes on top of QtWidgets
+Name:           kf-%{framework}
+Version:        5.249.0
+Release:        1%{?dist}
+Summary:        KDE Frameworks 6 Tier 1 addon with various classes on top of QtWidgets
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
+BuildRequires:  cmake
+BuildRequires:  gcc-c++
 BuildRequires:  extra-cmake-modules >= %{majmin}
-BuildRequires:  kf5-rpm-macros
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qttools-devel
-BuildRequires:  qt5-qttools-static
+BuildRequires:  kf-rpm-macros
+BuildRequires:  qtbase-devel
+BuildRequires:  qttools-devel
+BuildRequires:  qttools-static
 
-Requires:       kf5-filesystem >= %{majmin}
+Requires:       kf-filesystem >= %{majmin}
 
 %description
-KDE Frameworks 5 Tier 1 addon with various classes on top of QtWidgets.
+KDE Frameworks 6 Tier 1 addon with various classes on top of QtWidgets.
 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt5-qtbase-devel
+Requires:       qtbase-devel
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
-
 %prep
-%setup -q -n %{framework}-%{version}
-
+%autosetup -n %{framework}-%{version} -p1
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
-
-%make_build -C %{_target_platform}
-
+%cmake_kf6
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
+%cmake_install
+%find_lang_kf6 kwidgetsaddons6_qt
+%fdupes %{buildroot}/%{_kf6_includedir}/KWidgetsAddons/
+%fdupes LICENSES
 
-%find_lang_kf5 kwidgetsaddons5_qt
-
-
-%post   -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-
-%files -f kwidgetsaddons5_qt.lang
+	
+%files -f kwidgetsaddons6_qt.lang
 %doc README.md
-%license COPYING.LIB
-%{_kf5_libdir}/libKF5WidgetsAddons.so.*
-%{_kf5_datadir}/kf5/kcharselect/
+%license LICENSES/*.txt
+%{_kf_datadir}/qlogging-categories6/*categories
+%{_kf_libdir}/libKF6WidgetsAddons.so.*
+%{_kf_qtplugindir}/designer/*6widgets.so
 
 %files devel
-%{_kf5_includedir}/kwidgetsaddons_version.h
-%{_kf5_includedir}/KWidgetsAddons/
-%{_kf5_libdir}/libKF5WidgetsAddons.so
-%{_kf5_libdir}/cmake/KF5WidgetsAddons/
-%{_kf5_archdatadir}/mkspecs/modules/qt_KWidgetsAddons.pri
+%{_kf_includedir}/KWidgetsAddons/
+%{_kf_libdir}/cmake/KF6WidgetsAddons/
+%{_kf_libdir}/libKF6WidgetsAddons.so
+%{_qt_docdir}/*.tags
 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
+- Upgrade for Azure Linux 3.0
+
 * Thu Apr 23 2020 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.61.0-3
 - License verified.
 - Fixed Source0 tag.
