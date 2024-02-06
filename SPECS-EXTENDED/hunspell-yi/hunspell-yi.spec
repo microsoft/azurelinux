@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-yi
 Summary: Yiddish hunspell dictionaries
 Version: 1.1

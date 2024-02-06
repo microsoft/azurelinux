@@ -6,7 +6,7 @@ Version:        0.1.2
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/condor/ltsv
 Source0:        https://github.com/condor/ltsv/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

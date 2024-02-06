@@ -7,7 +7,7 @@ Release:        13%{?dist}
 Summary:        Convert between DateTime and RFC2822/822 formats
 License:        GPL+ or Artistic        
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-Format-Mail            
 Source0:        https://cpan.metacpan.org/authors/id/B/BO/BOOK/DateTime-Format-Mail-%{version}.tar.gz#/perl-DateTime-Format-Mail-%{version}.tar.gz
 BuildArch:      noarch

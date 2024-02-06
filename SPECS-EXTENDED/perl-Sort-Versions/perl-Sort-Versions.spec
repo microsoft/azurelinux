@@ -4,7 +4,7 @@ Release:        15%{?dist}
 Summary:        Perl module for sorting of revision-like numbers
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sort-Versions
 Source0:        https://cpan.metacpan.org/modules/by-module/Sort/Sort-Versions-%{version}.tar.gz#/perl-Sort-Versions-%{version}.tar.gz
 

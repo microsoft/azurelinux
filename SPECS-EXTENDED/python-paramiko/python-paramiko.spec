@@ -1,7 +1,7 @@
 %global srcname paramiko
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Name:          python-%{srcname}
 Version:       2.12.0

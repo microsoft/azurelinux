@@ -11,7 +11,7 @@ Release:        23%{?dist}
 Summary:        Install subroutines into packages easily
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sub-Install
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Install-%{version}.tar.gz#/perl-Sub-Install-%{version}.tar.gz
 BuildArch:      noarch

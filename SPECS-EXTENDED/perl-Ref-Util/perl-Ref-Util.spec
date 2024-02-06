@@ -11,7 +11,7 @@ Release:	8%{?dist}
 Summary:	Utility functions for checking references
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Ref-Util
 Source0:	https://cpan.metacpan.org/authors/id/A/AR/ARC/Ref-Util-%{version}.tar.gz#/perl-Ref-Util-%{version}.tar.gz
 BuildArch:	noarch

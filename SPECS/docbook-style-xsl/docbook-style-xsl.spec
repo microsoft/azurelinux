@@ -4,7 +4,7 @@ Version:        1.79.1
 Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.docbook.org
 Source0:        http://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2

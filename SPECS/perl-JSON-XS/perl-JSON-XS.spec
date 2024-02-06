@@ -8,7 +8,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/JSON-XS/
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-Canary-Stability
 BuildRequires:  perl-common-sense

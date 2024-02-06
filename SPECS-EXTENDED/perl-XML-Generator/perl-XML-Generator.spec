@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:            XML-Generator Perl module
 Name:               perl-XML-Generator
 Version:            1.04

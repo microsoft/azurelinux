@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:    mallard-rng
 Version: 1.1.0
 Release: 4%{?dist}

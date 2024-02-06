@@ -4,7 +4,7 @@ Version:        10.11.6
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Databases
 
 # A buildable mariadb environment needs functioning submodules that do not work from the archive download

@@ -7,7 +7,7 @@ Version:        380
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://invisible-island.net/xterm
 Source0:        https://github.com/ThomasDickey/xterm-snapshots/archive/refs/tags/%{name}-%{version}.tar.gz
 Source1:        https://ftp.invisible-island.net/archives/xterm/16colors.txt

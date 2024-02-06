@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        Write your linewise code for handles; this does the rest
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mixin-Linewise
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Mixin-Linewise-%{version}.tar.gz#/perl-Mixin-Linewise-%{version}.tar.gz
 BuildArch:      noarch

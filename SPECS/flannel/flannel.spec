@@ -7,7 +7,7 @@ Version:        0.14.0
 Release:        21%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
 #Source0:       https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz

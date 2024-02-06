@@ -4,7 +4,7 @@ Version:        1.6.3
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/dejagnu
 Source0:        https://ftp.gnu.org/pub/gnu/dejagnu/%{name}-%{version}.tar.gz

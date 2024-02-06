@@ -4,7 +4,7 @@ Version:        1.25
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wayland.freedesktop.org/
 Source0:        https://wayland.freedesktop.org/releases/%{name}-%{version}.tar.xz
 BuildRequires:  meson

@@ -24,7 +24,7 @@ Release:        8%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xml.apache.org/commons/
 # From source control because the published tarball doesn't include some docs:
 #   toolkit/scripts/svn2source.sh https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-%%{underscore_version}/java/external %%{name}-%%{version}

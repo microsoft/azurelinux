@@ -6,7 +6,7 @@ Version:        1.7.3
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://hyperrealm.github.io/libconfig/
 Source0:        https://github.com/hyperrealm/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz

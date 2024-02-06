@@ -5,7 +5,7 @@ Version:        1.6.0
 Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://distro.readthedocs.io/en/latest/
 Source0:        https://github.com/python-distro/distro/releases/download/v%{version}/distro-%{version}.tar.gz

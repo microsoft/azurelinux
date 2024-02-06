@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Business-ISBN-Data
 Version:        20191107
 Release:        3%{?dist}

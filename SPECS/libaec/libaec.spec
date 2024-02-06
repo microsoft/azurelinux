@@ -4,7 +4,7 @@ Version:        1.0.4
 Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.dkrz.de/k202009/libaec
 Source0:        https://gitlab.dkrz.de/k202009/libaec/-/archive/v%{version}/libaec-v%{version}.tar.gz
 BuildRequires:  cmake3 >= 3.1

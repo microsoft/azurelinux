@@ -20,7 +20,7 @@ Version:        3.1.0
 Release:        4%{?dist}
 License:        (CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://servlet-spec.java.net
 Source0:        https://github.com/javaee/servlet-spec/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

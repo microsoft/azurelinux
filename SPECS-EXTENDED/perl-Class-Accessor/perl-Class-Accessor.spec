@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Automated accessor generation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Accessor
 Source0:        https://cpan.metacpan.org/authors/id/K/KA/KASEI/Class-Accessor-%{version}.tar.gz#/perl-Class-Accessor-%{version}.tar.gz
 BuildArch:      noarch

@@ -7,7 +7,7 @@ Version:        7.10.0
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libvirt.org
 Source0:        https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-XML-Dumper
 Version:        0.81
 Release:        37%{?dist}

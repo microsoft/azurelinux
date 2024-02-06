@@ -8,7 +8,7 @@ Version:        1.16.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/ffi/ffi
 # Using the source code from the gem to include the 'libffi' submodule.
