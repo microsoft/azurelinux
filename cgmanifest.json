@@ -8981,8 +8981,8 @@
         "type": "other",
         "other": {
           "name": "libdnet",
-          "version": "1.14",
-          "downloadUrl": "https://github.com/dugsong/libdnet/archive/libdnet-1.14.tar.gz"
+          "version": "1.17.0",
+          "downloadUrl": "https://github.com/ofalk/libdnet/archive/refs/tags/libdnet-1.17.0.tar.gz"
         }
       }
     },
