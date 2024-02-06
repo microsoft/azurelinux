@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
-Version:        1.9.3
-Release:        4%{?dist}
+Version:        1.9.8
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -455,6 +455,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.8-1
+- Auto-upgrade to 1.9.8 - Upgrade to 1.9.8 in Mariner 3.0
+
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-4
 - Cleanup duplicate BRs
 - Add an explicit BR on `git` to enable ptest
