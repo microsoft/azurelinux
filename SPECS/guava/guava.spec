@@ -1,7 +1,7 @@
 #
 # spec file for package guava
 #
-# Copyright (c) 2019 SUSE LLC
+# Copyright (c) 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -25,7 +25,6 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
-Patch0:         %{name}-%{version}-java8compat.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -62,7 +61,6 @@ guava-testlib provides additional functionality for conveninent unit testing
 
 %prep
 %setup -q -a1
-%patch0 -p1
 
 find . -name '*.jar' -delete
 
@@ -131,11 +129,11 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 
 %files -f .mfiles-guava
 %doc CONTRIBUTORS README*
-%license COPYING
+%license LICENSE
 
 %files javadoc
 %{_javadocdir}/%{name}
-%license COPYING
+%license LICENSE
 
 %files testlib -f .mfiles-guava-testlib
 

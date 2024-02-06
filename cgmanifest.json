@@ -4981,7 +4981,7 @@
         "other": {
           "name": "guava",
           "version": "33.0.0",
-          "downloadUrl": "https://github.com/google/guava/archive/refs/tags/v33.0.0.tar.gz"
+          "downloadUrl": "https://github.com/google/guava/archive/v33.0.0.tar.gz"
         }
       }
     },
