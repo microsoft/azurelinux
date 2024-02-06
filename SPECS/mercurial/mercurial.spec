@@ -51,13 +51,13 @@ popd
 %postun
 /sbin/ldconfig
 
-%define bash_completions_dir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '%{_sysconfdir}/bash_completion.d')
+# tries to set zsh_completions_dir or fallback to default value. Used in %files section
 %define zsh_completions_dir %(pkg-config --variable=completionsdir zsh 2>/dev/null || echo '%{_datadir}/zsh/site-functions')
 
 %files
 %defattr(-,root,root)
 %license COPYING
-%{bash_completions_dir}/hg
+/usr/share/bash-completion/completions/hg
 %{zsh_completions_dir}/_hg
 /.hgrc
 %{_bindir}/hg
