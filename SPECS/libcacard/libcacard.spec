@@ -1,7 +1,7 @@
 Summary:        CAC (Common Access Card) library
 Name:           libcacard
-Version:        2.7.0
-Release:        11%{?dist}
+Version:        2.8.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/libcacard.pc
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.1-1
+- Auto-upgrade to 2.8.1 - 3.0 package upgrade
+
 * Mon Mar 07 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 2.7.0-11
 - Reverting removal of nss-tools BR for ptests.
 
