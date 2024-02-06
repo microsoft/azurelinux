@@ -13433,8 +13433,8 @@
         "type": "other",
         "other": {
           "name": "munge",
-          "version": "0.5.13",
-          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
+          "version": "0.5.15",
+          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.15/munge-0.5.15.tar.xz"
         }
       }
     },
