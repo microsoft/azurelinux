@@ -7072,7 +7072,7 @@
         "other": {
           "name": "icu",
           "version": "72.1.0.3",
-          "downloadUrl": "https://github.com/microsoft/icu/refs/tags/archive/v72.1.0.3.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/icu/archive/refs/tags/v72.1.0.3.tar.gz"
         }
       }
     },
