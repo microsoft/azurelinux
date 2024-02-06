@@ -7,6 +7,8 @@ set -e
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
 LKG_FILENAME="lkg-3.0-dev.json"
 
+trap cleanup EXIT
+
 usage() {
     echo "./setuplkgtoolchain.sh"
     echo " Syncs toolchain manifests to match LKG build"
@@ -33,7 +35,7 @@ update_manifests() {
     wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt
 }
 
-delete_lkg() {
+cleanup() {
     rm -f $LKG_FILENAME
 }
 
@@ -44,8 +46,6 @@ get_lkg
 check_for_modified_manifests
 
 update_manifests
-
-delete_lkg
 
 cat << EOF
 ===
