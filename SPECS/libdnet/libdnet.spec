@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://github.com/ofalk/%{name}
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/ofalk/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 	
 BuildRequires: gcc-c++
 BuildRequires: make
@@ -66,6 +66,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 	
 %install
 %make_install
+find %{buildroot}/usr/lib/ -name '*.la' -delete
 
 pushd python
 %{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
@@ -81,7 +82,6 @@ popd
 %files devel
 %{_bindir}/*
 %{_libdir}/*.so
-%{_libdir}/libdnet.la
 %{_includedir}/*
 %{_mandir}/man3/*.3*
  
