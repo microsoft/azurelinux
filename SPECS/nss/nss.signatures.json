@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "nss-3.75.tar.gz": "fd571507827284644f4dd522a032acda2286835f6683ed22a1c2d3878cc58582",
+  "nss-3.96.1.tar.gz": "c51e89f6fbb06163f4302e368eeb672d748b52d583948bdb15ef1b069237a496",
   "nss-config.in": "e44ac5095b4d88f24ec7b2e6a9f1581560bd3ad41a3d198596d67ef22f67adb9",
   "nss-util-config.in": "e9b92b6b153ff9ba5d2fb721a69f76d0fc94a75e997fbd34a46603dd83aabdcd",
   "nss-util.pc.in": "cffebbc5d4dbc80ccd9f821a71fb4ea3a09183870b9833d8e0d119d9542f456e",

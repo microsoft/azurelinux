@@ -14103,8 +14103,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.9.6",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
+          "version": "4.35",
+          "downloadUrl": "https://ftp.mozilla.org/pub/nspr/releases/v4.35/src/nspr-4.35.tar.gz"
         }
       }
     },
@@ -14113,8 +14113,8 @@
         "type": "other",
         "other": {
           "name": "nss",
-          "version": "3.75",
-          "downloadUrl": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_75_RTM/src/nss-3.75.tar.gz"
+          "version": "3.96.1",
+          "downloadUrl": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_96_1_RTM/src/nss-3.96.1.tar.gz"
         }
       }
     },
