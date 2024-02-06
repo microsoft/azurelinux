@@ -79,8 +79,8 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/share/man/man8/determine_maximum_mpps.8.gz
 
 %changelog
-* Sat Jan 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6-1
-- Auto-upgrade to 2.6 - none
+* Tue Feb 2 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.6-1
+- Upgrade to 2.6
 
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-13
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
