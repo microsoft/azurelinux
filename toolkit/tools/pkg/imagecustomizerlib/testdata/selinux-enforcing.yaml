@@ -1,0 +1,9 @@
+SystemConfig:
+  KernelCommandLine:
+    SELinux: enforcing
+
+  PackagesInstall:
+  - selinux-policy
+  - selinux-policy-modules
+  - setools-console
+  - policycoreutils-python-utils

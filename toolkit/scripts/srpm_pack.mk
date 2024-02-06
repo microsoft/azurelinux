@@ -100,6 +100,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_packer.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/srpm_packer.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/srpm_packer.trace \
@@ -124,6 +125,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_toolchain_packer.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/srpm_toolchain_packer.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/srpm_toolchain_packer.trace \
