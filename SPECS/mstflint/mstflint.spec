@@ -33,6 +33,9 @@ Summary:        Scripts and header files for mstflint
 Requires:       %{name} = %{version}-1
 Provides:       mstflint-devel = %{version}-1
 
+%description devel
+Header files and scripts for mstflint
+
 %prep
 %setup -q
 
