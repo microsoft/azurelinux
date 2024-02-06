@@ -4,7 +4,7 @@ Release:        5%{?dist}
 Summary:        Disables bareword filehandles
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/bareword-filehandles
 Source0:        https://cpan.metacpan.org/authors/id/I/IL/ILMARI/bareword-filehandles-%{version}.tar.gz#/perl-bareword-filehandles-%{version}.tar.gz
 BuildRequires:  findutils

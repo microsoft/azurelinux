@@ -4,7 +4,7 @@ Version:        4.6.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/plougher/squashfs-tools
 Source0:        https://github.com/plougher/squashfs-tools/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        mksquashfs.1

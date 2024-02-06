@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: docbook5-style-xsl
 Version: 1.79.2
 Release: 11%{?dist}

@@ -11,7 +11,7 @@ Release:	7%{?dist}
 Summary:	Build an optimized subroutine parameter validator once, use it forever
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Params-ValidationCompiler
 Source0:	https://cpan.metacpan.org/modules/by-module/Params/Params-ValidationCompiler-%{version}.tar.gz#/perl-Params-ValidationCompiler-%{version}.tar.gz
 BuildArch:	noarch

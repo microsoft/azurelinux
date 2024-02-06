@@ -6,7 +6,7 @@ License:       BSD
 URL:           https://waterlan.home.xs4all.nl/dos2unix.html
 Source:        https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 
 BuildRequires: gcc
 BuildRequires: gettext

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-File-CheckTree
 Version:        4.42
 Release:        308%{?dist}

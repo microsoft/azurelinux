@@ -5,7 +5,7 @@ Version:        8.6.13
 Release:        3%{?dist}
 License:        TCL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://tcl.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/sourceforge/tcl/tcl-core%{version}-src.tar.gz

@@ -28,7 +28,7 @@ Version:        1.44.0
 Release:        19%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Source and patches.
 URL:            https://libguestfs.org/
 Source0:        https://libguestfs.org/download/%{majmin}-stable/%{name}-%{version}.tar.gz

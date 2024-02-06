@@ -8,7 +8,7 @@ Version:        2.1.0
 Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://luajit.org/
 Source0:        https://luajit.org/download/LuaJIT-%{srcver}.tar.gz
 

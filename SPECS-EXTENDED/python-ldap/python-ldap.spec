@@ -13,7 +13,7 @@ Version:        3.4.0
 Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://python-ldap.org/
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
 

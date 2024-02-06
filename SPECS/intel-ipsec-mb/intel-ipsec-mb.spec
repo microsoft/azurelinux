@@ -14,7 +14,7 @@ Version:        %{fullversion}
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/intel/%{githubname}
 Source0:        https://github.com/intel/%{githubname}/archive/v%{githubver}/%{githubfull}.tar.gz

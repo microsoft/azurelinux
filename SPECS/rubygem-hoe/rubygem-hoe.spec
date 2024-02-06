@@ -6,7 +6,7 @@ Version:        3.18.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/hoe
 Source0:        https://github.com/seattlerb/hoe/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

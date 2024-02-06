@@ -13,7 +13,7 @@ Summary:        %{sum}
 
 License:        MIT and Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/%{pypi_name}
 Source0:        https://files.pythonhosted.org/packages/ba/06/b899c8867518df19e242d8cbc82d4ba210f5ffbeebb7704c695e687ab59c/openpyxl-2.6.2.tar.gz#/python-openpyxl-2.6.2.tar.gz
 

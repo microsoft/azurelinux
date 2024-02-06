@@ -6,7 +6,7 @@ Version:        1.0.8
 Release:        1%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.kornshell.com/
 Source0:        https://github.com/ksh93/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        kshcomp.conf

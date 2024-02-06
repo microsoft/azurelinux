@@ -22,7 +22,7 @@ Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
 # ./generate-tarball.sh
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz

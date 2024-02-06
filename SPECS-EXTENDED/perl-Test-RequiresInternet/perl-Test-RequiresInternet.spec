@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		perl-Test-RequiresInternet
 Version:	0.05
 Release:	17%{?dist}

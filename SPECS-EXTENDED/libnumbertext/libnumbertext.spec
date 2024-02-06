@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:      libnumbertext
 Version:   1.0.5
 Release:   5%{?dist}

@@ -11,7 +11,7 @@ Release:        10%{?dist}
 Summary:        Argument type classification
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Params-Classify
 Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/Params-Classify-%{version}.tar.gz#/perl-Params-Classify-%{version}.tar.gz
 # Module Build

@@ -5,7 +5,7 @@ Release:         5%{?dist}
 # See copyright_summary for details
 License:         BSD and GPLv2 and IJG and MIT and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://netpbm.sourceforge.net/
 # Source0 is prepared by
 # svn checkout https://svn.code.sf.net/p/netpbm/code/advanced netpbm-%%{version}

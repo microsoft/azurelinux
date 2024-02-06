@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:				libraqm
 Version:			0.7.0
 Release:			7%{?dist}

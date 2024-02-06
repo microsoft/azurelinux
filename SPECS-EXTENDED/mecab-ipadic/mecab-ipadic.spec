@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # This spec file is very similar with mecab-jumandic
 
 %define		majorver	2.7.0
