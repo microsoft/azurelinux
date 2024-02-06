@@ -705,8 +705,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.5.1",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.1.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.2.tar.gz"
         }
       }
     },
