@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           ocl-icd
 Version:        2.2.13
 Release:        2%{?dist}

@@ -6,7 +6,7 @@ Version:        1.8.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:	        Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ruby/webrick
 Source0:        https://github.com/ruby/webrick/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  git

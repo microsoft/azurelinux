@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # package options
 %global with_tls	yes
 %global with_sasl2	yes

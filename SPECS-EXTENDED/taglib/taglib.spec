@@ -8,7 +8,7 @@ Version:        1.13.1
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://taglib.github.io/
 # The snapshot tarballs generated with the following script:
 Source1:        taglib-snapshot.sh

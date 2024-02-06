@@ -7,7 +7,7 @@ Summary:        Discover pkgconf and libpkgconf
 # pkgconf-1.3.9/aclocal.m4: GPLv3+ with exceptions
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Alien-pkgconf
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-pkgconf-%{version}.tar.gz#/perl-Alien-pkgconf-%{version}.tar.gz
 # This is a full-arch package because it stores data about arch-specific

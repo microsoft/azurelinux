@@ -5,7 +5,7 @@ Summary:        Perl module for quoting strings for passing through the shell
 License:        (GPL+ OR Artistic) and GPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/String-ShellQuote
 Source0:        https://cpan.metacpan.org/authors/id/R/RO/ROSCH/String-ShellQuote-%{version}.tar.gz
 BuildArch:      noarch

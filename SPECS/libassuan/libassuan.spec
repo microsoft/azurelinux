@@ -6,7 +6,7 @@ License:        LGPLv2+
 URL:            https://gnupg.org/software/libassuan/index.html
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
 BuildRequires:  libgpg-error-devel >= 1.21
 Requires:       libgpg-error >= 1.21

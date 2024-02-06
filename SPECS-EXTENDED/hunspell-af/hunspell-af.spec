@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-af
 Summary: Afrikaans hunspell dictionary
 %global upstreamid 20080825

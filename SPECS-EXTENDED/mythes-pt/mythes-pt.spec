@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-pt
 Summary: Portuguese thesaurus
 %global upstreamid 20060817

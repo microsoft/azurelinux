@@ -6,7 +6,7 @@ Summary:        Finite state machine compiler
 License:        MIT AND LGPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.colm.net/open-source/%{name}/
 Source0:        https://github.com/adrian-thurston/ragel/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         Ragel-Colm-NoStatic.patch

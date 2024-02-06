@@ -10,7 +10,7 @@ Version:      2.15.0
 Release:      4%{?dist}
 License:      GPLv2+
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 Source0:      https://github.com/redhat-performance/%{name}/archive/v%{version}%{?prerel2}/%{name}-%{version}%{?prerel2}.tar.gz
 Patch0:       skip-gui-files.patch
 URL:          http://www.tuned-project.org/

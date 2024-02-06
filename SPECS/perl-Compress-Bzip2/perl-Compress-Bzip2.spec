@@ -16,7 +16,7 @@ Summary:        Interface to Bzip2 compression library
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Compress-Bzip2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Compress-Bzip2-%{version}.tar.gz
 BuildRequires:  bzip2-devel >= 1.0.5
 BuildRequires:  coreutils

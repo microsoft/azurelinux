@@ -4,7 +4,7 @@ Version:        4.35
 Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://firefox-source-docs.mozilla.org/nspr
 Source0:	https://ftp.mozilla.org/pub/nspr/releases/v%{version}/src/nspr-%{version}.tar.gz

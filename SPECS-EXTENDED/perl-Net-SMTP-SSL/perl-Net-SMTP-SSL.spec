@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Net-SMTP-SSL
 Version:        1.04
 Release:        12%{?dist}

@@ -7,7 +7,7 @@ Version:        0.7.3
 Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rtomayko/ronn
 Source0:        https://github.com/rtomayko/ronn/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildArch:      noarch

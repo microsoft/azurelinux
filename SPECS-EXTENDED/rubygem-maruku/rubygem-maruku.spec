@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define gem_name maruku
 
 Name: rubygem-%{gem_name}

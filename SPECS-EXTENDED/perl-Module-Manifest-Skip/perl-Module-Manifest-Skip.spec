@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        MANIFEST.SKIP Manangement for Modules
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Manifest-Skip
 Source0:        https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Manifest-Skip-%{version}.tar.gz#/perl-Module-Manifest-Skip-%{version}.tar.gz
 BuildArch:      noarch

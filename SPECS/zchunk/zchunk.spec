@@ -4,7 +4,7 @@ Version:        1.3.2
 Release:        1%{?dist}
 License:        BSD 2-Clause AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
 Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz

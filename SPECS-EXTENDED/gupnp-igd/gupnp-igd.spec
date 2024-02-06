@@ -5,7 +5,7 @@ Version:        1.2.0
 Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/GUPnP
 Source0:        https://github.com/GNOME/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  glib2-devel

@@ -4,7 +4,7 @@ Release:        2%{?dist}
 Summary:        Interface to pkg-config files via libpkgconf
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/PkgConfig-LibPkgConf
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/PkgConfig-LibPkgConf-%{version}.tar.gz#/perl-PkgConfig-LibPkgConf-%{version}.tar.gz
 BuildRequires:  findutils

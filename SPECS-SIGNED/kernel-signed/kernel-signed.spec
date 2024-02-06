@@ -13,7 +13,7 @@ Version:        6.6.12.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This spec purpose is to take an input kernel rpm and input secure-boot-signed

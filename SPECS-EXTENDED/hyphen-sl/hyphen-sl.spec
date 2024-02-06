@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-sl
 Summary: Slovenian hyphenation rules
 %global upstreamid 20070127

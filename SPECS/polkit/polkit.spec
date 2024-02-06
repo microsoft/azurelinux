@@ -7,7 +7,7 @@ Vendor:            Microsoft Corporation
 License:           GPLv2+
 URL:               https://gitlab.freedesktop.org/polkit/polkit
 Source0:           https://gitlab.freedesktop.org/polkit/polkit/-/archive/%{version}/polkit-%{version}.tar.gz
-Distribution:      Mariner
+Distribution:   Azure Linux
 BuildRequires:     duktape-devel
 BuildRequires:     expat-devel
 BuildRequires:     glib-devel

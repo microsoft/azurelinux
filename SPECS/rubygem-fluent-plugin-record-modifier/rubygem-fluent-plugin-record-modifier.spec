@@ -6,7 +6,7 @@ Version:        2.1.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/repeatedly/fluent-plugin-record-modifier
 Source0:        https://github.com/repeatedly/fluent-plugin-record-modifier/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

@@ -7,7 +7,7 @@ Version:        4.1
 Release:        2%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv2
 URL:            https://chrony.tuxfamily.org
 Source0:        https://download.tuxfamily.org/%{name}/%{name}-%{version}.tar.gz
