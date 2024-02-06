@@ -26,7 +26,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,7 @@ Source8:        default.yaml
 #Source9:       https://github.com/containers/common/archive/refs/tags/v0.44.0.tar.gz
 Source9:        %{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
+Patch0:         CVE-2021-44716.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -158,6 +159,9 @@ fi
 %license LICENSE
 
 %changelog
+* Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 20210526-3
+- Patching CVE-2021-44716
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 20210626-2
 - Bump release to rebuild with updated version of Go.
 
