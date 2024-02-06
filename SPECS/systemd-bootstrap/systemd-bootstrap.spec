@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -227,7 +227,8 @@ fi
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
-%{_datadir}/polkit-1
+%{_datadir}/polkit-1/actions/*
+%{_datadir}/polkit-1/rules.d/*
 %{_datadir}/systemd
 %{_datadir}/zsh/*
 %dir %{_localstatedir}/log/journal
@@ -247,6 +248,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Tue Feb 06 2024 Dan Streetman <ddstreet@ieee.org> - 250.3-15
+- do not conflict with polkit dir
+
 * Wed Nov 15 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-14
 - Bump release
 
