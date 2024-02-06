@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 set -eux
 
 # cleanup symlinks created by the toolkit that are not needed for base images
