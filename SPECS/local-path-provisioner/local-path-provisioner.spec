@@ -21,7 +21,7 @@ Provides a way for the Kubernetes users to utilize the local storage in each nod
 %prep
 %setup -q
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
-%patch 1
+%patch 1 -p1
 
 %build
 export CGO_ENABLED=0
