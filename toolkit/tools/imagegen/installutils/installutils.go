@@ -2572,7 +2572,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	return packageList
 }
 
-// stopGPGAgent stops gpg-agent if it is running inside the installChroot.
+// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
 //
 // It is possible that one of the packages or post-install scripts started a GPG agent.
 // e.g. when installing the mariner-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
@@ -2583,6 +2583,12 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 		if err != nil {
 			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
+		}
+
+		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
+		if err != nil {
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
+			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
 		}
 
 		return nil
