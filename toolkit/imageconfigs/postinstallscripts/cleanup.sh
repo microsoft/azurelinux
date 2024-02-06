@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eux
 
 # cleanup symlinks created by the toolkit that are not needed for base images
 rm -rf /srv
