@@ -1,16 +1,22 @@
 Summary:        OSS implementation of the TCG TPM2 Software Stack (TSS2)
 Name:           tpm2-tss
-Version:        2.4.6
-Release:        3%{?dist}
+Version:        4.0.1
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/tpm2-software/tpm2-tss
+
 Source0:        https://github.com/tpm2-software/tpm2-tss/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-22745.patch
+# Other distros are using systemd-rpm-macros and a sysusers file, but this introduces
+# a circular dependency.  So, for CBL-Mariner, keep the manual post steps to create
+# tss group/user and do not include sysusers file.
+
 BuildRequires:  json-c-devel
 BuildRequires:  openssl-devel
+BuildRequires:  shadow-utils
+BuildRequires:  systemd-bootstrap-devel
 Requires:       json-c
 Requires:       openssl
 Requires(postun): %{_sbindir}/groupdel
@@ -21,11 +27,11 @@ Requires(pre):  %{_sbindir}/useradd
 %description
 OSS implementation of the TCG TPM2 Software Stack (TSS2)
 
-%package devel
-Summary:        The libraries and header files needed for TSS2 development.
-Requires:       %{name} = %{version}-%{release}
+%package      devel
+Summary:      The libraries and header files needed for TSS2 development.
+Requires:     %{name} = %{version}-%{release}
 
-%description devel
+%description    devel
 The libraries and header files needed for TSS2 development.
 
 %prep
@@ -35,13 +41,14 @@ The libraries and header files needed for TSS2 development.
 %configure \
     --disable-static \
     --disable-doxygen-doc \
+    --enable-fapi=no \
     --with-udevrulesdir=%{_sysconfdir}/udev/rules.d
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
-find %{buildroot} -type f -name "*.la" -delete -print
+%make_install %{?_smp_mflags}
+find %{buildroot}%{_libdir} -type f -name \*.la -delete
 
 %post
 /sbin/ldconfig
@@ -71,24 +78,24 @@ fi
 
 %files
 %defattr(-,root,root)
-%license LICENSE
 %{_sysconfdir}/udev/rules.d/tpm-udev.rules
-%{_sysconfdir}/tmpfiles.d/tpm2-tss-fapi.conf
-%{_sysconfdir}/tpm2-tss/*
-%{_libdir}/*.so.0.0.0
-%exclude %{_sysconfdir}/sysusers.d/tpm2-tss.conf
+%{_libdir}/*.so.*
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/tss2/*
 %{_libdir}/pkgconfig/*
 %{_libdir}/*.so
-%{_libdir}/*.so.0
-%{_mandir}/man3/*
-%{_mandir}/man5/*
-%{_mandir}/man7/*
+%{_mandir}/man3
+%{_mandir}/man7
 
 %changelog
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0.1-2
+- Remove circular dependency that systemd-rpm-macros introduced.
+
+* Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0.1-1
+- Updated to 4.0.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.6-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

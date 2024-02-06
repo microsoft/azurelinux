@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -88,7 +88,6 @@ Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
-BuildRequires:  systemd-devel
 BuildRequires:  xz-devel
 Requires:       device-mapper
 Requires:       xz
@@ -388,6 +387,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Thu Jan 25 10:49:55 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.06-14
+- remove systemd-devel build dep
+
 * Mon Nov 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.06-13
 - Move /etc/grub.d to the configuration subpackage
 

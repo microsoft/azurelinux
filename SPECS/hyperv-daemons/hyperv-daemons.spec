@@ -11,7 +11,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        6.6.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,7 @@ is running on Windows Host with Hyper-V.
 %package -n hypervkvpd
 Summary:        Hyper-V key value pair (KVP) daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -60,7 +60,7 @@ IP injection functionality on the Guest.
 %package -n hypervvssd
 Summary:        Hyper-V VSS daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -77,7 +77,7 @@ on the Linux Guest.
 %package -n hypervfcopyd
 Summary:        Hyper-V FCOPY daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -221,6 +221,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Mon Jan 29 14:54:48 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- use "bootstrap" systemd rpm macros
+
 * Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
 - Upgrade to 6.6.12.1
 

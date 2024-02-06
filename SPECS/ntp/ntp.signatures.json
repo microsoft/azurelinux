@@ -1,13 +1,13 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "22591c393c8f9d309234493b98ccddcf246cf5f843358b2bdb62d84e59780e02",
-  "ntp-4.2.8p15.tar.gz": "f65840deab68614d5d7ceb2d0bb9304ff70dcdedd09abb79754a87536b849c19",
-  "ntp.step-tickers": "8b4bc72cc4a0af1e855f8836de5ceaa15b29620b7d3147e8f05c73bac773bee8",
-  "ntp.sysconfig": "f2a0ab20767f2c1975cd56cc2b013070fc5b0fbc6a619a3fad05c16d5d0bd6ba",
-  "ntpd.service": "10636ab4e5d799c3071a08a961b2ed668309f70ebae9f46bf23f4079be60d431",
-  "ntpdate.service": "a75376fde5a9d0eb0237ef4a84bac3cdef4c6ecadeee0eb41c6c124cd857fa46",
-  "ntpdate.sysconfig": "7ce7b151ea02332800688c8cb0bafefd246c9c0037491686fd833b3baaeff419",
-  "ntpdate.wrapper": "f63c7828bd29379b88db578658528bbb7ff915cd0e56cf1fee0a77ff59c35f09",
-  "ntpstat-master.zip": "383871e655c38fa853a4d5935d4be4aba08842e73e51ed3daf824e6a333dadc6"
- }
+  "Signatures": {
+    "LICENSE.PTR": "22591c393c8f9d309234493b98ccddcf246cf5f843358b2bdb62d84e59780e02",
+    "ntp.step-tickers": "8b4bc72cc4a0af1e855f8836de5ceaa15b29620b7d3147e8f05c73bac773bee8",
+    "ntp.sysconfig": "f2a0ab20767f2c1975cd56cc2b013070fc5b0fbc6a619a3fad05c16d5d0bd6ba",
+    "ntpd.service": "10636ab4e5d799c3071a08a961b2ed668309f70ebae9f46bf23f4079be60d431",
+    "ntpdate.service": "a75376fde5a9d0eb0237ef4a84bac3cdef4c6ecadeee0eb41c6c124cd857fa46",
+    "ntpdate.sysconfig": "7ce7b151ea02332800688c8cb0bafefd246c9c0037491686fd833b3baaeff419",
+    "ntpdate.wrapper": "f63c7828bd29379b88db578658528bbb7ff915cd0e56cf1fee0a77ff59c35f09",
+    "ntpstat-master.zip": "383871e655c38fa853a4d5935d4be4aba08842e73e51ed3daf824e6a333dadc6",
+    "ntp-4.2.8p17.tar.gz": "103dd272e6a66c5b8df07dce5e9a02555fcd6f1397bdfb782237328e89d3a866"
+  }
 }

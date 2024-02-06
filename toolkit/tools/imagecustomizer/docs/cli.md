@@ -31,9 +31,12 @@ The file path to write the final customized image to.
 
 The image format of the the final customized image.
 
-Options: vhd, vhdx, qcow2, and raw.
+Options: vhd, vhdx, qcow2, raw, and iso.
 
-At least one of --output-image-format and --output-split-partitions-format is required.
+At least one of `--output-image-format` and `--output-split-partitions-format` is required.
+
+When the output image format is set to iso, the generated image is a LiveOS
+iso image. For more details on this format, see: [Mariner Image Customizer ISO Support](./iso.md).
 
 ## --output-split-partitions-format=FORMAT
 
