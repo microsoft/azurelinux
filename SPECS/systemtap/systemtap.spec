@@ -8,7 +8,7 @@
 %define        with_sqlite    1
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
-Version:        5.0
+Version:        5.14
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -349,6 +349,9 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.14-1
+- Auto-upgrade to 5.14 - Dependency for tuned package
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 5.0-1
 - Upgrade to 5.0
 
