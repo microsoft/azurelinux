@@ -2,8 +2,8 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        Desktop notification library
 Name:           libnotify
-Version:        0.7.9
-Release:        4%{?dist}
+Version:        0.8.3
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -64,6 +64,9 @@ development of programs using %{name}.
 %{_datadir}/gir-1.0/Notify-%{majmin}.gir
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.3-1
+- Auto-upgrade to 0.8.3 - none
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
 - License verified
 - Lint spec
