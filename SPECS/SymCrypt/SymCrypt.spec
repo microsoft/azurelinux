@@ -26,13 +26,16 @@ A core cryptographic library written by Microsoft
 %ifarch x86_64
 %define symcrypt_arch AMD64
 %define symcrypt_cc gcc
+%define symcrypt_c_flags "-Wno-maybe-uninitialized"
 %define symcrypt_cxx g++
 %endif
+
 
 %ifarch aarch64
 %define symcrypt_arch ARM64
 # Currently SymCrypt ARM64 build requires use of clang
 %define symcrypt_cc clang
+%define symcrypt_c_flags "-Wno-conditional-uninitialized"
 %define symcrypt_cxx clang++
 %endif
 
@@ -52,7 +55,7 @@ cmake   -S . -B bin \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=%{symcrypt_cc} \
         -DCMAKE_CXX_COMPILER=%{symcrypt_cxx} \
-        -DCMAKE_C_FLAGS="-Wno-maybe-uninitialized" \
+        -DCMAKE_C_FLAGS="%{symcrypt_c_flags}" \
         -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
 
 cmake --build bin

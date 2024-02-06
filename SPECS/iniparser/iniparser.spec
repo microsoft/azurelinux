@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:		iniparser
 Version:	4.1
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	C library for parsing "INI-style" files
 
 License:	MIT
@@ -71,6 +71,9 @@ make check
 %{_includedir}/*.h
 
 %changelog
+* Mon Feb 5 2024 Saul Paredes <saulparedes@microsoft.com> - 4.1-6
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

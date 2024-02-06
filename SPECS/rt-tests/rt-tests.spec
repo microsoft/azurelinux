@@ -1,33 +1,22 @@
 Summary:       Programs that test various rt-features
 Name:          rt-tests
-Version:       1.8
-Release:       13%{?dist}
+Version:       2.6
+Release:       1%{?dist}
 License:       GPLv2
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
 Group:         Development/Tools
 URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-Source0:       https://www.kernel.org/pub/linux/utils/rt-tests/older/%{name}-%{version}.tar.xz
+Source0:       https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz
+Patch1:        rt-tests-Makefile-Restore-support-for-Exuberant-Ctag.patch
+Patch2:        rt-tests-Add-missing-SPDX-licenses.patch
+Patch3:        rt-tests-Remove-remaining-unnecessary-texts-after-ad.patch
 ExclusiveArch: x86_64
 Requires:      bash
 Requires:      bc
 Requires:      python3
 BuildRequires: libnuma-devel
 BuildRequires: python3-devel
-Patch1:        cyclictest-Fix-setaffinity-error-on-large-NUMA-machines.patch
-Patch2:        rt-tests-queuelat-Fix-storing-unsigned-long-long-int.patch
-Patch3:        rt-tests-cyclictest-remove-the-debug-log-pid-xxx-in-.patch
-Patch4:        rt-tests-improvements-to-the-python-style-in-get_cyc.patch
-Patch5:        rt-tests-pi_stress.8-Remove-unused-t-n-from-the-manp.patch
-Patch6:        rt-tests-ptsematest.8-Update-the-ptsematest-man-page.patch
-Patch7:        rt-tests-Add-a-man-page-for-get_cyclictest_snapshot.patch
-Patch8:        rt-tests-Tweak-the-cyclictest-man-page.patch
-Patch9:        rt-tests-get_cyclictest_snapshot-Warn-if-no-cyclicte.patch
-Patch10:       rt-tests-Install-new-man-page-get_cyclictest_snapshot.patch
-Patch11:       pi_stress-limit-the-number-of-inversion-groups-to-th.patch
-Patch12:       rt-tests-cyclictest-Move-ftrace-helpers-into-rt-util.patch
-Patch13:       rt-tests-oslat-Init-commit.patch
-Patch14:       rt-tests-oslat-Proper-reformat-of-code.patch
 
 %description
 rt-tests is a set of programs that test and measure various components of
@@ -35,21 +24,7 @@ real-time kernel behavior. This package measures timer, signal, and hardware
 latency. It also tests the functioning of priority-inheritance mutexes.
 
 %prep
-%setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 make %{?_smp_mflags} NUMA=1 HAVE_PARSE_CPUSTRING_ALL=1
@@ -80,7 +55,6 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/bin/ssdd
 /usr/bin/oslat
 /usr/bin/determine_maximum_mpps.sh
-/usr/bin/get_cpuinfo_mhz.sh
 /usr/bin/get_cyclictest_snapshot
 %{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/*
@@ -102,8 +76,12 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/share/man/man8/ssdd.8.gz
 /usr/share/man/man8/oslat.8.gz
 /usr/share/man/man8/get_cyclictest_snapshot.8.gz
+/usr/share/man/man8/determine_maximum_mpps.8.gz
 
 %changelog
+* Tue Feb 2 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.6-1
+- Upgrade to 2.6
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-13
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - License verified

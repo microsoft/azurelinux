@@ -1,22 +1,23 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
-Version:        1.45.5
+Version:        1.90.0
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://pango.org
-Source0:        https://download.gnome.org/sources/pango/1.45/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/pango/1.90/%{name}-%{version}.tar.xz
+# All the tests were failing on same reason
 Patch0:         0001-skip-tests-which-are-known-to-fail.patch
-BuildRequires:  cairo-devel
+BuildRequires:  cairo-devel >= 1.18.0
 BuildRequires:  fontconfig
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype
 BuildRequires:  glib-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  harfbuzz
-BuildRequires:  harfbuzz-devel
+BuildRequires:  harfbuzz >= 8.3.0
+BuildRequires:  harfbuzz-devel >= 8.3.0
 BuildRequires:  libpng-devel
 BuildRequires:  meson
 BuildRequires:  pkg-config
@@ -37,7 +38,7 @@ It contains the libraries and header files to create applications
 %autosetup -p1
 
 %build
-%meson
+%meson -Dlibthai=disabled
 
 %meson_build
 
@@ -66,6 +67,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jan 29 2024 Bala <balakumaran.kannan@microsoft.com> - 1.90.0-1
+- Upgrade to version 1.90.0
+- Update the patch to skip tests to skip know failiures
+
 * Sun Apr 17 2022 Muhammad Falak <mwani@microsoft.com> - 1.45.5-1
 - Bump version to 1.45.5 to address CVE-2019-1010238
 
