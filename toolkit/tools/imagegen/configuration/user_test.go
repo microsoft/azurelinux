@@ -71,15 +71,15 @@ func TestShouldFailParsingInvalidUIDLowerBound_User(t *testing.T) {
 	testUser.UID = "-2"
 	err := testUser.UIDIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for uid (-2), not within [0, 60000]", err.Error())
+	assert.Equal(t, "invalid value for UID (-2), not within [0, 60000]", err.Error())
 
 	err = testUser.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for uid (-2), not within [0, 60000]", err.Error())
+	assert.Equal(t, "invalid value for UID (-2), not within [0, 60000]", err.Error())
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [User]: invalid value for uid (-2), not within [0, 60000]", err.Error())
+	assert.Equal(t, "failed to parse [User]: invalid value for UID (-2), not within [0, 60000]", err.Error())
 }
 
 // TestShouldFailParsingInvalidUID
@@ -90,15 +90,15 @@ func TestShouldFailParsingInvalidUIDUpperBound_User(t *testing.T) {
 	testUser.UID = "60001"
 	err := testUser.UIDIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for uid (60001), not within [0, 60000]", err.Error())
+	assert.Equal(t, "invalid value for UID (60001), not within [0, 60000]", err.Error())
 
 	err = testUser.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for uid (60001), not within [0, 60000]", err.Error())
+	assert.Equal(t, "invalid value for UID (60001), not within [0, 60000]", err.Error())
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [User]: invalid value for uid (60001), not within [0, 60000]", err.Error())
+	assert.Equal(t, "failed to parse [User]: invalid value for UID (60001), not within [0, 60000]", err.Error())
 }
 
 // TestShouldFailParsingInvalidPasswordExpiresDays
@@ -109,15 +109,15 @@ func TestShouldFailParsingInvalidPasswordExpiresDaysLowerBound_User(t *testing.T
 	testUser.PasswordExpiresDays = -2
 	err := testUser.PasswordExpiresDaysIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for passwordExpiresDays (-2), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "invalid value for PasswordExpiresDays (-2), not within [-1, 99999]", err.Error())
 
 	err = testUser.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for passwordExpiresDays (-2), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "invalid value for PasswordExpiresDays (-2), not within [-1, 99999]", err.Error())
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [User]: invalid value for passwordExpiresDays (-2), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "failed to parse [User]: invalid value for PasswordExpiresDays (-2), not within [-1, 99999]", err.Error())
 }
 
 // TestShouldFailParsingInvalidPasswordExpiresDays
@@ -128,13 +128,13 @@ func TestShouldFailParsingInvalidPasswordExpiresDayUpperBound_User(t *testing.T)
 	testUser.PasswordExpiresDays = 100000
 	err := testUser.PasswordExpiresDaysIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for passwordExpiresDays (100000), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "invalid value for PasswordExpiresDays (100000), not within [-1, 99999]", err.Error())
 
 	err = testUser.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for passwordExpiresDays (100000), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "invalid value for PasswordExpiresDays (100000), not within [-1, 99999]", err.Error())
 
 	err = remarshalJSON(testUser, &checkedUser)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [User]: invalid value for passwordExpiresDays (100000), not within [-1, 99999]", err.Error())
+	assert.Equal(t, "failed to parse [User]: invalid value for PasswordExpiresDays (100000), not within [-1, 99999]", err.Error())
 }
