@@ -1,13 +1,13 @@
 Summary:        Tools and libraries to manipulate EFI variables
 Name:           efivar
-Version:        37
-Release:        6%{?dist}
+Version:        39
+Release:        1%{?dist}
 License:        LGPL-2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/System Utilities
 URL:            https://github.com/rhboot/efivar
-Source0:        https://github.com/rhboot/efivar/releases/download/%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/rhboot/efivar/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  popt-devel
 Provides:       %{name}-libs = %{version}-%{release}
 
@@ -52,6 +52,9 @@ It contains the libraries and header files to create applications
 %{_mandir}/man3/*
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 39-1
+- Upgrade to v39
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 37-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
