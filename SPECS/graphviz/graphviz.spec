@@ -3,8 +3,12 @@
 %bcond_with guile
 %else
 # temporal drop of PHP support due to https://gitlab.com/graphviz/graphviz/-/issues/2277
+# Mariner comment: we want to be doing what rhel is doing in it's newer versions, so
+# the lines below are commented out and replaced with `bcond_with php` and `bcond_with guile`.
+#% bcond_with php
+#% bcond_without guile
 %bcond_with php
-%bcond_without guile
+%bcond_with guile
 %endif
 %bcond_with python2
 
@@ -12,20 +16,30 @@
 # which cause problems during rebuilds. Currently it is circular dependency of graphviz and
 # doxygen - in case a dependency of graphviz/doxygen bumps SONAME and graphviz/doxygen
 # has to be rebuilt, we can break the circular dependency by building with --with bootstrap.
-%bcond_with bootstrap
+# Mariner Comment: We do not build with doxygen, so this line below is 
+# commented out and replaced with `bcond bootstrap 1` to disable the use of doxygen
+#% bcond_with bootstrap
+%bcond bootstrap 1
 
 %if 0%{?rhel} >= 10
 %bcond_with gtk2
 %else
-%bcond_without gtk2
+# Mariner comment: we want to be doing what rhel is doing in it's newer versions, so
+# the line below is commented out and replaced with `bcond_with gtk2`
+#% bcond_without gtk2
+%bcond_with gtk2
 %endif
 
-# Necessary conditionals
-%ifarch %{mono_arches}
-%global SHARP  1
-%else
+# Mariner Comment: The following block evaluates to true and sets SHARP to 1. Mariner does not build the necessary mono-core package.
+# So we replace the block below with `% global SHARP 0`
+## Necessary conditionals
+#% ifarch % {mono_arches}
+#% global SHARP  1
+#% else
+#% global SHARP  0
+#% endif
 %global SHARP  0
-%endif
+# endblock
 
 # OCaml packages not built on i686 since OCaml 5 / Fedora 39.
 %ifnarch %{ix86}
@@ -34,15 +48,23 @@
 %global OCAML  0
 %endif
 
-%global DEVIL  1
-%global ARRRR  1
+# Mariner Comment: we don't have the packages needed to build DEVIL, so DEVIL 1 is commented out below and replaced with `global DEVIL 0`
+# % global DEVIL  1
+%global DEVIL  0
+# Mariner Comment: Removing support for R since we don't currently package libR.pc with the R-core-devel package, so ARRRR 1 is commented out below and replaced with `global ARRRR 0`
+#% global ARRRR  1
+%global ARRRR  0
 
 # Build with QT applications (currently only gvedit)
 # Disabled until the package gets better structuring, see bug #447133
 %global QTAPPS 0
 
-%global GTS    1
-%global LASI   1
+
+# Mariner Comment: we don't have the packages needed to build GTS or LASI, so GTS 1 and LASI 1 are commented out below and replaced with `GTS 0` and `LASI 0`
+#% global GTS    1
+#% global LASI   1
+%global GTS    0
+%global LASI   0
 
 # Not in Fedora yet.
 %global MING   0
@@ -101,127 +123,147 @@
 %global FFSTORE -ffloat-store
 %endif
 
-Name:			graphviz
-Summary:		Graph Visualization Tools
-Version:		9.0.0
-Release:		10%{?dist}
+Name:            graphviz
+Summary:        Graph Visualization Tools
+Version:        9.0.0
+Release:        1%{?dist}
 # Add license:
-License:		epl-1.0 AND cpl-1.0 AND bsd-3-clause AND mit AND gpl-3.0-or-later WITH bison-exception-2.2 AND apache-1.1 AND lgpl-2.0-or-later WITH libtool-exception AND smlnj AND hpnd-uc
-URL:			http://www.graphviz.org/
-#Source0:		https://gitlab.com/%%{name}/%%{name}/-/archive/%%{version}/%%{name}-%%{version}.tar.bz2
-Source0:		https://gitlab.com/api/v4/projects/%{name}%2F%{name}/packages/generic/%{name}-releases/%{version}/%{name}-%{version}.tar.xz
-BuildRequires:		gcc-g++
-BuildRequires:		zlib-devel
-BuildRequires:		libpng-devel
-BuildRequires:		libjpeg-devel
-BuildRequires:		expat-devel
-BuildRequires:		freetype-devel >= 2
-BuildRequires:		ksh
-BuildRequires:		bison
-BuildRequires:		m4
-BuildRequires:		flex
-BuildRequires:		tk-devel
-BuildRequires:		tcl-devel >= 8.3
-BuildRequires:		swig
-BuildRequires:		sed
-BuildRequires:		fontconfig-devel
-BuildRequires:		libtool-ltdl-devel
-BuildRequires:		ruby-devel
-BuildRequires:		ruby
-BuildRequires:		libXt-devel
-BuildRequires:		libXmu-devel
+License:        epl-1.0 AND cpl-1.0 AND bsd-3-clause AND mit AND gpl-3.0-or-later WITH bison-exception-2.2 AND apache-1.1 AND lgpl-2.0-or-later WITH libtool-exception AND smlnj AND hpnd-uc
+URL:            http://www.graphviz.org/
+#Source0:        https://gitlab.com/%%{name}/%%{name}/-/archive/%%{version}/%%{name}-%%{version}.tar.bz2
+Source0:        https://gitlab.com/api/v4/projects/%{name}%2F%{name}/packages/generic/%{name}-releases/%{version}/%{name}-%{version}.tar.xz
+BuildRequires:        gcc-g++
+BuildRequires:        zlib-devel
+BuildRequires:        libpng-devel
+BuildRequires:        libjpeg-devel
+BuildRequires:        expat-devel
+BuildRequires:        freetype-devel >= 2
+BuildRequires:        ksh
+BuildRequires:        bison
+BuildRequires:        m4
+BuildRequires:        flex
+# Mariner Comment: tk is a SPECS Extended package. For now, we will comment out this BuildRequires
+#BuildRequires:        tk-devel
+BuildRequires:        tcl-devel >= 8.3
+BuildRequires:        swig
+BuildRequires:        sed
+BuildRequires:        fontconfig-devel
+BuildRequires:        libtool-ltdl-devel
+BuildRequires:        ruby-devel
+BuildRequires:        ruby
+BuildRequires:        libXt-devel
+BuildRequires:        libXmu-devel
 %if %{GUILE}
-BuildRequires:		guile22-devel
+# Mariner Comment: Mariner's guile package is named `guile` not `guile22`. We update this BuildRequires to match our naming convention.
+#BuildRequires:        guile22-devel
+BuildRequires:       guile-devel
 %endif
 %if %{with python2}
-BuildRequires:		python2-devel
+BuildRequires:        python2-devel
 %endif
-BuildRequires:		python3-devel
-BuildRequires:		libXaw-devel
-BuildRequires:		libSM-devel
-BuildRequires:		libXext-devel
+BuildRequires:        python3-devel
+BuildRequires:        libXaw-devel
+BuildRequires:        libSM-devel
+BuildRequires:        libXext-devel
 %if %{JAVA}
-BuildRequires:		java-devel
-BuildRequires:		javapackages-tools
+BuildRequires:        java-devel
+BuildRequires:        javapackages-tools
 %endif
-BuildRequires:		cairo-devel >= 1.1.10
-BuildRequires:		pango-devel
-BuildRequires:		gmp-devel
-BuildRequires:		lua-devel
+BuildRequires:        cairo-devel >= 1.1.10
+BuildRequires:        pango-devel
+BuildRequires:        gmp-devel
+BuildRequires:        lua-devel
 %if %{with gtk2}
-BuildRequires:		gtk2-devel
+BuildRequires:        gtk2-devel
 %endif
-BuildRequires:		gd-devel
-BuildRequires:		perl-devel
-BuildRequires:		swig >= 1.3.33
-BuildRequires:		automake
-BuildRequires:		autoconf
-BuildRequires:		libtool
-BuildRequires:		qpdf
+BuildRequires:        gd-devel
+BuildRequires:        perl-devel
+BuildRequires:        swig >= 1.3.33
+BuildRequires:        automake
+BuildRequires:        autoconf
+BuildRequires:        libtool
+# Mariner Comment: qpdf is a SPECS-EXTENDED package and is utilized for pdf metadata scrubbing during build. For now we do not support this step.
+#BuildRequires:        qpdf
 # Temporary workaound for perl(Carp) not pulled
-BuildRequires:		perl-Carp
+BuildRequires:        perl-Carp
 %if %{PHP}
-BuildRequires:		php-devel
+BuildRequires:        php-devel
 %endif
 %if %{SHARP}
-BuildRequires:		mono-core
+BuildRequires:        mono-core
 %endif
 %if %{DEVIL}
-BuildRequires:		DevIL-devel
+BuildRequires:        DevIL-devel
 %endif
+# Mariner Comment: Updating BuildRequires to point to our R-devel package, which is named R-core-devel
 %if %{ARRRR}
-BuildRequires:		R-devel
+#BuildRequires:        R-devel
 %endif
 %if %{OCAML}
-BuildRequires:		ocaml
+BuildRequires:        ocaml
 %endif
 %if %{QTAPPS}
-BuildRequires:		qt-devel
+BuildRequires:        qt-devel
 %endif
 %if %{GTS}
-BuildRequires:		gts-devel
+BuildRequires:        gts-devel
 %endif
 %if %{LASI}
-BuildRequires:		lasi-devel
+BuildRequires:        lasi-devel
 %endif
-BuildRequires:		urw-base35-fonts
-BuildRequires:		perl-ExtUtils-Embed
-BuildRequires:		perl-generators
-BuildRequires:		librsvg2-devel
+# Mariner Comment: We do not build the package urw-base35-fonts
+#BuildRequires:        urw-base35-fonts
+BuildRequires:        perl-ExtUtils-Embed
+BuildRequires:        perl-generators
+# Mariner Comment: We do not have a subselection of these packages and they are required for a feature we then can't support. The packages below are commented out.
+#BuildRequires:        librsvg2-devel
 # for ps2pdf
-BuildRequires:		ghostscript
-BuildRequires:		libgs-devel
-BuildRequires:		make
-BuildRequires:		poppler-glib-devel
-BuildRequires:		freeglut-devel
+#BuildRequires:        ghostscript
+#BuildRequires:        libgs-devel
+BuildRequires:        make
+#BuildRequires:        poppler-glib-devel
+#BuildRequires:        freeglut-devel
 %if %{SMYRNA}
-BuildRequires:		libglade2-devel
-BuildRequires:		gtkglext-devel
+BuildRequires:        libglade2-devel
+BuildRequires:        gtkglext-devel
 %endif
 %if %{without bootstrap}
-BuildRequires:		doxygen
+BuildRequires:        doxygen
 %endif
 %if %{GOLANG}
-BuildRequires:		golang
+BuildRequires:        golang
 %endif
-Requires:		urw-base35-fonts
-# rhbz#1838679
-Patch0:			graphviz-4.0.0-gvpack-neato-static.patch
-# https://gitlab.com/graphviz/graphviz/-/issues/2448
-Patch1:			graphviz-9.0.0-doxygen-fix.patch
+# Mariner Comment: We do not build the package urw-base35-fonts, the line below is commented out. Instead we use the freefont package
+#Requires:        urw-base35-fonts
+Requires: freefont
 
-%if ! %{JAVA}
-Obsoletes:              graphviz-java < %{version}-%{release}
-%endif
+# Mariner Comment: Adding /sbin/ldconfig Requires from Mariner 2.0
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
+
+# Mariner Comment: Removing Patch 0. RedHat BugZilla issue 1838679 was resolved in the upstream (graphviz) 
+# in 2023. See commit: https://gitlab.com/graphviz/graphviz/-/commit/315c1cf5243ee5d237f14cf81dd4800cd9852959  
+# rhbz#1838679
+#Patch0:            graphviz-4.0.0-gvpack-neato-static.patch
+# https://gitlab.com/graphviz/graphviz/-/issues/2448
+# Mariner Comment: Removing Patch 1. We do not build with doxygen, so the line below is commented out
+#Patch1:            graphviz-9.0.0-doxygen-fix.patch
+
+# Mariner Comment: We do not build a graphviz-java package, so the lines below are commented out
+#% if ! % {JAVA}
+#Obsoletes:              graphviz-java < % {version}-% {release}
+#% endif
 
 %description
 A collection of tools for the manipulation and layout of graphs (as in nodes
 and edges, not as in barcharts).
 
 %package devel
-Summary:		Development package for graphviz
-Requires:		%{name} = %{version}-%{release}, pkgconfig
-Requires:		%{name}-gd = %{version}-%{release}
+Summary:        Development package for graphviz
+# Mariner Comment: Splitting Requires across multiple lines
+Requires:        %{name} = %{version}-%{release}
+Requires:       pkgconfig
+Requires:        %{name}-gd = %{version}-%{release}
 
 %description devel
 A collection of tools for the manipulation and layout of graphs (as in nodes
@@ -230,8 +272,8 @@ graphviz.
 
 %if %{DEVIL}
 %package devil
-Summary:		Graphviz plugin for renderers based on DevIL
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for renderers based on DevIL
+Requires:        %{name} = %{version}-%{release}
 
 %description devil
 Graphviz plugin for renderers based on DevIL. (Unless you absolutely have
@@ -240,22 +282,26 @@ supported directly by the cairo+pango based renderer in the base graphviz rpm.)
 %endif
 
 %package doc
-Summary:		PDF and HTML documents for graphviz
+Summary:        PDF and HTML documents for graphviz
 
 %description doc
 Provides some additional PDF and HTML documentation for graphviz.
 
 %if %{SMYRNA}
 %package smyrna
-Summary:		Graphviz interactive graph viewer
+Summary:        Graphviz interactive graph viewer
 
 %description smyrna
 Smyrna is a viewer for graphs in the DOT format.
 %endif
 
 %package gd
-Summary:		Graphviz plugin for renderers based on gd
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for renderers based on gd
+Requires:        %{name} = %{version}-%{release}
+# Mariner Comment: Adding additional requires from Mariner 2.0
+Requires:       freefont
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
 
 %description gd
 Graphviz plugin for renderers based on gd.  (Unless you absolutely have to use
@@ -264,23 +310,23 @@ quality anti-aliased lines provided by the cairo+pango based renderer.)
 
 %if %{with gtk2}
 %package gtk2
-Summary:		Graphviz plugin for renderers based on gtk2
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for renderers based on gtk2
+Requires:        %{name} = %{version}-%{release}
 
 %description gtk2
 Graphviz plugin for renderers based on gtk2.
 %endif
 
 %package graphs
-Summary:		Demo graphs for graphviz
+Summary:        Demo graphs for graphviz
 
 %description graphs
 Some demo graphs for graphviz.
 
 %if %{GUILE}
 %package guile
-Summary:		Guile extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Guile extension for graphviz
+Requires:        %{name} = %{version}-%{release}
 
 %description guile
 Guile extension for graphviz.
@@ -288,24 +334,26 @@ Guile extension for graphviz.
 
 %if %{JAVA}
 %package java
-Summary:		Java extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Java extension for graphviz
+Requires:        %{name} = %{version}-%{release}
 
 %description java
 Java extension for graphviz.
 %endif
 
 %package lua
-Summary:		Lua extension for graphviz
-Requires:		%{name} = %{version}-%{release}, lua
+Summary:        Lua extension for graphviz
+# Mariner Comment: Separated Requires into two lines
+Requires:        %{name} = %{version}-%{release}
+Requires:       lua
 
 %description lua
 Lua extension for graphviz.
 
 %if %{MING}
 %package ming
-Summary:		Graphviz plugin for flash renderer based on ming
-Requires:		%{name} = %{version}-%{release}
+Summary:        Graphviz plugin for flash renderer based on ming
+Requires:        %{name} = %{version}-%{release}
 
 %description ming
 Graphviz plugin for -Tswf (flash) renderer based on ming.
@@ -313,26 +361,28 @@ Graphviz plugin for -Tswf (flash) renderer based on ming.
 
 %if %{OCAML}
 %package ocaml
-Summary:		Ocaml extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Ocaml extension for graphviz
+Requires:        %{name} = %{version}-%{release}
 
 %description ocaml
 Ocaml extension for graphviz.
 %endif
 
 %package perl
-Summary:		Perl extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Perl extension for graphviz
+Requires:        %{name} = %{version}-%{release}
+# Mariner Comment: Adding requires from Mariner 2.0
+Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 
 %description perl
 Perl extension for graphviz.
 
 %if %{PHP}
 %package php
-Summary:		PHP extension for graphviz
-Requires:		%{name} = %{version}-%{release}
-Requires:	php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
-Requires:	php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
+Summary:        PHP extension for graphviz
+Requires:        %{name} = %{version}-%{release}
+Requires:    php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
+Requires:    php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
 
 %description php
 PHP extension for graphviz.
@@ -340,8 +390,8 @@ PHP extension for graphviz.
 
 %if %{with python2}
 %package python2
-Summary:		Python extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Python extension for graphviz
+Requires:        %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
 Provides: python2dist(gv) = %{version}
 Provides: python%{python2_version}dist(gv) = %{version}
@@ -356,8 +406,8 @@ Python extension for graphviz.
 %endif
 
 %package python3
-Summary:		Python 3 extension for graphviz
-Requires:		%{name} = %{version}-%{release}
+Summary:        Python 3 extension for graphviz
+Requires:        %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
 Provides: python3dist(gv) = %{version}
 Provides: python%{python3_version}dist(gv) = %{version}
@@ -367,40 +417,49 @@ Python 3 extension for graphviz.
 
 %if %{ARRRR}
 %package R
-Summary:		R extension for graphviz
-Requires:		%{name} = %{version}-%{release}, R-core
+Summary:        R extension for graphviz
+# Mariner Comment: Spliting Requires out into multiple lines
+Requires:        %{name} = %{version}-%{release}
+Requires:        R-core
 
 %description R
 R extension for graphviz.
 %endif
 
 %package ruby
-Summary:		Ruby extension for graphviz
-Requires:		%{name} = %{version}-%{release}, ruby
+Summary:        Ruby extension for graphviz
+Requires:        %{name} = %{version}-%{release}
+# Mariner Comment: Split Requires into multiple lines
+Requires:        ruby
 
 %description ruby
 Ruby extension for graphviz.
 
 %if %{SHARP}
 %package sharp
-Summary:		C# extension for graphviz
-Requires:		%{name} = %{version}-%{release}, mono-core
+Summary:        C# extension for graphviz
+Requires:        %{name} = %{version}-%{release}, mono-core
 
 %description sharp
 C# extension for graphviz.
 %endif
 
 %package tcl
-Summary:		Tcl extension & tools for graphviz
-Requires:		%{name} = %{version}-%{release}, tcl >= 8.3, tk
+Summary:        Tcl extension & tools for graphviz
+# Mariner Comment: Splitting Requires out into multiple lines
+Requires:        %{name} = %{version}-%{release}
+Requires:       tcl >= 8.3
+# Mariner Comment: tk is currently in SPECS Extended. For now, tk is commented out as a requires.
+# It was not required in Mariner 2.0, so this would not be considered a regression
+# Requires:       tk
 
 %description tcl
 Various tcl packages (extensions) for the graphviz tools.
 
 %if %{GOLANG}
 %package go
-Summary:		Go extension for graphviz
-Requires:		%{name} = %{version}-%{release}, golang
+Summary:        Go extension for graphviz
+Requires:        %{name} = %{version}-%{release}, golang
 
 %description go
 Go extension for graphviz.
@@ -425,70 +484,83 @@ sed -i 's|sitearchdir|vendorarchdir|' config/config_ruby.rb
 
 # get the path to search for ruby/config.h to CPPFLAGS, so that configure can find it
 export CPPFLAGS=-I`ruby -e "puts File.join(RbConfig::CONFIG['includedir'], RbConfig::CONFIG['sitearch'])" || echo /dev/null`
+
+# Mariner Comment: Altered the configure command below via: 
+# removed --with-lefty to match 2.0, 
+# swapped --with-gdk-pixbuf to --without-gdk-pixbuf to match 2.0,
+#TODO add back # added --without-ruby to match 2.0
+# added --without-python2 to match 2.0
+# added --with-freetype* to match 2.0
 %configure --with-x --disable-static --disable-dependency-tracking \
 %if ! %{JAVA}
---enable-java=no \
+    --enable-java=no \
 %endif
-	--without-mylibgd --with-ipsepcola --with-pangocairo \
-	--with-gdk-pixbuf --with-visio --disable-silent-rules --enable-lefty \
+    --without-mylibgd --with-ipsepcola --with-pangocairo \
+    --without-gdk-pixbuf --with-visio --disable-silent-rules \
+    --without-ruby --without-python2 \
+    --with-freetypeincludedir=%{_includedir}/freetype2 --with-freetypelibdir=%{_libdir}/lib \
 %if ! %{LASI}
-	--without-lasi \
+    --without-lasi \
 %endif
 %if %{without gtk2}
-	--without-gtk \
-	--without-gtkgl \
-	--without-gtkglext \
-	--without-glade \
+    --without-gtk \
+    --without-gtkgl \
+    --without-gtkglext \
+    --without-glade \
 %endif
 %if ! %{GTS}
-	--without-gts \
+    --without-gts \
 %endif
 %if ! %{SMYRNA}
-	--without-smyrna \
+    --without-smyrna \
 %endif
 %if ! %{SHARP}
-	--disable-sharp \
+    --disable-sharp \
 %endif
 %if ! %{OCAML}
-	--disable-ocaml \
+    --disable-ocaml \
 %endif
 %if ! %{MING}
-	--without-ming \
+    --without-ming \
 %endif
 %if ! %{ARRRR}
-	--disable-r \
+    --disable-r \
 %endif
 %if ! %{DEVIL}
-	--without-devil \
+    --without-devil \
 %endif
 %if ! %{QTAPPS}
-	--without-qt \
+    --without-qt \
 %endif
 %if %{GUILE}
-	--enable-guile=yes \
+    --enable-guile=yes \
 %else
-	--enable-guile=no \
+    --enable-guile=no \
 %endif
 %if %{GOLANG}
-	--enable-go=yes
+    --enable-go=yes
 %else
-	--enable-go=no
+    --enable-go=no
 %endif
 
 # drop rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
-%make_build CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}" \
-  CXXFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}"
+# Mariner Comment: Swapped $RPM_OPT_FLAGS with %{optflags}
+%make_build CFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}" \
+  CXXFLAGS="%{optflags} -fno-strict-aliasing -fno-strict-overflow %{?FFSTORE}"
 
 %if %{without bootstrap}
 make doxygen
 %endif
 
 %install
+# Mariner Comment: 
+# set DESTDIR to % {buildroot} to match 2.0
 %make_install docdir=%{_docdir}/%{name} \
-	pkgconfigdir=%{_libdir}/pkgconfig
+    pkgconfigdir=%{_libdir}/pkgconfig \
+    DESTDIR=%{buildroot}
 find %{buildroot} -type f -name "*.la" -exec rm -f {} ';'
 
 # Install README
@@ -515,18 +587,29 @@ find %{buildroot}%{_docdir}/%{name}/demo -type f -name "*.py" -exec mv {} {}.dem
 # Remove dot_builtins, on demand loading should be sufficient
 rm -f %{buildroot}%{_bindir}/dot_builtins
 
+# Mariner Comment: adding back in this block from Mariner 2.0
+# These are part of gnome subpkg
+rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_pango*
+rm -f %{buildroot}%{_libdir}/graphviz/libgvplugin_xlib*
+# This is part of the x11 subpkg only
+rm -rf %{buildroot}%{_datadir}/graphviz/lefty
+rm -f %{buildroot}%{_mandir}/man1/{lefty.1*}
+# endblock
+
+# Mariner Comment: Removing the block below because qpdf is not a core package
 # Remove metadata from generated PDFs
-pushd %{buildroot}%{_docdir}/%{name}
-for f in prune gvgen.1 gc.1 dot.1 cluster.1
-do
-  if [ -f $f.pdf ]
-  then
-# ugly, but there is probably no better solution
-    qpdf --empty --static-id --pages $f.pdf -- $f.pdf.$$
-    mv -f $f.pdf.$$ $f.pdf
-  fi
-done
-popd
+#pushd % {buildroot}% {_docdir}/% {name}
+#for f in prune gvgen.1 gc.1 dot.1 cluster.1
+#do
+#  if [ -f $f.pdf ]
+#  then
+## ugly, but there is probably no better solution
+#    qpdf --empty --static-id --pages $f.pdf -- $f.pdf.$$
+#    mv -f $f.pdf.$$ $f.pdf
+#  fi
+#done
+#popd
+# endblock
 
 %if %{with python2}
 install -pD tclpkg/gv/.libs/libgv_python2.so %{buildroot}%{python2_sitearch}/_gv.so
@@ -546,10 +629,11 @@ if [ "%{_prefix}" != "/usr" ]; then
   rm -rf %{buildroot}/usr/*
 fi
 
+# Mariner Comment: Removing this line because we do not build Smyrna and we have not created an examples dir in previous versions
 # Explicitly create examples directory to always have it.
 # At the moment there are only examples dependant on smyrna. I.e. if smyrna is not
 # built this directory is empty.
-mkdir -p %{buildroot}%{_datadir}/%{name}/examples
+#mkdir -p % {buildroot}% {_datadir}/% {name}/examples
 
 %check
 %if %{PHP}
@@ -566,13 +650,32 @@ php --no-php-ini \
 # cd rtest
 # make rtest
 
-%transfiletriggerin -- %{_libdir}/graphviz
+# Mariner Comment: removing the below transfiletrigger lines because we have used a different approach in previous Mariner versions.
+# Adding in the block below instead.
+#
+#% transfiletriggerin -- % {_libdir}/graphviz
+#% {_bindir}/dot -c 2>/dev/null || :
+#
+#% transfiletriggerpostun -- % {_libdir}/graphviz
+#% {_bindir}/dot -c 2>/dev/null || :
+
+%post
+%{?ldconfig}
 %{_bindir}/dot -c 2>/dev/null || :
 
-%transfiletriggerpostun -- %{_libdir}/graphviz
+%{ldconfig_postun}
+
+# run "dot -c" to generate plugin config in %% {_libdir}/graphviz/config*
+%post gd
 %{_bindir}/dot -c 2>/dev/null || :
+
+%postun gd
+%{_bindir}/dot -c 2>/dev/null || :
+%{?ldconfig}
+# endblock
 
 %files
+%license COPYING
 %doc %{_docdir}/%{name}
 %if %{SMYRNA}
 %exclude %{_bindir}/smyrna
@@ -589,7 +692,8 @@ php --no-php-ini \
 %exclude %{_docdir}/%{name}/*.pdf
 %exclude %{_docdir}/%{name}/demo
 %{_datadir}/%{name}/gvpr
-%{_datadir}/%{name}/examples
+# Mariner Comment: removing examples dir because we do not build it. See above comment w.r.t. smyrna
+#% {_datadir}/% {name}/examples
 %ghost %{_libdir}/%{name}/config%{pluginsver}
 
 %if %{QTAPPS}
@@ -661,7 +765,8 @@ php --no-php-ini \
 
 %files lua
 %{_libdir}/graphviz/lua/
-%{_libdir}/lua*/*
+# Mariner Comment: Updated line below to point at % {_lib64dir} instead of % {_libdir}
+%{_lib64dir}/lua*/*
 %{_mandir}/man3/gv.3lua*
 
 %if %{MING}
@@ -719,7 +824,8 @@ php --no-php-ini \
 
 %files tcl
 %{_libdir}/graphviz/tcl/
-%{_libdir}/tcl*/*
+# Mariner Comment: Updated line below to point at % {_lib64dir} instead of % {_libdir}
+%{_lib64dir}/tcl*/*
 # hack to include gv.3tcl only if available
 #  always includes tcldot.3tcl, gdtclft.3tcl
 %{_mandir}/man3/*.3tcl*
@@ -731,6 +837,11 @@ php --no-php-ini \
 %endif
 
 %changelog
+* Tue Feb 06 2024 Sean Dougherty <sdougherty@microsoft.com> - 9.0.0-1
+- Imported spec file from Fedora 40 (license: MIT)
+- For Mariner 3.0 upgrade: merged fedora spec with Mariner 2.0 spec to upgrade graphviz from 2.4* to 9.0
+- License Verified
+
 * Thu Jan 25 2024 Jaroslav Škarvada <jskarvad@redhat.com> - 9.0.0-10
 - Added hpnd-uc license
 
@@ -757,6 +868,409 @@ php --no-php-ini \
 
 * Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 9.0.0-2
 - OCaml 5.1 rebuild for Fedora 40
+
+* Mon Sep 25 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 9.0.0-1
+- New version
+  Resolves: rhbz#2238427
+
+* Tue Aug 22 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.1.0-6
+- Dropped unused xserver fonts dependency
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 8.1.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jul 13 2023 Jitka Plesnikova <jplesnik@redhat.com> - 8.1.0-4
+- Perl 5.38 re-rebuild updated packages
+
+* Wed Jul 12 2023 Richard W.M. Jones <rjones@redhat.com> - 8.1.0-3
+- OCaml 5.0 rebuild for Fedora 39
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 8.1.0-2
+- Perl 5.38 rebuild
+
+* Tue Jul 11 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.1.0-1
+- New version
+  Resolves: rhbz#2221142
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 8.0.5-3
+- OCaml 5.0.0 rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 8.0.5-2
+- Rebuilt for Python 3.12
+
+* Tue May  2 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.0.5-1
+- New version
+  Resolves: rhbz#2192232
+
+* Wed Apr 26 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.0.4-1
+- New version
+  Related: rhbz#2187116
+
+* Wed Apr 26 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.0.3-1
+- New version
+  Resolves: rhbz#2187116
+
+* Fri Apr 21 2023 Iñaki Úcar <iucar@fedoraproject.org> - 8.0.2-2
+- R-maint-sig mass rebuild
+
+* Tue Apr 11 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.0.2-1
+- New version
+  Resolves: rhbz#2185659
+
+* Tue Mar 28 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 8.0.1-1
+- New version
+  Resolves: rhbz#2182174
+
+* Tue Jan 24 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 7.1.0-2
+- Release bump to handle gs update
+
+* Tue Jan 24 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 7.1.0-1
+- New version
+  Resolves: rhbz#2162906
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 7.0.6-4
+- Rebuild OCaml packages for F38
+
+* Mon Jan 23 2023 Zdenek Dohnal <zdohnal@redhat.com> - 7.0.6-3
+- add %%bcond_with bootstrap to break circular dependency with doxygen if needed
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 12 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.6-1
+- New version
+  Resovles: rhbz#2158703
+
+* Fri Jan 06 2023 Tomas Popela <tpopela@redhat.com> - 7.0.5-3
+- Don't build GTK 2 bits on ELN/RHEL 10 as GTK 2 won't be available there
+
+* Wed Jan 04 2023 Mamoru TASAKA <mtasaka@fedoraproject.org> - 7.0.5-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_3.2
+
+* Thu Dec 29 2022 Tom Callaway <spot@fedoraproject.org> - 7.0.5-1
+- update to 7.0.5
+- patch out distutils usage to build with Python 3.12
+
+* Thu Dec 15 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.4-1
+- New version
+  Resolves: rhbz#2150535
+
+* Thu Dec  1 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.3-1
+- New version
+  Resolves: rhbz#2148597
+
+* Mon Nov 21 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.2-1
+- New version
+  Resolves: rhbz#2144128
+
+* Mon Nov 14 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.1-1
+- New version
+  Resolves: rhbz#2141409
+
+* Tue Nov  1 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.0-2
+- Temporally drop PHP support due to graphviz issue #2277
+  Resolves: rhbz#2137832
+
+* Mon Oct 24 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 7.0.0-1
+- New version
+  Resolves: rhbz#2137071
+
+* Fri Oct 14 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 6.0.2-3
+- More fixes for conditional build of smyrna
+
+* Fri Oct 14 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 6.0.2-2
+- Made smyrna dependant on GTS
+
+* Thu Oct 13 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 6.0.2-1
+- New version
+  Resolves: rhbz#2133932
+
+* Wed Oct 05 2022 Remi Collet <remi@remirepo.net> - 6.0.1-2
+- rebuild for https://fedoraproject.org/wiki/Changes/php82
+
+* Thu Sep 22 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 6.0.1-1
+- New version
+  Resolves: rhbz#2125817
+
+* Tue Aug 23 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 5.0.1-1
+- New version
+  Resolves: rhbz#2119990
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 19 2022 Maxwell G <gotmax@e.email> - 5.0.0-3
+- Only build go subpackage on %%golang_arches (i.e. the architectures where
+  golang is available).
+
+* Fri Jul 15 2022 Jiri Vanek <jvanek@redhat.com> - 5.0.0-2
+- adapted to removal of java on i686
+- finsihing merged https://src.fedoraproject.org/rpms/graphviz/pull-request/9#request_diff
+- ifed out on i686 recomanded rm -v...
+- set --enable-java=no for non java arches
+- added changelog entry, bumped release
+- https://bugzilla.redhat.com/show_bug.cgi?id=2104225
+
+* Tue Jul 12 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 5.0.0-1
+- New version
+  Resolves: rhbz#2105006
+
+* Sun Jul 10 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 4.0.0-9
+- Rebuilt for CVE-2022-1996, CVE-2022-24675, CVE-2022-28327, CVE-2022-27191,
+  CVE-2022-29526, CVE-2022-30629
+
+* Mon Jun 20 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 4.0.0-8
+- Rebuilt for ocaml
+  Resolves: rhbz#2098719
+
+* Sun Jun 19 2022 Python Maint <python-maint@redhat.com> - 4.0.0-7
+- Rebuilt for Python 3.11
+
+* Sun Jun 19 2022 Robert-André Mauchin <zebob.m@gmail.com> - 4.0.0-6
+- Rebuilt for CVE-2022-1996, CVE-2022-24675, CVE-2022-28327, CVE-2022-27191,
+  CVE-2022-29526, CVE-2022-30629
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 4.0.0-5
+- OCaml 4.14.0 rebuild
+
+* Sat Jun 18 2022 Robert-André Mauchin <zebob.m@gmail.com> - 4.0.0-4
+- Rebuilt for CVE-2022-1996, CVE-2022-24675, CVE-2022-28327, CVE-2022-27191,
+  CVE-2022-29526, CVE-2022-30629
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 4.0.0-3
+- Rebuilt for Python 3.11
+
+* Thu Jun  9 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 4.0.0-2
+- Used lm fix patch from upstream
+
+* Mon Jun  6 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 4.0.0-1
+- New version
+  Resolves: rhbz#2091383
+
+* Wed Jun 01 2022 Jitka Plesnikova <jplesnik@redhat.com> - 3.0.0-2
+- Perl 5.36 rebuild
+
+* Wed Mar  2 2022 Jaroslav Škarvada <jskarvad@redhat.com> - 3.0.0-1
+- New version
+  Resolves: rhbz#2058892
+
+* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 2.50.0-6
+- Rebuilt for java-17-openjdk as system jdk
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 2.50.0-5
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Wed Jan 26 2022 Vít Ondruch <vondruch@redhat.com> - 2.50.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Changes/Ruby_3.1
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.50.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Dec 15 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.50.0-2
+- GTK2 stuff Split to the gtk2 subpackage
+  Resolves: rhbz#2032671
+
+* Mon Dec  6 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.50.0-1
+- New version
+  Resolves: rhbz#2029089
+
+* Tue Nov 23 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.49.3-3
+- Fixed gvpack to run
+  Resolves: rhbz#1838679
+
+* Thu Oct 28 2021 Remi Collet <remi@remirepo.net> - 2.49.3-2
+- rebuild for https://fedoraproject.org/wiki/Changes/php81
+
+* Mon Oct 25 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.49.3-1
+- New version
+  Resolves: rhbz#2016728
+
+* Mon Oct 18 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.49.2-1
+- New version
+  Resolves: rhbz#2014784
+
+* Wed Oct 06 2021 Richard W.M. Jones <rjones@redhat.com> - 2.49.1-2
+- Rebuild for OCaml 4.13.1
+
+* Tue Oct  5 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.49.1-1
+- New version
+  Resolves: rhbz#2007059
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 2.49.0-3
+- OCaml 4.13.1 build
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2.49.0-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Mon Sep  6 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.49.0-1
+- New version
+  Resolves: rhbz#1998765
+
+* Fri Jul 23 2021 Aleksei Bavshin <alebastr@fedoraproject.org> - 2.48.0-3
+- Dropped unused runtime dependency from guile 2.0
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.48.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 19 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.48.0-1
+- New version
+  Resolves: rhbz#1983328
+
+* Tue Jun 22 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.3-1
+- New version
+  Resolves: rhbz#1973976
+
+* Tue Jun  8 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.2-3
+- Fixed possible races during docs build which could lead to empty pdf files
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.47.2-2
+- Rebuilt for Python 3.10
+
+* Thu May 27 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.2-1
+- New version
+  Resolves: rhbz#1965146
+
+* Sun May 23 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2.47.1-5
+- Perl 5.34 rebuild
+
+* Wed May 12 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.1-4
+- Dropped unneeded tmsize10.clo file
+
+* Fri May  7 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.1-3
+- Added build requirement for gcc-g++
+
+* Fri May  7 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.1-2
+- Conditionalized guile support
+- Updated RHEL macros
+
+* Mon Apr 19 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.1-1
+- New version
+  Resolves: rhbz#1950691
+
+* Tue Mar 23 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.0-2
+- Re-enabled PHP support
+  Resolves: rhbz#1934996
+
+* Tue Mar 16 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.47.0-1
+- New version
+  Resolves: rhbz#1939299
+
+* Mon Mar  8 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.46.1-3
+- Temporary disabled PHP support
+  Resolves: rhbz#1935859
+
+* Thu Mar  4 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.46.1-2
+- Built against guile22
+
+* Wed Mar  3 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.46.1-1
+- New version
+  Related: rhbz#1933722
+
+* Tue Mar  2 2021 Jaroslav Škarvada <jskarvad@redhat.com> - 2.46.0-1
+- New version
+  Resolves: rhbz#1933722
+
+* Mon Mar  1 13:11:59 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-18
+- OCaml 4.12.0 build
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.44.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Jan 07 2021 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.44.0-16
+- F-34: rebuild against ruby 3.0
+
+* Wed Nov 25 2020 Miro Hrončok <mhroncok@redhat.com> - 2.44.0-15
+- Disable Python 2 in ELN
+
+* Tue Sep 01 2020 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-14
+- OCaml 4.11.1 rebuild
+
+* Fri Aug 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-13
+- OCaml 4.11.0 rebuild
+
+* Sat Aug 01 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.44.0-12
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.44.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Fri Jul 10 2020 Jiri Vanek <jvanek@redhat.com> - 2.44.0-10
+- Rebuilt for JDK-11, see https://fedoraproject.org/wiki/Changes/Java11
+
+* Thu Jun 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2.44.0-9
+- Perl 5.32 rebuild
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.44.0-8
+- Rebuilt for Python 3.9
+
+* Wed May 20 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.44.0-7
+- Also fixed man page typo
+
+* Wed May 20 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.44.0-6
+- Fixed man pages according to man page scan
+
+* Mon May 04 2020 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-5
+- OCaml 4.11.0+dev2-2020-04-22 rebuild
+
+* Tue Apr 21 2020 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-4
+- OCaml 4.11.0 pre-release attempt 2
+
+* Fri Apr 17 2020 Richard W.M. Jones <rjones@redhat.com> - 2.44.0-3
+- OCaml 4.11.0 pre-release
+
+* Wed Apr  8 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.44.0-2
+- Fixed multiple packaging of manual pages
+
+* Wed Apr  8 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.44.0-1
+- New version
+  Resolves: rhbz#1822101
+
+* Mon Apr  6 2020 Jaroslav Škarvada <jskarvad@redhat.com> - 2.42.4-1
+- New version
+  Resolves: rhbz#1821045
+- Switched to bz2 archives
+- Dropped ocaml-allow-const-cast patch (upstreamed)
+
+* Thu Apr 02 2020 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-10
+- Update all OCaml dependencies for RPM 4.16.
+
+* Wed Feb 26 2020 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-9
+- OCaml 4.10.0 final.
+
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.42.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
+* Sun Jan 19 2020 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.42.2-7
+- F-32: rebuild against ruby27
+
+* Sat Jan 18 2020 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-6
+- Bump release and rebuild.
+
+* Sat Jan 18 2020 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-5
+- OCaml 4.10.0+beta1 rebuild.
+
+* Fri Dec 06 2019 Richard W.M. Jones <rjones@redhat.com> - 2.42.2-4
+- OCaml 4.09.0 (final) rebuild.
+
+* Thu Oct 31 2019 Miro Hrončok <mhroncok@redhat.com> - 2.42.2-3
+- Remove Python 2 package on Fedora 32+
+
+* Fri Oct 04 2019 Remi Collet <remi@remirepo.net> - 2.42.2-2
+- rebuild for https://fedoraproject.org/wiki/Changes/php74
+
+* Wed Oct  2 2019 Jaroslav Škarvada <jskarvad@redhat.com> - 2.42.2-1
+- New version
+  Resolves: rhbz#1753061
+- Dropped visio, python3, CVE-2018-10196, CVE-2019-11023, and
+  swig4-updated-language-options patches (all upstreamed)
+- Simplified python bindings build process
+
+* Mon Feb 05 2024 Sean Dougherty <sdougherty@microsoft.com> - 2.42.4-9
+- Moving to using Fedora 40 spec (License: MIT) for guidance, importing changelog above
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.42.4-9
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
 * Mon Sep 25 2023 Jaroslav Škarvada <jskarvad@redhat.com> - 9.0.0-1
 - New version
