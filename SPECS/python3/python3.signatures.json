@@ -1,5 +1,9 @@
 {
  "Signatures": {
-  "Python-3.12.0.tar.xz": "795c34f44df45a0e9b9710c8c71c15c671871524cd412ca14def212e8ccb155d"
+  "Python-3.12.0.tar.xz": "795c34f44df45a0e9b9710c8c71c15c671871524cd412ca14def212e8ccb155d",
+  "setuptools-69.0.3.tar.gz": "be1af57fc409f93647f2e8e4573a142ed38724b8cdd389706a867bb4efcf1e78",
+  "pathfix.py": "7a2ff222346d3c95b08814e3372975823e099c17dddaa73a459a3d840e6e9c1b",
+  "setuptools-58.1.0-py3-none-any.whl": "7324fd4b66efa05cdfc9c89174573a4410acc7848f318cc0565c7fb659dfdc81",
+  "flit_core-3.9.0.tar.gz": "72ad266176c4a3fcfab5f2930d76896059851240570ce9a98733b658cb786eba"
  }
 }

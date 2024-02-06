@@ -6,8 +6,11 @@
 %global majmin 3.12
 %global majmin_nodots 312
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
+#%%global pip_version 22.0.4
 %global pip_version 23.2.1
-%global setuptools_version 67.6.1
+#%%global setuptools_version 58.1.0
+#%%global setuptools_version 67.6.1
+%global setuptools_version 69.0.3
 
 Summary:        A high-level scripting language
 Name:           python3
@@ -19,16 +22,20 @@ Distribution:   Mariner
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
+Source1:        https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz
+Source2:        pathfix.py
+Source3:        setuptools-58.1.0-py3-none-any.whl
+Source4:        https://pypi.org/packages/source/f/flit-core/flit_core-3.9.0.tar.gz
 Patch0:         cgi3.patch
-Patch1:         CVE-2015-20107.patch
+#Patch1:         CVE-2015-20107.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
 Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 Patch3:         CVE-2022-37454.patch
-Patch4:         CVE-2022-45061.patch
-Patch5:         CVE-2022-42919.patch
-Patch6:         CVE-2023-24329.patch
+#Patch4:         CVE-2022-45061.patch
+#Patch5:         CVE-2022-42919.patch
+#Patch6:         CVE-2023-24329.patch
 # Patch for setuptools, resolved in 65.5.1
-Patch1000:      CVE-2022-40897.patch
+#Patch1000:      CVE-2022-40897.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -158,18 +165,16 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
+pip3 list -v || true
+
 # We need to patch setuptools later, so manually manage patches with -N
 %autosetup -p1 -n Python-%{version} -N
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
 #%%patch0 -p1
-#%%patch1 -p1
 #%%patch2 -p1
 #%%patch3 -p1
-#%%patch4 -p1
-#%%patch5 -p1
-#%%patch6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -212,10 +217,32 @@ python3 Lib/ensurepip
 # and install fails. We will install these two bundled wheels manually.
 # https://github.com/pypa/pip/issues/3063
 # https://bugs.python.org/issue31916
-pip3 install --no-cache-dir --no-index --ignore-installed \
-    --root %{buildroot} \
-    ./Lib/test/setuptools-%{setuptools_version}-py3-none-any.whl \
+pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
     ./Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
+
+#    %{SOURCE3} \
+#    ./Lib/test/setuptools-%{setuptools_version}-py3-none-any.whl \
+
+tar --no-same-owner -xf %{SOURCE4}
+pushd flit_core-3.9.0
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
+    --no-user --find-links=dist flit_core
+popd
+
+tar --no-same-owner -xf %{SOURCE1}
+pushd setuptools-69.0.3
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
+    --no-user --find-links=dist setuptools
+popd
+
+echo Checking pip package status
+pip3 show dist || true
+pip3 show setuptools || true
+pip3 show wheel || true
+pip3 show flit_core || true
+pip3 list -v || true
 
 # Manually patch CVE-2022-40897 which is a bundled wheel. We can only update the source code after install
 #echo 'Patching CVE-2022-40897 in bundled wheel file %{_libdir}/python%{majmin}/site-packages/setuptools/package_index.py'
@@ -225,6 +252,8 @@ pip3 install --no-cache-dir --no-index --ignore-installed \
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
+cp -pv %{SOURCE2} %{buildroot}%{_bindir}/pathfix%{majmin}.py
+ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 #cp -p Tools/scripts/pathfix.py %{buildroot}%{_bindir}/pathfix%{majmin}.py
 #ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
@@ -247,6 +276,8 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_bindir}/pydoc*
 %{_bindir}/python3
 %{_bindir}/python%{majmin}
+%{_bindir}/pathfix.py
+%{_bindir}/pathfix%{majmin}.py
 %{_mandir}/*/*
 
 %dir %{_libdir}/python%{majmin}
