@@ -1467,8 +1467,8 @@
         "type": "other",
         "other": {
           "name": "catch",
-          "version": "2.13.8",
-          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://github.com/catchorg/Catch2/archive/refs/tags/v3.5.2.tar.gz"
         }
       }
     },
@@ -8981,8 +8981,8 @@
         "type": "other",
         "other": {
           "name": "libdnet",
-          "version": "1.14",
-          "downloadUrl": "https://github.com/dugsong/libdnet/archive/libdnet-1.14.tar.gz"
+          "version": "1.17.0",
+          "downloadUrl": "https://github.com/ofalk/libdnet/archive/refs/tags/libdnet-1.17.0.tar.gz"
         }
       }
     },
@@ -13763,8 +13763,8 @@
         "type": "other",
         "other": {
           "name": "ndctl",
-          "version": "65",
-          "downloadUrl": "https://github.com/pmem/ndctl/archive/v65.tar.gz"
+          "version": "78",
+          "downloadUrl": "https://github.com/pmem/ndctl/archive/v78.tar.gz"
         }
       }
     },
@@ -14003,8 +14003,8 @@
         "type": "other",
         "other": {
           "name": "nlohmann-json",
-          "version": "3.10.4",
-          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.10.4.tar.gz"
+          "version": "3.11.3",
+          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.11.3.tar.gz"
         }
       }
     },
