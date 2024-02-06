@@ -705,8 +705,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.5.1",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.1.tar.gz"
+          "version": "2.5.2",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.2.tar.gz"
         }
       }
     },
@@ -1767,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "35.0",
-          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v35.0.tar.gz"
+          "version": "37.0",
+          "downloadUrl": "https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v37.0.tar.gz"
         }
       }
     },
@@ -8981,8 +8981,8 @@
         "type": "other",
         "other": {
           "name": "libdnet",
-          "version": "1.14",
-          "downloadUrl": "https://github.com/dugsong/libdnet/archive/libdnet-1.14.tar.gz"
+          "version": "1.17.0",
+          "downloadUrl": "https://github.com/ofalk/libdnet/archive/refs/tags/libdnet-1.17.0.tar.gz"
         }
       }
     },
@@ -13433,8 +13433,8 @@
         "type": "other",
         "other": {
           "name": "munge",
-          "version": "0.5.13",
-          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.13/munge-0.5.13.tar.xz"
+          "version": "0.5.15",
+          "downloadUrl": "https://github.com/dun/munge/releases/download/munge-0.5.15/munge-0.5.15.tar.xz"
         }
       }
     },
@@ -14103,8 +14103,8 @@
         "type": "other",
         "other": {
           "name": "nspr",
-          "version": "4.9.6",
-          "downloadUrl": "https://archive.mozilla.org/pub/nspr/releases/v4.9.6/src/nspr-4.9.6.tar.gz"
+          "version": "4.35",
+          "downloadUrl": "https://ftp.mozilla.org/pub/nspr/releases/v4.35/src/nspr-4.35.tar.gz"
         }
       }
     },
@@ -14113,8 +14113,8 @@
         "type": "other",
         "other": {
           "name": "nss",
-          "version": "3.75",
-          "downloadUrl": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_75_RTM/src/nss-3.75.tar.gz"
+          "version": "3.96.1",
+          "downloadUrl": "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_96_1_RTM/src/nss-3.96.1.tar.gz"
         }
       }
     },
@@ -14253,8 +14253,8 @@
         "type": "other",
         "other": {
           "name": "nvidia-container-toolkit",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.13.5.tar.gz"
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.14.4.tar.gz"
         }
       }
     },
@@ -15064,8 +15064,8 @@
         "type": "other",
         "other": {
           "name": "openldap",
-          "version": "2.4.57",
-          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.4.57.tgz"
+          "version": "2.6.7",
+          "downloadUrl": "https://gpl.savoirfairelinux.net/pub/mirrors/openldap/openldap-release/openldap-2.6.7.tgz"
         }
       }
     },
@@ -15504,8 +15504,8 @@
         "type": "other",
         "other": {
           "name": "pango",
-          "version": "1.45.5",
-          "downloadUrl": "https://download.gnome.org/sources/pango/1.45/pango-1.45.5.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://download.gnome.org/sources/pango/1.90/pango-1.90.0.tar.xz"
         }
       }
     },
@@ -19564,8 +19564,8 @@
         "type": "other",
         "other": {
           "name": "perl-Sys-Virt",
-          "version": "9.8.0",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v9.8.0.tar.gz"
+          "version": "6.1.0",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v6.1.0.tar.gz"
         }
       }
     },
@@ -19924,8 +19924,8 @@
         "type": "other",
         "other": {
           "name": "perl-Test-NoWarnings",
-          "version": "1.04",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/A/AD/ADAMK/Test-NoWarnings-1.04.tar.gz"
+          "version": "1.06",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Test-NoWarnings-1.06.tar.gz"
         }
       }
     },
@@ -20284,8 +20284,8 @@
         "type": "other",
         "other": {
           "name": "perl-Types-Serialiser",
-          "version": "1.0",
-          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-1.0.tar.gz"
+          "version": "1.01",
+          "downloadUrl": "http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-1.01.tar.gz"
         }
       }
     },
@@ -20524,8 +20524,8 @@
         "type": "other",
         "other": {
           "name": "perl-XML-Parser",
-          "version": "2.46",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.46.tar.gz"
+          "version": "2.47",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz"
         }
       }
     },
@@ -25485,8 +25485,8 @@
         "type": "other",
         "other": {
           "name": "rt-tests",
-          "version": "1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/utils/rt-tests/older/rt-tests-1.8.tar.xz"
+          "version": "2.6",
+          "downloadUrl": "https://mirrors.edge.kernel.org/pub/linux/utils/rt-tests/rt-tests-2.6.tar.xz"
         }
       }
     },
@@ -29602,8 +29602,8 @@
         "type": "other",
         "other": {
           "name": "xdp-tools",
-          "version": "1.4.1",
-          "downloadUrl": "https://github.com/xdp-project/xdp-tools/archive/refs/tags/v1.4.1.tar.gz"
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/xdp-project/xdp-tools/releases/download/v1.4.2/xdp-tools-1.4.2.tar.gz"
         }
       }
     },
