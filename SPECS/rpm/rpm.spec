@@ -146,6 +146,8 @@ rm -r docs/man/{fr,ja,ko,pl,ru,sk}
 %make_build
 
 pushd python
+# prevent error: could not create 'rpm.egg-info': File exists
+rm -vf %{_topdir}/BUILD/%{name}-%{version}/python/rpm.egg-info
 %py3_build
 popd
 
