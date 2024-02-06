@@ -6,7 +6,7 @@ parsing/unpacking it first, while still having great forwards/backwards
 compatibility.}
 Summary:        Memory efficient serialization library
 Name:           flatbuffers
-Version:        2.0.8
+Version:        23.5.26
 Release:        1%{?dist}
 # The entire source code is Apache-2.0. Even code from grpc, which is
 # BSD-3-Clause in its upstream, is intended to be Apache-2.0 in this project.
