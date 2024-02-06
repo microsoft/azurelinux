@@ -4,7 +4,7 @@ Version:        9.0.1
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://mesa3d.org/
 Source0:        https://mesa.freedesktop.org/archive/glu/glu-%{version}.tar.xz
 Source1:        LICENSE.PTR

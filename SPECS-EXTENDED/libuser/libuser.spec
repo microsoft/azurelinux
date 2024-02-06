@@ -5,7 +5,7 @@ Version: 0.63
 Release: 10%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://pagure.io/libuser
 Source: https://releases.pagure.org/libuser/libuser-%{version}.tar.xz
 BuildRequires: glib2-devel

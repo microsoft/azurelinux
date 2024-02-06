@@ -4,7 +4,7 @@ Version:        16.1
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2

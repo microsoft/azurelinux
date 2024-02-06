@@ -4,7 +4,7 @@ Version:        3.2.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xml.apache.org/xerces-c/
 Source:         https://downloads.apache.org/xerces/c/3/sources/xerces-c-%{version}.tar.xz
 BuildRequires:  dos2unix

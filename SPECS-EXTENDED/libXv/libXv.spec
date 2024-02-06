@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global tarball libXv
 #global gitdate 20130524
 %global gitversion 50fc4cb18

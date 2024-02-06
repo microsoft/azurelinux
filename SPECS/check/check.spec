@@ -8,7 +8,7 @@ Source0:        https://github.com/libcheck/check/archive/refs/tags/%{version}.t
 Provides:       %{name}-devel = %{version}-%{release}
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 Check is a unit testing framework for C. It features a simple interface for defining unit tests,

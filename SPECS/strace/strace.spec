@@ -5,7 +5,7 @@ Version:        6.6
 Release:        1%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Debuggers
 URL:            https://strace.io/
 Source0:        https://strace.io/files/%{version}/%{name}-%{version}.tar.xz

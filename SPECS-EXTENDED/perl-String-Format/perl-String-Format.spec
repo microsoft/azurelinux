@@ -5,7 +5,7 @@ Summary:        Sprintf-like string formatting capabilities with arbitrary forma
 
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/String-Format
 Source0:        https://cpan.metacpan.org/authors/id/S/SR/SREZIC/String-Format-%{version}.tar.gz#/perl-String-Format-%{version}.tar.gz
 

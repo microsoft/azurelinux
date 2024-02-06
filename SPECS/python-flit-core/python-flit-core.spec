@@ -15,7 +15,7 @@ Version:        3.9.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://flit.readthedocs.io/en/latest/
 Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 

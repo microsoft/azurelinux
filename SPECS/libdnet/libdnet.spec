@@ -4,7 +4,7 @@ Version:        1.17.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/ofalk/%{name}
 Source0:        https://github.com/ofalk/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz

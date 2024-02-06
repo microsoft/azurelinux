@@ -6,7 +6,7 @@ Version:        1.7.2
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/conda/conda-package-handling
 Source0:        https://github.com/conda/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc

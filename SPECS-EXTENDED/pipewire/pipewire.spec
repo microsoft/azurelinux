@@ -21,7 +21,7 @@ Version:        %{majorversion}.%{minorversion}.%{microversion}
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pipewire.org/
 Source0:        https://github.com/PipeWire/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if %{with media_session}

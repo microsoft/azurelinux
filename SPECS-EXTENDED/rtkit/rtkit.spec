@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:             rtkit
 Version:          0.11
 Release:          24%{?dist}

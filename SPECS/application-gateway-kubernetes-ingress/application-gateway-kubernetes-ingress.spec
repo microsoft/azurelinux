@@ -5,7 +5,7 @@ Version:        1.7.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Networking
 URL:            https://github.com/Azure/application-gateway-kubernetes-ingress
 Source0:        https://github.com/Azure/application-gateway-kubernetes-ingress/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

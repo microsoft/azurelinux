@@ -4,7 +4,7 @@ Version:        37
 Release:        6%{?dist}
 License:        LGPL-2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/System Utilities
 URL:            https://github.com/rhboot/efivar
 Source0:        https://github.com/rhboot/efivar/releases/download/%{version}/%{name}-%{version}.tar.bz2

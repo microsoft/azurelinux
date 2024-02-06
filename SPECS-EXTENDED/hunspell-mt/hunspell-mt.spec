@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-mt
 Summary: Maltese hunspell dictionaries
 %global upstreamid 20110414

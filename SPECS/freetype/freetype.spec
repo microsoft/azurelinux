@@ -4,7 +4,7 @@ Version:        2.13.2
 Release:        1%{?dist}
 License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz

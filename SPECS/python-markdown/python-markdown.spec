@@ -6,7 +6,7 @@ Version:        3.2.2
 Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://python-markdown.github.io/
 Source0:        https://files.pythonhosted.org/packages/source/M/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

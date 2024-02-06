@@ -6,7 +6,7 @@ Version:        1.1
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/app/%{pkgname}-%{version}.tar.bz2
 

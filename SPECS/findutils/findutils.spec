@@ -4,7 +4,7 @@ Version:        4.9.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/findutils
 Source0:        https://ftp.gnu.org/gnu/findutils/%{name}-%{version}.tar.xz

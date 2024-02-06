@@ -8,7 +8,7 @@ License:        (GPL+ or Artistic) and Public Domain
 URL:            http://search.cpan.org/dist/DBD-SQLite/
 Source0:        https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  sqlite-devel >= 3.22.0
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-DBI

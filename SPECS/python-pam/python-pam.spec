@@ -4,7 +4,7 @@ Version:        1.8.4
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-pam/
 Source0:        https://pypi.python.org/packages/source/p/python-pam/%{name}-%{version}.tar.gz

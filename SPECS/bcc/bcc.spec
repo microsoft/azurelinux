@@ -5,7 +5,7 @@ Version:        0.29.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it

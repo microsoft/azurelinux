@@ -6,7 +6,7 @@ Version:	   5.15.34.1
 Release:	   2%{?dist}
 License:	   GPLv2+
 Vendor:            Microsoft Corporation
-Distribution:      Mariner
+Distribution:   Azure Linux
 Group:             System/Kernel
 # https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%%{version}.tar.gz
 # In the interests of keeping the source rpm from being ridiculously large,

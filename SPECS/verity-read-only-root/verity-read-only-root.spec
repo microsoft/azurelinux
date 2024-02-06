@@ -4,7 +4,7 @@ Version:        1.0
 Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://dracut.wiki.kernel.org/
 Source0:        verity.conf

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		pacrunner
 Version:	0.16
 Release:	3%{?dist}

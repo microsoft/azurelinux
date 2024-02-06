@@ -4,7 +4,7 @@ Version:        4.1.0
 Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ogdi.sourceforge.net/
 # new project location is https://github.com/libogdi/ogdi
 Source0:        https://github.com/libogdi/ogdi/archive/%{name}_4_1_0.tar.gz#/%{name}-%{version}.tar.gz

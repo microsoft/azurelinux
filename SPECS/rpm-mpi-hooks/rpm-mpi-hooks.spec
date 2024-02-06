@@ -4,7 +4,7 @@ Version:        8
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://src.fedoraproject.org/rpms/rpm-mpi-hooks
 Source0:        https://src.fedoraproject.org/rpms/rpm-mpi-hooks/raw/f37/f/mpi.attr
 Source1:        mpilibsymlink.attr

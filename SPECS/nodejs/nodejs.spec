@@ -8,7 +8,7 @@ Version:        20.10.0
 Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/nodejs/node
 # !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball
