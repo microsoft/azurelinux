@@ -333,9 +333,9 @@ popd
 
 %files -n qt-doctools
 %{_bindir}/qdoc*
-%{_qt6_bindir}/qdoc*
-%{_qt6_libexecdir}/qhelpgenerator*
-%{_qt6_libexecdir}/qtattributionsscanner*
+%{_qt_bindir}/qdoc*
+%{_qt_libexecdir}/qhelpgenerator*
+%{_qt_libexecdir}/qtattributionsscanner*
 
 %changelog
 * Tue Jan 02 2024 Sam Meluch <sammeluch@microsoft.com> - 6.6.1-1
