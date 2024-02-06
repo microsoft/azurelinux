@@ -5,7 +5,7 @@ Version:        5.2.1
 Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.ntop.org/
 #Source0:       https://github.com/ntop/ntopng/archive/%{version}.tar.gz

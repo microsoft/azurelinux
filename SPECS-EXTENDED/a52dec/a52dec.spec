@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:    Small test program for liba52
 Name:       a52dec
 Version:    0.7.4

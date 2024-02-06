@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/createrepo_c
 #Source0:       https://github.com/rpm-software-management/%{name}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

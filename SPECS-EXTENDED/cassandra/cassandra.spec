@@ -9,7 +9,7 @@ URL:            http://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://archive.apache.org/dist/cassandra/%{version}/apache-%{name}-%{version}-src.tar.gz
 Source1:        cassandra.service
 # Refer to Readme file for detailed

@@ -11,7 +11,7 @@ Release:        2%{?dist}
 Summary:        Forces the unavailability of specified Perl modules (for testing)
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-Hide
 Source0:        https://cpan.metacpan.org/modules/by-module/Devel/Devel-Hide-%{version}.tar.gz#/perl-Devel-Hide-%{version}.tar.gz
 BuildArch:      noarch

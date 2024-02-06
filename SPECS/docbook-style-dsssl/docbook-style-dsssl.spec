@@ -4,7 +4,7 @@ Version:        1.79
 Release:        31%{?dist}
 License:        MIT WITH Advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://docbook.sourceforge.net/
 Source0:        http://prdownloads.sourceforge.net/docbook/docbook-dsssl-%{version}.tar.gz
 Source1:        %{name}.Makefile

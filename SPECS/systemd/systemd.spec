@@ -2,10 +2,10 @@
 Summary:        Systemd
 Name:           systemd
 Version:        254.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.freedesktop.org/wiki/Software/systemd/
 Source0:        https://github.com/%{name}/%{name}-stable/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -222,7 +222,7 @@ fi
 %{_libdir}/sysctl.d
 %{_libdir}/tmpfiles.d
 /lib/*.so*
-/lib/cryptsetup/libcryptsetup-token-systemd-tpm2.so
+/lib/cryptsetup/libcryptsetup-token-systemd-*.so
 %{_libdir}/modprobe.d/systemd.conf
 %{_libdir}/sysusers.d/*
 %{_bindir}/*
@@ -232,7 +232,8 @@ fi
 %{_datadir}/factory/*
 %{_datadir}/dbus-1
 %{_docdir}/*
-%{_datadir}/polkit-1
+%{_datadir}/polkit-1/actions/*
+%{_datadir}/polkit-1/rules.d/*
 %{_datadir}/systemd
 %{_datadir}/zsh/*
 %dir %{_localstatedir}/log/journal
@@ -256,6 +257,10 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Wed Jan 31 16:28:30 EST 2024 Dan Streetman <ddstreet@ieee.org> - 254.5-2
+- do not conflict with polkit dir
+- include all libcryptsetup plugin libs
+
 * Wed Nov 15 2023 Dan Streetman <ddstreet@ieee.org> - 254.5-1
 - Update to systemd-stable 254.5
 

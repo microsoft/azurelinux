@@ -5,7 +5,7 @@ Version:        2.1.3
 Release:        23%{?dist}
 Summary:        Unit testing framework for C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        LGPLv2+
 URL:            http://cunit.sourceforge.net/
 #Source0:       https://downloads.sourceforge.net/cunit/%{name}-%{tarver}.tar.bz2

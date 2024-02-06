@@ -7,7 +7,7 @@ URL:            https://gnupg.org/
 Group:          Development/Libraries
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 This is a library that defines common error values for all GnuPG

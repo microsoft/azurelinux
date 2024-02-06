@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname lazy-object-proxy
 %global sum A fast and thorough lazy object proxy
 

@@ -4,7 +4,7 @@ Version:        0.58
 Release:        4%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dkimproxy.sourceforge.net/
 Source0:        https://cpan.metacpan.org/authors/id/M/MB/MBRADSHAW/Mail-DKIM-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

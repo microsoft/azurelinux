@@ -4,7 +4,7 @@ Release:        38%{?dist}
 Summary:        Emulate file interface for in-core strings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-String
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/IO-String-%{version}.tar.gz#/perl-IO-String-%{version}.tar.gz
 BuildArch:      noarch

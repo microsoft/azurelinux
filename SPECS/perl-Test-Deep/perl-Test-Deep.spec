@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Extremely flexible deep comparison
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Deep
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-Deep-%{version}.tar.gz#/perl-Test-Deep-%{version}.tar.gz
 Source1:        LICENSE.PTR

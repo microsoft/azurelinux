@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-si
 Summary: Sinhala hunspell dictionaries
 Version: 0.2.1

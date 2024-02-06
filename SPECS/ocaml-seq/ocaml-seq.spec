@@ -6,7 +6,7 @@ Version:        0.2.2
 Release:        7%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/c-cube/seq
 Source0:        %{url}/archive/%{version}/seq-%{version}.tar.gz
 

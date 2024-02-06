@@ -4,7 +4,7 @@ Version:        1.11.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ninja-build.org
 Source0:        https://github.com/ninja-build/ninja/archive/v%{version}.tar.gz#/ninja-%{version}.tar.gz
 Source1:        macros.ninja

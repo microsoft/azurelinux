@@ -4,7 +4,7 @@ Version:        3.2
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/thkukuk/libnss_nis
 Source:         https://github.com/thkukuk/libnss_nis/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # https://github.com/systemd/systemd/issues/7074

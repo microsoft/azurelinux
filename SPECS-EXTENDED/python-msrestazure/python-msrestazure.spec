@@ -5,7 +5,7 @@
 
 Summary:        The runtime library "msrestazure" for AutoRest generated Python clients
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Version:        0.6.4
 Name:           python-%{srcname}
 Release:        11%{?dist}

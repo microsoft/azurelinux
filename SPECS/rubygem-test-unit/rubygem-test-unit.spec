@@ -5,7 +5,7 @@ Version:        3.6.1
 Release:        1%{?dist}
 License:        PSF AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://test-unit.github.io/
 Source0:        https://github.com/test-unit/test-unit/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

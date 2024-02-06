@@ -4,7 +4,7 @@ Release:        7%{?dist}
 Summary:        The OpenGL Extension Wrangler Library
 License:        BSD and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://glew.sourceforge.net
 
 Source0:        https://sourceforge.net/projects/glew/files/glew/%{version}/glew-%{version}.tgz

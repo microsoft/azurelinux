@@ -4,7 +4,7 @@ Version:        1.10.2
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://gnupg.org/related_software/libgcrypt/
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2

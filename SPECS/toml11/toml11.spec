@@ -9,7 +9,7 @@ License:        MIT
 URL:            https://github.com/ToruNiina/toml11
 Group:          System Environment
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 #Source0:       https://github.com/ToruNiina/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

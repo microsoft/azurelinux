@@ -7,7 +7,7 @@ Summary:        Satisfiability Modulo Theories (SMT) solver
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/Z3Prover/z3
 Source0:        https://github.com/Z3Prover/z3/archive/%{name}-%{version}.tar.gz
 # https://github.com/Z3Prover/z3/pull/2730

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		xcb-util-keysyms
 Version:	0.4.0
 Release:	14%{?dist}

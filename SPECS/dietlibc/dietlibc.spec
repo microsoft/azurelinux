@@ -14,7 +14,7 @@ Version:        0.34
 Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.fefe.de/dietlibc/
 Source0:        https://www.fefe.de/dietlibc/%{name}-%{version}.tar.xz
 Patch1:         dietlibc-insecure-defpath.patch

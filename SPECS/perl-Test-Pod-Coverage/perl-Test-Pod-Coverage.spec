@@ -4,7 +4,7 @@ Version:        1.10
 Release:        18%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Test-Pod-Coverage-%{version}.tar.gz#/perl-Test-Pod-Coverage-%{version}.tar.gz
 Source1:        LICENSE.PTR

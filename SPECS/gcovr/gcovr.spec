@@ -1,11 +1,11 @@
 %bcond_with  docs
 Summary:        A code coverage report generator using GNU gcov
 Name:           gcovr
-Version:        5.0
-Release:        2%{?dist}
+Version:        7.0
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gcovr.com/
 Source0:        https://github.com/gcovr/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  make
@@ -94,6 +94,9 @@ popd
 %endif
 
 %changelog
+* Tue Jan 30 2024 Henry Li <lihl@microsoft.com> - 7.0-1
+- Upgrade to v7.0
+
 * Mon Apr 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.0-2
 - Add runtime requirements to main package
 - Use SPDX expression in license tag

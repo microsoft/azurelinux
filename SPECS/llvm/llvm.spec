@@ -1,10 +1,10 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        17.0.6
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
@@ -67,6 +67,14 @@ cmake -G Ninja                              \
 # disable security hardening for tests
 rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 cd build
+
+# remove tests that do not pass because of 'root' user usage in chroot while testing
+#    - e.g.: verifying access denied against a file for current user
+rm -f ../llvm/test/tools/llvm-ar/error-opening-permission.test
+rm -f ../llvm/test/tools/llvm-ranlib/error-opening-permission.test
+rm -f ../llvm/test/tools/llvm-dwarfdump/X86/output.s
+rm -f ../llvm/test/tools/llvm-ifs/fail-file-write.test
+
 ninja check-all
 
 %files
@@ -89,6 +97,13 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
+- Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
+  compile files for the specified targets.
+ 
+* Wed Jan 31 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
+- Address %check issues
+
 * Fri Jan 12 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
 - Upgrade to 17.0.6
 

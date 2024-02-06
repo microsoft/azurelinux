@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
