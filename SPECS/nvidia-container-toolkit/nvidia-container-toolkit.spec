@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
-Version:        1.13.5
-Release:        3%{?dist}
+Version:        1.14.4
+Release:        1%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -65,15 +65,9 @@ install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime-hook
 install -m 755 -t %{buildroot}%{_bindir} nvidia-container-runtime
 install -m 755 -t %{buildroot}%{_bindir} nvidia-ctk
 
-cp config/config.toml.rpm-yum config.toml
 mkdir -p %{buildroot}%{_sysconfdir}/nvidia-container-runtime
-install -m 644 -t %{buildroot}%{_sysconfdir}/nvidia-container-runtime config.toml
-
 mkdir -p %{buildroot}%{_libexecdir}/oci/hooks.d
-install -m 755 -t %{buildroot}%{_libexecdir}/oci/hooks.d oci-nvidia-hook
-
 mkdir -p %{buildroot}%{_datadir}/containers/oci/hooks.d
-install -m 644 -t %{buildroot}%{_datadir}/containers/oci/hooks.d oci-nvidia-hook.json
 
 %posttrans
 ln -sf %{_bindir}/nvidia-container-runtime-hook %{_bindir}/nvidia-container-toolkit
@@ -84,16 +78,17 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %files
 %license LICENSE
 %{_bindir}/nvidia-container-runtime-hook
-%{_libexecdir}/oci/hooks.d/oci-nvidia-hook
-%{_datadir}/containers/oci/hooks.d/oci-nvidia-hook.json
 
 %files base
 %license LICENSE
-%config %{_sysconfdir}/nvidia-container-runtime/config.toml
 %{_bindir}/nvidia-container-runtime
 %{_bindir}/nvidia-ctk
 
 %changelog
+* Mon Feb 05 2024 Bala <balakumaran.kannan@microsoft.com> - 1.14.4-1
+- Upgrade to version 1.14.4
+- Remove config and oci hooks from files as they are handled in post-install from v1.14.0
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.5-3
 - Bump release to rebuild with go 1.20.10
 
