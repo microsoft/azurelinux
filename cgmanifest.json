@@ -14003,8 +14003,8 @@
         "type": "other",
         "other": {
           "name": "nlohmann-json",
-          "version": "3.10.4",
-          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.10.4.tar.gz"
+          "version": "3.11.3",
+          "downloadUrl": "https://github.com/nlohmann/json/archive/v3.11.3.tar.gz"
         }
       }
     },
