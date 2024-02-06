@@ -33,6 +33,10 @@ update_manifests() {
     wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt
 }
 
+delete_lkg() {
+    rm -f $LKG_FILENAME
+}
+
 [[ "$1" == "--help" || "$1" == "help" ]] && usage
 
 get_lkg
@@ -40,6 +44,8 @@ get_lkg
 check_for_modified_manifests
 
 update_manifests
+
+delete_lkg
 
 cat << EOF
 ===
