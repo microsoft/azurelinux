@@ -9,8 +9,6 @@ URL:            https://www.freedesktop.org/wiki/Software/DBusBindings/
 Source0:        https://dbus.freedesktop.org/releases/%{name}/%{name}-%{version}.tar.gz
 # borrow centos7 patch to use sitearch properly
 Patch0:         0001-Move-python-modules-to-architecture-specific-directo.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1788491
-Patch1:         python39.patch
 
 BuildRequires:  autoconf-archive
 BuildRequires:  automake
@@ -28,6 +26,9 @@ Summary:        D-Bus bindings for python3
 BuildRequires:  python3-devel
 # for py3_build
 BuildRequires:  python3dist(setuptools)
+BuildRequires:  python3dist(setuptools-scm)
+BuildRequires:  python3dist(wheel)
+BuildRequires:  meson
 
 %description -n python3-dbus
 %{summary}.
