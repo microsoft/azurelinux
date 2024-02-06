@@ -91,6 +91,7 @@ BuildRequires: perl(Test::More)
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: coreutils
 Requires: perl
+Requires: SymCrypt
 
 %description
 The OpenSSL toolkit provides support for secure communications between
