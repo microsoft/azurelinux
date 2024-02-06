@@ -45,6 +45,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.7-1
+- Auto-upgrade to 3.0.7 - none
+
 * Fri Feb 04 2022 Thomas Crain <thcrain@microsoft.com> - 3.0.7-1
 - Upgrade to latest upstream version
 - Add tests
