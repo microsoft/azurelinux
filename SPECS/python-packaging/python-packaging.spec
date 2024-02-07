@@ -1,57 +1,130 @@
 Summary:        Core utilities for Python packages
 Name:           python-packaging
-Version:        21.3
+Version:        23.2
 Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
-Source0:        https://github.com/pypa/packaging/releases/download/%{version}/packaging-%{version}.tar.gz
+Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.tar.gz#/packaging-%{version}.tar.gz
+
 BuildArch:      noarch
+ 
 BuildRequires:  python3-devel
-%if %{with_check}
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-pyparsing
+BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
 BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  unzip
+ 
+%if %{with bootstrap}
+BuildRequires:  python%{python3_pkgversion}-flit-core
 %endif
-
-%description
-Core utilities for Python packages
-
-%package -n     python3-packaging
-Summary:        Core utilities for Python packages
-Requires:       python3
-Requires:       python3-pyparsing
-Requires:       python3-six
-
-
-%description -n python3-packaging
-Core utilities for Python packages
-
+ 
+# Upstream uses nox for testing, we specify the test deps manually as well.
+%if %{with tests}
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-pretend
+%endif
+%if %{with docs}
+BuildRequires:  python%{python3_pkgversion}-sphinx
+%endif
+ 
+ 
+%global _description %{expand:
+python-packaging provides core utilities for Python packages like utilities for
+dealing with versions, specifiers, markers etc.}
+ 
+%description %_description
+ 
+%package -n python%{python3_pkgversion}-%{pypi_name}
+Summary:        %{summary}
+ 
+%if %{with bootstrap}
+Provides:       python%{python3_pkgversion}dist(packaging) = %{version}
+Provides:       python%{python3_version}dist(packaging) = %{version}
+Requires:       python(abi) = %{python3_version}
+%endif
+ 
+%description -n python%{python3_pkgversion}-%{pypi_name}  %_description
+ 
+%if %{with docs}
+%package -n python-%{pypi_name}-doc
+Summary:        python-packaging documentation
+ 
+%description -n python-%{pypi_name}-doc
+Documentation for python-packaging
+%endif
+ 
+ 
 %prep
-%autosetup -n packaging-%{version}
-
+%autosetup -p1 -n %{pypi_name}-%{version}
+ 
+# Do not use furo as HTML theme in docs
+# furo is not available in Fedora
+sed -i '/html_theme = "furo"/d' docs/conf.py
+ 
+%if %{without bootstrap}
+%generate_buildrequires
+%pyproject_buildrequires -r
+%endif
+ 
+ 
 %build
-%py3_build
-
+%if %{with bootstrap}
+%{python3} -m flit_core.wheel
+%else
+%pyproject_wheel
+%endif
+ 
+%if %{with docs}
+# generate html docs
+sphinx-build-3 docs html
+# remove the sphinx-build leftovers
+rm -rf html/.{doctrees,buildinfo}
+# Do not bundle fonts
+rm -rf html/_static/fonts/
+%endif
+ 
+ 
 %install
-%py3_install
-
+%if %{with bootstrap}
+mkdir -p %{buildroot}%{python3_sitelib}
+unzip dist/packaging-%{version}-py3-none-any.whl -d %{buildroot}%{python3_sitelib} -x packaging-%{version}.dist-info/RECORD
+echo '%{python3_sitelib}/packaging*' > %{pyproject_files}
+%else
+%pyproject_install
+%pyproject_save_files %{pypi_name}
+%endif
+ 
+ 
 %check
-pip3 install pretend pytest
-PYTHONPATH=./ pytest
-
-%files -n python3-packaging
-%defattr(-,root,root,-)
-%license LICENSE
-%{python3_sitelib}/*
-
+%{!?with_bootstrap:%pyproject_check_import}
+%if %{with tests}
+%pytest
+%endif
+ 
+ 
+%files -n python%{python3_pkgversion}-%{pypi_name} -f %{pyproject_files}
+%license LICENSE LICENSE.APACHE LICENSE.BSD
+%doc README.rst CHANGELOG.rst CONTRIBUTING.rst
+ 
+ 
+%if %{with docs}
+%files -n python-%{pypi_name}-doc
+%doc html
+%license LICENSE LICENSE.APACHE LICENSE.BSD
+%endif
+ 
 %changelog
+* Wed Feb 07 2022 Brian Fjeldstad <bfjelds@microsoft.com> - 23.2-1
+  Upgrade to 23.2-1
+
 * Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
 - Upgrade to latest upstream version
 - Use github release source instead of pypi source
