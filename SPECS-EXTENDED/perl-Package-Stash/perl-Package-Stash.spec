@@ -11,7 +11,7 @@ Release:	7%{?dist}
 Summary:	Routines for manipulating stashes
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-Stash
 Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-%{version}.tar.gz#/perl-Package-Stash-%{version}.tar.gz
 BuildArch:	noarch

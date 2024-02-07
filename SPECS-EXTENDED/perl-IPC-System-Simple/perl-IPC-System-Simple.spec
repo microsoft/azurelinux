@@ -10,7 +10,7 @@ Version:	1.30
 Release:	2%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Run commands simply, with detailed diagnostics
 URL:		https://metacpan.org/release/IPC-System-Simple
 Source0:	https://cpan.metacpan.org/modules/by-module/IPC/IPC-System-Simple-%{version}.tar.gz#/perl-IPC-System-Simple-%{version}.tar.gz

@@ -15,7 +15,7 @@ Version:        1.15.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            http://www.openucx.org
 Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz

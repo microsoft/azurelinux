@@ -5,7 +5,7 @@ Version:        2023.05.03
 Release:        1%{?dist}
 Summary:        Regulatory database for 802.11 wireless networking
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        ISC
 URL:            https://wireless.wiki.kernel.org/en/developers/regulatory/wireless-regdb
 BuildArch:      noarch

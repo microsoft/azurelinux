@@ -11,7 +11,7 @@ Release:        10%{?dist}
 Summary:        System V and POSIX timezone strings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-TimeZone-SystemV
 Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/DateTime-TimeZone-SystemV-%{version}.tar.gz#/perl-DateTime-TimeZone-SystemV-%{version}.tar.gz
 BuildArch:      noarch

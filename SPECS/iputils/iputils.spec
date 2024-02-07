@@ -1,13 +1,13 @@
 Summary:        Programs for basic networking
 Name:           iputils
-Version:        20211215
-Release:        2%{?dist}
+Version:        20240117
+Release:        1%{?dist}
 License:        BSD-3 AND GPLv2+ AND Rdisc
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Communications
 URL:            https://github.com/iputils/iputils
-Source0:        https://github.com/iputils/iputils/archive/20211215.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/iputils/iputils/archive/20240117.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         ping_test_ipv6_localhost.patch
 BuildRequires:  iproute
 BuildRequires:  libcap-devel
@@ -32,7 +32,7 @@ The Iputils package contains programs for basic networking.
 %install
 %meson_install
 
-# rdisc and ninfod installed in sbin by default
+mkdir -p %{buildroot}%{_sbindir}
 ln -sf ../bin/tracepath %{buildroot}%{_sbindir}/tracepath
 ln -sf ../bin/tracepath %{buildroot}%{_sbindir}/tracepath6
 ln -sf ../bin/arping %{buildroot}%{_sbindir}/arping
@@ -52,8 +52,6 @@ mv -f RELNOTES.tmp RELNOTES.old
 %defattr(-,root,root)
 %license LICENSE
 %doc RELNOTES.old
-%{_sbindir}/rdisc
-%{_sbindir}/ninfod
 %{_sbindir}/tracepath
 %{_sbindir}/tracepath6
 %{_bindir}/tracepath
@@ -64,9 +62,11 @@ mv -f RELNOTES.tmp RELNOTES.old
 %caps(cap_net_raw=p cap_net_admin=p) %{_bindir}/ping
 %caps(cap_net_raw=p cap_net_admin=p) %{_bindir}/ping6
 %exclude %{_datadir}/locale/
-%exclude %{_sysconfdir}/init.d/ninfod.sh
 
 %changelog
+* Thu Feb 01 2024 Suresh Thelkar <sthelkaro@microsoft.com> - 20240117-1
+- Upgrade to 20240117
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20211215-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

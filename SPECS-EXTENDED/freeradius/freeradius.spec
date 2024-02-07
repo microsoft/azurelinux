@@ -9,7 +9,7 @@ Version:        3.2.3
 Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://freeradius.org/
 
 %global dist_base freeradius-server-%{version}

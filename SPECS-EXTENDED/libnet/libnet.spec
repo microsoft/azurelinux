@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        C library for portable packet creation and injection
 Name:           libnet
 Version:        1.2

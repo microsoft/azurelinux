@@ -4,7 +4,7 @@ Release:        26%{?dist}
 Summary:        Database of robots.txt-derived permissions
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/WWW-RobotRules
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/WWW-RobotRules-%{version}.tar.gz#/perl-WWW-RobotRules-%{version}.tar.gz
 BuildArch:      noarch

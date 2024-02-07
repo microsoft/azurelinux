@@ -18,7 +18,7 @@ Release:        21%{?dist}
 # install-sh:                   MIT
 License:        GPLv3+ AND (GPLv3+ AND BSD) AND (LGPLv3+ OR BSD) AND LGPLv2+ AND Public Domain AND GFDL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.gnu.org/software/%{name}/
 Source:         https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # Pass compilation with -Werror=format-security, bug #1037323

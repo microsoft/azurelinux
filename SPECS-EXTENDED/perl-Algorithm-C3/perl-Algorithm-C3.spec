@@ -4,7 +4,7 @@ Release:	18%{?dist}
 Summary:	Module for merging hierarchies using the C3 algorithm
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Algorithm-C3
 Source0:	https://cpan.metacpan.org/modules/by-module/Algorithm/Algorithm-C3-%{version}.tar.gz#/perl-Algorithm-C3-%{version}.tar.gz
 BuildArch:	noarch

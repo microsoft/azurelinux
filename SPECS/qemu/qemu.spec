@@ -220,7 +220,7 @@ Version:        6.2.0
 Release:        18%{?dist}
 License:        BSD AND CC-BY AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.qemu.org/
 Source0:        https://download.qemu.org/%{name}-%{version}.tar.xz
 Source10:       qemu-guest-agent.service

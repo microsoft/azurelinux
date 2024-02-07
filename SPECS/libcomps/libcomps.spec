@@ -5,7 +5,7 @@ Version:        0.1.19
 Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/libcomps

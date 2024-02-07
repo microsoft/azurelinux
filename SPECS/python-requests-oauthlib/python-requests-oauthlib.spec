@@ -7,7 +7,7 @@ Version:        1.3.1
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/requests-oauthlib
 Source0:        https://github.com/requests/requests-oauthlib/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch

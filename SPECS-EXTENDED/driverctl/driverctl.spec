@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global commit	fa9dce43d1a667d6e6e26895fbed01b3b04362c9
 
 Name:		driverctl

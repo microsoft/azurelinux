@@ -13,7 +13,7 @@ URL:            https://metacpan.org/dist/Module-Build
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-%{version}.tar.gz
 Source1:        LICENSE.PTR
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 
 BuildRequires:  perl >= 5.28.0

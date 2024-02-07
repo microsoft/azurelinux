@@ -5,7 +5,7 @@ Release:       14%{?dist}
 License:       BSD
 Group:         System Environment/Daemons
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/xinetd-org/xinetd
 #Source0:      https://github.com/xinetd-org/xinetd/archive/%{name}-2-3-15.tar.gz
 Source0:       %{name}-%{version}.tar.gz

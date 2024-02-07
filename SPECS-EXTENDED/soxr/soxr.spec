@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           soxr
 Version:        0.1.3
 Release:        6%{?dist}

@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        HTML tree handling modules for Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTML-Tree
 Source0:        https://cpan.metacpan.org/authors/id/K/KE/KENTNL/HTML-Tree-%{version}.tar.gz#/perl-HTML-Tree-%{version}.tar.gz
 BuildArch:      noarch

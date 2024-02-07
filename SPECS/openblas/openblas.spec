@@ -24,8 +24,8 @@ Version:        0.3.26
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://github.com/OpenMathLib/OpenBLAS
+Distribution:   Azure Linux
+URL:            https://github.com/OpenMathLib/OpenBLAS/
 Source0:        https://github.com/OpenMathLib/OpenBLAS/archive/v%{version}/openblas-%{version}.tar.gz
 # Use system lapack
 Patch0:         openblas-0.2.15-system_lapack.patch
@@ -189,10 +189,10 @@ This package contains the static libraries.
 tar zxf %{SOURCE0}
 cd OpenBLAS-%{version}
 %if %{with system_lapack}
-%patch0 -p1 -b .system_lapack
+%patch 0 -p1 -b .system_lapack
 %endif
-%patch1 -p1 -b .libname
-%patch3 -p1 -b .tests
+%patch 1 -p1 -b .libname
+%patch 3 -p1 -b .tests
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;

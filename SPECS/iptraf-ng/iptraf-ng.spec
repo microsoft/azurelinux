@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        A console-based network monitoring utility
 Name:           iptraf-ng
 Version:        1.2.1

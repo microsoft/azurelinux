@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:      hyphen
 Summary:   A text hyphenation library
 Version:   2.8.8

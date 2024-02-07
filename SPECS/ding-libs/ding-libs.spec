@@ -13,7 +13,7 @@ Version:        0.6.2
 Release:        55%{?dist}
 License:        LGPLv3+ AND GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/SSSD/ding-libs
 Source0:        https://github.com/SSSD/ding-libs/releases/download/%{version}/%{name}-%{version}.tar.gz
 

@@ -23,7 +23,7 @@ Version:        2.9.0~dev.9
 Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Networking/Web/Browsers
 URL:            https://lynx.invisible-island.net/
 Source0:        https://invisible-mirror.net/archives/%{name}/tarballs/%{name}%{tarbase}.tar.bz2
