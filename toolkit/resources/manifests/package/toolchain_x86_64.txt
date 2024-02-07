@@ -509,8 +509,8 @@ perl-utils-5.38.2-503.azl3.noarch.rpm
 perl-vars-1.05-503.azl3.noarch.rpm
 perl-version-0.99.29-503.azl3.noarch.rpm
 perl-vmsish-1.04-503.azl3.noarch.rpm
-perl-XML-Parser-2.46-2.azl3.x86_64.rpm
-perl-XML-Parser-debuginfo-2.46-2.azl3.x86_64.rpm
+perl-XML-Parser-2.47-1.azl3.x86_64.rpm
+perl-XML-Parser-debuginfo-2.47-1.azl3.x86_64.rpm
 pinentry-1.2.1-1.azl3.x86_64.rpm
 pinentry-debuginfo-1.2.1-1.azl3.x86_64.rpm
 pkgconf-2.0.2-1.azl3.x86_64.rpm
@@ -571,10 +571,10 @@ sqlite-devel-3.44.0-1.azl3.x86_64.rpm
 sqlite-libs-3.44.0-1.azl3.x86_64.rpm
 swig-4.1.1-1.azl3.x86_64.rpm
 swig-debuginfo-4.1.1-1.azl3.x86_64.rpm
-systemd-bootstrap-250.3-14.azl3.x86_64.rpm
-systemd-bootstrap-debuginfo-250.3-14.azl3.x86_64.rpm
-systemd-bootstrap-devel-250.3-14.azl3.x86_64.rpm
-systemd-bootstrap-rpm-macros-250.3-14.azl3.noarch.rpm
+systemd-bootstrap-250.3-15.azl3.x86_64.rpm
+systemd-bootstrap-debuginfo-250.3-15.azl3.x86_64.rpm
+systemd-bootstrap-devel-250.3-15.azl3.x86_64.rpm
+systemd-bootstrap-rpm-macros-250.3-15.azl3.noarch.rpm
 tar-1.35-1.azl3.x86_64.rpm
 tar-debuginfo-1.35-1.azl3.x86_64.rpm
 tdnf-3.5.2-2.azl3.x86_64.rpm

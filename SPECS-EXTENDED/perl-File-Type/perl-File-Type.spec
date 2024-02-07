@@ -4,7 +4,7 @@ Release:        37%{?dist}
 Summary:        Determine file type using magic
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Type
 Source0:        https://cpan.metacpan.org/authors/id/P/PM/PMISON/File-Type-%{version}.tar.gz#/perl-File-Type-%{version}.tar.gz
 BuildArch:      noarch

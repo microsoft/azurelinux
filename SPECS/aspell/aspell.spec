@@ -10,7 +10,7 @@ Release:        8%{?dist}
 # BSD     .. myspell/munch.c
 License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://aspell.net/
 Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch

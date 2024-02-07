@@ -7,7 +7,7 @@ Version:        %{cpan_version}
 Release:        16%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/BDB
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/BDB-%{cpan_version}.tar.gz
 

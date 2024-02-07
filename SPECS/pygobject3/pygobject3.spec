@@ -5,7 +5,7 @@ Version:        3.42.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/PyGObject
 Source0:        https://download.gnome.org/sources/pygobject/%{majmin}/pygobject-%{version}.tar.xz
 BuildRequires:  cairo-gobject-devel

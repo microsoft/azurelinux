@@ -16,7 +16,7 @@ Version:        1.21.1
 Release:        3%{?dist}
 License:        PHP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pecl.php.net/package/zip
 Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz#/%{name}-%{version}.tgz
 BuildRequires:  gcc

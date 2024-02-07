@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           liboauth
 Version:        1.0.3
 Release:        15%{?dist}

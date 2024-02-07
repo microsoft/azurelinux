@@ -6,7 +6,7 @@ License:        GPLv2+ and GPLv2 and BSD and Latex2e and Verbatim and GPL+ and B
 URL:            https://www.kernel.org/doc/man-pages
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://mirrors.edge.kernel.org/pub/linux/docs/%{name}/Archive/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 

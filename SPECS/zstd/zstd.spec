@@ -4,7 +4,7 @@ Version:        1.5.5
 Release:        2%{?dist}
 License:        BSD-3-Clause AND GPL-2.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://facebook.github.io/zstd/
 Source0:        https://github.com/facebook/zstd/releases/download/v%{version}/%{name}-%{version}.tar.gz

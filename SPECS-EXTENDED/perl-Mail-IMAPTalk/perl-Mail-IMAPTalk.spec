@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Mail-IMAPTalk
 Version:        4.04
 Release:        12%{?dist}

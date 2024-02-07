@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           langtable
 Version:        0.0.53
 Release:        2%{?dist}

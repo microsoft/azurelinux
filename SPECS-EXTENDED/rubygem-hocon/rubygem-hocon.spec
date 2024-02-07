@@ -9,7 +9,7 @@ Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/puppetlabs/ruby-hocon
 Source0:        https://github.com/puppetlabs/ruby-hocon/archive/refs/tags/%{version}.tar.gz#/ruby-%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby

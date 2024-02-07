@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           spice-vdagent
 Version:        0.22.1
 Release:        1%{?dist}

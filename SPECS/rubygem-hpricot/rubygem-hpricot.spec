@@ -11,7 +11,7 @@ Release:       36%{?dist}
 # ext/fast_xs/FastXsService.java is licensed under ASL 2.0
 License:       MIT AND ASL 2.0
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/hpricot/hpricot
 Source0:       https://github.com/hpricot/hpricot/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 

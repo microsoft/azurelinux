@@ -6,7 +6,7 @@ Version:        1.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/tarcieri/cool.io
 Source0:        https://github.com/tarcieri/cool.io/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

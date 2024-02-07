@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # cleanup
 rm -rf /usr/share/misc
 rm -rf /usr/share/man

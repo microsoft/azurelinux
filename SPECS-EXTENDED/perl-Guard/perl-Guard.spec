@@ -4,7 +4,7 @@ Release:        18%{?dist}
 Summary:        Safe cleanup blocks
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Guard
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Guard-%{version}.tar.gz#/perl-Guard-%{version}.tar.gz
 # Module Build

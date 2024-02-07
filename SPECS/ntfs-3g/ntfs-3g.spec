@@ -4,7 +4,7 @@ Version:        2022.10.3
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.tuxera.com/company/open-source/
 Source0:        https://tuxera.com/opensource/%{name}_ntfsprogs-%{version}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch

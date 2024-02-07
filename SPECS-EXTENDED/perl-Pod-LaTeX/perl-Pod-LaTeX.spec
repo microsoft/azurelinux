@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Pod-LaTeX
 Version:        0.61
 Release:        309%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Business-ISBN
 %global cpan_version 3.005
 Version:        %(echo '%{cpan_version}' | tr '_' '.'})

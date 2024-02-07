@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-dsb
 Summary: Lower Sorbian hunspell dictionaries
 Version: 1.4.8

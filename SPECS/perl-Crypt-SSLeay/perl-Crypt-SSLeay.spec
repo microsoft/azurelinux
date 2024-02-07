@@ -8,7 +8,7 @@ URL:            https://metacpan.org/release/Crypt-SSLeay
 License:        Artistic 2.0
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/N/NA/NANIS/Crypt-SSLeay-%{version}.tar.gz
 Source1:        %{LICENSE_PATH}
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))

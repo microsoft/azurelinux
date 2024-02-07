@@ -4,7 +4,7 @@ Version:        1.15.1
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://sourceforge.net/projects/cppunit/
 Source0:        https://dev-www.libreoffice.org/src/%{name}-%{version}.tar.gz
