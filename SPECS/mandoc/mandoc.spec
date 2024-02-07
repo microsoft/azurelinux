@@ -218,3 +218,85 @@ fi
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.14.6-1
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+* Thu Sep 21 2023 David Cantrell <dcantrell@redhat.com> - 1.14.6-6
+- Convert License tag to SPDX expression
+ 
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+ 
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+ 
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+ 
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+ 
+* Mon Dec 20 2021 David Cantrell <dcantrell@redhat.com> - 1.14.6-1
+- Upgrade to mandoc-1.14.6 (#2005601)
+ 
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.5-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+ 
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.5-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+ 
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.5-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+ 
+* Wed May 20 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-12
+- Drop explicit Requires for libmandoc package (#1837690)
+ 
+* Tue May 19 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-11
+- Per discussion with upstream, drop the shared library patch
+ 
+* Tue Apr 14 2020 Björn Esser <besser82@fedoraproject.org> - 1.14.5-10
+- libmandoc.so must be linked with COMPAT_OBJS
+- Add patch to fix configure script
+- Replace plain make with %%make_build
+* Mon Mar 09 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-9
+- BR perl-interpreter
+ 
+* Mon Mar 09 2020 Nikola Forró <nforro@redhat.com> - 1.14.5-8
+- Do not use alternatives for mdoc.7
+ 
+* Thu Mar 05 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-7
+- Build everything using -fPIC
+ 
+* Thu Mar 05 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-6
+- Include libmandoc.a in libmandoc-devel
+ 
+* Tue Feb 25 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-5
+- Split alternatives in to 4 sets (nforro)
+- Use default names for binaries and man pages (nforro)
+- Do not compress man pages (nforro)
+- Add missing %%preun requirement (nforro)
+ 
+* Mon Feb 24 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-4
+- Install the user tools using alternatives (#1785308)
+ 
+* Thu Feb 06 2020 David Cantrell <dcantrell@redhat.com> - 1.14.5-3
+- Simplify the compat preprocessor tests (#1799629)
+ 
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+ 
+* Wed Oct 16 2019 David Cantrell <dcantrell@redhat.com> - 1.14.5-1
+- Update to mandoc-1.14.5
+ 
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1.14.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+ 
+* Mon Mar 25 2019 David Shea <dshea@redhat.com> - 1.14.4-2
+- Move mdoc.7 to mandoc_mdoc.7 (#1691793)
+ 
+* Thu Feb  7 2019 David Shea <dshea@redhat.com> - 1.14.4-1
+- Initial package
