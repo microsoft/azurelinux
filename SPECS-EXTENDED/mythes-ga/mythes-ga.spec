@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-ga
 Summary: Irish thesaurus
 %global upstreamid 20071001

@@ -22,7 +22,7 @@ Version:        20200113
 Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools/Building
 URL:            https://github.com/kubic-project/bazel-workspaces
 # There are no official source tarball releases for this version. The source tarbll is grabbed from this

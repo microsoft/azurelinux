@@ -27,6 +27,9 @@ var (
 
 	// Valid log levels
 	levelsArray = []string{"panic", "fatal", "error", "warn", "info", "debug", "trace"}
+
+	// Valid log colors
+	colorsArray = []string{"always", "auto", "never"}
 )
 
 const (
@@ -45,16 +48,37 @@ const (
 	// FileFlagHelp is the suggested help message for the logfile flag
 	FileFlagHelp = "Path to the image's log file."
 
+	// ColorsPlaceholder are all valid log colors separated by '|' character.
+	ColorsPlaceholder = "(always|auto|never)"
+
+	// ColorFlag is the suggested name for logcolor flag
+	ColorFlag = "log-color"
+
+	// ColorFlagHelp is the suggested help message for the logcolor flag
+	ColorFlagHelp = "Color setting for log terminal output."
+
 	defaultLogFileLevel   = logrus.DebugLevel
 	defaultStderrLogLevel = logrus.InfoLevel
 	parentCallerLevel     = 1
+	colorModeAuto         = "auto"
+	colorModeAlways       = "always"
+	colorModeNever        = "never"
 )
 
+type LogFlags struct {
+	LogColor *string
+	LogFile  *string
+	LogLevel *string
+}
+
 // initLogFile initializes the common logger with a file
-func initLogFile(filePath string) (err error) {
+func initLogFile(filePath string, color string) (err error) {
+	useColors := false
+	if color == colorModeAlways {
+		useColors = true
+	}
 	const (
 		noToolName = ""
-		useColors  = false
 	)
 
 	err = os.MkdirAll(filepath.Dir(filePath), os.ModePerm)
@@ -81,7 +105,7 @@ func InitStderrLog() {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath)
+	initStderrLogInternal(callerFilePath, colorModeAuto)
 }
 
 // SetFileLogLevel sets the lowest log level for file output
@@ -95,7 +119,11 @@ func SetStderrLogLevel(level string) (err error) {
 }
 
 // InitBestEffort runs InitStderrLog always, and InitLogFile if path is not empty
-func InitBestEffort(path string, level string) {
+func InitBestEffort(lf *LogFlags) {
+	level := *lf.LogLevel
+	color := *lf.LogColor
+	path := *lf.LogFile
+
 	if level == "" {
 		level = defaultStderrLogLevel.String()
 	}
@@ -105,10 +133,10 @@ func InitBestEffort(path string, level string) {
 		log.Panic("Failed to get caller info.")
 	}
 
-	initStderrLogInternal(callerFilePath)
+	initStderrLogInternal(callerFilePath, color)
 
 	if path != "" {
-		PanicOnError(initLogFile(path), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path, color), "Failed while setting log file (%s).", path)
 	}
 
 	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
@@ -117,6 +145,11 @@ func InitBestEffort(path string, level string) {
 // Levels returns list of strings representing valid log levels.
 func Levels() []string {
 	return levelsArray
+}
+
+// Colors returns list of strings representing valid log colors.
+func Colors() []string {
+	return colorsArray
 }
 
 // PanicOnError logs the error and any message strings and then panics
@@ -179,8 +212,11 @@ func ReplaceStderrFormatter(newFormatter logrus.Formatter) (oldFormatter logrus.
 	return stderrHook.ReplaceFormatter(newFormatter)
 }
 
-func initStderrLogInternal(callerFilePath string) {
-	const useColors = true
+func initStderrLogInternal(callerFilePath string, color string) {
+	useColors := true
+	if color == colorModeNever {
+		useColors = false
+	}
 
 	Log = logrus.New()
 	Log.ReportCaller = true

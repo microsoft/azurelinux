@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Temporarily set Config or XSConfig values
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mock-Config
 Source0:        https://cpan.metacpan.org/authors/id/R/RU/RURBAN/Mock-Config-%{version}.tar.gz#/perl-Mock-Config-%{version}.tar.gz
 BuildArch:      noarch

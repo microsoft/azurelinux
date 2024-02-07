@@ -1,0 +1,117 @@
+From f4a3020f202d67ad5682304e7710bfc14f1320eb Mon Sep 17 00:00:00 2001
+From: Thomas Crain <thcrain@microsoft.com>
+Date: Wed, 19 Jan 2022 21:36:29 -0800
+Subject: [PATCH] Add Microsoft Azure Linux support to supermin
+
+---
+ src/ph_rpm.ml        | 18 +++++++++++++++++-
+ tests/test-harder.sh | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/src/ph_rpm.ml b/src/ph_rpm.ml
+index 549bd9a..760c815 100644
+--- a/src/ph_rpm.ml
++++ b/src/ph_rpm.ml
+@@ -65,6 +65,12 @@ let ibm_powerkvm_detect () =
+       (stat "/etc/ibm_powerkvm-release").st_kind = S_REG
+     with Unix_error _ -> false
+ 
++let azurelinux_detect () =
++  Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
++    Config.dnf <> "no" &&
++    Os_release.get_id () = "azurelinux" ||
++     try (stat "/etc/azurelinux-release").st_kind = S_REG with Unix_error _ -> false
++
+ let settings = ref no_settings
+ let rpm_major, rpm_minor, rpm_arch = ref 0, ref 0, ref ""
+ let zypper_major, zypper_minor, zypper_patch = ref 0, ref 0, ref 0
+@@ -450,6 +456,10 @@ and mageia_download_all_packages pkgs dir =
+ 
+   rpm_unpack tdir dir
+ 
++and azurelinux_download_all_packages pkgs dir =
++  let tdir = !settings.tmpdir // string_random8 () in
++  download_all_packages_with_dnf pkgs dir tdir
++
+ and download_all_packages_with_urpmi pkgs dir tdir =
+   let rpms = List.map rpm_package_name (PackageSet.elements pkgs) in
+ 
+@@ -544,4 +554,10 @@ let () =
+     ph_detect = openmandriva_detect;
+     ph_download_package = PHDownloadAllPackages openmandriva_download_all_packages;
+   } in
+-  register_package_handler "openmandriva" "rpm" openmandriva
++  register_package_handler "openmandriva" "rpm" openmandriva;
++  let azurelinux = {
++    fedora with
++    ph_detect = azurelinux_detect;
++    ph_download_package = PHDownloadAllPackages azurelinux_download_all_packages;
++  } in
++  register_package_handler "azurelinux" "rpm" azurelinux
+diff --git a/tests/test-harder.sh b/tests/test-harder.sh
+index aceef21..223cae9 100755
+--- a/tests/test-harder.sh
++++ b/tests/test-harder.sh
+@@ -32,6 +32,7 @@ if [ -f /etc/os-release ]; then
+         opensuse*|sled|sles) distro=suse ;;
+         ubuntu) distro=debian ;;
+         openmandriva) distro=openmandriva ;;
++		azurelinux) distro=azurelinux ;;
+     esac
+ elif [ -f /etc/arch-release ]; then
+     distro=arch
+@@ -45,6 +46,8 @@ elif [ -f /etc/SuSE-release ]; then
+     distro=suse
+ elif [ -f /etc/ibm_powerkvm-release ]; then
+     distro=ibm-powerkvm
++elif [ -f /etc/azurelinux-release ]; then
++	distro=azurelinux
+ else
+     exit 77
+ fi
+@@ -67,6 +70,8 @@ case $distro in
+ 	# installed.  (See commit fb40baade8e3441b73ce6fd10a32fbbfe49cc4da)
+ 	pkgs="augeas hivex rpm"
+ 	;;
++	azurelinux)
++	pkgs="augeas hivex tar"
+     redhat)
+         # Choose tar because it has an epoch > 0 and is commonly
+         # installed.  (See commit fb40baade8e3441b73ce6fd10a32fbbfe49cc4da)
+@@ -157,6 +162,33 @@ case $distro in
+ 	    exit 1
+ 	fi
+ 	;;
++	azurelinux)
++	if [ ! -x $d2/usr/bin/augtool ]; then
++	    echo "$0: $distro: augtool binary not installed in chroot"
++	    ls -lR $d2
++	    exit 1
++	fi
++	if [ "$(find $d2/usr/lib* -name libaugeas.so.0 | wc -l)" -lt 1 ]; then
++	    echo "$0: $distro: augeas library not installed in chroot"
++	    ls -lR $d2
++	    exit 1
++	fi
++	if [ ! -x $d2/usr/bin/hivexget ]; then
++	    echo "$0: $distro: hivexget binary not installed in chroot"
++	    ls -lR $d2
++	    exit 1
++	fi
++	if [ "$(find $d2/usr/lib* -name libhivex.so.0 | wc -l)" -lt 1 ]; then
++	    echo "$0: $distro: hivex library not installed in chroot"
++	    ls -lR $d2
++	    exit 1
++	fi
++	if [ ! -x $d2/bin/tar ]; then
++	    echo "$0: $distro: tar binary not installed in chroot"
++	    ls -lR $d2
++	    exit 1
++	fi
++	;;
+     openmandriva)
+ 	if [ ! -x $d2/usr/bin/augtool ]; then
+ 	    echo "$0: $distro: augtool binary not installed in chroot"
+-- 
+2.25.1
+

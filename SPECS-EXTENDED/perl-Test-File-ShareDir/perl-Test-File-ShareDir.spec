@@ -4,7 +4,7 @@ Release:        11%{?dist}
 Summary:        Create a Fake ShareDir for your modules for testing
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-File-ShareDir
 Source0:        https://cpan.metacpan.org/authors/id/K/KE/KENTNL/Test-File-ShareDir-%{version}.tar.gz#/perl-Test-File-ShareDir-%{version}.tar.gz
 BuildArch:      noarch

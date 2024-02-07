@@ -6,7 +6,7 @@ Summary:        High-performance regular expression matching library
 License:        BSD
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.hyperscan.io/
 Source0:        https://github.com/intel/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         hyperscan-fix-missed-symbols.patch

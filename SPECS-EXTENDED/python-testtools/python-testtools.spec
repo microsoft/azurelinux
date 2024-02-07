@@ -32,7 +32,7 @@ Summary:        Extensions to the Python unit testing framework
 License:        MIT
 URL:            https://launchpad.net/testtools
 Vendor:         Microsoft
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/t/%{libname}/%{libname}-%{version}.tar.gz
 Patch0:         testtools-2.4.0-remove_backports.patch
 # Reported as:

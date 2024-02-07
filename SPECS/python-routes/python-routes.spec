@@ -9,7 +9,7 @@ Release:        4%{?dist}
 License:        MIT
 URL:            https://routes.readthedocs.io/en/latest/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/R/%{upname}/%{upname}-%{version}.tar.gz
 BuildArch:      noarch
 

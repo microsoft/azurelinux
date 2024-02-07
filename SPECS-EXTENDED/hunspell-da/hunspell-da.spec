@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-da
 Summary: Danish hunspell dictionaries
 Version: 1.7.42

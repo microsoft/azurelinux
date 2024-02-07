@@ -10,7 +10,7 @@ Summary:        Header files from the SPIR-V registry
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup
 Source0:        %url/SPIRV-Headers/archive/%{commit}/%{name}-%{commit}.tar.gz
 

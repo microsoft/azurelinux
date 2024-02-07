@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        A more sensible way to change directories
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-chdir
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-chdir-%{version}.tar.gz#/perl-File-chdir-%{version}.tar.gz
 BuildArch:      noarch

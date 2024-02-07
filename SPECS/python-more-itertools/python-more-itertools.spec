@@ -9,7 +9,7 @@ Version:        8.13.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/erikrose/more-itertools
 Source0:        %{pypi_source more-itertools}
 BuildRequires:  python3-devel

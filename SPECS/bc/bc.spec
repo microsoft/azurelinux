@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            https://www.gnu.org/software/bc/
 Group:          System Environment/base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/bc/%{name}-%{version}.tar.gz
 
 BuildRequires:  ed

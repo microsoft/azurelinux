@@ -40,14 +40,12 @@ func OutputDirFlag(k *kingpin.Application, doc string) *string {
 	return k.Flag("output-dir", doc).Required().String()
 }
 
-// LogFileFlag registers a log file flag for k and returns the passed value
-func LogFileFlag(k *kingpin.Application) *string {
-	return k.Flag(logger.FileFlag, logger.FileFlagHelp).String()
-}
-
-// LogLevelFlag registers a log level flag for k and returns the passed value
-func LogLevelFlag(k *kingpin.Application) *string {
-	return k.Flag(logger.LevelsFlag, logger.LevelsHelp).PlaceHolder(logger.LevelsPlaceholder).Enum(logger.Levels()...)
+func SetupLogFlags(k *kingpin.Application) *logger.LogFlags {
+	lf := &logger.LogFlags{}
+	lf.LogColor = k.Flag(logger.ColorFlag, logger.ColorFlagHelp).PlaceHolder(logger.ColorsPlaceholder).Enum(logger.Colors()...)
+	lf.LogFile = k.Flag(logger.FileFlag, logger.FileFlagHelp).String()
+	lf.LogLevel = k.Flag(logger.LevelsFlag, logger.LevelsHelp).PlaceHolder(logger.LevelsPlaceholder).Enum(logger.Levels()...)
+	return lf
 }
 
 // PlaceHolderize takes a list of available inputs and returns a corresponding placeholder

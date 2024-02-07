@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
@@ -107,7 +108,7 @@ func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskP
 	defer efiSystemPartitionMount.Close()
 
 	// Read the grub.cfg file.
-	grubConfigFilePath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
+	grubConfigFilePath := filepath.Join(tmpDir, installutils.GrubCfgFile)
 	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)

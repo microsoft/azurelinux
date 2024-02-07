@@ -4,7 +4,7 @@ Version:        0.9.12
 Release:        28%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.unicap-imaging.org/
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-filter.sh

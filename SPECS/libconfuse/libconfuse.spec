@@ -4,7 +4,7 @@ Version:        3.3
 Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/libconfuse/libconfuse
 Source0:        https://github.com/libconfuse/libconfuse/releases/download/v%{version}/confuse-%{version}.tar.gz
