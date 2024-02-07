@@ -64,6 +64,9 @@ Utilities to handle and/or debug evdev devices.
 %{_bindir}/touchpad-edge-detector
 %{_bindir}/mouse-dpi-tool
 %{_bindir}/libevdev-tweak-device
+%{_mandir}/man1/libevdev-tweak-device.1*
+%{_mandir}/man1/touchpad-edge-detector.1*
+%{_mandir}/man1/mouse-dpi-tool.1*
 
 %changelog
 * Mon Feb 05 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.13.1
