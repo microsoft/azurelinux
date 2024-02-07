@@ -1,6 +1,6 @@
 Summary:        SELinux Translation Daemon
 Name:           mcstrans
-Version:        3.2
+Version:        3.6
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -12,9 +12,9 @@ BuildRequires:  gcc
 BuildRequires:  libcap-devel
 BuildRequires:  libselinux-devel >= %{version}
 BuildRequires:  libsepol-devel >= %{version}
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  systemd
-Requires:       pcre
+Requires:       pcre2
 Provides:       setransd = %{version}-%{release}
 Provides:       libsetrans = %{version}-%{release}
 Obsoletes:      libsetrans <= %{version}-%{release}
@@ -52,29 +52,28 @@ rm -f %{buildroot}%{_libdir}/*.a
 cp -r share/* %{buildroot}%{_datadir}/mcstrans/
 
 # Systemd
+mkdir -p %{buildroot}%{_unitdir}
+ln -s mcstrans.service %{buildroot}/%{_unitdir}/mcstransd.service
 rm -rf %{buildroot}/%{_sysconfdir}/rc.d/init.d/mcstrans
 install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 
 %post
-%systemd_post mcstrans.service
+%systemd_post mcstransd.service
 
 %preun
-%systemd_preun mcstrans.service
+%systemd_preun mcstransd.service
 
 %postun
-%systemd_postun mcstrans.service
+%systemd_postun mcstransd.service
 
 %files
-%license COPYING
 %{_mandir}/man8/mcs.8.gz
 %{_mandir}/man8/mcstransd.8.gz
 %{_mandir}/man5/setrans.conf.5.gz
-%{_mandir}/ru/man8/mcs.8.gz
-%{_mandir}/ru/man8/mcstransd.8.gz
-%{_mandir}/ru/man5/setrans.conf.5.gz
 %{_mandir}/man8/secolor.conf.8.gz
 %{_sbindir}/mcstransd
 %{_unitdir}/mcstrans.service
+%{_unitdir}/mcstransd.service
 %dir %{_sysconfdir}/selinux/mls/setrans.d
 %dir %{_datadir}/mcstrans
 
@@ -87,6 +86,11 @@ install -m644 %{SOURCE1} %{buildroot}%{_mandir}/man8/
 %{_datadir}/mcstrans/util/*
 
 %changelog
+* Mon Feb 5 2024 Nan Liu <liunan@microsoft.com> - 3.6-1
+- Upgrade to 3.6
+- Drop /ru/
+- Port to new PCRE2 from end-of-life PCRE
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
