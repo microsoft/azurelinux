@@ -33,11 +33,13 @@ for more information about the goals and features on the CIL language.
 %make_install SBINDIR="%{buildroot}%{_sbindir}" LIBDIR="%{buildroot}%{_libdir}"
 
 %files
-%license COPYING
+%license LICENSE
 %{_bindir}/secilc
 %{_bindir}/secil2conf
+%{_bindir}/secil2tree
 %{_mandir}/man8/secilc.8.gz
 %{_mandir}/man8/secil2conf.8.gz
+%{_mandir}/man8/secil2tree.8.gz
 
 %changelog
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
