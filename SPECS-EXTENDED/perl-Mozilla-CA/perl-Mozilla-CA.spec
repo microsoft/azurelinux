@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Mozilla-CA
 # You do not need to back-port a new version for updating a list of the
 # certificates. They are taken from ca-certificates package instead

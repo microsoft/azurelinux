@@ -6,7 +6,7 @@ Version:        78.10.0
 Release:        6%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey
 Source0:        https://ftp.mozilla.org/pub/firefox/releases/%{version}esr/source/firefox-%{version}esr.source.tar.xz

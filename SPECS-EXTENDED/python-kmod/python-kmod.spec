@@ -1,7 +1,7 @@
 Name:           python-kmod
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Python module to work with kernel modules
 Version:        0.9
 Release:        28%{?dist}

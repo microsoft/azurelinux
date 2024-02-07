@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global min_libpmemobj_ver 1.8
 %global upstreamversion 1.9
 

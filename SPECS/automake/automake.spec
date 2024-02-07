@@ -6,7 +6,7 @@ License:	GPLv2+
 URL:		https://www.gnu.org/software/automake/
 Group:		System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	https://ftp.gnu.org/gnu/automake/%{name}-%{version}.tar.gz
 BuildRequires:	autoconf
 BuildArch:      noarch

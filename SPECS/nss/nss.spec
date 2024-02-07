@@ -1,4 +1,4 @@
-%global nspr_version 4.30
+%global nspr_version 4.35
 %global unsupported_tools_directory %{_libdir}/nss/unsupported-tools
 # Produce .chk files for the final stripped binaries
 %define __spec_install_post \
@@ -13,14 +13,14 @@
 
 Summary:        Security client
 Name:           nss
-Version:        3.75
-Release:        2%{?dist}
+Version:        3.96.1
+Release:        1%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS
-Source0:        https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_75_RTM/src/%{name}-%{version}.tar.gz
+Source0:        https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_96_1_RTM/src/%{name}-%{version}.tar.gz
 Source1:        nss-util.pc.in
 Source2:        nss-util-config.in
 Source3:        nss.pc.in
@@ -217,6 +217,9 @@ popd
 %{_bindir}/ssltap
 
 %changelog
+* Tue Feb 06 2024 Kanika Nema <kanikanema@microsoft.com> - 3.96.1-1
+- Upgrade to version 3.96.1
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.75-2
 - Fixing source URL.
 

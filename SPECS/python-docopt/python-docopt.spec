@@ -4,7 +4,7 @@ Version:        0.6.2
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/docopt
 Source0:        https://files.pythonhosted.org/packages/source/d/docopt/docopt-%{version}.tar.gz

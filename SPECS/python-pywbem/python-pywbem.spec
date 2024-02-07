@@ -6,7 +6,7 @@ Version:        1.0.1
 Release:        6%{?dist}
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pywbem/pywbem
 Source0:        https://github.com/%{pkgname}/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch

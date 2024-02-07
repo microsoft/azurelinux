@@ -4,7 +4,7 @@ Version:        3.7.20
 Release:        1%{?dist}
 License:        BSD WITH advertising AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sshock/AFFLIBv3
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

@@ -10,7 +10,7 @@ Version:        2.38
 Release:        1%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.gnu.org/software/libc
 Source0:        https://ftp.gnu.org/gnu/glibc/%{name}-%{version}.tar.xz

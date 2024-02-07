@@ -6,7 +6,7 @@ Summary:	Globally/Universally Unique Identifiers (GUIDs/UUIDs)
 # https://lists.fedoraproject.org/pipermail/legal/2013-August/002226.html
 License:	BSD and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Data-UUID
 Source0:	https://cpan.metacpan.org/modules/by-module/Data/Data-UUID-%{version}.tar.gz#/perl-Data-UUID-%{version}.tar.gz
 # Module Build

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Crypt-OpenSSL-Guess
 Version:        0.11
 Release:        8%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-tk
 Summary: Turkmen hunspell dictionaries
 Version: 0.02

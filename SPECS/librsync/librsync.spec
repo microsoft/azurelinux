@@ -4,7 +4,7 @@ Version:        2.3.4
 Release:        1%{?dist}
 License:        LGPLv2+ AND CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://librsync.github.io/
 #Source0:       https://github.com/librsync/librsync/archive/v%{version}.tar.gz

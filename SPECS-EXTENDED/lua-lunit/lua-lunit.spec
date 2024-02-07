@@ -8,7 +8,7 @@ Summary:        Unit testing framework for Lua
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mrothNET/lunit
 # Source0:      https://github.com/mrothNET/lunit/archive/refs/tags/v0.5.tar.gz
 Source0:        https://github.com/mrothNET/lunit/archive/refs/tags/lunit-%{version}.tar.gz

@@ -4,7 +4,7 @@ Release:        11%{?dist}
 Summary:        Lexically scoped subroutine wrappers
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Hook-LexWrap
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Hook-LexWrap-%{version}.tar.gz#/perl-Hook-LexWrap-%{version}.tar.gz
 BuildArch:      noarch

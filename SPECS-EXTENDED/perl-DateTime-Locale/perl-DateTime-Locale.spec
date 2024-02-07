@@ -10,7 +10,7 @@ Summary:        Localization support for DateTime.pm
 # other files:          GPL+ or Artistic
 License:        (GPL+ or Artistic) and Unicode
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-Locale
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-Locale-%{version}.tar.gz#/perl-DateTime-Locale-%{version}.tar.gz
 BuildArch:      noarch

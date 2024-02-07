@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: sound-theme-freedesktop
 Version: 0.8
 Release: 16%{?dist}

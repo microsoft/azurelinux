@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mythes-cs
 Summary: Czech thesaurus
 %global upstreamid 20070926

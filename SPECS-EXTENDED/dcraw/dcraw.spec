@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tool for decoding raw image data from digital cameras
 Name: dcraw
 Version: 9.28.0

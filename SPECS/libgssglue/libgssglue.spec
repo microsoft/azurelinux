@@ -6,7 +6,7 @@ License:        BSD and MIT
 URL:            http://www.citi.umich.edu/projects/nfsv4/linux/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://www.citi.umich.edu/projects/nfsv4/linux/libgssglue/%{name}-%{version}.tar.gz
 
 %description

@@ -16,7 +16,7 @@ Version:        1.18.8
 Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://golang.org
 Source0:        https://golang.org/dl/go%{version}.src.tar.gz

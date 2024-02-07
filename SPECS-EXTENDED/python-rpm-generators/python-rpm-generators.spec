@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Disable automatic bytecompilation. We install only one script and we will
 # never "import" it.
 %undefine py_auto_byte_compile

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define is_rhel 0%{?rhel} != 0
 
 # python3 is not available on RHEL <=7

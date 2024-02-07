@@ -7,7 +7,7 @@ Summary:	A library for import of Microsoft Works documents
 
 License:	LGPLv2+ or MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://libwps.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 

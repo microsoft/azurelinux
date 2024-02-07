@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		sblim-indication_helper
 Version:	0.5.0
 Release:	4%{?dist}
