@@ -9,37 +9,40 @@ import (
 )
 
 type Overlay struct {
-	LowerDir  string           `yaml:"LowerDir"`
-	UpperDir  string           `yaml:"UpperDir"`
-	WorkDir   string           `yaml:"WorkDir"`
-	Partition *VerityPartition `yaml:"Partition"`
+	LowerDir  string               `yaml:"LowerDir"`
+	UpperDir  string               `yaml:"UpperDir"`
+	WorkDir   string               `yaml:"WorkDir"`
+	Partition *IdentifiedPartition `yaml:"Partition"`
 }
 
 func (o *Overlay) IsValid() error {
 	// Validate paths for UpperDir, WorkDir, and LowerDir
 	if err := validatePath(o.UpperDir); err != nil {
-		return fmt.Errorf("UpperDir: %v", err)
+		return fmt.Errorf("UpperDir '%s': %w", o.UpperDir, err)
 	}
 	if err := validatePath(o.WorkDir); err != nil {
-		return fmt.Errorf("WorkDir: %v", err)
+		return fmt.Errorf("WorkDir '%s': %w", o.WorkDir, err)
 	}
 	if err := validatePath(o.LowerDir); err != nil {
-		return fmt.Errorf("LowerDir: %v", err)
+		return fmt.Errorf("LowerDir '%s': %w", o.LowerDir, err)
 	}
 
 	// Check if UpperDir and WorkDir are identical
 	if o.UpperDir == o.WorkDir {
-		return fmt.Errorf("UpperDir and WorkDir must be distinct")
+		return fmt.Errorf("UpperDir and WorkDir must be distinct, but both are '%s'", o.UpperDir)
 	}
 
 	// Check if UpperDir is a subdirectory of WorkDir or vice versa
-	if isSubDirString(o.UpperDir, o.WorkDir) || isSubDirString(o.WorkDir, o.UpperDir) {
-		return fmt.Errorf("UpperDir and WorkDir should not be a subdirectory of one another")
+	if isSubDirString(o.UpperDir, o.WorkDir) {
+		return fmt.Errorf("UpperDir '%s' should not be a subdirectory of WorkDir '%s'", o.UpperDir, o.WorkDir)
+	}
+	if isSubDirString(o.WorkDir, o.UpperDir) {
+		return fmt.Errorf("WorkDir '%s' should not be a subdirectory of UpperDir '%s'", o.WorkDir, o.UpperDir)
 	}
 
 	if o.Partition != nil {
 		if err := o.Partition.IsValid(); err != nil {
-			return fmt.Errorf("invalid Partition: %v", err)
+			return fmt.Errorf("invalid Partition in UpperDir '%s', WorkDir '%s', LowerDir '%s': %w", o.UpperDir, o.WorkDir, o.LowerDir, err)
 		}
 	}
 
@@ -49,7 +52,7 @@ func (o *Overlay) IsValid() error {
 func validatePath(path string) error {
 	// Check if the path is empty
 	if path == "" {
-		return fmt.Errorf("path of lowerdir, upperdir or workdir cannot be empty")
+		return fmt.Errorf("path cannot be empty")
 	}
 
 	// Check if the path contains spaces

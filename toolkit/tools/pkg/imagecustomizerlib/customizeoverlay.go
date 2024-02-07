@@ -14,7 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-func enableOverlay(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
+func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	if overlays == nil {
@@ -63,28 +63,28 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 	concatenatedOverlays := strings.Join(overlayConfigs, " ")
 
 	// Construct the final cmdline argument
-	newArgs := fmt.Sprintf("rd.overlays=%s", concatenatedOverlays)
+	newArgs := fmt.Sprintf("rd.overlays=\"%s\"", concatenatedOverlays)
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 	lines, err := file.ReadLines(grubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to read grub config: %v", err)
+		return fmt.Errorf("failed to read grub config: %w", err)
 	}
 
 	var updatedLines []string
-	linuxLineRegex, err := regexp.Compile(`^linux .*rd.overlays=.*`)
+	linuxLineRegex, err := regexp.Compile(`^linux .*rd.overlayfs=.*`)
 	if err != nil {
-		return fmt.Errorf("failed to compile regex: %v", err)
+		return fmt.Errorf("failed to compile regex: %w", err)
 	}
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
 		if linuxLineRegex.MatchString(trimmedLine) {
 			// Replace existing arguments for overlays.
-			overlayRegexPattern := `rd.overlays=[^ ]*` +
-				`( rd.overlay_persistent_volume=[^ ]*)?`
+			overlayRegexPattern := `rd.overlayfs=[^ ]*` +
+				`( rd.overlayfs_persistent_volume=[^ ]*)?`
 			overlayRegex, err := regexp.Compile(overlayRegexPattern)
 			if err != nil {
-				return fmt.Errorf("failed to compile overlay regex: %v", err)
+				return fmt.Errorf("failed to compile overlay regex: %w", err)
 			}
 			newLinuxLine := overlayRegex.ReplaceAllString(trimmedLine, newArgs)
 			updatedLines = append(updatedLines, newLinuxLine)
@@ -100,7 +100,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 	// Write the updated lines back to grub.cfg
 	err = file.WriteLines(updatedLines, grubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to write updated grub config: %v", err)
+		return fmt.Errorf("failed to write updated grub config: %w", err)
 	}
 
 	return nil

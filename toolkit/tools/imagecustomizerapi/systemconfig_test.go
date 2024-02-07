@@ -45,11 +45,11 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	invalidVerity := SystemConfig{
 		Verity: &Verity{
-			DataPartition: VerityPartition{
+			DataPartition: IdentifiedPartition{
 				IdType: "PartUuid",
 				Id:     "incorrect-uuid-format",
 			},
-			HashPartition: VerityPartition{
+			HashPartition: IdentifiedPartition{
 				IdType: "PartLabel",
 				Id:     "hash_partition",
 			},

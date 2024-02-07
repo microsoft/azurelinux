@@ -115,18 +115,18 @@ func (s *SystemConfig) IsValid() error {
 			// Validate the overlay itself
 			err := overlay.IsValid()
 			if err != nil {
-				return fmt.Errorf("invalid Overlay item at index %d: %w", i, err)
+				return fmt.Errorf("invalid Overlay (LowerDir: '%s') at index %d: %w", overlay.LowerDir, i, err)
 			}
 
 			// Check for unique UpperDir
 			if _, exists := upperDirs[overlay.UpperDir]; exists {
-				return fmt.Errorf("duplicate UpperDir found in Overlay item at index %d", i)
+				return fmt.Errorf("duplicate UpperDir '%s' found in Overlay (LowerDir: '%s') at index %d", overlay.UpperDir, overlay.LowerDir, i)
 			}
 			upperDirs[overlay.UpperDir] = true
 
 			// Check for unique WorkDir
 			if _, exists := workDirs[overlay.WorkDir]; exists {
-				return fmt.Errorf("duplicate WorkDir found in Overlay item at index %d", i)
+				return fmt.Errorf("duplicate WorkDir '%s' found in Overlay (LowerDir: '%s') at index %d", overlay.WorkDir, overlay.LowerDir, i)
 			}
 			workDirs[overlay.WorkDir] = true
 		}
