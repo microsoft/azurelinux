@@ -29126,6 +29126,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "virtiofsd",
+          "version": "1.10.1",
+          "downloadUrl": "https://gitlab.com/virtio-fs/virtiofsd/-/archive/v1.10.1/virtiofsd-v1.10.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "vitess",
           "version": "17.0.2",
           "downloadUrl": "https://github.com/vitessio/vitess/archive/refs/tags/v17.0.2.tar.gz"
