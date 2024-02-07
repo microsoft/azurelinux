@@ -22,10 +22,6 @@ BuildRequires:  systemd-devel
 BuildRequires:  python3-libevdev
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pyudev
-BuildRequires:  python3-pip
-
-Requires:       python3
-Requires:       python3-setuptools
 
 Requires:       %{name}-data = %{version}-%{release}
 
@@ -69,10 +65,6 @@ Tablet information client library data files.
 install -d %{buildroot}/%{_udevrulesdir}
 
 %check
-pip install     \
-    pytest      \
-    libevdev    \
-    pyudev
 %meson_test
 
 %post -p /sbin/ldconfig
