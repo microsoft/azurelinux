@@ -1,4 +1,6 @@
 #!/bin/bash -e
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 function get_packages {
     # First argument is an URL to a directory containing packages

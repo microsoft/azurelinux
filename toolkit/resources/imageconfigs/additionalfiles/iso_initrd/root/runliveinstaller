@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 # Use a custom termcap for the Mariner installer in an ISO environment
 # for a high contrast cursor. This is based on the "linux" termcap.
