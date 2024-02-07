@@ -371,8 +371,8 @@ Ocaml extension for graphviz.
 %package perl
 Summary:        Perl extension for graphviz
 Requires:        %{name} = %{version}-%{release}
-# Mariner Comment: Adding requires from Mariner 2.0
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
+# Mariner Comment: Adding requires from Mariner 2.0 and updating to grab the subpackage that contains the necessary perllib.so files
+Requires:       perl(libs)
 
 %description perl
 Perl extension for graphviz.
