@@ -25155,7 +25155,7 @@
         "other": {
           "name": "re2",
           "version": "20240201",
-          "downloadUrl": "https://github.com/google/re2/archive/2024-02-01.tar.gz"
+          "downloadUrl": "https://github.com/google/re2/archive/refs/tags/2024-02-01.tar.gz"
         }
       }
     },
