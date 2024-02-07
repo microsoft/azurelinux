@@ -3,65 +3,88 @@
 
 Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-setuptools_scm
-Version:        6.4.2
+Version:        8.0.4
 Release:        1%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Url:            https://pypi.python.org/pypi/setuptools_scm
-Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
+Source0:        https://github.com/pypa/setuptools_scm/archive/refs/tags/v%{version}.tar.gz#/setuptools_scm-%{version}.tar.gz
 
 BuildArch:      noarch
-
+ 
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-
-%if %{with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  pyproject-rpm-macros
+%if %{with tests}
+BuildRequires:  git-core
+# Don't pull mercurial into RHEL just to test this work with it
+%if %{undefined rhel}
+BuildRequires:  mercurial
 %endif
-
+# Manually listed test dependencies from tox.ini, to avoid pulling tox into RHEL
+# Omit virtualenv, used only for test_distlib_setuptools_works skipped below (requires internet)
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(setuptools) >= 45
+%endif
+ 
 %description
-setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
-
-It also handles file finders for the supported scm’s.
-
-%package -n     python3-setuptools_scm
-Summary:        python-setuptools_scm
-
-Requires:       python3
-Requires:       python3-libs
-Requires:       python3-packaging
-Requires:       python3-pip
-Requires:       python3-tomli
-
-Provides:       %{name} = %{version}-%{release}
-
-%description -n python3-setuptools_scm
-setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
-
-It also handles file finders for the supported scm’s.
-
+Setuptools_scm handles managing your Python package versions in SCM metadata.
+It also handles file finders for the supported SCMs.
+ 
+ 
+%package -n python%{python3_pkgversion}-setuptools_scm
+Summary:        %{summary}
+ 
+%description -n python%{python3_pkgversion}-setuptools_scm
+Setuptools_scm handles managing your Python package versions in SCM metadata.
+It also handles file finders for the supported SCMs.
+ 
+ 
+%pyproject_extras_subpkg -n python%{python3_pkgversion}-setuptools_scm toml
+ 
+ 
 %prep
-%setup -q -n setuptools_scm-%{version}
-
+%autosetup -p1 -n setuptools_scm-%{version}
+# In case of a bootstrap loop between toml and setuptools_scm, do:
+#   rm pyproject.toml
+# That way, toml is not fetched to parse the file.
+# That only works assuming the backend in the file remains the default backend.
+ 
+ 
+%generate_buildrequires
+%pyproject_buildrequires
+ 
 %build
-python3 setup.py build
-
+%pyproject_wheel
+ 
 %install
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
-
+%pyproject_install
+%pyproject_save_files setuptools_scm
+ 
+ 
+%if %{with tests}
 %check
-python3 setup.py test
-
-%files -n python3-setuptools_scm
-%defattr(-,root,root)
-%{python3_sitelib}/*
+# Both of the skipped tests try to download from the internet
+%pytest -v -k 'not test_pip_download and not test_distlib_setuptools_works'
+%endif
+ 
+ 
+%files -n python%{python3_pkgversion}-setuptools_scm -f %{pyproject_files}
+%license LICENSE
+%doc README.rst
 
 %changelog
+* Wed Feb 07 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 8.0.4-1
+- Updating to version 8.0.4.
+
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.2-1
 - Updating to version 6.4.2.
 - Adding a dependency on 'python3-tomli'.

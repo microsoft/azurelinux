@@ -1,14 +1,3 @@
-# The function of bootstrap is that it disables the wheel subpackage
-%bcond_with bootstrap
-Summary:        Built-package format for Python
-Name:           python-%{pypi_name}
-Version:        0.33.6
-Release:        7%{?dist}
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/pypa/wheel
-Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 %global pypi_name wheel
 %global python_wheelname %{pypi_name}-%{version}-py2.py3-none-any.whl
 %global python_wheeldir %{_datadir}/python-wheels
@@ -18,90 +7,155 @@ A built-package format for Python.\
 A wheel is a ZIP-format archive with a specially formatted filename and the\
 .whl extension. It is designed to contain all the files for a PEP 376\
 compatible install in a way that is very close to the on-disk format.
+
+# The function of bootstrap is that it disables the wheel subpackage
+%bcond_with bootstrap
+Summary:        Built-package format for Python
+Name:           python-%{pypi_name}
+Version:        0.42.0
+Release:        1%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://github.com/pypa/wheel
+Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+# This is used in bootstrap mode where we manually install the wheel and
+# entrypoints
+Source1:        wheel-entrypoint
 BuildArch:      noarch
-%{?python_enable_dependency_generator}
-%if %{with_check}
+
+BuildRequires:  python3-devel
+BuildRequires:  python3-libs
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+
+ 
+BuildRequires:  python%{python3_pkgversion}-devel
+# python3 bootstrap: this is rebuilt before the final build of python3, which
+# adds the dependency on python3-rpm-generators, so we require it manually
+BuildRequires:  python3-rpm-generators
+ 
+# Needed to manually build and unpack the wheel
+%if %{with bootstrap}
+BuildRequires:  python%{python3_pkgversion}-flit-core
+BuildRequires:  unzip
+%endif
+ 
+%if %{with tests}
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-setuptools
 # several tests compile extensions
 # those tests are skipped if gcc is not found
 BuildRequires:  gcc
 %endif
-
+ 
+%global _description %{expand:
+Wheel is the reference implementation of the Python wheel packaging standard,
+as defined in PEP 427.
+ 
+It has two different roles:
+ 
+ 1. A setuptools extension for building wheels that provides the bdist_wheel
+    setuptools command.
+ 2. A command line tool for working with wheel files.}
+ 
 %description %{_description}
-
-%package -n     python3-%{pypi_name}
+ 
+# Virtual provides for the packages bundled by wheel.
+# Actual version can be found in git history:
+# https://github.com/pypa/wheel/commits/master/src/wheel/vendored/packaging/tags.py
+%global bundled %{expand:
+Provides:       bundled(python3dist(packaging)) = 23
+}
+ 
+ 
+%package -n     python%{python3_pkgversion}-%{pypi_name}
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{pypi_name}}
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-BuildRequires:  python3-six
-%endif
-
-%description -n python3-%{pypi_name} %{_description}
-
-Python 3 version.
-
-%if %{without bootstrap}
-%package wheel
+%{bundled}
+ 
+%description -n python%{python3_pkgversion}-%{pypi_name} %{_description}
+ 
+ 
+%package -n     python%{python3_pkgversion}-%{pypi_name}-wheel
 Summary:        The Python wheel module packaged as a wheel
-
-%description wheel
+%{bundled}
+ 
+%description -n python%{python3_pkgversion}-%{pypi_name}-wheel
 A Python wheel of wheel to use with virtualenv.
-%endif
-
-
+ 
+ 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
-
-# Empty files make rpmlint sad
-test -s wheel/cli/install.py || echo "# empty" > wheel/cli/install.py
-
-%build
-%py3_build
-
+ 
+ 
 %if %{without bootstrap}
-%{py3_build_wheel}
+%generate_buildrequires
+%pyproject_buildrequires
 %endif
-
-
+ 
+ 
+%build
+%if %{with bootstrap}
+%global _pyproject_wheeldir dist
+%python3 -m flit_core.wheel
+%else
+%pyproject_wheel
+%endif
+ 
+ 
 %install
-%py3_install
+# pip is not available when bootstrapping, so we need to unpack the wheel and
+# create the entrypoints manually.
+%if %{with bootstrap}
+mkdir -p %{buildroot}%{python3_sitelib}
+unzip %{_pyproject_wheeldir}/%{python_wheel_name} \
+    -d %{buildroot}%{python3_sitelib} -x wheel-%{version}.dist-info/RECORD
+install -Dpm 0755 %{SOURCE1} %{buildroot}%{_bindir}/wheel
+%py3_shebang_fix %{buildroot}%{_bindir}/wheel
+%else
+%pyproject_install
+%endif
+ 
 mv %{buildroot}%{_bindir}/%{pypi_name}{,-%{python3_version}}
+%if %{with main_python}
 ln -s %{pypi_name}-%{python3_version} %{buildroot}%{_bindir}/%{pypi_name}-3
 ln -s %{pypi_name}-3 %{buildroot}%{_bindir}/%{pypi_name}
-
-%if %{without bootstrap}
-mkdir -p %{buildroot}%{python_wheeldir}
-install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 %endif
-
-
+ 
+mkdir -p %{buildroot}%{python_wheel_dir}
+install -p %{_pyproject_wheeldir}/%{python_wheel_name} -t %{buildroot}%{python_wheel_dir}
+ 
+ 
 %check
-rm setup.cfg
-%{python3} -m pip install pluggy more-itertools
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
-
-%files -n python3-%{pypi_name}
+# Smoke test
+%{py3_test_envvars} wheel-%{python3_version} version
+%py3_check_import wheel
+ 
+%if %{with tests}
+%pytest -v --ignore build
+%endif
+ 
+%files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE.txt
 %doc README.rst
+%{_bindir}/%{pypi_name}-%{python3_version}
+%if %{with main_python}
 %{_bindir}/%{pypi_name}
 %{_bindir}/%{pypi_name}-3
-%{_bindir}/%{pypi_name}-%{python3_version}
-%{python3_sitelib}/%{pypi_name}*
-
-%if %{without bootstrap}
-%files wheel
+%endif
+%{python3_sitelib}/%{pypi_name}*/
+ 
+%files -n python%{python3_pkgversion}-%{pypi_name}-wheel
 %license LICENSE.txt
 # we own the dir for simplicity
-%dir %{python_wheeldir}/
-%{python_wheeldir}/%{python_wheelname}
-%endif
-
+%dir %{python_wheel_dir}/
+%{python_wheel_dir}/%{python_wheel_name}
+ 
 %changelog
+* Wed Feb 07 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.42.0-1
+- Upgrade wheel to match Python 3.12 upgrade
+
 * Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
 - BR multiple python3 modules for PTest
 - pip3 install additional modules which not available as RPM
