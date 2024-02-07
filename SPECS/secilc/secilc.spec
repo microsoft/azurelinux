@@ -1,7 +1,7 @@
 %global libsepolver %{version}-1
 Summary:        The SELinux CIL Compiler
 Name:           secilc
-Version:        3.2
+Version:        3.6
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -40,6 +40,9 @@ for more information about the goals and features on the CIL language.
 %{_mandir}/man8/secil2conf.8.gz
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
+- Upgrade to version 3.6
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version and rebase patch
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream
