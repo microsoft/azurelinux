@@ -109,10 +109,3 @@
   <target name="jar" depends="package" description="Builds the jar for the application"/>
 
 </project>
-Powered by Gitea
-Version: 1.21.4 Page:
-66ms
-Template:
-5ms
-Licenses
-API
