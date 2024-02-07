@@ -5,7 +5,7 @@ Release:        1%{?dist}
 Summary:        Library for managing partitions by KDE programs
 License:        GPLv3+
 URL:            https://github.com/KDE/kpmcore
-Source0:        https://github.com/KDE/%{name}/archive/refs/tags/v%{version}.tar.gz#%{name}-%{version}.tar.gz
+Source0:        https://github.com/KDE/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 

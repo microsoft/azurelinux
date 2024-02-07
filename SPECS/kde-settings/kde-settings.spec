@@ -13,7 +13,6 @@ Source1:        COPYING
 BuildArch: noarch
 
 BuildRequires: systemd
-BuildRequires: kde-filesystem
 
 # when kdebugrc was moved here
 Conflicts: kf5-kdelibs4support < 5.7.0-3
@@ -21,7 +20,6 @@ Conflicts: kf5-kdelibs4support < 5.7.0-3
 Obsoletes: kde-settings-ksplash < 24-2
 Obsoletes: kde-settings-minimal < 24-3
 
-Requires: kde-filesystem
 # /etc/pam.d/ ownership
 Requires: pam
 
@@ -104,6 +102,8 @@ rm -fv %{buildroot}%{_datadir}/plasma/look-and-feel/org.fedoraproject.fedora.des
 %config(noreplace) %{_sysconfdir}/profile.d/kde.*
 %config(noreplace) %{_sysconfdir}/xdg/kcm-about-distrorc
 %config(noreplace) %{_sysconfdir}/xdg/kdebugrc
+%{_sysconfdir}/fonts/conf.d/10-sub-pixel-rgb-for-kde.conf
+%{_libdir}/sddm/sddm.conf.d/kde_settings.conf
 
 %files -n qt-settings
 %license COPYING

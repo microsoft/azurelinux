@@ -50,7 +50,6 @@ mkdir -p %{buildroot}%{_prefix}/{lib,%{_lib}}/qt6/qml/org/kde/
 mkdir -p %{buildroot}%{_sysconfdir}/xdg/plasma-workspace/{env,shutdown}
 
 install -Dpm644 %{_sourcedir}/macros.kf %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf
-install -Dpm644 %{_sourcedir}/LICENSE %{buildroot}%{_datadir}/kf6/LICENSE
 sed -i \
   -e "s|@@KF_VERSION@@|%{version}|g" \
   %{buildroot}%{_rpmconfigdir}/macros.d/macros.kf
@@ -69,7 +68,6 @@ sed -i \
 %{_docdir}/qt6/
 %{_includedir}/kf6/
 %{_includedir}/KF6/
-%{_libexecdir}/kf6/
 %{_prefix}/%{_lib}/kconf_update_bin/
 %{_prefix}/%{_lib}/qt6/plugins/kf6/
 %{_prefix}/%{_lib}/qt6/qml/org/kde/
