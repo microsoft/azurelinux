@@ -9181,8 +9181,8 @@
         "type": "other",
         "other": {
           "name": "libevdev",
-          "version": "1.9.1",
-          "downloadUrl": "https://www.freedesktop.org/software/libevdev/libevdev-1.9.1.tar.xz"
+          "version": "1.13.1",
+          "downloadUrl": "https://www.freedesktop.org/software/libevdev/libevdev-1.13.1.tar.xz"
         }
       }
     },
