@@ -11431,8 +11431,8 @@
         "type": "other",
         "other": {
           "name": "libwacom",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/linuxwacom/libwacom/releases/download/libwacom-1.6/libwacom-1.6.tar.bz2"
+          "version": "2.9.0",
+          "downloadUrl": "https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.9.0/libwacom-2.9.0.tar.xz"
         }
       }
     },
@@ -22244,8 +22244,8 @@
         "type": "other",
         "other": {
           "name": "python-evdev",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/gvalkov/python-evdev/archive/v1.1.2.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/gvalkov/python-evdev/archive/v1.6.1.tar.gz"
         }
       }
     },
@@ -22854,6 +22854,16 @@
         "type": "other",
         "other": {
           "name": "python-libclang",
+          "version": "14.0.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-libevdev",
           "version": "14.0.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
         }
