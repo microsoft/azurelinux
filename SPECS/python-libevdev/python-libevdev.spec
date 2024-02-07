@@ -8,13 +8,12 @@ Release:        1%{?dist}
 Summary:        Python bindings for the Linux input handling subsystem in userspace
 
 License:        MIT
-URL:            https://python-libevdev.readthedocs.io/en/latest/
-Source0:        https://gitlab.freedesktop.org/libevdev/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
+URL:            https://python-%{srcname}.readthedocs.io/en/latest/
+Source0:        https://gitlab.freedesktop.org/%{srcname}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  libevdev-devel
-BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 
@@ -29,10 +28,10 @@ an existing device, and modify the event stream Linux.
 %description %{_description}
 
 
-%package -n python3-libevdev
+%package -n python3-%{srcname}
 Summary:        %{summary}
-%{?python_provide:%python_provide python3-libevdev}
-%description -n python3-libevdev %{_description}
+%{?python_provide:%python_provide python3-%{srcname}}
+%description -n python3-%{srcname} %{_description}
 
 
 #------------------------------------------------------------------------------
@@ -49,14 +48,15 @@ Summary:        %{summary}
 %py3_install
 
 #------------------------------------------------------------------------------
-%files -n python3-libevdev
+%files -n python3-%{srcname}
 %defattr(-,root,root,-)
 %license COPYING
 %doc README.md
-%{python3_sitelib}/libevdev/*
-%{python3_sitearch}/libevdev-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/*
+%{python3_sitearch}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
 #------------------------------------------------------------------------------
 %changelog
 * Wed Feb 07 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 0.11-1
-- Initial import into CBL-Mariner
+- Original version for CBL-Mariner
+- License verified

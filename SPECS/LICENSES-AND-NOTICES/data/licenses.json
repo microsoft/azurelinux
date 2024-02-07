@@ -2246,6 +2246,7 @@
                 "python-execnet",
                 "python-google-pasta",
                 "python-libclang",
+                "python-libevdev",
                 "python-logutils",
                 "python-nocasedict",
                 "python-opt-einsum",

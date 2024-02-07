@@ -22,11 +22,9 @@ BuildRequires:  systemd-devel
 BuildRequires:  python3-libevdev
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pyudev
+BuildRequires:  python3-pip
 
 Requires:       python3
-Requires:       python3-libevdev
-Requires:       python3-pytest
-Requires:       python3-pyudev
 Requires:       python3-setuptools
 
 Requires:       %{name}-data = %{version}-%{release}
@@ -41,6 +39,9 @@ Summary:        Tablet Information Client Library Development Package
 
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkg-config
+Requires:       python3-libevdev
+Requires:       python3-pytest
+Requires:       python3-pyudev
 
 %description devel
 Tablet information client library development package.
@@ -59,9 +60,7 @@ Tablet information client library data files.
 %build
 %meson \
   -Ddocumentation=disabled \
-%if !%{with_check}
   -Dtests=disabled \
-%endif
   -Dudev-dir=%{udevdir}
 %meson_build
 
@@ -70,6 +69,10 @@ Tablet information client library data files.
 install -d %{buildroot}/%{_udevrulesdir}
 
 %check
+pip install     \
+    pytest      \
+    libevdev    \
+    pyudev
 %meson_test
 
 %post -p /sbin/ldconfig
