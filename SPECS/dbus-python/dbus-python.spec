@@ -26,9 +26,10 @@ Summary:        D-Bus bindings for python3
 BuildRequires:  python3-devel
 # for py3_build
 BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(pip)
+BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  meson
+BuildRequires:  ninja-build
 
 %description -n python3-dbus
 %{summary}.
