@@ -32,7 +32,7 @@ https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
 https://www.linuxfromscratch.org/patches/downloads/lua/lua-5.4.4-shared_library-2.patch
-https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz
+https://ftp.gnu.org/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.xz
 https://ftp.gnu.org/gnu/glibc/glibc-2.35.tar.xz
 https://www.linuxfromscratch.org/patches/downloads/glibc/glibc-2.35-fhs-1.patch
 https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz

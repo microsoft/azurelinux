@@ -314,9 +314,9 @@ popd
 rm -rf mpc-1.2.1
 touch /logs/status_libmpc_complete
 
-echo GCC-11.2.0
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo GCC-11.4.0
+tar xf gcc-11.4.0.tar.xz
+pushd gcc-11.4.0
 # fix issue compiling with glibc 2.34
 sed -e '/static.*SIGSTKSZ/d' \
     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
@@ -418,7 +418,7 @@ set -e
 mkdir -pv /usr/share/gdb/auto-load/usr/lib
 mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-11.4.0
 
 touch /logs/status_gcc_complete
 

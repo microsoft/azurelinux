@@ -36,9 +36,9 @@ rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass1_complete
 
-echo GCC-11.2.0 - Pass 1
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo GCC-11.4.0 - Pass 1
+tar xf gcc-11.4.0.tar.xz
+pushd gcc-11.4.0
 tar xf ../mpfr-4.1.0.tar.xz
 mv -v mpfr-4.1.0 mpfr
 tar xf ../gmp-6.2.1.tar.xz
@@ -111,7 +111,7 @@ cd       build
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-11.4.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
@@ -165,9 +165,9 @@ rm -rf glibc-2.35
 
 touch $LFS/logs/temptoolchain/status_glibc_complete
 
-echo Libstdc++ from GCC-11.2.0
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo Libstdc++ from GCC-11.4.0
+tar xf gcc-11.4.0.tar.xz
+pushd gcc-11.4.0
 mkdir -v build
 cd       build
 ../libstdc++-v3/configure           \
@@ -181,7 +181,7 @@ cd       build
 make -j$(nproc)
 make install
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-11.4.0
 
 touch $LFS/logs/temptoolchain/status_libstdc++_complete
 
@@ -209,9 +209,9 @@ rm -rf binutils-2.37
 
 touch $LFS/logs/temptoolchain/status_binutils_pass2_complete
 
-echo GCC-11.2.0 - Pass 2
-tar xf gcc-11.2.0.tar.xz
-pushd gcc-11.2.0
+echo GCC-11.4.0 - Pass 2
+tar xf gcc-11.4.0.tar.xz
+pushd gcc-11.4.0
 # fix issue compiling with glibc 2.34
 sed -e '/static.*SIGSTKSZ/d' \
     -e 's/return kAltStackSize/return SIGSTKSZ * 4/' \
@@ -300,7 +300,7 @@ rm -v dummy.c a.out
 set -e
 echo End sanity check - temptoolchain - gcc 11.2.0 pass2
 popd
-rm -rf gcc-11.2.0
+rm -rf gcc-11.4.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass2_complete
 

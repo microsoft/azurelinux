@@ -94,7 +94,7 @@ flex-debuginfo-2.6.4-7.cm2.x86_64.rpm
 flex-devel-2.6.4-7.cm2.x86_64.rpm
 gawk-5.1.1-1.cm2.x86_64.rpm
 gawk-debuginfo-5.1.1-1.cm2.x86_64.rpm
-gcc-11.2.0-8.cm2.x86_64.rpm
+gcc-11.4.0-1.cm2.x86_64.rpm
 gcc-aarch64-linux-gnu-11.2.0-8.cm2.x86_64.rpm
 gcc-c++-11.2.0-8.cm2.x86_64.rpm
 gcc-c++-aarch64-linux-gnu-11.2.0-8.cm2.x86_64.rpm

@@ -27,7 +27,7 @@ libstdc++-11.2.0-8.cm2.aarch64.rpm
 libstdc++-devel-11.2.0-8.cm2.aarch64.rpm
 libgomp-11.2.0-8.cm2.aarch64.rpm
 libgomp-devel-11.2.0-8.cm2.aarch64.rpm
-gcc-11.2.0-8.cm2.aarch64.rpm
+gcc-11.4.0-1.cm2.aarch64.rpm
 gcc-c++-11.2.0-8.cm2.aarch64.rpm
 libpkgconf-1.8.0-3.cm2.aarch64.rpm
 pkgconf-1.8.0-3.cm2.aarch64.rpm

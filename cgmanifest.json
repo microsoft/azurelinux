@@ -4040,8 +4040,8 @@
         "type": "other",
         "other": {
           "name": "gcc",
-          "version": "11.2.0",
-          "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-11.2.0/gcc-11.2.0.tar.xz"
+          "version": "11.4.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/gcc/gcc-11.4.0/gcc-11.4.0.tar.xz"
         }
       }
     },
