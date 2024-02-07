@@ -3979,6 +3979,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gbenchmark",
+          "version": "1.8.3",
+          "downloadUrl": "https://github.com/google/benchmark/archive/refs/tags/v1.8.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gc",
           "version": "8.2.2",
           "downloadUrl": "https://www.hboehm.info/gc/gc_source/gc-8.2.2.tar.gz"
@@ -7391,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "iputils",
-          "version": "20211215",
-          "downloadUrl": "https://github.com/iputils/iputils/archive/20211215.tar.gz"
+          "version": "20240117",
+          "downloadUrl": "https://github.com/iputils/iputils/archive/20240117.tar.gz"
         }
       }
     },
@@ -9171,8 +9181,8 @@
         "type": "other",
         "other": {
           "name": "libevdev",
-          "version": "1.9.1",
-          "downloadUrl": "https://www.freedesktop.org/software/libevdev/libevdev-1.9.1.tar.xz"
+          "version": "1.13.1",
+          "downloadUrl": "https://www.freedesktop.org/software/libevdev/libevdev-1.13.1.tar.xz"
         }
       }
     },
@@ -9961,8 +9971,8 @@
         "type": "other",
         "other": {
           "name": "libmicrohttpd",
-          "version": "0.9.76",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz"
+          "version": "0.9.77",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.77.tar.gz"
         }
       }
     },
@@ -11671,8 +11681,8 @@
         "type": "other",
         "other": {
           "name": "libxkbcommon",
-          "version": "1.5.0",
-          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.5.0.tar.xz"
+          "version": "1.6.0",
+          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.6.0.tar.xz"
         }
       }
     },
@@ -12161,8 +12171,8 @@
         "type": "other",
         "other": {
           "name": "ltp",
-          "version": "20230127",
-          "downloadUrl": "https://github.com/linux-test-project/ltp/archive/refs/tags/20230127.tar.gz"
+          "version": "20240129",
+          "downloadUrl": "https://github.com/linux-test-project/ltp/releases/download/20240129/ltp-full-20240129.tar.xz"
         }
       }
     },
@@ -12500,6 +12510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mandoc",
+          "version": "1.14.6",
+          "downloadUrl": "https://mandoc.bsd.lv/snapshots/mandoc-1.14.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "man-db",
           "version": "2.11.2",
           "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.11.2.tar.xz"
@@ -12761,8 +12781,8 @@
         "type": "other",
         "other": {
           "name": "mcstrans",
-          "version": "3.2",
-          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.2/mcstrans-3.2.tar.gz"
+          "version": "3.6",
+          "downloadUrl": "https://github.com/SELinuxProject/selinux/releases/download/3.6/mcstrans-3.6.tar.gz"
         }
       }
     },
@@ -24763,6 +24783,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-zstd",
+          "version": "1.5.5.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zstd/zstd-1.5.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3",
           "version": "3.9.14",
           "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
@@ -25134,8 +25164,8 @@
         "type": "other",
         "other": {
           "name": "re2",
-          "version": "20190801",
-          "downloadUrl": "https://github.com/google/re2/archive/2019-08-01.tar.gz"
+          "version": "20240201",
+          "downloadUrl": "https://github.com/google/re2/archive/refs/tags/2024-02-01.tar.gz"
         }
       }
     },
@@ -27997,8 +28027,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "254.5",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/refs/tags/v254.5.tar.gz"
+          "version": "255",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v255/systemd-255.tar.gz"
         }
       }
     },
