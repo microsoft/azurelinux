@@ -5,6 +5,7 @@ package imagecustomizerapi
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -50,4 +51,21 @@ func UnmarshalYaml[ValueType HasIsValid](yamlData []byte, value ValueType) error
 	}
 
 	return nil
+}
+
+func AggregateErrors(aggregateErr error, err error) error {
+	if aggregateErr != nil {
+		if err != nil {
+			return fmt.Errorf("%w\n%w", aggregateErr, err)
+		} else {
+			return aggregateErr
+		}
+
+	} else {
+		if err != nil {
+			return err
+		} else {
+			return nil
+		}
+	}
 }

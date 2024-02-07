@@ -77,87 +77,6 @@ SystemConfig:
   - kernel-hci
 ```
 
-## Schema Overview
-
-- [Config type](#config-type)
-  - [Disks](#disks-disk)
-    - [Disk type](#disk-type)
-      - [PartitionTableType](#partitiontabletype-string)
-      - [MaxSize](#maxsize-uint64)
-      - [Partitions](#partitions-partition)
-        - [Partition type](#partition-type)
-          - [ID](#id-string)
-          - [FsType](#fstype-string)
-          - [Name](#partition-name)
-          - [Start](#start-uint64)
-          - [End](#end-uint64)
-          - [Size](#size-uint64)
-          - [Flag](#flags-string)
-  - [Iso](#iso-type)
-    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
-      - string: []FileConfig | []string
-        - [FileConfig type](#fileconfig-type)
-          - [Path](#path-string)
-          - [Permissions](#permissions-string)
-  - [SystemConfig](#systemconfig-type)
-    - [BootType](#boottype-string)
-    - [Hostname](#hostname-string)
-    - [KernelCommandLine](#kernelcommandline-type)
-      - [ExtraCommandLine](#extracommandline-string)
-    - [UpdateBaseImagePackages](#updatebaseimagepackages-bool)
-    - [PackageListsInstall](#packagelistsinstall-string)
-      - [PackageList type](#packagelist-type)
-        - [Packages](#packages-string)
-    - [PackagesInstall](#packagesinstall-string)
-    - [PackageListsRemove](#packagelistsremove-string)
-      - [PackageList type](#packagelist-type)
-        - [Packages](#packages-string)
-    - [PackagesRemove](#packagesremove-string)
-    - [PackageListsUpdate](#packagelistsupdate-string)
-    - [PackagesUpdate](#packagesupdate-string)
-    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
-      - string: []FileConfig | []string
-        - [FileConfig type](#fileconfig-type)
-          - [Path](#path-string)
-          - [Permissions](#permissions-string)
-    - [PartitionSettings](#partitionsettings-partitionsetting)
-      - [PartitionSetting type](#partitionsetting-type)
-        - [ID](#id-string)
-        - [MountIdentifier](#mountidentifier-string)
-        - [MountOptions](#mountoptions-string)
-        - [MountPoint](#mountpoint-string)
-    - [PostInstallScripts](#postinstallscripts-script)
-      - [Script type](#script-type)
-        - [Path](#path-string)
-        - [Args](#args-string)
-    - [FinalizeImageScripts](#finalizeimagescripts-script)
-      - [Script type](#script-type)
-        - [Path](#path-string)
-        - [Args](#args-string)
-    - [Users](#users-user)
-      - [User type](#user-type)
-        - [Name](#user-name)
-        - [UID](#uid-int)
-        - [PasswordHashed](#passwordhashed-bool)
-        - [Password](#password-string)
-        - [PasswordPath](#passwordpath-string)
-        - [PasswordExpiresDays](#passwordexpiresdays-int)
-        - [SSHPubKeyPaths](#sshpubkeypaths-string)
-        - [PrimaryGroup](#primarygroup-string)
-        - [SecondaryGroups](#secondarygroups-string)
-        - [StartupCommand](#startupcommand-string)
-    - [Services](#services-type)
-      -  [Enable](#enable-string)
-      -  [Disable](#disable-string)
-    - [Modules](#modules-type)
-      - [Load](#load-module)
-        - [Module type](#module-type)
-          - [Name](#module-name)
-      - [Disable](#disable-module)
-        - [Module type](#module-type)
-          - [Name](#module-name)
-    - [Verity type](#verity-type)
-
 ## Top-level
 
 The top level type for the YAML file is the [Config](#config-type) type.
@@ -234,7 +153,7 @@ Supported options:
 
 The size of the disk, specified in mebibytes (MiB).
 
-### Partitions [[][Partition](#partition-type)]
+### Partitions [[Partition](#partition-type)[]]
 
 The partitions to provision on the disk.
 
@@ -611,7 +530,7 @@ SystemConfig:
 
 Options for configuring systemd services.
 
-### Enable [[]string]
+### Enable [string[]]
 
 A list of services to enable.
 That is, services that will be set to automatically run on OS boot.
@@ -625,7 +544,7 @@ SystemConfig:
     - sshd
 ```
 
-### Disable [[]string]
+### Disable [string[]]
 
 A list of services to disable.
 That is, services that will be set to not automatically run on OS boot.
