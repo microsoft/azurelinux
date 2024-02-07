@@ -55,15 +55,14 @@
 
 Summary:        Contains the GNU compiler collection
 Name:           gcc
-Version:        11.2.0
-Release:        8%{?dist}
+Version:        11.4.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-4039.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
