@@ -12510,6 +12510,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "mandoc",
+          "version": "1.14.6",
+          "downloadUrl": "https://mandoc.bsd.lv/snapshots/mandoc-1.14.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "man-db",
           "version": "2.11.2",
           "downloadUrl": "https://download.savannah.nongnu.org/releases/man-db/man-db-2.11.2.tar.xz"
