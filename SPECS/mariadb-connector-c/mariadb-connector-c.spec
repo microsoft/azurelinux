@@ -2,8 +2,8 @@
 %bcond_with     debug
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
-Version:        3.1.10
-Release:        6%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
