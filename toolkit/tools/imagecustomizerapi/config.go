@@ -11,8 +11,8 @@ import (
 
 type Config struct {
 	Disks        *[]Disk      `yaml:"Disks"`
-	SystemConfig SystemConfig `yaml:"SystemConfig"`
 	Iso          *Iso         `yaml:"Iso"`
+	SystemConfig SystemConfig `yaml:"SystemConfig"`
 }
 
 func (c *Config) IsValid() (err error) {

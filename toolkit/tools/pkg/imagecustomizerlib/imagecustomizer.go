@@ -210,6 +210,11 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 
 	partitionsCustomized := hasPartitionCustomizations(config)
 
+	err = validateIsoConfig(baseConfigPath, config.Iso)
+	if err != nil {
+		return err
+	}
+
 	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
@@ -223,6 +228,26 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 	return config.Disks != nil
 }
 
+func validateAdditionalFiles(baseConfigPath string, additionalFiles *imagecustomizerapi.AdditionalFilesMap) error {
+	var aggregateErr error
+	for sourceFile := range *additionalFiles {
+		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
+		isFile, err := file.IsFile(sourceFileFullPath)
+		if err != nil {
+			aggregateErr = imagecustomizerapi.AggregateErrors(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
+		}
+
+		if !isFile {
+			aggregateErr = imagecustomizerapi.AggregateErrors(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
+		}
+	}
+	return aggregateErr
+}
+
+func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) error {
+	return validateAdditionalFiles(baseConfigPath, &config.AdditionalFiles)
+}
+
 func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
 	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
@@ -233,16 +258,9 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.Syst
 		return err
 	}
 
-	for sourceFile := range config.AdditionalFiles {
-		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
-		isFile, err := file.IsFile(sourceFileFullPath)
-		if err != nil {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err)
-		}
-
-		if !isFile {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile)
-		}
+	err = validateAdditionalFiles(baseConfigPath, &config.AdditionalFiles)
+	if err != nil {
+		return err
 	}
 
 	for i, script := range config.PostInstallScripts {
