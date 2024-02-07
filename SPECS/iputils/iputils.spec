@@ -32,7 +32,7 @@ The Iputils package contains programs for basic networking.
 %install
 %meson_install
 
-mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
+mkdir -p %{buildroot}%{_sbindir}
 ln -sf ../bin/tracepath %{buildroot}%{_sbindir}/tracepath
 ln -sf ../bin/tracepath %{buildroot}%{_sbindir}/tracepath6
 ln -sf ../bin/arping %{buildroot}%{_sbindir}/arping
