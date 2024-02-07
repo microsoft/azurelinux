@@ -1,7 +1,7 @@
 Summary:        Provides a way for the Kubernetes users to utilize the local storage in each node
 Name:           local-path-provisioner
 Version:        0.0.21
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/rancher/local-path-provisioner
 Group:          Applications/Text
@@ -11,6 +11,7 @@ Source0:        https://github.com/rancher/%{name}/archive/refs/tags/v%{version}
 #Note that the source file should be renamed to the format {name}-%{version}.tar.gz
 # Fixed in upstream 0.0.24, so we can remove this patch when we upgrade to that version
 Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2021-44716.patch
 
 BuildRequires: golang
 
@@ -20,6 +21,7 @@ Provides a way for the Kubernetes users to utilize the local storage in each nod
 %prep
 %setup -q
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1 -p1
 
 %build
 export CGO_ENABLED=0
@@ -33,6 +35,9 @@ install local-path-provisioner %{buildroot}%{_bindir}/local-path-provisioner
 %{_bindir}/local-path-provisioner
 
 %changelog
+* Tue Feb 06 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.0.21-15
+- Fix CVE-2021-44716
+
 * Wed Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.21-14
 - Fix CVE-2022-21698
 
