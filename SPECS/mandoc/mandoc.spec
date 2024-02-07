@@ -1,6 +1,6 @@
 Name:             mandoc
 Version:          1.14.6
-Release:          1%{?dist}
+Release:          9%{?dist}
 Summary:          A suite of tools for compiling mdoc and man
 License:          ISC AND BSD-2-Clause AND BSD-3-Clause
 URL:              https://mandoc.bsd.lv/
@@ -215,7 +215,7 @@ fi
 %{_mandir}/man3/tbl.3*
 
 %changelog
-* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.14.6-1
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.14.6-9
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
 
