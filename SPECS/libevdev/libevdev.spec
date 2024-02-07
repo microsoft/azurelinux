@@ -1,7 +1,7 @@
 Summary:        Kernel Evdev Device Wrapper Library
 Name:           libevdev
 Version:        1.13.1
-Release:        7%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,7 +69,7 @@ Utilities to handle and/or debug evdev devices.
 %{_mandir}/man1/mouse-dpi-tool.1*
 
 %changelog
-* Mon Feb 05 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.13.1
+* Mon Feb 05 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.13.1-1
 - Upgrade to 1.13.1
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.9.1-7
