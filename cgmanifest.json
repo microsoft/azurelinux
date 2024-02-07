@@ -9961,8 +9961,8 @@
         "type": "other",
         "other": {
           "name": "libmicrohttpd",
-          "version": "0.9.76",
-          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.76.tar.gz"
+          "version": "0.9.77",
+          "downloadUrl": "https://ftp.gnu.org/gnu/libmicrohttpd/libmicrohttpd-0.9.77.tar.gz"
         }
       }
     },
@@ -11671,8 +11671,8 @@
         "type": "other",
         "other": {
           "name": "libxkbcommon",
-          "version": "1.5.0",
-          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.5.0.tar.xz"
+          "version": "1.6.0",
+          "downloadUrl": "https://xkbcommon.org/download/libxkbcommon-1.6.0.tar.xz"
         }
       }
     },
@@ -24763,6 +24763,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-zstd",
+          "version": "1.5.5.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zstd/zstd-1.5.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python3",
           "version": "3.9.14",
           "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
@@ -27997,8 +28007,8 @@
         "type": "other",
         "other": {
           "name": "systemd",
-          "version": "254.5",
-          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/refs/tags/v254.5.tar.gz"
+          "version": "255",
+          "downloadUrl": "https://github.com/systemd/systemd-stable/archive/v255/systemd-255.tar.gz"
         }
       }
     },
