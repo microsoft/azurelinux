@@ -6,7 +6,7 @@ Summary:        An administration shell for storage targets
 Version:        2.1.53
 Release:        2%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/open-iscsi/%{oname}
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 Patch0:         Do-not-install-systemd-files-in-setup.py.patch

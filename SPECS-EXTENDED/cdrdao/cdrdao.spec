@@ -4,7 +4,7 @@ Version:        1.2.4
 Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://cdrdao.sourceforge.net/
 Source0:        https://prdownloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
 Patch0:         cdrdao-1.2.4-wformat-security.patch

@@ -4,7 +4,7 @@ Version:        0.3.4
 Release:        22%{?dist}
 License:        GPLv2+
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 Source0:        https://web.archive.org/web/20040604132106/http://colorize.raszi.hu/downloads/colorize_0.3.4.tar.bz2
 # http://web.archive.org/web/20040607115833/colorize.raszi.hu/
 URL:            https://colorize.raszi.hu/

@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/gnu-efi
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://sourceforge.net/projects/%{name}/files/%{name}-%{version}.tar.bz2
 Source1:        LICENSE.PTR
 

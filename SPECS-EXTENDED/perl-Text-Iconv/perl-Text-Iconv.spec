@@ -5,7 +5,7 @@ Summary:        Perl interface to iconv() codeset conversion function
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Text-Iconv
 Source0:        https://cpan.metacpan.org/authors/id/M/MP/MPIOTR/Text-Iconv-%{version}.tar.gz#/perl-Text-Iconv-%{version}.tar.gz
 

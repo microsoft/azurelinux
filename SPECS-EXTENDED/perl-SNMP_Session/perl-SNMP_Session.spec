@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-SNMP_Session
 Version:        1.13
 Release:        24%{?dist}

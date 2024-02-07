@@ -6,7 +6,7 @@ Version:        6.4
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://invisible-island.net/ncurses/
 #

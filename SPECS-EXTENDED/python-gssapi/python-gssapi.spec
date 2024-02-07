@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # NOTE: tests are disabled since should_be has not yet been packaged.
 
 Name:           python-gssapi

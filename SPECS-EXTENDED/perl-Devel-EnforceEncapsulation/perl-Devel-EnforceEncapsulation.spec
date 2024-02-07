@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		perl-Devel-EnforceEncapsulation
 Version:	0.51
 Release:	18%{?dist}

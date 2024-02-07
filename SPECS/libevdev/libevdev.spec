@@ -4,7 +4,7 @@ Version:        1.13.1
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/libevdev
 Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 

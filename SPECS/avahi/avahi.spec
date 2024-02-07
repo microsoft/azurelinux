@@ -6,7 +6,7 @@ Version:        0.8
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://avahi.org
 Source0:        https://github.com/lathiat/avahi/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-libevent-pc-fix.patch

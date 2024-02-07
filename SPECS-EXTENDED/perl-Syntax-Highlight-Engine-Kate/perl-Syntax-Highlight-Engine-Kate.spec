@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Syntax-Highlight-Engine-Kate
 Version:        0.14
 Release:        10%{?dist}

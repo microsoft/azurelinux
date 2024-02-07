@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global fontname cjkuni-uming
 %global fontconf 65-ttf-arphic-uming.conf
 %global fontconf3 90-ttf-arphic-uming-embolden.conf

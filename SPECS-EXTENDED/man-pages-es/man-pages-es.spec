@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Spanish man pages from the Linux Documentation Project
 Name: man-pages-es
 Version: 1.55

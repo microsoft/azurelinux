@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        Read a POD document as a series of trivial events
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Eventual
 Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Eventual-%{version}.tar.gz#/perl-Pod-Eventual-%{version}.tar.gz
 BuildArch:      noarch

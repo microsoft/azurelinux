@@ -20,7 +20,7 @@ Version:        0.3.0
 Release:        16%{?dist}
 Summary:        C++ support for the HOCON configuration file format
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 License:        ASL 2.0
 URL:            https://github.com/puppetlabs/cpp-hocon
 Source0:        https://github.com/puppetlabs/cpp-hocon/archive/%{version}/cpp-hocon-%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        14
 Release:        1%{?dist}
 License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/latchset/%{name}
 Source0:        https://github.com/latchset/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        tang.sysusers

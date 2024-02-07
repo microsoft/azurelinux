@@ -8,7 +8,7 @@ Version:        6.4
 Release:        17%{?dist}
 License:        (GPL+ or Artistic) and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Date-Calc
 Source0:        https://cpan.metacpan.org/authors/id/S/ST/STBEY/Date-Calc-%{version}.tar.gz#/perl-Date-Calc-%{version}.tar.gz
 BuildRequires:  perl-generators

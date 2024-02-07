@@ -10,7 +10,7 @@ Summary:        Pure-Python library for parsing and analyzing ELF files
 License:        Public Domain AND MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/eliben/pyelftools
 Source0:        https://github.com/eliben/pyelftools/archive/v%{version}/%{name}-%{version}.tar.gz
 %global _description \

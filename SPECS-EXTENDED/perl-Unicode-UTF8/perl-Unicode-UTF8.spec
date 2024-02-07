@@ -13,7 +13,7 @@ Version:	0.62
 Release:	13%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Unicode-UTF8
 Source0:	https://cpan.metacpan.org/authors/id/C/CH/CHANSEN/Unicode-UTF8-%{version}.tar.gz#/perl-Unicode-UTF8-%{version}.tar.gz
 # Module Build

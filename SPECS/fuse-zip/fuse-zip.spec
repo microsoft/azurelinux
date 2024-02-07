@@ -3,7 +3,7 @@ Version:        0.7.2
 Release:        2%{?dist}
 Summary:        Filesystem to navigate, extract, create and modify ZIP archives
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv3+
 URL:            https://bitbucket.org/agalanin/fuse-zip/
 Source0:        https://bitbucket.org/agalanin/fuse-zip/downloads/%{name}-%{version}.tar.gz

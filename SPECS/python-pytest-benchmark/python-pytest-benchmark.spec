@@ -16,7 +16,7 @@ Version:        3.4.1
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ionelmc/pytest-benchmark
 Source:         %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 BuildRequires:  python3-cpuinfo

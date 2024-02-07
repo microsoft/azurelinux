@@ -4,7 +4,7 @@ Version:        3.17.6
 Release:        1%{?dist}
 License:        MIT OR AFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/simplejson
 Source0:        https://pypi.python.org/packages/source/s/simplejson/simplejson-%{version}.tar.gz

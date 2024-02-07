@@ -10,7 +10,7 @@ Release:        2%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/nodejs/node
 # !!!! Nodejs code has a vendored version of OpenSSL code that must be removed from source tarball 
 # !!!! because it contains patented algorithms.

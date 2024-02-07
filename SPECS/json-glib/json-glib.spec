@@ -7,7 +7,7 @@ Group:          Development/Libraries
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/%{name}-%{version}.tar.xz
 URL:            https://wiki.gnome.org/Projects/JsonGlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gettext
 BuildRequires:	glib-devel

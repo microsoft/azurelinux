@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.mercurial-scm.org/release/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 %if %{with_check}

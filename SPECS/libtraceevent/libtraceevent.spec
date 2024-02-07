@@ -8,7 +8,7 @@ Version:        1.7.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/
 # If upstream does not provide tarballs, to generate:
 # git clone git://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git

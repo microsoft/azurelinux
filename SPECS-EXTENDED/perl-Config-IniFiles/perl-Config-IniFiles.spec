@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Config-IniFiles
 Version:        3.000002
 Release:        6%{?dist}
