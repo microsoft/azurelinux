@@ -455,7 +455,7 @@ fi
 
 %changelog
 * Tue Feb 06 2024 Nan Liu <liunan@microsoft.com> - 1.9.8-1
-- Upgrade to 1.9.8 in Mariner 3.0
+- Upgrade to 1.9.8 in Azure Linux 3.0
 - Remove the unneeded patch
 
 * Fri Mar 04 2022 Muhammad Falak <mwani@microsoft.com> - 1.9.3-4
