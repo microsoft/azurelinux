@@ -32,13 +32,13 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			switch partitionFormat {
 			case "raw":
 				// Do nothing for "raw" case.
-			case "raw-zstd":
+			case "raw-zst":
 				partitionFilepath, err = compressWithZstd(partitionFilepath)
 				if err != nil {
 					return err
 				}
 			default:
-				return fmt.Errorf("unsupported partition format (supported: raw, raw-zstd): %s", partitionFormat)
+				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
 
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
@@ -70,7 +70,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 	return fullPath, nil
 }
 
-// Compress file from raw to raw-zstd format using zstd.
+// Compress file from .raw to .raw.zst format using zstd.
 func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, err error) {
 	// Using -f to overwrite a file with same name if it exists.
 	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath)
@@ -78,7 +78,7 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
 
-	// Remove raw file since output partition format is raw-zstd.
+	// Remove raw file since output partition format is raw-zst.
 	err = os.Remove(partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
