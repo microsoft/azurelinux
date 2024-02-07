@@ -78,6 +78,7 @@ sed -e '/get_git_version/d' -e '/-Werror/d' -i CMakeLists.txt
 * Wed Jan 31 2024 Jon Slobodzian <joslobo@microsoft.com> - 1.8.3-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - Upgraded to 1.8.3 from Fedora version
+- License verified.
 
 * Fri Nov 11 2022 Vitaly Zaitsev <vitaly@easycoding.org> - 1.7.1-1
 - Updated to version 1.7.1.
