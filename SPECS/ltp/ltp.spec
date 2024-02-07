@@ -9,16 +9,14 @@
 
 Summary:        Linux Test Project
 Name:           ltp
-Version:        20230127
-Release:        2%{?dist}
+Version:        20240129
+Release:        1%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/linux-test-project/ltp
-Source0:        https://github.com/linux-test-project/ltp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_submodules_tarball.sh script to create a tarball during version updates.
-Source1:        %{name}_submodules-%{version}.tar.gz
+Source0:        https://github.com/linux-test-project/ltp/releases/download/%{version}/ltp-full-%{version}.tar.xz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -62,7 +60,7 @@ BuildArch:      noarch
 LTP documentation and manuals.
 
 %prep
-%autosetup -a 1
+%autosetup -n ltp-full-%{version}
 
 %build
 make autotools
@@ -76,8 +74,6 @@ make autotools
 %make_install
 
 %check
-# Disabling cloning of git submodules - already provided in Source1
-sed -i "s/git submodule.*/@echo 'Skipping submodule init - already provided.'/" tools/sparse/Makefile
 make check
 
 %preun
@@ -92,6 +88,9 @@ rm -rf %{ltp_prefix}/{output,results,testcases/bin/[0-9]*}
 %{_mandir}/*
 
 %changelog
+* Tue Feb 06 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240129-1
+- Upgrade to 20240129 for Mariner 3.0 release
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 20230127-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
