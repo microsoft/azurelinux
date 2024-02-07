@@ -24884,8 +24884,8 @@
         "type": "other",
         "other": {
           "name": "qdox",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.0.tar.gz"
+          "version": "2.0.3",
+          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.3.tar.gz"
         }
       }
     },

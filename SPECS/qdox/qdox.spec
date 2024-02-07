@@ -17,15 +17,17 @@
 
 Summary:        Tool to extract class/interface/method definitions from sources
 Name:           qdox
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        2.0.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/paul-hammant/qdox
 Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
-Source1:        qdox-MANIFEST.MF
+Source1:        qdox-build.xml
+Patch0:         port-to-jflex-1.7.0.patch
+BuildRequires:  ant
 BuildRequires:  byaccj
 BuildRequires:  fdupes
 BuildRequires:  java-cup-bootstrap
@@ -39,19 +41,29 @@ QDox is a parser for extracting class/interface/method definitions
 from source files complete with JavaDoc @tags. It is designed to be
 used by active code generators or documentation tools.
 
+%package javadoc
+Summary:        Javadoc for %{name}
+Group:          Development/Libraries/Java
+
+%description javadoc
+API docs for %{name}.
+
 %prep
 %setup -q -n %{name}-%{name}-%{version}
+cp %{SOURCE1} build.xml
+%patch0 -p1
 find -name *.jar -delete
 find -name *.class -delete
 rm -rf bootstrap
 
 # We don't need these plugins
 %pom_remove_plugin :animal-sniffer-maven-plugin
+%pom_remove_plugin :maven-assembly-plugin
 %pom_remove_plugin :maven-failsafe-plugin
-%pom_remove_plugin :maven-jflex-plugin
+%pom_remove_plugin :maven-invoker-plugin
+%pom_remove_plugin :jflex-maven-plugin
 %pom_remove_plugin :maven-enforcer-plugin
-
-%pom_xpath_set pom:workingDirectory '${basedir}/src/main/java/com/thoughtworks/qdox/parser/impl'
+%pom_remove_plugin :exec-maven-plugin
 
 %pom_remove_parent .
 
@@ -75,6 +87,8 @@ GRAMMAR_PATH=$(pwd)/src/grammar/parser.y && \
 	-Jpackage=com.thoughtworks.qdox.parser.impl \
 	-Jstack=500 ${GRAMMAR_PATH})
 
+  %ant jar javadoc
+
 # Build artifact
 mkdir -p build/classes
 javac -d build/classes -source 6 -target 6 \
@@ -92,10 +106,18 @@ install -pm 0644 build/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.ja
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar -a qdox:qdox
+# javadoc
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+%fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.txt
 %doc README.md
+
+%files javadoc
+%{_javadocdir}/%{name}
+%license LICENSE.txt
 
 %changelog
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.0-2

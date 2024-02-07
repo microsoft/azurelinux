@@ -1,0 +1,21 @@
++++ qdox-2.0.1/src/grammar/lexer.flex	2022-03-12 07:00:33.182053962 +0100
+@@ -173,7 +173,7 @@
+ 	}
+ 
+     public JFlexLexer( java.io.InputStream stream, java.io.Writer writer ) {
+-       this( stream );
++       this( new java.io.InputStreamReader( stream, java.nio.charset.Charset.forName( "UTF-8" ) ) );
+        this.writer = writer;
+   	}
+ 
+--- qdox-2.0.1/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java	2021-11-13 15:25:20.000000000 +0100
++++ qdox-2.0.1/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java	2022-03-12 07:00:33.182053962 +0100
+@@ -112,7 +112,7 @@
+             if ( sourceStream != null )
+             {
+                 Builder builder = getModelBuilder();
+-                JavaLexer lexer = new JFlexLexer( sourceStream );
++                JavaLexer lexer = new JFlexLexer( new java.io.InputStreamReader( sourceStream, java.nio.charset.Charset.forName( "UTF-8" ) ) );
+                 Parser parser = new Parser( lexer, builder );
+                 parser.setDebugLexer( debugLexer );
+                 parser.setDebugParser( debugParser );
