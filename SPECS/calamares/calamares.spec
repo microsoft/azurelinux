@@ -28,7 +28,7 @@ Source23:       branding.desc
 Source24:       users.conf
 Source25:       stylesheet.qss
 # Source40..100 - Assets
-Source40:       mariner-logo.png
+Source40:       azl-logo.png
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_fr.ts
 # then translate the template in linguist-qt5.
@@ -41,8 +41,8 @@ Source42:       calamares-auto_de.ts
 # lupdate-qt5 show.qml -ts calamares-auto_it.ts
 # then translate the template in linguist-qt5.
 Source43:       calamares-auto_it.ts
-Source52:       mariner-welcome.png
-Source53:       mariner-eula
+Source52:       azl-welcome.png
+Source53:       azl-eula
 # adjust some default settings (default shipped .conf files)
 Patch0:         Azure-Linux-Calamares-Conf-Patch-3.3.1.patch
 #Patch3:         round-to-full-disk-size.patch
@@ -61,12 +61,12 @@ BuildRequires:  gcc
 # Other build-time tools
 BuildRequires:  gettext
 # KF5
-BuildRequires:  kf5-kconfig-devel
-BuildRequires:  kf5-kcoreaddons-devel
-BuildRequires:  kf5-ki18n-devel
-BuildRequires:  kf5-kwidgetsaddons-devel
+BuildRequires:  kf-kconfig-devel
+BuildRequires:  kf-kcoreaddons-devel
+BuildRequires:  kf-ki18n-devel
+BuildRequires:  kf-kwidgetsaddons-devel
 # Macros
-BuildRequires:  kf5-rpm-macros
+BuildRequires:  kf-rpm-macros
 # KPMCORE
 BuildRequires:  kpmcore-devel >= 3.3
 BuildRequires:  libatasmart-devel
@@ -77,11 +77,11 @@ BuildRequires:  parted
 BuildRequires:  pkg-config
 # Python 3
 BuildRequires:  python3-devel >= 3.3
-# Qt 5
-BuildRequires:  qt-linguist >= 6.6
-BuildRequires:  qtbase-devel >= 6.6
-BuildRequires:  qtdeclarative-devel >= 6.6
-BuildRequires:  qtsvg-devel >= 6.6
+# Qt 6
+BuildRequires:  qt-linguist >= 6.6.1
+BuildRequires:  qtbase-devel >= 6.6.1
+BuildRequires:  qtdeclarative-devel >= 6.6.1
+BuildRequires:  qtsvg-devel >= 6.6.1
 BuildRequires:  util-linux-devel
 BuildRequires:  yaml-cpp-devel >= 0.5.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
