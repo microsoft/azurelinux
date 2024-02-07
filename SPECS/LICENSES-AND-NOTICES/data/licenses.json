@@ -2804,6 +2804,7 @@
                 "m4",
                 "make",
                 "man-db",
+                "mandoc",
                 "man-pages",
                 "mariadb",
                 "maven",
