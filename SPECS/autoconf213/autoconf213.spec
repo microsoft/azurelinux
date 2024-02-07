@@ -9,7 +9,7 @@ Patch0:     autoconf-2.13-versioning.patch
 Patch1:     autoconf213-destdir.patch
 Patch2:     autoconf213-info.patch
 Vendor:     Microsoft Corporation
-Distribution:  Mariner
+Distribution:  Azure Linux
 
 Requires:   gawk, m4 >= 1.1, coreutils
 BuildRequires:   texinfo, m4 >= 1.1, perl, gawk, dejagnu, flex
@@ -20,12 +20,12 @@ GNU's Autoconf is a tool for configuring source code and Makefiles.
 Using Autoconf, programmers can create portable and configurable
 packages, since the person building the package is allowed to specify
 various configuration options.
- 
+
 You should install Autoconf if you are developing software and you
 would like to use it to create shell scripts that will configure your
 source code packages. If you are installing Autoconf, you will also
 need to install the GNU m4 package.
- 
+
 Note that the Autoconf package is not required for the end-user who
 may be configuring software with an Autoconf-generated script;
 Autoconf is only required for the generation of the scripts, not their
@@ -33,9 +33,9 @@ use.
 
 %prep
 %setup -q -n autoconf-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
 
 mv autoconf.texi autoconf213.texi
 rm -f autoconf.info
@@ -62,22 +62,22 @@ sed -i 's/AC_DEFUN(AC_PROG_F77,/AU_DEFUN(AC_PROG_F77,/g' ./acspecific.m4
 sed -i 's/AC_DEFUN(AC_PROG_F77_WORKS,/AU_DEFUN(AC_PROG_F77_WORKS,/g' ./acspecific.m4
 sed -i 's/AC_DEFUN(AC_F77_LIBRARY_LDFLAGS,/AU_DEFUN(AC_F77_LIBRARY_LDFLAGS,/g' ./acspecific.m4
 make check
- 
+
 %post
 /sbin/install-info %{_infodir}/%{name}.info %{_infodir}/dir || :
- 
+
 %preun
 if [ "$1" = 0 ]; then
     /sbin/install-info --delete %{_infodir}/%{name}.info %{_infodir}/dir || :
 fi
- 
+
 %files
 %defattr(-,root,root,-)
 %license COPYING
 %{_bindir}/*
 %{_infodir}/*.info*
 %{_datadir}/autoconf-%{version}/
- 
+
 %changelog
 * Fri Jul 1 2022 Jamie Magee <jamagee@microsoft.com> - 2.13-49
 - Switch from FTP to HTTPS source
@@ -96,12 +96,12 @@ fi
 *   Tue Jan 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-44
 -   Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 *   Wed Jul 24 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-43
--   Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild 
+-   Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 *   Thu Feb 21 2019 Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com> - 2.13-42
 -   Ensure %{_infodir}/standards* is not installed in install, or conflict with binutils'
     version.
 *   Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-41
--   Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild 
+-   Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 *   Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-40
 -   Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 *   Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.13-39
@@ -118,11 +118,11 @@ fi
 -   don't ship broken (and ancient) autoscan (rhbz#1194568)
 -   drop explicit 'Requires: perl' (related rhbz#1194568)
 *   Mon Jul 28 2014 Pavel Raiskup <praiskup@redhat.com> - 2.13-32
--   don't build-require compat-gcc-34-g77 at all 
+-   don't build-require compat-gcc-34-g77 at all
 *   Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-31
--   Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild 
+-   Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 *   Fri Oct 18 2013 Pavel Raiskup <praiskup@redhat.com> - 2.13-30
--   disable g77 tests for RHEL7 builds 
+-   disable g77 tests for RHEL7 builds
 *   Wed Oct 09 2013 Pavel Raiskup <praiskup@redhat.com> - 2.13-29
 -   enable testsuite for obsolescent autoconf213
 *   Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-28
@@ -132,9 +132,9 @@ fi
 *   Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-26
 -   Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 *   Mon Oct 29 2012 Pavel Raiskup <praiskup@redhat.com> - 2.13-25
--   remove unnecessary BR, remove trailing whitespaces 
+-   remove unnecessary BR, remove trailing whitespaces
 *   Fri Oct 12 2012 Pavel Raiskup <praiskup@redhat.com> - 2.13-24
--   update license tag in specfile 
+-   update license tag in specfile
 *   Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-23
 -   Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 *   Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-22
@@ -146,7 +146,7 @@ fi
 *   Mon Feb 23 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.13-19
 -   Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 *   Wed Aug 08 2007 Karsten Hopp <karsten@redhat.com> 2.13-18
--   update license tag 
+-   update license tag
 *   Mon Feb 26 2007 Karsten Hopp <karsten@redhat.com> 2.13-17
 -   our tarball hat different size and timestamps then the upstream
     tarball. No changes, though.
@@ -157,7 +157,7 @@ fi
 -   add autoconf213 info entry
 -   add disttag
 *   Wed Feb 14 2007 Karsten Hopp <karsten@redhat.com> 2.13-14
--   buildrequire perl for autoscan script 
+-   buildrequire perl for autoscan script
 *   Wed Feb 14 2007 Karsten Hopp <karsten@redhat.com> 2.13-13
 -   buildroot fixed
 -   removed textutils requirement
@@ -177,7 +177,7 @@ fi
 *   Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 -   rebuilt
 *   Mon Feb 21 2005 Karsten Hopp <karsten@redhat.de> 2.13-10
--   Copyright -> License 
+-   Copyright -> License
 *   Thu Sep 23 2004 Daniel Reed <djr@redhat.com> - 2.13-9
 -   rebuilt for dist-fc3
 *   Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
@@ -194,7 +194,7 @@ fi
 *   Fri Jun 21 2002 Tim Powers <timp@redhat.com> 2.13-3
 -   automated rebuild
 *   Thu May 23 2002 Tim Powers <timp@redhat.com> 2.13-2
--   automated rebuild 
+-   automated rebuild
 *   Wed May 15 2002 Jens Petersen <petersen@redhat.com> 2.13-1
 -   new package based on autoconf-2.13-17
 -   don't make unversioned bindir symlinks
@@ -211,9 +211,9 @@ fi
     something that the kernel will take note of. Fixes the failing wait3 test
     that was worked around in time-1.7-15.
 *   Mon Aug  6 2001 Tim Powers <timp@redhat.com>
--   rebuilt to fix bug #50761 
+-   rebuilt to fix bug #50761
 *   Thu Jul 26 2001 Than Ngo <than@redhat.com>
--   add patch to fix exit status 
+-   add patch to fix exit status
 *   Tue Jul 10 2001 Jens Petersen <petersen@redhat.com>
 -   add patch to include various standard C headers as needed
     by various autoconf tests (#19114)
@@ -238,7 +238,7 @@ fi
 *   Wed Jul 12 2000 Prospector <bugzilla@redhat.com>
 -   automatic rebuild
 *   Mon Jun  5 2000 Jeff Johnson <jbj@redhat.com>
--   FHS packaging. 
+-   FHS packaging.
 *   Sun Mar 26 2000 Florian La Roche <Florian.LaRoche@redhat.com>
 -   fix preun
 *   Fri Mar 26 1999 Cristian Gafton <gafton@redhat.com>
@@ -254,7 +254,7 @@ fi
 *   Tue Jan 12 1999 Jeff Johnson <jbj@redhat.com>
 -   update to 2.13.
 *   Fri Dec 18 1998 Cristian Gafton <gafton@redhat.com>
--   build against glibc 2.1 
+-   build against glibc 2.1
 *   Mon Oct 05 1998 Cristian Gafton <gafton@redhat.com>
 -   requires perl
 *   Thu Aug 27 1998 Cristian Gafton <gafton@redhat.com>
