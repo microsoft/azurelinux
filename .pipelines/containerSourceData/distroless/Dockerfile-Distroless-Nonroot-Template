@@ -1,0 +1,31 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+ARG FINAL_IMAGE
+
+FROM $BASE_IMAGE AS BASE
+
+ARG MARINER_VERSION=2.0
+ARG USERNAME=nonroot
+ARG USER_UID=65532
+ARG USER_GID=$USER_UID
+ARG SET_USER=$USERNAME
+
+RUN mkdir -p /staging/etc \
+    && tdnf install -y --releasever=$MARINER_VERSION shadow-utils \
+    && groupadd --gid $USER_GID $USERNAME \
+    && useradd --gid $USER_GID -g $USERNAME $USERNAME -u $USER_UID \
+    && tdnf clean all \
+    # Copy user/group info to staging
+    && cp /etc/passwd /staging/etc/passwd \
+    && cp /etc/group /staging/etc/group
+
+FROM $FINAL_IMAGE AS FINAL
+
+ARG USER_UID=65532
+ARG SET_USER=$USER_UID
+
+COPY --from=BASE /staging/ /
+
+USER $SET_USER
