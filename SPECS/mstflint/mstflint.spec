@@ -1,3 +1,5 @@
+%{!?CONF_DIR: %define CONF_DIR /etc/mstflint}
+
 Summary:        Mellanox firmware burning application
 Name:           mstflint
 Version:        4.26.0
