@@ -197,7 +197,7 @@ BuildRequires:        DevIL-devel
 %endif
 # Mariner Comment: Updating BuildRequires to point to our R-devel package, which is named R-core-devel
 %if %{ARRRR}
-#BuildRequires:        R-devel
+BuildRequires:        R-core-devel
 %endif
 %if %{OCAML}
 BuildRequires:        ocaml
@@ -235,7 +235,7 @@ BuildRequires:        golang
 %endif
 # Mariner Comment: We do not build the package urw-base35-fonts, the line below is commented out. Instead we use the freefont package
 #Requires:        urw-base35-fonts
-Requires: freefont
+Requires:             freefont
 
 # Mariner Comment: Adding /sbin/ldconfig Requires from Mariner 2.0
 Requires(post): /sbin/ldconfig
@@ -261,9 +261,9 @@ and edges, not as in barcharts).
 %package devel
 Summary:        Development package for graphviz
 # Mariner Comment: Splitting Requires across multiple lines
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       pkgconfig
-Requires:        %{name}-gd = %{version}-%{release}
+Requires:       %{name}-gd = %{version}-%{release}
 
 %description devel
 A collection of tools for the manipulation and layout of graphs (as in nodes
@@ -273,7 +273,7 @@ graphviz.
 %if %{DEVIL}
 %package devil
 Summary:        Graphviz plugin for renderers based on DevIL
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description devil
 Graphviz plugin for renderers based on DevIL. (Unless you absolutely have
@@ -297,7 +297,7 @@ Smyrna is a viewer for graphs in the DOT format.
 
 %package gd
 Summary:        Graphviz plugin for renderers based on gd
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 # Mariner Comment: Adding additional requires from Mariner 2.0
 Requires:       freefont
 Requires(post): /sbin/ldconfig
@@ -311,7 +311,7 @@ quality anti-aliased lines provided by the cairo+pango based renderer.)
 %if %{with gtk2}
 %package gtk2
 Summary:        Graphviz plugin for renderers based on gtk2
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description gtk2
 Graphviz plugin for renderers based on gtk2.
@@ -326,7 +326,7 @@ Some demo graphs for graphviz.
 %if %{GUILE}
 %package guile
 Summary:        Guile extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description guile
 Guile extension for graphviz.
@@ -335,7 +335,7 @@ Guile extension for graphviz.
 %if %{JAVA}
 %package java
 Summary:        Java extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description java
 Java extension for graphviz.
@@ -344,7 +344,7 @@ Java extension for graphviz.
 %package lua
 Summary:        Lua extension for graphviz
 # Mariner Comment: Separated Requires into two lines
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       lua
 
 %description lua
@@ -353,7 +353,7 @@ Lua extension for graphviz.
 %if %{MING}
 %package ming
 Summary:        Graphviz plugin for flash renderer based on ming
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description ming
 Graphviz plugin for -Tswf (flash) renderer based on ming.
@@ -362,7 +362,7 @@ Graphviz plugin for -Tswf (flash) renderer based on ming.
 %if %{OCAML}
 %package ocaml
 Summary:        Ocaml extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description ocaml
 Ocaml extension for graphviz.
@@ -370,7 +370,7 @@ Ocaml extension for graphviz.
 
 %package perl
 Summary:        Perl extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 # Mariner Comment: Adding requires from Mariner 2.0 and updating to grab the subpackage that contains the necessary perllib.so files
 Requires:       perl(libs)
 
@@ -380,9 +380,9 @@ Perl extension for graphviz.
 %if %{PHP}
 %package php
 Summary:        PHP extension for graphviz
-Requires:        %{name} = %{version}-%{release}
-Requires:    php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
-Requires:    php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
+Requires:       %{name} = %{version}-%{release}
+Requires:       php(zend-abi) = %{?php_zend_api}%{?!php_zend_api:UNDEFINED}
+Requires:       php(api) = %{?php_core_api}%{?!php_core_api:UNDEFINED}
 
 %description php
 PHP extension for graphviz.
@@ -391,7 +391,7 @@ PHP extension for graphviz.
 %if %{with python2}
 %package python2
 Summary:        Python extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
 Provides: python2dist(gv) = %{version}
 Provides: python%{python2_version}dist(gv) = %{version}
@@ -407,7 +407,7 @@ Python extension for graphviz.
 
 %package python3
 Summary:        Python 3 extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 # Manually add provides that would be generated automatically if .egg-info was present
 Provides: python3dist(gv) = %{version}
 Provides: python%{python3_version}dist(gv) = %{version}
@@ -419,8 +419,8 @@ Python 3 extension for graphviz.
 %package R
 Summary:        R extension for graphviz
 # Mariner Comment: Spliting Requires out into multiple lines
-Requires:        %{name} = %{version}-%{release}
-Requires:        R-core
+Requires:       %{name} = %{version}-%{release}
+Requires:       R-core
 
 %description R
 R extension for graphviz.
@@ -428,9 +428,9 @@ R extension for graphviz.
 
 %package ruby
 Summary:        Ruby extension for graphviz
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 # Mariner Comment: Split Requires into multiple lines
-Requires:        ruby
+Requires:       ruby
 
 %description ruby
 Ruby extension for graphviz.
@@ -438,7 +438,7 @@ Ruby extension for graphviz.
 %if %{SHARP}
 %package sharp
 Summary:        C# extension for graphviz
-Requires:        %{name} = %{version}-%{release}, mono-core
+Requires:       %{name} = %{version}-%{release}, mono-core
 
 %description sharp
 C# extension for graphviz.
@@ -447,11 +447,11 @@ C# extension for graphviz.
 %package tcl
 Summary:        Tcl extension & tools for graphviz
 # Mariner Comment: Splitting Requires out into multiple lines
-Requires:        %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 Requires:       tcl >= 8.3
 # Mariner Comment: tk is currently in SPECS Extended. For now, tk is commented out as a requires.
 # It was not required in Mariner 2.0, so this would not be considered a regression
-# Requires:       tk
+# Requires:     tk
 
 %description tcl
 Various tcl packages (extensions) for the graphviz tools.
@@ -459,7 +459,7 @@ Various tcl packages (extensions) for the graphviz tools.
 %if %{GOLANG}
 %package go
 Summary:        Go extension for graphviz
-Requires:        %{name} = %{version}-%{release}, golang
+Requires:       %{name} = %{version}-%{release}, golang
 
 %description go
 Go extension for graphviz.
