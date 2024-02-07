@@ -26,7 +26,7 @@ Group:          Development/Libraries/Rust
 License:        Apache-2.0
 URL:            https://gitlab.com/virtio-fs/virtiofsd
 Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -38,12 +38,16 @@ Conflicts:      qemu-tools < 8
 vhost-user virtio-fs device backend written in Rust
 
 %prep
-%autosetup -a1
-mkdir .cargo
-cp %{SOURCE2} .cargo/config
+%autosetup -n %{name}-v%{version}
+#pushd %{name}-v%{version}
+tar -xf %{SOURCE1}
+install -D %{SOURCE2} .cargo/config
+#popd
 
 %build
+#pushd %{name}-v%{version}
 cargo build --release
+#popd
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}
