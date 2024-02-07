@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN  adduser --system --no-create-home -u 101 virt-operator
+USER 101
+
+#simple smoke test
+RUN ls /usr/bin/virt-operator
+
+ENTRYPOINT [ "/usr/bin/virt-operator" ]

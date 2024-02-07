@@ -1,0 +1,8 @@
+autoconf
+build-essential
+ca-certificates
+php
+php-pear
+php-pecl-zip
+pkg-config
+unzip
