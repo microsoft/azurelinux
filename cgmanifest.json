@@ -2928,8 +2928,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "055",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-055.tar.xz"
+          "version": "059",
+          "downloadUrl": "https://github.com/dracutdevs/dracut/archive/refs/tags/059.tar.gz"
         }
       }
     },
