@@ -10,7 +10,9 @@
 %bcond_with php
 %bcond_with guile
 %endif
-%bcond_with python2
+# Mariner Comment: Azure Linux 3 does not support python2. Removing % bcond_with python2 and inserting % bcond python2 0
+#%bcond_with python2
+%bcond python2 0
 
 # Macro for creating an option which enables bootstraping build without dependencies,
 # which cause problems during rebuilds. Currently it is circular dependency of graphviz and
