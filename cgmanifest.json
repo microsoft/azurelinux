@@ -7401,8 +7401,8 @@
         "type": "other",
         "other": {
           "name": "iputils",
-          "version": "20211215",
-          "downloadUrl": "https://github.com/iputils/iputils/archive/20211215.tar.gz"
+          "version": "20240117",
+          "downloadUrl": "https://github.com/iputils/iputils/archive/20240117.tar.gz"
         }
       }
     },
