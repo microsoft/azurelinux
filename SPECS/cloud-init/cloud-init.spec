@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,6 +144,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 23.3.3-2
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Tue Oct 15 2023 Dan Streetman <ddstreet@ieee.org> - 23.3.3-1
 - Upgrade to cloud-init 23.3.3
 - Remove Photon-specific behavior of refusal to setup fallback network
@@ -176,7 +179,7 @@ make check %{?_smp_mflags}
 - Remove add-mariner-distro-support and CVE-2022-2084 pathc as no longer needed in newer version
 
 * Tue Oct 04 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-9
-- add BuildRequires azurelinux-release to make sure /etc/os-release exists so variant can be set as mariner properly
+- add BuildRequires mariner-release to make sure /etc/os-release exists so variant can be set as mariner properly
 
 * Thu Sep 15 2022 Minghe Ren <mingheren@microsoft.com> - 22.2-8
 - Revert the change for adding sysinit.target dependency on previous two releases

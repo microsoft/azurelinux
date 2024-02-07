@@ -1,7 +1,7 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -157,6 +157,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-7
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2022.1-6
 - Bump package to rebuild with rust 1.72.0
 

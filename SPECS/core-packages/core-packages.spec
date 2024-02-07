@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,9 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-10
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Wed Jan 24 12:12:42 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.0-9
 - require broken-out systemd packages
 
