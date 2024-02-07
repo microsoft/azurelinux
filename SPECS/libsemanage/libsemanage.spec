@@ -87,7 +87,6 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %config(noreplace) %{_sysconfdir}/selinux/semanage.conf
 %{_libdir}/libsemanage.so.2
 %{_mandir}/man5/*
-%{_mandir}/ru/man5/*
 %dir %{_libexecdir}/selinux
 %dir %{_sharedstatedir}/selinux
 %dir %{_sharedstatedir}/selinux/tmp
