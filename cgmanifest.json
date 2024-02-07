@@ -1317,8 +1317,8 @@
         "type": "other",
         "other": {
           "name": "busybox",
-          "version": "1.35.0",
-          "downloadUrl": "https://www.busybox.net/downloads/busybox-1.35.0.tar.bz2"
+          "version": "1.36.1",
+          "downloadUrl": "https://www.busybox.net/downloads/busybox-1.36.1.tar.bz2"
         }
       }
     },
