@@ -57,6 +57,11 @@
             "KernelOptions": {
                 "default": "kernel"
             },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]
