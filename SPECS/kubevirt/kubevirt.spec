@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,6 +32,7 @@ Source1:        disks-images-provider.yaml
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
+Patch3:         Hp-volume-pod-should-respect-blockdevices.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
@@ -211,6 +212,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Feb 8 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-12
+- Add patch for render hp-volume- pod to respect blockdevices (IcM 467224770)
+
 * Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 0.59.0-11
 - Bump release to rebuild against glibc 2.35-6
 
