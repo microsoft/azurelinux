@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nicolas Frayer <nfrayer@redhat.com>
+Date: Mon, 20 Feb 2023 15:26:20 +0100
+Subject: [PATCH] cms_common: Fixed Segmentation fault
+
+When running efikeygen, the binary crashes with a segfault due
+to dereferencing a **ptr instead of a *ptr.
+
+Signed-off-by: Nicolas Frayer <nfrayer@redhat.com>
+(cherry picked from commit 227435af461f38fc4abeafe02884675ad4b1feb4)
+---
+ src/cms_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index 24576f2..89d946a 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -956,7 +956,7 @@ find_certificate_by_issuer_and_sn(cms_context *cms,
+ 	if (!ias)
+ 		cnreterr(-1, cms, "invalid issuer and serial number");
+ 
+-	return find_certificate_by_callback(cms, match_issuer_and_serial, &ias, cert);
++	return find_certificate_by_callback(cms, match_issuer_and_serial, ias, cert);
+ }
+ 
+ int
