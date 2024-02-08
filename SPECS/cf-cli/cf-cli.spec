@@ -27,13 +27,9 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        cli-%{version}-vendor.tar.gz
-Patch0:         use-mod-vendor-with-tests.patch
-Patch1:         CVE-2023-44487.patch
+Patch0:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.18.3
-%if %{with_check}
-BuildRequires:  tzdata
-%endif
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 

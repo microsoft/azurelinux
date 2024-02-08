@@ -52,6 +52,7 @@ go test -mod=vendor ./...
 * Wed Feb 07 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.0.2-16
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 - Rework CVE-2023-21698.patch to apply without directory change
+- Add check section
 
 * Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.0.2-15
 - Fix CVE-2021-44716

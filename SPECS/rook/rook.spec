@@ -130,7 +130,6 @@ This package contains Helm Charts for Rook.
 # Apply vendor before patching
 tar -xf %{SOURCE1} --no-same-owner
 %autopatch -p1
-%autopatch -p1
 
 %build
 # remove symbols unsupported by k8s (+) from version
