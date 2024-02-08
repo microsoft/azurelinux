@@ -1,5 +1,7 @@
 # Mariner Image Customizer ISO Support
 
+## Overview
+
 Given a full disk image, the Mariner Image Customizer (MIC) can generate a
 LiveOS ISO image when the `--output-image-format` is set to `iso`.
 
@@ -33,3 +35,8 @@ The current implementation for the LiveOS ISO does not support the following:
 - disk layout.
   - There is always one disk generated when an `iso` output format is
     specified.
+
+  ## ISO Specific Customizations
+
+  - The user can specify one or more files to be copied to the iso media.
+    See MIC's iso configuration [Config.ISO](./configuration.md#iso-type).

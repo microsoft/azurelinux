@@ -5,9 +5,11 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -24,21 +26,24 @@ menuentry "Mariner Baremetal Iso" {
 
 	search --label CDROM --set root
 	linux /isolinux/vmlinuz \
-			overlay-size=70% \
+			overlay-size=70%% \
 			selinux=0 \
 			console=tty0 \
 			apparmor=0 \
 			root=live:LABEL=CDROM \
 			rd.shell \
 			rd.live.image \
-			rd.live.dir=config/additionalfiles/0 \
-			rd.live.squashimg=rootfs.img \
+			rd.live.dir=%s \
+			rd.live.squashimg=%s \
 			rd.live.overlay=1 \
 			rd.live.overlay.nouserconfirmprompt
 
 	initrd /isolinux/initrd.img
 }	
 `
+	liveOSDir   = "liveos"
+	liveOSImage = "rootfs.img"
+
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
 `
@@ -291,9 +296,10 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 	b.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
+	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, liveOSDir, liveOSImage)
 	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
 
-	err = os.WriteFile(targetGrubCfgPath, []byte(grubCfgTemplate), 0o644)
+	err = os.WriteFile(targetGrubCfgPath, []byte(targetGrubCfgContent), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to create grub.cfg:\n%w", err)
 	}
@@ -464,57 +470,14 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	return nil
 }
 
-// createIsoMakerConfig
-//
-//	creates an IsoMaker config objects with the necessary configuration.
-//
-// inputs:
-//   - squashfsImagePath:
-//     path to an existing squashfs image file. The configuration will instruct
-//     IsoMaker to place it under:
-//   - /config/additionalfiles/0/$(basename $squashfsImagePath).
-//
-// outputs:
-//   - returns an IsoMaker configuration.Config object.
-func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error) {
-
-	config := configuration.Config{
-		SystemConfigs: []configuration.SystemConfig{
-			{
-				AdditionalFiles: map[string]configuration.FileConfigList{
-					// 'AdditionalFiles' is meant to do two things:
-					// 1. copy the files from the build machine to the ISO
-					//    media.
-					// 2. have Mariner installer copy those files from the ISO
-					//    media to the target storage device.
-					// In the MIC LiveOS ISO generation sceanrio, we do not
-					// have/run Mariner installer and do not need to copy them.
-					// So, we are setting the destination to 'dummy-name' as it
-					// never be used.
-					squashfsImagePath: {{Path: "/dummy-name"}},
-				},
-			},
-		},
-	}
-
-	return config, nil
-}
-
 // createIsoImage
 //
 //	creates an LiveOS ISO image.
 //
 // inputs:
-//   - isomakerBuildDir:
-//     folder to be created by the IsoMaker tool to place its temporary files.
-//   - grubCfgPath:
-//     path to the grub.cfg file to be used with the bootloaders.
-//   - initrdImagePath:
-//     path to an existing initrd image file. The initrd image must be
-//     configured to run the LiveOS booting flow in Dracut.
-//   - squashfsImagePath:
-//     path to an existing squashfs image file. The squashfs must host a
-//     rootfs so that initrd can pivot.
+//   - additionalIsoFiles:
+//     map of addition files to copy to the iso media.
+//     sourcePath -> [ targetPath0, targetPath1, ...]
 //   - isoOutputDir:
 //     path to a folder where the output image will be placed. It does not
 //     need to be created before calling this function.
@@ -524,7 +487,7 @@ func createIsoMakerConfig(squashfsImagePath string) (configuration.Config, error
 //
 // ouptuts:
 //   - create a LiveOS ISO.
-func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string) error {
+func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileToCopy, isoOutputDir, isoOutputBaseName string) error {
 
 	baseDirPath := ""
 
@@ -549,12 +512,18 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	releaseVersion := ""
 	imageNameTag := ""
 
-	config, err := createIsoMakerConfig(b.artifacts.squashfsImagePath)
-	if err != nil {
-		return err
-	}
+	// empty target system config since LiveOS does not install the OS
+	// artifacts to the target system.
+	targetSystemConfig := configuration.Config{}
 
-	err = os.MkdirAll(isoOutputDir, os.ModePerm)
+	// Add the squashfs file
+	squashfsImageToCopy := safechroot.FileToCopy{
+		Src:  b.artifacts.squashfsImagePath,
+		Dest: filepath.Join(liveOSDir, liveOSImage),
+	}
+	additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
+
+	err := os.MkdirAll(isoOutputDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -567,7 +536,8 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 		b.workingDirs.isomakerBuildDir,
 		releaseVersion,
 		isoResourcesDir,
-		config,
+		additionalIsoFiles,
+		targetSystemConfig,
 		b.artifacts.initrdImagePath,
 		b.artifacts.grubCfgPath,
 		isoRepoDirPath,
@@ -586,6 +556,41 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 	return nil
 }
 
+// micIsoConfigToIsoMakerConfig
+//
+//	converts imagecustomizerapi.Iso to isomaker configuration.
+//
+// inputs:
+//
+//   - 'baseConfigPath'
+//     path to the folder where the mic configuration was loaded from.
+//     This path will be used to construct absolute paths for build machine
+//     file references defined in the config.
+//   - 'isoConfig'
+//     user provided configuration for the iso image.
+//
+// outputs:
+//   - 'additionalIsoFiles'
+//     list of files to copy from the build machine to the iso media.
+func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, err error) {
+
+	additionalIsoFiles = []safechroot.FileToCopy{}
+
+	for sourcePath, fileConfigs := range isoConfig.AdditionalFiles {
+		absSourcePath := filepath.Join(baseConfigPath, sourcePath)
+		for _, fileConfig := range fileConfigs {
+			fileToCopy := safechroot.FileToCopy{
+				Src:         absSourcePath,
+				Dest:        fileConfig.Path,
+				Permissions: (*fs.FileMode)(fileConfig.Permissions),
+			}
+			additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
+		}
+	}
+
+	return additionalIsoFiles, nil
+}
+
 // createLiveOSIsoImage
 //
 //	main function to create a LiveOS ISO image from a raw full disk image file.
@@ -594,6 +599,12 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 //
 //   - 'buildDir':
 //     path build directory (can be shared with other tools).
+//   - 'baseConfigPath'
+//     path to the folder where the mic configuration was loaded from.
+//     This path will be used to construct absolute paths for file references
+//     defined in the config.
+//   - 'isoConfig'
+//     user provided configuration for the iso image.
 //   - 'rawImageFile':
 //     path to an existing raw full disk image (has boot + rootfs partitions).
 //   - 'outputImageDir':
@@ -605,7 +616,12 @@ func (b *LiveOSIsoBuilder) createIsoImage(isoOutputDir, isoOutputBaseName string
 // outputs:
 //
 //	creates a LiveOS ISO image.
-func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase string) (err error) {
+func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, rawImageFile, outputImageDir, outputImageBase string) (err error) {
+
+	additionalIsoFiles, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
+	if err != nil {
+		return fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
+	}
 
 	isoBuildDir := filepath.Join(buildDir, "tmp")
 
@@ -640,7 +656,7 @@ func createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBas
 		return err
 	}
 
-	err = isoBuilder.createIsoImage(outputImageDir, outputImageBase)
+	err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
 	if err != nil {
 		return err
 	}

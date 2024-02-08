@@ -21,5 +21,5 @@ func (d *DummyChroot) UnsafeRun(toRun func() error) (err error) {
 }
 
 func (d *DummyChroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	return addFilesToDestination(d.RootDir(), filesToCopy...)
+	return AddFilesToDestination(d.RootDir(), filesToCopy...)
 }

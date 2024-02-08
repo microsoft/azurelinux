@@ -168,13 +168,14 @@ func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]imagecustomizerapi.FileConfigList, imageChroot *safechroot.Chroot) error {
+func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap, imageChroot *safechroot.Chroot) error {
 	for sourceFile, fileConfigs := range additionalFiles {
+		absSourceFile := filepath.Join(baseConfigPath, sourceFile)
 		for _, fileConfig := range fileConfigs {
 			logger.Log.Infof("Copying: %s", fileConfig.Path)
 
 			fileToCopy := safechroot.FileToCopy{
-				Src:         filepath.Join(baseConfigPath, sourceFile),
+				Src:         absSourceFile,
 				Dest:        fileConfig.Path,
 				Permissions: (*fs.FileMode)(fileConfig.Permissions),
 			}

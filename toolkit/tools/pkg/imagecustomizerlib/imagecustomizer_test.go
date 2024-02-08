@@ -135,7 +135,7 @@ func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConne
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
-			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/a.txt": {{Path: "/a.txt"}},
 			},
 		}}, nil, true)
@@ -145,7 +145,7 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
-			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/missing_a.txt": {{Path: "/a.txt"}},
 			},
 		}}, nil, true)
@@ -155,7 +155,7 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
 		SystemConfig: imagecustomizerapi.SystemConfig{
-			AdditionalFiles: map[string]imagecustomizerapi.FileConfigList{
+			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files": {{Path: "/a.txt"}},
 			},
 		}}, nil, true)

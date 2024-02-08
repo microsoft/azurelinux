@@ -30,7 +30,7 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 
 7. Enable/disable services. ([Services](#services-type))
 
-8. Configure kernel modules.
+8. Configure kernel modules. ([Modules](#modules-type))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
@@ -45,6 +45,10 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 14. Delete `/etc/resolv.conf` file.
 
 15. Enable dm-verity root protection.
+
+And if the output format is set to `iso`:
+
+12. Copy additional iso media files ([Iso](#iso-type)).
 
 ### /etc/resolv.conf
 
@@ -149,9 +153,17 @@ Supported options:
 
 The size of the disk, specified in mebibytes (MiB).
 
-### Partitions [[Partition](#partition-type)]
+### Partitions [[Partition](#partition-type)[]]
 
 The partitions to provision on the disk.
+
+## Iso type
+
+Specifies the configuration for the generated ISO media.
+
+### AdditionalFiles
+
+- See [AdditionalFiles](#additionalfiles-mapstring-fileconfig).
 
 ## Verity type
 
@@ -224,7 +236,7 @@ SystemConfig:
 
 Options for configuring the kernel.
 
-### ExtraCommandLine
+### ExtraCommandLine [string]
 
 Additional Linux kernel command line options to add to the image.
 
@@ -296,6 +308,8 @@ SystemConfig:
 ## Module type
 
 Options for configuring a kernel module.
+
+<div id="module-name"></div>
 
 ### Name
 
@@ -381,6 +395,8 @@ Supported options:
 - `ext4`
 - `fat32`
 - `xfs`
+
+<div id="partition-name"></div>
 
 ### Name [string]
 
@@ -514,7 +530,7 @@ SystemConfig:
 
 Options for configuring systemd services.
 
-### Enable
+### Enable [string[]]
 
 A list of services to enable.
 That is, services that will be set to automatically run on OS boot.
@@ -528,7 +544,7 @@ SystemConfig:
     - sshd
 ```
 
-### Disable
+### Disable [string[]]
 
 A list of services to disable.
 That is, services that will be set to not automatically run on OS boot.
@@ -774,6 +790,8 @@ Options for configuration kernel modules.
 ## User type
 
 Options for configuring a user account.
+
+<div id="user-name"></div>
 
 ### Name [string]
 
