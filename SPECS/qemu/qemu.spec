@@ -276,7 +276,11 @@ Distribution:   Mariner
 %define requires_block_rbd %{nil}
 %define obsoletes_block_rbd Obsoletes: %{name}-block-rbd < %{evr}
 %endif
+%if %{with libssh}
 %define requires_block_ssh Requires: %{name}-block-ssh = %{evr}
+%else
+%define requires_block_ssh %{nil}
+%endif
 %define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
 %define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
 %if %{with pulseaudio}
@@ -316,11 +320,20 @@ Distribution:   Mariner
 %define requires_ui_egl_headless %{nil}
 %define requires_ui_opengl %{nil}
 %endif
+#check if needs to be enabled for azl
+%if %{have_ui}
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
+%else
+%define requires_device_display_virtio_gpu %{nil}
+%define requires_device_display_virtio_gpu_pci %{nil}
+%define requires_device_display_virtio_gpu_ccw %{nil}
+%define requires_device_display_virtio_vga %{nil}
+%define requires_device_display_virtio_vga_gl %{nil}
+%endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %ifnarch %{ix86}
 %if 0%{?fedora} || 0%{?rhel} > 9
