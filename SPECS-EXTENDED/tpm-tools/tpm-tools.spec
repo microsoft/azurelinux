@@ -4,7 +4,7 @@ Version:          1.3.9
 Release:          9%{?dist}
 License:          CPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:              http://trousers.sourceforge.net
 Source0:          http://downloads.sourceforge.net/trousers/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

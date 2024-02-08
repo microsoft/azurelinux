@@ -6,7 +6,7 @@ Release:        2%{?dist}
 # Scripts used to translate original XML data into the necessary format are MIT
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/Mic92/iana-etc
 Source0:        https://github.com/Mic92/iana-etc/releases/download/%{version}/%{name}-%{version}.tar.gz

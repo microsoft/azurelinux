@@ -10,7 +10,7 @@ Version:        0.9.7
 Release:        15%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://erratique.ch/software/uuidm
 Source0:        https://github.com/dbuenzli/uuidm/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

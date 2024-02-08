@@ -7,7 +7,7 @@ URL:            https://lttng.org/
 Source0:        https://lttng.org/files/%{name}/%{name}-%{version}.tar.bz2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires: libxml2-devel >= 2.7.6
 BuildRequires: m4

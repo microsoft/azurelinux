@@ -31,7 +31,7 @@ Version:        4.1.5
 Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.open-mpi.org/
 # We can't use %%{name} here because of _cc_name_suffix
 Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{version}.tar.bz2

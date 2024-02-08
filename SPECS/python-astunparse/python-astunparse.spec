@@ -8,7 +8,7 @@ Release:        10%{?dist}
 # The unparse and the test_unparse modules are under the PSF license.
 License:        BSD AND PSF
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/simonpercivall/astunparse
 Source0:        %{pypi_source}
 

@@ -56,7 +56,7 @@ Version:        1.29.30
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.candlepinproject.org/
 Source0:        https://github.com/candlepin/subscription-manager/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
 # The following macro examples are preceeded by '%' to stop macro expansion

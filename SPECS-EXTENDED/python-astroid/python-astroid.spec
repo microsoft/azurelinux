@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Remove when globs in setup.py work.
 %{?python_disable_dependency_generator}
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Database-specific drivers for libdbi
 Name: libdbi-drivers
 Version: 0.9.0

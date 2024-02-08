@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Date conversion routines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTTP-Date
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-%{version}.tar.gz#/perl-HTTP-Date-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,14 +1,17 @@
 Summary:        Platform-neutral API
 Name:           nspr
 Version:        4.35
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://firefox-source-docs.mozilla.org/nspr
 Source0:	https://ftp.mozilla.org/pub/nspr/releases/v%{version}/src/nspr-%{version}.tar.gz
+BuildRequires:  binutils
 BuildRequires:  gcc
+BuildRequires:  glibc-devel
+BuildRequires:  kernel-headers
 BuildRequires:  make
 
 %description
@@ -58,6 +61,9 @@ cd nspr
 %{_datarootdir}/aclocal/*
 
 %changelog
+* Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 4.35-2
+- add build deps
+
 * Tue Feb 06 2024 Kanika nema <kanikanema@microsoft.com> - 4.35-1
 - Upgrade to release version 4.35
 - Added disable-debug and enable-optimize config options as suggested

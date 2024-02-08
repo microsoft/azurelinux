@@ -6,7 +6,7 @@ Version:        0.12.0.beta.4
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/appsignal/rdkafka-ruby
 Source0:        https://github.com/appsignal/rdkafka-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz

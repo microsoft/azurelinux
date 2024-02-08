@@ -1,10 +1,10 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.11.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Databases
 
 # A buildable mariadb environment needs functioning submodules that do not work from the archive download
@@ -21,7 +21,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  pkgconf
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-connector-c
 Conflicts:      mysql
@@ -468,6 +468,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 10.11.6-2
+- workaround "circular dependencies" from build tooling
+
 * Thu Nov 16 2023 Andrew Phelps <anphel@microsoft.com> - 10.11.6-1
 - Upgrade to version 10.11.6
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Crypt-OpenSSL-RSA
 Version:        0.31
 Release:        6%{?dist}

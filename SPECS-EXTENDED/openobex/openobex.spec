@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global udevdir %{_prefix}/lib/udev
 
 Summary: Library for using OBEX

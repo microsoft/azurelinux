@@ -14,7 +14,7 @@ Release:        1%{?dist}
 # will.) See https://github.com/google/flatbuffers/pull/7073.
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://google.github.io/flatbuffers
 Source0:        https://github.com/google/flatbuffers/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel

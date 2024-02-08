@@ -4,7 +4,7 @@ Version:        5.2.2
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gawk
 Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz

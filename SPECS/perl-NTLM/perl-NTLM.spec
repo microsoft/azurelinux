@@ -4,7 +4,7 @@ Release:        25%{?dist}
 Summary:        NTLM Perl module
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/NTLM
 Source0:        https://cpan.metacpan.org/authors/id/N/NB/NBEBOUT/NTLM-%{version}.tar.gz#/perl-NTLM-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        1.04
 Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.lzop.org/
 Source:         https://www.lzop.org/download/%{name}-%{version}.tar.gz
 

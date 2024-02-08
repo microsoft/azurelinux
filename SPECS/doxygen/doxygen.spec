@@ -6,7 +6,7 @@ License:        GPLv2
 Group:          Development/Tools/Doc Generators
 Url:            https://www.doxygen.nl
 Vendor:         Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 Source0:        https://doxygen.nl/files/%{name}-%{version}.src.tar.gz
 
 %global debug_package %{nil}

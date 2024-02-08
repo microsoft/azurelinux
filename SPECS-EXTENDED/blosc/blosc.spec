@@ -4,7 +4,7 @@ Version:        1.21.4
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/Blosc/c-blosc
 Source:         https://github.com/Blosc/c-blosc/archive/v%{version}/blosc-%{version}.tar.gz
 Patch0:         %{name}-gcc11.patch
