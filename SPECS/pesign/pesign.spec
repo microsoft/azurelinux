@@ -1,35 +1,42 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+# No.  I have enough trouble already.
+%undefine _auto_set_build_flags
+
 Name:    pesign
 Summary: Signing utility for UEFI binaries
-Version: 0.112
-Release: 32%{?dist}
-License: GPLv2
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:     https://github.com/vathpela/pesign
+Version: 116
+Release: 3%{?dist}
+License: GPL-2.0-only
+URL:     https://github.com/rhboot/pesign
+
+Vendor:        Microsoft Corporation
+Distribution:  Azure Linux
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
+BuildRequires: efivar-devel >= 38-1
 BuildRequires: gcc
 BuildRequires: git
+BuildRequires: libuuid-devel
+BuildRequires: make
+BuildRequires: mandoc
 BuildRequires: nspr
+BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss
+BuildRequires: nss-devel >= 3.13.6-1
+BuildRequires: nss-tools
 BuildRequires: nss-util
 BuildRequires: popt-devel
-BuildRequires: nss-tools
-BuildRequires: nspr-devel >= 4.9.2-1
-BuildRequires: nss-devel >= 3.13.6-1
-BuildRequires: efivar-devel >= 31-1
-BuildRequires: libuuid-devel
+BuildRequires: python3
+BuildRequires: python3-rpm-macros
 BuildRequires: tar
 BuildRequires: xz
-BuildRequires: python3-rpm-macros
-BuildRequires: python3
-
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17 || 0%{?azl}
 BuildRequires: systemd-rpm-macros
-
+%endif
 Requires:      nspr
 Requires:      nss
+Requires:      nss-tools >= 3.53
 Requires:      nss-util
 Requires:      popt
 Requires:      rpm
@@ -39,42 +46,13 @@ ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm}
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
-Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
+Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Source2: pesign.py
+Source3: pesign.patches
 
-Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
-Patch0002: 0002-Fix-command-line-parsing.patch
-Patch0003: 0003-gcc-don-t-error-on-stuff-in-includes.patch
-Patch0004: 0004-Fix-certficate-argument-name.patch
-Patch0005: 0005-Fix-description-of-ascii-armor-option-in-manpage.patch
-Patch0006: 0006-Make-ascii-work-since-we-documented-it.patch
-Patch0007: 0007-Switch-pesign-client-to-also-accept-token-cert-macro.patch
-Patch0008: 0008-pesigcheck-Verify-with-the-cert-as-an-object-signer.patch
-Patch0009: 0009-pesigcheck-make-certfile-actually-work.patch
-Patch0010: 0010-signerInfos-make-sure-err-is-always-initialized.patch
-Patch0011: 0011-pesign-make-pesign-h-tell-you-the-file-name.patch
-Patch0012: 0012-Add-coverity-build-scripts.patch
-Patch0013: 0013-Document-implicit-fallthrough.patch
-Patch0014: 0014-Actually-setfacl-each-directory-of-our-key-storage.patch
-Patch0015: 0015-oid-add-SHIM_EKU_MODULE_SIGNING_ONLY-and-fix-our-arr.patch
-Patch0016: 0016-efikeygen-add-modsign.patch
-Patch0017: 0017-check_cert_db-try-even-harder-to-pick-a-reasonable-v.patch
-Patch0018: 0018-show-which-db-we-re-checking.patch
-Patch0019: 0019-more-about-the-time.patch
-Patch0020: 0020-try-to-say-why-something-fails.patch
-Patch0021: 0021-Fix-race-condition-in-SEC_GetPassword.patch
-Patch0022: 0022-sysvinit-Create-the-socket-directory-at-runtime.patch
-Patch0023: 0023-Better-authorization-scripts.-Again.patch
-Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
-Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
-Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
-Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
-Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
-Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
-Patch0030: 0030-efikeygen-Fix-the-build-with-nss-3.44.patch
-Patch0031: 0031-pesigcheck-Fix-a-wrong-assignment.patch
-Patch0032: 0032-set-werror.patch
+# generate with tool
+%include %{SOURCE3}
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -84,16 +62,13 @@ well as other associated tools.
 %setup -q -T -b 0
 %setup -q -T -D -c -n pesign-%{version}/ -a 1
 git init
-git config user.email "pesign-owner@fedoraproject.org"
-git config user.name "Fedora Ninjas"
+git config user.email "azurelinux@microsoft.com"
+git config user.name "Azure Linux"
 git add .
 git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 git config --unset user.email
 git config --unset user.name
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1678146
-sed -i 's|/var/run/pesign|/run/pesign|' src/tmpfiles.conf
 
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
@@ -102,14 +77,15 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 mkdir -p %{buildroot}/%{_libdir}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
 	install
-
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17 || 0%{?azl}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
 	install_systemd
-
+%endif
 
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
+
 mkdir -p %{buildroot}%{_sysconfdir}/pki/pesign/
 mkdir -p %{buildroot}%{_sysconfdir}/pki/pesign-rh-test/
 cp -a etc/pki/pesign/* %{buildroot}%{_sysconfdir}/pki/pesign/
@@ -132,16 +108,13 @@ install -m 0755 %{SOURCE2} %{buildroot}%{python3_sitelib}/mockbuild/plugins/
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
-	useradd -r -g pesign -d /var/run/pesign -s /usr/sbin/nologin \
+	useradd -r -g pesign -d /run/pesign -s /sbin/nologin \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
-
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17 || 0%{?azl}
 %post
 %systemd_post pesign.service
-
-#%%posttrans
-#%%{_libexecdir}/pesign/pesign-authorize
 
 %preun
 %systemd_preun pesign.service
@@ -149,41 +122,167 @@ exit 0
 %postun
 %systemd_postun_with_restart pesign.service
 
+%posttrans
+certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
+
+# this is disabled currently because it breaks the fedora kernel build root
+# generation - because we don't currently have a good way of populating
+# /etc/pesign/{users,groups} before the buildroot is installed, or
+# populating them and re-running pesign-authorize afterwards but before the
+# package build of e.g. kernel
+#%%{_libexecdir}/pesign/pesign-authorize
+%endif
 
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc README TODO
+%doc README.md TODO
 %{_bindir}/authvar
 %{_bindir}/efikeygen
-%{_bindir}/efisiglist
 %{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%{_bindir}/pesum
 %dir %{_libexecdir}/pesign/
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/
 %config(noreplace) %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
 %dir %attr(0775,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/
 %config(noreplace) %attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
 %{_libexecdir}/pesign/pesign-authorize
+%{_libexecdir}/pesign/pesign-rpmbuild-helper
 %config(noreplace)/%{_sysconfdir}/pesign/users
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
 %{_mandir}/man*/*
-%dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
-
+%dir %attr(0770, pesign, pesign) %{_rundir}/%{name}
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/socket
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/pesign.pid
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17 || 0%{?azl}
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
-
+%endif
 %{python3_sitelib}/mockbuild/plugins/*/pesign.*
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Feb 08 2024 Dan Streetman <ddstreet@ieee.org> - 116-3
+- Initial Azure Linux import from Fedora 39 (license: MIT).
+- license verified
+
+* Mon Feb 20 2023 Nicolas Frayer <nfrayer@redhat.com> - 116-2
+- cms_common: Fixed Segmentation fault
+
+* Tue Jan 31 2023 Robbie Harwood <rharwood@redhat.com> - 116-1
+- New upstream release (116)
+- Resolves: CVE-2022-3560
+
+* Wed Aug 31 2022 Robbie Harwood <rharwood@redhat.com> - 115-9
+- Roll up to pjones's smartcard/cms fixes
+
+* Tue Aug 02 2022 Robbie Harwood <rharwood@redhat.com> - 115-8
+- Rebuild for python bytecode change
+- See-also: #2107826
+
+* Thu Jul 07 2022 Robbie Harwood <rharwood@redhat.com> - 115-6
+- Fix formatting of man pages
+- Resolves: #2104778
+
+* Mon Apr 04 2022 Robbie Harwood <rharwood@redhat.com> - 115-5
+- Detect presence of rpm-sign when checking for rhel-ness
+
+* Fri Apr 01 2022 Robbie Harwood <rharwood@redhat.com> - 115-4
+- Correctly handle rhel and centos macros
+
+* Fri Mar 25 2022 Robbie Harwood <rharwood@redhat.com> - 115-3
+- Add -D_GLIBCXX_ASSERTIONS to CPPFLAGS
+
+* Thu Mar 24 2022 Robbie Harwood <rharwood@redhat.com> - 115-2
+- Add support for non-koji signing in macros
+- Resolves: #1880858
+
+* Tue Mar 08 2022 Robbie Harwood <rharwood@redhat.com> - 115-1
+- New upstream version (115)
+
+* Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-4
+- Disable -fanalyzer since it's broken and pragmas don't work
+- See-also: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104370
+
+* Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-3
+- Fix explicit NULL deref when daemonizing
+
+* Wed Feb 02 2022 Robbie Harwood <rharwood@redhat.com> - 114-2
+- Attempt to fix signing parsing by dropping pesign_args
+
+* Tue Feb 01 2022 Robbie Harwood <rharwood@redhat.com> - 114-1
+- New upstream version (114)
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 113-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 113-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 113-16
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 113-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Nov 16 2020 Jeff Law <law@redhat.com> - 113-14
+- Turn off -Wfree-nonheap-object
+
+* Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-13
+- Add the rundir related stuff that was staged on my f32 checkout.
+
+* Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-12
+- Try to make kernel and fwupd both work at the same time.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 113-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-10
+- I really cannot figure out why bkernel01 thinks the certificate nickname
+  starts with /CN=, but it does, so I'm gonna stop fighting with the sand.
+
+* Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-9
+- Even more kernel build debugging...
+
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-8
+- More kernel build debugging...
+
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-6
+- Disable the pesign-authorize call in posttrans, until we can figure out a
+  better way to deal with that in the fedora kernel builder chroot setup
+
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-5
+- Make pesign require nss-tools for the posttrans scriptlet
+- Move most of macros.pesign to /usr/libexec/pesign/pesign-rpmbuild-helper
+
+* Mon Jul 06 2020 Peter Jones <pjones@redhat.com> - 113-4
+- Attempt to fix kernel signing failures caused by -3...
+
+* Fri Jun 12 2020 Peter Jones <pjones@redhat.com> - 113-3
+- Fix the signer name for fedora and some other minor nits
+  Related: rhbz#1708773
+  Related: rhbz#1678146
+
+* Thu Jun 11 2020 Peter Jones <pjones@redhat.com> - 113-2
+- Fix a signing protocol bug we introduced in 113 that makes the fedora
+  kernel builders fail.
+  Related: rhbz#1708773
+
+* Thu Jun 11 2020 Javier Martinez Canillas <javierm@redhat.com> - 113-1
+- Update to 113 release
+  Resolves: rhbz#1708773
+
 * Fri Apr 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.112-32
 - Making binaries paths compatible with CBL-Mariner's paths.
+
+* Mon Jun 08 2020 Javier Martinez Canillas <javierm@redhat.com> - 0.112-31
+- Switch default NSS database to SQLite format (pjones)
+  Resolves: rhbz#1827902
 
 * Wed Dec 16 2020 Ruying Chen <v-ruyche@microsoft.com> - 0.112-31
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
