@@ -45,6 +45,10 @@ This package provides development files for libfdt
 sed -i 's@--prefix=$(PREFIX)@--prefix=$(PREFIX) --root=/@' pylibfdt/Makefile.pylibfdt
 
 %build
+# Export version for setuptools-scm to prevent error: 
+# "LookupError: setuptools-scm was unable to detect version"
+# due to using a tarball instead of a git repo. This will no longer be needed
+# once "pylibfdt: use fallback version in tarballs" (cd3e230) is released.
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 make %{?_smp_mflags} V=1 CC="gcc %{optflags} $LDFLAGS -Wno-error=missing-prototypes -Wno-error=cast-qual" NO_PYTHON=1
 
