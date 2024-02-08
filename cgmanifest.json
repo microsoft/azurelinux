@@ -24885,7 +24885,7 @@
         "other": {
           "name": "qdox",
           "version": "2.0.3",
-          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.3.tar.gz"
+          "downloadUrl": "https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/2.0.3/qdox-2.0.3-project.tar.bz2"
         }
       }
     },

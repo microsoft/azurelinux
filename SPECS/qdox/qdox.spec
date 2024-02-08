@@ -24,7 +24,7 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/paul-hammant/qdox
-Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:        https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/%{version}/%{name}-%{version}-project.tar.bz2
 Source1:        qdox-build.xml
 Patch0:         port-to-jflex-1.7.0.patch
 BuildRequires:  ant
@@ -49,7 +49,7 @@ Group:          Development/Libraries/Java
 API docs for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%setup -q -n %{name}-%{version}
 cp %{SOURCE1} build.xml
 %patch0 -p1
 find -name *.jar -delete
