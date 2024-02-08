@@ -1,5 +1,5 @@
 Name:           uid_wrapper
-Version:        1.2.9
+Version:        1.3.0
 Release:        1%{?dist}
 Summary:        A wrapper for privilege separation
 License:        GPLv3+
@@ -58,7 +58,7 @@ make test || cat $(find Testing -name "*.log")
 popd
 
 %files
-%doc AUTHORS README.md ChangeLog
+%doc AUTHORS README.md CHANGELOG
 %license LICENSE
 %{_libdir}/libuid_wrapper.so*
 %dir %{_libdir}/cmake
@@ -70,6 +70,9 @@ popd
 %{_mandir}/man1/uid_wrapper.1*
 
 %changelog
+* Wed Jan 31 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.0-1
+- Auto-upgrade to 1.3.0 in Mariner 3.0
+
 * Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.2.9-1
 - Bumping version to 1.2.9.
 - Remove gpg signature check.
