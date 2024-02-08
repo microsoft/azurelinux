@@ -1,1 +1,3 @@
-%_cups_serverbin %(/usr/bin/cups-config --serverbin)
+%_cups_serverbin %(/usr/bin/pkg-config --variable=cups_serverbin cups)
+%_cups_datadir %(/usr/bin/pkg-config --variable=cups_datadir cups)
+%_cups_serverroot %(/usr/bin/pkg-config --variable=cups_serverroot cups)

@@ -11,8 +11,8 @@
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
-Version:        2.3.3%{OP_VER}
-Release:        6%{?dist}
+Version:        2.4.7
+Release:        1%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ Patch1:         cups-system-auth.patch
 # fixed hack with pkg-config calling for gnutls' libdir variable
 Patch2:         cups-multilib.patch
 # if someone makes a change to banner files, then there will <banner>.rpmnew
-# with next update of cups-filters - this patch makes sure the banner file
+# with next update of cups-filters - this patch makes sure the banner file 
 # changed by user is used and .rpmnew or .rpmsave is ignored
 # Note: This could be rewrite with use a kind of #define and send to upstream
 Patch3:         cups-banners.patch
@@ -44,7 +44,7 @@ Patch5:         cups-direct-usb.patch
 # when system workload is high, timeout for cups-driverd can be reached -
 # increase the timeout
 Patch6:         cups-driverd-timeout.patch
-# usb backend didn't get any notification about out-of-paper because of kernel
+# usb backend didn't get any notification about out-of-paper because of kernel 
 Patch7:         cups-usb-paperout.patch
 # uri compatibility with old Fedoras
 Patch8:         cups-uri-compat.patch
@@ -61,9 +61,20 @@ Patch12:        cups-failover-backend.patch
 # add device id for dymo printer
 Patch13:        cups-dymo-deviceid.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
+# https://github.com/OpenPrinting/cups/pull/742
+# 2218124 - The command "cancel -x <job>" does not remove job files
+Patch1001: 0001-Use-purge-job-instead-of-purge-jobs-when-canceling-a.patch
+# https://github.com/OpenPrinting/cups/pull/814
+Patch1002: cups-colorman-leak.patch
+# https://github.com/OpenPrinting/cups/pull/813/
+Patch1003: cups-unload-job-leak.patch
+# https://github.com/OpenPrinting/cups/pull/839
+Patch1004: 0001-httpAddrConnect2-Check-for-error-if-POLLHUP-is-in-va.patch
+ 
+ 
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
-##### breaks something.
+##### breaks something. 
 BuildRequires:  automake
 # gcc and gcc-c++ is no longer in buildroot by default
 # gcc for most of files
@@ -258,7 +269,14 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 %patch 13 -p1 -b .dymo-deviceid
 
 # UPSTREAM PATCHES
-
+# 2218124 - The command "cancel -x <job>" does not remove job files
+%patch -P 1001 -p1 -b .purge-job
+# https://github.com/OpenPrinting/cups/pull/814
+%patch -P 1002 -p1 -b .colorman
+# https://github.com/OpenPrinting/cups/pull/813/
+%patch -P 1003 -p1 -b .unloadjob
+# https://github.com/OpenPrinting/cups/pull/839
+%patch -P 1004 -p1 -b .httpaddrconnect-pollhup
 
 # LSPP support.
 %patch 100 -p1 -b .lspp
@@ -513,6 +531,8 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/cups/ppdc/*.h
 %dir %{_datadir}/cups/templates
 %{_datadir}/cups/templates/*.tmpl
+%dir %{_datadir}/cups/templates/da
+%{_datadir}/cups/templates/da/*.tmpl
 %dir %{_datadir}/cups/templates/de
 %{_datadir}/cups/templates/de/*.tmpl
 %dir %{_datadir}/cups/templates/es
@@ -536,14 +556,18 @@ rm -f %{cups_serverbin}/backend/smb
 %{_datadir}/%{name}/www/index.html
 %{_datadir}/%{name}/www/help
 %{_datadir}/%{name}/www/robots.txt
+%{_datadir}/%{name}/www/da/index.html
 %{_datadir}/%{name}/www/de/index.html
 %{_datadir}/%{name}/www/es/index.html
+%{_datadir}/%{name}/www/fr/index.html
 %{_datadir}/%{name}/www/ja/index.html
 %{_datadir}/%{name}/www/ru/index.html
 %{_datadir}/%{name}/www/pt_BR/index.html
 %{_datadir}/%{name}/www/apple-touch-icon.png
+%dir %{_datadir}/%{name}/www/da
 %dir %{_datadir}/%{name}/www/de
 %dir %{_datadir}/%{name}/www/es
+%dir %{_datadir}/%{name}/www/fr
 %dir %{_datadir}/%{name}/www/ja
 %dir %{_datadir}/%{name}/www/pt_BR
 %dir %{_datadir}/%{name}/www/ru
@@ -623,6 +647,7 @@ rm -f %{cups_serverbin}/backend/smb
 %{_bindir}/cups-config
 %{_includedir}/cups
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/cups.pc
 %{_mandir}/man1/cups-config.1.gz
 %{_rpmconfigdir}/macros.d/macros.cups
 
@@ -650,6 +675,10 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+
+* Tue Apr 02 2024 Archana Choudhary <archana1@microsoft.com> - 2.4.7-1
+- Upgrade to 2.4.7
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
 - Updating naming for 3.0 version of Azure Linux.
 

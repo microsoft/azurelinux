@@ -1,0 +1,76 @@
+From e0c31f4794ef637b74b0a0074364ff407ca40d5a Mon Sep 17 00:00:00 2001
+From: Zdenek Dohnal <zdohnal@redhat.com>
+Date: Fri, 15 Dec 2023 10:59:54 +0100
+Subject: [PATCH] httpAddrConnect2: Check for error if POLLHUP is in valid
+ revents
+
+Some Linux kernel versions put POLLOUT|POLLHUP into revents when client tries to connect with httpAddrConnect2(), which makes the connection fail.
+Let's check the option SO_ERROR before scratching the attempt - if there is no error, remove POLLHUP from revents.
+
+I've re-purposed previously Solaris-only code to be used everywhere if the conditions are met - this should prevent bigger delays than necessary.
+
+Slightly different issue than #827, but with similar symptoms (kernel sending POLLOUT|POLLHUP).
+---
+ CHANGES.md           |  2 ++
+ cups/http-addrlist.c | 43 ++++++++++++++++++++++++++++++-------------
+ 2 files changed, 32 insertions(+), 13 deletions(-)
+
+diff --git a/cups/http-addrlist.c b/cups/http-addrlist.c
+index 198d073d0..cffcf184c 100644
+--- a/cups/http-addrlist.c
++++ b/cups/http-addrlist.c
+@@ -318,21 +318,38 @@ httpAddrConnect2(
+       {
+ #  ifdef HAVE_POLL
+ 	DEBUG_printf(("pfds[%d].revents=%x\n", i, pfds[i].revents));
+-#    ifdef __sun
+-	// Solaris connect runs asynchronously returning EINPROGRESS. Following
+-	// poll() does not detect the socket is not connected and returns
+-	// POLLIN|POLLOUT. Check the connection status and update error flag.
+-	int            sres, serr;
+-	socklen_t      slen = sizeof(serr);
+-	sres = getsockopt(fds[i], SOL_SOCKET, SO_ERROR, &serr, &slen);
+-	if (sres || serr)
++
++#    ifdef _WIN32
++	if (((WSAGetLastError() == WSAEINPROGRESS) && (pfds[i].revents & POLLIN) && (pfds[i].revents & POLLOUT)) ||
++	    ((pfds[i].revents & POLLHUP) && (pfds[i].revents & (POLLIN|POLLOUT))))
++#    else
++	if (((errno == EINPROGRESS) && (pfds[i].revents & POLLIN) && (pfds[i].revents & POLLOUT)) ||
++	    ((pfds[i].revents & POLLHUP) && (pfds[i].revents & (POLLIN|POLLOUT))))
++#    endif /* _WIN32 */
+ 	{
+-	  pfds[i].revents |= POLLERR;
+-#      ifdef DEBUG
+-	  DEBUG_printf(("1httpAddrConnect2: getsockopt returned: %d with error: %s", sres, strerror(serr)));
+-#      endif
++	  // Some systems generate POLLIN or POLLOUT together with POLLHUP when doing
++	  // asynchronous connections. The solution seems to be to use getsockopt to
++	  // check the SO_ERROR value and ignore the POLLHUP if there is no error or
++	  // the error is EINPROGRESS.
++
++	  int	    sres,		 /* Return value from getsockopt() - 0, or -1 if error */
++		    serr;		 /* Option SO_ERROR value */
++	  socklen_t slen = sizeof(serr); /* Option value size */
++
++	  sres = getsockopt(fds[i], SOL_SOCKET, SO_ERROR, &serr, &slen);
++
++	  if (sres || serr)
++	  {
++	    pfds[i].revents |= POLLERR;
++#    ifdef DEBUG
++	    DEBUG_printf(("1httpAddrConnect2: getsockopt returned: %d with error: %s", sres, strerror(serr)));
++#    endif
++	  }
++	  else if (pfds[i].revents && (pfds[i].revents & POLLHUP) && (pfds[i].revents & (POLLIN | POLLOUT)))
++	  {
++	    pfds[i].revents &= ~POLLHUP;
++	  }
+ 	}
+-#    endif // __sun
+ 
+ 
+ 	if (pfds[i].revents && !(pfds[i].revents & (POLLERR | POLLHUP)))
+-- 
+2.43.0
+

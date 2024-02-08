@@ -1,10 +1,10 @@
-diff -up cups-2.2b2/config-scripts/cups-ssl.m4.no-export-ssllibs cups-2.2b2/config-scripts/cups-ssl.m4
---- cups-2.2b2/config-scripts/cups-ssl.m4.no-export-ssllibs	2016-06-27 15:06:22.299980753 +0200
-+++ cups-2.2b2/config-scripts/cups-ssl.m4	2016-06-27 15:08:00.953154042 +0200
-@@ -102,5 +102,5 @@ AC_SUBST(IPPALIASES)
- AC_SUBST(SSLFLAGS)
- AC_SUBST(SSLLIBS)
+diff -up cups-2.2b2/config-scripts/cups-tls.m4.no-export-ssllibs cups-2.2b2/config-scripts/cups-tls.m4
+--- cups-2.2b2/config-scripts/cups-tls.m4.no-export-ssllibs	2016-06-27 15:06:22.299980753 +0200
++++ cups-2.2b2/config-scripts/cups-tls.m4	2016-06-27 15:08:00.953154042 +0200
+@@ -102,5 +102,5 @@ AC_SUBST([IPPALIASES])
+ AC_SUBST([TLSFLAGS])
+ AC_SUBST([TLSLIBS])
  
--EXPORT_SSLLIBS="$SSLLIBS"
-+EXPORT_SSLLIBS=""
- AC_SUBST(EXPORT_SSLLIBS)
+-EXPORT_TLSLIBS="$TLSLIBS"
++EXPORT_TLSLIBS=""
+ AC_SUBST([EXPORT_TLSLIBS])

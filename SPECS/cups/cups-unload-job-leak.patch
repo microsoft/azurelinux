@@ -1,0 +1,18 @@
+diff --git a/scheduler/job.c b/scheduler/job.c
+index 32f2519..6425305 100644
+--- a/scheduler/job.c
++++ b/scheduler/job.c
+@@ -1500,11 +1500,11 @@ cupsdDeleteJob(cupsd_job_t       *job,	/* I - Job */
+     job->num_files = 0;
+   }
+ 
++  unload_job(job);
++
+   if (job->history)
+     free_job_history(job);
+ 
+-  unload_job(job);
+-
+   cupsArrayRemove(Jobs, job);
+   cupsArrayRemove(ActiveJobs, job);
+   cupsArrayRemove(PrintingJobs, job);

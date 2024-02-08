@@ -1,0 +1,48 @@
+From c5ad7aaf6c8063a39974c6b4a3cf59b7f912daae Mon Sep 17 00:00:00 2001
+From: Bryan Mason <bmason@redhat.com>
+Date: Tue, 27 Jun 2023 04:18:46 -0700
+Subject: [PATCH 1/2] Use "purge-job" instead of "purge-jobs" when canceling a
+ single job (#742)
+
+The command "cancel -x <job>" adds "purge-jobs true" to the Cancel-Job
+operation; however, the correct attribute to use for Cancel-job is
+"purge-job" (singular), not "purge-jobs" (plural).  As a result, job
+files are not removed from /var/spool/cups when "cancel -x <job>" is
+executed.
+
+This patch resolves the issue by adding "purge-job" when the IPP
+operation is Cancel-Job and "purge-jobs" for other IPP operations
+(Purge-Jobs, Cancel-Jobs, and Cancel-My-Jobs)
+---
+ systemv/cancel.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/systemv/cancel.c b/systemv/cancel.c
+index 572f413e1..f5b8e12b5 100644
+--- a/systemv/cancel.c
++++ b/systemv/cancel.c
+@@ -260,6 +260,7 @@ main(int  argc,				/* I - Number of command-line arguments */
+       *    attributes-natural-language
+       *    printer-uri + job-id *or* job-uri
+       *    [requesting-user-name]
++      *    [purge-job] or [purge-jobs]
+       */
+ 
+       request = ippNewRequest(op);
+@@ -294,7 +295,12 @@ main(int  argc,				/* I - Number of command-line arguments */
+                      "requesting-user-name", NULL, cupsUser());
+ 
+       if (purge)
+-	ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
++      {
++	if (op == IPP_CANCEL_JOB)
++	  ippAddBoolean(request, IPP_TAG_OPERATION, "purge-job", (char)purge);
++	else
++	  ippAddBoolean(request, IPP_TAG_OPERATION, "purge-jobs", (char)purge);
++      }
+ 
+      /*
+       * Do the request and get back a response...
+-- 
+2.41.0
+
