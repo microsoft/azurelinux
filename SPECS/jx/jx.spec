@@ -37,7 +37,7 @@ BuildRequires:  golang >= 1.17.1
 Command line tool for working with Jenkins X.
 
 %prep
-%autosetup -N -p1
+%autosetup -N
 # Apply vendor before patching
 tar --no-same-owner -xf %{SOURCE1}
 %autopatch -p1
