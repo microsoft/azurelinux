@@ -2,13 +2,13 @@
 
 Summary:        X.Org X11 X authority utilities
 Name:           xorg-x11-%{pkgname}
-Version:        1.1
-Release:        7%{?dist}
+Version:        1.1.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
-Source0:        https://www.x.org/pub/individual/app/%{pkgname}-%{version}.tar.bz2
+Source0:        https://www.x.org/pub/individual/app/%{pkgname}-%{version}.tar.xz
 
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -43,6 +43,9 @@ rm -r %{buildroot}%{_mandir}/man1/xauth.1*
 %{_bindir}/xauth
 
 %changelog
+* Thu Feb 08 2024 Ameya Usgaonkar <ausgaonkar@microsft.com> - 1.1.2-7
+- Upgrade to version 1.1.2
+
 * Wed Oct 27 2021 Muhammad Falak <mwani@microsft.com> - 1.1-7
 - Remove epoch
 
