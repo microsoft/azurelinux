@@ -245,6 +245,9 @@ func validateAdditionalFiles(baseConfigPath string, additionalFiles *imagecustom
 }
 
 func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) error {
+	if config == nil {
+		return nil
+	}
 	return validateAdditionalFiles(baseConfigPath, &config.AdditionalFiles)
 }
 
