@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Provide a way to skip tests via rpmbuild `--without`
 # This makes it easier to skip tests in copr repos, where
 # the qemu test suite is historically flakey
