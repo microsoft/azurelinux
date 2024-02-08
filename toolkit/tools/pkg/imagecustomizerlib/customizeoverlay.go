@@ -23,7 +23,7 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 
 	// Integrate overlay dracut module and overlay driver into initramfs img.
 	// Integrate systemd veritysetup dracut module into initramfs img.
-	overlayDracutModule := "overlay"
+	overlayDracutModule := "overlayfs"
 	overlayDracutDriver := "overlay"
 	err = buildDracutModule(overlayDracutModule, overlayDracutDriver, imageChroot)
 	if err != nil {
@@ -43,18 +43,20 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.Overlay) error {
 	var err error
 	var overlayConfigs []string
+	var formattedPartition string
 
 	// Iterate over each Overlay configuration
 	for _, overlay := range overlays {
-		formattedPartition, err := systemdFormatPartitionId(overlay.Partition.IdType, overlay.Partition.Id)
-		if err != nil {
-			return err
+		if overlay.Partition != nil {
+			formattedPartition, err = systemdFormatPartitionId(overlay.Partition.IdType, overlay.Partition.Id)
+			if err != nil {
+				return err
+			}
 		}
-
 		// Construct the argument for each Overlay
 		overlayConfig := fmt.Sprintf(
-			"%s,%s,%s,%s",
-			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir, formattedPartition,
+			"%s,%s,%s",
+			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir,
 		)
 		overlayConfigs = append(overlayConfigs, overlayConfig)
 	}
@@ -63,7 +65,11 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 	concatenatedOverlays := strings.Join(overlayConfigs, " ")
 
 	// Construct the final cmdline argument
-	newArgs := fmt.Sprintf("rd.overlays=\"%s\"", concatenatedOverlays)
+	newArgs := fmt.Sprintf("rd.overlayfs=\"%s\"", concatenatedOverlays)
+
+	if formattedPartition != "" { // Check if formattedPartition was set
+		newArgs = fmt.Sprintf("%s rd.overlayfs_persistent_volume=\"%s\"", newArgs, formattedPartition) // Append the persistent volume if exists
+	}
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 	lines, err := file.ReadLines(grubCfgPath)

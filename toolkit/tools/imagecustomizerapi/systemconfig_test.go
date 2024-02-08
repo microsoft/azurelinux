@@ -60,3 +60,15 @@ func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid Id format")
 }
+
+func TestSystemConfigIsValidOverlayInvalidLowerDir(t *testing.T) {
+	overlayWithInvalidLowerDir := Overlay{
+		LowerDir: "",
+		UpperDir: "/upper",
+		WorkDir:  "/work",
+	}
+
+	err := overlayWithInvalidLowerDir.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "path cannot be empty")
+}
