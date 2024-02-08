@@ -87,7 +87,7 @@ CLASSPATH=$(build-classpath java-cup) \
 %install
 # jar
 install -dm 0755 %{buildroot}%{_javadir}
-install -pm 0644 build/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 # pom
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
