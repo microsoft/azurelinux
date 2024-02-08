@@ -4,6 +4,7 @@
 package imagecustomizerlib
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -228,17 +229,17 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 	return config.Disks != nil
 }
 
-func validateAdditionalFiles(baseConfigPath string, additionalFiles *imagecustomizerapi.AdditionalFilesMap) error {
+func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
 	var aggregateErr error
-	for sourceFile := range *additionalFiles {
+	for sourceFile := range additionalFiles {
 		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
-			aggregateErr = imagecustomizerapi.AggregateErrors(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
 		}
 
 		if !isFile {
-			aggregateErr = imagecustomizerapi.AggregateErrors(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
 		}
 	}
 	return aggregateErr
@@ -248,7 +249,13 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 	if config == nil {
 		return nil
 	}
-	return validateAdditionalFiles(baseConfigPath, &config.AdditionalFiles)
+
+	err := validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
@@ -261,7 +268,7 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.Syst
 		return err
 	}
 
-	err = validateAdditionalFiles(baseConfigPath, &config.AdditionalFiles)
+	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
 	if err != nil {
 		return err
 	}

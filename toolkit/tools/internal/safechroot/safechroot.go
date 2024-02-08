@@ -303,42 +303,23 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	return addFilesToDestination(c.rootDir, filesToCopy...)
+	return AddFilesToDestination(c.rootDir, filesToCopy...)
 }
 
-func addFileToDestination(destDir string, fileToCopy FileToCopy) error {
-	dest := filepath.Join(destDir, fileToCopy.Dest)
-	logger.Log.Debugf("Copying '%s' to '%s'", fileToCopy.Src, dest)
-
-	var err error
-	if fileToCopy.Permissions != nil {
-		err = file.CopyAndChangeMode(fileToCopy.Src, dest, os.ModePerm, *fileToCopy.Permissions)
-	} else {
-		err = file.Copy(fileToCopy.Src, dest)
-	}
-
-	if err != nil {
-		logger.Log.Errorf("Error copying file '%s'", fileToCopy.Src)
-		return err
-	}
-
-	return nil
-}
-
-func AddFilesToDestination(destDir string, filesToCopy []FileToCopy) error {
+func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		err := addFileToDestination(destDir, f)
-		if err != nil {
-			return err
+		dest := filepath.Join(destDir, f.Dest)
+		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
+
+		var err error
+		if f.Permissions != nil {
+			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
+		} else {
+			err = file.Copy(f.Src, dest)
 		}
-	}
-	return nil
-}
 
-func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
-	for _, f := range filesToCopy {
-		err := addFileToDestination(destDir, f)
 		if err != nil {
+			logger.Log.Errorf("Error copying file '%s'", f.Src)
 			return err
 		}
 	}
