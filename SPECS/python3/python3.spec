@@ -1,10 +1,7 @@
 %global openssl_flags -DOPENSSL_NO_SSL3 -DOPENSSL_NO_SSL2 -DOPENSSL_NO_COMP
 %global __brp_python_bytecompile %{nil}
-# Automating the extraction of these alternate version strings has proven to be tricky,
-# with regards to tooling available in the toolchain build environment.
-# These will be manually maintained for the time being.
-%global majmin 3.12
-%global majmin_nodots 312
+%define majmin %(echo %{version} | cut -d. -f1-2)
+%define majmin_nodots %(echo %{majmin} | tr -d .)
 # See Lib/ensurepip/__init__.py in Source0 for the pip version number
 %global pip_version 23.2.1
 %global setuptools_version 69.0.3
