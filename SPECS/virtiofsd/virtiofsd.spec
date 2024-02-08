@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package virtiofsd
 #
@@ -78,7 +78,6 @@ cargo test --release
 - License verified
 - Remove build dependencies on cargo-packaging
 - Include vendored sources tarball
-
 * Tue Jan 30 2024 caleb.crane@suse.com
 - Fix CVE-2023-50711: vmm-sys-util: out of bounds memory accesses (bsc#1218502, bsc#1218500)
 - Update to version 1.10.1:
