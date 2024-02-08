@@ -43,7 +43,7 @@ Source1013:     commons-beanutils-1.9.4.tar.xz
 Source1014:     commons-cli-1.5.0.tar.xz
 Source1015:     commons-codec-1.16.0.tar.xz
 Source1016:     commons-collections-3.2.2.tar.xz
-Source1017:     commons-compress-1.23.0.tar.xz
+Source1017:     commons-compress-jpb-1.23.0.tar.xz
 Source1018:     commons-io-2.13.0.tar.xz
 Source1019:     commons-jxpath-jpb2-1.3.tar.xz
 Source1020:     commons-lang-3.13.0.tar.xz
@@ -96,7 +96,7 @@ Source1066:     maven-filtering-3.3.1.tar.xz
 Source1067:     maven-jar-plugin-3.3.0.tar.xz
 Source1068:     maven-parent-pom-40.tar.xz
 Source1069:     maven-plugin-testing-3.3.0.tar.xz
-Source1070:     maven-plugin-tools-3.9.0.tar.xz
+Source1070:     maven-plugin-tools-jpb-3.9.0.tar.xz
 Source1071:     maven-remote-resources-plugin-3.1.0.tar.xz
 Source1072:     maven-resolver-1.9.15.tar.xz
 Source1073:     maven-resources-plugin-3.3.1.tar.xz
