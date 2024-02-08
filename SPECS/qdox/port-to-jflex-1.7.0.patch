@@ -1,5 +1,5 @@
 diff --git a/src/grammar/lexer.flex b/src/grammar/lexer.flex
-index eb18e07..9f669db 100644
+index f81cd88..a607fb8 100644
 --- a/src/grammar/lexer.flex
 +++ b/src/grammar/lexer.flex
 @@ -173,7 +173,7 @@ import java.util.*;
@@ -12,7 +12,7 @@ index eb18e07..9f669db 100644
    	}
  
 diff --git a/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java b/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
-index 7c1eda5..6f6ce0f 100644
+index c947f9b..5b415c0 100644
 --- a/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
 +++ b/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
 @@ -112,7 +112,7 @@ public class ClassLoaderLibrary
