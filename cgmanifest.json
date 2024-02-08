@@ -11641,8 +11641,8 @@
         "type": "other",
         "other": {
           "name": "libXfont2",
-          "version": "2.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.3.tar.bz2"
+          "version": "2.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.6.tar.xz"
         }
       }
     },
