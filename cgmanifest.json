@@ -30099,8 +30099,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xauth",
-          "version": "1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xauth-1.1.tar.bz2"
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xauth-1.1.2.tar.xz"
         }
       }
     },
