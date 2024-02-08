@@ -1,19 +1,70 @@
 %global project_version_major 5
 %global project_version_minor 1
 %global project_version_patch 11
-
+# ========== versions of dependencies ==========
+%global libmodulemd_version 2.5.0
+%global librepo_version 1.15.0
+%global libsolv_version 0.7.25
+%global sqlite_version 3.35.0
+%global swig_version 4
+%global zchunk_version 0.9.11
+# ========== build options ==========
+%bcond_with    dnf5daemon_client
+%bcond_with    dnf5daemon_server
+%bcond_without libdnf_cli
+%bcond_without dnf5
+%bcond_without dnf5_plugins
+%bcond_without plugin_actions
+%bcond_with    plugin_rhsm
+%bcond_without python_plugins_loader
+%bcond_without comps
+%bcond_without modulemd
+%bcond_without zchunk
+%bcond_with    html
+%bcond_with    man
+# TODO Go bindings fail to build, disable for now
+%bcond_with    go
+%bcond_with    perl5
+%bcond_without python3
+%bcond_with    ruby
+%bcond_with    clang
+%bcond_with    sanitizers
+%bcond_without tests
+%bcond_with    performance_tests
+%bcond_with    dnf5daemon_tests
+%if %{with clang}
+    %global toolchain clang
+%endif
+Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
 Release:        1%{?dist}
-Summary:        Command-line package manager
 License:        GPL-2.0-or-later
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf5
 Source0:        %{url}/archive/%{version}/dnf5-%{version}.tar.gz
-
+# ========== build requires ==========
+BuildRequires:  bash-completion
+BuildRequires:  cmake
+BuildRequires:  doxygen
+BuildRequires:  gettext
+BuildRequires:  pkg-config
+BuildRequires:  sdbus-cpp >= 0.8.1
+BuildRequires:  sdbus-cpp-devel >= 0.8.1
+BuildRequires:  toml11-devel
+BuildRequires:  pkgconfig(check)
+BuildRequires:  pkgconfig(fmt)
+BuildRequires:  pkgconfig(json-c)
+BuildRequires:  pkgconfig(libcrypto)
+BuildRequires:  pkgconfig(librepo) >= %{librepo_version}
+BuildRequires:  pkgconfig(libsolv) >= %{libsolv_version}
+BuildRequires:  pkgconfig(libsolvext) >= %{libsolv_version}
+BuildRequires:  pkgconfig(rpm) >= 4.17.0
+BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Recommends:     bash-completion
-
 Provides:       dnf5-command(install)
 Provides:       dnf5-command(upgrade)
 Provides:       dnf5-command(remove)
@@ -26,119 +77,44 @@ Provides:       dnf5-command(autoremove)
 Provides:       dnf5-command(check)
 Provides:       dnf5-command(check-upgrade)
 Provides:       dnf5-command(provides)
-
 Provides:       dnf5-command(leaves)
 Provides:       dnf5-command(repoquery)
 Provides:       dnf5-command(search)
 Provides:       dnf5-command(list)
 Provides:       dnf5-command(info)
-
 Provides:       dnf5-command(group)
 Provides:       dnf5-command(environment)
 Provides:       dnf5-command(module)
 Provides:       dnf5-command(history)
 Provides:       dnf5-command(repo)
 Provides:       dnf5-command(advisory)
-
 Provides:       dnf5-command(clean)
 Provides:       dnf5-command(download)
 Provides:       dnf5-command(makecache)
-
-
-# ========== build options ==========
-
-%bcond_with    dnf5daemon_client
-%bcond_with    dnf5daemon_server
-%bcond_without libdnf_cli
-%bcond_without dnf5
-%bcond_without dnf5_plugins
-%bcond_without plugin_actions
-%bcond_with    plugin_rhsm
-%bcond_without python_plugins_loader
-
-%bcond_without comps
-%bcond_without modulemd
-%bcond_without zchunk
-
-%bcond_with    html
-%bcond_with    man
-
-
-# TODO Go bindings fail to build, disable for now
-%bcond_with    go
-%bcond_with    perl5
-%bcond_without python3
-%bcond_with    ruby
-
-%bcond_with    clang
-%bcond_with    sanitizers
-%bcond_without tests
-%bcond_with    performance_tests
-%bcond_with    dnf5daemon_tests
-
-%if %{with clang}
-    %global toolchain clang
-%endif
-
-# ========== versions of dependencies ==========
-
-%global libmodulemd_version 2.5.0
-%global librepo_version 1.15.0
-%global libsolv_version 0.7.25
-%global sqlite_version 3.35.0
-%global swig_version 4
-%global zchunk_version 0.9.11
-
-
-# ========== build requires ==========
-
-BuildRequires:  bash-completion
-BuildRequires:  cmake
-BuildRequires:  doxygen
-BuildRequires:  gettext
-BuildRequires:  pkgconfig(check)
-BuildRequires:  pkgconfig(fmt)
-BuildRequires:  pkgconfig(json-c)
-BuildRequires:  pkgconfig(libcrypto)
-BuildRequires:  pkgconfig(librepo) >= %{librepo_version}
-BuildRequires:  pkgconfig(libsolv) >= %{libsolv_version}
-BuildRequires:  pkgconfig(libsolvext) >= %{libsolv_version}
-BuildRequires:  pkgconfig(rpm) >= 4.17.0
-BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
-BuildRequires:  toml11-devel
-BuildRequires:  sdbus-cpp-devel >= 0.8.1
-BuildRequires:  sdbus-cpp >= 0.8.1
-
 %if %{with clang}
 BuildRequires:  clang
 %else
 BuildRequires:  gcc-c++ >= 10.1
 %endif
-
 %if %{with tests}
 BuildRequires:  createrepo_c
-BuildRequires:  pkgconfig(cppunit)
 BuildRequires:  rpm-build
+BuildRequires:  pkgconfig(cppunit)
 %endif
-
 %if %{with comps}
 BuildRequires:  pkgconfig(libcomps)
 %endif
-
 %if %{with modulemd}
 BuildRequires:  pkgconfig(modulemd-2.0) >= %{libmodulemd_version}
 %endif
-
 %if %{with zchunk}
 BuildRequires:  pkgconfig(zck) >= %{zchunk_version}
 %endif
-
 %if %{with html} || %{with man}
 BuildRequires:  python3dist(breathe)
 BuildRequires:  python3dist(sphinx) >= 4.1.2
 BuildRequires:  python3dist(sphinx-rtd-theme)
 %endif
-
 %if %{with sanitizers}
 # compiler-rt is required by sanitizers in clang
 BuildRequires:  compiler-rt
@@ -146,16 +122,13 @@ BuildRequires:  libasan
 BuildRequires:  liblsan
 BuildRequires:  libubsan
 %endif
-
 %if %{with libdnf_cli}
 # required for libdnf5-cli
 BuildRequires:  pkgconfig(smartcols)
 %endif
-
 %if %{with dnf5_plugins}
 BuildRequires:  curl-devel >= 7.62.0
 %endif
-
 %if %{with dnf5daemon_server}
 # required for dnf5daemon-server
 BuildRequires:  systemd-rpm-macros
@@ -166,30 +139,25 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(dbus-python)
 %endif
 %endif
-
 %if %{with plugin_rhsm}
-BuildRequires:  pkgconfig(librhsm) >= 0.0.3
 BuildRequires:  pkgconfig(glib-2.0) >= 2.44.0
+BuildRequires:  pkgconfig(librhsm) >= 0.0.3
 %endif
-
 # ========== language bindings section ==========
-
 %if %{with perl5} || %{with ruby} || %{with python3}
 BuildRequires:  swig >= %{swig_version}
 %endif
-
 %if %{with perl5}
 # required for perl-libdnf5 and perl-libdnf5-cli
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 %if %{with tests}
-BuildRequires:  perl(strict)
-BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Test::Exception)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 %endif
 %endif
-
 %if %{with ruby}
 # required for ruby-libdnf5 and ruby-libdnf5-cli
 BuildRequires:  pkgconfig(ruby)
@@ -197,7 +165,6 @@ BuildRequires:  pkgconfig(ruby)
 BuildRequires:  rubygem-test-unit
 %endif
 %endif
-
 %if %{with python3}
 # required for python3-libdnf5 and python3-libdnf5-cli
 BuildRequires:  python3-devel
@@ -223,8 +190,8 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %dir %{_datadir}/bash-completion/
 %dir %{_datadir}/bash-completion/completions/
 %{_datadir}/bash-completion/completions/dnf5
-%dir %{_prefix}/lib/sysimage/dnf
-%verify(not md5 size mtime) %ghost %{_prefix}/lib/sysimage/dnf/*
+%dir %{_libdir}/sysimage/dnf
+%verify(not md5 size mtime) %ghost %{_libdir}/sysimage/dnf/*
 %license COPYING.md
 %license gpl-2.0.txt
 %if %{with man}
@@ -273,9 +240,9 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %package -n libdnf5
 Summary:        Package management library
 License:        LGPL-2.1-or-later
+Requires:       librepo%{?_isa} >= %{librepo_version}
 #Requires:       libmodulemd{?_isa} >= {libmodulemd_version}
 Requires:       libsolv%{?_isa} >= %{libsolv_version}
-Requires:       librepo%{?_isa} >= %{librepo_version}
 Requires:       sqlite-libs%{?_isa} >= %{sqlite_version}
 
 %description -n libdnf5
@@ -318,8 +285,8 @@ Library for working with a terminal in a command-line package manager.
 Summary:        Development files for dnf5
 License:        LGPL-2.1-or-later
 Requires:       dnf5%{?_isa} = %{version}-%{release}
-Requires:       libdnf5-devel%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli-devel%{?_isa} = %{version}-%{release}
+Requires:       libdnf5-devel%{?_isa} = %{version}-%{release}
 
 %description -n dnf5-devel
 Development files for dnf5.
@@ -328,7 +295,6 @@ Development files for dnf5.
 %{_includedir}/dnf5/
 %license COPYING.md
 %license lgpl-2.1.txt
-
 
 # ========== libdnf5-devel ==========
 
@@ -349,7 +315,6 @@ Development files for libdnf.
 %license COPYING.md
 %license lgpl-2.1.txt
 
-
 # ========== libdnf5-cli-devel ==========
 
 %package -n libdnf5-cli-devel
@@ -367,7 +332,6 @@ Development files for libdnf5-cli.
 %license COPYING.md
 %license lgpl-2.1.txt
 
-
 # ========== perl-libdnf5 ==========
 
 %if %{with perl5}
@@ -375,7 +339,6 @@ Development files for libdnf5-cli.
 Summary:        Perl 5 bindings for the libdnf library
 License:        LGPL-2.1-or-later
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
-
 
 %description -n perl-libdnf5
 Perl 5 bindings for the libdnf library.
@@ -395,7 +358,6 @@ Perl 5 bindings for the libdnf library.
 Summary:        Perl 5 bindings for the libdnf5-cli library
 License:        LGPL-2.1-or-later
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
-
 
 %description -n perl-libdnf5-cli
 Perl 5 bindings for the libdnf5-cli library.
@@ -454,9 +416,9 @@ Python 3 bindings for the libdnf5-cli library.
 %package -n ruby-libdnf5
 Summary:        Ruby bindings for the libdnf library
 License:        LGPL-2.1-or-later
-Provides:       ruby(libdnf) = %{version}-%{release}
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       ruby(release)
+Provides:       ruby(libdnf) = %{version}-%{release}
 
 %description -n ruby-libdnf5
 Ruby bindings for the libdnf library.
@@ -474,9 +436,9 @@ Ruby bindings for the libdnf library.
 %package -n ruby-libdnf5-cli
 Summary:        Ruby bindings for the libdnf5-cli library
 License:        LGPL-2.1-or-later
-Provides:       ruby(libdnf_cli) = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Requires:       ruby(release)
+Provides:       ruby(libdnf_cli) = %{version}-%{release}
 
 %description -n ruby-libdnf5-cli
 Ruby bindings for the libdnf5-cli library.
@@ -554,9 +516,9 @@ Libdnf5 plugin that allows loading Python plugins.
 %package -n dnf5daemon-client
 Summary:        Command-line interface for dnf5daemon-server
 License:        GPL-2.0-or-later
+Requires:       dnf5daemon-server
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
-Requires:       dnf5daemon-server
 
 %description -n dnf5daemon-client
 Command-line interface for dnf5daemon-server.
@@ -577,9 +539,9 @@ Command-line interface for dnf5daemon-server.
 %package -n dnf5daemon-server
 Summary:        Package management service with a DBus interface
 License:        GPL-2.0-or-later
+Requires:       dbus
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
-Requires:       dbus
 Requires:       polkit
 
 %description -n dnf5daemon-server
@@ -616,8 +578,8 @@ Package management service with a DBus interface.
 %package -n dnf5-plugins
 Summary:        Plugins for dnf5
 License:        LGPL-2.1-or-later
-Requires:       dnf5%{?_isa} = %{version}-%{release}
 Requires:       curl-libs%{?_isa} >= 7.62.0
+Requires:       dnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Provides:       dnf5-command(builddep)
 Provides:       dnf5-command(changelog)
@@ -698,14 +660,14 @@ config-manager, copr, and repoclosure commands.
 
 
 # own dirs and files that dnf5 creates on runtime
-mkdir -p %{buildroot}%{_prefix}/lib/sysimage/dnf
+mkdir -p %{buildroot}%{_libdir}/sysimage/dnf
 for files in \
     groups.toml modules.toml nevras.toml packages.toml \
     system.toml transaction_history.sqlite \
     transaction_history.sqlite-shm \
     transaction_history.sqlite-wal userinstalled.toml
 do
-    touch %{buildroot}%{_prefix}/lib/sysimage/dnf/$files
+    touch %{buildroot}%{_libdir}/sysimage/dnf/$files
 done
 
 %ldconfig_scriptlets
