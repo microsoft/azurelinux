@@ -77,7 +77,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
-* Fri Jan 02 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 0.7.28-1
+* Wed Feb 07 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 0.7.28-1
 - Upgrade to version 0.7.28
 
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
