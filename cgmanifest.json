@@ -2978,8 +2978,8 @@
         "type": "other",
         "other": {
           "name": "dtc",
-          "version": "1.6.1",
-          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.6.1.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.7.0.tar.gz"
         }
       }
     },
