@@ -29257,8 +29257,8 @@
         "type": "other",
         "other": {
           "name": "wayland-protocols",
-          "version": "1.25",
-          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz"
+          "version": "1.33",
+          "downloadUrl": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.33/downloads/wayland-protocols-1.33.tar.xz"
         }
       }
     },
