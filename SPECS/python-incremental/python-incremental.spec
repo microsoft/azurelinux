@@ -4,7 +4,7 @@ Version:        21.3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/incremental
 Source0:        https://files.pythonhosted.org/packages/source/i/incremental/incremental-%{version}.tar.gz

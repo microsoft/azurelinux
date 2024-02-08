@@ -4,7 +4,7 @@ Release:        14%{?dist}
 Summary:        Import packages into other packages
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Import-Into
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Import-Into-%{version}.tar.gz#/perl-Import-Into-%{version}.tar.gz
 BuildArch:      noarch

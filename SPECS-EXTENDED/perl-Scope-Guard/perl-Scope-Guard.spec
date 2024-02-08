@@ -5,7 +5,7 @@ Release:        14%{?dist}
 License:        GPL+ or Artistic
 Source0:        https://cpan.metacpan.org/authors/id/C/CH/CHOCOLATE/Scope-Guard-%{version}.tar.gz 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Scope-Guard
 BuildArch:      noarch
 # Module Build

@@ -5,7 +5,7 @@ Version:        2.1.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ionelmc/python-process-tests
 Source0:        https://github.com/ionelmc/python-process-tests/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel

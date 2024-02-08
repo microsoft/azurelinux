@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: docbook-simple
 Version: 1.1
 Release: 25%{?dist}

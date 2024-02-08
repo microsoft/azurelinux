@@ -4,7 +4,7 @@ Version:        1.4.8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://conntrack-tools.netfilter.org/
 Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.xz
 Source1:        conntrackd.service

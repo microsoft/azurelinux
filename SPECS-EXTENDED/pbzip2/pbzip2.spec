@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		pbzip2
 Version:	1.1.13
 Release:	3%{?dist}

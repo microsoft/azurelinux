@@ -4,7 +4,7 @@ Release:	4%{?dist}
 Summary:	Explain tools for the Perl Test2 framework
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test2-Tools-Explain
 Source0:	https://cpan.metacpan.org/authors/id/P/PE/PETDANCE/Test2-Tools-Explain-%{version}.tar.gz#/perl-Test2-Tools-Explain-%{version}.tar.gz
 BuildArch:	noarch

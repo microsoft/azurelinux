@@ -6,7 +6,7 @@ URL:            https://www.zlib.net/
 License:        zlib
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/madler/zlib/releases/download/v%{version}/%{name}-%{version}.tar.xz
 %description
 Compression and decompression routines

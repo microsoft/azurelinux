@@ -10,7 +10,7 @@ Version:        %{major_ver}.0
 Release:        37%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tclx.sourceforge.net/
 Source:         https://downloads.sourceforge.net/%{name}/%{name}%{major_ver}.tar.bz2
 Patch1:         %{name}-%{major_ver}-varinit.patch

@@ -4,7 +4,7 @@ Release:        10%{?dist}
 Summary:        Associate user-defined magic to variables from Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Variable-Magic
 Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-%{version}.tar.gz#/perl-Variable-Magic-%{version}.tar.gz
 BuildRequires:  coreutils

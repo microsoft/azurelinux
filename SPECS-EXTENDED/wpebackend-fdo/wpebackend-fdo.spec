@@ -4,7 +4,7 @@ Version:        1.12.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/Igalia/%{name}
 Source0:        https://github.com/Igalia/WPEBackend-fdo/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake

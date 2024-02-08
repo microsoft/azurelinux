@@ -10,7 +10,7 @@ Version:        0.29
 Release:        3%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Keep imports out of your namespace
 URL:            https://metacpan.org/release/namespace-autoclean
 Source0:        https://cpan.metacpan.org/modules/by-module/namespace/namespace-autoclean-%{version}.tar.gz#/perl-namespace-autoclean-%{version}.tar.gz

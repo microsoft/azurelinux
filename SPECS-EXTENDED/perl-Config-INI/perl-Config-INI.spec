@@ -4,7 +4,7 @@ Release:        16%{?dist}
 Summary:        Config::INI Perl module
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Config-INI
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Config-INI-%{version}.tar.gz#/perl-Config-INI-%{version}.tar.gz
 BuildArch:      noarch

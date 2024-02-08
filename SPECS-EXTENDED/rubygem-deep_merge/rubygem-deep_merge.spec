@@ -9,7 +9,7 @@ Release:        2%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/danielsdeleo/deep_merge
 Source0:        https://github.com/danielsdeleo/deep_merge/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby

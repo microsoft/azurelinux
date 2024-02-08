@@ -4,7 +4,7 @@ Version:        0.14.3
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://nixos.org/patchelf.html
 Source0:        https://github.com/NixOS/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

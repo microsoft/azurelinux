@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           liblqr-1
 Version:        0.4.2
 Release:        15%{?dist}

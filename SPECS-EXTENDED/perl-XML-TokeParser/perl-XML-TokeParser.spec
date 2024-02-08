@@ -4,7 +4,7 @@ Release:        32%{?dist}
 Summary:        Simplified interface to XML::Parser
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-TokeParser
 Source0:        https://cpan.metacpan.org/authors/id/P/PO/PODMASTER/XML-TokeParser-%{version}.tar.gz#/perl-XML-TokeParser-%{version}.tar.gz
 

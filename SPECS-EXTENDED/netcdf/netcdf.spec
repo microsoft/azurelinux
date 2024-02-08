@@ -15,7 +15,7 @@ Version:        4.9.0
 Release:        4%{?dist}
 License:        NetCDF
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.unidata.ucar.edu/software/netcdf/
 Source0:        https://github.com/Unidata/netcdf-c/archive/v%{version}/%{name}-%{version}.tar.gz
 # Fix plugins - https://github.com/Unidata/netcdf-c/pull/2431

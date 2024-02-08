@@ -4,7 +4,7 @@ Release:	12%{?dist}
 Summary:	Manage deprecation warnings for your distribution
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-DeprecationManager
 Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Package-DeprecationManager-%{version}.tar.gz#/perl-Package-DeprecationManager-%{version}.tar.gz
 BuildArch:	noarch

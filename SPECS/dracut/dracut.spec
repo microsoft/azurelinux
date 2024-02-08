@@ -1,48 +1,60 @@
-%define dracutlibdir %{_libdir}/dracut
-%define _unitdir %{_libdir}/systemd/system
+%define dracutlibdir        %{_libdir}/%{name}
+%global __requires_exclude  pkg-config
 
 Summary:        dracut to create initramfs
 Name:           dracut
-Version:        055
-Release:        7%{?dist}
+Version:        059
+Release:        12%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://dracut.wiki.kernel.org/
-Source0:        http://www.kernel.org/pub/linux/utils/boot/dracut/%{name}-%{version}.tar.xz
+URL:            https://github.com/dracutdevs/dracut/wiki
+
+Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source2:        mkinitrd
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
-Patch0:         disable-xattr.patch
-Patch1:         fix-initrd-naming-for-mariner.patch
-Patch2:         fix-functions-Avoid-calling-grep-with-PCRE-P.patch
+Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
-Patch3:         allow-liveos-overlay-no-user-confirmation-prompt.patch
-BuildRequires:  asciidoc
+Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
+
+Patch:          0002-disable-xattr.patch
+Patch:          0003-fix-initrd-naming-for-photon.patch
+Patch:          0006-dracut.sh-validate-instmods-calls.patch
+Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
+Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
+Patch:          0009-install-systemd-executor.patch
+
 BuildRequires:  bash
-BuildRequires:  git
 BuildRequires:  kmod-devel
 BuildRequires:  pkg-config
+BuildRequires:  asciidoc
 BuildRequires:  systemd-rpm-macros
-Requires:       /bin/grep
-Requires:       /bin/sed
-Requires:       bash >= 4
-Requires:       coreutils
-Requires:       cpio
-Requires:       findutils
-Requires:       kmod
-Requires:       systemd
-Requires:       util-linux
 
-Provides:       %{name}-caps = %{version}-%{release}
+Requires:       bash >= 4
+Requires:       kmod
+Requires:       sed
+Requires:       grep
+Requires:       xz
+Requires:       gzip
+Requires:       cpio
+Requires:       filesystem
+Requires:       util-linux
+Requires:       findutils
+Requires:       procps-ng
+Requires:       systemd
+Requires:       systemd-udev
+# Our toolkit cannot handle OR requirements
+#Requires:       (coreutils or coreutils-selinux)
+Requires:       coreutils
 
 %description
 dracut contains tools to create a bootable initramfs for 2.6 Linux kernels.
@@ -96,31 +108,25 @@ cp %{SOURCE1} .
 %make_build
 
 %install
-%make_install \
-     DESTDIR=%{buildroot} \
-     libdir=%{_libdir}
+%make_install %{?_smp_mflags} libdir=%{_libdir}
 
-echo "DRACUT_VERSION=%{version}-%{release}" > %{buildroot}/%{dracutlibdir}/dracut-version.sh
+echo "DRACUT_VERSION=%{version}-%{release}" > %{buildroot}%{dracutlibdir}/%{name}-version.sh
 
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/00bootchart
 
 # we do not support dash in the initramfs
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/00dash
+rm -fr -- %{buildroot}%{dracutlibdir}/modules.d/00dash
 
 # remove gentoo specific modules
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/50gensplash
+rm -fr -- %{buildroot}%{dracutlibdir}/modules.d/96securityfs \
+          %{buildroot}%{dracutlibdir}/modules.d/97masterkey \
+          %{buildroot}%{dracutlibdir}/modules.d/98integrity
 
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/96securityfs
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/97masterkey
-rm -fr -- %{buildroot}/%{dracutlibdir}/modules.d/98integrity
-
-mkdir -p %{buildroot}/boot/dracut
-mkdir -p %{buildroot}%{_sharedstatedir}/dracut/overlay
-mkdir -p %{buildroot}%{_localstatedir}/log
-touch %{buildroot}%{_localstatedir}/log/dracut.log
-mkdir -p %{buildroot}%{_sharedstatedir}/initramfs
-
-rm -f %{buildroot}%{_mandir}/man?/*suse*
+mkdir -p %{buildroot}/boot/%{name} \
+         %{buildroot}%{_sharedstatedir}/%{name}/overlay \
+         %{buildroot}%{_var}/log \
+         %{buildroot}%{_var}/opt/%{name}/log \
+         %{buildroot}%{_sharedstatedir}/initramfs \
+         %{buildroot}%{_sbindir}
 
 install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
@@ -133,59 +139,59 @@ mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
 
-# create compat symlink
-mkdir -p %{buildroot}%{_sbindir}
-ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
+touch %{buildroot}%{_var}/opt/%{name}/log/%{name}.log
+ln -srv %{buildroot}%{_var}/opt/%{name}/log/%{name}.log %{buildroot}%{_var}/log/
 
-%check
-%make_build -k clean check
+# create compat symlink
+ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 
 %files
 %defattr(-,root,root,0755)
-%{!?_licensedir:%global license %%doc}
-%license COPYING lgpl-2.1.txt
-%{_bindir}/dracut
+%{_bindir}/%{name}
 %{_bindir}/mkinitrd
 %{_bindir}/lsinitrd
 # compat symlink
-%{_sbindir}/dracut
-%{_datadir}/bash-completion/completions/dracut
+%{_sbindir}/%{name}
+%{_datadir}/bash-completion/completions/%{name}
 %{_datadir}/bash-completion/completions/lsinitrd
 %dir %{dracutlibdir}
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
-%{_libdir}/dracut/dracut-init.sh
-%{_libdir}/dracut/dracut-util
-%{_datadir}/pkgconfig/dracut.pc
-%{dracutlibdir}/dracut-functions.sh
-%{dracutlibdir}/dracut-functions
-%{dracutlibdir}/dracut-version.sh
-%{dracutlibdir}/dracut-logger.sh
-%{dracutlibdir}/dracut-initramfs-restore
-%{dracutlibdir}/dracut-install
+%{_libdir}/%{name}/%{name}-init.sh
+%{_datadir}/pkgconfig/%{name}.pc
+%{dracutlibdir}/%{name}-functions.sh
+%{dracutlibdir}/%{name}-functions
+%{dracutlibdir}/%{name}-version.sh
+%{dracutlibdir}/%{name}-logger.sh
+%{dracutlibdir}/%{name}-initramfs-restore
+%{dracutlibdir}/%{name}-install
 %{dracutlibdir}/skipcpio
-%config(noreplace) %{_sysconfdir}/dracut.conf
-%dir %{_sysconfdir}/dracut.conf.d
-%dir %{dracutlibdir}/dracut.conf.d
-%attr(0644,root,root) %ghost %config(missingok,noreplace) %{_localstatedir}/log/dracut.log
+%{dracutlibdir}/%{name}-util
+%config(noreplace) %{_sysconfdir}/%{name}.conf
+%dir %{_sysconfdir}/%{name}.conf.d
+%dir %{dracutlibdir}/%{name}.conf.d
+%dir %{_var}/opt/%{name}/log
+%attr(0644,root,root) %ghost %config(missingok,noreplace) %{_var}/opt/%{name}/log/%{name}.log
+%{_var}/log/%{name}.log
 %dir %{_sharedstatedir}/initramfs
-%{_unitdir}/dracut-shutdown.service
-%{_unitdir}/sysinit.target.wants/dracut-shutdown.service
-%{_unitdir}/dracut-cmdline.service
-%{_unitdir}/dracut-initqueue.service
-%{_unitdir}/dracut-mount.service
-%{_unitdir}/dracut-pre-mount.service
-%{_unitdir}/dracut-pre-pivot.service
-%{_unitdir}/dracut-pre-trigger.service
-%{_unitdir}/dracut-pre-udev.service
-%{_unitdir}/initrd.target.wants/dracut-cmdline.service
-%{_unitdir}/initrd.target.wants/dracut-initqueue.service
-%{_unitdir}/initrd.target.wants/dracut-mount.service
-%{_unitdir}/initrd.target.wants/dracut-pre-mount.service
-%{_unitdir}/initrd.target.wants/dracut-pre-pivot.service
-%{_unitdir}/initrd.target.wants/dracut-pre-trigger.service
-%{_unitdir}/initrd.target.wants/dracut-pre-udev.service
+%{_unitdir}/%{name}-shutdown.service
+%{_unitdir}/sysinit.target.wants/%{name}-shutdown.service
+%{_unitdir}/%{name}-cmdline.service
+%{_unitdir}/%{name}-initqueue.service
+%{_unitdir}/%{name}-mount.service
+%{_unitdir}/%{name}-pre-mount.service
+%{_unitdir}/%{name}-pre-pivot.service
+%{_unitdir}/%{name}-pre-trigger.service
+%{_unitdir}/%{name}-pre-udev.service
+%{_unitdir}/dracut-shutdown-onfailure.service
+%{_unitdir}/initrd.target.wants/%{name}-cmdline.service
+%{_unitdir}/initrd.target.wants/%{name}-initqueue.service
+%{_unitdir}/initrd.target.wants/%{name}-mount.service
+%{_unitdir}/initrd.target.wants/%{name}-pre-mount.service
+%{_unitdir}/initrd.target.wants/%{name}-pre-pivot.service
+%{_unitdir}/initrd.target.wants/%{name}-pre-trigger.service
+%{_unitdir}/initrd.target.wants/%{name}-pre-udev.service
 
 %files fips
 %defattr(-,root,root,0755)
@@ -204,12 +210,51 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_libdir}/dracut/modules.d/20overlayfs
 %{_libdir}/dracut/modules.d/20overlayfs/*
 
-%{_bindir}/dracut-catimages
-%dir /boot/dracut
-%dir %{_sharedstatedir}/dracut
-%dir %{_sharedstatedir}/dracut/overlay
+%{_bindir}/%{name}-catimages
+%dir /boot/%{name}
+%dir %{_sharedstatedir}/%{name}
+%dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 059-12
+- update to 059
+
+* Wed Jan 03 2024 Susant Sahani <susant.sahani@broadcom.com> 059-11
+- Include systemd-executor if available
+
+* Tue Oct 03 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-10
+- Add gzip, procps-ng, xz to requires
+
+* Thu Jul 27 2023 Piyush Gupta <gpiyush@vmware.com> 059-9
+- fix(dracut-systemd): rootfs-generator cannot write outside of generator dir
+
+* Mon Jul 17 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-8
+- Fix a bug in finding installed kernel versions during mkinitrd
+
+* Tue Apr 25 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-7
+- Code improvements in multiple conf dir support
+
+* Sat Apr 1 2023 Laszlo Gombos <laszlo.gombos@gmail.com> 059-6
+- Update wiki link and remove obsolete references
+
+* Wed Mar 15 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-5
+- Add systemd-udev to requires
+
+* Wed Mar 08 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-4
+- Add /etc/dracut.conf.d to conf dirs list during initrd creation
+- Drop multiple conf file support
+
+* Wed Mar 01 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-3
+- Fix mkinitrd verbose & add a sanity check
+
+* Wed Jan 25 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-2
+- Fix requires
+* Mon Jan 02 2023 Shreenidhi Shedi <sshedi@vmware.com> 059-1
+- Upgrade to v059
+
+* Wed Sep 28 2022 Shreenidhi Shedi <sshedi@vmware.com> 057-1
+- Upgrade to v057
+
 * Mon Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
 - Add overlayfs sub-package.
 

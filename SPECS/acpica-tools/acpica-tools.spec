@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           acpica-tools
 Version:        20190509
 Release:        8%{?dist}

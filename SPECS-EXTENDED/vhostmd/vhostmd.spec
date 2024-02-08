@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global have_xen 0
 
 Summary:       Virtualization host metrics daemon

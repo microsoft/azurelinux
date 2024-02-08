@@ -6,7 +6,7 @@ License:	GPLv2+
 URL:		http://www.ltrace.org/
 Group:		Development/Debuggers
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	http://www.ltrace.org/%{name}_%{version}.orig.tar.bz2
 Patch0:		Move-get_hfa_type-from-IA64-backend-to-type.c-name-i.patch
 Patch1:		Set-child-stack-alignment-in-trace-clone.c.patch

@@ -4,7 +4,7 @@ Version:        1.0.9
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.rodsbooks.com/gdisk/
 Source0:        https://downloads.sourceforge.net/gptfdisk/gptfdisk-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         gdisk-libuuid.patch

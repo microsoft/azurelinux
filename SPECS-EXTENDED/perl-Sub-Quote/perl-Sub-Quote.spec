@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Efficient generation of subroutines via string eval
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sub-Quote
 Source0:        https://cpan.metacpan.org/authors/id/H/HA/HAARG/Sub-Quote-%{version}.tar.gz#/perl-Sub-Quote-%{version}.tar.gz
 BuildArch:      noarch

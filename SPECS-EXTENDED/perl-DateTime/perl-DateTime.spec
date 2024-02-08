@@ -11,7 +11,7 @@ Release:        3%{?dist}
 Summary:        Date and time object for Perl
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime
 Source0:        https://cpan.metacpan.org/modules/by-module/DateTime/DateTime-%{version}.tar.gz#/perl-DateTime-%{version}.tar.gz
 # Build:

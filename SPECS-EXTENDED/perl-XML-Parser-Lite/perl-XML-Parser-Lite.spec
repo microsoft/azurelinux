@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-XML-Parser-Lite
 # Use three digits since 0.719 -> 0.72
 %global cpan_version 0.722

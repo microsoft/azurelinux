@@ -4,7 +4,7 @@ Version:        5.3.28
 Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://oss.oracle.com/berkeley-db.html
 Source0:        http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
