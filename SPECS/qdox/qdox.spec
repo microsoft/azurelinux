@@ -106,6 +106,14 @@ cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 %license LICENSE.txt
 
 %changelog
+* Thu Feb 08 2024 Henry Li <lihl@microsoft.com> - 2.0.3-1
+- Upgrade to version 2.0.3
+- Update Source0
+- Remove unnecessary plugins
+- Apply patch to use jflex 1.7.0 and remove duplicate constructor definitions
+- Add build xml file to define compilation targets and procedure
+- Add qdox-javadoc subpackage
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.0-2
 - Move to SPECS
 
