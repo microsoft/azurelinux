@@ -6470,8 +6470,8 @@
         "type": "other",
         "other": {
           "name": "hyperscan",
-          "version": "5.4.0",
-          "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.0.tar.gz"
+          "version": "5.4.2",
+          "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.2.tar.gz"
         }
       }
     },
