@@ -26,7 +26,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/paul-hammant/qdox
 Source0:        https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/%{version}/%{name}-%{version}-project.tar.bz2
 Source1:        qdox-build.xml
-Patch0:         port-to-jflex-1.7.0.patch
+Patch0:         Port-to-JFlex-1.7.0.patch
 BuildRequires:  ant
 BuildRequires:  byaccj
 BuildRequires:  fdupes
