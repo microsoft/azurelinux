@@ -3598,8 +3598,8 @@
         "type": "other",
         "other": {
           "name": "flatbuffers",
-          "version": "2.0.8",
-          "downloadUrl": "https://github.com/google/flatbuffers/archive/v2.0.8/flatbuffers-2.0.8.tar.gz"
+          "version": "23.5.26",
+          "downloadUrl": "https://github.com/google/flatbuffers/archive/v23.5.26/flatbuffers-23.5.26.tar.gz"
         }
       }
     },
