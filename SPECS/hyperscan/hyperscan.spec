@@ -1,7 +1,7 @@
 %global __cmake_in_source_build 1
 Name:           hyperscan
-Version:        5.4.0
-Release:        2%{?dist}
+Version:        5.4.2
+Release:        1%{?dist}
 Summary:        High-performance regular expression matching library
 License:        BSD
 Group:          Development/Libraries
@@ -9,7 +9,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.hyperscan.io/
 Source0:        https://github.com/intel/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         hyperscan-fix-missed-symbols.patch
 
 BuildRequires:  gcc
 BuildRequires:  libstdc++-devel
@@ -89,6 +88,11 @@ needed for developing Hyperscan applications.
 %{_includedir}/hs/
 
 %changelog
+* Thu Feb 08 2024 Archana Choudhary <archana1@microsoft.com> - 5.4.2-1
+- Upgrade to 5.4.2
+- Drop patch for missed symbols as its fixed in upstream
+  https://github.com/intel/hyperscan/issues/292
+  
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified
