@@ -41,6 +41,8 @@ func PrintBuildResult(res *BuildResult) {
 			logger.Log.Warnf("Ignored test for '%s' per user request.", baseSRPMName)
 		} else if res.UsedCache {
 			logger.Log.Infof("Skipped test: %s", baseSRPMName)
+		} else if res.CheckFailed {
+			logger.Log.Warnf("Failed test: %s", baseSRPMName)
 		} else {
 			logger.Log.Infof("Tested: %s", baseSRPMName)
 		}
@@ -145,7 +147,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	}
 
 	if len(testedSRPMs) != 0 {
-		logger.Log.Info(color.GreenString("Tested SRPMs:"))
+		logger.Log.Info(color.GreenString("Passed SRPMs tests:"))
 		keys := mapToSortedSlice(testedSRPMs)
 		for _, testedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
@@ -206,7 +208,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		keys := mapToSortedSlice(failedSRPMsTests)
 		for _, key := range keys {
 			failure := failedSRPMsTests[key]
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+			logger.Log.Infof("--> %s , for details see: %s", failure.Node.SRPMFileName(), failure.LogFile)
 		}
 	}
 
@@ -344,7 +346,7 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of tested SRPMs:", len(testedSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(testedSRPMs))))
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
 	printErrorInfoByCondition(len(blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
