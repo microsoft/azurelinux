@@ -69,8 +69,10 @@ rm -rf bootstrap
 
 %build
 # Generate scanners (upstream does this with maven-jflex-plugin)
-jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/lexer.flex
-jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/commentlexer.flex
+CLASSPATH=$(build-classpath java-cup) \
+  jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/lexer.flex
+CLASSPATH=$(build-classpath java-cup) \
+  jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/commentlexer.flex
 
 # Generate parsers (upstream does this with exec-maven-plugin)
 (cd ./src/main/java/com/thoughtworks/qdox/parser/impl
