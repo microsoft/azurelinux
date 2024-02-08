@@ -1310,7 +1310,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 		isRoot = true
 	} else {
-		err = userutils.AddUser(user.Name, hashedPassword, user.UID, installChroot)
+		err = userutils.AddUser(user.Name, user.HomeDirectory, user.PrimaryGroup, hashedPassword, user.UID, installChroot)
 		if err != nil {
 			return
 		}
