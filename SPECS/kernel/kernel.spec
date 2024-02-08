@@ -40,6 +40,8 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Patch0:         nvme_multipath_default_false.patch
+Patch1:         0001-arm64-HACK-Override-Pioneer-MIDR-value-with-ARM-Neov.patch
+Patch2:         0009-allow-acpi_tad-usage.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc

@@ -1,0 +1,48 @@
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index 7c7493cb5..4c989ff22 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -262,7 +262,7 @@ is_midr_in_range_list(u32 midr, struct midr_range const *ranges)
+  */
+ static inline u32 __attribute_const__ read_cpuid_id(void)
+ {
+-	return read_cpuid(MIDR_EL1);
++	return (read_cpuid(MIDR_EL1) == 0x6D0FD490 ? 0x410FD490 : read_cpuid(MIDR_EL1));
+ }
+ 
+ static inline u64 __attribute_const__ read_cpuid_mpidr(void)
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index b7afaa026..0e35f8b0b 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -138,6 +138,11 @@
+ .macro __init_el2_nvhe_idregs
+ 	mrs	x0, midr_el1
+ 	mrs	x1, mpidr_el1
++	ldr	x2, =0x6D0FD490
++	cmp	x0, x2
++	bne	.Loverride_pioneer_\@
++	ldr	x0, =0x410FD490
++.Loverride_pioneer_\@:
+ 	msr	vpidr_el2, x0
+ 	msr	vmpidr_el2, x1
+ .endm
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0afd6136e..1802e1669 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3275,7 +3275,13 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+ 		return ((struct sys_reg_desc *)r)->val;			\
+ 	}
+ 
+-FUNCTION_INVARIANT(midr_el1)
++static u64 get_midr_el1(struct kvm_vcpu *v, const struct sys_reg_desc *r)
++{
++	((struct sys_reg_desc *)r)->val = read_sysreg(midr_el1);
++	if (((struct sys_reg_desc *)r)->val == 0x6D0FD490)
++		((struct sys_reg_desc *)r)->val == 0x410FD490;
++	return ((struct sys_reg_desc *)r)->val;
++}
+ FUNCTION_INVARIANT(revidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+ 
