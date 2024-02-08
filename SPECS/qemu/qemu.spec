@@ -484,9 +484,6 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 %global excluded_targets %{excluded_targets},sparc-softmmu,sparc64-softmmu,sparc-linux-user,sparc32plus-linux-user,sparc64-linux-user
 %endif
 
-# To prevent rpmdev-bumpspec breakage
-# %global baserelease 0.2
-
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
@@ -499,9 +496,6 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 # https://patchwork.kernel.org/project/qemu-devel/patch/20231128143647.847668-1-crobinso@redhat.com/
 # Fix pvh.img ld build failure on fedora rawhide
 Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
-
-# See https://lists.gnu.org/archive/html/qemu-devel/2023-12/msg01035.html
-Patch: 0001-fix-qemu-build-with-xen-4.18.0.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -714,7 +708,6 @@ BuildRequires: pcre2-static
 BuildRequires: pcre-static
 %endif
 %endif
-
 
 # Requires for the Fedora 'qemu' metapackage
 Requires: %{name}-user = %{version}-%{release}
@@ -1958,7 +1951,9 @@ run_configure \
   --enable-opengl \
 %endif
   --enable-oss \
+%if %{with pulseaudio}
   --enable-pa \
+%endif
   --enable-pie \
 %if %{with pipewire}
   --enable-pipewire \
