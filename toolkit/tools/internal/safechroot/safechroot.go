@@ -306,20 +306,39 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return addFilesToDestination(c.rootDir, filesToCopy...)
 }
 
+func addFileToDestination(destDir string, fileToCopy FileToCopy) error {
+	dest := filepath.Join(destDir, fileToCopy.Dest)
+	logger.Log.Debugf("Copying '%s' to '%s'", fileToCopy.Src, dest)
+
+	var err error
+	if fileToCopy.Permissions != nil {
+		err = file.CopyAndChangeMode(fileToCopy.Src, dest, os.ModePerm, *fileToCopy.Permissions)
+	} else {
+		err = file.Copy(fileToCopy.Src, dest)
+	}
+
+	if err != nil {
+		logger.Log.Errorf("Error copying file '%s'", fileToCopy.Src)
+		return err
+	}
+
+	return nil
+}
+
+func AddFilesToDestination(destDir string, filesToCopy []FileToCopy) error {
+	for _, f := range filesToCopy {
+		err := addFileToDestination(destDir, f)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
-		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
-
-		var err error
-		if f.Permissions != nil {
-			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
-		} else {
-			err = file.Copy(f.Src, dest)
-		}
-
+		err := addFileToDestination(destDir, f)
 		if err != nil {
-			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
 			return err
 		}
 	}

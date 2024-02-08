@@ -564,23 +564,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 // files can be used by custom initrd/LiveOS images that will look for them
 // on the iso media.
 func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
-	for _, fileToCopy := range im.additionalIsoFiles {
-		// im.buildDirPath maps to the iso media root.
-		absTargetPath := filepath.Join(im.buildDirPath, fileToCopy.Dest)
-		if fileToCopy.Permissions == nil {
-			err = file.Copy(fileToCopy.Src, absTargetPath)
-			if err != nil {
-				return err
-			}
-		} else {
-			err = file.CopyAndChangeMode(fileToCopy.Src, absTargetPath, os.ModePerm, *fileToCopy.Permissions)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles)
 }
 
 // copyAndRenameAdditionalFiles will copy all additional files into an
