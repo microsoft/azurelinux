@@ -1,3 +1,5 @@
+%global pypi_name packaging
+
 Summary:        Core utilities for Python packages
 Name:           python-packaging
 Version:        23.2
@@ -122,7 +124,7 @@ echo '%{python3_sitelib}/packaging*' > %{pyproject_files}
 %endif
  
 %changelog
-* Wed Feb 07 2022 Brian Fjeldstad <bfjelds@microsoft.com> - 23.2-1
+* Wed Feb 07 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 23.2-1
   Upgrade to 23.2-1
 
 * Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
