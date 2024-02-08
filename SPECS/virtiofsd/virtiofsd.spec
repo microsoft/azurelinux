@@ -26,7 +26,19 @@ Group:          Development/Libraries/Rust
 License:        Apache-2.0
 URL:            https://gitlab.com/virtio-fs/virtiofsd
 Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+# Below is a manually created tarball, no download link.
+# Note: the %%{name}-%%{version}-vendor.tar.gz file contains the vendored
+# sources created by capturing the contents downloaded into vendor/
+# To create the tarball run:
+#   tar -xf %{name}-%{version}.tar.gz
+#   cd %{name}-v%{version}
+#   cargo vendor
+#   tar --sort=name --mtime="2021-04-26 00:00Z" --owner=0 --group=0 \
+#   --numeric-owner \
+#   --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime -cf \
+#   %{name}-%{version}-vendor.tar.gz vendor/
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        cargo_config
 BuildRequires:  cargo
 BuildRequires:  rust
@@ -39,20 +51,16 @@ vhost-user virtio-fs device backend written in Rust
 
 %prep
 %autosetup -n %{name}-v%{version}
-#pushd %{name}-v%{version}
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
-#popd
 
 %build
-#pushd %{name}-v%{version}
-cargo build --release
-#popd
+cargo build --release --offline
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}
-install -D -p -m 0755 %{_builddir}/%{name}-%{version}/target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd
-install -D -p -m 0644 %{_builddir}/%{name}-%{version}/50-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-virtiofsd.json
+install -D -p -m 0755 %{_builddir}/%{name}-v%{version}/target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd
+install -D -p -m 0644 %{_builddir}/%{name}-v%{version}/50-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-virtiofsd.json
 
 %check
 cargo test --release
@@ -69,6 +77,7 @@ cargo test --release
 - Initial CBL-Mariner import from openSuse Tumbleweed (license: Apache-2.0)
 - License verified
 - Remove build dependencies on cargo-packaging
+- Include vendored sources tarball
 
 * Tue Jan 30 2024 caleb.crane@suse.com
 - Fix CVE-2023-50711: vmm-sys-util: out of bounds memory accesses (bsc#1218502, bsc#1218500)

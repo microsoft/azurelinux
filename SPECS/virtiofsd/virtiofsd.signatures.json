@@ -1,7 +1,7 @@
 {
  "Signatures": {
   "cargo_config": "6eecdb513f92e130bb05679b32eb54d67aaefbf6a2086e275c3048ebcc972128",
-  "virtiofsd-1.10.1-cargo.tar.gz": "3e6a0b511baba74bd46ea7f02337158359a4389faff5944798c74d72b5c822d4",
+  "virtiofsd-1.10.1-vendor.tar.gz": "7959b7cf68cd5a5092c00ad4de2c46db3b26694c9f1d5db221fc23a855ffc6a5",
   "virtiofsd-1.10.1.tar.gz": "7d7cc7e9aa41f2f20864f2981b66fd2cfac06004399a990b865df18fbdecefde"
  }
 }
