@@ -2187,6 +2187,7 @@
                 "helm",
                 "hvloader",
                 "hvloader-signed",
+                "ig",
                 "installkernel",
                 "intel-pf-bb-config",
                 "ivykis",
