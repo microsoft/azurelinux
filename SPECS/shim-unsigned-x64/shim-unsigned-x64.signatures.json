@@ -1,7 +1,9 @@
 {
  "Signatures": {
-  "cbl-mariner-ca-20211013.der": "35478a4e9d9f5b8b04d417c4e2dbdfb32b6637a9d0293073aaafcdee8b506537",
-  "sbat.csv.in": "895ecdff532c9ed1cfbcd1e4d8fd9b29b87628394cc9c9101ec5be47f66e504d",
-  "shim-15.4.tar.bz2": "8344473dd10569588b8238a4656b8fab226714eea9f5363f8c410aa8a5090297"
+  "azurelinux-ca-20230216.der": "fac39cd3bbb87d6326eb87020eb7ab1f01058d9b94d3c47d4264da05601bc89a",
+  "sbat.azurelinux.csv": "bb37f33ec9bb6be2fa8929243b613337244f007efb0761196f2f6b3caa03926c",
+  "shim-15.8.tar.bz2": "a79f0a9b89f3681ab384865b1a46ab3f79d88b11b4ca59aa040ab03fffae80a9",
+  "shim-find-debuginfo.sh": "1516c1b476abb0a2c7af8d9087d0a6fab93bd83d529ab32f57aa36a1139235a5",
+  "shim.patches": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
  }
 }
