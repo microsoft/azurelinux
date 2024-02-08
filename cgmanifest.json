@@ -6930,8 +6930,8 @@
         "type": "other",
         "other": {
           "name": "iana-etc",
-          "version": "20211115",
-          "downloadUrl": "https://github.com/Mic92/iana-etc/releases/download/20211115/iana-etc-20211115.tar.gz"
+          "version": "20240125",
+          "downloadUrl": "https://github.com/Mic92/iana-etc/releases/download/20240125/iana-etc-20240125.tar.gz"
         }
       }
     },

@@ -1,7 +1,7 @@
 Summary:        Data for network services and protocols
 Name:           iana-etc
-Version:        20211115
-Release:        2%{?dist}
+Version:        20240125
+Release:        1%{?dist}
 # IANA base information is Public Domain
 # Scripts used to translate original XML data into the necessary format are MIT
 License:        MIT
@@ -49,6 +49,9 @@ install -vm 644 services %{buildroot}%{_sysconfdir}/services
 %doc protocol-numbers.xml service-names-port-numbers.xml
 
 %changelog
+* Thu Feb 08 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240125-1
+- Upgrade version for Mariner 3.0 release
+
 * Mon Sep 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 20211115-2
 - Separate documents into separate package to reduce base package size
 
