@@ -74,7 +74,7 @@ cargo test --release
 
 %changelog
 * Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.10.1-2
-- Initial CBL-Mariner import from openSUSE (license: same as "License" tag)
+- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
 - Remove build dependencies on cargo-packaging
 - Include vendored sources tarball
