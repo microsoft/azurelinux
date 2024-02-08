@@ -11851,8 +11851,8 @@
         "type": "other",
         "other": {
           "name": "libXxf86vm",
-          "version": "1.1.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.5.tar.xz"
         }
       }
     },
