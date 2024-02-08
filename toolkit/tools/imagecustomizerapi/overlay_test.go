@@ -14,7 +14,7 @@ func TestOverlayValidConfiguration(t *testing.T) {
 		LowerDir: "/lower",
 		UpperDir: "/upper",
 		WorkDir:  "/work",
-		Partition: IdentifiedPartition{
+		Partition: &IdentifiedPartition{
 			IdType: "PartUuid",
 			Id:     "123e4567-e89b-4d3a-a456-426614174000",
 		},
