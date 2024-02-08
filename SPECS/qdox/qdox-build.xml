@@ -55,7 +55,8 @@
   <!-- ====================================================================== -->
 
   <target name="javadoc" description="Generates the Javadoc of the application">
-    <javadoc sourcepath="${build.srcDir}" 
+    <javadoc sourcepath="${build.srcDir}"
+             additionalparam="-Xdoclint:none" 
              packagenames="*" 
              destdir="${reporting.outputDirectory}/apidocs" 
              access="protected" 
