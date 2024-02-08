@@ -1,8 +1,5 @@
-diff --git a/src/grammar/lexer.flex b/src/grammar/lexer.flex
-index f81cd88..a607fb8 100644
---- a/src/grammar/lexer.flex
-+++ b/src/grammar/lexer.flex
-@@ -173,7 +173,7 @@ import java.util.*;
++++ qdox-2.0.1/src/grammar/lexer.flex	2022-03-12 07:00:33.182053962 +0100
+@@ -173,7 +173,7 @@
  	}
  
      public JFlexLexer( java.io.InputStream stream, java.io.Writer writer ) {
@@ -11,11 +8,9 @@ index f81cd88..a607fb8 100644
         this.writer = writer;
    	}
  
-diff --git a/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java b/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
-index c947f9b..5b415c0 100644
---- a/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
-+++ b/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java
-@@ -112,7 +112,7 @@ public class ClassLoaderLibrary
+--- qdox-2.0.1/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java	2021-11-13 15:25:20.000000000 +0100
++++ qdox-2.0.1/src/main/java/com/thoughtworks/qdox/library/ClassLoaderLibrary.java	2022-03-12 07:00:33.182053962 +0100
+@@ -112,7 +112,7 @@
              if ( sourceStream != null )
              {
                  Builder builder = getModelBuilder();
