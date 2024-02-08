@@ -206,6 +206,7 @@ popd
 %changelog
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.8-1
 - Upgrading to version 3.3.8
+- Added docs subpackage
 - Removing unused patch files
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.1.10-6
