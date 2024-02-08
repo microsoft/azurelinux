@@ -4,7 +4,7 @@ Version:        1.6.1
 Release:        1%{?dist}
 License:        GPLv2+ AND MIT AND BSD AND ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/cronie-crond/cronie
 Source0:        https://github.com/cronie-crond/cronie/releases/download/cronie-%{version}/cronie-%{version}.tar.gz

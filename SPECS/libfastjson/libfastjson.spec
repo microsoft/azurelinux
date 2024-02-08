@@ -7,7 +7,7 @@ URL:            https://github.com/rsyslog/libfastjson
 Source0:        https://github.com/rsyslog/libfastjson/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  libtool
 
 %description

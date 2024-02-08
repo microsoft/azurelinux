@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.xz
 Provides:       man = %{version}-%{release}
 Requires:       libpipeline

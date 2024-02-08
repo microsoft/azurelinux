@@ -6,7 +6,7 @@ License:        GPLv2 with exceptions
 URL:            https://security.appspot.com/vsftpd.html
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://security.appspot.com/downloads/%{name}-%{version}.tar.gz
 
 Patch0:         vsftpd-gen-debuginfo.patch

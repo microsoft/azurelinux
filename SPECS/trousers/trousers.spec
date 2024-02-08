@@ -4,7 +4,7 @@ Version:        0.3.14
 Release:        7%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://sourceforge.net/projects/trousers
 Source0:        %{url}/files/%{name}/%{version}/%{name}-%{version}.tar.gz

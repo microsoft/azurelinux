@@ -4,7 +4,7 @@ Release:	9%{?dist}
 Summary:	Build.PL install path logic made easy
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/ExtUtils-InstallPaths
 Source0:	https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-InstallPaths-%{version}.tar.gz#/perl-ExtUtils-InstallPaths-%{version}.tar.gz
 BuildArch:	noarch

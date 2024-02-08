@@ -8,7 +8,7 @@ Version:        0.6
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://cihar.com/software/utidylib/
 Source0:        http://dl.cihar.com/utidylib/uTidylib-%{version}.tar.bz2
 BuildRequires:  python3-devel

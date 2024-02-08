@@ -6,7 +6,7 @@ Release:        43%{?dist}
 Summary:        HTML::Tagset - data tables useful in parsing HTML
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTML-Tagset
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PETDANCE/HTML-Tagset-%{version}.tar.gz#/perl-HTML-Tagset-%{version}.tar.gz
 BuildArch:      noarch

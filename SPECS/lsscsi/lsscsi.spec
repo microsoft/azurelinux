@@ -4,7 +4,7 @@ Version:        0.32
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Hardware/Others.
 URL:            https://sg.danny.cz/scsi/lsscsi.html
 Source0:        http://sg.danny.cz/scsi/%{name}-%{version}.tar.xz

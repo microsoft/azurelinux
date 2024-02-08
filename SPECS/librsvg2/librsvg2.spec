@@ -11,7 +11,7 @@ Version:        2.50.3
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/LibRsvg
 Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
 BuildRequires:  cairo-devel >= %{cairo_version}

@@ -9,7 +9,7 @@ Version:        1.3.0
 Release:        41%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libkml/libkml
 Source0:        https://github.com/libkml/libkml/archive/%{version}/libkml-%{version}.tar.gz
 # TODO: Port to minizip-2.x, meanwhile bundle version 1.3.0

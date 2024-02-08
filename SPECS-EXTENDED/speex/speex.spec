@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	A voice compression format (codec)
 Name:		speex
 Version:	1.2.0

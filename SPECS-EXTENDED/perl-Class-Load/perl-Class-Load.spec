@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Class::Load::XS is an optional extra
 %if 0%{?rhel:1}
 %bcond_with Class_Load_XS

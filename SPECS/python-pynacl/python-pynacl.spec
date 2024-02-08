@@ -4,7 +4,7 @@ Version:        1.5.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pynacl
 Source0:        https://github.com/pyca/pynacl/archive/refs/tags/%{version}.tar.gz#/pynacl-%{version}.tar.gz

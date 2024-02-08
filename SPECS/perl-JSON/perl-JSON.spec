@@ -6,7 +6,7 @@ Version:        4.10
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/JSON
 Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

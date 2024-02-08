@@ -6,7 +6,7 @@ Version:        1.5.0
 Release:        3%{?dist}
 License:        GPL-2.0-or-later AND (LGPL-2.0-or-later OR MIT) AND SUSE-Public-Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Graphics/Other
 URL:            https://shapelib.maptools.org/
 Source0:        https://download.osgeo.org/shapelib/%{name}-%{version}.tar.gz

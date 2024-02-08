@@ -8,7 +8,7 @@ Source0:        macros.qt5
 Source1:        qmake-qt5.sh
 BuildArch:      noarch
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Conflicts: qt5
 Conflicts: qt5-qtbase-devel < 5.6.0-0.23

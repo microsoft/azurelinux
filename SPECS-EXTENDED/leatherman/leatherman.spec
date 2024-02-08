@@ -3,7 +3,7 @@ Version:        1.12.6
 Release:        4%{?dist}
 Summary:        Collection of C++ and CMake utility libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # leatherman is ASL 2.0
 # bundled rapidjson is MIT
 License:        ASL 2.0 AND MIT

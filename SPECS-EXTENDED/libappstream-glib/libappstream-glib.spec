@@ -8,7 +8,7 @@ Version:   0.8.2
 Release:   4%{?dist}
 License:   LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
 Source0:   http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-grc
 Summary: Ancient Greek hyphenation rules
 %global upstreamid 20110913

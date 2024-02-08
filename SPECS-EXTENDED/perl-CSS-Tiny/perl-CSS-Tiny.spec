@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-CSS-Tiny
 Version:        1.20
 Release:        13%{?dist}

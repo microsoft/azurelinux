@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname dbus-signature-pyparsing
 
 Name:           python-%{srcname}

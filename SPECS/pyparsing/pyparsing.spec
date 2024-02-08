@@ -4,7 +4,7 @@ Version:        3.0.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyparsing/pyparsing
 Source0:        https://github.com/pyparsing/pyparsing/releases/download/%{name}_%{version}/%{name}-%{version}.tar.gz

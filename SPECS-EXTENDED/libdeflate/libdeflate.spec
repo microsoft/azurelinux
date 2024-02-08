@@ -4,7 +4,7 @@ Version:        1.9
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ebiggers/libdeflate
 Source0:        https://github.com/ebiggers/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

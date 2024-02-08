@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global enginesdir %(pkg-config --variable=enginesdir libcrypto)
 
 Name:           openssl-ibmpkcs11
