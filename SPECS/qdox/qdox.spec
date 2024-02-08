@@ -87,16 +87,7 @@ GRAMMAR_PATH=$(pwd)/src/grammar/parser.y && \
 	-Jpackage=com.thoughtworks.qdox.parser.impl \
 	-Jstack=500 ${GRAMMAR_PATH})
 
-  %ant jar javadoc
-
-# Build artifact
-mkdir -p build/classes
-javac -d build/classes -source 6 -target 6 \
-  $(find src/main/java -name \*.java)
-jar cf build/%{name}-%{version}.jar -C build/classes .
-
-# Inject OSGi manifests
-jar ufm build/%{name}-%{version}.jar %{SOURCE1}
+%ant jar javadoc
 
 %install
 # jar
