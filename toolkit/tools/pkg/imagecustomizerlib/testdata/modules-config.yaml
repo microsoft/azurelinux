@@ -1,12 +1,18 @@
 SystemConfig:
   Modules:
-    Load:
-      - br_netfilter
-      - ib_uverbs
-      - mlx5_ib
-      - kvm
-    Disable:
-      - mousedev
+  - Name: vfio
+    LoadMode: auto
     Options:
-      vfio:
-        enable_unsafe_noiommu_mode: "Y"
+    - enable_unsafe_noiommu_mode: "Y"
+
+  - name: br_netfilter
+    loadMode: auto
+
+  - name: mlx5_ib
+    loadMode: boot
+
+  - name: kvm
+    loadMode: auto
+
+  - name: mousedev
+    loadMode: disable
