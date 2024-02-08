@@ -118,7 +118,7 @@ Source1088:     opentest4j-1.3.0.tar.xz
 Source1089:     osgi-annotation-8.1.0.tar.xz
 Source1090:     osgi-cmpn-7.0.0.tar.xz
 Source1091:     osgi-core-8.0.0.tar.xz
-Source1092:     plexus-archiver-4.8.0.tar.xz
+Source1092:     plexus-archiver-jpb-4.8.0.tar.xz
 Source1093:     plexus-build-api-0.0.7.tar.xz
 Source1094:     plexus-cipher-2.0.tar.xz
 Source1095:     plexus-classworlds-2.7.0.tar.xz
