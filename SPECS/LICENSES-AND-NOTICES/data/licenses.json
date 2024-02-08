@@ -72,6 +72,7 @@
                 "authbind",
                 "authd",
                 "authselect",
+                "autoconf213",
                 "avahi",
                 "babeltrace",
                 "babeltrace2",
