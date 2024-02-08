@@ -54,9 +54,14 @@ install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 
 %check
+# jenkins is not available for aarch64, can only run unit tests for x86_64.
+%ifarch x86_64
 sed -i 's/TEST_BUILDFLAGS :=  -ldflags "$(BUILD_TIME_CONFIG_FLAGS)"/TEST_BUILDFLAGS :=  -mod=vendor -ldflags "$(BUILD_TIME_CONFIG_FLAGS)"/' ./Makefile
 make test && \
 ./build/jx --help
+%else
+./build/jx --help
+%endif
 
 %files
 %defattr(-,root,root)
