@@ -14,8 +14,8 @@ import (
 	packagelist "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packlist"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/specreaderutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/specreader/specreaderutils"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
