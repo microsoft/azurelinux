@@ -90,7 +90,7 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
-* Thu Feb 06 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.9.92-1
+* Thu Feb 08 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.9.92-1
 - Upgrade version for Mariner 3.0 release
 
 * Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.42.0-1
