@@ -6,6 +6,12 @@
 %global         __requires_exclude_from \\.jar$
 %global         __provides_exclude_from \\.jar$
 
+# Generated list of bundled packages
+%global         __local_generator_provides cat %{_builddir}/%{buildsubdir}/bundled-provides.txt
+%global         __local_generator_path ^%{metadataPath}/.*$
+
+%global         debug_package %{nil}
+
 %global mavenHomePath %{_datadir}/%{name}
 %global metadataPath %{mavenHomePath}/maven-metadata
 %global artifactsPath %{_javadir}
