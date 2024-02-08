@@ -2307,8 +2307,8 @@
         "type": "other",
         "other": {
           "name": "ctags",
-          "version": "5.9.20220619.0",
-          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/p5.9.20220619.0.tar.gz"
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/v6.1.0.tar.gz"
         }
       }
     },
