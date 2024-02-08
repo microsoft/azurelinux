@@ -2928,8 +2928,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "055",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-055.tar.xz"
+          "version": "059",
+          "downloadUrl": "https://github.com/dracutdevs/dracut/archive/refs/tags/059.tar.gz"
         }
       }
     },
@@ -9651,8 +9651,8 @@
         "type": "other",
         "other": {
           "name": "libinput",
-          "version": "1.21.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.21.0/libinput-1.21.0.tar.bz2"
+          "version": "1.25.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.25.0/libinput-1.25.0.tar.bz2"
         }
       }
     },
