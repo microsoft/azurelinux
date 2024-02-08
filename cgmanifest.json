@@ -11631,8 +11631,8 @@
         "type": "other",
         "other": {
           "name": "libXfixes",
-          "version": "5.0.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
+          "version": "6.0.1",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-6.0.1.tar.xz"
         }
       }
     },
