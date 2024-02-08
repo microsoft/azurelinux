@@ -3,7 +3,7 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,7 @@ Patch3:         spidermonkey_checks_disable.patch
 Patch4:         fix-soname.patch
 Patch5:         CVE-2022-48285.patch
 
-BuildRequires:  autoconf
+BuildRequires:  autoconf213
 BuildRequires:  gcc
 BuildRequires:  icu-devel
 BuildRequires:  llvm
@@ -128,9 +128,6 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
-* Mon Oct 23 2023 Andrew Phelps <anphel@microsoft.com> - 78.10.0-6
-- Replace BR for autoconf213 with autoconf
-
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 78.10.0-5
 - Bump package to rebuild with rust 1.72.0
 
