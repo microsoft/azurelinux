@@ -7,8 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/spice/libcacard
 Source0:        https://www.spice-space.org/download/libcacard/%{name}-%{version}.tar.xz
-# https://gitlab.freedesktop.org/spice/libcacard/merge_requests/5
-Patch0:         %{name}-2.7.0-caching-keys.patch
 
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
