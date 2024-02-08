@@ -45,7 +45,7 @@ Source1015:     commons-codec-1.16.0.tar.xz
 Source1016:     commons-collections-3.2.2.tar.xz
 Source1017:     commons-compress-1.23.0.tar.xz
 Source1018:     commons-io-2.13.0.tar.xz
-Source1019:     commons-jxpath-jpb-1.3.tar.xz
+Source1019:     commons-jxpath-jpb2-1.3.tar.xz
 Source1020:     commons-lang-3.13.0.tar.xz
 Source1021:     commons-logging-1.2.tar.xz
 Source1022:     commons-parent-pom-65.tar.xz
