@@ -1697,8 +1697,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "6.14",
-          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-6.14.tar.bz2"
+          "version": "7.0",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.0.tar.bz2"
         }
       }
     },
@@ -2207,8 +2207,8 @@
         "type": "other",
         "other": {
           "name": "createrepo_c",
-          "version": "0.17.5",
-          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/1.0.3.tar.gz"
         }
       }
     },
@@ -2307,8 +2307,8 @@
         "type": "other",
         "other": {
           "name": "ctags",
-          "version": "5.9.20220619.0",
-          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/p5.9.20220619.0.tar.gz"
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/v6.1.0.tar.gz"
         }
       }
     },
@@ -2928,8 +2928,8 @@
         "type": "other",
         "other": {
           "name": "dracut",
-          "version": "055",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/boot/dracut/dracut-055.tar.xz"
+          "version": "059",
+          "downloadUrl": "https://github.com/dracutdevs/dracut/archive/refs/tags/059.tar.gz"
         }
       }
     },
@@ -2978,8 +2978,8 @@
         "type": "other",
         "other": {
           "name": "dtc",
-          "version": "1.6.1",
-          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.6.1.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://kernel.org/pub/software/utils/dtc/dtc-1.7.0.tar.gz"
         }
       }
     },
@@ -6470,8 +6470,8 @@
         "type": "other",
         "other": {
           "name": "hyperscan",
-          "version": "5.4.0",
-          "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.0.tar.gz"
+          "version": "5.4.2",
+          "downloadUrl": "https://github.com/intel/hyperscan/archive/v5.4.2.tar.gz"
         }
       }
     },
@@ -9651,8 +9651,8 @@
         "type": "other",
         "other": {
           "name": "libinput",
-          "version": "1.21.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.21.0/libinput-1.21.0.tar.bz2"
+          "version": "1.25.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/libinput/libinput/-/archive/1.25.0/libinput-1.25.0.tar.bz2"
         }
       }
     },
@@ -10921,8 +10921,8 @@
         "type": "other",
         "other": {
           "name": "libsolv",
-          "version": "0.7.24",
-          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/0.7.24/libsolv-0.7.24.tar.gz"
+          "version": "0.7.28",
+          "downloadUrl": "https://github.com/openSUSE/libsolv/archive/refs/tags/0.7.28.tar.gz"
         }
       }
     },
@@ -11431,8 +11431,8 @@
         "type": "other",
         "other": {
           "name": "libwacom",
-          "version": "1.6",
-          "downloadUrl": "https://github.com/linuxwacom/libwacom/releases/download/libwacom-1.6/libwacom-1.6.tar.bz2"
+          "version": "2.9.0",
+          "downloadUrl": "https://github.com/linuxwacom/libwacom/releases/download/libwacom-2.9.0/libwacom-2.9.0.tar.xz"
         }
       }
     },
@@ -11591,8 +11591,8 @@
         "type": "other",
         "other": {
           "name": "libXdamage",
-          "version": "1.1.5",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.5.tar.bz2"
+          "version": "1.1.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdamage-1.1.6.tar.xz"
         }
       }
     },
@@ -11601,8 +11601,8 @@
         "type": "other",
         "other": {
           "name": "libXdmcp",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdmcp-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXdmcp-1.1.4.tar.xz"
         }
       }
     },
@@ -11631,8 +11631,8 @@
         "type": "other",
         "other": {
           "name": "libXfixes",
-          "version": "5.0.3",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-5.0.3.tar.bz2"
+          "version": "6.0.1",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXfixes-6.0.1.tar.xz"
         }
       }
     },
@@ -11641,8 +11641,8 @@
         "type": "other",
         "other": {
           "name": "libXfont2",
-          "version": "2.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.3.tar.bz2"
+          "version": "2.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/lib/libXfont2-2.0.6.tar.xz"
         }
       }
     },
@@ -11851,8 +11851,8 @@
         "type": "other",
         "other": {
           "name": "libXxf86vm",
-          "version": "1.1.4",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.4.tar.bz2"
+          "version": "1.1.5",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXxf86vm-1.1.5.tar.xz"
         }
       }
     },
@@ -22254,8 +22254,8 @@
         "type": "other",
         "other": {
           "name": "python-evdev",
-          "version": "1.1.2",
-          "downloadUrl": "https://github.com/gvalkov/python-evdev/archive/v1.1.2.tar.gz"
+          "version": "1.6.1",
+          "downloadUrl": "https://github.com/gvalkov/python-evdev/archive/v1.6.1.tar.gz"
         }
       }
     },
@@ -22866,6 +22866,16 @@
           "name": "python-libclang",
           "version": "14.0.6",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-libevdev",
+          "version": "0.11",
+          "downloadUrl": "https://gitlab.freedesktop.org/libevdev/python-libevdev/-/archive/0.11/python-libevdev-0.11.tar.gz"
         }
       }
     },
@@ -29247,8 +29257,8 @@
         "type": "other",
         "other": {
           "name": "wayland-protocols",
-          "version": "1.25",
-          "downloadUrl": "https://wayland.freedesktop.org/releases/wayland-protocols-1.25.tar.xz"
+          "version": "1.33",
+          "downloadUrl": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/releases/1.33/downloads/wayland-protocols-1.33.tar.xz"
         }
       }
     },
@@ -30079,8 +30089,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xauth",
-          "version": "1.1",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xauth-1.1.tar.bz2"
+          "version": "1.1.2",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xauth-1.1.2.tar.xz"
         }
       }
     },
