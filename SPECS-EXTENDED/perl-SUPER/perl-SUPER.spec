@@ -4,7 +4,7 @@ Release:	5%{?dist}
 Summary:	Sane superclass method dispatcher
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/SUPER
 Source0:	https://cpan.metacpan.org/authors/id/C/CH/CHROMATIC/SUPER-%{version}.tar.gz#/perl-SUPER-%{version}.tar.gz
 BuildArch:	noarch

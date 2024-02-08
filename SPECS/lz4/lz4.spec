@@ -4,7 +4,7 @@ Version:        1.9.4
 Release:        1%{?dist}
 License:        BSD 2-Clause and GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications
 URL:            https://lz4.github.io/lz4/
 Source0:        https://github.com/lz4/lz4/archive/v%{version}/%{name}-%{version}.tar.gz

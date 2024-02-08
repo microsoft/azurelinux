@@ -4,7 +4,7 @@ Version:	0.039
 Release:	17%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Module-Build-Tiny
 Source0:	https://cpan.metacpan.org/modules/by-module/Module/Module-Build-Tiny-%{version}.tar.gz#/perl-Module-Build-Tiny-%{version}.tar.gz
 BuildArch:	noarch

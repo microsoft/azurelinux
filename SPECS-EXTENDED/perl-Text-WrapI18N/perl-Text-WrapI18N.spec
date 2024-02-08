@@ -4,7 +4,7 @@ Version:        0.06
 Release:        37%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Text-WrapI18N
 Source0:        https://cpan.metacpan.org/authors/id/K/KU/KUBOTA/Text-WrapI18N-%{version}.tar.gz#/perl-Text-WrapI18N-%{version}.tar.gz
 

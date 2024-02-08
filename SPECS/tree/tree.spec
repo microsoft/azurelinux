@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            http://mama.indstate.edu/users/ice/tree/
 Group:          Applications
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://mama.indstate.edu/users/ice/tree/src/tree-%{version}.tgz
 
 %description

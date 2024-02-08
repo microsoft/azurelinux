@@ -4,7 +4,7 @@ Version:        1.1.1
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Multimedia/Other
 URL:            https://www.theora.org/
 Source0:        https://ftp.osuosl.org/pub/xiph/releases/theora/%{name}-%{version}.tar.gz

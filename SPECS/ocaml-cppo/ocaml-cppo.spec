@@ -12,7 +12,7 @@ Version:        1.6.6
 Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-community/cppo
 Source0:        https://github.com/ocaml-community/cppo/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

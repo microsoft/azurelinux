@@ -4,7 +4,7 @@ Version:        3.21.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/logrotate/logrotate/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz

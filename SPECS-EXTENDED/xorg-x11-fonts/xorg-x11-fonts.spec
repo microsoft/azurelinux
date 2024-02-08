@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _catalogue /etc/X11/fontpath.d
 # NOTE: Fonts strictly intended for X core fonts, should be installed into _x11fontdir.
 %global _x11fontdir %{_datadir}/X11/fonts

@@ -4,7 +4,7 @@ Release:        36%{?dist}
 Summary:        Filter to put all characters() in one event
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-Filter-BufferText
 Source0:        https://cpan.metacpan.org/modules/by-module/XML/XML-Filter-BufferText-%{version}.tar.gz#/perl-XML-Filter-BufferText-%{version}.tar.gz
 BuildArch:      noarch

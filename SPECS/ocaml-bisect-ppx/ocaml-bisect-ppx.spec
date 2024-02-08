@@ -11,7 +11,7 @@ Version:        2.6.3
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://aantron.github.io/bisect_ppx/
 Source0:        https://github.com/aantron/%{upname}/archive/%{version}/%{upname}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-pa
 Summary: Punjabi hyphenation rules
 Version: 0.7.0

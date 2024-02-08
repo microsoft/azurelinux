@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           cpuid
 Version:        20200427
 Release:        2%{?dist}

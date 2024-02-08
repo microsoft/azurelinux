@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           optipng
 Version:        0.7.7
 Release:        7%{?dist}

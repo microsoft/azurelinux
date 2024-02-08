@@ -7,7 +7,7 @@ Version:        1
 Release:        17%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fedoraproject.org/wiki/PackagingDrafts/MultilibTricks
 Source0:        multilib-fix
 Source1:        macros.ml

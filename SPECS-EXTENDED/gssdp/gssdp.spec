@@ -7,7 +7,7 @@ Version:        1.6.2
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gupnp.org/
 Source0:        https://github.com/GNOME/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 BuildRequires:  pkgconfig(gio-2.0)

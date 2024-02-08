@@ -4,7 +4,7 @@ Release:	14%{?dist}
 Summary:	Check that a command is available
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Devel-CheckBin
 Source0:	https://cpan.metacpan.org/authors/id/T/TO/TOKUHIROM/Devel-CheckBin-%{version}.tar.gz#/perl-Devel-CheckBin-%{version}.tar.gz
 BuildArch:	noarch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-lb
 Summary: Luxembourgish hunspell dictionaries
 %global upstreamid 20121128

@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/URI
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-%{version}.tar.gz#/perl-URI-%{version}.tar.gz
 BuildArch:      noarch

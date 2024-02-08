@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Net-CIDR-Lite
 Version:        0.22
 Release:        2%{?dist}

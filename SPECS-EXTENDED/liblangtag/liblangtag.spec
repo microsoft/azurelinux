@@ -10,7 +10,7 @@ Summary: An interface library to access tags for identifying languages
 
 License: LGPLv3+ or MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://tagoh.bitbucket.org/liblangtag/
 Source0: https://bitbucket.org/tagoh/%{name}/downloads/%{name}-%{version}.tar.bz2
 

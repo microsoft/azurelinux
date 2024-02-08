@@ -7,7 +7,7 @@ Version: 6.6.4
 Release: 8%{?dist}
 License: GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.gnu.org/software/acct/
 
 Source: ftp://ftp.gnu.org/pub/gnu/acct/acct-%{version}.tar.gz

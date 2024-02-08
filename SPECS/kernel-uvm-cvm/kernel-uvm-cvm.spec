@@ -14,7 +14,7 @@ Version:        6.1.0.mshv11
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 Source0:        %{_mariner_sources_url}/kernel-uvm-%{version}.tar.gz
 Source1:        config

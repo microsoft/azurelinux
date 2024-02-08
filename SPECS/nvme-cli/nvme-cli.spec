@@ -4,7 +4,7 @@ Version:        1.16
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/linux-nvme/nvme-cli
 Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

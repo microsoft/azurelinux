@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        Parse directory listing
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Listing
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Listing-%{version}.tar.gz#/perl-File-Listing-%{version}.tar.gz
 BuildArch:      noarch

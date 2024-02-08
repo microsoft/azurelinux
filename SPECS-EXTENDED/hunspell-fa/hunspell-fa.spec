@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-fa
 Summary: Farsi hunspell dictionaries
 %global upstreamid 20070116

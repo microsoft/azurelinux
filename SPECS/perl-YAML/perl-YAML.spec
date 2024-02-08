@@ -8,7 +8,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/YAML/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators

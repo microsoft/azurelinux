@@ -4,7 +4,7 @@ Version:        0.8.3
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://people.redhat.com/sgrubb/libcap-ng
 Source0:        https://people.redhat.com/sgrubb/libcap-ng/%{name}-%{version}.tar.gz

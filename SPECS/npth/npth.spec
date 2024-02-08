@@ -4,7 +4,7 @@ Version:        1.6
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries.
 URL:            https://gnupg.org/software/npth/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2

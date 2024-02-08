@@ -6,7 +6,7 @@ Version:        4.8.0
 Release:        2%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

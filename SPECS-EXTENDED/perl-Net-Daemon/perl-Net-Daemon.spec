@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Net-Daemon
 Version:        0.48
 Release:        25%{?dist}

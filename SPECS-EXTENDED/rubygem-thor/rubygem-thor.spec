@@ -9,7 +9,7 @@ Release:        1%{?dist}
 Group:          Development/Languages
 License:        MIT
 Vendor:		    Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 URL:            http://whatisthor.com/
 Source0:        https://github.com/rails/thor/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby

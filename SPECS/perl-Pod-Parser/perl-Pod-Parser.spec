@@ -4,7 +4,7 @@ Version:        1.66
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Parser
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,14 +1,17 @@
 Summary:        Platform-neutral API
 Name:           nspr
-Version:        4.9.6
-Release:        1%{?dist}
+Version:        4.35
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
-URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSPR
-Source0:        https://archive.mozilla.org/pub/nspr/releases/v%{version}/src/%{name}-%{version}.tar.gz
+URL:            https://firefox-source-docs.mozilla.org/nspr
+Source0:	https://ftp.mozilla.org/pub/nspr/releases/v%{version}/src/nspr-%{version}.tar.gz
+BuildRequires:  binutils
 BuildRequires:  gcc
+BuildRequires:  glibc-devel
+BuildRequires:  kernel-headers
 BuildRequires:  make
 
 %description
@@ -24,14 +27,15 @@ It contains the libraries and header files to create applications
 
 %prep
 %autosetup
-cd mozilla/nsprpub
+cd nspr
 sed -ri 's#^(RELEASE_BINS =).*#\1#' pr/src/misc/Makefile.in
 sed -i 's#$(LIBRARY) ##' config/rules.mk
 
 %build
-cd mozilla/nsprpub
+cd nspr
 %configure \
-    --with-mozilla \
+    --disable-debug \
+    --enable-optimize \
     --with-pthreads \
     --enable-64bit \
     --disable-silent-rules
@@ -39,14 +43,14 @@ cd mozilla/nsprpub
 %make_build
 
 %install
-cd mozilla/nsprpub
+cd nspr
 %make_install
 
 %ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license mozilla/nsprpub/LICENSE
+%license nspr/LICENSE
 %{_bindir}/*
 %{_libdir}/*.so
 
@@ -57,6 +61,14 @@ cd mozilla/nsprpub
 %{_datarootdir}/aclocal/*
 
 %changelog
+* Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 4.35-2
+- add build deps
+
+* Tue Feb 06 2024 Kanika nema <kanikanema@microsoft.com> - 4.35-1
+- Upgrade to release version 4.35
+- Added disable-debug and enable-optimize config options as suggested
+  by the official NSPR page
+
 * Tue Jan 23 2024 Archana Choudhary <archana1@microsoft.com> - 4.9.6-1
 - Upgrade to 4.9.6
 

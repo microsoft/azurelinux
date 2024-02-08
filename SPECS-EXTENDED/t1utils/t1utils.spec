@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Collection of Type 1 and 2 font manipulation utilities
 Name:           t1utils
 Version:        1.42

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-memcached
 Version:        1.59
 Release:        7%{?dist}
