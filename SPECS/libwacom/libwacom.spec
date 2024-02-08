@@ -2,22 +2,26 @@
 
 Summary:        Tablet Information Client Library
 Name:           libwacom
-Version:        1.6
-Release:        5%{?dist}
+Version:        2.9.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/linuxwacom/libwacom
-Source0:        https://github.com/linuxwacom/libwacom/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Source0:        https://github.com/linuxwacom/libwacom/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glib-devel
+BuildRequires:  libevdev-devel
 BuildRequires:  libgudev-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  meson
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
+BuildRequires:  python3-libevdev
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pyudev
 
 Requires:       %{name}-data = %{version}-%{release}
 
@@ -31,6 +35,9 @@ Summary:        Tablet Information Client Library Development Package
 
 Requires:       %{name} = %{version}-%{release}
 Requires:       pkg-config
+Requires:       python3-libevdev
+Requires:       python3-pytest
+Requires:       python3-pyudev
 
 %description devel
 Tablet information client library development package.
@@ -49,9 +56,7 @@ Tablet information client library data files.
 %build
 %meson \
   -Ddocumentation=disabled \
-%if !%{with_check}
   -Dtests=disabled \
-%endif
   -Dudev-dir=%{udevdir}
 %meson_build
 
@@ -69,7 +74,11 @@ install -d %{buildroot}/%{_udevrulesdir}
 %license COPYING
 %doc README.md
 %{_libdir}/libwacom.so.*
+%{_bindir}/libwacom-list-devices
 %{_bindir}/libwacom-list-local-devices
+%{_bindir}/libwacom-show-stylus
+%{_bindir}/libwacom-update-db
+%{_mandir}/man1/libwacom-list-devices.1*
 %{_mandir}/man1/libwacom-list-local-devices.1*
 
 %files devel
@@ -90,6 +99,9 @@ install -d %{buildroot}/%{_udevrulesdir}
 %{_datadir}/libwacom/layouts/*.svg
 
 %changelog
+* Wed Feb 07 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 2.9.0-1
+- Upgrade to 2.9.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.6-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

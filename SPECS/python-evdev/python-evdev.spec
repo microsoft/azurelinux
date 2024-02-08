@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           python-evdev
-Version:        1.1.2
-Release:        8%{?dist}
+Version:        1.6.1
+Release:        1%{?dist}
 Summary:        Python bindings for the Linux input handling subsystem
 
 License:        BSD
@@ -61,6 +61,10 @@ Summary:        %{summary}
 
 #------------------------------------------------------------------------------
 %changelog
+* Wed Feb 07 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 1.6.1-1
+- Migrate from extended and upgrade to version 1.6.1
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.2-8
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
