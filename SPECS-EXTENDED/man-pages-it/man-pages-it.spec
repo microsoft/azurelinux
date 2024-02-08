@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Italian man (manual) pages from the Linux Documentation Project
 Name: man-pages-it
 Version: 4.08

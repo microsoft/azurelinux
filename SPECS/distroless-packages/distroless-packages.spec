@@ -1,10 +1,10 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
-Version:        0.1
-Release:        3%{?dist}
+Version:        3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/cbl-mariner
 
@@ -55,6 +55,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Mon Jan 22 2024 Betty Lakes <bettylakes@microsoft.com> - 3.0-1
+- Version upgraded to 3.0
+
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
 - Add tzdata to minimal

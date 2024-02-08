@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "pmdk-1.8.tar.gz": "afa8d3dd94e704637681331a8c06e31e02f96cfd8bcad82a9d6a9ec7f7775bf8"
- }
+  "Signatures": {
+    "pmdk-2.0.1.tar.gz": "56e1ea29285059b426a3fc4c75108bd44606bf8900cf7a8f80ecb4aa820da145"
+  }
 }

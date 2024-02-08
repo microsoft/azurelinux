@@ -56,7 +56,7 @@ Version:        11.2.206
 Release:        3%{?dist}
 License:        BSD-3-Clause OR GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/cornelisnetworks/opa-psm2/
 Source0:        https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz#/opa-psm2-PSM2_%{version}.tar.gz
 BuildRequires:  gcc

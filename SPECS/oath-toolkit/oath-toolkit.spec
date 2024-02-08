@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPLv3+ and LGPLv2+
 URL:            https://www.nongnu.org/oath-toolkit/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
 Patch0:        oath-toolkit-2.6.9-lockfile.patch

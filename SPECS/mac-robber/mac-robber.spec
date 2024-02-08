@@ -4,7 +4,7 @@ Version:        1.02
 Release:        23%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sourceforge.net/projects/mac-robber/
 Source0:        http://downloads.sourceforge.net/mac-robber/mac-robber-%{version}.tar.gz
 

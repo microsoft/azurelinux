@@ -4,7 +4,7 @@ Version:        2.0
 Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY

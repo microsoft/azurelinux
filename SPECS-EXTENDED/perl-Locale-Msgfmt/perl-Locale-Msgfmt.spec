@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Locale-Msgfmt
 Version:        0.15
 Release:        28%{?dist}

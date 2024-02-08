@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-gl
 Summary: Galician hunspell dictionaries
 %global upstreamid 20080515

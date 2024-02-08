@@ -6,7 +6,7 @@ Source0: https://github.com/containers/udica/archive/v%{version}.tar.gz#/%{name}
 License: GPLv3+
 BuildArch: noarch
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/containers/udica
 
 BuildRequires: python3 python3-devel python3-setuptools

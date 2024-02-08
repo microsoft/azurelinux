@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global common_description %{expand:
 GeoLite2 databases are free IP geolocation databases comparable to, but less
 accurate than, MaxMind's GeoIP2 databases.  This product includes GeoLite2 data

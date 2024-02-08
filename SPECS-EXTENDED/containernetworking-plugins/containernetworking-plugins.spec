@@ -28,7 +28,7 @@ Release:       13%{?dist}
 Summary:       Libraries for writing CNI plugin
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           %{git0}
 Source0: %{download_url}#/%{name}-%{version}.tar.gz
 # If go_compiler is not set to 1, there is no virtual provide. Use golang instead.

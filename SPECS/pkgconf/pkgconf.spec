@@ -14,7 +14,7 @@ Version:        2.0.2
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://pkgconf.org/
 # Mirror at https://releases.pagure.org/pkgconf/pkgconf/
 Source0:        https://distfiles.dereferenced.org/%{name}/%{name}-%{version}.tar.xz

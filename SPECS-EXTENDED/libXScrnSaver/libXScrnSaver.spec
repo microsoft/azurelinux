@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: X.Org X11 libXss runtime library
 Name: libXScrnSaver
 Version: 1.2.3

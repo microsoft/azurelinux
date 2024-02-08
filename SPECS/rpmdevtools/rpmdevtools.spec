@@ -7,7 +7,7 @@ Release:        13%{?dist}
 # rpmdev-setuptree is GPLv2, everything else GPLv2+
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/rpmdevtools
 Source0:        https://releases.pagure.org/rpmdevtools/%{name}-%{version}.tar.xz
 # Backports from upstream

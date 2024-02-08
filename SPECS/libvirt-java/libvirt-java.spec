@@ -7,7 +7,7 @@ Version:        0.5.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libvirt.org/
 Source:         https://libvirt.org/sources/java/%{name}-%{version}.tar.gz
 

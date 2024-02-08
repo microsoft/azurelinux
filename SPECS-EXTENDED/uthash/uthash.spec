@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global sover 0
 %global git_url https://github.com/troydhanson/%{name}
 

@@ -4,7 +4,7 @@ Version:        2.70.0
 Release:        1%{?dist}
 License:        GPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
 Source0:        https://download.gnome.org/sources/%{name}/2.70/%{name}-%{version}.tar.xz

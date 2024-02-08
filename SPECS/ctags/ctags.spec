@@ -1,16 +1,13 @@
-%define majorversion 5.9
-%define upstreamversion 20220619.0
-
 Summary:        A C programming language indexing and/or cross-reference tool
 Name:           ctags
-Version:        %{majorversion}.%{upstreamversion}
-Release:        7%{?dist}
+Version:        6.1.0
+Release:        1%{?dist}
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv2+
 URL:            https://ctags.io/
-Source0:        https://github.com/universal-ctags/%{name}/archive/refs/tags/p%{version}.tar.gz#/%{name}-p%{version}.tar.gz
+Source0:        https://github.com/universal-ctags/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -43,7 +40,7 @@ objects found in source files.
 Install ctags if you are going to use your system for C programming.
 
 %prep
-%autosetup -p1 -n %{name}-p%{majorversion}.%{upstreamversion}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 ./autogen.sh
@@ -68,6 +65,9 @@ make check
 %{_mandir}/man7/*
 
 %changelog
+* Thu Feb 08 2024 Suresh Thelkar <sthelkar@microsoft.com> - 6.1.0-1
+- Upgrade to version 6.1.0.
+
 * Mon Jul 25 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.9.20220619.0-7
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

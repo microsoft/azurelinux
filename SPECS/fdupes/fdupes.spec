@@ -6,7 +6,7 @@ Version:        2.2.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/adrianlopezroche/%{name}
 Source0:        https://github.com/adrianlopezroche/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.%{name}

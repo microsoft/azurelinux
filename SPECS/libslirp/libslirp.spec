@@ -4,7 +4,7 @@ Version:        4.7.0
 Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/slirp/libslirp
 Source0:        %{url}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildRequires:  gcc

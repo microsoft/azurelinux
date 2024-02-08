@@ -1,10 +1,10 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.7
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.netfilter.org/projects/iptables
 Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.bz2
@@ -16,9 +16,10 @@ Source5:        ip6save
 BuildRequires:  jansson-devel
 BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       iana-etc
-Requires:       systemd
+# Our build tooling cannot handle this
+#Requires:       systemd
 Provides:       %{name}-services = %{version}-%{release}
 
 %description
@@ -98,6 +99,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 1.8.7-6
+- workaround "circular dependencies" from build tooling
+
+* Thu Jan 25 2024 Dan Streetman <ddstreet@ieee.org> - 1.8.7-5
+- use bootstrap to avoid "circular deps"
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.7-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

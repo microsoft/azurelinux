@@ -5,7 +5,7 @@ Version:        0.10.3
 Release:        1%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/martinmoene/span-lite
 #Source0:       %{url}/archive/v%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		python-augeas
 Version:	0.5.0
 Release:	20%{?dist}

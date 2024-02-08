@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Perform optional tests
 %bcond_with perl_LDAP_enables_optional_test
 # Support XML serialization of LDAP schemata (DSML languge)

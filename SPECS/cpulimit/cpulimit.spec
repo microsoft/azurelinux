@@ -23,7 +23,7 @@ Version:        3.0
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Monitoring
 URL:            https://limitcpu.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/limitcpu/%{name}-%{version}.tar.gz
