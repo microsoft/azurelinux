@@ -69,23 +69,16 @@ rm -rf bootstrap
 
 %build
 # Generate scanners (upstream does this with maven-jflex-plugin)
-# Add the --inputstreamctor option if jflex is upgraded to a version 1.6 or higher
-CLASSPATH=$(build-classpath java-cup) \
-  jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/lexer.flex
-CLASSPATH=$(build-classpath java-cup) \
-  jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/commentlexer.flex
+jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/lexer.flex
+jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/commentlexer.flex
 
-# Generate the parsers using the command-line that the exec-maven-plugin uses
-GRAMMAR_PATH=$(pwd)/src/grammar/commentparser.y && \
-  (cd src/main/java/com/thoughtworks/qdox/parser/impl && \
-  byaccj -v -Jnorun -Jnoconstruct -Jclass=DefaultJavaCommentParser \
-    -Jpackage=com.thoughtworks.qdox.parser.impl ${GRAMMAR_PATH})
-GRAMMAR_PATH=$(pwd)/src/grammar/parser.y && \
-  (cd src/main/java/com/thoughtworks/qdox/parser/impl && \
-  byaccj -v -Jnorun -Jnoconstruct -Jclass=Parser \
-    -Jimplements=CommentHandler -Jsemantic=Value \
-	-Jpackage=com.thoughtworks.qdox.parser.impl \
-	-Jstack=500 ${GRAMMAR_PATH})
+# Generate parsers (upstream does this with exec-maven-plugin)
+(cd ./src/main/java/com/thoughtworks/qdox/parser/impl
+ byaccj -v -Jnorun -Jnoconstruct -Jclass=DefaultJavaCommentParser \
+  -Jpackage=com.thoughtworks.qdox.parser.impl ../../../../../../../grammar/commentparser.y
+ byaccj -v -Jnorun -Jnoconstruct -Jclass=Parser -Jimplements=CommentHandler -Jsemantic=Value \
+  -Jpackage=com.thoughtworks.qdox.parser.impl -Jstack=500 ../../../../../../../grammar/parser.y
+)
 
 %ant jar javadoc
 
