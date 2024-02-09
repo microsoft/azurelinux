@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.4.0
-Release:        16%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,16 +29,22 @@ Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Patches the version of client_golang used in the vendored source. Should be applied before creating the vendored tarball.
 # Can be removed if we upgrade keda to 2.6.0 or later.
 Patch0:         CVE-2022-21698.patch
+
+# patches for vendored code >= 1000
+Patch1000:         CVE-2023-44487.patch
+Patch1001:         CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.15
 
 %description
-KEDA is a Kubernetes-based Event Driven Autoscaling component. 
-It provides event driven scale for any container running in Kubernetes 
+KEDA is a Kubernetes-based Event Driven Autoscaling component.
+It provides event driven scale for any container running in Kubernetes
 
 %prep
-%autosetup -p1
+%autosetup -N
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
@@ -62,6 +68,12 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.0-18
+- Patch CVE-2021-44716
+
+* Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net/http2
+
 * Tue Jan 01 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.0-16
 - Patch CVE-2022-21698
 - Update vendored tarball

@@ -4,7 +4,7 @@
 Summary: The open-source application container engine client.
 Name: moby-%{upstream_name}
 Version: 20.10.27
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://github.com/docker/cli
@@ -14,6 +14,7 @@ Distribution: Mariner
 Source0: https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0: CVE-2023-48795.patch
 Patch1: CVE-2022-21698.patch
+Patch2: CVE-2021-44716.patch
 
 BuildRequires: golang >= 1.16.12
 BuildRequires: make
@@ -82,6 +83,9 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.27-4
+- Patch CVE-2021-44716
+
 * Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 20.10.27-3
 - Patch CVE-2022-21698
 
