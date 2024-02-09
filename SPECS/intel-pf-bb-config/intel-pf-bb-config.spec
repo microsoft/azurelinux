@@ -19,7 +19,8 @@ accessing their configuration space and setting parameters via MMIO.
 %autosetup -n pf-bb-config-%{version}
 
 %build
-./build.sh
+sed -i "s/#VERSION_STRING#/v%{version}-0-gf9206ad/g" config_app.c
+make
 
 %install
 mkdir -p %{buildroot}%{_bindir}
