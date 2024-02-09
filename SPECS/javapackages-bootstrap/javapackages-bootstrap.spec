@@ -183,7 +183,6 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 
 %prep
 %setup -q
-%{Source3} >bundled-provides.txt
 
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
