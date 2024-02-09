@@ -2,7 +2,7 @@ Summary:        Hardware identification and configuration data
 Name:           hwdata
 Version:        0.378
 Release:        1%{?dist}
-License:        GPL-2.0-or-later
+License:        GPLv2+ OR XFree86 1.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/vcrhonek/hwdata
