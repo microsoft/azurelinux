@@ -79,9 +79,11 @@ BuildRequires:  pkg-config
 BuildRequires:  python3-devel >= 3.3
 # Qt 6
 BuildRequires:  qt-linguist >= 6.6.1
+BuildRequires:  qttools-devel >= 6.6.1
 BuildRequires:  qtbase-devel >= 6.6.1
 BuildRequires:  qtdeclarative-devel >= 6.6.1
 BuildRequires:  qtsvg-devel >= 6.6.1
+BuildRequires:  polkit-qt6-1-devel
 BuildRequires:  util-linux-devel
 BuildRequires:  yaml-cpp-devel >= 0.5.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -134,7 +136,7 @@ rm -rf src/modules/{users,finished,welcome,partition,license}
 %setup -q -T -a 4 -D
 %setup -q -T -a 5 -D
 for module in users finished welcome partition license; do
-    mv "$module" src/modules/"$module"
+    mv "$module-%{version}" src/modules/"$module"
 done
 
 
@@ -142,15 +144,21 @@ done
 mv %{SOURCE20} src/modules/license/license.conf
 mv %{SOURCE24} src/modules/users/users.conf
 
-%patch0 -p1
+%patch -P 0 -p1
 #%patch3 -p1
-%patch4 -p1
+%patch -P 4 -p1
 #%patch5 -p1
 
 %build
 mkdir -p %{_target_platform}
 pushd %{_target_platform}
-%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
+%cmake_kf ..\
+  -DBUILD_TESTING:BOOL=OFF \
+  -DWITH_PYTHONQT:BOOL=OFF \
+  -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" \
+  -DINSTALL_POLKIT:BOOL=OFF \
+  -DWITH_QT6=ON \
+  -DWITH_QML=OFF
 popd
 
 make %{?_smp_mflags} -C %{_target_platform}
@@ -159,11 +167,11 @@ make %{?_smp_mflags} -C %{_target_platform}
 make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 # create the auto branding directory
 
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner/lang
-lrelease-qt5 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_fr.qm
-lrelease-qt5 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_de.qm
-lrelease-qt5 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_it.qm
+mkdir -p %{buildroot}%{_datadir}/calamares/branding/AzureLinux
+mkdir -p %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang
+lrelease-qt6 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_fr.qm
+lrelease-qt6 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_de.qm
+lrelease-qt6 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_it.qm
 
 # own the local settings directories
 mkdir -p %{buildroot}%{_sysconfdir}/calamares/modules
@@ -177,33 +185,32 @@ cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/cal
 cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/modules/
 
 install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
-install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/mariner/azl-logo.png
-install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/mariner/show.qml
-install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/mariner/branding.desc
-install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/mariner/stylesheet.qss
-install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/mariner/azl-welcome.png
+install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-logo.png
+install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/show.qml
+install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/branding.desc
+install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
+install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
 
 
 # EULA
-install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
+install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 
 %post
 
 %files -f calamares-python.lang
-%license LICENSE
 %doc AUTHORS
 %{_bindir}/calamares
 %dir %{_datadir}/calamares/
 %{_datadir}/calamares/settings.conf
 %dir %{_datadir}/calamares/branding/
 %{_datadir}/calamares/branding/default/
-%dir %{_datadir}/calamares/branding/mariner/
-%{_datadir}/calamares/branding/mariner/show.qml
-%{_datadir}/calamares/branding/mariner/lang/
-%{_datadir}/calamares/branding/mariner/mariner-logo.png
-%{_datadir}/calamares/branding/mariner/mariner-welcome.png
-%{_datadir}/calamares/branding/mariner/branding.desc
-%{_datadir}/calamares/branding/mariner/stylesheet.qss
+%dir %{_datadir}/calamares/branding/AzureLinux/
+%{_datadir}/calamares/branding/AzureLinux/show.qml
+%{_datadir}/calamares/branding/AzureLinux/lang/
+%{_datadir}/calamares/branding/AzureLinux/azl-logo.png
+%{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
+%{_datadir}/calamares/branding/AzureLinux/branding.desc
+%{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
 %{_datadir}/calamares/modules/
 %{_datadir}/calamares/qml/
 %{_datadir}/applications/calamares.desktop
@@ -211,7 +218,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_mandir}/man8/calamares.8*
 %{_sysconfdir}/calamares/
 %{_sysconfdir}/calamares/settings.conf
-%{_sysconfdir}/calamares/mariner-eula
+%{_sysconfdir}/calamares/azl-eula
 
 %files libs
 %{_libdir}/libcalamares.so.*
