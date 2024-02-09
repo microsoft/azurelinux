@@ -42,8 +42,8 @@ executable, and which have been executed.
 %py3_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0' PyContracts
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+pip3 install -r requirements/dev.pip
+tox
 
 %files -n python3-coverage
 %defattr(-,root,root)
