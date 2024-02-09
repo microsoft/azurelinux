@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/shadow-maint/shadow/
-Source0:        https://github.com/shadow-maint/shadow/releases/download/v%{version}/shadow-%{version}.tar.xz
+Source0:        https://github.com/shadow-maint/shadow/releases/download/%{version}/shadow-%{version}.tar.xz
 Source1:        chage
 Source2:        chpasswd
 Source3:        login
