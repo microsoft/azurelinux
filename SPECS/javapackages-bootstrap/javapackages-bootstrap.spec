@@ -195,8 +195,8 @@ do
 done
 
 pushd "downstream/xmvn-generator"
-sed -i 's|<release>17</release>|<release>11</release>|' pom.xml
-cat pom.xml
+sed -i 's|<release>17</release>|<release>11</release>|' ./pom.xml
+cat ./pom.xml
 popd
 
 for patch_path in patches/*/*
