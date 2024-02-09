@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global checkout 20130902svn
 
 Summary: Driver for QPDL/SPL2 printers (Samsung and several Xerox printers)

@@ -6,7 +6,7 @@ Version:        1.0.3
 Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
 Patch0:         test_qthelp_path_fix.patch

@@ -4,7 +4,7 @@ Version:        3.36
 Release:        2%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fedoraproject.org/wiki/pykickstart
 Source0:        https://github.com/pykickstart/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gettext

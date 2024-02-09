@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: man-pages-ja
 Version: 20190815
 Release: 3%{?dist}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libwvstreams
 Version: 4.6.1
 Release: 34%{?dist}

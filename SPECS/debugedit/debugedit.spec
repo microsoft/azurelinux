@@ -5,7 +5,7 @@ Release:      2%{?dist}
 License:      GPLv3+
 URL:          https://sourceware.org/debugedit/
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 Source0:      https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}.tar.xz
 
 %description

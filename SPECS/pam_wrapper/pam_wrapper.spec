@@ -5,7 +5,7 @@ Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
 URL:            https://cwrap.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake

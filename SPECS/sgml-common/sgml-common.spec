@@ -13,7 +13,7 @@ BuildArch: 		noarch
 #old page - only part of it is included in sgml-common package.
 URL: 			http://www.w3.org/2003/entities/
 Vendor: 		Microsoft Corporation
-Distribution: 	Mariner
+Distribution:   Azure Linux
 Source0: 		https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
 # Following 4 from openjade/pubtext - same maintainer as in SGML-common, so up2date:
 Source1: 		xml.dcl

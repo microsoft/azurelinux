@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Version-Requirements
 Version:        0.101023
 Release:        16%{?dist}

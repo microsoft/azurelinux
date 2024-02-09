@@ -1,10 +1,16 @@
+
+%bcond daemon 1
+%bcond subtree 1
+%bcond svn 0
+%bcond email 0
+
 Summary:        Fast distributed version control system
 Name:           git
 Version:        2.42.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://git-scm.com/
 Source0:        https://www.kernel.org/pub/software/scm/git/%{name}-%{version}.tar.xz
@@ -20,7 +26,9 @@ Requires:       perl-DBI
 Requires:       perl-YAML
 Requires:       perl-interpreter
 Requires:       python3
+%if %{with svn}
 Requires:       subversion-perl
+%endif
 Provides:       git-core = %{version}-%{release}
 %if %{with_check}
 BuildRequires:  perl(Getopt::Long)
@@ -46,11 +54,7 @@ Requires:       git >= 2.1.2
 %description lang
 These are the additional language files of git.
 
-%global with_daemon 1
-%global with_subtree 1
-%global with_svn 1
-%global with_email 0
-%if %{with_daemon}
+%if %{with daemon}
 %package        daemon
 Summary:        Git protocol daemon
 Requires:       git-core = %{version}-%{release}
@@ -64,7 +68,7 @@ The git daemon for supporting git:// access to git repositories
 %endif
 
 
-%if %{with_email}
+%if %{with email}
 %package        email
 Summary:        Git tools for sending patches via email
 Requires:       git = %{version}-%{release}
@@ -77,7 +81,7 @@ BuildArch:      noarch
 %endif
 
 
-%if %{with_subtree}
+%if %{with subtree}
 %package        subtree
 Summary:        Git tools to merge and split repositories
 Requires:       git-core = %{version}-%{release}
@@ -89,7 +93,7 @@ history.
 %endif
 
 
-%if %{with_svn}
+%if %{with svn}
 %package        svn
 Summary:        Git tools for interacting with Subversion repositories
 Requires:       git = %{version}-%{release}
@@ -147,27 +151,30 @@ fi
 %files lang -f %{name}.lang
 %defattr(-,root,root)
 
-%if %{with_daemon}
+%if %{with daemon}
 %files daemon
 %{_libexecdir}/git-core/git-daemon
 %endif
 
-%if %{with_email}
+%if %{with email}
 %files email
 %{_libexecdir}/git-core/git-send-email
 %endif
 
-%if %{with_subtree}
+%if %{with subtree}
 %files subtree
 %{_libexecdir}/git-core/git-merge-subtree
 %endif
 
-%if %{with_svn}
+%if %{with svn}
 %files svn
 %{_libexecdir}/git-core/git-svn
 %endif
 
 %changelog
+* Mon Feb 05 2024 Dan Streetman <ddstreet@ieee.org> - 2.42.0-2
+- do not build git-svn
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.42.0-1
 - Auto-upgrade to 2.42.0 - Azure Linux 3.0 - package upgrades
 

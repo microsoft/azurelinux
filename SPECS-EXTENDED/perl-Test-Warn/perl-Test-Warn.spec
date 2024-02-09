@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Perl extension to test methods for warnings
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Warn
 Source0:        https://cpan.metacpan.org/authors/id/B/BI/BIGJ/Test-Warn-%{version}.tar.gz#/perl-Test-Warn-%{version}.tar.gz
 BuildArch:      noarch

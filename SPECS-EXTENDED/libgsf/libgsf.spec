@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: GNOME Structured File library
 Name: libgsf
 Version: 1.14.47

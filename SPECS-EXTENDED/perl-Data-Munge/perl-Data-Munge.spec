@@ -4,7 +4,7 @@ Release:        11%{?dist}
 Summary:        Utility functions for working with perl data structures and code references
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Munge
 Source0:        https://cpan.metacpan.org/modules/by-module/Data/Data-Munge-%{version}.tar.gz#/perl-Data-Munge-%{version}.tar.gz
 BuildArch:      noarch

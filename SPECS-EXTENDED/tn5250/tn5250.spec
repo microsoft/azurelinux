@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1290742
 %undefine _hardened_build
 

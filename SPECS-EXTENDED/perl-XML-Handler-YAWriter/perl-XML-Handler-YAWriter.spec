@@ -6,7 +6,7 @@ Summary:        Yet another Perl SAX XML Writer
 
 License:        GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-Handler-YAWriter
 Source0:        https://cpan.metacpan.org/authors/id/K/KR/KRAEHE/XML-Handler-YAWriter-%{version}.tar.gz#/perl-XML-Handler-YAWriter-%{version}.tar.gz
 Patch0:         perl-XML-Handler-YAWriter-0.23-fix-POD-encoding.patch

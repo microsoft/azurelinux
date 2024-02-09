@@ -4,7 +4,7 @@ Version:        0.3.5
 Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/google/glog
 Source0:        https://github.com/google/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

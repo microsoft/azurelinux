@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        The Ogg bitstream file format library
 Name:           libogg
 Version:        1.3.4

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:             adobe-mappings-pdf
 Summary:          PDF mapping resources from Adobe
 Version:          20180407

@@ -13,7 +13,7 @@ Version:        1.0.7
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://erratique.ch/software/topkg/
 Source0:        https://github.com/dbuenzli/topkg/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

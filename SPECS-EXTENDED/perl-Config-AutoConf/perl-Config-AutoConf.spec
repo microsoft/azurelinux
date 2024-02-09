@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        A module to implement some of AutoConf macros in pure Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Config-AutoConf
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/Config-AutoConf-%{version}.tar.gz#/perl-Config-AutoConf-%{version}.tar.gz
 BuildArch:      noarch

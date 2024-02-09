@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           fdk-aac-free
 Version:        2.0.0
 Release:        4%{?dist}

@@ -4,7 +4,7 @@ Version:        1.1
 Release:        15%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hisdeedsaredust/ttembed
 Source0:        https://github.com/hisdeedsaredust/ttembed/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

@@ -4,7 +4,7 @@ Version:        1.0.3
 Release:        32%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.icculus.org/SDL_sound
 Source0:        https://icculus.org/SDL_sound/downloads/%{name}-%{version}.tar.gz
 BuildRequires:  make

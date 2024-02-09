@@ -10,7 +10,7 @@ Version:        %{blobfuse2_version}
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-fuse/
 # Below is the Github URL where blobfuse2 is accessible. This needs to be defined until blobfuse2 GAs since the version

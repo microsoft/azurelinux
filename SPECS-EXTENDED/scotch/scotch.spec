@@ -6,7 +6,7 @@ Version:        6.1.2
 Release:        3%{?dist}
 License:        CeCILL-C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.inria.fr/scotch/scotch
 Source0:        https://gitlab.inria.fr/scotch/scotch/-/archive/v%{version}/scotch-v%{version}.tar.bz2
 Source1:        scotch-Makefile.shared.inc.in

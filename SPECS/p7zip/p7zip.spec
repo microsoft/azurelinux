@@ -3,7 +3,7 @@ Name:           p7zip
 Version:        16.02
 Release:        23%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
 License:        LGPLv2 and (LGPLv2+ or CPL)
 URL:            http://p7zip.sourceforge.net/

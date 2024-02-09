@@ -6,7 +6,7 @@ License:        Gnuplot
 URL:            http://www.gnuplot.info/
 Group:          Applications
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %description
