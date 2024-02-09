@@ -1977,8 +1977,8 @@
         "type": "other",
         "other": {
           "name": "conntrack-tools",
-          "version": "1.4.5",
-          "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.5.tar.bz2"
+          "version": "1.4.8",
+          "downloadUrl": "https://netfilter.org/projects/conntrack-tools/files/conntrack-tools-1.4.8.tar.xz"
         }
       }
     },
@@ -3088,8 +3088,8 @@
         "type": "other",
         "other": {
           "name": "ed",
-          "version": "1.14.2",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/ed/ed-1.14.2.tar.xz/sha512/de838a6df785c7dc80f4b5ba84330bbe743983fd81218321d4ab84c4c3688fdafb4c005502f3228f0bfa2b6bcf342d64d9523ab73ee440b4f305a033f567cbc2/ed-1.14.2.tar.xz"
+          "version": "1.20",
+          "downloadUrl": "https://ftp.gnu.org/gnu/ed/ed-1.20.tar.lz"
         }
       }
     },
@@ -6930,8 +6930,8 @@
         "type": "other",
         "other": {
           "name": "iana-etc",
-          "version": "20211115",
-          "downloadUrl": "https://github.com/Mic92/iana-etc/releases/download/20211115/iana-etc-20211115.tar.gz"
+          "version": "20240125",
+          "downloadUrl": "https://github.com/Mic92/iana-etc/releases/download/20240125/iana-etc-20240125.tar.gz"
         }
       }
     },
@@ -12631,8 +12631,8 @@
         "type": "other",
         "other": {
           "name": "mariadb-connector-c",
-          "version": "3.1.10",
-          "downloadUrl": "https://archive.mariadb.org/connector-c-3.1.10/mariadb-connector-c-3.1.10-src.tar.gz"
+          "version": "3.3.8",
+          "downloadUrl": "https://archive.mariadb.org/connector-c-3.3.8/mariadb-connector-c-3.3.8-src.tar.gz"
         }
       }
     },
@@ -23274,8 +23274,8 @@
         "type": "other",
         "other": {
           "name": "python-pbr",
-          "version": "5.8.1",
-          "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-5.8.1.tar.gz"
+          "version": "6.0.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-6.0.0.tar.gz"
         }
       }
     },
@@ -23284,8 +23284,8 @@
         "type": "other",
         "other": {
           "name": "python-pecan",
-          "version": "1.4.0",
-          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.4.0.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.5.1.tar.gz"
         }
       }
     },
