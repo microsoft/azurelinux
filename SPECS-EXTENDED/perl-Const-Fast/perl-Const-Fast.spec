@@ -7,7 +7,7 @@ Release:        21%{?dist}
 Summary:        Facility for creating read-only scalars, arrays, and hashes
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Const-Fast
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/Const-Fast-%{version}.tar.gz#/perl-Const-Fast-%{version}.tar.gz
 BuildArch:      noarch

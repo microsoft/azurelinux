@@ -10,7 +10,7 @@ Release:        1%{?dist}
 #dovecot itself is MIT, a few sources are PD, pigeonhole is LGPLv2
 License:        MIT AND LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.dovecot.org/
 Source:         https://www.dovecot.org/releases/2.3/%{name}-%{version}%{?prever}.tar.gz
 Source1:        dovecot.init

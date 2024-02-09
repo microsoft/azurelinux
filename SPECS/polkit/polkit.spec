@@ -1,13 +1,13 @@
 Summary:           A toolkit for defining and handling authorizations.
 Name:              polkit
 Version:           123
-Release:           1%{?dist}
+Release:           2%{?dist}
 Group:             Applications/System
 Vendor:            Microsoft Corporation
 License:           GPLv2+
 URL:               https://gitlab.freedesktop.org/polkit/polkit
 Source0:           https://gitlab.freedesktop.org/polkit/polkit/-/archive/%{version}/polkit-%{version}.tar.gz
-Distribution:      Mariner
+Distribution:   Azure Linux
 BuildRequires:     duktape-devel
 BuildRequires:     expat-devel
 BuildRequires:     glib-devel
@@ -15,12 +15,13 @@ BuildRequires:     gobject-introspection-devel
 BuildRequires:     intltool >= 0.40.0
 BuildRequires:     meson
 BuildRequires:     pam-devel
-BuildRequires:     systemd-devel
+BuildRequires:     systemd-bootstrap-devel
 Requires:          duktape
 Requires:          expat
 Requires:          glib
 Requires:          pam
-Requires:          systemd
+# Our build tooling cannot handle this
+#Requires:          systemd
 Requires(pre):     /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):  /usr/sbin/userdel /usr/sbin/groupdel
 
@@ -122,6 +123,9 @@ fi
 
 
 %changelog
+* Thu Feb 01 2024 Dan Streetman <ddstreet@ieee.org> - 123-2
+- workaround "circular dependencies" from build tooling
+
 * Tue Jan 02 2024 Reuben Olinsky <reubeno@microsoft.com> - 123-1
 - Upgrade to polkit v123
 - Switch JS engine to duktape.

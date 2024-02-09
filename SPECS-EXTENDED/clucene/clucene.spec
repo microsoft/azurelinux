@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %define git_long  e8e3d20f20da5ee3e37d347207b01890829a5475
 %define git_short e8e3d20

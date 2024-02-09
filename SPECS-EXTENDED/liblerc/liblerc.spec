@@ -4,7 +4,7 @@ Version:        4.0.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/Esri/lerc
 Source0:        https://github.com/Esri/lerc/archive/v%{version}/lerc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake

@@ -5,7 +5,7 @@ Summary: A library for parsing Embedded OpenType font files
 
 License: MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/umanwizard/libeot
 Source: http://dev-www.libreoffice.org/src/%{name}-%{version}.tar.bz2
 

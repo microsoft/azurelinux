@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-gv
 Summary: Manx hunspell dictionaries
 %global upstreamid 20040505

@@ -6,7 +6,7 @@ Version:        2.2
 Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/vfs/
 Source0:        https://archive.apache.org/dist/commons/vfs/source/%{short_name}-distribution-%{version}-src.tar.gz

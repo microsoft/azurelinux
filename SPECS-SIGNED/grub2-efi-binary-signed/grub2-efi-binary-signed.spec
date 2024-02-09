@@ -15,7 +15,7 @@ Version:        2.06
 Release:        14%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnu.org/software/grub
 # This package's "version" and "release" must reflect the unsigned version that
 # was signed.

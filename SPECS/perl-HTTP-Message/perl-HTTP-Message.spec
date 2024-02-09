@@ -6,7 +6,7 @@ Summary:        HTTP style message
 # other files:      GPL+ or Artistic
 License:        (GPL+ or Artistic) and CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/HTTP-Message
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Message-%{version}.tar.gz#/perl-HTTP-Message-%{version}.tar.gz
 BuildArch:      noarch

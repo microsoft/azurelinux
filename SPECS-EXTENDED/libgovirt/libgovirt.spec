@@ -4,7 +4,7 @@ Version:        0.3.9
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/libgovirt
 Source0:        https://download.gnome.org/sources/libgovirt/0.3/%{name}-%{version}.tar.xz
 Patch1:         0001-Fix-i18n-generation.patch

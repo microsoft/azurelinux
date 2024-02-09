@@ -12,7 +12,7 @@ Version:        4.0.24
 Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf-plugins-core
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

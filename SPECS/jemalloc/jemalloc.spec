@@ -9,7 +9,7 @@ Release:        1%{?dist}
 # m4/ax_cxx_compile_stdcxx.m4 is under FSFAP
 License:        BSD AND GPLv3+ AND MIT AND Public Domain AND FSFAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            http://www.canonware.com/jemalloc/
 Source0:        https://github.com/jemalloc/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2

@@ -6,7 +6,7 @@ Version:        1.0.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/socketry/fiber-local
 Source0:        https://github.com/socketry/fiber-local/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

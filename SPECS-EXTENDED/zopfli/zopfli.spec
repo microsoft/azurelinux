@@ -5,7 +5,7 @@ Version:        1.0.3
 Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/google/%{name}
 Source0:        %{URL}/archive/%{name}-%{version}.tar.gz
 BuildRequires:  cmake

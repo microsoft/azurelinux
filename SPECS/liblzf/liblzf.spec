@@ -4,7 +4,7 @@ Version:        3.6
 Release:        24%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://oldhome.schmorp.de/marc/liblzf.html
 Source0:        http://dist.schmorp.de/liblzf/liblzf-%{version}.tar.gz
 # Adds autoconf and in particular support for building shared libraries.

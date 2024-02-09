@@ -6,7 +6,7 @@ Version:	0.14
 Release:	12%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Expose PL_dirty, the flag that marks global destruction
 URL:		https://metacpan.org/release/Devel-GlobalDestruction
 Source:		https://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-%{version}.tar.gz

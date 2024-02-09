@@ -4,7 +4,7 @@ Version:        1.0.13
 Release:        1%{?dist}
 License:        LGPLv2+ AND UCD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fribidi/fribidi/
 Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         %{name}-drop-bundled-gnulib.patch

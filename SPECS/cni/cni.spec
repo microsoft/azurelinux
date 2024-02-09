@@ -27,7 +27,7 @@ Version:        1.1.2
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/containernetworking/cni
 #Source0:       https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz

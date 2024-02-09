@@ -14,7 +14,7 @@ Release:	22%{?dist}
 Summary:	Sophisticated exporter for custom-built routines
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Sub-Exporter
 Source0:	http://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Exporter-%{version}.tar.gz
 BuildArch:	noarch

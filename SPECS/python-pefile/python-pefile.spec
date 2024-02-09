@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-pefile
 Version:        2023.2.7
 Release:        3%{?dist}

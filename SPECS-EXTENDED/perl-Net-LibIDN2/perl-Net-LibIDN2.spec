@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Net-LibIDN2
 Version:        1.01
 Release:        3%{?dist}
