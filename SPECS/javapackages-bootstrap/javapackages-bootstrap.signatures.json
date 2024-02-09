@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "ignore.upstream.patch.txt": "441bb5697fc5fb4089b1d43479dd443a8ce4405bec4d6b92c4152d4320ad3a80",
+    "ignore.upstream.patch.txt": "0bc76ca0b5f7c09c404755844835f05cec2ad224cd5ed599c4223052e1246828",
     "ant-1.10.14.tar.xz": "7d85e15b2c148d45f091bead98aa8c30a482085e156a8a99356c7e67c5ec57d8",
     "aopalliance-1.0.tar.xz": "6eb9ae56054952989f56afef96009ceb6f971612f94acf2b8a5a9ed5434cb689",
     "apache-pom-30.tar.xz": "98c947a661046ece25c33a751a4a21709ca5a907398d91187ef7ef02a1f6b609",
