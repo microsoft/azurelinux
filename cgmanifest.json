@@ -12631,8 +12631,8 @@
         "type": "other",
         "other": {
           "name": "lz4",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.3/lz4-1.9.3.tar.gz"
+          "version": "1.9.4",
+          "downloadUrl": "https://github.com/lz4/lz4/archive/v1.9.4/lz4-1.9.4.tar.gz"
         }
       }
     },
@@ -14363,8 +14363,8 @@
         "type": "other",
         "other": {
           "name": "nmi",
-          "version": "1.8.7",
-          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.7.tar.gz"
+          "version": "1.8.11",
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.11.tar.gz"
         }
       }
     },

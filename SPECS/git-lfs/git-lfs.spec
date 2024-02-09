@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.1.4
-Release:       16%{?dist}
+Release:       17%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -30,7 +30,8 @@ Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{
 Source1:       %{name}-%{version}-vendor.tar.gz
 
 # patches for vendored code >= 1000
-Patch1000: CVE-2021-44716.patch
+Patch1000:     CVE-2023-44487.patch
+Patch1001:     CVE-2021-44716.patch
 
 BuildRequires: golang
 BuildRequires: which
@@ -45,10 +46,8 @@ Git LFS is a command line extension and specification for managing large files w
 
 %prep
 %autosetup -N
-
 # Apply vendor before patching
 tar --no-same-owner -xf %{SOURCE1}
-
 %autopatch -p1
 
 %build
@@ -84,8 +83,11 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
-* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.1.4-16
+* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.1.4-17
 - Patch CVE-2021-44716
+
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.4-16
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.4-15
 - Bump release to rebuild with go 1.20.9

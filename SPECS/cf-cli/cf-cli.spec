@@ -1,7 +1,7 @@
 Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 Version:        8.4.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -29,7 +29,8 @@ Source0:        https://github.com/cloudfoundry/cli/archive/refs/tags/v%{version
 Source1:        cli-%{version}-vendor.tar.gz
 
 # patches for vendored code >= 1000
-Patch1000: CVE-2021-44716.patch
+Patch1000:      CVE-2023-44487.patch
+Patch1001:      CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.18.3
 %global debug_package %{nil}
@@ -40,10 +41,8 @@ The official command line client for Cloud Foundry.
 
 %prep
 %autosetup -N -n cli-%{version}
-
 # Apply vendor before patching
 tar --no-same-owner -xf %{SOURCE1}
-
 %autopatch -p1
 
 %build
@@ -66,8 +65,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
-* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.4.0-15
+* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.4.0-16
 - Patch CVE-2021-44716
+
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 8.4.0-15
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.4.0-14
 - Bump release to rebuild with go 1.20.9
