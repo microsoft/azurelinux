@@ -101,6 +101,9 @@ mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 chmod ug-s %{buildroot}/bin/passwd
 install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
 install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
+# Disable usergroups. Use "users" group by default (see /usr/sbin/useradd)
+# for all nonroot users.
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
@@ -152,6 +155,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/pwconv
 %{_sbindir}/grpconv
 chmod 000 %{_sysconfdir}/shadow
+
+%postun
+/sbin/ldconfig
+
+%clean
+rm -rf %{buildroot}/*
 
 %files -f shadow.lang
 %defattr(-,root,root)
