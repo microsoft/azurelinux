@@ -71,7 +71,7 @@ install -D -m0755 bin/lvmplugin %{buildroot}%{_bindir}/
 %{_bindir}/lvmplugin
 
 %changelog
-* Tue Feb 5 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 0.4.1-15
+* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 0.4.1-15
 - Patch CVE-2021-44716
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-14
