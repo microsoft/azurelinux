@@ -66,7 +66,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %changelog
 * Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.0-1
-- Auto-upgrade to 5.1.0 - none
+- Auto-upgrade to 5.1.0 - 3.0 package upgrade
 
 * Mon Mar 21 2022 Nick Samson <nicksamson@microsoft.com> - 4.0.3-1
 - Upgraded to 4.0.3
