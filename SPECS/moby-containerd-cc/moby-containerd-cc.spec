@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -17,6 +17,7 @@ Source0:  https://github.com/microsoft/confidential-containers-containerd/archiv
 Source1: containerd.service
 Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
+Patch1: CVE-2023-44487.patch
 
 %{?systemd_requires}
 
@@ -78,6 +79,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.7.2-4
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
 * Wed Dec 20 2023 Manuel Huber <mahuber@microsoft.com> - 1.7.2-3
 - Set oom_score_adj of containerd to -999
 
