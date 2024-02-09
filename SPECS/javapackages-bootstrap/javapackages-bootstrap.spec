@@ -206,8 +206,8 @@ do
   # only apply the patch if patch is not in the ignore.upstream.patch.txt file
   if ! grep -Fxq "patches/${package_name}/${patch_name}" %{SOURCE2}
   then
-    patch -p1 < "../../patches/${package_name}/${patch_name}"
-    # sed 's/\r//' "../../patches/${package_name}/${patch_name}" | patch -p1
+    #patch -p1 < "../../patches/${package_name}/${patch_name}"
+    sed 's/\r//' "../../patches/${package_name}/${patch_name}" | patch -p1
   fi  
   popd
 done
