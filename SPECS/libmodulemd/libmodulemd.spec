@@ -9,7 +9,6 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/fedora-modularity/libmodulemd
 Source0:        https://github.com/fedora-modularity/libmodulemd/releases/download/%{version}/modulemd-%{version}.tar.xz
-Patch1:         test_import_headers_timeout.patch
 BuildRequires:  clang-devel
 BuildRequires:  gcc
 BuildRequires:  glib
