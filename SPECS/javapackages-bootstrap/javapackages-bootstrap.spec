@@ -220,12 +220,13 @@ done
 %build
 export LC_ALL=en_US.UTF-8 
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
+echo $JAVA_HOME
 ./mbi.sh build -parallel
 
 %install
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
 ./mbi.sh dist \
-  -javaCmdPath=%{javaHomePath}/bin/java \
+  -javaCmdPath=%{JAVA_HOME}/bin/java \
   -basePackageName=%{name} \
   -installRoot=%{buildroot} \
   -mavenHomePath=%{mavenHomePath} \
