@@ -569,7 +569,9 @@ build_rpm_in_chroot_no_install grep
 # for SELinux support.
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install findutils
-
+# glib requires python3-packaging
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python3-packaging
 build_rpm_in_chroot_no_install glib
 build_rpm_in_chroot_no_install libassuan
 build_rpm_in_chroot_no_install npth

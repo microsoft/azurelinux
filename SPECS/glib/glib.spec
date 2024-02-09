@@ -71,6 +71,8 @@ The glib2-doc package includes documentation for the GLib library.
 %build
 %meson \
     -Dgtk_doc=true \
+    -Dintrospection=disabled \
+    -Dman-pages=disabled \
     --default-library=both
 
 %meson_build
@@ -96,6 +98,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/libgthread-*.so.*
 %{_libdir}/libgmodule-*.so.*
 %{_libdir}/libgio-*.so.*
+%{_libdir}/libgirepository-*.so.*
 %{_libdir}/libgobject-*.so.*
 %{_libexecdir}/gio-launch-desktop
 
@@ -121,7 +124,6 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_datadir}/glib-2.0/schemas/*
 
 %files doc
-%doc %{_datadir}/gtk-doc/html/*
 
 %changelog
 * Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 2.79.1-1
