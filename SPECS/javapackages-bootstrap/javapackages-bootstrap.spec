@@ -195,22 +195,22 @@ do
 done
 
 
-for patch_path in patches/*/*
-do
-  package_name="$(echo ${patch_path} | cut -f2 -d/)"
-  patch_name="$(echo ${patch_path} | cut -f3 -d/)"
+# for patch_path in patches/*/*
+# do
+#   package_name="$(echo ${patch_path} | cut -f2 -d/)"
+#   patch_name="$(echo ${patch_path} | cut -f3 -d/)"
   
-  pushd "downstream/${package_name}"
-  # not applying some patches provided by javapackages-bootstrap
-  # some upstream patches become not applicable when upgrading any of the sources
-  # only apply the patch if patch is not in the ignore.upstream.patch.txt file
-  if ! grep -Fxq "patches/${package_name}/${patch_name}" %{SOURCE2}
-  then
-    #patch -p1 < "../../patches/${package_name}/${patch_name}"
-    sed 's/\r//' "../../patches/${package_name}/${patch_name}" | patch -p1
-  fi  
-  popd
-done
+#   pushd "downstream/${package_name}"
+#   # not applying some patches provided by javapackages-bootstrap
+#   # some upstream patches become not applicable when upgrading any of the sources
+#   # only apply the patch if patch is not in the ignore.upstream.patch.txt file
+#   if ! grep -Fxq "patches/${package_name}/${patch_name}" %{SOURCE2}
+#   then
+#     #patch -p1 < "../../patches/${package_name}/${patch_name}"
+#     sed 's/\r//' "../../patches/${package_name}/${patch_name}" | patch -p1
+#   fi  
+#   popd
+# done
 
 # removing harmony files from the source as it causes build time error
 # sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
