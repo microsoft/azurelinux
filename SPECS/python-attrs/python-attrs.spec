@@ -1,14 +1,13 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
-Version:        21.4.0
-Release:        2%{?dist}
+Version:        23.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
-Patch0:         fix-mypy-tests.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
