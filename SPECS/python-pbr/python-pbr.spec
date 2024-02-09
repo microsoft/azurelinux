@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
-Version:        5.8.1
-Release:        4%{?dist}
+Version:        6.0.0
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,6 +55,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/pbr
 
 %changelog
+* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 6.0.0-1
+- Upgrade to version 6.0.0
+
 * Fri May 19 2023 Olivia Crain <oliviacrain@microsoft.com> - 5.8.1-4
 - Add patch to pin version of sphinx used in tests to a known compatible version
 - Remove check-time install of packages that should be handled by tox

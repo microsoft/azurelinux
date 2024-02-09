@@ -45,7 +45,7 @@
         "nspr",
         "nss",
         "openssl",
-        "mariner-release",
+        "azurelinux-release",
         "parted",
         "pcre",
         "pkgconfig",
