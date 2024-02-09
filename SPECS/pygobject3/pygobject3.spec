@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/PyGObject
-Source0:        https://github.com/GNOME/pygobject/archive/refs/tags/3.46.0.tar.gz#/pygobject-%{version}.tar.gz
+Source0:        https://github.com/GNOME/pygobject/archive/refs/tags/%{version}.tar.gz#/pygobject-%{version}.tar.gz
 BuildRequires:  cairo-gobject-devel
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
