@@ -44,7 +44,7 @@ Disadvantages:
    For documentation on the supported configuration options, see:
    [Mariner Image Customizer configuration](./docs/configuration.md)
 
-3. Install prerequisites required to run Mariner Image Customizer: `qemu-img,rpm,dd,lsblk,losetup,sfdisk,udevadm,flock,blkid,openssl,sed,createrepo,squashfs-tools`
+3. Install prerequisites required to run Mariner Image Customizer: `qemu-img,rpm,dd,lsblk,losetup,sfdisk,udevadm,flock,blkid,openssl,sed,createrepo,squashfs-tools,genisoimage`
 
 4. Run the Mariner Image Customizer tool.
 
