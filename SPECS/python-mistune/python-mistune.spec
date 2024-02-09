@@ -46,7 +46,7 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 
 %changelog
 * Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.2-1
-- Auto-upgrade to 3.0.2 - none
+- Auto-upgrade to 3.0.2 - 3.0 package upgrade
 
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 0.8.3-5
 - Add an explict BR on 'pip' to enable ptest
