@@ -66,7 +66,7 @@ tox
 %{_bindir}/gunicorn_pecan
 
 %changelog
-* Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> 1.5.1-1
+* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> 1.5.1-1
 - Upgrade to version 1.5.1
 
 * Wed Jun 23 2021 Neha Agarwal <nehaagarwal@microsoft.com> 1.4.0-2
