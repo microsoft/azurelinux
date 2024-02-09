@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
-Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.tar.gz#/packaging-%{version}.tar.gz
+Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.tar.gz#/python-packaging-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 %if %{with_check}
