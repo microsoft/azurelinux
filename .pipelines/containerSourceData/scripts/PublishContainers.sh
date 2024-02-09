@@ -168,9 +168,9 @@ function create_multi_arch_tags {
     output_file="$CONTAINER_TAGS_DIR/$FILE_NAME_PREFIX-$final_name$FILE_EXT"
     echo "Save the multi-arch tag to a file: $output_file"
 
-    "$original_container-amd64" >> "$output_file"
+    echo "$original_container-amd64" >> "$output_file"
     if [[ $architecture_build == *"ARM64"*  ]]; then
-        "$original_container-arm64" >> "$output_file"
+        echo "$original_container-arm64" >> "$output_file"
     fi
     echo "$full_multiarch_tag" >> "$output_file"
 }
