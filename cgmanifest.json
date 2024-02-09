@@ -23284,8 +23284,8 @@
         "type": "other",
         "other": {
           "name": "python-pecan",
-          "version": "1.4.0",
-          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.4.0.tar.gz"
+          "version": "1.5.1",
+          "downloadUrl": "https://pypi.io/packages/source/p/pecan/pecan-1.5.1.tar.gz"
         }
       }
     },
