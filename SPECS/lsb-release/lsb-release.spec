@@ -1,7 +1,7 @@
 Summary:        lsb_release script
 Name:           lsb-release
 Version:        3.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,7 @@ Source1:        %{LICENSE_PATH}
 %define LICENSE_PATH LICENSE.PTR
 BuildRequires:  coreutils
 BuildRequires:  gzip
-Requires:       mariner-release
+Requires:       azurelinux-release
 BuildArch:      noarch
 
 %description
@@ -34,6 +34,9 @@ install -D -m 755 lsb_release %{buildroot}%{_bindir}/lsb_release
 %{_mandir}/man1/lsb_release.1.gz
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.2-2
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2-1
 - Auto-upgrade to 3.2 - Azure Linux 3.0 - package upgrades
 

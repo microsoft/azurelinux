@@ -76,7 +76,7 @@ BuildRequires:  gcc
 BuildRequires:  python3-setuptools
 BuildRequires:  gettext
 BuildRequires:  libnotify-devel
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 BuildRequires:  python3-dateutil
 BuildRequires:  systemd
 Requires:       python3-ethtool

@@ -133,7 +133,7 @@ BuildRequires:  pkgconfig(libcrypt)
 BuildRequires:  p11-kit-devel
 BuildRequires:  polkit-devel
 # This is required for /etc/os-release, as the systemd uses this during src/boot/efi build
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++

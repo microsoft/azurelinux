@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.3.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ Patch1:         make_fallback_network_config_work.patch
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
-BuildRequires:  mariner-release 
+BuildRequires:  azurelinux-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -144,6 +144,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 23.3.3-2
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Tue Oct 15 2023 Dan Streetman <ddstreet@ieee.org> - 23.3.3-1
 - Upgrade to cloud-init 23.3.3
 - Remove Photon-specific behavior of refusal to setup fallback network

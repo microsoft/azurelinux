@@ -71,7 +71,7 @@ Requires:       dnf-plugins-core
 # RHBZ#771310
 Requires:       e2fsprogs-libs >= 1.42
 Requires:       findutils
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       rpm
 Requires:       tar
 Requires:       util-linux-ng
@@ -131,6 +131,7 @@ make check || {
 %changelog
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.2.1-11
 - Fix patch file with new changed azure linux OS files.
+- Update the runtime dependency from mariner-release to azurelinux-release
 
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-10
 - Bump release to rebuild against glibc 2.38-1
