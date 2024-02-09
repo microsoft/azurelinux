@@ -1,7 +1,7 @@
 Summary:        Container storage interface for logical volume management
 Name:           csi-driver-lvm
 Version:        0.4.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,10 @@ Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{vers
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
+
+# patches for vendored code >= 1000
+Patch1000:      CVE-2021-44716.patch
+
 BuildRequires:  golang
 Requires:       %{name}-csi-lvmplugin-provisioner
 Requires:       %{name}-lvmplugin
@@ -39,8 +43,12 @@ Summary:        csi-driver-lvm's lvmplugin binary
 lvmplugin collects the size of logical volumes (LV) and free space inside a volume group (VG) from Linux' Logical Volume Manager (LVM).
 
 %prep
-%autosetup
-%setup -q -T -D -a 1
+%autosetup -N
+
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+
+%autopatch -p1
 
 %build
 %make_build
@@ -63,6 +71,9 @@ install -D -m0755 bin/lvmplugin %{buildroot}%{_bindir}/
 %{_bindir}/lvmplugin
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 0.4.1-15
+- Patch CVE-2021-44716
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-14
 - Bump release to rebuild with go 1.20.9
 
