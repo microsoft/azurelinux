@@ -26,7 +26,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,7 +57,7 @@ BuildRequires: nspr-devel
 BuildRequires: nss-devel >= %{nss_version}
 BuildRequires: nss-tools >= %{nss_version}
 BuildRequires: openldap-devel
-BuildRequires: mariner-release
+BuildRequires: azurelinux-release
 BuildRequires: pam-devel
 BuildRequires: pkgconfig
 BuildRequires: systemd-devel
@@ -196,6 +196,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.7-6
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Mon Aug 28 2023 Henry Beberman <henry.beberman@microsoft.com> - 4.7-5
 - Backport patches for CVE-2023-38710, CVE-2023-38711, CVE-2023-38712
 
