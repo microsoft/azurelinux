@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,10 +31,8 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
-
-# Patch for old x/net/http2 vendored code, apply after vendored code is extracted.
-Patch1000:      CVE-2023-44487.patch
-Patch1001:      CVE-2023-49295.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -43,8 +41,8 @@ CoreDNS is a fast and flexible DNS server.
 
 %prep
 %autosetup -N
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
 %autopatch -p1
 
 %build
@@ -56,11 +54,11 @@ make
 %check
 # From go.test.yml
 go install github.com/fatih/faillint@latest && \
-(cd request && go test -v -race ./...) && \
-(cd core && go test -v -race ./...) && \
-(cd coremain && go test -v -race ./...) && \
-(cd plugin && go test -v -race ./...) && \
-(cd test && go test -v -race ./...) && \
+(cd request && go test -v -mod=vendor -race ./...) && \
+(cd core && go test -v -mod=vendor -race ./...) && \
+(cd coremain && go test -v -mod=vendor -race ./...) && \
+(cd plugin && go test -v -mod=vendor -race ./...) && \
+(cd test && go test -v -mod=vendor -race ./...) && \
 ./coredns -version
 
 %install
@@ -73,8 +71,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
-* Fri Feb 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-3
+* Fri Feb 10 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-4
 - patched vendored quic-go package to address CVE-2023-49295
+
+* Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-3
+- Refactor vendor patch application
+- Force vendored components during test
 
 * Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
 - Address CVE-2023-44487 by patching vendored golang.org/x/net

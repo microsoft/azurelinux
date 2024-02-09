@@ -1,7 +1,7 @@
 Summary:        Infrastructure as code deployment management tool
 Name:           terraform
 Version:        1.3.2
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,8 @@ Source0:        https://github.com/hashicorp/terraform/archive/refs/tags/v%{vers
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-44487.patch
+
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 BuildRequires:  golang <= 1.18.8
@@ -35,10 +37,12 @@ BuildRequires:  golang <= 1.18.8
 Terraform is an infrastructure as code deployment management tool
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 go build -mod=vendor -v -a -o terraform
 
@@ -57,6 +61,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./terraform
 %{_bindir}/terraform
 
 %changelog
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.2-13
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-12
 - Bump release to rebuild with go 1.20.9
 
