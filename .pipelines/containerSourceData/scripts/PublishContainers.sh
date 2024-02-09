@@ -164,6 +164,11 @@ function create_multi_arch_tags {
     image_basename=${multiarch_name#*/}
     dash_removed_name=${image_basename//-/}
     final_name=${dash_removed_name////_}
+
+    "$original_container-amd64" >> "$CONTAINER_TAGS_DIR/$FILE_NAME_PREFIX-$final_name$FILE_EXT"
+    if [[ $architecture_build == *"ARM64"*  ]]; then
+        "$original_container-arm64" >> "$CONTAINER_TAGS_DIR/$FILE_NAME_PREFIX-$final_name$FILE_EXT"
+    fi
     echo "$full_multiarch_tag" >> "$CONTAINER_TAGS_DIR/$FILE_NAME_PREFIX-$final_name$FILE_EXT"
 }
 
