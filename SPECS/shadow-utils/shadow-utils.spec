@@ -48,8 +48,6 @@ Provides:       /usr/sbin/useradd
 Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
 
-# TODO Check CVE patches in Photon spec
-
 %description
 The Shadow package contains programs for handling passwords
 in a secure way.
@@ -186,8 +184,9 @@ rm -rf %{buildroot}/*
 %{_libdir}/libsubid.so
 
 %changelog
-* Wed Feb 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.3-1
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.3-1
 - Auto-upgrade to 4.14.3 - 3.0 Upgrade
+- Remove obsolete patches and fix configure command
 
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9-14
 - Switch to link with libxcrypt
