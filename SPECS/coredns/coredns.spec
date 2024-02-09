@@ -32,7 +32,7 @@ Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
 Patch1:         CVE-2023-44487.patch
-Patch1001:      CVE-2023-49295.patch
+Patch2:         CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
