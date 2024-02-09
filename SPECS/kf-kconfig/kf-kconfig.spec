@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with advanced configuration system
 License:        LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -25,6 +25,7 @@ BuildRequires:  kf-rpm-macros
 
 BuildRequires:  qtbase-devel
 BuildRequires:  qttools-devel
+BuildRequires:  qtdeclarative-devel
 
 Requires:       kf-filesystem
 
@@ -41,40 +42,47 @@ Requires:	qtbase-devel
 %description	devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
- 
+
 %prep
-%autosetup -n %{framework}-%{version} -p1
+%autosetup -n %{framework}-v%{version} -p1
 
 %build
 %cmake_kf
 %cmake_build
 
 %install
-%cmake_install
-%find_lang_kf kcoreaddons6_qt
-%find_lang_kf kde6_xml_mimetypes
-cat *.lang > all.lang
+%cmake_install	
+%find_lang_kf kconfig6_qt
 
-%files -f all.lang
-%doc README.md
+%files -f kconfig6_qt.lang
+%doc DESIGN README.md TODO
 %license LICENSES/*.txt
-%{_datadir}/kf6/jsonschema/kpluginmetadata.schema.json
-%{_kf_datadir}/kf6/licenses/
-%{_kf_datadir}/mime/packages/kde6.xml
-%{_kf_datadir}/qlogging-categories6/%{framework}.*
-%{_kf_libdir}/libKF6CoreAddons.so.*
-%{_kf_libdir}/qt6/qml/org/kde/coreaddons/libkcoreaddonsplugin.so
-%{_kf_libdir}/qt6/qml/org/kde/coreaddons/qmldir
-%{_libdir}/qt6/qml/org/kde/coreaddons/kcoreaddonsplugin.qmltypes
-%{_libdir}/qt6/qml/org/kde/coreaddons/kde-qmlmodule.version
+%{_kf_bindir}/kreadconfig6
+%{_kf_bindir}/kwriteconfig6
+%{_kf_datadir}/qlogging-categories6/%{framework}*
+%{_kf_libdir}/libKF6ConfigCore.so.5*
+%{_kf_libdir}/libKF6ConfigCore.so.6*
+%{_kf_libdir}/libKF6ConfigGui.so.5*
+%{_kf_libdir}/libKF6ConfigGui.so.6*
+%{_kf_libdir}/libKF6ConfigQml.so.5*
+%{_kf_libdir}/libKF6ConfigQml.so.6*
+%{_kf_libdir}/qt6/qml/org/kde/config/kconfigqmlplugin.qmltypes
+%{_kf_libdir}/qt6/qml/org/kde/config/kde-qmlmodule.version
+%{_kf_libdir}/qt6/qml/org/kde/config/libkconfigqmlplugin.so
+%{_kf_libdir}/qt6/qml/org/kde/config/qmldir
+%{_kf_libexecdir}/kconf_update
+%{_kf_libexecdir}/kconfig_compiler_kf6
 
-
+	
 %files devel
-%{_kf_includedir}/KCoreAddons/
-%{_kf_libdir}/cmake/KF6CoreAddons/
-%{_kf_libdir}/libKF6CoreAddons.so
-%{_qt_docdir}/*.tags
- 
+%{_kf_includedir}/KConfig/
+%{_kf_includedir}/KConfigCore/
+%{_kf_includedir}/KConfigGui/
+%{_kf_includedir}/KConfigQml/
+%{_kf_libdir}/cmake/KF6Config/
+%{_kf_libdir}/libKF6ConfigCore.so
+%{_kf_libdir}/libKF6ConfigGui.so
+%{_kf_libdir}/libKF6ConfigQml.so
 
 %changelog
 * Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1

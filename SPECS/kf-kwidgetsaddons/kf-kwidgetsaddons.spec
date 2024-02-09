@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with various classes on top of QtWidgets
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -33,17 +33,15 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{framework}-%{version} -p1
+%autosetup -n %{framework}-v%{version} -p1
 
 %build
-%cmake_kf6
+%cmake_kf
 %cmake_build
 
 %install
 %cmake_install
-%find_lang_kf6 kwidgetsaddons6_qt
-%fdupes %{buildroot}/%{_kf6_includedir}/KWidgetsAddons/
-%fdupes LICENSES
+%find_lang_kf kwidgetsaddons6_qt
 
 	
 %files -f kwidgetsaddons6_qt.lang
@@ -57,7 +55,6 @@ developing applications that use %{name}.
 %{_kf_includedir}/KWidgetsAddons/
 %{_kf_libdir}/cmake/KF6WidgetsAddons/
 %{_kf_libdir}/libKF6WidgetsAddons.so
-%{_qt_docdir}/*.tags
 
 
 %changelog

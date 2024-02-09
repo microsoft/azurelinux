@@ -1,3 +1,4 @@
+%global sover 12
 
 Name:           kpmcore
 Version:        24.01.95
@@ -17,6 +18,7 @@ BuildRequires:  kf-ki18n-devel
 BuildRequires:  kf-kwidgetsaddons-devel
 BuildRequires:  kf-rpm-macros
 BuildRequires:  qtbase-devel
+BuildRequires:  polkit-qt6-1-devel
 
 BuildRequires:  util-linux-devel
 BuildRequires:  libatasmart-devel

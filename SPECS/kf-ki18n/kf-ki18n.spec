@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon for localization
 License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://invent.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
+Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -42,7 +42,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n %{framework}-%{version} -p1
+%autosetup -n %{framework}-v%{version} -p1
 
 %build
 %cmake_kf
@@ -81,7 +81,6 @@ developing applications that use %{name}.
 %{_kf_libdir}/cmake/KF6I18n/
 %{_kf_libdir}/libKF6I18n.so
 %{_kf_libdir}/libKF6I18nLocaleData.so
-%{_qt_docdir}/*.tags
 
 
 %changelog

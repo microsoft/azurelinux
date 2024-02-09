@@ -9,8 +9,9 @@ License: LGPLv2+
 URL:     https://cgit.kde.org/kcoreaddons.git
 
 %global majmin %(echo %{version} | cut -d. -f1-2)
+%global framework kcoreaddons
 
-Source0: https://invent.kde.org/stable/frameworks/%{majmin}/kcoreaddons-%{version}.tar.xz
+Source0: https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 
 ## upstream patches
 
@@ -21,6 +22,7 @@ BuildRequires:  extra-cmake-modules >= %{majmin}
 BuildRequires:  kf-rpm-macros >= %{majmin}
 BuildRequires:  qtbase-devel
 BuildRequires:  qttools-devel
+BuildRequires:  qtdeclarative-devel
 BuildRequires:  systemd-devel
 Requires:       kf-filesystem >= %{majmin}
 
@@ -40,7 +42,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n kcoreaddons-%{version}
+%autosetup -n kcoreaddons-v%{version}
 
 %build
 %cmake_kf
@@ -77,7 +79,6 @@ time \
 %{_kf_includedir}/KCoreAddons/
 %{_kf_libdir}/cmake/KF6CoreAddons/
 %{_kf_libdir}/libKF6CoreAddons.so
-%{_qt_docdir}/*.tags
 
 %changelog
 * Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1

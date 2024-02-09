@@ -3,20 +3,20 @@ Summary:      Additional modules for CMake build system
 Version:      5.249.0
 Release:      1%{?dist}
 Vendor:       Microsoft Corporation
-Distribution:   Azure Linux
+Distribution: Azure Linux
 License:      BSD
 URL:          https://github.com/KDE/extra-cmake-modules
 
 %global versiondir %(echo %{version} | cut -d. -f1-2)
-%global docs 1
+%global docs 0
 %global tests 1
 
-Source0:   https://invent.kde.org/stable/frameworks/%{versiondir}/%{name}-%{version}.tar.gz
+Source0:   https://invent.kde.org/frameworks/%{name}/-/archive/v%{versiondir}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 # bundle clang python bindings here, at least until they are properly packaged elsewhere, see:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1490997
-Source1: clang-python-4.0.1.tar.gz
+#Source1: clang-python-4.0.1.tar.gz
 
 BuildRequires: kf-rpm-macros
 BuildRequires: qttools-devel
@@ -31,9 +31,9 @@ Additional modules for CMake build system needed by KDE Frameworks.
 
 %prep
 # Setup Source0
-%autosetup -n %{name}-%version} -p1
+%autosetup -n %{name}-v%{version} -p1
 # Setup Source1
-%setup -q -T -D -a 1
+#%setup -q -T -D -a 1
 
 %build
 %cmake_kf \
@@ -46,21 +46,21 @@ Additional modules for CMake build system needed by KDE Frameworks.
 %cmake_install
 
 # hack clang-python install
-mkdir -p %{buildroot}%{_datadir}/ECM/python/clang
-install -m644 -p python/clang/* %{buildroot}%{_datadir}/ECM/python/clang/
+#mkdir -p %{buildroot}%{_datadir}/ECM/python/clang
+#install -m644 -p python/clang/* %{buildroot}%{_datadir}/ECM/python/clang/
 
 %check
-export PYTHONPATH=`pwd`/python
+#export PYTHONPATH=`pwd`/python
 export CTEST_OUTPUT_ON_FAILURE=1
-make test ARGS="--output-on-failure --timeout 300" -C %{_target_platform} ||:
+make test ARGS="--output-on-failure --timeout 300" -C %{_vpath_builddir} ||:
 
 %files
 %doc README.rst
 %license LICENSES/*.txt
 %{_datadir}/ECM/
 %if 0%{?docs}
-%{_kf6_docdir}/ECM/html/
-%{_kf6_mandir}/man7/ecm*.7*
+%{_kf_docdir}/ECM/html/
+%{_kf_mandir}/man7/ecm*.7*
 %endif
 
 %changelog
