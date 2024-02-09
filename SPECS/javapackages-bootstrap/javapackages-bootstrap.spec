@@ -194,6 +194,9 @@ do
   tar -xf "${source}"
 done
 
+pushd "downstream/xmvn-generator"
+sed -i 's|<release>17</release>|<release>11</release>|' pom.xml
+popd
 
 for patch_path in patches/*/*
 do
@@ -201,9 +204,7 @@ do
   patch_name="$(echo ${patch_path} | cut -f3 -d/)"
   
   pushd "downstream/${package_name}"
-  if [ ${package_name} == "xmvn-generator"]; then
-      sed -i 's|<release>17</release>|<release>11</release>|' pom.xml
-  fi
+
   # not applying some patches provided by javapackages-bootstrap
   # some upstream patches become not applicable when upgrading any of the sources
   # only apply the patch if patch is not in the ignore.upstream.patch.txt file
