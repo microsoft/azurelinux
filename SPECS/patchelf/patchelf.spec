@@ -30,7 +30,7 @@ of an executable and change the RPATH of an executable or library.
 rm src/elf.h
 
 %build
-autoreconf -fi
+sh ./bootstrap.sh
 %configure
 %make_build
 
