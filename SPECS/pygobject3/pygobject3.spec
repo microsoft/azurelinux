@@ -1,13 +1,12 @@
-%define majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        Python bindings for GObject Introspection
 Name:           pygobject3
-Version:        3.9.92
+Version:        3.46.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/PyGObject
-Source0:        https://download.gnome.org/sources/pygobject/%{majmin}/pygobject-%{version}.tar.xz
+Source0:        https://github.com/GNOME/pygobject/archive/refs/tags/3.46.0.tar.gz#/pygobject-%{version}.tar.gz
 BuildRequires:  cairo-gobject-devel
 BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
@@ -90,7 +89,7 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
-* Thu Feb 08 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.9.92-1
+* Thu Feb 08 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.46.0-1
 - Upgrade version for Mariner 3.0 release
 
 * Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.42.0-1

@@ -21484,8 +21484,8 @@
         "type": "other",
         "other": {
           "name": "pygobject3",
-          "version": "3.9.92",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.9/pygobject-3.9.92.tar.xz"
+          "version": "3.46.0",
+          "downloadUrl": "https://github.com/GNOME/pygobject/archive/refs/tags/3.46.0.tar.gz"
         }
       }
     },
