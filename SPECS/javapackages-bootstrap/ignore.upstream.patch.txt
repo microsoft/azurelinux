@@ -1,3 +1,1 @@
 patches/commons-compress/0001-Remove-usage-of-ArchiveStreamFactory.patch
-patches/commons-collections/0001-Port-to-Java-8.patch
-patches/maven-artifact-transfer/0001-Compatibility-with-Maven-3.0.3-and-later.patch
