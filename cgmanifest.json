@@ -24044,8 +24044,8 @@
         "type": "other",
         "other": {
           "name": "python-simplejson",
-          "version": "3.17.6",
-          "downloadUrl": "https://pypi.python.org/packages/source/s/simplejson/simplejson-3.17.6.tar.gz"
+          "version": "3.19.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/s/simplejson/simplejson-3.19.2.tar.gz"
         }
       }
     },
