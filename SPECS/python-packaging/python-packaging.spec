@@ -1,13 +1,13 @@
 Summary:        Core utilities for Python packages
 Name:           python-packaging
-Version:        21.3
+Version:        23.2
 Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
-Source0:        https://github.com/pypa/packaging/releases/download/%{version}/packaging-%{version}.tar.gz
+Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 %if %{with_check}
@@ -52,6 +52,9 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 09 2024 Aurelien Bombo <abombo@microsoft.com> - 23.2-1
+- AzL 3.0 package upgrade
+
 * Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
 - Upgrade to latest upstream version
 - Use github release source instead of pypi source
