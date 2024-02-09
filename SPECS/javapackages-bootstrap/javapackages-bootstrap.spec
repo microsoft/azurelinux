@@ -201,6 +201,9 @@ do
   patch_name="$(echo ${patch_path} | cut -f3 -d/)"
   
   pushd "downstream/${package_name}"
+  %if ${package_name} == "xmvn-generator"
+      sed -i 's|<release>17</release>|<release>11</release>|' pom.xml
+  %endif
   # not applying some patches provided by javapackages-bootstrap
   # some upstream patches become not applicable when upgrading any of the sources
   # only apply the patch if patch is not in the ignore.upstream.patch.txt file
@@ -212,6 +215,8 @@ do
   fi  
   popd
 done
+
+
 
 # removing harmony files from the source as it causes build time error
 # sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
