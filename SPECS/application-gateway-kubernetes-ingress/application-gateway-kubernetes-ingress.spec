@@ -2,7 +2,7 @@
 Summary:        Application Gateway Ingress Controller
 Name:           application-gateway-kubernetes-ingress
 Version:        1.4.0
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -24,9 +24,13 @@ Source0:        %{name}-%{version}.tar.gz
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
+
+# patches for vendored code >= 1000
 # If upstream ever upgrades client_goland to 1.11.1, we can get rid of this patch.
-Patch0:         CVE-2022-21698.patch
-Patch1:         CVE-2023-44487.patch
+Patch1000:      CVE-2022-21698.patch
+Patch1001:      CVE-2023-44487.patch
+Patch1002:      CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.13
 %if %{with_check}
 BuildRequires:  helm
@@ -64,6 +68,9 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.0-19
+- Patch CVE-2021-44716
+
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.4.0-18
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 - Add check section
