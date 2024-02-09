@@ -1,6 +1,6 @@
 Summary:        A tool for configuring certain Intel baseband devices
 Name:           intel-pf-bb-config
-Version:        22.03
+Version:        23.11
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -34,6 +34,9 @@ install -p -m 755 pf_bb_config %{buildroot}%{_bindir}/pf_bb_config
 %{_bindir}/pf_bb_config
 
 %changelog
+* Fri Feb 09 2024 Vince Perri <viperri@microsoft.com> - 23.11-1
+- Upgrade to 23.11
+
 * Wed Jul 06 2022 Sriram Nambakam <snambakam@microsoft.com> - 22.03-1
 - Upgrade to 22.03
 
