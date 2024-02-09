@@ -3,7 +3,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -31,14 +31,8 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         makefile-buildoption-commitnb.patch
-<<<<<<< HEAD
-
-# Patch for old x/net/http2 vendored code, apply after vendored code is extracted.
-Patch1000:      CVE-2023-44487.patch
-Patch1001:      CVE-2023-49295.patch
-=======
 Patch1:         CVE-2023-44487.patch
->>>>>>> 298f5d5ad (Patch CVE-2023-44487 in vendored golang (#7780))
+Patch1001:      CVE-2023-49295.patch
 
 BuildRequires:  golang >= 1.12
 
@@ -47,13 +41,8 @@ CoreDNS is a fast and flexible DNS server.
 
 %prep
 %autosetup -N
-<<<<<<< HEAD
-# create vendor folder from the vendor tarball and set vendor mode
-tar -xf %{SOURCE1} --no-same-owner
-=======
 # Apply vendor before patching
 tar --no-same-owner -xf %{SOURCE1}
->>>>>>> 298f5d5ad (Patch CVE-2023-44487 in vendored golang (#7780))
 %autopatch -p1
 
 %build
@@ -82,14 +71,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} %{name}
 %{_bindir}/%{name}
 
 %changelog
-<<<<<<< HEAD
-* Fri Feb 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-3
+* Fri Feb 10 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.1-4
 - patched vendored quic-go package to address CVE-2023-49295
-=======
+
 * Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-3
 - Refactor vendor patch application
 - Force vendored components during test
->>>>>>> 298f5d5ad (Patch CVE-2023-44487 in vendored golang (#7780))
 
 * Mon Jan 29 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.11.1-2
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
