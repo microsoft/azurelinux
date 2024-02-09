@@ -23274,8 +23274,8 @@
         "type": "other",
         "other": {
           "name": "python-pbr",
-          "version": "5.8.1",
-          "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-5.8.1.tar.gz"
+          "version": "6.0.0",
+          "downloadUrl": "https://pypi.io/packages/source/p/pbr/pbr-6.0.0.tar.gz"
         }
       }
     },
