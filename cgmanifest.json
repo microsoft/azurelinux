@@ -11581,8 +11581,8 @@
         "type": "other",
         "other": {
           "name": "libXcursor",
-          "version": "1.2.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.0.tar.bz2"
+          "version": "1.2.1",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/libXcursor-1.2.1.tar.gz"
         }
       }
     },
