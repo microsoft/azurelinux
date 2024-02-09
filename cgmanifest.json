@@ -7861,7 +7861,7 @@
         "type": "other",
         "other": {
           "name": "json-c",
-          "version": "0.17-20230812",
+          "version": "0.17",
           "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.17-20230812.tar.gz"
         }
       }
