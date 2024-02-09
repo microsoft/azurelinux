@@ -1,0 +1,202 @@
+From afe49f6814a3dbbad6b2d119aca6bc416691e010 Mon Sep 17 00:00:00 2001
+From: Alberto Contreras <alberto.contreras@canonical.com>
+Date: Mon, 29 Jan 2024 18:30:56 +0100
+Subject: [PATCH 1/3] test: fix mocking leaks (#4815)
+
+In pytest==8.0.0, the collection algorithm changed which results in
+unittests being executed in a different order.  This is shows some
+mocking leaks that are fixed in this commit, as:
+
+- super().tearDown not called
+- super().setUp doubly called
+- Distro.default_updates_event not mocked
+---
+
+Modified-by: Chris Co <chrco@microsoft.com>
+---
+ tests/unittests/config/test_cc_growpart.py    | 1 +
+ tests/unittests/config/test_cc_seed_random.py | 1 +
+ tests/unittests/sources/test_altcloud.py      | 4 ++++
+ tests/unittests/sources/test_azure.py         | 1 -
+ tests/unittests/test_stages.py                | 4 ++++
+ 5 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/tests/unittests/config/test_cc_growpart.py b/tests/unittests/config/test_cc_growpart.py
+index 5b97f7b..d5e62ec 100644
+--- a/tests/unittests/config/test_cc_growpart.py
++++ b/tests/unittests/config/test_cc_growpart.py
+@@ -135,6 +135,7 @@ class TestConfig(TestCase):
+     def tearDown(self):
+         self.tmpfile.close()
+         os.remove(self.tmppath)
++        super().tearDown()
+ 
+     @mock.patch.object(os.path, "isfile", return_value=False)
+     @mock.patch.dict("os.environ", clear=True)
+diff --git a/tests/unittests/config/test_cc_seed_random.py b/tests/unittests/config/test_cc_seed_random.py
+index 3ba2a96..b9b1250 100644
+--- a/tests/unittests/config/test_cc_seed_random.py
++++ b/tests/unittests/config/test_cc_seed_random.py
+@@ -42,6 +42,7 @@ class TestRandomSeed(TestCase):
+     def tearDown(self):
+         apply_patches([i for i in reversed(self.unapply)])
+         util.del_file(self._seed_file)
++        super().tearDown()
+ 
+     def apply_patches(self, patches):
+         ret = apply_patches(patches)
+diff --git a/tests/unittests/sources/test_altcloud.py b/tests/unittests/sources/test_altcloud.py
+index b4bc44b..dba0f6a 100644
+--- a/tests/unittests/sources/test_altcloud.py
++++ b/tests/unittests/sources/test_altcloud.py
+@@ -92,6 +92,7 @@ class TestGetCloudType(CiTestCase):
+         # Reset
+         dmi.read_dmi_data = self.dmi_data
+         force_arch()
++        super().tearDown()
+ 
+     def test_cloud_info_file_ioerror(self):
+         """Return UNKNOWN when /etc/sysconfig/cloud-info exists but errors."""
+@@ -230,6 +231,7 @@ class TestGetDataNoCloudInfoFile(CiTestCase):
+         dmi.read_dmi_data = self.dmi_data
+         # Return back to original arch
+         force_arch()
++        super().tearDown()
+ 
+     def test_rhev_no_cloud_file(self):
+         """Test No cloud info file module get_data() forcing RHEV."""
+@@ -346,6 +348,7 @@ class TestUserDataVsphere(CiTestCase):
+             pass
+ 
+         dsac.CLOUD_INFO_FILE = "/etc/sysconfig/cloud-info"
++        super().tearDown()
+ 
+     @mock.patch("cloudinit.sources.DataSourceAltCloud.util.find_devs_with")
+     @mock.patch("cloudinit.sources.DataSourceAltCloud.util.mount_cb")
+@@ -409,6 +412,7 @@ class TestReadUserDataCallback(CiTestCase):
+             shutil.rmtree(self.mount_dir)
+         except OSError:
+             pass
++        super().tearDown()
+ 
+     def test_callback_both(self):
+         """Test read_user_data_callback() with both files."""
+diff --git a/tests/unittests/sources/test_azure.py b/tests/unittests/sources/test_azure.py
+index 2a477f8..87155f3 100644
+--- a/tests/unittests/sources/test_azure.py
++++ b/tests/unittests/sources/test_azure.py
+@@ -1058,7 +1058,6 @@ class TestAzureDataSource(CiTestCase):
+                 mock.MagicMock(),
+             )
+         )
+-        super(TestAzureDataSource, self).setUp()
+ 
+     def apply_patches(self, patches):
+         for module, name, new in patches:
+diff --git a/tests/unittests/test_stages.py b/tests/unittests/test_stages.py
+index 7730608..4c54257 100644
+--- a/tests/unittests/test_stages.py
++++ b/tests/unittests/test_stages.py
+@@ -441,6 +441,10 @@ class TestInit:
+                 assert not self.tmpdir.join(path).exists()
+ 
+     @mock.patch("cloudinit.distros.ubuntu.Distro")
++    @mock.patch.dict(
++        sources.DataSource.default_update_events,
++        {EventScope.NETWORK: {EventType.BOOT_NEW_INSTANCE}},
++    )
+     def test_apply_network_on_same_instance_id(self, m_ubuntu, caplog):
+         """Only call distro.networking.apply_network_config_names on same
+         instance id."""
+-- 
+2.33.8
+
+
+From e23e013336578e251498d38fe967536262f628c3 Mon Sep 17 00:00:00 2001
+From: Alberto Contreras <alberto.contreras@canonical.com>
+Date: Mon, 29 Jan 2024 21:22:30 +0100
+Subject: [PATCH 2/3] chore: do not modify instance attribute (#4815)
+
+---
+ cloudinit/sources/DataSourceAliYun.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cloudinit/sources/DataSourceAliYun.py b/cloudinit/sources/DataSourceAliYun.py
+index 606ade1..8db89e4 100644
+--- a/cloudinit/sources/DataSourceAliYun.py
++++ b/cloudinit/sources/DataSourceAliYun.py
+@@ -1,5 +1,6 @@
+ # This file is part of cloud-init. See LICENSE file for license information.
+ 
++import copy
+ import logging
+ from typing import List
+ 
+@@ -29,6 +30,7 @@ class DataSourceAliYun(EC2.DataSourceEc2):
+ 
+     def __init__(self, sys_cfg, distro, paths):
+         super(DataSourceAliYun, self).__init__(sys_cfg, distro, paths)
++        self.default_update_events = copy.deepcopy(self.default_update_events)
+         self.default_update_events[EventScope.NETWORK].add(EventType.BOOT)
+ 
+     def get_hostname(self, fqdn=False, resolve_ip=False, metadata_only=False):
+-- 
+2.33.8
+
+
+From 26a182ce3ceb7b14d08546621715a5787907a10f Mon Sep 17 00:00:00 2001
+From: Alberto Contreras <alberto.contreras@canonical.com>
+Date: Tue, 30 Jan 2024 11:19:47 +0100
+Subject: [PATCH 3/3] doc: update DataSource.default_update_events doc (#4815)
+
+---
+ cloudinit/sources/__init__.py | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/cloudinit/sources/__init__.py b/cloudinit/sources/__init__.py
+index c207b5e..b2fb5e3 100644
+--- a/cloudinit/sources/__init__.py
++++ b/cloudinit/sources/__init__.py
+@@ -223,10 +223,28 @@ class DataSource(CloudInitPickleMixin, metaclass=abc.ABCMeta):
+     # The datasource also defines a set of default EventTypes that the
+     # datasource can react to. These are the event types that will be used
+     # if not overridden by the user.
++    #
+     # A datasource requiring to write network config on each system boot
+-    # would call default_update_events['network'].add(EventType.BOOT).
++    # would either:
++    #
++    # 1) Overwrite the class attribute `default_update_events` like:
++    #
++    # >>> default_update_events = {
++    # ...     EventScope.NETWORK: {
++    # ...         EventType.BOOT_NEW_INSTANCE,
++    # ...         EventType.BOOT,
++    # ...     }
++    # ... }
++    #
++    # 2) Or, if writing network config on every boot has to be determined at
++    # runtime, then deepcopy to not overwrite the class attribute on other
++    # elements of this class hierarchy, like:
++    #
++    # >>> self.default_update_events = copy.deepcopy(
++    # ...    self.default_update_events
++    # ... )
++    # >>> self.default_update_events[EventScope.NETWORK].add(EventType.BOOT)
+ 
+-    # Default: generate network config on new instance id (first boot).
+     supported_update_events = {
+         EventScope.NETWORK: {
+             EventType.BOOT_NEW_INSTANCE,
+@@ -235,6 +253,8 @@ class DataSource(CloudInitPickleMixin, metaclass=abc.ABCMeta):
+             EventType.HOTPLUG,
+         }
+     }
++
++    # Default: generate network config on new instance id (first boot).
+     default_update_events = {
+         EventScope.NETWORK: {
+             EventType.BOOT_NEW_INSTANCE,
+-- 
+2.33.8
+
