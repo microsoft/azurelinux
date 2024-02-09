@@ -1,8 +1,8 @@
 %bcond_with docs
 Summary:        Module manipulating metadata files
 Name:           libmodulemd
-Version:        2.13.0
-Release:        2%{?dist}
+Version:        2.15.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,9 @@ export LC_CTYPE=C.utf8
 %{_includedir}/modulemd-2.0/*
 
 %changelog
+* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15.0-1
+- Auto-upgrade to 2.15.0 - 3.0 package upgrade
+
 * Sun Dec 12 2021 Chris Co <chrco@microsoft.com> - 2.13.0-2
 - Fix build options with new meson
 
