@@ -64,9 +64,6 @@ popd
 * Fri Feb 06 2024 Tobias Brick <tobiasb@microsoft.com> - 1.8.11-1
 - Upgrade to version 1.8.11 to CVE-2022-21698 
 
-* Fri Feb 02 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.7-16
-- Bump release to rebuild with go 1.21.6
-
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-15
 - Bump release to rebuild with go 1.20.9
 
