@@ -178,10 +178,11 @@ rm -rf %{buildroot}/*
 
 %files subid
 %license COPYING
-%{_libdir}/libsubid.so.3*
+%{_libdir}/libsubid.so.4*
 
 %files subid-devel
 %{_includedir}/shadow/subid.h
+%{_libdir}/libsubid.a
 %{_libdir}/libsubid.so
 
 %changelog
