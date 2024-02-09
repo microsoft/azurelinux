@@ -207,6 +207,10 @@ pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
     --no-user --find-links=dist setuptools
 popd
+# create distutils-precedence.pth
+cat > %{python3_sitelib}/distutils-precedence.pth <<- "EOF"
+import os; var = 'SETUPTOOLS_USE_DISTUTILS'; enabled = os.environ.get(var, 'local') == 'local'; enabled and __import__('_distutils_hack').add_shim();
+EOF
 
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
@@ -296,6 +300,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %files setuptools
 %defattr(-,root,root,755)
+%{_libdir}/python%{majmin}/site-packages/distutils-precedence.pth
 %{_libdir}/python%{majmin}/site-packages/pkg_resources/*
 %{_libdir}/python%{majmin}/site-packages/setuptools/*
 %{_libdir}/python%{majmin}/site-packages/_distutils_hack/
