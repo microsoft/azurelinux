@@ -83,7 +83,7 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
-* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.27-4
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 20.10.27-4
 - Patch CVE-2021-44716
 
 * Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 20.10.27-3

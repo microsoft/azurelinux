@@ -65,7 +65,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
-* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.4.0-16
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 8.4.0-16
 - Patch CVE-2021-44716
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 8.4.0-15

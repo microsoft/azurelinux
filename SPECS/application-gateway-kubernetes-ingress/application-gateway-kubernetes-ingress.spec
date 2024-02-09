@@ -68,7 +68,7 @@ cp appgw-ingress %{buildroot}%{_bindir}/
 %{_bindir}/appgw-ingress
 
 %changelog
-* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.0-19
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.0-19
 - Patch CVE-2021-44716
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.4.0-18

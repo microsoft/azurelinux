@@ -73,7 +73,7 @@ make test && \
 %{_bindir}/jx
 
 %changelog
-* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.236-16
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.236-16
 - Patch CVE-2021-44716
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> -3.2.236-15

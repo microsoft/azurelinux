@@ -83,7 +83,7 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
-* Tue Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.1.4-17
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.1.4-17
 - Patch CVE-2021-44716
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.4-16
