@@ -1,7 +1,7 @@
 Summary:        The Kube-Vip cloud provider functions as a general-purpose cloud provider for on-premises bare-metal or virtualized setups
 Name:           kube-vip-cloud-provider
 Version:        0.0.2
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        ASL 2.0
 URL:            https://github.com/kube-vip/kube-vip-cloud-provider
 Group:          Applications/Text
@@ -22,6 +22,7 @@ Source0:        https://github.com/kube-vip/%{name}/archive/refs/tags/v%{version
 
 Source1: %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2021-44716.patch
 BuildRequires: golang
 
 %description
@@ -31,6 +32,7 @@ The Kube-Vip cloud provider functions as a general-purpose cloud provider for on
 %autosetup -N
 tar -xvf %{SOURCE1}
 %patch 0 -p1 -d vendor/github.com/prometheus/client_golang
+%patch 1 -p1
 
 %build 
 go build -mod=vendor
@@ -43,6 +45,9 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 %{_bindir}/kube-vip-cloud-provider
 
 %changelog
+* Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.0.2-15
+- Fix CVE-2021-44716
+
 * Tue Jan 31 2024 Tobias Brick <tobiasb@microsoft.com> - 0.0.2-14
 - Fix CVE-2022-21698
 
