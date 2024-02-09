@@ -20,8 +20,6 @@ Source10:       system-password
 Source11:       system-session
 Source12:       useradd-default
 Source13:       login-defs
-Patch0:         chkname-allowcase.patch
-Patch1:         libsubid-pam-link.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
@@ -50,6 +48,8 @@ Provides:       /usr/sbin/useradd
 Provides:       /usr/sbin/userdel
 Provides:       passwd = %{version}-%{release}
 
+# TODO Check CVE patches in Photon spec
+
 %description
 The Shadow package contains programs for handling passwords
 in a secure way.
@@ -69,8 +69,6 @@ Libraries and headers for libsubid
 
 %prep
 %setup -q -n shadow-%{version}
-%patch 0 -p1
-%patch 1 -p1
 
 autoreconf -fiv
 
@@ -90,6 +88,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
+    --without-libbsd \
     --enable-man \
     --with-su=no
 %make_build
