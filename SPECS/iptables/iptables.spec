@@ -91,7 +91,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/iptables-xml
 %{_mandir}/man1/*
 %{_mandir}/man8/*
- /usr/share/xtables/iptables.xslt
+/usr/share/xtables/iptables.xslt
 
 %files devel
 %{_libdir}/*.so
