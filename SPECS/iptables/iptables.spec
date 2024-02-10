@@ -1,13 +1,13 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
-Version:        1.8.7
-Release:        6%{?dist}
+Version:        1.8.10
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.netfilter.org/projects/iptables
-Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.bz2
+Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.xz
 Source1:        iptables.service
 Source2:        iptables
 Source3:        iptables.stop
@@ -91,6 +91,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/iptables-xml
 %{_mandir}/man1/*
 %{_mandir}/man8/*
+/usr/share/xtables/iptables.xslt
 
 %files devel
 %{_libdir}/*.so
@@ -99,6 +100,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Feb 09 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.8.10-1
+- Upgrade version for Mariner 3.0 release
+
 * Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 1.8.7-6
 - workaround "circular dependencies" from build tooling
 
