@@ -5,7 +5,8 @@
       "2.0",
       "3.0-dev",
       "3.0",
-      "fasttrack/2.0"
+      "fasttrack/2.0",
+      "topic"
     ],
     "azurecli": {
       "architecture": "AMD64-ARM64",
@@ -86,7 +87,8 @@
       "2.0",
       "3.0-dev",
       "3.0",
-      "fasttrack/2.0"
+      "fasttrack/2.0",
+      "topic"
     ],
     "cdi": {
       "architecture": "AMD64",
@@ -142,11 +144,13 @@
     },
     "fasttrack/2.0": {
       "development": "cblmarinerfasttrack",
+      "hciRedirect": "acrafoimages",
       "preview": "cblmarineracr2mcrpreview",
       "production": "azurelinuxpreview"
     },
     "topic": {
-      "development": "cblmarinertopic"
+      "development": "cblmarinertopic",
+      "hciRedirect": "acrafoimages"
     }
   }
 }
