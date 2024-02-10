@@ -12,7 +12,7 @@ License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://aspell.net/
-Source:         ftp://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
+Source:         https://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch
 BuildRequires:  chrpath
@@ -43,8 +43,8 @@ and header files needed for Aspell development.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fc
-%patch1 -p1 -b .mlib
+%patch 0 -p1 -b .fc
+%patch 1 -p1 -b .mlib
 iconv -f iso-8859-2 -t utf-8 < manual/aspell.info > manual/aspell.info.aux
 mv manual/aspell.info.aux manual/aspell.info
 
