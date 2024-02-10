@@ -1,6 +1,6 @@
 Summary:        Creates a common metadata repository
 Name:           createrepo_c
-Version:        1.0.3
+Version:        0.17.5
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
@@ -72,7 +72,7 @@ popd
 %license COPYING
 %{_sysconfdir}/bash_completion.d/createrepo_c.bash
 %{_bindir}/*
-%{_libdir}/*.so.*
+%{_libdir}/*.so.0*
 %{_mandir}/*
 %exclude %{_libdir}/python*
 
@@ -83,9 +83,6 @@ popd
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Tue Feb 06 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.0.3-1
-- Upgrade to 1.0.3
-
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.17.5-1
 - Upgrade to latest upstream version
 - Lint spec
