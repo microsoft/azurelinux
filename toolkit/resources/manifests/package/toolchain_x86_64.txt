@@ -44,9 +44,9 @@ cracklib-debuginfo-2.9.11-1.azl3.x86_64.rpm
 cracklib-devel-2.9.11-1.azl3.x86_64.rpm
 cracklib-dicts-2.9.11-1.azl3.x86_64.rpm
 cracklib-lang-2.9.11-1.azl3.x86_64.rpm
-createrepo_c-1.0.3-1.azl3.x86_64.rpm
-createrepo_c-debuginfo-1.0.3-1.azl3.x86_64.rpm
-createrepo_c-devel-1.0.3-1.azl3.x86_64.rpm
+createrepo_c-0.17.5-1.azl3.x86_64.rpm
+createrepo_c-debuginfo-0.17.5-1.azl3.x86_64.rpm
+createrepo_c-devel-0.17.5-1.azl3.x86_64.rpm
 cross-binutils-common-2.41-2.azl3.noarch.rpm
 cross-gcc-common-13.2.0-2.azl3.noarch.rpm
 curl-8.5.0-1.azl3.x86_64.rpm
