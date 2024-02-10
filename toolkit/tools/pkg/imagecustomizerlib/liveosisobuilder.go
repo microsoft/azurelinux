@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
@@ -246,45 +245,6 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
-// canonalizeExtraCommandLine
-//
-// given the kernel extra commandline parameters, this function ensures
-// that they are well-formatted for grub correct consumption.
-//
-// inputs:
-//   - extraCommandLine:
-//     extra commandline parameters to canonalize.
-//
-// outputs
-//   - canonalized commadline parameters.
-func canonalizeExtraCommandLine(extraCommandLine string) string {
-	cannonicalExtraCommandLine := ""
-	// Split by spaces/tabs into 'fields'.
-	fields := strings.Fields(extraCommandLine)
-	for _, field := range fields {
-		// If a field starts with 'ds=nocloud;s=' (for cloud-init), it means
-		// the user did not wrap it in single quotes as it should be. If left
-		// as-is, the grub parsing at runtime will drop the text after the ';'.
-		//
-		// Unfortunately, if the user adds single quotes, the higher-level
-		// toolkit and MIC schema validation fail because the Mariner Toolkit
-		// does not allow it.
-		//
-		// This Toolkit limitation is because it uses 'sed' to manipulate
-		// grub.cfg and 'sed' relies on single quotes to parse its input
-		// expression. So, include a single quote will break the sed input
-		// parsing.
-		//
-		// The work around below is to restore the needed single quotes.
-		if strings.HasPrefix(field, "ds=nocloud;s=") {
-			field = "'" + field + "'"
-		}
-		cannonicalExtraCommandLine += field + " "
-	}
-	cannonicalExtraCommandLine = strings.TrimSpace(cannonicalExtraCommandLine)
-	return cannonicalExtraCommandLine
-}
-
 // prepareLiveOSDir
 //
 //		given a rootfs, this function:
@@ -340,8 +300,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerA
 	b.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
-	cannonicalExtraCommandLine := canonalizeExtraCommandLine(extraCommadLine)
-	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, cannonicalExtraCommandLine, liveOSDir, liveOSImage)
+	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, extraCommadLine, liveOSDir, liveOSImage)
 	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
 
 	err = os.WriteFile(targetGrubCfgPath, []byte(targetGrubCfgContent), 0o644)
@@ -621,7 +580,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 //     list of files to copy from the build machine to the iso media.
 func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommadLine string, err error) {
 
-	extraCommadLine = isoConfig.KernelCommandLine.ExtraCommandLine
+	extraCommadLine = string(isoConfig.KernelExtraCommandLine)
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 

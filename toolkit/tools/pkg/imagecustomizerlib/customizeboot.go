@@ -47,7 +47,7 @@ const (
 	selinuxConfigModeRegexSELinuxMode = 1
 )
 
-func handleKernelCommandLine(extraCommandLine string, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
+func handleKernelCommandLine(kernelExtraParameters imagecustomizerapi.KernelExtraParameters, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
 	var err error
 
 	if partitionsCustomized {
@@ -55,6 +55,8 @@ func handleKernelCommandLine(extraCommandLine string, imageChroot *safechroot.Ch
 		// scatch.
 		return nil
 	}
+
+	extraCommandLine := string(kernelExtraParameters)
 
 	if extraCommandLine == "" {
 		// Nothing to do.
