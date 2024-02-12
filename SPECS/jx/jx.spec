@@ -1,7 +1,7 @@
 Summary:        Command line tool for working with Jenkins X.
 Name:           jx
 Version:        3.2.236
-Release:        14%{?dist}
+Release:        16%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,10 @@ Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{na
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
+# patches for vendored code >= 1000
+Patch1000:      CVE-2023-44487.patch
+Patch1001:      CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.17.1
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
@@ -36,10 +40,12 @@ BuildRequires:  golang >= 1.17.1
 Command line tool for working with Jenkins X.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 # No download use vednor cache locally
 sed -i 's/go mod download/# go mod download/' ./Makefile
@@ -51,7 +57,14 @@ install -m 755 -d %{buildroot}%{_bindir}
 install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 
 %check
+# jenkins is not available for aarch64, can only run unit tests for x86_64.
+%ifarch x86_64
+sed -i 's/TEST_BUILDFLAGS :=  -ldflags "$(BUILD_TIME_CONFIG_FLAGS)"/TEST_BUILDFLAGS :=  -mod=vendor -ldflags "$(BUILD_TIME_CONFIG_FLAGS)"/' ./Makefile
+make test && \
 ./build/jx --help
+%else
+./build/jx --help
+%endif
 
 %files
 %defattr(-,root,root)
@@ -60,6 +73,13 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./build/jx
 %{_bindir}/jx
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.2.236-16
+- Patch CVE-2021-44716
+
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> -3.2.236-15
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+- Add unit tests to check section
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.236-14
 - Bump release to rebuild with go 1.20.9
 

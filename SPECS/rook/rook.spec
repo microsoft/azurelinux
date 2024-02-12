@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        15%{?dist}
+Release:        18%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,10 @@ Source99:       update-tarball.sh
 # creating a new SUSE release branch of Rook.
 # Change the default FlexVolume dir path to support Kubic.
 Patch0:         flexvolume-dir.patch
+# Patches the vendered source tarball; must be applied after untarring that tarball.
+# Can be removed if we upgrade to prometheus-node-exporter 1.10.0 or later.
+Patch1:         CVE-2022-21698.patch
+Patch2:         CVE-2023-44487.patch
 # Ceph version is needed to set correct container tag in manifests
 BuildRequires:  ceph
 # Rook requirements
@@ -122,8 +126,10 @@ This package contains Helm Charts for Rook.
 %define _buildshell /bin/bash
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 # remove symbols unsupported by k8s (+) from version
@@ -248,6 +254,15 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
+* Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 1.6.2-18
+- Bump release to rebuild with go 1.21.6
+
+* Thu Feb 08 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.6.2-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Wed Feb 07 2024 Tobias Brick <tobiasb@microsoft.com> - 1.6.2-16
+- Patch to fix CVE-2022-21698
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.2-15
 - Bump release to rebuild with go 1.20.9
 

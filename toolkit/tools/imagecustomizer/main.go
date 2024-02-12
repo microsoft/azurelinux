@@ -26,8 +26,7 @@ var (
 	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()
-	logFile                     = exe.LogFileFlag(app)
-	logLevel                    = exe.LogLevelFlag(app)
+	logFlags                    = exe.SetupLogFlags(app)
 	profFlags                   = exe.SetupProfileFlags(app)
 	timestampFile               = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -41,7 +40,7 @@ func main() {
 		kingpin.Fatalf("Either --output-image-format or --output-split-partitions-format must be specified.")
 	}
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

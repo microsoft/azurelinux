@@ -1,7 +1,7 @@
 Summary:        NFS client utils
 Name:           nfs-utils
 Version:        2.5.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT and GPLv2 and GPLv2+ and BSD
 URL:            https://linux-nfs.org/
 Group:          Applications/Nfs-utils-client
@@ -125,10 +125,10 @@ make check
 
 %pre
 if ! getent group nobody >/dev/null; then
-    groupadd -r nobody
+    groupadd -r -g 65534 nobody
 fi
 if ! getent passwd nobody >/dev/null; then
-    useradd -g named -s /bin/false -M -r nobody
+    useradd -g named -u 65534 -s /bin/false -M -r nobody
 fi
 
 %post
@@ -167,6 +167,9 @@ fi
 %{_libdir}/libnfsidmap.so
 
 %changelog
+* Wed Nov 01 2023 Andy Zaugg <azaugg@linkedin.com> - 2.5.4-4
+- Fix post-install script to create nobody user instead of named user
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.5.4-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
