@@ -30,9 +30,8 @@ Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Can be removed if we upgrade keda to 2.6.0 or later.
 Patch0:         CVE-2022-21698.patch
 
-# patches for vendored code >= 1000
-Patch1000:         CVE-2023-44487.patch
-Patch1001:         CVE-2021-44716.patch
+Patch0:            CVE-2023-44487.patch
+Patch1:            CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.15
 

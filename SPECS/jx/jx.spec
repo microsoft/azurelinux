@@ -28,9 +28,8 @@ Source0:        https://github.com/jenkins-x/jx/archive/v%{version}.tar.gz#/%{na
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 
-# patches for vendored code >= 1000
-Patch1000:      CVE-2023-44487.patch
-Patch1001:      CVE-2021-44716.patch
+Patch0:         CVE-2023-44487.patch
+Patch1:         CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.17.1
 %global debug_package %{nil}
