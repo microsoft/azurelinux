@@ -154,14 +154,14 @@ Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xz-java-1.9.tar.xz
 
 BuildRequires:  byaccj
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-generators
 BuildRequires:  java-devel
 BuildRequires:  rpm-devel
 
 Requires:       bash
 Requires:       coreutils
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       procps-ng
 
 %description
@@ -193,11 +193,6 @@ for source in ${other_sources}
 do
   tar -xf "${source}"
 done
-
-pushd "downstream/xmvn-generator"
-sed -i 's|<release>17</release>|<release>11</release>|' ./pom.xml
-cat ./pom.xml
-popd
 
 for patch_path in patches/*/*
 do
