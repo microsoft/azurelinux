@@ -1,7 +1,7 @@
 Summary:        Docutils -- Python Documentation Utilities.
 Name:           python-docutils
-Version:        0.18.1
-Release:        2%{?dist}
+Version:        0.20.1
+Release:        1%{?dist}
 License:        Public Domain, PSF-2.0, BSD, GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -97,6 +97,9 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %{_bindir}/rst2html43.py
 
 %changelog
+* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.20.1-1
+- Auto-upgrade to 0.20.1 - Azure Linux 3.0 - package upgrades
+
 * Fri Feb 25 2022 Muhammad Falak <mwani@microsoft.com> - 0.18.1-2
 - Fix test path `s/test3/test/` to enable ptest
 
