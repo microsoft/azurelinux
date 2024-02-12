@@ -7,7 +7,7 @@ Release:        1%{?dist}
 # binaries are GPL and libraries are LGPL.  See COPYING.
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/SELinuxProject/setools
 Source0:        https://github.com/SELinuxProject/setools/releases/download/%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  bison

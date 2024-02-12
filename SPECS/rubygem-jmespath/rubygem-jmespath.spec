@@ -6,7 +6,7 @@ Version:        1.6.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/jmespath/jmespath.rb
 Source0:        https://github.com/jmespath/jmespath.rb/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}.rb-%{version}.tar.gz

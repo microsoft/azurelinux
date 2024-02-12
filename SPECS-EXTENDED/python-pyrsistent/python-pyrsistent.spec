@@ -22,7 +22,7 @@ Release:        2%{?dist}
 License:        MIT
 URL:            http://github.com/tobgu/pyrsistent/
 Vendor:         Microsoft
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 # relax dependencies specified in setup.py
 Patch0:         00-relax-dependencies.patch

@@ -4,7 +4,7 @@ Release:	17%{?dist}
 Summary:	A switch statement for Perl
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Switch
 Source0:	https://cpan.metacpan.org/authors/id/R/RG/RGARCIA/Switch-%{version}.tar.gz#/perl-Switch-%{version}.tar.gz
 Patch0:		Switch-2.17-Filter-1.50.patch

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A utility for converting amounts from one unit to another
 Name: units
 Version: 2.19

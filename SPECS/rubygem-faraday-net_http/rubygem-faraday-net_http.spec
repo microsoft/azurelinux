@@ -6,7 +6,7 @@ Version:        3.0.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-net_http
 Source0:        https://github.com/lostisland/faraday-net_http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

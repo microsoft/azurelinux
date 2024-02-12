@@ -20,7 +20,7 @@ Version:        1.3.2
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-dune/csexp
 Source0:        %{url}/releases/download/%{version}/%{srcname}-%{version}.tbz
 # Depend on Stdlib.Result instead of ocaml-result.  See comment above.

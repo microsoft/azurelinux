@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-DateTime-Format-DateParse
 Version:        0.05
 Release:        23%{?dist}

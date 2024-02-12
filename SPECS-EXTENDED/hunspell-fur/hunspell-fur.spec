@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-fur
 Summary: Friulian hunspell dictionaries
 %global upstreamid 20050912

@@ -8,7 +8,7 @@ Release:        32%{?dist}
 # scripts included.
 License:        HPND AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Net-IP
 Source:         https://cpan.metacpan.org/modules/by-module/Net/Net-IP-%{version}.tar.gz
 Patch0:         Net-IP-1.26-rt60439.patch

@@ -12,7 +12,7 @@ Version:        2.1.9
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.open-iscsi.com/
 Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{version}-%{commit0}.tar.gz
 Source4:        04-iscsi

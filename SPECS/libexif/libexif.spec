@@ -4,7 +4,7 @@ Version:        0.6.24
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libexif.github.io/
 Source0:        https://github.com/libexif/libexif/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 BuildRequires:  doxygen

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define		perl_vendorarch	%(eval "`perl -V:installvendorarch`"; echo $installvendorarch)
 
 Summary:	Modular text mode IRC client with Perl scripting

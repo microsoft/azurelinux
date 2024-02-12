@@ -7,7 +7,7 @@
 %bcond_with     tests
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Version:        1.18.0~b1
 Name:           python-%{srcname}
 Release:        3%{?dist}

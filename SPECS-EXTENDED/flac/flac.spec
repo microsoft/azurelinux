@@ -4,7 +4,7 @@ Version:        1.4.3
 Release:        1%{?dist}
 License:        BSD-3-Clause AND GPL-2.0-or-later AND GFDL-1.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.xiph.org/flac/
 Source0:        https://downloads.xiph.org/releases/flac/flac-%{version}.tar.xz
 BuildRequires:  autoconf

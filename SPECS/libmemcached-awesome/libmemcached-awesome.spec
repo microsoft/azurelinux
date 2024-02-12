@@ -15,7 +15,7 @@ Version:        1.1.1
 Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/awesomized/libmemcached
 Source0:        https://github.com/awesomized/libmemcached/archive/refs/tags/%{version}.tar.gz#/%{libname}-%{version}.tar.gz
 BuildRequires:  bison

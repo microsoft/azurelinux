@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           meanwhile
 Version:        1.1.0
 Release:        30%{?dist}

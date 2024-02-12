@@ -4,7 +4,7 @@ Version:        1.1.1
 Release:        7%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://frippery.org/uml/
 Source0:        https://frippery.org/uml/%{name}-%{version}.tgz
 Source1:        https://frippery.org/uml/sparsify.c

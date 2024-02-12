@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-ExtUtils-PkgConfig
 Version:        1.16
 Release:        12%{?dist}

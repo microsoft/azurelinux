@@ -5,7 +5,7 @@ Version:        15.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rhboot/shim
 %ifarch x86_64
 BuildRequires:  shim-unsigned-x64

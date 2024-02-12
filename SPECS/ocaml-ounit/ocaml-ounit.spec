@@ -15,7 +15,7 @@ Version:        2.2.2
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ounit
 Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
 # We neither need nor want the stdlib-shims package.  It is a forward

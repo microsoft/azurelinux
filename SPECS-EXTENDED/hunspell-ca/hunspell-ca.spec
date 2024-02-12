@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ca
 Summary: Catalan hunspell dictionaries
 Version: 2.3

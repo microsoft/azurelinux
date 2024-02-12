@@ -4,7 +4,7 @@ Version:        0.52.23
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://pagure.io/newt
 Source0:        https://pagure.io/releases/%{name}/%{name}-%{version}.tar.gz

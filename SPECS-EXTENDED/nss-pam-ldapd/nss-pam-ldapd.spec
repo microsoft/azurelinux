@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global nssdir /%{_lib}
 %global pamdir /%{_lib}/security
 

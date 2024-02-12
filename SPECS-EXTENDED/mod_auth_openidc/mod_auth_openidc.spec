@@ -16,7 +16,7 @@ Version:        2.4.14.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/OpenIDC/mod_auth_openidc
 Source0:        https://github.com/OpenIDC/mod_auth_openidc/releases/download/v%{version}/%{name}-%{version}.tar.gz
 

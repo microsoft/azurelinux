@@ -9,7 +9,7 @@ Version:        1.49.3
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnu.org/software/help2man
 Source:         ftp://ftp.gnu.org/gnu/help2man/help2man-%{version}.tar.xz
 

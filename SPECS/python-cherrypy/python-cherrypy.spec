@@ -11,7 +11,7 @@ Release:        1%{?dist}
 License:        BSD
 Url:            https://cherrypy.dev/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/C/%{pypiname}/%{pypiname}-%{version}.tar.gz
 BuildArch:      noarch
 

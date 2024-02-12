@@ -4,7 +4,7 @@ Version:        0.9.1
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/virgl/virglrenderer
 Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-0135.patch

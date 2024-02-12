@@ -4,7 +4,7 @@ Version:        22.03
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Tools
 URL:            https://github.com/intel/pf-bb-config
 Source0:        https://github.com/intel/pf-bb-config/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

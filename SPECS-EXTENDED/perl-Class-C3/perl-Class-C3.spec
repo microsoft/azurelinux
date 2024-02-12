@@ -4,7 +4,7 @@ Release:	10%{?dist}
 Summary:	Pragma to use the C3 method resolution order algorithm
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Class-C3
 Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/Class-C3-%{version}.tar.gz#/perl-Class-C3-%{version}.tar.gz
 BuildArch:	noarch
