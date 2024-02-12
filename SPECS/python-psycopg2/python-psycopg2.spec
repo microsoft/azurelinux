@@ -1,15 +1,14 @@
 %define _python_bytecompile_errors_terminate_build 0
 Summary:        Python-PostgreSQL Database Adapter
 Name:           python-psycopg2
-Version:        2.7.5
-Release:        8%{?dist}
+Version:        2.9.9
+Release:        1%{?dist}
 Url:            https://pypi.python.org/pypi/psycopg2
 License:        LGPLv3+ with exceptions
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-%{version}.tar.gz
-Patch0:         psycopg2-py38.patch
+Source0:        https://github.com/psycopg/psycopg2/archive/%{version}/psycopg2-%{version}.tar.gz
 
 %description
 Psycopg is the most popular PostgreSQL database adapter for the Python programming language.
@@ -35,7 +34,7 @@ Documentation and example files for the psycopg python PostgreSQL
 database adapter.
 
 %prep
-%autosetup -p1 -n psycopg2-%{version}
+%autosetup -n psycopg2-%{version}
 
 %build
 %py3_build
@@ -75,6 +74,9 @@ rm -r /home/postgres/data &>/dev/null ||:
 %doc doc
 
 %changelog
+* Mon Feb 12 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 2.9.9-1
+- Upgrade to version 2.9.9
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.7.5-8
 - Fix build with Python 3.9 using upstream patch
 
