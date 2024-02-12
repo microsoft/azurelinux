@@ -6,7 +6,7 @@ Version:        15.4
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rhboot/shim
 # This signed-shim tarball contains the shim binary signed with
 # the Microsoft UEFI CA key

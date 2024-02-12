@@ -4,7 +4,7 @@ Version:        2.9.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.haproxy.org
 Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.gz

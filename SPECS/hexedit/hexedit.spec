@@ -4,7 +4,7 @@ Version:        1.2.13
 Release:        19%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://rigaux.org/hexedit.html
 Source:         http://rigaux.org/%{name}-%{version}.src.tgz
 Patch1:         hexedit-1.2.13-config.patch

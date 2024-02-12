@@ -4,7 +4,7 @@ Version:        5.63
 Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.bluez.org/
 Source0:        http://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
 Source1:        bluez.gitignore

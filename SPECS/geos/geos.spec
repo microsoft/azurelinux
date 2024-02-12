@@ -1,16 +1,12 @@
 Summary:        GEOS is a C++ port of the Java Topology Suite
 Name:           geos
-Version:        3.11.1
-Release:        4%{?dist}
+Version:        3.12.1
+Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://trac.osgeo.org/geos/
 Source0:        https://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
-# Fix doxygen errors
-Patch0:         geos_docs.patch
-# Fix GCC13 FTBFS
-Patch1:         geos_gcc13.patch
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
@@ -37,7 +33,7 @@ This package contains the development files to build applications that
 use GEOS.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 # Native build
@@ -55,7 +51,7 @@ make docs -C %{__cmake_builddir}
 %doc AUTHORS NEWS.md README.md
 %license COPYING
 %{_bindir}/geosop
-%{_libdir}/libgeos.so.3.11.1
+%{_libdir}/libgeos.so.3.12.1
 %{_libdir}/libgeos_c.so.1*
 
 %files devel
@@ -70,6 +66,9 @@ make docs -C %{__cmake_builddir}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Feb 09 2024 Aditya Dubey <adityadubey@microsoft.com> - 3.12.1
+- Upgrading to version 3.12.1 for mariner 3.0
+
 * Tue Feb 14 2023 Sindhu Karri <lakarri@microsoft.com> - 3.11.1-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - Removed building for mingw environment

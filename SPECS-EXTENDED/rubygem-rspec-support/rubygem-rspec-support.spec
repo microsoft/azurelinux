@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global	gem_name	rspec-support
 
 %global	mainver	3.12.0

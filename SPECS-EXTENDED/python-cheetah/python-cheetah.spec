@@ -7,7 +7,7 @@ Summary:        Template engine and code generator
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://cheetahtemplate.org/
 Source:         https://github.com/CheetahTemplate3/cheetah3/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

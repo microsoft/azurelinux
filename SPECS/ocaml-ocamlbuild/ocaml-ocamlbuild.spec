@@ -8,7 +8,7 @@ Version:        0.14.2
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml/ocamlbuild
 Source0:        https://github.com/ocaml/ocamlbuild/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

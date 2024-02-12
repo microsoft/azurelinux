@@ -7,7 +7,7 @@ Version:        3.4.4
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://wiki.gnome.org/LibSoup
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libsoup/%{majmin}/%{name}-%{version}.tar.xz

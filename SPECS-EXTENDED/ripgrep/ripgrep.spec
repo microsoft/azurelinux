@@ -24,7 +24,7 @@ Release:        5%{?dist}
 Summary:        A search tool that combines ag with grep
 License:        MIT AND Unlicense
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Text/Utilities
 URL:            https://github.com/BurntSushi/ripgrep
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz

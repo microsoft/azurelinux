@@ -8,7 +8,7 @@ Version:        2.13.1
 Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://abrt.readthedocs.org/
 Source:         https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         0001-gui-wizard-gtk-Fix-segfault.patch

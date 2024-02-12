@@ -14,7 +14,7 @@ Release:	24%{?dist}
 Summary:	Loads one of several alternate underlying implementations for a module
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/pod/Module::Implementation
 Source0:	https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Module-Implementation-%{version}.tar.gz#/perl-Module-Implementation-%{version}.tar.gz
 BuildArch:	noarch

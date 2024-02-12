@@ -6,7 +6,7 @@ Version:        1.0.19
 Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libsodium.org/
 Source0:        https://download.libsodium.org/%{name}/releases/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

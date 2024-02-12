@@ -7,7 +7,7 @@ Version:        1.100263
 Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.google.com/fonts/specimen/Roboto+Slab
 # Fonts archive retrieved on 2021-12-06.
 Source0:        https://fonts.google.com/download?family=Roboto%20Slab#/%{name}-%{version}.zip

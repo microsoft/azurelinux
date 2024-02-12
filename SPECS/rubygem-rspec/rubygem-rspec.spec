@@ -6,7 +6,7 @@ Version:        3.12.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://rspec.info
 Source0:        https://github.com/rspec/rspec-metagem/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-metagem-%{version}.tar.gz
 BuildRequires:  rubygems-devel

@@ -12,7 +12,7 @@ Version:        0.5+%{git_short_commit_date}.%{git_short_commit}
 Release:        34%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/numad
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz
 # The source for this package was pulled from upstream's vcs.  Use the

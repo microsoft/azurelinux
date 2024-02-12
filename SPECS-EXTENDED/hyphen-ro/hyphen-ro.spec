@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ro
 Summary: Romanian hyphenation rules
 Version: 3.3.6

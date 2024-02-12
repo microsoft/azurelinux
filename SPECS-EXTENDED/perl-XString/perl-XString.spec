@@ -4,7 +4,7 @@ Release:	4%{?dist}
 Summary:	Isolated String helpers from B
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/XString
 Source0:	https://cpan.metacpan.org/authors/id/A/AT/ATOOMIC/XString-%{version}.tar.gz#/perl-XString-%{version}.tar.gz
 # Build

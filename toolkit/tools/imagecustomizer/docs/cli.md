@@ -42,7 +42,7 @@ iso image. For more details on this format, see: [Mariner Image Customizer ISO S
 
 Format of partition files. If specified, disk partitions will be extracted as separate files.
 
-Options: raw, raw-zstd.
+Options: raw, raw-zst.
 
 ## --shrink-filesystems
 

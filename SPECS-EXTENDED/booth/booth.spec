@@ -35,7 +35,7 @@ Version:        1.0
 Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ClusterLabs/%{name}
 Source0:        https://github.com/ClusterLabs/%{name}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:    CVE-2022-2553.patch
