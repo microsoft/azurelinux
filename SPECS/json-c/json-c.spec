@@ -58,7 +58,7 @@ make %{?_smp_mflags} test
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
-* Fri Feb 9 2024 <elainezhao@microsoft.com> - 0.17-1
+* Mon Feb 12 2024 Elaine Zhao <elainezhao@microsoft.com> - 0.17-1
 - Bump version to 0.17
 
 * Mon Aug 28 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.15-2
