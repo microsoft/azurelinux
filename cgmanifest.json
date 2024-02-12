@@ -23014,8 +23014,8 @@
         "type": "other",
         "other": {
           "name": "python-mock",
-          "version": "4.0.3",
-          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-4.0.3.tar.gz"
+          "version": "5.1.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-5.1.0.tar.gz"
         }
       }
     },
