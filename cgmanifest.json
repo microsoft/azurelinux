@@ -8701,8 +8701,8 @@
         "type": "other",
         "other": {
           "name": "libcacard",
-          "version": "2.7.0",
-          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
+          "version": "2.8.1",
+          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.8.1.tar.xz"
         }
       }
     },
@@ -11001,8 +11001,8 @@
         "type": "other",
         "other": {
           "name": "libstoragemgmt",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.9.3/libstoragemgmt-1.9.3.tar.gz"
+          "version": "1.9.8",
+          "downloadUrl": "https://github.com/libstorage/libstoragemgmt/releases/download/1.9.8/libstoragemgmt-1.9.8.tar.gz"
         }
       }
     },
@@ -12871,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mercurial",
-          "version": "6.0.3",
-          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-6.0.3.tar.gz"
+          "version": "6.5.1",
+          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-6.5.1.tar.gz"
         }
       }
     },
