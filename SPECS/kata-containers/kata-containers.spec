@@ -36,7 +36,7 @@
 %global agent_make_vars         LIBC=gnu \\\
                                 DESTDIR=%{buildroot}%{kataagentdir}
 
-Summary:        Kata Containers version 2.x repository
+Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl0
 Release:        1%{?dist}
@@ -72,17 +72,11 @@ Requires:       libseccomp
 # %{SOURCE0}/versions.yaml.
 Requires:       virtiofsd = 1.8.0
 
-Conflicts:      kata-agent
-Conflicts:      kata-ksm-throttler
-Conflicts:      kata-proxy
-Conflicts:      kata-runtime
-Conflicts:      kata-shim
-
 %description
-Kata Containers version 2.x repository. Kata Containers is an open source
-project and community working to build a standard implementation of lightweight
-Virtual Machines (VMs) that feel and perform like containers, but provide the
-workload isolation and security advantages of VMs. https://katacontainers.io/.}
+Kata Containers is an open source project and community working to build a
+standard implementation of lightweight Virtual Machines (VMs) that feel and
+perform like containers, but provide the workload isolation and security
+advantages of VMs. https://katacontainers.io/.}
 
 %package tools
 Summary:        Kata Tools package
