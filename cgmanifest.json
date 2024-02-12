@@ -23034,8 +23034,8 @@
         "type": "other",
         "other": {
           "name": "python-more-itertools",
-          "version": "8.13.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-8.13.0.tar.gz"
+          "version": "10.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-10.2.0.tar.gz"
         }
       }
     },
