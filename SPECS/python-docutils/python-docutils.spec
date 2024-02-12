@@ -47,6 +47,7 @@ PATH=%{buildroot}%{_bindir}:${PATH} \
 %defattr(-,root,root)
 %license licenses
 %{python3_sitelib}/*
+%{_bindir}/docutils
 %{_bindir}/rstpep2html
 %{_bindir}/rst2xml
 %{_bindir}/rst2xetex
