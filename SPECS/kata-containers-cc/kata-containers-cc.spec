@@ -1,5 +1,6 @@
 %global runtime_make_vars       DEFMEMSZ=256 \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
+                                DEFSNPGUEST=true \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
