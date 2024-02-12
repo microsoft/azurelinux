@@ -22114,8 +22114,8 @@
         "type": "other",
         "other": {
           "name": "python-decorator",
-          "version": "4.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/decorator-4.4.2.tar.gz"
+          "version": "5.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/decorator-5.1.1.tar.gz"
         }
       }
     },
@@ -23004,8 +23004,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "0.8.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-0.8.3.tar.gz"
+          "version": "3.0.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.0.2.tar.gz"
         }
       }
     },
@@ -23014,8 +23014,8 @@
         "type": "other",
         "other": {
           "name": "python-mock",
-          "version": "4.0.3",
-          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-4.0.3.tar.gz"
+          "version": "5.1.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-5.1.0.tar.gz"
         }
       }
     },
@@ -23034,8 +23034,8 @@
         "type": "other",
         "other": {
           "name": "python-more-itertools",
-          "version": "8.13.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-8.13.0.tar.gz"
+          "version": "10.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/more-itertools/more-itertools-10.2.0.tar.gz"
         }
       }
     },
