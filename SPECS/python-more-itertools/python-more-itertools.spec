@@ -5,8 +5,8 @@ collect additional building blocks, recipes, and routines for working with
 Python iterables.}
 Summary:        More routines for operating on Python iterables, beyond itertools
 Name:           python-more-itertools
-Version:        8.13.0
-Release:        3%{?dist}
+Version:        10.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,9 @@ tox -e py%{python3_version_nodots}
 %license LICENSE
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.2.0-1
+- Auto-upgrade to 10.2.0 - 3.0 package upgrade
+
 * Tue Aug 22 2023 Osama Esmail <osamaesmail@microsoft.com> - 8.13.0-3
 - Fixing tests by adding 'tox'
 
