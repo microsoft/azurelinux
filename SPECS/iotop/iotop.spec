@@ -7,7 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Monitoring
 URL:            https://github.com/tomas-m/iotop
-Source0:        https://github.com/tomas-m/%{name}/archive/refs/tags/%{name}-v%{version}.tar.gz
+# Source0:      https://github.com/tomas-m/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-v%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  ncurses-devel
