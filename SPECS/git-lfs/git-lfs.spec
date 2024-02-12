@@ -28,7 +28,6 @@ Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:       %{name}-%{version}-vendor.tar.gz
-
 Patch0:        CVE-2023-44487.patch
 Patch1:        CVE-2021-44716.patch
 
