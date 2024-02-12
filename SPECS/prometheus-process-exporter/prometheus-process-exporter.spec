@@ -5,7 +5,7 @@
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
 Version:        0.7.10
-Release:        15%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,9 @@ Source3:        %{name}.logrotate
 Source4:        %{name}.conf
 Patch0:         01-fix-RSS-test-on-non4K-pagesize-systems.patch
 Patch1:         03-disable-fakescraper.patch
+# Can be removed if we ever update to a version that includes this pull request: https://github.com/ncabatoff/process-exporter/pull/264.
+Patch2:         CVE-2022-21698.patch
+Patch3:         CVE-2023-44487.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-rpm-macros
@@ -45,10 +48,11 @@ instrument with Prometheus. This exporter solves that issue by mining
 process metrics from procfs.
 
 %prep
-%autosetup -p1 -n process-exporter-%{version}
-
+%autosetup -N -n process-exporter-%{version}
+# Apply vendor before patching
 rm -rf vendor
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 
 %build
 LDFLAGS="-X github.com/ncabatoff/process-exporter/version.Version=%{version}      \
@@ -97,6 +101,15 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 0.7.10-18
+- Bump release to rebuild with go 1.21.6
+
+* Thu Feb 08 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.7.10-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Wed Feb 07 2024 Tobias Brick <tobiasb@microsoft.com> - 0.7.10-16
+- Patch to fix CVE-2022-21698
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.10-15
 - Bump release to rebuild with go 1.20.9
 

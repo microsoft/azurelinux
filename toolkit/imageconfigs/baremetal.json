@@ -51,12 +51,17 @@
                 "packagelists/selinux-full.json"
             ],
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0",
+                "ExtraCommandLine": "console=tty0 console=ttyS0 rd.info log_buf_len=1M",
                 "SELinux": "enforcing"
             },
             "KernelOptions": {
                 "default": "kernel"
             },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]
