@@ -21,7 +21,7 @@ Version:        1.0.6
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/X11/Icons
 URL:            https://xorg.freedesktop.org/
 Source0:        https://xorg.freedesktop.org/releases/individual/data/%{name}-%{version}.tar.bz2

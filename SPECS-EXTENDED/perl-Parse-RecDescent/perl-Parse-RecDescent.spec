@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Parse-RecDescent
 Version:        1.967015
 Release:        11%{?dist}

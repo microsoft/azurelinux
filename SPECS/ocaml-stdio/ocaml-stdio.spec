@@ -12,7 +12,7 @@ Version:        0.15.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 

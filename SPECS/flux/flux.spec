@@ -21,11 +21,11 @@
 
 Summary:        Influx data language
 Name:           flux
-Version:        0.191.0
-Release:        3%{?dist}
+Version:        0.194.5
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/flux
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -139,6 +139,9 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
+- Upgrade to version 0.194.5
+
 * Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.191.0-3
 - Introduce patch to drop warnings as build blocker
 

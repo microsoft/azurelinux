@@ -4,7 +4,7 @@ Version:        10.2.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fmtlib/%{name}
 Source0:        https://github.com/fmtlib/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

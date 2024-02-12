@@ -24,7 +24,7 @@ Version:        1.18.0
 Release:        22%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://%{name}.io
 Source:         %{download_url}#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2022-2990.patch

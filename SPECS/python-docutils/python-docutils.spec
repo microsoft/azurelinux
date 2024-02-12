@@ -4,7 +4,7 @@ Version:        0.18.1
 Release:        2%{?dist}
 License:        Public Domain, PSF-2.0, BSD, GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/docutils
 Source0:        https://files.pythonhosted.org/packages/source/d/docutils/docutils-%{version}.tar.gz

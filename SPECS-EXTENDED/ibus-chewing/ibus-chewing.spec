@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if 0%{?el6}
 %bcond_with gsettings
 %bcond_without gconf2

@@ -28,7 +28,7 @@ Version:        1.9.1
 Release:        15%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/weaveworks/kured
 #Source0:       https://github.com/weaveworks/kured/archive/refs/tags/%{version}.tar.gz

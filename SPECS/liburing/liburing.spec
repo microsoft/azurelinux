@@ -4,7 +4,7 @@ Version:        2.5
 Release:        1%{?dist}
 License:        (GPLv2 WITH exceptions AND LGPLv2+) OR MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.kernel.dk/cgit/liburing/
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

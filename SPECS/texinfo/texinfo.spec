@@ -6,7 +6,7 @@ License:        GPLv3+
 URL:            https://www.gnu.org/software/texinfo/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Provides:       info = %{version}-%{release}
 Provides:       %{name}-tex = %{version}-%{release}

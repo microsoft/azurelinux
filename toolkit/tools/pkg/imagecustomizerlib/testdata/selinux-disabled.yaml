@@ -1,0 +1,3 @@
+SystemConfig:
+  KernelCommandLine:
+    SELinux: disabled

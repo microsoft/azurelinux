@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPLv2
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/opensvc/multipath-tools
 Source0:        https://github.com/opensvc/multipath-tools/archive/refs/tags/%{version}.tar.gz#/multipath-tools-%{version}.tar.gz
 BuildRequires:  userspace-rcu-devel

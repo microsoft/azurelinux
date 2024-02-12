@@ -5,7 +5,7 @@ Version:        20210511
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.imapwiki.org/ImapTest
 Source0:        https://dovecot.org/nightly/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf

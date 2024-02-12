@@ -4,7 +4,7 @@ Version:        0.5
 Release:        1%{?dist}
 License:        MIT OR Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/candlepin/python-iniparse
 Source0:        https://files.pythonhosted.org/packages/4c/9a/02beaf11fc9ea7829d3a9041536934cd03990e09c359724f99ee6bd2b41b/iniparse-%{version}.tar.gz 

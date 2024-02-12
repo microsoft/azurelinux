@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global project_owner avakar
 %global github_name pytoml
 %global sum Parser for TOML

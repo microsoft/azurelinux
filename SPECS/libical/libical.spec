@@ -4,7 +4,7 @@ Version:        3.0.9
 Release:        5%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libical.github.io/libical/
 Source:         https://github.com/%{name}/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  %{_bindir}/xsltproc

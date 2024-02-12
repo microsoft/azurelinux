@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global unicodedir %{_datadir}/unicode
 %global emojidir %{unicodedir}/emoji
 

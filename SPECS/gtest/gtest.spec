@@ -4,7 +4,7 @@ Version:        1.12.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/google/googletest
 Source0:        https://github.com/google/googletest/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz

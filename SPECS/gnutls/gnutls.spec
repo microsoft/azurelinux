@@ -4,7 +4,7 @@ Version:        3.8.2
 Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz

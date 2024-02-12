@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	High-level API for X Keyboard Extension
 Name:		libxklavier
 Version:	5.4

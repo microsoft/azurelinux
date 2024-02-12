@@ -5,7 +5,7 @@ Version:        7.0
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gcovr.com/
 Source0:        https://github.com/gcovr/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  make

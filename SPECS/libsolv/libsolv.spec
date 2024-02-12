@@ -1,13 +1,13 @@
 Summary:        A free package dependency solver
 Name:           libsolv
-Version:        0.7.24
+Version:        0.7.28
 Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
-Source0:        https://github.com/openSUSE/libsolv/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  cmake
 BuildRequires:  rpm-devel
 Requires:       expat-libs
@@ -77,6 +77,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Wed Feb 07 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 0.7.28-1
+- Upgrade to version 0.7.28
+
 * Tue Jun 20 2023 Sam Meluch <sammeluch@microsoft.com> - 0.7.24-1
 - add ENABLE_COMPS option to support dnf5
 - Upgrade to version 0.7.24

@@ -4,7 +4,7 @@ Version:        0.8.3
 Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/mistune/
 Source0:        https://files.pythonhosted.org/packages/source/m/mistune/mistune-%{version}.tar.gz

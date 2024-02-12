@@ -4,7 +4,7 @@ Version:        3.2.0
 Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/jazzband/prettytable
 Source0:        https://pypi.io/packages/source/p/prettytable/prettytable-%{version}.tar.gz

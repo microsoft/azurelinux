@@ -4,7 +4,7 @@ Version:        1.2.6
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://netfilter.org/projects/libnftnl/
 Source0:        https://netfilter.org/projects/libnftnl/files/%{name}-%{version}.tar.xz

@@ -1,4 +1,6 @@
 #!/bin/bash -e
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 function filter_packages {
     # First argument is a path to the packages directory

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Test-HasVersion
 Version:        0.014
 Release:        14%{?dist}

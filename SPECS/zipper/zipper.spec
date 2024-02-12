@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # zlib licenses comes from minizip/ source code
 License:        MIT AND zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://github.com/sebastiandev/zipper
 #Source0:       https://github.com/sebastiandev/%{name}/archive/v%{version}.tar.gz

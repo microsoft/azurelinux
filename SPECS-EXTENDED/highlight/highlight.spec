@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           highlight
 Summary:        Universal source code to formatted text converter
 Version:        3.54

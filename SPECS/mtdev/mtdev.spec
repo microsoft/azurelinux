@@ -4,7 +4,7 @@ Version:        1.1.6
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://bitmath.org/code/mtdev/
 Source0:        https://bitmath.org/code/%{name}/%{name}-%{version}.tar.bz2
 

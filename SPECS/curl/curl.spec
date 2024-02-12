@@ -4,7 +4,7 @@ Version:        8.5.0
 Release:        1%{?dist}
 License:        curl
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/NetworkingLibraries
 URL:            https://curl.haxx.se
 Source0:        https://curl.haxx.se/download/%{name}-%{version}.tar.gz

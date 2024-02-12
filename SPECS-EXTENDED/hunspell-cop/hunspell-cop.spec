@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-cop
 Summary: Coptic hunspell dictionaries
 Version: 0.3

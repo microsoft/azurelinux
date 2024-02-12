@@ -16,9 +16,11 @@ import (
 	"github.com/klauspost/pgzip"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -31,22 +33,23 @@ const (
 
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
 type IsoMaker struct {
-	enableBiosBoot     bool                 // Flag deciding whether to include BIOS bootloaders or not in the generated ISO image.
-	enableRpmRepo      bool                 // Flag deciding whether to include the contents of the Rpm repo folder in the generated ISO image.
-	unattendedInstall  bool                 // Flag deciding if the installer should run in unattended mode.
-	config             configuration.Config // Configuration for the built ISO image and its installer.
-	configSubDirNumber int                  // Current number for the subdirectories storing files mentioned in the config.
-	baseDirPath        string               // Base directory for config's relative paths.
-	buildDirPath       string               // Path to the temporary build directory.
-	efiBootImgPath     string               // Path to the efiboot.img file needed to boot the ISO installer.
-	fetchedRepoDirPath string               // Path to the directory containing an RPM repository with all packages required by the ISO installer.
-	initrdPath         string               // Path to ISO's initrd file.
-	grubCfgPath        string               // Path to ISO's grub.cfg file. If provided, overrides the grub.cfg from the resourcesDirPath location.
-	outputDirPath      string               // Path to the output ISO directory.
-	releaseVersion     string               // Current Mariner release version.
-	resourcesDirPath   string               // Path to the 'resources' directory.
-	imageNameBase      string               // Base name of the ISO to generate (no path, and no file extension).
-	imageNameTag       string               // Optional user-supplied tag appended to the generated ISO's name.
+	enableBiosBoot     bool                    // Flag deciding whether to include BIOS bootloaders or not in the generated ISO image.
+	enableRpmRepo      bool                    // Flag deciding whether to include the contents of the Rpm repo folder in the generated ISO image.
+	unattendedInstall  bool                    // Flag deciding if the installer should run in unattended mode.
+	config             configuration.Config    // Configuration for the built ISO image and its installer.
+	configSubDirNumber int                     // Current number for the subdirectories storing files mentioned in the config.
+	baseDirPath        string                  // Base directory for config's relative paths.
+	buildDirPath       string                  // Path to the temporary build directory.
+	efiBootImgPath     string                  // Path to the efiboot.img file needed to boot the ISO installer.
+	fetchedRepoDirPath string                  // Path to the directory containing an RPM repository with all packages required by the ISO installer.
+	initrdPath         string                  // Path to ISO's initrd file.
+	grubCfgPath        string                  // Path to ISO's grub.cfg file. If provided, overrides the grub.cfg from the resourcesDirPath location.
+	outputDirPath      string                  // Path to the output ISO directory.
+	releaseVersion     string                  // Current Mariner release version.
+	resourcesDirPath   string                  // Path to the 'resources' directory.
+	additionalIsoFiles []safechroot.FileToCopy // Additional files to copy to the ISO media (absolute-source-path -> iso-root-relative-path).
+	imageNameBase      string                  // Base name of the ISO to generate (no path, and no file extension).
+	imageNameTag       string                  // Optional user-supplied tag appended to the generated ISO's name.
 
 	isoMakerCleanUpTasks []func() error // List of clean-up tasks to perform at the end of the ISO generation process.
 }
@@ -87,7 +90,7 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 	return isoMaker, nil
 }
 
-func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, additionalIsoFiles []safechroot.FileToCopy, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
 
 	if imageNameBase == "" {
 		imageNameBase = defaultImageNameBase
@@ -109,6 +112,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool
 		grubCfgPath:        grubCfgPath,
 		releaseVersion:     releaseVersion,
 		resourcesDirPath:   resourcesDirPath,
+		additionalIsoFiles: additionalIsoFiles,
 		fetchedRepoDirPath: isoRepoDirPath,
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
@@ -445,6 +449,11 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 		return err
 	}
 
+	err = im.copyIsoAdditionalFiles()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -470,13 +479,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 	// im.grubCfgPath allows the user to overwrite the default grub.cfg that is
 	// copied from the resource folder.
 	if im.grubCfgPath != "" {
-		targetGrubCfg := filepath.Join(im.buildDirPath, "boot/grub2/grub.cfg")
-		targetGrubCfgDir := filepath.Dir(targetGrubCfg)
-		err := os.MkdirAll(targetGrubCfgDir, os.ModePerm)
-		if err != nil {
-			return fmt.Errorf("failed while creating directory '%s':\n%w", targetGrubCfgDir, err)
-		}
-
+		targetGrubCfg := filepath.Join(im.buildDirPath, installutils.GrubCfgFile)
 		err = file.Copy(im.grubCfgPath, targetGrubCfg)
 		if err != nil {
 			return err
@@ -555,6 +558,13 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 		return err
 	}
 	return nil
+}
+
+// copyIsoAdditionalFiles copies user-specified files to the iso media. Such
+// files can be used by custom initrd/LiveOS images that will look for them
+// on the iso media.
+func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
+	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles...)
 }
 
 // copyAndRenameAdditionalFiles will copy all additional files into an

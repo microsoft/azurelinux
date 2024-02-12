@@ -6,7 +6,7 @@ Version:        6.24.10
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Shells
 URL:            https://www.tcsh.org/
 Source0:        https://github.com/tcsh-org/tcsh/archive/refs/tags/TCSH6_24_10.tar.gz

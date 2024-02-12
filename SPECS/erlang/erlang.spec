@@ -5,7 +5,7 @@ Version:        25.2
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz

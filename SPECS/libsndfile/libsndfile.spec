@@ -4,7 +4,7 @@ Version:        1.0.31
 Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.mega-nerd.com/libsndfile/
 #Source0:        https://github.com/libsndfile/libsndfile/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
