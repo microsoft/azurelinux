@@ -1877,8 +1877,8 @@
         "type": "other",
         "other": {
           "name": "cni-plugins",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/containernetworking/plugins/archive/v1.4.0.tar.gz"
         }
       }
     },
@@ -23404,8 +23404,8 @@
         "type": "other",
         "other": {
           "name": "python-psycopg2",
-          "version": "2.7.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-2.7.5.tar.gz"
+          "version": "2.9.9",
+          "downloadUrl": "https://github.com/psycopg/psycopg2/archive/2.9.9/psycopg2-2.9.9.tar.gz"
         }
       }
     },
