@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "supermin-5.2.1.tar.gz": "c45d8479b6da8ea55ca2c4b82b2c8bc7c2e6f724cf59c980df1dec93fb578ffb",
-  "supermin-find-requires": "2adbf0ddcd86bde7151679abb8876ba769807c2cfc92306cfecab976cdfc4935",
-  "supermin.attr": "6046070fd8ddb5452292a9e21fe5c8235ac12f1993f7d64f828c099bf22493c6"
- }
+  "Signatures": {
+    "supermin-find-requires": "2adbf0ddcd86bde7151679abb8876ba769807c2cfc92306cfecab976cdfc4935",
+    "supermin.attr": "6046070fd8ddb5452292a9e21fe5c8235ac12f1993f7d64f828c099bf22493c6",
+    "supermin-5.2.2.tar.gz": "ce3921d3635c8168cfb7ca0c5a82b9d5cef5b2b271f84b776d63b8bbbeec358e"
+  }
 }
