@@ -12871,8 +12871,8 @@
         "type": "other",
         "other": {
           "name": "mercurial",
-          "version": "6.0.3",
-          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-6.0.3.tar.gz"
+          "version": "6.5.1",
+          "downloadUrl": "https://www.mercurial-scm.org/release/mercurial-6.5.1.tar.gz"
         }
       }
     },
