@@ -38,13 +38,13 @@
 
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
-Version:        3.1.0
-Release:        11%{?dist}
+Version:        3.2.0.azl0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-URL:            https://github.com/%{name}/%{name}
-Source0:        https://github.com/%{name}/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}-vendor.tar.gz
+URL:            https://github.com/microsoft/kata-containers
+Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        50-kata
 Source3:        mariner-build-uvm.sh
 
@@ -220,6 +220,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
+- Use Microsoft sources based on upstream version 3.2.0.
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-11
 - Bump release to rebuild with go 1.21.6
 

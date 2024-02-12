@@ -9,16 +9,15 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.3
-Release:      4%{?dist}
+Version:      3.2.0.azl0
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
-Source2:      %{name}-%{version}-cargo.tar.gz
-Source3:      mariner-coco-build-uvm.sh
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:      %{name}-%{version}-cargo.tar.gz
+Source2:      mariner-coco-build-uvm.sh
 
 ExclusiveArch: x86_64
 
@@ -70,7 +69,7 @@ This package contains the the tooling and files required to build the UVM
 %prep
 %autosetup -p1 -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE2}
+tar -xf %{SOURCE1}
 popd
 
 %build
@@ -138,7 +137,7 @@ pushd %{_builddir}/%{name}-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
-install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
+install -D -m 0755 %{SOURCE2}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
 install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
 install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
 install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
@@ -288,8 +287,11 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-4
-- Bump release to rebuild with go 1.21.6
+*   Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
+-   Use Microsoft sources based on upstream Kata version 3.2.0.
+
+*   Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-4
+-   Bump release to rebuild with go 1.21.6
 
 *   Tue Jan 30 2024 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
 -   Remove kernel-uvm-cvm(-devel) dependency
