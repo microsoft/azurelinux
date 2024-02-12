@@ -10021,8 +10021,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.13.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
+          "version": "2.15.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.15.0/modulemd-2.15.0.tar.xz"
         }
       }
     },
