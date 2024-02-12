@@ -1,23 +1,18 @@
 Summary:        Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
 Name:           iotop
-Version:        1.23
+Version:        1.25
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Monitoring
-URL:            http://guichaz.free.fr/iotop/
-Source0:        http://guichaz.free.fr/iotop/files/%{name}-%{version}.tar.gz
-# Fix build issue with Python 3
-# https://repo.or.cz/iotop.git/commit/99c8d7cedce81f17b851954d94bfa73787300599
-Patch0:         %{name}-itervalues.patch
-# Build explicitly with Python 3
-# https://repo.or.cz/iotop.git/commit/5bdd01c3b3b1c415c71b00b2374538995f63597c
-Patch1:         %{name}-use-py3.patch
-BuildRequires:  python3-devel
-Requires:       python3
-Requires:       python3-curses
-BuildArch:      noarch
+URL:            https://github.com/tomas-m/iotop
+Source0:        https://github.com/tomas-m/%{name}/archive/refs/tags/%{name}-v%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  gnupg2
+BuildRequires:  ncurses-devel
+BuildRequires:  make
+BuildRequires:  pkgconfig(ncursesw)
 
 %description
 Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
@@ -26,26 +21,27 @@ Iotop is a Python program with a top like UI used to show the processes and thei
 %autosetup -p1
 
 %build
-%py3_build
+%set_build_flags
+NO_FLTO=1 %make_build
 
 %install
-%py3_install
+V=1 STRIP=: %make_install
+mv %{buildroot}%{_sbindir}/iotop %{buildroot}%{_sbindir}/iotop-c
+mv %{buildroot}%{_mandir}/man8/iotop.8 %{buildroot}%{_mandir}/man8/iotop-c.8
 
 # %%check
 # This package does not have any tests
 
-%files
-%defattr(-,root,root)
+%files	
 %license COPYING
-%doc NEWS THANKS
-%{python3_sitelib}/%{name}*.egg-info
-%{python3_sitelib}/%{name}/
-%{_sbindir}/%{name}
-%{_mandir}/man8/%{name}*
-
+%license LICENSE
+%{_sbindir}/iotop-c
+%{_mandir}/man8/iotop-c.8*
+ 
 %changelog
-* Fri Dec 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23-1
-- Auto-upgrade to 1.23 - none
+* Fri Dec 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25-1
+- Auto-upgrade to 1.25 - 3.0 upgrade
+- Change the package to iotop-c (iotop but with C-based implementation)
 
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
