@@ -1,4 +1,4 @@
-Summary:        Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
+Summary:        Simple top-like I/O monitor (implemented in C).
 Name:           iotop
 Version:        1.25
 Release:        1%{?dist}
@@ -15,7 +15,21 @@ BuildRequires:  make
 BuildRequires:  pkgconfig(ncursesw)
 
 %description
-Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
+iotop does for I/O usage what top(1) does for CPU usage. It watches I/O
+usage information output by the Linux kernel and displays a table of
+current I/O usage by processes on the system. It is handy for answering
+the question "Why is the disk churning so much?".
+ 
+iotop requires a Linux kernel built with the CONFIG_TASKSTATS,
+CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING and
+CONFIG_VM_EVENT_COUNTERS config options on.
+ 
+This package actually an alternative re-implementation of the older
+Python-based iotop in C, optimized for performance. Normally a monitoring
+tool intended to be used on a system under heavy stress should use the
+least additional resources as possible.
+ 
+%global _hardened_build 1
 
 %prep
 %autosetup -p1
@@ -26,8 +40,6 @@ NO_FLTO=1 %make_build
 
 %install
 V=1 STRIP=: %make_install
-mv %{buildroot}%{_sbindir}/iotop %{buildroot}%{_sbindir}/iotop-c
-mv %{buildroot}%{_mandir}/man8/iotop.8 %{buildroot}%{_mandir}/man8/iotop-c.8
 
 # %%check
 # This package does not have any tests
@@ -35,13 +47,14 @@ mv %{buildroot}%{_mandir}/man8/iotop.8 %{buildroot}%{_mandir}/man8/iotop-c.8
 %files	
 %license COPYING
 %license LICENSE
-%{_sbindir}/iotop-c
-%{_mandir}/man8/iotop-c.8*
+%{_sbindir}/iotop
+%{_mandir}/man8/iotop.8*
  
 %changelog
 * Fri Dec 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25-1
 - Auto-upgrade to 1.25 - 3.0 upgrade
 - Change the package to iotop-c (iotop but with C-based implementation)
+- Import spec file contents from Fedora
 
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
