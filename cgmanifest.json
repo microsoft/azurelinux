@@ -29166,8 +29166,8 @@
         "type": "other",
         "other": {
           "name": "virglrenderer",
-          "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
+          "version": "0.10.4",
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/virglrenderer-0.10.4/virglrenderer-virglrenderer-0.10.4.tar.gz"
         }
       }
     },

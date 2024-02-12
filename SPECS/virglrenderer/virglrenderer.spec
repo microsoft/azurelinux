@@ -1,14 +1,12 @@
 Summary:        Virgl Rendering library.
 Name:           virglrenderer
-Version:        0.9.1
-Release:        3%{?dist}
+Version:        0.10.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/virgl/virglrenderer
 Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-0135.patch
-Patch1:         CVE-2022-0175.patch
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
@@ -66,6 +64,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.10.4-1
+- Auto-upgrade to 0.10.4 - Upgrade to 0.10.4 in Azure Linux 3.0
+
 * Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
 - Apply CVE-2022-0175 patch from upstream.
 
