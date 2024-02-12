@@ -22114,8 +22114,8 @@
         "type": "other",
         "other": {
           "name": "python-decorator",
-          "version": "4.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/decorator-4.4.2.tar.gz"
+          "version": "5.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/decorator/decorator-5.1.1.tar.gz"
         }
       }
     },

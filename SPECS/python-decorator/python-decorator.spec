@@ -9,8 +9,8 @@
 
 Summary:        Module to simplify usage of decorators
 Name:           python-%{pypi_name}
-Version:        4.4.2
-Release:        5%{?dist}
+Version:        5.1.1
+Release:        1%{?dist}
 License:        BSD
 URL:            https://github.com/micheles/decorator
 Source0:        https://files.pythonhosted.org/packages/source/d/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -57,6 +57,9 @@ find %{buildroot} -name SOURCES.txt~ -exec rm -f {} \;
 %{python3_sitelib}/__pycache__/*
 
 %changelog
+* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.1-1
+- Auto-upgrade to 5.1.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Jan 31 2022 Cameron Baird <cameronbaird@microsoft.com> - 4.4.2-5
 - Move to SPECS
 - License verified
