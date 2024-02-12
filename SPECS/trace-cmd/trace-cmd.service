@@ -1,0 +1,15 @@
+[Unit]
+Description=trace-cmd Flightrecorder
+DefaultDependencies=no
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/etc/sysconfig/trace-cmd.conf
+ExecStart=/usr/bin/trace-cmd start $OPTS
+ExecStop=/usr/bin/trace-cmd reset
+ExecReload=/usr/bin/trace-cmd start $OPTS
+
+[Install]
+WantedBy=multi-user.target

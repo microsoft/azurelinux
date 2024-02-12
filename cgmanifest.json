@@ -28615,6 +28615,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "trace-cmd",
+          "version": "3.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tracelogging",
           "version": "0.3.1",
           "downloadUrl": "https://github.com/microsoft/tracelogging/archive/v0.3.1.tar.gz"
