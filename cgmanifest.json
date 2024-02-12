@@ -8701,8 +8701,8 @@
         "type": "other",
         "other": {
           "name": "libcacard",
-          "version": "2.7.0",
-          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz"
+          "version": "2.8.1",
+          "downloadUrl": "https://www.spice-space.org/download/libcacard/libcacard-2.8.1.tar.xz"
         }
       }
     },
@@ -10021,8 +10021,8 @@
         "type": "other",
         "other": {
           "name": "libmodulemd",
-          "version": "2.13.0",
-          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.13.0/modulemd-2.13.0.tar.xz"
+          "version": "2.15.0",
+          "downloadUrl": "https://github.com/fedora-modularity/libmodulemd/releases/download/2.15.0/modulemd-2.15.0.tar.xz"
         }
       }
     },
@@ -10671,8 +10671,8 @@
         "type": "other",
         "other": {
           "name": "librepo",
-          "version": "1.15.1",
-          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.15.1.tar.gz"
+          "version": "1.15.2",
+          "downloadUrl": "https://github.com/rpm-software-management/librepo/archive/1.15.2.tar.gz"
         }
       }
     },
