@@ -52,9 +52,9 @@ func TestKernelExtraParametersValid(t *testing.T) {
 
 	configsToTest := map[KernelExtraParameters]*string{
 		// very simple cases (no quoting)
-		"": nil,
-		"a": nil,
-		"a=b": nil,
+		"":        nil,
+		"a":       nil,
+		"a=b":     nil,
 		"a=b x=y": nil,
 		// enlosed in double quotes (4)
 		"\"a=b\"": nil,
