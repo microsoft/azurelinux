@@ -10,7 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/json-c/json-c
 Source0:        %{url}/archive/%{name}-%{version}-%{publishdate}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2021-32292.patch
 
 BuildRequires: cmake
 
