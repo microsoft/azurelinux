@@ -23404,8 +23404,8 @@
         "type": "other",
         "other": {
           "name": "python-psycopg2",
-          "version": "2.7.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/psycopg2/psycopg2-2.7.5.tar.gz"
+          "version": "2.9.9",
+          "downloadUrl": "https://github.com/psycopg/psycopg2/archive/2.9.9/psycopg2-2.9.9.tar.gz"
         }
       }
     },
@@ -23494,8 +23494,8 @@
         "type": "other",
         "other": {
           "name": "python-pycurl",
-          "version": "7.43.0.2",
-          "downloadUrl": "https://pypi.io/packages/source/p/pycurl/pycurl-7.43.0.2.tar.gz"
+          "version": "7.45.2",
+          "downloadUrl": "https://pypi.io/packages/source/p/pycurl/pycurl-7.45.2.tar.gz"
         }
       }
     },
