@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,7 @@ Metapackage holding sets of core packages for different applications.
 %package minimal
 Summary:        The smallest useful package list.
 Requires:       filesystem
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
@@ -28,7 +28,7 @@ Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
 Requires:       tzdata
@@ -55,6 +55,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-2
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Mon Jan 22 2024 Betty Lakes <bettylakes@microsoft.com> - 3.0-1
 - Version upgraded to 3.0
 
