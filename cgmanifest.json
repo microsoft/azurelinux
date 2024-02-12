@@ -13384,7 +13384,7 @@
         "other": {
           "name": "moby-containerd-cc",
           "version": "1.7.7",
-          "downloadUrl": null
+          "downloadUrl": "https://mitchzhu.blob.core.windows.net/public/moby-containerd-cc-1.7.7.tar.gz"
         }
       }
     },

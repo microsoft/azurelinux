@@ -13,7 +13,8 @@ URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+#Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:  https://mitchzhu.blob.core.windows.net/public/moby-containerd-cc-1.7.7.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
