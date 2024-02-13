@@ -29863,8 +29863,8 @@
         "type": "other",
         "other": {
           "name": "xkeyboard-config",
-          "version": "2.30",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.30.tar.bz2"
+          "version": "2.40",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/data/xkeyboard-config/xkeyboard-config-2.40.tar.xz"
         }
       }
     },
