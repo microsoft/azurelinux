@@ -23725,7 +23725,7 @@
         "other": {
           "name": "python-pyudev",
           "version": "0.24.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/20/b6/16961ac3575575260c72928f17df9c99c2a696871e486965ec6e2fa2aff4/pyudev-0.24.1.tar.g"
+          "downloadUrl": "https://files.pythonhosted.org/packages/20/b6/16961ac3575575260c72928f17df9c99c2a696871e486965ec6e2fa2aff4/pyudev-0.24.1.tar.gz"
         }
       }
     },
