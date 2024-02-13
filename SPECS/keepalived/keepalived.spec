@@ -4,7 +4,7 @@ Version:        2.2.8
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.keepalived.org/
 Source0:        https://www.keepalived.org/software/%{name}-%{version}.tar.gz

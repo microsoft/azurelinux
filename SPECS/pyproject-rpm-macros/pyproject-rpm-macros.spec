@@ -10,7 +10,7 @@ Version:        1.0.0~rc1
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
 
 BuildArch:      noarch

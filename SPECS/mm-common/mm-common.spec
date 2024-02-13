@@ -4,7 +4,7 @@ Version:        1.0.6
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://gtkmm.org
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/1.0/%{name}-%{version}.tar.xz

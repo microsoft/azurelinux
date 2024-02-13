@@ -5,7 +5,7 @@ Version:        4.6.1
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/sosreport/sos
 Source0:        https://github.com/sosreport/sos/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The sos-4.6.1.tar.gz is missing a commit to bump the version to 4.6.1

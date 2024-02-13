@@ -4,7 +4,7 @@ Release:        40%{?dist}
 Summary:        A collection of Perl modules for working with XML
 License:        (GPL+ or Artistic) and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/libxml-perl
 Source0:        https://cpan.metacpan.org/authors/id/K/KM/KMACLEOD/libxml-perl-%{version}.tar.gz#/perl-libxml-perl-%{version}.tar.gz
 BuildArch:      noarch

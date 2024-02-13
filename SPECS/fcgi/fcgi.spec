@@ -10,7 +10,7 @@ Patch0:         fcgi-EOF.patch
 Patch1:         CVE-2012-6687.patch
 Group:          Development/Libraries/C and C++
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 FastCGI is a language independent, scalable, open extension to CGI that

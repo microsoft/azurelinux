@@ -4,7 +4,7 @@ Version:        2.15
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.littlecms.com/
 Source0:        https://github.com/mm2/Little-CMS/archive/refs/tags/lcms%{version}.tar.gz#/Little-CMS-lcms%{version}.tar.gz
 BuildRequires:  gcc

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           iio-sensor-proxy
 Version:        3.0
 Release:        5%{?dist}

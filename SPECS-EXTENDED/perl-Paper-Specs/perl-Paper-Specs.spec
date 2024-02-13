@@ -4,7 +4,7 @@ Release:        23%{?dist}
 Summary:        Size and layout information for paper stock, forms, and labels
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Paper-Specs
 Source0:        https://cpan.metacpan.org/authors/id/J/JO/JONALLEN/Paper-Specs-%{version}.tar.gz#/perl-Paper-Specs-%{version}.tar.gz
 # https://rt.cpan.org/Public/Bug/Display.html?id=78027

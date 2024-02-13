@@ -4,7 +4,7 @@ Version:        2.04
 Release:        8%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-StackTrace
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Devel-StackTrace-%{version}.tar.gz#/perl-Devel-StackTrace-%{version}.tar.gz
 BuildArch:      noarch

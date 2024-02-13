@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       ibus-sayura
 Version:    1.3.2
 Release:    20%{?dist}

@@ -2,7 +2,7 @@
 %bcond_with systemd
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %if %{with selinux}
 %global selinuxtype targeted

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global require_ibus_version 1.3.99
 %global require_libhangul_version 0.1.0
 

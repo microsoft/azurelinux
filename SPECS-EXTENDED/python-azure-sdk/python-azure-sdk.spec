@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Commit corresponding to the 5.0.0 release of the azure bundle on PyPi
 %global commit 2b2cfd46758e7b9d55346f79f05592d7488c1bd0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})

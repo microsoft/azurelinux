@@ -5,7 +5,7 @@ Summary:        Regular expressions for XML tokens
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-RegExp
 Source0:        https://cpan.metacpan.org/authors/id/T/TJ/TJMATHER/XML-RegExp-%{version}.tar.gz#/perl-XML-RegExp-%{version}.tar.gz
 

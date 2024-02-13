@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # we don't want to provide private python extension libs in python3 dirs
 %global __provides_exclude_from ^%{python3_sitearch}/.*\\.so$
 

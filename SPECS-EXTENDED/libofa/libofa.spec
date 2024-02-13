@@ -5,7 +5,7 @@ Version:        0.9.3
 Release:        42%{?dist}
 License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://code.google.com/p/musicip-libofa/
 # Source0:	http://musicip-libofa.googlecode.com/files/libofa-%{version}.tar.gz
 Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/musicip-libofa/libofa-%{version}.tar.gz

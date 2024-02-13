@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: The libglade library for loading user interfaces
 Name: libglade2
 Version: 2.6.4

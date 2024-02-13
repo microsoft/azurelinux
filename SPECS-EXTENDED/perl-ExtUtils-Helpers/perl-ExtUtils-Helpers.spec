@@ -4,7 +4,7 @@ Release:	14%{?dist}
 Summary:	Various portability utilities for module builders
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/ExtUtils-Helpers
 Source0:	https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-Helpers-%{version}.tar.gz#/perl-ExtUtils-Helpers-%{version}.tar.gz
 BuildArch:	noarch

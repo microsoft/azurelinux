@@ -4,7 +4,7 @@ Version:        6.3.0
 Release:        1%{?dist}
 License:        GPLv2+ AND GPLv3+ AND LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.gnu.org/software/gmp
 Source0:        http://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz

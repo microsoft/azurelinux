@@ -5,7 +5,7 @@ Summary:        Change directory temporarily for a limited scope
 License:        ASL 2.0
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-pushd
 Source0:        http://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/File-pushd-%{version}.tar.gz
 BuildArch:      noarch

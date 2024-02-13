@@ -6,7 +6,7 @@ Release: 3%{?dist}
 Summary: System-level performance monitoring and performance management
 License: GPLv2+ and LGPLv2+ and CC-BY
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:     https://pcp.io
 
 %global  bintray https://bintray.com/artifact/download

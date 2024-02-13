@@ -9,7 +9,7 @@ Summary:        The new features in unittest backported to Python 2.4+
 
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://pypi.python.org/pypi/unittest2
 Source0:        https://pypi.python.org/packages/source/u/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
 # we don't need this in Fedora, since we have Python 2.7, which has argparse

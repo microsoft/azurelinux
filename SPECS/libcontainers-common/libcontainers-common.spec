@@ -29,7 +29,7 @@ Version:        20210626
 Release:        2%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/containers
 #Source0:       https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz

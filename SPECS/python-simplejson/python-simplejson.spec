@@ -1,10 +1,10 @@
 Summary:        Simple, fast, extensible JSON encoder/decoder for Python.
 Name:           python-simplejson
-Version:        3.17.6
+Version:        3.19.2
 Release:        1%{?dist}
 License:        MIT OR AFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/simplejson
 Source0:        https://pypi.python.org/packages/source/s/simplejson/simplejson-%{version}.tar.gz
@@ -39,6 +39,9 @@ It is pure Python code with no dependencies, but includes an optional C extensio
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.2-1
+- Auto-upgrade to 3.19.2 - 3.0 package upgrade
+
 * Tue Mar 29 2022 Olivia Crain <oliviacrain@microsoft.com> - 3.17.6-1
 - Upgrade to latest upstream version
 

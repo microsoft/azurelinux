@@ -7,7 +7,7 @@ Version:        0.6.10
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://drobilla.net/software/%{name}/
 Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
 BuildRequires:  doxygen

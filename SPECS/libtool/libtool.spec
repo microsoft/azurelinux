@@ -6,7 +6,7 @@ License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://ftp.gnu.org/gnu/libtool/%{name}-%{version}.tar.xz
 %description
 It wraps the complexity of using shared libraries in a

@@ -4,7 +4,7 @@ Version:        0.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/jbeder/yaml-cpp
 Source0:        https://github.com/jbeder/yaml-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake

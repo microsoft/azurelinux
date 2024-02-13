@@ -4,7 +4,7 @@ Release:        5%{?dist}
 Summary:        Utilities for handling Byte Order Marks
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-BOM
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MATTLAW/File-BOM-%{version}.tar.gz#/perl-File-BOM-%{version}.tar.gz
 BuildArch:      noarch

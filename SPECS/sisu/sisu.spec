@@ -6,7 +6,7 @@ Release:        4%{?dist}
 # sisu is EPL-1.0, the bundled asm is BSD
 License:        EPL-1.0 AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://eclipse.org/sisu/
 Source0:        https://github.com/eclipse/sisu.inject/archive/refs/tags/releases/%{version}.tar.gz#/org.eclipse.sisu.inject-%{version}.tar.gz
 Source1:        https://github.com/eclipse/sisu.plexus/archive/refs/tags/releases/%{version}.tar.gz#/org.eclipse.sisu.plexus-%{version}.tar.gz

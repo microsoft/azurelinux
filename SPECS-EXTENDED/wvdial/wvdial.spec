@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A heuristic autodialer for PPP connections
 Name: wvdial
 Version: 1.61

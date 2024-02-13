@@ -9,7 +9,7 @@ Version:        2.3.8
 Release:        1%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/frozendict
 Source0:        https://github.com/Marco-Sulla/%{name}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

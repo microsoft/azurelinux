@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # first two digits of version
 %define release_version %(echo %{version} | awk -F. '{print $1"."$2}')
 
