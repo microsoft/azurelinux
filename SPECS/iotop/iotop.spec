@@ -52,10 +52,10 @@ V=1 STRIP=: %make_install
 %{_mandir}/man8/iotop.8*
  
 %changelog
-* Fri Dec 29 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25-1
+* Mon Feb 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.25-1
 - Auto-upgrade to 1.25 - 3.0 upgrade
 - Change the package to iotop-c (iotop but with C-based implementation)
-- Import spec file contents from Fedora
+- Re-import from Fedora 40 (license: GPL 2.0 or later)
 
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
