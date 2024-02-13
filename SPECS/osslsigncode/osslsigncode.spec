@@ -2,7 +2,7 @@ Summary:        Verify and sign routines for PE binaries
 Name:           osslsigncode
 Version:        2.7
 Release:        1%{?dist}
-License:        GPLv3
+License:        MIT
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -35,5 +35,5 @@ install -D -m 755 ./build/osslsigncode %{buildroot}%{_bindir}/osslsigncode
 
 %changelog
 *   Tue Feb 13 2024 Cameron Baird <cameronbaird@microsoft.com.com> 2.7-1
--   Initial build for verification of Windows binaries.
+-   Original version for CBL-Mariner (license: MIT).
 -   License verified
