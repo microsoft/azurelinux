@@ -35,14 +35,16 @@ The current implementation for the LiveOS ISO does not support the following:
 - disk layout.
   - There is always one disk generated when an `iso` output format is
     specified.
+- SELinux
+  - No SELinux configuration is supported for the generated ISO image.
 
 ## ISO Specific Customizations
 
 - The user can specify one or more files to be copied to the iso media.
 - The user can add kernel parameters.
 
-For a full list of capabilities, see Mariner Image Customizer's iso configuration 
-section: [Config.ISO](./configuration.md#iso-type).
+For a full list of capabilities, see Mariner Image Customizer's iso
+configuration section: [Config.ISO](./configuration.md#iso-type).
 
 ## cloud-init Support
 
@@ -67,7 +69,8 @@ Iso:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data
-  KernelExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
+  KernelCommandLine:
+    ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
 SystemConfig:
   Users:
   - Name: test
@@ -81,7 +84,8 @@ If cloud-init data is to be placed within the LiveOS root file system:
 
 ```yaml
 Iso:
-  KernelExtraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
+  KernelCommandLine:
+    ExtraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
 SystemConfig:
   Users:
   - Name: test

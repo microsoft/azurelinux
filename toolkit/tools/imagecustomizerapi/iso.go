@@ -9,16 +9,16 @@ import (
 
 // Iso defines how the generated iso media should be configured.
 type Iso struct {
-	KernelExtraCommandLine KernelExtraParameters `yaml:"KernelExtraCommandLine"`
-	AdditionalFiles        AdditionalFilesMap    `yaml:"AdditionalFiles"`
+	KernelCommandLine KernelCommandLine  `yaml:"KernelCommandLine"`
+	AdditionalFiles   AdditionalFilesMap `yaml:"AdditionalFiles"`
 }
 
 func (i *Iso) IsValid() error {
 	var err error
 
-	err = i.KernelExtraCommandLine.IsValid()
+	err = i.KernelCommandLine.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid KernelExtraCommandLine: %w", err)
+		return fmt.Errorf("invalid KernelCommandLine: %w", err)
 	}
 
 	if i.AdditionalFiles != nil {

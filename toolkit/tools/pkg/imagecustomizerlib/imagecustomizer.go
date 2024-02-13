@@ -250,11 +250,23 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 		return nil
 	}
 
-	err := validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	err := validateIsoKernelCommandline(config.KernelCommandLine)
 	if err != nil {
 		return err
 	}
 
+	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateIsoKernelCommandline(kernelCommandLine imagecustomizerapi.KernelCommandLine) error {
+	if kernelCommandLine.SELinux != imagecustomizerapi.SELinuxDefault {
+		return fmt.Errorf("unsupported SELinux configuration for the output ISO image.")
+	}
 	return nil
 }
 

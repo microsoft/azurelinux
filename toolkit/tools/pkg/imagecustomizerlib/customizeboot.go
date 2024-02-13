@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -56,8 +57,7 @@ func handleKernelCommandLine(kernelExtraParameters imagecustomizerapi.KernelExtr
 		return nil
 	}
 
-	extraCommandLine := string(kernelExtraParameters)
-
+	extraCommandLine := strings.TrimSpace(string(kernelExtraParameters))
 	if extraCommandLine == "" {
 		// Nothing to do.
 		return nil

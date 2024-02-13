@@ -93,7 +93,7 @@ func validateKernelParametersFormat(kernelParameters string) (err error) {
 	// Disallow special characters to avoid breaking the grub.cfg file.
 	// In addition, disallow the "`" character, since it is used as the sed
 	// escape character by `installutils.setGrubCfgAdditionalCmdLine()`.
-	if strings.ContainsAny(kernelParameters, "\n$`") {
+	if strings.ContainsAny(kernelParameters, "$`") {
 		return fmt.Errorf("the ExtraCommandLine value contains invalid characters")
 	}
 
