@@ -1,6 +1,6 @@
 Summary:        Repodata downloading library
 Name:           librepo
-Version:        1.15.1
+Version:        1.15.2
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -13,6 +13,7 @@ BuildRequires:  attr-devel
 BuildRequires:  check
 BuildRequires:  cmake
 BuildRequires:  curl-devel
+BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  glib-devel
 BuildRequires:  gpgme-devel
@@ -23,6 +24,7 @@ BuildRequires:  python3-sphinx
 BuildRequires:  zchunk-devel
 Requires:       curl-libs
 Requires:       gpgme
+Requires:       openssl
 Requires:       zchunk
 
 %description
@@ -82,6 +84,9 @@ popd
 %{python3_sitearch}/%{name}/
 
 %changelog
+* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.2-1
+- Auto-upgrade to 1.15.2 - 3.0 package upgrade
+
 * Wed Jun 21 2023 Sam Meluch <sammeluch@microsoft.com> - 1.15.1-1
 - Upgrade to version 1.15.1 for dnf5
 

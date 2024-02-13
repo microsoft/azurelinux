@@ -44,7 +44,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        2%{?dist}
+Release:        3%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -133,7 +133,7 @@ BuildRequires:  pkgconfig(libcrypt)
 BuildRequires:  p11-kit-devel
 BuildRequires:  polkit-devel
 # This is required for /etc/os-release, as the systemd uses this during src/boot/efi build
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -272,7 +272,7 @@ Conflicts:      initscripts < 9.56.1
 Conflicts:      fedora-release < 23-0.12
 %endif
 # Make sure that dracut supports systemd-executor and the renames done for v255
-Conflicts:      dracut < 059-16
+Conflicts:      dracut < 059
 
 Obsoletes:      timedatex < 0.6-3
 Provides:       timedatex = 0.6-3
@@ -1170,6 +1170,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 255-3
+- remove conflicts dracut release number
+
 * Thu Jan 04 2024 Dan Streetman <ddstreet@ieee.org> - 255-2
 - Change upstream parent from Photon to Fedora.
 - Following line is included only to avoid tooling failures, and does not indicate the actual license.
