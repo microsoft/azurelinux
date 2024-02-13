@@ -94,6 +94,9 @@ SystemConfig:
           - [Size](#size-uint64)
           - [Flag](#flags-string)
   - [Iso](#iso-type)
+    - [KernelCommandLine](#kernelcommandline-type)
+      - [ExtraCommandLine](#extracommandline-string)
+      - [SELinux](#selinux) - *not supported under the Iso node*
     - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
       - [FileConfig type](#fileconfig-type)
         - [Path](#path-string)
@@ -103,6 +106,7 @@ SystemConfig:
     - [Hostname](#hostname-string)
     - [KernelCommandLine](#kernelcommandline-type)
       - [ExtraCommandLine](#extracommandline-string)
+      - [SELinux](#selinux)
     - [UpdateBaseImagePackages](#updatebaseimagepackages-bool)
     - [PackageListsInstall](#packagelistsinstall-string)
       - [PackageList type](#packagelist-type)
