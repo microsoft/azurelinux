@@ -18,7 +18,7 @@ BuildArch:    noarch
 
 BuildRequires: python3
 BuildRequires: python3-devel
-BuildRequires: systemd
+BuildRequires: systemd-bootstrap
 
 # BuildRequires for 'make test'
 BuildRequires: python3-configobj
