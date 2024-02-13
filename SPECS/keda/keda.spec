@@ -29,10 +29,8 @@ Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Patches the version of client_golang used in the vendored source. Should be applied before creating the vendored tarball.
 # Can be removed if we upgrade keda to 2.6.0 or later.
 Patch0:         CVE-2022-21698.patch
-
-# patches for vendored code >= 1000
-Patch1000:         CVE-2023-44487.patch
-Patch1001:         CVE-2021-44716.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.15
 

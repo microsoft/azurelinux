@@ -20,8 +20,7 @@ Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{vers
 #           -cf %%{name}-%%{version}-govendor.tar.gz vendor
 Source1:        %{name}-%{version}-govendor.tar.gz
 
-# patches for vendored code >= 1000
-Patch1000:      CVE-2021-44716.patch
+Patch0:         CVE-2021-44716.patch
 
 BuildRequires:  golang
 Requires:       %{name}-csi-lvmplugin-provisioner
