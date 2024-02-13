@@ -1,49 +1,62 @@
-Summary:        Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
+%global _hardened_build 1
+
+Summary:        Simple top-like I/O monitor (implemented in C).
 Name:           iotop
-Version:        0.6
-Release:        10%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Monitoring
-URL:            http://guichaz.free.fr/iotop/
-Source0:        http://guichaz.free.fr/iotop/files/%{name}-%{version}.tar.gz
-# Fix build issue with Python 3
-# https://repo.or.cz/iotop.git/commit/99c8d7cedce81f17b851954d94bfa73787300599
-Patch0:         %{name}-itervalues.patch
-# Build explicitly with Python 3
-# https://repo.or.cz/iotop.git/commit/5bdd01c3b3b1c415c71b00b2374538995f63597c
-Patch1:         %{name}-use-py3.patch
-BuildRequires:  python3-devel
-Requires:       python3
-Requires:       python3-curses
-BuildArch:      noarch
+URL:            https://github.com/tomas-m/iotop
+# Source0:      https://github.com/tomas-m/%{name}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+BuildRequires:  gcc
+BuildRequires:  gnupg2
+BuildRequires:  ncurses-devel
+BuildRequires:  make
+BuildRequires:  pkgconfig(ncursesw)
 
 %description
-Iotop is a Python program with a top like UI used to show the processes and their corresponding IO activity.
-
+iotop does for I/O usage what top(1) does for CPU usage. It watches I/O
+usage information output by the Linux kernel and displays a table of
+current I/O usage by processes on the system. It is handy for answering
+the question "Why is the disk churning so much?".
+ 
+iotop requires a Linux kernel built with the CONFIG_TASKSTATS,
+CONFIG_TASK_DELAY_ACCT, CONFIG_TASK_IO_ACCOUNTING and
+CONFIG_VM_EVENT_COUNTERS config options on.
+ 
+This package actually an alternative re-implementation of the older
+Python-based iotop in C, optimized for performance. Normally a monitoring
+tool intended to be used on a system under heavy stress should use the
+least additional resources as possible.
+ 
 %prep
 %autosetup -p1
 
 %build
-%py3_build
+%set_build_flags
+NO_FLTO=1 %make_build
 
 %install
-%py3_install
+V=1 STRIP=: %make_install
 
 # %%check
 # This package does not have any tests
 
-%files
-%defattr(-,root,root)
+%files	
 %license COPYING
-%doc NEWS THANKS
-%{python3_sitelib}/%{name}*.egg-info
-%{python3_sitelib}/%{name}/
-%{_sbindir}/%{name}
-%{_mandir}/man8/%{name}*
-
+%license LICENSE
+%{_sbindir}/iotop
+%{_mandir}/man8/iotop.8*
+ 
 %changelog
+* Mon Feb 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.25-1
+- Auto-upgrade to 1.25 - 3.0 upgrade
+- Change the package to iotop-c (iotop but with C-based implementation)
+- Re-import from Fedora 40 (license: MIT)
+
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
 
