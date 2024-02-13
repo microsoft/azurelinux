@@ -145,7 +145,7 @@ index 63d8d43d2..0e608c4bb 100644
  	}
  	// Look up all the disks to attach
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
-@@ -1142,7 +1224,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -1146,7 +1228,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		if !allowAttach {
  			continue
  		}
