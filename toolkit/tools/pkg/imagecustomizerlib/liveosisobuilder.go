@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
@@ -26,6 +27,7 @@ menuentry "Mariner Baremetal Iso" {
 
 	search --label CDROM --set root
 	linux /isolinux/vmlinuz \
+			%s \
 			overlay-size=70%% \
 			selinux=0 \
 			console=tty0 \
@@ -41,6 +43,7 @@ menuentry "Mariner Baremetal Iso" {
 	initrd /isolinux/initrd.img
 }	
 `
+
 	liveOSDir   = "liveos"
 	liveOSImage = "rootfs.img"
 
@@ -261,11 +264,13 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 //     The folder where the artifacts needed by isoMaker will be staged before
 //     'dracut' is run. 'dracut' will include this folder as-is and place it in
 //     the initrd image.
+//   - 'extraCommandLine':
+//     extra kernel command line arguments to add to grub.
 //
 // outputs
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
-func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir string) error {
+func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerArtifactsStagingDir string, extraCommandLine string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -296,7 +301,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir, isoMakerArtifact
 	b.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
-	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, liveOSDir, liveOSImage)
+	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, extraCommandLine, liveOSDir, liveOSImage)
 	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
 
 	err = os.WriteFile(targetGrubCfgPath, []byte(targetGrubCfgContent), 0o644)
@@ -422,13 +427,15 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //   - 'rawImageFile':
 //     path to an existing raw full disk image (i.e. image with boot
 //     partition and a rootfs partition).
+//   - 'extraCommandLine':
+//     extra kernel command line arguments to add to grub.
 //
 // outputs:
 //   - all the extracted/generated artifacts will be placed in the
 //     `LiveOSIsoBuilder.workingDirs.isoArtifactsDir` folder.
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
-func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) error {
+func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string, extraCommandLine string) error {
 
 	logger.Log.Infof("Preparing iso artifacts")
 
@@ -451,7 +458,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string) er
 	}
 
 	isoMakerArtifactsStagingDir := "/boot-staging"
-	err = b.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir)
+	err = b.prepareLiveOSDir(writeableRootfsDir, isoMakerArtifactsStagingDir, extraCommandLine)
 	if err != nil {
 		return fmt.Errorf("failed to convert rootfs folder to a LiveOS folder:\n%w", err)
 	}
@@ -572,7 +579,9 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 // outputs:
 //   - 'additionalIsoFiles'
 //     list of files to copy from the build machine to the iso media.
-func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, err error) {
+func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommandLine string, err error) {
+
+	extraCommandLine = strings.TrimSpace(string(isoConfig.KernelCommandLine.ExtraCommandLine))
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
@@ -588,7 +597,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 		}
 	}
 
-	return additionalIsoFiles, nil
+	return additionalIsoFiles, extraCommandLine, nil
 }
 
 // createLiveOSIsoImage
@@ -618,7 +627,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 //	creates a LiveOS ISO image.
 func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, rawImageFile, outputImageDir, outputImageBase string) (err error) {
 
-	additionalIsoFiles, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
+	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
 	if err != nil {
 		return fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
 	}
@@ -651,7 +660,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecusto
 		}
 	}()
 
-	err = isoBuilder.prepareArtifactsFromFullImage(rawImageFile)
+	err = isoBuilder.prepareArtifactsFromFullImage(rawImageFile, extraCommandLine)
 	if err != nil {
 		return err
 	}
