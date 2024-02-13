@@ -265,7 +265,7 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 //     'dracut' is run. 'dracut' will include this folder as-is and place it in
 //     the initrd image.
 //   - 'extraCommandLine':
-//     extra kernel command line parameters to add to grub.
+//     extra kernel command line arguments to add to grub.
 //
 // outputs
 //   - customized writeableRootfsDir (new files, deleted files, etc)
@@ -428,7 +428,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //     path to an existing raw full disk image (i.e. image with boot
 //     partition and a rootfs partition).
 //   - 'extraCommandLine':
-//     extra kernel command line parameters to add to grub.
+//     extra kernel command line arguments to add to grub.
 //
 // outputs:
 //   - all the extracted/generated artifacts will be placed in the

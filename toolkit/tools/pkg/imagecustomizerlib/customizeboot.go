@@ -48,7 +48,7 @@ const (
 	selinuxConfigModeRegexSELinuxMode = 1
 )
 
-func handleKernelCommandLine(kernelExtraParameters imagecustomizerapi.KernelExtraParameters, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
+func handleKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
 	var err error
 
 	if partitionsCustomized {
@@ -57,7 +57,7 @@ func handleKernelCommandLine(kernelExtraParameters imagecustomizerapi.KernelExtr
 		return nil
 	}
 
-	extraCommandLine := strings.TrimSpace(string(kernelExtraParameters))
+	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
 	if extraCommandLine == "" {
 		// Nothing to do.
 		return nil

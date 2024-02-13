@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestKernelExtraParametersValid(t *testing.T) {
+func TestKernelExtraArgumentsIsValid(t *testing.T) {
 	/*
 		The following test cases are based on the 'quoting' section in grub
 		documentation: https://www.gnu.org/software/grub/manual/grub/grub.html#Quoting
@@ -43,14 +43,17 @@ func TestKernelExtraParametersValid(t *testing.T) {
 		The backslash retains its special meaning only when followed by one of the
 		following characters: ‘$’, ‘"’, ‘\’, or newline. A backslash-newline pair is
 		treated as a line continuation (that is, it is removed from the input stream
-		and effectively ignored7). A double quote may be quoted within double quotes by
-		preceding it with a backslash.
+		and effectively ignored.
+
+		(7)
+		A double quote may be quoted within double quotes by preceding it with a
+		backslash.
 	*/
 
 	missingClosingDoubleQuotes := "invalid double-quoted string. Missing closing double-quotes."
 	missingClosingSingleQuote := "invalid single-quoted string. Missing closing single-quote."
 
-	configsToTest := map[KernelExtraParameters]*string{
+	configsToTest := map[KernelExtraArguments]*string{
 		// very simple cases (no quoting)
 		"":        nil,
 		"a":       nil,
@@ -64,7 +67,7 @@ func TestKernelExtraParametersValid(t *testing.T) {
 		"\"a='b\" 'x=\"y'": nil,
 		// single-quoted string embedded within a double quoted value (4)
 		"\"'a=b' x=y\"": nil,
-		// double-quoted string embedded within a double quoted value (4)(6)
+		// double-quoted string embedded within a double quoted value (4)(6)(7)
 		"\"a=b \\\"x=y\\\"\"": nil,
 		// \n embedded within a double quoted value (4)(6)
 		"\"a=b x=y\\n\"": nil,
