@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
@@ -47,7 +48,7 @@ const (
 	selinuxConfigModeRegexSELinuxMode = 1
 )
 
-func handleKernelCommandLine(extraCommandLine string, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
+func handleKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
 	var err error
 
 	if partitionsCustomized {
@@ -56,6 +57,7 @@ func handleKernelCommandLine(extraCommandLine string, imageChroot *safechroot.Ch
 		return nil
 	}
 
+	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
 	if extraCommandLine == "" {
 		// Nothing to do.
 		return nil

@@ -240,6 +240,10 @@ The partitions to provision on the disk.
 
 Specifies the configuration for the generated ISO media.
 
+### KernelExtraCommandLine [string]
+
+- See [ExtraCommandLine](#extracommandline-string).
+
 ### AdditionalFiles
 
 - See [AdditionalFiles](#additionalfiles-mapstring-fileconfig).
