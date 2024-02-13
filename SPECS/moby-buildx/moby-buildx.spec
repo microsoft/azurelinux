@@ -46,7 +46,7 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
-* Mon Feb 12 2024 Nan Liu<liunan@microsoft.com> - 0.7.1-18
+* Mon Feb 12 2024 Nan Liu <liunan@microsoft.com> - 0.7.1-18
 - Address CVE-2021-44716 by patching vendored golang.org/x/net
 
 * Wed Feb 07 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.7.1-17
