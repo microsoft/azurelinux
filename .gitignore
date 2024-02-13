@@ -388,3 +388,6 @@ MigrationBackup/
 
 # Output from the "download_spec_sources.sh" script
 downloaded_sources/
+
+# Output of ./scripts/setuplkgtoolchain.sh
+toolkit/lkg-3.0-dev.json
