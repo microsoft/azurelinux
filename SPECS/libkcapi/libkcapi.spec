@@ -1,7 +1,7 @@
 # Shared object version of libkcapi.
 %global vmajor            1
-%global vminor            3
-%global vpatch            1
+%global vminor            4
+%global vpatch            0
 # This package needs at least Linux Kernel v4.10.0.
 %global min_kernel_ver    4.10.0
 # Do we need to tweak sysctl.d? In newer versions of the Linux
@@ -17,8 +17,8 @@
 %global test_optmem_max   %(cat /proc/sys/net/core/optmem_max || echo 0)
 # For picking patches from upstream commits or pull requests.
 %global giturl            https://github.com/smuellerDD/%{name}
-%global apps_hmaccalc sha1hmac sha224hmac sha256hmac sha384hmac sha512hmac
-%global apps_fipscheck sha1sum sha224sum sha256sum sha384sum sha512sum md5sum fipscheck fipshmac
+%global apps_hmaccalc sha1hmac sha224hmac sha256hmac sha384hmac sha512hmac sm3hmac
+%global apps_fipscheck sha1sum sha224sum sha256sum sha384sum sha512sum md5sum sm3sum fipscheck fipshmac
 # Use OpenSSL to perform hmac calculations
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %global fipshmac   bash %{_sourcedir}/fipshmac-openssl.sh
@@ -58,7 +58,7 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +79,7 @@ BuildRequires:  systemd
 BuildRequires:  xmlto
 # For ownership of %%{_sysctldir}.
 Requires:       systemd
+BuildRequires:  systemd-rpm-macros
 Obsoletes:      %{name}-replacements <= %{version}-%{release}
 
 %description
@@ -202,7 +203,8 @@ install -Dpm 0644 -t %{buildroot}%{_sysctldir} \
 
 rm -f                            \
   %{buildroot}%{_bindir}/md5sum       \
-  %{buildroot}%{_bindir}/sha*sum
+  %{buildroot}%{_bindir}/sha*sum      \
+  %{buildroot}%{_bindir}/sm*sum
 
 # We don't ship autocrap dumplings.
 find %{buildroot} -type f -name "*.la" -delete -print
@@ -235,15 +237,13 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files hmaccalc
 %{_bindir}/sha*hmac
+%{_bindir}/sm*hmac
 /%{_lib}/hmaccalc/sha*hmac.hmac
+/%{_lib}/hmaccalc/sm*hmac.hmac
 
 %files fipscheck
 %{_bindir}/fips*
 /%{_lib}/fipscheck/fips*.hmac
-
-%files hmaccalc
-%{_bindir}/sha*hmac
-/%{_lib}/hmaccalc/sha*hmac.hmac
 
 %files static
 /%{_lib}/%{name}.a
@@ -256,6 +256,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Tue Feb 13 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.4.0-1
+- Upgrade to version 1.4.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.1-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
