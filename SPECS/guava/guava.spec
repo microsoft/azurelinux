@@ -73,7 +73,8 @@ find . -name '*.jar' -delete
 
 %pom_xpath_inject /pom:project/pom:build/pom:plugins/pom:plugin/pom:configuration/pom:instructions "<_nouses>true</_nouses>" guava/pom.xml
 
-%pom_remove_dep -r :animal-sniffer-annotations
+%pom_remove_dep -r :listenablefuture
+%pom_remove_dep -r :failureaccess
 %pom_remove_dep -r :error_prone_annotations
 %pom_remove_dep -r :j2objc-annotations
 %pom_remove_dep -r org.checkerframework:
@@ -91,10 +92,9 @@ annotations=$(
 )
 # guava started using quite a few annotation libraries for code quality, which
 # we don't have. This ugly regex is supposed to remove their usage from the code
-find -name '*.java' | xargs sed -ri \
-    "s/^import .*\.($annotations);//;s/@($annotations)"'\>\s*(\((("[^"]*")|([^)]*))\))?//g'
+./remove_annotations.sh . $annotations
 
-for mod in guava guava-testlib; do
+for mod in guava guava-testlib futures/failureaccess; do
   %pom_remove_parent ${mod}
   %pom_xpath_inject pom:project '
     <groupId>com.google.guava</groupId>
