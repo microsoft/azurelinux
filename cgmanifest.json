@@ -27497,8 +27497,8 @@
         "type": "other",
         "other": {
           "name": "snappy",
-          "version": "1.1.9",
-          "downloadUrl": "https://github.com/google/snappy/archive/1.1.9.tar.gz"
+          "version": "1.1.10",
+          "downloadUrl": "https://github.com/google/snappy/archive/1.1.10.tar.gz"
         }
       }
     },
