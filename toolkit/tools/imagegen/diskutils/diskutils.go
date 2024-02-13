@@ -35,15 +35,24 @@ var (
 	}
 )
 
-type blockDevicesOutput struct {
-	Devices []blockDeviceInfo `json:"blockdevices"`
+type lsblkOutput struct {
+	Devices []lsblkBlockDeviceInfo `json:"blockdevices"`
 }
 
-type blockDeviceInfo struct {
-	Name   string      `json:"name"`    // Example: sda
-	MajMin string      `json:"maj:min"` // Example: 1:2
-	Size   json.Number `json:"size"`    // Number of bytes. Can be a quoted string or a JSON number, depending on the util-linux version
-	Model  string      `json:"model"`   // Example: 'Virtual Disk'
+type lsblkBlockDeviceInfo struct {
+	Name     string                 `json:"name"`    // Example: sda
+	MajMin   string                 `json:"maj:min"` // Example: 1:2
+	Size     json.Number            `json:"size"`    // Number of bytes. Can be a quoted string or a JSON number, depending on the util-linux version
+	Model    string                 `json:"model"`   // Example: 'Virtual Disk'
+	Children []lsblkBlockDeviceInfo `json:"children"`
+}
+
+type BlockDeviceInfo struct {
+	Name  string
+	Maj   string
+	Min   string
+	Size  string
+	Model string
 }
 
 // SystemBlockDevice defines a block device on the host computer
@@ -286,7 +295,7 @@ func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 
 	bytes := []byte(rawDiskOutput)
 
-	var blockDevices blockDevicesOutput
+	var blockDevices lsblkOutput
 	err = json.Unmarshal(bytes, &blockDevices)
 	if err != nil {
 		return
@@ -304,6 +313,48 @@ func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 	}
 	maj = diskIDs[0]
 	min = diskIDs[1]
+	return
+}
+
+func GetDeviceChildren(diskDevPath string) (childBlockDevices []BlockDeviceInfo, err error) {
+	childBlockDevices = []BlockDeviceInfo{}
+
+	rawDiskOutput, stderr, err := shell.Execute("lsblk", "--json", "--output", "NAME,MAJ:MIN", diskDevPath)
+	if err != nil {
+		logger.Log.Warn(stderr)
+		err = fmt.Errorf("failed to find IDs for disk (%s):\n%w", diskDevPath, err)
+		return
+	}
+
+	bytes := []byte(rawDiskOutput)
+
+	var blockDevices lsblkOutput
+	err = json.Unmarshal(bytes, &blockDevices)
+	if err != nil {
+		return
+	}
+
+	if len(blockDevices.Devices) != 1 {
+		err = fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		return
+	}
+
+	for _, lsblkBlockDevice := range blockDevices.Devices[0].Children {
+		childDiskIDs := strings.Split(lsblkBlockDevice.MajMin, ":")
+		if len(childDiskIDs) != 2 {
+			err = fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+			return
+		}
+		blockDeviceInfo := BlockDeviceInfo{
+			Name:  lsblkBlockDevice.Name,
+			Maj:   childDiskIDs[0],
+			Min:   childDiskIDs[1],
+			Size:  lsblkBlockDevice.Size.String(),
+			Model: lsblkBlockDevice.Model,
+		}
+
+		childBlockDevices = append(childBlockDevices, blockDeviceInfo)
+	}
 	return
 }
 
@@ -738,7 +789,7 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 		virtualDiskMajorNumber   = "252,253,254"
 		blockExtendedMajorNumber = "259"
 	)
-	var blockDevices blockDevicesOutput
+	var blockDevices lsblkOutput
 
 	blockDeviceMajorNumbers := []string{scsiDiskMajorNumber, mmcBlockMajorNumber, virtualDiskMajorNumber, blockExtendedMajorNumber}
 	includeFilter := strings.Join(blockDeviceMajorNumbers, ",")
