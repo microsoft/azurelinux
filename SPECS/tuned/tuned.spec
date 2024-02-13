@@ -172,6 +172,13 @@ Requires: %{name} = %{version}
 %description profiles-postgresql
 Additional tuned profile(s) targeted to PostgreSQL server loads.
 
+%package profiles-openshift
+Summary: Additional TuneD profile(s) optimized for OpenShift
+Requires: %{name} = %{version}
+
+%description profiles-openshift
+Additional TuneD profile(s) optimized for OpenShift.
+
 %prep
 %autosetup -p1 -n %{name}-%{version}%{?prerel2}
 
@@ -282,6 +289,7 @@ fi
 %exclude %{_sysconfdir}/tuned/realtime-virtual-guest-variables.conf
 %exclude %{_sysconfdir}/tuned/realtime-virtual-host-variables.conf
 %exclude %{_sysconfdir}/tuned/cpu-partitioning-variables.conf
+%exclude %{_sysconfdir}/tuned/cpu-partitioning-powersave-variables.conf
 %exclude %{_prefix}/lib/tuned/default
 %exclude %{_prefix}/lib/tuned/desktop-powersave
 %exclude %{_prefix}/lib/tuned/laptop-ac-powersave
@@ -291,6 +299,7 @@ fi
 %exclude %{_prefix}/lib/tuned/spindown-disk
 %exclude %{_prefix}/lib/tuned/sap-netweaver
 %exclude %{_prefix}/lib/tuned/sap-hana
+%exclude %{_prefix}/lib/tuned/sap-hana-kvm-guest
 %exclude %{_prefix}/lib/tuned/mssql
 %exclude %{_prefix}/lib/tuned/oracle
 %exclude %{_prefix}/lib/tuned/atomic-host
@@ -299,8 +308,12 @@ fi
 %exclude %{_prefix}/lib/tuned/realtime-virtual-guest
 %exclude %{_prefix}/lib/tuned/realtime-virtual-host
 %exclude %{_prefix}/lib/tuned/cpu-partitioning
+%exclude %{_prefix}/lib/tuned/cpu-partitioning-powersave
 %exclude %{_prefix}/lib/tuned/spectrumscale-ece
 %exclude %{_prefix}/lib/tuned/postgresql
+%exclude %{_prefix}/lib/tuned/openshift
+%exclude %{_prefix}/lib/tuned/openshift-control-plane
+%exclude %{_prefix}/lib/tuned/openshift-node
 %exclude %{_sbindir}/tuned-gui
 %exclude %{_datadir}/tuned/ui
 %exclude %{_bindir}/powertop2tuned
@@ -314,6 +327,7 @@ fi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/tuned/post_loaded_profile
 %config(noreplace) %{_sysconfdir}/tuned/tuned-main.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/tuned/bootcmdline
+%{_sysconfdir}/dbus-1/system.d/com.redhat.tuned.conf
 %verify(not size mtime md5) %{_sysconfdir}/modprobe.d/tuned.conf
 %{_tmpfilesdir}/tuned.conf
 %{_unitdir}/tuned.service
@@ -325,6 +339,7 @@ fi
 %{_mandir}/man8/tuned*
 %dir %{_datadir}/tuned
 %{_datadir}/tuned/grub2
+%{_datadir}/dbus-1/system.d/com.redhat.tuned.conf
 %{_datadir}/polkit-1/actions/com.redhat.tuned.policy
 %ghost %{_sysconfdir}/modprobe.d/kvm.rt.tuned.conf
 %{_prefix}/lib/kernel/install.d/92-tuned.install
@@ -350,6 +365,7 @@ fi
 
 %files profiles-sap-hana
 %{_prefix}/lib/tuned/sap-hana
+%{_prefix}/lib/tuned/sap-hana-kvm-guest
 %{_mandir}/man7/tuned-profiles-sap-hana.7*
 
 %files profiles-mssql
@@ -382,7 +398,9 @@ fi
 
 %files profiles-cpu-partitioning
 %config(noreplace) %{_sysconfdir}/tuned/cpu-partitioning-variables.conf
+%config(noreplace) %{_sysconfdir}/tuned/cpu-partitioning-powersave-variables.conf
 %{_prefix}/lib/tuned/cpu-partitioning
+%{_prefix}/lib/tuned/cpu-partitioning-powersave
 %{_mandir}/man7/tuned-profiles-cpu-partitioning.7*
 
 %files profiles-spectrumscale
@@ -404,9 +422,16 @@ fi
 %{_prefix}/lib/tuned/postgresql
 %{_mandir}/man7/tuned-profiles-postgresql.7*
 
+%files profiles-openshift
+%{_prefix}/lib/tuned/openshift
+%{_prefix}/lib/tuned/openshift-control-plane
+%{_prefix}/lib/tuned/openshift-node
+%{_mandir}/man7/tuned-profiles-openshift.7*
+
 %changelog
 * Tue Jan 16 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> 2.21.0-1
 - Upgrade package version to 2.21.0
+- Modifying SPEC file to reflect upstream changes (https://github.com/redhat-performance/tuned/blob/v2.21.0/tuned.spec)
 
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 2.15.0-4
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
