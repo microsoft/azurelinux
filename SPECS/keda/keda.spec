@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.4.0
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -30,6 +30,7 @@ Source1:        %{name}-%{version}-vendor-v2.tar.gz
 # Can be removed if we upgrade keda to 2.6.0 or later.
 Patch0:         CVE-2022-21698.patch
 Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.15
 
@@ -65,6 +66,12 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.0-18
+- Patch CVE-2021-44716
+
+* Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net/http2
+
 * Tue Jan 01 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.0-16
 - Patch CVE-2022-21698
 - Update vendored tarball
