@@ -26,14 +26,15 @@ index 46b242932..d75354bc5 100644
  		if cpu.IsolateEmulatorThread {
 -			emulatorThreadCPUs := resource.NewQuantity(1, resource.BinarySI)
 +			emulatorThreadCPUs := resource.NewQuantity(2, resource.BinarySI)
- 			limits := renderer.calculatedLimits[k8sv1.ResourceCPU]
+
+			limits := renderer.calculatedLimits[k8sv1.ResourceCPU]
 			_, emulatorThreadCompleteToEvenParityAnnotationExists := annotations[v1.EmulatorThreadCompleteToEvenParity]
 			if emulatorThreadCompleteToEvenParityAnnotationExists &&
 				limits.Value()%2 == 0 {
 				emulatorThreadCPUs = resource.NewQuantity(2, resource.BinarySI)
 			}
  			limits.Add(*emulatorThreadCPUs)
- 			renderer.vmLimits[k8sv1.ResourceCPU] = limits
+			renderer.vmLimits[k8sv1.ResourceCPU] = limits
 -- 
 2.25.1
 
