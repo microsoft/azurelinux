@@ -431,6 +431,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %changelog
 * Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
 - Auto-upgrade to 6.6.14.1
+- Enable support for latency based cgroup IO protection
+- Enable ZRAM module
+- Enable Broadcom MPI3 Storage Controller Device Driver module
 
 * Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
 - Config changes to converge kernel-hci config with kernel
