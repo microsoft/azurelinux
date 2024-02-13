@@ -1,0 +1,24 @@
+--- a/configure.ac.in     2023-11-02 14:11:55.000000000 +0000
++++ b/configure.ac.in     2024-02-13 21:07:24.667497169 +0000
+@@ -507,17 +507,12 @@
+ HIREDIS_INC=
+ HIREDIS_LIB=
+ AS_VAR_IF(with_hiredis, yes, [
+-    pkg-config --exists hiredis
+-    if test "$?" -ne 1; then
+-    HIREDIS_INC="`pkg-config --cflags hiredis` -I/usr/include/hiredis"
+-    if test $SYSTEM = "FreeBSD"; then
+-        HIREDIS_LIB="/usr/local/lib/libhiredis.a"
++    if [[ -f /usr/local/lib/libhiredis.a ]] && [[ -d /usr/local/include/hiredis ]]; then
++       HIREDIS_INC="-I/usr/local/include/hiredis"
++       HIREDIS_LIB="/usr/local/lib/libhiredis.a"
+     else
+-        HIREDIS_LIB="`pkg-config --libs hiredis`"
+-    fi
+-    else
+-    echo "Please install hiredis package prerequisite"
+-    exit -1
++       echo "Please install hiredis package prerequisite"
++       exit -1
+     fi
+ ])

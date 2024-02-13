@@ -1,8 +1,8 @@
-%global nDPIver 4.2
+%global nDPIver 4.8
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
-Version:        5.2.1
-Release:        2%{?dist}
+Version:        6.0
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,10 @@ URL:            https://www.ntop.org/
 Source0:        %{name}-%{version}.tar.gz
 #Source1:       https://github.com/ntop/nDPI/archive/%{nDPIver}.tar.gz
 Source1:        nDPI-%{nDPIver}.tar.gz
+Source2:        hiredis-1.2.0.tar.gz
+# Add variable for hiredis version
 Patch1:         CVE-2021-45985.patch
+Patch2:         configure.ac.in.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
@@ -33,6 +36,7 @@ Requires:       libmaxminddb
 Requires:       libpcap
 Requires:       libxml2
 Requires:       mysql
+Requires:       redis
 Requires:       sqlite
 Requires:       zeromq
 
@@ -44,6 +48,12 @@ under GPLv3. It is the new incarnation of the original ntop written in
 %prep
 tar -xf %{SOURCE1}
 mv nDPI-%{nDPIver} nDPI
+
+tar -xzf %{SOURCE2}
+pushd hiredis-1.2.0/
+make && make install
+popd
+
 %autosetup -p1 -b 0
 
 %build
@@ -62,6 +72,11 @@ mv nDPI-%{nDPIver} nDPI
 %{_datadir}/ntopng/*
 
 %changelog
+* Tue Feb 13 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.0-1
+- Upgrade to ntopng 6.0 for Mariner 3.0 upgrade
+- Upgrade version of nDPI to 4.8
+- Pack hiredis src code for header files and static library during RPM build
+
 * Tue Apr 18 2023 Bala <balakumaran.kannan@microsoft.com> - 5.2.1-2
 - Patch CVE-2021-45985 on integrated lua source
 
