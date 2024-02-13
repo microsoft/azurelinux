@@ -49,10 +49,10 @@ operating system.
 %prep
 %setup -q
 
-%patch0
-%patch1 -p1
-%patch2 -p1
-%patch3
+%patch 0
+%patch 1 -p1
+%patch 2 -p1
+%patch 3
 
 f=LICENSE
 mv $f $f.iso88591

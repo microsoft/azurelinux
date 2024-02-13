@@ -85,7 +85,7 @@ that use TECkit, a character encoding and mapping, library.
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 # Remove bundled libraries
 rm -r zlib-*/*.c SFconv/expat
 # Regenerate build script

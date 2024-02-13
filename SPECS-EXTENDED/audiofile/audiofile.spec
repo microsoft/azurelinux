@@ -47,15 +47,15 @@ other resources you can use to develop Audio File applications.
 
 %prep
 %setup -q
-%patch0 -p1 -b .CVE-2015-7747
-%patch1 -p1 -b .left-shift-neg
-%patch2 -p1 -b .narrowing-conversion
-%patch3 -p1 -b .pull42
-%patch4 -p1 -b .pull43
-%patch5 -p1 -b .pull44
-%patch6 -p1 -b .CVE-2018-17095
-%patch7 -p1 -b .CVE-2018-13440
-%patch8 -p1 -b .CVE-2018-13440
+%patch 0 -p1 -b .CVE-2015-7747
+%patch 1 -p1 -b .left-shift-neg
+%patch 2 -p1 -b .narrowing-conversion
+%patch 3 -p1 -b .pull42
+%patch 4 -p1 -b .pull43
+%patch 5 -p1 -b .pull44
+%patch 6 -p1 -b .CVE-2018-17095
+%patch 7 -p1 -b .CVE-2018-13440
+%patch 8 -p1 -b .CVE-2018-13440
 
 
 %build

@@ -24,7 +24,7 @@ users will also need to install and use fcoe-utils.
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %py3_build

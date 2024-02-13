@@ -59,7 +59,7 @@ Group:          Documentation/HTML
 
 %prep
 %setup -q
-%patch0
+%patch 0
 cp %{SOURCE1} build.xml
 
 # bnc#500524

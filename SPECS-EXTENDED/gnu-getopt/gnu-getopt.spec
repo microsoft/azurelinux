@@ -55,7 +55,7 @@ classes.
 
 %prep
 %setup -q -c
-%patch0
+%patch 0
 mv gnu/getopt/buildx.xml build.xml
 
 %build

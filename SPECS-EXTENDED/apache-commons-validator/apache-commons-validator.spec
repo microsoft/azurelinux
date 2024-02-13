@@ -62,8 +62,8 @@ Validator Package.
 
 %prep
 %setup -q -n %{short_name}-%{version}-src
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 sed -i 's/\r//' LICENSE.txt
 sed -i 's/\r//' RELEASE-NOTES.txt

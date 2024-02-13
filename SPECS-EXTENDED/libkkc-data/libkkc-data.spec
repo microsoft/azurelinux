@@ -23,7 +23,7 @@ at run time.
 
 %prep
 %setup -q
-%patch0 -p4 -b .orig
+%patch 0 -p4 -b .orig
 
 
 %build

@@ -61,7 +61,7 @@ The libzhuyin package contains libzhuyin compatibility library.
 %setup -q
 
 %if %snapshot
-%patch0 -p1 -b .head
+%patch 0 -p1 -b .head
 %endif
 
 %build

@@ -104,8 +104,8 @@ protocols used in the internet community.
 %setup -q -n libnet-%{version}
 # Provide dummy Net::libnetFAQ document, CPAN RT#117888
 install -m 0644 %{SOURCE1} lib/Net
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 </dev/null

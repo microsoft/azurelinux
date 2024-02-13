@@ -40,9 +40,9 @@ dialog library.
 
 %prep
 %setup -q -n %{name}-%{version}-%{dialogsubversion}
-%patch1 -p1 -b .incdir
-%patch2 -p1 -b .multilib
-%patch3 -p1 -b .libs
+%patch 1 -p1 -b .incdir
+%patch 2 -p1 -b .multilib
+%patch 3 -p1 -b .libs
 
 %build
 %configure \

@@ -20,10 +20,10 @@ so slow?".
 
 %prep
 %setup -q -n %{name}-%{version}pre4
-%patch0 -p1 -b .ncursesw
+%patch 0 -p1 -b .ncursesw
 touch -c -r configure.ac{.ncursesw,}
-%patch1 -p1 -b .git20181003
-%patch2 -p1 -b .gcc10
+%patch 1 -p1 -b .git20181003
+%patch 2 -p1 -b .gcc10
 
 %build
 %configure

@@ -56,7 +56,7 @@ provides:
 %setup -q -n Parse-RecDescent-%{version}
 
 # Recode as UTF8
-%patch0 -p1
+%patch 0 -p1
 
 # Fix permissions and script interpreters
 chmod -c a-x demo/* tutorial/*

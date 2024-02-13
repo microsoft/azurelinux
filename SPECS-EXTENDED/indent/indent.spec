@@ -68,9 +68,9 @@ you want a program to format your code.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 # Regenerate sources
 rm src/gperf.c src/gperf-cc.c
 # Update config.sub to support aarch64, bug #925588

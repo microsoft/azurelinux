@@ -50,8 +50,8 @@ pushd ppd
 make distclean
 popd
 
-%patch0 -p1 -b .deviceID
-%patch1 -p1 -b .ldflags
+%patch 0 -p1 -b .deviceID
+%patch 1 -p1 -b .ldflags
 
 %build
 %set_build_flags

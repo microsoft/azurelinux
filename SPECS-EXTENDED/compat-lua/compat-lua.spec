@@ -43,10 +43,10 @@ This package contains development files for compat-lua-libs.
 
 %prep
 %setup -q -n lua-%{version}
-%patch0 -p1 -E -z .autoxxx
-%patch1 -p0 -z .lunatic
-%patch2 -p1 -z .idsize
-%patch3 -p1
+%patch 0 -p1 -E -z .autoxxx
+%patch 1 -p0 -z .lunatic
+%patch 2 -p1 -z .idsize
+%patch 3 -p1
 # fix perms on auto files
 chmod u+x autogen.sh config.guess config.sub configure depcomp install-sh missing
 # Avoid make doing auto-reconf itself, killing our rpath removal in the process

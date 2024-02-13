@@ -39,8 +39,8 @@ much more detailed information.
 %prep
 %setup -q -n EV-%{version}
 
-%patch0 -p1
-%patch1
+%patch 0 -p1
+%patch 1
 
 # remove all traces of the bundled libev
 rm -fr ./libev

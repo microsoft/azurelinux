@@ -57,8 +57,8 @@ about a point.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 mkdir -p build

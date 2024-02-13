@@ -23,7 +23,7 @@ Ancient Greek hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-grc
 cp -p %{SOURCE0} hyph-grc.tex
-%patch0 -p0 -b .clean
+%patch 0 -p0 -b .clean
 cp %{SOURCE1} ./LICENSE.txt
 
 %build

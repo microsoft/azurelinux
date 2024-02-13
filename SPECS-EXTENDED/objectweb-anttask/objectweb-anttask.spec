@@ -42,8 +42,8 @@ ObjectWeb Ant task
 
 %prep
 %setup -q -c -n %{name}
-%patch1
-%patch2 -p1
+%patch 1
+%patch 2 -p1
 find . -name "*.class" -exec rm {} \;
 find . -name "*.jar" -exec rm {} \;
 

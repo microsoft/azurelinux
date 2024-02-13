@@ -59,8 +59,8 @@ cd jflex
 perl -pi -e 's/
 $//g' examples/standalone/sample.inp
 rm -rf src/java_cup
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 rm -rf src/JFlex/tests
 

@@ -45,7 +45,7 @@ icontainer2icns - extract icns files from icontainers
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

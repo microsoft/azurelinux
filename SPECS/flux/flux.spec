@@ -71,7 +71,7 @@ programs using Influx data language.
 
 %prep
 %setup -q
-%patch2 -p1
+%patch 2 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config

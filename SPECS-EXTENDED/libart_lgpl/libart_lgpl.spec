@@ -27,7 +27,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 %build
 libtoolize

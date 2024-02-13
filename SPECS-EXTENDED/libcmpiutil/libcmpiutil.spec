@@ -41,7 +41,7 @@ instance properties to standardizing method dispatch and argument checking.
 %setup -q
 chmod -x *.c *.y *.h *.l
 
-%patch0
+%patch 0
 
 %build
 # FIXME: Package has c11 inline compatibility issues.

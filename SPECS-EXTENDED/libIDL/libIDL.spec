@@ -32,7 +32,7 @@ or compile programs that use libIDL.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 %build
 %configure

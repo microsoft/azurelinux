@@ -41,7 +41,7 @@ replacement.
 
 %prep
 %setup -q -n Test-Inter-%{version}
-%patch0 -p1
+%patch 0 -p1
 chmod -x examples/*
 
 %build

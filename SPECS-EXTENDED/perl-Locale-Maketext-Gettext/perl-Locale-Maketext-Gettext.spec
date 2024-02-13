@@ -43,7 +43,7 @@ problems, too.
 
 %prep
 %setup -q -n Locale-Maketext-Gettext-%{version}
-%patch0 -p 1
+%patch 0 -p 1
 
 %build
 %{__perl} Build.PL installdirs=vendor

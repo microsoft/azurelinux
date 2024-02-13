@@ -29,7 +29,7 @@ Common rules for searching for Perl things.
 
 %prep
 %setup -q -n File-Find-Rule-Perl-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1

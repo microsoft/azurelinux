@@ -62,7 +62,7 @@ This package contains demonstration and sample files for JDepend.
 find . -name "*.jar" -exec rm -f {} \;
 # fix strange permissions
 find . -type d -exec chmod 755 {} \;
-%patch0 -b .target15
+%patch 0 -b .target15
 
 %build
 ant jar

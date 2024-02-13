@@ -45,7 +45,7 @@ See CPAN::Meta for further details of the CPAN Meta Specification.
 %setup -q -n Test-CPAN-Meta-JSON-%{version}
 
 # Recode LICENSE as UTF-8
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

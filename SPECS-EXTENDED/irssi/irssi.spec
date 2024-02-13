@@ -40,7 +40,7 @@ being maintained.
 
 %prep
 %setup -q
-%patch0 -p1 -b .ctrl-space-fix
+%patch 0 -p1 -b .ctrl-space-fix
 
 
 %build

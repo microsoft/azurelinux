@@ -49,7 +49,7 @@ The libdbi-doc package contains guides for development of applications with libd
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch1 -p1
+%patch 1 -p1
 
 %build
 %configure

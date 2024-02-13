@@ -43,7 +43,7 @@ them unused names and sets up their package data, if provided.
 
 # We need to patch the test suite if we have an old version of Test::More
 %if %{old_test_more}
-%patch1
+%patch 1
 %endif
 
 %build

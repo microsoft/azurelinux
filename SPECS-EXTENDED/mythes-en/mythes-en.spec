@@ -24,7 +24,7 @@ English thesaurus.
 
 %prep
 %setup -q -c %{name}-%{version}
-%patch0 -p1 -b .python3
+%patch 0 -p1 -b .python3
 
 %build
 export WNHOME=/usr/share/wordnet-%{version}

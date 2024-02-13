@@ -39,7 +39,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch1 -p1 -b .gdither
+%patch 1 -p1 -b .gdither
 
 #Disable buildtime cpu detection
 sed -i -i 's/LQT_TRY_CFLAGS/dnl LQT_TRY_CFLAGS/g' configure.ac

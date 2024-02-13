@@ -35,10 +35,10 @@ SBLIM Base Params Testcase Files for SBLIM Testsuite
 
 %prep
 %setup -q
-%patch0 -p1 -b .no-abi-params
-%patch1 -p1 -b .docdir
-%patch2 -p1 -b .pegasus-interop
-%patch3 -p1 -b .prov-reg-sfcb-systemd
+%patch 0 -p1 -b .no-abi-params
+%patch 1 -p1 -b .docdir
+%patch 2 -p1 -b .pegasus-interop
+%patch 3 -p1 -b .prov-reg-sfcb-systemd
 
 %build
 %configure \

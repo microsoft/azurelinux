@@ -20,7 +20,7 @@ pages.
 
 %prep
 %setup -q
-%patch0 -p1 -b .config
+%patch 0 -p1 -b .config
 
 %build
 make BINDIR=%{_bindir} LIBDIR=%{_datadir} MANDIR=%{_mandir}/man1

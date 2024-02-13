@@ -78,8 +78,8 @@ The Javadoc Documentation for Commons Daemon.
 %prep
 %setup -q -n %{short_name}-%{version}-src
 cp %{SOURCE10} build.xml
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 # remove java binaries from sources
 rm -rf src/samples/build/

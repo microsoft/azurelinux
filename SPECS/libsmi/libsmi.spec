@@ -44,10 +44,10 @@ libsmi-based applications.
 
 %prep
 %setup -q
-%patch0 -p1 -b .wget111
-%patch1 -p1 -b .CVE-2010-2891
-%patch2 -p1 -b .clash
-%patch3 -p1 -b .format-security
+%patch 0 -p1 -b .wget111
+%patch 1 -p1 -b .CVE-2010-2891
+%patch 2 -p1 -b .clash
+%patch 3 -p1 -b .format-security
 cp %{SOURCE2} .
 
 %build

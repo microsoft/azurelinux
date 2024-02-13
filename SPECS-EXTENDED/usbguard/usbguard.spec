@@ -121,7 +121,7 @@ daemon.
 %setup -q -D -T -a 1
 %endif
 
-%patch1 -p1 -b .libqb
+%patch 1 -p1 -b .libqb
 
 # Remove bundled library sources before build
 rm -rf src/ThirdParty/{Catch,PEGTL}

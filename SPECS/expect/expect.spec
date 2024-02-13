@@ -29,7 +29,7 @@ Headers and development libraries for expect
 
 %prep
 %setup -q -n %{name}%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure

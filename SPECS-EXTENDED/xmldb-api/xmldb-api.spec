@@ -90,7 +90,7 @@ implementation is also provided.
 
 %prep
 %setup -q -n xapi
-%patch0 -p1
+%patch 0 -p1
 find . -name "*.jar" | xargs -t rm
 # FIXME: (dwalluck): These use org.apache.xalan.xpath
 rm src/common/org/xmldb/common/xml/queries/xalan/XPathQueryImpl.java

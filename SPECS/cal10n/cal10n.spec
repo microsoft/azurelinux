@@ -57,7 +57,7 @@ API documentation for %{name}.
 %prep
 %setup -q
 tar -xf %{SOURCE1}
-%patch0 -p1
+%patch 0 -p1
 find . -name "*.jar" | xargs rm
 
 # bnc#759912

@@ -62,8 +62,8 @@ Streaming API for XML
 
 %prep
 %setup -q -c
-%patch0 -b .target15
-%patch2 -b .gcj-build
+%patch 0 -b .target15
+%patch 2 -b .gcj-build
 cp %{SOURCE10} LICENSE
 
 %build

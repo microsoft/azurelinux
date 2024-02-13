@@ -40,7 +40,7 @@ Requires:       perl(MIME::Base64)
 # Recode documentation as UTF-8
 # Can't just use iconv because README includes an example of
 # character code conversion that would be wrong if simply recoded
-%patch0 -p1
+%patch 0 -p1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" %{__perl} Makefile.PL INSTALLDIRS=vendor

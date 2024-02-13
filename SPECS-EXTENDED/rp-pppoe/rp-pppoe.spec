@@ -47,13 +47,13 @@ the official PPPoE specification.
 
 %prep
 %setup -q
-%patch0 -p1 -b .config
-%patch1 -p1 -b .ip-allocation
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1 -b .pluginpath
-%patch5 -p1 -b .manpages
-%patch6 -p1 -b .bz#1469960-new-kernel-header
+%patch 0 -p1 -b .config
+%patch 1 -p1 -b .ip-allocation
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1 -b .pluginpath
+%patch 5 -p1 -b .manpages
+%patch 6 -p1 -b .bz#1469960-new-kernel-header
 
 %build
 cd src

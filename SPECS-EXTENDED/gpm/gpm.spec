@@ -78,13 +78,13 @@ mouse support to text-based Linux applications.
 %prep
 %setup -q
 
-%patch0 -p1 -b .master
-%patch3 -p1 -b .gcc10
-%patch1 -p1 -b .multilib
-%patch2 -p1 -b .lib-silent
-%patch4 -p1 -b .close-fds
-%patch5 -p1 -b .weak-wgetch
-%patch7 -p1
+%patch 0 -p1 -b .master
+%patch 3 -p1 -b .gcc10
+%patch 1 -p1 -b .multilib
+%patch 2 -p1 -b .lib-silent
+%patch 4 -p1 -b .close-fds
+%patch 5 -p1 -b .weak-wgetch
+%patch 7 -p1
 # not sure if this is really needed
 #patch8 -p1
 

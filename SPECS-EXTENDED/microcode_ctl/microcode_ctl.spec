@@ -23,7 +23,7 @@ back to the old microcode.
 
 %prep
 %setup -q -n %{name}-%{upstream_version}
-%patch0 -p1
+%patch 0 -p1
 # License not extracted from nested tar by Makefile- do it manually here
 tar --no-anchored --strip-components=1 -xvf microcode*.tar.gz license
 

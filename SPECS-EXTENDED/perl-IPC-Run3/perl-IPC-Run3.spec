@@ -40,7 +40,7 @@ API and none of the bloat and rarely used features of IPC::Run.
 
 %prep
 %setup -q -n IPC-Run3-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 # Perms in tarballs are broken 
 find -type f -exec chmod -x {} \;

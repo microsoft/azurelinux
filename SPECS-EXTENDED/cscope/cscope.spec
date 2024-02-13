@@ -28,7 +28,7 @@ matches for use in file editing.
 
 %prep
 %setup -q
-%patch1 -p1 
+%patch 1 -p1 
 
 autoreconf
 

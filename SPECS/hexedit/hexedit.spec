@@ -22,8 +22,8 @@ and search through it.
 %prep
 %setup -q -n %{name}
 
-%patch1 -p1 -b .config
-%patch2 -p1 -b .color
+%patch 1 -p1 -b .config
+%patch 2 -p1 -b .color
 
 %build
 %configure

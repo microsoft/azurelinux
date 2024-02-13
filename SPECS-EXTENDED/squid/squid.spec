@@ -93,14 +93,14 @@ lookup program (dnsserver), a program for retrieving FTP data
 # Upstream patches
 
 # Backported patches
-%patch101 -p1 -b .ip-bind-address-no-port
+%patch 101 -p1 -b .ip-bind-address-no-port
 
 # Local patches
-%patch201 -p1 -b .config
-%patch202 -p1 -b .location
-%patch203 -p1 -b .perlpath
-%patch204  -b .include-guards
-%patch205 -p1 -R -b .symlink-lang-err
+%patch 201 -p1 -b .config
+%patch 202 -p1 -b .location
+%patch 203 -p1 -b .perlpath
+%patch 204  -b .include-guards
+%patch 205 -p1 -R -b .symlink-lang-err
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1679526
 # Patch in the vendor documentation and used different location for documentation

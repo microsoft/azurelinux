@@ -28,11 +28,11 @@ scripts.
 %prep
 %setup -q
 autoreconf --install --force
-%patch0 -p1 -b .gcc43
-%patch1 -p1 -b .https-segfaults
-%patch2 -p1 -b .ssl-proto-option
-%patch3 -p1 -b .fix-exit-status
-%patch4 -p1 -b .covscan-fixes
+%patch 0 -p1 -b .gcc43
+%patch 1 -p1 -b .https-segfaults
+%patch 2 -p1 -b .ssl-proto-option
+%patch 3 -p1 -b .fix-exit-status
+%patch 4 -p1 -b .covscan-fixes
 
 %build
 %configure CACERT=/etc/pki/Pegasus/client.pem

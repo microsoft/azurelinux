@@ -31,7 +31,7 @@ failure.
 
 %prep
 %setup -q 
-%patch1 -p1 -b .defaultconf
+%patch 1 -p1 -b .defaultconf
 
 # update SOURCE5 on maintainer's machine prior commiting, there's no internet connection on builders
 curl %{UrlSource5} -o %{SOURCE5} ||:

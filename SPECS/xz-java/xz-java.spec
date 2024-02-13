@@ -50,7 +50,7 @@ This package contains the API documentation of xz-java.
 
 %prep
 %setup -q -c -n %{name}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 sed -i 's/linkoffline="[^"]*"//;/extdoc_/d' build.xml

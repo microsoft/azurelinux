@@ -50,7 +50,7 @@ features from the command line.
 
 %prep
 %setup -q -n %{pkgname}
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 libtoolize --force
 autoreconf --force --install

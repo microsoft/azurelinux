@@ -28,7 +28,7 @@ snapshot eras
 
 %prep
 %setup -q -n thin-provisioning-tools-%{version}
-%patch0 -p1 -b .avoid_strip
+%patch 0 -p1 -b .avoid_strip
 echo %{version}-%{release} > VERSION
 
 %build

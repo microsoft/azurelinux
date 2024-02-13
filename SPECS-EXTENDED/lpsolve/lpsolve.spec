@@ -26,8 +26,8 @@ Includes and definitions for developing with lpsolve
 
 %prep
 %setup -q -n lp_solve_5.5
-%patch0 -p1 -b .cflags.patch
-%patch1 -p1 -b .defines.patch
+%patch 0 -p1 -b .cflags.patch
+%patch 1 -p1 -b .defines.patch
 
 %build
 %set_build_flags

@@ -22,7 +22,7 @@ top of libnghttp2 for httpd 2.4 servers.
 
 %prep
 %setup -q
-%patch1 -p1 -b .buildfix
+%patch 1 -p1 -b .buildfix
 
 %build
 %configure

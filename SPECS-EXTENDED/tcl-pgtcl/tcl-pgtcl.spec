@@ -48,7 +48,7 @@ unzip %{SOURCE1}
 PGTCLDOCDIR=`basename %{SOURCE1} .zip`
 mv $PGTCLDOCDIR Pgtcl-docs
 
-%patch1 -p1
+%patch 1 -p1
 
 autoconf
 

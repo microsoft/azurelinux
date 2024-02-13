@@ -50,15 +50,15 @@ The %{name}-test package contains binaries for testing %{name}.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fix_werror
-%patch1 -p1 -b .unused
-%patch2 -p1 -b .nodoc
-%patch3 -p1 -b .dynl
-%patch4 -p1 -b .pb
-%patch5 -p1 -b .sf
-%patch6  -b .orig
-%patch7 -p1 -b .memcpy
-%patch8  -b .register
+%patch 0 -p1 -b .fix_werror
+%patch 1 -p1 -b .unused
+%patch 2 -p1 -b .nodoc
+%patch 3 -p1 -b .dynl
+%patch 4 -p1 -b .pb
+%patch 5 -p1 -b .sf
+%patch 6  -b .orig
+%patch 7 -p1 -b .memcpy
+%patch 8  -b .register
 sed -i -e 's/ -Werror//' configure.ac
 autoreconf -vif
 

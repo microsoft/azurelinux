@@ -105,10 +105,10 @@ their content in human-readable form.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %if 0%{?rhel} && 0%{?rhel} <= 7
-%patch100 -p1
+%patch 100 -p1
 %endif
 
 %build

@@ -83,7 +83,7 @@ Requires: %{name}-debug = %{version}-%{release}
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 make %{?_smp_mflags} all-shared CFLAGS="${CFLAGS:-%optflags}  -fgnu89-inline" \

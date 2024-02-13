@@ -43,8 +43,8 @@ Vodafone, Option, ZTE und Novatell werden unterstützt.
 %setup -q -n %{source_name}-%{version}
 cp -f %{SOURCE1} device_reference.txt
 
-%patch0 -p0
-%patch1 -p1
+%patch 0 -p0
+%patch 1 -p1
 
 
 %build

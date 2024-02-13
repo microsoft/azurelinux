@@ -221,7 +221,7 @@ candidates for your Prefer plugin.
 # Remove redundant pkgconfig implementations, keep
 # Alien::Build::Plugin::PkgConfig::LibPkgConf,
 # MANIFEST is updated by Remove-redundant-pkgconfig-implementations.patch
-%patch0 -p1
+%patch 0 -p1
 rm lib/Alien/Build/Plugin/PkgConfig/{CommandLine,PP}.pm 
 rm t/alien_build_plugin_pkgconfig_{commandline,pp}.t
 

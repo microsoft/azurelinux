@@ -54,11 +54,11 @@ Documentation for the %{name} library.
 
 %prep
 %setup -q
-%patch0 -p0 -b .crash
-%patch1 -p1 -b .fix-glib-headers
-%patch2 -p1 -b .file-transfer
-%patch3 -p1 -b .status-timestamp-workaround
-%patch4 -p1 -b .format-security-fix
+%patch 0 -p0 -b .crash
+%patch 1 -p1 -b .fix-glib-headers
+%patch 2 -p1 -b .file-transfer
+%patch 3 -p1 -b .status-timestamp-workaround
+%patch 4 -p1 -b .format-security-fix
 
 %build
 export CFLAGS="%{optflags} -fno-tree-vrp"

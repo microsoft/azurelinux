@@ -34,7 +34,7 @@ These are the development files.
 %prep
 %setup -qn %{name}-%{commit0}
 
-%patch0 -p1
+%patch 0 -p1
 
 %build
 

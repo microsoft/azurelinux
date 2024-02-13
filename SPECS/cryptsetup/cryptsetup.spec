@@ -94,7 +94,7 @@ can be used for offline reencryption of disk in situ.
 
 %prep
 %setup -q -n cryptsetup-%{version}
-%patch0 -p1
+%patch 0 -p1
 chmod -x misc/dracut_90reencrypt/*
 
 %build

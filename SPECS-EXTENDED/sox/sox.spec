@@ -94,18 +94,18 @@ which will use the SoX sound file format converter.
 
 %prep
 %setup -q -n %{name}-downstream-%{name}-%{version}.modified
-%patch0 -p1
-%patch1 -p1 -b .lpc
-%patch2 -p1
-%patch1000 -p1
-%patch1001 -p1
-%patch1002 -p1
-%patch1003 -p1
-%patch1004 -p1
-%patch1005 -p1
-%patch1006 -p1
-%patch1007 -p1
-%patch9000 -p1
+%patch 0 -p1
+%patch 1 -p1 -b .lpc
+%patch 2 -p1
+%patch 1000 -p1
+%patch 1001 -p1
+%patch 1002 -p1
+%patch 1003 -p1
+%patch 1004 -p1
+%patch 1005 -p1
+%patch 1006 -p1
+%patch 1007 -p1
+%patch 9000 -p1
 #regenerate scripts from older autoconf to support aarch64
 autoreconf -vfi
 

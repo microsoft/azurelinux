@@ -27,7 +27,7 @@ Summary:       %{summary}
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch01 -p1
+%patch 01 -p1
 sed -i '1c#! %{__python3}' python3/pyinotify.py
 
 %build

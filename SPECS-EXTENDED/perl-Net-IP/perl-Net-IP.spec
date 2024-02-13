@@ -50,10 +50,10 @@ handy IP "cheat sheet".
 %setup -q -n Net-IP-%{version}
 
 # Apply fix for zero networks (#197425, CPAN RT#20265, CPAN RT#60439)
-%patch0
+%patch 0
 
 # Fix shellbangs in shipped scripts
-%patch1
+%patch 1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

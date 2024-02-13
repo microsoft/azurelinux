@@ -52,7 +52,7 @@ Module::Install.
 %setup -q -n Test-CPAN-Meta-%{version}
 
 # Re-code documentation as UTF-8
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

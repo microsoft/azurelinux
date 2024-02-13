@@ -144,12 +144,12 @@ done
 mv %{SOURCE20} src/modules/license/license.conf
 mv %{SOURCE24} src/modules/users/users.conf
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
 
 %build
 mkdir -p %{_target_platform}

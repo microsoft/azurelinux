@@ -36,7 +36,7 @@ display the state table once.
 
 %prep
 %setup -q
-%patch0 -p1 -b .man8
+%patch 0 -p1 -b .man8
 
 %build
 make %{?_smp_mflags} CXXFLAGS="$RPM_OPT_FLAGS $RPM_LD_FLAGS"

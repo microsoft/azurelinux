@@ -49,15 +49,15 @@ for comparing SGML files.
 
 %prep
 %setup -q
-%patch0 -p1 -b .spaces
-%patch1 -p1 -b .2ndspaces
-%patch2 -p1 -b .w3mtxtconvert
-%patch3 -p1 -b .grepnocolors
-%patch4 -p1 -b .sgmlinclude
-%patch5 -p1 -b .rtfman
-%patch6 -p1 -b .papersize
-%patch7 -p1 -b .finalecho
-%patch8 -p1 -b .newgrep
+%patch 0 -p1 -b .spaces
+%patch 1 -p1 -b .2ndspaces
+%patch 2 -p1 -b .w3mtxtconvert
+%patch 3 -p1 -b .grepnocolors
+%patch 4 -p1 -b .sgmlinclude
+%patch 5 -p1 -b .rtfman
+%patch 6 -p1 -b .papersize
+%patch 7 -p1 -b .finalecho
+%patch 8 -p1 -b .newgrep
 
 %build
 ./configure --prefix=%{_prefix} --mandir=%{_mandir} --libdir=%{_libdir}

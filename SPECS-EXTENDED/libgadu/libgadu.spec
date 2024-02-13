@@ -60,7 +60,7 @@ Pakiet libgadu-doc zawiera dokumentację biblioteki libgadu.
 
 %prep
 %setup -q -n %{name}-%{version}%{?rcver}
-%patch0 -p1 -b .gcc10
+%patch 0 -p1 -b .gcc10
 
 # bug 1126750: touch to force rebuild with protobuf-c-1.0.0 (incompatible with 0.15)
 touch packets.proto

@@ -77,8 +77,8 @@ active development concentrates on its successor XPP3/MXP1
 %setup -q -n %{originalname}%{version}
 # remove all binary libs
 find . -name "*.jar" -exec rm -f {} \;
-%patch0 -b .sav
-%patch1 -p1
+%patch 0 -b .sav
+%patch 1 -p1
 
 %build
 export OPT_JAR_LIST="ant/ant-junit junit"

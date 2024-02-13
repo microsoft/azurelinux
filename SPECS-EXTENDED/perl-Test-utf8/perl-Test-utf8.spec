@@ -45,8 +45,8 @@ strings in Perl.
 
 %prep
 %setup -q -n Test-utf8-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 # Remove bundled modules
 rm -rf ./inc/*
 sed -i -e '/^inc\//d' MANIFEST

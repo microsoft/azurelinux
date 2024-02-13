@@ -48,7 +48,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %if 0%{?with_fips:1}

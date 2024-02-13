@@ -82,17 +82,17 @@ for selecting groups of messages.
 %setup -q
 # do not run ./prepare -V, because it also runs ./configure
 
-%patch10 -p1 -b .lynx_no_backscapes
-%patch12 -p1 -b .nodotlock
+%patch 10 -p1 -b .lynx_no_backscapes
+%patch 12 -p1 -b .nodotlock
 
 autoreconf --install
-%patch1 -p1 -b .muttrc
-%patch2 -p1 -b .cabundle
-%patch3 -p1 -b .syncdebug
-%patch8 -p1 -b .system_certs
-%patch9 -p1 -b .ssl_ciphers
-%patch13 -p1 -b .optusegpgagent
-%patch14 -p1
+%patch 1 -p1 -b .muttrc
+%patch 2 -p1 -b .cabundle
+%patch 3 -p1 -b .syncdebug
+%patch 8 -p1 -b .system_certs
+%patch 9 -p1 -b .ssl_ciphers
+%patch 13 -p1 -b .optusegpgagent
+%patch 14 -p1
 
 sed -i -r 's/`$GPGME_CONFIG --libs`/"\0 -lgpg-error"/' configure
 

@@ -25,8 +25,8 @@ domains and their virtual hosts automatically, including at renewal.
 
 %prep
 %setup -q
-%patch2 -p1 -b .warnfix
-%patch3 -p1 -b .tol_missing_res
+%patch 2 -p1 -b .warnfix
+%patch 3 -p1 -b .tol_missing_res
 
 %build
 %configure

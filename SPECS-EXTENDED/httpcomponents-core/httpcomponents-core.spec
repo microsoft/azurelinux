@@ -67,7 +67,7 @@ Group:          Development/Libraries/Java
 %prep
 %setup -q -a1
 
-%patch0 -p1
+%patch 0 -p1
 
 # Random test failures on ARM -- 100 ms sleep is not eneough on this
 # very performant arch, lets make it 2 s

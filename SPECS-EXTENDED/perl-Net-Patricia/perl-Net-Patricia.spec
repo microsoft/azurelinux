@@ -50,7 +50,7 @@ lookups within the BSD kernel since the 4.3 Reno release.
 
 %prep
 %setup -q -n Net-Patricia-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS"

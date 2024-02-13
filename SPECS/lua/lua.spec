@@ -93,26 +93,26 @@ This package contains the static version of liblua for %{name}.
 %endif
 cp %{SOURCE1} .
 mv src/luaconf.h src/luaconf.h.template.in
-%patch0 -p1 -E -z .autoxxx
-%patch1 -p1 -z .idsize
+%patch 0 -p1 -E -z .autoxxx
+%patch 1 -p1 -z .idsize
 #%% patch2 -p1 -z .luac-shared
-%patch3 -p1 -z .configure-linux
-%patch4 -p1 -z .configure-compat-all
+%patch 3 -p1 -z .configure-linux
+%patch 4 -p1 -z .configure-compat-all
 # Put proper version in configure.ac, patch0 hardcodes 5.3.0
 sed -i 's|5.3.0|%{version}|g' configure.ac
-%patch21 -p1
-%patch23 -p1
+%patch 21 -p1
+%patch 23 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
 cd lua-%{bootstrap_version}/
 mv src/luaconf.h src/luaconf.h.template.in
-%patch5 -p1 -b .autoxxx
-%patch1 -p1 -b .idsize
-%patch3 -p1 -z .configure-linux
-%patch4 -p1 -z .configure-compat-all
-%patch6 -p1 -b .luac-shared-link-fix
-%patch18 -p1 -b .CVE-2020-24370
+%patch 5 -p1 -b .autoxxx
+%patch 1 -p1 -b .idsize
+%patch 3 -p1 -z .configure-linux
+%patch 4 -p1 -z .configure-compat-all
+%patch 6 -p1 -b .luac-shared-link-fix
+%patch 18 -p1 -b .CVE-2020-24370
 autoreconf -i
 cd ..
 %endif

@@ -33,7 +33,7 @@ NMI is the resource that is used when your pods look to use their identity.
 %prep
 %autosetup -c -N -n %{name}-%{version}
 pushd aad-pod-identity-%{version}
-%patch0 -p1
+%patch 0 -p1
 popd
 
 %build

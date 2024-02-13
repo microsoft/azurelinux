@@ -63,8 +63,8 @@ guava-testlib provides additional functionality for conveninent unit testing
 
 %prep
 %setup -q -a1
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 find . -name '*.jar' -delete
 

@@ -78,18 +78,18 @@ Programming Interface (CMPI).
 
 %prep
 %setup -q -T -b 0 -n %{name}-%{version}
-%patch0 -p1 -b .sfcbrepos-schema-location
-%patch1 -p1 -b .fix-provider-debugging
-%patch2 -p1 -b .maxMsgLen
-%patch3 -p1 -b .service
-%patch4 -p1 -b .multilib-man-cfg
-%patch5 -p1 -b .default-ecdh-curve-name
-%patch6 -p1 -b .fix-ftbfs
-%patch7 -p1 -b .fix-null-deref
-%patch8 -p1 -b .fix-null-content-type-crash
-%patch9 -p1 -b .fix-ppc-optimization-level
-%patch10 -p1 -b .docdir-license
-%patch11 -p1 -b .fix-multiple-definition
+%patch 0 -p1 -b .sfcbrepos-schema-location
+%patch 1 -p1 -b .fix-provider-debugging
+%patch 2 -p1 -b .maxMsgLen
+%patch 3 -p1 -b .service
+%patch 4 -p1 -b .multilib-man-cfg
+%patch 5 -p1 -b .default-ecdh-curve-name
+%patch 6 -p1 -b .fix-ftbfs
+%patch 7 -p1 -b .fix-null-deref
+%patch 8 -p1 -b .fix-null-content-type-crash
+%patch 9 -p1 -b .fix-ppc-optimization-level
+%patch 10 -p1 -b .docdir-license
+%patch 11 -p1 -b .fix-multiple-definition
 
 %build
 %configure --enable-debug --enable-uds --enable-ssl --enable-pam --enable-ipv6 \

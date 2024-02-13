@@ -42,8 +42,8 @@ This is Perl binding to the LZF compression library.
 
 %prep
 %setup -q -n Compress-LZF-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"

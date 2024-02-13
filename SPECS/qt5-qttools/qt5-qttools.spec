@@ -118,7 +118,7 @@ Requires: %{name}-common = %{version}-%{release}
 
 %prep
 %setup -q -n qttools-everywhere-src-%{version}
-%patch0 -p1 -b .qmake-qt5
+%patch 0 -p1 -b .qmake-qt5
 
 %build
 

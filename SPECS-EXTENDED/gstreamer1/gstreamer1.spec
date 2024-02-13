@@ -57,7 +57,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n gstreamer-%{version}
-%patch0 -p1 -b .rpm-provides
+%patch 0 -p1 -b .rpm-provides
 
 %build
 %meson	\

@@ -40,7 +40,7 @@ added to resources under META.yml.
 
 %prep
 %setup -q -n Module-Install-Repository-%{version}
-%patch0 -p1
+%patch 0 -p1
 find -type f -exec chmod -x {} +
 cp %{SOURCE1} .
 

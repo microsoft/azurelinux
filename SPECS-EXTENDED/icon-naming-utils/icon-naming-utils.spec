@@ -22,7 +22,7 @@ the new Icon Naming Specification names, for desktop icon themes.
 
 %prep
 %setup -q
-%patch0 -p1 -b .paths
+%patch 0 -p1 -b .paths
 
 
 %build

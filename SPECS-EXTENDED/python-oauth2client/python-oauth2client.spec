@@ -44,9 +44,9 @@ This is a python client module for accessing resources protected by OAuth 2.0
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p1 -b .doc
-%patch1 -p1 -b .doc2
-%patch2 -p1 -b .keyring
+%patch 0 -p1 -b .doc
+%patch 1 -p1 -b .doc2
+%patch 2 -p1 -b .keyring
 
 # Remove the version constraint on httplib2.  From reading upstream's git log,
 # it seems the only reason they require a new version is to force python3

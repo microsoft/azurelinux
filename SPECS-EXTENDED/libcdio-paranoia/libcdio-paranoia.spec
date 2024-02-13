@@ -32,7 +32,7 @@ This package contains header files and libraries for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 # fix pkgconfig files
 sed -i -e 's,-I${includedir},-I${includedir}/cdio,g' libcdio_paranoia.pc.in

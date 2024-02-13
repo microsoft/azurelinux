@@ -96,9 +96,9 @@ programming much safer and easier than using other thread models.
 
 %ifnarch %{ix86} x86_64 %{arm}
 # use ucontext backend on non-x86 (setjmp didn't work on s390(x))
-%patch0 -p1 -b .ucontext-default
+%patch 0 -p1 -b .ucontext-default
 %endif
-%patch1 -p1
+%patch 1 -p1
 
 # Unbundle libecb
 rm Coro/ecb.h

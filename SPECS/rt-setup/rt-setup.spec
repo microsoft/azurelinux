@@ -32,7 +32,7 @@ The 'rt-setup' package configures details required by RHEL-RT environment.
 
 %prep
 %setup -q
-%patch0
+%patch 0
 
 %build
 %set_build_flags

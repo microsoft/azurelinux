@@ -51,9 +51,9 @@ This package provides an html manual for mcpp.
 
 %prep
 %setup -q
-%patch0 -b -z.euc-jp
-%patch1 -p1
-%patch2 -p1
+%patch 0 -b -z.euc-jp
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure --enable-mcpplib --disable-static

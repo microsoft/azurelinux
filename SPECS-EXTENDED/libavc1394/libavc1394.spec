@@ -30,7 +30,7 @@ Development libraries required to build applications using libavc1394.
 
 %prep
 %setup -q
-%patch1 -p1 -b .librom
+%patch 1 -p1 -b .librom
 chmod -x test/dvcont.c
 
 %build

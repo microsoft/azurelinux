@@ -45,11 +45,11 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 find . -name README -or -name \*.cpp -or -name \*.h | xargs --no-run-if-empty sed -i -e 's|\r||'  ||:
 
-%patch1 -p1 -b .gcc41
-%patch2 -p1 -b .pkgconfig
-%patch3 -p1 -b .gcc43
-%patch4 -p1 -b .curl
-%patch5 -p1 -b .gcc47
+%patch 1 -p1 -b .gcc41
+%patch 2 -p1 -b .pkgconfig
+%patch 3 -p1 -b .gcc43
+%patch 4 -p1 -b .curl
+%patch 5 -p1 -b .gcc47
 
 ## pkg-config < 0.20.0 (apparently?) doesn't grok URL
 %if "%(pkg-config --version 2>/dev/null)" < "0.20.0"

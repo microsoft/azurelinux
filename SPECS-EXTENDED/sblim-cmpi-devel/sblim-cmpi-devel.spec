@@ -34,7 +34,7 @@ This packages provides the C++ wrapper library for CMPI development
 
 %prep
 %setup -q
-%patch0 -p1 -b .docdir
+%patch 0 -p1 -b .docdir
 
 %build
 %configure

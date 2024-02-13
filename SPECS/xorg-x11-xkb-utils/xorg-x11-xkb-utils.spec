@@ -56,7 +56,7 @@ X.Org X11 xkb gadgets.
 %prep
 %setup -q -c %{name}-%{version} -a1 -a2 -a3 -a4
 pushd xkbcomp-*
-%patch0 -p1
+%patch 0 -p1
 popd
 
 %build

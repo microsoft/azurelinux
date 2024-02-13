@@ -50,17 +50,17 @@ doing network applications development. This package contains static libraries.
 
 %prep
 %setup -q -n wvstreams-%{version}
-%patch1 -p1 -b .multilib
-%patch2 -p1 -b .xplctarget
-%patch3 -p1 -b .make
-%patch4 -p1 -b .statinclude
-%patch5 -p1 -b .gcc
-%patch6 -p1 -b .gcc47
-%patch7 -p1 -b .magic
-%patch8 -p1 -b .cast
-%patch9 -p1 -b .fix-stack-size
-%patch10 -p1 -b .gcc10
-%patch11 -p1 -b .openssl11
+%patch 1 -p1 -b .multilib
+%patch 2 -p1 -b .xplctarget
+%patch 3 -p1 -b .make
+%patch 4 -p1 -b .statinclude
+%patch 5 -p1 -b .gcc
+%patch 6 -p1 -b .gcc47
+%patch 7 -p1 -b .magic
+%patch 8 -p1 -b .cast
+%patch 9 -p1 -b .fix-stack-size
+%patch 10 -p1 -b .gcc10
+%patch 11 -p1 -b .openssl11
 
 %build
 

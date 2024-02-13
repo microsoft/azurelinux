@@ -47,7 +47,7 @@ Provides:       bundled(fcgi)
 
 %prep
 %setup -q -n FCGI-%{version}
-%patch0 -p1
+%patch 0 -p1
 find . -type f -exec chmod -c -x {} +
 
 %build

@@ -46,7 +46,7 @@ because of my modification.
 
 %prep
 %setup -q -n Parse-PMFile-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

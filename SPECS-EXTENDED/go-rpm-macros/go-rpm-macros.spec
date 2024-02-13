@@ -91,7 +91,7 @@ macros provided by go-rpm-macros to create Go packages.
 
 %prep
 %forgesetup
-%patch0 -p1
+%patch 0 -p1
 
 %writevars -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
 for template in templates/rpm/*\.spec ; do

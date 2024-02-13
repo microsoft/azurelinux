@@ -47,12 +47,12 @@ Development files for Flite, a small, fast speech synthesis engine.
 
 %prep
 %setup -q -n %{name}-%{version}-release
-%patch0 -p1 -b .flite-1.3-sharedlibs
-%patch1 -p1 -b .flite-1.3-doc_texinfo
-%patch2 -p1 -b .flite-1.3-alsa_support
-%patch3 -p1 -b .flite-1.3-implicit_dso_linking
-%patch4 -p1
-%patch5 -p1
+%patch 0 -p1 -b .flite-1.3-sharedlibs
+%patch 1 -p1 -b .flite-1.3-doc_texinfo
+%patch 2 -p1 -b .flite-1.3-alsa_support
+%patch 3 -p1 -b .flite-1.3-implicit_dso_linking
+%patch 4 -p1
+%patch 5 -p1
 cp -p %{SOURCE1} .
 
 

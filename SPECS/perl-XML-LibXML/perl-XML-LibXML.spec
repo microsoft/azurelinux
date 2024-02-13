@@ -113,8 +113,8 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n XML-LibXML-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 chmod -x *.c
 for i in Changes; do
   /usr/bin/iconv -f iso8859-1 -t utf-8 $i > $i.conv && /bin/mv -f $i.conv $i

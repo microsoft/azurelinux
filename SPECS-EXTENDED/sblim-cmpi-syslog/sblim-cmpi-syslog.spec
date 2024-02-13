@@ -55,11 +55,11 @@ SBLIM Base Syslog Testcase Files for SBLIM Testsuite
 
 %prep
 %setup -q
-%patch0 -p1 -b .interop
-%patch1 -p1 -b .docdir
-%patch2 -p1 -b .prov-reg-sfcb-systemd
-%patch3 -p1 -b .format-security
-%patch4 -p1 -b .buffer-overflow-remove-tmpnam
+%patch 0 -p1 -b .interop
+%patch 1 -p1 -b .docdir
+%patch 2 -p1 -b .prov-reg-sfcb-systemd
+%patch 3 -p1 -b .format-security
+%patch 4 -p1 -b .buffer-overflow-remove-tmpnam
 
 %build
 %ifarch s390 s390x ppc ppc64

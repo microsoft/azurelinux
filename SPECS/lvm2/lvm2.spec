@@ -165,7 +165,7 @@ the device-mapper event library.
 
 %prep
 %setup -q -n LVM2.%{version}
-%patch0 -p1 -b .preferred_names
+%patch 0 -p1 -b .preferred_names
 
 %build
 %define _default_pid_dir /run

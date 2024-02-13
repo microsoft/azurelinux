@@ -18,7 +18,7 @@ Walloon hunspell dictionaries.
 
 %prep
 %setup -q -n aspell-wa-%{version}
-%patch0 -p1 -b .buildfix
+%patch 0 -p1 -b .buildfix
 
 %build
 make myspell

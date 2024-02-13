@@ -48,11 +48,11 @@ tables in RFC 1345.  New maps can easily be installed.
 %setup -q -n Unicode-Map8-%{version}
 
 # Patches from openSUSE to fix test suite on x86_64
-%patch0 -p0
-%patch1 -p0
+%patch 0 -p0
+%patch 1 -p0
 
 # Re-code docs as UTF8
-%patch2
+%patch 2
 
 
 %build

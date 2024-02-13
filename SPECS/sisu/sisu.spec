@@ -39,10 +39,10 @@ cp %{SOURCE100} pom.xml
 cp %{SOURCE101} sisu-inject/pom.xml
 cp %{SOURCE102} sisu-plexus/pom.xml
 
-%patch0
-%patch2
-%patch3
-%patch4 -p1
+%patch 0
+%patch 2
+%patch 3
+%patch 4 -p1
 
 %pom_remove_dep :servlet-api sisu-inject
 

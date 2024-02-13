@@ -22,10 +22,10 @@ copylefted Zmodem solution for Linux systems.
 %prep
 %setup -q
 
-%patch1 -p1 -b .glibc21
-%patch2 -p1 -b .crc
-%patch3 -p1 -b .man
-%patch4 -p1 -b .aarch64
+%patch 1 -p1 -b .glibc21
+%patch 2 -p1 -b .crc
+%patch 3 -p1 -b .man
+%patch 4 -p1 -b .aarch64
 
 rm -f po/*.gmo
 

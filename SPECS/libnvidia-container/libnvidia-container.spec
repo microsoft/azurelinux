@@ -30,12 +30,12 @@ kernel subsystems and is designed to be agnostic of the container runtime.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 mkdir -p %{mod_probe_dir}
 tar -C %{mod_probe_dir} --strip-components=1 -xzf %{SOURCE1}
-%patch2 -p1 -d %{mod_probe_dir}
+%patch 2 -p1 -d %{mod_probe_dir}
 touch %{mod_probe_dir}/.download_stamp
 
 %build

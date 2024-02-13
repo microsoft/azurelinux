@@ -30,15 +30,15 @@ library, which provides a color text mode user interface.
 
 %prep
 %setup -q -n Newt-%{version}
-%patch0 -p1 -b .debian
-%patch1 -p1 -b .valist
-%patch2 -p1 -b .fix
-%patch3 -p1 -b .exes
-%patch4 -p1 -b .lang
-%patch5 -p1 -b .bz385751
-%patch6 -p1 -b .export
-%patch7 -p1 -b .doc
-%patch8 -p1 -b .formdestroy
+%patch 0 -p1 -b .debian
+%patch 1 -p1 -b .valist
+%patch 2 -p1 -b .fix
+%patch 3 -p1 -b .exes
+%patch 4 -p1 -b .lang
+%patch 5 -p1 -b .bz385751
+%patch 6 -p1 -b .export
+%patch 7 -p1 -b .doc
+%patch 8 -p1 -b .formdestroy
 rm -rf newtlib
 
 %build

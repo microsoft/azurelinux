@@ -46,9 +46,9 @@ applications
 
 %prep
 %setup -q
-%patch0 -p1 -b .png15
-%patch1 -p1 -b .aarch64
-%patch2 -p1 -b .format-security
+%patch 0 -p1 -b .png15
+%patch 1 -p1 -b .aarch64
+%patch 2 -p1 -b .format-security
 
 %build
 %configure --disable-static --enable-libplotter --enable-libxmi --enable-ps-fonts-in-pcl

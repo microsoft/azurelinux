@@ -40,7 +40,7 @@ based memory management, circular references will cause memory leaks.
 %setup -q -n Devel-Cycle-%{version}
 
 # Fix a Perl 5.12 incompatibility (#757274, CPAN RT#56681)
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

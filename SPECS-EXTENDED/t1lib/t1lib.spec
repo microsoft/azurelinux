@@ -58,12 +58,12 @@ This package contains static libraries for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1 -b .segf
-%patch2 -p1 -b .afm-fix
-%patch3 -p1 -b .type1-inv-rw-fix
-%patch4 -p1 -b .aarch64
-%patch5 -p1 -b .format-security
+%patch 0 -p1
+%patch 1 -p1 -b .segf
+%patch 2 -p1 -b .afm-fix
+%patch 3 -p1 -b .type1-inv-rw-fix
+%patch 4 -p1 -b .aarch64
+%patch 5 -p1 -b .format-security
 
 # use debian patches directly instead of duplicating them
 #patch -p1 < debian/patches/segfault.diff -b -z .segf

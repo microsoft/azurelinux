@@ -34,7 +34,7 @@ and it supports both Unicode and ANSI modes.
 
 %prep
 %setup -q -n %{name}-%{version}-ga-src
-%patch1 -p1
+%patch 1 -p1
 
 %build
 

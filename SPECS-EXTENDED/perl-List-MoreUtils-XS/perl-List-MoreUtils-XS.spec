@@ -53,7 +53,7 @@ This module provides accelerated versions of functions in List::MoreUtils.
 %setup -q -n List-MoreUtils-XS-%{version}
 
 # Unbundle bundled modules except private inc::Config::AutoConf::LMU
-%patch0
+%patch 0
 find inc/ -type f ! -name LMU.pm -print -delete
 
 %build

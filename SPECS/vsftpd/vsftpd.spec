@@ -17,7 +17,7 @@ Requires:       libcap pam openssl libnsl2
 Very secure and very small FTP daemon.
 %prep
 %setup -q
-%patch0
+%patch 0
 
 %build
 sed -i 's/#undef VSF_BUILD_SSL/#define VSF_BUILD_SSL/g' builddefs.h

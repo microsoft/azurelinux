@@ -114,8 +114,8 @@ Log4j implemented over SLF4J.
 
 %prep
 %setup -q -n %{name}-v_%{version} -a2
-%patch1 -p1
-%patch2 -p1
+%patch 1 -p1
+%patch 2 -p1
 find . -name "*.jar" | xargs rm
 cp -p %{SOURCE1} APACHE-LICENSE
 

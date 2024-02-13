@@ -32,7 +32,7 @@ for i in YAWriter.pm README; do {
 };
 done;
 
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

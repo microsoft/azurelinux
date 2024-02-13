@@ -52,11 +52,11 @@ Install yp-tools-devel package for developing applications that use yp-tools
 
 %prep
 %setup -q
-%patch1 -p1 -b .hash
-%patch2 -p1 -b .crypt
-%patch3 -p1 -b .adjunct
-%patch4 -p1 -b .strict-prototypes
-%patch5 -p1
+%patch 1 -p1 -b .hash
+%patch 2 -p1 -b .crypt
+%patch 3 -p1 -b .adjunct
+%patch 4 -p1 -b .strict-prototypes
+%patch 5 -p1
 
 
 autoreconf -i -f -v

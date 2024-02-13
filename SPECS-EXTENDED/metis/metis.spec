@@ -89,10 +89,10 @@ OpenMP version (64bit INTEGER).
 %setup -qc 
  
 pushd %{name}-%{version}
-%patch0 -p0
-%patch1 -p0
-%patch3 -p0
-%patch5 -p0
+%patch 0 -p0
+%patch 1 -p0
+%patch 3 -p0
+%patch 5 -p0
 
 ## Remove default compiler flag
 sed -e 's|-O3||g' -i GKlib/GKlibSystem.cmake

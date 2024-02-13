@@ -89,7 +89,7 @@ This package provides the header files for a recode library.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 autoreconf -fi
 
 %build

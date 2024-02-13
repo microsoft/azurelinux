@@ -30,10 +30,10 @@ Header files and libtool library for developing applications that use OpenSP.
 
 %prep
 %setup -q -n OpenSP-%{version}
-%patch0 -p1 -b .multilib
-%patch1 -p1 -b .nodeids
-%patch2 -p1 -b .sigsegv
-%patch3 -p1 -b .manpage
+%patch 0 -p1 -b .multilib
+%patch 1 -p1 -b .nodeids
+%patch 2 -p1 -b .sigsegv
+%patch 3 -p1 -b .manpage
 # convert files to UTF-8
 iconv -f latin1 -t utf8 ChangeLog -o ChangeLog.tmp
 mv -f ChangeLog.tmp ChangeLog

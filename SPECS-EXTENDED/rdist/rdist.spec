@@ -48,22 +48,22 @@ cp %{SOURCE2} .
 cp %{SOURCE3} .
 
 # apply patch15 first due to #840419
-%patch15 -p1 -b .license-fix
-%patch0 -p1 -b .linux
-%patch1 -p1 -b .links
-%patch2 -p1 -b .oldpath
-%patch3 -p1 -b .hardlink
-%patch4 -p1 -b .bison
-%patch5 -p1 -b .varargs
-%patch6 -p1 -b .maxargs
-%patch7 -p1 -b .lfs
-%patch8 -p1 -b .cleanup
-%patch9 -p1 -b .svr4
-%patch10 -p1 -b .ssh
-%patch11 -p1 -b .mkstemp
-%patch12 -p1 -b .stat64
-%patch13 -p1 -b .re_args
-%patch14 -p1 -b .fix-msgsndnotify-loop
+%patch 15 -p1 -b .license-fix
+%patch 0 -p1 -b .linux
+%patch 1 -p1 -b .links
+%patch 2 -p1 -b .oldpath
+%patch 3 -p1 -b .hardlink
+%patch 4 -p1 -b .bison
+%patch 5 -p1 -b .varargs
+%patch 6 -p1 -b .maxargs
+%patch 7 -p1 -b .lfs
+%patch 8 -p1 -b .cleanup
+%patch 9 -p1 -b .svr4
+%patch 10 -p1 -b .ssh
+%patch 11 -p1 -b .mkstemp
+%patch 12 -p1 -b .stat64
+%patch 13 -p1 -b .re_args
+%patch 14 -p1 -b .fix-msgsndnotify-loop
 
 %build
 make

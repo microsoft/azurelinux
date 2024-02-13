@@ -228,12 +228,12 @@ Summary:        BIND utilities
 %prep
 %setup -q
 
-%patch9 -p1 -b .config-pkcs11
+%patch 9 -p1 -b .config-pkcs11
 cp -r bin/named{,-pkcs11}
 cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
-%patch10 -p1 -b .dist_pkcs11
+%patch 10 -p1 -b .dist_pkcs11
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 

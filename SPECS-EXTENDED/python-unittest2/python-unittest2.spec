@@ -58,12 +58,12 @@ framework in Python 2.7 and onwards. It is tested to run on Python 2.6, 2.7,
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
-%patch0 -p0
-%patch2 -p0
+%patch 0 -p0
+%patch 2 -p0
 %if 0%{?bootstrap_traceback2}
-%patch1 -p0
+%patch 1 -p0
 %endif
-%patch3 -p0
+%patch 3 -p0
 
 
 %build
