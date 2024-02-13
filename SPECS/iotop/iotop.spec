@@ -1,3 +1,5 @@
+%global _hardened_build 1
+
 Summary:        Simple top-like I/O monitor (implemented in C).
 Name:           iotop
 Version:        1.25
@@ -30,8 +32,6 @@ Python-based iotop in C, optimized for performance. Normally a monitoring
 tool intended to be used on a system under heavy stress should use the
 least additional resources as possible.
  
-%global _hardened_build 1
-
 %prep
 %autosetup -p1
 
