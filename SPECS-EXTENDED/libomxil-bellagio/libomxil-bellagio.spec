@@ -4,7 +4,7 @@ Version:        0.9.3
 Release:        29%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://omxil.sourceforge.net
 Source0:        http://downloads.sourceforge.net/omxil/%{name}-%{version}.tar.gz
 #https://sourceforge.net/tracker/?func=detail&aid=3477869&group_id=160680&atid=816817

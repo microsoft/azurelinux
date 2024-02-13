@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # SPDX-License-Identifier: MIT
 %global forgeurl https://pagure.io/fonts-rpm-macros
 Epoch: 1

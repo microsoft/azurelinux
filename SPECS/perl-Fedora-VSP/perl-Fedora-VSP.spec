@@ -5,7 +5,7 @@ Version:        0.001
 Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ppisar.fedorapeople.org/Fedora-VSP/
 Source0:        %{url}Fedora-VSP-%{version}.tar.gz
 

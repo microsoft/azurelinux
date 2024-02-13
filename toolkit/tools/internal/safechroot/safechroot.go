@@ -303,13 +303,13 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	return addFilesToDestination(c.rootDir, filesToCopy...)
+	return AddFilesToDestination(c.rootDir, filesToCopy...)
 }
 
-func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
+func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
+		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
 
 		var err error
 		if f.Permissions != nil {
@@ -319,7 +319,7 @@ func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		}
 
 		if err != nil {
-			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
+			logger.Log.Errorf("Error copying file '%s'", f.Src)
 			return err
 		}
 	}

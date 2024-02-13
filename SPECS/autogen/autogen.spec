@@ -22,7 +22,7 @@ Requires:       guile
 Requires:       gc
 Requires:       gmp
 Requires:       %{name}-libopts
-Distribution:   Mariner
+Distribution:   Azure Linux
 %description
 AutoGen is a tool designed to simplify the creation and maintenance of programs that contain large amounts of repetitious text. It is especially valuable in programs that have several blocks of text that must be kept synchronized.
 

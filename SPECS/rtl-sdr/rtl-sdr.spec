@@ -5,7 +5,7 @@ Version:        0.6.0
 Release:        12%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://osmocom.org/projects/rtl-sdr/wiki/Rtl-sdr
 Source0:        https://github.com/steve-m/librtlsdr/archive/%{version}/librtlsdr-%{version}.tar.gz
 Patch0:         librtlsdr-0.6.0-pkgconfig.patch

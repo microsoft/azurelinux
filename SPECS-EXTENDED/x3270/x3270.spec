@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global catalogue /etc/X11/fontpath.d
 
 %global majorver 3.6

@@ -6,7 +6,7 @@ Version:        2.6.1
 Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.opendnssec.org/
 Source0:        https://dist.opendnssec.org/source/%{name}-%{version}.tar.gz
 Patch1:         softhsm-2.6.1-rh1831086-exit.patch

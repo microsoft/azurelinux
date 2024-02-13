@@ -4,7 +4,7 @@ Version:        5.0
 Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/vapier/ncompress
 #Source0:       https://github.com/vapier/%{name}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz

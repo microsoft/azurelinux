@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	A sophisticated file transfer program
 Name:		lftp
 Version:	4.9.2

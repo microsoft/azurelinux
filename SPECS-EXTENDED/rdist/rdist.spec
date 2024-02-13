@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Maintains identical copies of files on multiple machines
 Name: rdist
 Version: 6.1.5

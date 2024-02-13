@@ -11,7 +11,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/common-sense
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 

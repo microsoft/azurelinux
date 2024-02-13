@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: gnome-doc-utils
 Version: 0.20.10
 Release: 24%{?dist}

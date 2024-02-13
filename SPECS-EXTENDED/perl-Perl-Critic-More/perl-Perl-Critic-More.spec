@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Perl-Critic-More
 Version:        1.003
 Release:        18%{?dist}

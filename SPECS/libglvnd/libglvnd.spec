@@ -4,7 +4,7 @@ Version:        1.3.2
 Release:        5%{?dist}
 License:        MIT AND GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/NVIDIA/libglvnd
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 

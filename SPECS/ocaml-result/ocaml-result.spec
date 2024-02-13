@@ -10,7 +10,7 @@ Version:        1.5
 Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/janestreet/result/
 Source0:        %{URL}/archive/%{version}/%{name}-%{version}.tar.gz
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		icon-naming-utils
 Version:	0.8.90
 Release:	23%{?dist}

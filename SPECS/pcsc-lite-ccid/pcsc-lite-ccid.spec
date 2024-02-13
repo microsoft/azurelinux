@@ -6,7 +6,7 @@ Version:        1.4.33
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ccid.apdu.fr/files
 Source0:        https://ccid.apdu.fr/files/ccid-%{version}.tar.bz2
 Patch0:         ccid-1.4.26-omnikey-3121.patch

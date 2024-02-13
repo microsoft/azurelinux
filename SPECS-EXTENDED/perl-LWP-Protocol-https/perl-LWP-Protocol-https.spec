@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Perform tests that need the Internet
 %bcond_with perl_LWP_Protocol_https_enables_internet_test
 

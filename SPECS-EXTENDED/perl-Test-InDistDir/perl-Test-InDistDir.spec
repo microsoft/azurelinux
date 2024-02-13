@@ -4,7 +4,7 @@ Release:        13%{?dist}
 Summary:        Test environment setup for development with IDE
 License:        WTFPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-InDistDir
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MITHALDU/Test-InDistDir-%{version}.tar.gz#/perl-Test-InDistDir-%{version}.tar.gz
 BuildArch:      noarch

@@ -21,7 +21,7 @@ Version:        3.23.1
 Release:        7%{?dist}
 License:        LGPL-2.1-or-later OR MPL-1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.javassist.org/
 Source0:        https://github.com/jboss-javassist/javassist/archive/%{tar_version}.tar.gz

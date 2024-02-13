@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define	_bindir	/bin
 
 Summary: A utility for configuring serial ports

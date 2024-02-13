@@ -25,7 +25,7 @@ Release:        16%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hamcrest/JavaHamcrest
 Source0:        https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-%{version}.tar.gz
 Source1:        hamcrest-core-MANIFEST.MF

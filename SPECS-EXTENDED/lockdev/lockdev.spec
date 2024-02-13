@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Where lock files are stored
 %global _lockdir /run/lock/lockdev
 

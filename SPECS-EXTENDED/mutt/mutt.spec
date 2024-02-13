@@ -35,7 +35,7 @@ Release:        1%{?dist}
 # pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
 License:        GPLv2+ AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.mutt.org
 # hg snapshot created from http://dev.mutt.org/hg/mutt
 Source:         ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz

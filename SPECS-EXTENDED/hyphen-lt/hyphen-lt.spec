@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-lt
 Summary: Lithuanian hyphenation rules
 %global upstreamid 20100531

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define _legacy_common_support 1
 
 Summary: Utilities for managing the JFS filesystem

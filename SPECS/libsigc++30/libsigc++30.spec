@@ -6,7 +6,7 @@ License:        LGPLv2+
 URL:            https://github.com/libsigcplusplus/libsigcplusplus
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/libsigcplusplus/libsigcplusplus/releases/download/%{version}/libsigc++-%{version}.tar.xz
 BuildRequires:  docbook-style-xsl
 BuildRequires:  doxygen

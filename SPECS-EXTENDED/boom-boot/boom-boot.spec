@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global summary A set of libraries and tools for managing boot loader entries
 %global sphinx_docs 1
 

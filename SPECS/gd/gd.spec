@@ -24,7 +24,7 @@ Release:        4%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libgd.github.io/
 Source:         https://github.com/libgd/libgd/releases/download/%{name}-%{version}/%{prjname}-%{version}.tar.xz
 Source1:        baselibs.conf

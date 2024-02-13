@@ -5,7 +5,7 @@ Version:        1.7.3
 Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/resolver/
 Source0:        https://archive.apache.org/dist/maven/resolver/%{name}-%{version}-source-release.zip
 Patch0:         0001-Remove-use-of-deprecated-SHA-1-and-MD5-algorithms.patch

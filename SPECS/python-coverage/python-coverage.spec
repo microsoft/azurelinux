@@ -4,7 +4,7 @@ Version:        6.3.2
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/coverage
 Source0:        https://files.pythonhosted.org/packages/source/c/coverage/coverage-%{version}.tar.gz

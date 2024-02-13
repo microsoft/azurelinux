@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A tool for printing multiple pages of text on each printed page
 Name: mpage
 Version: 2.5.7

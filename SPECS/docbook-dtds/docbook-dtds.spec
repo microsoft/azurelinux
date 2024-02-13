@@ -8,7 +8,7 @@ Version:        1.0
 Release:        78%{?dist}
 License:        MIT With Advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.oasis-open.org/docbook/
 Source0:        https://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip
 Source1:        http://www.oasis-open.org/docbook/sgml/3.1/docbk31.zip

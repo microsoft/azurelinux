@@ -4,7 +4,7 @@ Version:        0.002
 Release:        24%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Install-AuthorTests
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Module-Install-AuthorTests-%{version}.tar.gz#/perl-Module-Install-AuthorTests-%{version}.tar.gz
 Source1:        LICENSE.PTR

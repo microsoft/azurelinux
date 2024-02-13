@@ -5,7 +5,7 @@ Version:        4.2.3
 Release:        15%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/thkukuk/yp-tools
 Source:         https://github.com/thkukuk/yp-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         yp-tools-2.12-hash.patch

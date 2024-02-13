@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
 %global WITH_SELINUX 1
 %endif

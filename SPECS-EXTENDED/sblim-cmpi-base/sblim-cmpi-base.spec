@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           sblim-cmpi-base
 Version:        1.6.4
 Release:        17%{?dist}

@@ -8,7 +8,7 @@ Release:        20020803%{?dist}
 Summary:        XHTML 1.0 document type definitions
 License:        W3C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
 Source0:        %{_mariner_sources_url}/%{name}-%{date}.tar.xz

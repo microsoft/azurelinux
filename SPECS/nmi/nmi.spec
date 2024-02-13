@@ -5,7 +5,7 @@ Version:        1.8.7
 Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/Azure/aad-pod-identity
 #Source0:       https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%{version}.tar.gz

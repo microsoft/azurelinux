@@ -4,7 +4,7 @@ Version:        0.04
 Release:        40%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Text-CharWidth
 Source0:        https://cpan.metacpan.org/authors/id/K/KU/KUBOTA/Text-CharWidth-%{version}.tar.gz#/perl-Text-CharWidth-%{version}.tar.gz
 

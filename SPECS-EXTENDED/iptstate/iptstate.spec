@@ -5,7 +5,7 @@ Release: 1%{?dist}
 Source: https://github.com/jaymzh/iptstate/releases/download/v%{version}/iptstate-%{version}.tar.bz2
 Patch0: iptstate-2.1-man8.patch
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.phildev.net/iptstate/
 License: zlib
 Requires: iptables

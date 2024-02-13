@@ -3,7 +3,7 @@ Version:      5.61.0
 Release:      4%{?dist}
 Summary:      KDE Frameworks 5 Tier 1 addon with various classes on top of QtCore
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 License: LGPLv2+
 URL:     https://cgit.kde.org/kcoreaddons.git

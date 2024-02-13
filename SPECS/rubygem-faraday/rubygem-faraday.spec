@@ -6,7 +6,7 @@ Version:        2.7.10
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://lostisland.github.io/faraday/
 Source0:        https://github.com/lostisland/faraday/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

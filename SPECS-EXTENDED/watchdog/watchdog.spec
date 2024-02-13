@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:          Software and/or Hardware watchdog daemon
 Name:             watchdog
 Version:          5.15

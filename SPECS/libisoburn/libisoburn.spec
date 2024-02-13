@@ -4,7 +4,7 @@ Version:        1.5.4
 Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dev.lovelyhq.com/libburnia/libisoburn
 Source0:        https://dev.lovelyhq.com/libburnia/libisoburn/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz

@@ -9,7 +9,7 @@ Release:        3%{?dist}
 # perlmulticore.h:  Public Domain or CC0
 License:        (GPL+ OR Artistic) AND (Public Domain OR CC0)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Coro-Multicore
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-%{version}.tar.gz
 # Declare POD encoding, submitted to upstream,

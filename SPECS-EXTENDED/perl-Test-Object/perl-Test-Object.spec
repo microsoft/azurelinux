@@ -5,7 +5,7 @@ Summary:        Thoroughly testing objects via registered handlers
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Object
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Object-%{version}.tar.gz#/perl-Test-Object-%{version}.tar.gz
 

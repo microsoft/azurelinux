@@ -5,7 +5,7 @@ Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Parse-PMFile
 Source0:        https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-%{version}.tar.gz
 # Remove useless dependency on ExtUtils::MakeMaker::CPANfile

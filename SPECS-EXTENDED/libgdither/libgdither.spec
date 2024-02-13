@@ -4,7 +4,7 @@ Version:        0.6
 Release:        27%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://plugin.org.uk/libgdither/README
 Source0:        http://plugin.org.uk/libgdither/libgdither-%{version}.tar.gz
 Patch0:         libgdither-0.6-default.patch

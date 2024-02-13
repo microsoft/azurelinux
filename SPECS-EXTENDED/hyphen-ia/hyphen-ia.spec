@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-ia
 Summary: Interlingua hyphenation rules
 %global upstreamid 20050628

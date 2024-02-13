@@ -8,7 +8,7 @@ Version:        0.23
 Release:        22%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Coverage
 Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Pod-Coverage-%{version}.tar.gz#/perl-Pod-Coverage-%{version}.tar.gz
 Source1:        LICENSE.PTR

@@ -8,7 +8,7 @@ License:       LGPLv2+
 URL:           https://invisible-island.net/dialog/dialog.html
 Group:         Applications/System
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Source0:       ftp://ftp.invisible-island.net/dialog/%{name}-%{version}-%{dialogsubversion}.tgz
 BuildRequires: ncurses-devel
 BuildRequires: gettext

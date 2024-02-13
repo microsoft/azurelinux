@@ -5,7 +5,7 @@ Version:        4.2.3
 Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/google/guice
 # ./create-tarball.sh %%{version}
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Mail-AuthenticationResults
 Version:        1.20200108
 Release:        3%{?dist}

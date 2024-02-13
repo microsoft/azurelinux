@@ -7,7 +7,7 @@ Version:        2.1.1
 Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/jexl
 Source0:        https://downloads.apache.org/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz

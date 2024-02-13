@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
 %global debug_package %{nil}
 

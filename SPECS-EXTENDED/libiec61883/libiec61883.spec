@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Streaming library for IEEE1394
 Name:           libiec61883
 Version:        1.2.0

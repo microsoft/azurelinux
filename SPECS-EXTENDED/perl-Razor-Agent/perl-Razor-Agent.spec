@@ -4,7 +4,7 @@ Version:        2.85
 Release:        37%{?dist}
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://razor.sourceforge.net/
 Source:         https://downloads.sourceforge.net/project/razor/razor-agents/%{version}/razor-agents-%{version}.tar.bz2#/%{name}-%{version}.tar.bz2
 Patch0:         razor-agents-2.85-use-sha-not-sha1.patch

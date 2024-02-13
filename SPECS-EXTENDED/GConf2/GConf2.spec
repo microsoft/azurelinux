@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define libxml2_version 2.4.12
 %define glib2_version 2.25.9
 %define dbus_version 1.0.1

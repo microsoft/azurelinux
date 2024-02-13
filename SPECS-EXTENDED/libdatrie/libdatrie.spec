@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Implementation of Double-Array structure for representing trie
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://linux.thai.net/projects/datrie
 Source0:        http://linux.thai.net/pub/thailinux/software/libthai/%{name}-%{version}.tar.xz
 Patch0:         libdatrie-fixes-docs.patch

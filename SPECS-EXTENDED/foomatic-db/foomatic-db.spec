@@ -6,7 +6,7 @@ Version:        %{dbver_rel}
 Release:        70%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.openprinting.org
 Source0:        %{_mariner_sources_url}/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
 Patch1:         foomatic-db-device-ids.patch

@@ -4,7 +4,7 @@ Version:        0.03
 Release:        23%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Crypt-Random-Seed
 Source0:        https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-Random-Seed-%{version}.tar.gz
 BuildArch:      noarch

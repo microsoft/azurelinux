@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Todo: build docs
 # BuildRequires:  gtk-doc >= 1.14
 # configure --enable-gtk-doc --enable-gtk-doc-html --enable-gtk-doc-pdf

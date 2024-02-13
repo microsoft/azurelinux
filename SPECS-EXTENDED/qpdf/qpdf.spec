@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Command-line tools and library for transforming PDF files
 Name:    qpdf
 Version: 10.1.0

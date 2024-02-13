@@ -4,7 +4,7 @@ Version:        1.4.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/appdirs
 Source0:        https://github.com/ActiveState/appdirs/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

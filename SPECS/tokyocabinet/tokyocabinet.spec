@@ -4,7 +4,7 @@ Version:        1.4.48
 Release:        18%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://fallabs.com/tokyocabinet/
 Source:         http://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz 
 Patch0:         tokyocabinet-fedora.patch

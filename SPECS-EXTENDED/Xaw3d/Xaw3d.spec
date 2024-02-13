@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A version of the MIT Athena widget set for X
 Name: Xaw3d
 Version: 1.6.3

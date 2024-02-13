@@ -4,7 +4,7 @@ Version:        2023c
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.iana.org/time-zones
 Source0:        https://data.iana.org/time-zones/releases/%{name}%{version}.tar.gz

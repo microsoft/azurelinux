@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Database Independent Abstraction Layer for C
 Name: libdbi
 Version: 0.9.0

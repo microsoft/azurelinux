@@ -25,7 +25,7 @@ Release:        124%{?dist}
 License:        Public Domain
 Group:          Development/Tools/Other
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.antlr.org/
 # Upstream source under https://www.antlr2.org/download/antlr-2.7.7.tar.gz. Needs verification.
 Source0:        %{_mariner_sources_url}/antlr-%{version}.tar.bz2

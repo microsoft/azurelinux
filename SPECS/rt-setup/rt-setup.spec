@@ -4,7 +4,7 @@ Version:       2.1
 Release:       5%{?dist}
 License:       GPL+
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Group:         System Environment/Base
 Source:        %{_mariner_sources_url}/rt-setup-%{version}.tar.bz2
 Patch0:        no-annobin.patch

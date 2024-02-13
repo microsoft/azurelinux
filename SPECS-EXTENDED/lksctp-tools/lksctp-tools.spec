@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:    lksctp-tools
 Summary: User-space access to Linux Kernel SCTP
 Version: 1.0.18

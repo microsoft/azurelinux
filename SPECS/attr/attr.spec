@@ -1,10 +1,10 @@
 Summary:        Utilities for managing filesystem extended attributes
 Name:           attr
-Version:        2.5.1
-Release:        3%{?dist}
+Version:        2.5.2
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://savannah.nongnu.org/projects/attr
 Source:         https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.gz
@@ -109,6 +109,9 @@ ln -fs ../sys/xattr.h %{buildroot}%{_includedir}/attr/xattr.h
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.2-1
+- Auto-upgrade to 2.5.2 - Package upgrade for Azure Linux 3.0
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.1-3
 - Removing 'exit' calls from the '%%check' section.
 

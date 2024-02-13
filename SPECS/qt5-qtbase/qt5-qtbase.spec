@@ -37,7 +37,7 @@ Release:      9%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 URL:          https://qt-project.org/
 %global       majmin %(echo %{version} | cut -d. -f1-2)
 Source0:      https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz

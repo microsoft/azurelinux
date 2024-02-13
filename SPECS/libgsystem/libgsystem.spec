@@ -7,7 +7,7 @@ Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{versio
 License:        LGPLv2+
 URL:            https://wiki.gnome.org/Projects/LibGSystem
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # We always run autogen.sh
 BuildRequires:  autoconf

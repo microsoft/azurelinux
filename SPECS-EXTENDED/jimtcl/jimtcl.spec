@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           jimtcl
 Version:        0.78
 Release:        5%{?dist}

@@ -4,7 +4,7 @@ Version:        10.19
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/fedora-sysv/initscripts
 Source0:        https://github.com/fedora-sysv/initscripts/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

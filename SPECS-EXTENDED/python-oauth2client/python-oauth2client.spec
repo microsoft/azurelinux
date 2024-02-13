@@ -4,7 +4,7 @@
 %global _docdir_fmt %{name}
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Name:           python-%{srcname}
 Version:        4.1.3

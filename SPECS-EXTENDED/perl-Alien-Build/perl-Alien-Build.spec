@@ -15,7 +15,7 @@ Summary:        Build external dependencies for use in CPAN
 # object file and a static library).
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Alien-Build
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Build-%{version}.tar.gz#/perl-Alien-Build-%{version}.tar.gz
 # Support only the most advanced pkgconfig implementation,

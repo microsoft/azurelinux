@@ -9,7 +9,7 @@ Release:        4%{?dist}
 Summary:        Format a header and rows into a table
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Term-Table
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Term-Table-%{version}.tar.gz#/perl-Term-Table-%{version}.tar.gz
 # Unbundle Object::HashBase
