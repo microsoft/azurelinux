@@ -1971,6 +1971,45 @@
                 "value": [
                     "y"
                 ]
+            },
+            "CONFIG_BLK_CGROUP_IOLATENCY": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Enable support for latency based cgroup IO protection",
+                "value": [
+                    "y"
+                ]
+            },
+            "CONFIG_SCSI_MPI3MR": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for customer",
+                "value": [
+                    "m"
+                ]
+            },
+            "CONFIG_ZRAM": {
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Enable ZRAM to align ARM and AMD offerings",
+                "value": [
+                    "m"
+                ]
             }
         }
     }
