@@ -7,7 +7,7 @@
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
 Version:        4.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -76,7 +76,7 @@ Requires:       plexus-sec-dispatcher
 Requires:       plexus-utils
 Requires:       sisu
 Requires:       slf4j
-Suggests:       maven-openjdk11
+Suggests:       maven-openjdk17
 Obsoletes:      xmvn-connector-aether < 4.0.0
 
 %description    minimal
@@ -153,6 +153,13 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
+# Workaround easymock incompatibility with Java 17that should be fixed            
+# in easymock 4.4: https://github.com/easymock/easymock/issues/274            
+%pom_add_plugin :maven-surefire-plugin xmvn-connector "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+%pom_add_plugin :maven-surefire-plugin xmvn-tools/xmvn-install "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+    
 %build
 %mvn_build -j -- -P\\!quality
 
@@ -263,6 +270,9 @@ end
 %license LICENSE NOTICE
 
 %changelog
+* Mon Feb 12 2024 Nan Liu<liunan@microsoft.com> - 4.0.0-2
+- Workaround build issue with OpenJDK 17
+
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
