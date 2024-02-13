@@ -1,9 +1,9 @@
 {
  "Signatures": {
-  "Xclients": "b6fb27613ade37a739a747fe0dd458740fc8ceed88e91af2517da3310acf5d25",
+  "Xclients": "51dbee7a986456024259cf81ba7c4506a82e56fca313c4ce54e0cc4a30a524ca",
   "Xmodmap": "44088171eef3b117ebc7a99ecc1aee3ec0bf2d5ef85bc9691908c52779ea3dfc",
   "Xresources": "d2980d932a5aea6b48f8c1b57aca2b11693a78d35014ac21c80f0cfba5e0926c",
-  "Xsession": "7e2b2949e0f6b7a34f73c6859ad7447df80bb51509b13cb9caef5ea7622afde2",
+  "Xsession": "84102e89519eb369ce6b522a6306cbe7af9df204379923adeb128046ae0cba82",
   "localuser.sh": "9bc75259c0de4d0f858d4ffb552b5085f17307d16346644a4f007841a3bfebac",
   "xinit-1.4.2.tar.xz": "b7d8dc8d22ef9f15985a10b606ee4f2aad6828befa437359934647e88d331f23",
   "xinit-compat": "597e3f830cae1e9733f47a55a1e507259434ebae2da6e813f14e40e6cded2b20",
