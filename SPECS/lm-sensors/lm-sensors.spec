@@ -4,7 +4,7 @@ Version:        3.6.0
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Drivers
 URL:            https://github.com/lm-sensors/lm-sensors
 #Source0:       https://github.com/lm-sensors/lm-sensors/archive/V3-6-0.tar.gz

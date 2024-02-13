@@ -4,7 +4,7 @@ Version:	168
 Release:	3%{?dist}
 License:	GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://github.com/andikleen/mcelog
 Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 # note that this source OVERRIDES the one on the tarball above!

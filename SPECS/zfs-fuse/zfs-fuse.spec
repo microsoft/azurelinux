@@ -6,7 +6,7 @@ Version:        0.7.2.2
 Release:        17%{?dist}
 License:        CDDL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/gordan-bobic/zfs-fuse
 Source00:       http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source01:       zfs-fuse.service
@@ -49,10 +49,10 @@ operating system.
 %prep
 %setup -q
 
-%patch0
-%patch1 -p1
-%patch2 -p1
-%patch3
+%patch 0
+%patch 1 -p1
+%patch 2 -p1
+%patch 3
 
 f=LICENSE
 mv $f $f.iso88591

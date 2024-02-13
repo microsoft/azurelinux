@@ -4,7 +4,7 @@ Version:        0.5.2
 Release:        18%{?dist}
 License:        LGPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ocaml-fileutils
 # NOTE: the "_2" suffix was added to avoid conflicts with an older source tarball for the same version of the sources.
 #       Please remove it during a version update.

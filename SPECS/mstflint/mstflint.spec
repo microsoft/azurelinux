@@ -4,7 +4,7 @@ Version:        4.21.0
 Release:        4%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz

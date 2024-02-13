@@ -4,7 +4,7 @@ Version:        3.23
 Release:        8%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://packages.qa.debian.org/h/hostname.html
 Source0:        http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        gpl-2.0.txt
@@ -24,7 +24,7 @@ DNS name, and to display or set its hostname or NIS domain name.
 %prep
 %setup -q -n hostname
 cp %{SOURCE1} %{SOURCE2} %{SOURCE3} .
-%patch1 -p1
+%patch 1 -p1
 
 %build
 make CFLAGS="%{optflags} $CFLAGS -D_GNU_SOURCE" LDFLAGS="$RPM_LD_FLAGS"

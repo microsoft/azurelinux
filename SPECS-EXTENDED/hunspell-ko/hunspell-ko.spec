@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ko
 Summary: Korean hunspell dictionaries
 Version: 0.7.0

@@ -11,7 +11,7 @@ Version:        1.20.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://gstreamer.freedesktop.org/
 Source0:        http://gstreamer.freedesktop.org/src/gstreamer/gstreamer-%{version}.tar.xz
 ## For GStreamer RPM provides
@@ -57,7 +57,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n gstreamer-%{version}
-%patch0 -p1 -b .rpm-provides
+%patch 0 -p1 -b .rpm-provides
 
 %build
 %meson	\

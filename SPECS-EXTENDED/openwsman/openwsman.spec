@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Name:		openwsman
 Version:	2.6.8
@@ -101,13 +101,13 @@ This package provides Perl bindings to access the openwsman client API.
 %prep
 %setup -q
 
-%patch1 -p1 -b .pamsetup
-%patch2 -p1 -b .ruby-binding-build
-%patch3 -p1 -b .openssl-1.1-fix
-%patch4 -p1 -b .http-status-line
-%patch5 -p1 -b .libcurl-error-codes-update
-%patch6 -p1 -b .CVE-2019-3816
-%patch7 -p1 -b .CVE-2019-3833
+%patch 1 -p1 -b .pamsetup
+%patch 2 -p1 -b .ruby-binding-build
+%patch 3 -p1 -b .openssl-1.1-fix
+%patch 4 -p1 -b .http-status-line
+%patch 5 -p1 -b .libcurl-error-codes-update
+%patch 6 -p1 -b .CVE-2019-3816
+%patch 7 -p1 -b .CVE-2019-3833
 
 %build
 # Removing executable permissions on .c and .h files to fix rpmlint warnings. 

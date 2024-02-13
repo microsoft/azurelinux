@@ -4,7 +4,7 @@ Version:        3.6
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.gnu.org/software/parted/
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
@@ -21,7 +21,7 @@ command-line frontend, parted, which can also be used in scripts.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 #Add a header to allow building with glibc-2.28 or later

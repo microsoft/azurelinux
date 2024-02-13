@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global project openexr
 
 Name:    ilmbase
@@ -51,8 +51,8 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %prep
 %setup -q
 
-%patch51 -p1 -b .no_undefined
-%patch53 -p1 -b .pkgconfig
+%patch 51 -p1 -b .no_undefined
+%patch 53 -p1 -b .pkgconfig
 #patch54 -p1 -b .glibc_iszero
 
 #/bootstrap

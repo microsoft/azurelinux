@@ -4,7 +4,7 @@ Version:        0.0.20051105
 Release:        41%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.hping.org/
 Source0:        https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz
 Patch0:         hping3-include.patch
@@ -31,13 +31,13 @@ Since version 3, hping implements scripting capabilties
 %prep
 
 %setup -q -n hping3-20051105
-%patch0  -b .include
-%patch1  -b .bytesex
-%patch2 -p1 -b .getifnamedebug
-%patch3  -b .cflags
-%patch4  -b .man
-%patch5 -p1
-%patch6 -p1 -b .common
+%patch 0  -b .include
+%patch 1  -b .bytesex
+%patch 2 -p1 -b .getifnamedebug
+%patch 3  -b .cflags
+%patch 4  -b .man
+%patch 5 -p1
+%patch 6 -p1 -b .common
 
 %build
 %configure --force-libpcap

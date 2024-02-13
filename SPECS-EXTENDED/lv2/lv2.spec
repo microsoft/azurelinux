@@ -7,7 +7,7 @@ Release:        3%{?dist}
 # lv2specgen template.html is CC-AT-SA
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://lv2plug.in
 Source:         https://lv2plug.in/spec/%{name}-%{version}.tar.xz
 BuildRequires:  asciidoc

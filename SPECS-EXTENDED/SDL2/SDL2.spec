@@ -5,7 +5,7 @@ Version:        2.24.0
 Release:        2%{?dist}
 License:        zlib AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.libsdl.org/
 Source0:        https://www.libsdl.org/release/%{name}-%{version}.tar.gz
 Source1:        SDL_config.h

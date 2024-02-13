@@ -8,7 +8,7 @@ Source0:        https://downloads.sourceforge.net/infozip/zip30.tar.gz
 Patch:          CVE-2018-13410.patch
 Group:          SystemUtilities
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 The Zip package contains Zip utilities.

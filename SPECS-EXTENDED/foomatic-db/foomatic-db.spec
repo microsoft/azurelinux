@@ -6,7 +6,7 @@ Version:        %{dbver_rel}
 Release:        70%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.openprinting.org
 Source0:        %{_mariner_sources_url}/foomatic-db-%{dbver_rel}-%{dbver_snap}.tar.gz
 Patch1:         foomatic-db-device-ids.patch
@@ -109,10 +109,10 @@ popd
 # HP DeskJet 720C (bug #797099)
 # Kyocera FS-1118MFP (bug #782377)
 # Brother HL-2040 (bug #999040)
-%patch1 -p1
+%patch 1 -p1
 
 # These can't be generated at all (bug #866476)
-%patch2 -p1
+%patch 2 -p1
 
 # Use sed instead of perl in the PPDs (bug #512739).
 find db/source/PPD -type f -name '*.ppd' -exec sed -i 's,perl -p,sed,g' {} +

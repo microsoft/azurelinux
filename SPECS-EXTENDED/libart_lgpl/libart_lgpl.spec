@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: libart_lgpl
 Version: 2.3.21
 Release: 24%{?dist}
@@ -27,7 +27,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 %build
 libtoolize

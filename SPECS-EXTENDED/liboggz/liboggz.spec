@@ -4,7 +4,7 @@ Version:        1.1.1
 Release:        20%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.xiph.org/oggz/
 Source0:        https://downloads.xiph.org/releases/liboggz/%{name}-%{version}.tar.gz
 # Always have oggz_off_t == loff_t even on 64-bit platforms
@@ -49,7 +49,7 @@ liboggz.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 %build
 %configure --disable-static

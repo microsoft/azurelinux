@@ -6,7 +6,7 @@ Version:        0.3.3
 Release:        9%{?dist}
 License:        LGPL-2.0-or-later OR MPL-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libwpg.sourceforge.net/
 Source0:        https://download.sourceforge.net/libwpg/%{name}-%{version}.tar.xz
 BuildRequires:  doxygen

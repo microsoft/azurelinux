@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %ifnarch %{ocaml_native_compiler}
 %global debug_package %{nil}
 %endif
@@ -42,7 +42,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n calendar-%{version}
-%patch1 -p1
+%patch 1 -p1
 
 
 %build

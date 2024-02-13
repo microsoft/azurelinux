@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package ecj
 #
@@ -57,9 +57,9 @@ the JDT Core batch compiler.
 
 %prep
 %setup -q -c -a 1
-%patch0 -p1
-%patch2 -p1
-%patch3
+%patch 0 -p1
+%patch 2 -p1
+%patch 3
 
 sed -i -e 's|debuglevel=\"lines,source\"|debug=\"yes\"|g' build.xml
 

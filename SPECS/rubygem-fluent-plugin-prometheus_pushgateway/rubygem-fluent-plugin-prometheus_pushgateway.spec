@@ -6,7 +6,7 @@ Version:        0.1.1
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/fluent/fluent-plugin-prometheus_pushgateway
 Source0:        https://github.com/fluent/fluent-plugin-prometheus_pushgateway/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

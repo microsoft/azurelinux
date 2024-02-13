@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		libtranslit
 Version:	0.0.3
 Release:	27%{?dist}

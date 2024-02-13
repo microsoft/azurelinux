@@ -4,7 +4,7 @@ Release:        5%{?dist}
 Summary:        Framework for more readable interactive test scripts
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-Inter
 Source0:        https://cpan.metacpan.org/authors/id/S/SB/SBECK/Test-Inter-%{version}.tar.gz#/perl-Test-Inter-%{version}.tar.gz
 # Remove dependencies on release tests that are skipped, proposed to upstream,
@@ -41,7 +41,7 @@ replacement.
 
 %prep
 %setup -q -n Test-Inter-%{version}
-%patch0 -p1
+%patch 0 -p1
 chmod -x examples/*
 
 %build

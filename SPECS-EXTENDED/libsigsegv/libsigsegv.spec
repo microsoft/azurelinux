@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Summary: Library for handling page faults in user mode
 Name:    libsigsegv
@@ -39,7 +39,7 @@ Requires: %{name}-devel%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

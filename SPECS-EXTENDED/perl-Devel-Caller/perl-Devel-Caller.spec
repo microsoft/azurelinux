@@ -4,7 +4,7 @@ Release:        22%{?dist}
 Summary:        Meatier versions of caller
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-Caller
 Source0:        https://cpan.metacpan.org/authors/id/R/RC/RCLAMP/Devel-Caller-%{version}.tar.gz#/perl-Devel-Caller-%{version}.tar.gz
 BuildRequires:  findutils

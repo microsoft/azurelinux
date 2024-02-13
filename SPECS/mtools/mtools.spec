@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Programs for accessing MS-DOS disks without mounting the disks
 Name: mtools
 Version: 4.0.43
@@ -25,7 +25,7 @@ Mtools should be installed if you need to use MS-DOS disks
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .conf
+%patch 0 -p1 -b .conf
 
 %build
 autoreconf -fiv

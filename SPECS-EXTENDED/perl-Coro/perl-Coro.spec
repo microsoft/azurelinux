@@ -18,7 +18,7 @@ Release:        5%{?dist}
 # Rest of package: GPL+ or Artistic
 License:        (GPL+ OR Artistic) AND (GPLv2 OR BSD)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Coro
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-%{cpan_version}.tar.gz
 Patch0:         %{name}-5.25-ucontext-default.patch
@@ -96,9 +96,9 @@ programming much safer and easier than using other thread models.
 
 %ifnarch %{ix86} x86_64 %{arm}
 # use ucontext backend on non-x86 (setjmp didn't work on s390(x))
-%patch0 -p1 -b .ucontext-default
+%patch 0 -p1 -b .ucontext-default
 %endif
-%patch1 -p1
+%patch 1 -p1
 
 # Unbundle libecb
 rm Coro/ecb.h

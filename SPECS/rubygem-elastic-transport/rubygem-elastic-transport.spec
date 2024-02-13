@@ -6,7 +6,7 @@ Version:        8.2.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/elastic/elastic-transport-ruby
 Source0:        https://github.com/elastic/elastic-transport-ruby/archive/refs/tags/v%{version}.tar.gz#/elastic-transport-ruby-%{version}.tar.gz

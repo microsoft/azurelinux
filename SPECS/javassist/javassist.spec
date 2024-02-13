@@ -21,7 +21,7 @@ Version:        3.23.1
 Release:        7%{?dist}
 License:        LGPL-2.1-or-later OR MPL-1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.javassist.org/
 Source0:        https://github.com/jboss-javassist/javassist/archive/%{tar_version}.tar.gz
@@ -76,9 +76,9 @@ Tutorial for javassist.
 %prep
 %setup -q -n %{name}-%{tar_version}
 %if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-%patch0 -p1
+%patch 0 -p1
 %endif
-%patch1 -p1
+%patch 1 -p1
 for j in $(find . -name "*.jar"); do
         mv $j $j.no
 done

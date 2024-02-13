@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       python-slip
 Version:    0.6.4
 Release:    21%{?dist}

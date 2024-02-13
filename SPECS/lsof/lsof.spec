@@ -4,7 +4,7 @@ Version:        4.98.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Tools
 URL:            https://github.com/lsof-org/lsof
 #Source0:       https://github.com/lsof-org/%{name}/archive/%{version}.tar.gz

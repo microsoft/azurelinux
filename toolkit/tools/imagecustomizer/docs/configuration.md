@@ -30,7 +30,7 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 
 7. Enable/disable services. ([Services](#services-type))
 
-8. Configure kernel modules.
+8. Configure kernel modules. ([Modules](#modules-type))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
@@ -45,6 +45,10 @@ The Mariner Image Customizer is configured using a YAML (or JSON) file.
 14. Delete `/etc/resolv.conf` file.
 
 15. Enable dm-verity root protection.
+
+And if the output format is set to `iso`:
+
+12. Copy additional iso media files ([Iso](#iso-type)).
 
 ### /etc/resolv.conf
 
@@ -72,6 +76,85 @@ SystemConfig:
   PackagesInstall:
   - kernel-hci
 ```
+
+## Schema Overview
+
+- [Config type](#config-type)
+  - [Disks](#disks-disk)
+    - [Disk type](#disk-type)
+      - [PartitionTableType](#partitiontabletype-string)
+      - [MaxSize](#maxsize-uint64)
+      - [Partitions](#partitions-partition)
+        - [Partition type](#partition-type)
+          - [ID](#id-string)
+          - [FsType](#fstype-string)
+          - [Name](#partition-name)
+          - [Start](#start-uint64)
+          - [End](#end-uint64)
+          - [Size](#size-uint64)
+          - [Flag](#flags-string)
+  - [Iso](#iso-type)
+    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
+      - [FileConfig type](#fileconfig-type)
+        - [Path](#path-string)
+        - [Permissions](#permissions-string)
+  - [SystemConfig](#systemconfig-type)
+    - [BootType](#boottype-string)
+    - [Hostname](#hostname-string)
+    - [KernelCommandLine](#kernelcommandline-type)
+      - [ExtraCommandLine](#extracommandline-string)
+    - [UpdateBaseImagePackages](#updatebaseimagepackages-bool)
+    - [PackageListsInstall](#packagelistsinstall-string)
+      - [PackageList type](#packagelist-type)
+        - [Packages](#packages-string)
+    - [PackagesInstall](#packagesinstall-string)
+    - [PackageListsRemove](#packagelistsremove-string)
+      - [PackageList type](#packagelist-type)
+        - [Packages](#packages-string)
+    - [PackagesRemove](#packagesremove-string)
+    - [PackageListsUpdate](#packagelistsupdate-string)
+    - [PackagesUpdate](#packagesupdate-string)
+    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
+      - [FileConfig type](#fileconfig-type)
+        - [Path](#path-string)
+        - [Permissions](#permissions-string)
+    - [PartitionSettings](#partitionsettings-partitionsetting)
+      - [PartitionSetting type](#partitionsetting-type)
+        - [ID](#id-string)
+        - [MountIdentifier](#mountidentifier-string)
+        - [MountOptions](#mountoptions-string)
+        - [MountPoint](#mountpoint-string)
+    - [PostInstallScripts](#postinstallscripts-script)
+      - [Script type](#script-type)
+        - [Path](#path-string)
+        - [Args](#args-string)
+    - [FinalizeImageScripts](#finalizeimagescripts-script)
+      - [Script type](#script-type)
+        - [Path](#path-string)
+        - [Args](#args-string)
+    - [Users](#users-user)
+      - [User type](#user-type)
+        - [Name](#user-name)
+        - [UID](#uid-int)
+        - [PasswordHashed](#passwordhashed-bool)
+        - [Password](#password-string)
+        - [PasswordPath](#passwordpath-string)
+        - [PasswordExpiresDays](#passwordexpiresdays-int)
+        - [SSHPubKeyPaths](#sshpubkeypaths-string)
+        - [PrimaryGroup](#primarygroup-string)
+        - [SecondaryGroups](#secondarygroups-string)
+        - [StartupCommand](#startupcommand-string)
+    - [Services](#services-type)
+      -  [Enable](#enable-string)
+      -  [Disable](#disable-string)
+    - [Modules](#modules-type)
+      - [Load](#load-module)
+        - [Module type](#module-type)
+          - [Name](#module-name)
+      - [Disable](#disable-module)
+        - [Module type](#module-type)
+          - [Name](#module-name)
+    - [Verity type](#verity-type)
 
 ## Top-level
 
@@ -149,9 +232,21 @@ Supported options:
 
 The size of the disk, specified in mebibytes (MiB).
 
-### Partitions [[Partition](#partition-type)]
+### Partitions [[Partition](#partition-type)[]]
 
 The partitions to provision on the disk.
+
+## Iso type
+
+Specifies the configuration for the generated ISO media.
+
+### KernelExtraCommandLine [string]
+
+- See [ExtraCommandLine](#extracommandline-string).
+
+### AdditionalFiles
+
+- See [AdditionalFiles](#additionalfiles-mapstring-fileconfig).
 
 ## Verity type
 
@@ -224,7 +319,7 @@ SystemConfig:
 
 Options for configuring the kernel.
 
-### ExtraCommandLine
+### ExtraCommandLine [string]
 
 Additional Linux kernel command line options to add to the image.
 
@@ -296,6 +391,8 @@ SystemConfig:
 ## Module type
 
 Options for configuring a kernel module.
+
+<div id="module-name"></div>
 
 ### Name
 
@@ -381,6 +478,8 @@ Supported options:
 - `ext4`
 - `fat32`
 - `xfs`
+
+<div id="partition-name"></div>
 
 ### Name [string]
 
@@ -514,7 +613,7 @@ SystemConfig:
 
 Options for configuring systemd services.
 
-### Enable
+### Enable [string[]]
 
 A list of services to enable.
 That is, services that will be set to automatically run on OS boot.
@@ -528,7 +627,7 @@ SystemConfig:
     - sshd
 ```
 
-### Disable
+### Disable [string[]]
 
 A list of services to disable.
 That is, services that will be set to not automatically run on OS boot.
@@ -774,6 +873,8 @@ Options for configuration kernel modules.
 ## User type
 
 Options for configuring a user account.
+
+<div id="user-name"></div>
 
 ### Name [string]
 

@@ -4,7 +4,7 @@ Version:        3.7.0
 Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/puppetlabs/hiera
 Source0:        http://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
 # Use /etc/puppet rather than /etc/puppetlabs/puppet
@@ -22,7 +22,7 @@ A simple hierarchical database supporting plugin data sources.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 # Nothing to build

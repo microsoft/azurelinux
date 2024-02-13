@@ -7,7 +7,7 @@ Summary:       Native C++ bindings for D-Bus
 
 License:       LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:           http://sourceforge.net/projects/dbus-cplusplus/
 Source0:       http://downloads.sourceforge.net/dbus-cplusplus/lib%{name}-%{version}.tar.gz
 
@@ -63,11 +63,11 @@ developing applications that use %{name}.
 %setup -q -n lib%{name}-%{version}
 sed -i 's/\r//' AUTHORS
 sed -i 's/libtoolize --force --copy/libtoolize -if --copy/' bootstrap
-%patch1 -p1 -b .gcc47
-%patch2 -p1 -b .linkfix
-%patch3 -p1 -b .collision
-%patch4 -p1 -b .threading
-%patch5 -p1 -b .writechar
+%patch 1 -p1 -b .gcc47
+%patch 2 -p1 -b .linkfix
+%patch 3 -p1 -b .collision
+%patch 4 -p1 -b .threading
+%patch 5 -p1 -b .writechar
 
 %build
 autoreconf -vfi

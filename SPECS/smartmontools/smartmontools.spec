@@ -4,7 +4,7 @@ Version:	7.4
 Release:	1%{?dist}
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://smartmontools.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source2:	smartmontools.sysconf
@@ -31,7 +31,7 @@ failure.
 
 %prep
 %setup -q 
-%patch1 -p1 -b .defaultconf
+%patch 1 -p1 -b .defaultconf
 
 # update SOURCE5 on maintainer's machine prior commiting, there's no internet connection on builders
 curl %{UrlSource5} -o %{SOURCE5} ||:

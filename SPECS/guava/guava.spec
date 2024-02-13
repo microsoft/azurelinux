@@ -20,7 +20,7 @@ Version:        25.0
 Release:        7%{?dist}
 License:        Apache-2.0 AND CC0-1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -63,8 +63,8 @@ guava-testlib provides additional functionality for conveninent unit testing
 
 %prep
 %setup -q -a1
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 find . -name '*.jar' -delete
 

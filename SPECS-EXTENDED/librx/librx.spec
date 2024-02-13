@@ -4,7 +4,7 @@ Version: 1.5
 Release: 37%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.gnu.org/software/rx/rx.html
 # Originally downloaded from ftp://ftp.gnu.org/gnu/rx/rx-1.5.tar.bz2
 # The FSF no longer offers this code.
@@ -35,12 +35,12 @@ This package contains files needed for development with librx.
 
 %prep
 %setup -q -n rx-%{version}
-%patch0 -p1
-%patch1 -p1 -b .texipatch
+%patch 0 -p1
+%patch 1 -p1 -b .texipatch
 %ifarch x86_64 s390x ia64 %{power64} alpha sparc64 aarch64 %{mips64}
-%patch2 -p1 -b .64bit
+%patch 2 -p1 -b .64bit
 %endif
-%patch3 -p1 -b .libtoolmode
+%patch 3 -p1 -b .libtoolmode
 
 %build
 %configure

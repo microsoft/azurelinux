@@ -1,7 +1,7 @@
 %global srcname httplib2
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{srcname}
 Version:        0.20.3
 Release:        3%{?dist}

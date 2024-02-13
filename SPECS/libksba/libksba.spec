@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # See AUTHORS file for licensing details
 License:        (LGPLv3+ or GPLv2+) and GPLv3+ 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Security/Libraries.
 URL:            https://www.gnupg.org/(fr)/download/index.html#libksba
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2

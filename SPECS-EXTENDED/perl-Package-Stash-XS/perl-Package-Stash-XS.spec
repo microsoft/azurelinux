@@ -11,7 +11,7 @@ Release:	7%{?dist}
 Summary:	Faster and more correct implementation of the Package::Stash API
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-Stash-XS
 Source0:	https://cpan.metacpan.org/modules/by-module/Package/Package-Stash-XS-%{version}.tar.gz#/perl-Package-Stash-XS-%{version}.tar.gz
 # Module Build

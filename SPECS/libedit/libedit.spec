@@ -6,7 +6,7 @@ Name:           libedit
 Version:        3.1.20230828
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.thrysoee.dk/editline/libedit-%{libedit_release}-%{libedit_version}.tar.gz
 License:        BSD
 Url:            https://www.thrysoee.dk/editline/

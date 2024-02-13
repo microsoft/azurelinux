@@ -2,7 +2,7 @@
 %global upstreamid 20110620
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-tk
 Summary: Turkmen hyphenation rules
 Version: 0.%{upstreamid}
@@ -22,7 +22,7 @@ Turkmen hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-tk
 cp -p %{SOURCE0} .
-%patch0 -p0 -b .clean
+%patch 0 -p0 -b .clean
 
 %build
 substrings.pl hyph-tk.tex hyph_tk_TM.dic UTF-8

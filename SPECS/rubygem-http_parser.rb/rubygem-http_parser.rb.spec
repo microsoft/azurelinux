@@ -5,7 +5,7 @@ Version:        0.6.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/tmm1/http_parser.rb
 Source0:        %{_mariner_sources_url}/%{gem_name}-%{version}.tar.gz

@@ -7,7 +7,7 @@ URL:            https://github.com/GNOME/gnome-common
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/3.18/%{name}-%{version}.tar.xz
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 
 %description

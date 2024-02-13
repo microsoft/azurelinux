@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package bcel
 #
@@ -62,7 +62,7 @@ standard JVM message.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 # remove all binary libs
 find . -name "*.jar" -exec rm -f {} \;
 # very broken build

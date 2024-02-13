@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Created by pyp2rpm-1.1.0b
 
 %global pypi_name rfc3986

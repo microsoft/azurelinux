@@ -8,7 +8,7 @@ Release:        32%{?dist}
 # scripts included.
 License:        HPND AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Net-IP
 Source:         https://cpan.metacpan.org/modules/by-module/Net/Net-IP-%{version}.tar.gz
 Patch0:         Net-IP-1.26-rt60439.patch
@@ -50,10 +50,10 @@ handy IP "cheat sheet".
 %setup -q -n Net-IP-%{version}
 
 # Apply fix for zero networks (#197425, CPAN RT#20265, CPAN RT#60439)
-%patch0
+%patch 0
 
 # Fix shellbangs in shipped scripts
-%patch1
+%patch 1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

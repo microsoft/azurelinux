@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-GD-Barcode
 Version:        1.15
 Release:        34%{?dist}

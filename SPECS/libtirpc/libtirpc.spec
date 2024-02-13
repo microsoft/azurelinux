@@ -6,7 +6,7 @@ License:        BSD
 Group:          System Environment/Libraries
 URL:            https://git.linux-nfs.org/?p=steved/libtirpc.git
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  krb5-devel

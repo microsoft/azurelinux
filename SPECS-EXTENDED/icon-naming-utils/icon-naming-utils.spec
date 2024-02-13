@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		icon-naming-utils
 Version:	0.8.90
 Release:	23%{?dist}
@@ -22,7 +22,7 @@ the new Icon Naming Specification names, for desktop icon themes.
 
 %prep
 %setup -q
-%patch0 -p1 -b .paths
+%patch 0 -p1 -b .paths
 
 
 %build

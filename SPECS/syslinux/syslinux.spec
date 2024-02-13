@@ -7,7 +7,7 @@ License:        GPLv2+
 URL:            https://www.syslinux.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.kernel.org/pub/linux/utils/boot/%{name}/Testing/%{version}/%{name}-%{version}-pre1.tar.xz
 Patch0:         0001-Add-install-all-target-to-top-side-of-HAVE_FIRMWARE.patch
 Patch1:         0006-Replace-builtin-strlen-that-appears-to-get-optimized.patch
@@ -33,9 +33,9 @@ Headers and libraries for syslinux development.
 
 %prep
 %setup -q -n %{name}-%{version}-pre1
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 # gcc 11.2.0 and above produce error: "cc1: error: '-fcf-protection' is not compatible with this target"

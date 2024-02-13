@@ -15,7 +15,7 @@ Patch4:         CVE-2019-13638.nopatch
 Patch5:         CVE-2019-13636.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Conflicts:      toybox
 
 %description
@@ -24,11 +24,11 @@ file typically created by the diff program.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch5 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 5 -p1
 
 %build
 %configure --disable-silent-rules

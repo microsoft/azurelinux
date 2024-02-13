@@ -4,7 +4,7 @@ Version:        49.1
 Release:        1%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
 #  providers/ipathverbs/ Dual licensed using a BSD license with an extra patent clause
