@@ -21,6 +21,12 @@ Source3: docker.service
 Source4: docker.socket
 Patch0:  CVE-2023-25153.patch
 Patch1:  CVE-2022-21698.patch
+# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
+# Remove once we upgrade this package at least to version 25.0+.
+Patch2:  CVE-2024-23651.patch
+# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
+# Remove once we upgrade this package at least to version 25.0+.
+Patch3:  CVE-2024-23652.patch
 
 %{?systemd_requires}
 
@@ -128,8 +134,13 @@ fi
 %{_unitdir}/*
 
 %changelog
+<<<<<<< HEAD
 * Thu Feb 08 2024 Muhammad Falak <mwani@microsoft.com> - 20.10.27-3
 - Bump release to rebuild with go 1.21.6
+=======
+* Mon Feb 12 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20.10.27-3
+- Fixing CVEs: 2024-23651 and 2024-23652.
+>>>>>>> 2b3ea32e3 (Patched `moby-engine` CVEs: 2024-23651 and 2024-23652. (#7838))
 
 * Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 20.10.27-2
 - Patch CVE-2022-21698
