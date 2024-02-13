@@ -14303,8 +14303,8 @@
         "type": "other",
         "other": {
           "name": "nvme-cli",
-          "version": "1.16",
-          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.16.tar.gz"
+          "version": "2.7.1",
+          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/refs/tags/v2.7.1.tar.gz"
         }
       }
     },
