@@ -177,9 +177,9 @@ This is the Python 3 build of wx-siplib.
 
 %setup -q -n %{name}-%{version}%{?snap:.%{snap}}
 
-%patch50 -p1 -b .no_strip
-%patch51 -p1 -b .no_rpath
-%patch53 -p1 -b .no_sip_so
+%patch 50 -p1 -b .no_strip
+%patch 51 -p1 -b .no_rpath
+%patch 53 -p1 -b .no_sip_so
 
 
 %build

@@ -228,10 +228,10 @@ maps with Postfix, you need this.
 %prep
 %setup -q
 # Apply obligatory patches
-%patch1 -p1 -b .config
-%patch2 -p1 -b .files
-%patch3 -p1 -b .alternatives
-%patch4 -p1 -b .large-fs
+%patch 1 -p1 -b .config
+%patch 2 -p1 -b .files
+%patch 3 -p1 -b .alternatives
+%patch 4 -p1 -b .large-fs
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
@@ -241,14 +241,14 @@ src/global/mail_params.h
 %if %{with pflogsumm}
 gzip -dc %{SOURCE53} | tar xf -
 pushd pflogsumm-%{pflogsumm_ver}
-%patch9 -p1 -b .datecalc
-%patch10 -p1 -b .ipv6-warnings-fix
+%patch 9 -p1 -b .datecalc
+%patch 10 -p1 -b .ipv6-warnings-fix
 popd
 %endif
-%patch11 -p1 -b .chroot-example-fix
-%patch12 -p1 -b .glibc-234-build-fix
-%patch13 -p1 -b .whitespace-name-fix
-%patch14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
+%patch 11 -p1 -b .chroot-example-fix
+%patch 12 -p1 -b .glibc-234-build-fix
+%patch 13 -p1 -b .whitespace-name-fix
+%patch 14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&

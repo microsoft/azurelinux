@@ -76,9 +76,9 @@ Tutorial for javassist.
 %prep
 %setup -q -n %{name}-%{tar_version}
 %if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-%patch0 -p1
+%patch 0 -p1
 %endif
-%patch1 -p1
+%patch 1 -p1
 for j in $(find . -name "*.jar"); do
         mv $j $j.no
 done

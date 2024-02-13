@@ -54,7 +54,7 @@ module is comprehensive.
 
 %prep
 %setup -q -n Pod-Coverage-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 cp %{SOURCE1} .
 

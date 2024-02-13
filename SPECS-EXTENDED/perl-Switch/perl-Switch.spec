@@ -34,7 +34,7 @@ various cases.
 
 %prep
 %setup -q -n Switch-%{version}
-%patch0 -p1 -b .fixme
+%patch 0 -p1 -b .fixme
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor

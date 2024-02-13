@@ -85,7 +85,7 @@ A collection of common X Window System applications.
 
 %prep
 %setup -q -c %{name}-%{version} -a1 -a2 -a3 -a4 -a5 -a6 -a7 -a8 -a9 -a10 -a11 -a12 -a13 -a14 -a15 -a16
-%patch0  -b .x11perf-datadir-cleanup
+%patch 0  -b .x11perf-datadir-cleanup
 
 %build
 # Build all apps

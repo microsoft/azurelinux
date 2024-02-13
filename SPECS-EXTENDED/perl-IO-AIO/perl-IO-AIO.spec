@@ -74,7 +74,7 @@ If no paths are given, treescan will use the current directory.
 %setup -q -n IO-AIO-%{upstream_version}
 
 # Fix shellbang in treescan
-%patch0
+%patch 0
 
 %build
 PERL_CANARY_STABILITY_NOPROMPT=1 perl Makefile.PL \

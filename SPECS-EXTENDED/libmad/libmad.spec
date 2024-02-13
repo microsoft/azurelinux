@@ -47,15 +47,15 @@ Requires:	pkgconfig
 %setup -q
 #Only relevant on multilibs arches
 %ifarch %{ix86} x86_64 ppc ppc64
-%patch0 -p1 -b .multiarch
+%patch 0 -p1 -b .multiarch
 %endif
-%patch1 -p1 -b .ppc
-%patch2 -p1 -b .alt_t2
-%patch3 -p1 -b .thumb
-%patch4 -p1 -b .cflags
-%patch5 -p1 -b .02
-%patch6 -p1 -b .lc
-%patch7 -p1 -b .md_size
+%patch 1 -p1 -b .ppc
+%patch 2 -p1 -b .alt_t2
+%patch 3 -p1 -b .thumb
+%patch 4 -p1 -b .cflags
+%patch 5 -p1 -b .02
+%patch 6 -p1 -b .lc
+%patch 7 -p1 -b .md_size
 
 touch -r aclocal.m4 configure.ac NEWS AUTHORS ChangeLog
 

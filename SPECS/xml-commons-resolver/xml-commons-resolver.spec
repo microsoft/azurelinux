@@ -68,8 +68,8 @@ Javadoc for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 cp %{SOURCE1} pom.xml
 
