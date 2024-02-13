@@ -15,7 +15,7 @@ diff --git a/pkg/virt-controller/services/renderresources.go b/pkg/virt-controll
 index 46b242932..d75354bc5 100644
 --- a/pkg/virt-controller/services/renderresources.go
 +++ b/pkg/virt-controller/services/renderresources.go
-@@ -194,9 +194,11 @@ func WithCPUPinning(cpu *v1.CPU) ResourceRendererOption {
+@@ -199,9 +199,11 @@ func WithCPUPinning(cpu *v1.CPU) ResourceRendererOption {
  			}
  		}
  
