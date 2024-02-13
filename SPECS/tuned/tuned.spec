@@ -303,8 +303,6 @@ fi
 %exclude %{_prefix}/lib/tuned/postgresql
 %exclude %{_sbindir}/tuned-gui
 %exclude %{_datadir}/tuned/ui
-%exclude %{_datadir}/icons/hicolor/scalable/apps/tuned.svg
-%exclude %{_datadir}/applications/tuned-gui.desktop
 %exclude %{_bindir}/powertop2tuned
 %{_prefix}/lib/tuned
 %dir %{_sysconfdir}/tuned
@@ -316,7 +314,6 @@ fi
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/tuned/post_loaded_profile
 %config(noreplace) %{_sysconfdir}/tuned/tuned-main.conf
 %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/tuned/bootcmdline
-%{_sysconfdir}/dbus-1/system.d/com.redhat.tuned.conf
 %verify(not size mtime md5) %{_sysconfdir}/modprobe.d/tuned.conf
 %{_tmpfilesdir}/tuned.conf
 %{_unitdir}/tuned.service
