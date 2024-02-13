@@ -2,8 +2,8 @@
 
 Summary:        Plexus Security Dispatcher Component
 Name:           plexus-sec-dispatcher
-Version:        1.4
-Release:        2%{?dist}
+Version:        2
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +52,9 @@ cp %{SOURCE1} .
 %license LICENSE-2.0.txt
  
 %changelog
+* Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2-1
+- Auto-upgrade to 2 - 3.0 package upgrade
+
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.4-2
 - Rebuilt with msopenjdk-17
 - change source, target and release version
