@@ -37,7 +37,7 @@ func CreateRepo(repoDir string) (err error) {
 	}
 
 	// Create a new repodata
-	_, stderr, err := shell.Execute("createrepo", repoDir)
+	_, stderr, err := shell.Execute("createrepo", "--compatibility", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}

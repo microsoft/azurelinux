@@ -57,7 +57,7 @@ diff -ur fontpackages-1.44.orig/bin/repo-font-audit fontpackages-1.44/bin/repo-f
 -3. indexing this directory with createrepo:
 -$ createrepo path-to-test-directory
 +3. indexing this directory with $CREATEREPO:
-+$ $CREATEREPO path-to-test-directory
++$ $CREATEREPO --compatibility path-to-test-directory
  4. running repo-font-audit:
  $ repo-font-audit test absolute-path-to-test-directory
  
