@@ -25,7 +25,7 @@ BuildRequires: python3-configobj
 BuildRequires: python3-dbus
 BuildRequires: python3-decorator
 BuildRequires: python3-pyudev
-BuildRequires: systemd-rpm-macros
+BuildRequires: systemd-bootstrap-rpm-macros
 
 Requires: dbus
 Requires: ethtool
