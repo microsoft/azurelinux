@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-el
 Summary: Greek hyphenation rules
 %global upstreamid 20051018

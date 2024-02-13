@@ -41,3 +41,22 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
 }
+
+func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
+	invalidVerity := SystemConfig{
+		Verity: &Verity{
+			DataPartition: VerityPartition{
+				IdType: "PartUuid",
+				Id:     "incorrect-uuid-format",
+			},
+			HashPartition: VerityPartition{
+				IdType: "PartLabel",
+				Id:     "hash_partition",
+			},
+		},
+	}
+
+	err := invalidVerity.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "invalid Id format")
+}

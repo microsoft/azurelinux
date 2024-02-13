@@ -12,22 +12,24 @@ import (
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	BootType                BootType                  `yaml:"BootType"`
-	Hostname                string                    `yaml:"Hostname"`
-	UpdateBaseImagePackages bool                      `yaml:"UpdateBaseImagePackages"`
-	PackageListsInstall     []string                  `yaml:"PackageListsInstall"`
-	PackagesInstall         []string                  `yaml:"PackagesInstall"`
-	PackageListsRemove      []string                  `yaml:"PackageListsRemove"`
-	PackagesRemove          []string                  `yaml:"PackagesRemove"`
-	PackageListsUpdate      []string                  `yaml:"PackageListsUpdate"`
-	PackagesUpdate          []string                  `yaml:"PackagesUpdate"`
-	AdditionalFiles         map[string]FileConfigList `yaml:"AdditionalFiles"`
-	PartitionSettings       []PartitionSetting        `yaml:"PartitionSettings"`
-	PostInstallScripts      []Script                  `yaml:"PostInstallScripts"`
-	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
-	Users                   []User                    `yaml:"Users"`
-	Services                Services                  `yaml:"Services"`
-	Modules                 Modules                   `yaml:"Modules"`
+	BootType                BootType           `yaml:"BootType"`
+	Hostname                string             `yaml:"Hostname"`
+	UpdateBaseImagePackages bool               `yaml:"UpdateBaseImagePackages"`
+	PackageListsInstall     []string           `yaml:"PackageListsInstall"`
+	PackagesInstall         []string           `yaml:"PackagesInstall"`
+	PackageListsRemove      []string           `yaml:"PackageListsRemove"`
+	PackagesRemove          []string           `yaml:"PackagesRemove"`
+	PackageListsUpdate      []string           `yaml:"PackageListsUpdate"`
+	PackagesUpdate          []string           `yaml:"PackagesUpdate"`
+	KernelCommandLine       KernelCommandLine  `yaml:"KernelCommandLine"`
+	AdditionalFiles         AdditionalFilesMap `yaml:"AdditionalFiles"`
+	PartitionSettings       []PartitionSetting `yaml:"PartitionSettings"`
+	PostInstallScripts      []Script           `yaml:"PostInstallScripts"`
+	FinalizeImageScripts    []Script           `yaml:"FinalizeImageScripts"`
+	Users                   []User             `yaml:"Users"`
+	Services                Services           `yaml:"Services"`
+	Modules                 Modules            `yaml:"Modules"`
+	Verity                  *Verity            `yaml:"Verity"`
 }
 
 func (s *SystemConfig) IsValid() error {
@@ -44,11 +46,14 @@ func (s *SystemConfig) IsValid() error {
 		}
 	}
 
-	for sourcePath, fileConfigList := range s.AdditionalFiles {
-		err = fileConfigList.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid file configs for (%s):\n%w", sourcePath, err)
-		}
+	err = s.KernelCommandLine.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid KernelCommandLine: %w", err)
+	}
+
+	err = s.AdditionalFiles.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid AdditionalFiles: %w", err)
 	}
 
 	partitionIDSet := make(map[string]bool)
@@ -92,6 +97,13 @@ func (s *SystemConfig) IsValid() error {
 
 	if err := s.Modules.IsValid(); err != nil {
 		return err
+	}
+
+	if s.Verity != nil {
+		err = s.Verity.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Verity: %w", err)
+		}
 	}
 
 	return nil

@@ -1,7 +1,7 @@
 %global require_ibus_version 1.4.0
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:       ibus-m17n
 Version:    1.4.18
 Release:    2%{?dist}

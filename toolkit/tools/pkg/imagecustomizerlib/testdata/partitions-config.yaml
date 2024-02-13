@@ -39,3 +39,6 @@ SystemConfig:
 
   - ID: var
     MountPoint: /var
+
+  KernelCommandLine:
+    ExtraCommandLine: console=tty0 console=ttyS0

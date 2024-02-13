@@ -435,7 +435,7 @@ index 2a5504d104..5f3a029566 100644
  #define RSA_DEFAULT_DIGEST_NAME OSSL_DIGEST_NAME_SHA1
 +#define RSA_DEFAULT_DIGEST_NAME_NONLEGACY OSSL_DIGEST_NAME_SHA2_256
  
- OSSL_FUNC_signature_newctx_fn rsa_newctx;
+ static OSSL_FUNC_signature_newctx_fn rsa_newctx;
  static OSSL_FUNC_signature_sign_init_fn rsa_sign_init;
 @@ -302,10 +304,15 @@ static int rsa_setup_md(PROV_RSA_CTX *ctx, const char *mdname,
  

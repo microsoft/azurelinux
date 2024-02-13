@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        MIT
 Url:            https://pagure.io/fedora-kde/kde-settings
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pagure.io/fedora-kde/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:        COPYING
 

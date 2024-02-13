@@ -1,18 +1,19 @@
 # Got the intial spec from Fedora and modified it
 Summary:	Simple data types for common serialization formats
 Name:		perl-Types-Serialiser
-Version:	1.0
-Release:        8%{?dist}
+Version:	1.01
+Release:    1%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
 URL:		http://search.cpan.org/dist/Types-Serialiser/
 Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:	noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl-common-sense
+BuildRequires:  perl(ExtUtils::MakeMaker)
 
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(Carp)
@@ -57,6 +58,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 01 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.01-1
+- Auto-upgrade to 1.01 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-8
 - Adding 'BuildRequires: perl-generators'.
 

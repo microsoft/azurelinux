@@ -4,7 +4,7 @@ Version:        1.10.0
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pytest-dev/py
 # Must use PyPI sources. Building from GitHub's release sources fails with a message to use PyPI.

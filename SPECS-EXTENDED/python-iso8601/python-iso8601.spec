@@ -12,7 +12,7 @@ Summary:        Simple module to parse ISO 8601 dates
 
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/micktwomey/pyiso8601
 # source0:      https://github.com/micktwomey/pyiso8601/archive/refs/tags/0.1.12.tar.gz
 Source0:        %{pypi_source}

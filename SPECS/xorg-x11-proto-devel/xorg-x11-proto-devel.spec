@@ -7,7 +7,7 @@ Version:        2023.2
 Release:        1%{?dist}
 License:        MIT AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/proto/xorgproto-%{version}.tar.gz
 

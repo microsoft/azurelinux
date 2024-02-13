@@ -11,10 +11,11 @@ import (
 
 type Config struct {
 	Disks        *[]Disk      `yaml:"Disks"`
+	Iso          *Iso         `yaml:"Iso"`
 	SystemConfig SystemConfig `yaml:"SystemConfig"`
 }
 
-func (c *Config) IsValid() error {
+func (c *Config) IsValid() (err error) {
 	if c.Disks != nil {
 		disks := *c.Disks
 		if len(disks) < 1 {
@@ -32,16 +33,28 @@ func (c *Config) IsValid() error {
 		}
 	}
 
-	err := c.SystemConfig.IsValid()
+	if c.Iso != nil {
+		err = c.Iso.IsValid()
+		if err != nil {
+			return err
+		}
+	}
+
+	err = c.SystemConfig.IsValid()
 	if err != nil {
 		return err
 	}
 
 	hasDisks := c.Disks != nil
 	hasBootType := c.SystemConfig.BootType != BootTypeUnset
+	hasPartitionSettings := len(c.SystemConfig.PartitionSettings) > 0
 
 	if hasDisks != hasBootType {
 		return fmt.Errorf("SystemConfig.BootType and Disks must be specified together")
+	}
+
+	if hasPartitionSettings && !hasDisks {
+		return fmt.Errorf("the Disks and SystemConfig.BootType values must also be specified if SystemConfig.PartitionSettings is specified")
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.

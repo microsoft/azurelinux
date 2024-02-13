@@ -4,7 +4,7 @@ Version:        4.3
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release URLs
 Source0:        http://www.puimula.org/voikko-sources/%{name}/%{name}-%{version}.tar.gz

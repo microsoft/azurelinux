@@ -1,10 +1,10 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
-Version:        10.15.0
-Release:        14%{?dist}
+Version:        10.22.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/Azure/azure-storage-azcopy
 Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/v%{version}.tar.gz#/azure-storage-%{name}-%{version}.tar.gz
@@ -61,6 +61,9 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Thu Jan 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.22.1-1
+- Auto-upgrade to 10.22.1 - 3.0 upgrade
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.15.0-14
 - Bump release to rebuild with go 1.20.10
 

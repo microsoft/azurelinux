@@ -6,7 +6,7 @@ License:        GPLv2
 URL:            https://pagure.io/mlocate
 Source0:        http://releases.pagure.org/mlocate/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 BuildRequires:  sed
 BuildRequires:  grep

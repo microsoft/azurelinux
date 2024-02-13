@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-pt
 Summary: Portuguese hunspell dictionaries
 %global upstreamid 20130125

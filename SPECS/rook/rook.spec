@@ -22,7 +22,7 @@ Version:        1.6.2
 Release:        15%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Filesystems
 URL:            https://rook.io/
 #Source0:       https://github.com/rook/rook/archive/refs/tags/v%%{version}.tar.gz

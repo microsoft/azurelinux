@@ -4,7 +4,7 @@ Version:        1.10.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Standard proto files source: https://github.com/open-telemetry/opentelemetry-proto

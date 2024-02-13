@@ -1,16 +1,14 @@
 Summary:        Ed - A line-oriented text editor
 Name:           ed
-Version:        1.14.2
-Release:        9%{?dist}
+Version:        1.20
+Release:        1%{?dist}
 URL:            https://www.gnu.org/software/ed/
 License:        GPLv3
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
-# Official source under https://ftp.gnu.org/gnu/ed/ed-1.14.2.tar.lz.
-# We don't have lzip to decompress it.
-Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.xz/sha512/de838a6df785c7dc80f4b5ba84330bbe743983fd81218321d4ab84c4c3688fdafb4c005502f3228f0bfa2b6bcf342d64d9523ab73ee440b4f305a033f567cbc2/%{name}-%{version}.tar.xz
-
+Distribution:   Azure Linux
+# We don't have lzip to decompress it. Hence converted to tar.gz
+Source0:        https://ftp.gnu.org/gnu/ed/ed-1.20.tar.lz#/%{name}-%{version}.tar.gz
 # CVE-2015-2987 applies to a different program named ED
 Patch0:         CVE-2015-2987.nopatch
 
@@ -46,6 +44,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+* Wed Feb 07 2024 Joe Schmitt <joschmit@microsoft.com> - 1.20-1
+- Upgrade to version 1.20
+
 * Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 1.14.2-9
 - Replace incorrect %%{_lib} usage with %%{_libdir}
 

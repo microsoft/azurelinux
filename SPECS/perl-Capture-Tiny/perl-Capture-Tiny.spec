@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Capture STDOUT and STDERR from Perl, XS or external programs
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Capture-Tiny
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Capture-Tiny-%{version}.tar.gz#/perl-Capture-Tiny-%{version}.tar.gz
 BuildArch:      noarch

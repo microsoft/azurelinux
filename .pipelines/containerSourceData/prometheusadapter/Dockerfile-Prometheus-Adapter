@@ -1,0 +1,14 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# basic smoke test
+RUN adapter 2>temp.txt; grep "successfully using in-cluster auth" temp.txt; rm temp.txt
+
+# set default command for the container
+ENTRYPOINT [ "adapter" ]

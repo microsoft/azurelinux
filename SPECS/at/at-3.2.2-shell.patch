@@ -4,13 +4,13 @@ diff -ur b/at.c a/at.c
 @@ -62,11 +62,8 @@
  #include <stdlib.h>
  #include <string.h>
- 
+
 -#ifdef TM_IN_SYS_TIME
  #include <sys/time.h>
 -#else
  #include <time.h>
 -#endif
- 
+
  #ifdef HAVE_UNISTD_H
  #include <unistd.h>
 @@ -245,6 +242,12 @@
@@ -23,13 +23,13 @@ diff -ur b/at.c a/at.c
 +
 +    gettimeofday(&tv, &tz);
 +    srandom(getpid()+tv.tv_usec);
- 
+
  /* Install the signal handler for SIGINT; terminate after removing the
   * spool file if necessary
 @@ -492,6 +495,9 @@
      fprintf(fp, " || {\n\t echo 'Execution directory "
  	    "inaccessible' >&2\n\t exit 1\n}\n");
- 
+
 +    i = random();
 +    fprintf(fp, "${SHELL:-/bin/sh} << \'marcinDELIMITER%08lx\'\n", i);
 +
@@ -41,7 +41,7 @@ diff -ur b/at.c a/at.c
  	fprintf(stderr, "<EOT>\n");
      }
 -    fprintf(fp, "\n");
-+    fprintf(fp, "marcinDELIMITER%08lx\n", i);
++    fprintf(fp, "\nmarcinDELIMITER%08lx\n", i);
      if (ferror(fp))
  	panic("Output error");
      fflush(fp);

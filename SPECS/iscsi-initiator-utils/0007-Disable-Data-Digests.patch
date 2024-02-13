@@ -1,0 +1,70 @@
+From 4fd0476062b1c63e1e4aff45a59e3fa79e3bf0e6 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 18 Apr 2023 16:04:00 -0700
+Subject: [PATCH 6/6] Disable Data Digests
+ 
+---
+ etc/iscsid.conf | 18 +++++++-----------
+ usr/idbm.c      |  4 ++++
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+ 
+diff --git a/etc/iscsid.conf b/etc/iscsid.conf
+index ec4d4df..e009c29 100644
+--- a/etc/iscsid.conf
++++ b/etc/iscsid.conf
+@@ -285,27 +285,23 @@ discovery.sendtargets.iscsi.MaxRecvDataSegmentLength = 32768
+ 
+ # To allow the targets to control the setting of the digest checking,
+ # with the initiator requesting a preference of enabling the checking,
+-# uncomment one or both of the following lines:
++# uncomment the following line:
+ #node.conn[0].iscsi.HeaderDigest = CRC32C,None
+-#node.conn[0].iscsi.DataDigest = CRC32C,None
+ #
+ # To allow the targets to control the setting of the digest checking,
+ # with the initiator requesting a preference of disabling the checking,
+-# uncomment one or both of the following lines:
++# uncomment the following line:
+ #node.conn[0].iscsi.HeaderDigest = None,CRC32C
+-#node.conn[0].iscsi.DataDigest = None,CRC32C
+ #
+-# To enable CRC32C digest checking for the header and/or data part of
+-# iSCSI PDUs, uncomment one or both of the following lines:
++# To enable CRC32C digest checking for the header of
++# iSCSI PDUs, uncomment the following line:
+ #node.conn[0].iscsi.HeaderDigest = CRC32C
+-#node.conn[0].iscsi.DataDigest = CRC32C
+ #
+-# To disable digest checking for the header and/or data part of
+-# iSCSI PDUs, uncomment one or both of the following lines:
++# To disable digest checking for the header of
++# iSCSI PDUs, uncomment the following line:
+ #node.conn[0].iscsi.HeaderDigest = None
+-#node.conn[0].iscsi.DataDigest = None
+ #
+-# The default is to never use DataDigests or HeaderDigests.
++# The default is to never use HeaderDigests.
+ #
+ 
+ # For multipath configurations, you may want more than one session to be
+diff --git a/usr/idbm.c b/usr/idbm.c
+index ca4a4ec..32e99bc 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -568,9 +568,13 @@ idbm_recinfo_node(node_rec_t *r, recinfo_t *ri)
+ 				 IDBM_SHOW, "None", "CRC32C", "CRC32C,None",
+ 				 "None,CRC32C", num, 1);
+ 		sprintf(key, CONN_DATA_DIGEST, i);
++
++#if 0
++We do not support data digests
+ 		__recinfo_int_o4(key, ri, r, conn[i].iscsi.DataDigest, IDBM_SHOW,
+ 				 "None", "CRC32C", "CRC32C,None",
+ 				 "None,CRC32C", num, 1);
++#endif
+ 		sprintf(key, CONN_IFMARKER, i);
+ 		__recinfo_int_o2(key, ri, r, conn[i].iscsi.IFMarker, IDBM_SHOW,
+ 				"No", "Yes", num, 1);
+-- 
+2.39.2
+ 

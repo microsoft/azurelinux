@@ -1,6 +1,6 @@
 %bcond_with tests
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 ## START: Set by rpmautospec
 ## (rpmautospec version 0.3.5)
 ## RPMAUTOSPEC: autorelease, autochangelog

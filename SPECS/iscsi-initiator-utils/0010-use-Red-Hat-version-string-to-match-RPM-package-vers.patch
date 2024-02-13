@@ -1,0 +1,39 @@
+From 08e9412135c1c89df4d50b8dbdc12c0d227307cb Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Mon, 21 Jan 2013 15:43:36 -0800
+Subject: [PATCH 1/1] use Red Hat version string to match RPM package version
+ 
+---
+ Makefile    | 2 +-
+ meson.build | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+ 
+diff --git a/Makefile b/Makefile
+index a0859b7..7ae461a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,7 +7,7 @@
+ DESTDIR ?=
+ 
+ # our VERSION String
+-ISCSI_VERSION_STR ?= 2.1.9
++ISCSI_VERSION_STR ?= 6.2.1.9
+ 
+ prefix = /usr
+ exec_prefix =
+diff --git a/meson.build b/meson.build
+index d49afbb..ab67096 100644
+--- a/meson.build
++++ b/meson.build
+@@ -4,7 +4,7 @@
+ 
+ project('open-iscsi', 'c',
+   meson_version: '>= 0.54.0',
+-  version: '2.1.9',
++  version: '6.2.1.9',
+   license: 'LGPL-2.1-or-later',
+   default_options: [
+     'c_std=gnu99',
+-- 
+2.40.1
+ 

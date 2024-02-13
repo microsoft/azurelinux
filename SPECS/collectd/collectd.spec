@@ -6,7 +6,7 @@ Version:        5.12.0
 Release:        9%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://collectd.org/
 Source:         https://github.com/collectd/collectd/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 Source1:        collectd-httpd.conf

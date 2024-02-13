@@ -140,6 +140,21 @@ func NewOverlayMountPoint(chrootDir, source, target, lowerDir, upperDir, workDir
 	return
 }
 
+// GetSource gets the source device of the mount.
+func (m *MountPoint) GetSource() string {
+	return m.source
+}
+
+// GetFSType gets the file-system type of the mount.
+func (m *MountPoint) GetFSType() string {
+	return m.fstype
+}
+
+// GetTarget gets the target directory path of the mount.
+func (m *MountPoint) GetTarget() string {
+	return m.target
+}
+
 // NewChroot creates a new Chroot struct
 func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 	// get chroot folder
@@ -173,7 +188,9 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 //
 // This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
-func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) (err error) {
+func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint,
+	includeDefaultMounts bool,
+) (err error) {
 	// On failed initialization, cleanup all chroot files
 	const leaveChrootOnDisk = false
 
@@ -256,7 +273,9 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			}
 		}
 
-		allMountPoints = append(allMountPoints, defaultMountPoints()...)
+		if includeDefaultMounts {
+			allMountPoints = append(allMountPoints, defaultMountPoints()...)
+		}
 
 		for _, mountPoint := range extraMountPoints {
 			if !mountPoint.mountBeforeDefaults {
@@ -284,13 +303,13 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	return addFilesToDestination(c.rootDir, filesToCopy...)
+	return AddFilesToDestination(c.rootDir, filesToCopy...)
 }
 
-func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
+func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
+		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
 
 		var err error
 		if f.Permissions != nil {
@@ -300,7 +319,7 @@ func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		}
 
 		if err != nil {
-			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
+			logger.Log.Errorf("Error copying file '%s'", f.Src)
 			return err
 		}
 	}
@@ -665,4 +684,11 @@ func extractWorkerTar(chroot string, workerTar string) (err error) {
 	logger.Log.Debugf("Using (%s) to extract tar", gzipTool)
 	_, _, err = shell.Execute("tar", "-I", gzipTool, "-xf", workerTar, "-C", chroot)
 	return
+}
+
+// GetMountPoints gets a copy of the list of mounts the Chroot was initialized with.
+func (c *Chroot) GetMountPoints() []*MountPoint {
+	// Create a copy of the list so that the caller can't mess with the list.
+	mountPoints := append([]*MountPoint(nil), c.mountPoints...)
+	return mountPoints
 }

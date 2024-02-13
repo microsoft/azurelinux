@@ -6,7 +6,7 @@ Version:        2.8.3
 Release:        1%{?dist}
 License:        NAKAMURA, Hiroshi Open Source
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/nahi/httpclient
 Source0:        https://github.com/nahi/httpclient/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

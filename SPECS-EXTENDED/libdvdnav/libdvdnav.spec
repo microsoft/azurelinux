@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libdvdnav
 Version:        6.0.1
 Release:        4%{?dist}

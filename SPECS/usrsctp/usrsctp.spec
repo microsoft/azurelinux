@@ -4,7 +4,7 @@ Version:        0.9.5.0
 Release:        1%{?dist}
 License:        LGPLv2+ AND CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/sctplab/usrsctp
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

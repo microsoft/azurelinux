@@ -52,6 +52,13 @@ version_matching_groups = [
     frozenset([
         "SPECS/influxdb/influxdb.spec",
         "SPECS/influx-cli/influx-cli.spec"
+    ]),
+    frozenset([
+        "SPECS/clang/clang.spec",
+        "SPECS/compiler-rt/compiler-rt.spec",
+        "SPECS/lld/lld.spec",
+        "SPECS/lldb/lldb.spec",
+        "SPECS/llvm/llvm.spec"
     ])
 ]
 

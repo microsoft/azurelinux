@@ -4,7 +4,7 @@ Version:        1.0.6
 Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            http://www.liblogging.org/
 Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz

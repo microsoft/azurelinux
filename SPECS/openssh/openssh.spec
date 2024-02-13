@@ -3,10 +3,10 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.openssh.com/
 Source0:        https://ftp.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/%{name}-%{openssh_ver}.tar.gz
@@ -42,7 +42,7 @@ BuildRequires:  libselinux-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 %if %{with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
@@ -94,12 +94,12 @@ The module is most useful for su and sudo service stacks.
 %setup -q -a 3
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
-%patch300 -p2 -b .psaa-build
-%patch301 -p2 -b .psaa-seteuid
-%patch302 -p2 -b .psaa-visibility
-%patch306 -p2 -b .psaa-compat
-%patch305 -p2 -b .psaa-agent
-%patch307 -p2 -b .psaa-deref
+%patch -P 300 -p2 -b .psaa-build
+%patch -P 301 -p2 -b .psaa-seteuid
+%patch -P 302 -p2 -b .psaa-visibility
+%patch -P 306 -p2 -b .psaa-compat
+%patch -P 305 -p2 -b .psaa-agent
+%patch -P 307 -p2 -b .psaa-deref
 # Remove duplicate headers and library files
 rm -f $(cat %{SOURCE4})
 autoreconf
@@ -261,6 +261,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 9.5p1-2
+- workaround "circular dependencies" from build tooling
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 9.5p1-1
 - Upgrade to version 9.5p1
 

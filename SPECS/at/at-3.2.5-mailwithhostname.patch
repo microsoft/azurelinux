@@ -1,0 +1,62 @@
+diff -ur b/atd.c a/atd.c
+--- b/atd.c	2022-02-22 15:21:06.649147600 +0100
++++ a/atd.c	2022-02-22 15:49:13.640184845 +0100
+@@ -98,6 +98,10 @@
+ #define BATCH_INTERVAL_DEFAULT 60
+ #define CHECK_INTERVAL 3600
+ 
++#ifndef MAXHOSTNAMELEN
++#define MAXHOSTNAMELEN 64
++#endif
++
+ /* Global variables */
+ 
+ uid_t real_uid, effective_uid;
+@@ -115,6 +119,7 @@
+ static int nothing_to_do = 0;
+ unsigned int batch_interval;
+ static int run_as_daemon = 0;
++static int mail_with_hostname = 0;
+ static int hupped = 0;
+ 
+ static volatile sig_atomic_t term_signal = 0;
+@@ -301,6 +306,7 @@
+     char fmt[64];
+     unsigned long jobno;
+     int rc;
++    char hostbuf[MAXHOSTNAMELEN];
+ #ifdef WITH_PAM
+     int retcode;
+ #endif
+@@ -455,6 +461,11 @@
+ 
+     write_string(fd_out, "Subject: Output from your job ");
+     write_string(fd_out, jobbuf);
++    if (mail_with_hostname > 0) {
++        gethostname(hostbuf, MAXHOSTNAMELEN-1);
++        write_string(fd_out, " ");
++        write_string(fd_out, hostbuf);
++    }
+     write_string(fd_out, "\nTo: ");
+     write_string(fd_out, mailname);    
+     write_string(fd_out, "\n\n");
+@@ -905,7 +916,7 @@
+     run_as_daemon = 1;
+     batch_interval = BATCH_INTERVAL_DEFAULT;
+ 
+-    while ((c = getopt(argc, argv, "sdl:b:f")) != EOF) {
++    while ((c = getopt(argc, argv, "sdnl:b:f")) != EOF) {
+ 	switch (c) {
+ 	case 'l':
+ 	    if (sscanf(optarg, "%lf", &load_avg) != 1)
+@@ -927,6 +938,10 @@
+ 	    daemon_foreground++;
+ 	    break;
+ 
++	case 'n':
++	    mail_with_hostname=1;
++	    break;
++
+ 	case 's':
+ 	    run_as_daemon = 0;
+ 	    break;

@@ -7,7 +7,7 @@ Release:        2%{?dist}
 Summary:        Set of tools built upon the Test2 framework
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test2-Suite
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Test2-Suite-%{version}.tar.gz#/perl-Test2-Suite-%{version}.tar.gz
 BuildArch:      noarch

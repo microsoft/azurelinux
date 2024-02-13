@@ -5,8 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -17,11 +15,16 @@ import (
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	buildImageFile string, newBuildImageFile string,
 ) error {
-	existingImageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot")
+	existingImageConnection, err := connectToExistingImage(buildImageFile, buildDir, "imageroot", false)
 	if err != nil {
 		return err
 	}
 	defer existingImageConnection.Close()
+
+	currentSELinuxMode, err := getCurrentSELinuxMode(existingImageConnection.Chroot())
+	if err != nil {
+		return err
+	}
 
 	diskConfig := (*config.Disks)[0]
 
@@ -29,14 +32,9 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 		return copyFilesIntoNewDisk(existingImageConnection.Chroot(), imageChroot)
 	}
 
-	newImageConnection, err := createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
-		config.SystemConfig.BootType, buildDir, "newimageroot", installOSFunc)
-	if err != nil {
-		return err
-	}
-	defer newImageConnection.Close()
-
-	err = newImageConnection.CleanClose()
+	err = createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
+		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot",
+		currentSELinuxMode, installOSFunc)
 	if err != nil {
 		return err
 	}
@@ -50,40 +48,21 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 }
 
 func copyFilesIntoNewDisk(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
-	err := copyFilesIntoNewDiskHelper(existingImageChroot, newImageChroot)
+	err := copyPartitionFiles(existingImageChroot.RootDir()+"/.", newImageChroot.RootDir())
 	if err != nil {
 		return fmt.Errorf("failed to copy files into new partition layout:\n%w", err)
 	}
 	return nil
 }
 
-func copyFilesIntoNewDiskHelper(existingImageChroot *safechroot.Chroot, newImageChroot *safechroot.Chroot) error {
+func copyPartitionFiles(sourceRoot, targetRoot string) error {
 	// Notes:
 	// `-a` ensures unix permissions, extended attributes (including SELinux), and sub-directories (-r) are copied.
 	// `--no-dereference` ensures that symlinks are copied as symlinks.
-	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always", "-t", newImageChroot.RootDir()}
+	copyArgs := []string{"--verbose", "--no-clobber", "-a", "--no-dereference", "--sparse", "always",
+		sourceRoot, targetRoot}
 
-	files, err := os.ReadDir(existingImageChroot.RootDir())
-	if err != nil {
-		return fmt.Errorf("failed to read base image root directory:\n%w", err)
-	}
-
-	for _, file := range files {
-		switch file.Name() {
-		case "dev", "proc", "sys", "run", "tmp":
-			// Exclude special directories.
-			//
-			// Note: Under /var, there are symlinks to a couple of these special directories.
-			// However, the `cp` command is called with `--no-dereference`. So, the symlinks will be copied as symlinks.
-			continue
-		}
-
-		fullFileName := filepath.Join(existingImageChroot.RootDir(), file.Name())
-		copyArgs = append(copyArgs, fullFileName)
-	}
-
-	err = shell.ExecuteLiveWithCallback(func(...interface{}) {}, logger.Log.Warn, false,
-		"cp", copyArgs...)
+	err := shell.ExecuteLiveWithErrAndCallbacks(1, func(...interface{}) {}, logger.Log.Debug, "cp", copyArgs...)
 	if err != nil {
 		return fmt.Errorf("failed to copy files:\n%w", err)
 	}

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-mk
 Summary: Macedonian hunspell dictionaries
 %global upstreamid 20051126
