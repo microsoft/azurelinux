@@ -55,7 +55,7 @@ V=1 STRIP=: %make_install
 * Mon Feb 12 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.25-1
 - Auto-upgrade to 1.25 - 3.0 upgrade
 - Change the package to iotop-c (iotop but with C-based implementation)
-- Re-import from Fedora 40 (license: GPL 2.0 or later)
+- Re-import from Fedora 40 (license: MIT)
 
 * Wed May 25 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.6-10
 - Add dependency on python3-curses
