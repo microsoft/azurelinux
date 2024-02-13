@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "mariner-coco-build-uvm.sh": "594c1e3764b65372a4fda2ab35fecaa2aa41937f37e0e3ccdf4778cc98f9b793",
+    "mariner-coco-build-uvm.sh": "4f2be6965d8c4d7919fd201a68160fc8ab02a1be50a336abbfea13f16a6ffb89",
     "kata-containers-cc-3.2.0.tar.gz": "26e6a6827fce572faee3e84def7493faf45f1caaf2e0fd13d67049461ba3e7cd",
     "kata-containers-cc-3.2.0-cargo.tar.gz": "0696d6b540b45af9251a2714f99c14329adc04c8fb29966647fdb58769ffe0e8"
   }
