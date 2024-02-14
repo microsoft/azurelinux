@@ -31,7 +31,7 @@ is maintained by Korean Manpage Project Team.
 
 %prep
 %setup -q -c %{name}-%{version}
-%patch0 -p0
+%patch 0 -p0
 find . -name CVS -exec rm -rf {} \;
 cp -p %{SOURCE1} COPYING
 

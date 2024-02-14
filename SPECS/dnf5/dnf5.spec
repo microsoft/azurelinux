@@ -1,20 +1,21 @@
 %global project_version_major 5
-%global project_version_minor 0
-%global project_version_patch 14
+%global project_version_minor 1
+%global project_version_patch 11
 # ========== versions of dependencies ==========
 %global libmodulemd_version 2.5.0
 %global librepo_version 1.15.0
-%global libsolv_version 0.7.21
+%global libsolv_version 0.7.25
 %global sqlite_version 3.35.0
 %global swig_version 4
 %global zchunk_version 0.9.11
 # ========== build options ==========
-%bcond_with dnf5daemon_client
-%bcond_with dnf5daemon_server
+%bcond_with    dnf5daemon_client
+%bcond_with    dnf5daemon_server
 %bcond_without libdnf_cli
 %bcond_without dnf5
 %bcond_without dnf5_plugins
 %bcond_without plugin_actions
+%bcond_with    plugin_rhsm
 %bcond_without python_plugins_loader
 %bcond_without comps
 %bcond_without modulemd
@@ -37,7 +38,7 @@
 Summary:        Command-line package manager
 Name:           dnf5
 Version:        %{project_version_major}.%{project_version_minor}.%{project_version_patch}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +50,8 @@ BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gettext
 BuildRequires:  pkg-config
+BuildRequires:  sdbus-cpp >= 0.8.1
+BuildRequires:  sdbus-cpp-devel >= 0.8.1
 BuildRequires:  toml11-devel
 BuildRequires:  pkgconfig(check)
 BuildRequires:  pkgconfig(fmt)
@@ -62,10 +65,36 @@ BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Recommends:     bash-completion
+Provides:       dnf5-command(install)
+Provides:       dnf5-command(upgrade)
+Provides:       dnf5-command(remove)
+Provides:       dnf5-command(distro-sync)
+Provides:       dnf5-command(downgrade)
+Provides:       dnf5-command(reinstall)
+Provides:       dnf5-command(swap)
+Provides:       dnf5-command(mark)
+Provides:       dnf5-command(autoremove)
+Provides:       dnf5-command(check)
+Provides:       dnf5-command(check-upgrade)
+Provides:       dnf5-command(provides)
+Provides:       dnf5-command(leaves)
+Provides:       dnf5-command(repoquery)
+Provides:       dnf5-command(search)
+Provides:       dnf5-command(list)
+Provides:       dnf5-command(info)
+Provides:       dnf5-command(group)
+Provides:       dnf5-command(environment)
+Provides:       dnf5-command(module)
+Provides:       dnf5-command(history)
+Provides:       dnf5-command(repo)
+Provides:       dnf5-command(advisory)
+Provides:       dnf5-command(clean)
+Provides:       dnf5-command(download)
+Provides:       dnf5-command(makecache)
 %if %{with clang}
 BuildRequires:  clang
 %else
-BuildRequires:  gcc-c++
+BuildRequires:  gcc-c++ >= 10.1
 %endif
 %if %{with tests}
 BuildRequires:  createrepo_c
@@ -97,16 +126,22 @@ BuildRequires:  libubsan
 # required for libdnf5-cli
 BuildRequires:  pkgconfig(smartcols)
 %endif
+%if %{with dnf5_plugins}
+BuildRequires:  curl-devel >= 7.62.0
+%endif
 %if %{with dnf5daemon_server}
-BuildRequires:  systemd-rpm-macros
 # required for dnf5daemon-server
-BuildRequires:  pkgconfig(sdbus-c++) >= 0.8.1
+BuildRequires:  systemd-rpm-macros
 %if %{with dnf5daemon_tests}
 BuildRequires:  dbus-daemon
 BuildRequires:  polkit
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(dbus-python)
 %endif
+%endif
+%if %{with plugin_rhsm}
+BuildRequires:  pkgconfig(glib-2.0) >= 2.44.0
+BuildRequires:  pkgconfig(librhsm) >= 0.0.3
 %endif
 # ========== language bindings section ==========
 %if %{with perl5} || %{with ruby} || %{with python3}
@@ -159,11 +194,11 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %verify(not md5 size mtime) %ghost %{_libdir}/sysimage/dnf/*
 %license COPYING.md
 %license gpl-2.0.txt
-
 %if %{with man}
 %{_mandir}/man8/dnf5.8.*
 %{_mandir}/man8/dnf5-advisory.8.*
 %{_mandir}/man8/dnf5-autoremove.8.*
+%{_mandir}/man8/dnf5-check.8.*
 %{_mandir}/man8/dnf5-clean.8.*
 %{_mandir}/man8/dnf5-distro-sync.8.*
 %{_mandir}/man8/dnf5-downgrade.8.*
@@ -178,6 +213,7 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man8/dnf5-mark.8.*
 # TODO(jkolarik): module is not ready yet
 # %%{_mandir}/man8/dnf5-module.8.*
+%{_mandir}/man8/dnf5-provides.8.*
 %{_mandir}/man8/dnf5-reinstall.8.*
 %{_mandir}/man8/dnf5-remove.8.*
 %{_mandir}/man8/dnf5-repo.8.*
@@ -185,13 +221,19 @@ It supports RPM packages, modulemd modules, and comps groups & environments.
 %{_mandir}/man8/dnf5-search.8.*
 %{_mandir}/man8/dnf5-swap.8.*
 %{_mandir}/man8/dnf5-upgrade.8.*
+%{_mandir}/man7/dnf5-aliases.7.*
+%{_mandir}/man7/dnf5-caching.7.*
 %{_mandir}/man7/dnf5-comps.7.*
 # TODO(jkolarik): filtering is not ready yet
 # %%{_mandir}/man7/dnf5-filtering.7.*
+%{_mandir}/man7/dnf5-forcearch.7.*
 %{_mandir}/man7/dnf5-installroot.7.*
 # TODO(jkolarik): modularity is not ready yet
 # %%{_mandir}/man7/dnf5-modularity.7.*
 %{_mandir}/man7/dnf5-specs.7.*
+%{_mandir}/man5/dnf5.conf.5.*
+%{_mandir}/man5/dnf5.conf-todo.5.*
+%{_mandir}/man5/dnf5.conf-deprecated.5.*
 %endif
 
 # ========== libdnf5 ==========
@@ -208,10 +250,17 @@ Package management library.
 
 %files -n libdnf5
 %exclude %{_sysconfdir}/dnf/dnf.conf
+%dir %{_datadir}/dnf5/libdnf.conf.d
+%dir %{_sysconfdir}/dnf/libdnf5.conf.d
+%dir %{_datadir}/dnf5/repos.override.d
+%dir %{_sysconfdir}/dnf/repos.override.d
+%dir %{_sysconfdir}/dnf/libdnf5-plugins
+%dir %{_datadir}/dnf5/repos.d
+%dir %{_datadir}/dnf5/vars.d
 %dir %{_libdir}/libdnf5
 %{_libdir}/libdnf5.so.1*
 %license lgpl-2.1.txt
-%{_var}/cache/libdnf/
+%{_var}/cache/libdnf5/
 
 # ========== libdnf5-cli ==========
 
@@ -225,7 +274,7 @@ Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Library for working with a terminal in a command-line package manager.
 
 %files -n libdnf5-cli
-%{_libdir}/libdnf-cli.so.1*
+%{_libdir}/libdnf5-cli.so.1*
 %license COPYING.md
 %license lgpl-2.1.txt
 %endif
@@ -240,7 +289,7 @@ Requires:       libdnf5-cli-devel%{?_isa} = %{version}-%{release}
 Requires:       libdnf5-devel%{?_isa} = %{version}-%{release}
 
 %description -n dnf5-devel
-Develpment files for dnf5.
+Development files for dnf5.
 
 %files -n dnf5-devel
 %{_includedir}/dnf5/
@@ -259,7 +308,7 @@ Requires:       libsolv-devel%{?_isa} >= %{libsolv_version}
 Development files for libdnf.
 
 %files -n libdnf5-devel
-%{_includedir}/libdnf/
+%{_includedir}/libdnf5/
 %dir %{_libdir}/libdnf5
 %{_libdir}/libdnf5.so
 %{_libdir}/pkgconfig/libdnf5.pc
@@ -277,9 +326,9 @@ Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
 Development files for libdnf5-cli.
 
 %files -n libdnf5-cli-devel
-%{_includedir}/libdnf-cli/
-%{_libdir}/libdnf-cli.so
-%{_libdir}/pkgconfig/libdnf-cli.pc
+%{_includedir}/libdnf5-cli/
+%{_libdir}/libdnf5-cli.so
+%{_libdir}/pkgconfig/libdnf5-cli.pc
 %license COPYING.md
 %license lgpl-2.1.txt
 
@@ -405,15 +454,40 @@ Ruby bindings for the libdnf5-cli library.
 
 %if %{with plugin_actions}
 %package -n libdnf5-plugin-actions
-Summary:        Libdnf plugin that allows to run actions (external executables) on hooks
+Summary:        Libdnf5 plugin that allows to run actions (external executables) on hooks
 License:        LGPL-2.1-or-later
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 
 %description -n libdnf5-plugin-actions
-Libdnf plugin that allows to run actions (external executables) on hooks.
+Libdnf5 plugin that allows to run actions (external executables) on hooks.
 
 %files -n libdnf5-plugin-actions
 %{_libdir}/libdnf5/plugins/actions.*
+%config %{_sysconfdir}/dnf/libdnf5-plugins/actions.conf
+%dir %{_sysconfdir}/dnf/libdnf5-plugins/actions.d
+%if %{with man}
+%{_mandir}/man8/libdnf5-actions.8.*
+%endif
+%endif
+
+
+# ========== libdnf5-plugin-plugin_rhsm ==========
+
+%if %{with plugin_rhsm}
+%package -n libdnf5-plugin-rhsm
+Summary:        Libdnf5 rhsm (Red Hat Subscription Manager) plugin
+License:        LGPL-2.1-or-later
+Requires:       libdnf5%{?_isa} = %{version}-%{release}
+
+%description -n libdnf5-plugin-rhsm
+Libdnf5 plugin with basic support for Red Hat subscriptions.
+Synchronizes the the enrollment with the vendor system. This can change
+the contents of the repositories configuration files according
+to the subscription levels.
+
+%files -n libdnf5-plugin-rhsm
+%{_libdir}/libdnf5/plugins/rhsm.*
+%config %{_sysconfdir}/dnf/libdnf5-plugins/rhsm.conf
 %endif
 
 
@@ -421,13 +495,13 @@ Libdnf plugin that allows to run actions (external executables) on hooks.
 
 %if %{with python_plugins_loader}
 %package -n python3-libdnf5-python-plugins-loader
-Summary:        Libdnf plugin that allows loading Python plugins
+Summary:        Libdnf5 plugin that allows loading Python plugins
 License:        LGPL-2.1-or-later
 Requires:       libdnf5%{?_isa} = %{version}-%{release}
 Requires:       python3-libdnf5%{?_isa} = %{version}-%{release}
 
 %description -n python3-libdnf5-python-plugins-loader
-Libdnf plugin that allows loading Python plugins.
+Libdnf5 plugin that allows loading Python plugins.
 
 %files -n python3-libdnf5-python-plugins-loader
 %{_libdir}/libdnf5/plugins/python_plugins_loader.*
@@ -504,16 +578,26 @@ Package management service with a DBus interface.
 %package -n dnf5-plugins
 Summary:        Plugins for dnf5
 License:        LGPL-2.1-or-later
+Requires:       curl-libs%{?_isa} >= 7.62.0
 Requires:       dnf5%{?_isa} = %{version}-%{release}
+Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
+Provides:       dnf5-command(builddep)
+Provides:       dnf5-command(changelog)
+Provides:       dnf5-command(config-manager)
+Provides:       dnf5-command(copr)
+Provides:       dnf5-command(needs-restarting)
+Provides:       dnf5-command(repoclosure)
 
 %description -n dnf5-plugins
-Core DNF5 plugins that enhance dnf5 with builddep, changelog, copr, and repoclosure commands.
+Core DNF5 plugins that enhance dnf5 with builddep, changelog,
+config-manager, copr, and repoclosure commands.
 
 %files -n dnf5-plugins
 %{_libdir}/dnf5/plugins/*.so
 %if %{with man}
 %{_mandir}/man8/dnf5-builddep.8.*
 %{_mandir}/man8/dnf5-copr.8.*
+%{_mandir}/man8/dnf5-needs-restarting.8.*
 %{_mandir}/man8/dnf5-repoclosure.8.*
 %endif
 %endif
@@ -535,6 +619,7 @@ Core DNF5 plugins that enhance dnf5 with builddep, changelog, copr, and repoclos
     -DWITH_LIBDNF5_CLI=%{?with_libdnf_cli:ON}%{!?with_libdnf_cli:OFF} \
     -DWITH_DNF5=%{?with_dnf5:ON}%{!?with_dnf5:OFF} \
     -DWITH_PLUGIN_ACTIONS=%{?with_plugin_actions:ON}%{!?with_plugin_actions:OFF} \
+    -DWITH_PLUGIN_RHSM=%{?with_plugin_rhsm:ON}%{!?with_plugin_rhsm:OFF} \
     -DWITH_PYTHON_PLUGINS_LOADER=%{?with_python_plugins_loader:ON}%{!?with_python_plugins_loader:OFF} \
     \
     -DWITH_COMPS=%{?with_comps:ON}%{!?with_comps:OFF} \
@@ -556,7 +641,8 @@ Core DNF5 plugins that enhance dnf5 with builddep, changelog, copr, and repoclos
     \
     -DPROJECT_VERSION_MAJOR=%{project_version_major} \
     -DPROJECT_VERSION_MINOR=%{project_version_minor} \
-    -DPROJECT_VERSION_PATCH=%{project_version_patch}
+    -DPROJECT_VERSION_PATCH=%{project_version_patch} \
+	-DWITH_TRANSLATIONS=OFF
 %cmake_build
 %if %{with man}
     %cmake_build --target doc-man
@@ -584,12 +670,15 @@ do
     touch %{buildroot}%{_libdir}/sysimage/dnf/$files
 done
 
-#find_lang {name}
-
 %ldconfig_scriptlets
 
 
 %changelog
+* Wed Jan 31 2024 Sam Meluch <sammeluch@microsoft.com> - 5.1.11-1
+- Update to version 5.1.11
+- Merge spec from upstream dnf5 repo
+- Update dependency lists for Azure Linux provided packages
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.0.14-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

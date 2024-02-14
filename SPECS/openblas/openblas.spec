@@ -194,12 +194,12 @@ This package contains the static libraries.
 tar zxf %{SOURCE0}
 cd OpenBLAS-%{version}
 %if %{with system_lapack}
-%patch0 -p1 -b .system_lapack
+%patch 0 -p1 -b .system_lapack
 %endif
-%patch1 -p1 -b .libname
-%patch3 -p1 -b .sbgem
-%patch4 -p1 -b .tests
-%patch5 -p1
+%patch 1 -p1 -b .libname
+%patch 3 -p1 -b .sbgem
+%patch 4 -p1 -b .tests
+%patch 5 -p1
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;

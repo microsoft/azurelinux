@@ -80,7 +80,7 @@ rpmbuild() {
 refresh_local_repo() {
     echo "-------- refreshing the local repo ---------"
     pushd $RPMS_DIR
-    createrepo .
+    createrepo --compatibility .
     popd
 }
 
@@ -98,7 +98,7 @@ enable_local_repo() {
         url="${urlWithPrefix#$prefixToRemove}" #remove 'file://' prefix
         mkdir -p $url || { echo -e "\033[31m WARNING: Could not mkdir at $url, continuing\033[0m"; continue; }
         pushd $url
-        createrepo .
+        createrepo --compatibility .
         popd
         url_list+=" $url"
     done

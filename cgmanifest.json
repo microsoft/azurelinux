@@ -595,8 +595,8 @@
         "type": "other",
         "other": {
           "name": "aspell",
-          "version": "0.60.8",
-          "downloadUrl": "ftp://ftp.gnu.org/gnu/aspell/aspell-0.60.8.tar.gz"
+          "version": "0.60.8.1",
+          "downloadUrl": "https://ftp.gnu.org/gnu/aspell/aspell-0.60.8.1.tar.gz"
         }
       }
     },
@@ -2708,8 +2708,8 @@
         "type": "other",
         "other": {
           "name": "dnf5",
-          "version": "5.0.14",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/dnf5-5.0.14.tar.gz"
+          "version": "5.1.11",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.1.11/dnf5-5.1.11.tar.gz"
         }
       }
     },
@@ -6480,8 +6480,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -7281,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "iotop",
-          "version": "0.6",
-          "downloadUrl": "http://guichaz.free.fr/iotop/files/iotop-0.6.tar.gz"
+          "version": "1.25",
+          "downloadUrl": "https://github.com/tomas-m/iotop/archive/refs/tags/v1.25.tar.gz"
         }
       }
     },
@@ -7671,8 +7671,8 @@
         "type": "other",
         "other": {
           "name": "javassist",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/rel_3_23_1_ga.tar.gz"
+          "version": "3.30.2",
+          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/refs/tags/rel_3_30_2_ga.tar.gz"
         }
       }
     },
@@ -7861,8 +7861,8 @@
         "type": "other",
         "other": {
           "name": "json-c",
-          "version": "0.15",
-          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.15-20200726.tar.gz"
+          "version": "0.17",
+          "downloadUrl": "https://github.com/json-c/json-c/archive/json-c-0.17-20230812.tar.gz"
         }
       }
     },
@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -8081,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -11161,8 +11161,8 @@
         "type": "other",
         "other": {
           "name": "libtraceevent",
-          "version": "1.7.2",
-          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
         }
       }
     },
@@ -22184,8 +22184,8 @@
         "type": "other",
         "other": {
           "name": "python-docutils",
-          "version": "0.18.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.18.1.tar.gz"
+          "version": "0.20.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/docutils/docutils-0.20.1.tar.gz"
         }
       }
     },
@@ -29017,8 +29017,8 @@
         "type": "other",
         "other": {
           "name": "vala",
-          "version": "0.54.6",
-          "downloadUrl": "http://download.gnome.org/sources/vala/0.54/vala-0.54.6.tar.xz"
+          "version": "0.56.14",
+          "downloadUrl": "http://download.gnome.org/sources/vala/0.56/vala-0.56.14.tar.xz"
         }
       }
     },

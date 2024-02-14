@@ -86,8 +86,8 @@ find . -name '*jar' | xargs rm
 rm -rf dist
 dos2unix OTHERS
 
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 chmod -Rf a+rX,u+w,g-w,o-w .
 sed -i 's|@LIBDIR@|%{_libdir}/%{name}|' src/com/sun/jna/Native.java

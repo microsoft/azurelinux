@@ -57,8 +57,8 @@ also need to install the ypserv package to a machine on your network.
 
 %prep
 %setup -q -n ypbind-mt-%{version}
-%patch1 -p1 -b .gettextdomain
-%patch2 -p1 -b .helpman
+%patch 1 -p1 -b .gettextdomain
+%patch 2 -p1 -b .helpman
 
 autoreconf -fiv
 

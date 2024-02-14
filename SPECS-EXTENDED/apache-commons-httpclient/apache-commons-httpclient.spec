@@ -105,17 +105,17 @@ Manual for %{name}
 mkdir lib # duh
 rm -rf docs/apidocs docs/*.patch docs/*.orig docs/*.rej
 
-%patch0
+%patch 0
 
 pushd src/conf
 sed -i 's/\r//' MANIFEST.MF
-%patch1
+%patch 1
 popd
 
-%patch2
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch 2
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
 
 # Use javax classes, not com.sun ones
 # assume no filename contains spaces

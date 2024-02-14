@@ -37,11 +37,11 @@ ID3 tag library development files.
 
 %prep
 %setup -q
-%patch0 -p0 -b .CVE-2008-2109
-%patch1 -p1 -b .zero-padding
-%patch2 -p1 -b .unknown-encoding
-%patch3 -p0 -b .endless-loop
-%patch4 -p1 -b .gperf
+%patch 0 -p0 -b .CVE-2008-2109
+%patch 1 -p1 -b .zero-padding
+%patch 2 -p1 -b .unknown-encoding
+%patch 3 -p0 -b .endless-loop
+%patch 4 -p1 -b .gperf
 
 touch NEWS AUTHORS ChangeLog
 

@@ -37,7 +37,7 @@ programs using the pkcs11-helper library.
 
 %prep
 %setup -q
-%patch2 -p1
+%patch 2 -p1
 
 %build
 %configure --disable-static --enable-doc
