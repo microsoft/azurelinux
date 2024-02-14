@@ -16,35 +16,35 @@
 #
 
 # commonver - version from containers/common
-%define commonver 0.44.0
-# podman - version from containers/podman
-%define podmanver 3.3.1
-# storagever - version from containers/storage
-%define storagever 1.36.0
+%define commonver 0.57.4
 # imagever - version from containers/image
-%define imagever 5.16.0
+%define imagever 5.29.2
+# podman - version from containers/podman
+%define podmanver 4.9.3
+# storagever - version from containers/storage
+%define storagever 1.52.0
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
-Version:        20210626
-Release:        2%{?dist}
+Version:        20240213
+Release:        1%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/containers
-#Source0:       https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz
+#Source0:       https://github.com/containers/image/archive/refs/tags/v%{imagever}.tar.gz
 Source0:        %{name}-image-%{imagever}.tar.gz
-#Source1:       https://github.com/containers/storage/archive/refs/tags/v1.36.0.tar.gz
+#Source1:       https://github.com/containers/storage/archive/refs/tags/v%{storagever}.tar.gz
 Source1:        %{name}-storage-%{storagever}.tar.gz
 Source2:        LICENSE
 Source3:        policy.json
 Source4:        storage.conf
 Source5:        mounts.conf
 Source6:        registries.conf
-#Source7:       https://github.com/containers/podman/archive/refs/tags/v3.3.1.tar.gz
+#Source7:       https://github.com/containers/podman/archive/refs/tags/v%{podmanver}.tar.gz
 Source7:        %{name}-podman-%{podmanver}.tar.gz
 Source8:        default.yaml
-#Source9:       https://github.com/containers/common/archive/refs/tags/v0.44.0.tar.gz
+#Source9:       https://github.com/containers/common/archive/refs/tags/v%{commonver}.tar.gz
 Source9:        %{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
 BuildRequires:  go-go-md2man
@@ -90,7 +90,7 @@ rename '.md' '.1' docs/*
 cd ..
 # compile subset of containers/podman manpages
 cd podman-%{podmanver}
-go-md2man -in pkg/hooks/docs/oci-hooks.5.md -out pkg/hooks/docs/oci-hooks.5
+go-md2man -in docs/source/markdown/podman.1.md -out docs/source/markdown/podman.1
 cd ..
 
 cd common-%{commonver}
@@ -158,6 +158,10 @@ fi
 %license LICENSE
 
 %changelog
+* Wed Feb 14 2024 Amrita Kohli <amritakohli@microsoft.com> - 20240213-1
+- Upgrade versions of all containers.
+- Rearrange variables to be in alphabetical order, similar to signatures file.
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 20210626-2
 - Bump release to rebuild with updated version of Go.
 

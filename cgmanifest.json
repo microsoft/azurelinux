@@ -8861,8 +8861,8 @@
         "type": "other",
         "other": {
           "name": "libcontainers-common",
-          "version": "20210626",
-          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz"
+          "version": "20240213",
+          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.29.2.tar.gz"
         }
       }
     },
