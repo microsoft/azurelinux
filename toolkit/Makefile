@@ -141,7 +141,24 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## REMAINING BUILD FLAGS ########
 
+##help:var:DAILY_BUILD_ID:{lkg,lkg-force,<build_id>}='lkg' will auto select latest daily build repo, 'lkg-force' will also replace the toolchain manifest files. An explicit ID of the daily build repo can also be used.
 ifneq ($(DAILY_BUILD_ID),)
+   # If DAILY_BUILD_ID is set to "lkg" or "lkg-force" we should attempt to auto select the best daily build
+   ifeq ($(DAILY_BUILD_ID),lkg)
+      $(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
+      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id)
+      ifneq ($(.SHELLSTATUS),0)
+         $(error Failed to auto detect DAILY_BUILD_ID... try DAILY_BUILD_ID=lkg-force to overwrite manifests)
+      endif
+   endif
+   ifeq ($(DAILY_BUILD_ID),lkg-force)
+      $(info Auto detecting DAILY_BUILD_ID based on the latest known good build AND overwriting manifests)
+      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id --force)
+      ifneq ($(.SHELLSTATUS),0)
+         $(error Failed to auto detect DAILY_BUILD_ID and update manifests)
+      endif
+   endif
+
    $(warning Using Daily Build $(DAILY_BUILD_ID))
    # Ensure build_arch is set
    ifeq ($(build_arch),)
