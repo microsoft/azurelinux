@@ -12881,8 +12881,8 @@
         "type": "other",
         "other": {
           "name": "mesa",
-          "version": "21.0.0",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-21.0.0.tar.xz"
+          "version": "24.0.0",
+          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-24.0.0.tar.xz"
         }
       }
     },

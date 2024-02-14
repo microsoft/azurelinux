@@ -51,8 +51,8 @@
 
 Summary:        Mesa graphics libraries
 Name:           mesa
-Version:        21.0.0
-Release:        4%{?dist}
+Version:        24.0.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -588,6 +588,9 @@ popd
 %endif
 
 %changelog
+* Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.0.0-1
+- Auto-upgrade to 24.0.0 - none
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.0.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
