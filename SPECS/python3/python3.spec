@@ -87,7 +87,7 @@ Summary:        The libraries and header files needed for Python development.
 Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
-Requires:       %{name}-setuptools = %{version}-%{release}
+Requires:       python3-setuptools
 Provides:       python%{majmin}-devel = %{version}-%{release}
 Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
 
@@ -124,17 +124,6 @@ BuildArch:      noarch
 %description    pip
 The PyPA recommended tool for installing Python packages.
 
-%package        setuptools
-Summary:        Download, build, install, upgrade, and uninstall Python packages.
-Group:          Development/Tools
-Requires:       %{name} = %{version}-%{release}
-Provides:       python3dist(setuptools) = %{version}-%{release}
-Provides:       python%{majmin}dist(setuptools) = %{version}-%{release}
-BuildArch:      noarch
-
-%description    setuptools
-setuptools is a collection of enhancements to the Python distutils that allow you to more easily build and distribute Python packages, especially ones that have dependencies on other packages.
-
 %package        test
 Summary:        Regression tests package for Python.
 Group:          Development/Tools
@@ -146,7 +135,6 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-# We need to patch setuptools later, so manually manage patches with -N
 %autosetup -p1 -n Python-%{version} -N
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
@@ -197,7 +185,7 @@ python3 Lib/ensurepip
 pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
     ./Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
 
-# Windows executables get installed by pip and setuptools- we don't need these.
+# Windows executables get installed by pip - we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
