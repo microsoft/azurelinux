@@ -45,7 +45,6 @@ set -e
 #   │   ├── acrRepoV2.json
 #   ├── scripts
 #   │   ├── BuildGoldenContainer.sh
-#   │   ├── acrRepoParser.py
 #   ├── Dockerfile-Initial
 #   ├── marinerLocalRepo.repo
 
