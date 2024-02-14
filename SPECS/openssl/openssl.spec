@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,7 @@ Patch35:        CVE-2023-0466.patch
 Patch36:        CVE-2023-2650.patch
 Patch37:        CVE-2023-3817.patch
 Patch38:        openssl-1.1.1-improve-safety-of-DH.patch
+Patch39:        openssl-1.1.1-add-null-checks-where-contentinfo-data-can-be-null.patch
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
 BuildRequires:  perl(FindBin)
@@ -67,7 +68,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glibc
 Requires:       libgcc
 Conflicts:      httpd <= 2.4.37
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 BuildRequires:  perl(Math::BigInt)
 BuildRequires:  perl(Test::Harness)
@@ -170,6 +171,7 @@ cp %{SOURCE4} test/
 %patch36 -p1
 %patch37 -p1
 %patch38 -p1
+%patch39 -p1
 
 %build
 # Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
@@ -359,6 +361,9 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Wed Feb 14 2024 Tobias Brick <tobiasb@microsoft.com> - 1.1.1k-29
+- Introduce patch to correctly address NULL ContentInfo data
+
 * Wed Dec 06 2023 Muhammad Falak <mwani@microsoft.com> - 1.1.1k-28
 - Introduce patch to correctly address exessively long DH keys
 
