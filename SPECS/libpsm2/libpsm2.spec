@@ -65,6 +65,7 @@ BuildRequires:  make
 BuildRequires:  numactl-devel
 BuildRequires:  perl
 BuildRequires:  systemd
+BuildRequires:  systemd-rpm-macros
 Obsoletes:      hfi1-psm < 1.0.0
 # The OPA product is supported on x86_64 only:
 ExclusiveArch:  x86_64
