@@ -2,7 +2,7 @@ diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/
 index 63d8d43d2..0e608c4bb 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
-@@ -103,6 +103,11 @@ const (
+@@ -103,6 +108,11 @@ const (
  const maxConcurrentHotplugHostDevices = 1
  const maxConcurrentMemoryDumps = 1
  
