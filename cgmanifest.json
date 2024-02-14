@@ -28587,8 +28587,8 @@
         "type": "other",
         "other": {
           "name": "tuned",
-          "version": "2.15.0",
-          "downloadUrl": "https://github.com/redhat-performance/tuned/archive/v2.15.0/tuned-2.15.0.tar.gz"
+          "version": "2.21.0",
+          "downloadUrl": "https://github.com/redhat-performance/tuned/archive/v2.21.0/tuned-2.21.0.tar.gz"
         }
       }
     },
