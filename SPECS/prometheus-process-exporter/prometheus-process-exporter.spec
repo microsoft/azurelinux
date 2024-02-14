@@ -102,11 +102,11 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
-* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.7.10-19
-- Patch CVE-2021-44716
-
-* Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 0.7.10-18
+* Tue Feb 13 2024 Muhammad Falak <mwani@microsoft.com> - 0.7.10-19
 - Bump release to rebuild with go 1.21.6
+
+* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.7.10-18
+- Patch CVE-2021-44716
 
 * Thu Feb 08 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.7.10-17
 - Address CVE-2023-44487 by patching vendored golang.org/x/net

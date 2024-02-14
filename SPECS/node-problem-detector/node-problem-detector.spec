@@ -66,11 +66,11 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
-* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.8.10-20
-- Patch CVE-2021-44716
-
-* Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 0.8.10-19
+* Tue Feb 13 2024 Muhammad Falak <mwani@microsoft.com> - 0.8.10-20
 - Bump release to rebuild with go 1.21.6
+
+* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.8.10-19
+- Patch CVE-2021-44716
 
 * Mon Feb 05 2024 Tobias Brick <tobiasb@microsoft.com> - 0.8.10-18
 - Patch CVE-2022-21698
