@@ -9,14 +9,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.ntop.org/
-#Source0:       https://github.com/ntop/ntopng/archive/refs/tags/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-#Source1:       https://github.com/ntop/nDPI/archive/refs/tags/%{nDPIver}.tar.gz
-Source1:        nDPI-%{nDPIver}.tar.gz
-# Source2:      https://github.com/redis/hiredis/archive/refs/tags/v%{hiredisVer}.tar.gz
-Source2:        hiredis-%{hiredisVer}.tar.gz
+Source0:        https://github.com/ntop/ntopng/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        https://github.com/ntop/nDPI/archive/refs/tags/%{nDPIver}.tar.gz#/nDPI-%{nDPIver}.tar.gz
+Source2:        https://github.com/redis/hiredis/archive/refs/tags/v%{hiredisVer}.tar.gz#/hiredis-%{hiredisVer}.tar.gz
 Patch1:         CVE-2021-45985.patch
-Patch2:         configure.ac.in.patch
+Patch2:         use-vendored-hiredis.patch
 BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  glib-devel
