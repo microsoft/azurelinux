@@ -1,13 +1,13 @@
 %global pkgname xinit
 Summary:        X.Org X11 X Window System xinit startup scripts
 Name:           xorg-x11-%{pkgname}
-Version:        1.4.0
-Release:        8%{?dist}
+Version:        1.4.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
-Source0:        https://xorg.freedesktop.org/archive/individual/app/%{pkgname}-%{version}.tar.bz2
+Source0:        https://xorg.freedesktop.org/archive/individual/app/%{pkgname}-%{version}.tar.xz
 Source10:       xinitrc-common
 Source11:       xinitrc
 Source12:       Xclients
@@ -89,7 +89,7 @@ install -p -m 755 %{SOURCE19} %{buildroot}%{_libexecdir}
 
 %files
 %license COPYING
-%doc README ChangeLog
+%doc README.md ChangeLog
 %{_bindir}/startx
 %{_bindir}/xinit
 %dir %{_sysconfdir}/X11/xinit
@@ -111,6 +111,11 @@ install -p -m 755 %{SOURCE19} %{buildroot}%{_libexecdir}
 %{_datadir}/xsessions/xinit-compat.desktop
 
 %changelog
+* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 1.4.2-1
+- Upgrade to 1.4.2
+- Use correct binary for the KDE Plasma session
+- Update source url
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.4.0-8
 - License verified
 - Lint spec

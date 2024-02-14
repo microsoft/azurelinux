@@ -60,8 +60,8 @@ case $# in
 	    exec -l $SHELL -c gnome-session
 	    exec /bin/sh -c "exec -l $SHELL -c \"gnome-session\"" 
 	    ;;
-	kde|kde1|kde2)
-	    exec $CK_XINIT_SESSION $SSH_AGENT /bin/sh -c "exec -l $SHELL -c \"startkde\""
+	kde|kde1|kde2|kdeplasma)
+	    exec $CK_XINIT_SESSION $SSH_AGENT /bin/sh -c "exec -l $SHELL -c \"startplasma-x11\""
 	    ;;
 	twm)
         # fall back to twm
