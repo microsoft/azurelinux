@@ -23604,8 +23604,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-benchmark",
-          "version": "3.4.1",
-          "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v3.4.1.tar.gz"
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v4.0.0.tar.gz"
         }
       }
     },
