@@ -24803,8 +24803,8 @@
         "type": "other",
         "other": {
           "name": "python-zipp",
-          "version": "3.8.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zipp/zipp-3.8.0.tar.gz"
+          "version": "3.17.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/z/zipp/zipp-3.17.0.tar.gz"
         }
       }
     },
