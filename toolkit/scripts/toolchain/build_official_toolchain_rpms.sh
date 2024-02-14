@@ -436,6 +436,9 @@ chroot_and_install_rpms libxcrypt
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
 
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2

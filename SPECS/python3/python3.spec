@@ -4,7 +4,6 @@
 %define majmin_nodots %(echo %{majmin} | tr -d .)
 # See Lib/ensurepip/__init__.py in Source0 for the pip version number
 %global pip_version 23.2.1
-%global setuptools_version 69.0.3
 
 Summary:        A high-level scripting language
 Name:           python3
@@ -16,8 +15,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
-Source1:        https://pypi.org/packages/source/s/setuptools/setuptools-%{setuptools_version}.tar.gz
-Source2:        pathfix.py
+Source1:        pathfix.py
 Patch0:         cgi3.patch
 
 BuildRequires:  bzip2-devel
@@ -200,23 +198,11 @@ python3 Lib/ensurepip
 pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
     ./Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
 
-# Install setuptools
-tar --no-same-owner -xf %{SOURCE1}
-pushd setuptools-%{setuptools_version}
-pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
-    --no-user --find-links=dist setuptools
-popd
-# create distutils-precedence.pth
-cat > %{python3_sitelib}/distutils-precedence.pth <<- "EOF"
-import os; var = 'SETUPTOOLS_USE_DISTUTILS'; enabled = os.environ.get(var, 'local') == 'local'; enabled and __import__('_distutils_hack').add_shim();
-EOF
-
 # Windows executables get installed by pip and setuptools- we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
 
 # Install pathfix.py to bindir
-cp -pv %{SOURCE2} %{buildroot}%{_bindir}/pathfix%{majmin}.py
+cp -pv %{SOURCE1} %{buildroot}%{_bindir}/pathfix%{majmin}.py
 ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
 # Remove unused stuff
@@ -297,14 +283,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/site-packages/pip/*
 %{_libdir}/python%{majmin}/site-packages/pip-%{pip_version}.dist-info/*
 %{_bindir}/pip*
-
-%files setuptools
-%defattr(-,root,root,755)
-%{_libdir}/python%{majmin}/site-packages/distutils-precedence.pth
-%{_libdir}/python%{majmin}/site-packages/pkg_resources/*
-%{_libdir}/python%{majmin}/site-packages/setuptools/*
-%{_libdir}/python%{majmin}/site-packages/_distutils_hack/
-%{_libdir}/python%{majmin}/site-packages/setuptools-%{setuptools_version}.dist-info/*
 
 %files test
 %{_libdir}/python%{majmin}/test/*
