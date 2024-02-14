@@ -24784,8 +24784,8 @@
         "type": "other",
         "other": {
           "name": "python-zope-interface",
-          "version": "5.4.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-5.4.0.tar.gz"
+          "version": "6.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-6.1.tar.gz"
         }
       }
     },
