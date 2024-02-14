@@ -12,7 +12,7 @@
 
 
 Name:           netplan
-Version:        0.95
+Version:        0.107.1
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
