@@ -7671,8 +7671,8 @@
         "type": "other",
         "other": {
           "name": "javassist",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/rel_3_23_1_ga.tar.gz"
+          "version": "3.30.2",
+          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/refs/tags/rel_3_30_2_ga.tar.gz"
         }
       }
     },
