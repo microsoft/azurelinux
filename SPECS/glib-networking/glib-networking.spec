@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
-Source0:        https://download.gnome.org/sources/%{name}/2.78/%{name}-%{version}.tar.xz#/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/2.78/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  meson
