@@ -22,15 +22,17 @@ accessing their configuration space and setting parameters via MMIO.
 %autosetup -n pf-bb-config-%{version}
 
 %build
-# This sed replaces
+# These instructions are taken from ./build.sh in the source code. The sed
+# in particular replaces
 #
 #     VERSION_STRING=`git describe --tags --long`
 #     echo ${VERSION_STRING}
 #     sed -i "s/#VERSION_STRING#/${VERSION_STRING}/g" config_app.c
 #
-# From the build.sh script in the source code, removing the git
-# dependency.
-#
+# from that script. The script itself cannot be run because it needs to be
+# run from with the git repository of the project at a particular release
+# commit, but we are not in a git repsitory when building from a source
+# tarball.
 sed -i "s/#VERSION_STRING#/v%{version}-0-gf9206ad/g" config_app.c
 make
 
