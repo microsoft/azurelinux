@@ -49,4 +49,5 @@ EOF
 
 %changelog
 * Tue Feb 13 2024 Andrew Phelps anphel@microsoft.com - 69.0.3-1
-- Initial version
+- License verified
+- Original version for CBL-Mariner

@@ -24023,6 +24023,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-setuptools",
+          "version": "69.0.3",
+          "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-setuptools_scm",
           "version": "6.4.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-6.4.2.tar.gz"
@@ -27268,16 +27278,6 @@
           "name": "setuptool",
           "version": "1.19.11",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/setuptool-1.19.11.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "setuptools",
-          "version": "69.0.3",
-          "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
         }
       }
     },
