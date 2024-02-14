@@ -581,6 +581,10 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 //     list of files to copy from the build machine to the iso media.
 func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommandLine string, err error) {
 
+	if isoConfig == nil {
+		return
+	}
+
 	extraCommandLine = strings.TrimSpace(string(isoConfig.KernelCommandLine.ExtraCommandLine))
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
