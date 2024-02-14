@@ -18,6 +18,7 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
+Patch0:         CVE-2024-21626.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
 BuildRequires:  golang
