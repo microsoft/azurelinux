@@ -37,6 +37,16 @@ func TestParseListArgument(t *testing.T) {
 			input:    "value1  value2   value3",
 			expected: []string{"value1", "value2", "value3"},
 		},
+		{
+			name:     "tabs",
+			input:    "value1\tvalue2\tvalue3",
+			expected: []string{"value1", "value2", "value3"},
+		},
+		{
+			name:     "mixed whitespace",
+			input:    "value1\tvalue2  value3",
+			expected: []string{"value1", "value2", "value3"},
+		},
 	}
 
 	for _, tt := range tests {
