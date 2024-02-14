@@ -132,6 +132,7 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 %changelog
 * Tue Feb 13 2024 Aditya Dubey <adityadubey@microsoft.com> - 12.0-1
 - Upgrading to latest version for Mariner 3.0
+- Adding BuildRequires: perl and BuildRequires: systemd-rpm-macros
 
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 11.2.206-3
 - Fix build issue by using _libdir macro
