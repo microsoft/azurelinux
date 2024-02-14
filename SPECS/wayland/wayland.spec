@@ -94,7 +94,7 @@ Wayland server library
 %{_datadir}/wayland/wayland.dtd
 
 %files doc
-%doc README
+%doc README.md
 
 %files -n libwayland-client
 %license COPYING
