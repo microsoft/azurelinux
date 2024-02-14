@@ -28,7 +28,7 @@ BuildRequires:  make
 BuildRequires:  bash-completion-devel
 BuildRequires:  libgcc-devel
 BuildRequires:  bash-devel
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  glib-devel
 BuildRequires:  libyaml-devel
 BuildRequires:  util-linux-devel
