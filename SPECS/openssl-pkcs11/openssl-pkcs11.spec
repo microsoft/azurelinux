@@ -3,7 +3,7 @@
 Summary:        A PKCS#11 engine for use with OpenSSL
 Name:           openssl-pkcs11
 Version:        0.4.10
-Release:        10%{?dist}
+Release:        11%{?dist}
 # The source code is LGPLv2+ except eng_back.c and eng_parse.c which are BSD
 License:        LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
@@ -25,7 +25,6 @@ BuildRequires:  pkgconfig(p11-kit-1)
 BuildRequires:  doxygen
 %if %{with_check}
 BuildRequires:  procps-ng
-BuildRequires:  opensc
 BuildRequires:  softhsm
 %endif
 Requires:       openssl-libs >= 1.0.2
@@ -99,6 +98,9 @@ make check %{?_smp_mflags} || { cat tests/*.log; false; }
 %{_includedir}/*.h
 
 %changelog
+* Wed Feb 13 2024 Nick Samson <nisamson@microsoft.com> - 0.4.10-11
+- Removed opensc depdendency from checks
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.10-10
 - Removing 'exit' calls from the '%%check' section.
 
