@@ -10,6 +10,7 @@ URL:            https://github.com/linux-nvme/nvme-cli
 Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:	meson
 Requires(post): systemd
 Requires(post): systemd-udev
 Requires(post): util-linux
