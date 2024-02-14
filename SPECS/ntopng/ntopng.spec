@@ -1,4 +1,5 @@
 %global nDPIver 4.8
+%global hiredisVer 1.2.0
 Summary:        Web-based Network Traffic Monitoring Application
 Name:           ntopng
 Version:        6.0
@@ -8,12 +9,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.ntop.org/
-#Source0:       https://github.com/ntop/ntopng/archive/%{version}.tar.gz
+#Source0:       https://github.com/ntop/ntopng/archive/refs/tags/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-#Source1:       https://github.com/ntop/nDPI/archive/%{nDPIver}.tar.gz
+#Source1:       https://github.com/ntop/nDPI/archive/refs/tags/%{nDPIver}.tar.gz
 Source1:        nDPI-%{nDPIver}.tar.gz
-Source2:        hiredis-1.2.0.tar.gz
-# Add variable for hiredis version
+# Source2:      https://github.com/redis/hiredis/archive/refs/tags/v%{hiredisVer}.tar.gz
+Source2:        hiredis-%{hiredisVer}.tar.gz
 Patch1:         CVE-2021-45985.patch
 Patch2:         configure.ac.in.patch
 BuildRequires:  curl-devel
@@ -50,7 +51,7 @@ tar -xf %{SOURCE1}
 mv nDPI-%{nDPIver} nDPI
 
 tar -xzf %{SOURCE2}
-pushd hiredis-1.2.0/
+pushd hiredis-%{hiredisVer}/
 make && make install
 popd
 
