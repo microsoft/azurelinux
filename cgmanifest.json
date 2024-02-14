@@ -12141,8 +12141,8 @@
         "type": "other",
         "other": {
           "name": "lshw",
-          "version": "B.02.19",
-          "downloadUrl": "https://github.com/lyonel/lshw/archive/B.02.19/lshw-B.02.19.tar.gz"
+          "version": "B.02.20",
+          "downloadUrl": "https://github.com/lyonel/lshw/archive/refs/tags/B.02.20.tar.gz"
         }
       }
     },
