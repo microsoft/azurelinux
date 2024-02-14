@@ -30109,8 +30109,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xinit",
-          "version": "1.4.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.0.tar.bz2"
+          "version": "1.4.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.2.tar.xz"
         }
       }
     },
