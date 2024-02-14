@@ -23,17 +23,22 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        build.xml-0.7.7.tar.xz
-Patch0:         cal10n-0.7.7-sourcetarget.patch
-BuildRequires:  ant
-BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
-BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-BuildRequires:  junit
-BuildRequires:  xz
-Requires:       java
+Source0:        https://github.com/qos-ch/%{name}/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+BuildRequires:  mvn(org.apache.maven.plugins:maven-site-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
+BuildRequires:  mvn(org.apache.maven:maven-artifact)
+BuildRequires:  mvn(org.apache.maven:maven-artifact-manager)
+BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
+
+#BuildRequires:  ant
+#BuildRequires:  fdupes
+#BuildRequires:  java-devel >= 1.8
+#BuildRequires:  javapackages-local-bootstrap
+#BuildRequires:  javapackages-tools
+#BuildRequires:  junit
+#BuildRequires:  xz
+#Requires:       java
 BuildArch:      noarch
 
 %description
@@ -48,17 +53,21 @@ Features:
     * automatic reloading of resource bundles upon change
 
 %package javadoc
-Summary:        Javadoc for %{name}
-Group:          Development/Libraries/Java
+Summary:        API documentation for %{name}
 
 %description javadoc
-API documentation for %{name}.
+%{summary}.
 
 %prep
-%setup -q
-tar -xf %{SOURCE1}
-%patch 0 -p1
-find . -name "*.jar" | xargs rm
+%setup -q -n %{name}-v_%{version}
+
+find . -name "*.jar" -delete
+
+%pom_xpath_remove pom:extensions
+%pom_add_dep org.apache.maven:maven-artifact maven-%{name}-plugin
+%pom_disable_module %{name}-site
+%pom_disable_module maven-%{name}-plugin-smoke
+%mvn_package :*-{plugin} @1
 
 # bnc#759912
 rm -rf docs cal10n-site
@@ -125,8 +134,8 @@ popd
 %{_javadocdir}/%{name}-%{version}
 
 %changelog
-* Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.1-1
-- Auto-upgrade to 0.8.1 - none
+* Wed Feb 14 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
+- Update to version 0.8.1
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
 - Moved from extended to core
