@@ -97,7 +97,7 @@ Development files for the Intel PSM library
 Support for MPIs linked with PSM versions < 2
 
 %prep
-%autosetup -n opa-psm2-psm-%{version}
+%autosetup -n opa-psm2-psm-v%{version}
 
 %build
 %{set_build_flags}
