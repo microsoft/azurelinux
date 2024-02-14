@@ -11,6 +11,7 @@ Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{versi
 Patch0:         001-remove_arch_specific_makefile_logic.patch
 Patch1:         002-add_mariner_OSVersion.patch
 Patch2:         CVE-2022-21698.patch
+Patch3:         CVE-2021-44716.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       mariner-release
@@ -65,8 +66,13 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+<<<<<<< HEAD
 * Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 0.8.10-19
 - Bump release to rebuild with go 1.21.6
+=======
+* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.8.10-19
+- Patch CVE-2021-44716
+>>>>>>> ef116bd86 (Add patches to address CVE-2021-44716 (#7864))
 
 * Mon Feb 05 2024 Tobias Brick <tobiasb@microsoft.com> - 0.8.10-18
 - Patch CVE-2022-21698

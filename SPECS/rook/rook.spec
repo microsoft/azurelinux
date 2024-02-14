@@ -56,6 +56,7 @@ Patch0:         flexvolume-dir.patch
 # Can be removed if we upgrade to prometheus-node-exporter 1.10.0 or later.
 Patch1:         CVE-2022-21698.patch
 Patch2:         CVE-2023-44487.patch
+Patch3:         CVE-2021-44716.patch
 # Ceph version is needed to set correct container tag in manifests
 BuildRequires:  ceph
 # Rook requirements
@@ -254,8 +255,13 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
+<<<<<<< HEAD
 * Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 1.6.2-18
 - Bump release to rebuild with go 1.21.6
+=======
+* Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 1.6.2-18
+- Patch CVE-2021-44716
+>>>>>>> ef116bd86 (Add patches to address CVE-2021-44716 (#7864))
 
 * Thu Feb 08 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.6.2-17
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
