@@ -45,13 +45,12 @@ func Move(src, dst string) (err error) {
 
 	src, err = filepath.Abs(src)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move source (%s).", src)
-		return
+		return fmt.Errorf("Failed to get absolute path for move source (%s):\n%w", src, err)
 	}
 
 	dst, err = filepath.Abs(dst)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move destination (%s).", dst)
+		return fmt.Errorf("Failed to get absolute path for move destination (%s):\n%w", dst, err)
 		return
 	}
 
