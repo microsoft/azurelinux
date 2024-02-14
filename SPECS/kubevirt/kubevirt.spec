@@ -33,6 +33,7 @@ Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
 Patch3:         CVE-2023-44487.patch
+Patch4:         CVE-2024-21626.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
