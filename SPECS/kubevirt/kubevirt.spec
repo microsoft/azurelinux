@@ -40,7 +40,7 @@ BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  pkgconfig(libvirt)
+BuildRequires:  libvirt-devel
 ExclusiveArch:  x86_64 aarch64
 
 %description
