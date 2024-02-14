@@ -7,8 +7,17 @@ set -e
 # This script is used to publish the multi-arch tags for the container images.
 # Note that this script assumes that 'az login' has already been done.
 
+# CONTAINER_SRC_DIR is expected to contain the acrRepoParser.py script and the configuration file acrRepoV2.json.
+# The acrRepoParser.py script is used to parse the ACR repository details from the acrRepoV2.json configuration file.
+# The directory (assuming it is called container_artifacts) is expected to have the following structure:
+# container_artifacts
+# ├── configuration
+# │   └── acrRepoV2.json
+# └── scripts
+#     └── acrRepoParser.py
+
 # parse script parameters:
-# -c -> Container source directory (e.g. ~/workspace/CBL-Mariner/.pipelines/containerSourceData)
+# -c -> Container pipelines' configuration directory (e.g. $(Build.SourcesDirectory)/.pipelines/container_artifacts)
 # -d -> Directory containing the containers list
 # -e -> Containers file name prefix
 # -f -> Containers file name suffix
