@@ -43,9 +43,28 @@ check_for_modified_manifests() {
     fi
 }
 
-update_manifests() {
-    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/toolchain_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/toolchain_$(uname -p).txt 1>&2
-    wget -nv https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt -O $ROOT_FOLDER/toolkit/resources/manifests/package/pkggen_core_$(uname -p).txt 1>&2
+# We don't want to update the timestamps unless we actually change the file, so download to a temp file and then move it over
+# if the files are different
+# $1 - filename (e.g. toolchain_aarch64.txt)
+update_manifest() {
+    local filename
+    local url
+    local filepath
+    filename="$1"
+    url="https://raw.githubusercontent.com/microsoft/CBL-Mariner/$GIT_COMMIT/toolkit/resources/manifests/package/${filename}"
+    filepath="$ROOT_FOLDER/toolkit/resources/manifests/package/${filename}"
+    filepath_tmp="${filepath}.tmp"
+
+    echo "Downloading $filename manifest from $url" 1>&2
+
+    wget -nv "${url}" -O "${filepath_tmp}" 1>&2
+    # only update if the files are different
+    if ! cmp -s "${filepath_tmp}" "${filepath}"; then
+        echo "Manifests are different, updating ${filename}" 1>&2
+        mv "${filepath_tmp}" "${filepath}"
+    else
+        rm -f "${filepath_tmp}"
+    fi
 }
 
 cleanup() {
@@ -74,7 +93,8 @@ get_lkg
 
 check_for_modified_manifests $auto_id $force_manifests
 
-update_manifests
+update_manifest "toolchain_$(uname -p).txt"
+update_manifest "pkggen_core_$(uname -p).txt"
 
 if ! $auto_id; then
 cat << EOF
