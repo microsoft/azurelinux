@@ -146,7 +146,6 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-
 # We need to patch setuptools later, so manually manage patches with -N
 %autosetup -p1 -n Python-%{version} -N
 
@@ -290,6 +289,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %changelog
 * Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-1
 - Upgrade to version 3.12.0
+- Split python-setuptools into separate spec
 
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
