@@ -22,6 +22,15 @@ accessing their configuration space and setting parameters via MMIO.
 %autosetup -n pf-bb-config-%{version}
 
 %build
+# This sed replaces
+#
+#     VERSION_STRING=`git describe --tags --long`
+#     echo ${VERSION_STRING}
+#     sed -i "s/#VERSION_STRING#/${VERSION_STRING}/g" config_app.c
+#
+# From the build.sh script in the source code, removing the git
+# dependency.
+#
 sed -i "s/#VERSION_STRING#/v%{version}-0-gf9206ad/g" config_app.c
 make
 
