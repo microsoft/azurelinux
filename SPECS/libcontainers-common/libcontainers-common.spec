@@ -32,20 +32,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/containers
-#Source0:       https://github.com/containers/image/archive/refs/tags/v%{imagever}.tar.gz
-Source0:        %{name}-image-%{imagever}.tar.gz
-#Source1:       https://github.com/containers/storage/archive/refs/tags/v%{storagever}.tar.gz
-Source1:        %{name}-storage-%{storagever}.tar.gz
+Source0:        https://github.com/containers/image/archive/refs/tags/v%{imagever}.tar.gz#/%{name}-image-%{imagever}.tar.gz
+Source1:        https://github.com/containers/storage/archive/refs/tags/v%{storagever}.tar.gz#/%{name}-storage-%{storagever}.tar.gz
 Source2:        LICENSE
 Source3:        policy.json
 Source4:        storage.conf
 Source5:        mounts.conf
 Source6:        registries.conf
-#Source7:       https://github.com/containers/podman/archive/refs/tags/v%{podmanver}.tar.gz
-Source7:        %{name}-podman-%{podmanver}.tar.gz
+Source7:        https://github.com/containers/podman/archive/refs/tags/v%{podmanver}.tar.gz#/%{name}-podman-%{podmanver}.tar.gz
 Source8:        default.yaml
-#Source9:       https://github.com/containers/common/archive/refs/tags/v%{commonver}.tar.gz
-Source9:        %{name}-common-%{commonver}.tar.gz
+Source9:        https://github.com/containers/common/archive/refs/tags/v%{commonver}.tar.gz#/%{name}-common-%{commonver}.tar.gz
 Source10:       containers.conf
 BuildRequires:  go-go-md2man
 Requires(post): grep
