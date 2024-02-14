@@ -112,7 +112,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
 BuildRequires:  snappy-devel
 BuildRequires:  sudo
-BuildRequires:  systemd-devel
+BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  util-linux
 BuildRequires:  valgrind
 BuildRequires:  which
