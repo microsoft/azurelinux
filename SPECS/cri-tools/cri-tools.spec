@@ -45,11 +45,11 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
-* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.0-5
-- Patch runc for CVE-2024-21626
-
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-4
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-5
 - Bump release to rebuild with go 1.21.6
+
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.0-4
+- Patch runc for CVE-2024-21626
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-3
 - Bump release to rebuild with go 1.20.9

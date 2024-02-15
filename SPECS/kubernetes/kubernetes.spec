@@ -265,11 +265,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.4-3
-- Address CVE-2024-21626 by patching vendored github/opencontainer/runc
-
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.4-2
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.4-3
 - Bump release to rebuild with go 1.21.6
+
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.4-2
+- Address CVE-2024-21626 by patching vendored github/opencontainer/runc
 
 * Tue Dec 5 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.28.4-1
 - Upgrade to 1.28.4 to fix CVE-2023-5528
