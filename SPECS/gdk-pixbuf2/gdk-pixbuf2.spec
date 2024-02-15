@@ -1,13 +1,13 @@
 %global glib2_version 2.48.0
 Summary:        An image loading library
 Name:           gdk-pixbuf2
-Version:        2.40.0
-Release:        5%{?dist}
+Version:        2.42.9
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/gdk-pixbuf
-Source0:        https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  gtk-doc
 BuildRequires:  jasper-devel

@@ -4100,8 +4100,8 @@
         "type": "other",
         "other": {
           "name": "gdk-pixbuf2",
-          "version": "2.40.0",
-          "downloadUrl": "https://download.gnome.org/sources/gdk-pixbuf/2.40/gdk-pixbuf-2.40.0.tar.xz"
+          "version": "2.42.9",
+          "downloadUrl": "https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.9.tar.xz"
         }
       }
     },
