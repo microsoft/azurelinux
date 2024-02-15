@@ -7661,8 +7661,8 @@
         "type": "other",
         "other": {
           "name": "javapackages-tools",
-          "version": "6.0.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.0.0.tar.gz"
+          "version": "6.1.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages/archive/6.1.0.tar.gz"
         }
       }
     },

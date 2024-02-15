@@ -8,8 +8,8 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        6.0.0
-Release:        2%{?dist}
+Version:        6.1.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -153,6 +153,9 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.0-1
+- Auto-upgrade to 6.1.0 - none
+
 * Fri Mar 31 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 6.0.0-2
 - Added maven-local subpackage
 
