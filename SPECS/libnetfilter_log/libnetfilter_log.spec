@@ -68,12 +68,14 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*.h
 %{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/%{name}_libipulog.pc
 
 %changelog
 * Mon Jan 29 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> -1.0.2-1
 - Bump version to 1.0.2 from 1.0.1
 - Removing the patch file since the contents of the files it patches have changed in this release leading to incorrect patch application.
 - Adding libmnl-devel to the BuildRequires for the package.
+- Adding %{name}_libipulog.pc to the list of packaged files
 
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-22
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
