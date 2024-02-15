@@ -126,7 +126,8 @@ export RUBYLIB=${PWD}/lib/rb/lib
   %{?without_ruby:     --without-ruby     } \
   %{?without_php:      --without-php      } \
   %{!?without_php:     PHP_PREFIX=${RPM_BUILD_ROOT}/usr/lib/php } \
-  --without-erlang \
+  --without-erlang 
+
 %if 0%{!?without_ruby:1}
 eval $(grep "^WITH_RUBY_TRUE" config.log)
 if [[ "${WITH_RUBY_TRUE}" != "" ]]; then
@@ -139,6 +140,7 @@ if [[ "${WITH_RUBY_TRUE}" != "" ]]; then
   exit 1
 fi
 %endif
+
 make %{?_smp_mflags}
 %if 0%{!?without_java:1}
 cd lib/java
