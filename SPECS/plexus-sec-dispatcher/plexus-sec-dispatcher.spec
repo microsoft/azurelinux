@@ -2,29 +2,29 @@
 
 Summary:        Plexus Security Dispatcher Component
 Name:           plexus-sec-dispatcher
-Version:        2
+Version:        2.0
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
-Source0:        %{url}/archive/refs/tags/sec-dispatcher-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/plexus-sec-dispatcher-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt 
 # Removed maven-compiler-plugin configuration version in the pom as annotations isn't available in version 1.4.
-Patch0:         %{name}-pom.patch
+# Patch0:         %{name}-pom.patch
 BuildArch:      noarch
 
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires: javapackages-local-bootstrap
 %else
-BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
-BuildRequires:  mvn(org.sonatype.plexus:plexus-cipher)
+BuildRequires:  maven-local
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
+BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
+BuildRequires:  mvn(org.sonatype.plexus:plexus-cipher)
 %endif
  
 %description
@@ -32,24 +32,36 @@ Plexus Security Dispatcher Component
  
 %{?module_package}
 %{?javadoc_package}
+
+echo here1
  
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -n %{name}-%{name}-%{version}
  
+echo here2
+
 cp %{SOURCE1} .
  
 %pom_remove_parent
-%pom_xpath_inject "pom:dependency[pom:artifactId='junit']" "<scope>test</scope>"
+%pom_xpath_inject 'pom:project' '<groupId>org.codehaus.plexus</groupId>'
  
 %mvn_file : plexus/%{name}
+
+echo here3
+
+%mvn_alias org.codehaus.plexus: org.sonatype.plexus:
  
 %build
-%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 
+%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+
 %install
 %mvn_install
-%files -n %{?module_prefix}%{name} -f .mfiles
+
+	
+%files -f .mfiles
 %license LICENSE-2.0.txt
+
+echo here4
  
 %changelog
 * Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2-1
