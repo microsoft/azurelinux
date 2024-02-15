@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,7 +33,11 @@ Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
 Patch3:         CVE-2023-44487.patch
+<<<<<<< HEAD
 Patch4:         Hp-volume-pod-should-respect-blockdevices.patch
+=======
+Patch4:         CVE-2024-21626.patch
+>>>>>>> 88ed6a05f (Fix CVE-2024-21626 by patching vendored runc in kubernetes, kubevirt, cri-tools (#7899))
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
@@ -213,8 +217,13 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Thu Feb 8 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-12
 - Add patch for render hp-volume- pod to respect blockdevices (IcM 467224770)
+=======
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.59.0-13
+- Address CVE-2024-21626 by patching vendored github/opencontainer/runc
+>>>>>>> 88ed6a05f (Fix CVE-2024-21626 by patching vendored runc in kubernetes, kubevirt, cri-tools (#7899))
 
 * Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.59.0-12
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
