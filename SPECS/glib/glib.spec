@@ -126,7 +126,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %files doc
 
 %changelog
-* Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 2.79.1-1
+* Tue Feb 27 2024 Betty Lakes <bettylakes@microsoft.com> - 2.79.1-1
 - Update version to 2.79.1
 
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.78.1-1

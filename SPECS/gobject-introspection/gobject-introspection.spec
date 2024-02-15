@@ -99,7 +99,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 %changelog
-* Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 1.79.1-1
+* Tue Feb 27 2024 Betty Lakes <bettylakes@microsoft.com> - 1.79.1-1
 - Update version to 1.79.1
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.71.0-16
