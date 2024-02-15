@@ -11170,6 +11170,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracecmd",
+          "version": "1.5.1",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtirpc",
           "version": "1.3.4",
           "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.4.tar.bz2"
