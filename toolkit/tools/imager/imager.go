@@ -269,11 +269,8 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		}
 
 		// Extract image package manifest from the 'setuproot' chroot
-		err = setupChroot.MoveOutFile(installutils.PackageManifestRelativePath, imgContentFile)
-		if err != nil {
-			logger.Log.Errorf("Failed to move files %v", err)
-			return
-		}
+		setupChroot.MoveOutFile(installutils.PackageManifestRelativePath, imgContentFile)
+
 		err = cleanupExtraFilesInChroot(setupChroot)
 		if err != nil {
 			logger.Log.Error("Failed to cleanup extra files in setup chroot")

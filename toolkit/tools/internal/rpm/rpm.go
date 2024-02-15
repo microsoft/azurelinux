@@ -536,7 +536,7 @@ func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
 
 	specPaths, err = filepath.Glob(specFilesGlob)
 	if err != nil {
-		return nil, fmt.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %w", specFilesGlob, err)
+		return nil, fmt.Errorf("failed to enumerate all spec files with (%s)\n%w", specFilesGlob, err)
 	}
 
 	return
