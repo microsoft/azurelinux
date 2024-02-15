@@ -772,7 +772,6 @@ fi
 
 %changelog
 * Thu Feb 15 2024 Sumedh Sharma <sumsharma@microsoft.com> - 5.12.11-11
-- Backport patch 'avoid processing-intensive painting of high number of tiny dashes'
 - Add patch to resolve CVE-2021-38593
 
 * Fri Jan 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 5.12.11-10
