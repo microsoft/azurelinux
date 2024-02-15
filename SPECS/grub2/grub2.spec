@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -85,6 +85,24 @@ Patch0199:      0199-fs-f2fs-Do-not-copy-file-names-that-are-too-long.patch
 Patch0200:      0200-fs-btrfs-Fix-several-fuzz-issues-with-invalid-dir-it.patch
 Patch0201:      0201-fs-btrfs-Fix-more-ASAN-and-SEGV-issues-found-with-fu.patch
 Patch0202:      0202-fs-btrfs-Fix-more-fuzz-issues-related-to-chunks.patch
+# Required to reach SBAT 3
+Patch:          sbat-3-0001-font-Reject-glyphs-exceeds-font-max_glyph_width-or-f.patch
+Patch:          sbat-3-0004-font-Remove-grub_font_dup_glyph.patch
+Patch:          sbat-3-0005-font-Fix-integer-overflow-in-ensure_comb_space.patch
+Patch:          sbat-3-0006-font-Fix-integer-overflow-in-BMP-index.patch
+Patch:          sbat-3-0007-font-Fix-integer-underflow-in-binary-search-of-char-.patch
+Patch:          sbat-3-0008-kern-efi-sb-Enforce-verification-of-font-files.patch
+Patch:          sbat-3-0009-fbutil-Fix-integer-overflow.patch
+Patch:          sbat-3-0011-font-Harden-grub_font_blit_glyph-and-grub_font_blit_.patch
+Patch:          sbat-3-0012-font-Assign-null_font-to-glyphs-in-ascii_font_glyph.patch
+Patch:          sbat-3-0013-normal-charset-Fix-an-integer-overflow-in-grub_unico.patch
+# Required to reach SBAT 4
+Patch:          sbat-4-0001-fs-ntfs-Fix-an-OOB-write-when-parsing-the-ATTRIBUTE_.patch
+Patch:          sbat-4-0002-fs-ntfs-Fix-an-OOB-read-when-reading-data-from-the-r.patch
+Patch:          sbat-4-0003-fs-ntfs-Fix-an-OOB-read-when-parsing-directory-entri.patch
+Patch:          sbat-4-0004-fs-ntfs-Fix-an-OOB-read-when-parsing-bitmaps-for-ind.patch
+Patch:          sbat-4-0005-fs-ntfs-Fix-an-OOB-read-when-parsing-a-volume-label.patch
+Patch:          sbat-4-0006-fs-ntfs-Make-code-more-readable.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
@@ -387,6 +405,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/default/grub.d
 
 %changelog
+* Thu Feb 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-13
+- update grub to sbat 4
+
 * Wed Oct 18 2023 Gary Swalling <gaswal@microsoft.com> - 2.06-12
 - CVE-2021-3695 CVE-2021-3696 CVE-2021-3697 CVE-2022-28733 CVE-2022-28734
   CVE-2022-28735 CVE-2022-28736 and increment SBAT level to 2
