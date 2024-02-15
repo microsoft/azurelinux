@@ -64,7 +64,8 @@ needed for developing Hyperscan applications.
 # multiply defined symbols.  This seems like a GCC bug
 # Disable LTO
 %define _lto_cflags %{nil}
-%cmake -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_STATIC_AND_SHARED:BOOL=OFF -DPYTHON_EXECUTABLE=/usr/bin/python3 .
+%cmake -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_STATIC_AND_SHARED:BOOL=OFF -DPYTHON_EXECUTABLE=%{python3} .
+
 %make_build
 
 %install

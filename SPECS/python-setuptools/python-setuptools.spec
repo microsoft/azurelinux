@@ -1,3 +1,5 @@
+%define python3_majmin 3.12
+
 Summary:        Easily build and distribute Python packages
 Name:           python-setuptools
 Version:        69.0.3
@@ -8,11 +10,9 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://pypi.python.org/pypi/setuptools
 Source0:        https://pypi.org/packages/source/s/setuptools/setuptools-%{version}.tar.gz
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-flit-core
 Requires:       python3
+Provides:       python3dist(setuptools) = %{version}-%{release}
+Provides:       python%{python3_majmin}dist(setuptools) = %{version}-%{release}
 BuildArch:      noarch
 
 %description
@@ -28,9 +28,9 @@ Setuptools is a fully-featured, actively-maintained, and stable library designed
 %autosetup -n setuptools-%{version}
 
 %build
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 
 %install
-pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
 pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
     --no-user --find-links=dist setuptools
 

@@ -135,11 +135,7 @@ Provides:       python%{majmin_nodots}-test = %{version}-%{release}
 The test package contains all regression tests for Python as well as the modules test.support and test.regrtest. test.support is used to enhance your tests while test.regrtest drives the testing suite.
 
 %prep
-%autosetup -p1 -n Python-%{version} -N
-
-# Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
-# We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
-%patch -P 0 -p1
+%autosetup -p1 -n Python-%{version}
 
 %build
 # Remove GCC specs and build environment linker scripts
