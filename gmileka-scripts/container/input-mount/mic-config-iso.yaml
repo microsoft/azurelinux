@@ -1,5 +1,0 @@
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
-    PrimaryGroup: sudo
