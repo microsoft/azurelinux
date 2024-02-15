@@ -57,7 +57,7 @@ RPM macros for building projects with cargo.
 %install
 install -D -p -m 0644 -t %{buildroot}/%{_rpmmacrodir} macros.d/macros.cargo
 install -D -p -m 0644 -t %{buildroot}/%{_rpmmacrodir} macros.d/macros.rust
-install -D -p -m 0644 -t %{buildroot}/%{_rpmmacrodir} macros.d/macros.rust-srpm
+# Remove conflicting macros.d/macros.rust-srpm
 install -D -p -m 0644 -t %{buildroot}/%{_fileattrsdir} fileattrs/cargo.attr
 install -D -p -m 0644 -t %{buildroot}/%{_fileattrsdir} fileattrs/cargo_vendor.attr
 
@@ -70,7 +70,7 @@ pytest -vv
 %files -n rust-srpm-macros
 %license LICENSE
 %{_rpmmacrodir}/macros.rust
-%{_rpmmacrodir}/macros.rust-srpm
+# Remove conflicting macros.d/macros.rust-srpm
 
 %files -n cargo-rpm-macros
 %license LICENSE

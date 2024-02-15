@@ -9,10 +9,24 @@ Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
 URL:            https://crates.io/crates/mdevctl
-Source:         https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
+Source0:        https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
+Source1:        https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
 
 BuildRequires: make systemd python3-docutils
 BuildRequires:  rust-packaging >= 21
+
+ExclusiveArch:  x86_64
+
+%ifarch x86_64
+%define rust_def_target x86_64-unknown-linux-gnu
+%define cargo_pkg_feature_opts --no-default-features
+%endif
+%ifarch aarch64
+%define rust_def_target aarch64-unknown-linux-gnu
+%define cargo_pkg_feature_opts --no-default-features
+%endif
+
+%global bashcompletiondir %{_datadir}/bash-completion/completions
 
 %description
 mdevctl is a utility for managing and persisting devices in the
@@ -22,17 +36,43 @@ can be dynamically created and potentially used by drivers like
 vfio-mdev for assignment to virtual machines.
 
 %prep
-%autosetup -n %{crate}-%{version_no_tilde} -p1
-%cargo_prep
+%autosetup -n %{crate}-%{version} -p1
 
-%generate_buildrequires
-%cargo_generate_buildrequires
+# Do vendor expansion here manually by
+# calling `tar x` and setting up 
+# .cargo/config to use it.
+tar fx %{SOURCE1}
+mkdir -p .cargo
+
+cat >.cargo/config << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
 
 %build
-%cargo_build
+# Makefile.in is in the source tarball
+# but there is no configure.  Manually
+# build using `cargo build`
+cargo build --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} --offline
 
 %install
-%make_install
+# Makefile.in is in the source tarball
+# but there is no configure.  Manually
+# install.  Exclude man8 files.
+mkdir -p %{buildroot}%{_sysconfdir}/mdevctl.d
+mkdir -p %{buildroot}%{_udevrulesdir}/
+install -m 644 60-mdevctl.rules %{buildroot}%{_udevrulesdir}/
+mkdir -p %{buildroot}%{_sbindir}
+install -m 755 ./target/%{rust_def_target}/release/mdevctl %{buildroot}%{_sbindir}
+ln -sf mdevctl %{buildroot}%{_sbindir}/lsmdev
+mkdir -p %{buildroot}%{bashcompletiondir}/
+install -m 644 -T $(find ./target/%{rust_def_target}/release -name mdevctl.bash) %{buildroot}%{bashcompletiondir}/mdevctl
+install -m 644 -T $(find ./target/%{rust_def_target}/release -name lsmdev.bash) %{buildroot}%{bashcompletiondir}/lsmdev
+mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/callouts
+mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/notifiers
 
 %if %{with check}
 %check
@@ -48,8 +88,7 @@ vfio-mdev for assignment to virtual machines.
 %dir %{_sysconfdir}/mdevctl.d
 %dir %{_prefix}/lib/mdevctl/scripts.d/callouts
 %dir %{_prefix}/lib/mdevctl/scripts.d/notifiers
-%{_mandir}/man8/mdevctl.8*
-%{_mandir}/man8/lsmdev.8*
+# Exclude man8 files.
 %{_datadir}/bash-completion/completions/mdevctl
 %{_datadir}/bash-completion/completions/lsmdev
 
@@ -57,6 +96,8 @@ vfio-mdev for assignment to virtual machines.
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified.
+- Copy Makefile.in build/install to spec file
+- Handle vendor tarball in spec file
 
 * Thu Jan 11 2024 Alex Williamson <alex.williamson@redhat.com> - 1.3.0-1
 - New upstream release: https://github.com/mdevctl/mdevctl/releases/tag/v1.3.0
