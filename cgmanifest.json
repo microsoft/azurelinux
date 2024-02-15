@@ -11180,6 +11180,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracefs",
+          "version": "1.8.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtnc",
           "version": "1.25",
           "downloadUrl": "https://sourceforge.net/projects/libtnc/files/libtnc/1.25/libtnc-1.25.tar.gz"
