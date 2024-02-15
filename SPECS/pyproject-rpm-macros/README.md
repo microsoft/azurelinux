@@ -69,8 +69,7 @@ the package's runtime dependencies need to also be included as build requirement
 
 Hence, `%pyproject_buildrequires` also generates runtime dependencies by default.
 
-For this to work, the project's build system must support the
-[`prepare-metadata-for-build-wheel` hook](https://www.python.org/dev/peps/pep-0517/#prepare-metadata-for-build-wheel).
+For this to work, the project's build system must support the [prepare-metadata-for-build-wheel hook].
 The popular buildsystems (setuptools, flit, poetry) do support it.
 
 This behavior can be disabled
@@ -79,6 +78,28 @@ using the `-R` flag:
 
     %generate_buildrequires
     %pyproject_buildrequires -R
+
+Alternatively, the runtime dependencies can be obtained by building the wheel and reading the metadata from the built wheel.
+This can be enabled by using the `-w` flag.
+Support for building wheels with `%pyproject_buildrequires -w` is **provisional** and the behavior might change.
+Please subscribe to Fedora's [python-devel list] if you use the option.
+
+    %generate_buildrequires
+    %pyproject_buildrequires -w
+
+When this is used, the wheel is going to be built at least twice,
+becasue the `%generate_buildrequires` section runs repeatedly.
+To avoid accidentally reusing a wheel leaking from a previous (different) build,
+it cannot be reused between `%generate_buildrequires` rounds.
+Contrarily to that, rebuilding the wheel again in the `%build` section is redundant
+and the packager can omit the `%build` section entirely
+to reuse the wheel built from the last round of `%generate_buildrequires`.
+Be extra careful when attempting to modify the sources after `%pyproject_buildrequires`,
+e.g. when running extra commands in the `%build` section:
+
+    %build
+    cython src/wrong.pyx  # this is too late with %%pyproject_buildrequires -w
+    %pyproject_wheel
 
 For projects that specify test requirements using an [`extra`
 provide](https://packaging.python.org/specifications/core-metadata/#provides-extra-multiple-use),
@@ -119,21 +140,65 @@ such plugins will be BuildRequired as well.
 Not all plugins are guaranteed to play well with [tox-current-env],
 in worst case, patch/sed the requirement out from the tox configuration.
 
-Note that both `-x` and `-t` imply `-r`,
+Note that neither `-x` or `-t` can be used with `-R`,
 because runtime dependencies are always required for testing.
+You can only use those options if the build backend  supports the [prepare-metadata-for-build-wheel hook],
+or together with `-w`.
 
 [tox]: https://tox.readthedocs.io/
 [tox-current-env]: https://github.com/fedora-python/tox-current-env/
+[prepare-metadata-for-build-wheel hook]: https://www.python.org/dev/peps/pep-0517/#prepare-metadata-for-build-wheel
 
 Additionally to generated requirements you can supply multiple file names to `%pyproject_buildrequires` macro.
 Dependencies will be loaded from them:
 
-    %pyproject_buildrequires -r requirements/tests.in requirements/docs.in requirements/dev.in
+    %pyproject_buildrequires requirements/tests.in requirements/docs.in requirements/dev.in
 
 For packages not using build system you can use `-N` to entirely skip automatical
 generation of requirements and install requirements only from manually specified files.
-`-N` option cannot be used in combination with other options mentioned above
-(`-r`, `-e`, `-t`, `-x`).
+`-N` option implies `-R` and cannot be used in combination with other options mentioned above
+(`-w`, `-e`, `-t`, `-x`).
+
+The `%pyproject_buildrequires` macro also accepts the `-r` flag for backward compatibility;
+it means "include runtime dependencies" which has been the default since version 0-53.
+
+
+Passing config settings to build backends
+-----------------------------------------
+
+The `%pyproject_buildrequires` and `%pyproject_wheel` macros accept a `-C` flag
+to pass [configuration settings][config_settings] to the build backend.
+Options take the form of `-C KEY`, `-C KEY=VALUE`, or `-C--option-with-dashes`.
+Pass `-C` multiple times to specify multiple options.
+This option is equivalent to pip's `--config-settings` flag.
+These are passed on to PEP 517 hooks' `config_settings` argument as a Python
+dictionary.
+
+The `%pyproject_buildrequires` macro passes these options to the
+`get_requires_for_build_wheel` and `prepare_metadata_for_build_wheel` hooks.
+Passing `-C` to `%pyproject_buildrequires` is incompatible with `-N` which does
+not call these hooks at all.
+
+The `%pyproject_wheel` macro passes these options to the `build_wheel` hook.
+
+Consult the project's upstream documentation and/or the corresponding build
+backend's documentation for more information.
+Note that some projects don't use config settings at all
+and other projects may only accept config settings for one of the two steps.
+
+Note that the current implementation of the macros uses `pip` to build wheels.
+On some systems (notably on RHEL 9 with Python 3.9),
+`pip` is too old to understand `--config-settings`.
+Using the `-C` option for `%pyproject_wheel` (or `%pyproject_buildrequires -w`)
+is not supported there and will result to an error like:
+
+    Usage:   
+      /usr/bin/python3 -m pip wheel [options] <requirement specifier> ...
+      ...
+    no such option: --config-settings
+
+[config_settings]: https://peps.python.org/pep-0517/#config-settings
+
 
 Running tox based tests
 -----------------------
@@ -147,8 +212,9 @@ Then, use the `%tox` macro in `%check`:
 
 The macro:
 
- - Always prepends `$PATH` with `%{buildroot}%{_bindir}`
- - If not defined, sets `$PYTHONPATH` to `%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}`
+ - Sets environment variables via `%{py3_test_envvars}`, namely:
+     - Always prepends `$PATH` with `%{buildroot}%{_bindir}`
+     - If not defined, sets `$PYTHONPATH` to `%{buildroot}%{python3_sitearch}:%{buildroot}%{python3_sitelib}`
  - If not defined, sets `$TOX_TESTENV_PASSENV` to `*`
  - Runs `tox` with `-q` (quiet), `--recreate` and `--current-env` (from [tox-current-env]) flags
  - Implicitly uses the tox environment name stored in `%{toxenv}` - as overridden by `%pyproject_buildrequires -e`
@@ -220,8 +286,14 @@ However, in Fedora packages, always list executables explicitly to avoid uninten
 
 `%pyproject_save_files` can automatically mark license files with `%license` macro
 and  language (`*.mo`) files with `%lang` macro and appropriate language code.
-Only license files declared via [PEP 639] `License-Field` field are detected.
+Only license files declared via [PEP 639] `License-File` field are detected.
 [PEP 639] is still a draft and can be changed in the future.
+It is possible to use the `-l` flag to declare that a missing license should
+terminate the build or `-L` (the default) to explicitly disable this check.
+Packagers are encouraged to use the `-l` flag when the `%license` file is not manually listed in `%files`
+to avoid accidentally losing the file in a future version.
+When the `%license` file is manually listed in `%files`,
+packagers can use the `-L` flag to ensure future compatibility in case the `-l` behavior eventually becomes a default.
 
 Note that `%pyproject_save_files` uses data from the [RECORD file](https://www.python.org/dev/peps/pep-0627/).
 If you wish to rename, remove or otherwise change the installed files of a package
@@ -241,6 +313,7 @@ If `%pyproject_save_files` is not used, calling `%pyproject_check_import` will f
 When `%pyproject_save_files` is invoked,
 it creates a list of all valid and public (i.e. not starting with `_`)
 importable module names found in the package.
+Each top-level module name matches at least one of the globs provided as an argument to `%pyproject_save_files`.
 This list is then usable by `%pyproject_check_import` which performs an import check for each listed module.
 When a module fails to import, the build fails.
 
@@ -275,6 +348,12 @@ The `%pyproject_check_import` macro also accepts positional arguments with
 additional qualified module names to check, useful for example if some modules are installed manually.
 Note that filtering by `-t`/`-e` also applies to the positional arguments.
 
+Another macro, `%_pyproject_check_import_allow_no_modules` allows to pass the import check,
+even if no Python modules are detected in the package.
+This may be a valid case for packages containing e.g. typing stubs.
+Don't use this macro in Fedora packages.
+It's only intended to be used in automated build environments such as Copr.
+
 
 Generating Extras subpackages
 -----------------------------
@@ -304,73 +383,6 @@ These arguments are still required:
 * -n: name of the “base” package (e.g. python3-requests)
 * Positional arguments: the extra name(s).
   Multiple subpackages are generated when multiple names are provided.
-
-
-PROVISIONAL: Importing just-built (extension) modules in %build
----------------------------------------------------------------
-
-Sometimes, it is desired to be able to import the *just-built* extension modules
-in the `%build` section, e.g. to build the documentation with Sphinx.
-
-    %build
-    %pyproject_wheel
-    ... build the docs here ...
-
-With pure Python packages, it might be possible to set `PYTHONPATH=${PWD}` or `PYTHONPATH=${PWD}/src`.
-However, it is a bit more complicated with extension modules.
-
-The location of just-built modules might differ depending on Python version, architecture, pip version.
-Hence, the macro `%{pyproject_build_lib}` exists to be used like this:
-
-    %build
-    %pyproject_wheel
-    PYTHONPATH=%{pyproject_build_lib} ... build the docs here ...
-
-This macro is currently **provisional** and the behavior might change.
-Please subscribe to Fedora's [python-devel list] if you use the macro.
-
-The `%{pyproject_build_lib}` macro expands to an Shell `$(...)` expression and does not work when put into single quotes (`'`).
-
-Depending on the pip version, the expanded value will differ:
-
-[python-devel list]: https://lists.fedoraproject.org/archives/list/python-devel@lists.fedoraproject.org/
-
-### New pip 21.3+ with in-tree-build (Fedora 36+)
-
-Always use the macro from the same directory where you called `%pyproject_wheel` from.
-The value will expand to something like:
-
-* `/builddir/build/BUILD/%{name}-%{version}/build/lib.linux-x86_64-3.10` for wheels with extension modules
-* `/builddir/build/BUILD/%{name}-%{version}/build/lib` for pure Python wheels
-
-If multiple wheels were built from the same directory,
-some pure Python and some with extension modules,
-the expanded value will be combined with `:`:
-
-* `/builddir/build/BUILD/%{name}-%{version}/build/lib.linux-x86_64-3.10:/builddir/build/BUILD/%{name}-%{version}/build/lib`
-
-If multiple wheels were built from different directories,
-the value will differ depending on the current directory.
-
-
-### Older pip with out-of-tree-build (Fedora 34, 35, and EL 9)
-
-The value will expand to something like:
-
-* `/builddir/build/BUILD/%{name}-%{version}/.pyproject-builddir/pip-req-build-xxxxxxxx/build/lib.linux-x86_64-3.10` for wheels with extension modules
-* `/builddir/build/BUILD/%{name}-%{version}/.pyproject-builddir/pip-req-build-xxxxxxxx/build/lib` for pure Python wheels
-
-Note that the exact value is **not stable** between builds
-(the `xxxxxxxx` part is randomly generated,
-neither you should consider the `.pyproject-builddir` directory to remain stable).
-
-If multiple wheels are built,
-the expanded value will always be combined with `:` regardless of the current directory, e.g.:
-
-* `/builddir/build/BUILD/%{name}-%{version}/.pyproject-builddir/pip-req-build-xxxxxxxx/build/lib.linux-x86_64-3.10:/builddir/build/BUILD/%{name}-%{version}/.pyproject-builddir/pip-req-build-yyyyyyyy/build/lib.linux-x86_64-3.10:/builddir/build/BUILD/%{name}-%{version}/.pyproject-builddir/pip-req-build-zzzzzzzz/build/lib`
-
-**Note:** If you manage to build some wheels with in-tree-build and some with out-of-tree-build option,
-the expanded value will contain all relevant directories.
 
 
 Limitations
@@ -423,6 +435,12 @@ so be prepared for problems.
 [PEP 518]: https://www.python.org/dev/peps/pep-0518/
 [PEP 639]: https://www.python.org/dev/peps/pep-0639/
 [pip's documentation]: https://pip.pypa.io/en/stable/cli/pip_install/#vcs-support
+
+
+Deprecated
+----------
+
+The `%{pyproject_build_lib}` macro is deprecated, don't use it.
 
 
 Testing the macros
