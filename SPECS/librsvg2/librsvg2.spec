@@ -7,13 +7,13 @@
 
 Summary:        An SVG library based on cairo
 Name:           librsvg2
-Version:        2.50.3
-Release:        4%{?dist}
+Version:        2.57.91
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wiki.gnome.org/Projects/LibRsvg
-Source0:        https://download.gnome.org/sources/librsvg/2.50/librsvg-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/librsvg/2.57/librsvg-%{version}.tar.xz
 BuildRequires:  cairo-devel >= %{cairo_version}
 BuildRequires:  cairo-gobject-devel >= %{cairo_version}
 BuildRequires:  chrpath
@@ -111,6 +111,9 @@ rm -vrf %{buildroot}%{_docdir}
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Wed Feb 14 2024 Aditya Dubey <adityadubey@microsoft.com> - 45.0-1
+- Update to 2.57.91
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.50.3-4
 - Bump package to rebuild with rust 1.72.0
 
