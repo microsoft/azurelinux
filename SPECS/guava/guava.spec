@@ -51,8 +51,8 @@ find . -name '*.jar' -delete
 %pom_disable_module guava-gwt
 %pom_disable_module guava-tests
 
-# Starting guava x version, faliure module became a runtime depedency due to android limitations.
-# We are going to artificially add it as a module to the main guava-parent pacakge
+# Starting guava v27.0 failureaccess module became a seperate runtime depedency due to android limitations.
+# We are going to artificially bake it with guava https://github.com/google/guava/wiki/UseGuavaInYourBuild#what-about-guavas-own-dependencies
 %pom_xpath_inject pom:modules "<module>futures/failureaccess</module>"
 %pom_xpath_inject pom:parent "<relativePath>../..</relativePath>" futures/failureaccess
 %pom_xpath_set pom:parent/pom:version %{version}-jre futures/failureaccess
@@ -72,16 +72,17 @@ find . -name '*.jar' -delete
  
 %pom_xpath_inject /pom:project/pom:build/pom:plugins/pom:plugin/pom:configuration/pom:instructions "<_nouses>true</_nouses>" guava/pom.xml
  
-# missing error_prone_core artifact
+# Remove error_prone_core artifact
 %pom_xpath_remove pom:annotationProcessorPaths
-%pom_xpath_remove  "//*[local-name()='arg'][contains(., '-Xplugin:ErrorProne')]"
 
+# Clean annotation dependencies. These depdencies are only used for 
+# code quality. These modules are not present in mariner (and are not needed)
 %pom_remove_dep -r :error_prone_annotations
+%pom_xpath_remove  "//*[local-name()='arg'][contains(., '-Xplugin:ErrorProne')]"
 %pom_remove_dep -r :j2objc-annotations
 %pom_remove_dep -r org.checkerframework:
-%pom_remove_dep -r :listenablefuture
-%pom_remove_dep jdk:srczip guava
 
+# Clean annotation usage from code
 annotations=$(
     find -name '*.java' \
     | xargs grep -F -h \
@@ -93,8 +94,7 @@ annotations=$(
     | sed 's/.*\.\([^.]*\);/\1/' \
     | paste -sd\|
 )
-# guava started using quite a few annotation libraries for code quality, which
-# we don't have. This ugly regex is supposed to remove their usage from the code
+
 find -type f -name "*.java" -print0 | while IFS= read -r -d '' file; do
     if [ -r "$file" ]; then
         # Remove the imports
@@ -113,10 +113,13 @@ find -type f -name "*.java" -print0 | while IFS= read -r -d '' file; do
     fi
 done
 
+%pom_remove_dep -r :listenablefuture # Android specific
+%pom_remove_dep jdk:srczip guava # Reference/IDE specific
+
 %mvn_package "com.google.guava:failureaccess" guava
-echo "karim"
-echo %{_javadocdir}/%{name}
+
 %mvn_package "com.google.guava:guava-bom" __noinstall
+
 %build
 # Tests fail on Koji due to insufficient memory,
 # see https://bugzilla.redhat.com/show_bug.cgi?id=1332971
@@ -137,8 +140,9 @@ echo %{_javadocdir}/%{name}
 %files testlib -f .mfiles-guava-testlib
 
 %changelog
-* Mon Feb 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 33.0.0-1
-- Auto-upgrade to 33.0.0 - 3.0 - Upgrade
+* Mon Feb 05 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 33.0.0-1
+- Auto-upgrade to 33.0.0 - 3.0
+- Move from ant to mvn, using Fedora's spec file instead of OpenSUSE
 
 * Wed Aug 23 2023 Dallas Delaney <dadelan@microsoft.com> 25.0-7
 - Add patch for CVE-2020-8908
