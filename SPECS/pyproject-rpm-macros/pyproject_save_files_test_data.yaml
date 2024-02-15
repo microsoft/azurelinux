@@ -230,6 +230,28 @@ classified:
       - /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/COPYING.md
       - /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/INSTALLER
       licenses: []
+    lang:
+      ipykernel:
+        fr:
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/nbjs.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/nbui.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/notebook.mo
+        ja:
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/nbjs.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/nbui.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/notebook.mo
+        nl:
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/nbjs.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/nbui.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/notebook.mo
+        ru:
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/nbjs.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/nbui.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/notebook.mo
+        zh:
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/nbjs.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/nbui.mo
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/notebook.mo
     modules:
       ipykernel:
       - files:
@@ -279,6 +301,8 @@ classified:
         - /usr/lib/python3.7/site-packages/ipykernel/gui/gtk3embed.py
         - /usr/lib/python3.7/site-packages/ipykernel/gui/gtkembed.py
         - /usr/lib/python3.7/site-packages/ipykernel/heartbeat.py
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/__init__.py
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/__pycache__/__init__.cpython-37{,.opt-?}.pyc
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__init__.py
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__/__init__.cpython-37{,.opt-?}.pyc
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__/blocking.cpython-37{,.opt-?}.pyc
@@ -362,6 +386,18 @@ classified:
         - /usr/lib/python3.7/site-packages/ipykernel/comm/__pycache__
         - /usr/lib/python3.7/site-packages/ipykernel/gui
         - /usr/lib/python3.7/site-packages/ipykernel/gui/__pycache__
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/__pycache__
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/nl
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN
+        - /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__
         - /usr/lib/python3.7/site-packages/ipykernel/inprocess/tests
@@ -409,10 +445,27 @@ classified:
     other:
       files:
       - /usr/lib/python3.7/site-packages/zope.event-4.4-py3.7-nspkg.pth
+  comic2pdf:
+    metadata:
+      dirs:
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info
+      docs: []
+      files:
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/METADATA
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/WHEEL
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/entry_points.txt
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/top_level.txt
+      - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/zip-safe
+      licenses: []
+    modules: []
+    other:
+      files:
+      - /usr/bin/comic2pdf.py
   django:
     metadata:
       dirs:
       - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info
+      - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses
       docs: []
       files:
       - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/AUTHORS
@@ -422,8 +475,8 @@ classified:
       - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/entry_points.txt
       - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/top_level.txt
       licenses:
-      - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/LICENSE
-      - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/LICENSE.python
+      - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses/LICENSE
+      - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses/LICENSE.python
     lang:
       django:
         af:
@@ -7542,6 +7595,18 @@ dumped:
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/comm/__pycache__'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/gui'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/gui/__pycache__'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/__pycache__'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/nl'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN'
+    - '%dir /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/inprocess'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/inprocess/tests'
@@ -7551,6 +7616,21 @@ dumped:
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/resources'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/tests'
     - '%dir /usr/lib/python3.7/site-packages/ipykernel/tests/__pycache__'
+    - '%lang(fr) /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/nbjs.mo'
+    - '%lang(fr) /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/nbui.mo'
+    - '%lang(fr) /usr/lib/python3.7/site-packages/ipykernel/i18n/fr_FR/LC_MESSAGES/notebook.mo'
+    - '%lang(ja) /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/nbjs.mo'
+    - '%lang(ja) /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/nbui.mo'
+    - '%lang(ja) /usr/lib/python3.7/site-packages/ipykernel/i18n/ja_JP/LC_MESSAGES/notebook.mo'
+    - '%lang(nl) /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/nbjs.mo'
+    - '%lang(nl) /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/nbui.mo'
+    - '%lang(nl) /usr/lib/python3.7/site-packages/ipykernel/i18n/nl/LC_MESSAGES/notebook.mo'
+    - '%lang(ru) /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/nbjs.mo'
+    - '%lang(ru) /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/nbui.mo'
+    - '%lang(ru) /usr/lib/python3.7/site-packages/ipykernel/i18n/ru_RU/LC_MESSAGES/notebook.mo'
+    - '%lang(zh) /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/nbjs.mo'
+    - '%lang(zh) /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/nbui.mo'
+    - '%lang(zh) /usr/lib/python3.7/site-packages/ipykernel/i18n/zh_CN/LC_MESSAGES/notebook.mo'
     - /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/COPYING.md
     - /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/INSTALLER
     - /usr/lib/python3.7/site-packages/ipykernel-5.2.1.dist-info/METADATA
@@ -7602,6 +7682,8 @@ dumped:
     - /usr/lib/python3.7/site-packages/ipykernel/gui/gtk3embed.py
     - /usr/lib/python3.7/site-packages/ipykernel/gui/gtkembed.py
     - /usr/lib/python3.7/site-packages/ipykernel/heartbeat.py
+    - /usr/lib/python3.7/site-packages/ipykernel/i18n/__init__.py
+    - /usr/lib/python3.7/site-packages/ipykernel/i18n/__pycache__/__init__.cpython-37{,.opt-?}.pyc
     - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__init__.py
     - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__/__init__.cpython-37{,.opt-?}.pyc
     - /usr/lib/python3.7/site-packages/ipykernel/inprocess/__pycache__/blocking.cpython-37{,.opt-?}.pyc
@@ -7696,6 +7778,7 @@ dumped:
     - ipykernel.gui.gtk3embed
     - ipykernel.gui.gtkembed
     - ipykernel.heartbeat
+    - ipykernel.i18n
     - ipykernel.inprocess
     - ipykernel.inprocess.blocking
     - ipykernel.inprocess.channels
@@ -7738,7 +7821,6 @@ dumped:
     - ipykernel.tests.utils
     - ipykernel.trio_runner
     - ipykernel.zmqshell
-    - ipykernel_launcher
 - - zope
   - zope
   - - '%dir /usr/lib/python3.7/site-packages/zope'
@@ -7763,9 +7845,20 @@ dumped:
     - zope.event
     - zope.event.classhandler
     - zope.event.tests
+- - comic2pdf
+  - '*'
+  - - '%dir /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info'
+    - /usr/bin/comic2pdf.py
+    - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/METADATA
+    - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/WHEEL
+    - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/entry_points.txt
+    - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/top_level.txt
+    - /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/zip-safe
+  - []
 - - django
   - django
   - - '%dir /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info'
+    - '%dir /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses'
     - '%dir /usr/lib/python3.7/site-packages/django'
     - '%dir /usr/lib/python3.7/site-packages/django/__pycache__'
     - '%dir /usr/lib/python3.7/site-packages/django/apps'
@@ -11349,8 +11442,8 @@ dumped:
     - '%lang(zh) /usr/lib/python3.7/site-packages/django/contrib/sessions/locale/zh_Hant/LC_MESSAGES/django.mo'
     - '%lang(zh) /usr/lib/python3.7/site-packages/django/contrib/sites/locale/zh_Hans/LC_MESSAGES/django.mo'
     - '%lang(zh) /usr/lib/python3.7/site-packages/django/contrib/sites/locale/zh_Hant/LC_MESSAGES/django.mo'
-    - '%license /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/LICENSE'
-    - '%license /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/LICENSE.python'
+    - '%license /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses/LICENSE'
+    - '%license /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/licenses/LICENSE.python'
     - /usr/bin/django-admin
     - /usr/bin/django-admin.py
     - /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/AUTHORS
@@ -15646,6 +15739,24 @@ records:
       ipykernel/gui/gtk3embed.py,sha256=mjUXqAzPxF956OcmWdWzvU2VLJoZ4ZyXrqCImJcn_Ug,3222
       ipykernel/gui/gtkembed.py,sha256=yYp-Npg8jPrfXiN6mrzFy8L6JS7JeBOHz5WxTxSdvMA,3131
       ipykernel/heartbeat.py,sha256=ZwIsWYgvjZQgFLjw6PrD9GJnN9XO1CzafUc89DEiPaA,4194
+      ipykernel/i18n/__init__.py,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/__pycache__/__init__.cpython-37.opt-1.pyc,,
+      ipykernel/i18n/__pycache__/__init__.cpython-37.pyc,,
+      ipykernel/i18n/fr_FR/LC_MESSAGES/nbjs.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/fr_FR/LC_MESSAGES/nbui.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/fr_FR/LC_MESSAGES/notebook.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ja_JP/LC_MESSAGES/nbjs.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ja_JP/LC_MESSAGES/nbui.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ja_JP/LC_MESSAGES/notebook.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/nl/LC_MESSAGES/nbjs.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/nl/LC_MESSAGES/nbui.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/nl/LC_MESSAGES/notebook.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ru_RU/LC_MESSAGES/nbjs.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ru_RU/LC_MESSAGES/nbui.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/ru_RU/LC_MESSAGES/notebook.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/zh_CN/LC_MESSAGES/nbjs.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/zh_CN/LC_MESSAGES/nbui.mo,sha256=0000000000000000000000000000000000000000000,10
+      ipykernel/i18n/zh_CN/LC_MESSAGES/notebook.mo,sha256=0000000000000000000000000000000000000000000,10
       ipykernel/inprocess/__init__.py,sha256=UrsfQEevAq5OZ3au4Fn9bu_7c6b_QqroRIE7vE4PB_o,211
       ipykernel/inprocess/__pycache__/__init__.cpython-37.pyc,,
       ipykernel/inprocess/__pycache__/blocking.cpython-37.pyc,,
@@ -15743,6 +15854,17 @@ records:
       zope/event/classhandler.py,sha256=CEx6issKWSia0Wruob_jIQI2EfYX45krokoTHyVsJFQ,1816
       zope/event/tests.py,sha256=bvEzvOmPoQETMqYiqsR9EeVsC8Dzy-HOclfpQFVjDhE,1871
 
+  comic2pdf:
+    path: /usr/lib/python3.7/site-packages/comic2pdf-3.1.0.dist-info/RECORD
+    content: |
+      ../../../bin/comic2pdf.py,sha256=ad0XbWxj2fzn_oYi1h-usY8jsxAvfpYA1aaify1Ym88,3266
+      comic2pdf-3.1.0.dist-info/METADATA,sha256=qMVNbSPY02NdWfGex5yWNxoK1d96ereES-XoKxshVEA,3195
+      comic2pdf-3.1.0.dist-info/WHEEL,sha256=G16H4A3IeoQmnOrYV4ueZGKSjhipXx8zc8nu9FGlvMA,92
+      comic2pdf-3.1.0.dist-info/entry_points.txt,sha256=uORK0FJD-i46W74x2mNHfloSPS4QElN3-Y0vKQZ7svw,46
+      comic2pdf-3.1.0.dist-info/top_level.txt,sha256=AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs,1
+      comic2pdf-3.1.0.dist-info/zip-safe,sha256=AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs,1
+      comic2pdf-3.1.0.dist-info/RECORD,,
+
   django:
     path: /usr/lib/python3.7/site-packages/Django-3.0.7.dist-info/RECORD
     content: |
@@ -15751,8 +15873,8 @@ records:
       ../../../bin/django-admin.py,sha256=OOv0QKYqhDD2O4X3HQx3gFFQ-CC7hSLnWuzZnQXeiiA,115
       Django-3.0.7.dist-info/AUTHORS,sha256=cV29hNQ1SpKhTmZuPff3LWHyQ7mHNBWP7_0JufEUHbs,36806
       Django-3.0.7.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
-      Django-3.0.7.dist-info/LICENSE,sha256=uEZBXRtRTpwd_xSiLeuQbXlLxUbKYSn5UKGM0JHipmk,1552
-      Django-3.0.7.dist-info/LICENSE.python,sha256=Z-Pr3SuMPxOcaosqZSgr_NAjh2cFRcFyPZjP7nMeQrQ,13231
+      Django-3.0.7.dist-info/licenses/LICENSE,sha256=uEZBXRtRTpwd_xSiLeuQbXlLxUbKYSn5UKGM0JHipmk,1552
+      Django-3.0.7.dist-info/licenses/LICENSE.python,sha256=Z-Pr3SuMPxOcaosqZSgr_NAjh2cFRcFyPZjP7nMeQrQ,13231
       Django-3.0.7.dist-info/METADATA,sha256=0ZU0N0E-CHKarXMLp4oOYf7EMUHR8eJ79f2yqw2NwoM,3574
       Django-3.0.7.dist-info/RECORD,,
       Django-3.0.7.dist-info/WHEEL,sha256=g4nMs7d-Xl9-xC9XovUrsDHGXt-FT0E17Yqo92DEfvY,92
