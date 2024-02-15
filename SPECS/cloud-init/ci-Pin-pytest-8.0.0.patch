@@ -1,0 +1,41 @@
+From 7c96c9cd9318e816ce4564b58a2c98271363c447 Mon Sep 17 00:00:00 2001
+From: Brett Holman <brett.holman@canonical.com>
+Date: Mon, 29 Jan 2024 12:03:36 -0700
+Subject: [PATCH] ci: Pin pytest<8.0.0. (#4816)
+
+The latest pytest release broke some tests in non-obvious ways. Pin
+the version for now so that CI passes.
+---
+ integration-requirements.txt | 2 +-
+ test-requirements.txt        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/integration-requirements.txt b/integration-requirements.txt
+index dc17759a..208a0c6a 100644
+--- a/integration-requirements.txt
++++ b/integration-requirements.txt
+@@ -7,7 +7,7 @@ pycloudlib>=5.10.0,<1!6
+ # test/unittests/conftest.py to be loaded by our integration-tests tox env
+ # resulting in an unmet dependency issue:
+ # https://github.com/pytest-dev/pytest/issues/11104
+-pytest!=7.3.2
++pytest!=7.3.2,<8.0.0
+ 
+ packaging
+ passlib
+diff --git a/test-requirements.txt b/test-requirements.txt
+index 46a98b4c..3d2480fd 100644
+--- a/test-requirements.txt
++++ b/test-requirements.txt
+@@ -4,7 +4,7 @@
+ # test/unittests/conftest.py to be loaded by our integration-tests tox env
+ # resulting in an unmet dependency issue:
+ # https://github.com/pytest-dev/pytest/issues/11104
+-pytest!=7.3.2
++pytest!=7.3.2,<8.0.0
+ 
+ pytest-cov
+ pytest-mock
+-- 
+2.33.8
+

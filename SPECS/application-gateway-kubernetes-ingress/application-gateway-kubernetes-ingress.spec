@@ -25,11 +25,10 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 
-# patches for vendored code >= 1000
 # If upstream ever upgrades client_goland to 1.11.1, we can get rid of this patch.
-Patch1000:      CVE-2022-21698.patch
-Patch1001:      CVE-2023-44487.patch
-Patch1002:      CVE-2021-44716.patch
+Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2021-44716.patch
 
 BuildRequires:  golang >= 1.13
 %if %{with_check}

@@ -1360,6 +1360,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/7181"
                 ]
+            },
+            "CONFIG_SCSI_MPI3MR": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for customer",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/7897"
+                ]
             }
         }
     }
