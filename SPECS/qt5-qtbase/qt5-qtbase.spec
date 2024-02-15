@@ -148,9 +148,12 @@ Patch87: CVE-2023-38197.patch
 # Fix CVE-2023-51714
 Patch88: CVE-2023-51714.patch
 
-# Backport: https://github.com/qt/qtbase/commit/6869d2463a2e0d71bd04dbc82f5d6ef4933dc510
-Patch89: avoid-processing-intensive-painting-of-tiny-dashes.patch
-
+# Fix taken from Ubuntu's backport: https://bugs.launchpad.net/ubuntu/+source/qtbase-opensource-src/+bug/1950193.
+# It's a combination of 4 commits:
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=9378ba2ae857df7e
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=81998f50d039a631
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=7f345f2a1c8d9f60
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=cca8ed0547405b1c
 Patch90: CVE-2021-38593.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
