@@ -96,6 +96,8 @@ mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/notifiers
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified.
+- Copy Makefile.in build/install to spec file
+- Handle vendor tarball in spec file
 
 * Thu Jan 11 2024 Alex Williamson <alex.williamson@redhat.com> - 1.3.0-1
 - New upstream release: https://github.com/mdevctl/mdevctl/releases/tag/v1.3.0
