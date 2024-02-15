@@ -29581,8 +29581,8 @@
         "type": "other",
         "other": {
           "name": "xcursor-themes",
-          "version": "1.0.6",
-          "downloadUrl": "https://xorg.freedesktop.org/releases/individual/data/xcursor-themes-1.0.6.tar.bz2"
+          "version": "1.0.7",
+          "downloadUrl": "https://xorg.freedesktop.org/releases/individual/data/xcursor-themes-1.0.7.tar.gz"
         }
       }
     },
