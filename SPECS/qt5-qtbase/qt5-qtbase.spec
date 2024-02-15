@@ -772,7 +772,7 @@ fi
 
 %changelog
 * Thu Feb 15 2024 Sumedh Sharma <sumsharma@microsoft.com> - 5.12.11-11
-- Add patch to resolve CVE-2021-38593
+- Add patch to resolve CVE-2021-38593, used Ubuntu's patch for guidance.
 
 * Fri Jan 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 5.12.11-10
 - Add patch to resolve CVE-2023-51714
