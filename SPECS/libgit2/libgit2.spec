@@ -1,7 +1,7 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
-Version:        1.4.5
-Release:        2%{?dist}
+Version:        1.7.2
+Release:        1%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,8 +43,10 @@ find examples -name ".gitignore" -delete -print
 # Don't run "online" tests
 sed -i '/-sonline/s/^/#/' tests/CMakeLists.txt
 
-# Remove bundled libraries
-rm -vr deps
+# Remove bundled libraries (except libxdiff)
+pushd deps
+find . -maxdepth 1 -not -name xdiff -exec rm -rf {} ';'
+popd
 
 %build
 %cmake . -B%{_target_platform} \
@@ -76,6 +78,9 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
+* Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
+- Update to 1.7.2
+
 * Tue Mar 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 1.4.5-2
 - promote to core spec
 
