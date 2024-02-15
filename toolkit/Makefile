@@ -139,21 +139,31 @@ SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 # Variable prerequisite tracking
 include $(SCRIPTS_DIR)/utils.mk
 
-######## REMAINING BUILD FLAGS ########
+######## DAILY BUILD AND PREVIEW REPO SUPPORT ########
 
-##help:var:DAILY_BUILD_ID:{lkg,lkg-force,<build_id>}='lkg' will auto select latest daily build repo, 'lkg-force' will also replace the toolchain manifest files. An explicit ID of the daily build repo can also be used.
+##help:var:DAILY_BUILD_ID:{'lkg','lkg-force',<build_id>}='lkg' will auto select latest daily build repo. Unless LKG_MANIFESTS='n' is used, unmodifed manifests will be udpated to match. 'lkg-force' will overwrite changes. An explicit ID of the daily build repo can also be used.
+DAILY_BUILD_ID ?=
+
+##help:var:LKG_MANIFESTS:{y,n}='y' will auto update the manifests to the latest daily build if used in conjunction with DAILY_BUILD_ID='lkg' or 'lkg-force'.
+LKG_MANIFESTS ?= y
+skip_manifest_updates = $(if $(filter y,$(LKG_MANIFESTS)),,--skip-manifest-updates)
+
 ifneq ($(DAILY_BUILD_ID),)
    # If DAILY_BUILD_ID is set to "lkg" or "lkg-force" we should attempt to auto select the best daily build
    ifeq ($(DAILY_BUILD_ID),lkg)
       $(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
-      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id)
+      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id $(skip_manifest_updates))
       ifneq ($(.SHELLSTATUS),0)
          $(error Failed to auto detect DAILY_BUILD_ID... try DAILY_BUILD_ID=lkg-force to overwrite manifests)
       endif
    endif
    ifeq ($(DAILY_BUILD_ID),lkg-force)
+      # lkg-force is incompatible with LKG_MANIFESTS=n
+      ifneq ($(LKG_MANIFESTS),y)
+         $(error DAILY_BUILD_ID=lkg-force requires LKG_MANIFESTS=y)
+      endif
       $(info Auto detecting DAILY_BUILD_ID based on the latest known good build AND overwriting manifests)
-      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id --force)
+      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id --force $(skip_manifest_updates))
       ifneq ($(.SHELLSTATUS),0)
          $(error Failed to auto detect DAILY_BUILD_ID and update manifests)
       endif
@@ -193,6 +203,9 @@ else
       endif
    endif
 endif
+
+######## REMAINING BUILD FLAGS ########
+
 
 CA_CERT     ?=
 TLS_CERT    ?=

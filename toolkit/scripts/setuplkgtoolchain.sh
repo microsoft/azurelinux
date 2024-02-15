@@ -6,6 +6,9 @@ set -e
 
 ROOT_FOLDER=$(git rev-parse --show-toplevel)
 LKG_FILENAME="lkg-3.0-dev.json"
+# Get SUDO_USER if set, USER otherwise
+CALLING_USER=${SUDO_USER:-$USER}
+echo "Running setuplkgtoolchain.sh as $CALLING_USER" 1>&2
 
 trap cleanup EXIT
 
@@ -62,6 +65,7 @@ update_manifest() {
     if ! cmp -s "${filepath_tmp}" "${filepath}"; then
         echo "Manifests are different, updating ${filename}" 1>&2
         mv "${filepath_tmp}" "${filepath}"
+        chown "$CALLING_USER:$CALLING_USER" "${filepath}"
     else
         rm -f "${filepath_tmp}"
     fi
@@ -73,6 +77,7 @@ cleanup() {
 
 auto_id=false
 force_manifests=false
+skip_manifest_updates=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         *auto-id)
@@ -83,6 +88,10 @@ while [[ $# -gt 0 ]]; do
             force_manifests=true
             shift
             ;;
+        *skip-manifest-updates)
+            skip_manifest_updates=true
+            shift
+            ;;
         *help | *)
             usage
             ;;
@@ -91,10 +100,11 @@ done
 
 get_lkg
 
-check_for_modified_manifests $auto_id $force_manifests
-
-update_manifest "toolchain_$(uname -p).txt"
-update_manifest "pkggen_core_$(uname -p).txt"
+if ! $skip_manifest_updates; then
+    check_for_modified_manifests $auto_id $force_manifests
+    update_manifest "toolchain_$(uname -p).txt"
+    update_manifest "pkggen_core_$(uname -p).txt"
+fi
 
 if ! $auto_id; then
 cat << EOF
