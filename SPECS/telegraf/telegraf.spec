@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.28.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to get the vendored sources.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-48795.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -33,8 +34,10 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
 tar -xf %{SOURCE1}
+%autopatch -p1
 
 %build
 go build -buildvcs=false -mod=vendor ./cmd/telegraf
@@ -81,6 +84,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu Feb 15 2024 Nan Liu <liunan@microsoft.com> - 1.28.5-3
+- Address CVE-2023-48795 by patching vendored golang.org/x/crypto
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.5-2
 - Bump release to rebuild with go 1.21.6
 
