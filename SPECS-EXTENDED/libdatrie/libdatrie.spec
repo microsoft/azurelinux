@@ -30,7 +30,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch0 -p1 -b .docs
+%patch 0 -p1 -b .docs
 
 %build
 autoreconf -f -i -v

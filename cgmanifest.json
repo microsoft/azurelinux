@@ -2708,8 +2708,8 @@
         "type": "other",
         "other": {
           "name": "dnf5",
-          "version": "5.0.14",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.0.14/dnf5-5.0.14.tar.gz"
+          "version": "5.1.11",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf5/archive/5.1.11/dnf5-5.1.11.tar.gz"
         }
       }
     },
@@ -6480,8 +6480,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -7281,8 +7281,8 @@
         "type": "other",
         "other": {
           "name": "iotop",
-          "version": "0.6",
-          "downloadUrl": "http://guichaz.free.fr/iotop/files/iotop-0.6.tar.gz"
+          "version": "1.25",
+          "downloadUrl": "https://github.com/tomas-m/iotop/archive/refs/tags/v1.25.tar.gz"
         }
       }
     },
@@ -7671,8 +7671,8 @@
         "type": "other",
         "other": {
           "name": "javassist",
-          "version": "3.23.1",
-          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/rel_3_23_1_ga.tar.gz"
+          "version": "3.30.2",
+          "downloadUrl": "https://github.com/jboss-javassist/javassist/archive/refs/tags/rel_3_30_2_ga.tar.gz"
         }
       }
     },
@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -8081,8 +8081,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.12.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.12.1.tar.gz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz"
         }
       }
     },
@@ -8861,8 +8861,8 @@
         "type": "other",
         "other": {
           "name": "libcontainers-common",
-          "version": "20210626",
-          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.16.0.tar.gz"
+          "version": "20240213",
+          "downloadUrl": "https://github.com/containers/image/archive/refs/tags/v5.29.2.tar.gz"
         }
       }
     },
@@ -9011,8 +9011,8 @@
         "type": "other",
         "other": {
           "name": "libdrm",
-          "version": "2.4.116",
-          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.116.tar.xz"
+          "version": "2.4.120",
+          "downloadUrl": "https://dri.freedesktop.org/libdrm/libdrm-2.4.120.tar.xz"
         }
       }
     },
@@ -10151,8 +10151,8 @@
         "type": "other",
         "other": {
           "name": "libnetfilter_cthelper",
-          "version": "1.0.0",
-          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_cthelper/files/libnetfilter_cthelper-1.0.0.tar.bz2"
+          "version": "1.0.1",
+          "downloadUrl": "http://www.netfilter.org/projects/libnetfilter_cthelper/files/libnetfilter_cthelper-1.0.1.tar.bz2"
         }
       }
     },
@@ -10561,8 +10561,8 @@
         "type": "other",
         "other": {
           "name": "libpsm2",
-          "version": "11.2.206",
-          "downloadUrl": "https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz"
+          "version": "12.0",
+          "downloadUrl": "https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/psm-v12.0.tar.gz"
         }
       }
     },
@@ -11161,8 +11161,8 @@
         "type": "other",
         "other": {
           "name": "libtraceevent",
-          "version": "1.7.2",
-          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.7.2.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
         }
       }
     },
@@ -12141,8 +12141,8 @@
         "type": "other",
         "other": {
           "name": "lshw",
-          "version": "B.02.19",
-          "downloadUrl": "https://github.com/lyonel/lshw/archive/B.02.19/lshw-B.02.19.tar.gz"
+          "version": "B.02.20",
+          "downloadUrl": "https://github.com/lyonel/lshw/archive/refs/tags/B.02.20.tar.gz"
         }
       }
     },
@@ -13813,8 +13813,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.9.1",
-          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.1/net-snmp-5.9.1.tar.gz"
+          "version": "5.9.4",
+          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.4/net-snmp-5.9.4.tar.gz"
         }
       }
     },
@@ -21534,8 +21534,8 @@
         "type": "other",
         "other": {
           "name": "pyparsing",
-          "version": "3.0.7",
-          "downloadUrl": "https://github.com/pyparsing/pyparsing/releases/download/pyparsing_3.0.7/pyparsing-3.0.7.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/pyparsing/pyparsing/releases/download/3.1.1/pyparsing-3.1.1.tar.gz"
         }
       }
     },
@@ -23604,8 +23604,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-benchmark",
-          "version": "3.4.1",
-          "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v3.4.1.tar.gz"
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/ionelmc/pytest-benchmark/archive/refs/tags/v4.0.0.tar.gz"
         }
       }
     },
@@ -23614,8 +23614,8 @@
         "type": "other",
         "other": {
           "name": "python-pytest-cov",
-          "version": "2.12.1",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v2.12.1/pytest-cov-2.12.1.tar.gz"
+          "version": "4.1.0",
+          "downloadUrl": "https://github.com/pytest-dev/pytest-cov/archive/v4.1.0/pytest-cov-4.1.0.tar.gz"
         }
       }
     },
@@ -24784,8 +24784,8 @@
         "type": "other",
         "other": {
           "name": "python-zope-interface",
-          "version": "5.4.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-5.4.0.tar.gz"
+          "version": "6.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/z/zope.interface/zope.interface-6.1.tar.gz"
         }
       }
     },
@@ -27327,8 +27327,8 @@
         "type": "other",
         "other": {
           "name": "shadow-utils",
-          "version": "4.9",
-          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/v4.9/shadow-4.9.tar.xz"
+          "version": "4.14.3",
+          "downloadUrl": "https://github.com/shadow-maint/shadow/releases/download/4.14.3/shadow-4.14.3.tar.xz"
         }
       }
     },
@@ -28587,8 +28587,8 @@
         "type": "other",
         "other": {
           "name": "tuned",
-          "version": "2.15.0",
-          "downloadUrl": "https://github.com/redhat-performance/tuned/archive/v2.15.0/tuned-2.15.0.tar.gz"
+          "version": "2.21.0",
+          "downloadUrl": "https://github.com/redhat-performance/tuned/archive/v2.21.0/tuned-2.21.0.tar.gz"
         }
       }
     },
@@ -30109,8 +30109,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-xinit",
-          "version": "1.4.0",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.0.tar.bz2"
+          "version": "1.4.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/app/xinit-1.4.2.tar.xz"
         }
       }
     },

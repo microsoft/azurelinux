@@ -41,8 +41,8 @@ http://www.atcomputing.nl/Tools/atop/kernpatch.html
 
 %prep
 %setup -q
-%patch0  -b .sysconfig
-%patch1  -b .format
+%patch 0  -b .sysconfig
+%patch 1  -b .format
 
 # Correct unit file path
 sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service

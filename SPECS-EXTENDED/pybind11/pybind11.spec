@@ -67,7 +67,7 @@ This package contains the Python 3 files.
 
 %prep
 %setup -q
-%patch1 -p1 -b .hpath
+%patch 1 -p1 -b .hpath
 
 %build
 pys=""

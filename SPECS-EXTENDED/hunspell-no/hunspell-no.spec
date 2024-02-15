@@ -72,7 +72,7 @@ unzip -q hyph_nb_NO.zip
 unzip -q hyph_nn_NO.zip
 unzip -q th_nb_NO_v2.zip
 unzip -q th_nn_NO_v2.zip
-%patch1 -p0 -b .rhbz959989
+%patch 1 -p0 -b .rhbz959989
 
 cp %{SOURCE1} ./LICENSE.txt
 

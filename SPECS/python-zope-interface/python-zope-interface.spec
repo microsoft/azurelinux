@@ -1,7 +1,7 @@
 %define pypi_name zope.interface
 Summary:        Interfaces for Python
 Name:           python-zope-interface
-Version:        5.4.0
+Version:        6.1
 Release:        1%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
@@ -48,6 +48,9 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 6.1-1
+- Upgrade to 6.1
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 5.4.0-1
 - Updated to version 5.4.0
 

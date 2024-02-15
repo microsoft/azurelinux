@@ -47,7 +47,7 @@ library for MTP media players.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure --disable-static \
