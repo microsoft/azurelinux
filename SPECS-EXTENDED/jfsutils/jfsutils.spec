@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define _legacy_common_support 1
 
 Summary: Utilities for managing the JFS filesystem
@@ -30,9 +30,9 @@ into a file;  xpeek - shell-type JFS file system editor.
 %prep
 %setup -q
 find . -type f -name *.[ch] -exec chmod -x {} \;
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure 

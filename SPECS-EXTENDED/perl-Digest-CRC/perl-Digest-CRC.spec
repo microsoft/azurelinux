@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Generic CRC functions
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Digest-CRC
 Source0:        https://cpan.metacpan.org/authors/id/O/OL/OLIMAUL/Digest-CRC-%{version}.tar.gz#/perl-Digest-CRC-%{version}.tar.gz
 # Build

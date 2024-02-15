@@ -4,7 +4,7 @@ Version:        2.0.1
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libcgroup/libcgroup
 
 # libcgroup git repo contains submodules that must be part of source tarball (adapt version number)

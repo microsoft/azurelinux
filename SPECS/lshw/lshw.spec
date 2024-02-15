@@ -1,13 +1,13 @@
 Summary:        Hardware lister
 Name:           lshw
-Version:        B.02.19
+Version:        B.02.20
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
-URL:            https://github.com/lyonel/lshw/releases
-Source0:        https://github.com/lyonel/lshw/archive/%{version}/%{name}-%{version}.tar.gz
+URL:            https://github.com/lyonel/lshw/tags
+Source0:        https://github.com/lyonel/lshw/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %description
 lshw is a small tool to provide detailed informaton on the hardware
@@ -42,6 +42,9 @@ make DESTDIR=%{buildroot} install
 %{_datadir}/*
 
 %changelog
+* Tue Feb 13 2024 Aditya Dubey <adityadubey@microsoft.com> - B.02.20-1
+- Upgrading to latest version for Mariner 3.0
+
 * Tue Feb 08 2022 Henry Li <lihl@microsoft.com> - B.02.19-1
 - Upgrade to B.02.19
 - Fix Source0

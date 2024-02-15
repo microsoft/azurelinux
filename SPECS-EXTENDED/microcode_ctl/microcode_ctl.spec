@@ -7,7 +7,7 @@ Version:        2.1
 Release:        41%{?dist}
 License:        GPLv2+ and Redistributable, no modification permitted
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/microcode_ctl
 Source0:        https://releases.pagure.org/microcode_ctl/%{name}-%{upstream_version}.tar.xz
 Patch0:         enable-wildcards-in-tar.patch
@@ -23,7 +23,7 @@ back to the old microcode.
 
 %prep
 %setup -q -n %{name}-%{upstream_version}
-%patch0 -p1
+%patch 0 -p1
 # License not extracted from nested tar by Makefile- do it manually here
 tar --no-anchored --strip-components=1 -xvf microcode*.tar.gz license
 

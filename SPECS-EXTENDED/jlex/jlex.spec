@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package jlex
 #
@@ -47,7 +47,7 @@ JLex is a lexical analyzer generator for Java.
 %prep
 %setup -q -c -T
 cp %{SOURCE0} .
-%patch0
+%patch 0
 cp %{SOURCE1} build.xml
 
 %build

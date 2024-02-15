@@ -6,7 +6,7 @@ Version:        1.13.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/jfelchner/ruby-progressbar
 Source0:        https://github.com/jfelchner/ruby-progressbar/archive/refs/tags/releases/v%{version}.tar.gz#/%{gem_name}-releases-v%{version}.tar.gz

@@ -4,7 +4,7 @@ Version:        20221130
 Release:        2%{?dist}
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libosinfo.org/
 Source0:        https://releases.pagure.org/libosinfo/%{name}-%{version}.tar.xz
 BuildRequires:  intltool

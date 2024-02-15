@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Database-specific drivers for libdbi
 Name: libdbi-drivers
 Version: 0.9.0
@@ -57,7 +57,7 @@ does not require recompilation or rewriting source code.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch1 -p1
+%patch 1 -p1
 autoconf
 # mariadb provides headers in a subfolder <mysql/mysql.h>
 sed -i -r 's|<(mysql\.h)>|<mysql/\1>|' drivers/mysql/dbd_mysql.c

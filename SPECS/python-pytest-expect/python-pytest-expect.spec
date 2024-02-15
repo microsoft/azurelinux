@@ -6,7 +6,7 @@ Version:        1.1.0
 Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/gsnedders/pytest-expect
 Source0:        %{pypi_source}
 Source1:        %{url}/raw/%{version}/LICENSE

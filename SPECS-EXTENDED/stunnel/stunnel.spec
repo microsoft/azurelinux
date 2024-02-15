@@ -8,7 +8,7 @@ Version:        5.70
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.stunnel.org/
 Source0:        https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
 Source2:        Certificate-Creation

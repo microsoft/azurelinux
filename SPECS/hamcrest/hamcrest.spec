@@ -25,7 +25,7 @@ Release:        16%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hamcrest/JavaHamcrest
 Source0:        https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-%{version}.tar.gz
 Source1:        hamcrest-core-MANIFEST.MF
@@ -106,14 +106,14 @@ rm -fr hamcrest-integration/src/main/java/org/hamcrest/integration/EasyMock2Adap
 rm -fr hamcrest-integration/src/main/java/org/hamcrest/EasyMock2Matchers.java
 %endif
 
-%patch0 -p1
-%patch1 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
+%patch 8 -p1
 
 sed -i 's/\r//' LICENSE.txt
 

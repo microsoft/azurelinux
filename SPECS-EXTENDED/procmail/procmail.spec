@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # hardened build if not overridden
 %{!?_hardened_build:%global _hardened_build 1}
 
@@ -41,16 +41,16 @@ forward certain incoming mail automatically to someone.
 
 %prep
 %setup -q
-%patch0 -p1 -b .rhconfig
-%patch1 -p1
-%patch2 -p1
-%patch4 -p1 -b .truncate
-%patch5 -p1 -b .ipv6
-%patch6 -p1 -b .getline
-%patch7 -p1 -b .CVE-2014-3618
-%patch8 -p1 -b .crash-fix
-%patch9 -p1 -b .CVE-2017-16844
-%patch10 -p1 -b .coverity-scan-fixes
+%patch 0 -p1 -b .rhconfig
+%patch 1 -p1
+%patch 2 -p1
+%patch 4 -p1 -b .truncate
+%patch 5 -p1 -b .ipv6
+%patch 6 -p1 -b .getline
+%patch 7 -p1 -b .CVE-2014-3618
+%patch 8 -p1 -b .crash-fix
+%patch 9 -p1 -b .CVE-2017-16844
+%patch 10 -p1 -b .coverity-scan-fixes
 
 find examples -type f | xargs chmod 644
 

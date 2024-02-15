@@ -4,7 +4,7 @@ Version:        1.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Metapackages
 URL:            http://en.opensuse.org/Patterns
 ExclusiveArch:  x86_64 aarch64 ppc64le s390x

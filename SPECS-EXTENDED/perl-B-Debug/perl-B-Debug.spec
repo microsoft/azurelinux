@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Run optional test
 %if !%{defined perl_bootstrap}
 %if ! (0%{?rhel})

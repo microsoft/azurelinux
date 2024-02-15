@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package apache
 #
@@ -63,18 +63,18 @@ This package provides %{summary}.
 cp %{SOURCE2} build.xml
 
 # Unavailable Google Brotli library (org.brotli.dec)
-%patch0 -p1
+%patch 0 -p1
 %pom_remove_dep org.brotli:dec
 rm -r src/{main,test}/java/org/apache/commons/compress/compressors/brotli
 
 # Unavailable ZSTD JNI library
-%patch1 -p1
+%patch 1 -p1
 %pom_remove_dep :zstd-jni
 rm -r src/{main,test}/java/org/apache/commons/compress/compressors/zstandard
 rm src/test/java/org/apache/commons/compress/compressors/DetectCompressorTestCase.java
 
 # Restore Java 8 compatibility
-%patch2 -p1
+%patch 2 -p1
 
 # remove osgi tests, we don't have deps for them
 %pom_remove_dep org.ops4j.pax.exam:::test

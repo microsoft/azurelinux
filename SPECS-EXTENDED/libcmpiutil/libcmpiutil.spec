@@ -5,7 +5,7 @@ Version:        0.5.7
 Release:        20%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.com/libvirt/libvirt-cim
 Source:         https://libvirt.org/sources/CIM/libcmpiutil-%{version}.tar.gz
 Patch0:         libcmpiutil-0.5.6-cast-align.patch
@@ -41,7 +41,7 @@ instance properties to standardizing method dispatch and argument checking.
 %setup -q
 chmod -x *.c *.y *.h *.l
 
-%patch0
+%patch 0
 
 %build
 # FIXME: Package has c11 inline compatibility issues.

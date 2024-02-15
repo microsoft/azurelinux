@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A version of the MIT Athena widget set for X
 Name: Xaw3d
 Version: 1.6.3
@@ -63,9 +63,9 @@ package.
 %setup -q -n libXaw3d-%{version}
 # This doesn't apply cleanly, but has not been applied
 #%patch5 -p1 -b .debian
-%patch7 -p1 -b .3Dlabel
-%patch10 -p1 -b .fontset
-%patch11 -p1 -b .hsbar
+%patch 7 -p1 -b .3Dlabel
+%patch 10 -p1 -b .fontset
+%patch 11 -p1 -b .hsbar
 
 
 %build

@@ -4,7 +4,7 @@ Version:        1.1.5
 Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://cmocka.org
 Source0:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz
 Source1:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz.asc

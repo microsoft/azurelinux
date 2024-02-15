@@ -194,7 +194,8 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 
 	delete(g.activeBuilds, res.Node.ID())
 
-	if res.Err != nil {
+	failure := (res.Err != nil) || res.CheckFailed
+	if failure {
 		g.failures = append(g.failures, res)
 	}
 
@@ -208,7 +209,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	}
 
 	state := &nodeState{
-		available: res.Err == nil,
+		available: !failure,
 		cached:    res.UsedCache,
 		usedDelta: res.WasDelta,
 		freshness: freshness,

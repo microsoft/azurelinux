@@ -4,7 +4,7 @@ Version:        20221101
 Release:        1%{?dist}
 License:        GPL-3.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fontforge/libspiro/
 Source0:        https://github.com/fontforge/libspiro/releases/download/%{version}/libspiro-dist-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc

@@ -7,7 +7,7 @@ Version:        4.1
 Release:        2%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv2
 URL:            https://chrony.tuxfamily.org
 Source0:        https://download.tuxfamily.org/%{name}/%{name}-%{version}.tar.gz
@@ -61,8 +61,8 @@ service to other computers in the network.
 %prep
 
 %setup -q -n %{name}-%{version} -a 10
-%patch2 -p1 -b .service-helper
-%patch3 -p1
+%patch 2 -p1 -b .service-helper
+%patch 3 -p1
 
 # review changes in packaged configuration files and scripts
 md5sum -c <<-EOF | (! grep -v 'OK$')

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global oname  pyinotify
 
 Summary:       Monitor filesystem events with Python under Linux
@@ -27,7 +27,7 @@ Summary:       %{summary}
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch01 -p1
+%patch 01 -p1
 sed -i '1c#! %{__python3}' python3/pyinotify.py
 
 %build

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global provider_dir %{_libdir}/cmpi
 
 Name:           sblim-cmpi-sysfs
@@ -41,11 +41,11 @@ SBLIM Base Params Testcase Files for SBLIM Testsuite
 
 %prep
 %setup -q
-%patch0 -p1 -b .provider-segfault
-%patch1 -p1 -b .sysfs-links
-%patch2 -p1 -b .docdir
-%patch3 -p1 -b .pegasus-interop
-%patch4 -p1 -b .prov-reg-sfcb-systemd
+%patch 0 -p1 -b .provider-segfault
+%patch 1 -p1 -b .sysfs-links
+%patch 2 -p1 -b .docdir
+%patch 3 -p1 -b .pegasus-interop
+%patch 4 -p1 -b .prov-reg-sfcb-systemd
 sed -ri 's,-type d -maxdepth 1 -mindepth 1,-maxdepth 1 -mindepth 1 -type d,g' \
         ./test/system/linux/*.{sh,system}
 

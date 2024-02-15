@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Conformance tests disabled by default since it requires 1 GB of test data
 #global runcheck 1
 

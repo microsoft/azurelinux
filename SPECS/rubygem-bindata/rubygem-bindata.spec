@@ -9,7 +9,7 @@ Version:        2.4.15
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/dmendel/bindata
 Source0:        https://github.com/dmendel/bindata/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz

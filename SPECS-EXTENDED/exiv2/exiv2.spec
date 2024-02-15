@@ -5,7 +5,7 @@ Version:        0.28.0
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.exiv2.org/
 Source0:        https://github.com/Exiv2/exiv2/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake

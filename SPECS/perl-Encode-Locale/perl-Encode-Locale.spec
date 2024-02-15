@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        Determine the locale encoding
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Encode-Locale
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Encode-Locale-%{version}.tar.gz#/perl-Encode-Locale-%{version}.tar.gz
 BuildArch:      noarch

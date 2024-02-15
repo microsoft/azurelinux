@@ -5,7 +5,7 @@ Release:        29%{?dist}
 # Sam as the "Saxpath" license but restricts the use of the name "JDOM" instead of "SAXPath".
 License:        JDOM
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.jdom.org/
 # ./generate-tarball.sh
 Source0:        https://github.com/hunterhacker/jdom/archive/JDOM-%{version}.tar.gz#/%{name}-%{version}.tar.gz

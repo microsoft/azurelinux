@@ -10,7 +10,7 @@ Source0:       https://01.org/sites/default/files/downloads/msr-tools/%{name}-%{
 Source1:       %{LICENSE_PATH}
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 
 BuildRequires: unzip
 

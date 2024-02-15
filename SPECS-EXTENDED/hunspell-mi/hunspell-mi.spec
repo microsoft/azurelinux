@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-mi
 Summary: Maori hunspell dictionaries
 %global upstreamid 20080630

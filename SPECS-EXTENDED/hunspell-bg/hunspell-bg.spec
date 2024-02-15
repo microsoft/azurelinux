@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-bg
 Summary: Bulgarian hunspell dictionaries
 Version: 4.3

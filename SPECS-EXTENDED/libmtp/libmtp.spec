@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # SPEC file for libmtp, primary target is the Fedora
 # RPM repository.
 
@@ -47,7 +47,7 @@ library for MTP media players.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure --disable-static \

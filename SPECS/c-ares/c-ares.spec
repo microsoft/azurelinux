@@ -4,7 +4,7 @@ Version:        1.25.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://c-ares.haxx.se/
 Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz

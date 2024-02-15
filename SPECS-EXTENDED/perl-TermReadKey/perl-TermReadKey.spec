@@ -4,7 +4,7 @@ Release:        7%{?dist}
 Summary:        A perl module for simple terminal control
 License:        (Copyright only) and (Artistic or GPL+)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/TermReadKey
 Source0:        https://cpan.metacpan.org/authors/id/J/JS/JSTOWE/TermReadKey-%{version}.tar.gz#/perl-TermReadKey-%{version}.tar.gz
 # Build

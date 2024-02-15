@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
 %global debug_package %{nil}
 
@@ -58,10 +58,10 @@ different virtualization systems.
 %setup -q
 
 %if 0%{?rhel} >= 6
-%patch0 -p1
+%patch 0 -p1
 %endif
 
-%patch1 -p1
+%patch 1 -p1
 
 
 %build

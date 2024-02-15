@@ -6,7 +6,7 @@ License:        ASL 2.0
 URL:            https://serf.apache.org/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.apache.org/dist/serf/serf-%{version}.tar.bz2
 Requires:       openldap
 BuildRequires:  apr-devel

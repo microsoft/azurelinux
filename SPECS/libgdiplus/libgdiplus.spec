@@ -4,7 +4,7 @@ Version:        6.1
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mono/libgdiplus/
 Source0:        https://download.mono-project.com/sources/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++

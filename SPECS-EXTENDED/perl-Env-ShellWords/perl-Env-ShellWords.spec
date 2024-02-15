@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Environment variables for arguments as a Perl array
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Env-ShellWords
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Env-ShellWords-%{version}.tar.gz#/perl-Env-ShellWords-%{version}.tar.gz
 BuildArch:      noarch

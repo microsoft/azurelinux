@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Database Independent Abstraction Layer for C
 Name: libdbi
 Version: 0.9.0
@@ -49,7 +49,7 @@ The libdbi-doc package contains guides for development of applications with libd
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch1 -p1
+%patch 1 -p1
 
 %build
 %configure

@@ -5,7 +5,7 @@ Version:        3.8.1
 Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-compiler-plugin
 Source0:        https://archive.apache.org/dist/maven/plugins/%{name}-%{version}-source-release.zip
 # port to plexus-languages 1.0.3
@@ -27,8 +27,8 @@ API documentation for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 # Replace path to junit in a test case with the system wide .jar
 sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar junit || find-jar javapackages-bootstrap/junit)"|' src/test/java/org/apache/maven/plugin/compiler/CompilerMojoTestCase.java

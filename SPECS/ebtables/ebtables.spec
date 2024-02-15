@@ -2,7 +2,7 @@
 
 Name:			ebtables
 Version:		2.0.11
-Release:		6%{?dist}
+Release:		7%{?dist}
 Summary:		Ethernet Bridge frame table administration tool
 License:		GPLv2+
 URL:			http://ebtables.sourceforge.net/
@@ -18,7 +18,7 @@ BuildRequires:		autoconf
 BuildRequires:		automake
 BuildRequires:		libtool
 BuildRequires:		gcc
-BuildRequires:		systemd
+BuildRequires:		systemd-bootstrap-rpm-macros
 
 %description
 Ethernet bridge tables is a firewalling tool to transparently filter network
@@ -118,6 +118,10 @@ ln -sf ebtables-legacy-restore %{buildroot}%{_sbindir}/ebtables-restore
 %ghost %{_sysconfdir}/sysconfig/ebtables
 
 %changelog
+* Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.11-7
+- workaround "circular dependencies" from build tooling
+- license verified
+
 * Fri Jul 31 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.0.11-6
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Modified to remove update-alternatives dependency

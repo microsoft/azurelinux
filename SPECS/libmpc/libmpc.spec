@@ -6,7 +6,7 @@ License:        LGPLv3+
 URL:            http://www.multiprecision.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/mpc/mpc-%{version}.tar.gz
 Requires:       gmp
 Provides:       %{name}-devel = %{version}-%{release}

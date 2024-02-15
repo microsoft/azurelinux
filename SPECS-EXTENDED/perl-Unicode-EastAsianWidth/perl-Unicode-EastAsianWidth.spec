@@ -4,7 +4,7 @@ Version:        12.0
 Release:        4%{?dist}
 License:        CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-EastAsianWidth
 Source0:        https://cpan.metacpan.org/authors/id/A/AU/AUDREYT/Unicode-EastAsianWidth-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         perl-Unicode-EastAsianWidth-no-inc.patch
@@ -31,7 +31,7 @@ status of East Asian characters, as specified in
 
 %prep
 %setup -q -n Unicode-EastAsianWidth-%{version}
-%patch0 -p1 -b .noinc
+%patch 0 -p1 -b .noinc
 rm -rf inc/*
 
 %build

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Authen-SASL
 Version:        2.16
 Release:        21%{?dist}
@@ -45,7 +45,7 @@ protocols should be able to share.
 
 %prep
 %setup -q -n Authen-SASL-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 # Remove bundled libraries
 rm -r inc

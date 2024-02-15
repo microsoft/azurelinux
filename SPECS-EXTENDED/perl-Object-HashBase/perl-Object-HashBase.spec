@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Build hash-based classes
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Object-HashBase
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Object-HashBase-%{version}.tar.gz#/perl-Object-HashBase-%{version}.tar.gz
 # Correct shebangs
@@ -52,7 +52,7 @@ also generate the tests for it.
 
 %prep
 %setup -q -n Object-HashBase-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

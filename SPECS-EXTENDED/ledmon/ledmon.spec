@@ -4,7 +4,7 @@ Version: 0.92
 Release: 4%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: https://github.com/intel/ledmon
 Source0: https://github.com/intel/ledmon/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -27,7 +27,7 @@ use this application.
 
 %prep
 %setup -q
-%patch0 -p1 -b .cflags
+%patch 0 -p1 -b .cflags
 
 %build
 # can't use smp_flags because -j4 makes the build fail

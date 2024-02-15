@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-uk
 Summary: Ukrainian hyphenation rules
 %global upstreamid 20030903

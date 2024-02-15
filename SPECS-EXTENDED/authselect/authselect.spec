@@ -6,7 +6,7 @@ Version:        1.2.1
 Release:        2%{?dist}
 Summary:        Configures authentication and identity sources from supported profiles
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/authselect/authselect
 
 License:        GPLv3+

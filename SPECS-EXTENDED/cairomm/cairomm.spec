@@ -4,7 +4,7 @@ Version:        1.12.0
 Release:        15%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.cairographics.org
 Source:         http://www.cairographics.org/releases/%{name}-%{version}.tar.gz
 %global apiver 1.0

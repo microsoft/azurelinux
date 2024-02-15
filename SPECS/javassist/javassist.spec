@@ -14,19 +14,17 @@
 # published by the Open Source Initiative.
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-%define tar_version rel_3_23_1_ga
+%define tar_version rel_3_30_2_ga
 Summary:        Java Programming Assistant: bytecode manipulation
 Name:           javassist
-Version:        3.23.1
-Release:        7%{?dist}
+Version:        3.30.2
+Release:        1%{?dist}
 License:        LGPL-2.1-or-later OR MPL-1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.javassist.org/
-Source0:        https://github.com/jboss-javassist/javassist/archive/%{tar_version}.tar.gz
-Patch0:         javassist-java8-compat.patch
-Patch1:         javassist-osgi.patch
+Source0:        https://github.com/jboss-javassist/javassist/archive/refs/tags/%{tar_version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ant >= 1.6
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
@@ -75,10 +73,6 @@ Tutorial for javassist.
 
 %prep
 %setup -q -n %{name}-%{tar_version}
-%if %{?pkg_vcmp:%pkg_vcmp java-devel < 9}%{!?pkg_vcmp:1}
-%patch0 -p1
-%endif
-%patch1 -p1
 for j in $(find . -name "*.jar"); do
         mv $j $j.no
 done
@@ -101,10 +95,6 @@ install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 # demo
 mkdir -p %{buildroot}/%{_datadir}/%{name}-%{version}
 cp -pr sample/* %{buildroot}/%{_datadir}/%{name}-%{version}
-
-# javadoc
-mkdir -p %{buildroot}/%{_javadocdir}/%{name}
-cp -pr html/* %{buildroot}/%{_javadocdir}/%{name}
 
 %fdupes -s %{buildroot}/%{_javadocdir}/%{name}/jquery/
 
@@ -130,14 +120,15 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 %{_datadir}/%{name}-%{version}
 
 %files javadoc
-%defattr(0644,root,root,0755)
-%doc %{_javadocdir}/%{name}
 
 %files manual
 %defattr(0644,root,root,0755)
 %doc %{_docdir}/%{name}-%{version}/tutorial
 
 %changelog
+* Tue Feb 13 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.30.2-1
+- Upgrade to latest version for AZL 3.0 release
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.23.1-7
 - Moved from extended to core
 - License verified
