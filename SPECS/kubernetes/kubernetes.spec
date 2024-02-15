@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Group:          Microsoft Kubernetes
 URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
+Patch0:         CVE-2024-21626.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
 BuildRequires:  golang
@@ -91,6 +92,7 @@ Pause component for Microsoft Kubernetes %{version}.
 
 %prep
 %setup -q -c -n %{name}
+%patch 0 -p1
 
 %build
 # set version information using KUBE_GIT_VERSION
@@ -263,6 +265,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.4-2
+- Address CVE-2024-21626 by patching vendored github/opencontainer/runc
+
 * Tue Dec 5 2023 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.28.4-1
 - Upgrade to 1.28.4 to fix CVE-2023-5528
 
