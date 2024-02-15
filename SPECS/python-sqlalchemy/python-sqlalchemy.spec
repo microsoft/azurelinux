@@ -17,8 +17,8 @@
 
 Summary:        Modular and flexible ORM library for python
 Name:           python-sqlalchemy
-Version:        1.4.32
-Release:        2%{?dist}
+Version:        2.0.27
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -100,6 +100,9 @@ PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 %{python3_sitearch}/*
 
 %changelog
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
+- Auto-upgrade to 2.0.27 - none
+
 * Thu Mar 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.32-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removed unused BR on 'python3-pluggy'.

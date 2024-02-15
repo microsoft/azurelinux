@@ -24254,8 +24254,8 @@
         "type": "other",
         "other": {
           "name": "python-sqlalchemy",
-          "version": "1.4.32",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/S/SQLAlchemy/SQLAlchemy-1.4.32.tar.gz"
+          "version": "2.0.27",
+          "downloadUrl": "https://files.pythonhosted.org/packages/b9/fc/327f0072d1f5231d61c715ad52cb7819ec60f0ac80dc1e507bc338919caa/SQLAlchemy-2.0.27.tar.gz"
         }
       }
     },
