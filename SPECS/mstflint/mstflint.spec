@@ -1,21 +1,20 @@
 Summary:        Mellanox firmware burning tool
 Name:           mstflint
-Version:        4.21.0
-Release:        4%{?dist}
+Version:        4.26.0
+Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/Mellanox/%{name}
 Source0:        https://github.com/Mellanox/%{name}/releases/download/v%{version}-1/%{name}-%{version}-1.tar.gz
-Patch4:         add-default-link-flags-for-shared-libraries.patch
-Patch6:         replace-mlxfwreset-with-mstfwreset-in-mstflint-message.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  boost-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  libcurl-devel
+BuildRequires:  libibmad-devel
 BuildRequires:  libibmad-devel
 BuildRequires:  libstdc++-devel
 BuildRequires:  libtool
@@ -30,7 +29,7 @@ This package contains firmware update tool, vpd dump and register dump tools
 for network adapters based on Mellanox Technologies chips.
 
 %prep
-%autosetup -p1
+%autosetup
 
 find . -type f -iname '*.[ch]' -exec chmod a-x '{}' ';'
 find . -type f -iname '*.cpp' -exec chmod a-x '{}' ';'
@@ -58,6 +57,10 @@ find %{buildroot} -type f -name '*.a' -delete
 %{_mandir}/man1/*
 
 %changelog
+* Thu Feb 15 2024 Juan Camposeco <juanarturoc@microsoft.com> - 4.21.0-4
+- Upgrade to 4.26.0 from Mellanox repository
+- Remove patches from Fedora
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.21.0-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
