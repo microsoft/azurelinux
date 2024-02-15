@@ -35,7 +35,7 @@ This package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n libgit2-%{version}
 
 # Remove VCS files from examples
 find examples -name ".gitignore" -delete -print
@@ -76,6 +76,7 @@ popd
 %{_libdir}/pkgconfig/libgit2.pc
 %{_includedir}/git2.h
 %{_includedir}/git2/
+%{_bindir}/git2
 
 %changelog
 * Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
