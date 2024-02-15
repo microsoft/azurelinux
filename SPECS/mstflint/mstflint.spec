@@ -15,7 +15,6 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  libcurl-devel
 BuildRequires:  libibmad-devel
-BuildRequires:  libibmad-devel
 BuildRequires:  libstdc++-devel
 BuildRequires:  libtool
 BuildRequires:  libxml2-devel
