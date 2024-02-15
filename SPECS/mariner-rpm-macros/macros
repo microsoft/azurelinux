@@ -24,6 +24,7 @@
 %_sharedstatedir    /var/lib
 %_var               /var
 %_localstatedir     /var
+%_rundir            /run
 
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
