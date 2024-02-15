@@ -30559,7 +30559,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libthrift-dev",
+          "name": "thrift",
           "version": "0.19.0",
           "downloadUrl": "https://dlcdn.apache.org/thrift/0.19.0/thrift-0.19.0.tar.gz"
         }

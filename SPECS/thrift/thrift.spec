@@ -3,7 +3,7 @@
 %define without_tests 1
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
-Name:           libthrift-dev
+Name:           thrift
 License:        Apache License v2.0
 Group:          Development
 Summary:        RPC and serialization framework
