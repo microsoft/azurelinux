@@ -24103,6 +24103,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sortedcontainers",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/grantjenks/python-sortedcontainers/archive/v2.4.0/python-sortedcontainers-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-soupsieve",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/facelessuser/soupsieve/archive/1.9.2/python-soupsieve-1.9.2.tar.gz"
