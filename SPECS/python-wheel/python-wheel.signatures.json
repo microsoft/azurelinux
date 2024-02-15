@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "wheel-0.42.0.tar.gz": "000b0bb617ff3914f7a352687a7087ededd5b96a95e70e743c484904115a1021",
+    "wheel-0.33.6.tar.gz": "ce9b3af862796aeb7af75c72e54fe974e4bb9a95502f49b1da25fdbf4c53e742",
   "wheel-entrypoint": "572c3c0e9659f7f615e5ae62ed22abf5f4574c03f928cee58f5c47e96ea07bd5"
  }
 }
