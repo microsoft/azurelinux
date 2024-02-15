@@ -20,7 +20,7 @@ mkdir -p $containerStagingFolder
 
 # stage those files that need to be in the container
 cp $enlistmentRoot/toolkit/tools/imagecustomizer/imagecustomizer $containerStagingFolder
-cp $enlistmentRoot/gmileka-scripts/container/generate-iso.sh $containerStagingFolder
+cp $enlistmentRoot/gmileka-scripts/container/run-mic.sh $containerStagingFolder
 
 # build the container
 

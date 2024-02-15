@@ -8,4 +8,4 @@ RUN tdnf update -y && tdnf install -y sudo qemu-img rpm coreutils util-linux sys
 
 COPY . /mic
 
-ENTRYPOINT ["/mic/generate-iso.sh"]
+ENTRYPOINT ["/mic/run-mic.sh"]
