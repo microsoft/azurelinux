@@ -154,7 +154,7 @@ Patch88: CVE-2023-51714.patch
 # - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=81998f50d039a631
 # - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=7f345f2a1c8d9f60
 # - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=cca8ed0547405b1c
-Patch90: CVE-2021-38593.patch
+Patch89: CVE-2021-38593.patch
 
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
@@ -266,7 +266,6 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch87 -p1
 %patch88 -p1
 %patch89 -p1
-%patch90 -p1
 
 ## upstream patches
 
