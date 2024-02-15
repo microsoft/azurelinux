@@ -2259,6 +2259,7 @@
                 "node-problem-detector",
                 "ntopng",
                 "opentelemetry-cpp",
+                "osslsigncode",
                 "packer",
                 "pcaudiolib",
                 "pcre2",
