@@ -131,9 +131,7 @@ func (cfg *Config) CreateAllSrpmsWrapper() error {
 	packList, err := packagelist.ParsePackageListFile(cfg.PackListFile)
 	logger.PanicOnError(err)
 
-	err = createAllSRPMsWrapper(cfg.SpecsDir, cfg.DistTag, cfg.BuildDir, cfg.OutDir, cfg.WorkerTar, cfg.Workers, cfg.ConcurrentNetOps, cfg.NestedSourcesDir, cfg.RepackAll, cfg.RunCheck, packList, templateSrcConfig)
-
-	return nil
+	return createAllSRPMsWrapper(cfg.SpecsDir, cfg.DistTag, cfg.BuildDir, cfg.OutDir, cfg.WorkerTar, cfg.Workers, cfg.ConcurrentNetOps, cfg.NestedSourcesDir, cfg.RepackAll, cfg.RunCheck, packList, templateSrcConfig)
 }
 
 // createAllSRPMsWrapper wraps createAllSRPMs to conditionally run it inside a chroot.
