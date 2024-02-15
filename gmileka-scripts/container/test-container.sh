@@ -6,25 +6,51 @@ set -e
 scriptDir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 enlistmentRoot=$scriptDir/../..
 
-# cp /home/george/git/CBL-Mariner-POC/out/images/baremetal/core-3.0.20240129.1326.vhdx  /home/george/git/CBL-Mariner-POC/gmileka-scripts/container/input-mount/
-# cp /home/george/git/CBL-Mariner-POC/gmileka-scripts/mic-config-iso.yaml /home/george/git/CBL-Mariner-POC/gmileka-scripts/container/input-mount/
+# ---- parameters ----
 
-inputDir=$enlistmentRoot/gmileka-scripts/container/input-mount
-outputDir=$enlistmentRoot/gmileka-scripts/container/output-mount
-
+# mic container
 containerRegistery=xyz.azurecr.io
 containerName=mic-iso
 containerTag=v0.1
+
+# mic arguments
+inputImage=$enlistmentRoot/out/images/baremetal/core-3.0.20240129.1326.vhdx
+inputConfig=$enlistmentRoot/gmileka-scripts/mic-config-iso.yaml
+outputFormat=iso
+outputImage=$enlistmentRoot/mic-build/out/mic-$(date +'%Y%m%d-%H%M').iso
+micLogLevel=debug
+
+# ---- main ----
+
 containerFullPath=$containerRegistery/$containerName/$containerTag
 
-sudo rm -rf $outputDir
-mkdir -p $outputDir
+inputImageDir=$(dirname $inputImage)
+inputConfigDdir=$(dirname $inputConfig)
+outputImageDir=$(dirname $outputImage)
+
+containerInputImageDir=/mic/input
+containerInputImage=$containerInputImageDir/$(basename $inputImage)
+containerInputConfigDir=/mic/config
+containerInputConfig=$containerInputConfigDir/$(basename $inputConfig)
+containerBuildDir=/mic/build
+containerOutputDir=/mic/output
+containerOutputImage=$containerOutputDir/$(basename $outputImage)
+
+sudo rm -rf $outputImageDir
+sudo mkdir -p $outputImageDir
 
 # works without issues.
 docker run --rm \
   --privileged=true \
-   -v $inputDir:/input:z \
-   -v $outputDir:/output:z \
+   -v $inputImageDir:$containerInputImageDir:z \
+   -v $inputConfigDdir:$containerInputConfigDir:z \
+   -v $outputImageDir:$containerOutputDir:z \
+   -e MIC_INPUT_IMAGE=$containerInputImage \
+   -e MIC_INPUT_CONFIG=$containerInputConfig \
+   -e MIC_BUILD_DIR=$containerBuildDir \
+   -e MIC_OUTPUT_FORMAT=$outputFormat \
+   -e MIC_OUTPUT_IMAGE=$containerOutputImage \
+   -e MIC_LOG_LEVEL=$micLogLevel \
    $containerFullPath
 
 # Error:
@@ -32,8 +58,8 @@ docker run --rm \
 #
 # docker run --rm \
 #   --cap-add ALL \
-#    -v $inputDir:/input:z \
-#    -v $outputDir:/output:z \
+#    -v $inputImageDir:/input:z \
+#    -v $outputImageDir:/output:z \
 #    $containerFullPath
 
 # Error:
@@ -41,7 +67,7 @@ docker run --rm \
 #
 # docker run --rm \
 #   --cap-add SYS_ADMIN \
-#    -v $inputDir:/input:z \
-#    -v $outputDir:/output:z \
+#    -v $inputImageDir:/input:z \
+#    -v $outputImageDir:/output:z \
 #    $containerFullPath
 

@@ -3,24 +3,13 @@
 set -x
 set -e
 
-inputImageDir=/input
-inputImageName=core-3.0.20240129.1326.vhdx
-inputConfigName=mic-config-iso.yaml
-isoBuildDir=/build
-outputImageDir=/output
-
-mkdir -p $inputImageDir
-mkdir -p $isoBuildDir
-mkdir -p $outputImageDir
-
-inputImage=$inputImageDir/$inputImageName
-inputConfig=$inputImageDir/$inputConfigName
-outputImage=$outputImageDir/mic-$(date +'%Y%m%d-%H%M').iso
+mkdir -p $MIC_BUILD_DIR
+mkdir -p $(dirname $MIC_OUTPUT_IMAGE)
 
 sudo /mic/imagecustomizer \
-    --build-dir $isoBuildDir \
-    --image-file $inputImage \
-    --output-image-file $outputImage \
-    --output-image-format iso \
-    --config-file $inputConfig \
-    --log-level debug
+    --image-file $MIC_INPUT_IMAGE \
+    --config-file $MIC_INPUT_CONFIG \
+    --build-dir $MIC_BUILD_DIR \
+    --output-image-file $MIC_OUTPUT_IMAGE \
+    --output-image-format $MIC_OUTPUT_FORMAT \
+    --log-level $MIC_LOG_LEVEL
