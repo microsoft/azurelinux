@@ -319,8 +319,7 @@ func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		}
 
 		if err != nil {
-			logger.Log.Errorf("Error copying file '%s'", f.Src)
-			return err
+			return fmt.Errorf("Error copying file %s. Error: %w", f.Src, err)
 		}
 	}
 	return nil
@@ -331,8 +330,7 @@ func (c *Chroot) CopyOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Copy(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error copying file '%s'", err)
-		return
+		return fmt.Errorf("Error copying file. Error: %w", err)
 	}
 	return
 }
@@ -342,8 +340,7 @@ func (c *Chroot) MoveOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Move(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error moving file '%s'", err)
-		return
+		return fmt.Errorf("Error moving file from %s to %s. Error: %w", srcPath, destPath, err)
 	}
 	return
 }
