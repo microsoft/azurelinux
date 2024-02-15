@@ -93,8 +93,6 @@ Python libraries for Thrift.
 %package -n rubygem-%{gem_name}
 Summary: Thrift Ruby library
 Group:   Libraries
-# TODO figure out the version to obsolete
-# Obsoletes: %{name}-lib-ruby
 %description -n rubygem-%{gem_name}
 Ruby libraries for Thrift.
 %files -n rubygem-%{gem_name}
