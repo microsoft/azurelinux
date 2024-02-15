@@ -1,18 +1,4 @@
-#
-# spec file for package guava
-#
-# Copyright (c) 2023 SUSE LLC
-#
-# All modifications and additions to the file contributed by third parties
-# remain the property of their copyright owners, unless otherwise agreed
-# upon. The license for this file, and modifications and additions to the
-# file, is the same license as for the pristine package itself (unless the
-# license for the pristine package is not an Open Source License, in which
-# case the license is the MIT License). An "Open Source License" is a
-# license that conforms to the Open Source Definition (Version 1.9)
-# published by the Open Source Initiative.
-# Please submit bugfixes or comments via https://bugs.opensuse.org/
-#
+# Based on https://src.fedoraproject.org/rpms/guava/tree/main
 
 Summary:        Google Core Libraries for Java
 Name:           guava
@@ -25,12 +11,8 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/google/guava
 Source0:        https://github.com/google/guava/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
-BuildRequires:  ant
-BuildRequires:  fdupes
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  jsr-305
-BuildRequires:  junit
-Requires:       mvn(com.google.code.findbugs:jsr305)
 Provides:       mvn(com.google.guava:guava) = %{version}-%{release}
 BuildArch:      noarch
 
@@ -60,24 +42,45 @@ Requires:       mvn(junit:junit)
 guava-testlib provides additional functionality for conveninent unit testing
 
 %prep
-%setup -q -a1
+%setup -q
 
 find . -name '*.jar' -delete
 
+%pom_remove_parent guava-bom
+
 %pom_disable_module guava-gwt
 %pom_disable_module guava-tests
+
+# Starting guava x version, faliure module became a runtime depedency due to android limitations.
+# We are going to artificially add it as a module to the main guava-parent pacakge
+%pom_xpath_inject pom:modules "<module>futures/failureaccess</module>"
+%pom_xpath_inject pom:parent "<relativePath>../..</relativePath>" futures/failureaccess
+%pom_xpath_set pom:parent/pom:version %{version}-jre futures/failureaccess
 
 %pom_remove_plugin -r :animal-sniffer-maven-plugin
 # Downloads JDK source for doc generation
 %pom_remove_plugin :maven-dependency-plugin guava
 
-%pom_xpath_inject /pom:project/pom:build/pom:plugins/pom:plugin/pom:configuration/pom:instructions "<_nouses>true</_nouses>" guava/pom.xml
+%pom_remove_dep :caliper guava-tests
 
-%pom_remove_dep -r :listenablefuture
-%pom_remove_dep -r :failureaccess
+%mvn_package :guava-parent guava
+ 
+# javadoc generation fails due to strict doclint in JDK 1.8.0_45
+%pom_remove_plugin -r :maven-javadoc-plugin
+ 
+%pom_remove_plugin -r :build-helper-maven-plugin
+ 
+%pom_xpath_inject /pom:project/pom:build/pom:plugins/pom:plugin/pom:configuration/pom:instructions "<_nouses>true</_nouses>" guava/pom.xml
+ 
+# missing error_prone_core artifact
+%pom_xpath_remove pom:annotationProcessorPaths
+%pom_xpath_remove  "//*[local-name()='arg'][contains(., '-Xplugin:ErrorProne')]"
+
 %pom_remove_dep -r :error_prone_annotations
 %pom_remove_dep -r :j2objc-annotations
 %pom_remove_dep -r org.checkerframework:
+%pom_remove_dep -r :listenablefuture
+%pom_remove_dep jdk:srczip guava
 
 annotations=$(
     find -name '*.java' \
@@ -92,40 +95,35 @@ annotations=$(
 )
 # guava started using quite a few annotation libraries for code quality, which
 # we don't have. This ugly regex is supposed to remove their usage from the code
-./remove_annotations.sh . $annotations
-
-for mod in guava guava-testlib futures/failureaccess; do
-  %pom_remove_parent ${mod}
-  %pom_xpath_inject pom:project '
-    <groupId>com.google.guava</groupId>
-    <version>%{version}</version>' ${mod}
+find -type f -name "*.java" -print0 | while IFS= read -r -d '' file; do
+    if [ -r "$file" ]; then
+        # Remove the imports
+        sed -i -r "s/^import .*\.($annotations);//" "$file"
+        # Removes multi line (with nested parentheses)
+        sed -i -E ':a;N;$!ba;s/@('"$annotations"')\([^()]*(\([^()]*\)[^()]*)*\)//g' "$file"
+        sed -i -E ':a;N;$!ba;s/@(com\.google\.errorprone\.annotations\.('"$annotations"'))\([^()]*(\([^()]*\)[^()]*)*\)//g' "$file"
+        # Remove single line (with nested parentheses)
+        sed -i -E "s/@($annotations)\([^()]*(\([^()]*\)[^()]*)*\)//g" "$file"
+        sed -i -E 's/@(com\.google\.errorprone\.annotations\.('"$annotations"'))\([^()]*(\([^()]*\)[^()]*)*\)//g' "$file"
+        # Remove inline or no parantheses
+        sed -i -E "s/@($annotations)//g" "$file"
+        sed -i -E "s/@(com\.google\.errorprone\.annotations\.($annotations))//g" "$file"
+    else
+        echo "Error: Cannot read file $file"
+    fi
 done
 
-%pom_change_dep -r -f ::::: :::::
-
+%mvn_package "com.google.guava:failureaccess" guava
+echo "karim"
+echo %{_javadocdir}/%{name}
+%mvn_package "com.google.guava:guava-bom" __noinstall
 %build
-mkdir -p lib
-build-jar-repository -s lib junit jsr-305
-%ant -Dtest.skip=true package javadoc
-
+# Tests fail on Koji due to insufficient memory,
+# see https://bugzilla.redhat.com/show_bug.cgi?id=1332971
+%mvn_build -s -f
+ 
 %install
-# jars
-install -dm 0755 %{buildroot}%{_javadir}/%{name}
-install -pm 0644 %{name}/target/%{name}-%{version}*.jar %{buildroot}%{_javadir}/%{name}/%{name}.jar
-install -pm 0644 %{name}-testlib/target/%{name}-testlib-%{version}*.jar %{buildroot}%{_javadir}/%{name}/%{name}-testlib.jar
-
-# poms
-install -dm 0755 %{buildroot}%{_mavenpomdir}/%{name}
-install -pm 0644 %{name}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{name}.pom
-%add_maven_depmap %{name}/%{name}.pom %{name}/%{name}.jar -f %{name}
-install -pm 0644 %{name}-testlib/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{name}-testlib.pom
-%add_maven_depmap %{name}/%{name}-testlib.pom %{name}/%{name}-testlib.jar -f %{name}-testlib
-
-# javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -r %{name}/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{name}
-cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{name}-testlib
-%fdupes -s %{buildroot}%{_javadocdir}
+%mvn_install
 
 %files -f .mfiles-guava
 %doc CONTRIBUTORS README*
@@ -133,6 +131,7 @@ cp -r %{name}-testlib/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{n
 
 %files javadoc
 %{_javadocdir}/%{name}
+%doc CONTRIBUTORS README*
 %license LICENSE
 
 %files testlib -f .mfiles-guava-testlib
