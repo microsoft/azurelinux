@@ -147,39 +147,49 @@ cd lib/java
 %ant
 cd ../..
 %endif
+
 %if 0%{!?without_python:1}
 cd lib/py
 CFLAGS="%{optflags}" %{__python} setup.py build
 cd ../..
 %endif
+
 %if 0%{!?without_ruby:1}
 %gem_install -n lib/rb/thrift*.gem
 %endif
+
 %install
 export GEM_HOME=${PWD}/.gem-home
 export RUBYLIB=${PWD}/lib/rb/lib
+
+
+
 %makeinstall
-ln -s libthrift-%{version}.so ${RPM_BUILD_ROOT}%{_libdir}/libthrift.so.0
-ln -s libthriftnb-%{version}.so ${RPM_BUILD_ROOT}%{_libdir}/libthriftnb.so.0
-ln -s libthriftz-%{version}.so ${RPM_BUILD_ROOT}%{_libdir}/libthriftz.so.0
 %if 0%{!?without_java:1}
 mkdir -p $RPM_BUILD_ROOT%{_javadir}
 cp -p lib/java/build/*.jar $RPM_BUILD_ROOT%{_javadir}
 %endif
+
 %if 0%{!?without_python:1}
 cd lib/py
 %{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 cd ../..
 %endif
+
 %if 0%{!?without_ruby:1}
 mkdir -p %{buildroot}%{gem_dir}
 cp -a ./%{gem_dir}/* %{buildroot}%{gem_dir}/
 %endif
+
+
+
 %clean
 rm -rf ${RPM_BUILD_ROOT}
+
 %post
 umask 007
 /sbin/ldconfig > /dev/null 2>&1
+
 %postun
 umask 007
 /sbin/ldconfig > /dev/null 2>&1
