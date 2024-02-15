@@ -30554,6 +30554,16 @@
           "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.72.tar.gz"
         }
       }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libthrift-dev",
+          "version": "0.19.0",
+          "downloadUrl": "https://dlcdn.apache.org/thrift/0.19.0/thrift-0.19.0.tar.gz"
+        }
+      }
     }
   ],
   "Version": 1
