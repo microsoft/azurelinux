@@ -1,7 +1,7 @@
 Summary:        zip-3.0
 Name:           zip
 Version:        3.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 URL:            http://infozip.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/infozip/zip30.tar.gz
@@ -14,8 +14,7 @@ Distribution:   Azure Linux
 The Zip package contains Zip utilities.
 
 %prep
-%setup -qn %{name}30
-%patch -p1
+%autosetup -p1 -n %{name}30
 
 %build
 make -f unix/Makefile generic_gcc %{?_smp_mflags}
@@ -31,6 +30,9 @@ make prefix=%{buildroot}/%{_prefix} MANDIR=%{buildroot}/usr/share/man/man1 -f un
 %{_mandir}/*
 
 %changelog
+*   Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-6
+-   - Updated patch application macros.
+
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.0-5
 -   Added %%license line automatically
 *   Mon May 04 2020 Emre Girgin <mrgirgin@microsoft.com> 3.0-4

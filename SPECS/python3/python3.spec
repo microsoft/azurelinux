@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -163,13 +163,13 @@ The test package contains all regression tests for Python as well as the modules
 
 # Ideally we would use '%%autopatch -p1 -M 999', but unfortunately the GitHub CI pipelines use a very old version of rpm which doesn't support it.
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
-%patch 6 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
+%patch -P 3 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
@@ -323,6 +323,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.14-9
+- Updated patch application macros.
+
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
 

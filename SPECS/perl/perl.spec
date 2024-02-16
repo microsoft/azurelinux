@@ -146,7 +146,7 @@ Source7:        gendep.macros
 %endif
 
 # Provide maybe_command independently, bug #1129443
-Patch0:         perl-5.22.1-Provide-ExtUtils-MM-methods-as-standalone-ExtUtils-M.patch
+Patch5:         perl-5.22.1-Provide-ExtUtils-MM-methods-as-standalone-ExtUtils-M.patch
 
 # Define SONAME for libperl.so
 Patch8:         perl-5.16.3-create_libperl_soname.patch
@@ -6839,7 +6839,7 @@ popd
 # Old changelog entries are preserved in CVS.
 %changelog
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-504
-- Making sure the spec has got a patch with number 0.
+- Updated patch application macros.
 - Applying missed patches 14 and 202.
 
 * Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-503
