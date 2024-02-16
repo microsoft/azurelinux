@@ -7,7 +7,7 @@
 
 Summary:        Read and write Windows Registry binary hive files
 Name:           hivex
-Version:        1.3.21
+Version:        1.3.23
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -191,7 +191,7 @@ fi
 
 %files -f %{name}.lang
 %license LICENSE
-%doc README
+%doc README.md
 %{_bindir}/hivexget
 %{_bindir}/hivexml
 %{_bindir}/hivexsh
@@ -211,7 +211,7 @@ fi
 
 %if %{with ocaml}
 %files -n ocaml-%{name}
-%doc README
+%doc README.md
 %{_libdir}/ocaml/hivex
 %exclude %{_libdir}/ocaml/hivex/*.a
 %exclude %{_libdir}/ocaml/hivex/*.cmxa
@@ -244,6 +244,9 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
+* Fri Feb 16 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.3.23-3
+- Upgrate to 1.3.23.
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.21-3
 - Removing 'exit' calls from the '%%check' section.
 
