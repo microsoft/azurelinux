@@ -54,7 +54,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest-cov
 BuildRequires:  python%{python3_pkgversion}-PyYAML
 
 # netplan ships dbus files
-Requires:       dbus-common
+Requires:       dbus
 
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
