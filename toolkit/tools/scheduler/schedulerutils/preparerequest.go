@@ -60,13 +60,13 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 
 	newBuildReqs, err := buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)
 	if err != nil {
-		err = fmt.Errorf("error converting build nodes to requests. Error:\n%w", err)
+		err = fmt.Errorf("failed to convert build nodes to requests:\n%w", err)
 		return
 	}
 	requests = append(requests, newBuildReqs...)
 	newTestReqs, err := testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)
 	if err != nil {
-		err = fmt.Errorf("error converting test nodes to requests. Error:\n%w", err)
+		err = fmt.Errorf("failed to convert test nodes to requests:\n%w", err)
 		return
 	}
 	requests = append(requests, newTestReqs...)
@@ -90,7 +90,7 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(defaultNode.SRPMFileName()) || buildState.IsNodeProcessed(defaultNode) {
-			err = fmt.Errorf("unexpected duplicate build for '%s'", defaultNode.SRPMFileName())
+			err = fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName())
 			return
 		}
 
@@ -194,7 +194,7 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
-			err = fmt.Errorf("unexpected duplicate test for '%s'", srpmFileName)
+			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
 			return
 		}
 

@@ -336,7 +336,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
 		newRequests, requestError := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
 		if requestError != nil {
-			err = fmt.Errorf("error converting nodes to requests:\n%w", requestError)
+			err = fmt.Errorf("failed to convert nodes to requests:\n%w", requestError)
 			stopBuilding = true
 			break
 		}
