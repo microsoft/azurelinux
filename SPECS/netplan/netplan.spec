@@ -29,7 +29,7 @@ Patch0:         remove-flakes-check.patch
 
 BuildRequires:  gcc
 # BuildRequires:  make
-# BuildRequires:  meson >= 0.61 (RE-ENABLE!!!)
+BuildRequires:  meson >= 0.61
 BuildRequires:  cmake
 BuildRequires:  ninja-build
 BuildRequires:  bash-completion-devel
@@ -59,7 +59,7 @@ Requires:       python%{python3_pkgversion}-PyYAML
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
 # netplan ships dbus files
-Requires:       dbus-common
+Requires:       dbus
 
 # Netplan requires a backend for configuration
 Requires:       %{name}-default-backend
@@ -215,8 +215,8 @@ network:
 EOF
 
 %changelog
-* Fri Jan 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.107.1-1
-- Auto-upgrade to 0.107.1 - none
+* Thu Feb 15 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 0.107.1-1
+- Upgrade to 0.107.1
 
 * Fri Sep 17 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 0.95-1
 - Initial CBL-Mariner import from Netplan source (license: GPLv3)
