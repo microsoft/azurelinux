@@ -629,6 +629,7 @@ BuildRequires: glusterfs-api-devel
 # gtk related?
 BuildRequires: glib2-devel
 BuildRequires: gnutls-devel
+BuildRequires: gnutls
 # GTK frontend
 BuildRequires: gtk3-devel
 BuildRequires: vte291-devel
@@ -1876,6 +1877,9 @@ run_configure() {
     echo "==="
 }
 
+# XXX for now disable meson cant find it --enable-gnutls \
+# --audio-drv-list=pipewire,pa,sdl,alsa,%{?jack_drv}oss \ For azlinux none
+# --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \ 2.0
 
 pushd %{qemu_kvm_build}
 run_configure \
@@ -1903,9 +1907,9 @@ run_configure \
 %endif
   --enable-bpf \
   --enable-cap-ng \
-  %if %{with capstone}
+%if %{with capstone}
   --enable-capstone \
-  %endif
+%endif
   --enable-coroutine-pool \
   --enable-curl \
 %if %{have_dbus_display}
@@ -1919,7 +1923,7 @@ run_configure \
   --enable-fdt=system \
 %endif
   --enable-gettext \
-  --enable-gnutls \
+  --enable-tools \
   --enable-guest-agent \
   --enable-iconv \
 %if %{have_jack}
@@ -1973,7 +1977,6 @@ run_configure \
   --enable-snappy \
   --enable-system \
   --enable-tcg \
-  --enable-tools \
   --enable-tpm \
 %if %{have_usbredir}
   --enable-usb-redir \
@@ -1983,9 +1986,11 @@ run_configure \
   --enable-vhost-user \
   --enable-vhost-user-blk-server \
   --enable-vhost-vdpa \
+%if %{have_ui}
   --enable-vnc \
   --enable-png \
   --enable-vnc-sasl \
+%endif
 %if %{enable_werror}
   --enable-werror \
 %endif
@@ -1993,8 +1998,6 @@ run_configure \
   --enable-xkbcommon \
 %endif
   \
-  \
-  --audio-drv-list=pipewire,pa,sdl,alsa,%{?jack_drv}oss \
   --target-list-exclude=moxie-softmmu \
   --with-default-devices \
   --enable-auth-pam \
@@ -2060,7 +2063,9 @@ run_configure \
   --enable-virtfs \
   --enable-virtfs-proxy-helper \
   --enable-vpc \
+%if %{have_ui}
   --enable-vnc-jpeg \
+%endif
   --enable-vte \
   --enable-vvfat \
 %if %{have_xen}
@@ -2254,21 +2259,25 @@ rm -rf %{buildroot}%{_datadir}/%{name}/u-boot-sam460-20100605.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,tcx.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,cgthree.bin
 %endif
-%
-# Fedora specific stuff below
-%find_lang %{name}
 
+# Fedora specific stuff below
+# %find_lang %{name}
+
+%if ! %{azl}
 # Generate qemu-system-* man pages
 chmod -x %{buildroot}%{_mandir}/man1/*
 for emu in %{buildroot}%{_bindir}/qemu-system-*; do
     ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/$(basename $emu).1.gz
  done
+%endif
 
 # Install kvm specific source bits, and qemu-kvm manpage
 %ifarch x86_64
 # Install kvm specific source bits, and qemu-kvm manpage
 %if %{need_qemu_kvm}
+%if ! 0%{azl}
 ln -sf qemu.1.gz %{buildroot}%{_mandir}/man1/qemu-kvm.1.gz
+%endif
 ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
 %endif
 %else
@@ -2279,8 +2288,10 @@ rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-i386.so
 rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-x86_64.so
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-i386*.stp
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-x86_64*.stp
+%if ! %{azl}
 rm -rf %{buildroot}%{_mandir}/man1/qemu-system-i386.1*
 rm -rf %{buildroot}%{_mandir}/man1/qemu-system-x86_64.1*
+%endif
 rm -rf %{buildroot}%{_datadir}/%{name}/kvmvapic.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/linuxboot.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/multiboot.bin
@@ -2494,16 +2505,19 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_bindir}/qemu-io
 %{_bindir}/qemu-nbd
 %{_bindir}/qemu-storage-daemon
+%if ! %{azl}
 %{_mandir}/man1/qemu-img.1*
 %{_mandir}/man8/qemu-nbd.8*
 %{_mandir}/man1/qemu-storage-daemon.1*
 %{_mandir}/man7/qemu-storage-daemon-qmp-ref.7*
-
+%endif
 
 %files -n qemu-guest-agent
 %doc COPYING README.rst
 %{_bindir}/qemu-ga
+%if ! %{azl}
 %{_mandir}/man8/qemu-ga.8*
+%endif
 %{_unitdir}/qemu-guest-agent.service
 %{_udevrulesdir}/99-qemu-guest-agent.rules
 %config(noreplace) %{_sysconfdir}/sysconfig/qemu-ga
@@ -2521,11 +2535,14 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_bindir}/qemu-pr-helper
 %{_unitdir}/qemu-pr-helper.service
 %{_unitdir}/qemu-pr-helper.socket
+%if ! %{azl}
 %{_mandir}/man8/qemu-pr-helper.8*
-
+%endif
 
 %files tools
+%if %{have_ui}
 %{_bindir}/qemu-keymap
+%endif
 %{_bindir}/qemu-edid
 %{_bindir}/qemu-trace-stap
 %{_datadir}/%{name}/simpletrace.py*
@@ -2534,7 +2551,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/%{name}/tracetool/format/*.py*
 %{_datadir}/%{name}/dump-guest-memory.py*
 %{_datadir}/%{name}/trace-events-all
+%if ! %{azl}
 %{_mandir}/man1/qemu-trace-stap.1*
+%endif
 # Fedora specific
 %{_bindir}/elf2dmp
 
@@ -2543,19 +2562,24 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %doc %{qemudocdir}
 %endif
 
-%files common -f %{name}.lang
+%files common
+# azlinux: no lang files generated yet. -f %{name}.lang
 %license COPYING COPYING.LIB LICENSE
 %dir %{_datadir}/%{name}/
 %dir %{_datadir}/%{name}/vhost-user/
 %{_datadir}/icons/*
+%if %{have_ui}
 %{_datadir}/%{name}/keymaps/
+%endif
 %{_datadir}/%{name}/linuxboot_dma.bin
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
+%if ! %{azl}
 %{_mandir}/man1/%{name}.1*
 %{_mandir}/man7/qemu-block-drivers.7*
 %{_mandir}/man7/qemu-cpu-models.7*
 %{_mandir}/man7/qemu-ga-ref.7*
 %{_mandir}/man7/qemu-qmp-ref.7*
+%endif
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/bridge.conf
 %if %{have_kvm}
@@ -2569,7 +2593,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/applications/qemu.desktop
 %exclude %{_datadir}/%{name}/qemu-nsis.bmp
 %{_libexecdir}/virtfs-proxy-helper
+%if ! %{azl}
 %{_mandir}/man1/virtfs-proxy-helper.1*
+%endif
 
 
 %files tests
@@ -3122,7 +3148,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-aarch64.stp
 %{_datadir}/systemtap/tapset/qemu-system-aarch64-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-aarch64-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-aarch64.1*
+%endif
 
 
 %files system-alpha
@@ -3131,7 +3159,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-alpha.stp
 %{_datadir}/systemtap/tapset/qemu-system-alpha-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-alpha-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-alpha.1*
+%endif
 %{_datadir}/%{name}/palcode-clipper
 
 
@@ -3142,7 +3172,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-arm.stp
 %{_datadir}/systemtap/tapset/qemu-system-arm-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-arm-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-arm.1*
+%endif
 
 
 %files system-avr
@@ -3151,7 +3183,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-avr.stp
 %{_datadir}/systemtap/tapset/qemu-system-avr-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-avr-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-avr.1*
+%endif
 
 
 %files system-cris
@@ -3160,7 +3194,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-cris.stp
 %{_datadir}/systemtap/tapset/qemu-system-cris-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-cris-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-cris.1*
+%endif
 
 
 %files system-hppa
@@ -3169,7 +3205,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-hppa.stp
 %{_datadir}/systemtap/tapset/qemu-system-hppa-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-hppa-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-hppa.1*
+%endif
 %{_datadir}/%{name}/hppa-firmware.img
 
 
@@ -3179,7 +3217,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-loongarch64.stp
 %{_datadir}/systemtap/tapset/qemu-system-loongarch64-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-loongarch64-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-loongarch64.1*
+%endif
 
 
 %files system-m68k
@@ -3188,7 +3228,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-m68k.stp
 %{_datadir}/systemtap/tapset/qemu-system-m68k-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-m68k-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-m68k.1*
+%endif
 
 
 %files system-microblaze
@@ -3201,8 +3243,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-microblazeel.stp
 %{_datadir}/systemtap/tapset/qemu-system-microblazeel-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-microblazeel-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-microblaze.1*
 %{_mandir}/man1/qemu-system-microblazeel.1*
+%endif
 %{_datadir}/%{name}/petalogix*.dtb
 
 
@@ -3224,10 +3268,12 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-mips64el.stp
 %{_datadir}/systemtap/tapset/qemu-system-mips64el-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-mips64el-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-mips.1*
 %{_mandir}/man1/qemu-system-mipsel.1*
 %{_mandir}/man1/qemu-system-mips64el.1*
 %{_mandir}/man1/qemu-system-mips64.1*
+%endif
 
 
 %files system-nios2
@@ -3236,8 +3282,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-nios2.stp
 %{_datadir}/systemtap/tapset/qemu-system-nios2-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-nios2-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-nios2.1*
-
+%endif
 
 %files system-or1k
 %files system-or1k-core
@@ -3245,7 +3292,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-or1k.stp
 %{_datadir}/systemtap/tapset/qemu-system-or1k-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-or1k-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-or1k.1*
+%endif
 
 %if %{with ppc_support}
 %files system-ppc
@@ -3258,8 +3307,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-ppc64.stp
 %{_datadir}/systemtap/tapset/qemu-system-ppc64-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-ppc64-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-ppc.1*
 %{_mandir}/man1/qemu-system-ppc64.1*
+%endif
 %{_datadir}/%{name}/bamboo.dtb
 %{_datadir}/%{name}/canyonlands.dtb
 %{_datadir}/%{name}/qemu_vga.ndrv
@@ -3283,8 +3334,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-riscv64.stp
 %{_datadir}/systemtap/tapset/qemu-system-riscv64-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-riscv64-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-riscv*.1*
-
+%endif
 
 %files system-rx
 %files system-rx-core
@@ -3292,8 +3344,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-rx.stp
 %{_datadir}/systemtap/tapset/qemu-system-rx-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-rx-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-rx.1*
-
+%endif
 
 %files system-s390x
 %files system-s390x-core
@@ -3301,7 +3354,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-s390x.stp
 %{_datadir}/systemtap/tapset/qemu-system-s390x-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-s390x-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-s390x.1*
+%endif
 %{_datadir}/%{name}/s390-ccw.img
 %{_datadir}/%{name}/s390-netboot.img
 
@@ -3316,8 +3371,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-sh4eb.stp
 %{_datadir}/systemtap/tapset/qemu-system-sh4eb-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-sh4eb-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-sh4.1*
 %{_mandir}/man1/qemu-system-sh4eb.1*
+%endif
 
 %if %{with sparc_support}
 %files system-sparc
@@ -3342,7 +3399,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-tricore.stp
 %{_datadir}/systemtap/tapset/qemu-system-tricore-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-tricore-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-tricore.1*
+%endif
 
 %files ipxe
 %{_datadir}/%{name}/pxe*rom
@@ -3360,8 +3419,11 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-x86_64.stp
 %{_datadir}/systemtap/tapset/qemu-system-x86_64-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-x86_64-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-i386.1*
 %{_mandir}/man1/qemu-system-x86_64.1*
+%{_mandir}/man1/qemu-kvm.1*
+%endif
 %{_datadir}/%{name}/kvmvapic.bin
 %{_datadir}/%{name}/linuxboot.bin
 %{_datadir}/%{name}/multiboot.bin
@@ -3370,7 +3432,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/%{name}/qboot.rom
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
-%{_mandir}/man1/qemu-kvm.1*
 %endif
 
 
@@ -3384,8 +3445,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/systemtap/tapset/qemu-system-xtensaeb.stp
 %{_datadir}/systemtap/tapset/qemu-system-xtensaeb-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-xtensaeb-simpletrace.stp
+%if ! %{azl}
 %{_mandir}/man1/qemu-system-xtensa.1*
 %{_mandir}/man1/qemu-system-xtensaeb.1*
+%endif
 # endif !tools_only
 %endif
 
