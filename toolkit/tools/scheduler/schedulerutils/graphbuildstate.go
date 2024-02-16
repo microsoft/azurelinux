@@ -151,7 +151,7 @@ func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
 	return
 }
 
-// ActiveBuildFromSRPM returns a build request for the queried SRPM file
+// ActiveTestFromSRPM returns a build request for the queried SRPM file
 // or nil if the SRPM is not among the active builds.
 func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest {
 	for _, buildRequest := range g.activeBuilds {
