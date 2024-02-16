@@ -770,13 +770,12 @@ the KVM hypervisor.
 
 This package provides documentation and auxiliary programs used with %{name}.
 
-%if ! 0%{?azl}
+# Azlinux - these are simple files that don't require python-spinx pkg
 %package docs
 Summary: %{name} documentation
 BuildArch: noarch
 %description docs
 %{name}-docs provides documentation files regarding %{name}.
-%endif
 
 %package -n qemu-img
 Summary: QEMU command line tool for manipulating disk images
@@ -2234,8 +2233,6 @@ rm -rf %{buildroot}%{_datadir}/%{name}/openbios-sparc64
 # Provided by package SLOF
 rm -rf %{buildroot}%{_datadir}/%{name}/slof.bin
 # AzLinux specific
-# Provided by package ipxe
-#rm -rf %{buildroot}%{_datadir}/%{name}/pxe*rom
 #rm -rf %{buildroot}%{_datadir}/%{name}/efi*rom
 # Provided by package seavgabios
 rm -rf %{buildroot}%{_datadir}/%{name}/vgabios*bin
@@ -2253,13 +2250,65 @@ rm -rf %{buildroot}%{_datadir}/%{name}/qemu_vga.ndrv
 rm -rf %{buildroot}%{_datadir}/%{name}/skiboot.lid
 rm -rf %{buildroot}%{_datadir}/%{name}/u-boot.e500
 rm -rf %{buildroot}%{_datadir}/%{name}/u-boot-sam460-20100605.bin
+rm -rf %{buildroot}%{_datadir}/%{name}/vof*.bin
+rm -rf %{buildroot}%{_bindir}/qemu-ppc
+rm -rf %{buildroot}%{_bindir}/qemu-ppc64
+rm -rf %{buildroot}%{_bindir}/qemu-ppc64le
+rm -rf %{buildroot}%{_bindir}/qemu-system-ppc
+rm -rf %{buildroot}%{_bindir}/qemu-system-ppc64
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc64.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc64-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-ppc64-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64le.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64le-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-ppc64le-simpletrace.stp
 %endif
 
 %if %{without sparc_support}
 rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,tcx.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/QEMU,cgthree.bin
+rm -rf %{buildroot}%{_bindir}/qemu-sparc
+rm -rf %{buildroot}%{_bindir}/qemu-sparc32plus
+rm -rf %{buildroot}%{_bindir}/qemu-sparc64
+rm -rf %{buildroot}%{_bindir}/qemu-system-sparc
+rm -rf %{buildroot}%{_bindir}/qemu-system-sparc64
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc32plus.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc32plus-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc32plus-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc64.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc64-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-sparc64-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc-simpletrace.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-log.stp
+rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-sparc64-simpletrace.stp
+
 %endif
 
+%if !%{have_ui}
+rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu-pci.so
+rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-gpu.so
+rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga-gl.so
+rm -rf %{buildroot}%{_libdir}/%{name}/hw-display-virtio-vga.so
+rm -rf %{buildroot}%{_libdir}/%{name}/hw-s390x-virtio-gpu-ccw.so
+rm -rf %{buildroot}%{_libdir}/%{name}/ui-curses.so
+# remove keymap files
+rm -rf %{buildroot}%{_datadir}/%{name}/keymaps/*
+%endif
 # Fedora specific stuff below
 # %find_lang %{name}
 
@@ -2557,10 +2606,9 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 # Fedora specific
 %{_bindir}/elf2dmp
 
-%if ! 0%{azl}
+# includes licence, readme and other files
 %files docs
 %doc %{qemudocdir}
-%endif
 
 %files common
 # azlinux: no lang files generated yet. -f %{name}.lang
