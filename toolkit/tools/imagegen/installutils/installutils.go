@@ -765,7 +765,7 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
 	if err != nil {
-		err = fmt.Errorf("unable to check if machine-id exists. Error:\n%w", err)
+		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
 		return
 	}
 	if !exists {
