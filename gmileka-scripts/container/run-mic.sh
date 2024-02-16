@@ -6,7 +6,7 @@ set -e
 mkdir -p $MIC_BUILD_DIR
 mkdir -p $(dirname $MIC_OUTPUT_IMAGE)
 
-sudo /mic/imagecustomizer \
+/mic/imagecustomizer \
     --image-file $MIC_INPUT_IMAGE \
     --config-file $MIC_INPUT_CONFIG \
     --build-dir $MIC_BUILD_DIR \

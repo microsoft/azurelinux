@@ -28,6 +28,9 @@ inputImageDir=$(dirname $inputImage)
 inputConfigDdir=$(dirname $inputConfig)
 outputImageDir=$(dirname $outputImage)
 
+sudo rm -rf $outputImageDir
+sudo mkdir -p $outputImageDir
+
 containerInputImageDir=/mic/input
 containerInputImage=$containerInputImageDir/$(basename $inputImage)
 containerInputConfigDir=/mic/config
@@ -36,15 +39,13 @@ containerBuildDir=/mic/build
 containerOutputDir=/mic/output
 containerOutputImage=$containerOutputDir/$(basename $outputImage)
 
-sudo rm -rf $outputImageDir
-sudo mkdir -p $outputImageDir
-
 # works without issues.
 docker run --rm \
   --privileged=true \
    -v $inputImageDir:$containerInputImageDir:z \
    -v $inputConfigDdir:$containerInputConfigDir:z \
    -v $outputImageDir:$containerOutputDir:z \
+   -v /dev:/dev:z \
    -e MIC_INPUT_IMAGE=$containerInputImage \
    -e MIC_INPUT_CONFIG=$containerInputConfig \
    -e MIC_BUILD_DIR=$containerBuildDir \
