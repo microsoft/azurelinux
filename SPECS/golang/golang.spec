@@ -23,7 +23,8 @@ Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
 Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/go.%{ms_go_buildid}.src.tar.gz
-Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+# Same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source1:        https://github.com/microsoft/go/releases/download/v1.4.0-1/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://github.com/microsoft/go/releases/download/%{bootstrap_compiler_version}/go.20230802.5.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Provides:       %{name} = %{version}
