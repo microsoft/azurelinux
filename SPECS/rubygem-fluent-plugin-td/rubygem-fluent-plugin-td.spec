@@ -10,6 +10,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.treasuredata.com/
 Source0:        https://github.com/treasure-data/fluent-plugin-td/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluentd
