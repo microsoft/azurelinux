@@ -2,9 +2,6 @@
 
 Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in (configuration.go)[../../tools/imagegen/configuration/configuration.go] and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
 
-### IsContainerImage
-IsContainerImage is a optional boolean that indicates to the imager tool whether the config describes a container or system rootfs. If IsContainerImage is specified, the only valid values are `true` and `false`. Default is `false`. When IsContainerImage is `true`, no bootloader or kernel will be installed. 
-
 ## Disks
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 

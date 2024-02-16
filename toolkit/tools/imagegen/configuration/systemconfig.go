@@ -52,6 +52,11 @@ func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *Partitio
 	return FindRootPartitionSetting(s.PartitionSettings)
 }
 
+// We assume that any image without partitions is describing a rootfs image.
+func (s *SystemConfig) IsRootFS() bool {
+	return len(s.PartitionSettings) == 0
+}
+
 // GetMountpointPartitionSetting will search the system configuration for the partition setting
 // corresponding to a mount point.
 func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
