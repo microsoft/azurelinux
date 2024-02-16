@@ -1,6 +1,6 @@
 diff -urN a/fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec b/fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec
---- fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec	2022-11-05 01:48:58.000000000 -0700
-+++ fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec	2024-02-16 14:31:43.387042200 -0800
+--- a/fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec	2022-11-05 01:48:58.000000000 -0700
++++ b/fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec	2024-02-16 14:31:43.387042200 -0800
 @@ -8,9 +8,9 @@
    gem.version     = Fluent::Plugin::TreasureDataPlugin::VERSION
    gem.authors     = ['Treasure Data, Inc.']
@@ -14,3 +14,15 @@ diff -urN a/fluent-plugin-td-1.2.1/fluent-plugin-td.gemspec b/fluent-plugin-td-1
    gem.require_paths = ['lib']
    gem.license       = 'Apache-2.0'
  
+diff -urN a/fluent-plugin-td-1.2.1/lib/fluent/plugin/td_plugin_version.rb b/fluent-plugin-td-1.2.1/lib/fluent/plugin/td_plugin_version.rb
+--- a/fluent-plugin-td-1.2.1/lib/fluent/plugin/td_plugin_version.rb	2022-11-05 01:48:58.000000000 -0700
++++ b/fluent-plugin-td-1.2.1/lib/fluent/plugin/td_plugin_version.rb	2024-02-16 15:22:17.819382000 -0800
+@@ -1,7 +1,7 @@
+ module Fluent
+   module Plugin
+     module TreasureDataPlugin
+-      VERSION = '1.2.0'
++      VERSION = '1.2.1'
+     end
+   end
+ end
