@@ -144,9 +144,6 @@ function initialization {
     LOCAL_REPO_FILE="local.repo"
     cp "$CONTAINER_SRC_DIR/marinerLocalRepo.repo" "$WORK_DIR/$LOCAL_REPO_FILE"
 
-    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
-    echo "ROOT_FOLDER                   -> $ROOT_FOLDER"
-
     if [ "$PUBLISHING_LEVEL" = "preview" ]; then
         ACR_NAME_FULL=${ACR}.azurecr.io/${REPO_PREFIX}
     elif [ "$PUBLISHING_LEVEL" = "development" ]; then
@@ -224,7 +221,12 @@ function docker_build {
     local build_dir="$WORK_DIR/container_build_dir"
     mkdir -p "$build_dir"
 
-    cp "$ROOT_FOLDER/pipelines/publish-containers/common/data/$EULA_FILE_NAME" "$build_dir"/
+    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
+    EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
+    if [ -d "$EULA_FILE_PATH" ]; then
+        cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
+    fi
+
     cp "$CONTAINER_SRC_DIR/base/$dockerfile" "$build_dir/dockerfile"
 
     pushd "$build_dir" > /dev/null
