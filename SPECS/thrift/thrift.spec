@@ -404,11 +404,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %{_libdir}/pkgconfig/thrift.pc
 %{_libdir}/pkgconfig/thrift_c_glib.pc
 %doc LICENSE NOTICE
- 
-%files -n perl-%{name}
-%{perl_vendorlib}/Thrift
-%{perl_vendorlib}/Thrift.pm
-%doc LICENSE NOTICE
+
  
 %if 0%{?want_php} != 0
 %files -n php-%{name}
