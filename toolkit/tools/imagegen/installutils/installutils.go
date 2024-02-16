@@ -743,13 +743,18 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot
+// addMachineID creates the /etc/machine-id file in the installChroot, if it is
+// not already present (systemd package will include it if installed).
 func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
-	// should be an empty file in the generic file system image. An ID will be
-	// generated during boot and saved to this file if possible.
+	// should be either missing or an empty file in the generic file system
+	// image (the difference between the two options is described under
+	//"First Boot Semantics" below). An ID will be generated during boot and
+	// saved to this file if possible. Having an empty file in place is useful
+	// because it allows a temporary file to be bind-mounted over the real file,
+	// in case the image is used read-only
 
 	const (
 		machineIDFile      = "/etc/machine-id"
@@ -758,9 +763,16 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	ReportAction("Configuring machine id")
 
-	err = installChroot.UnsafeRun(func() error {
-		return file.Create(machineIDFile, machineIDFilePerms)
-	})
+	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
+	if err != nil {
+		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
+		return
+	}
+	if !exists {
+		err = installChroot.UnsafeRun(func() error {
+			return file.Create(machineIDFile, machineIDFilePerms)
+		})
+	}
 	return
 }
 
