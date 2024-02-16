@@ -76,6 +76,13 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		}
 
 		defaultNode := buildNodes[0]
+
+		// Check if we already queued up this build node for building.
+		if buildState.IsSRPMBuildActive(defaultNode.SRPMFileName()) || buildState.IsNodeProcessed(defaultNode) {
+			logger.Log.Debugf("Skipping build of '%s' as it is already queued for building", defaultNode.SRPMFileName())
+			continue
+		}
+
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
 
 		if req.UseCache {
@@ -173,6 +180,12 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 	for _, testNodes := range testNodesLists {
 		defaultTestNode := testNodes[0]
 		srpmFileName := defaultTestNode.SRPMFileName()
+
+		// Check if we already queued up this build node for building.
+		if buildState.IsSRPMBuildActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
+			logger.Log.Debugf("Skipping test of '%s' as it is already queued for testing", srpmFileName)
+			continue
+		}
 
 		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
 		if buildRequest := buildState.ActiveBuildFromSRPM(srpmFileName); buildRequest != nil {
