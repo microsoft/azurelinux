@@ -26085,8 +26085,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-hoe",
-          "version": "3.18.0",
-          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
+          "version": "4.0.4",
+          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v4.0.4.tar.gz"
         }
       }
     },

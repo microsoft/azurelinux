@@ -2,8 +2,8 @@
 %global gem_name hoe
 Summary:        Rake/Rubygems helper for project Rakefiles
 Name:           rubygem-hoe
-Version:        3.18.0
-Release:        2%{?dist}
+Version:        4.0.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Fri Feb 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.4-1
+- Auto-upgrade to 4.0.4 - azl3.0
+
 * Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.18.1-4
 - Cleanup
 
