@@ -1,0 +1,54 @@
+From 19a8a137b1c5fd9248896bd5f63638acfc9aff8c Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Thu, 14 Sep 2023 14:56:17 +0530
+Subject: [PATCH 1/2] kata-types: drop mut for variables that are not mutated
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ src/libs/kata-types/src/annotations/mod.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libs/kata-types/src/annotations/mod.rs b/src/libs/kata-types/src/annotations/mod.rs
+index c8d6312..d6c51c1 100644
+--- a/src/libs/kata-types/src/annotations/mod.rs
++++ b/src/libs/kata-types/src/annotations/mod.rs
+@@ -462,8 +462,8 @@ impl Annotation {
+         let u32_err = io::Error::new(io::ErrorKind::InvalidData, "parse u32 error".to_string());
+         let u64_err = io::Error::new(io::ErrorKind::InvalidData, "parse u64 error".to_string());
+         let i32_err = io::Error::new(io::ErrorKind::InvalidData, "parse i32 error".to_string());
+-        let mut hv = config.hypervisor.get_mut(hypervisor_name).unwrap();
+-        let mut ag = config.agent.get_mut(agent_name).unwrap();
++        let hv = config.hypervisor.get_mut(hypervisor_name).unwrap();
++        let ag = config.agent.get_mut(agent_name).unwrap();
+         for (key, value) in &self.annotations {
+             if hv.security_info.is_annotation_enabled(key) {
+                 match key.as_str() {
+-- 
+2.40.1
+
+From 7ec3b121c3891f4e4de643bcbef3287d7f564d7f Mon Sep 17 00:00:00 2001
+From: Muhammad Falak R Wani <falakreyaz@gmail.com>
+Date: Thu, 14 Sep 2023 15:31:16 +0530
+Subject: [PATCH 2/2] agent: drop mut from variable which is not mutated
+
+Signed-off-by: Muhammad Falak R Wani <falakreyaz@gmail.com>
+---
+ src/agent/src/signal.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/agent/src/signal.rs b/src/agent/src/signal.rs
+index 79dea3b..8ec6556 100644
+--- a/src/agent/src/signal.rs
++++ b/src/agent/src/signal.rs
+@@ -57,7 +57,7 @@ async fn handle_sigchild(logger: Logger, sandbox: Arc<Mutex<Sandbox>>) -> Result
+                 continue;
+             }
+ 
+-            let mut p = process.unwrap();
++            let p = process.unwrap();
+ 
+             let ret: i32 = match wait_status {
+                 WaitStatus::Exited(_, c) => c,
+-- 
+2.40.1
+

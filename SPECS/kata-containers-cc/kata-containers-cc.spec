@@ -1,6 +1,6 @@
 %global runtime_make_vars       DEFMEMSZ=256 \\\
+                                DEFSHAREDFS_CLH_SNP_VIRTIOFS=none \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
-                                DEFSNPGUEST=true \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
@@ -9,15 +9,16 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl0
-Release:      1%{?dist}
+Version:      0.6.3
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:      %{name}-%{version}-cargo.tar.gz
-Source2:      mariner-coco-build-uvm.sh
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
+Source2:      %{name}-%{version}-cargo.tar.gz
+Source3:      mariner-coco-build-uvm.sh
 
 ExclusiveArch: x86_64
 
@@ -69,7 +70,7 @@ This package contains the the tooling and files required to build the UVM
 %prep
 %autosetup -p1 -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE1}
+tar -xf %{SOURCE2}
 popd
 
 %build
@@ -137,7 +138,7 @@ pushd %{_builddir}/%{name}-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
-install -D -m 0755 %{SOURCE2}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
+install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
 install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
 install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
 install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
@@ -184,27 +185,14 @@ install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
 install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
-# We deploy 3 configurations:
-# configuration-clh-snp: production Kata-CC - IGVM & image, confidential_guest=true, sev_snp_guest=true
-# configuration-clh-snp-debug: debug Kata-CC - kernel & image, confidential_guest=true, sev_snp_guest=false
-# configuration-clh (symlinked to by configuration.toml): vanilla Kata - kernel & initrd, confidential_guest=false, sev_snp_guest=false
-install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
-install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+# Note: we deploy two configurations - the additional one is for policy/snapshotter testing w/o SEV SNP or IGVM
 install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
+install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 
-# Adapt configuration files:
-# - Change paths with locations specific to our distribution.
-sed --follow-symlinks -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh*.toml
-# - Set up configuration-clh-snp-debug. Note that kernel and image are already
-#   set through configuration-clh.toml.in.
-sed -i 's|-igvm.img|-igvm-debug.img|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#confidential_guest =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#enable_debug =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i '/^#debug_console_enabled =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-sed -i 's|shared_fs = "virtio-fs"|shared_fs = "none"|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
-# - Set up configuration-clh.
-sed -i '/^#initrd =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
-sed -i '/^image =/s|^|#|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
+# adapt upstream config files
+# change paths with locations specific to our distribution
+sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
+sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
 popd
 
 # tardev-snapshotter
@@ -287,11 +275,8 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-*   Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
--   Use Microsoft sources based on upstream Kata version 3.2.0.
-
-*   Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-4
--   Bump release to rebuild with go 1.21.6
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-4
+- Bump release to rebuild with go 1.21.6
 
 *   Tue Jan 30 2024 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
 -   Remove kernel-uvm-cvm(-devel) dependency
