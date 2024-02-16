@@ -15,6 +15,9 @@ Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 # Patch0:         %{name}-pom.patch
 BuildArch:      noarch
 
+# BuildRequires:  plexus-cipher
+# BuildRequires:  mvn(org.sonatype.plexus:plexus-cipher)
+
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 BuildRequires: javapackages-local-bootstrap
@@ -50,6 +53,9 @@ cp %{SOURCE1} .
 echo here3
 
 %mvn_alias org.codehaus.plexus: org.sonatype.plexus:
+
+# %pom_remove_dep org.codehaus.plexus:plexus-cipher
+# %pom_add_dep org.codehaus.plexus:plexus-cipher
  
 %build
 %mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
