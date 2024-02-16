@@ -6,17 +6,21 @@ set -e
 scriptDir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 enlistmentRoot=$scriptDir/../../../..
 
-containerRegistery=xyz.azurecr.io
-containerName=mic-iso
-containerTag=v0.1
+# ---- parameters ----
+
+# mic container
+containerRegistery=mcr.azurecr.io
+containerName=imagecustomizer
+containerTag=v0.0.1
 
 # ---- main ----
 
 containerStagingFolder=$(mktemp -d)
 
 function cleanUp() {
+    local exit_code=$?
     sudo rm -rf $containerStagingFolder
-    exit 1
+    exit $exit_code
 }
 trap 'cleanUp' ERR
 
@@ -27,15 +31,12 @@ mkdir -p $containerStagingFolder/mic
 
 # stage those files that need to be in the container
 cp $enlistmentRoot/toolkit/tools/imagecustomizer/imagecustomizer $containerStagingFolder/mic
-# cp $enlistmentRoot/gmileka-scripts/container/run-mic.sh $containerStagingFolder/mic
 touch $containerStagingFolder/.mariner-toolkit-ignore-dockerenv
 
 # build the container
-
 pushd $containerStagingFolder
-
 docker build -f $dockerFile . -t $containerFullPath
-
 popd
 
-rm -r $containerStagingFolder
+# clean-up
+cleanUp

@@ -9,9 +9,9 @@ enlistmentRoot=$scriptDir/../../../..
 # ---- parameters ----
 
 # mic container
-containerRegistery=xyz.azurecr.io
-containerName=mic-iso
-containerTag=v0.1
+containerRegistery=mcr.azurecr.io
+containerName=imagecustomizer
+containerTag=v0.0.1
 
 # mic arguments
 inputImage=$enlistmentRoot/out/images/baremetal/core-3.0.20240129.1326.vhdx
