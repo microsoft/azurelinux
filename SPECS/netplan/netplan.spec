@@ -27,39 +27,42 @@ URL:            https://netplan.io/
 Source0:        %{name}-%{version}.tar.gz
 Patch0:         remove-flakes-check.patch
 
-BuildRequires:  gcc
-# BuildRequires:  make
-BuildRequires:  meson >= 0.61
-BuildRequires:  cmake
-BuildRequires:  ninja-build
 BuildRequires:  bash-completion-devel
-BuildRequires:  libgcc-devel
 BuildRequires:  bash-devel
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  glib-devel
+BuildRequires:  libgcc-devel
+BuildRequires:  libyaml-devel
+BuildRequires:  meson >= 0.61
+BuildRequires:  ninja-build
+BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  glib-devel
-BuildRequires:  libyaml-devel
 BuildRequires:  util-linux-devel
-BuildRequires:  python%{python3_pkgversion}-devel
 # For tests
 BuildRequires:  iproute
 BuildRequires:  libcmocka-devel
+BuildRequires:  openvswitch
 BuildRequires:  python%{python3_pkgversion}-cffi
-BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-netifaces
 BuildRequires:  python%{python3_pkgversion}-pycodestyle
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-pytest-cov
 BuildRequires:  python%{python3_pkgversion}-PyYAML
+
+# netplan ships dbus files
+Requires:       dbus-common
+
+# 'ip' command is used in netplan apply subcommand
+Requires:       iproute
 
 # /usr/sbin/netplan is a Python 3 script that requires netifaces and PyYAML
 Requires:       python%{python3_pkgversion}-netifaces
 Requires:       python%{python3_pkgversion}-PyYAML
 # Requires:       python3dist(rich) # TBD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# 'ip' command is used in netplan apply subcommand
-Requires:       iproute
-# netplan ships dbus files
-Requires:       dbus
 
 # Netplan requires a backend for configuration
 Requires:       %{name}-default-backend
@@ -143,8 +146,7 @@ Requires:       %{name} = %{version}-%{release}
 # Netplan requires systemd-networkd for configuration
 Requires:       systemd-networkd
 
-# Generally, if linux-firmware is installed, we want Wi-Fi capabilities
-Recommends:     (wpa_supplicant if linux-firmware)
+# Wireless configuration through netplan requires using wpa_supplicant
 Suggests:       wpa_supplicant
 
 # One and only one default backend permitted
@@ -202,17 +204,21 @@ rm -f %{buildroot}/lib/netplan/generate
 rmdir %{buildroot}/lib/netplan
 rmdir %{buildroot}/lib
 
-# Remove superfluous __pycache__
-rm -rf %{buildroot}/usr/lib/python3.11/site-packages/netplan/__pycache__
+# Remove __pycache__
+rm -rf %{buildroot}/usr/lib/python3.*/site-packages/netplan/__pycache__
 
 # Pre-create the config directories
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
 mkdir -p %{buildroot}%{_prefix}/lib/%{name}
 
+# Create the default renderer configuration for networkd
 cat > %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-networkd.yaml <<EOF
 network:
   renderer: networkd
 EOF
+
+%check
+%meson_test
 
 %changelog
 * Thu Feb 15 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 0.107.1-1
