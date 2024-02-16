@@ -27,9 +27,9 @@ func IsRegularBuild() bool {
 	// some specific build pipeline builds Mariner from a Docker container and
 	// consequently have special requirements with regards to chroot
 	// check if .dockerenv file exist to disambiguate build pipeline
-	// exists, _ := file.PathExists("/.dockerenv")
-	// return !exists
-	return true
+	dockerEnvExists, _ := file.PathExists("/.dockerenv")
+	ignoreDockerEnvExists, _ := file.PathExists("/.mariner-toolkit-ignore-dockerenv")
+	return ignoreDockerEnvExists || !dockerEnvExists
 }
 
 // GetChrootDir returns the chroot folder

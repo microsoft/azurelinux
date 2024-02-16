@@ -6,6 +6,6 @@ FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
 # no udevadm -> systemd
 RUN tdnf update -y && tdnf install -y sudo qemu-img rpm coreutils util-linux systemd openssl sed squashfs-tools dosfstools genisoimage
 
-COPY . /mic
+COPY . /
 
 ENTRYPOINT ["/mic/run-mic.sh"]
