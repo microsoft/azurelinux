@@ -92,6 +92,8 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: coreutils
 Requires: perl
 
+Recommends: SymCrypt
+
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared

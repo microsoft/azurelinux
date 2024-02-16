@@ -31,6 +31,7 @@ Requires:       iana-etc
 Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
+Requires:       SymCrypt
 Requires:       tzdata
 
 %description base

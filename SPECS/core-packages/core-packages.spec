@@ -73,6 +73,7 @@ Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
+Requires:       SymCrypt
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
 Requires:       xz
