@@ -377,8 +377,12 @@ find %{buildroot} -name Thread.h -exec chmod a-x '{}' \;
  
 # Ensure all python scripts are executable
 find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r chmod 755
- 
 %ldconfig_scriptlets
+
+%check
+# Running the test parallely is flaky and hangs the pipeline sometimes. Avoid using `-j` flags
+make -k check
+
 %files
 %doc LICENSE NOTICE
 %{_bindir}/thrift
@@ -435,7 +439,6 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %files -n lib%{name}-java -f .mfiles
 %doc LICENSE NOTICE
 %endif
- 
  
 %changelog
 * Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-4
