@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+from pathlib import Path
 from pyrpm.spec import Spec
 from os.path import dirname, realpath
 
@@ -10,6 +11,9 @@ import re
 import sys
 
 from spec_source_attributions import get_spec_source, VALID_SOURCE_ATTRIBUTIONS
+
+any_patch_tag = re.compile(
+    r'^\s*Patch\d*:', re.MULTILINE)
 
 # Checking if the specs include only the valid 'Distribution: Azure Linux' tag.
 invalid_distribution_tag_regex = re.compile(
@@ -27,6 +31,9 @@ valid_release_tag_regex = re.compile(
     r'^[1-9]\d*%\{\?dist\}$')
 
 valid_source_attributions_one_per_line = "\n".join(f"- {key}: '{value}'" for key, value in VALID_SOURCE_ATTRIBUTIONS.items())
+
+zero_patch_tag = re.compile(
+    r'^\s*Patch0?:', re.MULTILINE)
 
 
 def check_distribution_tag(spec_path: str):
@@ -121,7 +128,33 @@ ERROR: no valid source attribution.
     return False
 
 
-def check_spec(spec_path):
+def check_toolchain_patch_lines(spec_path: str, toolchain_specs: list):
+    """Checks if a toolchain spec file contains either no patches, or a 'Patch' or 'Patch0' tag.
+       RPM < 4.18 will fail parsing a spec otherwise and toolchain specs are parsed on the host, which may have older versions of RPM.
+    """
+
+    if Path(spec_path).stem not in toolchain_specs:
+        return True
+
+    with open(spec_path) as file:
+        contents = file.read()
+        
+    if any_patch_tag.search(contents) is None:
+        return True
+
+    if zero_patch_tag.search(contents) is None:
+        print(f"""
+ERROR: detected a toolchain spec with invalid 'Patch' tags.
+
+    If a toolchain spec contains a patch, it must have one "zero" patch tag: 'Patch' or 'Patch0'.
+    More patches are allowed. Patch tags with higher numbers have no specific requirements.
+""")
+        return False
+
+    return True
+
+
+def check_spec(spec_path, toolchain_specs):
     spec_correct = True
 
     print(f"Checking {spec_path}")
@@ -140,6 +173,9 @@ def check_spec(spec_path):
 
     if not check_license_verification(spec_path):
         spec_correct = False
+    
+    if not check_toolchain_patch_lines(spec_path, toolchain_specs):
+        spec_correct = False
 
     return spec_correct
 
@@ -147,16 +183,21 @@ def check_spec(spec_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Tool for checking if an RPM spec file follows CBL-Mariner's guidelines.")
+    parser.add_argument('toolchain_specs',
+                        type=argparse.FileType('r'),
+                        help='Path to a file containing a list of toolchain specs.')
     parser.add_argument('specs',
                         metavar='spec_path',
                         type=argparse.FileType('r'),
                         nargs='+',
                         help='path to an RPM spec file')
     args = parser.parse_args()
+    
+    toolchain_specs = set(args.toolchain_specs.read().splitlines())
 
     specs_correct = True
     for spec in args.specs:
-        if not check_spec(spec.name):
+        if not check_spec(spec.name, toolchain_specs):
             specs_correct = False
 
     if not specs_correct:
