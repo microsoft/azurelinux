@@ -1,5 +1,8 @@
 %global srcname SQLAlchemy
 
+# Added global debug_package to fix the failure of empty debugfiles.list
+%global debug_package %{nil}
+
 %global python_pkg_extras \
     asyncio \
     mssql_pymssql \
@@ -34,6 +37,7 @@ BuildRequires:  python3-greenlet >= 1.0
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
+BuildRequires:  python3-typing-extensions
 
 %description
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
