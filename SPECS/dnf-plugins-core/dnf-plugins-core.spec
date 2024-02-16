@@ -8,8 +8,8 @@
 
 Summary:        Core Plugins for DNF
 Name:           dnf-plugins-core
-Version:        4.0.24
-Release:        3%{?dist}
+Version:        4.5.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -198,6 +198,17 @@ Provides:       yum-plugin-versionlock = %{version}-%{release}
 Version lock plugin takes a set of name/versions for packages and excludes all other
 versions of those packages. This allows you to e.g. protect packages from being
 updated by newer versions.
+	
+%package -n python3-dnf-plugin-modulesync
+Summary:        Download module metadata and packages and create repository
+Requires:       python3-%{name} = %{version}-%{release}
+Requires:       createrepo_c >= 0.17.4
+Provides:       dnf-plugin-modulesync =  %{version}-%{release}
+Provides:       dnf-command(modulesync)
+ 
+%description -n python3-dnf-plugin-modulesync
+Download module metadata from all enabled repositories, module artifacts and profiles of matching modules and create
+repository.
 
 %prep
 %autosetup
@@ -214,6 +225,13 @@ popd
 pushd build-py3
   %make_install
 popd
+mkdir -p %{buildroot}%{_unitdir}/system-update.target.wants/
+pushd %{buildroot}%{_unitdir}/system-update.target.wants/
+  ln -sr ../dnf-system-upgrade.service
+popd
+ln -sf %{_mandir}/man8/dnf-system-upgrade.8.gz %{buildroot}%{_mandir}/man8/dnf-offline-upgrade.8.gz
+ln -sf %{_mandir}/man8/dnf-system-upgrade.8.gz %{buildroot}%{_mandir}/man8/dnf-offline-distrosync.8.gz
+
 %find_lang %{name}
 %if %{with yumutils}
   mv %{buildroot}%{_libexecdir}/dnf-utils-3 %{buildroot}%{_libexecdir}/dnf-utils
@@ -266,6 +284,9 @@ python3 -m unittest discover -t . -s tests/
 %{_mandir}/man8/dnf-repograph.*
 %{_mandir}/man8/dnf-repomanage.*
 %{_mandir}/man8/dnf-reposync.*
+%{_mandir}/man8/dnf-system-upgrade.*
+%{_mandir}/man8/dnf-offline-upgrade.*
+%{_mandir}/man8/dnf-offline-distrosync.*
 %if %{with yumcompatibility}
 %{_mandir}/man1/yum-changelog.*
 %{_mandir}/man8/yum-copr.*
@@ -296,6 +317,7 @@ python3 -m unittest discover -t . -s tests/
 %{python3_sitelib}/dnf-plugins/repograph.py
 %{python3_sitelib}/dnf-plugins/repomanage.py
 %{python3_sitelib}/dnf-plugins/reposync.py
+%{python3_sitelib}/dnf-plugins/system_upgrade.py
 %{python3_sitelib}/dnf-plugins/__pycache__/builddep.*
 %{python3_sitelib}/dnf-plugins/__pycache__/changelog.*
 %{python3_sitelib}/dnf-plugins/__pycache__/config_manager.*
@@ -312,6 +334,10 @@ python3 -m unittest discover -t . -s tests/
 %{python3_sitelib}/dnf-plugins/__pycache__/repomanage.*
 %{python3_sitelib}/dnf-plugins/__pycache__/reposync.*
 %{python3_sitelib}/dnfpluginscore/
+%{python3_sitelib}/dnf-plugins/__pycache__/system_upgrade.*
+%{_unitdir}/dnf-system-upgrade.service
+%{_unitdir}/dnf-system-upgrade-cleanup.service
+%{_unitdir}/system-update.target.wants/dnf-system-upgrade.service
 
 %if %{with yumutils}
 %files -n %{yum_utils_subpackage_name}
@@ -410,7 +436,15 @@ python3 -m unittest discover -t . -s tests/
 %exclude %{_mandir}/man5/yum-versionlock.*
 %endif
 
+%files -n python3-dnf-plugin-modulesync
+%{python3_sitelib}/dnf-plugins/modulesync.*
+%{python3_sitelib}/dnf-plugins/__pycache__/modulesync.*
+%{_mandir}/man8/dnf-modulesync.*
+
 %changelog
+* Fri Feb 16 2024 Yash Panchal <yashpanchal@microsoft.com> - 4.5.0-1
+- Update to 4.5.0
+
 * Mon May 22 2023 Olivia Crain <oliviacrain@microsoft.com> - 4.0.24-3
 - Fix tests by replacing nose with built-in unittests runner, per upstream recommendation
 
