@@ -1876,9 +1876,8 @@ run_configure() {
     echo "==="
 }
 
-# XXX for now disable meson cant find it --enable-gnutls \
-# --audio-drv-list=pipewire,pa,sdl,alsa,%{?jack_drv}oss \ For azlinux none
-# --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \ 2.0
+# XXX for now remove gnutls meson cant find it --enable-gnutls \
+# --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss Same as CBLM 2.0
 
 pushd %{qemu_kvm_build}
 run_configure \
@@ -1997,6 +1996,8 @@ run_configure \
   --enable-xkbcommon \
 %endif
   \
+  \
+  --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
   --target-list-exclude=moxie-softmmu \
   --with-default-devices \
   --enable-auth-pam \
