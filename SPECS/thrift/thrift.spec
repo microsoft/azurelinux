@@ -96,7 +96,9 @@ Patch2: configure-java-prefix.patch
 # BuildRequires for language-specific bindings are listed under these
 # subpackages, to facilitate enabling or disabling individual language
 # bindings in the future
- 
+
+BuildRequires:  pkgconfig(libcrypto)
+
 %if 0%{?want_java} > 0
 BuildRequires: ant >= 1.7
 %endif
