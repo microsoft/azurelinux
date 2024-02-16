@@ -63,7 +63,7 @@ findutils-lang-4.9.0-1.azl3.aarch64.rpm
 gettext-0.22-1.azl3.aarch64.rpm
 gzip-1.13-1.azl3.aarch64.rpm
 make-4.4.1-1.azl3.aarch64.rpm
-patch-2.7.6-8.azl3.aarch64.rpm
+patch-2.7.6-9.azl3.aarch64.rpm
 libcap-ng-0.8.3-1.azl3.aarch64.rpm
 libcap-ng-devel-0.8.3-1.azl3.aarch64.rpm
 util-linux-2.39.2-1.azl3.aarch64.rpm
@@ -204,8 +204,8 @@ libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
 pcre-8.45-2.azl3.aarch64.rpm
 pcre-libs-8.45-2.azl3.aarch64.rpm
-lua-5.4.4-1.azl3.aarch64.rpm
-lua-libs-5.4.4-1.azl3.aarch64.rpm
+lua-5.4.4-2.azl3.aarch64.rpm
+lua-libs-5.4.4-2.azl3.aarch64.rpm
 mariner-rpm-macros-2.0-24.azl3.noarch.rpm
 mariner-check-macros-2.0-24.azl3.noarch.rpm
 tdnf-3.5.2-3.azl3.aarch64.rpm
@@ -237,10 +237,10 @@ ca-certificates-base-3.0.0-3.azl3.noarch.rpm
 ca-certificates-3.0.0-3.azl3.noarch.rpm
 dwz-0.14-2.azl3.aarch64.rpm
 unzip-6.0-20.azl3.aarch64.rpm
-python3-3.9.14-8.azl3.aarch64.rpm
-python3-devel-3.9.14-8.azl3.aarch64.rpm
-python3-libs-3.9.14-8.azl3.aarch64.rpm
-python3-setuptools-3.9.14-8.azl3.noarch.rpm
+python3-3.9.14-9.azl3.aarch64.rpm
+python3-devel-3.9.14-9.azl3.aarch64.rpm
+python3-libs-3.9.14-9.azl3.aarch64.rpm
+python3-setuptools-3.9.14-9.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm
 libselinux-3.5-1.azl3.aarch64.rpm
