@@ -9721,8 +9721,8 @@
         "type": "other",
         "other": {
           "name": "libisofs",
-          "version": "1.5.4",
-          "downloadUrl": "https://dev.lovelyhq.com/libburnia/libisofs/archive/release-1.5.4.tar.gz"
+          "version": "1.5.6",
+          "downloadUrl": "https://files.libburnia-project.org/releases/libisofs-1.5.6.tar.gz"
         }
       }
     },

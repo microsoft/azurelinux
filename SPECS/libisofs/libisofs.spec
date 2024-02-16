@@ -1,13 +1,12 @@
 Summary:  Library to create ISO 9660 disk images
 Name:     libisofs
-Version:  1.5.4
+Version:  1.5.6
 Release:  1%{?dist}
 # make_isohybrid_mbr.c is under LGPLv2+, the rest under GPLv2+
 License:  GPLv2+ and LGPLv2+
 Group:    System Environment/Libraries
 URL:      https://dev.lovelyhq.com/libburnia/libisofs
-Source0:  https://dev.lovelyhq.com/libburnia/libisofs/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:   libisofs-0.6.16-multilib.patch
+Source0:  https://files.libburnia-project.org/releases/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -36,8 +35,7 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q -n %{name}
-%patch 0 -p1 -b .multilib
+%setup -q
 
 libtoolize --force
 autoreconf --force --install
@@ -72,6 +70,9 @@ rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 %{_libdir}/pkgconfig/%{name}*.pc
 
 %changelog
+* Fri Feb 16 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.5.6-1
+- Upgrade to 1.5.6.
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.5.4-1
 - Upgrade to 1.5.4.
 
