@@ -28,7 +28,7 @@ Source2:        https://github.com/microsoft/go/releases/download/%{bootstrap_co
 Patch0:         go14_bootstrap_aarch64.patch
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
-Provides:       msft-golang
+Provides:       msft-golang = %{version}-%{release}
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
