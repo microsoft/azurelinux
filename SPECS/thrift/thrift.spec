@@ -361,9 +361,7 @@ find %{buildroot} -name \*.jar -a \! -name \*thrift\* -exec rm -f '{}' \;
 # Move perl files into appropriate places
 find %{buildroot} -name \*.pod -exec rm -f '{}' \;
 find %{buildroot} -name .packlist -exec rm -f '{}' \;
-find %{buildroot}/usr/lib/perl5 -type d -empty -delete
-mkdir -p %{buildroot}/%{perl_vendorlib}/
-mv %{buildroot}/usr/lib/perl5/* %{buildroot}/%{perl_vendorlib}
+
  
 %if 0%{?want_php} != 0
  
