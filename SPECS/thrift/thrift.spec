@@ -114,7 +114,6 @@ BuildRequires: libstdc++-devel
 BuildRequires: libtool
 BuildRequires: openssl-devel
 BuildRequires: qt5-qtbase-devel
-BuildRequires: texlive
 BuildRequires: zlib-devel
  
 %if 0%{?want_golang} > 0
