@@ -25,7 +25,15 @@ License:        GPLv3
 URL:            https://netplan.io/
 # Source0:      https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+
+# netplan build optionally depends on pyflakes, but there is a hard check for it
+# in the meson file. This patch disabled that check.
 Patch0:         remove-flakes-check.patch
+
+# Some unit tests parse an openvswitch related config that requires openvswitch
+# to be installed. Using a different fixture completes the test without the ovs
+# depencency.
+Patch1:         unit-test-no-ovs.patch
 
 BuildRequires:  bash-completion-devel
 BuildRequires:  bash-devel
@@ -44,7 +52,8 @@ BuildRequires:  util-linux-devel
 # For tests
 BuildRequires:  iproute
 BuildRequires:  libcmocka-devel
-BuildRequires:  openvswitch
+# Blocked: not building on 3.0 yet
+# BuildRequires:  openvswitch
 BuildRequires:  python%{python3_pkgversion}-cffi
 BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-netifaces
