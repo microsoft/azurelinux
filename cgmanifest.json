@@ -30560,8 +30560,8 @@
         "type": "other",
         "other": {
           "name": "thrift",
-          "version": "0.19.0",
-          "downloadUrl": "https://dlcdn.apache.org/thrift/0.19.0/thrift-0.19.0.tar.gz"
+          "version": "0.15.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
         }
       }
     }
