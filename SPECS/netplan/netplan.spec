@@ -27,13 +27,15 @@ URL:            https://netplan.io/
 Source0:        %{name}-%{version}.tar.gz
 
 # netplan build optionally depends on pyflakes, but there is a hard check for it
-# in the meson file. This patch disabled that check.
+# in the meson file. This patch disables that check.
 Patch0:         remove-flakes-check.patch
 
 # Some unit tests parse an openvswitch related config that requires openvswitch
-# to be installed. Using a different fixture completes the test without the ovs
-# depencency.
-Patch1:         unit-test-no-ovs.patch
+# to be installed.
+Patch1:         skip-ovs-tests.patch
+
+# Fix bug in netplan when python3-rich is not present.
+Patch2:         rich-import-failure-no-log.patch
 
 BuildRequires:  bash-completion-devel
 BuildRequires:  bash-devel
@@ -105,8 +107,15 @@ Currently supported backends are systemd-networkd and NetworkManager.
 %dir %{_prefix}/lib/%{name}
 %{_libexecdir}/%{name}/
 %{_datadir}/bash-completion/completions/%{name}
+
+# Check if sitearch and archlib are different to avoid "File listed twice"
+# warning.
+%if "%{python3_sitelib}" == "%{python3_sitearch}"
+%{python3_sitelib}/%{name}/
+%else
 %{python3_sitelib}/%{name}/
 %{python3_sitearch}/%{name}/
+%endif
 
 # ------------------------------------------------------------------------------------------------
 
@@ -214,7 +223,7 @@ rmdir %{buildroot}/lib/netplan
 rmdir %{buildroot}/lib
 
 # Remove __pycache__
-rm -rf %{buildroot}/usr/lib/python3.*/site-packages/netplan/__pycache__
+rm -rf %{buildroot}%{python3_sitelib}/%{name}/__pycache__
 
 # Pre-create the config directories
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
