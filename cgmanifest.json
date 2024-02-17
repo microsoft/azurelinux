@@ -2437,8 +2437,8 @@
         "type": "other",
         "other": {
           "name": "dconf",
-          "version": "0.36.0",
-          "downloadUrl": "https://download.gnome.org/sources/dconf/0.36/dconf-0.36.0.tar.xz"
+          "version": "0.40.0",
+          "downloadUrl": "https://download.gnome.org/sources/dconf/0.40/dconf-0.40.0.tar.xz"
         }
       }
     },
