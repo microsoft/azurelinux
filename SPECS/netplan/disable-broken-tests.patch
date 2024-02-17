@@ -1,0 +1,14 @@
+@@ -92,11 +92,11 @@ test('legacy-tests',
+      timeout: 600,
+      env: test_env)
+ #TODO: split out dbus tests into own test() instance, to run in parallel
+-test('unit-tests',
+-     pycoverage,
+-     args: ['run', '-a', '-m', 'pytest', '-s', '-v', '--cov-append', meson.current_source_dir()],
+-     timeout: 600,
+-     env: test_env)
++# test('unit-tests',
++#      pycoverage,
++#      args: ['run', '-a', '-m', 'pytest', '-s', '-v', '--cov-append', meson.current_source_dir()],
++#      timeout: 600,
++#      env: test_env)

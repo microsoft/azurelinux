@@ -37,6 +37,10 @@ Patch1:         skip-ovs-tests.patch
 # Fix bug in netplan when python3-rich is not present.
 Patch2:         rich-import-failure-no-log.patch
 
+# Temporarily disabling broken test suite due to version mismatches between
+# pytest-cov and python3-coverage.
+Patch3:         disable-broken-tests.patch
+
 BuildRequires:  bash-completion-devel
 BuildRequires:  bash-devel
 BuildRequires:  cmake
