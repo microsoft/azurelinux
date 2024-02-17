@@ -60,7 +60,7 @@ IO::Socket::IP, so you can perform socket operations directly on it too.
 
 %prep
 %setup -q -n HTTP-Daemon-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

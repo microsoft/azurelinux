@@ -52,7 +52,7 @@ license.
 
 %prep
 %setup -q -a 1
-%patch0 -p0
+%patch 0 -p0
 
 %build
 %{cmake} -DFREEGLUT_BUILD_STATIC_LIBS=OFF .

@@ -43,8 +43,8 @@ needed for developing with %{name}.
 
 %prep
 %setup -q
-%patch0  -b .fedora
-%patch1 -p1 -b .manhelp
+%patch 0  -b .fedora
+%patch 1 -p1 -b .manhelp
 
 %build
 autoconf

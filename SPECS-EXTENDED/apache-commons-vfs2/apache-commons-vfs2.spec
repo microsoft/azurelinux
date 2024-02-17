@@ -80,8 +80,8 @@ cp %{SOURCE1} .
 cp %{SOURCE2} .
 cp %{SOURCE3} commons-vfs2/build.xml
 cp %{SOURCE4} commons-vfs2-examples/build.xml
-%patch0 -p1 -b .build.xml
-%patch1 -p1 -b .provider.xml
+%patch 0 -p1 -b .build.xml
+%patch 1 -p1 -b .provider.xml
 
 %pom_remove_plugin :apache-rat-plugin
 

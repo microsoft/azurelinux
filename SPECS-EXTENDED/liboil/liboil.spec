@@ -39,7 +39,7 @@ extended instructions provided by modern CPUs (Altivec, MMX, SSE, etc.).
 
 %prep
 %setup -q
-%patch4 -p0 -b .disable-ppc64-opts
+%patch 4 -p0 -b .disable-ppc64-opts
 
 %build
 %configure

@@ -46,7 +46,7 @@ Readonly:
 %setup -q -n Readonly-%{version}
 
 # Fix script interpreter for test suite since we're packaging it
-%patch0
+%patch 0
 
 %build
 perl Build.PL --installdirs=vendor

@@ -4,7 +4,7 @@ Summary:        Library to parse raw trace event formats
 #%%global commitdate 20201009
 #%%global shortcommit %%(c=%%{commit}; echo ${c:0:7})
 Name:           libtraceevent
-Version:        1.7.2
+Version:        1.8.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ rm -rf %{buildroot}/%{_libdir}/libtraceevent.a
 %{_libdir}/pkgconfig/libtraceevent.pc
 
 %changelog
+* Tue Feb 13 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.8.2-1
+- Update to 1.8.2
+
 * Tue Jul 18 2023 Saranya R <rsaranya@microsoft.com> - 1.7.2-1
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - License verified

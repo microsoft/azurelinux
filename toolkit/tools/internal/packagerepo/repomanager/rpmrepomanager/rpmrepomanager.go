@@ -37,7 +37,7 @@ func CreateRepo(repoDir string) (err error) {
 	}
 
 	// Create a new repodata
-	_, stderr, err := shell.Execute("createrepo", repoDir)
+	_, stderr, err := shell.Execute("createrepo", "--compatibility", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}
@@ -49,7 +49,7 @@ func CreateRepo(repoDir string) (err error) {
 // it if the metadata files already exist.
 func CreateOrUpdateRepo(repoDir string) (err error) {
 	// Create or update repodata
-	_, stderr, err := shell.Execute("createrepo", "--update", repoDir)
+	_, stderr, err := shell.Execute("createrepo", "--compatibility", "--update", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}

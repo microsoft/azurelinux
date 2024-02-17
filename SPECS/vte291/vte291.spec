@@ -76,7 +76,7 @@ emulator library.
 
 %prep
 %setup -q -n vte-%{version}
-%patch100 -p1 -b .cntnr-precmd-preexec-scroll
+%patch 100 -p1 -b .cntnr-precmd-preexec-scroll
 %if 0%{?flatpak}
 # Install user units where systemd macros expect them
 sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build

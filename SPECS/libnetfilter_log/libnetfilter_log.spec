@@ -1,21 +1,22 @@
 %define libnfnetlink 1.0.0
 
 Name:           libnetfilter_log
-Version:        1.0.1
-Release:        22%{?dist}
+Version:        1.0.2
+Release:        1%{?dist}
 Summary:        Netfilter logging userspace library
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://netfilter.org
 Source0:        https://netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
-Patch0:		libnetfilter_log-sysheader.patch
 
 BuildRequires:  gcc
 BuildRequires:  libnfnetlink-devel >= %{libnfnetlink}
 BuildRequires:  make
 BuildRequires:  pkg-config
 BuildRequires:  kernel-headers
+BuildRequires:  libmnl
+BuildRequires:  libmnl-devel
 
 %description
 libnetfilter_log is a userspace library providing interface to packets that
@@ -41,7 +42,6 @@ libnetfilter_log is used by ulogd2.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 %configure --disable-static --disable-rpath
@@ -68,8 +68,15 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*.h
 %{_libdir}/pkgconfig/%{name}.pc
+%{_libdir}/pkgconfig/%{name}_libipulog.pc
 
 %changelog
+* Mon Jan 29 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> -1.0.2-1
+- Bump version to 1.0.2 from 1.0.1
+- Removing the patch file since the contents of the files it patches have changed in this release leading to incorrect patch application.
+- Adding libmnl-devel to the BuildRequires for the package.
+- Adding %{name}_libipulog.pc to the list of packaged files
+
 * Tue Dec 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.0.1-22
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
