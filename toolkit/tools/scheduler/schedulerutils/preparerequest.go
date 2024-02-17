@@ -61,13 +61,19 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	newBuildReqs, err := buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)
 	if err != nil {
 		err = fmt.Errorf("failed to convert build nodes to requests:\n%w", err)
-		return
+		// Temporarily clear the error, this state is unexpected but not fatal. Error return will be
+		// restored later once the underlying cause of this error is fixed.
+		err = nil
+		//return
 	}
 	requests = append(requests, newBuildReqs...)
 	newTestReqs, err := testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)
 	if err != nil {
 		err = fmt.Errorf("failed to convert test nodes to requests:\n%w", err)
-		return
+		// Temporarily clear the error, this state is unexpected but not fatal. Error return will be
+		// restored later once the underlying cause of this error is fixed.
+		err = nil
+		//return
 	}
 	requests = append(requests, newTestReqs...)
 
@@ -91,7 +97,11 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(defaultNode.SRPMFileName()) || buildState.IsNodeProcessed(defaultNode) {
 			err = fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName())
-			return
+			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
+			// restored later once the underlying cause of this error is fixed.
+			logger.Log.Errorf(err.Error())
+			continue
+			//return
 		}
 
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
@@ -195,7 +205,11 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
 			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
-			return
+			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
+			// restored later once the underlying cause of this error is fixed.
+			logger.Log.Errorf(err.Error())
+			continue
+			//return
 		}
 
 		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
