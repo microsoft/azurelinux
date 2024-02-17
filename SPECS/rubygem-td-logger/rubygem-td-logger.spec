@@ -2,8 +2,8 @@
 %global gem_name td-logger
 Summary:        Treasure Data logging library
 Name:           rubygem-%{gem_name}
-Version:        0.3.27
-Release:        2%{?dist}
+Version:        0.3.28
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Feb 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.28-1
+- Auto-upgrade to 0.3.28 - azl3.0
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.3.27-2
 - Build from .tar.gz source.
 

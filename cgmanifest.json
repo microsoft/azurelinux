@@ -26655,8 +26655,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-td-logger",
-          "version": "0.3.27",
-          "downloadUrl": "https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v0.3.27.tar.gz"
+          "version": "0.3.28",
+          "downloadUrl": "https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v0.3.28.tar.gz"
         }
       }
     },
