@@ -23,8 +23,6 @@ BuildRequires:  %{_bindir}/sphinx-build-3
 BuildRequires:  cmake
 BuildRequires:  gettext
 
-Requires:       python3-%{name} = %{version}-%{release}
-
 Provides:       dnf-command(builddep)
 Provides:       dnf-command(changelog)
 Provides:       dnf-command(config-manager)
@@ -265,8 +263,9 @@ ln -sf %{_mandir}/man1/%{yum_utils_subpackage_name}.1.gz %{buildroot}%{_mandir}/
 %endif
 
 %check
-export PYTHONPATH=./plugins
-python3 -m unittest discover -t . -s tests/
+pushd build-py3
+ctest -VV
+popd
 
 %files
 %{_mandir}/man8/dnf-builddep.*
