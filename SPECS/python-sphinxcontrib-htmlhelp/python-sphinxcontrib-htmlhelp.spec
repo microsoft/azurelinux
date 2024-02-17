@@ -2,21 +2,22 @@
 
 Summary:        Sphinx extension for HTML help files
 Name:           python-%{pypi_name}
-Version:        2.0.0
-Release:        5%{?dist}
+Version:        2.0.5
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
-# Upstream fix: https://github.com/sphinx-doc/sphinxcontrib-htmlhelp/pull/16
-Patch0:         test_htmlhelp_path_fix.patch
 
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-wheel
+BuildRequires:  python-flit-core
 
 %if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
@@ -41,17 +42,20 @@ Summary:        %{summary}
 sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
 
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}
+%autosetup -n sphinxcontrib_htmlhelp-%{version}
 find -name '*.mo' -delete
+
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
@@ -68,17 +72,20 @@ popd
 %find_lang sphinxcontrib.htmlhelp
 
 %check
-pip3 install more-itertools Sphinx webencodings
-python3 -m pytest
+pip3 install sphinx webencodings exceptiongroup iniconfig tomli
+%py3_check_import sphinxcontrib.htmlhelp
+%{__python3} -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.htmlhelp.lang
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_htmlhelp-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_htmlhelp-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/sphinxcontrib_htmlhelp*.dist-info
 
 %changelog
+* Fri Feb 16 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.0.5-1
+- Upgrade to latest version.
+
 * Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.0-5
 - Fixing ptests.
 
