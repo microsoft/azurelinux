@@ -8,7 +8,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        %{pypi_source}
+Source0:        https://files.pythonhosted.org/packages/8a/03/2f9d699fbfdf03ecb3b6d0e2a268a8998d009f2a9f699c2dcc936899257d/sphinxcontrib_htmlhelp-2.0.5.tar.gz#/%{pypi_name}-#{version}.tar.gz
 
 BuildArch:      noarch
 
