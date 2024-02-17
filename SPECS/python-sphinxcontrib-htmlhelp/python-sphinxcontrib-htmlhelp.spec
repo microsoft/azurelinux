@@ -24,7 +24,6 @@ BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils
 BuildRequires:  python%{python3_pkgversion}-html5lib
-BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-pygments
 BuildRequires:  python%{python3_pkgversion}-pytest
