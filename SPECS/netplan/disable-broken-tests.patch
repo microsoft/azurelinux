@@ -1,3 +1,7 @@
+diff --git a/meson.build b/meson.build
+index 66cda8b..5c82f28 100644
+--- a/meson.build
++++ b/meson.build
 @@ -92,11 +92,11 @@ test('legacy-tests',
       timeout: 600,
       env: test_env)
@@ -12,3 +16,6 @@
 +#      args: ['run', '-a', '-m', 'pytest', '-s', '-v', '--cov-append', meson.current_source_dir()],
 +#      timeout: 600,
 +#      env: test_env)
+ 
+ #TODO: the coverage section should probably be cleaned up a bit
+ if get_option('b_coverage')
