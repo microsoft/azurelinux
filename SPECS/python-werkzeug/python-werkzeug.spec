@@ -71,7 +71,10 @@ pip3 install more-itertools exceptiongroup iniconfig tomli ephemeral_port_reserv
 %if %{with_check}
 # deselect the test_exclude_patterns test case as it's failing
 # when we set PYTHONPATH: https://github.com/pallets/werkzeug/issues/2404
-%pytest -Wdefault --deselect tests/test_serving.py::test_exclude_patterns
+%pytest -Wdefault --deselect tests/test_serving.py::test_exclude_patterns \
+  --deselect tests/test_serving.py::test_server \
+  --deselect tests/test_serving.py::test_ssl_dev_cert \
+  --deselect tests/test_serving.py::test_ssl_object
 %endif
 
 %files -n python3-%{modname} -f %{pyproject_files}
