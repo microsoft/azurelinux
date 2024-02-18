@@ -7,13 +7,42 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://github.com/kubernetes/node-problem-detector
-Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         0001-remove-arch-specific-logic-from-Makefile.patch
+#Source0:        https://github.com/kubernetes/%%{name}/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/kubernetes/%%{name}/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#
+Source1:        %{name}-%{version}-vendor.tar.gz
+# Below is a manually created tarball, no download link.
+# We're using pre-populated Go modules from this tarball, since network is disabled during build time.
+# How to re-build this file:
+#   1. wget https://github.com/kubernetes/%%{name}/archive/refs/tags/v%%{version}.tar.gz#/%%{name}-%%{version}.tar.gz
+#   2. tar -xf %%{name}-%%{version}.tar.gz
+#   3. cd %%{name}-%%{version}/test
+#   4. go mod vendor
+#   5. tar  --sort=name \
+#           --mtime="2021-04-26 00:00Z" \
+#           --owner=0 --group=0 --numeric-owner \
+#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
+#           -cf %%{name}-%%{version}-test-vendor.tar.gz vendor
+#
+Source2:        %{name}-%{version}-test-vendor.tar.gz
+Patch0:         0001-remove-arch-specific-logic-from-makefile.patch
 Patch1:         0001-add-Mariner-and-Azure-Linux-OS-Versions.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
 Requires:       azurelinux-release
-%if %{with_check}
+%if %{with check}
 BuildRequires:  azurelinux-release
 %endif
 
@@ -33,6 +62,12 @@ Default configuration files for node-problem-detector
 %autosetup -p1 
 
 %build
+# create vendor folder from the vendor tarball
+tar -xf %{SOURCE1} --no-same-owner
+pushd test
+tar -xf %{SOURCE2} --no-same-owner
+popd
+
 %make_build build-binaries VERSION=%{version}
 
 %install
