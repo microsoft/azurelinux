@@ -24193,8 +24193,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx_rtd_theme",
-          "version": "1.0.0",
-          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/1.0.0/sphinx_rtd_theme-1.0.0.tar.gz"
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/rtfd/sphinx_rtd_theme/archive/2.0.0/sphinx_rtd_theme-2.0.0.tar.gz"
         }
       }
     },

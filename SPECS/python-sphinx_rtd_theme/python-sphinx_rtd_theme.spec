@@ -1,8 +1,8 @@
 %global srcname sphinx_rtd_theme
 Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
-Version:        1.0.0
-Release:        3%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -89,6 +89,9 @@ pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
 %{python3_sitelib}/%{srcname}*
 
 %changelog
+* Mon Feb 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - 3.0 - Upgrade
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.0.0-3
 - Add Provides python3dist(sphinx-rtd-theme)
 
