@@ -24274,8 +24274,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-websupport",
-          "version": "1.2.4",
-          "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.4.tar.gz"
+          "version": "1.2.7",
+          "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.7.tar.gz"
         }
       }
     },

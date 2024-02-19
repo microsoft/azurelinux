@@ -1,8 +1,8 @@
 %define pkgname sphinxcontrib-websupport
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pkgname}
-Version:        1.2.4
-Release:        3%{?dist}
+Version:        1.2.7
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ tox
 %{python3_sitelib}/*.pth
 
 %changelog
+* Mon Feb 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.7-1
+- Auto-upgrade to 1.2.7 - 3.0 - Upgrade
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-3
 - Updating source URL.
 
