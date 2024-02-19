@@ -336,7 +336,7 @@ Distribution:   Azure Linux
 %endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %ifnarch %{ix86}
-%if 0%{?fedora} || 0%{?rhel} > 9
+%if 0%{?fedora} || 0%{?rhel} > 9 || 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
 %else
 %define requires_package_virtiofsd Requires: virtiofsd
