@@ -15494,8 +15494,8 @@
         "type": "other",
         "other": {
           "name": "pam",
-          "version": "1.5.3",
-          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.3/Linux-PAM-1.5.3.tar.xz"
+          "version": "1.6.0",
+          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.6.0/Linux-PAM-1.6.0.tar.xz"
         }
       }
     },

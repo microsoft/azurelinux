@@ -1,6 +1,6 @@
 Summary:        Linux Pluggable Authentication Modules
 Name:           pam
-Version:        1.5.3
+Version:        1.6.0
 Release:        1%{?dist}
 License:        BSD and GPLv2+
 URL:            https://github.com/linux-pam/linux-pam
@@ -102,6 +102,9 @@ EOF
 %{_libdir}/pkgconfig/pamc.pc
 
 %changelog
+* Mon Feb 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.0-1
+- Auto-upgrade to 1.6.0 - none
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
 - Auto-upgrade to 1.5.3 - Azure Linux 3.0 - package upgrades
 
