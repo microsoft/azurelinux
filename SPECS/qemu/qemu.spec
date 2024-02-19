@@ -625,11 +625,10 @@ BuildRequires: brlapi-devel
 # gluster block driver
 BuildRequires: glusterfs-api-devel
 %endif
+BuildRequires: gnutls-devel
 %if %{have_ui}
 # gtk related?
 BuildRequires: glib2-devel
-BuildRequires: gnutls-devel
-BuildRequires: gnutls
 # GTK frontend
 BuildRequires: gtk3-devel
 BuildRequires: vte291-devel
@@ -1877,7 +1876,6 @@ run_configure() {
     echo "==="
 }
 
-# XXX for now remove gnutls meson cant find it --enable-gnutls \
 # --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss Same as CBLM 2.0
 
 pushd %{qemu_kvm_build}
@@ -1922,6 +1920,7 @@ run_configure \
   --enable-fdt=system \
 %endif
   --enable-gettext \
+  --enable-gnutls \
   --enable-tools \
   --enable-guest-agent \
   --enable-iconv \
@@ -3513,7 +3512,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
   brltty, libssh, pulseaudio, sdl
 - Disable all UI related subpackages (under have_ui variable)
 - Disable manpages to reduce dependency on python-sphinx
-- Remove --enable-gnults
 
 * Tue Dec 05 2023 Richard W.M. Jones <rjones@redhat.com> - 2:8.2.0-0.2.rc2
 - Bump and rebuild for xen 4.18.0
