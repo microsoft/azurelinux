@@ -3503,8 +3503,16 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
-* Wed Jan 10 2024 Kanika Nema <kanikanema@microsoft.com>  - 8.2.0-1
-- Initial import from fedora
+* Mon Feb 19 2024 Kanika Nema <kanikanema@microsoft.com>  - 8.2.0-1
+- Initial CBL-Mariner import from Fedora 40 (license: MIT)
+- License verified
+- Remove epoch to work with Azlinux release numbering
+- Add a global variable 'azl' to conditionally turn on/off config options
+- Disable packages based on CBLM 2.0 settings - ppc/sparc,
+  brltty, libssh, pulseaudio, sdl
+- Disable all UI related subpackages (under have_ui variable)
+- Disable manpages to reduce dependency on python-sphinx
+- Remove --enable-gnults
 
 * Tue Dec 05 2023 Richard W.M. Jones <rjones@redhat.com> - 2:8.2.0-0.2.rc2
 - Bump and rebuild for xen 4.18.0
