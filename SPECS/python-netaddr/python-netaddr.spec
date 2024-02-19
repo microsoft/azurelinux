@@ -12,12 +12,11 @@ Source0:        https://github.com/netaddr/netaddr/archive/refs/tags/%{version}.
 BuildArch:      noarch
 	
 BuildRequires:  python3-devel
+BuildRequires:  python3-pytest
 BuildRequires:  python3-wheel
 BuildRequires:  python3-pip
 BuildRequires:  pyproject-rpm-macros
-%if 0%{?with_check}
-BuildRequires:  python3-pytest
-%endif
+
 
 %global desc A network address manipulation library for Python\
 \

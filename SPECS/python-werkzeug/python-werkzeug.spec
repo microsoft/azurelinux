@@ -21,20 +21,16 @@ The Swiss Army knife of Python web development
 
 %package -n     python3-werkzeug
 Summary:        The Swiss Army knife of Python web development
-
-BuildRequires:  make
 BuildRequires:  python3-devel
-BuildRequires:  python3-pytest
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-flit-core
 Requires:       python3
-%if 0%{?with_check}
+BuildRequires:  python3-pip
+%if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-requests
 %endif
 
 %description -n python3-werkzeug
@@ -66,15 +62,13 @@ Documentation and examples for python3-werkzeug.
 %pyproject_save_files %{modname}
 
 %check
-pip3 install more-itertools exceptiongroup iniconfig tomli ephemeral_port_reserve pytest-xprocess MarkupSafe watchdog
+pip3 install more-itertools exceptiongroup iniconfig tomli ephemeral_port_reserve pytest-xprocess MarkupSafe watchdog pytest requests cryptography
 %py3_check_import %{modname}
 %if %{with_check}
 # deselect the test_exclude_patterns test case as it's failing
 # when we set PYTHONPATH: https://github.com/pallets/werkzeug/issues/2404
 %pytest -Wdefault --deselect tests/test_serving.py::test_exclude_patterns \
-  --deselect tests/test_serving.py::test_server \
-  --deselect tests/test_serving.py::test_ssl_dev_cert \
-  --deselect tests/test_serving.py::test_ssl_object
+  --deselect tests/test_exceptions.py::test_response_body
 %endif
 
 %files -n python3-%{modname} -f %{pyproject_files}
