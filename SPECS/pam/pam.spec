@@ -96,6 +96,9 @@ EOF
 %{_includedir}/*
 %{_mandir}/man3/*
 %{_docdir}/%{name}-%{version}/*
+%{_libdir}/pkgconfig/pam.pc
+%{_libdir}/pkgconfig/pam_misc.pc
+%{_libdir}/pkgconfig/pamc.pc
 
 %changelog
 * Mon Feb 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
