@@ -702,7 +702,8 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static glib2-static zlib-static
+BuildRequires: glibc-static >= 2.38-1
+BuildRequires: glib2-static zlib-static
 %if 0%{?fedora} >= 37
 BuildRequires: pcre2-static
 %else
