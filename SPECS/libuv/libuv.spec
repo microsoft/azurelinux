@@ -1,13 +1,14 @@
 Summary:        Cross-platform asynchronous I/O
 Name:           libuv
 Version:        1.43.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT AND CC-BY
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://libuv.org/
 Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz
+Patch0:         CVE-2024-24806.patch
 BuildRequires:  build-essential
 BuildRequires:  coreutils
 %if %{with_check}
@@ -35,7 +36,7 @@ Group:          Development/Libraries
 %{summary}.
 
 %prep
-%setup -q -n %{name}-v%{version}
+%autosetup -p1 -n %{name}-v%{version}
 
 %build
 ./autogen.sh
@@ -75,6 +76,9 @@ sudo -u test make -k check
 %{_libdir}/%{name}.a
 
 %changelog
+* Mon Feb 19 2024 Suresh Thelkar <sthelkar@microsoft.com> - 1.43.0-2
+- Patch for CVE-2024-24806
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.43.0-1
 - Upgrade to version 1.43.0
 - License Verified
