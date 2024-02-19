@@ -16,17 +16,16 @@
 #
 
 
-%define tarbase 2.9.0dev.9
 Summary:        A Text-Based WWW Browser
 Name:           lynx
-Version:        2.9.0~dev.9
-Release:        5%{?dist}
+Version:        2.9.0
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Networking/Web/Browsers
 URL:            https://lynx.invisible-island.net/
-Source0:        https://invisible-mirror.net/archives/%{name}/tarballs/%{name}%{tarbase}.tar.bz2
+Source0:        https://invisible-mirror.net/archives/%{name}/tarballs/%{name}%{version}.tar.bz2
 # changing default configuration
 Patch0:         lynx-charset.patch
 Patch1:         lynx-enable_xli.patch
@@ -50,7 +49,7 @@ based and therefore makes it possible to use WWW resources on text
 terminals.
 
 %prep
-%autosetup -p1 -n %{name}%{tarbase}
+%autosetup -p1 -n %{name}%{version}
 
 %build
 %configure --enable-debug --with-build-cflags="%{optflags} -DNO_BUILDSTAMP" \
@@ -97,6 +96,9 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
 %doc lynx_help samples scripts
 
 %changelog
+* Mon Feb 19 2023 Bala <balakumaran.kannan@microsoft.com> - 2.9.0-1
+- Upgrade to 2.9.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.9.0~dev.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
