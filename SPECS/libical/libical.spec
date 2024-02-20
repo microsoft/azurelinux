@@ -58,8 +58,6 @@ Development files needed for building things which link against %{name}-glib.
 %autosetup -p1 -S gendiff
 
 %build
-mkdir %{_target_platform}
-pushd %{_target_platform}
 %cmake \
   -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=true \
   -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=true \
@@ -71,16 +69,15 @@ pushd %{_target_platform}
 
 # avoid parallel-builds, gir generatation fails on slower archs
 %cmake_build -j1
-popd
 
 %install
-%cmake_install -C %{_target_platform}
+%cmake_install
 
 # This is just a private build tool, not meant to be installed
 rm %{buildroot}/%{_libexecdir}/libical/ical-glib-src-generator
 
 %check
-make test ARGS="-V" -C %{_target_platform}
+make test ARGS="-V"
 
 %ldconfig_scriptlets
 
