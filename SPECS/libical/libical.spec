@@ -74,7 +74,7 @@ pushd %{_target_platform}
 popd
 
 %install
-%cmake_install
+%cmake_install -C %{_target_platform}
 
 # This is just a private build tool, not meant to be installed
 rm %{buildroot}/%{_libexecdir}/libical/ical-glib-src-generator
