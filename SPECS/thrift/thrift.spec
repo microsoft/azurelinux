@@ -98,7 +98,7 @@ Patch2: configure-java-prefix.patch
 # bindings in the future
 
 BuildRequires:  pkgconfig(libcrypto)
-
+BuildRequires:python-six
 %if 0%{?want_java} > 0
 BuildRequires: ant >= 1.7
 %endif
