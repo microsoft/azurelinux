@@ -204,7 +204,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
 	freshness := res.Freshness
 	if freshness > g.GetMaxFreshness() {
-		err = fmt.Errorf("unexpected freshness value of %d for node '%s'. Should be: (<freshness> <= %d)", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+		err = fmt.Errorf("unexpected freshness value of (%d) for node (%s). Should be: (<freshness> <= (%d))", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
 		return
 	}
 
