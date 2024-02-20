@@ -149,6 +149,7 @@ Source1113:     univocity-parsers-2.9.1.tar.xz
 Source1114:     velocity-engine-2.3.tar.xz
 Source1115:     xbean-4.23.tar.xz
 Source1116:     xmlunit-2.9.1.tar.xz
+Source1117:     xmvn-generator-test4-1.2.1.tar.xz
 Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xz-java-1.9.tar.xz
 
@@ -212,11 +213,8 @@ do
   popd
 done
 
-
-
-# removing harmony files from the source as it causes build time error
-# sed  -i "/<excludeSourceMatching>/a\ \t<excludeSourceMatching>/org/apache/commons/compress/harmony/(pack200|unpack200)/.*</excludeSourceMatching>" project/commons-compress.xml
-
+# chnage java version to 11 
+sed -i "s|<release>17</release>|<release>11</release>|" project/xmvn-generator.xml
 
 %build
 export LC_ALL=en_US.UTF-8 
