@@ -10,9 +10,6 @@
 # Netplan library soversion major
 %global libsomajor 0.0
 
-# Force auto-byte-compilation to Python 3
-%global __python %{__python3}
-
 
 Name:           netplan
 Version:        0.107.1
@@ -23,8 +20,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        GPLv3
 URL:            https://netplan.io/
-# Source0:      https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # netplan build optionally depends on pyflakes, but there is a hard check for it
 # in the meson file. This patch disables that check.
@@ -74,10 +70,12 @@ Requires:       dbus
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
 
-# /usr/sbin/netplan is a Python 3 script that requires netifaces and PyYAML
+# /usr/sbin/netplan is a Python 3 script that requires netifaces, PyYAML and
+# optionally python-rich
 Requires:       python%{python3_pkgversion}-netifaces
 Requires:       python%{python3_pkgversion}-PyYAML
-# Requires:       python3dist(rich) # TBD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Not available in 3.0 yet
+# Requires:       python%{python3_pkgversion}-rich
 
 # Netplan requires a backend for configuration
 Requires:       %{name}-default-backend
@@ -90,10 +88,10 @@ Provides:       %{ubuntu_name} = %{version}-%{release}
 Provides:       %{ubuntu_name}%{?_isa} = %{version}-%{release}
 
 %description
-netplan reads network configuration from /etc/netplan/*.yaml which are written by administrators,
-installers, cloud image instantiations, or other OS deployments. During early boot, it generates
-backend specific configuration files in /run to hand off control of devices to a particular
-networking daemon.
+netplan reads network configuration from /etc/netplan/*.yaml which are written
+by administrators, installers, cloud image instantiations, or other OS deployments.
+During early boot, it generates backend specific configuration files in /run to
+hand off control of devices to a particular networking daemon.
 
 Currently supported backends are systemd-networkd and NetworkManager.
 
@@ -105,8 +103,6 @@ Currently supported backends are systemd-networkd and NetworkManager.
 %{_datadir}/dbus-1/system-services/io.netplan.Netplan.service
 %{_datadir}/dbus-1/system.d/io.netplan.Netplan.conf
 %{_systemdgeneratordir}/%{name}
-# %{_mandir}/man5/%{name}.5*
-# %{_mandir}/man8/%{name}*.8*
 %dir %{_sysconfdir}/%{name}
 %dir %{_prefix}/lib/%{name}
 %{_libexecdir}/%{name}/
@@ -128,10 +124,10 @@ Summary:        Network configuration tool using YAML (core library)
 Group:          System Environment/Libraries
 
 %description libs
-netplan reads network configuration from /etc/netplan/*.yaml which are written by administrators,
-installers, cloud image instantiations, or other OS deployments. During early boot, it generates
-backend specific configuration files in /run to hand off control of devices to a particular
-networking daemon.
+netplan reads network configuration from /etc/netplan/*.yaml which are written
+by administrators, installers, cloud image instantiations, or other OS deployments.
+During early boot, it generates backend specific configuration files in /run to
+hand off control of devices to a particular networking daemon.
 
 This package provides Netplan's core libraries.
 
@@ -147,10 +143,10 @@ Group:          Development/Libraries
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
-netplan reads network configuration from /etc/netplan/*.yaml which are written by administrators,
-installers, cloud image instantiations, or other OS deployments. During early boot, it generates
-backend specific configuration files in /run to hand off control of devices to a particular
-networking daemon.
+netplan reads network configuration from /etc/netplan/*.yaml which are written
+by administrators, installers, cloud image instantiations, or other OS deployments.
+During early boot, it generates backend specific configuration files in /run to
+hand off control of devices to a particular networking daemon.
 
 This package provides development headers and libraries for building applications using Netplan.
 
@@ -178,10 +174,10 @@ Provides:       %{name}-default-backend
 BuildArch:      noarch
 
 %description default-backend-networkd
-netplan reads network configuration from /etc/netplan/*.yaml which are written by administrators,
-installers, cloud image instantiations, or other OS deployments. During early boot, it generates
-backend specific configuration files in /run to hand off control of devices to a particular
-networking daemon.
+netplan reads network configuration from /etc/netplan/*.yaml which are written
+by administrators, installers, cloud image instantiations, or other OS deployments.
+During early boot, it generates backend specific configuration files in /run to
+hand off control of devices to a particular networking daemon.
 
 This package configures Netplan to use systemd-networkd as its backend.
 
@@ -198,13 +194,8 @@ This package configures Netplan to use systemd-networkd as its backend.
 # /usr/include/glib-2.0/glib/glib-autocleanups.h:28:3: error: 'ip_str' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 sed -e "s/werror=true/werror=false/g" -i meson.build
 
-# # Do not use Pandoc to format documentation
-# sed -e "s/pandoc/echo pandoc/g" -i Makefile
 cp doc/netplan.md doc/netplan.5
 cp doc/netplan.md doc/netplan.html
-# # No man8 files only man5 files are generated 
-# sed -e "s/*.8/*.5/g" -i Makefile
-# sed -e "s/man8/man5/g" -i Makefile
 
 %build
 
