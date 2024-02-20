@@ -25,6 +25,7 @@
 /SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-azure-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
+/SPECS-SIGNED/kernel-mshv-signed/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/grub2/* @microsoft/cbl-mariner-bootloader
 /SPECS/grubby/* @microsoft/cbl-mariner-bootloader
@@ -68,6 +69,7 @@
 
 /SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
 /SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers
+/SPECS-SIGNED/hvloader-signed/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-init/* @microsoft/cbl-mariner-provisioning
 /SPECS/walinuxagent/* @microsoft/cbl-mariner-provisioning
