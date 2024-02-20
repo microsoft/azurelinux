@@ -32,6 +32,7 @@ Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
 Requires:       SymCrypt
+Requires:       SymCrypt-openssl
 Requires:       tzdata
 
 %description base

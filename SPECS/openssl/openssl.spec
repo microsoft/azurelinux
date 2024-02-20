@@ -93,6 +93,7 @@ Requires: coreutils
 Requires: perl
 
 Recommends: SymCrypt
+Recommends: SymCrypt-openssl
 
 %description
 The OpenSSL toolkit provides support for secure communications between
