@@ -232,7 +232,7 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
 	var aggregateErr error
 	for sourceFile := range additionalFiles {
-		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
+		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
 			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
