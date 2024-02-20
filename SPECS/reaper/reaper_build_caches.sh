@@ -94,7 +94,7 @@ function buildReaperSources {
 	tar -xf reaper.tar.gz
 	cd cassandra-reaper-${VERSION}
 	export JAVA_HOME="/usr/lib/jvm/msopenjdk-17"
-	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-17/lib/jli"
+	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-17/lib"
 	echo "Building reaper in online mode."
 	mvn -DskipTests package
 	popd

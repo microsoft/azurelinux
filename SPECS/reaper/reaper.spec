@@ -64,7 +64,7 @@ Cassandra reaper is an open source tool that aims to schedule and orchestrate re
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-17/lib/jli"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-17/lib"
 
 pushd "$HOME"
 echo "Installing bower cache."
