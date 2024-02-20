@@ -246,7 +246,6 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 		return fmt.Errorf("failed to access (%s):\n%w", networkFileDir, ferr)
 	} else if !exists {
 		return fmt.Errorf("%s: no such path or directory", networkFileDir)
-		
 	}
 
 	logger.Log.Debugf("Start creating network file")
