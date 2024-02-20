@@ -13384,7 +13384,7 @@
         "other": {
           "name": "moby-containerd-cc",
           "version": "1.7.7",
-          "downloadUrl": "https://mitchzhu.blob.core.windows.net/public/moby-containerd-cc-1.7.7.tar.gz"
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },

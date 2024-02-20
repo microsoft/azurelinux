@@ -13,8 +13,7 @@ URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Mariner
 
-#Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source0:  https://mitchzhu.blob.core.windows.net/public/moby-containerd-cc-1.7.7.tar.gz
+Source0:  https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 Patch0: CVE-2023-47108.patch
@@ -80,8 +79,8 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
-* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.7-1
-- Auto-upgrade to 1.7.7
+* Tue Feb 20 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.7.7-1
+- Skip image pull only if the correct snapshotter has a snapshot.
 
 * Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.7.2-4
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
