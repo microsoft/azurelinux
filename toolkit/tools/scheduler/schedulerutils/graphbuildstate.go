@@ -151,7 +151,7 @@ func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
 	return
 }
 
-// ActiveTestFromSRPM returns a build request for the queried SRPM file
+// ActiveTestFromSRPM returns a test request for the queried SRPM file
 // or nil if the SRPM is not among the active builds.
 func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest {
 	for _, buildRequest := range g.activeBuilds {
@@ -163,7 +163,7 @@ func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest 
 	return nil
 }
 
-// IsSRPMBuildActive returns true if a given SRPM is currently queued for building.
+// IsSRPMTestActive returns true if a given SRPM is currently queued for testing.
 func (g *GraphBuildState) IsSRPMTestActive(srpmFileName string) bool {
 	return g.ActiveTestFromSRPM(srpmFileName) != nil
 }

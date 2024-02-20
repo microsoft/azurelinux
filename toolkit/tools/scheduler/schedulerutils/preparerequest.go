@@ -61,19 +61,13 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 	newBuildReqs, err := buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)
 	if err != nil {
 		err = fmt.Errorf("failed to convert build nodes to requests:\n%w", err)
-		// Temporarily clear the error, this state is unexpected but not fatal. Error return will be
-		// restored later once the underlying cause of this error is fixed.
-		err = nil
-		//return
+		return
 	}
 	requests = append(requests, newBuildReqs...)
 	newTestReqs, err := testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)
 	if err != nil {
 		err = fmt.Errorf("failed to convert test nodes to requests:\n%w", err)
-		// Temporarily clear the error, this state is unexpected but not fatal. Error return will be
-		// restored later once the underlying cause of this error is fixed.
-		err = nil
-		//return
+		return
 	}
 	requests = append(requests, newTestReqs...)
 
@@ -100,8 +94,8 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
 			// restored later once the underlying cause of this error is fixed.
 			logger.Log.Errorf(err.Error())
+			err = nil
 			continue
-			//return
 		}
 
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
@@ -208,8 +202,8 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
 			// restored later once the underlying cause of this error is fixed.
 			logger.Log.Errorf(err.Error())
+			err = nil
 			continue
-			//return
 		}
 
 		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
