@@ -1772,6 +1772,7 @@
                 "python-simpleline",
                 "python-slip",
                 "python-sniffio",
+                "python-sortedcontainers",
                 "python-soupsieve",
                 "python-sphinx",
                 "python-sphinx-epytext",
