@@ -26215,8 +26215,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-mocha",
-          "version": "1.13.0",
-          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v1.13.0.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v2.1.0.tar.gz"
         }
       }
     },
