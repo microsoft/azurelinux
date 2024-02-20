@@ -54,7 +54,7 @@ It contains the libraries and header files to create applications
 %{_mandir}/man3/*
 
 %changelog
-* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 39-1
+* Tue Feb 20 2024 Jonathan Behrens <jbehrens@microsoft.com> - 39-1
 - Upgrade to v39
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 37-6
