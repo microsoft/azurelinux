@@ -61,6 +61,6 @@ index c05eefc1..02438508 100644
                  <package-root>ant-tools-src</package-root>
 -                <classpath mode="compile">src:lib/ant.jar:lib/asm-8.0.1.jar</classpath>
 +                <classpath mode="compile">src:lib/ant.jar:lib/objectweb-asm_asm.jar</classpath>
-                 <source-level>1.6</source-level>
+                 <source-level>1.8</source-level>
              </compilation-unit>
          </java-data>
