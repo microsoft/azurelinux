@@ -1,7 +1,7 @@
 %global gem_name io-event
 Summary:        An event loop
 Name:           rubygem-%{gem_name}
-Version:        1.0.7
+Version:        1.3.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ cp README.md %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
+- Auto-upgrade to 1.3.2 - azl3.0
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.7-1
 - License verified
 - Original version for CBL-Mariner
