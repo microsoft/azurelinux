@@ -26,6 +26,14 @@ version_release_matching_groups = [
         "SPECS/kernel-azure/kernel-azure.spec"
     ]),
     frozenset([
+        "SPECS-SIGNED/kernel-mshv-signed/kernel-mshv-signed.spec",
+        "SPECS/kernel-mshv/kernel-mshv.spec"
+    ]),
+    frozenset([
+        "SPECS-SIGNED/hvloader-signed/hvloader-signed.spec",
+        "SPECS/hvloader/hvloader.spec"
+    ]),
+    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
