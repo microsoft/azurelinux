@@ -69,7 +69,7 @@ authselect disable-feature with-mdns4 &> /dev/null || :
 
 %changelog
 * Tue Feb 20 2024 bala <balakumaran.kannan@microsoft.com> - 0.15.1-10
-- Initial import to CBL-Mariner from Fedora 39 (license: MIT).
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified (LGPL-2.1)
 
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.1-9
