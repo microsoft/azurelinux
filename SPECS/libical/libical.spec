@@ -58,6 +58,8 @@ Development files needed for building things which link against %{name}-glib.
 %autosetup -p1 -S gendiff
 
 %build
+mkdir %{_target_platform}
+pushd %{_target_platform}
 %cmake \
   -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=true \
   -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=true \
