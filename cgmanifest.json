@@ -3298,8 +3298,8 @@
         "type": "other",
         "other": {
           "name": "espeakup",
-          "version": "0.80",
-          "downloadUrl": "https://github.com/williamh/espeakup/archive/v0.80.tar.gz"
+          "version": "0.90",
+          "downloadUrl": "https://github.com/linux-speakup/espeakup/archive/refs/tags/v0.90.tar.gz"
         }
       }
     },
