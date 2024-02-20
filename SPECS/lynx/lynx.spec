@@ -40,6 +40,7 @@ BuildRequires:  slang-devel
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  zlib-devel
+Requires:       openssl-libs
 Provides:       web_browser
 
 %description
