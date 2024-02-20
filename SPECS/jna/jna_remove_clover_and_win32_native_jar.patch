@@ -20,15 +20,6 @@ index ed104c21..d483a971 100644
            description="Build primary jar">
      <!-- Bundle native components with primary jar to facilitate
           easy distribution to common platforms.
-@@ -1177,7 +1001,7 @@ cd ..
-     </javac>
-   </target>
- 
--  <target name="compile-tests" depends="compile,native,jar"
-+  <target name="compile-tests" depends="compile,jar"
-   	description="Compile all test code">
-     <javac classpathref="compile-test.path"
-            source="${test.compatibility}"
 @@ -1265,8 +1089,6 @@ cd ..
      <mkdir dir="${build}/jws"/>
      <copy todir="${build}/jws" file="${build}/${jar}"/>
@@ -38,11 +29,11 @@ index ed104c21..d483a971 100644
      <jar jarfile="${build}/jws/jnidispatch.jar" createUnicodeExtraFields="never" encoding="UTF-8">
        <fileset dir="${build.native}" includes="*jnidispatch.*"/>
      </jar>
-@@ -1467,7 +1289,6 @@ cd ..
+@@ -1310,7 +1289,6 @@ cd ..
        <doctitle>JNA API Documentation</doctitle>
        <header>${header}</header>
        <bottom>${footer}</bottom>
--      <link href="http://download.oracle.com/javase/${compatibility}/docs/api/"/>
+-      <link href="http://download.oracle.com/javase/${javac.release}/docs/api/"/>
  
        <packageset dir="${src}" defaultexcludes="yes">
          <patternset>
