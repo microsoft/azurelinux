@@ -74,7 +74,7 @@ popd
 %changelog
 * Thu Feb 15 2024 Thien Trung Vuong <tvuong@microsoft.com> - 2.4.0-16
 - License verified.
-- Initial Azure Linux import from Fedora 40 (license: MIT).
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
