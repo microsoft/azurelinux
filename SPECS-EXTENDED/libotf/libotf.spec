@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		libotf
 Version:	0.9.13
 Release:	16%{?dist}

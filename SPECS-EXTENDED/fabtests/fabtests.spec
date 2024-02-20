@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           fabtests
 Version:        1.12.0
 %global         __rc  rc1
@@ -24,7 +24,7 @@ fabric software library.
 
 %prep
 %setup -q -n %{name}-%{version}%{__rc}
-%patch0 -p2
+%patch 0 -p2
 
 %build
 %configure --with-valgrind

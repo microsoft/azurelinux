@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package servletapi4
 #
@@ -57,7 +57,7 @@ contains the javadoc documentation for the Java Servlet and JSP APIs.
 
 %prep
 %setup -q -n %{full_name}-4-src
-%patch160 -p1
+%patch 160 -p1
 
 %build
 ant dist -Dservletapi.build=build -Dservletapi.dist=dist

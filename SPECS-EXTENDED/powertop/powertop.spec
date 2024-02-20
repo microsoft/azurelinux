@@ -5,7 +5,7 @@ Summary:          Power consumption monitor
 
 License:          GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:              http://01.org/powertop/
 Source0:          http://github.com/fenrus75/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:          powertop.service
@@ -27,8 +27,8 @@ computer use more power than necessary while it is idle.
 
 %prep
 %setup -q
-%patch0 -p1 -b .always-create-params
-%patch1 -p1
+%patch 0 -p1 -b .always-create-params
+%patch 1 -p1
 
 echo "v%{version}" > version-long
 echo '"v%{version}"' > version-short

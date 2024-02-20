@@ -21,7 +21,7 @@ Version:        1.7.30
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -114,8 +114,8 @@ Log4j implemented over SLF4J.
 
 %prep
 %setup -q -n %{name}-v_%{version} -a2
-%patch1 -p1
-%patch2 -p1
+%patch 1 -p1
+%patch 2 -p1
 find . -name "*.jar" | xargs rm
 cp -p %{SOURCE1} APACHE-LICENSE
 

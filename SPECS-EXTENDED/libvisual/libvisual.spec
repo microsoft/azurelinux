@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global smallversion 0.4
 
 Name:           libvisual
@@ -41,9 +41,9 @@ This package contains the files needed to build an application with libvisual.
 
 %prep
 %setup -q
-%patch0 -p1 -b .altivec-detection
-%patch1 -p1 -b .inlinedefineconflict
-%patch2 -p1 -b .format-security
+%patch 0 -p1 -b .altivec-detection
+%patch 1 -p1 -b .inlinedefineconflict
+%patch 2 -p1 -b .format-security
 
 %build
 %ifarch i386

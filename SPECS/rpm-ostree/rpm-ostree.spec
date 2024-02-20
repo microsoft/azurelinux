@@ -1,10 +1,10 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
 Version:        2022.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         rpm-ostree-libdnf-build.patch
@@ -41,7 +41,7 @@ BuildRequires:  libsolv
 BuildRequires:  libsolv-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 BuildRequires:  mariner-repos
 BuildRequires:  openssl-devel
 BuildRequires:  ostree-devel
@@ -157,6 +157,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-7
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2022.1-6
 - Bump package to rebuild with rust 1.72.0
 

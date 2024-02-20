@@ -7,7 +7,7 @@ URL:            https://github.com/gperftools/gperftools
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Using an empty patch to ignoring this CVE because it's considered a false positive.
 # For more details see: https://github.com/gperftools/gperftools/issues/1013.

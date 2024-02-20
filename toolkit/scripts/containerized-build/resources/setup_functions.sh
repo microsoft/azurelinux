@@ -80,7 +80,7 @@ rpmbuild() {
 refresh_local_repo() {
     echo "-------- refreshing the local repo ---------"
     pushd $RPMS_DIR
-    createrepo .
+    createrepo --compatibility .
     popd
 }
 
@@ -98,7 +98,7 @@ enable_local_repo() {
         url="${urlWithPrefix#$prefixToRemove}" #remove 'file://' prefix
         mkdir -p $url || { echo -e "\033[31m WARNING: Could not mkdir at $url, continuing\033[0m"; continue; }
         pushd $url
-        createrepo .
+        createrepo --compatibility .
         popd
         url_list+=" $url"
     done
@@ -152,4 +152,17 @@ install_dependencies() {
 rpmspec() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
+}
+
+# TODO: Remove when PMC is available for 3.0
+# Add mariner 3.0 Daily Build Repo
+enable_mariner3_repo() {
+    local args=("$@")
+    alias tdnf='tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build'
+    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
+    echo "Installing vim, git and other packages ..."
+    tdnf  --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy vim git
+    if [[ ! -z "$@" ]]; then
+        tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy "${args[@]}"
+    fi
 }

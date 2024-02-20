@@ -4,7 +4,7 @@ Version:        2.11.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/General Libraries
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz

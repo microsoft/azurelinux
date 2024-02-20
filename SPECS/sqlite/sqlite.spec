@@ -5,7 +5,7 @@ Version:        3.44.0
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/GeneralLibraries
 URL:            https://www.sqlite.org
 Source0:        https://www.sqlite.org/2023/%{name}-autoconf-%{sourcever}.tar.gz

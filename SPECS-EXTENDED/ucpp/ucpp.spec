@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Embeddable, quick, light and fully compliant ISO C99 preprocessor
 Name: ucpp
 Version: 1.3.5

@@ -4,10 +4,10 @@
 Summary:        CUI Interface
 Name:           rubygem-%{gem_name}
 Version:        0.16.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.treasuredata.com/
 Source0:        https://github.com/treasure-data/td/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -37,13 +37,16 @@ interact with the REST API in managing databases and jobs on the Treasure Data C
 gem build %{gem_name}
 
 %install
-gem install -V --local --force --install-dir %{buildroot}/%{gemdir} --bindir %{buildroot}%{_prefix}/lib/ruby/gems/%{gems_version}/bin/ %{gem_name}-%{version}.gem
+gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
 %{gemdir}
 
 %changelog
+* Thu Feb 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.8-3
+- Fixed install steps misconfiguration.
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.16.8-2
 - Build from .tar.gz source.
 

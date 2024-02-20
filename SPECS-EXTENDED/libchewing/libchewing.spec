@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global libchewing_python_dir %{python3_sitelib}
 
 %global im_name_zh_TW 新酷音輸入法
@@ -65,7 +65,7 @@ Python binding of libchewing.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 CFLAGS="%{optflags} -g -DLIBINSTDIR='%{_libdir}'"

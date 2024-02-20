@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		Judy
 Version:	1.0.5
 Release:	23%{?dist}
@@ -40,14 +40,14 @@ for developing applications that use the Judy library.
 %setup -q -n judy-%{version}
 
 # Make tests use shared instead of static libJudy
-%patch0 -p1 -b .test-shared
+%patch 0 -p1 -b .test-shared
 
 # The J1* man pages were incorrectly being symlinked to Judy, rather than Judy1
 # This patch corrects that; submitted upstream 2008/11/27
-%patch1 -p1 -b .fix-Judy1-mans
+%patch 1 -p1 -b .fix-Judy1-mans
 
 # Fix some code with undefined behavior, commented on and removed by gcc
-%patch2 -p1 -b .behavior
+%patch 2 -p1 -b .behavior
 
 # README.Fedora
 cp -p %{SOURCE1} .

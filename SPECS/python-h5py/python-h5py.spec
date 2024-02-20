@@ -16,7 +16,7 @@ Version:        3.7.0
 Release:        4%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
 # drop the unnecessary workaround for float128 type after
@@ -50,7 +50,7 @@ Requires:       python%{python3_pkgversion}-six
 
 %prep
 %setup -q -c -n %{name}-%{version}
-%patch0
+%patch 0
 mv %{name}-%{version} serial
 cd serial
 %{__python3} api_gen.py

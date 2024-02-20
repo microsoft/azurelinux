@@ -4,7 +4,7 @@ Version:        3.26.0
 Release:        1%{?dist}
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/liblouis/liblouis
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  chrpath

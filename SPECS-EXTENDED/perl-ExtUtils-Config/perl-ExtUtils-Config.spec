@@ -4,7 +4,7 @@ Release:	19%{?dist}
 Summary:	A wrapper for perl's configuration
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/ExtUtils-Config
 Source0:	https://cpan.metacpan.org/modules/by-module/ExtUtils/ExtUtils-Config-%{version}.tar.gz#/perl-ExtUtils-Config-%{version}.tar.gz
 BuildArch:	noarch

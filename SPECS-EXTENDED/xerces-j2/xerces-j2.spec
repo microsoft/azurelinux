@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package xerces-j2
 #
@@ -91,10 +91,10 @@ Requires:       %{name} = %{version}-%{release}
 %setup -q -n xerces-%{cvs_version}
 find "(" -name "*.class" -o -name "*.jar" ")" -delete
 find -type f -exec dos2unix {} \;
-%patch0 -p1
-%patch1 -p1
-%patch2
-%patch3 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2
+%patch 3 -p1
 
 %build
 mkdir -p tools

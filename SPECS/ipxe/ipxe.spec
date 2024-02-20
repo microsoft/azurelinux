@@ -11,7 +11,7 @@ Source0:        https://github.com/ipxe/ipxe/archive/%{name}-%{version}.tar.gz
 #Source0:        https://github.com/ipxe/ipxe/archive/v%{version}.tar.gz
 Group:          System Environment/Daemons
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 ExclusiveArch:  x86_64
 BuildRequires:  cdrkit
 BuildRequires:  perl

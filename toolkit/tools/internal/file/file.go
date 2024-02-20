@@ -45,14 +45,12 @@ func Move(src, dst string) (err error) {
 
 	src, err = filepath.Abs(src)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move source (%s).", src)
-		return
+		return fmt.Errorf("failed to get absolute path for move source (%s):\n%w", src, err)
 	}
 
 	dst, err = filepath.Abs(dst)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move destination (%s).", dst)
-		return
+		return fmt.Errorf("failed to get absolute path for move destination (%s):\n%w", dst, err)
 	}
 
 	if src == dst {
@@ -84,6 +82,15 @@ func Copy(src, dst string) (err error) {
 // dst is assumed to be a file and not a directory. Will change the permissions to the given value.
 func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
 	return copyWithPermissions(src, dst, dirmode, true, filemode)
+}
+
+// Read reads a string from the file src.
+func Read(src string) (data string, err error) {
+	logger.Log.Debugf("Reading from (%s)", src)
+
+	bytes, err := os.ReadFile(src)
+	data = string(bytes)
+	return
 }
 
 // readLines reads file under path and returns lines as strings and any error encountered
@@ -119,13 +126,7 @@ func Create(dst string, perm os.FileMode) (err error) {
 func Write(data string, dst string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", dst)
 
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer dstFile.Close()
-
-	_, err = dstFile.WriteString(data)
+	err = os.WriteFile(dst, []byte(data), 0o666)
 	return
 }
 

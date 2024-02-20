@@ -8,12 +8,12 @@
 Summary:        Common directory and macro definitions used by font packages
 Name:           fontpackages
 Version:        1.44
-Release:        28%{?dist}
+Release:        29%{?dist}
 # Mostly means the scriptlets inserted via this package do not change the
 # license of the packages they're inserted in.
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pnemade/fontpackages
 Source0:        https://github.com/pnemade/fontpackages/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         dnf.patch
@@ -101,6 +101,9 @@ EOF
 %{ftcgtemplatedir}/*txt
 
 %changelog
+* Mon Feb 12 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.44-29
+- Added compatibility flag to createrepo command in the patch.
+
 * Thu Dec 02 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44-28
 - Removing the "*-tools" subpackage.
 - License verified.

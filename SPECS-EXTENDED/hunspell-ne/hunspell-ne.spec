@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-ne
 Summary: Nepali hunspell dictionaries
 Version: 20080425

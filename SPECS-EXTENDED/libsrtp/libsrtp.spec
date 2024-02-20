@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global shortname srtp
 
 Name:		libsrtp
@@ -29,7 +29,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .sharedfix
+%patch 0 -p1 -b .sharedfix
 
 %if 0%{?rhel} > 0
 %ifarch ppc64

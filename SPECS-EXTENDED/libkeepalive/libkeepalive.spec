@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		libkeepalive
 Version:	0.3
 Release:	13%{?dist}

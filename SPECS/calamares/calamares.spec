@@ -10,7 +10,7 @@ Version:        3.2.11
 Release:        40%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -144,12 +144,12 @@ done
 mv %{SOURCE20} src/modules/license/license.conf
 mv %{SOURCE24} src/modules/users/users.conf
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
 
 %build
 mkdir -p %{_target_platform}

@@ -4,7 +4,7 @@ Version:        1.6.2
 Release:        50%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.ossp.org/pkg/lib/uuid/
 Source0:        ftp://ftp.ossp.org/pkg/lib/uuid/uuid-%{version}.tar.gz
 Patch0:         uuid-1.6.1-ossp.patch
@@ -71,13 +71,13 @@ DCE development headers and libraries for OSSP uuid.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1 -b .php54
-%patch3 -p1 -b .hwaddr
-%patch4 -p1 -b .nostrip
-%patch5 -p1 -b .manfix
-%patch6 -p1 -b .aarch64
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1 -b .php54
+%patch 3 -p1 -b .hwaddr
+%patch 4 -p1 -b .nostrip
+%patch 5 -p1 -b .manfix
+%patch 6 -p1 -b .aarch64
 
 %build
 # Build the library.

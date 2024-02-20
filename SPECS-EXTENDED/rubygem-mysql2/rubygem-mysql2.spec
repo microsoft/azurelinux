@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Generated from mysql2-0.3.11.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name mysql2

@@ -7,7 +7,7 @@ Version:        1.8.4
 Release:        15%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.clutter-project.org
 Source0:        https://download.gnome.org/sources/clutter-gtk/1.8/clutter-gtk-%{version}.tar.xz
 BuildRequires:  clutter-devel >= %{clutter_version}

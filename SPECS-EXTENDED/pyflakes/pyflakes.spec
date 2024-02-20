@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           pyflakes
 # WARNING: When updating pyflakes, check not to break flake8!
 Version:        2.5.0
@@ -39,7 +39,7 @@ Requires:       python%{python3_pkgversion}-setuptools
 
 %prep
 %setup -q -a 1
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %py3_build

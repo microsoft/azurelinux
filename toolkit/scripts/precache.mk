@@ -42,6 +42,7 @@ $(STATUS_FLAGS_DIR)/precache.flag: $(go-precacher) $(chroot_worker) $(rpms_snaps
 		--worker-dir $(precache_chroot_dir) \
 		--log-file=$(precache_logs_path) \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/precacher.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/precacher.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/precacher.trace \

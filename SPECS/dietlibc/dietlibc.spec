@@ -14,7 +14,7 @@ Version:        0.34
 Release:        6%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.fefe.de/dietlibc/
 Source0:        https://www.fefe.de/dietlibc/%{name}-%{version}.tar.xz
 Patch1:         dietlibc-insecure-defpath.patch
@@ -61,7 +61,7 @@ This package contains the dynamic libraries for dietlibc.
 %prep
 %setup -q
 
-%patch1
+%patch 1
 
 %if %{without ssp}
 sed -i -e 's!^#define WANT_SSP$!// \0!g;

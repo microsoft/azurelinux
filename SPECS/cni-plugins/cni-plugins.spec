@@ -1,10 +1,10 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
-Version:        1.3.0
+Version:        1.4.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 # cni moved to https://github.com/containernetworking/cni/issues/667#issuecomment-491693752
 URL:            https://github.com/containernetworking/plugins
@@ -39,6 +39,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Mon Feb 12 2024 Betty Lakes <bettylakes@microsoft.com> - 1.4.0-1
+- Upgrade to version 1.4.0
+
 * Wed Oct 18 2023 Mateusz Gozdek <mgozdek@microsoft.com> - 1.3.0-1
 - Make plugin binaries correctly print version
 - Upgrade to version 1.3.0

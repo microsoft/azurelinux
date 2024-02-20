@@ -37,7 +37,35 @@ const (
 	PackageManifestRelativePath = "image_pkg_manifest_installroot.json"
 
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
-	NullDevice     = "/dev/null"
+	NullDevice = "/dev/null"
+
+	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
+	CmdlineSELinuxSettings = "security=selinux selinux=1"
+
+	// CmdlineSELinuxForceEnforcing is the kernel command-line args for enabling SELinux and force it to be in
+	// enforcing mode.
+	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " enforcing=1"
+
+	// SELinuxConfigFile is the file path of the SELinux config file.
+	SELinuxConfigFile = "/etc/selinux/config"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to enforcing in the /etc/selinux/config file.
+	SELinuxConfigEnforcing = "enforcing"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to permissive in the /etc/selinux/config file.
+	SELinuxConfigPermissive = "permissive"
+
+	// SELinuxConfigEnforcing is the string value to set SELinux to disabled in the /etc/selinux/config file.
+	SELinuxConfigDisabled = "disabled"
+
+	// GrubCfgFile is the filepath of the grub config file.
+	GrubCfgFile = "/boot/grub2/grub.cfg"
+
+	// GrubDefFile is the filepath of the config file used by grub-mkconfig.
+	GrubDefFile = "/etc/default/grub"
+)
+
+const (
 	overlay        = "overlay"
 	rootMountPoint = "/"
 
@@ -715,13 +743,18 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot
+// addMachineID creates the /etc/machine-id file in the installChroot, if it is
+// not already present (systemd package will include it if installed).
 func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
-	// should be an empty file in the generic file system image. An ID will be
-	// generated during boot and saved to this file if possible.
+	// should be either missing or an empty file in the generic file system
+	// image (the difference between the two options is described under
+	//"First Boot Semantics" below). An ID will be generated during boot and
+	// saved to this file if possible. Having an empty file in place is useful
+	// because it allows a temporary file to be bind-mounted over the real file,
+	// in case the image is used read-only
 
 	const (
 		machineIDFile      = "/etc/machine-id"
@@ -730,9 +763,16 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	ReportAction("Configuring machine id")
 
-	err = installChroot.UnsafeRun(func() error {
-		return file.Create(machineIDFile, machineIDFilePerms)
-	})
+	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
+	if err != nil {
+		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
+		return
+	}
+	if !exists {
+		err = installChroot.UnsafeRun(func() error {
+			return file.Create(machineIDFile, machineIDFilePerms)
+		})
+	}
 	return
 }
 
@@ -1074,15 +1114,13 @@ func InstallGrubEnv(installRoot string) (err error) {
 func InstallGrubCfg(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
 	const (
 		assetGrubcfgFile = "assets/grub2/grub.cfg"
-		grubCfgFile      = "boot/grub2/grub.cfg"
 		assetGrubDefFile = "assets/grub2/grub"
-		grubDefFile      = "etc/default/grub"
 	)
 
 	// Copy the bootloader's grub.cfg and set the file permission
-	installGrubCfgFile := filepath.Join(installRoot, grubCfgFile)
+	installGrubCfgFile := filepath.Join(installRoot, GrubCfgFile)
 
-	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+	installGrubDefFile := filepath.Join(installRoot, GrubDefFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubcfgFile, installGrubCfgFile, bootDirectoryDirMode,
 		bootDirectoryFileMode)
@@ -1180,7 +1218,7 @@ func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
 
 	ReportActionf("Running grub2-mkconfig...")
 	err = installChroot.UnsafeRun(func() error {
-		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", "/boot/grub2/grub.cfg")
+		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", GrubCfgFile)
 	})
 
 	return
@@ -1511,7 +1549,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(sshPubKeyPaths) == 0 {
+	if len(sshPubKeyPaths) == 0 && len(sshPubKeys) == 0 {
 		return
 	}
 
@@ -1619,17 +1657,19 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 }
 
 // SELinuxConfigure pre-configures SELinux file labels and configuration files
-func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
+func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot,
+	mountPointToFsTypeMap map[string]string, isRootFS bool,
+) (err error) {
 	timestamp.StartEvent("SELinux", nil)
 	defer timestamp.StopEvent(nil)
-	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", systemConfig.KernelCommandLine.SELinux)
+	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(systemConfig, installChroot)
+	err = selinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		logger.Log.Errorf("Failed to update SELinux config")
 		return
 	}
-	err = selinuxRelabelFiles(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		logger.Log.Errorf("Failed to label SELinux files")
 		return
@@ -1637,30 +1677,29 @@ func SELinuxConfigure(systemConfig configuration.SystemConfig, installChroot *sa
 	return
 }
 
-func selinuxUpdateConfig(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot) (err error) {
+func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
 	const (
-		configFile     = "etc/selinux/config"
 		selinuxPattern = "^SELINUX=.*"
 	)
 	var mode string
 
-	switch systemConfig.KernelCommandLine.SELinux {
+	switch selinuxMode {
 	case configuration.SELinuxEnforcing, configuration.SELinuxForceEnforcing:
-		mode = configuration.SELinuxEnforcing.String()
+		mode = SELinuxConfigEnforcing
 	case configuration.SELinuxPermissive:
-		mode = configuration.SELinuxPermissive.String()
+		mode = SELinuxConfigPermissive
 	}
 
-	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
-	selinuxMode := fmt.Sprintf("SELINUX=%s", mode)
-	err = sed(selinuxPattern, selinuxMode, "`", selinuxConfigPath)
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
+	selinuxProperty := fmt.Sprintf("SELINUX=%s", mode)
+	err = sed(selinuxPattern, selinuxProperty, "`", selinuxConfigPath)
 	return
 }
 
-func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool) (err error) {
+func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+) (err error) {
 	const (
 		squashErrors        = false
-		configFile          = "etc/selinux/config"
 		fileContextBasePath = "etc/selinux/%s/contexts/files/file_contexts"
 	)
 	var listOfMountsToLabel []string
@@ -1685,7 +1724,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 	}
 
 	// Find the type of policy we want to label with
-	selinuxConfigPath := filepath.Join(installChroot.RootDir(), configFile)
+	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
 	stdout, stderr, err := shell.Execute("sed", "-n", "s/^SELINUXTYPE=\\(.*\\)$/\\1/p", selinuxConfigPath)
 	if err != nil {
 		logger.Log.Errorf("Could not find an SELINUXTYPE in %s", selinuxConfigPath)
@@ -1734,6 +1773,7 @@ func selinuxRelabelFiles(systemConfig configuration.SystemConfig, installChroot 
 			if err != nil {
 				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
 			}
+			ReportActionf("SELinux: labelled %d files", files)
 			return err
 		})
 		if err != nil {
@@ -2164,17 +2204,15 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 
 func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCommandLine) (err error) {
 	const (
-		selinuxPattern        = "{{.SELinux}}"
-		selinuxSettings       = "security=selinux selinux=1"
-		selinuxForceEnforcing = "enforcing=1"
+		selinuxPattern = "{{.SELinux}}"
 	)
 	var selinux string
 
 	switch kernelCommandline.SELinux {
 	case configuration.SELinuxForceEnforcing:
-		selinux = fmt.Sprintf("%s %s", selinuxSettings, selinuxForceEnforcing)
+		selinux = CmdlineSELinuxForceEnforcing
 	case configuration.SELinuxPermissive, configuration.SELinuxEnforcing:
-		selinux = selinuxSettings
+		selinux = CmdlineSELinuxSettings
 	case configuration.SELinuxOff:
 		selinux = ""
 	}
@@ -2546,7 +2584,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	return packageList
 }
 
-// stopGPGAgent stops gpg-agent if it is running inside the installChroot.
+// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
 //
 // It is possible that one of the packages or post-install scripts started a GPG agent.
 // e.g. when installing the mariner-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
@@ -2557,6 +2595,12 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 		if err != nil {
 			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
+		}
+
+		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
+		if err != nil {
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
+			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
 		}
 
 		return nil

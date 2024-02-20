@@ -7,7 +7,7 @@ Patch0:         libatasmart-0.19-wd-fix.patch
 License:        LGPLv2+
 Url:            https://git.0pointer.net/libatasmart.git/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  gcc
 BuildRequires:  systemd-devel

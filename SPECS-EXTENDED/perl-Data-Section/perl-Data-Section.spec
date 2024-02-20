@@ -14,7 +14,7 @@ Release:        10%{?dist}
 Summary:        Read multiple hunks of data out of your DATA section
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Data-Section
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Data-Section-%{version}.tar.gz#/perl-Data-Section-%{version}.tar.gz
 BuildArch:      noarch

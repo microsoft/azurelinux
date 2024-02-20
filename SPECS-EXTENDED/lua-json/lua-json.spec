@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define luaver 5.4
 %define luapkgdir %{_datadir}/lua/%{luaver}
 %global commit 7a86bc22066858afeb23845a191a6ab680b46233
@@ -24,7 +24,7 @@ LuaJSON is a customizable JSON decoder/encoder, using LPEG for parsing.
 
 %prep
 %setup -q -n luajson-%{commit}
-%patch0 -p1 -b .lua-52
+%patch 0 -p1 -b .lua-52
 
 %build
 

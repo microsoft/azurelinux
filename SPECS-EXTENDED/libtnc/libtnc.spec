@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _hardened_build 1
 
 Name:		libtnc
@@ -45,8 +45,8 @@ pushd Interface-TNC
 tar xf Interface-TNC-1.0.tar.gz
 popd
 
-%patch0 -p1 -b .bootstrap
-%patch1 -p1 -b .syserror
+%patch 0 -p1 -b .bootstrap
+%patch 1 -p1 -b .syserror
 
 %build
 CFLAGS="%{optflags} -fPIC -DPIC"

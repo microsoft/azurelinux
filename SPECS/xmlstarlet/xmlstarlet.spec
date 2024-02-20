@@ -7,7 +7,7 @@ Release:        16%{?dist}
 License:        MIT
 URL:            http://xmlstar.sourceforge.net/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://downloads.sourceforge.net/project/xmlstar/%{name}/%{version}/%{name}-%{version}.tar.gz
 
 # https://sourceforge.net/p/xmlstar/bugs/109/
@@ -32,7 +32,7 @@ commands.
 
 %prep
 %setup -q
-%patch0 -p1 -b .nogit
+%patch 0 -p1 -b .nogit
 
 
 %build

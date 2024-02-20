@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           filebench
 Version:        1.4.9.1
 Release:        14%{?dist}
@@ -24,7 +24,7 @@ for detailed workload specification.
 
 %prep
 %setup -q
-%patch0 -p1 -b .dofile
+%patch 0 -p1 -b .dofile
 cp -p %{SOURCE1} .
 cp -p %{SOURCE2} .
 

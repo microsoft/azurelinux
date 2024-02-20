@@ -3,7 +3,7 @@ Name:         qt5-qttools
 Version:      5.12.5
 Release:      6%{?dist}
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 
 License: LGPLv3 or LGPLv2
 Url:     http://www.qt.io
@@ -118,7 +118,7 @@ Requires: %{name}-common = %{version}-%{release}
 
 %prep
 %setup -q -n qttools-everywhere-src-%{version}
-%patch0 -p1 -b .qmake-qt5
+%patch 0 -p1 -b .qmake-qt5
 
 %build
 

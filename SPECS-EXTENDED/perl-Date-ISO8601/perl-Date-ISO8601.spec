@@ -11,7 +11,7 @@ Release:        9%{?dist}
 Summary:        Three ISO 8601 numerical calendars
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Date-ISO8601
 Source0:        https://cpan.metacpan.org/modules/by-module/Date/Date-ISO8601-%{version}.tar.gz#/perl-Date-ISO8601-%{version}.tar.gz
 BuildArch:      noarch

@@ -5,7 +5,7 @@ Version:        2.7.2
 Release:        28%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://mcpp.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         mcpp-manual.html.patch
@@ -51,9 +51,9 @@ This package provides an html manual for mcpp.
 
 %prep
 %setup -q
-%patch0 -b -z.euc-jp
-%patch1 -p1
-%patch2 -p1
+%patch 0 -b -z.euc-jp
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure --enable-mcpplib --disable-static

@@ -6,7 +6,7 @@ Version:        3.0.0
 Release:        1%{?dist}
 License:        ASL 2.0 AND CPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
@@ -80,9 +80,9 @@ Javadoc for %{name}.
 %setup -q -n surefire-%{upstream_version}-M4
 cp -p %{SOURCE2} .
 
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 
 # Disable strict doclint
 sed -i /-Xdoclint:all/d pom.xml

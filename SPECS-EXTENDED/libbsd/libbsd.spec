@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libbsd
 Version:        0.10.0
 Release:        3%{?dist}
@@ -39,8 +39,8 @@ configured using "pkg-config --libs libbsd-ctor".
 %prep
 %setup -q
 %if 0%{?rhel} && 0%{?rhel} < 7
-%patch1 -p1 -b .deprecated
-%patch2 -p1 -b .compat
+%patch 1 -p1 -b .deprecated
+%patch 2 -p1 -b .compat
 %endif
 
 %build

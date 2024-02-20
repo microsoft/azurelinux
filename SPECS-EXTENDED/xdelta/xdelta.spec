@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A binary file delta generator
 Name: xdelta
 Version: 3.1.0
@@ -29,7 +29,7 @@ algorithm to replace the standard diff program used by RCS
 
 %prep
 %setup -q -n %{name}3-%{version}
-%patch1 -p2 -b .man-page-day
+%patch 1 -p2 -b .man-page-day
 
 %build
 %configure

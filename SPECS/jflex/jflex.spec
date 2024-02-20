@@ -22,7 +22,7 @@ Release:        1%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://www.jflex.de/
 Source0:        https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        jflex.script
@@ -92,12 +92,12 @@ pushd src
 %{ant} realclean
 %{ant} -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 jflex
 popd
-%patch0 -p1
+%patch 0 -p1
 
 # You must use Re jflex.spec and have a java-cup and jflex installed
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
 
 %build
 cd jflex

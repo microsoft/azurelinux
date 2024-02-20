@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		polkit-pkla-compat
 Version:	0.1
 Release:	17%{?dist}

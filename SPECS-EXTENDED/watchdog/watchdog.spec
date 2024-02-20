@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:          Software and/or Hardware watchdog daemon
 Name:             watchdog
 Version:          5.15
@@ -59,17 +59,17 @@ expiration) initiated by the BMC.
  
 %prep
 %setup -q -n %{name}-%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch99 -p1 -b .rhseldoc
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
+%patch 8 -p1
+%patch 9 -p1
+%patch 10 -p1
+%patch 99 -p1 -b .rhseldoc
 autoreconf -i
 
 cp %{SOURCE2} .

@@ -4,7 +4,7 @@ Release:	26%{?dist}
 Summary:	Anonymous packages
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-Anon
 Source0:	https://cpan.metacpan.org/authors/id/A/AU/AUGGY/Package-Anon-%{version}.tar.gz#/perl-Package-Anon-%{version}.tar.gz
 # Build

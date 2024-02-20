@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global sname oslosphinx
 %global pypi_name oslo-sphinx
 

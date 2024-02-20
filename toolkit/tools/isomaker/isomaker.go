@@ -8,6 +8,7 @@ import (
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -26,17 +27,16 @@ var (
 
 	imageTag = app.Flag("image-tag", "Tag (text) appended to the image name. Empty by default.").String()
 
-	logFilePath = exe.LogFileFlag(app)
-	logLevel    = exe.LogLevelFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFilePath, *logLevel)
+	logger.InitBestEffort(logFlags)
 
-	isoMaker := NewIsoMaker(
+	isoMaker, err := isomakerlib.NewIsoMaker(
 		*unattendedInstall,
 		*baseDirPath,
 		*buildDirPath,
@@ -47,5 +47,11 @@ func main() {
 		*isoRepoDirPath,
 		*outputDir,
 		*imageTag)
-	isoMaker.Make()
+	if err != nil {
+		logger.PanicOnError(err)
+	}
+	err = isoMaker.Make()
+	if err != nil {
+		logger.PanicOnError(err)
+	}
 }

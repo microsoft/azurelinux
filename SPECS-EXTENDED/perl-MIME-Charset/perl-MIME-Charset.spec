@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        Charset Informations for MIME
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/MIME-Charset
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEZUMI/MIME-Charset-%{version}.tar.gz#/perl-MIME-Charset-%{version}.tar.gz
 # Disable Module::AutoInstall
@@ -51,7 +51,7 @@ messages on Internet.
 
 %prep
 %setup -q -n MIME-Charset-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Remove bundled modules
 rm -rf ./inc
 sed -i -e '/^inc\//d' MANIFEST

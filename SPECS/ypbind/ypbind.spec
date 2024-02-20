@@ -4,7 +4,7 @@ Version:        2.7.2
 Release:        11%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/thkukuk/ypbind-mt
 Source0:        https://github.com/thkukuk/ypbind-mt/archive/v%{version}.tar.gz#/ypbind-mt-%{version}.tar.gz
 #Source1: ypbind.init
@@ -57,8 +57,8 @@ also need to install the ypserv package to a machine on your network.
 
 %prep
 %setup -q -n ypbind-mt-%{version}
-%patch1 -p1 -b .gettextdomain
-%patch2 -p1 -b .helpman
+%patch 1 -p1 -b .gettextdomain
+%patch 2 -p1 -b .helpman
 
 autoreconf -fiv
 

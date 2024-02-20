@@ -5,7 +5,7 @@ Version:        0.24.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mozilla/cbindgen
 Source:         %{url}/archive/refs/tags/v0.24.3.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.

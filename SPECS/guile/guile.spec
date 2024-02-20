@@ -4,7 +4,7 @@ Version:        3.0.9
 Release:        1%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.gnu.org/software/guile/
 Source0:        https://ftp.gnu.org/gnu/guile/%{name}-%{version}.tar.gz

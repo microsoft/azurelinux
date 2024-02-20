@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define git0 https://github.com/containers/%{name}
 %define commit0 27bf038d0ece553e5d2c431eaebc7acaa2e3d254
 %define shortcommit0 %(c=%{commit0}; echo ${c:0:7})

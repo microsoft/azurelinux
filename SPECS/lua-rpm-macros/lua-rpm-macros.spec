@@ -9,7 +9,7 @@ Release:        6%{?dist}
 Summary:        The common Lua RPM macros
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://src.stg.fedoraproject.org/rpms/lua-rpm-macros
 Group:          Development/Tools
 # Macros:

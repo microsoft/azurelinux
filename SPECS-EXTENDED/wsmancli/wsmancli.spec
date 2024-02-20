@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           wsmancli
 Version:        2.6.0
 Release:        13%{?dist}
@@ -21,7 +21,7 @@ systems using Web Services Management protocol.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 cp -fp %SOURCE1 %SOURCE2 %SOURCE3 .;
 
 %build

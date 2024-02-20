@@ -4,7 +4,7 @@ Release:        8%{?dist}
 Summary:        CPAN signature management utilities and modules
 License:        CC0 and (GPL+ or Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Signature
 Source0:        https://cpan.metacpan.org/modules/by-module/Module/Module-Signature-%{version}.tar.gz#/perl-Module-Signature-%{version}.tar.gz
 BuildArch:      noarch

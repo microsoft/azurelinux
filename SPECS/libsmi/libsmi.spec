@@ -4,7 +4,7 @@ Version:        0.4.8
 Release:        28%{?dist}
 License:        TCL AND BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
 #Upstream Source0 url is dead
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
@@ -44,10 +44,10 @@ libsmi-based applications.
 
 %prep
 %setup -q
-%patch0 -p1 -b .wget111
-%patch1 -p1 -b .CVE-2010-2891
-%patch2 -p1 -b .clash
-%patch3 -p1 -b .format-security
+%patch 0 -p1 -b .wget111
+%patch 1 -p1 -b .CVE-2010-2891
+%patch 2 -p1 -b .clash
+%patch 3 -p1 -b .format-security
 cp %{SOURCE2} .
 
 %build

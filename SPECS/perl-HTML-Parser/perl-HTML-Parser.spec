@@ -4,7 +4,7 @@ Version:        3.72
 Release:        23%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/HTML-Parser-%{version}.tar.gz 
 URL:            https://metacpan.org/release/HTML-Parser
 BuildRequires:  coreutils

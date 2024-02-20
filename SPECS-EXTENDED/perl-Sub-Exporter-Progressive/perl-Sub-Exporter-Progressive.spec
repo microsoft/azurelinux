@@ -7,7 +7,7 @@ Release:	12%{?dist}
 Summary:	Only use Sub::Exporter if you need it
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Sub-Exporter-Progressive
 Source0:	https://cpan.metacpan.org/authors/id/F/FR/FREW/Sub-Exporter-Progressive-%{version}.tar.gz#/perl-Sub-Exporter-Progressive-%{version}.tar.gz
 Patch1:		Sub-Exporter-Progressive-0.001013-old-Test-More.patch
@@ -53,7 +53,7 @@ might as well use it directly.
 
 # We need to patch the test suite if we have old versions of Test::More
 %if %{old_test_more}
-%patch1
+%patch 1
 %endif
 
 %build

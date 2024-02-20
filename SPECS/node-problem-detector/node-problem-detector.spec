@@ -1,10 +1,10 @@
 Summary:        Kubernetes daemon to detect and report node issues
 Name:           node-problem-detector
 Version:        0.8.10
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://github.com/kubernetes/node-problem-detector
 Source0:        https://github.com/kubernetes/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -12,9 +12,9 @@ Patch0:         001-remove_arch_specific_makefile_logic.patch
 Patch1:         002-add_mariner_OSVersion.patch
 BuildRequires:  golang
 BuildRequires:  systemd-devel
-Requires:       mariner-release
+Requires:       azurelinux-release
 %if %{with_check}
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 %endif
 
 %description
@@ -64,6 +64,9 @@ make test
 %config(noreplace) %{_sysconfdir}/node-problem-detector.d/*
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.8.10-18
+- Update the build and dependency from mariner-release to azurelinux-release
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.10-17
 - Bump release to rebuild with go 1.20.10
 
@@ -110,7 +113,7 @@ make test
 - Bump release to rebuild with golang 1.18.3
 
 * Wed Jun 01 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.8.10-2
-- Add explicit check/run-time dependencies on mariner-release
+- Add explicit check/run-time dependencies on mariner-release.
 
 * Fri Feb 25 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.8.10-1
 - Upgrading to v0.8.10
