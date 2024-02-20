@@ -765,8 +765,8 @@
         "type": "other",
         "other": {
           "name": "authselect",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/authselect/authselect/archive/1.2.1/authselect-1.2.1.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/authselect/authselect/archive/1.5.0/v1.5.0.tar.gz"
         }
       }
     },
@@ -14144,6 +14144,16 @@
           "name": "nss-altfiles",
           "version": "2.23.0",
           "downloadUrl": "https://github.com/aperezdc/nss-altfiles/archive/v2.23.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nss-mdns",
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/lathiat/nss-mdns/archive/v0.15.1.tar.gz"
         }
       }
     },
