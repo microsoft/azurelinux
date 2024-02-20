@@ -64,16 +64,18 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-cov
 BuildRequires:  python%{python3_pkgversion}-PyYAML
 
-# netplan ships dbus files
+# netplan ships dbus files and imports the dbus python module
 Requires:       dbus
+Requires:       python%{python3_pkgversion}-dbus
 
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
 
-# /usr/sbin/netplan is a Python 3 script that requires netifaces, PyYAML and
-# optionally python-rich
+# /usr/sbin/netplan is a Python 3 script that requires netifaces, PyYAML,
+# cffi and optionally python-rich
 Requires:       python%{python3_pkgversion}-netifaces
 Requires:       python%{python3_pkgversion}-PyYAML
+Requires:       python%{python3_pkgversion}-cffi
 # Not available in 3.0 yet
 # Requires:       python%{python3_pkgversion}-rich
 
@@ -229,6 +231,9 @@ cat > %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-networkd.ya
 network:
   renderer: networkd
 EOF
+
+# Make netplan configuration only accessible by root.
+chmod 600 %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-networkd.yaml
 
 %check
 %meson_test
