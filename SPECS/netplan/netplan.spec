@@ -20,7 +20,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        GPLv3
 URL:            https://netplan.io/
-Source0:        https://github.com/canonical/%{name}/archive/%{version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # netplan build optionally depends on pyflakes, but there is a hard check for it
 # in the meson file. This patch disables that check.
