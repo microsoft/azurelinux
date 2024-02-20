@@ -46,6 +46,7 @@ Core utilities for Python packages
 %pyproject_save_files packaging
 
 %check
+pip install pretend
 %pytest
 
 %files -n python3-packaging -f %{pyproject_files}
