@@ -9551,8 +9551,8 @@
         "type": "other",
         "other": {
           "name": "libical",
-          "version": "3.0.9",
-          "downloadUrl": "https://github.com/libical/libical/archive/v3.0.9/libical-3.0.9.tar.gz"
+          "version": "3.0.16",
+          "downloadUrl": "https://github.com/libical/libical/archive/v3.0.16/libical-3.0.16.tar.gz"
         }
       }
     },

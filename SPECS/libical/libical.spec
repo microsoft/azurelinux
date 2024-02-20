@@ -1,7 +1,7 @@
 Summary:        Reference implementation of the iCalendar data type and serialization format
 Name:           libical
-Version:        3.0.9
-Release:        5%{?dist}
+Version:        3.0.16
+Release:        1%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ make test ARGS="-V" -C %{_target_platform}
 %ldconfig_scriptlets
 
 %files
-%doc ReadMe.txt THANKS
+%doc README.md THANKS
 %license COPYING LICENSE LICENSE.LGPL21.txt LICENSE.MPL2.txt
 %{_libdir}/libical.so.3
 %{_libdir}/libical.so.%{version}
@@ -98,7 +98,7 @@ make test ARGS="-V" -C %{_target_platform}
 %{_datadir}/gir-1.0/ICal-3.0.gir
 
 %files devel
-%doc doc/UsingLibical.txt
+%doc doc/UsingLibical.md
 %{_libdir}/libical.so
 %{_libdir}/libical_cxx.so
 %{_libdir}/libicalss.so
@@ -123,6 +123,9 @@ make test ARGS="-V" -C %{_target_platform}
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Tue Feb 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 3.0.16-1
+- Update to 3.0.16
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 3.0.9-5
 - Promote to Mariner base repo
 - Lint spec
