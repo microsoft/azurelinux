@@ -31,13 +31,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pip
 %endif
 
-%bcond_without docs
-%if %{with docs}
-BuildRequires:  python3-sphinx
-BuildRequires:  dvipng
-BuildRequires:  tex(anyfontsize.sty)
-BuildRequires:  tex(bm.sty)
-%endif
 
 %description -n python3-%{srcname} %{_description}
 
@@ -55,13 +48,6 @@ Documentation for %{srcname} package.
 
 %build
 %py3_build
-
-%if %{with docs}
-pushd docs
-make SPHINXBUILD=sphinx-build-%{python3_version} html
-rm _build/html/.buildinfo
-popd
-%endif
 
 
 %install
@@ -83,13 +69,6 @@ popd
 %doc README.rst
 %{python3_sitelib}/%{srcname}/
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
-
-
-%if %{with docs}
-%files -n python-%{srcname}-doc
-%license LICENSE
-%doc README.rst docs/_build/html
-%endif
 
 
 %changelog
