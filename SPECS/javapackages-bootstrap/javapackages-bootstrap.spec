@@ -149,7 +149,6 @@ Source1113:     univocity-parsers-2.9.1.tar.xz
 Source1114:     velocity-engine-2.3.tar.xz
 Source1115:     xbean-4.23.tar.xz
 Source1116:     xmlunit-2.9.1.tar.xz
-Source1117:     xmvn-generator-test4-1.2.1.tar.xz
 Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xz-java-1.9.tar.xz
 
@@ -214,7 +213,9 @@ do
 done
 
 # chnage java version to 11 
-sed -i "s|<release>17</release>|<release>11</release>|" project/xmvn-generator.xml
+#sed -i "s|<release>17</release>|<release>11</release>|" project/xmvn-generator.xml
+rm project/xmvn-generator.xml
+rm project/xmvn-generator.properties
 
 %build
 export LC_ALL=en_US.UTF-8 
