@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pedantic"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
@@ -90,12 +91,12 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(defaultNode.SRPMFileName()) || buildState.IsNodeProcessed(defaultNode) {
-			err = fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName())
-			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
-			// restored later once the underlying cause of this error is fixed.
-			logger.Log.Warnf(err.Error())
-			err = nil
-			continue
+			err = pedantic.PedanticErrorWithWarning(fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName()))
+			if err != nil {
+				return
+			} else {
+				continue
+			}
 		}
 
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
@@ -198,12 +199,12 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 
 		// Check if we already queued up this build node for building.
 		if buildState.IsSRPMBuildActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
-			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
-			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
-			// restored later once the underlying cause of this error is fixed.
-			logger.Log.Warnf(err.Error())
-			err = nil
-			continue
+			err = pedantic.PedanticErrorWithWarning(fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName))
+			if err != nil {
+				return
+			} else {
+				continue
+			}
 		}
 
 		buildUsedCache := buildState.IsSRPMCached(srpmFileName)

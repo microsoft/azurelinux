@@ -190,6 +190,8 @@ LOG_COLOR          ?= auto
 STOP_ON_WARNING    ?= n
 STOP_ON_PKG_FAIL   ?= n
 STOP_ON_FETCH_FAIL ?= n
+##help:var:PEDANTIC:{y,n}=Set to 'y' to enable pedantic mode, which will stop the build on certain recoverable errors.
+PEDANTIC           ?= y
 
 ######## HIGH LEVEL TARGETS ########
 

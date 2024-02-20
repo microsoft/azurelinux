@@ -317,6 +317,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--max-cpu="$(MAX_CPU)" \
 		$(if $(PACKAGE_BUILD_TIMEOUT),--timeout="$(PACKAGE_BUILD_TIMEOUT)") \
 		$(logging_command) && \
+		$(if $(filter y,$(PEDANTIC)),--pedantic) &&\
 	touch $@
 
 ##help:target:compress-rpms=Compresses all RPMs in `../out/RPMS` into `../out/rpms.tar.gz`. See `hydrate-rpms` target.

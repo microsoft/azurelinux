@@ -15,6 +15,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pedantic"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -105,6 +106,7 @@ var (
 
 	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
+	pedanticMode  = exe.SetupPedanticFlag(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
 
@@ -118,6 +120,8 @@ func main() {
 		logger.Log.Warnf("Could not start profiling: %s", err)
 	}
 	defer prof.StopProfiler()
+
+	pedantic.EnablePedanticMode(*pedanticMode)
 
 	if *workers <= 0 {
 		*workers = runtime.NumCPU()

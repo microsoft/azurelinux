@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pedantic"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -77,4 +78,9 @@ func SetupProfileFlags(k *kingpin.Application) *ProfileFlags {
 	p.MemProfFile = k.Flag("mem-prof-file", "File that stores Memory pprof data.").String()
 	p.TraceFile = k.Flag("trace-file", "File that stores trace data.").String()
 	return p
+}
+
+func SetupPedanticFlag(k *kingpin.Application) *bool {
+	enablePedanticMode := k.Flag(pedantic.PedanticErrorFlag, "Enable more strict error checking").Bool()
+	return enablePedanticMode
 }
