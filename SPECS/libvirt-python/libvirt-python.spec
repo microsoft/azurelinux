@@ -3,7 +3,7 @@
 
 Summary:        The libvirt virtualization API python3 binding
 Name:           libvirt-python
-Version:        7.10.0
+Version:        10.0.0
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -79,6 +79,9 @@ python3 setup.py test
 %{python3_sitearch}/*egg-info
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.0.0-1
+- Auto-upgrade to 10.0.0 - 3.0 Upgrades
+
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

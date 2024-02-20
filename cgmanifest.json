@@ -11371,8 +11371,8 @@
         "type": "other",
         "other": {
           "name": "libvirt-python",
-          "version": "7.10.0",
-          "downloadUrl": "https://libvirt.org/sources/python/libvirt-python-7.10.0.tar.gz"
+          "version": "10.0.0",
+          "downloadUrl": "https://libvirt.org/sources/python/libvirt-python-10.0.0.tar.gz"
         }
       }
     },
