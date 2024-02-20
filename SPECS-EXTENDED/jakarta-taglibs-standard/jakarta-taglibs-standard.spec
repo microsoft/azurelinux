@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package jakarta-taglibs-standard
 #
@@ -58,11 +58,11 @@ This package contains the javadoc documentation for Jakarta Taglibs.
 
 %prep
 %setup -q -n %{name}-%{version}-src
-%patch0
-%patch1 -b .sav1
-%patch2 -b .sav2
-%patch3 -p1
-%patch4 -p1
+%patch 0
+%patch 1 -b .sav1
+%patch 2 -b .sav2
+%patch 3 -p1
+%patch 4 -p1
 
 cat > build.properties <<EOBP
 build.dir=build

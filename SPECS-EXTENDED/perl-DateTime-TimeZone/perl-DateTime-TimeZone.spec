@@ -14,7 +14,7 @@ Summary:        Time zone object base class and factory
 # upstream or locally:                  Public Domain
 License:        (GPL+ or Artistic) and Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-TimeZone
 Source0:        https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/DateTime-TimeZone-%{version}.tar.gz
 %if %{defined tzversion}
@@ -120,7 +120,7 @@ offset from GMT for a given time period.
 %setup -q -T -a 1 -c -n tzdata-%{tzversion}
 %endif
 %setup -q -T -b 0 -n DateTime-TimeZone-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %if !%{defined perl_bootstrap} && %{defined tzversion}

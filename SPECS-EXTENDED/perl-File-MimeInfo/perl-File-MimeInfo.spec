@@ -14,7 +14,7 @@ Release:        7%{?dist}
 Summary:        Determine file type and open application
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-MimeInfo
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-MimeInfo-%{version}.tar.gz#/perl-File-MimeInfo-%{version}.tar.gz
 BuildArch:      noarch

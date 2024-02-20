@@ -2,10 +2,10 @@
 Summary:        Distro - an OS platform information API
 Name:           python-distro
 Version:        1.6.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://distro.readthedocs.io/en/latest/
 Source0:        https://github.com/python-distro/distro/releases/download/v%{version}/distro-%{version}.tar.gz
@@ -21,7 +21,7 @@ Distro provides information about the OS distribution it runs on, such as a reli
 
 %package -n     python3-distro
 Summary:        Distro - an OS platform information API
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       python3
 
 %description -n python3-distro
@@ -49,6 +49,9 @@ export LANG=C.UTF-8
 %{_bindir}/*
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.6.0-3
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Wed Feb 09 2022 Muhammad Falak <mwani@microsoft.com> - 1.6.0-2
 - Use `%pytest` instead of `tox` to enable ptest
 

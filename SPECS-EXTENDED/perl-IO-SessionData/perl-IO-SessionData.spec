@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-IO-SessionData
 Version:        1.03
 Release:        18%{?dist}

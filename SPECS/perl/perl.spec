@@ -131,7 +131,7 @@ Release:        503%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
 Source3:        macros.perl
 # Tom Christiansen confirms Pod::Html uses the same license as perl
@@ -4077,15 +4077,15 @@ you're not running VMS, this module does nothing.
 
 %prep
 %setup -q -n perl-%{perl_version}
-%patch5 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch200 -p1
-%patch201 -p1
+%patch 5 -p1
+%patch 8 -p1
+%patch 9 -p1
+%patch 10 -p1
+%patch 11 -p1
+%patch 12 -p1
+%patch 13 -p1
+%patch 200 -p1
+%patch 201 -p1
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .

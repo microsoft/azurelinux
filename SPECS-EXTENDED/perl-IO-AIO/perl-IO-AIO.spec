@@ -8,7 +8,7 @@ Version:        %{upstream_version}%{extraversion}
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-AIO
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-AIO-%{upstream_version}.tar.gz
 Patch0:         IO-AIO-4.4-shellbang.patch
@@ -74,7 +74,7 @@ If no paths are given, treescan will use the current directory.
 %setup -q -n IO-AIO-%{upstream_version}
 
 # Fix shellbang in treescan
-%patch0
+%patch 0
 
 %build
 PERL_CANARY_STABILITY_NOPROMPT=1 perl Makefile.PL \

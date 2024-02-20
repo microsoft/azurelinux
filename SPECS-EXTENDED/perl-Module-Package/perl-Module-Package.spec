@@ -4,7 +4,7 @@ Release:        24%{?dist}
 Summary:        Postmodern Perl Module Packaging
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Module-Package
 Source0:        https://cpan.metacpan.org/authors/id/I/IN/INGY/Module-Package-%{version}.tar.gz#/perl-Module-Package-%{version}.tar.gz
 # Fix building on Perl without "." in @INC, CPAN RT#121748
@@ -35,7 +35,7 @@ Module::Install does, but just a bit better.
 
 %prep
 %setup -q -n Module-Package-%{version}
-%patch0 -p1
+%patch 0 -p1
 # XXX: Do not unbundle ./inc/ because of bootstrap
 
 %build

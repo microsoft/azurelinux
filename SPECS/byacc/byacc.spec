@@ -7,7 +7,7 @@ Release:      1%{?dist}
 License:      Public Domain
 URL:          https://invisible-island.net/byacc
 Vendor:       Microsoft Corporation
-Distribution: Mariner
+Distribution:   Azure Linux
 Source0:      https://invisible-mirror.net/archives/%{name}/%{name}-%{byaccdate}.tgz 
 
 BuildRequires: gcc

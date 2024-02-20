@@ -4,7 +4,7 @@ Version:        1.0
 Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ebiggers/ntfs-3g-system-compression
 Source0:        https://github.com/ebiggers/ntfs-3g-system-compression/archive/v%{version}/ntfs-3g-system-compression-%{version}.tar.gz
 

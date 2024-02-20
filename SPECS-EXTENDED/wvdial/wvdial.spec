@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A heuristic autodialer for PPP connections
 Name: wvdial
 Version: 1.61
@@ -36,13 +36,13 @@ negotiate the PPP connection using any mechanism needed.
 
 %prep
 %setup -q
-%patch1 -p1 -b .remotename
-%patch2 -p1 -b .9nums
-%patch3 -p1 -b .compuserve
-%patch4 -p1 -b .manpages
-%patch5 -p1 -b .typo_pon_wvdial
-%patch6 -p1 -b .ftbfs_with_gcc_45
-%patch7 -p1 -b ._DEFAULT_SOURCE
+%patch 1 -p1 -b .remotename
+%patch 2 -p1 -b .9nums
+%patch 3 -p1 -b .compuserve
+%patch 4 -p1 -b .manpages
+%patch 5 -p1 -b .typo_pon_wvdial
+%patch 6 -p1 -b .ftbfs_with_gcc_45
+%patch 7 -p1 -b ._DEFAULT_SOURCE
 
 %build
 %configure

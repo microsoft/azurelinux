@@ -4,7 +4,7 @@ Release:        20%{?dist}
 Summary:        Add test failures if warnings are caught
 License:        ASL 2.0 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-FailWarnings
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DAGOLDEN/Test-FailWarnings-%{version}.tar.gz#/perl-Test-FailWarnings-%{version}.tar.gz
 

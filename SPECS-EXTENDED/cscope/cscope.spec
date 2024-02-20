@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: C source code tree search and browse tool 
 Name: cscope
 Version: 15.9
@@ -28,7 +28,7 @@ matches for use in file editing.
 
 %prep
 %setup -q
-%patch1 -p1 
+%patch 1 -p1 
 
 autoreconf
 

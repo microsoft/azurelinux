@@ -16,7 +16,7 @@ Patch2:         cpprest-2.10.9-disable-tests-long-timeouts.patch
 # Disable test extract_floating_point, which fails on ppc64le and aarch64
 Patch3:         cpprest-2.10.9-disable-test-extract_floating_point.patch
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  boost-devel >= 1.55
 BuildRequires:  cmake >= 3.1
 BuildRequires:  websocketpp-devel
@@ -46,9 +46,9 @@ Development files.
 
 %prep
 %setup -n cpprestsdk-%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 # Remove bundled sources of websocketpp
 rm -r Release/libs
 # Remove file ThirdPartyNotices.txt, which is associated to websocketpp

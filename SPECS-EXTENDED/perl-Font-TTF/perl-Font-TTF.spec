@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:          perl-Font-TTF
 Version:       1.06
 Release:       13%{?dist}

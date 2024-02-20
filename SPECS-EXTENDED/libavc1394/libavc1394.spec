@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        Audio/Video Control library for IEEE-1394 devices
 Name:           libavc1394
 Version:        0.5.4
@@ -30,7 +30,7 @@ Development libraries required to build applications using libavc1394.
 
 %prep
 %setup -q
-%patch1 -p1 -b .librom
+%patch 1 -p1 -b .librom
 chmod -x test/dvcont.c
 
 %build

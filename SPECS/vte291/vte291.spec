@@ -14,7 +14,7 @@ Version:        0.66.2
 Release:        2%{?dist}
 License:        CC-BY AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org/
 Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version}.tar.xz
 # https://bugzilla.gnome.org/show_bug.cgi?id=711059
@@ -76,7 +76,7 @@ emulator library.
 
 %prep
 %setup -q -n vte-%{version}
-%patch100 -p1 -b .cntnr-precmd-preexec-scroll
+%patch 100 -p1 -b .cntnr-precmd-preexec-scroll
 %if 0%{?flatpak}
 # Install user units where systemd macros expect them
 sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build

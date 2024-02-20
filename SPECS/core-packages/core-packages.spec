@@ -1,10 +1,10 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
 Version:        2.0
-Release:        8%{?dist}
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 
@@ -39,6 +39,9 @@ Requires:       pkg-config
 Requires:       procps-ng
 Requires:       sudo
 Requires:       systemd
+Requires:       systemd-networkd
+Requires:       systemd-resolved
+Requires:       systemd-udev
 Requires:       tar
 Requires:       tzdata
 Requires:       util-linux
@@ -59,7 +62,7 @@ Requires:       filesystem
 Requires:       findutils
 Requires:       grep
 Requires:       gzip
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       mariner-repos
 Requires:       mariner-repos-extras
 Requires:       mariner-repos-microsoft
@@ -70,6 +73,8 @@ Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
+Requires:       SymCrypt
+Requires:       SymCrypt-openssl
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
 Requires:       xz
@@ -87,6 +92,12 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-10
+- Update the runtime dependency from mariner-release to azurelinux-release
+
+* Wed Jan 24 12:12:42 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.0-9
+- require broken-out systemd packages
+
 * Wed Jun 28 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-8
 - Moving 'curl' and 'grep' to the 'core-packages-container' package.
 

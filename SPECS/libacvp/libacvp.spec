@@ -4,7 +4,7 @@ Version:        1.3.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/cisco/libacvp
 Source0:        https://github.com/cisco/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz

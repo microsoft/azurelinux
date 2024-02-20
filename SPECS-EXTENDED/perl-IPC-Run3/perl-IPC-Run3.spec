@@ -4,7 +4,7 @@ Release:        19%{?dist}
 Summary:        Run a subprocess in batch mode
 License:        GPL+ or Artistic or BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IPC-Run3
 Source0:        https://cpan.metacpan.org/authors/id/R/RJ/RJBS/IPC-Run3-%{version}.tar.gz#/perl-IPC-Run3-%{version}.tar.gz
 BuildArch:      noarch
@@ -40,7 +40,7 @@ API and none of the bloat and rarely used features of IPC::Run.
 
 %prep
 %setup -q -n IPC-Run3-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 # Perms in tarballs are broken 
 find -type f -exec chmod -x {} \;

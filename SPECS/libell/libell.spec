@@ -4,7 +4,7 @@ Version:        0.61
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://01.org/ell
 Source0:        https://www.kernel.org/pub/linux/libs/ell/ell-%{version}.tar.xz
 BuildRequires:  gcc

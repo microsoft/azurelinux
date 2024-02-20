@@ -6,7 +6,7 @@ License:        GPLv3+
 URL:            http://www.mpfr.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.xz
 Requires:       gmp
 

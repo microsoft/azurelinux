@@ -4,7 +4,7 @@ Summary:        An adminstration shell for NVMe storage targets
 Version:        0.4
 Release:        11%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            ftp://ftp.infradead.org/pub/nvmetcli/
 Source:         ftp://ftp.infradead.org/pub/nvmetcli/%{name}-%{version}.tar.gz
 BuildArch:      noarch

@@ -4,7 +4,7 @@ Version:        4.23.9.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Systems
 URL:            https://github.com/inotify-tools/inotify-tools/wiki
 Source0:        https://github.com/%{name}/%{name}/archive/%{version}/%{name}-%{version}.tar.gz

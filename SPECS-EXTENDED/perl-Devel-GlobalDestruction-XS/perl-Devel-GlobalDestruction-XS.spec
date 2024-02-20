@@ -3,7 +3,7 @@ Version:	0.03
 Release:	13%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Faster implementation of the Devel::GlobalDestruction API
 URL:		https://metacpan.org/release/Devel-GlobalDestruction-XS
 Source0:	http://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-XS-%{version}.tar.gz

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package guava20
 #
@@ -69,8 +69,8 @@ guava-testlib provides additional functionality for conveninent unit testing
 %setup -q -n guava-%{version}
 cat %{SOURCE1} | sed 's#@BNDVRSN@#%{version}.0#g' >manifest.txt
 
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 find . -name '*.jar' -delete
 

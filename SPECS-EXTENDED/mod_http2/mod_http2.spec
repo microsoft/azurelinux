@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Module Magic Number
 %{!?_httpd_mmn: %global _httpd_mmn %(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}
 
@@ -22,7 +22,7 @@ top of libnghttp2 for httpd 2.4 servers.
 
 %prep
 %setup -q
-%patch1 -p1 -b .buildfix
+%patch 1 -p1 -b .buildfix
 
 %build
 %configure

@@ -6,7 +6,7 @@ Version:        0.7.0
 Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pexpect/ptyprocess
 Source0:        https://pypi.io/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch

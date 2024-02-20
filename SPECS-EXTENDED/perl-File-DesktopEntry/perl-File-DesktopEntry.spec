@@ -11,7 +11,7 @@ Release:        14%{?dist}
 Summary:        Object to handle .desktop files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-DesktopEntry
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MICHIELB/File-DesktopEntry-%{version}.tar.gz#/perl-File-DesktopEntry-%{version}.tar.gz
 BuildArch:      noarch

@@ -17,7 +17,7 @@ Release:        4%{?dist}
 # Structures_Graph is LGPLv3+
 License:        BSD AND LGPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pear.php.net/package/PEAR
 Source0:        http://download.pear.php.net/package/PEAR-%{version}.tgz
 # wget https://raw.githubusercontent.com/pear/pear-core/stable/install-pear.php

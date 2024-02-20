@@ -4,7 +4,7 @@ Version:        1.1
 Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/html5lib/html5lib-python
 Source:         %{pypi_source html5lib}
 # Fix compatibility with pytest 6

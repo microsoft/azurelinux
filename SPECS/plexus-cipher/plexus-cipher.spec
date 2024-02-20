@@ -6,7 +6,7 @@ Version:        2.0
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 # project moved to GitHub and it looks like there is no official website anymore
 URL:            https://github.com/codehaus-plexus/plexus-cipher

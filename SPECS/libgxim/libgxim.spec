@@ -4,7 +4,7 @@ Version:        0.5.0
 Release:        20%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://tagoh.bitbucket.org/libgxim/
 Source0:        https://bitbucket.org/tagoh/%{name}/downloads/%{name}-%{version}.tar.bz2
 Patch0:         %{name}-fix-build.patch

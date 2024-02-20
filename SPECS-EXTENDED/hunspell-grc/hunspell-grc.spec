@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-grc
 Summary: Ancient Greek hunspell dictionaries
 Version: 2.1.5

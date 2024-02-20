@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _use_internal_dependency_generator 0
 
 %global contentdir       %{_localstatedir}/www/%{name}
@@ -53,10 +53,10 @@ images which provide a LIVE visual representation of this traffic.
 
 %prep
 %setup -q
-%patch0 -p1 -b .lib64
-%patch1 -p1 -b .socket6
-%patch2 -p1 -b .ifhighspeed
-%patch3 -p1 -b .traffic-sum-man-option
+%patch 0 -p1 -b .lib64
+%patch 1 -p1 -b .socket6
+%patch 2 -p1 -b .ifhighspeed
+%patch 3 -p1 -b .traffic-sum-man-option
 
 for i in doc/mrtg-forum.1 doc/mrtg-squid.1 CHANGES; do
     iconv -f iso-8859-1 -t utf-8 < "$i" > "${i}_"

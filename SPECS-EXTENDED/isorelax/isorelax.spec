@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package isorelax
 #
@@ -63,7 +63,7 @@ cp %{SOURCE3} test
 chmod -R go=u-w *
 find . -name "*.jar" -exec rm -f {} \;
 rm -rf src/jp/gr/xml/relax/swift
-%patch0 -b .sav0
+%patch 0 -b .sav0
 
 %build
 export CLASSPATH=$(build-classpath \

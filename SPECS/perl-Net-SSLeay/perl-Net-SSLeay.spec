@@ -11,7 +11,7 @@ Patch0:         0001-local-tests-skip-2-failing-tests.patch
 Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  openssl-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(English)
@@ -48,7 +48,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %if 0%{?with_fips:1}

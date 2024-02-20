@@ -4,7 +4,7 @@ Version:        0.02
 Release:        29%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Digest-BubbleBabble
 Source0:        https://cpan.metacpan.org/modules/by-module/Digest/Digest-BubbleBabble-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils

@@ -13,7 +13,7 @@ Version:        9.16.44
 Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.isc.org/downloads/bind/
 Source0:        https://ftp.isc.org/isc/bind9/%{version}/%{name}-%{version}.tar.xz
@@ -228,12 +228,12 @@ Summary:        BIND utilities
 %prep
 %setup -q
 
-%patch9 -p1 -b .config-pkcs11
+%patch 9 -p1 -b .config-pkcs11
 cp -r bin/named{,-pkcs11}
 cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
-%patch10 -p1 -b .dist_pkcs11
+%patch 10 -p1 -b .dist_pkcs11
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
@@ -418,7 +418,7 @@ if [ $1 -gt 1 ]; then \
   done \
 fi
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %ldconfig_scriptlets libs
 %ldconfig_scriptlets pkcs11-libs
 

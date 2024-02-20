@@ -10,7 +10,7 @@ Version:        1.4.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/dbus/%{name}-%{version}.tar.xz
 

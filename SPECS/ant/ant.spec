@@ -26,7 +26,7 @@ Version:        1.10.14
 Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools/Building
 URL:            https://ant.apache.org/
 Source0:        https://archive.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
@@ -98,9 +98,9 @@ find -name build.xml -o -name pom.xml | xargs sed -i -e s/-SNAPSHOT//
 find -name \*.jar -print -delete
 
 # When bootstrapping, we don't have junit
-%patch0 -p1
+%patch 0 -p1
 # Explicitly set sourcepath when compiling bootstrap
-%patch1 -p1
+%patch 1 -p1
 
 # clean jar files
 find . -name "*.jar" -print -delete

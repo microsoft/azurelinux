@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Module Magic Number
 %{!?_httpd_mmn: %global _httpd_mmn %(cat %{_includedir}/httpd/.mmn 2>/dev/null || echo 0-0)}
 
@@ -25,8 +25,8 @@ domains and their virtual hosts automatically, including at renewal.
 
 %prep
 %setup -q
-%patch2 -p1 -b .warnfix
-%patch3 -p1 -b .tol_missing_res
+%patch 2 -p1 -b .warnfix
+%patch 3 -p1 -b .tol_missing_res
 
 %build
 %configure

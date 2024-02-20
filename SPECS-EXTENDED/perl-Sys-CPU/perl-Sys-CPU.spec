@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Sys-CPU
 Version:        0.61
 Release:        22%{?dist}
@@ -36,8 +36,8 @@ Currently only number of CPU's supported.
 
 %prep
 %setup -q -n Sys-CPU-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor

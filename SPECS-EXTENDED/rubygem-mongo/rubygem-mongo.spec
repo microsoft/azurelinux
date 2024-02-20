@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global gem_name mongo
 # Disable tests as MongoDB was dropped from Fedora because of a licensing issue.
 # https://src.fedoraproject.org/rpms/mongodb/blob/master/f/dead.package

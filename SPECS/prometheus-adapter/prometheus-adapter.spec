@@ -4,7 +4,7 @@ Version:        0.11.2
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/kubernetes-sigs/prometheus-adapter
 Source0:        https://github.com/kubernetes-sigs/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  golang

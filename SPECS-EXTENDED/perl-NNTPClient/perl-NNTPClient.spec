@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-NNTPClient
 Version:        0.37
 Release:        12%{?dist}
@@ -36,8 +36,8 @@ Programming interface.
 
 %prep
 %setup -q -n NNTPClient-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

@@ -7,7 +7,7 @@ Summary:	USB Modeswitch gets mobile broadband cards in operational mode
 Summary(de):	USB Modeswitch aktiviert UMTS-Karten
 License:	GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://www.draisberghof.de/usb_modeswitch/
 
 Source0:	http://www.draisberghof.de/%{name}/%{source_name}-%{version}.tar.bz2
@@ -43,8 +43,8 @@ Vodafone, Option, ZTE und Novatell werden unterstützt.
 %setup -q -n %{source_name}-%{version}
 cp -f %{SOURCE1} device_reference.txt
 
-%patch0 -p0
-%patch1 -p1
+%patch 0 -p0
+%patch 1 -p1
 
 
 %build

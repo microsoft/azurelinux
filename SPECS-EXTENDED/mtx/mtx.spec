@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: mtx
 Version: 1.3.12
 Release: 23%{?dist}
@@ -29,8 +29,8 @@ tape at a time, you should install MTX.
 %prep
 %setup -q
 
-%patch0 -p2 -b .destdir
-%patch1 -p2 -b .argc
+%patch 0 -p2 -b .destdir
+%patch 1 -p2 -b .argc
 
 # remove exec permission
 chmod a-x contrib/config_sgen_solaris.sh contrib/mtx-changer

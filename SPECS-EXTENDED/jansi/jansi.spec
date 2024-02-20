@@ -4,7 +4,7 @@ Version:        2.4.0
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://fusesource.github.io/jansi/
 Source0:        https://github.com/fusesource/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz

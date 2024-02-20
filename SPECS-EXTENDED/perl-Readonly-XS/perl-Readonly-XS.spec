@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Provides/Requires filtering is different from rpm 4.9 onwards
 %global rpm49 %(rpm --version | perl -p -e 's/^.* (\\d+)\\.(\\d+).*/sprintf("%d.%03d",$1,$2) ge 4.009 ? 1 : 0/e' 2>/dev/null || echo 0)
 
@@ -45,10 +45,10 @@ scalar variables.
 %setup -q -n Readonly-XS-%{version}
 
 # Build process does not actually need perl(Readonly)
-%patch0
+%patch 0
 
 # Fix script interpreter for test suite since we're packaging it
-%patch1
+%patch 1
 
 # And tests don't need to be executable either
 chmod -c -x t/test.t

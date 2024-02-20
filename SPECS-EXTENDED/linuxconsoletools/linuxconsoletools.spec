@@ -5,7 +5,7 @@ Version:        1.8.1
 Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sourceforge.net/projects/linuxconsole/
 Source:         https://downloads.sourceforge.net/linuxconsole/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc

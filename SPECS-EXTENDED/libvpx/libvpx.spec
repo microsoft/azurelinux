@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global somajor 8
 %global sominor 0
 %global sotiny  0
@@ -47,7 +47,7 @@ and decoder.
 
 %prep
 %setup -q -n libvpx-%{version}
-%patch0 -p1 -b .leave-fs-on
+%patch 0 -p1 -b .leave-fs-on
 
 %build
 %ifarch %{ix86}

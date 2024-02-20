@@ -4,7 +4,7 @@ Version:        2.2.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            http://ftp.altlinux.org/pub/people/legion/kbd
 Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
@@ -21,7 +21,7 @@ The Kbd package contains key-table files, console fonts, and keyboard utilities.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 sed -i 's/\(RESIZECONS_PROGS=\)yes/\1no/g' configure
 sed -i 's/resizecons.8 //'  docs/man/man8/Makefile.in
 # /bin/ld: libfont.a(kdmapop.o):/usr/src/mariner/BUILD/kbd-2.0.4/src/version.h:8: multiple definition of `progname';

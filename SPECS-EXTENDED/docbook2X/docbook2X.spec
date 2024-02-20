@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           docbook2X
 Version:        0.8.8
 Release:        36%{?dist}

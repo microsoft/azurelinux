@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           jbigkit
 Version:        2.1
 Release:        19%{?dist}
@@ -52,12 +52,12 @@ formats.
 
 %prep
 %setup -q -n jbigkit-2.1
-%patch0 -p1 -b .shlib
-%patch1 -p1 -b .warnings
+%patch 0 -p1 -b .shlib
+%patch 1 -p1 -b .warnings
 # jbigkit: Partial Fedora build flags injection (bug #1548546)
-%patch2 -p1 -b .ldflags
+%patch 2 -p1 -b .ldflags
 # covscan issues - backported from upstream
-%patch3 -p1 -b .covscan
+%patch 3 -p1 -b .covscan
 
 %build
 # get the correct redhat build flags

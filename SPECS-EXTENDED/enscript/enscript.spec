@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
@@ -58,17 +58,17 @@ includes many options for customizing printouts
 
 %prep
 %setup -q
-%patch3 -p1 -b .locale
-%patch8 -p1 -b .wrap_header
-%patch10 -p1 -b .rh457720
-%patch12 -p1 -b .rh477382
-%patch13 -p1 -b .build
-%patch14 -p1 -b .manfixes
-%patch15 -p1 -b .bufpos-crash
+%patch 3 -p1 -b .locale
+%patch 8 -p1 -b .wrap_header
+%patch 10 -p1 -b .rh457720
+%patch 12 -p1 -b .rh477382
+%patch 13 -p1 -b .build
+%patch 14 -p1 -b .manfixes
+%patch 15 -p1 -b .bufpos-crash
 # 1664367 - [RFE] Add support for 885915 encoding in enscript
-%patch16 -p1 -b .newencodings
+%patch 16 -p1 -b .newencodings
 # CVE in gnulib
-%patch17 -p1 -b .vasnprintf
+%patch 17 -p1 -b .vasnprintf
 
 %{__tar} -C states/hl -zxf %{SOURCE1} ruby.st
 install -pm 644 %{SOURCE2} states/hl/php.st

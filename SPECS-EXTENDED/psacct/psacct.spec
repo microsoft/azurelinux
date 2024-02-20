@@ -7,7 +7,7 @@ Version: 6.6.4
 Release: 8%{?dist}
 License: GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.gnu.org/software/acct/
 
 Source: ftp://ftp.gnu.org/pub/gnu/acct/acct-%{version}.tar.gz
@@ -43,9 +43,9 @@ commands.
 %prep
 %setup -q -n acct-%{version}
 
-%patch1 -p1 -b .subsubsec
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1 -b .subsubsec
+%patch 2 -p1
+%patch 3 -p1
 
 # fixing 'gets' undeclared
 sed -i 's|.*(gets,.*||g' lib/stdio.in.h

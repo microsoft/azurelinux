@@ -10,11 +10,11 @@
 
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        6.6.12.1
-Release:        2%{?dist}
+Version:        6.6.14.1
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 #Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz
@@ -221,6 +221,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
 * Mon Jan 29 14:54:48 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
 - use "bootstrap" systemd rpm macros
 

@@ -17,14 +17,14 @@
 
 Summary:        Default set of cursor themes for X
 Name:           xcursor-themes
-Version:        1.0.6
-Release:        2%{?dist}
+Version:        1.0.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/X11/Icons
 URL:            https://xorg.freedesktop.org/
-Source0:        https://xorg.freedesktop.org/releases/individual/data/%{name}-%{version}.tar.bz2
+Source0:        https://xorg.freedesktop.org/releases/individual/data/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -57,6 +57,9 @@ of the X.Org software distribution.
 %{_datadir}/icons/whiteglass/
 
 %changelog
+* Thu Feb 15 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.0.7-1
+- Update to 1.0.7
+
 * Fri Oct 08 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.6-2
 - Switching to using a single digit for the 'Release' tag.
 - Adding distribution information to the 'Release' tag.

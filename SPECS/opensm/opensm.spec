@@ -5,7 +5,7 @@ Version:        3.3.24
 Release:        1%{?dist}
 License:        GPLv2 OR BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/linux-rdma/opensm
 Source0:        https://github.com/linux-rdma/opensm/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source2:        opensm.logrotate

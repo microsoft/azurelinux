@@ -4,7 +4,7 @@ Version:        1.3.0
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools/Other
 URL:            https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/about
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git/snapshot/%{name}-%{version}.tar.gz

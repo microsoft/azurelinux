@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Log-Message-Simple
 Version:        0.10
 Release:        309%{?dist}
