@@ -49,7 +49,7 @@ diff --git a/nbproject/project.xml b/nbproject/project.xml
 index c05eefc1..02438508 100644
 --- a/nbproject/project.xml
 +++ b/nbproject/project.xml
-@@ -146,12 +146,12 @@ auxiliary.show.customizer.message=<message>
+@@ -174,12 +174,12 @@ auxiliary.show.customizer.message=<message>
              <compilation-unit>
                  <package-root>test</package-root>
                  <unit-tests/>

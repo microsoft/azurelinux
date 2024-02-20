@@ -162,6 +162,7 @@ ant
 * Tue Feb 20 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 5.14.0-1
 - Update from 5.10.0 to 5.14.0
 - Modifying jna_remove_clover_and_win32_native_jar.patch to remove already existing code in 5.14.0 versions
+- Modifying ant_tools_arbitrary_ow2.patch to reflect the new code added in the 5.14.0 version
 
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
 - Update source to v5.10.0
