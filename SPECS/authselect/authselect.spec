@@ -10,7 +10,8 @@ Distribution:   Azure Linux
 URL:            https://github.com/authselect/authselect
 
 License:        GPLv3+
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+#Source0:        %{url}/archive/%{version}/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 %global makedir %{_builddir}/%{name}-%{version}
 

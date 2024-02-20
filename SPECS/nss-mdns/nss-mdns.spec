@@ -10,7 +10,8 @@ Summary: glibc plugin for .local name resolution
 
 License: LGPLv2+
 URL: https://github.com/lathiat/nss-mdns
-Source: %{url}/archive/refs/tags/%{name}-%{version}.tar.gz
+#Source0: %{url}/archive/refs/tags/v%{version}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 # https://github.com/lathiat/nss-mdns/pull/84
 Patch1:  nss-mdns-local-heuristic.patch
