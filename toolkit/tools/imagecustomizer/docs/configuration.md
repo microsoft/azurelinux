@@ -821,6 +821,9 @@ Scripts to run against the image after the packages have been added and removed.
 
 These scripts are run under a chroot of the customized OS.
 
+Note: Scripts must be in the same directory or a child directory of the directory
+that contains the config file.
+
 Example:
 
 ```yaml
@@ -834,6 +837,9 @@ SystemConfig:
 Scripts to run against the image just before the image is finalized.
 
 These scripts are run under a chroot of the customized OS.
+
+Note: Scripts must be in the same directory or a child directory of the directory
+that contains the config file.
 
 Example:
 
