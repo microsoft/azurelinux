@@ -742,13 +742,18 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 	return
 }
 
-// addMachineID creates the /etc/machine-id file in the installChroot
+// addMachineID creates the /etc/machine-id file in the installChroot, if it is
+// not already present (systemd package will include it if installed).
 func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	// From https://www.freedesktop.org/software/systemd/man/machine-id.html:
 	// For operating system images which are created once and used on multiple
 	// machines, for example for containers or in the cloud, /etc/machine-id
-	// should be an empty file in the generic file system image. An ID will be
-	// generated during boot and saved to this file if possible.
+	// should be either missing or an empty file in the generic file system
+	// image (the difference between the two options is described under
+	//"First Boot Semantics" below). An ID will be generated during boot and
+	// saved to this file if possible. Having an empty file in place is useful
+	// because it allows a temporary file to be bind-mounted over the real file,
+	// in case the image is used read-only
 
 	const (
 		machineIDFile      = "/etc/machine-id"
@@ -757,9 +762,16 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 
 	ReportAction("Configuring machine id")
 
-	err = installChroot.UnsafeRun(func() error {
-		return file.Create(machineIDFile, machineIDFilePerms)
-	})
+	exists, err := file.PathExists(filepath.Join(installChroot.RootDir(), machineIDFile))
+	if err != nil {
+		err = fmt.Errorf("failed to check if machine-id exists:\n%w", err)
+		return
+	}
+	if !exists {
+		err = installChroot.UnsafeRun(func() error {
+			return file.Create(machineIDFile, machineIDFilePerms)
+		})
+	}
 	return
 }
 
@@ -1526,7 +1538,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	// Skip user SSH directory generation when not provided with public keys
 	// Let SSH handle the creation of this folder on its first use
-	if len(sshPubKeyPaths) == 0 {
+	if len(sshPubKeyPaths) == 0 && len(sshPubKeys) == 0 {
 		return
 	}
 
@@ -2576,7 +2588,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 	return packageList
 }
 
-// stopGPGAgent stops gpg-agent if it is running inside the installChroot.
+// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
 //
 // It is possible that one of the packages or post-install scripts started a GPG agent.
 // e.g. when installing the mariner-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
@@ -2587,6 +2599,12 @@ func stopGPGAgent(installChroot *safechroot.Chroot) {
 		if err != nil {
 			// This is non-fatal, as there is no guarantee the image has gpg agent started.
 			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
+		}
+
+		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
+		if err != nil {
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
+			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
 		}
 
 		return nil

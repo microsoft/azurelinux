@@ -20,7 +20,7 @@ Version:        0.7.7
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -57,7 +57,7 @@ API documentation for %{name}.
 %prep
 %setup -q
 tar -xf %{SOURCE1}
-%patch0 -p1
+%patch 0 -p1
 find . -name "*.jar" | xargs rm
 
 # bnc#759912

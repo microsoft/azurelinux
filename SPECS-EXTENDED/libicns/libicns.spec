@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libicns
 Version:        0.8.1
 Release:        20%{?dist}
@@ -45,7 +45,7 @@ icontainer2icns - extract icns files from icontainers
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

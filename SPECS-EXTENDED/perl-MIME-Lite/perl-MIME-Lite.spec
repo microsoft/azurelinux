@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-MIME-Lite
 Version:        3.031
 Release:        3%{?dist}

@@ -9,7 +9,7 @@ Summary:          API for Linux kernel LIO SCSI target
 Version:          2.1.fb69
 Release:          9%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:              https://github.com/open-iscsi/%{oname}
 Source:           %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 Source1:          target.service
@@ -72,7 +72,7 @@ on system restart.
 
 %prep
 %setup -q -n %{oname}-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

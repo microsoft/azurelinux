@@ -10,7 +10,7 @@
 
 GSESSION="$(type -p gnome-session)"
 MSESSION="$(type -p mate-session)"
-STARTKDE="$(type -p startkde)"
+STARTKDE="$(type -p startplasma-x11)"
 STARTLXDE="$(type -p startlxde)"
 
 # check to see if the user has a preferred desktop

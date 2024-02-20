@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Summary: Open implementation of Service Location Protocol V2
 Name:    openslp
@@ -68,13 +68,13 @@ OpenSLP server daemon to dynamically register services.
 %prep
 %setup -q
 
-%patch1 -p1 -b .multicast-set
-%patch2 -p2 -b .systemd
-%patch3 -p1 -b .null-pointer-deref
-%patch4 -p1 -b .openssl-1.1-fix
-%patch5 -p1 -b .cve-2016-7567
-%patch6 -p1 -b .cve-2017-17833
-%patch7 -p1 -b .cve-2019-5544
+%patch 1 -p1 -b .multicast-set
+%patch 2 -p2 -b .systemd
+%patch 3 -p1 -b .null-pointer-deref
+%patch 4 -p1 -b .openssl-1.1-fix
+%patch 5 -p1 -b .cve-2016-7567
+%patch 6 -p1 -b .cve-2017-17833
+%patch 7 -p1 -b .cve-2019-5544
 
 # tarball goof (?), it wants to re-automake anyway, so let's do it right.
 #libtoolize --force

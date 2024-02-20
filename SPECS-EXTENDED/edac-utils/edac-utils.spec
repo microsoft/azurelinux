@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		edac-utils
 Version:	0.16
 Release:	23%{?dist}

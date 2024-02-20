@@ -4,7 +4,7 @@ Version:        0.2.5
 Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://pyyaml.org/wiki/LibYAML
 Source0:        https://pyyaml.org/download/libyaml/yaml-%{version}.tar.gz

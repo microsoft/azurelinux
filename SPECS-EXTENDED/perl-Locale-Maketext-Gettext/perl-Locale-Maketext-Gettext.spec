@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Locale-Maketext-Gettext
 Version:        1.30
 Release:        3%{?dist}
@@ -43,7 +43,7 @@ problems, too.
 
 %prep
 %setup -q -n Locale-Maketext-Gettext-%{version}
-%patch0 -p 1
+%patch 0 -p 1
 
 %build
 %{__perl} Build.PL installdirs=vendor

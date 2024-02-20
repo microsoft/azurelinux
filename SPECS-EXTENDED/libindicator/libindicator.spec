@@ -4,7 +4,7 @@ Version:        12.10.1
 Release:        24%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://launchpad.net/libindicator
 Source0:        https://launchpad.net/libindicator/12.10/12.10.1/+download/%{name}-%{version}.tar.gz
 BuildRequires:  chrpath

@@ -19,7 +19,7 @@ Summary:        Google Noto Sans CJK Fonts
 
 License:        OFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/googlei18n/noto-cjk
 Source0:        https://github.com/googlei18n/noto-cjk/archive/%{commit0}.tar.gz#/noto-cjk-%{shortcommit0}.tar.gz
 Source1:        genfontconf.py

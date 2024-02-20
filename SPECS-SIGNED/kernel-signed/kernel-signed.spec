@@ -9,11 +9,11 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.12.1
-Release:        3%{?dist}
+Version:        6.6.14.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # This spec purpose is to take an input kernel rpm and input secure-boot-signed
@@ -147,9 +147,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
-* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.12.1-3
+* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
 - Remove legacy /boot/mariner.cfg
 - Introduce /etc/default/grub.d/10_kernel.cfg
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Bump release to match kernel
 
 * Sat Jan 27 11:11:08 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
 - update to match kernel version

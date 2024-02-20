@@ -7,7 +7,7 @@ Version:        3.36.1
 Release:        2%{?dist}
 License:        LGPLv3+ or CC-BY-SA
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org
 Source0:        https://download.gnome.org/sources/adwaita-icon-theme/%{majmin}/%{name}-%{version}.tar.xz
 BuildRequires:  intltool

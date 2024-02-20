@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Allow a module's pod to contain Pod::Coverage hints
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Coverage-TrustPod
 Source0:        https://cpan.metacpan.org/modules/by-module/Pod/Pod-Coverage-TrustPod-%{version}.tar.gz#/perl-Pod-Coverage-TrustPod-%{version}.tar.gz
 BuildArch:      noarch

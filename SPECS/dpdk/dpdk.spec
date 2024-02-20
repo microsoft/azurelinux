@@ -33,7 +33,7 @@ Version:        21.11.2
 Release:        2%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
@@ -103,7 +103,7 @@ as L2 and L3 forwarding.
 %define incdir %{_includedir}/%{name}
 %define pmddir %{_libdir}/%{name}-pmds
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %prep
 %autosetup -p1 -n dpdk-stable-%{version}

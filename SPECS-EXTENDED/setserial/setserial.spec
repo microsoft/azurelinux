@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define	_bindir	/bin
 
 Summary: A utility for configuring serial ports
@@ -29,23 +29,23 @@ port and IRQ that a particular serial device is using, and more.
 %prep
 %setup -q
 # Use FHS directory layout.
-%patch0 -p1 -b .fhs
+%patch 0 -p1 -b .fhs
 
 # Fixed initscript.
-%patch1 -p1 -b .rc
+%patch 1 -p1 -b .rc
 
 # Corrected readme file.
-%patch2 -p1 -b .readme
+%patch 2 -p1 -b .readme
 
 # Fixed spelling in help output.
-%patch3 -p1 -b .spelling
+%patch 3 -p1 -b .spelling
 
 # Don't require hayesesp.h (bug #564947).
-%patch4 -p1 -b .hayesesp
+%patch 4 -p1 -b .hayesesp
 rm -f config.cache
 
 # Support aarch64 (bug #926522).
-%patch5 -p1 -b .aarch64
+%patch 5 -p1 -b .aarch64
 
 mv %{SOURCE1} ./LICENSE.txt
 

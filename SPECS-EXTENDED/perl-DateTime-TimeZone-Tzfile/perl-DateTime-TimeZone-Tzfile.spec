@@ -11,7 +11,7 @@ Release:        10%{?dist}
 Summary:        Tzfile (zoneinfo) timezone files
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/DateTime-TimeZone-Tzfile
 Source0:        https://cpan.metacpan.org/authors/id/Z/ZE/ZEFRAM/DateTime-TimeZone-Tzfile-%{version}.tar.gz#/perl-DateTime-TimeZone-Tzfile-%{version}.tar.gz
 BuildArch:      noarch

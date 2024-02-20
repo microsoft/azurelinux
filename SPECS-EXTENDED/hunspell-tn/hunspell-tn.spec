@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-tn
 Summary: Tswana hunspell dictionaries
 %global upstreamid 20150904

@@ -6,7 +6,7 @@ Version:        %{git_date}
 Release:        5%{?dist}
 License:        LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.com/redhat-crypto/fedora-crypto-policies
 Source0:        https://gitlab.com/redhat-crypto/fedora-crypto-policies/-/archive/f32-updates/fedora-crypto-policies-f32-updates.tar.gz
 BuildRequires:  asciidoc

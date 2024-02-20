@@ -4,7 +4,7 @@ Release:        10%{?dist}
 Summary:        Return across multiple call levels
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Return-MultiLevel
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAUKE/Return-MultiLevel-%{version}.tar.gz#/perl-Return-MultiLevel-%{version}.tar.gz
 BuildArch:      noarch

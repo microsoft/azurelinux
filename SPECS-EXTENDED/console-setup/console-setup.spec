@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Name:		console-setup
 Version:	1.194
@@ -48,9 +48,9 @@ not wasted but used for another symbol.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1 -b .paths
-%patch1 -p1 -b .fsf-address
-%patch2 -p1 -b .ctrll-lock
+%patch 0 -p1 -b .paths
+%patch 1 -p1 -b .fsf-address
+%patch 2 -p1 -b .ctrll-lock
 
 
 %build

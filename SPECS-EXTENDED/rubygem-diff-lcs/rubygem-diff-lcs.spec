@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global gem_name diff-lcs
 
 # %%check section needs rspec-expectations, however rspec-expectations depends

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _hardened_build 1
 %global commit0 e60d4cca3d0e702c60ad0f9e2eecaa461baa4744
 
@@ -34,7 +34,7 @@ These are the development files.
 %prep
 %setup -qn %{name}-%{commit0}
 
-%patch0 -p1
+%patch 0 -p1
 
 %build
 

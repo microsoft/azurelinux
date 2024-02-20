@@ -6,7 +6,7 @@ Version:        2.2
 Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/vfs/
 Source0:        https://archive.apache.org/dist/commons/vfs/source/%{short_name}-distribution-%{version}-src.tar.gz
@@ -80,8 +80,8 @@ cp %{SOURCE1} .
 cp %{SOURCE2} .
 cp %{SOURCE3} commons-vfs2/build.xml
 cp %{SOURCE4} commons-vfs2-examples/build.xml
-%patch0 -p1 -b .build.xml
-%patch1 -p1 -b .provider.xml
+%patch 0 -p1 -b .build.xml
+%patch 1 -p1 -b .provider.xml
 
 %pom_remove_plugin :apache-rat-plugin
 

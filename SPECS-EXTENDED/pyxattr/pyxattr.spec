@@ -4,7 +4,7 @@ Version:        0.7.1
 Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pyxattr.k1024.org/
 Source0:        %{URL}/downloads/%{name}-%{version}.tar.gz
 Source1:        %{URL}/downloads/%{name}-%{version}.tar.gz.asc

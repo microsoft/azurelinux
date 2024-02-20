@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A tool for printing multiple pages of text on each printed page
 Name: mpage
 Version: 2.5.7
@@ -20,7 +20,7 @@ pages.
 
 %prep
 %setup -q
-%patch0 -p1 -b .config
+%patch 0 -p1 -b .config
 
 %build
 make BINDIR=%{_bindir} LIBDIR=%{_datadir} MANDIR=%{_mandir}/man1

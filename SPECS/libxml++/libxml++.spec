@@ -5,7 +5,7 @@ Version:        5.0.3
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://libxmlplusplus.sourceforge.net/
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
 BuildRequires:  glibmm-devel

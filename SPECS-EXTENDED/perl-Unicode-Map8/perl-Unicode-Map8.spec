@@ -4,7 +4,7 @@ Release:        35%{?dist}
 Summary:        Mapping table between 8-bit chars and Unicode for Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-Map8
 Source0:        https://cpan.metacpan.org/modules/by-module/Unicode/Unicode-Map8-%{version}.tar.gz#/perl-Unicode-Map8-%{version}.tar.gz
 Patch0:         perl-Unicode-Map8-0.12-declaration.patch
@@ -48,11 +48,11 @@ tables in RFC 1345.  New maps can easily be installed.
 %setup -q -n Unicode-Map8-%{version}
 
 # Patches from openSUSE to fix test suite on x86_64
-%patch0 -p0
-%patch1 -p0
+%patch 0 -p0
+%patch 1 -p0
 
 # Re-code docs as UTF8
-%patch2
+%patch 2
 
 
 %build

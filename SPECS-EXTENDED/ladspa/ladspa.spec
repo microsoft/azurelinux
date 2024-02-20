@@ -6,7 +6,7 @@ Summary:        Linux Audio Developer's Simple Plug-in API, examples and tools
 
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.ladspa.org/
 Source:         http://www.ladspa.org/download/%{name}_sdk_%{version}.tgz
 Patch1:         ladspa-1.13-plugindir.patch
@@ -37,7 +37,7 @@ header file.
 
 %prep
 %setup -q -n ladspa_sdk
-%patch1 -p0 -b .plugindir
+%patch 1 -p0 -b .plugindir
 # respect RPM_OPT_FLAGS
 perl -pi -e 's/^(CFLAGS.*)-O3(.*)/$1\$\(RPM_OPT_FLAGS\)$2 -DPLUGINDIR=\$\(PLUGINDIR\)/' src/makefile
 # avoid X.org dependency

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: fxload
 Version: 2008_10_13
 Release: 16%{?dist}
@@ -31,8 +31,8 @@ appears on the bus.
 
 %prep
 %setup -q 
-%patch0 -p1 -b .fxload-noa3load
-%patch1 -p1 -b .cflags
+%patch 0 -p1 -b .fxload-noa3load
+%patch 1 -p1 -b .cflags
 
 %build 
 make CC=gcc CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"

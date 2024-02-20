@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           amtk
 Version:        5.0.2
 Release:        3%{?dist}

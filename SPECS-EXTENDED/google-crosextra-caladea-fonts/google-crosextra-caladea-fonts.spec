@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global fontname google-crosextra-caladea
 %global fontconf62 62-%{fontname}
 %global fontconf30 30-0-%{fontname}

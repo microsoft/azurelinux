@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Mozilla-CA
 # You do not need to back-port a new version for updating a list of the
 # certificates. They are taken from ca-certificates package instead
@@ -38,7 +38,7 @@ and libraries based on OpenSSL.
 
 %prep
 %setup -q -n Mozilla-CA-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Remove a bundled CA bundle for sure
 rm lib/Mozilla/CA/cacert.pem
 # Do not distribute Mozilla downloader, we take certificates from

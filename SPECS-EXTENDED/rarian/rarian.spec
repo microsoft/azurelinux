@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 Name: rarian
 Version: 0.8.1
@@ -60,7 +60,7 @@ Rarian library ("librarian").
 
 %prep
 %setup -q
-%patch1 -p1 -b .categories
+%patch 1 -p1 -b .categories
 
 %build
 %configure --disable-skdb-update

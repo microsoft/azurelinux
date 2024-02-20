@@ -5,7 +5,7 @@ Release:        1%{?dist}
 # The code includes the advertising clause, so it's GPL-incompatible
 License:        BSD WITH advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.litech.org/radvd/
 Source0:        %{url}dist/%{name}-%{version}.tar.xz
 Source1:        radvd-tmpfs.conf

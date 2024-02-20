@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-GD
 Version:        2.71
 Release:        5%{?dist}
@@ -58,10 +58,10 @@ create PNG images on the fly or modify existing files.
 %setup -q -n GD-%{version}
 
 # Re-code documentation as UTF8
-%patch0
+%patch 0
 
 # Upstream wants -Wformat=1 but we don't
-%patch1
+%patch 1
 
 # Fix shellbangs in sample scripts
 perl -pi -e 's|/usr/local/bin/perl\b|%{__perl}|' \

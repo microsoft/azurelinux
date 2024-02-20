@@ -5,10 +5,10 @@
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
 Version:        3.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/RPM
 URL:            https://github.com/vmware/tdnf/wiki
 #Source0:       https://github.com/vmware/tdnf/archive/v%{version}.tar.gz
@@ -18,7 +18,7 @@ Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
 Patch0:         tdnf-mandatory-space-list-output.patch
-Patch1:         tdnf-default-mariner-release.patch
+Patch1:         tdnf-default-azurelinux-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/commit/d62d7097c009ee867bee992840334dbc12f4f0f3
@@ -225,6 +225,9 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.5.2-3
+- Fix and rename patch tdnf-default-mariner-release.patch file into tdnf-default-azurelinux-release.patch with new changed azure linux OS files.
+
 * Thu Jun 15 2023 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
 - add patch for SELECTION_DOTARCH in solv/tdnfquery.c
 

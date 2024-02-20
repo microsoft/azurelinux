@@ -4,7 +4,7 @@ Version:        4.0.0
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://heasarc.gsfc.nasa.gov/fitsio/
 Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
 # Remove soname version check

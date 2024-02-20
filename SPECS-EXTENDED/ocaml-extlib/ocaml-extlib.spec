@@ -7,7 +7,7 @@ Version:        1.7.8
 Release:        1%{?dist}
 License:        LGPLv2 with exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ygrek/ocaml-extlib
 Source0:        https://github.com/ygrek/ocaml-extlib/releases/download/%{version}/extlib-%{version}.tar.gz
 BuildRequires:  gawk

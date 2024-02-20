@@ -9,7 +9,7 @@ Summary:        The new features in unittest backported to Python 2.4+
 
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://pypi.python.org/pypi/unittest2
 Source0:        https://pypi.python.org/packages/source/u/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
 # we don't need this in Fedora, since we have Python 2.7, which has argparse
@@ -58,12 +58,12 @@ framework in Python 2.7 and onwards. It is tested to run on Python 2.6, 2.7,
 # Remove bundled egg-info
 rm -rf %{pypi_name}.egg-info
 
-%patch0 -p0
-%patch2 -p0
+%patch 0 -p0
+%patch 2 -p0
 %if 0%{?bootstrap_traceback2}
-%patch1 -p0
+%patch 1 -p0
 %endif
-%patch3 -p0
+%patch 3 -p0
 
 
 %build

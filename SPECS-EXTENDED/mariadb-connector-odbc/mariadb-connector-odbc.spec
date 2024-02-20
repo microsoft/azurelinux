@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # For deep debugging we need to build binaries with extra debug info
 %bcond_with     debug
 
@@ -34,7 +34,7 @@ and it supports both Unicode and ANSI modes.
 
 %prep
 %setup -q -n %{name}-%{version}-ga-src
-%patch1 -p1
+%patch 1 -p1
 
 %build
 

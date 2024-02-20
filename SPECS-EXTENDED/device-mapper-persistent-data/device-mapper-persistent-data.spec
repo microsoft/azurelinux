@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # Copyright (C) 2011-2017 Red Hat, Inc
 #
@@ -28,7 +28,7 @@ snapshot eras
 
 %prep
 %setup -q -n thin-provisioning-tools-%{version}
-%patch0 -p1 -b .avoid_strip
+%patch 0 -p1 -b .avoid_strip
 echo %{version}-%{release} > VERSION
 
 %build

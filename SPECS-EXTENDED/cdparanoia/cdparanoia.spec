@@ -4,7 +4,7 @@ Version:        10.2
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Multimedia/CD/Grabbers
 URL:            https://www.xiph.org/paranoia/index.html
 Source:         https://downloads.xiph.org/releases/%{name}/%{name}-III-%{version}.src.tgz

@@ -4,7 +4,7 @@ Version:        4.0.0
 Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libvirt.org/
 Source0:        https://libvirt.org/sources/glib/%{name}-%{version}.tar.xz
 Patch1:         %{name}-%{version}-cast-align.patch

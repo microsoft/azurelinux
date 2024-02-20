@@ -5,7 +5,7 @@ Version:        0.23.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/getsentry/responses
 # The 0.20.0 release had a bad manifest file, which caused the sdist file to not include tests.
 # Future releases should be able to use the actual release tarball, but for now we use the GitHub source tarball

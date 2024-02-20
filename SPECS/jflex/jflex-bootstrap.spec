@@ -22,7 +22,7 @@ Release:        1%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://www.jflex.de/
 Source0:        https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz#/jflex-%{version}.tar.gz
 Source1:        jflex.script
@@ -59,8 +59,8 @@ cd jflex
 perl -pi -e 's/
 $//g' examples/standalone/sample.inp
 rm -rf src/java_cup
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 rm -rf src/JFlex/tests
 
