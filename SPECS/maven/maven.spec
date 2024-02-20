@@ -32,12 +32,12 @@ Source2:        %{_mariner_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.r
 # ex: ./maven_build_caches.sh -v 3.8.4 -a x86_64
 Source3:        %{maven_cache_name}
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  wget
 BuildRequires:  which
 Provides:       maven3 = %{version}
 Requires:       %{_bindir}/which
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       %{name}-jdk-binding = %{version}-%{release}
 
 %description
@@ -47,7 +47,7 @@ Maven is a software project management and comprehension tool. Based on the conc
 Summary:        MSOpenJDK 11 binding for Maven
 RemovePathPostfixes: -openjdk11
 Requires: %{name} = %{version}-%{release}
-Requires: msopenjdk-11
+Requires: msopenjdk-17
 Provides: %{name}-jdk-binding = %{version}-%{release}
  
 %description openjdk11
@@ -83,8 +83,8 @@ popd
 # Changing distribution dir to BUILD directory as install macro clears buildroot prior to creating a fresh directory, thus clearing artifacts copied by maven. We copy them later.
 MAVEN_DIST_DIR=%{_builddir}%{_prefixmvn}
 
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find $JAVA_HOME/lib -name "jli")
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$JAVA_HOME/lib
 
 sed -i 's/www.opensource/opensource/g' DEPENDENCIES
 pwd
@@ -130,7 +130,7 @@ ln -sfv %{_bindirmvn}/mvn.1.gz %{buildroot}%{homedir}/bin/mvn.1.gz
 ln -sfv %{_bindirmvn}/mvnDebug.1.gz %{buildroot}%{homedir}/bin/mvnDebug.1.gz
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/java/
-echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.conf-openjdk11
+echo JAVA_HOME=%{_lib}/jvm/msopenjdk-17 >%{buildroot}%{_sysconfdir}/java/maven.conf-openjdk17
 
 %files
 %defattr(-,root,root)

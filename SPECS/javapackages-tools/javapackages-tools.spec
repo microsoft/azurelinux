@@ -22,7 +22,7 @@ Patch1:         remove-headless-from-java-requires.patch
 Patch2:         undeprecate_add_maven_depmap.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -36,7 +36,7 @@ BuildRequires:  python3-pip
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
@@ -95,7 +95,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 

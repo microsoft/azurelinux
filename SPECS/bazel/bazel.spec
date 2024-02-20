@@ -15,11 +15,11 @@ Patch0:         fix-bazel-version-check.patch
 BuildRequires:  build-essential
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 
 %description
 A fast, scalable, multi-language and extensible build system.
