@@ -44,12 +44,12 @@ Patch2:         CVE-2018-11694.patch
 BuildRequires:  git
 BuildRequires:  javapackages-tools
 BuildRequires:  maven
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  nodejs
 BuildRequires:  python3
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  openssl-devel
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires(pre):  %{_sbindir}/groupadd
 Requires(pre):  %{_sbindir}/useradd
 Provides:       reaper = %{version}-%{release}
@@ -63,8 +63,8 @@ Cassandra reaper is an open source tool that aims to schedule and orchestrate re
 %setup -q -n %{srcdir}
 
 %build
-export JAVA_HOME="%{_libdir}/jvm/msopenjdk-11"
-export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-11/lib/jli"
+export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
+export LD_LIBRARY_PATH="%{_libdir}/jvm/msopenjdk-17/lib/jli"
 
 pushd "$HOME"
 echo "Installing bower cache."

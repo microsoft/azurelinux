@@ -29,7 +29,7 @@ BuildRequires:  git
 BuildRequires:  tar
 BuildRequires:  which
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  javapackages-tools
 BuildRequires:  xml-commons-apis
@@ -39,7 +39,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       javapackages-tools
 Requires:       which
 Requires:       gawk
