@@ -71,6 +71,7 @@ pushd %{_target_platform}
 
 # avoid parallel-builds, gir generatation fails on slower archs
 %cmake_build -j1
+popd
 
 %install
 %cmake_install
