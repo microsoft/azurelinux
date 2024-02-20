@@ -45,6 +45,7 @@ BuildRequires:  rust
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libseccomp-devel
 Conflicts:      qemu-tools < 8
+Provides:       vhostuser-backend(fs)
 
 %description
 vhost-user virtio-fs device backend written in Rust
