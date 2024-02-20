@@ -9,7 +9,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(mocha) = %{version}-%{release}
