@@ -149,19 +149,19 @@ Source1113:     univocity-parsers-2.9.1.tar.xz
 Source1114:     velocity-engine-2.3.tar.xz
 Source1115:     xbean-4.23.tar.xz
 Source1116:     xmlunit-2.9.1.tar.xz
-Source1117:     xmvn-generator-1.2.1.tar.xz
+Source1117:     xmvn-generator-test1-1.2.1.tar.xz
 Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xz-java-1.9.tar.xz
 
 BuildRequires:  byaccj
-BuildRequires:  msopenjdk-17
+BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-generators
 BuildRequires:  java-devel
 BuildRequires:  rpm-devel
 
 Requires:       bash
 Requires:       coreutils
-Requires:       msopenjdk-17
+Requires:       msopenjdk-11
 Requires:       procps-ng
 
 %description
