@@ -26,11 +26,11 @@ gem build %{gem_name}
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 #add README.md file to buildroot from Source0
-cp README.md %{buildroot}%{gem_instdir}/
+cp readme.md %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/README.md
+%license %{gemdir}/gems/%{gem_name}-%{version}/readme.md
 %{gemdir}
 
 %changelog
