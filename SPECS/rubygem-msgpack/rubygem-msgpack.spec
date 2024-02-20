@@ -2,7 +2,7 @@
 %global gem_name msgpack
 Summary:        MessagePack implementation for Ruby
 Name:           rubygem-%{gem_name}
-Version:        1.4.5
+Version:        1.7.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.2-1
+- Auto-upgrade to 1.7.2 - azl3.0
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.4.5-1
 - Update to v1.4.5.
 - Build from .tar.gz source.
