@@ -1,6 +1,6 @@
 Summary:        Reference implementation of the iCalendar data type and serialization format
 Name:           libical
-Version:        3.0.16
+Version:        3.0.17
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
