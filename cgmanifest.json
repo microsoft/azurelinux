@@ -24114,8 +24114,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx",
-          "version": "4.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-4.4.0.tar.gz"
+          "version": "7.2.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/73/8e/6e51da4b26665b4b92b1944ea18b2d9c825e753e19180cc5bdc818d0ed3b/sphinx-7.2.6.tar.gz"
         }
       }
     },
