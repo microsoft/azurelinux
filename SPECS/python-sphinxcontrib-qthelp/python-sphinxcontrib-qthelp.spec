@@ -2,26 +2,27 @@
 
 Summary:        Sphinx extension for QtHelp documents
 Name:           python-%{pypi_name}
-Version:        1.0.3
-Release:        9%{?dist}
+Version:        1.0.7
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        %{pypi_source}
-Patch0:         test_qthelp_path_fix.patch
+Source0:        https://files.pythonhosted.org/packages/ac/29/705cd4e93e98a8473d62b5c32288e6de3f0c9660d3c97d4e80d3dbbad82b/sphinxcontrib_qthelp-1.0.7.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-wheel
+BuildRequires:  python-flit-core
 
 %if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils
-BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-pygments
 BuildRequires:  python%{python3_pkgversion}-pytest
@@ -30,6 +31,9 @@ BuildRequires:  python%{python3_pkgversion}-six
 
 %description
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
+	
+%generate_buildrequires
+%pyproject_buildrequires -x test
 
 %package -n     python%{python3_pkgversion}-%{pypi_name}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
@@ -39,17 +43,17 @@ Summary:        %{summary}
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
 
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}
+%autosetup -p1 -n sphinxcontrib_qthelp-%{version}
 find -name '*.mo' -delete
 
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
@@ -66,19 +70,18 @@ popd
 %find_lang sphinxcontrib.qthelp
 
 %check
-pip3 install more-itertools Sphinx
+pip3 install sphinx exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.qthelp.lang
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_qthelp-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_qthelp-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/sphinxcontrib_qthelp-%{version}.dist-info/
 
 %changelog
-* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-9
-- Fixing ptests.
+* Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.7-1
+- Upgrade to latest version.
 
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
