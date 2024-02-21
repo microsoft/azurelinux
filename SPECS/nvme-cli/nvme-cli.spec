@@ -1,7 +1,7 @@
 Summary:        NVM-Express user space tooling for Linux
 Name:           nvme-cli
-Version:        1.16
-Release:        2%{?dist}
+Version:        2.8
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,6 +60,9 @@ if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
 fi
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8-1
+- Auto-upgrade to 2.8 - none
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-2
 - Remove check tests which fail to run properly on daily build machines
 - Update spec with changes based on upstream github project's nvme.spec.in
