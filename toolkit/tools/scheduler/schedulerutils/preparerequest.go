@@ -197,7 +197,7 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 		srpmFileName := defaultTestNode.SRPMFileName()
 
 		// Check if we already queued up this build node for building.
-		if buildState.IsSRPMBuildActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
+		if buildState.IsSRPMTestActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
 			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
 			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
 			// restored later once the underlying cause of this error is fixed.
