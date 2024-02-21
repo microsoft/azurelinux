@@ -8550,6 +8550,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libadwaita",
+          "version": "1.4.3",
+          "downloadUrl": "https://gitlab.gnome.org/GNOME/libadwaita/-/archive/1.4.3/libadwaita-1.4.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libaec",
           "version": "1.0.4",
           "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.0.4/libaec-v1.0.4.tar.gz"
