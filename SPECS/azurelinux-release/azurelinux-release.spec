@@ -23,15 +23,17 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "%{distribution} %{version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
-echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "%{distribution} %{version}" > %{buildroot}%{_libdir}/azurelinux-release
+echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_libdir}/azurelinux-release
+ln -sv ..%{_libdir}/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 
-cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
+cat > %{buildroot}%{_libdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
 DISTRIB_RELEASE="%{version}"
 DISTRIB_CODENAME=AzureLinux
 DISTRIB_DESCRIPTION="%{distribution} %{version}"
 EOF
+ln -sv ..%{_libdir}/lsb-release %{buildroot}%{_sysconfdir}/lsb-release
 
 cat > %{buildroot}/%{_libdir}/os-release << EOF
 NAME="%{distribution}"
@@ -44,22 +46,27 @@ HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
 SUPPORT_URL="%{url}"
 EOF
+ln -sv ..%{_libdir}/os-release %{buildroot}%{_sysconfdir}/os-release
 
-ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
-
-cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
+cat > %{buildroot}%{_libdir}/issue <<- EOF
 Welcome to %{distribution} %{version} (%{_arch}) - (\l)
 EOF
+ln -sv ..%{_libdir}/issue %{buildroot}%{_sysconfdir}/issue
 
-cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
+cat > %{buildroot}%{_libdir}/issue.net <<- EOF
 Welcome to %{distribution} %{version} (%{_arch})
 EOF
+ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
 %files
 %defattr(-,root,root,-)
+%{_libdir}/azurelinux-release
+%{_libdir}/lsb-release
+%{_libdir}/os-release
+%{_libdir}/issue
+%{_libdir}/issue.net
 %{_sysconfdir}/azurelinux-release
 %{_sysconfdir}/lsb-release
-%{_libdir}/os-release
 %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
@@ -68,6 +75,7 @@ EOF
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
 - remove %%config(noreplace) from *-release files
 - define dist_version and use local macros
+- move *-release and issue files under %%_libdir and make %%_sysconfdir symlinks
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
