@@ -1,10 +1,4 @@
 
-# Temporary until azure-release-common is updated to carry macros.dist that defines %azure
-%if %{defined azure}
-%{error:Once azure macro is defined in macros.dist, please remove this}
-%endif
-%global azure 3
-
 # We ship a .pc file but don't want to have a dep on pkg-config. We
 # strip the automatically generated dep here and instead co-own the
 # directory.
@@ -178,20 +172,20 @@ BuildRequires:  openssl-devel
 %if %{with gnutls}
 BuildRequires:  gnutls-devel
 %endif
-%if %{undefined azure}
+%if %{undefined azl}
 BuildRequires:  qrencode-devel
 %endif
 BuildRequires:  libmicrohttpd-devel
 BuildRequires:  libxkbcommon-devel
 BuildRequires:  iptables-devel
-%if %{undefined azure}
+%if %{undefined azl}
 BuildRequires:  pkgconfig(libfido2)
 %endif
 BuildRequires:  pkgconfig(tss2-esys)
 BuildRequires:  pkgconfig(tss2-rc)
 BuildRequires:  pkgconfig(tss2-mu)
 BuildRequires:  pkgconfig(libbpf)
-%if %{undefined azure}
+%if %{undefined azl}
 # This is required for udev tracing
 BuildRequires:  systemtap-sdt-devel
 %endif
@@ -207,7 +201,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(jinja2)
 BuildRequires:  python3dist(lxml)
 BuildRequires:  python3dist(pefile)
-%if %{undefined azure}
+%if %{undefined azl}
 BuildRequires:  python3dist(pillow)
 BuildRequires:  python3dist(pytest-flakes)
 %endif
@@ -233,7 +227,7 @@ BuildRequires:  bpftool
 %global have_bpf 1
 %endif
 
-%if %{undefined azure}
+%if %{undefined azl}
 %ifarch x86_64 aarch64
 %global have_xen 1
 # That package is only built for those two architectures
@@ -249,8 +243,8 @@ Requires:       dbus >= 1.9.18
 Requires:       %{name}-pam%{_isa} = %{version}-%{release}
 Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
-%{?azure:Recommends:     %{name}-networkd = %{version}-%{release}}
-%{?azure:Recommends:     %{name}-resolved = %{version}-%{release}}
+%{?azl:Recommends:     %{name}-networkd = %{version}-%{release}}
+%{?azl:Recommends:     %{name}-resolved = %{version}-%{release}}
 Recommends:     diffutils
 # FIXME - our toolkit can't handle logical deps like this
 #Requires:       (util-linux-core or util-linux)
@@ -260,7 +254,7 @@ Provides:       /bin/systemctl
 Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
-%{?azure:Obsoletes:      systemd-bootstrap <= %{version}-%{release}}
+%{?azl:Obsoletes:      systemd-bootstrap <= %{version}-%{release}}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -292,7 +286,7 @@ Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 Recommends:     libpcre2-8.so.0%{?elf_suffix}
 Recommends:     libpwquality.so.1%{?elf_suffix}
 Recommends:     libpwquality.so.1(LIBPWQUALITY_1.0)%{?elf_bits}
-%if %{undefined azure}
+%if %{undefined azl}
 Recommends:     libqrencode.so.4%{?elf_suffix}
 %endif
 Recommends:     libbpf.so.1%{?elf_suffix}
@@ -347,7 +341,7 @@ Systemd PAM module registers the session with systemd-logind.
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
-%{?azure:Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}}
+%{?azl:Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -364,7 +358,7 @@ Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
 Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
-%{?azure:Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}}
+%{?azl:Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
@@ -401,7 +395,7 @@ Recommends:     libelf.so.1%{?elf_suffix}
 Recommends:     libelf.so.1(ELFUTILS_1.7)%{?elf_bits}
 
 # used by home, cryptsetup, cryptenroll, logind
-%if %{undefined azure}
+%if %{undefined azl}
 Recommends:     libfido2.so.1%{?elf_suffix}
 %endif
 Recommends:     libp11-kit.so.0%{?elf_suffix}
@@ -439,7 +433,7 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       python3dist(pefile)
 Requires:       python3dist(zstd)
 Requires:       python3dist(cryptography)
-%if %{undefined azure}
+%if %{undefined azl}
 Recommends:     python3dist(pillow)
 %endif
 
@@ -650,14 +644,14 @@ CONFIGURE_OPTS=(
         -Dlibcryptsetup=%[%{with bootstrap}?"disabled":"enabled"]
         -Delfutils=enabled
         -Dpwquality=enabled
-        -Dqrencode=%[%{defined azure}?"disabled":"enabled"]
+        -Dqrencode=%[%{defined azl}?"disabled":"enabled"]
         -Dgnutls=%[%{with gnutls}?"enabled":"disabled"]
         -Dmicrohttpd=enabled
         -Dvmspawn=enabled
         -Dlibidn2=enabled
         -Dlibiptc=disabled
         -Dlibcurl=enabled
-        -Dlibfido2=%[%{defined azure}?"disabled":"enabled"]
+        -Dlibfido2=%[%{defined azl}?"disabled":"enabled"]
         -Dxenctrl=%[0%{?have_xen}?"enabled":"disabled"]
         -Defi=true
         -Dtpm=true

@@ -20,7 +20,6 @@ Patch1: 0001-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 # 32-bit arm is missing required arch-specific memory barriers,
 ExcludeArch: %{arm}
 
-%global azl3 1
 BuildRequires: binutils
 BuildRequires: cmake >= 2.8.11
 BuildRequires: gcc
@@ -348,7 +347,7 @@ fi
 %systemd_postun_with_restart iwpmd.service
 
 %files
-%license COPYING.BSD_FB COPYING.BSD_MIT COPYING.GPL2 COPYING.md 
+%license COPYING.BSD_FB COPYING.BSD_MIT COPYING.GPL2 COPYING.md
 %dir %{_sysconfdir}/rdma
 %dir %{_docdir}/%{name}
 %doc %{_docdir}/%{name}/README.md

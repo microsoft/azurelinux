@@ -1,7 +1,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://aka.ms/azurelinux
 # Allows package management tools to find and set the default value
 # for the "releasever" variable from the RPM database.
 Provides:       system-release(releasever)
+Requires:       mariner-rpm-macros-dist
 BuildArch:      noarch
 
 %description
@@ -62,6 +63,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Tue Feb 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-4
+- Require macros.dist from the mariner-rpm-macros-dist package
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
 - Renamed MARINER_BUILD_NUMBER property to AZURELINUX_BUILD_NUMBER
