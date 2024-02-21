@@ -34,8 +34,8 @@ make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 make %{?_smp_mflags} COMMIT="%{commit_hash}" localunittest
 
 %install
-make install DESTDIR=%{buildroot} PREFIX="%{_prefix}" BINDIR="%{_bindir}"
-make install-man DESTDIR=%{buildroot} PREFIX="%{_prefix}"
+make install DESTDIR=%{buildroot} PREFIX=%{_prefix} BINDIR=%{_bindir}
+make install-man DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 %files
 %license LICENSE NOTICE
