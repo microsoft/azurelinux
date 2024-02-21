@@ -70,7 +70,7 @@ popd
 %find_lang sphinxcontrib.devhelp
 
 %check
-pip3 install sphinx exceptiongroup
+pip3 install sphinx exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.devhelp.lang
