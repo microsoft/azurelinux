@@ -90,8 +90,8 @@ python3 setup.py test
 %{_libdir}/pkgconfig/pygobject-3.0.pc
 
 %changelog
-* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.46.0-1
-- Auto-upgrade to 3.46.0 - Azure Linux 3.0 Upgrades
+* Wed Feb 21 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 3.46.0-1
+- Upgrade to 3.46.0
 
 * Thu Apr 07 2022 Olivia Crain <oliviacrain@microsoft> - 3.42.0-1
 - Upgrade to latest upstream version
