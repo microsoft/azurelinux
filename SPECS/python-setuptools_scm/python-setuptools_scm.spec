@@ -3,8 +3,8 @@
 
 Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-setuptools_scm
-Version:        6.4.2
-Release:        2%{?dist}
+Version:        8.0.3
+Release:        1%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
@@ -64,6 +64,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
+- Auto-upgrade to 8.0.3 - 3.0 package upgrade
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 6.4.2-2
 - Add build requirement on python3-tomli to fix python 3.12 break
 
