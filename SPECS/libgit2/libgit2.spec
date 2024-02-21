@@ -76,7 +76,7 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
-* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 1.6.5-4
+* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 1.6.5-1
 - Upgrade to version 1.6.5 to fix CVE-2024-24575
 
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.4.5-3
