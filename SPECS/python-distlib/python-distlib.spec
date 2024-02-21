@@ -8,7 +8,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://readthedocs.org/projects/distlib/
 Source0:        https://files.pythonhosted.org/packages/source/d/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         check-certs.patch
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
