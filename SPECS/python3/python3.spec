@@ -12,7 +12,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.9.14
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -237,8 +237,8 @@ find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
-# %check
-# make  %{?_smp_mflags} test
+%check
+%{buildroot}%{_bindir}/python3 -m test
 
 %ldconfig_scriptlets
 
@@ -323,6 +323,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Tue Feb 20 2024 Chris Co <chrco@microsoft.com> - 3.9.14-9
+- Enable check section
+
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
 
