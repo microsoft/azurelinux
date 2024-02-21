@@ -6,6 +6,7 @@
 package diskutils
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -253,10 +254,57 @@ func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error
 	return
 }
 
+// devineBlockSize tries to determine the block size used by the file system image
+func devineBlockSize(diskFilePath string) (blockSize uint32, err error) {
+	blockSize = 512 // Default to 512
+	diskFile, err := os.Open(diskFilePath)
+	if err != nil {
+		logger.Log.Errorf("Failed to open %v to determine block size.", diskFilePath)
+		return
+	}
+	defer diskFile.Close()
+
+	var probePoint int64 = 4096
+	signature := make([]byte, 8)
+	_, local_err := diskFile.ReadAt(signature, probePoint)
+	if local_err != nil {
+		// Failure to read is not fatal, assume default blockSize as no signature is present.
+		logger.Log.Warnf("Failed to read from %v to determine block size, assuming %d.", diskFilePath, blockSize)
+		return
+	}
+	// GPT header starts with 8 bytes of ascii "EFI PART"
+	if bytes.Equal(signature, []byte{0x45, 0x46, 0x49, 0x20, 0x50, 0x41, 0x52, 0x54}) {
+		logger.Log.Debugf("Found GPT signature at %d in: %v, assuming that block size", probePoint, diskFilePath)
+		blockSize = uint32(probePoint)
+	}
+	return
+}
+
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
-func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
-	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
-	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
+func SetupLoopbackDevice(diskFilePath string, blockSize uint32) (devicePath string, err error) {
+	switch blockSize {
+	case 0, 512, 4096:
+		break
+	default:
+		err = fmt.Errorf("invalid blockSize: %d. Must be 0, 512, or 4096", blockSize)
+		return
+	}
+
+	if blockSize == 0 {
+		blockSize, err = devineBlockSize(diskFilePath)
+		if err != nil {
+			return
+		}
+	}
+	logger.Log.Debugf("Attaching Loopback: %v, block size: %d", diskFilePath, blockSize)
+	losetupArgs := []string{
+		"--show",
+		"-f",
+		"-P",
+		"-b", fmt.Sprintf("%d", blockSize),
+		diskFilePath,
+	}
+	stdout, stderr, err := shell.Execute("losetup", losetupArgs...)
 	if err != nil {
 		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
 		return
