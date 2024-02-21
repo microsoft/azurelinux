@@ -14,7 +14,20 @@ fi
 
 # Additional macros required to parse spec files.
 DIST_TAG=$(make -s -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
-DEFINES=(-D "with_check 1" -D "dist $DIST_TAG")
+RELEASE_NUM=$(make -s -f $REPO_ROOT/toolkit/Makefile get-release-major)
+
+# Define 'azl <ver>' and 'azl<ver> 1' macros for use in spec files. Normally they would be defined in the 'mariner-rpm-macros-dist' package.
+# Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
+
+# 'azl<ver> 1': Strip the leading '.' from the DIST_TAG
+distro_def="${DIST_TAG#.} 1"
+
+# 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
+distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
+distro_majver="$(echo $RELEASE_NUM | cut -d'.' -f1)"
+distro_ver="${distro_name} ${distro_majver}"
+
+DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$distro_def" -D "$distro_ver")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
 
@@ -39,7 +52,7 @@ function mariner_rpmspec {
     done
 
     if [[ -z $sourcedir ]]
-    then        
+    then
         echo "Must pass valid spec path to 'mariner_rpmspec'!" >&2
         return 1
     fi
