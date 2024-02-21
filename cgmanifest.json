@@ -3138,8 +3138,8 @@
         "type": "other",
         "other": {
           "name": "efibootmgr",
-          "version": "16",
-          "downloadUrl": "https://github.com/rhboot/efibootmgr/releases/download/16/efibootmgr-16.tar.bz2"
+          "version": "18",
+          "downloadUrl": "https://github.com/rhboot/efibootmgr/releases/download/18/efibootmgr-18.tar.bz2"
         }
       }
     },
