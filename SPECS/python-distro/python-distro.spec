@@ -30,16 +30,19 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %prep
 %autosetup -n distro-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
-pip3 install tox pytest
+pip3 install pytest
 export LANG=C.UTF-8
-%tox
+%pytest
 
 %files -n python3-distro
 %defattr(-,root,root,-)
