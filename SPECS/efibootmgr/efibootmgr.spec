@@ -8,7 +8,7 @@ Group:          System Environment/System Utilities
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/rhboot/efibootmgr/releases/download/%{version}/%{name}-%{version}.tar.bz2
-BuildRequires: efivar-devel
+BuildRequires: efivar-devel >= 39-1
 BuildRequires: pciutils
 BuildRequires: zlib
 %description
