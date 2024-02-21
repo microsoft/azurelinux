@@ -7801,8 +7801,8 @@
         "type": "other",
         "other": {
           "name": "jna",
-          "version": "5.10.0",
-          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.10.0/jna-5.10.0.tar.gz"
+          "version": "5.14.0",
+          "downloadUrl": "https://github.com/java-native-access/jna/archive/5.14.0/jna-5.14.0.tar.gz"
         }
       }
     },
