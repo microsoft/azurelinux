@@ -46,7 +46,7 @@ Core utilities for Python packages
 %pyproject_save_files packaging
 
 %check
-pip3 install exceptiongroup pretend
+%{python3} -m pip install exceptiongroup iniconfig pretend tomli>=1.0.0
 %pytest
 
 %files -n python3-packaging -f %{pyproject_files}
