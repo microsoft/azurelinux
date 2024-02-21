@@ -16,7 +16,7 @@
   "fadump-howto.txt": "b9090c3e0e26b6124a0c8b0c79a7adf10637c9bbc34e0a59529e3f1b66c074f0",
   "kdump-dep-generator.sh": "f660e26df9c4843340093a294bcd41a68a71cea48314b5d1a3553bba5038bbbc",
   "kdump-in-cluster-environment.txt": "50784977e2c3a425ae00de4831f9fd4fb4a04574db1a72b9b28f7c0979a52564",
-  "kdump-lib-initramfs.sh": "ff4b63f99470ee796fd7e4a532dde241c4da02909306926a08a172457775a92a",
+  "kdump-lib-initramfs.sh": "28d2246007da7e6a29af5747485ff0547ac949b34e14c18e082bb9613a9a5057",
   "kdump-lib.sh": "3d50507626d4a92b8448c7d6604923f6f460c4cb5c8b18977381a7d5e516dfba",
   "kdump-udev-throttler": "125d538a59172f779b40ea32fea1e4eb50d849f25eb2537a48328d4401136679",
   "kdump.conf": "1d7ed03fa55f52047a6be4047cb2bfea08ac025b82d52ace86d69e2ec06e2ce7",

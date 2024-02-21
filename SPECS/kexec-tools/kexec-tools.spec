@@ -324,8 +324,9 @@ done
 /usr/share/makedumpfile/
 
 %changelog
-* Thu Oct 19 2023 Chris Co <chrco@microsoft.com> - 2.0.23-4
+* Tue Feb 20 2024 Chris Co <chrco@microsoft.com> - 2.0.23-4
 - Add mariner_2_initrd_use_suffix option to use a different kdump initrd path than the host's initrd
+- Change compressed vmcore directory path to align with default directory naming scheme
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
