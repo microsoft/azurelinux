@@ -25,35 +25,35 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  python3-flit-core
 
-%if %{with_check}
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  graphviz
-BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
 BuildRequires:  python3-pluggy
 BuildRequires:  texinfo
 
-BuildRequires:  python3-test
-BuildRequires:  python3-pytest
-BuildRequires:  python3-babel
-BuildRequires:  python3-Cython
-BuildRequires:  python3-importlib-metadata
-BuildRequires:  python3-imagesize
-BuildRequires:  python3-jinja2
-BuildRequires:  python3-packaging
-BuildRequires:  python3-pygments
-BuildRequires:  python3-requests
-BuildRequires:  python3-six
-BuildRequires:  python3-snowballstemmer
-BuildRequires:  python3-sphinx-theme-alabaster
 BuildRequires:  python3-sphinxcontrib-applehelp
 BuildRequires:  python3-sphinxcontrib-devhelp
 BuildRequires:  python3-sphinxcontrib-htmlhelp
 BuildRequires:  python3-sphinxcontrib-jsmath
 BuildRequires:  python3-sphinxcontrib-qthelp
 BuildRequires:  python3-sphinxcontrib-serializinghtml
+BuildRequires:  python3-jinja2
+BuildRequires:  python3-pygments
+BuildRequires:  python3-docutils
+BuildRequires:  python3-snowballstemmer
+BuildRequires:  python3-babel
+BuildRequires:  python3-sphinx-theme-alabaster
+BuildRequires:  python3-imagesize
+BuildRequires:  python3-requests
+BuildRequires:  python3-packaging
+BuildRequires:  python3-importlib-metadata
+
+%if %{with_check}
+BuildRequires:  python3-test
+BuildRequires:  python3-pytest
+BuildRequires:  python3-Cython
+BuildRequires:  python3-six
 %endif
 
 %description
@@ -107,6 +107,19 @@ sed -i '/"--import-mode=importlib",/d' pyproject.toml
 %build
 %pyproject_wheel
 
+export PYTHONPATH=$PWD
+pushd doc
+export SPHINXBUILD="%{python3} ../sphinx/cmd/build.py"
+make html SPHINXBUILD="$SPHINXBUILD"
+make man SPHINXBUILD="$SPHINXBUILD"
+rm -rf _build/html/.buildinfo
+# Those files are copied to _build/html/_images and loaded to the
+# html pages from there - we can safely remove the duplicated and unused files
+rm -rf _build/html/_static/themes _build/html/_static/tutorial
+rm -f _build/html/_static/more.png _build/html/_static/translation.svg
+mv _build/html ..
+popd
+
 %install
 %pyproject_install
 
@@ -119,6 +132,15 @@ done
 # Clean up non-python files
 rm -f %{buildroot}%{python3_sitelib}/sphinx/locale/.DS_Store
 rm -rf %{buildroot}%{python3_sitelib}/sphinx/locale/.tx
+
+pushd doc
+# Deliver man pages
+install -d %{buildroot}%{_mandir}/man1
+for f in _build/man/sphinx-*.1;
+do
+    cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f)
+done
+popd
 
 # Move language files to /usr/share;
 # patch to support this incorporated in 0.6.6
@@ -150,14 +172,22 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
   >> sphinx.lang
 
 %check
-# pip install \
-#   exceptiongroup \
-#   filelock \
-#   html5lib \
-#   iniconfig \
-#   tomli
-pip install exceptiongroup filelock html5lib iniconfig tomli
-%pytest
+pip install --upgrade \
+  exceptiongroup \
+  filelock \
+  html5lib \
+  iniconfig \
+  tomli \
+  "pygments>=2.14"
+
+# ignoring some tests due to incompatible dependencies
+# html5lib: test_build_html, test_build_latex
+# graphviz: test_ext_graphviz, test_ext_inheritance_diagram
+%pytest \
+  --ignore tests/test_build_html.py \
+  --ignore tests/test_build_latex.py \
+  --ignore tests/test_ext_graphviz.py \
+  --ignore tests/test_ext_inheritance_diagram.py
 
 %files -n python%{python3_pkgversion}-sphinx -f sphinx.lang
 %license LICENSE
@@ -169,10 +199,13 @@ pip install exceptiongroup filelock html5lib iniconfig tomli
 %dir %{_datadir}/sphinx/
 %dir %{_datadir}/sphinx/locale
 %dir %{_datadir}/sphinx/locale/*
+%{_mandir}/man1/sphinx-*
 
 %changelog
 * Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 7.2.6-1
-- Upgrade to version 7.2.6
+- Upgrade to version 7.2.6.
+- Import %build and %install section from Fedora 40 (license: MIT).
+- Disable some tests due to incompatible dependencies (html5lib, graphviz).
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
