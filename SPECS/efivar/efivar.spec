@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/System Utilities
 URL:            https://github.com/rhboot/efivar
-Source0:        https://github.com/rhboot/efivar/archive/refs/tags/%{version}.tar.gz
+Source0:        https://github.com/rhboot/efivar/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  grub2-tools
 BuildRequires:  mandoc
 BuildRequires:  popt-devel
