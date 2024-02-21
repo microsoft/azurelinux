@@ -71,6 +71,7 @@ Requires:       ceph-mon = %{version}-%{release}
 Requires(post): binutils
 Requires:       systemd
 
+BuildRequires: thrift
 BuildRequires:  libevent
 BuildRequires:  libevent-devel
 BuildRequires:  cryptsetup
