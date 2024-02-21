@@ -31,16 +31,15 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %autosetup -n distro-%{version}
 
 %build
-make build
+%py3_build
 
 %install
-make install
+%py3_install
 
 %check
-make test
-# pip3 install pytest
-# export LANG=C.UTF-8
-# %pytest
+pip3 install tox pytest
+export LANG=C.UTF-8
+%tox
 
 %files -n python3-distro
 %defattr(-,root,root,-)
