@@ -61,7 +61,7 @@
 /SPECS/moby-containerd/* @microsoft/cbl-mariner-container-runtime
 /SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
-/SPECS/moby-runc/* @microsoft/cbl-mariner-container-runtime
+/SPECS/runc/* @microsoft/cbl-mariner-container-runtime
 /SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
