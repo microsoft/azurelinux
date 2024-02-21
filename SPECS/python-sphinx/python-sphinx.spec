@@ -2,12 +2,6 @@
 # with user-installed modules (#1903763)
 %undefine py3_shebang_flags
 
-# Disabled until we bring "ImageMagick" to Mariner.
-%bcond_with imagemagick_tests
-
-# Disabled until we have the required LaTeX dependencies in Mariner.
-%bcond_with latex_tests
-
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        7.2.6
@@ -19,7 +13,7 @@ License:        BSD AND Python AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-%{version}.tar.gz
+Source0:        https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/Sphinx-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -29,7 +23,7 @@ BuildRequires:  make
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  python3dist(wheel)
+BuildRequires:  python3-wheel
 
 %if %{with_check}
 BuildRequires:  gcc
@@ -44,71 +38,14 @@ BuildRequires:  python3-six
 BuildRequires:  python3-test
 BuildRequires:  texinfo
 
-%if %{with imagemagick_tests}
-BuildRequires:  ImageMagick
-%endif
-
-%if %{with latex_tests}
-BuildRequires:  texlive-collection-fontsrecommended
-BuildRequires:  texlive-collection-latex
-BuildRequires:  texlive-dvipng
-BuildRequires:  texlive-dvisvgm
-BuildRequires:  tex(FreeSerif.otf)
-BuildRequires:  tex(amsmath.sty)
-BuildRequires:  tex(amsthm.sty)
-BuildRequires:  tex(anyfontsize.sty)
-BuildRequires:  tex(article.cls)
-BuildRequires:  tex(capt-of.sty)
-BuildRequires:  tex(cmap.sty)
-BuildRequires:  tex(color.sty)
-BuildRequires:  tex(ctablestack.sty)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(fancyvrb.sty)
-BuildRequires:  tex(fncychap.sty)
-BuildRequires:  tex(framed.sty)
-BuildRequires:  tex(geometry.sty)
-BuildRequires:  tex(hyperref.sty)
-BuildRequires:  tex(kvoptions.sty)
-BuildRequires:  tex(luatex85.sty)
-BuildRequires:  tex(needspace.sty)
-BuildRequires:  tex(parskip.sty)
-BuildRequires:  tex(polyglossia.sty)
-BuildRequires:  tex(tabulary.sty)
-BuildRequires:  tex(titlesec.sty)
-BuildRequires:  tex(upquote.sty)
-BuildRequires:  tex(utf8x.def)
-BuildRequires:  tex(wrapfig.sty)
-%endif
-
 %endif
 
 %description
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
+Sphinx makes it easy to create intelligent and beautiful documentation.
 
 Sphinx uses reStructuredText as its markup language, and many of its
-strengths come from the power and straightforwardness of
-reStructuredText and its parsing and translating suite, the Docutils.
-
-Although it is still under constant development, the following
-features are already present, work fine and can be seen "in action" in
-the Python docs:
-
-    * Output formats: HTML (including Windows HTML Help) and LaTeX,
-      for printable PDF versions
-    * Extensive cross-references: semantic markup and automatic links
-      for functions, classes, glossary terms and similar pieces of
-      information
-    * Hierarchical structure: easy definition of a document tree, with
-      automatic links to siblings, parents and children
-    * Automatic indices: general index as well as a module index
-    * Code handling: automatic highlighting using the Pygments highlighter
-    * Various extensions are available, e.g. for automatic testing of
-      snippets and inclusion of appropriately formatted docstrings.
+strength come from the power and straightforwardness of reStructuredText
+and its parsing and translating suite, the Docutils.
 
 %package -n python%{python3_pkgversion}-sphinx
 Summary:        Python documentation generator
@@ -142,58 +79,20 @@ Recommends:     graphviz
 Provides:       bundled(css3-mediaqueries) = 1.0
 
 %description -n python%{python3_pkgversion}-sphinx
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
+Sphinx makes it easy to create intelligent and beautiful documentation.
 
 Sphinx uses reStructuredText as its markup language, and many of its
-strengths come from the power and straightforwardness of
-reStructuredText and its parsing and translating suite, the Docutils.
-
-Although it is still under constant development, the following
-features are already present, work fine and can be seen "in action" in
-the Python docs:
-
-    * Output formats: HTML (including Windows HTML Help) and LaTeX,
-      for printable PDF versions
-    * Extensive cross-references: semantic markup and automatic links
-      for functions, classes, glossary terms and similar pieces of
-      information
-    * Hierarchical structure: easy definition of a document tree, with
-      automatic links to siblings, parents and children
-    * Automatic indices: general index as well as a module index
-    * Code handling: automatic highlighting using the Pygments highlighter
-    * Various extensions are available, e.g. for automatic testing of
-      snippets and inclusion of appropriately formatted docstrings.
+strength come from the power and straightforwardness of reStructuredText
+and its parsing and translating suite, the Docutils.
 
 %prep
-%autosetup -n Sphinx-%{version} -p1
-
-# Remove bundled JS components.
-rm ./sphinx/themes/basic/static/{jquery,underscore}*.js
-rm ./sphinx/themes/bizstyle/static/css3-mediaqueries*.js
-
-%if %{without imagemagick_tests}
-rm tests/test_ext_imgconverter.py
-%endif
-
-# Don't measure coverage:
-sed -i '/pytest-cov/d' setup.py
-# Not needed on recent Pythons, https://github.com/sphinx-doc/sphinx/pull/8483
-sed -i '/typed_ast/d' setup.py
-
-
-%generate_buildrequires
-%pyproject_buildrequires -r %{?with_check:-x test}
+%autosetup -n sphinx-%{version} -p1
 
 %build
-%pyproject_wheel
+%py3_build
 
 %install
-%pyproject_install
+%py3_install
 
 # For backwards compatibility. Remove with care, if at all
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
@@ -252,8 +151,8 @@ pip3 install more-itertools
 %dir %{_datadir}/sphinx/locale/*
 
 %changelog
-* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.2.6-1
-- Auto-upgrade to 7.2.6 - Package upgrade for Azure Linux 3.0
+* Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 7.2.6-1
+- Upgrade to version 7.2.6
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
