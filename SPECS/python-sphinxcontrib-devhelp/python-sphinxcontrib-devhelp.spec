@@ -2,25 +2,27 @@
 
 Summary:        Sphinx extension for Devhelp documents
 Name:           python-%{pypi_name}
-Version:        1.0.2
-Release:        8%{?dist}
+Version:        1.0.6
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        %{pypi_source}
+Source0:        https://files.pythonhosted.org/packages/c7/a1/80b7e9f677abc673cb9320bf255ad4e08931ccbc2e66bde4b59bad3809ad/sphinxcontrib_devhelp-1.0.6.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-wheel
+BuildRequires:  python-flit-core
 
 %if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils
-BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-pygments
 BuildRequires:  python%{python3_pkgversion}-pytest
@@ -37,18 +39,21 @@ Summary:        %{summary}
 %description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document.
 
+%generate_buildrequires
+%pyproject_buildrequires -x test
+
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n sphinxcontrib_devhelp-%{version}
 find -name '*.mo' -delete
 
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
@@ -65,17 +70,19 @@ popd
 %find_lang sphinxcontrib.devhelp
 
 %check
-pip3 install more-itertools Sphinx
+pip3 install sphinx exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.devhelp.lang
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_devhelp-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_devhelp-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/sphinxcontrib_devhelp-%{version}.dist-info/
 
 %changelog
+* Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.6-1
+- Upgrade to latest version.
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.
