@@ -1,13 +1,13 @@
 Summary:        library for laying out and rendering of text.
 Name:           pango
-Version:        1.90.0
+Version:        1.51.2
 Release:        1%{?dist}
 License:        LGPLv2 OR MPLv1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://pango.org
-Source0:        https://download.gnome.org/sources/pango/1.90/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/pango/1.51/%{name}-%{version}.tar.xz
 # All the tests were failing on same reason
 Patch0:         0001-skip-tests-which-are-known-to-fail.patch
 BuildRequires:  cairo-devel >= 1.18.0
@@ -19,6 +19,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  harfbuzz >= 8.3.0
 BuildRequires:  harfbuzz-devel >= 8.3.0
 BuildRequires:  libpng-devel
+BuildRequires:  libXft-devel
 BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(fribidi)
@@ -65,6 +66,8 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/pkgconfig/pangocairo.pc
+%{_libdir}/pkgconfig/pangoft2.pc
 
 %changelog
 * Mon Jan 29 2024 Bala <balakumaran.kannan@microsoft.com> - 1.90.0-1
