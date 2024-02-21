@@ -70,10 +70,10 @@ This package provides the Google “Noto Color Emoji” colored emoji font.
 
 %prep
 %setup -n noto-emoji-%{commit0}
-%patch0 -p1 -b .noto-emoji-build-all-flags
-%patch1 -p1 -b .noto-emoji-use-gm.patch
-%patch2 -p1 -b .noto-emoji-use-system-pngquant
-%patch3 -p1 -b .noto-emoji-check-sequence
+%patch 0 -p1 -b .noto-emoji-build-all-flags
+%patch 1 -p1 -b .noto-emoji-use-gm.patch
+%patch 2 -p1 -b .noto-emoji-use-system-pngquant
+%patch 3 -p1 -b .noto-emoji-check-sequence
 
 rm -rf third_party/pngquant
 

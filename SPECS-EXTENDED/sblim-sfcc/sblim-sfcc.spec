@@ -33,7 +33,7 @@ Small Footprint CIM Client Library Header Files and Link Libraries
 %prep
 
 %setup -q
-%patch0 -p1 -b .docdir-license
+%patch 0 -p1 -b .docdir-license
 
 %build
 chmod a-x backend/cimxml/*.[ch]

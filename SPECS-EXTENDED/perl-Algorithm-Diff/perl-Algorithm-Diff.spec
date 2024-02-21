@@ -37,7 +37,7 @@ find the *smallest possible* set of differences.
 %setup -q -n Algorithm-Diff-%{version}
 
 # Generate provide for perl(Algorithm::DiffOld)
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

@@ -24,7 +24,7 @@ LuaJSON is a customizable JSON decoder/encoder, using LPEG for parsing.
 
 %prep
 %setup -q -n luajson-%{commit}
-%patch0 -p1 -b .lua-52
+%patch 0 -p1 -b .lua-52
 
 %build
 

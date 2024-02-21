@@ -45,14 +45,14 @@ its variable name.
 
 %prep
 %setup -q
-%patch0
-%patch1 -p1
-%patch2
-%patch3
-%patch4
-%patch5
-%patch6 -p1
-%patch7 -p1
+%patch 0
+%patch 1 -p1
+%patch 2
+%patch 3
+%patch 4
+%patch 5
+%patch 6 -p1
+%patch 7 -p1
 
 %build
 mkdir -p OBJ

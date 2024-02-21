@@ -33,7 +33,7 @@ for generating documentation from Flask routing tables.
 
 %prep
 %setup -q -n %{upstream_name}-%{version}
-%patch4 -p2
+%patch 4 -p2
 rm -r *.egg-info
 
 %build

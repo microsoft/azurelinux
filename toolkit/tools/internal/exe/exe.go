@@ -53,16 +53,10 @@ func PlaceHolderize(thing []string) string {
 	return fmt.Sprintf("(%s)", strings.Join(thing, "|"))
 }
 
-// ParseListArgument takes a user provided string list that is space seperated
-// and returns a slice of the split and trimmed elements.
-func ParseListArgument(input string) (results []string) {
-	const delimiter = " "
-
-	trimmedInput := strings.TrimSpace(input)
-	if trimmedInput != "" {
-		results = strings.Split(trimmedInput, delimiter)
-	}
-	return
+// ParseListArgument takes a user provided string list that is white-space seperated
+// and returns a slice of the split elements, removing any empty elements and extra whitespace.
+func ParseListArgument(input string) []string {
+	return strings.Fields(input)
 }
 
 type ProfileFlags struct {
