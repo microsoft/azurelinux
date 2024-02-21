@@ -66,7 +66,8 @@ rm -vr deps
 
 %files
 %license COPYING
-%{_libdir}/libgit2.so.*
+%{_libdir}/libgit2.so.1.6*
+%{_bindir}/git2
 
 %files devel
 %doc AUTHORS docs examples README.md
