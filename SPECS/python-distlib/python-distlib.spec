@@ -61,7 +61,12 @@ pip3 install exceptiongroup iniconfig tomli
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
-%pytest -k "not test_sequencer_basic"
+
+
+# test_is_writable assumes we're not the root user
+# and does not like that we have write access to /etc
+
+%pytest -k "not (test_sequencer_basic or test_is_writable)"
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
