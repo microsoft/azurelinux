@@ -204,7 +204,7 @@ pip install --upgrade \
 %changelog
 * Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 7.2.6-1
 - Upgrade to version 7.2.6.
-- Import %build and %install section from Fedora 40 (license: MIT).
+- Import build and install section from Fedora 40 (license: MIT).
 - Disable some tests due to incompatible dependencies (html5lib, graphviz).
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
