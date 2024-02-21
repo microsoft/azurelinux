@@ -1,15 +1,12 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
-Version:        1.4.5
-Release:        4%{?dist}
+Version:        1.6.5
+Release:        1%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
-
-# Fixes CVE-2024-24575, can be removed when upgrade to a version containing commit add2dabb3c16aa49b33904dcdc07cd915efc12fa
-Patch0: CVE-2024-24575.patch
 
 BuildRequires:  cmake >= 3.5.1
 BuildRequires:  gcc
@@ -79,8 +76,8 @@ rm -vr deps
 %{_includedir}/git2/
 
 %changelog
-* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 1.4.5-4
-- Add patch for CVE-2024-24575
+* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 1.6.5-4
+- Upgrade to version 1.6.5 to fix CVE-2024-24575
 
 * Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.4.5-3
 - Release bump with no changes to force a rebuild and consume new libssh2 build
