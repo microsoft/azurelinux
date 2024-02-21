@@ -2,49 +2,54 @@
 
 Summary:        Sphinx extension for serialized HTML
 Name:           python-%{pypi_name}
-Version:        1.1.5
-Release:        5%{?dist}
+Version:        1.1.10
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/en/master/
-Source0:        https://files.pythonhosted.org/packages/b5/72/835d6fadb9e5d02304cf39b18f93d227cd93abd3c41ebf58e6853eeb1455/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/54/13/8dd7a7ed9c58e16e20c7f4ce8e4cb6943eb580955236d0c0d00079a73c49/sphinxcontrib_serializinghtml-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  gettext
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-wheel
+BuildRequires:  python-flit-core
 
 %if %{with_check}
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
 
-%package -n     python3-%{pypi_name}
+%package -n     python%{python3_pkgversion}-%{pypi_name}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
 
-%description -n python3-%{pypi_name}
+%description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
 
+%generate_buildrequires
+%pyproject_buildrequires -x test
+
 %prep
-%autosetup -n %{pypi_name}-%{version}
+%autosetup -n sphinxcontrib_serializinghtml-%{version}
 find -name '*.mo' -delete
 
 %build
 for po in $(find -name '*.po'); do
   msgfmt --output-file=${po%.po}.mo ${po}
 done
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 # Move language files to /usr/share
 pushd %{buildroot}%{python3_sitelib}
@@ -61,17 +66,19 @@ popd
 %find_lang sphinxcontrib.serializinghtml
 
 %check
-pip3 install Sphinx
+pip3 install sphinx exceptiongroup iniconfig tomli
 %pytest
 
 %files -n python3-%{pypi_name} -f sphinxcontrib.serializinghtml.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/sphinxcontrib/	
+%{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}.dist-info/
 
 %changelog
+* Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.1.10-1
+- Upgrade to latest version.
+
 * Thu Apr 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.5-5
 - Installing 'python3-sphinx' through pip3 during tests to remove cyclic dependency.
 

@@ -24244,8 +24244,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-serializinghtml",
-          "version": "1.1.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/b5/72/835d6fadb9e5d02304cf39b18f93d227cd93abd3c41ebf58e6853eeb1455/sphinxcontrib-serializinghtml-1.1.5.tar.gz"
+          "version": "1.1.10",
+          "downloadUrl": "https://files.pythonhosted.org/packages/54/13/8dd7a7ed9c58e16e20c7f4ce8e4cb6943eb580955236d0c0d00079a73c49/sphinxcontrib_serializinghtml-1.1.10.tar.gz"
         }
       }
     },
