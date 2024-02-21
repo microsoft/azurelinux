@@ -28,7 +28,6 @@ distro_majver="$(echo $RELEASE_NUM | cut -d'.' -f1)"
 distro_ver="${distro_name} ${distro_majver}"
 
 DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$distro_def" -D "$distro_ver")
-echo "EXTRA DEFINES: ${DEFINES[*]}"
 
 SPECS_DIR="$REPO_ROOT/SPECS"
 
