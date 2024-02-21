@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
-Version:        20.14.0
-Release:        4%{?dist}
+Version:        20.25.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,6 +53,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Mar 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.25.0-1
+- Auto-upgrade to 20.25.0 - 3.0 package upgrade
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 20.14.0-4
 - Remove version restriction on python3-platformdirs Requires
 
