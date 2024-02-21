@@ -1,7 +1,7 @@
 Summary:        Tools and libraries to manipulate EFI variables
 Name:           efivar
-Version:        37
-Release:        6%{?dist}
+Version:        none
+Release:        1%{?dist}
 License:        LGPL-2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +52,9 @@ It contains the libraries and header files to create applications
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - none-1
+- Auto-upgrade to none - none
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 37-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
