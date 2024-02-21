@@ -71,7 +71,7 @@ pip3 install exceptiongroup iniconfig tomli
 * Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.8-1
 - Auto-upgrade to 0.3.8 - Azure Linux 3.0 - package upgrades
 
-* Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
+* Tue Dec 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified.
 
