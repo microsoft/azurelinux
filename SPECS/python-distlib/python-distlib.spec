@@ -1,13 +1,14 @@
 %global srcname distlib
 Summary:        Low-level components of distutils2/packaging, augmented with higher-level APIs
 Name:           python-distlib
-Version:        0.3.6
-Release:        2%{?dist}
+Version:        0.3.8
+Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://readthedocs.org/projects/distlib/
 Source0:        https://files.pythonhosted.org/packages/source/d/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         check-certs.patch
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
@@ -39,10 +40,12 @@ time saved by not having to reinvent wheels, and improved interoperability
 between tools.
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 rm distlib/*.exe
 
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
 %pyproject_wheel
@@ -53,6 +56,8 @@ rm distlib/*.exe
 
 %check
 export PYTHONHASHSEED=0
+export SKIP_ONLINE=1
+pip3 install exceptiongroup iniconfig tomli
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
@@ -63,6 +68,9 @@ export PYTHONHASHSEED=0
 %doc README.rst
 
 %changelog
+* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.8-1
+- Auto-upgrade to 0.3.8 - Azure Linux 3.0 - package upgrades
+
 * Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - License verified.
