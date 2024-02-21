@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -20,6 +20,7 @@ Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
+Source4:        50_mariner_mshv_menuentry
 Patch0:         perf_bpf_test_add_nonnull_argument.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
@@ -120,8 +121,8 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 # Add kernel-mshv-specific boot configurations to /etc/default/grub.d
 # This configuration contains additional boot parameters required in our
 # Linux-Dom0-based images. 
-mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
-install -m 750 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
+install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
+install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
@@ -200,6 +201,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/efi/vmlinuz-%{uname_r}
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
+%config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 %exclude /lib/modules/%{uname_r}/build
@@ -229,8 +231,14 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
-* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
+* Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
 - Remove legacy /boot/mariner-mshv.cfg
+
+* Thu Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
+- Introduce 50_mariner_mshv_menuentry, which implements
+    the custom boot path when running over MSHV.
+- Check for required mshv components in 50_mariner_mshv.cfg before
+    defaulting to kernel-mshv boot. 
 
 * Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
 - Add patch for perf_bpf_test_add_nonnull_argument
