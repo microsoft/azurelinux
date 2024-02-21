@@ -10,8 +10,8 @@
 
 Summary:        Python documentation generator
 Name:           python-sphinx
-Version:        4.4.0
-Release:        2%{?dist}
+Version:        7.2.6
+Release:        1%{?dist}
 # Unless otherwise noted, the license for code is BSD
 # sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
@@ -252,6 +252,9 @@ pip3 install more-itertools
 %dir %{_datadir}/sphinx/locale/*
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.2.6-1
+- Auto-upgrade to 7.2.6 - Package upgrade for Azure Linux 3.0
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing epoch.
