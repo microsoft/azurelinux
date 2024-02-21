@@ -80,7 +80,7 @@ fi
 
 %changelog
 * Tue Feb 20 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.7.7-1
-- Skip image pull only if the correct snapshotter has a snapshot.
+- Upgrade to upstream containerd v1.7.7.
 
 * Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.7.2-4
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
