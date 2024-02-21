@@ -4,8 +4,9 @@ Name:           python-%{srcname}
 Version:        2.4.0
 Release:        16%{?dist}
 Summary:        Pure Python sorted container types
-
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/%{srcname}
 # PyPI tarball does not include docs or tests.
 Source0:        https://github.com/grantjenks/python-sortedcontainers/archive/v%{version}/%{name}-%{version}.tar.gz
