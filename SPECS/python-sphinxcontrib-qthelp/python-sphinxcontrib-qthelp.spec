@@ -83,6 +83,9 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.7-1
 - Upgrade to latest version.
 
+* Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-9
+- Fixing ptests.
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-8
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.
