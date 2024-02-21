@@ -3148,8 +3148,8 @@
         "type": "other",
         "other": {
           "name": "efivar",
-          "version": "37",
-          "downloadUrl": "https://github.com/rhboot/efivar/releases/download/37/efivar-37.tar.bz2"
+          "version": "39",
+          "downloadUrl": "https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz"
         }
       }
     },
