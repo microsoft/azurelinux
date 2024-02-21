@@ -71,6 +71,8 @@ Requires:       rpm
 Requires:       rpm-libs
 Requires:       sed
 Requires:       sqlite-libs
+Requires:       SymCrypt
+Requires:       SymCrypt-OpenSSL
 Requires:       tdnf
 Requires:       tdnf-plugin-repogpgcheck
 Requires:       xz
