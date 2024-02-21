@@ -1,6 +1,6 @@
 # Shared object version of libkcapi.
 %global vmajor            1
-%global vminor            4
+%global vminor            5
 %global vpatch            0
 # This package needs at least Linux Kernel v4.10.0.
 %global min_kernel_ver    4.10.0
@@ -63,7 +63,7 @@ License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.chronox.de/%{name}.html
-Source0:        https://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://www.chronox.de/%{name}/releases/%{version}/%{name}-1.5.0.tar.xz
 Source1:        sha512hmac-openssl.sh
 Source2:        fipshmac-openssl.sh
 BuildRequires:  bash
@@ -257,7 +257,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Feb 13 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.4.0-1
-- Upgrade to version 1.4.0
+- Upgrade to version 1.5.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.1-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
