@@ -40,7 +40,7 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %pyproject_install
 
 %check
-pip3 install pytest
+pip3 install wheel pytest
 export LANG=C.UTF-8
 %pytest
 
