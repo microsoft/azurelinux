@@ -30,6 +30,8 @@ index ed104c21..d483a971 100644
 -processor=x86;osname=win32,
 -com/sun/jna/win32-x86-64/jnidispatch.dll;
 -processor=x86-64;osname=win32,
+-com/sun/jna/win32-aarch64/jnidispatch.dll;
+-processor=aarch64;osname=win32,
 -com/sun/jna/win32-x86/jnidispatch.dll;
 -processor=x86;osname=win,
 -com/sun/jna/win32-x86-64/jnidispatch.dll;
@@ -79,6 +81,8 @@ index ed104c21..d483a971 100644
 -processor=mips64el;osname=linux,
 -com/sun/jna/linux-s390x/libjnidispatch.so;
 -processor=S390x;osname=linux,
+-com/sun/jna/linux-loongarch64/libjnidispatch.so;
+-processor=loongarch64;osname=linux,
 -
 -com/sun/jna/freebsd-x86/libjnidispatch.so;
 -processor=x86;osname=freebsd,
