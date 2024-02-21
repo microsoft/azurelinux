@@ -13132,9 +13132,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "moby-runc",
-          "version": "1.1.9",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.9.tar.gz"
+          "name": "runc",
+          "version": "1.1.12",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.1.12.tar.gz"
         }
       }
     },
