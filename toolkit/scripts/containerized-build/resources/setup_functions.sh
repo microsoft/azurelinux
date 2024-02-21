@@ -20,6 +20,15 @@ do
   MACROS+=("--load=$macro_file")
 done
 
+# Extra arguments for tdnf
+TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_MARINER_VERSION)
+
+# TODO Remove once PMC is available for 3.0
+if [[ $CONTAINERIZED_RPMBUILD_MARINER_VERSION == "3.0" ]]; then
+    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=mariner-3.0-daily-build")
+    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
+fi
+
 ## Create $SOURCES_DIR
 mkdir -p $SOURCES_DIR
 
@@ -154,15 +163,9 @@ rpmspec() {
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
 }
 
-# TODO: Remove when PMC is available for 3.0
-# Add mariner 3.0 Daily Build Repo
-enable_mariner3_repo() {
+# use proper tdnf arguments
+tdnf() {
     local args=("$@")
-    alias tdnf='tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build'
-    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
-    echo "Installing vim, git and other packages ..."
-    tdnf  --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy vim git
-    if [[ ! -z "$@" ]]; then
-        tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy "${args[@]}"
-    fi
+    command "$FUNCNAME" "${TDNF_ARGS[@]}" "${args[@]}"
+
 }
