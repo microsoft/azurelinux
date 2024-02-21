@@ -21,10 +21,10 @@ do
 done
 
 # Extra arguments for tdnf
-TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_MARINER_VERSION)
+TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
 
 # TODO Remove once PMC is available for 3.0
-if [[ $CONTAINERIZED_RPMBUILD_MARINER_VERSION == "3.0" ]]; then
+if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
     TDNF_ARGS+=("--disablerepo=*" "--enablerepo=mariner-3.0-daily-build")
     mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
 fi

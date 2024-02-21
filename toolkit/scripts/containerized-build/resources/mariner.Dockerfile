@@ -10,7 +10,7 @@ LABEL containerized-rpmbuild=$mariner_repo/build
 COPY resources/local_repo /etc/yum.repos.d/local_repo.disabled_repo
 
 # This is used by setup_functions.sh to determine tdnf default arguments
-ENV CONTAINERIZED_RPMBUILD_MARINER_VERSION=${version}
+ENV CONTAINERIZED_RPMBUILD_AZL_VERSION=${version}
 
 RUN echo "source /mariner_setup_dir/setup_functions.sh"          >> /root/.bashrc && \
     echo "if [[ ! -L /repo ]]; then ln -s /mnt/RPMS/ /repo; fi"  >> /root/.bashrc
