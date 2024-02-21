@@ -24,8 +24,8 @@
 
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
-Version:        1.44.0
-Release:        19%{?dist}
+Version:        1.52.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -1236,6 +1236,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.52.0-1
+- Auto-upgrade to 1.52.0 - Azure Linux 3.0 Upgrades
+
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-19
 - Bump release to rebuild against glibc 2.38-1
 
