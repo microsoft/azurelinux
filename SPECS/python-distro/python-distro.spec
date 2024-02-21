@@ -11,6 +11,7 @@ URL:            https://distro.readthedocs.io/en/latest/
 Source0:        https://github.com/python-distro/distro/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -40,7 +41,7 @@ Distro provides information about the OS distribution it runs on, such as a reli
 %pyproject_install
 
 %check
-pip3 install wheel pytest
+pip3 install pytest
 export LANG=C.UTF-8
 %pytest
 
