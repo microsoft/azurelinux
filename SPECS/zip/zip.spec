@@ -31,7 +31,7 @@ make prefix=%{buildroot}/%{_prefix} MANDIR=%{buildroot}/usr/share/man/man1 -f un
 
 %changelog
 *   Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-6
--   - Updated patch application macros.
+-   Updated patch application macros.
 
 *   Sat May 09 2020 Nick Samson <nisamson@microsoft.com> 3.0-5
 -   Added %%license line automatically

@@ -126,7 +126,7 @@ ERROR: no valid source attribution.
     return False
 
 
-def check_toolchain_patch_lines(spec_path: str, toolchain_specs: list):
+def check_toolchain_patch_lines(spec_path: str, toolchain_specs: set):
     """Checks if a toolchain spec file applies patches using the '%patch -P [number]' format.
        RPM < 4.18 will fail building a spec otherwise and toolchain specs are parsed directly on the host,
        which may have older versions of RPM.
