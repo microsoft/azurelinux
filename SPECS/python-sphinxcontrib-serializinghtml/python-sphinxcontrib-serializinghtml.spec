@@ -13,25 +13,25 @@ Source0:        https://files.pythonhosted.org/packages/54/13/8dd7a7ed9c58e16e20
 BuildArch:      noarch
 
 BuildRequires:  gettext
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-wheel
 BuildRequires:  python-flit-core
 
 %if %{with_check}
-BuildRequires:  python3-pytest
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 
 %description
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
 
-%package -n     python3-%{pypi_name}
+%package -n     python%{python3_pkgversion}-%{pypi_name}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
 
-%description -n python3-%{pypi_name}
+%description -n python%{python3_pkgversion}-%{pypi_name}
 sphinxcontrib-serializinghtml is a sphinx extension which outputs "serialized"
 HTML files (json and pickle).
 
