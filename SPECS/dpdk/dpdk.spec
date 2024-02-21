@@ -106,7 +106,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %prep
-%autosetup -p1 -n dpdk-stable-%{version}
+%autosetup -p1 -n dpdk-%{version}
 
 %build
 CFLAGS="$(echo %{optflags} -fcommon)" \
@@ -122,7 +122,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %else
   --default-library=static
 %endif
- 
+
 %meson_build
 
 %install
@@ -403,7 +403,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 - Remove ix86 from ExclusiveArch -- it does not build with above changes
 
 * Thu Jul 10 2014 - Neil Horman <nhorman@tuxdriver.com> - 1.7.0-1.0
-- Update source to official 1.7.0 release 
+- Update source to official 1.7.0 release
 
 * Thu Jul 03 2014 - Neil Horman <nhorman@tuxdriver.com>
 - Fixing up release numbering
