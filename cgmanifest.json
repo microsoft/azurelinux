@@ -9451,8 +9451,8 @@
         "type": "other",
         "other": {
           "name": "libgit2",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.4.5/libgit2-1.4.5.tar.gz"
+          "version": "1.6.5",
+          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.6.5/libgit2-1.6.5.tar.gz"
         }
       }
     },
