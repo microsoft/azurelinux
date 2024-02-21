@@ -24184,8 +24184,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-applehelp",
-          "version": "1.0.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/sphinxcontrib-applehelp/sphinxcontrib-applehelp-1.0.2.tar.gz"
+          "version": "1.0.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/26/6b/68f470fc337ed24043fec987b101f25b35010970bd958970c2ae5990859f/sphinxcontrib_applehelp-1.0.8.tar.gz"
         }
       }
     },
