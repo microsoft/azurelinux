@@ -70,6 +70,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/pangoft2.pc
 
 %changelog
+* Wed Feb 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.51.2-1
+- Updated to package version 1.51.2 since this is the current latest offical release
+- Updated the patch to skip tests to skip known failures
+
 * Mon Jan 29 2024 Bala <balakumaran.kannan@microsoft.com> - 1.90.0-1
 - Upgrade to version 1.90.0
 - Update the patch to skip tests to skip know failiures
