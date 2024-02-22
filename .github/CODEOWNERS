@@ -15,7 +15,6 @@
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
 
 # Modification to specific packages go to specific teams
-/SPECS/installkernel/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-hci/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
