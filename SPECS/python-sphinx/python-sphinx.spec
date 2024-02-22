@@ -66,6 +66,23 @@ and its parsing and translating suite, the Docutils.
 %package -n python%{python3_pkgversion}-sphinx
 Summary:        Python documentation generator
 
+Requires:       python3-sphinxcontrib-applehelp
+Requires:       python3-sphinxcontrib-devhelp
+Requires:       python3-sphinxcontrib-htmlhelp
+Requires:       python3-sphinxcontrib-jsmath
+Requires:       python3-sphinxcontrib-qthelp
+Requires:       python3-sphinxcontrib-serializinghtml
+Requires:       python3-jinja2
+Requires:       python3-pygments
+Requires:       python3-docutils
+Requires:       python3-snowballstemmer
+Requires:       python3-babel
+Requires:       python3-sphinx-theme-alabaster
+Requires:       python3-imagesize
+Requires:       python3-requests
+Requires:       python3-packaging
+Requires:       python3-importlib-metadata
+
 Recommends:     ImageMagick
 Recommends:     graphviz
 
