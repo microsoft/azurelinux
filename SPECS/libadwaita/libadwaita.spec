@@ -41,7 +41,6 @@ Building blocks for modern GNOME applications.
 
 %package -n libadwaita-1-0
 Summary:        Building blocks for modern GNOME applications
-# Make the -lang package installable
 Provides:       %{name} = %{version}
 
 %description -n libadwaita-1-0
@@ -86,12 +85,9 @@ This package provides the GObject Introspection bindings for libadwaita.
 
 %install
 %meson_install
-%find_lang %{name}
 %fdupes %{buildroot}%{_datadir}
 
 %{ldconfig_scriptlets -n libadwaita-1-0}
-
-%files lang -f %{name}.lang
 
 %files -n libadwaita-1-0
 %license COPYING
@@ -116,3 +112,4 @@ This package provides the GObject Introspection bindings for libadwaita.
 * Wed Feb 21 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.4.3-1
 - Bring in v1.4.3 version of libadwaita into Mariner
 - Required for rest package.
+- Remove the creation of the lang packages
