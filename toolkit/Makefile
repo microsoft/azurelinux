@@ -141,68 +141,8 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## DAILY BUILD AND PREVIEW REPO SUPPORT ########
 
-##help:var:DAILY_BUILD_ID:{'lkg','lkg-force',<build_id>}='lkg' will auto select latest daily build repo. Unless LKG_MANIFESTS='n' is used, unmodifed manifests will be udpated to match. 'lkg-force' will overwrite changes. An explicit ID of the daily build repo can also be used.
-DAILY_BUILD_ID ?=
+include $(SCRIPTS_DIR)/daily_build.mk
 
-##help:var:LKG_MANIFESTS:{y,n}='y' will auto update the manifests to the latest daily build if used in conjunction with DAILY_BUILD_ID='lkg' or 'lkg-force'.
-LKG_MANIFESTS ?= y
-skip_manifest_updates = $(if $(filter y,$(LKG_MANIFESTS)),,--skip-manifest-updates)
-
-ifneq ($(DAILY_BUILD_ID),)
-   # If DAILY_BUILD_ID is set to "lkg" or "lkg-force" we should attempt to auto select the best daily build
-   ifeq ($(DAILY_BUILD_ID),lkg)
-      $(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
-      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id $(skip_manifest_updates))
-      ifneq ($(.SHELLSTATUS),0)
-         $(error Failed to auto detect DAILY_BUILD_ID... try DAILY_BUILD_ID=lkg-force to overwrite manifests)
-      endif
-   endif
-   ifeq ($(DAILY_BUILD_ID),lkg-force)
-      # lkg-force is incompatible with LKG_MANIFESTS=n
-      ifneq ($(LKG_MANIFESTS),y)
-         $(error DAILY_BUILD_ID=lkg-force requires LKG_MANIFESTS=y)
-      endif
-      $(info Auto detecting DAILY_BUILD_ID based on the latest known good build AND overwriting manifests)
-      override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/setuplkgtoolchain.sh --auto-id --force $(skip_manifest_updates))
-      ifneq ($(.SHELLSTATUS),0)
-         $(error Failed to auto detect DAILY_BUILD_ID and update manifests)
-      endif
-   endif
-
-   $(warning Using Daily Build $(DAILY_BUILD_ID))
-   # Ensure build_arch is set
-   ifeq ($(build_arch),)
-      $(error build_arch must be set when using DAILY_BUILD_ID)
-   endif
-   # build_arch cannot be directly used because Azure storage do not support container names with '_' char
-   ifeq ($(build_arch),x86_64)
-      # The actual repo is found at <URL>/, while a duplicate copy of all the rpms can be found at <URL>/built_rpms_all/
-      # Include both so that the tools that expect a valid repo work, while the tools that expect a basic URL also work.
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-x86-64/SRPMS
-   else
-      override PACKAGE_URL_LIST   := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/built_rpms_all \
-                                       https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64
-      override SRPM_URL_LIST      := https://mariner3dailydevrepo.blob.core.windows.net/daily-repo-$(DAILY_BUILD_ID)-aarch64/SRPMS
-   endif
-else
-   ifeq ($(USE_PREVIEW_REPO),y)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
-      override SRPM_URL_LIST      += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/preview/base/srpms
-      ifneq ($(wildcard $(PREVIEW_REPO)),)
-         override REPO_LIST += $(PREVIEW_REPO)
-      else
-         $(warning )
-         $(warning ######################### WARNING #########################)
-         $(warning 'USE_PREVIEW_REPO=y' set but '$(PREVIEW_REPO)' is missing. Regenerate toolkit's 'repos' directory. Remove 'USE_PREVIEW_REPO' for core builds.)
-         $(warning ######################### WARNING #########################)
-         $(warning )
-      endif
-   endif
-endif
 
 ######## REMAINING BUILD FLAGS ########
 
