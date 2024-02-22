@@ -43,15 +43,15 @@ Requires:       %{name}-jdk-binding = %{version}-%{release}
 %description
 Maven is a software project management and comprehension tool. Based on the concept of a project object model (POM). Maven can manage a project's build, reporting and documentation from a central piece of information.
 
-%package openjdk11
+%package openjdk17
 Summary:        MSOpenJDK 11 binding for Maven
-RemovePathPostfixes: -openjdk11
+RemovePathPostfixes: -openjdk17
 Requires: %{name} = %{version}-%{release}
 Requires: msopenjdk-17
 Provides: %{name}-jdk-binding = %{version}-%{release}
  
-%description openjdk11
-Configures Maven to run with OpenJDK 11.
+%description openjdk17
+Configures Maven to run with OpenJDK 17.
 
 %prep
 # Installing 1.0 PMC packages to provide prebuilt mvn binary.
