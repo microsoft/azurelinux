@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/bitprophet/alabaster/
-Source0:        https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/%{version}#/alabaster-%{version}
+Source0:        https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/%{version}#/alabaster-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
