@@ -39,8 +39,6 @@ NVM-Express user space tooling for Linux
 %{_datadir}/bash-completion/completions/nvme
 %{_datadir}/zsh/site-functions/_nvme
 %dir %{_sysconfdir}/nvme
-%{_sysconfdir}/nvme/hostnqn
-%{_sysconfdir}/nvme/hostid
 %{_sysconfdir}/nvme/discovery.conf
 %{_sysconfdir}/udev/rules.d/65-persistent-net-nbft.rules
 %{_sysconfdir}/udev/rules.d/70-nvmf-autoconnect.rules
