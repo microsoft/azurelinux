@@ -153,8 +153,8 @@ echo JAVA_HOME=%{_lib}/jvm/msopenjdk-17 >%{buildroot}%{_sysconfdir}/java/maven.c
 %{_prefixmvn}/NOTICE
 %{_prefixmvn}/README.txt
 
-%files openjdk11
-%config /etc/java/maven.conf-openjdk11
+%files openjdk17
+%config /etc/java/maven.conf-openjdk17
 
 %changelog
 * Fri Jan 12 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.9.6-1
