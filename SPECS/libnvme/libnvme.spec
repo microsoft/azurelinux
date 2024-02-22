@@ -4,7 +4,7 @@ Version: 1.8
 Release: 1%{?dist}
 License: LGPL-2.1-or-later
 URL:     https://github.com/linux-nvme/libnvme
-Source0: https://github.com/linux-nvme/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0: https://github.com/linux-nvme/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires: dbus-devel
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -74,7 +74,7 @@ This package contains Python bindings for libnvme.
 
 %changelog
 * Wed Feb 21 2024 Adit Jha <aditjha@microsoft.com> - 1.8-1
-- Initial CBL-Mariner import from Fedora
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).  License verified.
 
 * Wed Feb 14 2024 Tomas Bzatek <tbzatek@redhat.com> - 1.8-1
 - Upstream v1.8 release
