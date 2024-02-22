@@ -49,9 +49,8 @@ Group:          Development/Libraries/Java
 API docs for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -p1
 cp %{SOURCE1} build.xml
-%patch 0 -p1
 find -name *.jar -delete
 find -name *.class -delete
 rm -rf bootstrap
