@@ -1,7 +1,8 @@
+%global debug_package %{nil}
 Summary:        Core utilities for Python packages
 Name:           python-packaging
 Version:        21.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,6 +53,9 @@ PYTHONPATH=./ pytest
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 21.3-2
+- Disable debuginfo package to fix build with python 3.12
+
 * Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
 - Upgrade to latest upstream version
 - Use github release source instead of pypi source
