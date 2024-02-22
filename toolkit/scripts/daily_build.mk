@@ -34,28 +34,32 @@ PKG_MANIFEST_OVERWRITE ?= $(if $(filter lkg-force,$(DAILY_BUILD_ID)),y,n)
 ######## CALCULATE LKG ID ########
 
 ifneq (, $(filter $(DAILY_BUILD_ID),lkg lkg-force))
-$(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
-override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(lkg_workdir))
-ifneq ($(.SHELLSTATUS),0)
-$(error Failed to auto detect DAILY_BUILD_ID)
-endif # .SHELLSTATUS
+    $(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
+    override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(lkg_workdir))
+    ifneq ($(.SHELLSTATUS),0)
+        $(error Failed to auto detect DAILY_BUILD_ID)
+    endif # .SHELLSTATUS
 endif # DAILY_BUILD_ID
 
 ######## MANIFEST UPDATE ########
 
 # Update the toolchain manifests
 .PHONY: update-toolchain-manifests
+
 ifeq ($(LKG_MANIFESTS),y)
+
 .PHONY: update_manifest_always_run_phony
 update-toolchain-manifests: $(TOOLCHAIN_MANIFEST) $(WORKER_CHROOT_MANIFEST)
 $(call create_folder,$(lkg_workdir))
 force_manifest_updates=$(if $(filter y,$(PKG_MANIFEST_OVERWRITE)),true,false)
 $(TOOLCHAIN_MANIFEST) $(WORKER_CHROOT_MANIFEST): update_manifest_always_run_phony
 	$(SCRIPTS_DIR)/update_manifest.sh $@ $(build_arch) $(lkg_workdir) $(force_manifest_updates)
-else # LKG_MANIFEST y
-update-toolchain-manifest:
-endif
 
+else # LKG_MANIFEST y
+
+update-toolchain-manifest:
+
+endif
 
 ######## DAILY BUILD ID ########
 
