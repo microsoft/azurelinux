@@ -1,21 +1,23 @@
 Summary:        Core utilities for Python packages
 Name:           python-packaging
-Version:        21.3
+Version:        23.2
 Release:        1%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/packaging
-Source0:        https://github.com/pypa/packaging/releases/download/%{version}/packaging-%{version}.tar.gz
+Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.tar.gz#/python-packaging-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
 %if %{with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
-BuildRequires:  python3-pip
 BuildRequires:  python3-pyparsing
-BuildRequires:  python3-setuptools
+BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 BuildRequires:  python3-xml
 %endif
@@ -37,21 +39,24 @@ Core utilities for Python packages
 %autosetup -n packaging-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files packaging
 
 %check
-pip3 install pretend pytest
-PYTHONPATH=./ pytest
+%{python3} -m pip install exceptiongroup iniconfig pretend tomli>=1.0.0
+%pytest
 
-%files -n python3-packaging
+%files -n python3-packaging -f %{pyproject_files}
 %defattr(-,root,root,-)
 %license LICENSE
-%{python3_sitelib}/*
 
 %changelog
+* Fri Feb 09 2024 Aurelien Bombo <abombo@microsoft.com> - 23.2-1
+- AzL 3.0 package upgrade
+
 * Tue Feb 01 2022 Thomas Crain <thcrain@microsoft.com> - 21.3-1
 - Upgrade to latest upstream version
 - Use github release source instead of pypi source
