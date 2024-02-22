@@ -1,5 +1,6 @@
 {
   "Signatures": {
+    "10_kernel.cfg": "078b6b5041edb2569c20d8adf557917cf05b5f832663946444f0197ba53d07b6",
     "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
     "config": "6dc199864e90f44f7bd730871d8fbdf49440c3e696df98a0c5796e38bb035c38",
     "config_aarch64": "62e5c3ee3933c98790eb4e0f051cf12163d6681aeeb10df4f00f62644cc1f46a",
