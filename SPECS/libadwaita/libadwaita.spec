@@ -27,7 +27,6 @@ Source:         https://gitlab.gnome.org/GNOME/%{name}/-/archive/%{version}/%{na
 BuildRequires:  fdupes
 BuildRequires:  meson >= 0.59.0
 BuildRequires:  pkgconfig
-BuildRequires:  libsass
 BuildRequires:  vala
 BuildRequires:  fribidi-devel
 BuildRequires:  pkgconfig(glib-2.0) >= 2.72
