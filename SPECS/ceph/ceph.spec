@@ -143,7 +143,6 @@ BuildRequires:  python%{python3_pkgversion}-prettytable
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
-BuildRequires:  systemd-devel
 BuildRequires:  util-linux
 
 
