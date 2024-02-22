@@ -728,7 +728,9 @@ Requires: %{name}-system-sh4 = %{version}-%{release}
 Requires: %{name}-system-sparc = %{version}-%{release}
 %endif
 Requires: %{name}-system-tricore = %{version}-%{release}
+%ifarch x86_64
 Requires: %{name}-system-x86 = %{version}-%{release}
+%endif
 Requires: %{name}-system-xtensa = %{version}-%{release}
 Requires: %{name}-img = %{version}-%{release}
 Requires: %{name}-tools = %{version}-%{release}
