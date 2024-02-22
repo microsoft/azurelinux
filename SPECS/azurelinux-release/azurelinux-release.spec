@@ -60,6 +60,8 @@ Welcome to %{distribution} %{version} (%{_arch})
 EOF
 ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
+install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -72,6 +74,7 @@ ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
+%dir %{_sysconfdir}/issue.d
 
 %changelog
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
@@ -79,6 +82,7 @@ ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 - define dist_version and use local macros
 - move *-release and issue files under %%_libdir and make %%_sysconfdir symlinks
 - use consistent creation of here documents
+- add issue.d dir
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
