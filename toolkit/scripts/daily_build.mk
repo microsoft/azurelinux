@@ -38,8 +38,8 @@ $(warning Auto detecting DAILY_BUILD_ID based on the latest known good build)
 override DAILY_BUILD_ID := $(shell $(SCRIPTS_DIR)/get_lkg_id.sh $(lkg_workdir))
 ifneq ($(.SHELLSTATUS),0)
 $(error Failed to auto detect DAILY_BUILD_ID)
-endif
-endif
+endif # .SHELLSTATUS
+endif # DAILY_BUILD_ID
 
 ######## MANIFEST UPDATE ########
 
