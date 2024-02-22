@@ -66,7 +66,7 @@ fi
 
 %changelog
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8-1
-- Auto-upgrade to 2.8 - none
+- Auto-upgrade to 2.8
 
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-2
 - Remove check tests which fail to run properly on daily build machines
