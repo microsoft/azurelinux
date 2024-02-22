@@ -118,17 +118,17 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	defer timestamp.StopEvent(nil)
 
 	const (
-		localRepoMountPoint   = "/mnt/cdrom/RPMS"
-		repoFileMountPoint    = "/etc/yum.repos.d"
-		setupRoot             = "/setuproot"
-		installRoot           = "/installroot"
-		rootID                = "rootfs"
-		defaultDiskIndex      = 0
-		defaultTempDiskName   = "disk.raw"
-		existingChrootDir     = false
-		leaveChrootOnDisk     = false
-		grub2Package          = "grub2"
-		marinerReleasePackage = "azurelinux-release"
+		localRepoMountPoint  = "/mnt/cdrom/RPMS"
+		repoFileMountPoint   = "/etc/yum.repos.d"
+		setupRoot            = "/setuproot"
+		installRoot          = "/installroot"
+		rootID               = "rootfs"
+		defaultDiskIndex     = 0
+		defaultTempDiskName  = "disk.raw"
+		existingChrootDir    = false
+		leaveChrootOnDisk    = false
+		grub2Package         = "grub2"
+		distroReleasePackage = "azurelinux-release"
 	)
 
 	var (
@@ -155,7 +155,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	// Mariner images don't work appropriately when azurelinux-release is not installed.
 	// As a stopgap to this, azurelinux-release will now be added to all images regardless
 	// of presence in the CONFIG_FILE
-	packagesToInstall = append([]string{marinerReleasePackage}, packagesToInstall...)
+	packagesToInstall = append([]string{distroReleasePackage}, packagesToInstall...)
 
 	if systemConfig.IsRootFS() {
 		logger.Log.Infof("Creating rootfs")
