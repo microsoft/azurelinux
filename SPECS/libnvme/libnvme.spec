@@ -28,15 +28,6 @@ Requires: %{name}%{?_isa} = %{version}-%{release}
 %description devel
 This package provides header files to include and libraries to link with
 for Linux-native nvme device management.
-%package doc
-Summary: Reference manual for libnvme
-BuildArch: noarch
-BuildRequires: perl-interpreter
-BuildRequires: python3-sphinx
-BuildRequires: python3-sphinx_rtd_theme
-
-%description doc
-This package contains the reference manual for %{name}.
 
 %package -n python3-libnvme
 Summary:  Python3 bindings for libnvme
