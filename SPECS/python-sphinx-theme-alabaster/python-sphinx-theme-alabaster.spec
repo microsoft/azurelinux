@@ -17,6 +17,8 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 Summary:        A configurable sidebar-enabled Sphinx theme
 BuildRequires:  python3
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
@@ -29,10 +31,10 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 %autosetup -n alabaster-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %files -n python3-sphinx-theme-alabaster
 %defattr(-,root,root,-)
