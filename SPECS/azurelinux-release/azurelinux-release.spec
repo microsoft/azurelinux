@@ -14,6 +14,8 @@ URL:            https://aka.ms/azurelinux
 Provides:       system-release
 Provides:       system-release(%{version})
 
+Conflicts:      mariner-rpm-macros < 2.0-25
+
 BuildArch:      noarch
 
 %description
@@ -22,6 +24,7 @@ Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release 
 %install
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}%{_libdir}
+install -d %{buildroot}%{_rpmmacrodir}
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/azurelinux-release
 %{distribution} %{version}
@@ -62,6 +65,20 @@ ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
 
+cat <<-"EOF" > %{buildroot}%{_rpmmacrodir}/macros.dist
+# dist macros.
+
+%%__bootstrap         ~bootstrap
+%%azl                 %{dist_version}
+%%azl%{dist_version}  1
+%%dist                .azl%{dist_version}%%{?with_bootstrap:%%{__bootstrap}}
+%%dist_vendor         %{vendor}
+%%dist_name           %{distribution}
+%%dist_home_url       %{url}
+%%dist_bug_report_url %{url}
+%%dist_debuginfod_url %{url}
+EOF
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -75,6 +92,7 @@ install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
 %dir %{_sysconfdir}/issue.d
+%{_rpmmacrodir}/macros.dist
 
 %changelog
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
@@ -83,6 +101,7 @@ install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
 - move *-release and issue files under %%_libdir and make %%_sysconfdir symlinks
 - use consistent creation of here documents
 - add issue.d dir
+- move macros.dist into this package
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
