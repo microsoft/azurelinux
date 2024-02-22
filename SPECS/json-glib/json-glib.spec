@@ -1,6 +1,6 @@
 Summary:        Library providing serialization and deserialization support for the JSON format
 Name:           json-glib
-Version:        1.6.6
+Version:        1.8.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
@@ -72,6 +72,9 @@ export LDFLAGS="-Wl,-z,relro,-z,now"
 %{_mandir}/man1/json-glib-validate.1*
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.0-1
+- Auto-upgrade to 1.8.0 - Azure Linux 3.0 Upgrades
+
 * Thu Feb 10 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.6.6-1
 - Update to v1.6.6
 - Disabled docs until gi-docgen is a supported package
