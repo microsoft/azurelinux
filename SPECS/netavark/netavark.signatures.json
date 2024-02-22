@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "netavark-1.0.3.tar.gz": "ff4e93b55d6822cf01f4db605095ef40b11e75507343492c75d2b394612d5fac",
-  "netavark-v1.0.3-vendor.tar.gz": "66253493230d5991d0bda401101a56dee8724054cd5d880d8949665de1bb9953"
- }
+  "Signatures": {
+    "netavark-v1.0.3-vendor.tar.gz": "66253493230d5991d0bda401101a56dee8724054cd5d880d8949665de1bb9953",
+    "netavark-1.10.3.tar.gz": "fdc3010cb221f0fcef0302f57ef6f4d9168a61f9606238a3e1ed4d2e348257b7"
+  }
 }
