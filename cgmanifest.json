@@ -23254,8 +23254,8 @@
         "type": "other",
         "other": {
           "name": "python-packaging",
-          "version": "21.3",
-          "downloadUrl": "https://github.com/pypa/packaging/releases/download/21.3/packaging-21.3.tar.gz"
+          "version": "23.2",
+          "downloadUrl": "https://github.com/pypa/packaging/archive/refs/tags/23.2.tar.gz"
         }
       }
     },
