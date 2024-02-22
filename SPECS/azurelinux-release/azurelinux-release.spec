@@ -39,7 +39,7 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 
 %install
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}/%{_libdir}
+install -d %{buildroot}%{_libdir}
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/azurelinux-release
 Azure Linux %{dist_version}
