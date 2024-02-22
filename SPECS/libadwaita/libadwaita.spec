@@ -75,7 +75,7 @@ This package provides the GObject Introspection bindings for libadwaita.
 %meson \
 	-Dexamples=false \
 	-Dintrospection=enabled \
-	-Dgtk_doc=disabled \
+	-Dgtk_doc=false \
 	-Dman=true \
 	%{nil}
 %meson_build
