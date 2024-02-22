@@ -24,7 +24,7 @@ distro_def="${DIST_TAG#.} 1"
 
 # 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
 distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
-distro_majver="$(echo $RELEASE_NUM | cut -d'.' -f1)"
+distro_majver="${RELEASE_NUM%%.*}"
 distro_ver="${distro_name} ${distro_majver}"
 
 DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$distro_def" -D "$distro_ver")

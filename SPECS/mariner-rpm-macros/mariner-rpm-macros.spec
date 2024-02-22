@@ -87,7 +87,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 
 major_version=`echo %{mariner_release_version} | cut -d'.' -f1`
-sed -e 's|@DIST@|%{dist}|g' %{SOURCE28} | sed -e "s|@MAJORVER@|$major_version|g" > macros.dist
+sed -e 's|@DIST@|%{dist}|g' -e "s|@MAJORVER@|$major_version|g" %{SOURCE28} > macros.dist
 
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
