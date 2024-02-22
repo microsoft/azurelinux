@@ -2,209 +2,145 @@
 # with user-installed modules (#1903763)
 %undefine py3_shebang_flags
 
-# Disabled until we bring "ImageMagick" to Mariner.
-%bcond_with imagemagick_tests
-
-# Disabled until we have the required LaTeX dependencies in Mariner.
-%bcond_with latex_tests
-
 Summary:        Python documentation generator
 Name:           python-sphinx
-Version:        4.4.0
-Release:        2%{?dist}
-# Unless otherwise noted, the license for code is BSD
-# sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
+Version:        7.2.6
+Release:        1%{?dist}
+
+# Unless otherwise noted, the license for code is BSD-2-Clause
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
-License:        BSD AND Python AND MIT
+License:        BSD-2-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-%{version}.tar.gz
+Source0:        https://github.com/sphinx-doc/sphinx/archive/refs/tags/v%{version}.tar.gz#/Sphinx-%{version}.tar.gz
 
 BuildArch:      noarch
 
-# for fixes
 BuildRequires:  dos2unix
 BuildRequires:  make
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-BuildRequires:  python3dist(wheel)
+BuildRequires:  python3-wheel
+BuildRequires:  python3-flit-core
 
-%if %{with_check}
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  graphviz
-BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
-BuildRequires:  python3-docutils
 BuildRequires:  python3-pluggy
-BuildRequires:  python3-pytest
-BuildRequires:  python3-six
-BuildRequires:  python3-test
 BuildRequires:  texinfo
 
-%if %{with imagemagick_tests}
-BuildRequires:  ImageMagick
-%endif
+BuildRequires:  python3-sphinxcontrib-applehelp
+BuildRequires:  python3-sphinxcontrib-devhelp
+BuildRequires:  python3-sphinxcontrib-htmlhelp
+BuildRequires:  python3-sphinxcontrib-jsmath
+BuildRequires:  python3-sphinxcontrib-qthelp
+BuildRequires:  python3-sphinxcontrib-serializinghtml
+BuildRequires:  python3-jinja2
+BuildRequires:  python3-pygments
+BuildRequires:  python3-docutils
+BuildRequires:  python3-snowballstemmer
+BuildRequires:  python3-babel
+BuildRequires:  python3-sphinx-theme-alabaster
+BuildRequires:  python3-imagesize
+BuildRequires:  python3-requests
+BuildRequires:  python3-packaging
+BuildRequires:  python3-importlib-metadata
 
-%if %{with latex_tests}
-BuildRequires:  texlive-collection-fontsrecommended
-BuildRequires:  texlive-collection-latex
-BuildRequires:  texlive-dvipng
-BuildRequires:  texlive-dvisvgm
-BuildRequires:  tex(FreeSerif.otf)
-BuildRequires:  tex(amsmath.sty)
-BuildRequires:  tex(amsthm.sty)
-BuildRequires:  tex(anyfontsize.sty)
-BuildRequires:  tex(article.cls)
-BuildRequires:  tex(capt-of.sty)
-BuildRequires:  tex(cmap.sty)
-BuildRequires:  tex(color.sty)
-BuildRequires:  tex(ctablestack.sty)
-BuildRequires:  tex(fancyhdr.sty)
-BuildRequires:  tex(fancyvrb.sty)
-BuildRequires:  tex(fncychap.sty)
-BuildRequires:  tex(framed.sty)
-BuildRequires:  tex(geometry.sty)
-BuildRequires:  tex(hyperref.sty)
-BuildRequires:  tex(kvoptions.sty)
-BuildRequires:  tex(luatex85.sty)
-BuildRequires:  tex(needspace.sty)
-BuildRequires:  tex(parskip.sty)
-BuildRequires:  tex(polyglossia.sty)
-BuildRequires:  tex(tabulary.sty)
-BuildRequires:  tex(titlesec.sty)
-BuildRequires:  tex(upquote.sty)
-BuildRequires:  tex(utf8x.def)
-BuildRequires:  tex(wrapfig.sty)
-%endif
-
+%if %{with_check}
+BuildRequires:  python3-test
+BuildRequires:  python3-pytest
+BuildRequires:  python3-Cython
+BuildRequires:  python3-six
 %endif
 
 %description
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
+Sphinx makes it easy to create intelligent and beautiful documentation.
 
 Sphinx uses reStructuredText as its markup language, and many of its
-strengths come from the power and straightforwardness of
-reStructuredText and its parsing and translating suite, the Docutils.
-
-Although it is still under constant development, the following
-features are already present, work fine and can be seen "in action" in
-the Python docs:
-
-    * Output formats: HTML (including Windows HTML Help) and LaTeX,
-      for printable PDF versions
-    * Extensive cross-references: semantic markup and automatic links
-      for functions, classes, glossary terms and similar pieces of
-      information
-    * Hierarchical structure: easy definition of a document tree, with
-      automatic links to siblings, parents and children
-    * Automatic indices: general index as well as a module index
-    * Code handling: automatic highlighting using the Pygments highlighter
-    * Various extensions are available, e.g. for automatic testing of
-      snippets and inclusion of appropriately formatted docstrings.
+strength come from the power and straightforwardness of reStructuredText
+and its parsing and translating suite, the Docutils.
 
 %package -n python%{python3_pkgversion}-sphinx
 Summary:        Python documentation generator
-License:        BSD AND Python AND MIT
-
-Requires:       python3-babel
-Requires:       python3-docutils
-Requires:       python3-imagesize
-# Required until we update to at least Python 3.10 due to Sphinx calling into "importlib_metadata.entry_points(group=...)".
-# Pre-Python 3.10 versions provide the "importlib.metadata.entry_points" function WITHOUT the "group" argument.
-# Without "python3-importlib-metadata" Sphinx attempts to use that Python's function and crashes for Python < 3.10.
-# This package provides the newer version of "entry_points", which accepts the "group" argument.
-Requires:       python3-importlib-metadata
-Requires:       python3-jinja2
-Requires:       python3-packaging
-Requires:       python3-pygments
-Requires:       python3-requests
-Requires:       python3-six
-Requires:       python3-snowballstemmer
-Requires:       python3-sphinx-theme-alabaster
-Requires:       python3-sphinxcontrib-applehelp
-Requires:       python3-sphinxcontrib-devhelp
-Requires:       python3-sphinxcontrib-htmlhelp
-Requires:       python3-sphinxcontrib-jsmath
-Requires:       python3-sphinxcontrib-qthelp
-Requires:       python3-sphinxcontrib-serializinghtml
 
 Recommends:     ImageMagick
 Recommends:     graphviz
 
-Provides:       bundled(css3-mediaqueries) = 1.0
-
 %description -n python%{python3_pkgversion}-sphinx
-Sphinx is a tool that makes it easy to create intelligent and
-beautiful documentation for Python projects (or other documents
-consisting of multiple reStructuredText sources), written by Georg
-Brandl. It was originally created to translate the new Python
-documentation, but has now been cleaned up in the hope that it will be
-useful to many other projects.
+Sphinx makes it easy to create intelligent and beautiful documentation.
 
 Sphinx uses reStructuredText as its markup language, and many of its
-strengths come from the power and straightforwardness of
-reStructuredText and its parsing and translating suite, the Docutils.
+strength come from the power and straightforwardness of reStructuredText
+and its parsing and translating suite, the Docutils.
 
-Although it is still under constant development, the following
-features are already present, work fine and can be seen "in action" in
-the Python docs:
+%package doc
+Summary:        Documentation for %{name}
+License:        BSD-2-Clause
+Recommends:     python%{python3_pkgversion}-sphinx = %{version}-%{release}
 
-    * Output formats: HTML (including Windows HTML Help) and LaTeX,
-      for printable PDF versions
-    * Extensive cross-references: semantic markup and automatic links
-      for functions, classes, glossary terms and similar pieces of
-      information
-    * Hierarchical structure: easy definition of a document tree, with
-      automatic links to siblings, parents and children
-    * Automatic indices: general index as well as a module index
-    * Code handling: automatic highlighting using the Pygments highlighter
-    * Various extensions are available, e.g. for automatic testing of
-      snippets and inclusion of appropriately formatted docstrings.
+%description doc
+Sphinx makes it easy to create intelligent and beautiful documentation.
+
+Sphinx uses reStructuredText as its markup language, and many of its
+strength come from the power and straightforwardness of reStructuredText
+and its parsing and translating suite, the Docutils.
+
+This package contains documentation in the HTML format.
 
 %prep
-%autosetup -n Sphinx-%{version} -p1
+%autosetup -n sphinx-%{version} -p1
 
-# Remove bundled JS components.
-rm ./sphinx/themes/basic/static/{jquery,underscore}*.js
-rm ./sphinx/themes/bizstyle/static/css3-mediaqueries*.js
-
-%if %{without imagemagick_tests}
+# We don't have ImageMagick at the moment
 rm tests/test_ext_imgconverter.py
-%endif
 
-# Don't measure coverage:
-sed -i '/pytest-cov/d' setup.py
-# Not needed on recent Pythons, https://github.com/sphinx-doc/sphinx/pull/8483
-sed -i '/typed_ast/d' setup.py
-
-
-%generate_buildrequires
-%pyproject_buildrequires -r %{?with_check:-x test}
+# Sphinx' tests import from each other, this feature is not supported by
+# the 'importlib' import mode in pytest. Upstream mitigates this by invoking
+# `python -m pytest` rather than `pytest` directly, but in the context of the
+# RPM build we explicitly want to test the installed library rather than the
+# one from PWD.
+# https://github.com/sphinx-doc/sphinx/issues/11740
+sed -i '/"--import-mode=importlib",/d' pyproject.toml
 
 %build
 %pyproject_wheel
+
+export PYTHONPATH=$PWD
+pushd doc
+export SPHINXBUILD="%{python3} ../sphinx/cmd/build.py"
+make html SPHINXBUILD="$SPHINXBUILD"
+make man SPHINXBUILD="$SPHINXBUILD"
+rm -rf _build/html/.buildinfo
+# Those files are copied to _build/html/_images and loaded to the
+# html pages from there - we can safely remove the duplicated and unused files
+rm -rf _build/html/_static/themes _build/html/_static/tutorial
+rm -f _build/html/_static/more.png _build/html/_static/translation.svg
+mv _build/html ..
+popd
 
 %install
 %pyproject_install
 
 # For backwards compatibility. Remove with care, if at all
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
-    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/${i}%{python3_pkgversion}
     ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_version}
-    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_pkgversion}
+    ln -s %{_bindir}/$i %{buildroot}%{_bindir}/$i-3
 done
 
 # Clean up non-python files
 rm -f %{buildroot}%{python3_sitelib}/sphinx/locale/.DS_Store
 rm -rf %{buildroot}%{python3_sitelib}/sphinx/locale/.tx
+
+pushd doc
+# Deliver man pages
+install -d %{buildroot}%{_mandir}/man1
+for f in _build/man/sphinx-*.1;
+do
+    cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f)
+done
+popd
 
 # Move language files to /usr/share;
 # patch to support this incorporated in 0.6.6
@@ -221,7 +157,6 @@ do
     %{buildroot}%{_datadir}/locale/$lang/LC_MESSAGES/
   rm -rf sphinx/locale/$lang
 done
-
 popd
 
 # Create the sphinxcontrib directory, so we can own it
@@ -237,8 +172,22 @@ mkdir %{buildroot}%{python3_sitelib}/sphinxcontrib
   >> sphinx.lang
 
 %check
-pip3 install more-itertools
-%pytest
+pip install --upgrade \
+  exceptiongroup \
+  filelock \
+  html5lib \
+  iniconfig \
+  tomli \
+  "pygments>=2.14"
+
+# ignoring some tests due to incompatible dependencies
+# html5lib: test_build_html, test_build_latex
+# graphviz: test_ext_graphviz, test_ext_inheritance_diagram
+%pytest \
+  --ignore tests/test_build_html.py \
+  --ignore tests/test_build_latex.py \
+  --ignore tests/test_ext_graphviz.py \
+  --ignore tests/test_ext_inheritance_diagram.py
 
 %files -n python%{python3_pkgversion}-sphinx -f sphinx.lang
 %license LICENSE
@@ -246,12 +195,18 @@ pip3 install more-itertools
 %{_bindir}/sphinx-*
 %{python3_sitelib}/sphinx/
 %dir %{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/Sphinx-%{version}.dist-info/
+%{python3_sitelib}/sphinx-%{version}.dist-info/
 %dir %{_datadir}/sphinx/
 %dir %{_datadir}/sphinx/locale
 %dir %{_datadir}/sphinx/locale/*
+%{_mandir}/man1/sphinx-*
 
 %changelog
+* Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 7.2.6-1
+- Upgrade to version 7.2.6.
+- Import build and install section from Fedora 40 (license: MIT).
+- Disable some tests due to incompatible dependencies (html5lib, graphviz).
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing epoch.
