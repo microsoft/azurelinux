@@ -19,7 +19,7 @@
 
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
-Version:           3.2.1
+Version:           3.3.0
 Release:           1%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
@@ -137,7 +137,7 @@ This provides ovs-vswitchd linked with DPDK library.
 %endif
 
 %prep
-%autosetup -p 1
+%autosetup -p1
 
 %build
 # BZ#2055576
@@ -501,8 +501,8 @@ fi
 %{_sysusersdir}/openvswitch.conf
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.1-1
-- Auto-upgrade to 3.2.1 - Package upgrade for Azure Linux 3.0
+* Thu Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
+- Update to version 3.3.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.17.5-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
