@@ -22,25 +22,28 @@ import (
 var (
 	grubCfgTemplate = `set default="0"
 set timeout=0
+set bootprefix=/isolinux
 
 menuentry "Mariner Baremetal Iso" {
 
 	search --label CDROM --set root
-	linux /isolinux/vmlinuz \
-			%s \
-			overlay-size=70%% \
-			selinux=0 \
+	linux $bootprefix/vmlinuz \
+			security=selinux \
+			selinux=1 \
 			console=tty0 \
-			apparmor=0 \
+			console=ttyS0,115200n8 \
+			lockdown=integrity \
+			sysctl.kernel.unprivileged_bpf_disabled=1 \
 			root=live:LABEL=CDROM \
 			rd.shell \
 			rd.live.image \
 			rd.live.dir=%s \
 			rd.live.squashimg=%s \
 			rd.live.overlay=1 \
-			rd.live.overlay.nouserconfirmprompt
+			rd.live.overlay.nouserconfirmprompt \
+			%s
 
-	initrd /isolinux/initrd.img
+	initrd $bootprefix/initrd.img
 }	
 `
 
@@ -301,7 +304,7 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerA
 	b.artifacts.vmlinuzPath = targetVmLinuzPath
 
 	// create grub.cfg
-	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, extraCommandLine, liveOSDir, liveOSImage)
+	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, liveOSDir, liveOSImage, extraCommandLine)
 	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
 
 	err = os.WriteFile(targetGrubCfgPath, []byte(targetGrubCfgContent), 0o644)
@@ -581,12 +584,16 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 //     list of files to copy from the build machine to the iso media.
 func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomizerapi.Iso) (additionalIsoFiles []safechroot.FileToCopy, extraCommandLine string, err error) {
 
+	if isoConfig == nil {
+		return
+	}
+
 	extraCommandLine = strings.TrimSpace(string(isoConfig.KernelCommandLine.ExtraCommandLine))
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
 	for sourcePath, fileConfigs := range isoConfig.AdditionalFiles {
-		absSourcePath := filepath.Join(baseConfigPath, sourcePath)
+		absSourcePath := file.GetAbsPathWithBase(baseConfigPath, sourcePath)
 		for _, fileConfig := range fileConfigs {
 			fileToCopy := safechroot.FileToCopy{
 				Src:         absSourcePath,

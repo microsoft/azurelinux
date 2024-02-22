@@ -1,13 +1,13 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
-Version:        4.9
-Release:        14%{?dist}
+Version:        4.14.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/shadow-maint/shadow/
-Source0:        https://github.com/shadow-maint/shadow/releases/download/v%{version}/shadow-%{version}.tar.xz
+Source0:        https://github.com/shadow-maint/shadow/releases/download/%{version}/shadow-%{version}.tar.xz
 Source1:        chage
 Source2:        chpasswd
 Source3:        login
@@ -20,9 +20,6 @@ Source10:       system-password
 Source11:       system-session
 Source12:       useradd-default
 Source13:       login-defs
-Patch0:         chkname-allowcase.patch
-Patch1:         libsubid-pam-link.patch
-Patch2:         CVE-2023-29383.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
@@ -70,9 +67,6 @@ Libraries and headers for libsubid
 
 %prep
 %setup -q -n shadow-%{version}
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
 
 autoreconf -fiv
 
@@ -92,6 +86,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
+    --without-libbsd \
     --enable-man \
     --with-su=no
 %make_build
@@ -104,6 +99,9 @@ mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 chmod ug-s %{buildroot}/bin/passwd
 install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
 install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
+# Disable usergroups. Use "users" group by default (see /usr/sbin/useradd)
+# for all nonroot users.
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
@@ -156,6 +154,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/grpconv
 chmod 000 %{_sysconfdir}/shadow
 
+%postun
+/sbin/ldconfig
+
+%clean
+rm -rf %{buildroot}/*
+
 %files -f shadow.lang
 %defattr(-,root,root)
 %license COPYING
@@ -172,13 +176,18 @@ chmod 000 %{_sysconfdir}/shadow
 
 %files subid
 %license COPYING
-%{_libdir}/libsubid.so.3*
+%{_libdir}/libsubid.so.4*
 
 %files subid-devel
 %{_includedir}/shadow/subid.h
+%{_libdir}/libsubid.a
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.3-1
+- Auto-upgrade to 4.14.3 - 3.0 Upgrade
+- Remove obsolete patches and fix configure command
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9-14
 - Switch to link with libxcrypt
 

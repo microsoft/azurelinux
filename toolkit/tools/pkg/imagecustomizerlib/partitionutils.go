@@ -84,6 +84,9 @@ func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskuti
 func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
 	var bootPartition *diskutils.PartitionInfo
 	bootPartition, err := findBootPartitionFromEsp(efiSystemPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, err
+	}
 
 	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
 	if err != nil {
