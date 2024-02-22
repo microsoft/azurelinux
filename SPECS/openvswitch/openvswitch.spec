@@ -419,6 +419,7 @@ fi
 %files devel
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/*.la
 %{_includedir}/openvswitch/*
 %{_includedir}/openflow/*
 %exclude %{_libdir}/*.a
@@ -501,7 +502,7 @@ fi
 %{_sysusersdir}/openvswitch.conf
 
 %changelog
-* Thu Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
+* Wed Feb 21 2024 Thien Trung Vuong <tvuong@microsoft.com> - 3.3.0-1
 - Update to version 3.3.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.17.5-3
