@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           objectweb-anttask
 Version:        1.2
-Release:        266%{?dist}
+Release:        267%{?dist}
 Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
@@ -69,6 +69,9 @@ popd
 %{_javadir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-267
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2-266
 - Updated source URL.
 

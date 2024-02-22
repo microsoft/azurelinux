@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 Summary:	A C++ port of Lucene
 Name:		clucene
 Version:	2.3.3.4
-Release:	38%{?dist}
+Release:	39%{?dist}
 # From 'COPYING':
 # - RSA license: src\CLucene\util\MD5Digester.cpp
 # - BSD license: cmake/MacroCheckGccVisibility.cmake, MacroEnsureVersion.cmake, and src/core/util/Compress.cpp
@@ -145,6 +145,9 @@ time make -C %{_target_platform} test ARGS="--timeout 300 --output-on-failure" |
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3.4-39
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3.4-38
 - Updating source URLs.
 - License verified.

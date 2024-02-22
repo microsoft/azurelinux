@@ -20,7 +20,7 @@
 Summary:        APIs for DOM, SAX, and JAXP
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -114,6 +114,9 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-9
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-8
 - Updating source URL.
 

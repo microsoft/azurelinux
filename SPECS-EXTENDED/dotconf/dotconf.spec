@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:		dotconf
 Version:	1.3
-Release:	25%{?dist}
+Release:	26%{?dist}
 Summary:	Libraries to parse configuration files
 License:	LGPLv2.1
 URL:		https://github.com/williamh/dotconf/
@@ -64,6 +64,9 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/* __tmp_doc
 %{_libdir}/pkgconfig/dotconf.pc
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-26
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-25
 - Updating source URLs.
 - License verified.

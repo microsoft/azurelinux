@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define full_name       jakarta-%{base_name}
 Name:           servletapi4
 Version:        4.0.4
-Release:        301%{?dist}
+Release:        302%{?dist}
 Summary:        Java servlet and JSP implementation classes
 License:        ASL 1.1
 Group:          Development/Libraries/Java
@@ -95,6 +95,9 @@ fi
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.0.4-302
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 4.0.4-301
 - Update Source0
 - License verified.

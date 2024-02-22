@@ -4,7 +4,7 @@ Name: hyphen-mi
 Summary: Maori hyphenation rules
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 22%{?dist}
+Release: 23%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
 Source: %{_azl_sources_url}/hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
@@ -34,6 +34,9 @@ cp -p mi.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen/hyph_mi_NZ.dic
 %{_datadir}/hyphen/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-23
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-22
 - Updating source URLs.
 - License verified.

@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 URL: http://bcache.evilpiepirate.org/
 VCS: git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
@@ -108,6 +108,9 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{dracutlibdir}/modules.d/90bcache
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-2
 - Updating source URLs.
 - License verified.

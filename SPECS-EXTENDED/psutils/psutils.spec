@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: PostScript Utilities
 Name:    psutils
 Version: 1.23
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: psutils
 
 # We can't follow https://fedoraproject.org/wiki/Packaging:SourceURL#Github
@@ -83,6 +83,9 @@ sed -i -e 's,/usr/bin/env perl,%{__perl},' \
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-20
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.23-19
 - Updated source URL.
 - License verified.

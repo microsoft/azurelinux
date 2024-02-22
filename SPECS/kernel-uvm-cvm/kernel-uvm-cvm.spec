@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for SEV SNP enabled Kata UVMs
 Name:           kernel-uvm-cvm
 Version:        6.1.0.mshv11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -153,6 +153,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.1.0.mshv11-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Oct 06 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv11-2
 - Enable dm-crypt and dm-integrity for encfs sidecar functionality
 

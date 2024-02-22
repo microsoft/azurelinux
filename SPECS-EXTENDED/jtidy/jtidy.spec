@@ -27,7 +27,7 @@ Distribution:   Azure Linux
 %bcond_with             maven
 Name:           jtidy
 Version:        8.0
-Release:        31%{?dist}
+Release:        32%{?dist}
 Summary:        HTML syntax checker and pretty printer
 License:        BSD
 Group:          Development/Libraries/Java
@@ -149,6 +149,9 @@ EOF
 %{_bindir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-32
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.0-31
 - Updating source URL.
 - License verified.

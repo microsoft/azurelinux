@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: GPLv2
 URL: http://www.nico.schottelius.org/software/gpm/
 #URL2 : http://freecode.com/projects/gpm
@@ -160,6 +160,9 @@ rm -rf %{buildroot}%{_mandir}
 %{_libdir}/libgpm.a
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-24
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-23
 - Updating source URLs.
 - License verified.

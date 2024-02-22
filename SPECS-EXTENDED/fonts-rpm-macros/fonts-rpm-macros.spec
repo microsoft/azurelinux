@@ -22,7 +22,7 @@ Version: 2.0.5
 BuildArch: noarch
 
 Name:      fonts-rpm-macros
-Release:   12%{?dist}
+Release:   13%{?dist}
 Summary:   Build-stage rpm automation for fonts packages
 
 License:   GPL-3.0-or-later
@@ -155,6 +155,10 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 %doc %{ftcgtemplatedir}/*txt
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.5-13
+- Updating file paths for 3.0 version of Azure Linux.
+- Resetting 'Epoch' for 3.0 version of Azure Linux.
+
 * Tue May 16 2023 Bala <balakumaran.kannan@microsoft.com> - 1:2.0.5-12
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License verified

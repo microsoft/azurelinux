@@ -19,7 +19,7 @@
 Summary:        Dependency injection specification for Java (JSR-330)
 Name:           atinject
 Version:        %{base_version}+%{git_version}
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -114,6 +114,9 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1+20100611git1f74ea7-4
 - Moved from extended to core
 

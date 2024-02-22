@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -650,6 +650,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3op2-5
 - License verified
 - Lint spec

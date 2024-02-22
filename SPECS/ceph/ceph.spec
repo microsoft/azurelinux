@@ -5,7 +5,7 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
@@ -1803,6 +1803,9 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.10-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

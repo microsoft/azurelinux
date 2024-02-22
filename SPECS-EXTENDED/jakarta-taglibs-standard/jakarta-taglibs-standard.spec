@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 %define short_name      taglibs-standard
 Name:           jakarta-taglibs-standard
 Version:        1.1.1
-Release:        260%{?dist}
+Release:        261%{?dist}
 Summary:        Open Source Implementation of the JSP Standard Tag Library
 License:        ASL 2.0
 Group:          Development/Libraries/Java
@@ -102,6 +102,9 @@ cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-261
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-260
 - Updating source URLs.
 - License verified.

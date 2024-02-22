@@ -15,7 +15,7 @@ Distribution:   Azure Linux
 Name:    fence-virt
 Summary: A pluggable fencing framework for virtual machines
 Version: 1.0.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 URL:     https://github.com/ClusterLabs/fence-virt
 Source0: %{_azl_sources_url}/%{name}-%{version}.tar.bz2
@@ -167,6 +167,9 @@ are located on corosync cluster nodes.
 %{_libdir}/%{name}/cpg.so
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-4
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0-3
 - Updating source URLs.
 - License verified.

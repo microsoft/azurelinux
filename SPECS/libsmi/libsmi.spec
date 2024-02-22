@@ -1,7 +1,7 @@
 Summary:        A library to access SMI MIB information
 Name:           libsmi
 Version:        0.4.8
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        TCL AND BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -97,6 +97,9 @@ make check ||:
 %{_mandir}/man3/*.3*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.8-29
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Feb 03 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.4.8-28
 - Move from extended to core.
 - License verified.

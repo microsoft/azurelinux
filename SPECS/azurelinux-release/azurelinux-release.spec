@@ -1,7 +1,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,6 +62,9 @@ EOF
 %config(noreplace) %{_sysconfdir}/issue.net
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
+- Updating naming for 3.0 version of Azure Linux.
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
 - Renamed MARINER_BUILD_NUMBER property to AZURELINUX_BUILD_NUMBER

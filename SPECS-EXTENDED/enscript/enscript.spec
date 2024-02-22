@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv3+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
@@ -115,6 +115,9 @@ done
 %config(noreplace) %{_sysconfdir}/enscript.cfg
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-25
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-24
 - Updating source URLs.
 - License verified.

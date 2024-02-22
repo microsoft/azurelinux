@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           jsoup
 Version:        1.11.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Java library for working with HTML
 License:        MIT
 Group:          Development/Libraries/Java
@@ -91,6 +91,9 @@ install -pdm 0755 target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-4
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.3-3
 - Updating source URLs.
 - License verified.

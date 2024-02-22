@@ -5,7 +5,7 @@ Name:           GeoIP-GeoLite-data
 #
 # No further releases of IPv4 GeoLite Legacy databases will be made from April 2018.
 Version:        2018.06
-Release:        11%{?dist}
+Release:        12%{?dist}
 # License specified at http://dev.maxmind.com/geoip/legacy/geolite/#License
 License:        CC-BY-SA
 Vendor:         Microsoft Corporation
@@ -143,6 +143,9 @@ exit 0
 %{_datadir}/GeoIP/GeoLiteASNumv6.dat
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2018.06-12
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Mar 08 2023 Sumedh Sharma <sumsharma@microsoft.com> - 2018.06-11
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
 - license verified

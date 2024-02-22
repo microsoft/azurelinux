@@ -6,7 +6,7 @@
 Summary:        Serial graphics BIOS option rom
 Name:           sgabios
 Version:        0.%{date}git
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 %{_datadir}/sgabios/sgabios.bin
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20180715git-9
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20180715git-8
 - Updating source URL.
 

@@ -7,7 +7,7 @@
 Summary:        Perl clients for various network protocols
 Name:           perl-libnet
 Version:        3.11
-Release:        443%{?dist}
+Release:        444%{?dist}
 # other files:  GPL+ or Artistic
 ## Not in binary packages
 # repackage.sh: GPLv2+
@@ -125,6 +125,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.11-444
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Mar 07 2023 Muhammad Falak <mwani@microsoft.com> - 3.11-443
 - License verified
 

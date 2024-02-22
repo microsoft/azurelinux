@@ -1,7 +1,7 @@
 Summary: POSIX regexp functions
 Name: librx
 Version: 1.5
-Release: 37%{?dist}
+Release: 38%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -72,6 +72,9 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %{_libdir}/*.so
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-38
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-37
 - Updating source URLs.
 - License verified.

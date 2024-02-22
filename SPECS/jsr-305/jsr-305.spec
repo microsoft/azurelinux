@@ -18,7 +18,7 @@
 Summary:        Correctness annotations for Java code
 Name:           jsr-305
 Version:        0.1+%{svn_date}
-Release:        7%{?dist}
+Release:        8%{?dist}
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
 License:        BSD AND CC-BY
@@ -101,6 +101,9 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-8
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.1+20130910-7
 - Fixing maven provides
 

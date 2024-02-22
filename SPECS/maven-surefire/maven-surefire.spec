@@ -3,7 +3,7 @@
 Summary:        Test framework project
 Name:           maven-surefire
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND CPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -147,6 +147,9 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

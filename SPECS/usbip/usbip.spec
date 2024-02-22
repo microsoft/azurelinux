@@ -3,7 +3,7 @@
 Name:		   usbip
 Summary:	   USB/IP user-space
 Version:	   5.15.34.1
-Release:	   2%{?dist}
+Release:	   3%{?dist}
 License:	   GPLv2+
 Vendor:            Microsoft Corporation
 Distribution:   Azure Linux
@@ -91,6 +91,9 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_unitdir}
 %{_libdir}/*.so
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.34.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.34.1-2
 - Updating source URL.
 

@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 
 Name:          nodejs-%{npm_name}
 Version:       2.0.3
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       Simple monitor script for use during development of a node.js app
 License:       MIT
 URL:           https://github.com/remy/nodemon
@@ -78,6 +78,9 @@ npm run test
 %{_bindir}/nodemon
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.3-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon May 15 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.0.3-4
 - Remove explicit build-time dependency on npm (provided by nodejs-devel)
 

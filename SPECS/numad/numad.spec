@@ -9,7 +9,7 @@ Name:           numad
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Versioning/#_snapshots
 # Using "+" instead of "^" because our version of RPM errors-out on the "^" symbol.
 Version:        0.5+%{git_short_commit_date}.%{git_short_commit}
-Release:        34%{?dist}
+Release:        35%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,6 +86,9 @@ cp %{SOURCE1} .
 %systemd_postun numad.service
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.5+20150602.aec1497e2b-35
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.5+20150602.aec1497e2b-34
 - Add buffer overflow patch
 

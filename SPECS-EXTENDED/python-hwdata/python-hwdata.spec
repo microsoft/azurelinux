@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 
 Name:		python-hwdata
 Version:	2.3.7
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Python bindings to hwdata package
 BuildArch:  noarch
 License:	GPLv2
@@ -111,6 +111,9 @@ pylint-3 hwdata.py example.py || :
 %endif # with python3
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.7-11
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3.7-10
 - Updated source URL.
 - License verified.

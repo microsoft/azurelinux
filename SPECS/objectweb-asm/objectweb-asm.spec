@@ -17,7 +17,7 @@
 
 Name:           objectweb-asm
 Version:        7.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
@@ -144,6 +144,9 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-4
 - Fixing source URL.
 

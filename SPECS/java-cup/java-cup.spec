@@ -21,7 +21,7 @@
 Summary:        LALR Parser Generator in Java
 Name:           java-cup
 Version:        0.11
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -126,6 +126,9 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %doc manual.html
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-33
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-32
 - Fixing source URL.
 

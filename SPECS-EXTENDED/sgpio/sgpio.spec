@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: SGPIO captive backplane tool
 Name: sgpio
 Version: 1.2.0.10
-Release: 27%{?dist}
+Release: 28%{?dist}
 License: GPLv2+
 URL: http://sources.redhat.com/lvm2/wiki/DMRAID_Eventing
 Source0: %{_azl_sources_url}/%{name}-1.2-0.10-src.tar.gz
@@ -39,6 +39,9 @@ make install INSTALL="%{__install} -p" DESTDIR=$RPM_BUILD_ROOT SBIN_DIR=$RPM_BUI
 %{_mandir}/man1/sgpio.*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0.10-28
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.2.0.10-27
 - Update Source0
 - License verified.

@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -281,6 +281,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18.1-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-1
 - Upgrade to version 4.18.1
 

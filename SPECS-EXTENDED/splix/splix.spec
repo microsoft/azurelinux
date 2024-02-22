@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 Summary: Driver for QPDL/SPL2 printers (Samsung and several Xerox printers)
 Name: splix
 Version: 2.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 URL: http://splix.sourceforge.net/
 
@@ -72,6 +72,9 @@ make install DRV_ONLY=1 CUPSDRV=%{_datadir}/cups/drv/splix DESTDIR=%{buildroot}
 %{_datadir}/cups/drv/splix
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.1-2
 - Update Source0
 - License verified.

@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -231,6 +231,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.126.mshv3-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
 - Remove legacy /boot/mariner-mshv.cfg
 

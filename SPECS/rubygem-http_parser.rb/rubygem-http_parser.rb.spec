@@ -2,7 +2,7 @@
 Summary:        simple callback-based HTTP request/response parser
 Name:           rubygem-%{gem_name}
 Version:        0.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.6.1-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.6.1-1
 - Downgrade to v0.6.1.
 - Build from .tar.gz source.

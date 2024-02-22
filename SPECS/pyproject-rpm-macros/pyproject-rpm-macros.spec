@@ -7,7 +7,7 @@ Name:           pyproject-rpm-macros
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -117,6 +117,9 @@ test_status=$?
 %{_rpmconfigdir}/azl/pyproject_requirements_txt.py
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
 - Update version of tox used for package tests
 

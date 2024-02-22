@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        503%{?dist}
+Release:        504%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -6847,6 +6847,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-504
+- Updating naming for 3.0 version of Azure Linux.
+
 * Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-503
 - Upgrade to version 5.38.2 referencing Fedora 39 (license: MIT)
 
@@ -8833,5 +8836,3 @@ related to tests!
 
 * Thu Nov 29 2007 Robin Norwood <rnorwood@redhat.com> - 4:5.10.0_RC2-0.1
 - first attempt at building 5.10.0
-
-

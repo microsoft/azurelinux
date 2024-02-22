@@ -1,6 +1,6 @@
 Name:       rtctl
 Version:    1.13
-Release:    5%{?dist}
+Release:    6%{?dist}
 Summary:    Scripts for controlling scheduling priorities of system threads
 Group:      Applications/System
 License:    GPL
@@ -41,6 +41,9 @@ systemctl disable rtctl
 fi
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-6
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.13-5
 - Updating source URL.
 

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: setuptool
 Version: 1.19.11
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary: A text mode system configuration tool
 License: GPLv2+
 Url: http://git.fedorahosted.org/git/?p=setuptool.git
@@ -47,6 +47,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_mandir}/man1/setup.1.gz
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19.11-23
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.19.11-22
 - Update Source0
 - Improve formatting

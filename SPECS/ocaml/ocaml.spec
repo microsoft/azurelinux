@@ -4,7 +4,7 @@
 Summary:        OCaml compiler and programming environment
 Name:           ocaml
 Version:        4.13.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -258,6 +258,9 @@ make -j1 all
 %{_libdir}/ocaml/compiler-libs/*.o
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
 - Introduce a patch to remove unused vars in test to enable ptest
 

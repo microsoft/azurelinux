@@ -7,7 +7,7 @@
 
 Name:           perl-Class-Data-Inheritable
 Version:        0.08
-Release:        36%{?dist}
+Release:        37%{?dist}
 Summary:        Inheritable, overridable class data
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/Class::Data::Inheritable.3pm*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-37
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.08-36
 - Updated source URL.
 - License verified.
