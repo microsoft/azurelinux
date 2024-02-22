@@ -326,6 +326,7 @@ start_record_timestamp "build packages/install"
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
 chroot_and_install_rpms mariner-rpm-macros
+chroot_and_install_rpms mariner-rpm-macros-dist
 chroot_and_install_rpms mariner-check-macros
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers

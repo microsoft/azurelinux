@@ -2,25 +2,39 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -e
+set -ex
 
 TOOLCHAIN_SPEC_LIST_FILE=$1
 SPECS_DIR=$2
 MANIFESTS_DIR=$3
 DIST_TAG=$4
-ARCH=$5
+RELEASE_NUM=$5
+ARCH=$6
+
+# Define 'azl <ver>' and 'azl<ver> 1' macros for use in spec files. Normally they would be defined in the 'mariner-rpm-macros-dist' package.
+# Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
+
+# 'azl<ver> 1': Strip the leading '.' from the DIST_TAG
+distro_def="${DIST_TAG#.} 1"
+
+# 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
+distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
+distro_majver="${RELEASE_NUM%%.*}"
+distro_ver="${distro_name} ${distro_majver}"
+
+distro_defines=(--define "with_check 1" --define "dist $DIST_TAG" --define "$distro_def" --define "$distro_ver")
 
 write_rpms_from_spec () {
     # $1 = spec file
     # $2 = file to save to
     spec_dir=$(dirname $1)
-    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="[%{EXCLUSIVEARCH} ]" --srpm 2>/dev/null)
+    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" "${distro_defines[@]}" --qf="[%{EXCLUSIVEARCH} ]" --srpm 2>/dev/null)
     if [[ -n "$exclusiveArch" && ! "$exclusiveArch" =~ "$ARCH" ]]; then
         return 0
     fi
 
-    version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --qf="%{VERSION}" --srpm 2>/dev/null)
-    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --target=$ARCH --qf="%{nvra}\n" 2>/dev/null)
+    version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" "${distro_defines[@]}" --qf="%{VERSION}" --srpm 2>/dev/null)
+    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" "${distro_defines[@]}" --target=$ARCH --qf="%{nvra}\n" 2>/dev/null)
 
     for rpm in $rpmWithoutExtension
     do

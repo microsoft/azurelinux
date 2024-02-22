@@ -107,6 +107,7 @@ check-aarch64-manifests: $(toolchain_spec_list)
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
+			$(RELEASE_MAJOR_ID) \
 			aarch64
 check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
@@ -115,6 +116,7 @@ check-x86_64-manifests: $(toolchain_spec_list)
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
+			$(RELEASE_MAJOR_ID) \
 			x86_64
 
 # Generate a list of a specs built as part of the toolchain.
