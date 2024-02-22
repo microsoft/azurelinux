@@ -21,7 +21,7 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 
 %install
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}/%{_libdir}
+install -d %{buildroot}%{_libdir}
 
 echo "%{distribution} %{version}" > %{buildroot}%{_libdir}/azurelinux-release
 echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_libdir}/azurelinux-release
@@ -35,7 +35,7 @@ DISTRIB_DESCRIPTION="%{distribution} %{version}"
 EOF
 ln -sv ..%{_libdir}/lsb-release %{buildroot}%{_sysconfdir}/lsb-release
 
-cat > %{buildroot}/%{_libdir}/os-release << EOF
+cat > %{buildroot}%{_libdir}/os-release << EOF
 NAME="%{distribution}"
 VERSION="%{version}"
 ID=azurelinux
