@@ -18,7 +18,7 @@ Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python-flit-core
 %if %{with check}
-BuildRequires:  python3-pip
+BuildRequires:  python-packaging
 %endif
 
 Requires:       python3
