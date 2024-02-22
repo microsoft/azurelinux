@@ -49,7 +49,7 @@ diff --git a/nbproject/project.xml b/nbproject/project.xml
 index c05eefc1..02438508 100644
 --- a/nbproject/project.xml
 +++ b/nbproject/project.xml
-@@ -146,12 +146,12 @@ auxiliary.show.customizer.message=<message>
+@@ -174,12 +185,12 @@ auxiliary.show.customizer.message=<message>
              <compilation-unit>
                  <package-root>test</package-root>
                  <unit-tests/>
@@ -61,6 +61,6 @@ index c05eefc1..02438508 100644
                  <package-root>ant-tools-src</package-root>
 -                <classpath mode="compile">src:lib/ant.jar:lib/asm-8.0.1.jar</classpath>
 +                <classpath mode="compile">src:lib/ant.jar:lib/objectweb-asm_asm.jar</classpath>
-                 <source-level>1.6</source-level>
+                 <source-level>1.8</source-level>
              </compilation-unit>
          </java-data>

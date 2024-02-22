@@ -334,7 +334,12 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
-		newRequests := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
+		newRequests, requestError := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
+		if requestError != nil {
+			err = fmt.Errorf("failed to convert nodes to requests:\n%w", requestError)
+			stopBuilding = true
+			break
+		}
 		for _, req := range newRequests {
 			buildState.RecordBuildRequest(req)
 			// Decide which priority the build should be. Generally we want to get any remote or prebuilt nodes out of the

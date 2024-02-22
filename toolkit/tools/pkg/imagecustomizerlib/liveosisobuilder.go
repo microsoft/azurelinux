@@ -593,7 +593,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
 	for sourcePath, fileConfigs := range isoConfig.AdditionalFiles {
-		absSourcePath := filepath.Join(baseConfigPath, sourcePath)
+		absSourcePath := file.GetAbsPathWithBase(baseConfigPath, sourcePath)
 		for _, fileConfig := range fileConfigs {
 			fileToCopy := safechroot.FileToCopy{
 				Src:         absSourcePath,

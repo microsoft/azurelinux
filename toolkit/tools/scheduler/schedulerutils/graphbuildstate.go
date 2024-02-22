@@ -124,6 +124,11 @@ func (g *GraphBuildState) ActiveBuildFromSRPM(srpmFileName string) *BuildRequest
 	return nil
 }
 
+// IsSRPMBuildActive returns true if a given SRPM is currently queued for building.
+func (g *GraphBuildState) IsSRPMBuildActive(srpmFileName string) bool {
+	return g.ActiveBuildFromSRPM(srpmFileName) != nil
+}
+
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	for _, buildRequest := range g.activeBuilds {
@@ -144,6 +149,23 @@ func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
 	}
 
 	return
+}
+
+// ActiveTestFromSRPM returns a test request for the queried SRPM file
+// or nil if the SRPM is not among the active builds.
+func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest {
+	for _, buildRequest := range g.activeBuilds {
+		if buildRequest.Node.Type == pkggraph.TypeTest && buildRequest.Node.SRPMFileName() == srpmFileName {
+			return buildRequest
+		}
+	}
+
+	return nil
+}
+
+// IsSRPMTestActive returns true if a given SRPM is currently queued for testing.
+func (g *GraphBuildState) IsSRPMTestActive(srpmFileName string) bool {
+	return g.ActiveTestFromSRPM(srpmFileName) != nil
 }
 
 // BuildFailures returns a slice of all failed builds.
