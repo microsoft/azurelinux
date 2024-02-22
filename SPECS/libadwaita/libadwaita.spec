@@ -29,11 +29,11 @@ BuildRequires:  meson >= 0.59.0
 BuildRequires:  pkgconfig
 BuildRequires:  sassc
 BuildRequires:  vala
-BuildRequires:  pkgconfig(appstream)
-BuildRequires:  pkgconfig(fribidi)
-BuildRequires:  pkgconfig(gi-docgen)
+BuildRequires:  libappstream-glib
+BuildRequires:  fribidi-devel
+BuildRequires:  gi-docgen
 BuildRequires:  pkgconfig(glib-2.0) >= 2.72
-BuildRequires:  pkgconfig(gobject-introspection-1.0)
+BuildRequires:  gobject-introspection-devel
 BuildRequires:  pkgconfig(gtk4) >= 4.11.3
 
 %description
