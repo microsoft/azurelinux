@@ -80,11 +80,8 @@ Distribution:   Azure Linux
 %global have_kvm 1
 %endif
 
-# Matches numactl ExcludeArch
+# On AzL numactl builds for arm and x86
 %global have_numactl 1
-%ifarch %{arm}
-%global have_numactl 0
-%endif
 
 %global have_spice 1
 %if 0%{?azl}
@@ -203,9 +200,6 @@ Distribution:   Azure Linux
 %endif
 
 %define have_librdma 1
-%ifarch %{arm}
-%define have_librdma 0
-%endif
 
 %define have_libcacard 1
 %if 0%{?azl}
