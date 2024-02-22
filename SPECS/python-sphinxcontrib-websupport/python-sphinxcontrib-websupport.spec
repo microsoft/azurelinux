@@ -13,11 +13,10 @@ BuildArch:      noarch
 %description
 Python API to integrate Sphinx into a web application
 
-%package -n python3-%{pkgname}
+%package -n     python3-%{pkgname}
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+BuildRequires:  python-flit-core
 %if %{with check}
 BuildRequires:  python3-pip
 %endif
@@ -28,30 +27,30 @@ Requires:       python3-sphinxcontrib-serializinghtml
 %description -n python3-%{pkgname}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
 
+%pyproject_extras_subpkg -n python3-%{pkgname} whoosh
+
 %prep
 %autosetup -n %{pkgname}-%{version} -p 1
-rm -rf *.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires -t
 
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files sphinxcontrib
 
 %check
-pip3 install tox
-tox
-
-%files -n python3-%{pkgname}
+%tox
+%files -n python3-%{pkgname} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/*
-%{python3_sitelib}/*.egg-info
-%{python3_sitelib}/*.pth
 
 %changelog
-* Mon Feb 19 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.7-1
+* Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-1
 - Auto-upgrade to 1.2.7 - 3.0 - Upgrade
+- Use pypi macros
 
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-3
 - Updating source URL.
