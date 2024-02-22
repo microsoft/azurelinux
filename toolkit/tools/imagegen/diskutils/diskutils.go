@@ -442,7 +442,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
 	partedArgument, err := partitionTableType.ConvertToPartedArgument()
 	if err != nil {
-		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
+		err = fmt.Errorf("failed to convert partition table type (%v) to parted argument:\n%w", partitionTableType, err)
 		return
 	}
 	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
@@ -470,27 +470,27 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
 		if err != nil {
-			logger.Log.Warnf("Failed to create single partition")
+			logger.Log.Warnf("Failed to create single partition:\n%v", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
-			logger.Log.Warnf("Failed to format partition")
+			logger.Log.Warnf("Failed to format partition:\n%v", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize encrypted root")
+				logger.Log.Warnf("Failed to initialize encrypted root:\n%v", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize read only root")
+				logger.Log.Warnf("Failed to initialize read only root:\n%v", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
@@ -596,7 +596,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		for _, testPartDevPath := range testPartDevPaths {
 			exists, err := file.PathExists(testPartDevPath)
 			if err != nil {
-				logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
+				err = fmt.Errorf("failed to find device path (%s):\n%w", testPartDevPath, err)
 				return err
 			}
 			if exists {
@@ -611,7 +611,6 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}, totalAttempts, retryDuration)
 
 	if err != nil {
-		logger.Log.Errorf("%s", err)
 		return
 	}
 
@@ -748,8 +747,7 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 		return
 	}
 	if len(rawDiskOutput) == 0 {
-		err = fmt.Errorf("no supported disks found")
-		logger.Log.Errorf("%s", err)
+		err = fmt.Errorf("failed to find supported disks:\n%w", err)
 		return
 	}
 
@@ -806,7 +804,7 @@ func createExtendedPartition(diskDevPath string, partitionTableType string, part
 
 	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, extendedPartitionType)
 	if err != nil {
-		logger.Log.Warnf("Failed to create extended partition")
+		logger.Log.Warnf("Failed to create extended partition:\n%v", err)
 		return
 	}
 	partIDToFsTypeMap[extendedPartition.ID] = ""
@@ -826,8 +824,7 @@ func getPartUUID(device string) (uuid string, err error) {
 
 func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 	if exists, ferr := file.PathExists(sectorFile); ferr != nil {
-		logger.Log.Errorf("Error accessing sector size file %s", sectorFile)
-		err = ferr
+		err = fmt.Errorf("failed to access sector size file (%s):\n%w", sectorFile, ferr)
 		return
 	} else if !exists {
 		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", sectorFile)
@@ -836,7 +833,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 
 	fileContent, err := file.ReadLines(sectorFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to read from %s: %s", sectorFile, err)
+		err = fmt.Errorf("failed to read from (%s):\n%w", sectorFile, err)
 		return
 	}
 
