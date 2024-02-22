@@ -4,7 +4,7 @@ Version:        1.8.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
-Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.8/%{name}-%{version}.tar.xz
 URL:            https://wiki.gnome.org/Projects/JsonGlib
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
