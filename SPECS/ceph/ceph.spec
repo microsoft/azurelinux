@@ -575,7 +575,7 @@ and providing access to them over the network.
 %package volume
 Summary: Ceph OSD deployment and inspection tool
 BuildArch: noarch
-Requires: ceph-osd =%{version}-%{release}
+Requires: ceph-osd = %{version}-%{release}
 Requires: cryptsetup
 Requires: e2fsprogs
 Requires: lvm2
@@ -584,7 +584,7 @@ Requires: util-linux
 Requires: xfsprogs
 Requires: python%{python3_pkgversion}-setuptools
 Requires: python%{python3_pkgversion}-packaging
-Requires: python%{python3_pkgversion}-ceph-common =%{version}-%{release}
+Requires: python%{python3_pkgversion}-ceph-common = %{version}-%{release}
 %description volume
 This package contains a tool to deploy OSD with different devices like
 lvm or physical disks, and trying to follow a predictable, and robust
@@ -633,7 +633,7 @@ Summary:    RADOS gateway client library
 Requires:   librados-devel = %{version}-%{release}
 Requires:   librgw2 = %{version}-%{release}
 Provides:   librgw2-devel = %{version}-%{release}
-Obsoletes:  librgw2-devel < %{version}-%{release}}
+Obsoletes:  librgw2-devel < %{version}-%{release}
 %description -n librgw-devel
 This package contains libraries and headers needed to develop programs
 that use RADOS gateway client library.
@@ -914,7 +914,6 @@ This package provides a Ceph MIB for SNMP traps.
 %package node-proxy
 Summary:        hw monitoring agent for Ceph
 BuildArch:      noarch
-%endif
 %description node-proxy
 This package provides a Ceph hardware monitoring agent.
 
