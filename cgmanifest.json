@@ -4230,8 +4230,8 @@
         "type": "other",
         "other": {
           "name": "giflib",
-          "version": "5.2.1",
-          "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.1.tar.gz"
+          "version": "5.2.2",
+          "downloadUrl": "http://downloads.sourceforge.net/giflib/giflib-5.2.2.tar.gz"
         }
       }
     },
