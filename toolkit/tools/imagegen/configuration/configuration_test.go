@@ -386,8 +386,9 @@ var expectedConfiguration Config = Config{
 	},
 	SystemConfigs: []SystemConfig{
 		{
-			Name:      "SmallerDisk",
-			IsDefault: true,
+			Name:               "SmallerDisk",
+			IsDefault:          true,
+			EnableGrubMkconfig: true,
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:              "MyBoot",
@@ -535,7 +536,8 @@ var expectedConfiguration Config = Config{
 			EnableHidepid: true,
 		},
 		{
-			Name: "BiggerDiskA",
+			Name:               "BiggerDiskA",
+			EnableGrubMkconfig: true,
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:              "MyBootA",
@@ -570,7 +572,8 @@ var expectedConfiguration Config = Config{
 			},
 		},
 		{
-			Name: "BiggerDiskB",
+			Name:               "BiggerDiskB",
+			EnableGrubMkconfig: true,
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:              "MyBootB",
