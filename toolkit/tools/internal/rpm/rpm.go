@@ -89,6 +89,10 @@ var (
 	//
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
+
+	// distTagRegex is used to extract the distro and version from the dist tag. This will work on
+	// strings of the form ".<distro><version>".
+	distTagRegex = regexp.MustCompile(`^\.([a-zA-Z]+)([0-9]+)$`)
 )
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
@@ -243,16 +247,30 @@ func executeRpmCommandRaw(program string, args ...string) (stdout string, err er
 	return
 }
 
-// DefaultDefinesWithDist returns a new map of default defines that can be used during RPM queries that also includes
-// the dist tag.
-func DefaultDefinesWithDist(runChecks bool, distTag string) map[string]string {
-	defines := DefaultDefines(runChecks)
-	defines[DistTagDefine] = distTag
+// DefaultDistroDefines returns a new map of default defines that can be used during RPM queries that also includes
+// the distro tags like '%dist', '%zal', '%alz<VER>'.
+// If distTag is empty, the distro tags will not be generated.
+func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
+	defines := defaultDefines(runChecks)
+	if distTag != "" {
+		defines[DistTagDefine] = distTag
+		// distTag is of the form ".<distro><version>", extract the distro and version
+		// This will be used to generate '%<distro> <version>' and `%<distro><version> 1`
+		distTagSplit := distTagRegex.FindStringSubmatch(distTag)
+		if len(distTagSplit) == 3 {
+			distroName := distTagSplit[1]
+			distroVersion := distTagSplit[2]
+			defines[distroName] = distroVersion
+			defines[distroName+distroVersion] = "1"
+		} else {
+			logger.Log.Warnf("Invalid distro tag (%s), won't generate derived distro defines", distTag)
+		}
+	}
 	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
-func DefaultDefines(runCheck bool) map[string]string {
+func defaultDefines(runCheck bool) map[string]string {
 	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible
 	withCheckSetting := "0"
 	if runCheck {

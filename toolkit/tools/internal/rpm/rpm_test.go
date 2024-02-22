@@ -199,3 +199,35 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 		})
 	}
 }
+
+func TestDefaultDefines(t *testing.T) {
+	distName := "myDistro"
+	distVersion := "1234"
+	distTag := fmt.Sprintf(".%s%s", distName, distVersion)
+	invalidDistDag := "invalid"
+
+	defines := DefaultDistroDefines(true, distTag)
+
+	assert.Equal(t, "1", defines[definesWithCheckKey])
+	assert.Equal(t, distTag, defines[DistTagDefine])
+
+	defines = DefaultDistroDefines(false, distTag)
+	assert.Equal(t, "0", defines[definesWithCheckKey])
+
+	// Check for distro name and version
+	assert.Equal(t, distTag, defines["dist"])
+	assert.Equal(t, distVersion, defines[distName])
+	assert.Equal(t, "1", defines[distName+distVersion])
+
+	// Check the dist macros are not in the dictionary for invalid distro tag
+	defines = DefaultDistroDefines(false, invalidDistDag)
+	assert.NotContains(t, defines, distName)
+	assert.NotContains(t, defines, distName+distVersion)
+	assert.Equal(t, invalidDistDag, defines["dist"])
+
+	// Check the dist macros are not in the dictionary for empty distro tag
+	defines = DefaultDistroDefines(false, "")
+	assert.NotContains(t, defines, distName)
+	assert.NotContains(t, defines, distName+distVersion)
+	assert.NotContains(t, defines, "dist")
+}
