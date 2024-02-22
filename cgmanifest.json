@@ -10921,8 +10921,8 @@
         "type": "other",
         "other": {
           "name": "libsndfile",
-          "version": "1.0.31",
-          "downloadUrl": "https://github.com/libsndfile/libsndfile/archive/1.0.31.tar.gz"
+          "version": "1.2.2",
+          "downloadUrl": "https://github.com/libsndfile/libsndfile/archive/refs/tags/1.2.2.tar.gz"
         }
       }
     },
