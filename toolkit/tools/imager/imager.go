@@ -311,7 +311,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 	if systemConfig.Encryption.Enable {
 		err = diskutils.CleanupEncryptedDisks(encryptedRoot, isOfflineInstall)
 		if err != nil {
-			logger.Log.Warn("Failed to cleanup encrypted disks")
+			err = fmt.Errorf("failed to cleanup encrypted disks:\n%w", err)
 			return
 		}
 	}
@@ -324,7 +324,7 @@ func setupDiskEncryption(systemConfig *configuration.SystemConfig, encryptedRoot
 		// Add a default keyfile for initramfs unlock
 		encryptedRoot.HostKeyFile, err = diskutils.AddDefaultKeyfile(keyFileDir, encryptedRoot.Device, systemConfig.Encryption)
 		if err != nil {
-			logger.Log.Warnf("Failed to add default keyfile: %v", err)
+			err = fmt.Errorf("failed to add default keyfile:\n%w", err)
 			return
 		}
 
@@ -504,7 +504,7 @@ func cleanupExtraFiles() (err error) {
 		logger.Log.Infof("Cleaning up directory %s", dir)
 		err = os.RemoveAll(dir)
 		if err != nil {
-			logger.Log.Warnf("Failed to cleanup directory (%s):\n%v", dir, err)
+			err = fmt.Errorf("failed to cleanup directory (%s):\n%w", dir, err)
 			return
 		}
 	}
