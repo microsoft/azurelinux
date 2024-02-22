@@ -24145,7 +24145,7 @@
         "other": {
           "name": "python-sphinx-theme-alabaster",
           "version": "0.7.16",
-          "downloadUrl": "https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/0.7.16"
+          "downloadUrl": "https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/0.7.16#/alabaster-0.7.16"
         }
       }
     },
