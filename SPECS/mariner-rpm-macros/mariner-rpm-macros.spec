@@ -51,7 +51,6 @@ Provides:       python-srpm-macros
 Provides:       python-rpm-macros
 Provides:       python3-rpm-macros
 Provides:       rust-srpm-macros
-Requires:       azurelinux-release
 BuildArch:      noarch
 
 %description
