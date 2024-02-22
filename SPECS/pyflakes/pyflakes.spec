@@ -10,7 +10,6 @@ License:        MIT
 URL:            https://github.com/PyCQA/pyflakes
 
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}.tar.gz
-Source1:        https://deb.debian.org/debian/pool/main/p/pyflakes/pyflakes_3.1.0-1.debian.tar.xz
 Patch0:         %{name}-1.1.0-python3-man.patch
 
 BuildArch:      noarch
