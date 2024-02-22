@@ -1,0 +1,39 @@
+# There is a bug in netplan when python3-rich is not present. 
+#
+# When the import fails in netplan_cli/cli/commands/status.py it tries to log
+# about it before logging is set up. Because of that, a new handler is added for
+# the root logger, and the default level is used (WARN). By the time the logger
+# is properly initialized in netplan/netplan_cli/cli/core.py with basicConfig,
+# it's too late. The function documentation states:
+# 
+# > This function does nothing if the root logger already has handlers
+# > configured, unless the keyword argument force is set to True.
+#
+# This means that the root logger is not being configured correctly by the calls
+# to basicConfig in netplan/netplan_cli/cli/core.py.
+#
+# To get around the issue, basicConfig supports the force argument (since 3.8),
+# which will clear any pre-existing handlers, and ensure the logger is
+# configured as requested.
+#
+# This issue was causing legacy-tests::test_loopback_only to fail, as it was expecting
+# a specific output that is produced in INFO level, but due to the bug, the output
+# was not being produced and the test was failing.
+diff --git a/netplan_cli/cli/core.py b/netplan_cli/cli/core.py
+index 4a863c3..7850c18 100644
+--- a/netplan_cli/cli/core.py
++++ b/netplan_cli/cli/core.py
+@@ -49,10 +49,10 @@ class Netplan(utils.NetplanCommand):
+         self.parse_args()
+ 
+         if self.debug:
+-            logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
++            logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s', force=True)
+             os.environ['G_MESSAGES_DEBUG'] = 'all'
+         else:
+-            logging.basicConfig(level=logging.INFO, format='%(message)s')
++            logging.basicConfig(level=logging.INFO, format='%(message)s', force=True)
+ 
+         try:
+             self.run_command()
+
