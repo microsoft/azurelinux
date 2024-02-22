@@ -9491,8 +9491,8 @@
         "type": "other",
         "other": {
           "name": "libguestfs",
-          "version": "1.44.0",
-          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "version": "1.52.0",
+          "downloadUrl": "https://libguestfs.org/download/1.52-stable/libguestfs-1.52.0.tar.gz"
         }
       }
     },
