@@ -19,7 +19,9 @@ BuildRequires:  make
 Requires:       /bin/sh
 Requires:       tar
 Requires:       xz
-Provides:       moby-cli
+# This package replaces the old name of moby-cli
+Provides:       moby-cli = %{version}-%{release}
+Obsoletes:      moby-cli < %{version}-%{release}
 
 %description
 %{summary}
