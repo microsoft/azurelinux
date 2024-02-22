@@ -1,0 +1,15 @@
+diff --git a/cmd/tools/Makefile.am b/cmd/tools/Makefile.am
+index 4978fea..9fbe2e2 100644
+--- a/cmd/tools/Makefile.am
++++ b/cmd/tools/Makefile.am
+@@ -249,7 +249,9 @@ gvpack_LDADD = \
+ 	$(top_builddir)/lib/ingraphs/libingraphs_C.la \
+ 	$(top_builddir)/lib/cgraph/libcgraph.la \
+ 	$(top_builddir)/lib/cdt/libcdt.la \
+-	$(top_builddir)/plugin/neato_layout/libgvplugin_neato_layout.la
++	$(top_builddir)/plugin/neato_layout/libgvplugin_neato_layout_C.la \
++	$(top_builddir)/lib/pathplan/libpathplan_C.la \
++		$(EXPAT_LIBS) $(Z_LIBS) $(GTS_LIBS) $(SOCKET_LIBS) $(IPSEPCOLA_LIBS) $(MATH_LIBS)
+ 
+ if ENABLE_STATIC
+ gvpack_static_SOURCES = gvpack.cpp
