@@ -35,7 +35,6 @@ BuildRequires:  pkgconfig(gi-docgen)
 BuildRequires:  pkgconfig(glib-2.0) >= 2.72
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(gtk4) >= 4.11.3
-%lang_package
 
 %description
 Building blocks for modern GNOME applications.
