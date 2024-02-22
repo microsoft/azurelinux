@@ -144,7 +144,8 @@ BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
 BuildRequires:  util-linux
-
+BuildRequires:  systemd
+BuildRequires:  systemd-devel
 
 
 BuildRequires:  xmlstarlet
