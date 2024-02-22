@@ -1,5 +1,5 @@
+azl-rpm-macros
 cmake
 lua
-azl-rpm-macros
 rpm
 rpm-libs
