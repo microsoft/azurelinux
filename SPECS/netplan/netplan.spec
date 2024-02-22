@@ -26,15 +26,19 @@ Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version
 # in the meson file. This patch disables that check.
 Patch0:         remove-flakes-check.patch
 
-# Some unit tests parse an openvswitch related config that requires openvswitch
-# to be installed.
+# Some unit tests require openvswitch to be installed. This is a backported
+# patch from upstream that adds logic to skip openvswitch tests when it is not
+# installed. It also removes this dependency from a couple parsing tests that do
+# not necessarily need openvswitch by replacing the test fixture with another
+# one that does not require openvswitch to be parsed. See note on
+# `BuildRequires: openvswitch` below.
 Patch1:         skip-ovs-tests.patch
 
 # Fix bug in netplan when python3-rich is not present.
 Patch2:         rich-import-failure-no-log.patch
 
 # Temporarily disabling broken test suite due to version mismatches between
-# pytest-cov and python3-coverage.
+# pytest-cov and python3-coverage in 3.0.
 Patch3:         disable-broken-tests.patch
 
 BuildRequires:  bash-completion-devel
@@ -51,10 +55,13 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  util-linux-devel
-# For tests
+
+# BuildRequires below are only required for %check:
 BuildRequires:  iproute
 BuildRequires:  libcmocka-devel
-# Blocked: not building on 3.0 yet
+# Disabled: openvswitch is not building on 3.0 yet. This is only required for
+# some tests, not blocking the build. Should be enabled once the dependency is
+# satisfied.
 # BuildRequires:  openvswitch
 BuildRequires:  python%{python3_pkgversion}-cffi
 BuildRequires:  python%{python3_pkgversion}-coverage
@@ -71,12 +78,13 @@ Requires:       python%{python3_pkgversion}-dbus
 # 'ip' command is used in netplan apply subcommand
 Requires:       iproute
 
-# /usr/sbin/netplan is a Python 3 script that requires netifaces, PyYAML,
-# cffi and optionally python-rich
+# /usr/sbin/netplan is a Python 3 script that imports the following:
 Requires:       python%{python3_pkgversion}-netifaces
 Requires:       python%{python3_pkgversion}-PyYAML
 Requires:       python%{python3_pkgversion}-cffi
-# Not available in 3.0 yet
+# Disabled: python-rich is not available on 3.0 yet. This is an optional
+# dependency used to improve the CLI output, but is not required for core
+# functionality. Should be enabled once the dependency is satisfied.
 # Requires:       python%{python3_pkgversion}-rich
 
 # Netplan requires a backend for configuration
