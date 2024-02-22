@@ -86,8 +86,7 @@ if test ! -e "obj"; then
 fi
 pushd obj
 %cmake \
-  -DWITH_STATIC_LIB=ON \
-  -DWITH_CMOCKERY_SUPPORT=ON \
+  -DBUILD_SHARED_LIBS=OFF \
   -DUNIT_TESTING=ON \
   %{_builddir}/%{name}-%{version}
 
