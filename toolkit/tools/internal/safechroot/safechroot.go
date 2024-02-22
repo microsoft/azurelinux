@@ -303,13 +303,13 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
-	return addFilesToDestination(c.rootDir, filesToCopy...)
+	return AddFilesToDestination(c.rootDir, filesToCopy...)
 }
 
-func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
+func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to worker '%s'", f.Src, dest)
+		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
 
 		var err error
 		if f.Permissions != nil {
@@ -319,8 +319,7 @@ func addFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		}
 
 		if err != nil {
-			logger.Log.Errorf("Error provisioning worker with '%s'", f.Src)
-			return err
+			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
 		}
 	}
 	return nil
@@ -331,8 +330,7 @@ func (c *Chroot) CopyOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Copy(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error copying file '%s'", err)
-		return
+		return fmt.Errorf("failed to copy (%s):\n%w", srcPathFull, err)
 	}
 	return
 }
@@ -342,8 +340,7 @@ func (c *Chroot) MoveOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Move(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error moving file '%s'", err)
-		return
+		return fmt.Errorf("failed to move file from (%s) to (%s):\n%w", srcPath, destPath, err)
 	}
 	return
 }

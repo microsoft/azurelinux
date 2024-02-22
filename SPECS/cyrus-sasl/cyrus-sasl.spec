@@ -4,7 +4,7 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           cyrus-sasl
 Version:        2.1.28
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -311,6 +311,9 @@ make %{?_smp_mflags} check
 %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 05 2024 Dan Streetman <ddstreet@ieee.org> - 2.1.28-6
+- match bootstrap version
+
 * Wed Nov 15 2023 Andrew Phelps <anphel@microsoft.com> - 2.1.28-5
 - Add BR for libxcrypt-devel
 

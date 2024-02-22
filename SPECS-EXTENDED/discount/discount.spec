@@ -38,7 +38,7 @@ libmarkdown.
 %prep
 %setup -q
 
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

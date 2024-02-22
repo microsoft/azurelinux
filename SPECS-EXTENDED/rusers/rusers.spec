@@ -74,27 +74,27 @@ who is logged into your machine.
 
 %prep
 %setup -q -n netkit-rusers-%{version} -a 2
-%patch0 -p1 -b .jbj
-%patch1 -p1 -b .numusers
-%patch2 -p1 -b .2.4
-%patch3 -p1 -b .includes
-%patch4 -p1 -b .truncate
-%patch5 -p1 -b .stats
-%patch6 -p1 -b .rstatd-no-static-buffer
-%patch7 -p1 -b .strip
-%patch8 -p1 -b .rup
-%patch9 -p1 -b .rup-timeout
-%patch10 -p1 -b .procps
-%patch11 -p1 -b .rup-stack
-%patch12 -p1 -b .bigendian
-%patch13 -p1 -b .return
-%patch14 -p1 -b .procdiskstats
-%patch15 -p1 -b .dropprivs
-%patch16 -p1 -b .licensefix
-%patch17 -p1 -b .manhelp
-%patch18 -p1 -b .freerpc
-%patch19 -p1 -b .rstatd-man
-%patch20 -p1 -b .license
+%patch 0 -p1 -b .jbj
+%patch 1 -p1 -b .numusers
+%patch 2 -p1 -b .2.4
+%patch 3 -p1 -b .includes
+%patch 4 -p1 -b .truncate
+%patch 5 -p1 -b .stats
+%patch 6 -p1 -b .rstatd-no-static-buffer
+%patch 7 -p1 -b .strip
+%patch 8 -p1 -b .rup
+%patch 9 -p1 -b .rup-timeout
+%patch 10 -p1 -b .procps
+%patch 11 -p1 -b .rup-stack
+%patch 12 -p1 -b .bigendian
+%patch 13 -p1 -b .return
+%patch 14 -p1 -b .procdiskstats
+%patch 15 -p1 -b .dropprivs
+%patch 16 -p1 -b .licensefix
+%patch 17 -p1 -b .manhelp
+%patch 18 -p1 -b .freerpc
+%patch 19 -p1 -b .rstatd-man
+%patch 20 -p1 -b .license
 
 %build
 cat > MCONFIG <<EOF

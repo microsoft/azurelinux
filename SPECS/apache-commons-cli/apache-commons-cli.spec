@@ -53,7 +53,7 @@ This package contains the API documentation for %{name}.
 
 %prep
 %setup -q -n %{short_name}-%{version}-src -a1
-%patch0 -p1
+%patch 0 -p1
 
 %pom_remove_parent
 

@@ -46,9 +46,9 @@ Development files.
 
 %prep
 %setup -n cpprestsdk-%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 # Remove bundled sources of websocketpp
 rm -r Release/libs
 # Remove file ThirdPartyNotices.txt, which is associated to websocketpp

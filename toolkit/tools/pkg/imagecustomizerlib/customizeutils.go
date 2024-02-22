@@ -168,13 +168,14 @@ func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
 	return nil
 }
 
-func copyAdditionalFiles(baseConfigPath string, additionalFiles map[string]imagecustomizerapi.FileConfigList, imageChroot *safechroot.Chroot) error {
+func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap, imageChroot *safechroot.Chroot) error {
 	for sourceFile, fileConfigs := range additionalFiles {
+		absSourceFile := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		for _, fileConfig := range fileConfigs {
 			logger.Log.Infof("Copying: %s", fileConfig.Path)
 
 			fileToCopy := safechroot.FileToCopy{
-				Src:         filepath.Join(baseConfigPath, sourceFile),
+				Src:         absSourceFile,
 				Dest:        fileConfig.Path,
 				Permissions: (*fs.FileMode)(fileConfig.Permissions),
 			}
@@ -244,7 +245,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	password := user.Password
 	if user.PasswordPath != "" {
 		// Read password from file.
-		passwordFullPath := filepath.Join(baseConfigPath, user.PasswordPath)
+		passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.PasswordPath)
 
 		passwordFileContents, err := os.ReadFile(passwordFullPath)
 		if err != nil {
@@ -304,10 +305,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	// Set user's SSH keys.
 	for i, _ := range user.SSHPubKeyPaths {
-		// If absolute path is not provided, then append baseConfigPath.
-		if !filepath.IsAbs(user.SSHPubKeyPaths[i]) {
-			user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
-		}
+		user.SSHPubKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPubKeyPaths[i])
 	}
 
 	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)

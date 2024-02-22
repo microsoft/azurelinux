@@ -1,23 +1,17 @@
-%global       verBetaPrefix 1.0.0
-%global       verBetaSuffix 1
-%global       verBetaFull %{verBetaPrefix}-beta.%{verBetaSuffix}
-
+# Added global debug_package to fix the failure of empty debugfiles.list
+%global debug_package %{nil}
 Summary:        The Original ATT Korn Shell
 Name:           ksh
-Version:        %{verBetaPrefix}~beta.%{verBetaSuffix}
-Release:        5%{?dist}
+Version:        1.0.8
+Release:        1%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.kornshell.com/
-Source0:        https://github.com/ksh93/%{name}/archive/v%{verBetaFull}/%{name}-%{verBetaFull}.tar.gz
+Source0:        https://github.com/ksh93/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        kshcomp.conf
 Source2:        kshrc.rhs
 Source3:        dotkshrc
-# temporary commenting out failing tests
-Patch1:         %{name}-%{verBetaFull}-regre-tests.patch
-# in some build commands relocate "-lm" flag
-Patch2:         %{name}-%{verBetaFull}-fix-build.patch
 
 BuildRequires:  bison
 BuildRequires:  gcc
@@ -25,6 +19,7 @@ BuildRequires:  gcc
 BuildRequires:  procps
 
 %if %{with_check}
+BuildRequires: tzdata
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif
@@ -32,10 +27,9 @@ BuildRequires:  sudo
 Requires:       coreutils
 Requires:       diffutils
 
-Requires(post): coreutils
 Requires(post): grep
+Requires(post): coreutils
 Requires(post): systemd
-
 Requires(postun): sed
 
 %description
@@ -45,7 +39,7 @@ KornShell is a shell programming language, which is upward compatible
 with "sh" (the Bourne Shell).
 
 %prep
-%autosetup -n %{name}-%{verBetaFull} -p1
+%autosetup
 
 #/dev/fd test does not work because of mock
 sed -i 's|ls /dev/fd|ls /proc/self/fd|' src/cmd/ksh93/features/options
@@ -80,12 +74,10 @@ touch %{buildroot}%{_bindir}/rksh
 touch %{buildroot}%{_mandir}/man1/rksh.1.gz
 
 %check
-# We run more tests as non-root user
-chmod g+w . -R
 useradd test -G root -m
-
-# Disabling tests as they tend to freez and the package is low-pri at the moment.
-false && sudo -u test ./bin/shtests --compile
+# disable pty tests as they tend to freeze
+find src/cmd/ksh93/tests -name "pty.sh" -delete
+bin/package test
 
 %post
 for s in /bin/ksh /bin/rksh %{_bindir}/ksh %{_bindir}/rksh
@@ -155,6 +147,10 @@ fi
 %config(noreplace) %{_sysconfdir}/binfmt.d/kshcomp.conf
 
 %changelog
+* Tue Jan 23 2024 Betty Lakes <bettylakes@microsoft.com> - 1.0.8-1
+- Version upgrade to 1.0.8
+- Disabled pty tests
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.0.0~beta.1-5
 - Modify ksh-1.0.0-beta.1-fix-build.patch-fix-build.patch with proper "-lm" location for updated toolchain
 

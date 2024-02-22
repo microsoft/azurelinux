@@ -4,6 +4,7 @@
 package schedulerutils
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
@@ -27,7 +28,7 @@ import (
 //     and are queued for building in the testNodesToRequests() function.
 //     At this point the partner build nodes for these test nodes have either already finished building or are being built,
 //     thus the check for active and cached SRPMs inside testNodesToRequests().
-func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest) {
+func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, nodesToBuild []*pkggraph.PkgNode, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildState *GraphBuildState, isCacheAllowed bool) (requests []*BuildRequest, err error) {
 	timestamp.StartEvent("generate requests", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -57,13 +58,23 @@ func ConvertNodesToRequests(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMute
 		requests = append(requests, req)
 	}
 
-	requests = append(requests, buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)...)
-	requests = append(requests, testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)...)
+	newBuildReqs, err := buildNodesToRequests(pkgGraph, buildState, packagesToRebuild, testsToRerun, buildNodes, isCacheAllowed)
+	if err != nil {
+		err = fmt.Errorf("failed to convert build nodes to requests:\n%w", err)
+		return
+	}
+	requests = append(requests, newBuildReqs...)
+	newTestReqs, err := testNodesToRequests(pkgGraph, buildState, testsToRerun, testNodes)
+	if err != nil {
+		err = fmt.Errorf("failed to convert test nodes to requests:\n%w", err)
+		return
+	}
+	requests = append(requests, newTestReqs...)
 
 	return
 }
 
-func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest) {
+func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, buildNodesLists map[string][]*pkggraph.PkgNode, isCacheAllowed bool) (requests []*BuildRequest, err error) {
 	for _, buildNodes := range buildNodesLists {
 		// Check if any of the build nodes is a delta node and mark it. We will use this to determine if the
 		// build is a delta build that might have pre-built .rpm files available.
@@ -76,6 +87,17 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		}
 
 		defaultNode := buildNodes[0]
+
+		// Check if we already queued up this build node for building.
+		if buildState.IsSRPMBuildActive(defaultNode.SRPMFileName()) || buildState.IsNodeProcessed(defaultNode) {
+			err = fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName())
+			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
+			// restored later once the underlying cause of this error is fixed.
+			logger.Log.Warnf(err.Error())
+			err = nil
+			continue
+		}
+
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
 
 		if req.UseCache {
@@ -167,12 +189,22 @@ func partnerTestNodesToRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBui
 // which have already been queued to build or finished building.
 //
 // NOTE: the caller must guarantee the build state does not change while this function is running.
-func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest) {
+func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, testsToRerun []*pkgjson.PackageVer, testNodesLists map[string][]*pkggraph.PkgNode) (requests []*BuildRequest, err error) {
 	const isDelta = false
 
 	for _, testNodes := range testNodesLists {
 		defaultTestNode := testNodes[0]
 		srpmFileName := defaultTestNode.SRPMFileName()
+
+		// Check if we already queued up this build node for building.
+		if buildState.IsSRPMTestActive(srpmFileName) || buildState.IsNodeProcessed(defaultTestNode) {
+			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
+			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
+			// restored later once the underlying cause of this error is fixed.
+			logger.Log.Warnf(err.Error())
+			err = nil
+			continue
+		}
 
 		buildUsedCache := buildState.IsSRPMCached(srpmFileName)
 		if buildRequest := buildState.ActiveBuildFromSRPM(srpmFileName); buildRequest != nil {

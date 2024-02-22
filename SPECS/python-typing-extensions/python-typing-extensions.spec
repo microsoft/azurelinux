@@ -22,8 +22,8 @@ reaches end of life.}
 
 Summary:        Python Typing Extensions
 Name:           python-typing-extensions
-Version:        4.2.0
-Release:        6%{?dist}
+Version:        4.9.0
+Release:        1%{?dist}
 License:        PSF-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,10 +65,13 @@ pip3 install pytest==7.1.3
 
 %files -n python3-typing-extensions -f %{pyproject_files}
 %license LICENSE
-%doc CHANGELOG
-%doc README.rst
+%doc CHANGELOG.md
+%doc README.md
 
 %changelog
+* Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.9.0-1
+- Upgrade to 4.9.0
+
 * Mon Oct 24 2022 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-6
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified

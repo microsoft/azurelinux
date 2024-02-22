@@ -32,7 +32,7 @@ PC/SC Lite daemon.
 
 %prep
 %setup -q -n ccid-%{version}
-%patch0 -p1 -b .omnikey
+%patch 0 -p1 -b .omnikey
 
 %build
 %configure --enable-twinserial

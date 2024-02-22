@@ -1,0 +1,2 @@
+%__sysusers_provides	%{_rpmconfigdir}/sysusers.prov
+%__sysusers_path	^%{_sysusersdir}/.*\\.conf$

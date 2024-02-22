@@ -109,9 +109,9 @@ python-requests layer.
 
 %prep
 %setup -q -n requests-mock-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 # Remove bundled egg-info
 rm -rf requests_mock.egg-info
