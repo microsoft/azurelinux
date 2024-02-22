@@ -7531,8 +7531,8 @@
         "type": "other",
         "other": {
           "name": "iw",
-          "version": "5.9",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.9.tar.xz"
+          "version": "6.7",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-6.7.tar.xz"
         }
       }
     },
