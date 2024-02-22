@@ -21924,8 +21924,8 @@
         "type": "other",
         "other": {
           "name": "python-conda-package-handling",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/conda/conda-package-handling/archive/1.7.2/conda-package-handling-1.7.2.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/conda/conda-package-handling/archive/2.2.0/conda-package-handling-2.2.0.tar.gz"
         }
       }
     },
@@ -22474,8 +22474,8 @@
         "type": "other",
         "other": {
           "name": "python-greenlet",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/2.0.2/greenlet-2.0.2.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/3.0.3/greenlet-3.0.3.tar.gz"
         }
       }
     },
