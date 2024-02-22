@@ -8,6 +8,13 @@ Vendor:       Microsoft Corporation
 URL:          http://www.linuxfromscratch.org
 Distribution:   Azure Linux
 
+# We don't order the same as Fedora here, although maybe we should.
+# If ordering is changed, be sure to coordinate with setup
+# package as well as package that provides system-release
+%if ! 0%{?azl}
+Requires(pre): setup
+%endif
+
 %description
 The filesystem package is one of the basic packages that is installed
 on a Linux system. Filesystem contains the basic directory
@@ -61,213 +68,6 @@ install -vdm 755 %{buildroot}/mnt/cdrom
 install -vdm 755 %{buildroot}/mnt/hgfs
 
 #
-#	Configuration files
-#
-cat > %{buildroot}/etc/passwd <<- "EOF"
-root:x:0:0:root:/root:/bin/bash
-bin:x:1:1:bin:/dev/null:/bin/false
-daemon:x:6:6:Daemon User:/dev/null:/bin/false
-messagebus:x:18:18:D-Bus Message Daemon User:/var/run/dbus:/bin/false
-systemd-bus-proxy:x:72:72:systemd Bus Proxy:/:/bin/false
-systemd-journal-gateway:x:73:73:systemd Journal Gateway:/:/bin/false
-systemd-journal-remote:x:74:74:systemd Journal Remote:/:/bin/false
-systemd-journal-upload:x:75:75:systemd Journal Upload:/:/bin/false
-systemd-network:x:76:76:systemd Network Management:/:/bin/false
-systemd-resolve:x:77:77:systemd Resolver:/:/bin/false
-systemd-timesync:x:78:78:systemd Time Synchronization:/:/bin/false
-systemd-coredump:x:79:79:systemd Core Dumper:/:/usr/bin/false
-systemd-oom:x:80:80:systemd Userspace OOM Killer:/:/usr/bin/false
-nobody:x:65534:65533:Unprivileged User:/dev/null:/bin/false
-EOF
-cat > %{buildroot}/etc/group <<- "EOF"
-root:x:0:
-bin:x:1:daemon
-sys:x:2:
-kmem:x:3:
-tape:x:4:
-tty:x:5:
-daemon:x:6:
-floppy:x:7:
-disk:x:8:
-lp:x:9:
-dialout:x:10:
-audio:x:11:
-video:x:12:
-utmp:x:13:
-usb:x:14:
-cdrom:x:15:
-adm:x:16:
-messagebus:x:18:
-systemd-journal:x:23:
-input:x:24:
-mail:x:34:
-lock:x:54:
-dip:x:30:
-render:x:31:
-kvm:x:32:
-systemd-bus-proxy:x:72:
-systemd-journal-gateway:x:73:
-systemd-journal-remote:x:74:
-systemd-journal-upload:x:75:
-systemd-network:x:76:
-systemd-resolve:x:77:
-systemd-timesync:x:78:
-systemd-coredump:x:79:
-systemd-oom:x:80:
-nogroup:x:65533:
-users:x:100:
-sudo:x:27:
-wheel:x:28:
-EOF
-#
-#	7.3. Customizing the /etc/hosts File"
-#
-cat > %{buildroot}/etc/hosts <<- "EOF"
-127.0.0.1   localhost localhost.localdomain
-::1         localhost localhost.localdomain ipv6-localhost ipv6-loopback
-EOF
-# host.conf file
-cat > %{buildroot}/etc/host.conf <<- "EOF"
-multi on
-EOF
-#
-#	7.13. The Bash Shell Startup Files
-#
-cat > %{buildroot}/etc/profile <<- "EOF"
-# Begin /etc/profile
-# Written for Beyond Linux From Scratch
-# by James Robertson <jameswrobertson@earthlink.net>
-# modifications by Dagmar d'Surreal <rivyqntzne@pbzpnfg.arg>
-
-# System wide environment variables and startup programs.
-
-# System wide aliases and functions should go in /etc/bashrc.  Personal
-# environment variables and startup programs should go into
-# ~/.bash_profile.  Personal aliases and functions should go into
-# ~/.bashrc.
-
-# Functions to help us manage paths.  Second argument is the name of the
-# path variable to be modified (default: PATH)
-pathremove () {
-        local IFS=':'
-        local NEWPATH
-        local DIR
-        local PATHVARIABLE=${2:-PATH}
-        for DIR in ${!PATHVARIABLE} ; do
-                if [ "$DIR" != "$1" ] ; then
-                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
-                fi
-        done
-        export $PATHVARIABLE="$NEWPATH"
-}
-
-pathprepend () {
-        pathremove $1 $2
-        local PATHVARIABLE=${2:-PATH}
-        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
-}
-
-pathappend () {
-        pathremove $1 $2
-        local PATHVARIABLE=${2:-PATH}
-        export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
-}
-
-export -f pathremove pathprepend pathappend
-
-# Set the initial path
-# Block unnessary as this is set elsewhere.
-# export PATH=$PATH:/bin:/usr/bin
-
-# if [ $EUID -eq 0 ] ; then
-#         pathappend /sbin:/usr/sbin
-#         unset HISTFILE
-# fi
-
-# Setup some environment variables.
-export HISTSIZE=1000
-export HISTIGNORE="&:[bf]g:exit"
-
-# Set some defaults for graphical systems
-export XDG_DATA_DIRS=/usr/share/
-export XDG_CONFIG_DIRS=/etc/xdg/
-
-# Setup a red prompt for root and a green one for users.
-NORMAL="\[\e[0m\]"
-RED="\[\e[1;31m\]"
-GREEN="\[\e[1;32m\]"
-if [[ $EUID == 0 ]] ; then
-  PS1="$RED\u@\h [ $NORMAL\w$RED ]# $NORMAL"
-else
-  PS1="$GREEN\u@\h [ $NORMAL\w$GREEN ]\$ $NORMAL"
-fi
-
-for script in /etc/profile.d/*.sh ; do
-        if [ -r $script ] ; then
-                . $script
-        fi
-done
-
-unset script RED GREEN NORMAL
-# End /etc/profile
-EOF
-#
-#	7.14. Creating the /etc/inputrc File
-#
-cat > %{buildroot}/etc/inputrc <<- "EOF"
-# Begin /etc/inputrc
-# Modified by Chris Lynn <roryo@roryo.dynup.net>
-
-# Allow the command prompt to wrap to the next line
-set horizontal-scroll-mode Off
-
-# Enable 8bit input
-set meta-flag On
-set input-meta On
-
-# Turns off 8th bit stripping
-set convert-meta Off
-
-# Keep the 8th bit for display
-set output-meta On
-
-# none, visible or audible
-set bell-style none
-
-# All of the following map the escape sequence of the value
-# contained in the 1st argument to the readline specific functions
-"\eOd": backward-word
-"\eOc": forward-word
-
-# for linux console
-"\e[1~": beginning-of-line
-"\e[4~": end-of-line
-# page up - history search backward
-"\e[5~": history-search-backward
-# page down - history search forward
-"\e[6~": history-search-forward
-"\e[3~": delete-char
-"\e[2~": quoted-insert
-
-# for xterm
-"\eOH": beginning-of-line
-"\eOF": end-of-line
-
-# for Konsole
-"\e[H": beginning-of-line
-"\e[F": end-of-line
-
-# ctrl + left/right arrow to jump words
-"\e[1;5C": forward-word
-"\e[1;5D": backward-word
-
-# End /etc/inputrc
-EOF
-#
-#	8.2. Creating the /etc/fstab File
-#
-touch %{buildroot}/etc/fstab
-
 #
 #		chapter 9.1. The End
 #
@@ -317,13 +117,6 @@ return 0
 %dir /var
 #	etc fileystem
 %dir /etc/opt
-%config(noreplace) /etc/fstab
-%config(noreplace) /etc/group
-%config(noreplace) /etc/host.conf
-%config(noreplace) /etc/hosts
-%config(noreplace) /etc/inputrc
-%config(noreplace) /etc/passwd
-%config(noreplace) /etc/profile
 %dir /etc/sysconfig
 %dir /etc/profile.d
 #	media filesystem
@@ -430,6 +223,7 @@ return 0
 - remove opensuse-style 'proxy' config file
 - remove unused /etc/sysconfig/clock file
 - remove unused opensuse-style /etc/sysconfig/console file
+- move some files into setup package
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts

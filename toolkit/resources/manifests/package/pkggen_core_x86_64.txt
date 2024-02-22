@@ -1,4 +1,5 @@
 filesystem-1.1-20.azl3.x86_64.rpm
+setup-2.14.5-3.azl3.noarch.rpm
 kernel-headers-6.6.14.1-4.azl3.noarch.rpm
 glibc-2.38-3.azl3.x86_64.rpm
 glibc-devel-2.38-3.azl3.x86_64.rpm

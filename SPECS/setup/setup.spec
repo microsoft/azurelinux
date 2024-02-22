@@ -1,18 +1,38 @@
+
+# Default to no check, because it pulls in other packages at build,
+# and that will cause "circular dependency" problems for the Azure
+# Linux toolkit
+%bcond check 0
+
 Summary: A set of system configuration and setup files
 Name: setup
 Version: 2.14.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 Group: System Environment/Base
 URL: https://pagure.io/setup/
-Source0: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
+Source0: https://pagure.io/%{name}/archive/%{name}-%{version}/%{name}-%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
+%if %{with check}
 #systemd-rpm-macros: required to use _tmpfilesdir macro
 # https://fedoraproject.org/wiki/Changes/Remove_make_from_BuildRoot
 BuildRequires: make
-BuildRequires: bash tcsh perl-interpreter systemd-rpm-macros
+BuildRequires: bash tcsh perl-interpreter
+%endif
+BuildRequires: systemd-bootstrap-rpm-macros
+
+# We don't order the same as Fedora here, although maybe we should.
+# If ordering is changed, be sure to coordinate with filesystem
+# package as well as package that provides system-release
+%if 0%{?azl}
+Requires: filesystem
+%else
 #require system release for saner dependency order
 Requires: system-release
+%endif
+
+# some of our files used to be provided by filesystem
+Conflicts: filesystem < 1.1-20
 
 %description
 The setup package contains a set of important system configuration and
@@ -25,9 +45,11 @@ setup files, such as passwd, group, and profile.
 
 %build
 
+%if %{with check}
 %check
 # Run any sanity checks.
 make check
+%endif
 
 %install
 rm -rf %{buildroot}
@@ -131,6 +153,10 @@ end
 /etc/dnf/protected.d/%{name}.conf
 
 %changelog
+* Thu Feb 29 2024 Dan Streetman <ddstreet@microsoft.com> - 2.14.5-3
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- License verified.
+
 * Sat Jan 27 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.14.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 

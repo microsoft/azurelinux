@@ -567,6 +567,7 @@ rpm-libs-4.18.1-4.azl3.x86_64.rpm
 sed-4.9-1.azl3.x86_64.rpm
 sed-debuginfo-4.9-1.azl3.x86_64.rpm
 sed-lang-4.9-1.azl3.x86_64.rpm
+setup-2.14.5-3.azl3.noarch.rpm
 slang-2.3.3-1.azl3.x86_64.rpm
 slang-debuginfo-2.3.3-1.azl3.x86_64.rpm
 slang-devel-2.3.3-1.azl3.x86_64.rpm
