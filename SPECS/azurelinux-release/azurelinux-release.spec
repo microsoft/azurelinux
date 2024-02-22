@@ -78,6 +78,8 @@ Welcome to Azure Linux %{dist_version} (%{_arch})
 EOF
 ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
+install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -90,6 +92,7 @@ ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 %{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
+%dir %{_sysconfdir}/issue.d
 
 %changelog
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
