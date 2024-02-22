@@ -80,6 +80,19 @@ ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
 
+cat <<-"EOF" > %{buildroot}%{_rpmmacrodir}/macros.dist
+# dist macros.
+
+%%__bootstrap         ~bootstrap
+%%azure               %{dist_version_major}
+%%dist                .azl%%{azure}%%{?with_bootstrap:%%{__bootstrap}}
+%%dist_vendor         %{dist_vendor}
+%%dist_name           %{dist_name}
+%%dist_home_url       %{dist_home_url}
+%%dist_bug_report_url %{dist_home_url}
+%%dist_debuginfod_url %{dist_home_url}
+EOF
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -93,6 +106,7 @@ install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
 %dir %{_sysconfdir}/issue.d
+%{_rpmmacrodir}/macros.dist
 
 %changelog
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
