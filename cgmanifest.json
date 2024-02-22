@@ -4310,8 +4310,8 @@
         "type": "other",
         "other": {
           "name": "glib-networking",
-          "version": "2.70.0",
-          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.70/glib-networking-2.70.0.tar.xz"
+          "version": "2.78.0",
+          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.78/glib-networking-2.78.0.tar.xz"
         }
       }
     },
