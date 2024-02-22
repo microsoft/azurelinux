@@ -12,6 +12,12 @@ lkg_workdir = $(BUILD_DIR)/daily_build_id
 
 ######## CONFIGURE FLAGS ########
 
+# DAILY_BUILD_ID is the main point of entry. It can be one of 'lkg', 'lkg-force', or <build-id>. Based on this selection 'LKG_MANIFESTS' and 'FORCE_MANIFEST_UPDATES' are selected by default. They may be overwritten if desired.
+
+# LKG_MANIFESTS will update the manifest files to match the commit in the LKG file. This does not make sense for arbitrary build-ids however, so only default to 'y' for 'lkg' or 'lkg-force'
+
+# PKG_MANIFEST_OVERWRITE will ignore local changes to the manifests and replace them with the LKG version.
+
 ##help:var:DAILY_BUILD_ID:{'lkg','lkg-force',<build_id>}='lkg' will auto select latest daily build repo. Unless LKG_MANIFESTS='n' is used, unmodifed manifests will be udpated to match. 'lkg-force' will overwrite changes. An explicit ID of the daily build repo can also be used.
 DAILY_BUILD_ID ?=
 

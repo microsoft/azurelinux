@@ -2,6 +2,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+# Updates the requested manifest file based on the contents of the LKG json.
+
 set -e
 
 if [ "$#" -ne 4 ]; then
