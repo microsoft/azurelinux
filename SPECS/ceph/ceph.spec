@@ -79,6 +79,7 @@ Requires:       ceph-mon = %{version}-%{release}
 Requires(post):	binutils
 Requires:       systemd
 
+BuildRequires: lmdb-devel >= 0.9.16
 BuildRequires:	libaio-devel
 BuildRequires:	libblkid-devel >= 2.17
 BuildRequires:  cryptsetup
@@ -921,7 +922,7 @@ This package provides a Ceph hardware monitoring agent.
 # common
 #################################################################################
 %prep
-%autosetup -p1 -n @TARBALL_BASENAME@
+%autosetup -p1 
 
 
 # Despite disabling diskprediction, some unpackaged files stick around
@@ -1415,64 +1416,6 @@ if [ $1 -eq 1 ] ; then
 fi
 
 %postun mgr-dashboard
-if [ $1 -eq 1 ] ; then
-    /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
-fi
-
-%files mgr-diskprediction-local
-%{_datadir}/ceph/mgr/diskprediction_local
-
-%post mgr-diskprediction-local
-if [ $1 -eq 1 ] ; then
-    /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
-fi
-
-%postun mgr-diskprediction-local
-if [ $1 -eq 1 ] ; then
-    /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
-fi
-
-%files mgr-modules-core
-%dir %{_datadir}/ceph/mgr
-%{_datadir}/ceph/mgr/alerts
-%{_datadir}/ceph/mgr/balancer
-%{_datadir}/ceph/mgr/crash
-%{_datadir}/ceph/mgr/devicehealth
-%{_datadir}/ceph/mgr/influx
-%{_datadir}/ceph/mgr/insights
-%{_datadir}/ceph/mgr/iostat
-%{_datadir}/ceph/mgr/localpool
-%{_datadir}/ceph/mgr/mds_autoscaler
-%{_datadir}/ceph/mgr/mirroring
-%{_datadir}/ceph/mgr/nfs
-%{_datadir}/ceph/mgr/orchestrator
-%{_datadir}/ceph/mgr/osd_perf_query
-%{_datadir}/ceph/mgr/osd_support
-%{_datadir}/ceph/mgr/pg_autoscaler
-%{_datadir}/ceph/mgr/progress
-%{_datadir}/ceph/mgr/prometheus
-%{_datadir}/ceph/mgr/rbd_support
-%{_datadir}/ceph/mgr/restful
-%{_datadir}/ceph/mgr/rgw
-%{_datadir}/ceph/mgr/selftest
-%{_datadir}/ceph/mgr/snap_schedule
-%{_datadir}/ceph/mgr/stats
-%{_datadir}/ceph/mgr/status
-%{_datadir}/ceph/mgr/telegraf
-%{_datadir}/ceph/mgr/telemetry
-%{_datadir}/ceph/mgr/test_orchestrator
-%{_datadir}/ceph/mgr/volumes
-%{_datadir}/ceph/mgr/zabbix
-
-%files mgr-rook
-%{_datadir}/ceph/mgr/rook
-
-%post mgr-rook
-if [ $1 -eq 1 ] ; then
-    /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
-fi
-
-%postun mgr-rook
 if [ $1 -eq 1 ] ; then
     /usr/bin/systemctl try-restart ceph-mgr.target >/dev/null 2>&1 || :
 fi
@@ -2116,6 +2059,6 @@ exit 0
 %dir %{python3_sitelib}/ceph_node_proxy
 %{python3_sitelib}/ceph_node_proxy/*
 %{python3_sitelib}/ceph_node_proxy-*
-#%{_mandir}/man8/ceph-node-proxy.8*
+
 
 %changelog
