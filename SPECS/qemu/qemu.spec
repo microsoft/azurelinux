@@ -3450,6 +3450,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/%{name}/pxe*rom
 %{_datadir}/%{name}/efi*rom
 
+%ifarch x86_64
 %files system-x86
 %files system-x86-core
 %{_bindir}/qemu-system-i386
@@ -3465,7 +3466,6 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %if ! %{azl}
 %{_mandir}/man1/qemu-system-i386.1*
 %{_mandir}/man1/qemu-system-x86_64.1*
-%{_mandir}/man1/qemu-kvm.1*
 %endif
 %{_datadir}/%{name}/kvmvapic.bin
 %{_datadir}/%{name}/linuxboot.bin
@@ -3475,6 +3475,10 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 %{_datadir}/%{name}/qboot.rom
 %if %{need_qemu_kvm}
 %{_bindir}/qemu-kvm
+%if ! %{azl}
+%{_mandir}/man1/qemu-kvm.1*
+%endif
+%endif
 %endif
 
 
