@@ -9,9 +9,9 @@ URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
 # $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_azl_sources_url}/%{name}-%{version}.tar.gz
 #http://neugierig.org/software/ruby/ruby-enscript.tar.gz
-Source1: %{_mariner_sources_url}/%{name}-ruby-1.6.4.tar.gz
+Source1: %{_azl_sources_url}/%{name}-ruby-1.6.4.tar.gz
 #http://home.raxnet.net/downloads/viewcvs/php.st
 Source2: enscript-php-1.6.4.st
 

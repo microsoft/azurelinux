@@ -32,7 +32,7 @@ URL:            https://code.google.com/archive/p/jsr-305
 #   svn export -r %{svn_revision} http://%{name}.googlecode.com/svn/trunk %{name}
 #   tar -czvf %{name}-%{svn_date}svn.tgz %{name}
 # Source0:      https://storage.googleapis.com/google-code-archive-source/v2/code.google.com/jsr-305/source-archive.zip
-Source0:        %{_mariner_sources_url}/jsr-305-%{svn_date}svn.tgz
+Source0:        %{_azl_sources_url}/jsr-305-%{svn_date}svn.tgz
 Source1:        jsr-305-ri-build.xml
 # File containing URL to CC-BY license text
 Source2:        NOTICE-CC-BY.txt

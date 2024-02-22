@@ -6,7 +6,7 @@ License:       GPL+
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
 Group:         System Environment/Base
-Source:        %{_mariner_sources_url}/rt-setup-%{version}.tar.bz2
+Source:        %{_azl_sources_url}/rt-setup-%{version}.tar.bz2
 Patch0:        no-annobin.patch
 ExclusiveArch: x86_64
 Requires:      /usr/sbin/groupadd

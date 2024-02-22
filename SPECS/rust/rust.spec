@@ -111,7 +111,7 @@ sh ./configure \
     --enable-extended \
     --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
-    --release-description="CBL-Mariner %{version}-%{release}"
+    --release-description="Azure Linux %{version}-%{release}"
 
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
@@ -123,8 +123,8 @@ USER=root SUDO_USER=root %make_build
 mkdir -p .github/workflows
 ./x.py run src/tools/expand-yaml-anchors
 
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
 rm -v ./tests/rustdoc-ui/issue-98690.*
 %make_build check

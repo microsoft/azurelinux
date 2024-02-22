@@ -27,7 +27,7 @@ Group:          Development/Libraries/Java
 URL:            http://jsoup.org/
 # ./generate-tarball.sh
 # The sources contain non-free scraped web pages as test data
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.xml
 Source100:      generate-tarball.sh
 BuildRequires:  ant

@@ -281,7 +281,7 @@ autoconf -f -I config-scripts
 export CC=%{__cc}
 export CXX=%{__cxx}
 # add Mariner specific flags to DSOFLAGS
-export DSOFLAGS="$DSOFLAGS -L../cgi-bin -L../filter -L../ppdc -L../scheduler -Wl,-z,relro -Wl,-z,now -specs=%{_libdir}/rpm/mariner/default-hardened-ld -Wl,-z,relro,-z,now -fPIE -pie"
+export DSOFLAGS="$DSOFLAGS -L../cgi-bin -L../filter -L../ppdc -L../scheduler -Wl,-z,relro -Wl,-z,now -specs=%{_libdir}/rpm/azl/default-hardened-ld -Wl,-z,relro,-z,now -fPIE -pie"
 export CFLAGS="%{optflags} -fstack-protector-all -DLDAP_DEPRECATED=1"
 # --enable-debug to avoid stripping binaries
 %configure --with-docdir=%{_datadir}/%{name}/www --enable-debug \

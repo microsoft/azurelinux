@@ -63,7 +63,7 @@
 %undefine _package_note_file
 
 # Skip module metadata notes for perl due to issue with embedded build ldflags
-%undefine mariner_module_ldflags
+%undefine azl_module_ldflags
 
 Name:           perl
 # These are all found licenses. They are distributed among various
@@ -472,9 +472,9 @@ Recommends:     perl-doc = %{perl_version}-%{release}
 Requires:       perl(Devel::PPPort)
 # Compiler and linker options stored into perl and used when building XS
 # modules refer to hardening profiles like
-# /usr/lib/rpm/mariner/default-hardened-cc1 that are delivered by
-# mariner-rpm-macros. Bug #1557667.
-Requires:       mariner-rpm-macros
+# /usr/lib/rpm/azl/default-hardened-cc1 that are delivered by
+# azl-rpm-macros. Bug #1557667.
+Requires:       azl-rpm-macros
 
 %if %{defined perl_bootstrap}
 Requires:       %perl_compat

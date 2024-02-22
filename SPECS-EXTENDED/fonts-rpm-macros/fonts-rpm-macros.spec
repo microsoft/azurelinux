@@ -2,12 +2,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # SPDX-License-Identifier: MIT
 %global forgeurl https://pagure.io/fonts-rpm-macros
-Epoch: 1
 Version: 2.0.5
 %forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
-%global _spectemplatedir %{_datadir}/rpmdevtools/mariner
+%global _spectemplatedir %{_datadir}/rpmdevtools/azl
 %global _docdir_fmt     %{name}
 %global ftcgtemplatedir %{_datadir}/fontconfig/templates
 
@@ -23,14 +22,14 @@ Version: 2.0.5
 BuildArch: noarch
 
 Name:      fonts-rpm-macros
-Release:   11%{?dist}
+Release:   12%{?dist}
 Summary:   Build-stage rpm automation for fonts packages
 
 License:   GPL-3.0-or-later
 URL:       https://docs.fedoraproject.org/en-US/packaging-guidelines/FontsPolicy/
 Source:    %{forgesource}
 Patch0:    %{name}-omit-foundry-in-family.patch
-Patch1:    update_for_mariner.patch
+Patch1:    update_for_azl.patch
 
 Requires:  fonts-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:  fonts-filesystem  = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -118,12 +117,12 @@ install -m 0644 -vp   templates/fontconfig/*{conf,txt} \
 install -m 0755 -vd   %{buildroot}%{rpmmacrodir}
 install -m 0644 -vp   rpm/macros.d/macros.fonts-* \
                       %{buildroot}%{rpmmacrodir}
-install -m 0755 -vd   %{buildroot}%{_rpmluadir}/mariner/srpm
+install -m 0755 -vd   %{buildroot}%{_rpmluadir}/azl/srpm
 install -m 0644 -vp   rpm/lua/srpm/*lua \
-                      %{buildroot}%{_rpmluadir}/mariner/srpm
-install -m 0755 -vd   %{buildroot}%{_rpmluadir}/mariner/rpm
+                      %{buildroot}%{_rpmluadir}/azl/srpm
+install -m 0755 -vd   %{buildroot}%{_rpmluadir}/azl/rpm
 install -m 0644 -vp   rpm/lua/rpm/*lua \
-                      %{buildroot}%{_rpmluadir}/mariner/rpm
+                      %{buildroot}%{_rpmluadir}/azl/rpm
 
 install -m 0755 -vd   %{buildroot}%{_bindir}
 install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
@@ -132,13 +131,13 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 %license LICENSE.txt
 %{_bindir}/*
 %{rpmmacrodir}/macros.fonts-rpm*
-%{_rpmluadir}/mariner/rpm/*.lua
+%{_rpmluadir}/azl/rpm/*.lua
 
 %files -n fonts-srpm-macros
 %license LICENSE.txt
 %doc     *.md changelog.txt
 %{rpmmacrodir}/macros.fonts-srpm*
-%{_rpmluadir}/mariner/srpm/*.lua
+%{_rpmluadir}/azl/srpm/*.lua
 
 %files -n fonts-filesystem
 %dir %{_datadir}/fontconfig

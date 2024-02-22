@@ -121,11 +121,11 @@ BuildRequires:  xfsprogs-devel
 BuildRequires:  xmlstarlet
 BuildRequires:  yasm
 
+BuildRequires:  azl-rpm-macros
 BuildRequires:  CUnit-devel
 BuildRequires:  boost
 BuildRequires:  cmake > 3.5
 BuildRequires:  librdmacm-devel
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  procps-ng

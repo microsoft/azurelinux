@@ -28,10 +28,10 @@ BuildRequires:  util-linux
 %if %{with_check}
 BuildRequires:  diffutils
 %endif
-# ocamlopt runs gcc to link binaries.  Because Mariner includes
-# hardening flags automatically, mariner-rpm-macros is also required.
+# ocamlopt runs gcc to link binaries.  Because Azure Linux includes
+# hardening flags automatically, azl-rpm-macros is also required.
+Requires:       azl-rpm-macros
 Requires:       gcc
-Requires:       mariner-rpm-macros
 # Because we pass -c flag to ocaml-find-requires (to avoid circular
 # dependencies) we also have to explicitly depend on the right version
 # of ocaml-runtime.
@@ -114,7 +114,7 @@ autoconf --force
 #
 # OC_CFLAGS/OC_LDFLAGS control what flags OCaml passes to the linker
 # when doing final linking of OCaml binaries.  Setting these is
-# necessary to ensure that generated binaries have Mariner hardening
+# necessary to ensure that generated binaries have Azure Linux hardening
 # features.
 %configure \
     OC_CFLAGS="$CFLAGS" \

@@ -7,7 +7,7 @@ Version: 0.%{upstreamid}
 Release: 25%{?dist}
 # Source URL is dead now
 # Source: http://download.github.com/nagybence-huhyphn-aa3fc85.tar.gz
-Source: %{_mariner_sources_url}/nagybence-huhyphn-aa3fc85.tar.gz
+Source: %{_azl_sources_url}/nagybence-huhyphn-aa3fc85.tar.gz
 URL: http://www.tipogral.hu/
 License: GPLv2
 BuildArch: noarch

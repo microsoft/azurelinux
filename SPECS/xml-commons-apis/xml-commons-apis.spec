@@ -28,7 +28,7 @@ Distribution:   Azure Linux
 URL:            https://xml.apache.org/commons/
 # From source control because the published tarball doesn't include some docs:
 #   toolkit/scripts/svn2source.sh https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-%%{underscore_version}/java/external %%{name}-%%{version}
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-MANIFEST.MF
 Source2:        %{name}-ext-MANIFEST.MF
 Source3:        https://repo1.maven.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom

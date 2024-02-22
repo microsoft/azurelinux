@@ -19,20 +19,20 @@ Azure Linux release files such as yum configs and other %{_sysconfdir}/ release 
 install -d %{buildroot}%{_sysconfdir}
 install -d %{buildroot}/%{_libdir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
+echo "Azure Linux %{azl_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
 echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
 DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{mariner_release_version}"
+DISTRIB_RELEASE="%{azl_release_version}"
 DISTRIB_CODENAME=AzureLinux
-DISTRIB_DESCRIPTION="Microsoft Azure Linux %{mariner_release_version}"
+DISTRIB_DESCRIPTION="Microsoft Azure Linux %{azl_release_version}"
 EOF
 
-version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
+version_id=`echo %{azl_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
 cat > %{buildroot}/%{_libdir}/os-release << EOF
 NAME="Microsoft Azure Linux"
-VERSION="%{mariner_release_version}"
+VERSION="%{azl_release_version}"
 ID=azurelinux
 VERSION_ID="$version_id"
 PRETTY_NAME="Microsoft Azure Linux $version_id"
@@ -45,11 +45,11 @@ EOF
 ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch}) - (\l)
+Welcome to Azure Linux %{azl_release_version} (%{_arch}) - (\l)
 EOF
 
 cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch})
+Welcome to Azure Linux %{azl_release_version} (%{_arch})
 EOF
 
 %files

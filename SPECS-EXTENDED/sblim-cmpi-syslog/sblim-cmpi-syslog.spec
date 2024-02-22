@@ -13,7 +13,7 @@ URL:            http://sourceforge.net/projects/sblim/
 #  cvs -z3 -d:pserver:anonymous@sblim.cvs.sourceforge.net:/cvsroot/sblim co -P cmpi-syslog
 #  mv cmpi-syslog sblim-cmpi-syslog-0.8.0
 #  tar -cJvf sblim-cmpi-syslog-0.8.0.tar.xz sblim-cmpi-syslog-0.8.0
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.bz2
+Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.bz2
 
 # use Pegasus' root/interop instead of root/PG_Interop
 Patch0:         sblim-cmpi-syslog-0.9.0-pegasus-interop.patch

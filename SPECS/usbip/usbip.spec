@@ -16,7 +16,7 @@ URL:		   https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # The kernel modules require working USB and there's no USB for s390x
 # See bug #1483403
 ExcludeArch:       s390x
-Source:		   %{_mariner_sources_url}/usbip-%{version}.tar.xz
+Source:		   %{_azl_sources_url}/usbip-%{version}.tar.xz
 Source1:	   usbip-server.service
 Source2:	   usbip-client.service
 Source99:	   extract_usbip.sh

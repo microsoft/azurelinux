@@ -50,7 +50,7 @@ name server. It requires a PKCS#11 crypto module library, such as softhsm
 sed -i "s/1024/2048/" conf/kasp.xml.in
 
 %build
-export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/mariner/default-hardened-ld"
+export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/azl/default-hardened-ld"
 export CFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wextra -Wformat -Wformat-nonliteral -Wformat-security"
 export CXXFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wformat-nonliteral -Wformat-security"
 %if 0%{?prever:1}

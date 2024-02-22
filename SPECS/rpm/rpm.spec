@@ -75,6 +75,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 Summary:        Binaries, scripts and libraries needed to build rpms.
 Requires:       %{name}-build-libs = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
+Requires:       azl-rpm-macros >= 2.0-22
 Requires:       bzip2
 Requires:       cpio
 Requires:       debugedit
@@ -84,7 +85,6 @@ Requires:       elfutils-libelf
 Requires:       file
 Requires:       gzip
 Requires:       lua
-Requires:       mariner-rpm-macros >= 2.0-22
 Requires:       patch
 Requires:       sed
 Requires:       tar

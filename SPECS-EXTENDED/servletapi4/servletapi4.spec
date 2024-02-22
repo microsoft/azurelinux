@@ -26,7 +26,7 @@ Summary:        Java servlet and JSP implementation classes
 License:        ASL 1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
-Source0:        %{_mariner_sources_url}/%{full_name}-4-src.tar.gz
+Source0:        %{_azl_sources_url}/%{full_name}-4-src.tar.gz
 Patch160:       java160_build.patch
 BuildRequires:  ant
 BuildRequires:  ant >= 1.2

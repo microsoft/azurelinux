@@ -12,7 +12,7 @@ URL: http://splix.sourceforge.net/
 # This is a SVN snapshot downloaded via 'Download Snapshot' from
 # https://sourceforge.net/p/splix/code/315/tree/
 # and renamed to follow naming guidelines
-Source0: %{_mariner_sources_url}/%{name}-%{version}.%{checkout}.tar.bz2
+Source0: %{_azl_sources_url}/%{name}-%{version}.%{checkout}.tar.bz2
 
 # IEEE 1284 Device IDs
 Patch0:  splix-deviceID.patch

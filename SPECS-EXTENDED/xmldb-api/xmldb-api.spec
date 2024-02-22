@@ -28,7 +28,7 @@ License:        Apache-1.1
 Url:            http://xmldb-org.sourceforge.net
 # cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org login
 # cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org export -D 2004-10-10 xapi
-Source0:        %{_mariner_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
+Source0:        %{_azl_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
 Patch0:         xmldb-api-java5-enum.patch
 BuildRequires:  ant >= 1.6
 BuildRequires:  javapackages-tools

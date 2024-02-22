@@ -37,12 +37,12 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
+BuildRequires:  azl-rpm-macros
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libnuma-devel
 BuildRequires:  libpcap-devel
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  meson
 BuildRequires:  python3-pyelftools
 BuildRequires:  python3-sphinx

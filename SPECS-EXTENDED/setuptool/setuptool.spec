@@ -6,7 +6,7 @@ Release: 22%{?dist}
 Summary: A text mode system configuration tool
 License: GPLv2+
 Url: http://git.fedorahosted.org/git/?p=setuptool.git
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_azl_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires: newt-devel
 BuildRequires: gettext
 BuildRequires: perl-XML-Parser

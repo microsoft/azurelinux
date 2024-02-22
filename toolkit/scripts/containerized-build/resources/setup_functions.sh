@@ -15,7 +15,7 @@ IS_REPO_ENABLED=false
 ## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
-for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+for macro_file in "$SPECS_DIR"/azl-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done

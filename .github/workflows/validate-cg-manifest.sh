@@ -42,7 +42,7 @@ ignore_no_source_tarball=" \
   livepatching \
   lua-rpm-macros \
   mariner-repos \
-  mariner-rpm-macros \
+  azl-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \
@@ -112,7 +112,7 @@ function specs_dir_from_spec_path {
   # Assuming we always check specs inside CBL-Mariner's core GitHub repository.
   # If that's the case, the spec paths will always have the following form:
   #     [repo_directory_path]/[specs_directory]/[package_name]/[package_spec_files]
-  echo "$(realpath "$(dirname "$1")/../../SPECS")/mariner-rpm-macros"
+  echo "$(realpath "$(dirname "$1")/../../SPECS")/azl-rpm-macros"
 }
 
 rm -f bad_registrations.txt

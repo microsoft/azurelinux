@@ -1,5 +1,5 @@
 cmake
 lua
-mariner-rpm-macros
+azl-rpm-macros
 rpm
 rpm-libs

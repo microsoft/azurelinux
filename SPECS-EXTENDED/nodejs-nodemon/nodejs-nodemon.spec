@@ -12,7 +12,7 @@ Release:       4%{?dist}
 Summary:       Simple monitor script for use during development of a node.js app
 License:       MIT
 URL:           https://github.com/remy/nodemon
-Source0:       %{_mariner_sources_url}/%{npm_name}-v%{version}-bundled.tar.gz
+Source0:       %{_azl_sources_url}/%{npm_name}-v%{version}-bundled.tar.gz
 
 BuildRequires: nodejs-devel
 BuildRequires: nodejs-packaging

@@ -35,7 +35,7 @@ URL:            http://jtidy.sourceforge.net/
 # svn export -r813 http://svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
 # # bnc#501764
 # rm jtidy/src/config/clover.license
-Source0:        %{_mariner_sources_url}/jtidy-r813.tar.bz2
+Source0:        %{_azl_sources_url}/jtidy-r813.tar.bz2
 Source1:        %{name}.jtidy.script
 Source2:        build.xml
 Source3:        maven-build.properties

@@ -8,7 +8,7 @@ License:	LGPLv2.1
 URL:		https://github.com/williamh/dotconf/
 # Upstream source's hash different from the Mariner one.
 # Source: https://github.com/williamh/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source:		%{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source:		%{_azl_sources_url}/%{name}-%{version}.tar.gz
  
 BuildRequires:	findutils
 BuildRequires:	gcc

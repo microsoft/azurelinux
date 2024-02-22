@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.ibr.cs.tu-bs.de/projects/libsmi/index.html
 #Upstream Source0 url is dead
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
 Source1:        smi.conf
 Source2:        IETF-MIB-LICENSE.txt
 Patch0:         libsmi-0.4.8-wget111.patch

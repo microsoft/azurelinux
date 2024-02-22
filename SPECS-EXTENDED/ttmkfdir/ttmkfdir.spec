@@ -9,7 +9,7 @@ License: LGPLv2+
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.bz2
+Source0: %{_azl_sources_url}/%{name}-%{version}.tar.bz2
 Source1: %{name}-LICENSE.txt
 Patch: ttmkfdir-3.0.9-cpp.patch
 Patch1: ttmkfdir-3.0.9-zlib.patch

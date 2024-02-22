@@ -1,10 +1,10 @@
-%global rcdir %{_libdir}/rpm/mariner
-%global rcluadir %{_libdir}/rpm/lua/mariner
+%global rcdir %{_libdir}/rpm/azl
+%global rcluadir %{_libdir}/rpm/lua/azl
 # Turn off auto byte compilation since when building this spec in the toolchain the needed scripts are not installed yet.
 # __brp_python_bytecompile
 %global __brp_python_bytecompile %{nil}
-Summary:        Mariner specific rpm macro files
-Name:           mariner-rpm-macros
+Summary:        Azure Linux specific rpm macro files
+Name:           azl-rpm-macros
 Version:        2.0
 Release:        24%{?dist}
 License:        GPL+ AND MIT
@@ -51,17 +51,24 @@ Provides:       python-srpm-macros
 Provides:       python-rpm-macros
 Provides:       python3-rpm-macros
 Provides:       rust-srpm-macros
+
+Obsoletes:      mariner-rpm-macros <= 2.0-24
+Provides:       mariner-rpm-macros = %{version}-%{release}
+
 BuildArch:      noarch
 
 %description
-Mariner specific rpm macro files.
+Azure Linux specific rpm macro files.
 
-%package -n mariner-check-macros
-Summary:        Mariner specific rpm macros to override default %%check behavior
+%package -n azl-check-macros
+Summary:        Azure Linux specific rpm macros to override default %%check behavior
 Group:          Development/System
 
-%description -n mariner-check-macros
-Mariner specific rpm macros to override default %%check behavior
+Obsoletes:      mariner-check-macros <= 2.0-24
+Provides:       mariner-check-macros = %{version}-%{release}
+
+%description -n azl-check-macros
+Azure Linux specific rpm macros to override default %%check behavior
 
 %prep
 %setup -q -c -T
@@ -121,7 +128,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
 
-%files -n mariner-check-macros
+%files -n azl-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog

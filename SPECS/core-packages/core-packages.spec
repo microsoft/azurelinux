@@ -32,7 +32,7 @@ Requires:       iputils
 Requires:       irqbalance
 Requires:       lvm2
 Requires:       lz4
-Requires:       mariner-rpm-macros
+Requires:       azl-rpm-macros
 Requires:       net-tools
 Requires:       openssh-clients
 Requires:       pkg-config

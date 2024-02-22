@@ -28,7 +28,7 @@ Group:          Development/Libraries/Java
 Url:            http://tomcat.apache.org/taglibs/
 # Need to switch to upstream's source tarball:
 # https://archive.apache.org/dist/jakarta/taglibs/standard/source/jakarta-taglibs-standard-1.1.1-src.tar.gz
-Source0:        %{_mariner_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2
+Source0:        %{_azl_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2
 Patch0:         %{name}-%{version}-build.patch
 Patch1:         %{name}-java6-compatibility.patch
 Patch2:         %{name}-%{version}-remove-enums.patch

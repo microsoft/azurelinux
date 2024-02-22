@@ -311,7 +311,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 
 func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
 	const (
-		chrootRpmBuildDir = "/usr/src/mariner/RPMS"
+		chrootRpmBuildDir = "/usr/src/azl/RPMS"
 		rpmExtension      = ".rpm"
 	)
 

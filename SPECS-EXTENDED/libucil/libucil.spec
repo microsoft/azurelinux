@@ -6,7 +6,7 @@ License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.unicap-imaging.org/
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
 # check return value of theora_encode_init() (#627890)
 Patch0:         libucil-0.9.8-bz627890.patch
 # fix some memory leaks

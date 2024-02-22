@@ -16,7 +16,7 @@ Source3:        COPYING
 Source4:        multilib-library
 Source5:        multilib-info
 BuildRequires:  gcc
-Requires:       mariner-rpm-macros
+Requires:       azl-rpm-macros
 BuildArch:      noarch
 
 %description
