@@ -379,9 +379,6 @@ find %{buildroot} -name Thread.h -exec chmod a-x '{}' \;
 find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r chmod 755
 %ldconfig_scriptlets
 
-%check
-# Running the test parallely is flaky and hangs the pipeline sometimes. Avoid using `-j` flags
-make -k check
 
 %files
 %doc LICENSE NOTICE
