@@ -10280,6 +10280,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libnvme",
+          "version": "1.8",
+          "downloadUrl": "https://github.com/linux-nvme/libnvme/archive/refs/tags/v1.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "liboauth",
           "version": "1.0.3",
           "downloadUrl": "http://downloads.sourceforge.net/liboauth/liboauth-1.0.3.tar.gz"

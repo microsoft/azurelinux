@@ -9,7 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/linux-nvme/nvme-cli
 Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
-BuildRequires:  make
+BuildRequires:	meson
 Requires(post): systemd
 Requires(post): systemd-udev
 Requires(post): util-linux
@@ -18,13 +18,14 @@ Requires(post): util-linux
 NVM-Express user space tooling for Linux
 
 %prep
-%setup -q
+%autosetup -p1 -n %{name}-%{version}
 
 %build
-make CFLAGS="%{build_cflags} -std=gnu99 -I."
+%meson -Dudevrulesdir=%{_udevrulesdir} -Dsystemddir=%{_unitdir} -Dpdc-enabled=true -Ddocs=all -Ddocs-build=true -Dhtmldir=%{_pkgdocdir}
+%meson_build
 
 %install
-make install PREFIX=%{_prefix} DESTDIR=%{buildroot}
+meson install PREFIX=%{_prefix} DESTDIR=%{buildroot}
 
 %files
 %defattr(-,root,root)
