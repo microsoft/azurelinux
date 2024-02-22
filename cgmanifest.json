@@ -7881,8 +7881,8 @@
         "type": "other",
         "other": {
           "name": "json-glib",
-          "version": "1.6.6",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/json-glib-1.6.6.tar.xz"
+          "version": "1.8.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.8/json-glib-1.8.0.tar.xz"
         }
       }
     },
