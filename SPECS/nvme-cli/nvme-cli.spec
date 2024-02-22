@@ -7,9 +7,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/linux-nvme/nvme-cli
-Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz	
+BuildRequires:  asciidoc
 BuildRequires:  gcc
+BuildRequires:  json-c-devel
+BuildRequires:  libnvme-devel
 BuildRequires:	meson
+BuildRequires:  xmlto
+
 Requires(post): systemd
 Requires(post): systemd-udev
 Requires(post): util-linux
@@ -21,11 +26,11 @@ NVM-Express user space tooling for Linux
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-%meson -Dudevrulesdir=%{_udevrulesdir} -Dsystemddir=%{_unitdir} -Dpdc-enabled=true -Ddocs=all -Ddocs-build=true -Dhtmldir=%{_pkgdocdir}
+%meson -Dudevrulesdir=%{_sysconfdir}/udev/rules.d -Dsystemddir=%{_libdir}/systemd/system -Dpdc-enabled=true
 %meson_build
 
 %install
-meson install PREFIX=%{_prefix} DESTDIR=%{buildroot}
+%meson_install
 
 %files
 %defattr(-,root,root)
@@ -33,18 +38,19 @@ meson install PREFIX=%{_prefix} DESTDIR=%{buildroot}
 %{_sbindir}/nvme
 %{_datadir}/bash-completion/completions/nvme
 %{_datadir}/zsh/site-functions/_nvme
-%{_mandir}/man1/nvme*.1*
 %dir %{_sysconfdir}/nvme
 %{_sysconfdir}/nvme/hostnqn
 %{_sysconfdir}/nvme/hostid
 %{_sysconfdir}/nvme/discovery.conf
+%{_sysconfdir}/udev/rules.d/65-persistent-net-nbft.rules
 %{_sysconfdir}/udev/rules.d/70-nvmf-autoconnect.rules
-%{_sysconfdir}/udev/rules.d/71-nvmf-iopolicy-netapp.rules
+%{_sysconfdir}/udev/rules.d/71-nvmf-netapp.rules
 %{_libdir}/dracut/dracut.conf.d/*
 %{_libdir}/systemd/system/nvmf-connect@.service
 %{_libdir}/systemd/system/nvmefc-boot-connections.service
 %{_libdir}/systemd/system/nvmf-connect.target
 %{_libdir}/systemd/system/nvmf-autoconnect.service
+%{_libdir}/systemd/system/nvmf-connect-nbft.service
 
 %post
 if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time

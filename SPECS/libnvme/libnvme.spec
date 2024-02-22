@@ -52,16 +52,11 @@ This package contains Python bindings for libnvme.
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-%meson -Dpython=enabled -Dlibdbus=enabled -Ddocs=all -Ddocs-build=true -Dhtmldir=%{_pkgdocdir}
+%meson -Dpython=enabled -Dlibdbus=enabled
 %meson_build
 
 %install
 %meson_install
-%{__install} -pm 644 README.md %{buildroot}%{_pkgdocdir}
-%{__install} -pm 644 doc/config-schema.json %{buildroot}%{_pkgdocdir}
-mv %{buildroot}%{_pkgdocdir}/nvme/html %{buildroot}%{_pkgdocdir}/html
-rm -rf %{buildroot}%{_pkgdocdir}/nvme
-mv %{buildroot}/usr/*.rst %{buildroot}%{_pkgdocdir}/
 
 %ldconfig_scriptlets
 
@@ -81,9 +76,6 @@ mv %{buildroot}/usr/*.rst %{buildroot}%{_pkgdocdir}/
 %{_includedir}/nvme/*.h
 %{_libdir}/pkgconfig/*.pc
 
-%files doc
-%doc %{_pkgdocdir}
-%{_mandir}/man2/*.2*
 
 %files -n python3-libnvme
 %dir %{python3_sitearch}/libnvme
@@ -91,7 +83,7 @@ mv %{buildroot}/usr/*.rst %{buildroot}%{_pkgdocdir}/
 
 %changelog
 * Wed Feb 21 2024 Adit Jha <aditjha@microsoft.com> - 1.8-1
-- Initial import from Fedora (verified license)
+- Initial import from Fedora (License verified)
 
 * Wed Feb 14 2024 Tomas Bzatek <tbzatek@redhat.com> - 1.8-1
 - Upstream v1.8 release
