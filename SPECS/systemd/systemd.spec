@@ -1,10 +1,4 @@
 
-# Temporary until azure-release-common is updated to carry macros.dist that defines %azure
-%if %{defined azure}
-%{error:Once azure macro is defined in macros.dist, please remove this}
-%endif
-%global azure 3
-
 # We ship a .pc file but don't want to have a dep on pkg-config. We
 # strip the automatically generated dep here and instead co-own the
 # directory.
@@ -56,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        6%{?dist}
+Release:        7%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -266,8 +260,8 @@ Requires:       %{name}-pam%{_isa} = %{version}-%{release}
 #Requires(meta): (%%{name}-rpm-macros = %%{version}-%%{release} if rpm-build)
 Requires(meta): %{name}-rpm-macros = %{version}-%{release}
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
-%{?azure:Recommends:     %{name}-networkd = %{version}-%{release}}
-%{?azure:Recommends:     %{name}-resolved = %{version}-%{release}}
+Recommends:     %{name}-networkd = %{version}-%{release}
+Recommends:     %{name}-resolved = %{version}-%{release}
 Recommends:     diffutils
 # FIXME - our toolkit can't handle logical deps like this
 #Requires:       (util-linux-core or util-linux)
@@ -277,7 +271,7 @@ Provides:       /bin/systemctl
 Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
-%{?azure:Obsoletes:      systemd-bootstrap <= %{version}-%{release}}
+Obsoletes:      systemd-bootstrap <= %{version}-%{release}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -364,7 +358,7 @@ Systemd PAM module registers the session with systemd-logind.
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
-%{?azure:Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}}
+Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -383,7 +377,7 @@ Requires(meta): %{name}-rpm-macros = %{version}-%{release}
 Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
-%{?azure:Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}}
+Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
@@ -1192,6 +1186,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
+- remove use of %%azure (or %%azl) macro
+
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6
 - skip sm3 digest in test-openssl, we dont provide that digest
 
