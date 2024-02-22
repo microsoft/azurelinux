@@ -51,10 +51,6 @@ Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
 %endif
 
 
-%global luarocks_package_name luarocks
-%bcond_without lua_packages
-%global _remote_tarball_prefix https://download.ceph.com/tarballs/
-
 
 %{!?_udevrulesdir: %global _udevrulesdir /lib/udev/rules.d}
 %{!?tmpfiles_create: %global tmpfiles_create systemd-tmpfiles --create}
@@ -199,7 +195,6 @@ BuildRequires:  librdkafka-devel
 
 %if 0%{with lua_packages}
 Requires:  lua-devel
-Requires:  %{luarocks_package_name}
 %endif
 
 %if 0%{with make_check}
@@ -392,7 +387,6 @@ of cluster membership, configuration, and state.
 %package mgr
 Summary:        Ceph Manager Daemon
 Requires:       ceph-base = %{version}-%{release}
-Requires:       ceph-mgr-modules-core = %{version}-%{release}
 
 %description mgr
 ceph-mgr enables python modules that provide services (such as the REST
@@ -554,7 +548,6 @@ Provides:   ceph-test:/usr/bin/ceph-osdomap-tool
 Requires:   ceph-base = %{version}-%{release}
 Requires:   lvm2
 Requires:   sudo
-Requires:   libstoragemgmt
 
 %description osd
 ceph-osd is the object storage daemon for the Ceph distributed file
