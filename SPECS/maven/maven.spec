@@ -13,7 +13,7 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.9.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -157,6 +157,9 @@ echo JAVA_HOME=%{_lib}/jvm/msopenjdk-17 >%{buildroot}%{_sysconfdir}/java/maven.c
 %config /etc/java/maven.conf-openjdk17
 
 %changelog
+* Thu Feb 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.9.6-2
+- Use msopenjdk-17
+
 * Fri Jan 12 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.9.6-1
 - Upgrade to 3.9.6
 
