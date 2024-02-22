@@ -181,6 +181,7 @@ ods-enforcer update all >/dev/null 2>/dev/null ||:
 %changelog
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-5
 - Updating naming for 3.0 version of Azure Linux.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
