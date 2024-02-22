@@ -1,13 +1,13 @@
 Summary:        A configurable sidebar-enabled Sphinx theme
 Name:           python-sphinx-theme-alabaster
-Version:        0.7.12
+Version:        0.7.16
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/bitprophet/alabaster/
-Source0:        https://files.pythonhosted.org/packages/cc/b4/ed8dcb0d67d5cfb7f83c4d5463a7614cb1d078ad7ae890c9143edebbf072/alabaster-%{version}.tar.gz
+Source0:        https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/%{version}
 BuildArch:      noarch
 
 %description
@@ -39,6 +39,9 @@ Alabaster is a visually (c)lean, responsive, configurable theme for the Sphinx d
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 21 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 0.7.16-1
+- Upgrade to 0.7.16 as part of Mariner 3.0 package upgrades.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.12-1
 - Updating to version 0.7.12.
 - Removed invalid '%%check' section.
