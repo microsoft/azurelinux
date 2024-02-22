@@ -44,7 +44,7 @@ Various scripts from the psutils distribution that require perl.
 %prep
 %setup -q
 
-%patch0 -p1 -b .paperconf
+%patch 0 -p1 -b .paperconf
 # Use /usr/bin/perl instead of /usr/bin/env perl
 sed -i -e 's,/usr/bin/env perl,%{__perl},' \
   extractres psjoin

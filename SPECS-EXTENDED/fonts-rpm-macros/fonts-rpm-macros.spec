@@ -99,8 +99,8 @@ for template in templates/rpm/*\.spec ; do
   grep -v '^%%dnl' "${template}" > "${target}"
   touch -r "${template}" "${target}"
 done
-%patch0 -p1 -b .1-omit-foundry-in-family
-%patch1 -p1
+%patch 0 -p1 -b .1-omit-foundry-in-family
+%patch 1 -p1
 
 %install
 install -m 0755 -d    %{buildroot}%{_fontbasedir} \

@@ -37,7 +37,7 @@ develop programs that use the Intel Processor Trace (Intel PT) Decoder Library.
 
 %prep
 %setup -q -n libipt-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo \

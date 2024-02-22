@@ -19,7 +19,7 @@ for controlling your sound card.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure --disable-alsaconf --disable-xmlto

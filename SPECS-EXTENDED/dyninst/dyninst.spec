@@ -87,11 +87,11 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b.result
-%patch2 -p1 -b.gettid
-%patch3 -p1 -b.386
-%patch4 -p1 -b.aarch
-%patch5 -p1
+%patch 1 -p1 -b.result
+%patch 2 -p1 -b.gettid
+%patch 3 -p1 -b.386
+%patch 4 -p1 -b.aarch
+%patch 5 -p1
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551

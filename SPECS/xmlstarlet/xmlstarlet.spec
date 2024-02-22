@@ -32,7 +32,7 @@ commands.
 
 %prep
 %setup -q
-%patch0 -p1 -b .nogit
+%patch 0 -p1 -b .nogit
 
 
 %build

@@ -288,13 +288,13 @@ do
   tar -xf "${source}"
 done
 
-%patch0 -p1
+%patch 0 -p1
 pushd "downstream/commons-compress"
-%patch1 -p1 
+%patch 1 -p1 
 popd
 
 pushd "downstream/plexus-archiver"
-%patch2 -p1 
+%patch 2 -p1 
 popd
 
 for patch_path in patches/*/*
