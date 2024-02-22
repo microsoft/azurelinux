@@ -27,14 +27,11 @@ Source:         https://gitlab.gnome.org/GNOME/%{name}/-/archive/%{version}/%{na
 BuildRequires:  fdupes
 BuildRequires:  meson >= 0.59.0
 BuildRequires:  pkgconfig
-BuildRequires:  sassc
+BuildRequires:  libsass-devel
 BuildRequires:  vala
-BuildRequires:  libappstream-glib
 BuildRequires:  fribidi-devel
-BuildRequires:  gi-docgen
 BuildRequires:  pkgconfig(glib-2.0) >= 2.72
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  pkgconfig(gtk4) >= 4.11.3
 
 %description
 Building blocks for modern GNOME applications.
@@ -79,7 +76,8 @@ This package provides the GObject Introspection bindings for libadwaita.
 %meson \
 	-Dexamples=false \
 	-Dintrospection=enabled \
-	-Dgtk_doc=true \
+	-Dgtk_doc=disabled \
+	-Dman=true \
 	%{nil}
 %meson_build
 
@@ -113,3 +111,4 @@ This package provides the GObject Introspection bindings for libadwaita.
 - Bring in v1.4.3 version of libadwaita into Mariner
 - Required for rest package.
 - Remove the creation of the lang packages
+- Disabled docs until gi-docgen is a supported package
