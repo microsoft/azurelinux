@@ -1,5 +1,5 @@
-# To enable DPDK support, specify '--with dpdk' when building
-%bcond_with dpdk
+# To disable DPDK support, specify '--without dpdk' when building
+%bcond_without dpdk
 
 %bcond_without afxdp
 
