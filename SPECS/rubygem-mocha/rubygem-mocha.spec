@@ -1,15 +1,14 @@
 %global gem_name mocha
 Summary:        Mocking and stubbing library
 Name:           rubygem-mocha
-Version:        1.13.0
-Release:        4%{?dist}
+Version:        2.1.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://mocha.jamesmead.org/
 Source0:        https://github.com/freerange/mocha/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         remove-missing-devdeps.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(mocha) = %{version}-%{release}
@@ -38,6 +37,9 @@ cp COPYING.md %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.0-1
+- Auto-upgrade to 2.1.0 - azl3.0
+
 * Thu Apr 21 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.0-4
 - Cleanup
 
