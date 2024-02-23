@@ -1,6 +1,9 @@
+# Temporary define azl
+%global azl 3
+
 Name:           rpmdevtools
 Version:        9.6
-Release:        7%{?dist}
+Release:        1%{?dist}
 Summary:        RPM Development Tools
 
 # rpmdev-md5 and rpmdev-setuptree are GPL-2.0-only,
@@ -10,6 +13,7 @@ URL:            https://pagure.io/rpmdevtools
 Source0:        https://releases.pagure.org/rpmdevtools/%{name}-%{version}.tar.xz
 Source1:        progressbar.py
 
+%if ! 0%{?azl}
 # Fedora-specific downstream patches
 ## Force legacy datestamp by default until rhbz#1715412 is resolved
 Patch1001:      0001-Force-legacy-datestamp-while-RHBZ-1715412-is-still-a.patch
@@ -17,6 +21,7 @@ Patch1001:      0001-Force-legacy-datestamp-while-RHBZ-1715412-is-still-a.patch
 # RHEL-specific downstream patches
 ## Remove fakeroot dependency (rhbz#1905465)
 Patch2001:      rpmdevtools-9.5-no_qa_robot.patch
+%endif
 
 BuildArch:      noarch
 # help2man, pod2man, *python for creating man pages
@@ -27,13 +32,15 @@ BuildRequires:  perl-generators
 # python dependencies for spectool
 # spectool is executed for creating man page
 BuildRequires:  python3-devel
-%if ! 0%{?rhel}
+%if ! 0%{?rhel} && ! 0%{?azl}
 BuildRequires:  python3dist(progressbar2)
 %endif
 BuildRequires:  python3dist(requests)
 BuildRequires:  python3dist(rpm)
+%if ! 0%{?azl}
 # emacs-common >= 1:22.3-3 for macros.emacs
 BuildRequires:  emacs-common >= 1:22.3-3
+%endif
 BuildRequires:  bash-completion
 Requires:       curl
 Requires:       diffutils
@@ -45,19 +52,24 @@ Requires:       findutils
 Requires:       gawk
 Requires:       grep
 Requires:       rpm-build >= 4.4.2.3
+%if ! 0%{?azl}
+# azl currently does not  have argcomplete, but it is optional.
 Requires:       python3dist(argcomplete)
-%if ! 0%{?rhel}
+%endif
+%if ! 0%{?rhel} && ! 0%{?azl}
 Requires:       python3dist(progressbar2)
 %endif
 Requires:       python3dist(requests)
 Requires:       python3dist(rpm)
 Requires:       sed
-Requires:       emacs-filesystem
+%if ! 0%{?azl}
+Requires:       emacs-filesystem}
+%endif
 # Optionally support rpmautospec
 Recommends:     python%{python3_version}dist(rpmautospec)
 
 %description
-This package contains scripts and Emacs support files to aid in
+This package contains scripts %{!?azl: and Emacs support files} to aid in
 development of RPM packages.
 rpmdev-setuptree    Create RPM build tree within user's home directory
 rpmdev-diff         Diff contents of two archives
@@ -80,7 +92,7 @@ rpmdev-bumpspec     Bump revision in specfile
 grep -lF "%{_bindir}/python " * \
 | xargs sed -i -e "s|%{_bindir}/python |%{_bindir}/python3 |"
 
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?azl}
 # Let spectool find the bundled progressbar2 implementation
 cp %{SOURCE1} .
 sed -i \
@@ -104,21 +116,30 @@ echo %%{_datadir}/bash-completion > %{name}.files
 [ -d %{buildroot}%{_sysconfdir}/bash_completion.d ] && \
 echo %%{_sysconfdir}/bash_completion.d > %{name}.files
 
+%if ! 0%{?azl}
 for dir in %{_emacs_sitestartdir} ; do
   install -dm 755 %{buildroot}$dir
   ln -s %{_datadir}/rpmdevtools/rpmdev-init.el %{buildroot}$dir
   touch %{buildroot}$dir/rpmdev-init.elc
 done
+%endif
 
 # For backwards compatibility
 ln -sr %{buildroot}%{_bindir}/rpmdev-spectool %{buildroot}%{_bindir}/spectool
 echo ".so man1/rpmdev-spectool.1" > %{buildroot}%{_mandir}/man1/spectool.1
 
-%if 0%{?rhel}
+%if 0%{?rhel} || 0%{?azl}
 cp %{SOURCE1} %{buildroot}%{_datadir}/rpmdevtools/
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/rpmdevtools/
 %endif
 
+%check
+check_ok=true
+# Skip rpmdev-checksig, rpmdev-wipetree since they have no help section
+for tool in rpmargs rpmdev-bumpspec rpmdev-cksum rpmdev-diff rpmdev-extract rpmdev-md5 rpmdev-newinit rpmdev-newspec rpmdev-packager rpmdev-rmdevelrpms rpmdev-setuptree rpmdev-sha1 rpmdev-sha224 rpmdev-sha256 rpmdev-sha384 rpmdev-sha512 rpmdev-sort rpmdev-spectool rpmdev-sum rpmdev-vercmp rpmelfsym rpmfile rpminfo rpmls rpmpeek rpmsodiff rpmsoname spectool; do
+  %{buildroot}/%{_bindir}/$tool -h > /dev/null || %{buildroot}/%{_bindir}/$tool --help || check_ok=false
+done
+$check_ok
 
 %files -f %{name}.files
 %license COPYING
@@ -126,81 +147,28 @@ cp %{SOURCE1} %{buildroot}%{_datadir}/rpmdevtools/
 %config(noreplace) %{_sysconfdir}/rpmdevtools/
 %{_datadir}/rpmdevtools/
 %{_bindir}/*
+%if 0%{?rhel}
 %{_emacs_sitestartdir}/rpmdev-init.el
 %ghost %{_emacs_sitestartdir}/rpmdev-init.elc
+%endif
 %{_mandir}/man[18]/*.[18]*
 
 
 %changelog
-* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+* Tue Feb 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 9.6-1
+- Refresh from Fedora 40 (license: MIT)
 
-* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+* Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.10-13
+- License verified.
 
-* Fri Aug 25 2023 Petr Pisar <ppisar@redhat.com> - 9.6-5
-- Convert a license tag to SPDX format
+* Tue Jun 22 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.10-12
+- Removing option to build with Python 2.
+- Replacing dependency on 'rpm-python3' with 'python3-rpm'.
 
-* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Fri Feb 04 2022 Neal Gompa <ngompa@fedoraproject.org> - 9.6-1
-- Update to 9.6
-
-* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.5-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Tue Nov  9 2021 Jerry James <loganjerry@gmail.com> - 9.5-3
-- Drop XEmacs support in F36 and later
-
-* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 9.5-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Sat Jul 17 2021 Neal Gompa <ngompa@fedoraproject.org> - 9.5-1
-- Update to 9.5
-
-* Sat Jul 17 2021 Neal Gompa <ngompa@fedoraproject.org> - 9.4-1
-- Update to 9.4
-
-* Mon Feb 15 2021 Miro Hrončok <mhroncok@redhat.com> - 9.3-5
-- Require any Python version of the Python packages
-
-* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 9.3-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Mon Jan 25 2021 Miro Hrončok <mhroncok@redhat.com> - 9.3-3
-- spectool: Download text as text
-
-* Fri Jan 22 2021 Michal Domonkos <mdomonko@redhat.com> - 9.3-2
-- Replace requests-download dependency with requests
-
-* Wed Jan 20 2021 Neal Gompa <ngompa13@gmail.com> - 9.3-1
-- Update to 9.3
-- Force legacy datestamp by default until rhbz#1715412 is resolved
-
-* Mon Oct 05 2020 Neal Gompa <ngompa13@gmail.com> - 9.2-1
-- Update to 9.2
-
-* Thu Aug 20 2020 Neal Gompa <ngompa13@gmail.com> - 9.1-1
-- Update to 9.1
-
-* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 9.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Thu Jul 16 2020 Neal Gompa <ngompa13@gmail.com> - 9.0-2
-- Backport fix for python spec template
-
-* Tue Jul 14 2020 Neal Gompa <ngompa13@gmail.com> - 9.0-1
-- Update to 9.0
-
-* Wed Mar 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 8.10-11
-- Add perl dependencies needed for build
+* Mon Nov 02 2020 Joe Schmitt <joschmit@microsoft.com> - 8.10-11
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Remove emacs dependency and support.
+- Enable python3 option.
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 8.10-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
