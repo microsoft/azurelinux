@@ -1,5 +1,5 @@
 diff --git a/tests/gunit/Makefile.am b/tests/gunit/Makefile.am
-index ba91039..e2b88e3 100644
+index 353567b..612eb3b 100644
 --- a/tests/gunit/Makefile.am
 +++ b/tests/gunit/Makefile.am
 @@ -9,8 +9,6 @@
@@ -23,14 +23,13 @@ index ba91039..e2b88e3 100644
  
  check_PROGRAMS = gtest
  TESTS = gtest
-@@ -43,8 +38,7 @@ gtest_SOURCES = gtest.cpp \
- 		014-cgroupv2_get_subtree_control.cpp \
- 		015-cgroupv2_controller_enabled.cpp \
- 		016-cgset_parse_r_flag.cpp
+@@ -45,8 +40,7 @@ gtest_SOURCES = gtest.cpp \
+ 		016-cgset_parse_r_flag.cpp \
+ 		017-API_fuzz_test.cpp
+ 
 -gtest_LDFLAGS = -L$(top_srcdir)/googletest/googletest -l:libgtest.so \
 -		-rpath $(abs_top_srcdir)/googletest/googletest
 +gtest_LDFLAGS = -l:libgtest.so
  
  clean-local:
  	${RM} test-procpidcgroup
-	
