@@ -26235,8 +26235,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-minitest",
-          "version": "5.15.0",
-          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.15.0.tar.gz"
+          "version": "5.19.0",
+          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.19.0.tar.gz"
         }
       }
     },
