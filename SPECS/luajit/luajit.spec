@@ -1,27 +1,37 @@
-%global rctag beta3
+# luajit does not have official releases, intead opting for a rolling release
+# model. The upstream supports a couple branches/versions, the value of
+# upstream_branch is the current production branch version.
+# See: https://luajit.org/status.html
+
+# Current production major & minor version:
+%global luajit_version_major 2
+%global luajit_version_minor 1
+
+%global luajit_major_minor %{luajit_version_major}.%{luajit_version_minor}
+
+# To support semantic versioning, luajit uses the posix timestamp of the last
+# commit as the patch version.
+
+# The following are filled in by generate-tarball.sh !
+# Upstream commit snapshot (run update-release.sh to update)
+%global upstream_commit 0d313b243194a0b8d2399d8b549ca5a0ff234db5
+# Upstream commit posix timestamp (run update-release.sh to update)
+%global upstream_commit_timestamp 1707061634
 
 Summary:        Just-In-Time Compiler for Lua
 Name:           luajit
-Version:        2.1.0
-%global apiver %(v=%{version}; echo ${v%.${v#[0-9].[0-9].}})
-%global srcver %{version}%{?rctag:-%{rctag}}
-Release:        26%{?dist}
+Version:        %{luajit_major_minor}.%{upstream_commit_timestamp}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://luajit.org/
-Source0:        https://luajit.org/download/LuaJIT-%{srcver}.tar.gz
-
-# Patches from https://github.com/LuaJit/LuaJIT.git
-# Generated from v2.1 branch against the 2.1.0-beta3 tag using
-# git diff v2.1.0-beta3..v2.1 > luajit-2.1-update.patch
-Patch0: luajit-2.1-update.patch
-# Patches from https://github.com/cryptomilk/LuaJIT/commits/v2.1-fedora
-# git format-patch --stdout -l1 --no-renames v2.1..v2.1-fedora > luajit-2.1-fedora.patch
-Patch1: luajit-2.1-fedora.patch
+# Note: github only cares about the commit ID, the name of the file name is anything we want.
+Source0:        https://github.com/LuaJIT/LuaJIT/archive/%{upstream_commit}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  tree
 
 %description
 LuaJIT implements the full set of language features defined by Lua 5.1.
@@ -36,10 +46,12 @@ Requires:       %{name} = %{version}-%{release}
 This package contains development files for %{name}.
 
 %prep
-%autosetup -n LuaJIT-%{srcver} -p1
+%autosetup -p1 -n LuaJIT-%{upstream_commit}
 
 # Enable Lua 5.2 features
 sed -i -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' src/Makefile
+
+grep DLUAJIT_ENABLE_LUA52COMPAT src/Makefile
 
 # preserve timestamps (cicku)
 sed -i -e '/install -m/s/-m/-p -m/' Makefile
@@ -65,10 +77,9 @@ cp -a doc _tmp_html/html
 # Remove static .a
 find %{buildroot} -type f -name *.a -delete -print
 
-%if %{defined rctag}
-# Development versions are not doing such symlink
-ln -s %{name}-%{srcver} %{buildroot}%{_bindir}/%{name}
-%endif
+tree %{buildroot}
+
+ls -l %{buildroot}%{_datadir}/lua/
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -82,18 +93,21 @@ make check || true
 %license COPYRIGHT
 %doc README
 %{_bindir}/%{name}
-%{_bindir}/%{name}-%{srcver}
+%{_bindir}/%{name}-%{version}
 %{_libdir}/lib%{name}-*.so.*
 %{_mandir}/man1/%{name}.1*
-%{_datadir}/%{name}-%{srcver}/
+%{_datadir}/%{name}-%{luajit_major_minor}/
 
 %files devel
 %doc _tmp_html/html/
-%{_includedir}/%{name}-%{apiver}/
+%{_includedir}/%{name}-%{luajit_major_minor}/
 %{_libdir}/lib%{name}-*.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Feb 23 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 2.1.1707061634-1
+- Update to latest rolling release.
+
 * Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-26
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).
 - Verified license.
