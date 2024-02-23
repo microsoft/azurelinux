@@ -140,7 +140,7 @@ index b8f9b5e..5bccd48 100644
  }
  
 -func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Stream, msg interface{}, cp Compressor, opts *transport.Options, comp encoding.Compressor) error {
-+func (s *Server) sendResponse(ctx context.Context, t transport.ServerTransport, stream *transport.Stream, msg any, cp Compressor, opts *transport.Options, comp encoding.Compressor) error {
++func (s *Server) sendResponse(ctx context.Context, t transport.ServerTransport, stream *transport.Stream, msg interface{}, cp Compressor, opts *transport.Options, comp encoding.Compressor) error {
  	data, err := encode(s.getCodec(stream.ContentSubtype()), msg)
  	if err != nil {
  		channelz.Error(logger, s.channelzID, "grpc: server failed to encode response: ", err)
@@ -279,7 +279,7 @@ index b8f9b5e..5bccd48 100644
 -			trInfo.tr.LazyLog(&fmtStringer{"Malformed method name %q", []interface{}{sm}}, true)
 -			trInfo.tr.SetError()
 +		if ti != nil {
-+			ti.tr.LazyLog(&fmtStringer{"Malformed method name %q", []any{sm}}, true)
++			ti.tr.LazyLog(&fmtStringer{"Malformed method name %q", []interface{}{sm}}, true)
 +			ti.tr.SetError()
  		}
  		errDesc := fmt.Sprintf("malformed method name: %q", stream.Method())
@@ -288,7 +288,7 @@ index b8f9b5e..5bccd48 100644
 -				trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 -				trInfo.tr.SetError()
 +			if ti != nil {
-+				ti.tr.LazyLog(&fmtStringer{"%v", []any{err}}, true)
++				ti.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 +				ti.tr.SetError()
  			}
  			channelz.Warningf(logger, s.channelzID, "grpc: Server.handleStream failed to write status: %v", err)
@@ -337,7 +337,7 @@ index b8f9b5e..5bccd48 100644
 -			trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 -			trInfo.tr.SetError()
 +		if ti != nil {
-+			ti.tr.LazyLog(&fmtStringer{"%v", []any{err}}, true)
++			ti.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
 +			ti.tr.SetError()
  		}
  		channelz.Warningf(logger, s.channelzID, "grpc: Server.handleStream failed to write status: %v", err)
