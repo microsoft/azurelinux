@@ -1,8 +1,10 @@
 %{!?python2_sitelib: %define python2_sitelib %(python2 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
+	
+%global srcname setuptools_scm
 
 Summary:        The blessed package to manage your versions by scm tags.
-Name:           python-setuptools_scm
+Name:           python-%{srcname}
 Version:        8.0.3
 Release:        1%{?dist}
 License:        MIT
@@ -14,22 +16,20 @@ Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/
 
 BuildArch:      noarch
 
+BuildRequires:  python3-wheel
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-
-%if %{with_check}
 BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-%endif
+BuildRequires:  cmake
 
 %description
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
 
 It also handles file finders for the supported scm’s.
 
-%package -n     python3-setuptools_scm
+%package -n     python3-%{srcname}
 Summary:        python-setuptools_scm
 
 BuildRequires:  python3-tomli
@@ -42,26 +42,37 @@ Requires:       python3-tomli
 
 Provides:       %{name} = %{version}-%{release}
 
-%description -n python3-setuptools_scm
+%description -n python3-%{srcname}
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
 
 It also handles file finders for the supported scm’s.
 
 %prep
-%setup -q -n setuptools-scm-%{version}
+%autosetup -n setuptools-scm-%{version}
+
+%generate_buildrequires
 
 %build
-python3 setup.py build
+%pyproject_wheel
 
 %install
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%pyproject_install
 
+%if %{with_check}
 %check
-python3 setup.py test
+%tox -- -- -v
+%endif
 
-%files -n python3-setuptools_scm
-%defattr(-,root,root)
-%{python3_sitelib}/*
+%files -n python3-%{srcname}
+%license LICENSE
+%{python3_sitelib}/%{srcname}/
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/INSTALLER
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/METADATA
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/LICENSE
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/WHEEL
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/entry_points.txt
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/top_level.txt
+ 
 
 %changelog
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.3-1
