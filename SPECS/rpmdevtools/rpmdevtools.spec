@@ -134,10 +134,15 @@ cp %{SOURCE1} %{buildroot}%{_datadir}/rpmdevtools/
 %endif
 
 %check
+# Some tools call into each other, update $PATH so they can be located.
+export PATH=%{buildroot}%{_bindir}:$PATH
+# Also need progressbar.py
+export PYTHONPATH=%{buildroot}%{_datadir}/rpmdevtools:$PYTHONPATH
 check_ok=true
 # Skip rpmdev-checksig, rpmdev-wipetree since they have no help section
 for tool in rpmargs rpmdev-bumpspec rpmdev-cksum rpmdev-diff rpmdev-extract rpmdev-md5 rpmdev-newinit rpmdev-newspec rpmdev-packager rpmdev-rmdevelrpms rpmdev-setuptree rpmdev-sha1 rpmdev-sha224 rpmdev-sha256 rpmdev-sha384 rpmdev-sha512 rpmdev-sort rpmdev-spectool rpmdev-sum rpmdev-vercmp rpmelfsym rpmfile rpminfo rpmls rpmpeek rpmsodiff rpmsoname spectool; do
-  %{buildroot}/%{_bindir}/$tool -h > /dev/null || %{buildroot}/%{_bindir}/$tool --help || check_ok=false
+  echo "Testing $tool"
+  $tool --help > /dev/null || $tool -h > /dev/null || check_ok=false
 done
 $check_ok
 
