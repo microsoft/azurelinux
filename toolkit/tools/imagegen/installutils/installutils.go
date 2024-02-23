@@ -189,8 +189,7 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 	devicePath, err := diskutils.SetupLoopbackDevice(partitionSetting.OverlayBaseImage)
 
 	if err != nil {
-		logger.Log.Errorf("Could not setup loop back device for mount (%s)", partitionSetting.OverlayBaseImage)
-
+		err = fmt.Errorf("failed to setup loop back device for mount (%s):\n%w", partitionSetting.OverlayBaseImage, err)
 		return
 	}
 
@@ -276,8 +275,7 @@ func mountSingleMountPoint(installRoot, mountPoint, device, fsType, extraOptions
 	if overlayDevice != nil {
 		err = overlayDevice.setupFolders()
 		if err != nil {
-			logger.Log.Errorf("Failed to create mount for overlay device: %v", err)
-			return
+			return fmt.Errorf("failed to create mount for overlay device:\n%w", err)
 		}
 	}
 	err = mount(mountPath, device, fsType, extraOptions)
@@ -386,7 +384,7 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 
 			packageVer, err = pkgjson.PackageStringToPackageVer(pkg)
 			if err != nil {
-				logger.Log.Errorf("Failed to parse packages list from system config \"%s\".", systemCfg.Name)
+				err = fmt.Errorf("failed to parse packages list from system config (%s):\n%w", systemCfg.Name, err)
 				return
 			}
 
@@ -700,7 +698,7 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 			if stderr == tdnfAssumeNoStdErr {
 				err = nil
 			} else {
-				logger.Log.Error(stderr)
+				err = fmt.Errorf("%v", stderr)
 				return
 			}
 		}
@@ -1309,8 +1307,7 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 		// Ignore updating if there is no shadow file to update in the target image
 		installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
-			logger.Log.Error("Error accessing shadow file.")
-			return ferr
+			return fmt.Errorf("failed to access shadow file:\n%w", ferr)
 		} else if !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
 			return
@@ -1344,8 +1341,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 		}
 
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
-			logger.Log.Error("Error accessing shadow file.")
-			err = ferr
+			err = fmt.Errorf("failed to access shadow file:\n%w", ferr)
 			return
 		} else if !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping updating user password..")
@@ -1369,8 +1365,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 	if user.PasswordExpiresDays != 0 {
 		// Ignore updating if there is no shadow file to update
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
-			logger.Log.Error("Error accessing shadow file.")
-			err = ferr
+			err = fmt.Errorf("failed to access shadow file:\n%w", ferr)
 			return
 		} else if !exists {
 			logger.Log.Debugf("No shadow file to update. Skipping updating password expiration.")
@@ -1655,12 +1650,12 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 
 	err = selinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
-		logger.Log.Errorf("Failed to update SELinux config")
+		err = fmt.Errorf("failed to update SELinux config:\n%w", err)
 		return
 	}
 	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
-		logger.Log.Errorf("Failed to label SELinux files")
+		err = fmt.Errorf("failed to label SELinux files:\n%w", err)
 		return
 	}
 	return
@@ -1716,8 +1711,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 	selinuxConfigPath := filepath.Join(installChroot.RootDir(), SELinuxConfigFile)
 	stdout, stderr, err := shell.Execute("sed", "-n", "s/^SELINUXTYPE=\\(.*\\)$/\\1/p", selinuxConfigPath)
 	if err != nil {
-		logger.Log.Errorf("Could not find an SELINUXTYPE in %s", selinuxConfigPath)
-		logger.Log.Error(stderr)
+		err = fmt.Errorf("failed to find an SELINUXTYPE in (%s):\n%w\n%v", selinuxConfigPath, err, stderr)
 		return
 	}
 	selinuxType := strings.TrimSpace(stdout)
@@ -1937,7 +1931,7 @@ func FormatMountIdentifier(identifier configuration.MountIdentifier, device stri
 	case configuration.MountIdentifierNone:
 		err = fmt.Errorf("must select a mount identifier for device (%s)", device)
 	default:
-		err = fmt.Errorf("unknown mount identifier: '%v'", identifier)
+		err = fmt.Errorf("unknown mount identifier: (%v)", identifier)
 	}
 	return
 }
@@ -2050,8 +2044,7 @@ func cleanupRpmDatabase(rootPrefix string) (err error) {
 	rpmDir := filepath.Join(rootPrefix, rpmDependenciesDirectory)
 	err = os.RemoveAll(rpmDir)
 	if err != nil {
-		logger.Log.Errorf("Failed to remove RPM database (%s). Error: %s", rpmDir, err)
-		err = fmt.Errorf("failed to remove RPM database (%s): %s", rpmDir, err)
+		err = fmt.Errorf("failed to remove RPM database (%s):\n%w", rpmDir, err)
 	} else {
 		logger.Log.Infof("Cleaned up RPM database (%s)", rpmDir)
 	}
@@ -2102,7 +2095,7 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 
 			err = os.Remove(scriptPath)
 			if err != nil {
-				logger.Log.Errorf("Failed to cleanup post-install script (%s). Error: %s", scriptPath, err)
+				err = fmt.Errorf("failed to cleanup post-install script (%s):\n%w", scriptPath, err)
 			}
 
 			return err
@@ -2143,7 +2136,7 @@ func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configurat
 
 			err = os.Remove(scriptPath)
 			if err != nil {
-				logger.Log.Errorf("Failed to cleanup finalize image script (%s). Error: %s", scriptPath, err)
+				err = fmt.Errorf("failed to cleanup finalize image script (%s):\n%w", scriptPath, err)
 			}
 
 			return err
