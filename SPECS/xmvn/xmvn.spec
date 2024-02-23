@@ -154,7 +154,7 @@ mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
 %build
-%mvn_build -j -- -P\\!quality -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
+%mvn_build -j -f -- -P\\!quality -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
 
 version=4.0.0
 tar --delay-directory-restore -xvf target/xmvn-*-bin.tar.gz
@@ -263,6 +263,10 @@ end
 %license LICENSE NOTICE
 
 %changelog
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-2
+- Rebuilt with msopenjdk-17 
+- change source, target
+
 * Mon Mar 27 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.2.0-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
