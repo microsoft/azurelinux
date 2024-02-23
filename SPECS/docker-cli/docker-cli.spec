@@ -1,36 +1,37 @@
-%define upstream_name cli
-%define commit_hash b82b9f3a0e763304a250531cb9350aa6d93723c9
-
-Summary: The open-source application container engine client.
-Name: moby-%{upstream_name}
-Version: 20.10.25
-Release: 3%{?dist}
-License: ASL 2.0
-Group: Tools/Container
-URL: https://github.com/docker/cli
-Vendor: Microsoft Corporation
+%define commit_hash 4debf411d1e6efbd9ce65e4250718e9c529a6525
+%define OUR_GOPATH  %{_topdir}/.gopath
+Summary:        The open-source application container engine client.
+Name:           docker-cli
+Version:        25.0.3
+Release:        1%{?dist}
+License:        ASL 2.0
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-
-Source0: https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-BuildRequires: golang >= 1.16.12
-BuildRequires: make
-BuildRequires: git
-BuildRequires: go-md2man
-
-Requires: /bin/sh
-Requires: tar
-Requires: xz
+Group:          Tools/Container
+URL:            https://github.com/docker/cli
+Source0:        https://github.com/docker/cli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-govendor-v1.tar.gz
+Patch0:         disable_manpage_vendor.patch
+BuildRequires:  git
+BuildRequires:  go-md2man
+BuildRequires:  golang
+BuildRequires:  make
+Requires:       /bin/sh
+Requires:       tar
+Requires:       xz
+# This package replaces the old name of moby-cli
+Provides:       moby-cli = %{version}-%{release}
+Obsoletes:      moby-cli < %{version}-%{release}
 
 %description
 %{summary}
 
-%define OUR_GOPATH  %{_topdir}/.gopath
-
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -p1 -n cli-%{version}
+%setup -q -n cli-%{version} -T -D -a 1
+
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
-ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
+ln -sfT %{_builddir}/cli-%{version} %{OUR_GOPATH}/src/github.com/docker/cli
 
 %build
 export GOPATH=%{OUR_GOPATH}
@@ -49,17 +50,17 @@ make \
 
 # Generating man pages.
 mkdir -p ./github.com/docker
-ln -sfT %{_builddir}/%{upstream_name}-%{version} ./github.com/docker/cli
+ln -sfT %{_builddir}/cli-%{version} ./github.com/docker/cli
 make manpages
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
-cp -aLT build/docker %{buildroot}/%{_bindir}/docker
+install -p -m 755 build/docker %{buildroot}%{_bindir}/docker
 
 install -dp %{buildroot}%{_mandir}/man{1,5,8}
-install -p -m 644 man/man1/*.1 %{buildroot}/%{_mandir}/man1
-install -p -m 644 man/man5/*.5 %{buildroot}/%{_mandir}/man5
-install -p -m 644 man/man8/*.8 %{buildroot}/%{_mandir}/man8
+install -p -m 644 man/man1/*.1 %{buildroot}%{_mandir}/man1
+install -p -m 644 man/man5/*.5 %{buildroot}%{_mandir}/man5
+install -p -m 644 man/man8/*.8 %{buildroot}%{_mandir}/man8
 
 install -d %{buildroot}%{_datadir}/bash-completion/completions
 install -d %{buildroot}%{_datadir}/zsh/vendor-completions
@@ -68,7 +69,6 @@ install -p -m 644 contrib/completion/bash/docker %{buildroot}%{_datadir}/bash-co
 install -p -m 644 contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/vendor-completions/_docker
 install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fish/vendor_completions.d/docker.fish
 
-# list files owned by the package here
 %files
 %license NOTICE LICENSE
 %{_bindir}/docker
@@ -80,6 +80,11 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
+* Thu Feb 22 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-1
+- Rename package to docker-cli
+- Bump version to 25.0.3
+- Add vendor tarball for new deps in make manpages
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.25-3
 - Bump release to rebuild with go 1.20.10
 
