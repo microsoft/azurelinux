@@ -20,6 +20,7 @@ BuildRequires:  python-flit-core
 %if %{with check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-packaging
+BuildRequires:  python3-sphinx
 %endif
 
 Requires:       python3
