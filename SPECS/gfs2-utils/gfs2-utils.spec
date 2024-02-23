@@ -21,6 +21,7 @@ Source:         https://releases.pagure.org/gfs2-utils/gfs2-utils-%{version}.tar
 
 BuildRequires:  automake
 BuildRequires:  bison
+BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  flex
 BuildRequires:  gettext-devel
@@ -30,7 +31,6 @@ BuildRequires:  libtool
 BuildRequires:  libuuid-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  zlib-devel
-BuildRequires:  bzip2-devel
 
 Recommends:     kmod(dlm.ko)
 Recommends:     kmod(gfs2.ko)
