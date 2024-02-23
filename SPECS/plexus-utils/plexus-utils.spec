@@ -23,9 +23,8 @@ Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
-Source1:        %{name}-build.xml
-Source2:        http://apache.org/licenses/LICENSE-2.0.txt
-BuildRequires:  ant
+Source1:        http://apache.org/licenses/LICENSE-2.0.txt
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
@@ -47,27 +46,20 @@ Javadoc for %{name}.
 %prep
 %setup -q -n %{name}-%{name}-%{version}
 
-cp %{SOURCE1} build.xml
-cp %{SOURCE2} .
+cp %{SOURCE1} .
 
 %pom_remove_parent .
 %pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>" .
 
+	
+%mvn_file : plexus/utils
+%mvn_alias : plexus:plexus-utils
+ 
 %build
-%ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8  jar javadoc
-
+%mvn_build -f -- -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
+ 
 %install
-# jar
-install -dm 0755 %{buildroot}%{_javadir}/plexus
-install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/plexus/utils.jar
-# pom
-install -dm 0755 %{buildroot}%{_mavenpomdir}/plexus
-install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/plexus/utils.pom
-%add_maven_depmap plexus/utils.pom plexus/utils.jar -a plexus:plexus-utils
-# javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-%fdupes -s %{buildroot}%{_javadocdir}
+%mvn_install
 
 %files -f .mfiles
 %doc NOTICE.txt LICENSE-2.0.txt
@@ -78,7 +70,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 %changelog
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-4
-- Rebuilt with msopenjdk-17
+- Rebuilt with msopenjdk-17 and maven
 - change source, target
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.0-3
