@@ -2117,8 +2117,8 @@
         "type": "other",
         "other": {
           "name": "cpprest",
-          "version": "2.10.18",
-          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.18.tar.gz"
+          "version": "2.10.19",
+          "downloadUrl": "https://github.com/microsoft/cpprestsdk/archive/2.10.19.tar.gz"
         }
       }
     },
