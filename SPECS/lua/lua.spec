@@ -14,7 +14,7 @@
 Summary:        Powerful light-weight programming language
 Name:           lua
 Version:        %{major_version}.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -93,26 +93,26 @@ This package contains the static version of liblua for %{name}.
 %endif
 cp %{SOURCE1} .
 mv src/luaconf.h src/luaconf.h.template.in
-%patch 0 -p1 -E -z .autoxxx
-%patch 1 -p1 -z .idsize
+%patch -P 0 -p1 -E -z .autoxxx
+%patch -P 1 -p1 -z .idsize
 #%% patch2 -p1 -z .luac-shared
-%patch 3 -p1 -z .configure-linux
-%patch 4 -p1 -z .configure-compat-all
+%patch -P 3 -p1 -z .configure-linux
+%patch -P 4 -p1 -z .configure-compat-all
 # Put proper version in configure.ac, patch0 hardcodes 5.3.0
 sed -i 's|5.3.0|%{version}|g' configure.ac
-%patch 21 -p1
-%patch 23 -p1
+%patch -P 21 -p1
+%patch -P 23 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
 cd lua-%{bootstrap_version}/
 mv src/luaconf.h src/luaconf.h.template.in
-%patch 5 -p1 -b .autoxxx
-%patch 1 -p1 -b .idsize
-%patch 3 -p1 -z .configure-linux
-%patch 4 -p1 -z .configure-compat-all
-%patch 6 -p1 -b .luac-shared-link-fix
-%patch 18 -p1 -b .CVE-2020-24370
+%patch -P 5 -p1 -b .autoxxx
+%patch -P 1 -p1 -b .idsize
+%patch -P 3 -p1 -z .configure-linux
+%patch -P 4 -p1 -z .configure-compat-all
+%patch -P 6 -p1 -b .luac-shared-link-fix
+%patch -P 18 -p1 -b .CVE-2020-24370
 autoreconf -i
 cd ..
 %endif
@@ -216,6 +216,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.4-2
+- Updated patch application macros.
+
 * Tue May 09 2023 Bala <balakumaran.kannan@microsoft.com> - 5.4.4-1
 - Upgrade to version 5.4.4 to fix CVE-2021-44964
 - Removed patches that are already part of new version

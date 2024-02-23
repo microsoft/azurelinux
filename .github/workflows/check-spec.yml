@@ -49,6 +49,10 @@ jobs:
           echo "Files to validate: '${changed_specs}'"
           echo "updated-specs=$(echo ${changed_specs})" >> $GITHUB_ENV
 
+      - name: Get toolchain spec list
+        run: |
+          make -C toolkit toolchain_spec_list
+
       - name: Main branch checkout
         uses: actions/checkout@v4
         with:
@@ -57,4 +61,4 @@ jobs:
 
       - name: Verify .spec files
         if: ${{ env.updated-specs != '' }}
-        run: python3 toolkit/scripts/check_spec_guidelines.py ${{ env.updated-specs }}
+        run: python3 toolkit/scripts/check_spec_guidelines.py build/toolchain/toolchain_specs.txt ${{ env.updated-specs }}

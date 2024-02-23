@@ -58,6 +58,8 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
+##help:target:toolchain_spec_list=Generate a file containing a list of toolchain specs.
+toolchain_spec_list: $(toolchain_spec_list)
 
 clean: clean-toolchain
 
@@ -121,6 +123,7 @@ $(toolchain_spec_list): $(toolchain_files)
 		./list_toolchain_specs.sh \
 			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
 			$(toolchain_spec_list)
+	@echo "Toolchain spec list created under '$(toolchain_spec_list)'."
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
