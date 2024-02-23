@@ -222,7 +222,7 @@ func (im *IsoMaker) prepareIsoBootLoaderFilesAndFolders() (err error) {
 
 // copyInitrd copies a pre-built initrd into the isolinux folder.
 func (im *IsoMaker) copyInitrd() error {
-	initrdDestinationPath := filepath.Join(im.buildDirPath, filepath.Join(im.osFilesPath, "initrd.img"))
+	initrdDestinationPath := filepath.Join(im.buildDirPath, im.osFilesPath, "initrd.img")
 
 	logger.Log.Debugf("Copying initrd from '%s'.", im.initrdPath)
 

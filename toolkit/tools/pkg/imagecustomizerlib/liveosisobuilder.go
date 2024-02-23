@@ -20,7 +20,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 )
 
-var (
+const (
 	isoMediaLabel         = "CDROM"
 	searchCommandTemplate = "search --label %s --set root"
 	rootValueTemplate     = "live:LABEL=%s"
