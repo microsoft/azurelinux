@@ -43,7 +43,7 @@ The python-sphinxcontrib-websupport package provides a Python API to easily inte
 %pyproject_save_files sphinxcontrib
 
 %check
-pip3 install tox tox-current-env
+pip3 install tox tox-current-env pytest
 %tox
 %files -n python3-%{pkgname} -f %{pyproject_files}
 %license LICENSE
