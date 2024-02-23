@@ -17,7 +17,7 @@
 Summary:        Plexus Interpolation API
 Name:           plexus-interpolation
 Version:        1.26
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -56,7 +56,7 @@ cp %{SOURCE1} build.xml
 %pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>"
 
 %build
-%ant \
+%ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
 %if %{without tests}
   -Dtest.skip=true \
 %endif
@@ -81,6 +81,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-4
+- Rebuilt with msopenjdk-17
+- change source, target
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.26-3
 - Moved from extended to core
 - License verified
