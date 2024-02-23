@@ -31,7 +31,6 @@ Source0:        https://github.com/LuaJIT/LuaJIT/archive/%{upstream_commit}/%{na
 
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  tree
 
 %description
 LuaJIT implements the full set of language features defined by Lua 5.1.
@@ -76,10 +75,6 @@ cp -a doc _tmp_html/html
 
 # Remove static .a
 find %{buildroot} -type f -name *.a -delete -print
-
-tree %{buildroot}
-
-ls -l %{buildroot}%{_datadir}/lua/
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
