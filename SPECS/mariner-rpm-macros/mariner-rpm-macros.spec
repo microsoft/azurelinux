@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        25%{?dist}
+Release:        24%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,13 +63,6 @@ Group:          Development/System
 %description -n mariner-check-macros
 Mariner specific rpm macros to override default %%check behavior
 
-%package dist
-Summary:        Mariner distro macros such as %%dist etc.
-Group:          System Environment/Base
-
-%description dist
-Defines distro tag macros
-
 %prep
 %setup -q -c -T
 cp -p %{sources} .
@@ -86,9 +79,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 
-major_version=`echo %{mariner_release_version} | cut -d'.' -f1`
-sed -e 's|@DIST@|%{dist}|g' -e "s|@MAJORVER@|$major_version|g" %{SOURCE28} > macros.dist
-
+sed -e 's|@DIST@|%{dist}|g' %{SOURCE28} > macros.dist
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
@@ -119,8 +110,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
 %{_rpmconfigdir}/macros.d/macros.suse
-
-%files dist
 %{_rpmconfigdir}/macros.d/macros.dist
 
 %dir %{rcluadir}
@@ -136,9 +125,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Wed Feb 21 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-25
-- Move macros.dist to a subpackage so that azurelinux-release can require it.
-
 * Thu Nov 09 2023 George Mileka <gmileka@microsoft.com> - 2.0-24
 - Update ccache to use the compiler content for comparison.
 

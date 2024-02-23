@@ -1,3 +1,1 @@
 %dist @DIST@
-%azl @MAJORVER@
-%azl@MAJORVER@ 1
