@@ -54,7 +54,7 @@ cp %{SOURCE2} .
 %pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>" .
 
 %build
-%ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6  jar javadoc
+%ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8  jar javadoc
 
 %install
 # jar
