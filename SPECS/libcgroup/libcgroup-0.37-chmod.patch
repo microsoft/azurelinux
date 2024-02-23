@@ -1,8 +1,8 @@
 diff --git a/src/api.c b/src/api.c
-index f8c5acd..3f7d831 100644
+index f2991a4..e1bf146 100644
 --- a/src/api.c
 +++ b/src/api.c
-@@ -52,6 +52,10 @@ const struct cgroup_library_version library_version = {
+@@ -53,6 +53,10 @@ const struct cgroup_library_version library_version = {
  	.release = CGROUP_VER_RELEASE,
  };
  
@@ -13,7 +13,7 @@ index f8c5acd..3f7d831 100644
  /*
   * The errno which happend the last time (have to be thread specific)
   */
-@@ -184,6 +188,8 @@ static int cg_chown_recursive(char **path, uid_t owner, gid_t group)
+@@ -183,6 +187,8 @@ static int cg_chown_recursive(char **path, uid_t owner, gid_t group)
  {
  	int ret = 0;
  	FTS *fts;
@@ -22,7 +22,7 @@ index f8c5acd..3f7d831 100644
  
  	cgroup_dbg("chown: path is %s\n", *path);
  	fts = fts_open(path, FTS_PHYSICAL | FTS_NOCHDIR | FTS_NOSTAT, NULL);
-@@ -201,6 +207,7 @@ static int cg_chown_recursive(char **path, uid_t owner, gid_t group)
+@@ -200,6 +206,7 @@ static int cg_chown_recursive(char **path, uid_t owner, gid_t group)
  			cgroup_warn("fts_read failed\n");
  			break;
  		}
@@ -30,4 +30,3 @@ index f8c5acd..3f7d831 100644
  		ret = cg_chown_file(fts, ent, owner, group);
  	}
  	fts_close(fts);
-	

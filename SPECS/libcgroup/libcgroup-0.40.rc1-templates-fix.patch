@@ -1,8 +1,8 @@
 diff --git a/src/api.c b/src/api.c
-index 1e4f021..33e99b6 100644
+index 4cc7263..2f8d514 100644
 --- a/src/api.c
 +++ b/src/api.c
-@@ -4177,9 +4177,9 @@ int cgroup_change_cgroup_flags(uid_t uid, gid_t gid, const char *procname, pid_t
+@@ -4514,9 +4514,9 @@ int cgroup_change_cgroup_flags(uid_t uid, gid_t gid, const char *procname, pid_t
  					written = snprintf(newdest + j,	available, "%d", pid);
  					break;
  				case 'p':
@@ -14,4 +14,3 @@ index 1e4f021..33e99b6 100644
  					} else {
  						written = snprintf(newdest + j,	available, "%d",
  								   pid);
-								

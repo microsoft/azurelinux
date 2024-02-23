@@ -1,8 +1,8 @@
 diff --git a/src/daemon/cgrulesengd.c b/src/daemon/cgrulesengd.c
-index 7c51412..d95f6a5 100644
+index 51988de..3145978 100644
 --- a/src/daemon/cgrulesengd.c
 +++ b/src/daemon/cgrulesengd.c
-@@ -652,7 +652,7 @@ close:
+@@ -653,7 +653,7 @@ close:
  
  static int cgre_create_netlink_socket_process_msg(void)
  {

@@ -1,8 +1,8 @@
 diff --git a/src/api.c b/src/api.c
-index 3f7d831..1e4f021 100644
+index e1bf146..4cc7263 100644
 --- a/src/api.c
 +++ b/src/api.c
-@@ -3227,26 +3227,26 @@ int cgroup_delete_cgroup_ext(struct cgroup *cgroup, int flags)
+@@ -3510,26 +3510,26 @@ int cgroup_delete_cgroup_ext(struct cgroup *cgroup, int flags)
  static int cg_rd_ctrl_file(const char *subsys, const char *cgroup, const char *file, char **value)
  {
  	char path[FILENAME_MAX];
@@ -36,7 +36,7 @@ index 3f7d831..1e4f021 100644
  	if (ret < 0) {
  		free(*value);
  		*value = NULL;
-@@ -3256,7 +3256,7 @@ static int cg_rd_ctrl_file(const char *subsys, const char *cgroup, const char *f
+@@ -3539,7 +3539,7 @@ static int cg_rd_ctrl_file(const char *subsys, const char *cgroup, const char *f
  			(*value)[ret-1] = '\0';
  	}
  
