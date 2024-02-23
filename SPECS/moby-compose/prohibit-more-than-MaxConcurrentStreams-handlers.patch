@@ -1,18 +1,18 @@
 From e74d387714f6695e7710d53144d88696374f06ab Mon Sep 17 00:00:00 2001
 From: Sam Meluch <sammeluch@microsoft.com>
 Date: Thu, 22 Feb 2024 15:08:47 -0800
-Subject: [PATCH 3/3] prohibit more than MaxConcurrentSTreams handlers from
+Subject: [PATCH 3/3] prohibit more than MaxConcurrentStreams handlers from
  running at once
 
 ---
  .../grpc/internal/transport/http2_server.go   | 11 +--
- google.golang.org/grpc/server.go              | 71 +++++++++++++------
+ vendor/google.golang.org/grpc/server.go       | 71 +++++++++++++------
  2 files changed, 53 insertions(+), 29 deletions(-)
 
 diff --git a/google.golang.org/grpc/internal/transport/http2_server.go b/google.golang.org/grpc/internal/transport/http2_server.go
 index 94d441c..2c006a1 100644
---- a/google.golang.org/grpc/internal/transport/http2_server.go
-+++ b/google.golang.org/grpc/internal/transport/http2_server.go
+--- a/vendor/google.golang.org/grpc/internal/transport/http2_server.go
++++ b/vendor/google.golang.org/grpc/internal/transport/http2_server.go
 @@ -165,15 +165,10 @@ func NewServerTransport(conn net.Conn, config *ServerConfig) (_ ServerTransport,
  		ID:  http2.SettingMaxFrameSize,
  		Val: http2MaxFrameLen,
@@ -42,8 +42,8 @@ index 94d441c..2c006a1 100644
  		state:             reachable,
 diff --git a/google.golang.org/grpc/server.go b/google.golang.org/grpc/server.go
 index 5bccd48..659361e 100644
---- a/google.golang.org/grpc/server.go
-+++ b/google.golang.org/grpc/server.go
+--- a/vendor/google.golang.org/grpc/server.go
++++ b/vendor/google.golang.org/grpc/server.go
 @@ -114,12 +114,6 @@ type serviceInfo struct {
  	mdata       interface{}
  }

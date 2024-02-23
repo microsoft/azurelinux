@@ -7,13 +7,13 @@ Subject: [PATCH 2/3] Change server stream context handling
  .../grpc/internal/transport/handler_server.go |   2 +-
  .../grpc/internal/transport/http2_server.go   |   7 +-
  .../grpc/internal/transport/transport.go      |   2 +-
- google.golang.org/grpc/server.go              | 116 ++++++++----------
+ vendor/google.golang.org/grpc/server.go       | 116 ++++++++----------
  4 files changed, 56 insertions(+), 71 deletions(-)
 
 diff --git a/google.golang.org/grpc/internal/transport/handler_server.go b/google.golang.org/grpc/internal/transport/handler_server.go
 index 0901209..3af9b4a 100644
---- a/google.golang.org/grpc/internal/transport/handler_server.go
-+++ b/google.golang.org/grpc/internal/transport/handler_server.go
+--- a/vendor/google.golang.org/grpc/internal/transport/handler_server.go
++++ b/vendor/google.golang.org/grpc/internal/transport/handler_server.go
 @@ -326,7 +326,7 @@ func (ht *serverHandlerTransport) WriteHeader(s *Stream, md metadata.MD) error {
  	return err
  }
@@ -25,8 +25,8 @@ index 0901209..3af9b4a 100644
  	ctx := ht.req.Context()
 diff --git a/google.golang.org/grpc/internal/transport/http2_server.go b/google.golang.org/grpc/internal/transport/http2_server.go
 index 3dd1564..94d441c 100644
---- a/google.golang.org/grpc/internal/transport/http2_server.go
-+++ b/google.golang.org/grpc/internal/transport/http2_server.go
+--- a/vendor/google.golang.org/grpc/internal/transport/http2_server.go
++++ b/vendor/google.golang.org/grpc/internal/transport/http2_server.go
 @@ -345,7 +345,7 @@ func NewServerTransport(conn net.Conn, config *ServerConfig) (_ ServerTransport,
  }
  
@@ -64,8 +64,8 @@ index 3dd1564..94d441c 100644
  			}
 diff --git a/google.golang.org/grpc/internal/transport/transport.go b/google.golang.org/grpc/internal/transport/transport.go
 index 6c3ba85..992fc25 100644
---- a/google.golang.org/grpc/internal/transport/transport.go
-+++ b/google.golang.org/grpc/internal/transport/transport.go
+--- a/vendor/google.golang.org/grpc/internal/transport/transport.go
++++ b/vendor/google.golang.org/grpc/internal/transport/transport.go
 @@ -674,7 +674,7 @@ type ClientTransport interface {
  // Write methods for a given Stream will be called serially.
  type ServerTransport interface {
@@ -77,8 +77,8 @@ index 6c3ba85..992fc25 100644
  	// WriteHeader may not be called on all streams.
 diff --git a/google.golang.org/grpc/server.go b/google.golang.org/grpc/server.go
 index b8f9b5e..5bccd48 100644
---- a/google.golang.org/grpc/server.go
-+++ b/google.golang.org/grpc/server.go
+--- a/vendor/google.golang.org/grpc/server.go
++++ b/vendor/google.golang.org/grpc/server.go
 @@ -577,7 +577,7 @@ func (s *Server) serverWorker() {
  
  func (s *Server) handleSingleStream(data *serverWorkerData) {
