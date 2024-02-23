@@ -211,7 +211,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isoMediaLabel)
 	rootValue := fmt.Sprintf(rootValueTemplate, isoMediaLabel)
 
-	inputContentString, err = setSearchCommand(inputContentString, searchCommand)
+	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
 	if err != nil {
 		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
 	}

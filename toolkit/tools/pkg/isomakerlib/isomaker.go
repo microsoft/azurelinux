@@ -378,7 +378,7 @@ func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile 
 func (im *IsoMaker) createVmlinuzImage() error {
 	const bootKernelFile = "boot/vmlinuz"
 
-	vmlinuzFilePath := filepath.Join(im.buildDirPath, filepath.Join(im.osFilesPath, "vmlinuz"))
+	vmlinuzFilePath := filepath.Join(im.buildDirPath, im.osFilesPath, "vmlinuz")
 
 	// In order to select the correct kernel for isolinux, open the initrd archive
 	// and extract the vmlinuz file in it. An initrd is a gzip of a cpio archive.

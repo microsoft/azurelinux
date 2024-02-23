@@ -35,7 +35,8 @@ var (
 
 const (
 	// The start index of "$kernelopts".
-	// Note: regexp returns index pairs. So, "4" is the start index of the 1st group.
+	// Note: regexp returns index pairs. So, "2" is the start index of the 1st group,
+	// "4" is the start of the 2nd group, and so on.
 	linuxCommandLineRegexIndentStart     = 2
 	linuxCommandLineRegexIndentEnd       = 3
 	linuxCommandLineRegexKernelOptsStart = 4
@@ -66,37 +67,24 @@ const (
 	initPathRegexPathIndexEnd = 3
 )
 
-func setSearchCommand(inputGrubCfgContent string, searchCommand string) (outputGrubCfgContent string, err error) {
+func replaceSearchCommand(inputGrubCfgContent string, searchCommand string) (outputGrubCfgContent string, err error) {
 
 	// Find the search command.
 	match := searchCommandRegex.FindStringSubmatchIndex(inputGrubCfgContent)
-	if match != nil {
-		indent := ""
-		if len(match) > searchCommandRegexIndentEnd {
-			start := match[searchCommandRegexIndentStart]
-			end := match[searchCommandRegexIndentEnd]
-			indent = inputGrubCfgContent[start:end]
-		}
-		// Replace the search command.
-		start := match[0]
-		end := match[1]
-		outputGrubCfgContent = inputGrubCfgContent[:start] + indent + searchCommand + " " + inputGrubCfgContent[end:]
-	} else {
-		// If no search command already exists, insert the search command right
-		// before the linux command.
-
-		// Find the the linux command.
-		match := linuxCommandLineRegex.FindStringSubmatchIndex(inputGrubCfgContent)
-		indent := ""
-		if len(match) > searchCommandRegexIndentEnd {
-			start := match[linuxCommandLineRegexIndentStart]
-			end := match[linuxCommandLineRegexIndentEnd]
-			indent = inputGrubCfgContent[start:end]
-		}
-		// Insert the search command right before the linux command.
-		start := match[0]
-		outputGrubCfgContent = inputGrubCfgContent[:start] + indent + searchCommand + "\n" + inputGrubCfgContent[start:]
+	if match == nil {
+		return "", fmt.Errorf("failed to find the 'search' command.")
 	}
+	indent := ""
+	if len(match) > searchCommandRegexIndentEnd {
+		start := match[searchCommandRegexIndentStart]
+		end := match[searchCommandRegexIndentEnd]
+		indent = inputGrubCfgContent[start:end]
+	}
+	// Replace the search command.
+	start := match[0]
+	end := match[1]
+	outputGrubCfgContent = inputGrubCfgContent[:start] + indent + searchCommand + " " + inputGrubCfgContent[end:]
+
 	return outputGrubCfgContent, nil
 }
 
