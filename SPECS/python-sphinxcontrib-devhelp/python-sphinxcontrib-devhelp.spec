@@ -1,7 +1,7 @@
 %global pypi_name_prefix sphinxcontrib
 %global pypi_name_suffix devhelp
-%global pypi_name %{pypi_name_prefix}-${pypi_name_suffix}
-%global pypi_name_underscore %{pypi_name_prefix}_${pypi_name_suffix}
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
 
 Summary:        Sphinx extension for Devhelp documents
 Name:           python-%{pypi_name}
