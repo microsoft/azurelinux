@@ -123,7 +123,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
 	specPaths, err = rpm.BuildCompatibleSpecsList(s.simpleToolChroot.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
-		fmt.Errorf("failed to retrieve a list of specs inside (%s):\n%w", s.simpleToolChroot.ChrootRelativeSpecDir(), err)
+		err = fmt.Errorf("failed to retrieve a list of specs inside (%s):\n%w", s.simpleToolChroot.ChrootRelativeSpecDir(), err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 
 	allBuiltRPMs, err = s.readBuiltRPMs(specPaths, defines)
 	if err != nil {
-		fmt.Errorf("failed to extract built RPMs from specs:\n%w", err)
+		err = fmt.Errorf("failed to extract built RPMs from specs:\n%w", err)
 		return
 	}
 
@@ -139,13 +139,13 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 
 	repoContents, err = s.convertResultsToRepoContents(allBuiltRPMs)
 	if err != nil {
-		fmt.Errorf("failed to convert RPMs list to a packages summary file:\n%w", err)
+		err = fmt.Errorf("failed to convert RPMs list to a packages summary file:\n%w", err)
 		return
 	}
 
 	err = jsonutils.WriteJSONFile(chrootOutputFilePath, repoContents)
 	if err != nil {
-		fmt.Errorf("Failed to save results into (%s):\n%w", chrootOutputFilePath, err)
+		err = fmt.Errorf("Failed to save results into (%s):\n%w", chrootOutputFilePath, err)
 	}
 
 	return
