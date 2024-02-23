@@ -3198,8 +3198,8 @@
         "type": "other",
         "other": {
           "name": "elixir",
-          "version": "1.14.3",
-          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.14.3/elixir-1.14.3.tar.gz"
+          "version": "1.16.1",
+          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.16.1/elixir-1.16.1.tar.gz"
         }
       }
     },
@@ -7881,8 +7881,8 @@
         "type": "other",
         "other": {
           "name": "json-glib",
-          "version": "1.6.6",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/json-glib-1.6.6.tar.xz"
+          "version": "1.8.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.8/json-glib-1.8.0.tar.xz"
         }
       }
     },
@@ -10283,6 +10283,16 @@
           "name": "libnvidia-container",
           "version": "1.13.5",
           "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libnvme",
+          "version": "1.8",
+          "downloadUrl": "https://github.com/linux-nvme/libnvme/archive/refs/tags/v1.8.tar.gz"
         }
       }
     },
@@ -13092,9 +13102,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "moby-cli",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.25.tar.gz"
+          "name": "docker-cli",
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.3.tar.gz"
         }
       }
     },
@@ -14313,8 +14323,8 @@
         "type": "other",
         "other": {
           "name": "nvme-cli",
-          "version": "1.16",
-          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.16.tar.gz"
+          "version": "2.8",
+          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v2.8.tar.gz"
         }
       }
     },
@@ -24113,6 +24123,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sortedcontainers",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/grantjenks/python-sortedcontainers/archive/v2.4.0/python-sortedcontainers-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-soupsieve",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/facelessuser/soupsieve/archive/1.9.2/python-soupsieve-1.9.2.tar.gz"
@@ -24914,8 +24934,8 @@
         "type": "other",
         "other": {
           "name": "qdox",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.0.tar.gz"
+          "version": "2.0.3",
+          "downloadUrl": "https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/2.0.3/qdox-2.0.3-project.tar.bz2"
         }
       }
     },
