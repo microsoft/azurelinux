@@ -1,7 +1,7 @@
 %global gem_name io-event
 Summary:        An event loop
 Name:           rubygem-%{gem_name}
-Version:        1.0.7
+Version:        1.3.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -18,6 +18,7 @@ An event loop
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%gemspec_clear_signing
 
 %build
 gem build %{gem_name}
@@ -25,14 +26,17 @@ gem build %{gem_name}
 %install
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 #add README.md file to buildroot from Source0
-cp README.md %{buildroot}%{gem_instdir}/
+cp readme.md %{buildroot}%{gem_instdir}/
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/README.md
+%license %{gemdir}/gems/%{gem_name}-%{version}/readme.md
 %{gemdir}
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.2-1
+- Auto-upgrade to 1.3.2 - azl3.0
+
 * Fri Apr 15 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.7-1
 - License verified
 - Original version for CBL-Mariner
