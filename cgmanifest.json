@@ -10001,8 +10001,8 @@
         "type": "other",
         "other": {
           "name": "libmnl",
-          "version": "1.0.4",
-          "downloadUrl": "http://netfilter.org/projects/libmnl/files/libmnl-1.0.4.tar.bz2"
+          "version": "1.0.5",
+          "downloadUrl": "http://netfilter.org/projects/libmnl/files/libmnl-1.0.5.tar.bz2"
         }
       }
     },
