@@ -4,7 +4,7 @@
 Summary:        Iconic font set
 Name:           %{fontname}-fonts
 Version:        4.7.0
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        OFL AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -82,6 +82,11 @@ cp -a css less scss %{buildroot}%{_datadir}/font-awesome-web/
 %{_datadir}/fonts/fontawesome/fontawesome-webfont.eot
 
 %changelog
+* Fri Feb 23 2024 Kanika Nema <kanikanema@microsoft.com> - 4.7.0-12
+- Reintroduce as fontawesome4-font to support packages that rely on fontawesome 4.x
+- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- License verified.
+
 * Sun Dec 05 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.7.0-11
 - License verified.
 - Updated sources URL.
