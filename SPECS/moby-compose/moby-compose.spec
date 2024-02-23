@@ -10,6 +10,10 @@ URL:            https://github.com/docker/compose
 Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-44487.patch
 # Patch can be removed when grpc go module is updated to version v1.62.0, patches backported to v1.50.0
+# These are the patches backported in order to get access to the security fix
+# https://github.com/grpc/grpc-go/commit/6eabd7e1834e47b20f55cbe9d473fc607c693358
+# https://github.com/grpc/grpc-go/commit/8eb4ac4c1514c190ee0b5d01a91c63218dac93c0
+# https://github.com/grpc/grpc-go/commit/f2180b4d5403d2210b30b93098eb7da31c05c721
 Patch1:         patch-server.go-to-support-single-serverWorkerChannel.patch
 Patch2:         Change-server-stream-context-handling.patch
 Patch3:         prohibit-more-than-MaxConcurrentStreams-handlers.patch
