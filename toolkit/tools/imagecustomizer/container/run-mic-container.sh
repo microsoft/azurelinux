@@ -111,7 +111,7 @@ docker run --rm \
    -v $outputImageDir:$containerOutputDir:z \
    -v /dev:/dev:z \
    $containerFullPath \
-   /usr/bin/imagecustomizer \
+   imagecustomizer \
       --image-file $containerInputImage \
       --config-file $containerInputConfig \
       --build-dir $containerBuildDir \
