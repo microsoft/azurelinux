@@ -3,7 +3,7 @@
 
 Name:           rpmdevtools
 Version:        9.6
-Release:        1%{?dist}
+Release:        8%{?dist}
 Summary:        RPM Development Tools
 
 # rpmdev-md5 and rpmdev-setuptree are GPL-2.0-only,
@@ -155,8 +155,79 @@ $check_ok
 
 
 %changelog
-* Tue Feb 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 9.6-1
+* Tue Feb 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 9.6-8
 - Refresh from Fedora 40 (license: MIT)
+- Add conditional flags for azl
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Jan 22 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Aug 25 2023 Petr Pisar <ppisar@redhat.com> - 9.6-5
+- Convert a license tag to SPDX format
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Feb 04 2022 Neal Gompa <ngompa@fedoraproject.org> - 9.6-1
+- Update to 9.6
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 9.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Nov  9 2021 Jerry James <loganjerry@gmail.com> - 9.5-3
+- Drop XEmacs support in F36 and later
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 9.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sat Jul 17 2021 Neal Gompa <ngompa@fedoraproject.org> - 9.5-1
+- Update to 9.5
+
+* Sat Jul 17 2021 Neal Gompa <ngompa@fedoraproject.org> - 9.4-1
+- Update to 9.4
+
+* Mon Feb 15 2021 Miro Hrončok <mhroncok@redhat.com> - 9.3-5
+- Require any Python version of the Python packages
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 9.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 25 2021 Miro Hrončok <mhroncok@redhat.com> - 9.3-3
+- spectool: Download text as text
+
+* Fri Jan 22 2021 Michal Domonkos <mdomonko@redhat.com> - 9.3-2
+- Replace requests-download dependency with requests
+
+* Wed Jan 20 2021 Neal Gompa <ngompa13@gmail.com> - 9.3-1
+- Update to 9.3
+- Force legacy datestamp by default until rhbz#1715412 is resolved
+
+* Mon Oct 05 2020 Neal Gompa <ngompa13@gmail.com> - 9.2-1
+- Update to 9.2
+
+* Thu Aug 20 2020 Neal Gompa <ngompa13@gmail.com> - 9.1-1
+- Update to 9.1
+
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Thu Jul 16 2020 Neal Gompa <ngompa13@gmail.com> - 9.0-2
+- Backport fix for python spec template
+
+* Tue Jul 14 2020 Neal Gompa <ngompa13@gmail.com> - 9.0-1
+- Update to 9.0
+
+* Wed Mar 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 8.10-11
+- Add perl dependencies needed for build
 
 * Mon Dec 06 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.10-13
 - License verified.
