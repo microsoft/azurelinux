@@ -1,7 +1,7 @@
 %define  debug_package %{nil}
 Summary:        elixir
 Name:           elixir
-Version:        1.14.3
+Version:        1.16.1
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -39,6 +39,9 @@ export LANG="en_US.UTF-8"
 
 
 %changelog
+* Tue Feb 20 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.16.1-1
+- Updated to 1.16.1.
+
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
 - Original version for CBL-Mariner
 - License verified
