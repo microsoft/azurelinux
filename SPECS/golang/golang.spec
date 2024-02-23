@@ -16,7 +16,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.21.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -91,7 +91,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{goroot}
 
-cp -R api bin doc lib pkg src misc VERSION %{buildroot}%{goroot}
+cp -R api bin doc lib pkg src misc VERSION go.env %{buildroot}%{goroot}
 
 # remove the unnecessary zoneinfo file (Go will always use the system one first)
 rm -rfv %{buildroot}%{goroot}/lib/time
@@ -144,6 +144,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Feb 22 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.6-2
+- Include go.env file in GOROOT
+
 * Wed Jan 24 2024 Davis Goodin <dagood@microsoft.com> - 1.21.6-1
 - Bump version to 1.21.6-1
 - Switch from upstream Go to the Microsoft build of Go
