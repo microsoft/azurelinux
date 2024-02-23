@@ -3,7 +3,7 @@
 Summary:        Plexus Security Dispatcher Component
 Name:           plexus-sec-dispatcher
 Version:        1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,13 +45,17 @@ cp %{SOURCE1} .
 %mvn_file : plexus/%{name}
  
 %build
-%mvn_build
+%mvn_build -- -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
 %install
 %mvn_install
 %files -n %{?module_prefix}%{name} -f .mfiles
 %license LICENSE-2.0.txt
  
 %changelog
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.4-2
+- Rebuilt with msopenjdk-17
+- change source, target and release version
+
 * Mon Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
