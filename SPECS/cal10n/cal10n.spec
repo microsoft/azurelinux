@@ -1,4 +1,3 @@
-
 #
 # spec file for package cal10n
 #
@@ -25,20 +24,18 @@ Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://github.com/qos-ch/%{name}/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  mvn(org.apache.maven.plugins:maven-site-plugin)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
+BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-bootstrap
+BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  maven-local
+BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.apache.maven:maven-artifact)
 BuildRequires:  mvn(org.apache.maven:maven-artifact-manager)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
+%endif
 
-#BuildRequires:  ant
-#BuildRequires:  fdupes
-#BuildRequires:  java-devel >= 1.8
-#BuildRequires:  javapackages-local-bootstrap
-#BuildRequires:  javapackages-tools
-#BuildRequires:  junit
-#BuildRequires:  xz
-#Requires:       java
 BuildArch:      noarch
 
 %description
@@ -57,6 +54,13 @@ Summary:        API documentation for %{name}
 
 %description javadoc
 %{summary}.
+	
+%package -n maven-%{name}-plugin
+Summary:        CAL10N maven plugin
+ 
+%description -n maven-%{name}-plugin
+Maven plugin verifying that the codes defined in
+an enum type match those in the corresponding resource bundles. 
 
 %prep
 %setup -q -n %{name}-v_%{version}
@@ -69,69 +73,31 @@ find . -name "*.jar" -delete
 %pom_disable_module maven-%{name}-plugin-smoke
 %mvn_package :*-{plugin} @1
 
-# bnc#759912
-rm -rf docs cal10n-site
-cat > README.SUSE <<EOF
+# remove maven-compiler-plugin configuration that is broken with Java 11
+%pom_xpath_remove 'pom:plugin[pom:artifactId="maven-compiler-plugin"]/pom:configuration'
 
-The documentation under Creative Commons Attribution-NonCommercial-ShareAlike
-2.5 License is not suitable for Linux distributors, so it has been removed.
-
-You may find the online version at
-http://cal10n.qos.ch/manual.html
-
-EOF
-
+# Disable default-jar execution of maven-jar-plugin, which is causing
+# problems with version 3.0.0 of the plugin.
+%pom_xpath_inject "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:executions" "
+    <execution>
+      <id>default-jar</id>
+      <phase>skip</phase>
+    </execution>" cal10n-api
+ 
 %build
-for dir in cal10n-api
-do
-  pushd $dir
-  export CLASSPATH=$(build-classpath \
-                     junit \
-                     ):target/classes:target/test-classes
-  ant -Dmaven.mode.offline=true package javadoc \
-      -Dmaven.test.skip=true \
-      -lib %{_datadir}/java
-  popd
-done
-
+%mvn_build -- -Dproject.build.sourceEncoding=ISO-8859-1 -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+ 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-install -m 644 cal10n-api/target/cal10n-api-%{version}.jar \
-        %{buildroot}%{_javadir}/%{name}/cal10n-api-%{version}.jar
+%mvn_install
 
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
-%add_maven_depmap %{name}.pom
-install -pm 644 %{name}-api/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-api.pom
-%add_maven_depmap %{name}-api.pom %{name}/cal10n-api-%{version}.jar
-
-# javadoc
-pushd cal10n-api
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/apidocs*/* %{buildroot}%{_javadocdir}/%{name}-%{version}/
-rm -rf target/site/api*
-popd
-%fdupes -s %{buildroot}%{_javadocdir}/%{name}-%{version}
-
-%files
-%license LICENSE.txt
-%defattr(0644,root,root,0755)
-%doc README.SUSE
+%files -f .mfiles
 %dir %{_javadir}/%{name}
-%{_javadir}/%{name}/%{name}*.jar
-%{_mavenpomdir}/*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
-
-%files javadoc
 %license LICENSE.txt
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}-%{version}
+ 
+%files -n maven-%{name}-plugin -f .mfiles-plugin
+ 
+%files javadoc -f .mfiles-javadoc
+%license LICENSE.txt
 
 %changelog
 * Wed Feb 14 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
