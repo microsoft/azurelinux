@@ -18,7 +18,8 @@ Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python-flit-core
 %if %{with check}
-BuildRequires:  python-packaging
+BuildRequires:  python3-pip
+BuildRequires:  python3-packaging
 %endif
 
 Requires:       python3
@@ -42,6 +43,7 @@ The python-sphinxcontrib-websupport package provides a Python API to easily inte
 %pyproject_save_files sphinxcontrib
 
 %check
+pip3 install tox
 %tox
 %files -n python3-%{pkgname} -f %{pyproject_files}
 %license LICENSE
