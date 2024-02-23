@@ -33,6 +33,7 @@ BuildRequires: flex
 BuildRequires: make
 BuildRequires: pam-devel
 BuildRequires: systemd-devel
+BuildRequires: systemd-rpm-macros
 
 # required to build tests
 BuildRequires: gtest-devel
