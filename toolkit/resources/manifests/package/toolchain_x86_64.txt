@@ -277,9 +277,9 @@ nghttp2-debuginfo-1.59.0-1.azl3.x86_64.rpm
 nghttp2-devel-1.59.0-1.azl3.x86_64.rpm
 ninja-build-1.11.1-1.azl3.x86_64.rpm
 ninja-build-debuginfo-1.11.1-1.azl3.x86_64.rpm
-npth-1.6-4.azl3.x86_64.rpm
-npth-debuginfo-1.6-4.azl3.x86_64.rpm
-npth-devel-1.6-4.azl3.x86_64.rpm
+npth-1.7-1.azl3.x86_64.rpm
+npth-debuginfo-1.7-1.azl3.x86_64.rpm
+npth-devel-1.7-1.azl3.x86_64.rpm
 ntsysv-1.25-1.azl3.x86_64.rpm
 openssl-3.1.4-1.azl3.x86_64.rpm
 openssl-debuginfo-3.1.4-1.azl3.x86_64.rpm

@@ -14133,8 +14133,8 @@
         "type": "other",
         "other": {
           "name": "npth",
-          "version": "1.6",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
+          "version": "1.7",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.7.tar.bz2"
         }
       }
     },
