@@ -67,19 +67,19 @@ cp -a css less scss %{buildroot}%{_datadir}/font-awesome-web/
 
 # files:
 %_font_pkg -f %{fontconf} *.ttf *.otf
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2
-%exclude %{_datadir}/fonts/fontawesome/fontawesome-webfont.eot
+%exclude %{_fontdir}/fontawesome-webfont.svg
+%exclude %{_fontdir}/fontawesome-webfont.woff
+%exclude %{_fontdir}/fontawesome-webfont.woff2
+%exclude %{_fontdir}/fontawesome-webfont.eot
 
 %doc README-Trademarks.txt
 
 %files web
 %{_datadir}/font-awesome-web/
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.svg
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.woff
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.woff2
-%{_datadir}/fonts/fontawesome/fontawesome-webfont.eot
+%{_fontdir}/fontawesome-webfont.svg
+%{_fontdir}/fontawesome-webfont.woff
+%{_fontdir}/fontawesome-webfont.woff2
+%{_fontdir}/fontawesome-webfont.eot
 
 %changelog
 * Fri Feb 23 2024 Kanika Nema <kanikanema@microsoft.com> - 4.7.0-12
