@@ -48,7 +48,7 @@ setuptools_scm handles managing your python package versions in scm metadata ins
 It also handles file finders for the supported scm’s.
 
 %prep
-%setup -q -n setuptools_scm-%{version}
+%setup -q -n setuptools-scm-%{version}
 
 %build
 python3 setup.py build
