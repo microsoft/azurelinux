@@ -16,8 +16,8 @@
 #
 
 Name:           objectweb-asm
-Version:        7.2
-Release:        4%{?dist}
+Version:        9.6
+Release:        1%{?dist}
 Summary:        Java bytecode manipulation framework
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
@@ -25,14 +25,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
 # ./generate-tarball.sh
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.xz
-Source1:        %{name}-%{version}-build.tar.xz
-Source2:        http://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
-Source3:        http://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/%{version}/asm-analysis-%{version}.pom
-Source4:        http://repo1.maven.org/maven2/org/ow2/asm/asm-commons/%{version}/asm-commons-%{version}.pom
-Source5:        http://repo1.maven.org/maven2/org/ow2/asm/asm-test/%{version}/asm-test-%{version}.pom
-Source6:        http://repo1.maven.org/maven2/org/ow2/asm/asm-tree/%{version}/asm-tree-%{version}.pom
-Source7:        http://repo1.maven.org/maven2/org/ow2/asm/asm-util/%{version}/asm-util-%{version}.pom
+Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source1:        http://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
+Source2:        http://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/%{version}/asm-analysis-%{version}.pom
+Source3:        http://repo1.maven.org/maven2/org/ow2/asm/asm-commons/%{version}/asm-commons-%{version}.pom
+Source4:        http://repo1.maven.org/maven2/org/ow2/asm/asm-test/%{version}/asm-test-%{version}.pom
+Source5:        http://repo1.maven.org/maven2/org/ow2/asm/asm-tree/%{version}/asm-tree-%{version}.pom
+Source6:        http://repo1.maven.org/maven2/org/ow2/asm/asm-util/%{version}/asm-util-%{version}.pom
 # We still want to create an "all" uberjar, so this is a custom pom to generate it
 # TODO: Fix other packages to no longer depend on "asm-all" so we can drop this
 Source9:        asm-all.pom
@@ -89,12 +88,12 @@ smaller.
 
 %prep
 %setup -q -a1
-cp %{SOURCE2} asm/pom.xml
-cp %{SOURCE3} asm-analysis/pom.xml
-cp %{SOURCE4} asm-commons/pom.xml
-cp %{SOURCE5} asm-test/pom.xml
-cp %{SOURCE6} asm-tree/pom.xml
-cp %{SOURCE7} asm-util/pom.xml
+cp %{SOURCE1} asm/pom.xml
+cp %{SOURCE2} asm-analysis/pom.xml
+cp %{SOURCE3} asm-commons/pom.xml
+cp %{SOURCE4} asm-test/pom.xml
+cp %{SOURCE5} asm-tree/pom.xml
+cp %{SOURCE6} asm-util/pom.xml
 # Insert asm-all pom
 mkdir -p asm-all
 sed 's/@VERSION@/%{version}/g' %{SOURCE9} > asm-all/pom.xml
