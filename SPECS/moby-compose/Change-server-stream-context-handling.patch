@@ -1,0 +1,354 @@
+From 4ef370839829840761e091b510c9e7e7b5fea022 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Thu, 22 Feb 2024 14:49:41 -0800
+Subject: [PATCH 2/3] Change server stream context handling
+
+---
+ .../grpc/internal/transport/handler_server.go |   2 +-
+ .../grpc/internal/transport/http2_server.go   |   7 +-
+ .../grpc/internal/transport/transport.go      |   2 +-
+ google.golang.org/grpc/server.go              | 116 ++++++++----------
+ 4 files changed, 56 insertions(+), 71 deletions(-)
+
+diff --git a/google.golang.org/grpc/internal/transport/handler_server.go b/google.golang.org/grpc/internal/transport/handler_server.go
+index 0901209..3af9b4a 100644
+--- a/google.golang.org/grpc/internal/transport/handler_server.go
++++ b/google.golang.org/grpc/internal/transport/handler_server.go
+@@ -326,7 +326,7 @@ func (ht *serverHandlerTransport) WriteHeader(s *Stream, md metadata.MD) error {
+ 	return err
+ }
+ 
+-func (ht *serverHandlerTransport) HandleStreams(startStream func(*Stream), traceCtx func(context.Context, string) context.Context) {
++func (ht *serverHandlerTransport) HandleStreams(startStream func(*Stream)) {
+ 	// With this transport type there will be exactly 1 stream: this HTTP request.
+ 
+ 	ctx := ht.req.Context()
+diff --git a/google.golang.org/grpc/internal/transport/http2_server.go b/google.golang.org/grpc/internal/transport/http2_server.go
+index 3dd1564..94d441c 100644
+--- a/google.golang.org/grpc/internal/transport/http2_server.go
++++ b/google.golang.org/grpc/internal/transport/http2_server.go
+@@ -345,7 +345,7 @@ func NewServerTransport(conn net.Conn, config *ServerConfig) (_ ServerTransport,
+ }
+ 
+ // operateHeader takes action on the decoded headers.
+-func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream), traceCtx func(context.Context, string) context.Context) (fatal bool) {
++func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream)) error {
+ 	// Acquire max stream ID lock for entire duration
+ 	t.maxStreamMu.Lock()
+ 	defer t.maxStreamMu.Unlock()
+@@ -565,7 +565,6 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
+ 	s.requestRead = func(n int) {
+ 		t.adjustWindow(s, uint32(n))
+ 	}
+-	s.ctx = traceCtx(s.ctx, s.method)
+ 	for _, sh := range t.stats {
+ 		s.ctx = sh.TagRPC(s.ctx, &stats.RPCTagInfo{FullMethodName: s.method})
+ 		inHeader := &stats.InHeader{
+@@ -603,7 +602,7 @@ func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(
+ // HandleStreams receives incoming streams using the given handler. This is
+ // typically run in a separate goroutine.
+ // traceCtx attaches trace to ctx and returns the new context.
+-func (t *http2Server) HandleStreams(handle func(*Stream), traceCtx func(context.Context, string) context.Context) {
++func (t *http2Server) HandleStreams(handle func(*Stream)) {
+ 	defer close(t.readerDone)
+ 	for {
+ 		t.controlBuf.throttle()
+@@ -641,7 +640,7 @@ func (t *http2Server) HandleStreams(handle func(*Stream), traceCtx func(context.
+ 		}
+ 		switch frame := frame.(type) {
+ 		case *http2.MetaHeadersFrame:
+-			if t.operateHeaders(frame, handle, traceCtx) {
++			if err := t.operateHeaders(frame, handle); err != nil {
+ 				t.Close()
+ 				break
+ 			}
+diff --git a/google.golang.org/grpc/internal/transport/transport.go b/google.golang.org/grpc/internal/transport/transport.go
+index 6c3ba85..992fc25 100644
+--- a/google.golang.org/grpc/internal/transport/transport.go
++++ b/google.golang.org/grpc/internal/transport/transport.go
+@@ -674,7 +674,7 @@ type ClientTransport interface {
+ // Write methods for a given Stream will be called serially.
+ type ServerTransport interface {
+ 	// HandleStreams receives incoming streams using the given handler.
+-	HandleStreams(func(*Stream), func(context.Context, string) context.Context)
++	HandleStreams(func(*Stream))
+ 
+ 	// WriteHeader sends the header metadata for the given stream.
+ 	// WriteHeader may not be called on all streams.
+diff --git a/google.golang.org/grpc/server.go b/google.golang.org/grpc/server.go
+index b8f9b5e..5bccd48 100644
+--- a/google.golang.org/grpc/server.go
++++ b/google.golang.org/grpc/server.go
+@@ -577,7 +577,7 @@ func (s *Server) serverWorker() {
+ 
+ func (s *Server) handleSingleStream(data *serverWorkerData) {
+ 	defer data.wg.Done()
+-	s.handleStream(data.st, data.stream, s.traceInfo(data.st, data.stream))
++	s.handleStream(data.st, data.stream)
+ }
+ 
+ // initServerWorkers creates worker goroutines and a channel to process incoming
+@@ -955,14 +955,8 @@ func (s *Server) serveStreams(st transport.ServerTransport) {
+ 		}
+ 		go func() {
+ 			defer wg.Done()
+-			s.handleStream(st, stream, s.traceInfo(st, stream))
++			s.handleStream(st, stream)
+ 		}()
+-	}, func(ctx context.Context, method string) context.Context {
+-		if !EnableTracing {
+-			return ctx
+-		}
+-		tr := trace.New("grpc.Recv."+methodFamily(method), method)
+-		return trace.NewContext(ctx, tr)
+ 	})
+ 	wg.Wait()
+ }
+@@ -1010,30 +1004,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+ 	s.serveStreams(st)
+ }
+ 
+-// traceInfo returns a traceInfo and associates it with stream, if tracing is enabled.
+-// If tracing is not enabled, it returns nil.
+-func (s *Server) traceInfo(st transport.ServerTransport, stream *transport.Stream) (trInfo *traceInfo) {
+-	if !EnableTracing {
+-		return nil
+-	}
+-	tr, ok := trace.FromContext(stream.Context())
+-	if !ok {
+-		return nil
+-	}
+-
+-	trInfo = &traceInfo{
+-		tr: tr,
+-		firstLine: firstLine{
+-			client:     false,
+-			remoteAddr: st.RemoteAddr(),
+-		},
+-	}
+-	if dl, ok := stream.Context().Deadline(); ok {
+-		trInfo.firstLine.deadline = time.Until(dl)
+-	}
+-	return trInfo
+-}
+-
+ func (s *Server) addConn(addr string, st transport.ServerTransport) bool {
+ 	s.mu.Lock()
+ 	defer s.mu.Unlock()
+@@ -1094,7 +1064,7 @@ func (s *Server) incrCallsFailed() {
+ 	atomic.AddInt64(&s.czData.callsFailed, 1)
+ }
+ 
+-func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Stream, msg interface{}, cp Compressor, opts *transport.Options, comp encoding.Compressor) error {
++func (s *Server) sendResponse(ctx context.Context, t transport.ServerTransport, stream *transport.Stream, msg any, cp Compressor, opts *transport.Options, comp encoding.Compressor) error {
+ 	data, err := encode(s.getCodec(stream.ContentSubtype()), msg)
+ 	if err != nil {
+ 		channelz.Error(logger, s.channelzID, "grpc: server failed to encode response: ", err)
+@@ -1113,7 +1083,7 @@ func (s *Server) sendResponse(t transport.ServerTransport, stream *transport.Str
+ 	err = t.Write(stream, hdr, payload, opts)
+ 	if err == nil {
+ 		for _, sh := range s.opts.statsHandlers {
+-			sh.HandleRPC(stream.Context(), outPayload(false, msg, data, payload, time.Now()))
++			sh.HandleRPC(ctx, outPayload(false, msg, data, payload, time.Now()))
+ 		}
+ 	}
+ 	return err
+@@ -1160,7 +1130,7 @@ func chainUnaryInterceptors(interceptors []UnaryServerInterceptor) UnaryServerIn
+ 	}
+ }
+ 
+-func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.Stream, info *serviceInfo, md *MethodDesc, trInfo *traceInfo) (err error) {
++func (s *Server) processUnaryRPC(ctx context.Context, t transport.ServerTransport, stream *transport.Stream, info *serviceInfo, md *MethodDesc, trInfo *traceInfo) (err error) {
+ 	shs := s.opts.statsHandlers
+ 	if len(shs) != 0 || trInfo != nil || channelz.IsOn() {
+ 		if channelz.IsOn() {
+@@ -1174,7 +1144,7 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 				IsClientStream: false,
+ 				IsServerStream: false,
+ 			}
+-			sh.HandleRPC(stream.Context(), statsBegin)
++			sh.HandleRPC(ctx, statsBegin)
+ 		}
+ 		if trInfo != nil {
+ 			trInfo.tr.LazyLog(&trInfo.firstLine, false)
+@@ -1206,7 +1176,7 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 				if err != nil && err != io.EOF {
+ 					end.Error = toRPCErr(err)
+ 				}
+-				sh.HandleRPC(stream.Context(), end)
++				sh.HandleRPC(ctx, end)
+ 			}
+ 
+ 			if channelz.IsOn() {
+@@ -1228,7 +1198,6 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 		}
+ 	}
+ 	if len(binlogs) != 0 {
+-		ctx := stream.Context()
+ 		md, _ := metadata.FromIncomingContext(ctx)
+ 		logEntry := &binarylog.ClientHeader{
+ 			Header:     md,
+@@ -1307,7 +1276,7 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 			return status.Errorf(codes.Internal, "grpc: error unmarshalling request: %v", err)
+ 		}
+ 		for _, sh := range shs {
+-			sh.HandleRPC(stream.Context(), &stats.InPayload{
++			sh.HandleRPC(ctx, &stats.InPayload{
+ 				RecvTime:   time.Now(),
+ 				Payload:    v,
+ 				WireLength: payInfo.wireLength + headerLen,
+@@ -1328,7 +1297,7 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 		}
+ 		return nil
+ 	}
+-	ctx := NewContextWithServerTransportStream(stream.Context(), stream)
++	ctx = NewContextWithServerTransportStream(ctx, stream)
+ 	reply, appErr := md.Handler(info.serviceImpl, ctx, df, s.opts.unaryInt)
+ 	if appErr != nil {
+ 		appStatus, ok := status.FromError(appErr)
+@@ -1371,7 +1340,7 @@ func (s *Server) processUnaryRPC(t transport.ServerTransport, stream *transport.
+ 	}
+ 	opts := &transport.Options{Last: true}
+ 
+-	if err := s.sendResponse(t, stream, reply, cp, opts, comp); err != nil {
++	if err := s.sendResponse(ctx, t, stream, reply, cp, opts, comp); err != nil {
+ 		if err == io.EOF {
+ 			// The entire stream is done (for unary RPC only).
+ 			return err
+@@ -1480,7 +1449,7 @@ func chainStreamInterceptors(interceptors []StreamServerInterceptor) StreamServe
+ 	}
+ }
+ 
+-func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transport.Stream, info *serviceInfo, sd *StreamDesc, trInfo *traceInfo) (err error) {
++func (s *Server) processStreamingRPC(ctx context.Context, t transport.ServerTransport, stream *transport.Stream, info *serviceInfo, sd *StreamDesc, trInfo *traceInfo) (err error) {
+ 	if channelz.IsOn() {
+ 		s.incrCallsStarted()
+ 	}
+@@ -1494,10 +1463,10 @@ func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transp
+ 			IsServerStream: sd.ServerStreams,
+ 		}
+ 		for _, sh := range shs {
+-			sh.HandleRPC(stream.Context(), statsBegin)
++			sh.HandleRPC(ctx, statsBegin)
+ 		}
+ 	}
+-	ctx := NewContextWithServerTransportStream(stream.Context(), stream)
++	ctx = NewContextWithServerTransportStream(ctx, stream)
+ 	ss := &serverStream{
+ 		ctx:                   ctx,
+ 		t:                     t,
+@@ -1533,7 +1502,7 @@ func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transp
+ 					end.Error = toRPCErr(err)
+ 				}
+ 				for _, sh := range shs {
+-					sh.HandleRPC(stream.Context(), end)
++					sh.HandleRPC(ctx, end)
+ 				}
+ 			}
+ 
+@@ -1672,27 +1641,44 @@ func (s *Server) processStreamingRPC(t transport.ServerTransport, stream *transp
+ 	return err
+ }
+ 
+-func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Stream, trInfo *traceInfo) {
++func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Stream) {
++	ctx := stream.Context()
++	var ti *traceInfo
++	if EnableTracing {
++		tr := trace.New("grpc.Recv."+methodFamily(stream.Method()), stream.Method())
++		ctx = trace.NewContext(ctx, tr)
++		ti = &traceInfo{
++			tr: tr,
++			firstLine: firstLine{
++				client:     false,
++				remoteAddr: t.RemoteAddr(),
++			},
++		}
++		if dl, ok := ctx.Deadline(); ok {
++			ti.firstLine.deadline = time.Until(dl)
++		}
++	}
++
+ 	sm := stream.Method()
+ 	if sm != "" && sm[0] == '/' {
+ 		sm = sm[1:]
+ 	}
+ 	pos := strings.LastIndex(sm, "/")
+ 	if pos == -1 {
+-		if trInfo != nil {
+-			trInfo.tr.LazyLog(&fmtStringer{"Malformed method name %q", []interface{}{sm}}, true)
+-			trInfo.tr.SetError()
++		if ti != nil {
++			ti.tr.LazyLog(&fmtStringer{"Malformed method name %q", []any{sm}}, true)
++			ti.tr.SetError()
+ 		}
+ 		errDesc := fmt.Sprintf("malformed method name: %q", stream.Method())
+ 		if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil {
+-			if trInfo != nil {
+-				trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
+-				trInfo.tr.SetError()
++			if ti != nil {
++				ti.tr.LazyLog(&fmtStringer{"%v", []any{err}}, true)
++				ti.tr.SetError()
+ 			}
+ 			channelz.Warningf(logger, s.channelzID, "grpc: Server.handleStream failed to write status: %v", err)
+ 		}
+-		if trInfo != nil {
+-			trInfo.tr.Finish()
++		if ti != nil {
++			ti.tr.Finish()
+ 		}
+ 		return
+ 	}
+@@ -1702,17 +1688,17 @@ func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Str
+ 	srv, knownService := s.services[service]
+ 	if knownService {
+ 		if md, ok := srv.methods[method]; ok {
+-			s.processUnaryRPC(t, stream, srv, md, trInfo)
++			s.processUnaryRPC(ctx, t, stream, srv, md, ti)
+ 			return
+ 		}
+ 		if sd, ok := srv.streams[method]; ok {
+-			s.processStreamingRPC(t, stream, srv, sd, trInfo)
++			s.processStreamingRPC(ctx, t, stream, srv, sd, ti)
+ 			return
+ 		}
+ 	}
+ 	// Unknown service, or known server unknown method.
+ 	if unknownDesc := s.opts.unknownStreamDesc; unknownDesc != nil {
+-		s.processStreamingRPC(t, stream, nil, unknownDesc, trInfo)
++		s.processStreamingRPC(ctx, t, stream, nil, unknownDesc, ti)
+ 		return
+ 	}
+ 	var errDesc string
+@@ -1721,19 +1707,19 @@ func (s *Server) handleStream(t transport.ServerTransport, stream *transport.Str
+ 	} else {
+ 		errDesc = fmt.Sprintf("unknown method %v for service %v", method, service)
+ 	}
+-	if trInfo != nil {
+-		trInfo.tr.LazyPrintf("%s", errDesc)
+-		trInfo.tr.SetError()
++	if ti != nil {
++		ti.tr.LazyPrintf("%s", errDesc)
++		ti.tr.SetError()
+ 	}
+ 	if err := t.WriteStatus(stream, status.New(codes.Unimplemented, errDesc)); err != nil {
+-		if trInfo != nil {
+-			trInfo.tr.LazyLog(&fmtStringer{"%v", []interface{}{err}}, true)
+-			trInfo.tr.SetError()
++		if ti != nil {
++			ti.tr.LazyLog(&fmtStringer{"%v", []any{err}}, true)
++			ti.tr.SetError()
+ 		}
+ 		channelz.Warningf(logger, s.channelzID, "grpc: Server.handleStream failed to write status: %v", err)
+ 	}
+-	if trInfo != nil {
+-		trInfo.tr.Finish()
++	if ti != nil {
++		ti.tr.Finish()
+ 	}
+ }
+ 
+-- 
+2.34.1
+

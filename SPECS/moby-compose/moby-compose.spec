@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           moby-compose
-Version:        2.17.2
-Release:        7%{?dist}
+Version:        2.17.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,10 @@ Group:          Tools/Container
 URL:            https://github.com/docker/compose
 Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-44487.patch
+# Patch can be removed when grpc go module is updated to version v1.62.0, patches backported to v1.50.0
+Patch1:         patch-server.go-to-support-single-serverWorkerChannel.patch
+Patch2:         Change-server-stream-context-handling.patch
+Patch3:         prohibit-more-than-MaxConcurrentStreams-handlers.patch
 
 # Leverage the `generate_source_tarball.sh` to create the vendor sources
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
@@ -47,6 +51,10 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 2.17.3-1
+- Upgrade to version 2.17.3
+- Add patch for vendored golang.org/grpc
+
 * Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.17.2-7
 - Address CVE-2023-44487 by patching vendored golang.org/x/net
 
