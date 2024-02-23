@@ -1,4 +1,7 @@
-%global pypi_name sphinxcontrib-devhelp
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix applehelp
+%global pypi_name %{pypi_name_prefix}-${pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_${pypi_name_suffix}
 
 Summary:        Sphinx extension for Devhelp documents
 Name:           python-%{pypi_name}
@@ -8,7 +11,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/c7/a1/80b7e9f677abc673cb9320bf255ad4e08931ccbc2e66bde4b59bad3809ad/sphinxcontrib_devhelp-1.0.6.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/c7/a1/80b7e9f677abc673cb9320bf255ad4e08931ccbc2e66bde4b59bad3809ad/%{pypi_name_underscore}-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -43,7 +46,7 @@ sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document.
 %pyproject_buildrequires -x test
 
 %prep
-%autosetup -n sphinxcontrib_devhelp-%{version}
+%autosetup -n %{pypi_name_underscore}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -76,8 +79,8 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.devhelp.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_devhelp-%{version}.dist-info/
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}.dist-info/
 
 %changelog
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.6-1

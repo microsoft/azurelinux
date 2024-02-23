@@ -1,4 +1,8 @@
-%global pypi_name sphinxcontrib-jsmath
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix jsmath
+%global pypi_name %{pypi_name_prefix}-${pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_${pypi_name_suffix}
+
 
 Summary:        Sphinx extension for math in HTML via JavaScript
 Name:           python-%{pypi_name}
@@ -55,9 +59,9 @@ python3 -m pytest
 %files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}-py%{python3_version}-*.pth
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
 * Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-16
