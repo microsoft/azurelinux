@@ -20,8 +20,11 @@ Source0:        https://github.com/libcgroup/libcgroup/archive/v%{version}.tar.g
 Source1:        cgconfig.service
 
 Patch0: fedora-config.patch
-Patch1: libcgroup-0.40.rc1.patch
-Patch2: no-googletests.patch
+Patch1: libcgroup-0.37-chmod.patch
+Patch2: libcgroup-0.40.rc1-coverity.patch
+Patch3: libcgroup-0.40.rc1-fread.patch
+Patch4: libcgroup-0.40.rc1-templates-fix.patch
+Patch5: no-googletests.patch
 
 %{?systemd_requires}
 

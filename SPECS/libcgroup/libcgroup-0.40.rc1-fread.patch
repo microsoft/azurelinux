@@ -1,0 +1,47 @@
+diff --git a/src/api.c b/src/api.c
+index 3f7d831..1e4f021 100644
+--- a/src/api.c
++++ b/src/api.c
+@@ -3227,26 +3227,26 @@ int cgroup_delete_cgroup_ext(struct cgroup *cgroup, int flags)
+ static int cg_rd_ctrl_file(const char *subsys, const char *cgroup, const char *file, char **value)
+ {
+ 	char path[FILENAME_MAX];
+-	FILE *ctrl_file = NULL;
+-	int ret;
++	int ctrl_file = -1;
++	ssize_t ret;
+ 
+ 	if (!cg_build_path_locked(cgroup, path, subsys))
+ 		return ECGFAIL;
+ 
+ 	strncat(path, file, sizeof(path) - strlen(path));
+-	ctrl_file = fopen(path, "re");
+-	if (!ctrl_file)
++	ctrl_file = open(path, O_RDONLY | O_CLOEXEC);
++	if (ctrl_file < 0)
+ 		return ECGROUPVALUENOTEXIST;
+ 
+ 	*value = calloc(CG_CONTROL_VALUE_MAX, 1);
+ 	if (!*value) {
+-		fclose(ctrl_file);
++		close(ctrl_file);
+ 		last_errno = errno;
+ 		return ECGOTHER;
+ 	}
+ 
+-	/* Using %as crashes when we try to read from files like memory.stat */
+-	ret = fread(*value, 1, CG_CONTROL_VALUE_MAX-1, ctrl_file);
++	/* Using %as or fread crashes when we try to read from files like memory.stat */
++	ret = read(ctrl_file, *value, CG_CONTROL_VALUE_MAX-1);
+ 	if (ret < 0) {
+ 		free(*value);
+ 		*value = NULL;
+@@ -3256,7 +3256,7 @@ static int cg_rd_ctrl_file(const char *subsys, const char *cgroup, const char *f
+ 			(*value)[ret-1] = '\0';
+ 	}
+ 
+-	fclose(ctrl_file);
++	close(ctrl_file);
+ 
+ 	return 0;
+ }
