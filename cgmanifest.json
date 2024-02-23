@@ -20944,8 +20944,8 @@
         "type": "other",
         "other": {
           "name": "plexus-containers",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-containers/archive/plexus-containers-2.1.1.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-containers/archive/plexus-containers-2.2.0.tar.gz"
         }
       }
     },
