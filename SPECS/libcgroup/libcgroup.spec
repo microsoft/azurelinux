@@ -116,8 +116,8 @@ install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}/cgconfig.d
-install -m 644 samples/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
-install -m 644 samples/cgsnapshot_blacklist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_blacklist.conf
+install -m 644 samples/config/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
+install -m 644 samples/config/cgsnapshot_blacklist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_blacklist.conf
 
 # install unit and sysconfig files
 install -d ${RPM_BUILD_ROOT}%{_unitdir}
