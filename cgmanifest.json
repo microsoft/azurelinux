@@ -21494,8 +21494,8 @@
         "type": "other",
         "other": {
           "name": "pyflakes",
-          "version": "2.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-2.5.0.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-3.2.0.tar.gz"
         }
       }
     },

@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           pyflakes
 # WARNING: When updating pyflakes, check not to break flake8!
-Version:        2.5.0
+Version:        3.2.0
 Release:        1%{?dist}
 Summary:        A simple program which checks Python source files for errors
 
@@ -10,7 +10,6 @@ License:        MIT
 URL:            https://github.com/PyCQA/pyflakes
 
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}.tar.gz
-Source1:        http://cdn.debian.net/debian/pool/main/p/pyflakes/pyflakes_2.0.0-1.debian.tar.xz
 Patch0:         %{name}-1.1.0-python3-man.patch
 
 BuildArch:      noarch
@@ -75,6 +74,9 @@ ln -s pyflakes-3.1 %{buildroot}%{_mandir}/man1/pyflakes.1
 %{_mandir}/man1/pyflakes.1*
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0-1
+- Auto-upgrade to 3.2.0 - netplan dependency
+
 * Thu Sep 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.5.0-1
 - Bump version to 2.5.0
 - License verified
