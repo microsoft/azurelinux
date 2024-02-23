@@ -7,7 +7,7 @@
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
 Version:        4.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -76,7 +76,7 @@ Requires:       plexus-sec-dispatcher
 Requires:       plexus-utils
 Requires:       sisu
 Requires:       slf4j
-Suggests:       maven-openjdk11
+Suggests:       maven-openjdk17
 Obsoletes:      xmvn-connector-aether < 4.0.0
 
 %description    minimal
@@ -154,7 +154,7 @@ mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
 %build
-%mvn_build -j -- -P\\!quality
+%mvn_build -j -- -P\\!quality -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
 
 version=4.0.0
 tar --delay-directory-restore -xvf target/xmvn-*-bin.tar.gz

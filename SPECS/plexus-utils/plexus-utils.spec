@@ -16,7 +16,7 @@ Summary:        Plexus Common Utilities
 #
 Name:           plexus-utils
 Version:        3.3.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,7 +54,7 @@ cp %{SOURCE2} .
 %pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>" .
 
 %build
-%ant jar javadoc
+%ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6  jar javadoc
 
 %install
 # jar
@@ -77,6 +77,10 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-4
+- Rebuilt with msopenjdk-17
+- change source, target
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.0-3
 - Moved from extended to core
 - License verified
