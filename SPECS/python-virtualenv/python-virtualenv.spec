@@ -7,7 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
-Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/94/d7/adb787076e65dc99ef057e0118e25becf80dd05233ef4c86f07aa35f6492/virtualenv-20.25.0.tar.gz
+Patch0:         0001-replace-to-flit.patch
 BuildArch:      noarch
 
 %description
@@ -19,13 +20,11 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
-
-%if 0%{?with_check}
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core >= 3.8.0
 
 Requires:       python3
-Requires:       python3-filelock
 Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
 Provides:       %{name}-doc = %{version}-%{release}
@@ -36,11 +35,13 @@ virtualenv is a tool to create isolated Python environment.
 %prep
 %autosetup -n virtualenv-%{version}
 
+%generate_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 pip3 install 'tox>=3.27.1,<4.0.0'
@@ -53,8 +54,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
-* Wed Mar 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.25.0-1
+* Fri Mar 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.25.0-1
 - Auto-upgrade to 20.25.0 - 3.0 package upgrade
+- Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Mariner)
 
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 20.14.0-4
 - Remove version restriction on python3-platformdirs Requires
