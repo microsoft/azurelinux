@@ -28456,8 +28456,8 @@
         "type": "other",
         "other": {
           "name": "tmux",
-          "version": "3.3a",
-          "downloadUrl": "https://github.com/tmux/tmux/releases/download/3.3a/tmux-3.3a.tar.gz"
+          "version": "3.4",
+          "downloadUrl": "https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz"
         }
       }
     },
