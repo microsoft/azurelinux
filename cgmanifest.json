@@ -27887,8 +27887,8 @@
         "type": "other",
         "other": {
           "name": "subversion",
-          "version": "1.14.2",
-          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.2.tar.bz2"
+          "version": "1.14.3",
+          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.3.tar.bz2"
         }
       }
     },
