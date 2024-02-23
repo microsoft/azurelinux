@@ -3688,6 +3688,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fontawesome4-fonts",
+          "version": "4.7.0",
+          "downloadUrl": "https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v4.7.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fontconfig",
           "version": "2.14.2",
           "downloadUrl": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.14.2.tar.gz"
