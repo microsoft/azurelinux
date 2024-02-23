@@ -30,6 +30,7 @@ BuildRequires:  libtool
 BuildRequires:  libuuid-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  zlib-devel
+BuildRequires:  bzip2-devel
 
 Recommends:     kmod(dlm.ko)
 Recommends:     kmod(gfs2.ko)
@@ -67,7 +68,7 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_sbindir}/gfs2_convert
 %{_sbindir}/gfs2_edit
 %{_sbindir}/tunegfs2
-%{_sbindir}/gfs2_withdraw_helper
+%{_libexecdir}/gfs2_withdraw_helper
 %{_sbindir}/glocktop
 %{_mandir}/man8/*gfs2*
 %{_mandir}/man8/glocktop*
@@ -75,9 +76,10 @@ modifying, and correcting inconsistencies in GFS2 file systems.
 %{_libdir}/udev/rules.d/82-gfs2-withdraw.rules
 
 %changelog
-* Thu Feb 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.1-1
-- Auto-upgrade to 3.5.1.
+* Fri Feb 23 2024 Nan Liu <liunan@microsoft.com> - 3.5.1-1
+- Upgrade to 3.5.1.
 - Remove patches.
+- Add BuildRequires and update file directory.
 
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.0-12
 - Removing 'exit' calls from the '%%check' section.
