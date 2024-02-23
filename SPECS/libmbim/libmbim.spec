@@ -1,6 +1,6 @@
 Summary:        Library for talking to WWAN modems and devices
 Name:           libmbim
-Version:        1.26.2
+Version:        1.26.4
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -57,6 +57,9 @@ make  %{?_smp_mflags} check
 %{_datadir}/gtk-doc/*
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.26.4-1
+- Auto-upgrade to 1.26.4 - Azure Linux 3.0 Upgrades
+
 * Mon Jan 10 2022 Henry Li <lihl@microsoft.com> - 1.26.2-1
 - Upgrade to version 1.26.2
 
