@@ -4210,8 +4210,8 @@
         "type": "other",
         "other": {
           "name": "gfs2-utils",
-          "version": "3.2.0",
-          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.2.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.5.1.tar.gz"
         }
       }
     },
@@ -13983,8 +13983,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.57.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.57.0/nghttp2-1.57.0.tar.xz"
+          "version": "1.59.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.59.0/nghttp2-1.59.0.tar.xz"
         }
       }
     },
@@ -22164,8 +22164,8 @@
         "type": "other",
         "other": {
           "name": "python-distro",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/python-distro/distro/releases/download/v1.6.0/distro-1.6.0.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/python-distro/distro/archive/refs/tags/v1.9.0.tar.gz"
         }
       }
     },
@@ -23444,8 +23444,8 @@
         "type": "other",
         "other": {
           "name": "python-py",
-          "version": "1.10.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-1.10.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/98/ff/fec109ceb715d2a6b4c4a85a61af3b40c723a961e8828319fbcb15b868dc/py-1.11.0.tar.gz"
         }
       }
     },
@@ -26165,8 +26165,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-io-event",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/socketry/io-event/archive/refs/tags/v1.0.7.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/socketry/io-event/archive/refs/tags/v1.3.2.tar.gz"
         }
       }
     },
@@ -26235,8 +26235,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-minitest",
-          "version": "5.15.0",
-          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.15.0.tar.gz"
+          "version": "5.19.0",
+          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.19.0.tar.gz"
         }
       }
     },
@@ -26245,8 +26245,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-mocha",
-          "version": "1.13.0",
-          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v1.13.0.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v2.1.0.tar.gz"
         }
       }
     },
@@ -26665,8 +26665,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-td",
-          "version": "0.16.8",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.16.8.tar.gz"
+          "version": "0.17.1",
+          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
         }
       }
     },

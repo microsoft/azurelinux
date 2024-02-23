@@ -28,22 +28,19 @@ func (o Overlay) getMountArgs() string {
 func (o Overlay) setupFolders() (err error) {
 	err = os.MkdirAll(o.lowerDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", o.lowerDir)
-		return
+		return fmt.Errorf("failed to create directory (%s):\n%w", o.lowerDir, err)
 	}
 	err = os.MkdirAll(o.upperDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", o.upperDir)
-		return
+		return fmt.Errorf("failed to create directory (%s):\n%w", o.upperDir, err)
 	}
 	err = os.MkdirAll(o.workDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Errorf("Could not create directory (%s)", o.workDir)
-		return
+		return fmt.Errorf("failed to create directory (%s):\n%w", o.workDir, err)
 	}
 	err = mount(o.lowerDir, o.DevicePath, "", "")
 	if err != nil {
-		logger.Log.Errorf("Could not mount %s to %s", o.DevicePath, o.lowerDir)
+		return fmt.Errorf("failed to mount (%s) to (%s):\n%w", o.DevicePath, o.lowerDir, err)
 	}
 	return
 }
