@@ -14,11 +14,11 @@ Distribution:   Azure Linux
 URL:            https://www.x.org
 Source0:        https://www.x.org/pub/individual/app/bdftopcf-%{bdftopcf}.tar.bz2
 Source1:        https://www.x.org/pub/individual/app/fonttosfnt-%{fonttosfnt}.tar.xz
-Source3:        https://www.x.org/pub/individual/app/mkfontscale-%{mkfontscale}.tar.xz
-Source4:        https://www.x.org/pub/individual/font/font-util-%{font_util}.tar.xz
+Source2:        https://www.x.org/pub/individual/app/mkfontscale-%{mkfontscale}.tar.xz
+Source3:        https://www.x.org/pub/individual/font/font-util-%{font_util}.tar.xz
 # helper script used in post for xorg-x11-fonts
-Source5:        xorg-x11-fonts-update-dirs
-Source6:        xorg-x11-fonts-update-dirs.1
+Source4:        xorg-x11-fonts-update-dirs
+Source5:        xorg-x11-fonts-update-dirs.1
 
 Patch0:         mkfontscale-examine-all-encodings.patch
 
@@ -45,7 +45,7 @@ X.Org X11 font utilities required for font installation, conversion, and
 generation.
 
 %prep
-%setup -q -c %{name}-%{version} -a1 -a3 -a4
+%setup -q -c %{name}-%{version} -a1 -a2 -a3
 pushd mkfontscale-*
 %patch 0 -p1 -b .all-encodings
 popd
@@ -85,10 +85,10 @@ done
     done
 }
 
-install -m 744 %{SOURCE5} %{buildroot}%{_bindir}/xorg-x11-fonts-update-dirs
+install -m 744 %{SOURCE4} %{buildroot}%{_bindir}/xorg-x11-fonts-update-dirs
 sed -i "s:@DATADIR@:%{_datadir}:" %{buildroot}%{_bindir}/xorg-x11-fonts-update-dirs
 
-install -m 744 -p -D %{SOURCE6} %{buildroot}%{_mandir}/man1/xorg-x11-fonts-update-dirs.1
+install -m 744 -p -D %{SOURCE5} %{buildroot}%{_mandir}/man1/xorg-x11-fonts-update-dirs.1
 
 find %{buildroot} -name bdftruncate\* -print0 | xargs -0 rm -f
 
