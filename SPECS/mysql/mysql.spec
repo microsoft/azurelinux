@@ -1,6 +1,6 @@
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.33
+Version:        8.0.36
 Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
@@ -72,14 +72,20 @@ make test
 %files devel
 %{_libdir}/*.so
 %{_libdir}/*.a
-%{_libdir}/private/icudt69l/brkitr/*.res
-%{_libdir}/private/icudt69l/brkitr/*.brk
-%{_libdir}/private/icudt69l/brkitr/*.dict
-%{_libdir}/private/icudt69l/unames.icu
+%{_libdir}/private/icudt73l/brkitr/*.res
+%{_libdir}/private/icudt73l/brkitr/*.brk
+%{_libdir}/private/icudt73l/brkitr/*.dict
+%{_libdir}/private/icudt73l/unames.icu
+%{_libdir}/private/icudt73l/ulayout.icu
+%{_libdir}/private/icudt73l/uemoji.icu
+%{_libdir}/private/icudt73l/cnvalias.icu
 %{_includedir}/*
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.36-1
+- Auto-upgrade to 8.0.36
+
 * Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.0.33-1
 - Auto-upgrade to 8.0.33 - address CVE-2023-21976, CVE-2023-21972, CVE-2023-21982, CVE-2023-21977, CVE-2023-21980
 
