@@ -1,59 +1,64 @@
-%global pypi_name ruamel.yaml
 %global srcname ruamel-yaml
+%global commit 6f41eb6001661917fceb0e88ed0693ae1a7c50f4
 %global debug_package %{nil}
 Summary:        YAML 1.2 loader/dumper package for Python
 Name:           python-%{srcname}
-Version:        0.16.6
-Release:        7%{?dist}
+Version:        0.18.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.org/project/ruamel.yaml/
-# Repository lives on https://sourceforge.net/projects/ruamel-yaml/; however, the snapshot is an unreliable link
-Source0:        https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/%{pypi_name}-%{version}.tar.gz
+Source0:        https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml/code/ruamel-yaml-code-%{commit}.zip
 
 %description
 ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
 It is a derivative of Kirill Simonov’s PyYAML 3.11
 
-%package -n     python%{python3_pkgversion}-%{srcname}
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{pypi_name}}
+%package -n     python3-%{srcname}
 Summary:        YAML 1.2 loader/dumper package for Python
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
-Requires:       python%{python3_pkgversion}-setuptools
+
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+
+Requires:       python3-ruamel-yaml-clib
+
 # For tests
 %if %{with_check}
-BuildRequires:  python3-pip
+BuildRequires:  python3-ruamel-yaml-clib
+BuildRequires:  python3-pytest
+BuildRequires:  python3-tomli
 %endif
 
-%description -n python%{python3_pkgversion}-%{srcname}
+%description -n python3-%{srcname}
 ruamel.yaml is a YAML 1.2 loader/dumper package for Python.
 It is a derivative of Kirill Simonov’s PyYAML 3.11
 
 %prep
-%autosetup -n %{pypi_name}-%{version} -p1
-rm -rf %{pypi_name}.egg-info
+%autosetup -n ruamel-yaml-code-%{commit}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-python3 setup.py install --single-version-externally-managed --skip-build --root %{buildroot}
+%pyproject_install
+%pyproject_save_files ruamel
 
 %check
-# tests not included in the pypi source
+pip3 install exceptiongroup iniconfig
+%pytest _test/test_*.py
 
-
-%files -n python%{python3_pkgversion}-%{srcname}
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENSE
-%doc README.rst
-%{python3_sitelib}/ruamel
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
+%doc README.md
 
 %changelog
+* Wed Feb 21 2024 Chris Gunn <chrisgun@mircosoft.com> - 0.18.6-1
+- Update to 0.18.6
+- Switch to sourceforge sources
+- Enable tests
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 0.16.6-7
 - Remove requirement on python3-typing (not needed for python >= 3.5)
 

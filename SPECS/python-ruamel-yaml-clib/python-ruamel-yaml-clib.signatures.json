@@ -1,5 +1,6 @@
 {
-  "Signatures": {
-    "ruamel.yaml.clib-0.2.0.tar.gz": "b66832ea8077d9b3f6e311c4a53d06273db5dc2db6e8a908550f3c14d67e718c"
-  }
+ "Signatures": {
+  "LICENSE-libyaml": "d0d8b09800a45cd982e9568fc7669d9c1a4c330e275a821bbe24d54366d16fe9",
+  "ruamel-yaml-clib-code-5f8ccce2f70b3a5d27c47ce19fe33e5bdd815571.zip": "db329f6be157d13db26bb24b42068326226356b0dd86b5f6996abafa113d6136"
+ }
 }

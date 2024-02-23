@@ -12526,7 +12526,7 @@
         }
       }
     },
-    {
+{
       "component": {
         "type": "other",
         "other": {
@@ -13098,7 +13098,7 @@
         }
       }
     },
-    {
+{
       "component": {
         "type": "other",
         "other": {
@@ -13148,7 +13148,7 @@
         }
       }
     },
-    {
+{
       "component": {
         "type": "other",
         "other": {
@@ -23994,8 +23994,8 @@
         "type": "other",
         "other": {
           "name": "python-ruamel-yaml",
-          "version": "0.16.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/ruamel.yaml-0.16.6.tar.gz"
+          "version": "0.18.6",
+          "downloadUrl": "https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml/code/ruamel-yaml-code-6f41eb6001661917fceb0e88ed0693ae1a7c50f4.zip"
         }
       }
     },
@@ -24004,8 +24004,8 @@
         "type": "other",
         "other": {
           "name": "python-ruamel-yaml-clib",
-          "version": "0.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/ruamel.yaml.clib-0.2.0.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://sourceforge.net/code-snapshots/hg/r/ru/ruamel-yaml-clib/code/ruamel-yaml-clib-code-5f8ccce2f70b3a5d27c47ce19fe33e5bdd815571.zip"
         }
       }
     },
