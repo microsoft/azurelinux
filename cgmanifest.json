@@ -20954,8 +20954,8 @@
         "type": "other",
         "other": {
           "name": "plexus-interpolation",
-          "version": "1.26",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-interpolation/archive/plexus-interpolation-1.26/plexus-interpolation-1.26.tar.gz"
+          "version": "1.27",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-interpolation/archive/plexus-interpolation-1.27/plexus-interpolation-1.27.tar.gz"
         }
       }
     },

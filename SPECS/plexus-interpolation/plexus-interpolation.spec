@@ -16,8 +16,8 @@
 %bcond_with tests
 Summary:        Plexus Interpolation API
 Name:           plexus-interpolation
-Version:        1.26
-Release:        3%{?dist}
+Version:        1.27
+Release:        1%{?dist}
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -81,6 +81,9 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.27-1
+- Auto-upgrade to 1.27 - Azure Linux 3.0 Upgrades
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.26-3
 - Moved from extended to core
 - License verified
