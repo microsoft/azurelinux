@@ -45,7 +45,7 @@ cp %{SOURCE1} .
 %mvn_file : plexus/%{name}
  
 %build
-%mvn_build -- -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
+%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 
 %install
 %mvn_install
 %files -n %{?module_prefix}%{name} -f .mfiles
