@@ -53,6 +53,7 @@ rm distlib/*.exe
 %pyproject_install
 %pyproject_save_files %{srcname}
 
+if %{with_check}
 %check
 export PYTHONHASHSEED=0
 export SKIP_ONLINE=1
@@ -65,7 +66,8 @@ pip3 install exceptiongroup iniconfig tomli
 # test_is_writable assumes we're not the root user
 # and does not like that we have write access to /etc
 
-%pytest -k "not (test_sequencer_basic or test_is_writable)"
+%pytest -k "not test_sequencer_basic"
+%endif
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
