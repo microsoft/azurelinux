@@ -32,7 +32,7 @@ index 3dd1564..94d441c 100644
  
  // operateHeader takes action on the decoded headers.
 -func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream), traceCtx func(context.Context, string) context.Context) (fatal bool) {
-+func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream)) error {
++func (t *http2Server) operateHeaders(frame *http2.MetaHeadersFrame, handle func(*Stream)) (fatal bool) {
  	// Acquire max stream ID lock for entire duration
  	t.maxStreamMu.Lock()
  	defer t.maxStreamMu.Unlock()
@@ -58,7 +58,7 @@ index 3dd1564..94d441c 100644
  		switch frame := frame.(type) {
  		case *http2.MetaHeadersFrame:
 -			if t.operateHeaders(frame, handle, traceCtx) {
-+			if err := t.operateHeaders(frame, handle); err != nil {
++			if t.operateHeaders(frame, handle){
  				t.Close()
  				break
  			}
