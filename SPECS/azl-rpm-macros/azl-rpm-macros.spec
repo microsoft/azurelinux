@@ -1,3 +1,4 @@
+# WARNING: the directory '<dir>' in '%{_libdir}/rpm/<dir>' must match the value passed through '--with-vendor' when building the 'rpm' package.
 %global rcdir %{_libdir}/rpm/azl
 %global rcluadir %{_libdir}/rpm/lua/azl
 # Turn off auto byte compilation since when building this spec in the toolchain the needed scripts are not installed yet.

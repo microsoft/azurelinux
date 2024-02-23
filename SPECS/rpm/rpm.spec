@@ -133,7 +133,7 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
     --enable-ndb \
     --disable-dependency-tracking \
     --disable-static \
-    --with-vendor=mariner \
+    --with-vendor=azl \
     --enable-python \
     --with-cap \
     --disable-silent-rules \
