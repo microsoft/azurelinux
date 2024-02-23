@@ -26665,8 +26665,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-td",
-          "version": "0.16.8",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.16.8.tar.gz"
+          "version": "0.17.1",
+          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
         }
       }
     },
