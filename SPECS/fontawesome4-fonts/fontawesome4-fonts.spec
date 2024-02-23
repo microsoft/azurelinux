@@ -7,7 +7,7 @@ Version:        4.7.0
 Release:        12%{?dist}
 License:        OFL AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fontawesome.com
 Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-fontconfig.conf
