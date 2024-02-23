@@ -1,4 +1,7 @@
-%global pypi_name sphinxcontrib-serializinghtml
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix serializinghtml
+%global pypi_name %{pypi_name_prefix}-${pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_${pypi_name_suffix}
 
 Summary:        Sphinx extension for serialized HTML
 Name:           python-%{pypi_name}
@@ -8,7 +11,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.sphinx-doc.org/en/master/
-Source0:        https://files.pythonhosted.org/packages/54/13/8dd7a7ed9c58e16e20c7f4ce8e4cb6943eb580955236d0c0d00079a73c49/sphinxcontrib_serializinghtml-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/54/13/8dd7a7ed9c58e16e20c7f4ce8e4cb6943eb580955236d0c0d00079a73c49/%{pypi_name_underscore}-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -39,7 +42,7 @@ HTML files (json and pickle).
 %pyproject_buildrequires -x test
 
 %prep
-%autosetup -n sphinxcontrib_serializinghtml-%{version}
+%autosetup -n %{pypi_name_underscore}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -72,8 +75,8 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 %files -n python3-%{pypi_name} -f sphinxcontrib.serializinghtml.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/	
-%{python3_sitelib}/sphinxcontrib_serializinghtml-%{version}.dist-info/
+%{python3_sitelib}/%{pypi_name_prefix}/	
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}.dist-info/
 
 %changelog
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.1.10-1

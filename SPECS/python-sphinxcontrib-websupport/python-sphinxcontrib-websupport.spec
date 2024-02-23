@@ -1,19 +1,23 @@
-%define pkgname sphinxcontrib-websupport
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix websupport
+%global pypi_name %{pypi_name_prefix}-${pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_${pypi_name_suffix}
+
 Summary:        Python API to integrate Sphinx into a web application
-Name:           python-%{pkgname}
+Name:           python-%{pypi_name}
 Version:        1.2.4
 Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
-Source0:        https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
+URL:            https://github.com/sphinx-doc/%{pypi_name}
+Source0:        https://github.com/sphinx-doc/%{pypi_name}/archive/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
 Python API to integrate Sphinx into a web application
 
-%package -n python3-%{pkgname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -25,11 +29,11 @@ BuildRequires:  python3-pip
 Requires:       python3
 Requires:       python3-sphinxcontrib-serializinghtml
 
-%description -n python3-%{pkgname}
+%description -n python3-%{pypi_name}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
 
 %prep
-%autosetup -n %{pkgname}-%{version} -p 1
+%autosetup -n %{pypi_name}-%{version} -p 1
 rm -rf *.egg-info
 
 %build
@@ -42,10 +46,10 @@ rm -rf *.egg-info
 pip3 install tox
 tox
 
-%files -n python3-%{pkgname}
+%files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/*
+%{python3_sitelib}/%{pypi_name_prefix}/*
 %{python3_sitelib}/*.egg-info
 %{python3_sitelib}/*.pth
 
