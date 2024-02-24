@@ -4,7 +4,7 @@
         "shadow-utils",
         "python3",
         "dnf",
-        "createrepo"
+        "createrepo_c"
     ],
     "_comment": "Additional packages needed on top of core image to bootstrap building of other images."
 }
