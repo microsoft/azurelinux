@@ -21934,8 +21934,8 @@
         "type": "other",
         "other": {
           "name": "python-conda-package-handling",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/conda/conda-package-handling/archive/1.7.2/conda-package-handling-1.7.2.tar.gz"
+          "version": "2.2.0",
+          "downloadUrl": "https://github.com/conda/conda-package-handling/archive/2.2.0/conda-package-handling-2.2.0.tar.gz"
         }
       }
     },
@@ -22484,8 +22484,8 @@
         "type": "other",
         "other": {
           "name": "python-greenlet",
-          "version": "2.0.2",
-          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/2.0.2/greenlet-2.0.2.tar.gz"
+          "version": "3.0.3",
+          "downloadUrl": "https://github.com/python-greenlet/greenlet/archive/3.0.3/greenlet-3.0.3.tar.gz"
         }
       }
     },
@@ -22974,8 +22974,8 @@
         "type": "other",
         "other": {
           "name": "python-markdown",
-          "version": "3.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.2.2.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.5.2.tar.gz"
         }
       }
     },
@@ -24004,8 +24004,8 @@
         "type": "other",
         "other": {
           "name": "python-ruamel-yaml-clib",
-          "version": "0.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/ruamel.yaml.clib-0.2.0.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/46/ab/bab9eb1566cd16f060b54055dd39cf6a34bfa0240c53a7218c43e974295b/ruamel.yaml.clib-0.2.8.tar.gz"
         }
       }
     },
@@ -24036,6 +24036,16 @@
           "name": "python-semantic_version",
           "version": "2.8.4",
           "downloadUrl": "https://github.com/rbarrois/python-semanticversion/archive/v2.8.4/semantic_version-2.8.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-setuptools",
+          "version": "69.0.3",
+          "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
         }
       }
     },
@@ -24834,8 +24844,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.14",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
+          "version": "3.12.0",
+          "downloadUrl": "https://www.python.org/ftp/python/3.12.0/Python-3.12.0.tar.xz"
         }
       }
     },
