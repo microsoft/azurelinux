@@ -2006,6 +2006,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "containerd",
+          "version": "1.7.13",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.7.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "containerized-data-importer",
           "version": "1.57.0",
           "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
@@ -13115,16 +13125,6 @@
           "name": "moby-compose",
           "version": "2.17.2",
           "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "moby-containerd",
-          "version": "1.6.22",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.22.tar.gz"
         }
       }
     },

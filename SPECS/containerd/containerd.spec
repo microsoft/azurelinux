@@ -1,40 +1,35 @@
 %global debug_package %{nil}
-%define upstream_name containerd
-%define commit_hash 8165feabfdfe38c65b599c4993d227328c231fca
+%define commit_hash 7c3aca7a610df76212171d200ca3811ff6096eb8
 
 Summary: Industry-standard container runtime
-Name: moby-%{upstream_name}
-Version: 1.6.22
-Release: 4%{?dist}
+Name: containerd
+Version: 1.7.13
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
-Distribution:   Azure Linux
+Distribution: Azure Linux
 
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
-Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
+Patch1:  fix_tests_for_golang1.21.patch
 
 %{?systemd_requires}
 
-BuildRequires: btrfs-progs-devel
 BuildRequires: git
 BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
-Requires: moby-runc >= 1.1.0
+Requires: runc
 
-Conflicts: containerd
-Conflicts: containerd-io
-Conflicts: moby-engine <= 3.0.10
-
-Obsoletes: containerd
-Obsoletes: containerd-io
+# This package replaces the old name of moby-containerd
+Provides: moby-containerd = %{version}-%{release}
+Obsoletes: moby-containerd < %{version}-%{release}
 
 %description
 containerd is an industry-standard container runtime with an emphasis on
@@ -47,7 +42,7 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -p1
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -90,7 +85,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-* Tue Oct 18 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-4
+* Fri Feb 23 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.13-1
+- Rename package to containerd
+- Upgrade to 1.7.13, remove unused patches
+- Add patch to fix tests on golang 1.21
+
+* Wed Oct 18 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.6.22-4
 - Precreate /opt/containerd/{bin,lib} to ensure correct SELinux labeling.
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.22-3
@@ -164,7 +164,7 @@ fi
 - Update to version 1.6.0-rc.3
 - Use code from upstream instead of Azure fork.
 
-* Tue Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
+* Mon Jan 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.5.9+azure-1
 - Update to version 1.5.9+azure
 
 * Wed Jan 19 2022 Henry Li <lihl@microsoft.com> - 1.4.4+azure-6
