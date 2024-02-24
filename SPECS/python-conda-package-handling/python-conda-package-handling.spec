@@ -16,21 +16,21 @@ BuildRequires:  libarchive-devel
 %description
 Create and extract conda packages of various formats.
 
-%package -n python3-%{srcname}
-%{?python_provide:%python_provide python3-%{srcname}}
+%package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{summary}
-BuildRequires:  python3-Cython
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-six
-BuildRequires:  python3-tqdm
-Requires:       python3-six
-Requires:       python3-tqdm
+BuildRequires:  python%{python3_pkgversion}-Cython
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-six
+BuildRequires:  python%{python3_pkgversion}-tqdm
+Requires:       python%{python3_pkgversion}-six
+Requires:       python%{python3_pkgversion}-tqdm
 %if %{with_check}
-BuildRequires:  python3-pip
+BuildRequires:  python%{python3_pkgversion}-pip
 %endif
 
-%description -n python3-%{srcname}
+%description -n python%{python3_pkgversion}-%{srcname}
 Create and extract conda packages of various formats.
 
 %prep
@@ -59,7 +59,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
     python%{python3_version} -m pytest -v tests -k 'not test_secure_refusal_to_extract_abs_paths'
 
 
-%files -n python3-%{srcname}
+%files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
 %doc AUTHORS.md CHANGELOG.md README.md
 %{_bindir}/cph

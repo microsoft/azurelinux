@@ -15,7 +15,9 @@ Distribution:   Azure Linux
 Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
-Source1:        pathfix.py
+# pathfix.py was provided by the previous Python source bundle (Python-3.9.14.tar.xz)
+# It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
+Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
 
 BuildRequires:  bzip2-devel
@@ -41,6 +43,7 @@ Provides:       /bin/python3
 Provides:       %{name}-docs = %{version}-%{release}
 Provides:       python%{majmin} = %{version}-%{release}
 Provides:       python%{majmin_nodots} = %{version}-%{release}
+
 %if %{with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
@@ -87,7 +90,9 @@ Summary:        The libraries and header files needed for Python development.
 Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
-Requires:       python3-setuptools
+# python3-setuptools is required, but provided in default worker chroot environment.
+#Requires:       python3-setuptools
+Provides:       python3-devel
 Provides:       python%{majmin}-devel = %{version}-%{release}
 Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
 
