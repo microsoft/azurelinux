@@ -19,13 +19,14 @@ Source2:        https://www.x.org/pub/individual/app/xkbevd-%{xkbevd}.tar.xz
 Source3:        https://www.x.org/pub/individual/app/xkbprint-%{xkbprint}.tar.xz
 Source4:        https://www.x.org/pub/individual/app/xkbutils-%{xkbutils}.tar.xz
 
-BuildRequires:  libxkbfile-devel
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xaw7)
 BuildRequires:  pkgconfig(xkbfile)
 BuildRequires:  pkgconfig(xorg-macros) >= 1.8
 BuildRequires:  pkgconfig(xt)
+# Add libXrandr as dependency needed for the Xwayland warning
+BuildRequires:  pkgconfig(xrandr)
 
 Provides:       setxkbmap = %{setxkbmap}
 Provides:       xkbcomp = %{xkbcomp}
