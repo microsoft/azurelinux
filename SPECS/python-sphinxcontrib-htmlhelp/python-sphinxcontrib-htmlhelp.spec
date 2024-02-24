@@ -1,4 +1,7 @@
-%global pypi_name sphinxcontrib-htmlhelp
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix htmlhelp
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
 
 Summary:        Sphinx extension for HTML help files
 Name:           python-%{pypi_name}
@@ -8,7 +11,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/8a/03/2f9d699fbfdf03ecb3b6d0e2a268a8998d009f2a9f699c2dcc936899257d/sphinxcontrib_htmlhelp-2.0.5.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/8a/03/2f9d699fbfdf03ecb3b6d0e2a268a8998d009f2a9f699c2dcc936899257d/%{pypi_name_underscore}-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -41,7 +44,7 @@ Summary:        %{summary}
 sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files.
 
 %prep
-%autosetup -n sphinxcontrib_htmlhelp-%{version}
+%autosetup -n %{pypi_name_underscore}-%{version}
 find -name '*.mo' -delete
 
 %generate_buildrequires
@@ -78,8 +81,8 @@ pip3 install sphinx webencodings exceptiongroup iniconfig tomli
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.htmlhelp.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_htmlhelp*.dist-info
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}*.dist-info
 
 %changelog
 * Fri Feb 16 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.0.5-1
