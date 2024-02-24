@@ -92,7 +92,7 @@ X.Org X11 xkb gadgets.
 
 %files -n xorg-x11-xkb-extras
 %license xkbutils-%{xkbutils}/COPYING
-%doc xkbutils-%{xkbutils}/README
+%doc xkbutils-%{xkbutils}/README.md
 %{_bindir}/xkbbell
 %{_bindir}/xkbevd
 %{_bindir}/xkbprint
