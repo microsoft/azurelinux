@@ -1,7 +1,7 @@
 Summary:        Device Tree Compiler
 Name:           dtc
 Version:        1.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,6 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 BuildRequires:  swig
 Provides:       libfdt = %{name}-%{version}
-Provides:       python3-libfdt = %{name}-%{version}
 
 %description
 Devicetree is a data structure for describing hardware. Rather than hard coding
@@ -27,6 +26,14 @@ can be described in a data structure that is passed to the operating system at
 boot time. The devicetree is used by OpenFirmware, OpenPOWER Abstraction Layer
 (OPAL), Power Architecture Platform Requirements (PAPR) and in the standalone
 Flattened Device Tree (FDT) form.
+
+%package -n python3-libfdt
+Summary:        Python3 bindings for libfdt
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python3-libfdt}
+
+%description -n python3-libfdt
+Python interface to libdft.
 
 %package        devel
 Summary:        Development headers for device tree library
@@ -70,6 +77,8 @@ make %{?_smp_mflags} check
 %{_bindir}/*
 %{_libdir}/libfdt-%{version}.so
 %{_libdir}/libfdt.so.*
+
+%files -n python3-libfdt
 %{python3_sitearch}/
 
 %files devel
@@ -78,6 +87,9 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Fri Feb 23 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.7.0-2
+- Factor python3 bindings to a separate subpackage.
+
 * Thu Feb 01 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.7.0-1
 - Update to version 1.7.0
 - Add %check section
