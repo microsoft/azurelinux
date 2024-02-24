@@ -59,8 +59,8 @@ are used by the tools in gnome-doc-utils and by yelp.
 
 %prep
 %setup -q
-%patch1 -p1 -b .package
-%patch2 -p1 -b .python3
+%patch 1 -p1 -b .package
+%patch 2 -p1 -b .python3
 
 %build
 %configure --disable-scrollkeeper --enable-build-utils

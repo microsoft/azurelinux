@@ -23,7 +23,7 @@ view a specific item.
 
 %prep
 %setup -q -n %{name}-%{gitfullrev}
-%patch1 -p1 -b .default
+%patch 1 -p1 -b .default
 
 %build
 %configure

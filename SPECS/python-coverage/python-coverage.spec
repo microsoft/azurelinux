@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 Summary:        Code coverage measurement for Python.
 Name:           python-coverage
 Version:        7.4.1
@@ -14,7 +15,7 @@ Code coverage measurement for Python.
 
 %package -n     python3-coverage
 Summary:        Code coverage measurement for Python.
-BuildRequires:  python3-devel >= 3.7
+BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
@@ -54,8 +55,12 @@ tox
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
-* Thu Feb 08 2024 Andrew Phelps <anphel@microsoft.com> - 7.4.1-1
+* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 7.4.1-1
 - Upgrade to version 7.4.1
+
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 6.3.2-5
+- Disable debuginfo package
+- Remove python3-devel version restriction
 
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 6.3.2-4
 - Update version of tox used for package tests

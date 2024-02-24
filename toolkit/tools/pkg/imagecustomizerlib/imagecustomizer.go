@@ -232,7 +232,7 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
 	var aggregateErr error
 	for sourceFile := range additionalFiles {
-		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
+		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
 			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
@@ -250,11 +250,23 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 		return nil
 	}
 
-	err := validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	err := validateIsoKernelCommandline(config.KernelCommandLine)
 	if err != nil {
 		return err
 	}
 
+	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateIsoKernelCommandline(kernelCommandLine imagecustomizerapi.KernelCommandLine) error {
+	if kernelCommandLine.SELinux != imagecustomizerapi.SELinuxDefault {
+		return fmt.Errorf("unsupported SELinux configuration for the output ISO image.")
+	}
 	return nil
 }
 

@@ -58,9 +58,9 @@ This package contains %{summary}.
 
 %prep
 %setup -q -n %{name}-%{long_ver}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 dos2unix README.txt CHANGES.txt
 
 cp %{SOURCE1} ./LICENSE.txt

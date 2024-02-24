@@ -38,7 +38,7 @@ and libraries based on OpenSSL.
 
 %prep
 %setup -q -n Mozilla-CA-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Remove a bundled CA bundle for sure
 rm lib/Mozilla/CA/cacert.pem
 # Do not distribute Mozilla downloader, we take certificates from

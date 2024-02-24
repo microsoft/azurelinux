@@ -52,18 +52,20 @@
 #
 Summary:        Intel PSM Libraries
 Name:           libpsm2
-Version:        11.2.206
-Release:        3%{?dist}
+Version:        12.0
+Release:        1%{?dist}
 License:        BSD-3-Clause OR GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/cornelisnetworks/opa-psm2/
-Source0:        https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/PSM2_11.2.206.tar.gz#/opa-psm2-PSM2_%{version}.tar.gz
+Source0:        https://github.com/cornelisnetworks/opa-psm2/archive/refs/tags/psm-v%{version}.tar.gz#/opa-psm2-psm-v%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  libuuid-devel
 BuildRequires:  make
 BuildRequires:  numactl-devel
+BuildRequires:  perl
 BuildRequires:  systemd
+BuildRequires:  systemd-rpm-macros
 Obsoletes:      hfi1-psm < 1.0.0
 # The OPA product is supported on x86_64 only:
 ExclusiveArch:  x86_64
@@ -95,7 +97,7 @@ Development files for the Intel PSM library
 Support for MPIs linked with PSM versions < 2
 
 %prep
-%autosetup -n opa-psm2-PSM2_%{version}
+%autosetup -n opa-psm2-psm-v%{version}
 
 %build
 %{set_build_flags}
@@ -128,6 +130,10 @@ rm -f %{buildroot}%{_lib64dir}/*.a
 %{_sysconfdir}/modprobe.d/libpsm2-compat.conf
 
 %changelog
+* Tue Feb 13 2024 Aditya Dubey <adityadubey@microsoft.com> - 12.0-1
+- Upgrading to latest version for Mariner 3.0
+- Adding BuildRequires: perl and BuildRequires: systemd-rpm-macros
+
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 11.2.206-3
 - Fix build issue by using _libdir macro
 
