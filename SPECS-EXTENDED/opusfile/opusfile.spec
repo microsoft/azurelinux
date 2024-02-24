@@ -1,20 +1,20 @@
+Summary:        A high-level API for decoding and seeking within .opus files
+Name:           opusfile
+Version:        0.12
+Release:        3%{?dist}
+License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-Name:          opusfile
-Version:       0.12
-Release:       2%{?dist}
-Summary:       A high-level API for decoding and seeking within .opus files
-License:       BSD
-URL:           https://www.opus-codec.org/
-Source0:       https://downloads.xiph.org/releases/opus/%{name}-%{version}.tar.gz
-
-BuildRequires: gcc
-BuildRequires: libogg-devel
-BuildRequires: openssl-devel
-BuildRequires: opus-devel
+URL:            https://www.opus-codec.org/
+Source0:        https://downloads.xiph.org/releases/opus/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-47021.patch
+BuildRequires:  gcc
+BuildRequires:  libogg-devel
+BuildRequires:  openssl-devel
+BuildRequires:  opus-devel
 
 %description
-libopusfile provides a high-level API for decoding and seeking 
+libopusfile provides a high-level API for decoding and seeking
 within .opus files. It includes:
 * Support for all files with at least one Opus stream (including
 multichannel files or Ogg files where Opus is muxed with something else).
@@ -26,15 +26,16 @@ decoded with a single output format, even if the channel count changes).
 * Support for both random access and streaming data sources.
 
 %package devel
-Summary: Development package for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
+Summary:        Development package for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig
 
 %description devel
 Files for development with %{name}.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 %configure --disable-static
@@ -45,7 +46,7 @@ Files for development with %{name}.
 %make_install
 
 #Remove libtool archives.
-find %{buildroot} -type f -name "*.la" -delete
+find %{buildroot} -type f -name "*.la" -delete -print
 
 %ldconfig_scriptlets
 
@@ -64,6 +65,10 @@ find %{buildroot} -type f -name "*.la" -delete
 %{_libdir}/libopusurl.so
 
 %changelog
+* Thu Sep 28 2023 Archana Choudhary <archana1@microsoft.com> - 0.12-3
+- Add patch for CVE-2022-47021
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
