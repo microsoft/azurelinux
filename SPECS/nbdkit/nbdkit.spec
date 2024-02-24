@@ -51,7 +51,7 @@ Distribution:   Azure Linux
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -104,6 +104,7 @@ BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
 
 # Only for running the test suite:
+%if %{with_check}
 BuildRequires:  %{_bindir}/bc
 BuildRequires:  %{_bindir}/certtool
 BuildRequires:  %{_bindir}/cut
@@ -121,6 +122,7 @@ BuildRequires:  /sbin/sfdisk
 BuildRequires:  %{_bindir}/socat
 BuildRequires:  /sbin/ss
 BuildRequires:  %{_bindir}/stat
+%endif
 
 # nbdkit is a metapackage pulling the server and a useful subset
 # of the plugins and filters.
@@ -1193,6 +1195,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.35.3-4
+- Wrap test dependencies in with_check if block
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.35.3-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
