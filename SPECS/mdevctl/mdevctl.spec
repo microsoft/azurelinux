@@ -12,8 +12,10 @@ URL:            https://crates.io/crates/mdevctl
 Source0:        https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
 Source1:        https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
 
-BuildRequires: make systemd python3-docutils
+BuildRequires:  make
+BuildRequires:  python3-docutils
 BuildRequires:  rust-packaging >= 21
+BuildRequires:  systemd-rpm-macros
 
 ExclusiveArch:  x86_64
 
