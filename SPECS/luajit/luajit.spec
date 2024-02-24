@@ -7,7 +7,7 @@
 %global luajit_version_major 2
 %global luajit_version_minor 1
 
-%global luajit_major_minor %{luajit_version_major}.%{luajit_version_minor}
+%global luajit_api_version %{luajit_version_major}.%{luajit_version_minor}
 
 # To support semantic versioning, luajit uses the posix timestamp of the last
 # commit as the patch version.
@@ -17,17 +17,28 @@
 %global upstream_commit 0d313b243194a0b8d2399d8b549ca5a0ff234db5
 # Upstream commit posix timestamp (run update-release.sh to update)
 %global upstream_commit_timestamp 1707061634
+# Upstream commit from LuaJIT-test-cleanup (run update-release.sh to update)
+%global upstream_test_commit 014708bceb70550a3ab8d539cff14d9085ca9cb8
 
 Summary:        Just-In-Time Compiler for Lua
 Name:           luajit
-Version:        %{luajit_major_minor}.%{upstream_commit_timestamp}
+Version:        %{luajit_api_version}.%{upstream_commit_timestamp}
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://luajit.org/
-# Note: github only cares about the commit ID, the name of the file name is anything we want.
 Source0:        https://github.com/LuaJIT/LuaJIT/archive/%{upstream_commit}/%{name}-%{version}.tar.gz
+
+# LuaJIT has an unofficial test suite that is not included in the official
+# release. While they actively state that it is not a part of the official
+# release, it is still useful to have for testing purposes, as Fedora does. The
+# tests are not super well maintained nor up-to-date, the patch below includes
+# some required fixes to get the tests to pass in the latest verion of LuaJIT.
+Source1:        https://github.com/LuaJIT/LuaJIT-test-cleanup/archive/%{upstream_test_commit}/%{name}-test-%{upstream_test_commit}.tar.gz
+
+# Add `make check` and update tests to latest version
+Patch0:         luajit-make-check.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -45,7 +56,14 @@ Requires:       %{name} = %{version}-%{release}
 This package contains development files for %{name}.
 
 %prep
-%autosetup -p1 -n LuaJIT-%{upstream_commit}
+# Setup and extract test tarball inside the unpacked source
+# Do not apply patches yet.
+%autosetup -N -n LuaJIT-%{upstream_commit} -a1
+
+ln -s LuaJIT-test-cleanup-%{upstream_test_commit}/test test
+
+# Apply patch after creating the symlink so we ignore the version.
+%autopatch -p1
 
 # Enable Lua 5.2 features
 sed -i -e '/-DLUAJIT_ENABLE_LUA52COMPAT/s/^#//' src/Makefile
@@ -82,7 +100,7 @@ find %{buildroot} -type f -name *.a -delete -print
 %check
 
 # Don't fail the build on a check failure.
-make check || true
+make check
 
 %files
 %license COPYRIGHT
@@ -91,17 +109,19 @@ make check || true
 %{_bindir}/%{name}-%{version}
 %{_libdir}/lib%{name}-*.so.*
 %{_mandir}/man1/%{name}.1*
-%{_datadir}/%{name}-%{luajit_major_minor}/
+%{_datadir}/lua/
+%{_datadir}/%{name}-%{luajit_api_version}/
 
 %files devel
 %doc _tmp_html/html/
-%{_includedir}/%{name}-%{luajit_major_minor}/
+%{_includedir}/%{name}-%{luajit_api_version}/
 %{_libdir}/lib%{name}-*.so
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
 * Fri Feb 23 2024 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 2.1.1707061634-1
 - Update to latest rolling release.
+- Integrate test suite from LuaJIT-test-cleanup.
 
 * Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-26
 - Initial CBL-Mariner import from Fedora 38 (license: MIT).

@@ -28,7 +28,9 @@ function cleanup {
 trap cleanup EXIT
 
 pushd $TEMPDIR
-git clone https://luajit.org/git/luajit.git
+
+# Check source repository
+git clone --depth 1 https://github.com/LuaJIT/LuaJIT luajit
 pushd luajit
 git checkout "$LUAJIT_BRANCH"
 GIT_COMMIT_ID=$(git rev-parse HEAD)
@@ -37,23 +39,44 @@ LUAJIT_VERSION="$LUAJIT_VERSION_MAJOR.$LUAJIT_VERSION_MINOR.$GIT_COMMIT_TIMESTAM
 TARBALL_NAME="luajit-$LUAJIT_VERSION.tar.gz"
 DOWNLOAD_LINK="https://github.com/LuaJIT/LuaJIT/archive/$GIT_COMMIT_ID/$TARBALL_NAME"
 popd
-wget $DOWNLOAD_LINK
-CHECKSUM=$(sha256sum "$TARBALL_NAME" | cut -f 1 -d ' ')
+
+# Check test repository
+git clone --depth 1 https://github.com/LuaJIT/LuaJIT-test-cleanup.git luajit-test
+pushd luajit-test
+TEST_GIT_COMMIT_ID=$(git rev-parse HEAD)
+TEST_TARBALL_NAME="luajit-test-$TEST_GIT_COMMIT_ID.tar.gz"
+TEST_DOWNLOAD_LINK="https://github.com/LuaJIT/LuaJIT-test-cleanup/archive/$TEST_GIT_COMMIT_ID/$TEST_TARBALL_NAME"
 popd
 
+wget $DOWNLOAD_LINK
+CHECKSUM=$(sha256sum "$TARBALL_NAME" | cut -f 1 -d ' ')
+
+wget $TEST_DOWNLOAD_LINK
+TEST_CHECKSUM=$(sha256sum "$TEST_TARBALL_NAME" | cut -f 1 -d ' ')
+
+popd
+
+echo "Updating specfile..." 
 sed "s/%global upstream_commit .*/%global upstream_commit $GIT_COMMIT_ID/" -i $SCRIPT_DIR/*.spec
 sed "s/%global upstream_commit_timestamp .*/%global upstream_commit_timestamp $GIT_COMMIT_TIMESTAMP/" -i $SCRIPT_DIR/*.spec
+sed "s/%global upstream_test_commit .*/%global upstream_test_commit $TEST_GIT_COMMIT_ID/" -i $SCRIPT_DIR/*.spec
 
+echo "Updating signatures..."
 cat << EOF > luajit.signatures.json
 {
     "Signatures": {
-        "$TARBALL_NAME": "$CHECKSUM"
+        "$TARBALL_NAME": "$CHECKSUM",
+        "$TEST_TARBALL_NAME": "$TEST_CHECKSUM"
     }
 }
 EOF
 
 echo ""
-echo "Successfully updated luajit release:"
-echo "DOWNLOAD LINK:"
+echo "SUCCESSFULLY UPDATED LUAJIT RELEASE:"
+echo "Latest commit:           $GIT_COMMIT_ID"
+echo "Latest commit timestamp: $GIT_COMMIT_TIMESTAMP"
+echo "Latest test repo commit: $TEST_GIT_COMMIT_ID"
+echo "DOWNLOAD LINKS:"
 echo "$DOWNLOAD_LINK"
+echo "$TEST_DOWNLOAD_LINK"
 
