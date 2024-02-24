@@ -50,7 +50,7 @@ The python-sphinxcontrib-websupport package provides a Python API to easily inte
 %check
 pip3 install tox tox-current-env pytest
 %tox
-%files -n python3-%{pypi_name}-f %{pyproject_files}
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
 
