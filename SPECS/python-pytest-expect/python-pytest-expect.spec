@@ -3,7 +3,7 @@
 Summary:        py.test plugin to store test expectations and mark tests based on them
 Name:           python-%{pypi_name}
 Version:        1.1.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,9 +48,12 @@ cp -p %{SOURCE1} .
 %license LICENSE
 %doc README.rst
 %{python3_sitelib}/pytest_expect
-%{python3_sitelib}/pytest_expect-%{version}-py?.?.egg-info
+%{python3_sitelib}/pytest_expect-%{version}-py*.egg-info
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.1.0-9
+- Fix path to egg-info
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-8
 - Cleaning-up spec. License verified.
 

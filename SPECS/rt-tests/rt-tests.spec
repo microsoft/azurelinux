@@ -1,22 +1,22 @@
-Summary:       Programs that test various rt-features
-Name:          rt-tests
-Version:       2.6
-Release:       1%{?dist}
-License:       GPLv2
-Vendor:        Microsoft Corporation
+Summary:        Programs that test various rt-features
+Name:           rt-tests
+Version:        2.6
+Release:        2%{?dist}
+License:        GPLv2
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Group:         Development/Tools
-URL:           git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
-Source0:       https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz
-Patch1:        rt-tests-Makefile-Restore-support-for-Exuberant-Ctag.patch
-Patch2:        rt-tests-Add-missing-SPDX-licenses.patch
-Patch3:        rt-tests-Remove-remaining-unnecessary-texts-after-ad.patch
-ExclusiveArch: x86_64
-Requires:      bash
-Requires:      bc
-Requires:      python3
-BuildRequires: libnuma-devel
-BuildRequires: python3-devel
+Group:          Development/Tools
+URL:            git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git
+Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/%{name}-%{version}.tar.xz
+Patch1:         rt-tests-Makefile-Restore-support-for-Exuberant-Ctag.patch
+Patch2:         rt-tests-Add-missing-SPDX-licenses.patch
+Patch3:         rt-tests-Remove-remaining-unnecessary-texts-after-ad.patch
+ExclusiveArch:  x86_64
+Requires:       bash
+Requires:       bc
+Requires:       python3
+BuildRequires:  libnuma-devel
+BuildRequires:  python3-devel
 
 %description
 rt-tests is a set of programs that test and measure various components of
@@ -56,7 +56,6 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/bin/oslat
 /usr/bin/determine_maximum_mpps.sh
 /usr/bin/get_cyclictest_snapshot
-%{python3_sitelib}/__pycache__/*
 %{python3_sitelib}/*
 %doc
 /usr/share/man/man8/cyclictest.8.gz
@@ -79,15 +78,18 @@ make %{?_smp_mflags} DESTDIR=%{buildroot} prefix=%{_prefix} install
 /usr/share/man/man8/determine_maximum_mpps.8.gz
 
 %changelog
-* Tue Feb 2 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.6-1
+* Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 2.6-2
+- Fix build issue with python 3.12
+
+* Tue Feb 02 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.6-1
 - Upgrade to 2.6
 
-* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.8-13
+* Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.8-13
 - Initial CBL-Mariner import from CentOS 8 (license: MIT).
 - License verified
 - Remove %%clean stage
 
-* Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> 1.8-12
+* Wed Mar 17 2021 Hernan Gatta <hegatta@microsoft.com> - 1.8-12
 - Initial import into ECF Mariner from CentOS 8 (License: GPLv2)
 
 * Thu Aug 20 2020 John Kacur <jkacur@redhat.com> - 1.8-11

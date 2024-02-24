@@ -1,7 +1,8 @@
+%global debug_package %{nil}
 Summary:        Code coverage measurement for Python.
 Name:           python-coverage
 Version:        6.3.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +15,7 @@ Code coverage measurement for Python.
 
 %package -n     python3-coverage
 Summary:        Code coverage measurement for Python.
-BuildRequires:  python3-devel >= 3.7
+BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
@@ -54,6 +55,10 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 6.3.2-5
+- Disable debuginfo package
+- Remove python3-devel version restriction
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 6.3.2-4
 - Update version of tox used for package tests
 

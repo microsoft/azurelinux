@@ -2,13 +2,13 @@
 %global pname ruamel-yaml-clib
 Summary:        C version of reader, parser and emitter for ruamel.yaml derived from libyaml
 Name:           python-%{pname}
-Version:        0.2.0
+Version:        0.2.8
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.org/project/ruamel.yaml.clib/
-Source0:        https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/46/ab/bab9eb1566cd16f060b54055dd39cf6a34bfa0240c53a7218c43e974295b/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  libyaml-devel
 
@@ -45,6 +45,9 @@ python3 setup.py install --single-version-externally-managed --skip-build --root
 %{python3_sitearch}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 0.2.8-1
+- Upgrade to version 0.2.8
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.2.0-1
 - Auto-upgrade to 0.2.0 - Azure Linux 3.0 - package upgrades
 

@@ -1,7 +1,7 @@
 %global __cmake_in_source_build 1
 Name:           hyperscan
 Version:        5.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        High-performance regular expression matching library
 License:        BSD
 Group:          Development/Libraries
@@ -64,7 +64,8 @@ needed for developing Hyperscan applications.
 # multiply defined symbols.  This seems like a GCC bug
 # Disable LTO
 %define _lto_cflags %{nil}
-%cmake -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_STATIC_AND_SHARED:BOOL=OFF .
+%cmake -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_STATIC_AND_SHARED:BOOL=OFF -DPYTHON_EXECUTABLE=%{python3} .
+
 %make_build
 
 %install
@@ -88,11 +89,14 @@ needed for developing Hyperscan applications.
 %{_includedir}/hs/
 
 %changelog
+* Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.2-2
+- Fix build issue with python 3.12 by defining PYTHON_EXECUTABLE
+
 * Thu Feb 08 2024 Archana Choudhary <archana1@microsoft.com> - 5.4.2-1
 - Upgrade to 5.4.2
 - Drop patch for missed symbols as its fixed in upstream
   https://github.com/intel/hyperscan/issues/292
-  
+
 * Fri Jul 02 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 5.4.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified

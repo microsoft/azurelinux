@@ -1,3 +1,4 @@
+%global debug_package %{nil}
 %global srcname frozendict
 %global _description %{expand:
 frozendict is an immutable wrapper around dictionaries that implements
@@ -6,7 +7,7 @@ replacement for dictionaries where immutability is desired.}
 Summary:        An immutable dictionary
 Name:           python-%{srcname}
 Version:        2.3.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +50,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} python3 -m pytest
 %{python3_sitelib}/%{srcname}/
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.3.8-2
+- Disable debuginfo package
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.8-1
 - Auto-upgrade to 2.3.8 - Azure Linux 3.0 - package upgrades
 

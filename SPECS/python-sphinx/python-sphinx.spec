@@ -11,7 +11,7 @@
 Summary:        Python documentation generator
 Name:           python-sphinx
 Version:        4.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 # Unless otherwise noted, the license for code is BSD
 # sphinx/util/inspect.py has bits licensed with PSF license v2 (Python)
 # sphinx/themes/haiku/static/haiku.css_t has bits licensed with MIT
@@ -141,6 +141,8 @@ Recommends:     graphviz
 
 Provides:       bundled(css3-mediaqueries) = 1.0
 
+Provides:       python3dist(sphinx)
+
 %description -n python%{python3_pkgversion}-sphinx
 Sphinx is a tool that makes it easy to create intelligent and
 beautiful documentation for Python projects (or other documents
@@ -252,6 +254,9 @@ pip3 install more-itertools
 %dir %{_datadir}/sphinx/locale/*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.0-3
+- Add Provides python3dist(sphinx)
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removing epoch.

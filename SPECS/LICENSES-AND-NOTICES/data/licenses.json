@@ -2259,6 +2259,7 @@
                 "python-repoze-lru",
                 "python-routes",
                 "python-rsa",
+                "python-setuptools",
                 "python-sphinxcontrib-websupport",
                 "python-tensorboard",
                 "python-tensorboard-plugin-wit",
