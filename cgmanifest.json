@@ -2006,6 +2006,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "containerd",
+          "version": "1.7.13",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.7.13.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "containerized-data-importer",
           "version": "1.57.0",
           "downloadUrl": "https://github.com/kubevirt/containerized-data-importer/archive/refs/tags/v1.57.0.tar.gz"
@@ -2528,8 +2538,8 @@
         "type": "other",
         "other": {
           "name": "desktop-file-utils",
-          "version": "0.26",
-          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.26.tar.xz"
+          "version": "0.27",
+          "downloadUrl": "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-0.27.tar.xz"
         }
       }
     },
@@ -2718,8 +2728,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.89",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
+          "version": "2.90",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.90.tar.xz"
         }
       }
     },
@@ -3198,8 +3208,8 @@
         "type": "other",
         "other": {
           "name": "elixir",
-          "version": "1.14.3",
-          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.14.3/elixir-1.14.3.tar.gz"
+          "version": "1.16.1",
+          "downloadUrl": "https://github.com/elixir-lang/elixir/archive/v1.16.1/elixir-1.16.1.tar.gz"
         }
       }
     },
@@ -4210,8 +4220,8 @@
         "type": "other",
         "other": {
           "name": "gfs2-utils",
-          "version": "3.2.0",
-          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.2.0.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://releases.pagure.org/gfs2-utils/gfs2-utils-3.5.1.tar.gz"
         }
       }
     },
@@ -4310,8 +4320,8 @@
         "type": "other",
         "other": {
           "name": "glib-networking",
-          "version": "2.70.0",
-          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.70/glib-networking-2.70.0.tar.xz"
+          "version": "2.78.0",
+          "downloadUrl": "https://download.gnome.org/sources/glib-networking/2.78/glib-networking-2.78.0.tar.xz"
         }
       }
     },
@@ -7531,8 +7541,8 @@
         "type": "other",
         "other": {
           "name": "iw",
-          "version": "5.9",
-          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-5.9.tar.xz"
+          "version": "6.7",
+          "downloadUrl": "http://www.kernel.org/pub/software/network/iw/iw-6.7.tar.xz"
         }
       }
     },
@@ -7881,8 +7891,8 @@
         "type": "other",
         "other": {
           "name": "json-glib",
-          "version": "1.6.6",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.6/json-glib-1.6.6.tar.xz"
+          "version": "1.8.0",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/json-glib/1.8/json-glib-1.8.0.tar.xz"
         }
       }
     },
@@ -10283,6 +10293,16 @@
           "name": "libnvidia-container",
           "version": "1.13.5",
           "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libnvme",
+          "version": "1.8",
+          "downloadUrl": "https://github.com/linux-nvme/libnvme/archive/refs/tags/v1.8.tar.gz"
         }
       }
     },
@@ -13092,9 +13112,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "moby-cli",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.25.tar.gz"
+          "name": "docker-cli",
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/docker/cli/archive/v25.0.3.tar.gz"
         }
       }
     },
@@ -13105,16 +13125,6 @@
           "name": "moby-compose",
           "version": "2.17.2",
           "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "moby-containerd",
-          "version": "1.6.22",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v1.6.22.tar.gz"
         }
       }
     },
@@ -13483,8 +13493,8 @@
         "type": "other",
         "other": {
           "name": "mysql",
-          "version": "8.0.33",
-          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.33.tar.gz"
+          "version": "8.0.36",
+          "downloadUrl": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-8.0.36.tar.gz"
         }
       }
     },
@@ -13893,8 +13903,8 @@
         "type": "other",
         "other": {
           "name": "netplan",
-          "version": "0.95",
-          "downloadUrl": "https://github.com/canonical/netplan/archive/0.95/0.95.tar.gz"
+          "version": "0.107.1",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/refs/tags/0.107.1.tar.gz"
         }
       }
     },
@@ -13973,8 +13983,8 @@
         "type": "other",
         "other": {
           "name": "nghttp2",
-          "version": "1.57.0",
-          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.57.0/nghttp2-1.57.0.tar.xz"
+          "version": "1.59.0",
+          "downloadUrl": "https://github.com/nghttp2/nghttp2/releases/download/v1.59.0/nghttp2-1.59.0.tar.xz"
         }
       }
     },
@@ -14313,8 +14323,8 @@
         "type": "other",
         "other": {
           "name": "nvme-cli",
-          "version": "1.16",
-          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v1.16.tar.gz"
+          "version": "2.8",
+          "downloadUrl": "https://github.com/linux-nvme/nvme-cli/archive/v2.8.tar.gz"
         }
       }
     },
@@ -20874,8 +20884,8 @@
         "type": "other",
         "other": {
           "name": "pixman",
-          "version": "0.42.2",
-          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.42.2.tar.xz"
+          "version": "0.43.2",
+          "downloadUrl": "https://xorg.freedesktop.org/archive/individual/lib/pixman-0.43.2.tar.xz"
         }
       }
     },
@@ -22154,8 +22164,8 @@
         "type": "other",
         "other": {
           "name": "python-distro",
-          "version": "1.6.0",
-          "downloadUrl": "https://github.com/python-distro/distro/releases/download/v1.6.0/distro-1.6.0.tar.gz"
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/python-distro/distro/archive/refs/tags/v1.9.0.tar.gz"
         }
       }
     },
@@ -23254,8 +23264,8 @@
         "type": "other",
         "other": {
           "name": "python-packaging",
-          "version": "21.3",
-          "downloadUrl": "https://github.com/pypa/packaging/releases/download/21.3/packaging-21.3.tar.gz"
+          "version": "23.2",
+          "downloadUrl": "https://github.com/pypa/packaging/archive/refs/tags/23.2.tar.gz"
         }
       }
     },
@@ -23434,8 +23444,8 @@
         "type": "other",
         "other": {
           "name": "python-py",
-          "version": "1.10.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-1.10.0.tar.gz"
+          "version": "1.11.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/98/ff/fec109ceb715d2a6b4c4a85a61af3b40c723a961e8828319fbcb15b868dc/py-1.11.0.tar.gz"
         }
       }
     },
@@ -24123,6 +24133,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-sortedcontainers",
+          "version": "2.4.0",
+          "downloadUrl": "https://github.com/grantjenks/python-sortedcontainers/archive/v2.4.0/python-sortedcontainers-2.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-soupsieve",
           "version": "1.9.2",
           "downloadUrl": "https://github.com/facelessuser/soupsieve/archive/1.9.2/python-soupsieve-1.9.2.tar.gz"
@@ -24154,8 +24174,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx-theme-alabaster",
-          "version": "0.7.12",
-          "downloadUrl": "https://files.pythonhosted.org/packages/cc/b4/ed8dcb0d67d5cfb7f83c4d5463a7614cb1d078ad7ae890c9143edebbf072/alabaster-0.7.12.tar.gz"
+          "version": "0.7.16",
+          "downloadUrl": "https://codeload.github.com/sphinx-doc/alabaster/tar.gz/refs/tags/0.7.16"
         }
       }
     },
@@ -24924,8 +24944,8 @@
         "type": "other",
         "other": {
           "name": "qdox",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/paul-hammant/qdox/archive/refs/tags/qdox-2.0.0.tar.gz"
+          "version": "2.0.3",
+          "downloadUrl": "https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/2.0.3/qdox-2.0.3-project.tar.bz2"
         }
       }
     },
@@ -26155,8 +26175,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-io-event",
-          "version": "1.0.7",
-          "downloadUrl": "https://github.com/socketry/io-event/archive/refs/tags/v1.0.7.tar.gz"
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/socketry/io-event/archive/refs/tags/v1.3.2.tar.gz"
         }
       }
     },
@@ -26225,8 +26245,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-minitest",
-          "version": "5.15.0",
-          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.15.0.tar.gz"
+          "version": "5.19.0",
+          "downloadUrl": "https://github.com/minitest/minitest/archive/refs/tags/v5.19.0.tar.gz"
         }
       }
     },
@@ -26235,8 +26255,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-mocha",
-          "version": "1.13.0",
-          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v1.13.0.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://github.com/freerange/mocha/archive/refs/tags/v2.1.0.tar.gz"
         }
       }
     },
@@ -26655,8 +26675,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-td",
-          "version": "0.16.8",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.16.8.tar.gz"
+          "version": "0.17.1",
+          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
         }
       }
     },
@@ -29267,8 +29287,8 @@
         "type": "other",
         "other": {
           "name": "wayland",
-          "version": "1.21.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.21.0/downloads/wayland-1.21.0.tar.xz"
+          "version": "1.22.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/wayland/wayland/-/releases/1.22.0/downloads/wayland-1.22.0.tar.xz"
         }
       }
     },

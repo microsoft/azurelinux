@@ -276,9 +276,12 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
-* Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-1
+* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-1
 - Upgrade to version 3.12.0
 - Split python-setuptools into separate spec
+
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.14-9
+- Updated patch application macros.
 
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
