@@ -22964,8 +22964,8 @@
         "type": "other",
         "other": {
           "name": "python-markdown",
-          "version": "3.2.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.2.2.tar.gz"
+          "version": "3.5.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.5.2.tar.gz"
         }
       }
     },
@@ -23994,8 +23994,8 @@
         "type": "other",
         "other": {
           "name": "python-ruamel-yaml-clib",
-          "version": "0.2.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/92/28/612085de3fae9f82d62d80255d9f4cf05b1b341db1e180adcf28c1bf748d/ruamel.yaml.clib-0.2.0.tar.gz"
+          "version": "0.2.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/46/ab/bab9eb1566cd16f060b54055dd39cf6a34bfa0240c53a7218c43e974295b/ruamel.yaml.clib-0.2.8.tar.gz"
         }
       }
     },
