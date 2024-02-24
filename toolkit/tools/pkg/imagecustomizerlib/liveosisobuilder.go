@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
@@ -19,36 +20,19 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 )
 
-var (
-	grubCfgTemplate = `set default="0"
-set timeout=0
-set bootprefix=/isolinux
+const (
+	isoMediaLabel         = "CDROM"
+	searchCommandTemplate = "search --label %s --set root"
+	rootValueTemplate     = "live:LABEL=%s"
+	// The names initrd.img and vmlinuz are expected by isomaker.
+	isoBootDir    = "boot"
+	isoInitrdPath = "/boot/initrd.img"
+	isoKernelPath = "/boot/vmlinuz"
 
-menuentry "Mariner Baremetal Iso" {
-
-	search --label CDROM --set root
-	linux $bootprefix/vmlinuz \
-			security=selinux \
-			selinux=1 \
-			console=tty0 \
-			console=ttyS0,115200n8 \
-			lockdown=integrity \
-			sysctl.kernel.unprivileged_bpf_disabled=1 \
-			root=live:LABEL=CDROM \
-			rd.shell \
-			rd.live.image \
-			rd.live.dir=%s \
-			rd.live.squashimg=%s \
-			rd.live.overlay=1 \
-			rd.live.overlay.nouserconfirmprompt \
-			%s
-
-	initrd $bootprefix/initrd.img
-}	
-`
-
-	liveOSDir   = "liveos"
-	liveOSImage = "rootfs.img"
+	// kernel arguments template
+	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	liveOSDir          = "liveos"
+	liveOSImage        = "rootfs.img"
 
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
@@ -77,44 +61,12 @@ type IsoArtifacts struct {
 	vmlinuzPath       string
 	initrdImagePath   string
 	squashfsImagePath string
+	bootDirFiles      map[string]string // local-build-path -> iso-media-path
 }
 
 type LiveOSIsoBuilder struct {
 	workingDirs IsoWorkingDirs
 	artifacts   IsoArtifacts
-}
-
-// extractArtifactsFromBootDevice
-//
-//	extracts the bootloaders from the specified boot device.
-//
-// inputs:
-//   - 'sourceDir'
-//     path to full image mount root.
-//
-// output:
-//   - the bootloaders are saved to the b.workingDirs.isoBuildDir
-func (b *LiveOSIsoBuilder) extractArtifactsFromBootDevice(sourceDir string) error {
-
-	logger.Log.Debugf("Extracting artifacts from the boot partition")
-
-	sourceBootx64EfiPath := filepath.Join(sourceDir, "/boot/efi/EFI/BOOT/bootx64.efi")
-	targetBootx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "bootx64.efi")
-	err := file.Copy(sourceBootx64EfiPath, targetBootx64EfiPath)
-	if err != nil {
-		return fmt.Errorf("failed to copy bootloader file (bootx64.efi):\n%w", err)
-	}
-	b.artifacts.bootx64EfiPath = targetBootx64EfiPath
-
-	sourceGrubx64EfiPath := filepath.Join(sourceDir, "/boot/efi/EFI/BOOT/grubx64.efi")
-	targetGrubx64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grubx64.efi")
-	err = file.Copy(sourceGrubx64EfiPath, targetGrubx64EfiPath)
-	if err != nil {
-		return fmt.Errorf("failed to copy bootloader file (grubx64.efi):\n%w", err)
-	}
-	b.artifacts.grubx64EfiPath = targetGrubx64EfiPath
-
-	return nil
 }
 
 // populateWriteableRootfsDir
@@ -151,13 +103,13 @@ func (b *LiveOSIsoBuilder) populateWriteableRootfsDir(sourceDir, writeableRootfs
 //
 //	IsoMaker looks for the vmlinuz/bootloader files inside the initrd image
 //	file under specific directory structure.
-//	This function extracts those artifacts and places them under the same
+//	This function stages those artifacts and places them under the same
 //	directory structure expected by IsoMaker.
-//	This is a staging steps until we run 'dracut' which will take this
-//	directory structure and embeds it into the initrd image.
+//	Later,  we run 'dracut' which takes this directory structure and embeds
+//	it into the initrd image.
 //	Finaly, the IsoMaker will read the initrd image and find the artifacts
-//	it needs.
-//	Something to consider in the future, change IsoMaker so that it can pick
+//	it needs to copy to the final iso media.
+//	Something to consider in the future: change IsoMaker so that it can pick
 //	those artifacts from the build machine directly.
 //
 // inputs:
@@ -181,18 +133,18 @@ func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoM
 		return fmt.Errorf("failed to create %s\n%w", targetBootloadersDir, err)
 	}
 
-	sourceBoot64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "bootx64.efi")
+	sourceBoot64EfiPath := b.artifacts.bootx64EfiPath
 	targetBoot64EfiPath := filepath.Join(targetBootloadersDir, "bootx64.efi")
 	err = file.Copy(sourceBoot64EfiPath, targetBoot64EfiPath)
 	if err != nil {
-		return fmt.Errorf("failed to bootloader file (bootx64.efi):\n%w", err)
+		return fmt.Errorf("failed to stage bootloader file (bootx64.efi):\n%w", err)
 	}
 
-	sourceGrub64EfiPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grubx64.efi")
+	sourceGrub64EfiPath := b.artifacts.grubx64EfiPath
 	targetGrub64EfiPath := filepath.Join(targetBootloadersDir, "grubx64.efi")
 	err = file.Copy(sourceGrub64EfiPath, targetGrub64EfiPath)
 	if err != nil {
-		return fmt.Errorf("failed to bootloader file (grubx64.efi):\n%w", err)
+		return fmt.Errorf("failed to stage bootloader file (grubx64.efi):\n%w", err)
 	}
 
 	targetVmlinuzLocalDir := filepath.Join(writeableRootfsDir, isoMakerArtifactsStagingDir)
@@ -249,16 +201,182 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
+func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLine string) error {
+
+	inputContentString, err := file.Read(grubCfgFileName)
+	if err != nil {
+		return err
+	}
+
+	searchCommand := fmt.Sprintf(searchCommandTemplate, isoMediaLabel)
+	rootValue := fmt.Sprintf(rootValueTemplate, isoMediaLabel)
+
+	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
+	if err != nil {
+		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, oldLinuxPath, err := setLinuxPath(inputContentString, isoKernelPath)
+	if err != nil {
+		return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, err = replaceToken(inputContentString, oldLinuxPath, isoKernelPath)
+	if err != nil {
+		return fmt.Errorf("failed to update all the kernel file path occurances in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, oldInitrdPath, err := setInitrdPath(inputContentString, isoInitrdPath)
+	if err != nil {
+		return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, err = replaceToken(inputContentString, oldInitrdPath, isoInitrdPath)
+	if err != nil {
+		return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "root", rootValue)
+	if err != nil {
+		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
+	}
+
+	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+
+	inputContentString, err = appendKernelCommandLineArguments(inputContentString, liveosKernelArgs)
+	if err != nil {
+		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
+	}
+
+	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
+	if err != nil {
+		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
+	}
+
+	return nil
+}
+
+// extractBootDirFiles
+//
+// given a rootfs, this function:
+// - extracts the files under the /boot folder
+//
+// inputs:
+//   - writeableRootfsDir:
+//     A writeable folder where the rootfs content is.
+//
+// outputs:
+//   - copied files and the following are populated:
+//     b.artifacts.bootx64EfiPath
+//     b.artifacts.grubx64EfiPath
+//     b.artifacts.vmlinuzPath
+//     b.artifacts.bootDirFiles
+func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error {
+
+	sourceBootDir := filepath.Join(writeableRootfsDir, "/boot")
+	b.artifacts.bootDirFiles = make(map[string]string)
+
+	var exclusions []*regexp.Regexp
+	// the following files will be re-created - no need to copy them only to
+	// have them overwritten.
+	exclusions = append(exclusions, regexp.MustCompile(`/boot/initrd\.img.*`))
+
+	err := filepath.Walk(sourceBootDir, func(sourcePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		for _, exclusion := range exclusions {
+			match := exclusion.FindStringIndex(sourcePath)
+			if match != nil {
+				return nil
+			}
+		}
+
+		targetPath := strings.Replace(sourcePath, writeableRootfsDir, b.workingDirs.isoArtifactsDir, -1)
+		targetFileName := filepath.Base(targetPath)
+
+		copiedByIsoMaker := false
+
+		switch targetFileName {
+		case "bootx64.efi":
+			b.artifacts.bootx64EfiPath = targetPath
+			copiedByIsoMaker = true
+		case "grubx64.efi":
+			b.artifacts.grubx64EfiPath = targetPath
+			copiedByIsoMaker = true
+		case "grub.cfg":
+			b.artifacts.grubCfgPath = targetPath
+		}
+		if strings.HasPrefix(targetFileName, "vmlinuz-") {
+			targetPath = filepath.Join(filepath.Dir(targetPath), "vmlinuz")
+			b.artifacts.vmlinuzPath = targetPath
+			copiedByIsoMaker = true
+		}
+
+		err = file.Copy(sourcePath, targetPath)
+		if err != nil {
+			return err
+		}
+
+		// If not copied by IsoMaker, add it to the list of files we will copy
+		// later. Otherwise, do not do anything and leave it to IsoMaker.
+		if !copiedByIsoMaker {
+			b.artifacts.bootDirFiles[targetPath] = strings.TrimPrefix(targetPath, b.workingDirs.isoArtifactsDir)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return fmt.Errorf("failed to extract files from under the boot folder:\n%w", err)
+	}
+
+	return nil
+}
+
+// findKernelVersion
+//
+// given a rootfs, this function:
+// - extracts the kernel version, and the files under the boot folder.
+//
+// inputs:
+//   - writeableRootfsDir:
+//     A writeable folder where the rootfs content is.
+//
+// outputs:
+//   - the following is populated:
+//     b.artifacts.kernelVersion
+func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
+	kernelParentPath := filepath.Join(writeableRootfsDir, "/usr/lib/modules")
+	kernelPaths, err := os.ReadDir(kernelParentPath)
+	if err != nil {
+		return fmt.Errorf("failed to enumerate kernels under (%s):\n%w", kernelParentPath, err)
+	}
+	if len(kernelPaths) == 0 {
+		return fmt.Errorf("did not find any kernels installed under (%s).", kernelParentPath)
+	}
+	if len(kernelPaths) > 1 {
+		return fmt.Errorf("unsupported scenario. found more than one kernel under (%s).", kernelParentPath)
+	}
+	b.artifacts.kernelVersion = kernelPaths[0].Name()
+	logger.Log.Debugf("Found installed kernel version (%s)", b.artifacts.kernelVersion)
+	return nil
+}
+
 // prepareLiveOSDir
 //
-//		given a rootfs, this function:
-//		- extracts the kernel version, and vmlinuz.
-//		- stages bootloaders and vmlinuz to a specific folder structure.
-//	   This folder structure is to be included later in the initrd image when
-//	   it gets generated. IsoMaker extracts those artifacts from the initrd
-//	   image file and uses them.
-//		- prepares the rootfs to run dracut (dracut will generate the initrd later).
-//		- creates the squashfs.
+//	given a rootfs, this function:
+//	- extracts the kernel version, and the files under the boot folder.
+//	- stages bootloaders and vmlinuz to a specific folder structure.
+//	This folder structure is to be included later in the initrd image when
+//	it gets generated. IsoMaker extracts those artifacts from the initrd
+//	image file and uses them.
+//	-prepares the rootfs to run dracut (dracut will generate the initrd later).
+//	- creates the squashfs.
 //
 // inputs:
 //   - writeableRootfsDir:
@@ -277,50 +395,26 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(writeableRootfsDir string, isoMakerA
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
-	// extract kernel version
-	kernelParentPath := filepath.Join(writeableRootfsDir, "/usr/lib/modules")
-	kernelPaths, err := os.ReadDir(kernelParentPath)
+	err := b.findKernelVersion(writeableRootfsDir)
 	if err != nil {
-		return fmt.Errorf("failed to enumerate kernels under (%s):\n%w", kernelParentPath, err)
+		return err
 	}
-	if len(kernelPaths) == 0 {
-		return fmt.Errorf("did not find any kernels installed under (%s).", kernelParentPath)
-	}
-	if len(kernelPaths) > 1 {
-		return fmt.Errorf("unsupported scenario. found more than one kernel under (%s).", kernelParentPath)
-	}
-	b.artifacts.kernelVersion = kernelPaths[0].Name()
-	logger.Log.Debugf("Found installed kernel version (%s)", b.artifacts.kernelVersion)
 
-	// extract vmlinuz
-	sourceVmlinuzPath := filepath.Join(writeableRootfsDir, "/boot/vmlinuz-"+b.artifacts.kernelVersion)
-	targetVmLinuzPath := filepath.Join(b.workingDirs.isoArtifactsDir, "vmlinuz")
-
-	err = file.Copy(sourceVmlinuzPath, targetVmLinuzPath)
+	err = b.extractBootDirFiles(writeableRootfsDir)
 	if err != nil {
-		return fmt.Errorf("failed to extract vmlinuz from (%s):\n%w", sourceVmlinuzPath, err)
+		return err
 	}
 
-	b.artifacts.vmlinuzPath = targetVmLinuzPath
-
-	// create grub.cfg
-	targetGrubCfgContent := fmt.Sprintf(grubCfgTemplate, liveOSDir, liveOSImage, extraCommandLine)
-	targetGrubCfgPath := filepath.Join(b.workingDirs.isoArtifactsDir, "grub.cfg")
-
-	err = os.WriteFile(targetGrubCfgPath, []byte(targetGrubCfgContent), 0o644)
+	err = b.updateGrubCfg(b.artifacts.grubCfgPath, extraCommandLine)
 	if err != nil {
-		return fmt.Errorf("failed to create grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
 
-	b.artifacts.grubCfgPath = targetGrubCfgPath
-
-	// stage artifacts needed by isomaker
 	err = b.stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoMakerArtifactsStagingDir)
 	if err != nil {
 		return fmt.Errorf("failed to stage isomaker initrd artifacts:\n%w", err)
 	}
 
-	// configure dracut
 	err = b.prepareRootfsForDracut(writeableRootfsDir)
 	if err != nil {
 		return fmt.Errorf("failed to prepare rootfs for dracut:\n%w", err)
@@ -449,11 +543,6 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(rawImageFile string, ex
 	}
 	defer rawImageConnection.Close()
 
-	err = b.extractArtifactsFromBootDevice(rawImageConnection.Chroot().RootDir())
-	if err != nil {
-		return fmt.Errorf("failed to extract boot artifacts from image (%s):\n%w", rawImageFile, err)
-	}
-
 	writeableRootfsDir := filepath.Join(b.workingDirs.isoBuildDir, "writeable-rootfs")
 	err = b.populateWriteableRootfsDir(rawImageConnection.Chroot().RootDir(), writeableRootfsDir)
 	if err != nil {
@@ -533,6 +622,15 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	}
 	additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
 
+	// Add /boot/* files
+	for sourceFile, targetFile := range b.artifacts.bootDirFiles {
+		fileToCopy := safechroot.FileToCopy{
+			Src:  sourceFile,
+			Dest: targetFile,
+		}
+		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
+	}
+
 	err := os.MkdirAll(isoOutputDir, os.ModePerm)
 	if err != nil {
 		return err
@@ -548,6 +646,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 		isoResourcesDir,
 		additionalIsoFiles,
 		targetSystemConfig,
+		isoBootDir,
 		b.artifacts.initrdImagePath,
 		b.artifacts.grubCfgPath,
 		isoRepoDirPath,

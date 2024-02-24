@@ -1,4 +1,7 @@
-%global pypi_name sphinxcontrib-applehelp
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix applehelp
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
 
 Summary:        Sphinx extension for Apple help books
 Name:           python-%{pypi_name}
@@ -8,7 +11,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/26/6b/68f470fc337ed24043fec987b101f25b35010970bd958970c2ae5990859f/sphinxcontrib_applehelp-1.0.8.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/26/6b/68f470fc337ed24043fec987b101f25b35010970bd958970c2ae5990859f/%{pypi_name_underscore}-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -43,7 +46,7 @@ Summary:        %{summary}
 sphinxcontrib-applehelp is a sphinx extension which outputs Apple help books.
 
 %prep
-%autosetup -n sphinxcontrib_applehelp-%{version}
+%autosetup -n %{pypi_name_underscore}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -76,8 +79,8 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.applehelp.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_applehelp-%{version}.dist-info/
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}.dist-info/
 
 %changelog
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.8-1

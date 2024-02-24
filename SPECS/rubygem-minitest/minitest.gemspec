@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |s|
   s.name = "minitest".freeze
-  s.version = "5.15.0"
+  s.version = "5.19.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
