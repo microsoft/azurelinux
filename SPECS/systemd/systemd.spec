@@ -44,7 +44,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        4%{?dist}
+Release:        5%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -247,7 +247,7 @@ Requires(post): grep
 Requires(post): openssl-libs
 Requires:       dbus >= 1.9.18
 Requires:       %{name}-pam%{_isa} = %{version}-%{release}
-Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
+Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
 %{?azure:Recommends:     %{name}-networkd = %{version}-%{release}}
 %{?azure:Recommends:     %{name}-resolved = %{version}-%{release}}
@@ -360,7 +360,7 @@ for information how to use those macros.
 Summary:        Development headers for systemd
 License:        LGPL-2.1-or-later AND MIT
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
-Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
+Requires:       %{name}-rpm-macros = %{version}-%{release}
 Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
@@ -1173,6 +1173,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 255-5
+- remove requires(meta) for testing
+
 * Tue Feb 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-4
 - Add Obsoletes: systemd-bootstrap* to allow systemd to replace the bootstrap version
 
