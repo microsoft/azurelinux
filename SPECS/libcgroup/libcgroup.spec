@@ -167,6 +167,7 @@ getent group cgred >/dev/null || groupadd -r cgred
 %{_sbindir}/cgconfigparser
 %{_bindir}/cgsnapshot
 %{_bindir}/cgclassify
+%{_bindir}/libcgroup_systemd_idle_thread
 %attr(2755, root, cgred) %{_bindir}/cgexec
 %attr(0644, root, root) %{_mandir}/man1/*
 %attr(0644, root, root) %{_mandir}/man5/*
