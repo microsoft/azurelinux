@@ -16,9 +16,6 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-%if %{with check}
-BuildRequires:  %{py3_dist pytest}
-%endif
  
 Requires:       cargo
  
@@ -41,6 +38,8 @@ and a Python API (which rust2rpm is built upon).
 %check
 %pyproject_check_import
 %if %{with check}
+pip3 install pytest==7.2.2
+pip3 install iniconfig
 %pytest
 %endif
  
