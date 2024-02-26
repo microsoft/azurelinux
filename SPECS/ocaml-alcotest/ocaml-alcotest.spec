@@ -7,8 +7,8 @@
 
 Summary:        Lightweight and colorful test framework for OCaml
 Name:           ocaml-%{srcname}
-Version:        1.3.0
-Release:        3%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -121,6 +121,9 @@ dune runtest -j 1 -p alcotest
 %{_libdir}/ocaml/%{srcname}/engine/*.mli
 
 %changelog
+* Mon Feb 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.0-1
+- Auto-upgrade to 1.7.0 - Mariner 3.0 package upgrades
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.0-3
 - Cleaning-up spec. License verified.
 

@@ -14402,8 +14402,8 @@
         "type": "other",
         "other": {
           "name": "ocaml-alcotest",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/mirage/alcotest/archive/1.3.0.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://github.com/mirage/alcotest/archive/1.7.0.tar.gz"
         }
       }
     },
