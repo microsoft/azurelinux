@@ -40,7 +40,7 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 
 %files -n python3-jsonpatch
 %defattr(-,root,root)
-%license COPYING
+%license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/jsondiff
 %{_bindir}/jsondiff3
