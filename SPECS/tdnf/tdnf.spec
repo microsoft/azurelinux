@@ -4,8 +4,8 @@
 
 Summary:        dnf/yum equivalent using C libs
 Name:           tdnf
-Version:        3.5.2
-Release:        3%{?dist}
+Version:        3.5.6
+Release:        1%{?dist}
 License:        LGPLv2.1 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +17,6 @@ Source1:        cache-updateinfo
 Source2:        cache-updateinfo.service
 Source3:        cache-updateinfo.timer
 Source4:        tdnfrepogpgcheck.conf
-Patch0:         tdnf-mandatory-space-list-output.patch
 Patch1:         tdnf-default-azurelinux-release.patch
 Patch2:         tdnf-enable-plugins-by-default.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
@@ -26,10 +25,6 @@ Patch3:         tdnf-printf-fix.patch
 # Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
 # https://github.com/vmware/tdnf/commit/5311b5ed0867a40ceb71b89358d70290bc2d0c51
 Patch4:         tdnf-sqlite-library.patch
-# Patch to be removed once we upgrade to a version of tdnf which contains the upstream fix
-# https://github.com/vmware/tdnf/pull/432
-Patch5:         tdnf-GetRepoMD-fix.patch
-Patch6:		tdnf-dotarch.patch
 #Cmake requires binutils
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -225,6 +220,10 @@ fi
 /%{_lib}/systemd/system/tdnf*
 
 %changelog
+* Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-1
+- Upgrade tdnf to version 3.5.6 for Azure Linux 3.0
+- Remove patches which are no longer needed
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.5.2-3
 - Fix and rename patch tdnf-default-mariner-release.patch file into tdnf-default-azurelinux-release.patch with new changed azure linux OS files.
 
