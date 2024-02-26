@@ -241,6 +241,16 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
+	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "security", "")
+	if err != nil {
+		return fmt.Errorf("failed to update the security kernel argument in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "selinux", "0")
+	if err != nil {
+		return fmt.Errorf("failed to update the selinux kernel argument in the iso grub.cfg:\n%w", err)
+	}
+
 	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
 
 	inputContentString, err = appendKernelCommandLineArguments(inputContentString, liveosKernelArgs)
