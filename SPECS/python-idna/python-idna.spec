@@ -20,7 +20,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-
+%if %{with_check}
+BuildRequires:  python3-pytest
+%endif
 %description -n python3-idna
 Support for the Internationalised Domain Names in Applications (IDNA) protocol as specified in RFC 5891. This is the latest version of the protocol and is sometimes referred to as “IDNA 2008”.
 
@@ -30,24 +32,32 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 
 %prep
 %autosetup -n idna-%{version}
+# Remove bundled egg-info
+rm -rf idna.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files idna
 
 %check
-%python3 setup.py test
+%pytest
 
-%files -n python3-idna
+%files -n python3-idna -f %pyproject_files
 %defattr(-,root,root,-)
 %license LICENSE.md
-%{python3_sitelib}/*
+%doc README.rst
 
 %changelog
-* Mon Feb 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6-1
+* Mon Feb 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.6-1
 - Auto-upgrade to 3.6 - Azure Linux 3.0 - package upgrades
+- Replacing a lot of macros with %%pyproject...
+- Adding README.rst to docs
 
 * Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 3.3-1
 - Updated Source0 and license file.
