@@ -21973,8 +21973,8 @@
         "type": "other",
         "other": {
           "name": "python-coverage",
-          "version": "6.3.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-6.3.2.tar.gz"
+          "version": "7.4.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-7.4.1.tar.gz"
         }
       }
     },
