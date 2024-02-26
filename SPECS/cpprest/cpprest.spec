@@ -2,13 +2,13 @@
 %define minor 10
 
 Name:           cpprest
-Version:        2.10.18
+Version:        2.10.19
 Release:        1%{?dist}
 Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
 Url:            https://github.com/microsoft/cpprestsdk
-Source0:        https://github.com/microsoft/cpprestsdk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/cpprestsdk/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Disable outside, failing and sometimes failing tests
 Patch1:         cpprest-2.10.17-disable-outside-and-failing-tests.patch
 # Disable tests with long timeouts
@@ -90,6 +90,9 @@ cd Release/build.release/Binaries
 
 
 %changelog
+* Fri Feb 23 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.10.19-1
+- Upgrade to 2.10.19
+
 * Wed Jan 19 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2.10.18-1
 - Upgrade to 2.10.18
 
