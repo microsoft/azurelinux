@@ -12,7 +12,7 @@ URL: https://github.com/abrt/container-exception-logger
 # source is created by:
 # git clone https://github.com/abrt/container-exception-logger
 # cd container-exception-logger; tito build --tgz
-Source0: %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: asciidoc

@@ -25,7 +25,7 @@ Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
 Url:            http://forge.objectweb.org/projects/monolog/
-Source0:        %{_azl_sources_url}/ow_util_ant_tasks_1.2.zip
+Source0:        %{_azurelinux_sources_url}/ow_util_ant_tasks_1.2.zip
 Source1:        %{name}-LICENSE.txt
 Patch1:         objectweb-anttask-ant17.patch
 Patch2:         objectweb-anttask-java5.patch

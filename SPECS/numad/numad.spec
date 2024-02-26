@@ -14,7 +14,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pagure.io/numad
-Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.xz
+Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.xz
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #   git clone -n https://pagure.io/numad.git numad-%%{version}

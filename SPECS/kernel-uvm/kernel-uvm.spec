@@ -16,7 +16,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
-Source0:        %{_azl_sources_url}/kernel-uvm-%{version}.tar.gz
+Source0:        %{_azurelinux_sources_url}/kernel-uvm-%{version}.tar.gz
 Source1:        config
 BuildRequires:  audit-devel
 BuildRequires:  bash

@@ -10,13 +10,13 @@ VCS: git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # cd bcache-tools/
 # git archive --format=tar --prefix=bcache-tools-1.1/ bcache-tools-1.1 | gzip > ../bcache-tools-1.1.tar.gz
-Source0: %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 # This part is a prerelease version obtained by https://gist.github.com/djwong/6343451:
 # git clone https://gist.github.com/6343451.git
 # cd 6343451/
 # git archive --format=tar --prefix=bcache-status-20140220/ 6d278f9886ab5f64bd896080b1b543ba7ef6c7a6 | gzip > ../bcache-status-20140220.tar.gz
 # see also http://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
-Source1: %{_azl_sources_url}/bcache-status-20140220.tar.gz
+Source1: %{_azurelinux_sources_url}/bcache-status-20140220.tar.gz
 # bcache status not provided as a true package, so this is a self maintained
 # man page for it
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946

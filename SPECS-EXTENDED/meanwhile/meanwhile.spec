@@ -12,7 +12,7 @@ URL:            http://%{name}.sourceforge.net
 # cvs -d:pserver:anonymous@meanwhile.cvs.sourceforge.net:/cvsroot/meanwhile co -d meanwhile-1.1.0 -r meanwhile_v1_1_0 meanwhile
 # tar -cvzf meanwhile-1.1.0.tar.gz meanwhile-1.1.0
 
-Source:         %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source:         %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-crash.patch
 Patch1:         %{name}-fix-glib-headers.patch
 Patch2:         %{name}-file-transfer.patch

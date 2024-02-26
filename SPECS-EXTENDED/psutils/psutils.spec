@@ -10,7 +10,7 @@ License: psutils
 # and use upstream tarball for building because ./bootstrap downloads gnulib.
 # wget https://github.com/rrthomas/psutils/archive/master.zip && unzip master.zip && cd psutils-master/
 # ./bootstrap && autoreconf -vfi && ./configure && make dist-xz
-Source: %{_azl_sources_url}/psutils-%{version}.tar.xz
+Source: %{_azurelinux_sources_url}/psutils-%{version}.tar.xz
 URL:    https://github.com/rrthomas/psutils
 
 # BZ#1072371

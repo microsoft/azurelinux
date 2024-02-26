@@ -11,12 +11,12 @@ License:        CC-BY-SA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://dev.maxmind.com/geoip/legacy/geolite/
-Source0:        %{_azl_sources_url}/GeoIP.dat.gz
-Source1:        %{_azl_sources_url}/GeoIPv6.dat.gz
-Source2:        %{_azl_sources_url}/GeoLiteCity.dat.gz
-Source3:        %{_azl_sources_url}/GeoLiteCityv6.dat.gz
-Source4:        %{_azl_sources_url}/GeoIPASNum.dat.gz
-Source5:        %{_azl_sources_url}/GeoIPASNumv6.dat.gz
+Source0:        %{_azurelinux_sources_url}/GeoIP.dat.gz
+Source1:        %{_azurelinux_sources_url}/GeoIPv6.dat.gz
+Source2:        %{_azurelinux_sources_url}/GeoLiteCity.dat.gz
+Source3:        %{_azurelinux_sources_url}/GeoLiteCityv6.dat.gz
+Source4:        %{_azurelinux_sources_url}/GeoIPASNum.dat.gz
+Source5:        %{_azurelinux_sources_url}/GeoIPASNumv6.dat.gz
 # The data was unbundled from GeoIP at 1.6.4-3
 Source6:        LICENSE
 Conflicts:      GeoIP < 1.6.4-3

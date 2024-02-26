@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/tmm1/http_parser.rb
-Source0:        %{_azl_sources_url}/%{gem_name}-%{version}.tar.gz
+Source0:        %{_azurelinux_sources_url}/%{gem_name}-%{version}.tar.gz
 # A buildable snappy environment needs functioning submodules that do not work from the archive download
 # To recreate the tar.gz run the following
 #  git clone https://github.com/tmm1/http_parser.rb

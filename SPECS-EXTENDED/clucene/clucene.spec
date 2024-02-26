@@ -16,7 +16,7 @@ License:	(ASL 2.0 or LGPLv2+) and BSD and RSA
 URL:		http://www.sourceforge.net/projects/clucene
 %if 0%{?snap}
 #  git archive e8e3d20f20da5ee3e37d347207b01890829a5475 --prefix=clucene-core-2.3.3.4/ | xz -9 > ../clucene-core-2.3.3.4-e8e3d20.tar.xz
-Source0:	%{_azl_sources_url}/clucene-core-2.3.3.4-%{git_short}.tar.xz
+Source0:	%{_azurelinux_sources_url}/clucene-core-2.3.3.4-%{git_short}.tar.xz
 
 %else
 Source0:	http://downloads.sourceforge.net/clucene/clucene-core-%{version}.tar.gz

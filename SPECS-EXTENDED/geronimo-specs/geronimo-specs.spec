@@ -26,7 +26,7 @@ Summary:        Geronimo J2EE server J2EE specifications
 License:        ASL 2.0
 Group:          Development/Languages/Java
 URL:            http://geronimo.apache.org
-Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 # STEPS TO CREATE THE SOURCE FILE
 # mkdir geronimo-specs-1.2
 # cd geronimo-specs-1.2

@@ -17,7 +17,7 @@ URL: http://www.nico.schottelius.org/software/gpm/
 # 4.] rm -rf %{name}-%{version}/doc/specs
 # 5.] tar cJf %{name}-%{version}.tar.xz %{name}-%{version}
 
-Source: %{_azl_sources_url}/%{name}-%{version}.tar.xz
+Source: %{_azurelinux_sources_url}/%{name}-%{version}.tar.xz
 Source1: gpm.service
 Patch0: https://github.com/telmich/gpm/compare/1.20.7...4a938233fbe6de7af05aabc74891b68d4bae40f8.diff
 # https://github.com/telmich/gpm/pull/37/

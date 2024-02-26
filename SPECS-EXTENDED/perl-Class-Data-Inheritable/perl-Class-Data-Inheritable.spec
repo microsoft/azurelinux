@@ -16,7 +16,7 @@ URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
 # Source0:      https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        %{_azl_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:        %{_azurelinux_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils

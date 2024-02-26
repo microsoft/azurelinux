@@ -17,7 +17,7 @@ URL:		https://github.com/xsuchy/python-hwdata
 # git clone https://github.com/xsuchy/python-hwdata.git
 # cd python-hwdata
 # tito build --tgz
-Source0:	%{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0:	%{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 
 %description
 Provide python interface to database stored in hwdata package.

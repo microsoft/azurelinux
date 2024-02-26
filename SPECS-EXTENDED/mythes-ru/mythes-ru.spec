@@ -7,7 +7,7 @@ Version: 0.%{upstreamid}
 Release: 24%{?dist}
 # Below source link is dead now
 # Source: http://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
-Source: %{_azl_sources_url}/thes_ru_RU_v2.zip
+Source: %{_azurelinux_sources_url}/thes_ru_RU_v2.zip
 URL: http://wiki.services.openoffice.org/wiki/Dictionaries
 BuildRequires: unzip
 License: LGPLv2+

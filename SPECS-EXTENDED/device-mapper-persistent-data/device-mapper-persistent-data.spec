@@ -12,7 +12,7 @@ License: GPLv3+
 URL: https://github.com/jthornber/thin-provisioning-tools
 # Upstream source's hash is different from the Mariner one.
 # Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz
-Source0: %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 Patch0: device-mapper-persistent-data-avoid-strip.patch
 
 BuildRequires: autoconf, expat-devel, libaio-devel, libstdc++-devel, boost-devel, gcc-c++

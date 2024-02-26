@@ -5,7 +5,7 @@ Summary:    Scripts for controlling scheduling priorities of system threads
 Group:      Applications/System
 License:    GPL
 BuildArch:  noarch
-Source0:    %{_azl_sources_url}/rtctl-%{version}.tar.bz2
+Source0:    %{_azurelinux_sources_url}/rtctl-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-build
 
 %description

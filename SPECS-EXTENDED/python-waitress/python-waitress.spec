@@ -9,7 +9,7 @@ Version:        1.4.4
 Release:        8%{?dist}
 License:        ZPLv2.1
 URL:            https://github.com/Pylons/%{srcname}
-Source0:        %{_azl_sources_url}/%{name}-%{version}-nodocs.tar.gz
+Source0:        %{_azurelinux_sources_url}/%{name}-%{version}-nodocs.tar.gz
 # Upstream ships non free docs files.
 # We do not even want them in our src.rpms
 # So we remove them before uploading.

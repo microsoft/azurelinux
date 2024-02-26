@@ -23,8 +23,8 @@ Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/sou
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 2.0 maven rpm to provide the mvn binary for the build.
 
-Source1:        %{_azl_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
-Source2:        %{_azl_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
+Source1:        %{_azurelinux_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
+Source2:        %{_azurelinux_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches
 # as tarballs to build rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".

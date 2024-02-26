@@ -27,7 +27,7 @@ Summary:        Java servlet and JSP implementation classes
 License:        ASL 1.1
 Group:          Development/Libraries/Java
 Url:            http://jakarta.apache.org/tomcat/
-Source0:        %{_azl_sources_url}/%{full_name}-5-src.tar.gz
+Source0:        %{_azurelinux_sources_url}/%{full_name}-5-src.tar.gz
 #!BuildIgnore:  xml-commons xml-commons-resolver xerces-j2 xml-commons-apis
 #!BuildIgnore:  xml-commons-jaxp-1.3-apis
 BuildRequires:  ant

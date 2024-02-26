@@ -18,7 +18,7 @@ URL:            https://github.com/qemu/sgabios
 # hash=`git log -1 --format='%h'`
 # date=`git log -1 --format='%cd' --date=short | tr -d -`
 # git archive --prefix sgabios-${date}-git${hash}/ ${hash} | xz -7e > ../openbios-${date}-git${hash}.tar.xz
-Source0:        %{_azl_sources_url}/%{name}-%{date}-git%{hash}.tar.xz
+Source0:        %{_azurelinux_sources_url}/%{name}-%{date}-git%{hash}.tar.xz
 BuildRequires:  gcc
 Requires:       %{name}-bin = %{version}-%{release}
 ExclusiveArch:  x86_64

@@ -16,7 +16,7 @@ License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        %{_azl_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
