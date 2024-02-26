@@ -10,7 +10,6 @@ License:        MIT
 URL:            https://github.com/PyCQA/pyflakes
 
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}.tar.gz
-Source1:        https://deb.debian.org/debian/pool/main/p/pyflakes/pyflakes_3.1.0-1.debian.tar.xz
 Patch0:         %{name}-1.1.0-python3-man.patch
 
 BuildArch:      noarch
@@ -38,7 +37,7 @@ Requires:       python%{python3_pkgversion}-setuptools
 %{desc}
 
 %prep
-%setup -q -a 1
+%setup -q 
 %patch 0 -p1
 
 %build
@@ -51,10 +50,6 @@ rm -rf %{buildroot}
 mv %{buildroot}%{_bindir}/pyflakes %{buildroot}%{_bindir}/pyflakes-%{python3_version}
 ln -s pyflakes-%{python3_version} %{buildroot}%{_bindir}/pyflakes-3
 ln -s pyflakes-3 %{buildroot}%{_bindir}/pyflakes
-
-install -Dpm 644 debian/pyflakes3.1 %{buildroot}%{_mandir}/man1/pyflakes-%{python3_version}.1
-ln -s pyflakes-%{python3_version}.1 %{buildroot}%{_mandir}/man1/pyflakes-3.1
-ln -s pyflakes-3.1 %{buildroot}%{_mandir}/man1/pyflakes.1
 
 
 
