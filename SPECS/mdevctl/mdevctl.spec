@@ -94,8 +94,8 @@ cargo test
 %dir %{_prefix}/lib/mdevctl/scripts.d/callouts
 %dir %{_prefix}/lib/mdevctl/scripts.d/notifiers
 # Exclude man8 files.
-%{_datadir}/bash-completion/completions/mdevctl
-%{_datadir}/bash-completion/completions/lsmdev
+%{bashcompletiondir}/mdevctl
+%{bashcompletiondir}/lsmdev
 
 %changelog
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-2
