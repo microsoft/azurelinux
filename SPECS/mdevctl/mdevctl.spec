@@ -4,7 +4,7 @@
 
 Name:           mdevctl
 Version:        1.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
@@ -98,11 +98,12 @@ cargo test
 %{_datadir}/bash-completion/completions/lsmdev
 
 %changelog
-* Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-1
+* Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-2
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified.
 - Copy Makefile.in build/install to spec file
 - Handle vendor tarball in spec file
+- Use plaing cargo rather than macros
 
 * Thu Jan 11 2024 Alex Williamson <alex.williamson@redhat.com> - 1.3.0-1
 - New upstream release: https://github.com/mdevctl/mdevctl/releases/tag/v1.3.0

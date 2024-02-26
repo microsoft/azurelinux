@@ -52,3 +52,4 @@ pip3 install iniconfig
 * Wed Jan 24 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.1.15-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified.
+- The autochangelog in Fedora has no changelog file to add here.
