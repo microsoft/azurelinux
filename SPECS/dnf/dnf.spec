@@ -2,8 +2,8 @@
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
-Version:        4.8.0
-Release:        2%{?dist}
+Version:        4.19.0
+Release:        1%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -146,6 +146,9 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 4.19.0-1
+- Upgrade to version 4.19.0 for Azure Linux 3.0
+
 * Thu Apr 14 2022 Chris Co <chrco@microsoft.com> - 4.8.0-2
 - Emit dnf-automatic messages through motd
 - Start dnf-automatic-notifyonly timer

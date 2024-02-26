@@ -2698,8 +2698,8 @@
         "type": "other",
         "other": {
           "name": "dnf",
-          "version": "4.8.0",
-          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.8.0.tar.gz"
+          "version": "4.19.0",
+          "downloadUrl": "https://github.com/rpm-software-management/dnf/archive/4.19.0.tar.gz"
         }
       }
     },
