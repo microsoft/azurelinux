@@ -19,7 +19,7 @@
 Summary:        Orchestrator for distributed storage systems in cloud-native environments
 Name:           rook
 Version:        1.6.2
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -255,6 +255,9 @@ sed -i -e "s|\(.*tag: \)VERSION|\1%{helm_appVersion}|" %{values_yaml}
 # bother adding docs or changelog or anything
 
 %changelog
+* Tue Feb 13 2024 Muhammad Falak <mwani@microsoft.com> - 1.6.2-19
+- Bump release to rebuild with go 1.21.6
+
 * Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 1.6.2-18
 - Patch CVE-2021-44716
 

@@ -10,6 +10,8 @@ on:
   schedule:
     - cron: "0 15 * * *"
 
+permissions: read-all
+
 jobs:
   get_input-srpms:
     runs-on: ubuntu-latest

@@ -21,7 +21,6 @@
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-azure-signed/* @microsoft/cbl-mariner-kernel
@@ -65,6 +64,7 @@
 /SPECS/moby-runc/* @microsoft/cbl-mariner-container-runtime
 /SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
+/SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization
 /SPECS/hvloader/* @microsoft/cbl-mariner-kata-containers

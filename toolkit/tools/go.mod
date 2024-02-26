@@ -8,6 +8,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/bendahl/uinput v1.4.0
 	github.com/cavaliercoder/go-cpio v0.0.0-20180626203310-925f9528c45e
+	github.com/fatih/color v1.16.0
 	github.com/gdamore/tcell v1.4.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/juliangruber/go-intersect v1.1.0
@@ -18,7 +19,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.7.1
 	github.com/ulikunitz/xz v0.5.10
-	golang.org/x/sys v0.14.0
+	golang.org/x/sys v0.15.0
 	gonum.org/v1/gonum v0.14.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/ini.v1 v1.67.0
@@ -38,13 +39,15 @@ require (
 	github.com/klauspost/compress v1.10.5 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.0.3 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.7 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20170218160415-a3153f7040e9 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/net v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

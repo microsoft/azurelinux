@@ -1807,8 +1807,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "23.3",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3/+download/cloud-init-23.3.tar.gz"
+          "version": "23.4.1",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.4.1/+download/cloud-init-23.4.1.tar.gz"
         }
       }
     },
@@ -4620,8 +4620,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.20.10",
-          "downloadUrl": "https://golang.org/dl/go1.20.10.src.tar.gz"
+          "version": "1.21.6",
+          "downloadUrl": "https://golang.org/dl/go1.21.6.src.tar.gz"
         }
       }
     },
@@ -6540,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8121,8 +8121,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8131,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8151,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mos",
-          "version": "5.15.145.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.145.2.tar.gz"
+          "version": "5.15.148.2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2-mos/5.15.148.2.tar.gz"
         }
       }
     },
@@ -8191,16 +8191,6 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv14",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv14.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kernel-uvm-cvm",
           "version": "6.1.0.mshv14",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv14.tar.gz"
         }
@@ -13393,8 +13383,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd-cc",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.2.tar.gz"
+          "version": "1.7.7",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },
@@ -13643,8 +13633,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.20.11",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.20.11-1/go.20231107.4.src.tar.gz"
+          "version": "1.21.6",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz"
         }
       }
     },
@@ -14455,6 +14445,16 @@
           "name": "nss-altfiles",
           "version": "2.23.0",
           "downloadUrl": "https://github.com/aperezdc/nss-altfiles/archive/v2.23.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "nss-mdns",
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/lathiat/nss-mdns/releases/download/v0.15.1/nss-mdns-0.15.1.tar.gz"
         }
       }
     },
@@ -27827,8 +27827,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.13.3",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.13.3.tar.gz"
+          "version": "1.14.1",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.14.1.tar.gz"
         }
       }
     },
@@ -27967,8 +27967,8 @@
         "type": "other",
         "other": {
           "name": "sos",
-          "version": "4.4",
-          "downloadUrl": "https://github.com/sosreport/sos/archive/4.4.tar.gz"
+          "version": "4.6.1",
+          "downloadUrl": "https://github.com/sosreport/sos/archive/4.6.1.tar.gz"
         }
       }
     },
@@ -28157,8 +28157,8 @@
         "type": "other",
         "other": {
           "name": "sriov-network-device-plugin",
-          "version": "3.5.1",
-          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.5.1.tar.gz"
+          "version": "3.6.2",
+          "downloadUrl": "https://github.com/k8snetworkplumbingwg/sriov-network-device-plugin/archive/refs/tags/v3.6.2.tar.gz"
         }
       }
     },
@@ -28997,8 +28997,8 @@
         "type": "other",
         "other": {
           "name": "tzdata",
-          "version": "2023c",
-          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz"
+          "version": "2024a",
+          "downloadUrl": "https://data.iana.org/time-zones/releases/tzdata2024a.tar.gz"
         }
       }
     },
@@ -29509,6 +29509,16 @@
           "name": "virt-who",
           "version": "0.24.2",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virtiofsd",
+          "version": "1.8.0",
+          "downloadUrl": "https://gitlab.com/virtio-fs/virtiofsd/-/archive/v1.8.0/virtiofsd-v1.8.0.tar.gz"
         }
       }
     },

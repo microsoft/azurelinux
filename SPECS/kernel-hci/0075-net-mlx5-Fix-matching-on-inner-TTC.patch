@@ -1,0 +1,48 @@
+From a042d7f5bb68c47f6e0e546ca367d14e1e4b25ba Mon Sep 17 00:00:00 2001
+From: Mark Bloch <mbloch@nvidia.com>
+Date: Sun, 10 Apr 2022 11:58:05 +0000
+Subject: [PATCH] net/mlx5: Fix matching on inner TTC
+
+The cited commits didn't use proper matching on inner TTC
+as a result distribution of encapsulated packets wasn't symmetric
+between the physical ports.
+
+Fixes: 4c71ce50d2fe ("net/mlx5: Support partial TTC rules")
+Fixes: 8e25a2bc6687 ("net/mlx5: Lag, add support to create TTC tables for LAG port selection")
+Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Reviewed-by: Maor Gottlieb <maorg@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c   | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+index a6592f9c3c05..5be322528279 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+@@ -505,7 +505,7 @@ static int mlx5_lag_create_inner_ttc_table(struct mlx5_lag *ldev)
+ 	struct ttc_params ttc_params = {};
+ 
+ 	mlx5_lag_set_inner_ttc_params(ldev, &ttc_params);
+-	port_sel->inner.ttc = mlx5_create_ttc_table(dev, &ttc_params);
++	port_sel->inner.ttc = mlx5_create_inner_ttc_table(dev, &ttc_params);
+ 	if (IS_ERR(port_sel->inner.ttc))
+ 		return PTR_ERR(port_sel->inner.ttc);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+index b63dec24747a..b78f2ba25c19 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
+@@ -408,6 +408,8 @@ static int mlx5_generate_inner_ttc_table_rules(struct mlx5_core_dev *dev,
+ 	for (tt = 0; tt < MLX5_NUM_TT; tt++) {
+ 		struct mlx5_ttc_rule *rule = &rules[tt];
+ 
++		if (test_bit(tt, params->ignore_dests))
++			continue;
+ 		rule->rule = mlx5_generate_inner_ttc_rule(dev, ft,
+ 							  &params->dests[tt],
+ 							  ttc_rules[tt].etype,
+-- 
+2.31.1
+

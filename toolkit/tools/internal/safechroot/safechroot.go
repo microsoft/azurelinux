@@ -173,7 +173,9 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 //
 // This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
-func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint) (err error) {
+func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint,
+	includeDefaultMounts bool,
+) (err error) {
 	// On failed initialization, cleanup all chroot files
 	const leaveChrootOnDisk = false
 
@@ -256,7 +258,9 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 			}
 		}
 
-		allMountPoints = append(allMountPoints, defaultMountPoints()...)
+		if includeDefaultMounts {
+			allMountPoints = append(allMountPoints, defaultMountPoints()...)
+		}
 
 		for _, mountPoint := range extraMountPoints {
 			if !mountPoint.mountBeforeDefaults {

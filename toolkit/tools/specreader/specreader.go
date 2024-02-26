@@ -81,8 +81,7 @@ var (
 	workerTar               = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	targetArch              = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
 	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
-	logFile                 = exe.LogFileFlag(app)
-	logLevel                = exe.LogLevelFlag(app)
+	logFlags                = exe.SetupLogFlags(app)
 	profFlags               = exe.SetupProfileFlags(app)
 	timestampFile           = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -90,7 +89,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -211,7 +210,7 @@ func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safec
 	chrootDir := filepath.Join(buildDir, chrootName)
 	chroot = safechroot.NewChroot(chrootDir, existingDir)
 
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints)
+	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true)
 	if err != nil {
 		return
 	}
