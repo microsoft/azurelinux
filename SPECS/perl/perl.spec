@@ -63,7 +63,7 @@
 %undefine _package_note_file
 
 # Skip module metadata notes for perl due to issue with embedded build ldflags
-%undefine azl_module_ldflags
+%undefine azurelinux_module_ldflags
 
 Name:           perl
 # These are all found licenses. They are distributed among various

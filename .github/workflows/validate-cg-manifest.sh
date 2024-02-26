@@ -23,6 +23,7 @@ ignore_multiple_sources=" \
 
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
+  azurelinux-rpm-macros \
   ca-certificates \
   check-restart \
   core-packages \
@@ -42,15 +43,14 @@ ignore_no_source_tarball=" \
   livepatching \
   lua-rpm-macros \
   mariner-repos \
-  azurelinux-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \
   qt5-rpm-macros \
+  sgx-backwards-compatability \
   verity-read-only-root \
   web-assets \
-  sgx-backwards-compatability \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.

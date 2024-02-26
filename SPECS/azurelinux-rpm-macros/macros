@@ -36,7 +36,7 @@
 # Generate metadata linker script before prep section of each SPEC
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
-/usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{azl_release_version}\
+/usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{azurelinux_release_version}\
 %{nil}
 
 # This section overrides the default behavior of the build macro to export
@@ -105,13 +105,13 @@
 # Binary macros
 %__make %{_bindir}/make
 
-# Enable linking with module_info.ld in Azure Linux build environment by defining: azl_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld
+# Enable linking with module_info.ld in Azure Linux build environment by defining: azurelinux_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld
 
 # Compilation and linking flag macros
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?azl_module_ldflags:%{azl_module_ldflags}}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?azurelinux_module_ldflags:%{azurelinux_module_ldflags}}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
