@@ -78,6 +78,9 @@ mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/notifiers
 
 %if %{with check}
 %check
+# Use simple cargo test rather than cargo_test macro which seems to fail
+# because there is no rpm profile in th ecargo setup (seems like this file
+# needs cargo_prep to enable cargo_test macro)
 cargo test
 %endif
 
