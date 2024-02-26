@@ -83,7 +83,11 @@
 
 ## Overview
 
+<<<<<<< HEAD
 The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/2.0/prod/)
+=======
+The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/2.0/prod/)
+>>>>>>> 1b65c3e64 (AZL 3.0 - set up PMC repos)
 
 If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
@@ -301,7 +305,11 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ### packages.microsoft.com Repository Structure
 
+<<<<<<< HEAD
 Azure Linux packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+=======
+CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+>>>>>>> 1b65c3e64 (AZL 3.0 - set up PMC repos)
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
 
@@ -474,10 +482,9 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 > Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. Azure Linux provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
 >
-> - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on Azure Linux repositories.
-> - `mariner-preview.repo` - Azure Linux repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
-> - `mariner-ui.repo` and `mariner-ui-preview.repo` - Azure Linux repository containing packages related to any UI components. The preview version serves the same purpose as the official preview repo.
-> - `mariner-extras.repo` and `mariner-extras-preview.repo` - Azure Linux repository containing proprietory RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
+> - `azurelinux-official-base.repo` - default, always-on Azure Linux repositories.
+> - `azurelinux-preview.repo` - Azure Linux repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
+> - `mariner-ms-non-oss.repo` and `mariner-ms-non-oss-preview.repo` - Azure Linux repository containing Microsoft non open Source RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
 
 #### Build Enable/Disable Flags

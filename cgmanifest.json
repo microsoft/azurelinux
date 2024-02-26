@@ -13353,7 +13353,7 @@
         "other": {
           "name": "msopenjdk-11",
           "version": "11.0.18-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm"
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm"
         }
       }
     },
@@ -13363,7 +13363,7 @@
         "other": {
           "name": "msopenjdk-11",
           "version": "11.0.18-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm"
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm"
         }
       }
     },

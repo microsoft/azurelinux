@@ -448,10 +448,10 @@ chroot_and_install_rpms libxml2
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -674,7 +674,7 @@ build_rpm_in_chroot_no_install newt
 chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
-build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install azurelinux-repos
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.

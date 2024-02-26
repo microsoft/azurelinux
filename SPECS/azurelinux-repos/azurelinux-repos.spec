@@ -1,7 +1,7 @@
-Summary:        CBL-Mariner repo files, gpg keys
-Name:           mariner-repos
-Version:        2.0
-Release:        8%{?dist}
+Summary:        AzureLinux repo files, gpg keys
+Name:           azurelinux-repos
+Version:        3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,28 +9,28 @@ Group:          System Environment/Base
 URL:            https://aka.ms/mariner
 Source0:        MICROSOFT-RPM-GPG-KEY
 Source1:        MICROSOFT-METADATA-GPG-KEY
-Source2:        mariner-debuginfo.repo
-Source3:        mariner-debuginfo-preview.repo
-Source4:        mariner-extended.repo
-Source5:        mariner-extended-preview.repo
-Source6:        mariner-extras.repo
-Source7:        mariner-extras-preview.repo
-Source8:        mariner-microsoft.repo
-Source9:        mariner-microsoft-preview.repo
-Source10:       mariner-official-base.repo
-Source11:       mariner-official-preview.repo
-Source12:       mariner-extended-debuginfo.repo
-Source13:       mariner-extended-debuginfo-preview.repo
+Source2:        azurelinux-debuginfo.repo
+Source3:        azurelinux-debuginfo-preview.repo
+Source4:        azurelinux-extended.repo
+Source5:        azurelinux-extended-preview.repo
+Source6:        azurelinux-ms-non-oss.repo
+Source7:        azurelinux-ms-non-oss-preview.repo
+Source8:        azurelinux-ms-oss.repo
+Source9:        azurelinux-ms-oss-preview.repo
+Source10:       azurelinux-official-base.repo
+Source11:       azurelinux-official-preview.repo
+Source12:       azurelinux-extended-debuginfo.repo
+Source13:       azurelinux-extended-debuginfo-preview.repo
 
 Requires:       %{name}-shared = %{version}-%{release}
 
 BuildArch:      noarch
 
 %description
-CBL-Mariner repo files and gpg keys
+Azure Linux repo files and gpg keys
 
 %package debug
-Summary:        CBL-Mariner Debuginfo repo file.
+Summary:        Azure Linux Debuginfo repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -38,7 +38,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 %{summary}
 
 %package debug-preview
-Summary:        CBL-Mariner Debuginfo preview repo file.
+Summary:        Azure Linux Debuginfo preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -46,7 +46,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 %{summary}
 
 %package extended
-Summary:        CBL-Mariner Extended repo file.
+Summary:        Azure Linux Extended repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -54,7 +54,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 %{summary}
 
 %package extended-debug
-Summary:        CBL-Mariner Extended Debuginfo repo file.
+Summary:        Azure Linux Extended Debuginfo repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -62,7 +62,7 @@ Requires:       %{name}-shared = %{version}-%{release}
 %{summary}
 
 %package extended-preview
-Summary:        CBL-Mariner Extended preview repo file.
+Summary:        Azure Linux Extended preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -70,47 +70,47 @@ Requires:       %{name}-shared = %{version}-%{release}
 %{summary}
 
 %package extended-debug-preview
-Summary:        CBL-Mariner Extended Debuginfo preview repo file.
+Summary:        Azure Linux Extended Debuginfo preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
 %description extended-debug-preview
 %{summary}
 
-%package extras
-Summary:        CBL-Mariner Extras repo file.
+%package ms-non-oss
+Summary:        Azure Linux Microsoft non oss repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description extras
+%description ms-non-oss
 %{summary}
 
-%package extras-preview
-Summary:        CBL-Mariner Extras preview repo file.
+%package ms-non-oss-preview
+Summary:        Azure Linux Microsoft non oss preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description extras-preview
+%description ms-non-oss-preview
 %{summary}
 
-%package microsoft
-Summary:        CBL-Mariner Microsoft repo file.
+%package ms-oss
+Summary:        Azure Linux Microsoft oss repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description microsoft
+%description ms-oss
 %{summary}
 
-%package microsoft-preview
-Summary:        CBL-Mariner Microsoft preview repo file.
+%package ms-oss-preview
+Summary:        Azure Linux Microsoft oss preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
-%description microsoft-preview
+%description ms-oss-preview
 %{summary}
 
 %package preview
-Summary:        CBL-Mariner preview repo file.
+Summary:        Azure Linux preview repo file.
 Group:          System Environment/Base
 Requires:       %{name}-shared = %{version}-%{release}
 
@@ -162,51 +162,51 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 
 %files
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-base.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-base.repo
 
 %files debug
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-debuginfo.repo
 
 %files debug-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-debuginfo-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-debuginfo-preview.repo
 
 %files extended
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-extended.repo
 
 %files extended-debug
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-debuginfo.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-extended-debuginfo.repo
 
 %files extended-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-extended-preview.repo
 
 %files extended-debug-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extended-debuginfo-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-extended-debuginfo-preview.repo
 
-%files extras
+%files ms-non-oss
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extras.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-ms-non-oss.repo
 
-%files extras-preview
+%files ms-non-oss-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-extras-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-ms-non-oss-preview.repo
 
-%files microsoft
+%files ms-oss
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-ms-oss.repo
 
-%files microsoft-preview
+%files ms-oss-preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-microsoft-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-ms-oss-preview.repo
 
 %files preview
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/yum.repos.d/mariner-official-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-official-preview.repo
 
 %files shared
 %dir %{_sysconfdir}/yum.repos.d
@@ -214,6 +214,9 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 %{_sysconfdir}/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 
 %changelog
+* Mon Feb 26 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 3.0-1
+- Set Repo URLS for Azure Linux 3.0
+
 * Thu Jul 14 2022 Andrew Phelps <anphel@microsoft.com> - 2.0-8
 - Add SRPM and Debuginfo repos to existing base, extended, and preview subpackages
 
@@ -221,13 +224,13 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Add support for extended debuginfo repositories for Mariner 2.0
 
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-6
-- Update required dependecies for mariner-repos-shared sub-package.
+- Update required dependecies for azurelinux-repos-shared sub-package.
 
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-5
 - Moving away from using 'debuginfo' in a custom package to avoid confusion.
 
 * Mon Jan 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-4
-- Creating a separate "mariner-repos-shared" subpackage to make repo configurations
+- Creating a separate "azurelinux-repos-shared" subpackage to make repo configurations
   independent of each other.
 
 * Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
@@ -267,7 +270,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Fixing distro name.
 
 * Fri Jul 17 2020 Andrew Phelps <anphel@microsoft.com> 1.0-6
-- Set sslverify=1 in [mariner-official-base] and [mariner-official-update]
+- Set sslverify=1 in [azurelinux-official-base] and [azurelinux-official-update]
 
 * Wed Nov 27 2019 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-5
 - Removing outdated repository configuration
@@ -279,7 +282,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Separate repo configs for official-base and official-update
 
 * Wed Oct 23 2019 Andrew Phelps <anphel@microsoft.com> 1.0-2
-- Add mariner-official.repo
+- Add azurelinux-official.repo
 
 * Wed Sep 04 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-1
 - Original version for CBL-Mariner.

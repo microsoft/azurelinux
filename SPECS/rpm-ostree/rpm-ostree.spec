@@ -42,7 +42,7 @@ BuildRequires:  libsolv-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
 BuildRequires:  azurelinux-release
-BuildRequires:  mariner-repos
+BuildRequires:  azurelinux-repos
 BuildRequires:  openssl-devel
 BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel

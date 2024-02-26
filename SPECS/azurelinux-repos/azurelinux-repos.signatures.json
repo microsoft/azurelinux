@@ -2,17 +2,17 @@
  "Signatures": {
   "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
   "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
-  "mariner-debuginfo-preview.repo": "1fea397ab17fc801351174626639c4a5e38df7393053bc419f192d49530d9f92",
-  "mariner-debuginfo.repo": "5502de8668a12802c46f45b51e47e54472e371b02984c641d757a3905322bc7d",
-  "mariner-extended-debuginfo-preview.repo": "2897ae5134cddb357a17348308a02f3f3ef7032109687fa9dbbfa017abc87933",
-  "mariner-extended-debuginfo.repo": "12091cfd754e1e9f94cda207091d9fe3d723baa2b8a8dea8ed60c73e734c5843",
-  "mariner-extended-preview.repo": "1499dcedc6dddec5c57dbc15ec19a8f26605b70a1c293192e0fafd514d7ad83e",
-  "mariner-extended.repo": "8d19a3a965e99f1a440fcc67c5c56fe26d71e20e6c59eb032d20e63175bb0288",
-  "mariner-extras-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
-  "mariner-extras.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
-  "mariner-microsoft-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
-  "mariner-microsoft.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
-  "mariner-official-base.repo": "4d7ecff06728fc92d629d5371bc0f04084ec4cd654887ced41d9d1be136ee8ce",
-  "mariner-official-preview.repo": "25d9875fcae366e55c4b7106d6f76e5f943dda8b9d89fd1f653bb672f786c405"
+  "azurelinux-debuginfo-preview.repo": "1fea397ab17fc801351174626639c4a5e38df7393053bc419f192d49530d9f92",
+  "azurelinux-debuginfo.repo": "5502de8668a12802c46f45b51e47e54472e371b02984c641d757a3905322bc7d",
+  "azurelinux-extended-debuginfo-preview.repo": "2897ae5134cddb357a17348308a02f3f3ef7032109687fa9dbbfa017abc87933",
+  "azurelinux-extended-debuginfo.repo": "12091cfd754e1e9f94cda207091d9fe3d723baa2b8a8dea8ed60c73e734c5843",
+  "azurelinux-extended-preview.repo": "1499dcedc6dddec5c57dbc15ec19a8f26605b70a1c293192e0fafd514d7ad83e",
+  "azurelinux-extended.repo": "8d19a3a965e99f1a440fcc67c5c56fe26d71e20e6c59eb032d20e63175bb0288",
+  "azurelinux-ms-non-oss-preview.repo": "81f54331c41562b551fc7979e24bba3a0fc3267101f0d8c2400afefe984df5c8",
+  "azurelinux-ms-non-oss.repo": "6f5c89b1f2c4df2126b0f0e5c367266ccad9b1dff410914cf5f2bce0767bc30a",
+  "azurelinux-ms-oss-preview.repo": "ba2b42f7f26ae904bd63cf02100f71ad75d0621d3628bc904d63b3a594474b0c",
+  "azurelinux-ms-oss.repo": "a20e69c50b51d297f807df2ac82c2813aa3d1fba0329885f38c739d37cac8c03",
+  "azurelinux-official-base.repo": "4d7ecff06728fc92d629d5371bc0f04084ec4cd654887ced41d9d1be136ee8ce",
+  "azurelinux-official-preview.repo": "25d9875fcae366e55c4b7106d6f76e5f943dda8b9d89fd1f653bb672f786c405"
  }
 }

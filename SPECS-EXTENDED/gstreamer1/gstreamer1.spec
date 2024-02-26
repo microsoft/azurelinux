@@ -62,7 +62,7 @@ developing applications that use %{name}.
 %build
 %meson	\
   -D package-name='CBL-Mariner GStreamer package' \
-  -D package-origin='https://packages.microsoft.com/cbl-mariner/2.0' \
+  -D package-origin='https://packages.microsoft.com/azurelinux/2.0' \
   -D tests=disabled \
   -D examples=disabled \
   -D ptp-helper-permissions=capabilities \

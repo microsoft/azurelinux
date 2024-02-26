@@ -2226,7 +2226,7 @@
                 "lsb-release",
                 "ltp",
                 "lttng-consume",
-                "mariner-repos",
+                "azurelinux-repos",
                 "mariner-rpm-macros",
                 "mm-common",
                 "moby-containerd-cc",

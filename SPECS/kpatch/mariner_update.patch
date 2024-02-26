@@ -82,7 +82,7 @@ index 296fa48..12ab099 100755
  			if [[ "$DISTRO" = fedora ]]; then
  				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
 +			elif [[ "$DISTRO" = mariner ]]; then
-+				wget -P "$TEMPDIR" "https://packages.microsoft.com/cbl-mariner/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
++				wget -P "$TEMPDIR" "https://packages.microsoft.com/azurelinux/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
  			else
  				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
  				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die

@@ -1,6 +1,6 @@
-[mariner-official-extras-preview]
-name=CBL-Mariner Official Extras Preview $releasever $basearch
-baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/preview/extras/$basearch
+[azurelinux-official-ms-non-oss-preview]
+name=Azure Linux Official Extras Preview $releasever $basearch
+baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/extras/$basearch
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
