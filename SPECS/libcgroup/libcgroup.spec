@@ -159,14 +159,15 @@ getent group cgred >/dev/null || groupadd -r cgred
 %{_bindir}/cgcreate
 %{_bindir}/cgget
 %{_bindir}/cgset
+%{_bindir}/cgxget
+%{_bindir}/cgxset
 %{_bindir}/cgdelete
 %{_bindir}/lscgroup
 %{_bindir}/lssubsys
 %{_sbindir}/cgconfigparser
-%{_sbindir}/cgclear
 %{_bindir}/cgsnapshot
+%{_bindir}/cgclassify
 %attr(2755, root, cgred) %{_bindir}/cgexec
-%attr(2755, root, cgred) %{_bindir}/cgclassify
 %attr(0644, root, root) %{_mandir}/man1/*
 %attr(0644, root, root) %{_mandir}/man5/*
 %attr(0644, root, root) %{_mandir}/man8/*
@@ -194,6 +195,8 @@ getent group cgred >/dev/null || groupadd -r cgred
 %changelog
 * Thu Feb 22 2024 Henry Li <lihl@microsoft.com> - 3.1.0-1
 - Upgrade to version 3.1.0
+- Add systemd-rpm-macros as BR
+- 
 
 * Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
 - Create CGCONFIG_CONF_DIR directories on package install
