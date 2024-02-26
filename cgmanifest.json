@@ -22512,6 +22512,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-hatchling",
+          "version": "1.21.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.21.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hatch-vcs",
+          "version": "0.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch-vcs/hatch-vcs-0.4.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-hs-dbus-signature",
           "version": "0.06",
           "downloadUrl": "https://github.com/stratis-storage/hs-dbus-signature/archive/v0.06/hs-dbus-signature-0.06.tar.gz"
@@ -23272,6 +23292,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pathspec",
+          "version": "0.12.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pathspec/pathspec-0.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pam",
           "version": "1.8.4",
           "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-1.8.4.tar.gz"
@@ -23343,8 +23373,8 @@
         "type": "other",
         "other": {
           "name": "python-platformdirs",
-          "version": "2.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-2.0.0.tar.gz"
+          "version": "4.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-4.2.0.tar.gz"
         }
       }
     },
@@ -24463,8 +24493,8 @@
         "type": "other",
         "other": {
           "name": "python-toml",
-          "version": "0.10.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/toml/toml-0.10.1.tar.gz"
+          "version": "0.10.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/toml/toml-0.10.2.tar.gz"
         }
       }
     },
@@ -24535,6 +24565,16 @@
           "name": "python-trio",
           "version": "0.16.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trio/trio-0.16.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-trove-classifier",
+          "version": "2024.2.23",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifier/trove-classifier-2024.2.23.tar.gz"
         }
       }
     },
