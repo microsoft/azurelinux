@@ -8,7 +8,7 @@ Summary:        C++ REST library
 Group:          Applications/File
 License:        MIT
 Url:            https://github.com/microsoft/cpprestsdk
-Source0:        https://github.com/microsoft/cpprestsdk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/cpprestsdk/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Disable outside, failing and sometimes failing tests
 Patch1:         cpprest-2.10.17-disable-outside-and-failing-tests.patch
 # Disable tests with long timeouts
