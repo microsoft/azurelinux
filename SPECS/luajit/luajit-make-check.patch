@@ -1,4 +1,4 @@
-# Add macke check target to run tests based on Fedora's patch.
+# Add make check target to run tests based on Fedora's patch.
 diff --git a/Makefile b/Makefile
 index 3aed365d..f809f6ab 100644
 --- a/Makefile
