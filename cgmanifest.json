@@ -13363,8 +13363,8 @@
         "type": "other",
         "other": {
           "name": "moby-compose",
-          "version": "2.17.2",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+          "version": "2.17.3",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.3.tar.gz"
         }
       }
     },
