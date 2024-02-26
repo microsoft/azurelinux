@@ -1,7 +1,7 @@
 Summary:        Program for modifying or creating files
 Name:           patch
 Version:        2.7.6
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv3+
 URL:            https://www.gnu.org/software/patch/
 Source0:        https://ftp.gnu.org/gnu/patch/%{name}-%{version}.tar.gz
@@ -23,12 +23,7 @@ Program for modifying or creating files by applying a patch
 file typically created by the diff program.
 
 %prep
-%setup -q
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 5 -p1
+%autosetup -p1
 
 %build
 %configure --disable-silent-rules
@@ -48,6 +43,9 @@ make  %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.6-9
+- Updated patch application macros.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.7.6-8
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
