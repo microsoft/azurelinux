@@ -4950,8 +4950,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.12.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz"
         }
       }
     },
