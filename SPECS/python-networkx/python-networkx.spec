@@ -11,9 +11,11 @@ Patch0:         %{name}-doc.patch
 # Temporary workaround for a failing test.
 # See https://github.com/networkx/networkx/issues/5913
 Patch1:         %{name}-test.patch
+Patch2:         %{name}-pyproject.patch
 BuildRequires:  make
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
@@ -43,8 +45,6 @@ sed -i 's/\(numpydoc>=1.\)5/\14/' requirements/doc.txt
 %install
 %{pyproject_install}
 %pyproject_save_files networkx
-mv %{buildroot}%{_docdir}/networkx-%{version} ./installed-docs
-rm -f installed-docs/INSTALL.txt
 
 %files -n python3-networkx -f %{pyproject_files}
 %license LICENSE.txt
