@@ -12,9 +12,9 @@ URL:            https://crates.io/crates/mdevctl
 Source0:        https://github.com/mdevctl/mdevctl/archive/refs/tags/v%{version}.tar.gz#/mdevctl-%{version}.tar.gz
 Source1:        https://github.com/mdevctl/mdevctl/releases/download/v%{version}/mdevctl-%{version}-vendor.tar.gz
 
+BuildRequires:  cargo
 BuildRequires:  make
 BuildRequires:  python3-docutils
-BuildRequires:  rust-packaging >= 21
 BuildRequires:  systemd-rpm-macros
 
 ExclusiveArch:  x86_64
@@ -103,7 +103,7 @@ cargo test
 - License verified.
 - Copy Makefile.in build/install to spec file
 - Handle vendor tarball in spec file
-- Use plaing cargo rather than macros
+- Use cargo directly rather than cargo macros, remove rust-packaging dependency.
 
 * Thu Jan 11 2024 Alex Williamson <alex.williamson@redhat.com> - 1.3.0-1
 - New upstream release: https://github.com/mdevctl/mdevctl/releases/tag/v1.3.0
