@@ -197,7 +197,12 @@ getent group cgred >/dev/null || groupadd -r cgred
 * Thu Feb 22 2024 Henry Li <lihl@microsoft.com> - 3.1.0-1
 - Upgrade to version 3.1.0
 - Add systemd-rpm-macros as BR
-- 
+- Break libcgroup-0.40.rc1.patch into multiple smaller patches
+- Update no-gooletests.patch
+- Fix config file path and file name
+- Remove cgclear as it is no longer provided by the new source and
+  add cgxget, cgxset, cgclassify and libcgroup_systemd_idle_thread
+
 
 * Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
 - Create CGCONFIG_CONF_DIR directories on package install
