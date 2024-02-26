@@ -48,7 +48,7 @@ API documentation for %{name}.
 	
 %build
 %mvn_file : plexus/interpolation
-%mvn_build
+%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
 
 %install
 %mvn_install
