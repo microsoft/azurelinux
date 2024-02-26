@@ -60,7 +60,7 @@ else
     export CHECK_DEFINE_NUM="0"
 fi
 
-# Define 'azl <ver>' and 'azl<ver> 1' macros for use in spec files. Normally they would be defined in the 'mariner-rpm-macros-dist' package.
+# Define 'azl <ver>' macro for use in spec files. Normally they would be defined in the 'azurelinux-release' package.
 # Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
 
 # 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
