@@ -3,12 +3,13 @@
 Summary:        A library for password generation and password quality checking
 Name:           libpwquality
 Version:        1.4.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/libpwquality/libpwquality/
 Source0:        https://github.com/libpwquality/libpwquality/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Patch1:         setuptools.patch
 %global _pwqlibdir %{_libdir}
 %global _moduledir %{_libdir}/security
 %global _secconfdir %{_sysconfdir}/security
@@ -21,6 +22,7 @@ BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  pam-devel
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 Requires:       pam
 
 %description
@@ -50,7 +52,7 @@ for easy password quality checking and generation of random
 pronounceable passwords from Python applications.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 [ -f %{_bindir}/python3 ] || ln -s %{_bindir}/python3 /bin/python
@@ -107,6 +109,9 @@ mkdir %{buildroot}%{_secconfdir}/pwquality.conf.d
 %{python3_sitearch}/*.egg-info
 
 %changelog
+* Mon Feb 12 2024 Andrew Phelps <anphel@microsoft.com> - 1.4.5-2
+- Add patch to fix build with python 3.12
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.5-1
 - Auto-upgrade to 1.4.5 - Azure Linux 3.0 - package upgrades
 

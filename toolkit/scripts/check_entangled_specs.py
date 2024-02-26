@@ -18,10 +18,6 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
-        "SPECS/kernel-hci/kernel-hci.spec"
-    ]),
-    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
