@@ -36,7 +36,6 @@ ignore_no_source_tarball=" \
   hyphen-lt \
   hyphen-mn \
   initramfs \
-  installkernel \
   javapackages-tools-meta \
   kde-filesystem \
   kf5 \

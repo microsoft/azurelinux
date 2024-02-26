@@ -3,7 +3,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.5.5.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Zstd Bindings for Python
 
 # original zstd bits are GPL-2.0-or-later OR BSD-2-Clause
@@ -28,6 +28,8 @@ Summary:        %{summary}
 # The library does not do symbol versioning to fully match automatically on
 # Unfortunately our zstd calls this 'zstd-libs' instead of libzstd
 Requires:       zstd-libs%{?_isa} >= %{zstd_version}
+
+Provides:       python3dist(zstd)
 
 %description -n python3-%{pypi_name}
 Simple Python bindings for the Zstd compression library.
@@ -63,6 +65,9 @@ sed -i -e '/test_version/d' tests/__init__.py
 %{python3_sitearch}/%{pypi_name}*.so
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.5.5.1-3
+- Add Provides python3dist(zstd)
+
 * Wed Jan 31 2024 Dan Streetman <ddstreet@ieee.org> - 1.5.5.1-2
 - Update to version from Fedora 39.
 - Next line is present only to avoid tooling failures, and does not indicate the actual package license.

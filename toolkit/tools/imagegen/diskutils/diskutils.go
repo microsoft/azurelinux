@@ -224,7 +224,7 @@ func ApplyRawBinary(diskDevPath string, rawBinary configuration.RawBinary) (err 
 
 	_, stderr, err := shell.Execute("dd", ddArgs...)
 	if err != nil {
-		logger.Log.Warnf("Failed to apply raw binary with dd: %v", stderr)
+		err = fmt.Errorf("failed to apply raw binary with dd:\n%v\n%w", stderr, err)
 	}
 	return
 }
@@ -258,7 +258,7 @@ func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
 	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
 	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
 	if err != nil {
-		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
+		err = fmt.Errorf("failed to create loopback device using losetup:\n%v\n%w", stderr, err)
 		return
 	}
 	devicePath = strings.TrimSpace(stdout)
@@ -279,8 +279,7 @@ func BlockOnDiskIO(diskDevPath string) (err error) {
 func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 	rawDiskOutput, stderr, err := shell.Execute("lsblk", "--nodeps", "--json", "--output", "NAME,MAJ:MIN", diskDevPath)
 	if err != nil {
-		logger.Log.Warn(stderr)
-		err = fmt.Errorf("failed to find IDs for disk (%s):\n%w", diskDevPath, err)
+		err = fmt.Errorf("failed to find IDs for disk (%s):\n%v\n%w", diskDevPath, stderr, err)
 		return
 	}
 
@@ -442,12 +441,12 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
 	partedArgument, err := partitionTableType.ConvertToPartedArgument()
 	if err != nil {
-		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
+		err = fmt.Errorf("failed to convert partition table type (%v) to parted argument:\n%w", partitionTableType, err)
 		return
 	}
 	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
-		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
+		err = fmt.Errorf("failed to set partition table type using parted:\n%v\n%w", stderr, err)
 		return
 	}
 
@@ -470,27 +469,27 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
 		if err != nil {
-			logger.Log.Warnf("Failed to create single partition")
+			err = fmt.Errorf("Failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
-			logger.Log.Warnf("Failed to format partition")
+			err = fmt.Errorf("Failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize encrypted root")
+				err = fmt.Errorf("Failed to initialize encrypted root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize read only root")
+				err = fmt.Errorf("Failed to initialize read only root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
@@ -540,13 +539,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	if end == 0 {
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fillToEndOption)
 		if err != nil {
-			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
+			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	} else {
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fmt.Sprintf(sFmt, end))
 		if err != nil {
-			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
+			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	}
@@ -565,7 +564,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	// to prevent us from possibly waiting forever.
 	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
+		err = fmt.Errorf("failed to execute partprobe:\n%v\n%w", stderr, err)
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
@@ -596,7 +595,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		for _, testPartDevPath := range testPartDevPaths {
 			exists, err := file.PathExists(testPartDevPath)
 			if err != nil {
-				logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
+				err = fmt.Errorf("failed to find device path (%s):\n%w", testPartDevPath, err)
 				return err
 			}
 			if exists {
@@ -611,7 +610,6 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}, totalAttempts, retryDuration)
 
 	if err != nil {
-		logger.Log.Errorf("%s", err)
 		return
 	}
 
@@ -658,7 +656,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	// Make sure all partition information is actually updated.
 	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", stderr)
+		err = fmt.Errorf("failed to execute partprobe after partition initialization:\n%v\n%w", stderr, err)
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
@@ -718,7 +716,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 
 		_, stderr, err := shell.Execute("swapon", partDevPath)
 		if err != nil {
-			logger.Log.Warnf("Failed to execute swapon: %v", stderr)
+			err = fmt.Errorf("failed to execute swapon:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	case "":
@@ -744,12 +742,11 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	includeFilter := strings.Join(blockDeviceMajorNumbers, ",")
 	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", includeFilter, "-n", "--json", "--output", "NAME,SIZE,MODEL")
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 		return
 	}
 	if len(rawDiskOutput) == 0 {
-		err = fmt.Errorf("no supported disks found")
-		logger.Log.Errorf("%s", err)
+		err = fmt.Errorf("failed to find supported disks:\n%w", err)
 		return
 	}
 
@@ -806,7 +803,7 @@ func createExtendedPartition(diskDevPath string, partitionTableType string, part
 
 	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, extendedPartitionType)
 	if err != nil {
-		logger.Log.Warnf("Failed to create extended partition")
+		err = fmt.Errorf("failed to create extended partition:\n%w", err)
 		return
 	}
 	partIDToFsTypeMap[extendedPartition.ID] = ""
@@ -826,8 +823,7 @@ func getPartUUID(device string) (uuid string, err error) {
 
 func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 	if exists, ferr := file.PathExists(sectorFile); ferr != nil {
-		logger.Log.Errorf("Error accessing sector size file %s", sectorFile)
-		err = ferr
+		err = fmt.Errorf("failed to access sector size file (%s):\n%w", sectorFile, ferr)
 		return
 	} else if !exists {
 		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", sectorFile)
@@ -836,7 +832,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 
 	fileContent, err := file.ReadLines(sectorFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to read from %s: %s", sectorFile, err)
+		err = fmt.Errorf("failed to read from (%s):\n%w", sectorFile, err)
 		return
 	}
 

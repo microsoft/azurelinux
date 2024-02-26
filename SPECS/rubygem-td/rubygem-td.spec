@@ -3,8 +3,8 @@
 %global gems_version 3.1.0
 Summary:        CUI Interface
 Name:           rubygem-%{gem_name}
-Version:        0.16.8
-Release:        3%{?dist}
+Version:        0.17.1
+Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Feb 17 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.17.1-1
+- Auto-upgrade to 0.17.1 - azl 3.0
+
 * Thu Feb 08 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.16.8-3
 - Fixed install steps misconfiguration.
 
