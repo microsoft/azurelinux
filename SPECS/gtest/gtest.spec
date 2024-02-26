@@ -86,6 +86,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Feb 26 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.14.0-1
 - Updating to 1.14.0 for mariner 3.0.
+- Updated Source0 to correct release url.
 
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.1-1
 - Updating to 1.12.1.
