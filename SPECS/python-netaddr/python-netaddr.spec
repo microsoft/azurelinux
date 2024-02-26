@@ -1,55 +1,93 @@
-Summary:        A network address manipulation library for Python
+Summary:        A pure Python network address representation and manipulation library
 Name:           python-netaddr
-Version:        0.8.0
+Version:        1.2.1
 Release:        1%{?dist}
-License:        BSD
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/netaddr/netaddr
 Source0:        https://github.com/netaddr/netaddr/archive/refs/tags/%{version}.tar.gz#/netaddr-%{version}.tar.gz
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-%if %{with_check}
-BuildRequires:  python3-pip
-BuildRequires:  curl-devel
-BuildRequires:  openssl-devel
-%endif
-BuildArch:      noarch
 
-%description
-A network address manipulation library for Python
+BuildArch:      noarch
+	
+BuildRequires:  python3-devel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pip
+BuildRequires:  pyproject-rpm-macros
+
+
+%global desc A network address manipulation library for Python\
+\
+Provides support for:\
+\
+Layer 3 addresses\
+\
+ * IPv4 and IPv6 addresses, subnets, masks, prefixes\
+ * iterating, slicing, sorting, summarizing and classifying IP networks\
+ * dealing with various ranges formats (CIDR, arbitrary ranges and globs, nmap)\
+ * set based operations (unions, intersections etc) over IP addresses and\
+   subnets\
+ * parsing a large variety of different formats and notations\
+ * looking up IANA IP block information\
+ * generating DNS reverse lookups\
+ * supernetting and subnetting\
+\
+Layer 2 addresses\
+\
+ * representation and manipulation MAC addresses and EUI-64 identifiers\
+ * looking up IEEE organisational information (OUI, IAB)\
+ * generating derived IPv6 addresses
+ 
+%global _description\
+%{desc}
+ 
+%description %_description
 
 %package -n python3-netaddr
-Summary:        A network address manipulation library for Python
-Requires:       python3
-
+Summary: A pure Python network address representation and manipulation library
+ 
 %description -n python3-netaddr
-A network address manipulation library for Python
+%{desc}
+ 
+%package -n python3-netaddr-shell
+Summary: An interactive shell environment for the netaddr library
+Requires:  python3-netaddr = %{version}-%{release}
+ 
+%description -n python3-netaddr-shell
+An interactive shell environment for the netaddr library
 
 %prep
-%autosetup -p 1 -n netaddr-%{version}
+%autosetup -n netaddr-%{version} -p1
+	
+# Make rpmlint happy, rip out python shebang lines from most python
+# modules
+#find netaddr -name "*.py" | \
+#  xargs sed -i -e '1 {/^#!\//d}'
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-ln -s netaddr %{buildroot}/%{_bindir}/netaddr3
-
+%pyproject_install
+%pyproject_save_files netaddr
+	
 %check
-pip3 install pytest
-LANG=en_US.UTF-8 PYTHONPATH=./ %{python3} setup.py test
+pip3 install iniconfig
+%pytest
+	
+%files -n python3-netaddr -f %{pyproject_files}
+%license COPYRIGHT.rst
+%doc AUTHORS.rst CHANGELOG.rst README.rst THANKS.rst
 
-%files -n python3-netaddr
-%defattr(-,root,root,-)
-%license LICENSE
+%files -n python3-netaddr-shell
 %{_bindir}/netaddr
-%{_bindir}/netaddr3
-%{python3_sitelib}/*
 
 %changelog
+* Mon Feb 26 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.2.1-1
+- Upgrade to latest upstream version
+
 * Mon Jan 24 2022 Thomas Crain <thcrain@microsoft.com> - 0.8.0-1
 - Upgrade to latest upstream version
 
