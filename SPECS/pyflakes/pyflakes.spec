@@ -39,7 +39,6 @@ Requires:       python%{python3_pkgversion}-setuptools
 
 %prep
 %setup -q -a 1
-%patch 0 -p1
 
 %build
 %py3_build
