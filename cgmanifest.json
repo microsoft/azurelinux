@@ -25504,8 +25504,8 @@
         "type": "other",
         "other": {
           "name": "rpmdevtools",
-          "version": "8.10",
-          "downloadUrl": "https://releases.pagure.org/rpmdevtools/rpmdevtools-8.10.tar.xz"
+          "version": "9.6",
+          "downloadUrl": "https://releases.pagure.org/rpmdevtools/rpmdevtools-9.6.tar.xz"
         }
       }
     },
