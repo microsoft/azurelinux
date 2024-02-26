@@ -1,13 +1,13 @@
 Summary:        Google's C++ gtest framework
 Name:           gtest
-Version:        1.12.1
+Version:        1.14.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/google/googletest
-Source0:        https://github.com/google/googletest/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/google/googletest/archive/refs/tags/v%{version}.tar.gz#/googletest-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -42,7 +42,7 @@ Requires:       gmock%{?_isa} = %{version}-%{release}
 This contains libgmock header files.
 
 %prep
-%setup -q -n googletest-release-%{version}
+%setup -q -n googletest-%{version}
 
 %build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix} -DBUILD_SHARED_LIBS=OFF .
@@ -84,6 +84,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_prefix}/src/gmock/
 
 %changelog
+* Mon Feb 26 2024 Aditya Dubey <adityadubey@microsoft.com> - 1.14.0-1
+- Updating to 1.14.0 for mariner 3.0.
+- Updated Source0 to correct release url.
+
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.1-1
 - Updating to 1.12.1.
 
