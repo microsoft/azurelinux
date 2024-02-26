@@ -203,7 +203,6 @@ getent group cgred >/dev/null || groupadd -r cgred
 - Remove cgclear as it is no longer provided by the new source and
   add cgxget, cgxset, cgclassify and libcgroup_systemd_idle_thread
 
-
 * Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
 - Create CGCONFIG_CONF_DIR directories on package install
 
