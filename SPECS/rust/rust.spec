@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.72.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -168,6 +168,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 1.72.0-6
+- Dash roll package to rebuild with new libgit2
+
 * Mon Oct 30 2023 Rohit Rawat <rohitrawat@microsoft.com> - 1.72.0-5
 - Patch CVE-2023-45853 in vendor/libz-sys/src/zlib
 
