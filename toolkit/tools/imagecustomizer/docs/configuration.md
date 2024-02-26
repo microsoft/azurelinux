@@ -74,7 +74,7 @@ SystemConfig:
   - kernel
 
   PackagesInstall:
-  - kernel-hci
+  - kernel-uvm
 ```
 
 ## Schema Overview

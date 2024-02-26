@@ -55,7 +55,7 @@
                 "SELinux": "enforcing"
             },
             "KernelOptions": {
-                "default": "kernel-hci"
+                "default": "kernel"
             },
             "Hostname": "azure-linux"
         }
