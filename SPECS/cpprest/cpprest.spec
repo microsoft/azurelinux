@@ -36,7 +36,6 @@ Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       boost-devel
 Requires:       openssl
-Requires:       pkgconfig(libcrypto)
 
 %description devel
 The C++ REST SDK is a Microsoft project for cloud-based client-server
