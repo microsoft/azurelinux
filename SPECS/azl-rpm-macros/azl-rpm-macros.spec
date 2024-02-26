@@ -5,7 +5,7 @@
 # __brp_python_bytecompile
 %global __brp_python_bytecompile %{nil}
 Summary:        Azure Linux specific rpm macro files
-Name:           azl-rpm-macros
+Name:           azurelinux-rpm-macros
 Version:        2.0
 Release:        25%{?dist}
 License:        GPL+ AND MIT
@@ -61,14 +61,14 @@ BuildArch:      noarch
 %description
 Azure Linux specific rpm macro files.
 
-%package -n azl-check-macros
+%package -n azurelinux-check-macros
 Summary:        Azure Linux specific rpm macros to override default %%check behavior
 Group:          Development/System
 
 Obsoletes:      mariner-check-macros <= 2.0-24
 Provides:       mariner-check-macros = %{version}-%{release}
 
-%description -n azl-check-macros
+%description -n azurelinux-check-macros
 Azure Linux specific rpm macros to override default %%check behavior
 
 %prep
@@ -129,7 +129,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
 
-%files -n azl-check-macros
+%files -n azurelinux-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog

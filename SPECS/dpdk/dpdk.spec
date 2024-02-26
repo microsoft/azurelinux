@@ -37,7 +37,7 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
-BuildRequires:  azl-rpm-macros
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  kernel-headers

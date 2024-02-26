@@ -14,7 +14,7 @@ Metapackage holding sets of core packages for different applications.
 %package        base-image
 Summary:        Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
 Requires:       %{name}-container = %{version}-%{release}
-Requires:       azl-rpm-macros
+Requires:       azurelinux-rpm-macros
 Requires:       bc
 Requires:       bridge-utils
 Requires:       chrony

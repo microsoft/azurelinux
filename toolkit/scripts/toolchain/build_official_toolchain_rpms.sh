@@ -309,11 +309,11 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
-cp -v $SPECROOT/azl-rpm-macros/macros $LFS/usr/etc/rpm/macros
+cp -v $SPECROOT/azurelinux-rpm-macros/macros $LFS/usr/etc/rpm/macros
 mkdir -pv $LFS/usr/lib/rpm/azl
-cp -v $SPECROOT/azl-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/azl/gen-ld-script.sh
-cp -v $SPECROOT/azl-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/azl/generate-package-note.py
-cp -v $SPECROOT/azl-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/azl/verify-package-notes.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/azl/gen-ld-script.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/azl/generate-package-note.py
+cp -v $SPECROOT/azurelinux-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/azl/verify-package-notes.sh
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
@@ -324,9 +324,9 @@ start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
-build_rpm_in_chroot_no_install azl-rpm-macros
-chroot_and_install_rpms azl-rpm-macros
-chroot_and_install_rpms azl-check-macros
+build_rpm_in_chroot_no_install azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-check-macros
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc

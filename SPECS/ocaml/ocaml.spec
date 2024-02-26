@@ -29,8 +29,8 @@ BuildRequires:  util-linux
 BuildRequires:  diffutils
 %endif
 # ocamlopt runs gcc to link binaries.  Because Azure Linux includes
-# hardening flags automatically, azl-rpm-macros is also required.
-Requires:       azl-rpm-macros
+# hardening flags automatically, azurelinux-rpm-macros is also required.
+Requires:       azurelinux-rpm-macros
 Requires:       gcc
 # Because we pass -c flag to ocaml-find-requires (to avoid circular
 # dependencies) we also have to explicitly depend on the right version

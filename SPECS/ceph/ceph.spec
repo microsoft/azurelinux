@@ -121,7 +121,7 @@ BuildRequires:  xfsprogs-devel
 BuildRequires:  xmlstarlet
 BuildRequires:  yasm
 
-BuildRequires:  azl-rpm-macros
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  CUnit-devel
 BuildRequires:  boost
 BuildRequires:  cmake > 3.5

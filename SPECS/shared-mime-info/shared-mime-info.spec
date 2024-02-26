@@ -27,7 +27,7 @@ Source5:        evince-defaults.list
 Source6: https://gitlab.freedesktop.org/xdg/xdgmime/-/archive/%{xdgmime_commit}/xdgmime-%{xdgmime_commit}.tar.bz2
 # Work-around for https://bugs.freedesktop.org/show_bug.cgi?id=40354
 Patch0:         0001-Remove-sub-classing-from-OO.o-mime-types.patch
-BuildRequires:  azl-rpm-macros
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gcc

@@ -473,8 +473,8 @@ Requires:       perl(Devel::PPPort)
 # Compiler and linker options stored into perl and used when building XS
 # modules refer to hardening profiles like
 # /usr/lib/rpm/azl/default-hardened-cc1 that are delivered by
-# azl-rpm-macros. Bug #1557667.
-Requires:       azl-rpm-macros
+# azurelinux-rpm-macros. Bug #1557667.
+Requires:       azurelinux-rpm-macros
 
 %if %{defined perl_bootstrap}
 Requires:       %perl_compat

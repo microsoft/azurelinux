@@ -1,4 +1,4 @@
-azl-rpm-macros
+azurelinux-rpm-macros
 cmake
 lua
 rpm
