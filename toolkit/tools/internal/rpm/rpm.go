@@ -255,13 +255,12 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	if distTag != "" {
 		defines[DistTagDefine] = distTag
 		// distTag is of the form ".<distro><version>", extract the distro and version
-		// This will be used to generate '%<distro> <version>' and `%<distro><version> 1`
+		// This will be used to generate '%<distro> <version>'
 		distTagSplit := distTagRegex.FindStringSubmatch(distTag)
 		if len(distTagSplit) == 3 {
 			distroName := distTagSplit[1]
 			distroVersion := distTagSplit[2]
 			defines[distroName] = distroVersion
-			defines[distroName+distroVersion] = "1"
 		} else {
 			logger.Log.Warnf("Invalid distro tag (%s), won't generate derived distro defines", distTag)
 		}

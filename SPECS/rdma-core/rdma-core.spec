@@ -26,10 +26,10 @@ BuildRequires: gcc
 BuildRequires: pkg-config
 BuildRequires: pkgconfig(libnl-3.0)
 BuildRequires: pkgconfig(libnl-route-3.0)
-# Disable pyverbs for azl3, as pyverbs cannot build with cython > 3
+# Disable pyverbs for azl, as pyverbs cannot build with cython > 3
 # pyverbs/device.c: error: redefinition of '__Pyx_Enum_ibv_event_type_to_py'
 # and non-matching exception definitions
-%if 0%{azl3}
+%if 0%{azl}
 %define with_pyverbs 0
 %endif
 %if %{with_pyverbs}

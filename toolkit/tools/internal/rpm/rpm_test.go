@@ -217,7 +217,6 @@ func TestDefaultDefines(t *testing.T) {
 	// Check for distro name and version
 	assert.Equal(t, distTag, defines["dist"])
 	assert.Equal(t, distVersion, defines[distName])
-	assert.Equal(t, "1", defines[distName+distVersion])
 
 	// Check the dist macros are not in the dictionary for invalid distro tag
 	defines = DefaultDistroDefines(false, invalidDistDag)

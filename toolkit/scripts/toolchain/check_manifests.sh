@@ -2,7 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -ex
+set -e
 
 TOOLCHAIN_SPEC_LIST_FILE=$1
 SPECS_DIR=$2
@@ -14,15 +14,12 @@ ARCH=$6
 # Define 'azl <ver>' and 'azl<ver> 1' macros for use in spec files. Normally they would be defined in the 'mariner-rpm-macros-dist' package.
 # Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
 
-# 'azl<ver> 1': Strip the leading '.' from the DIST_TAG
-distro_def="${DIST_TAG#.} 1"
-
 # 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
 distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
 distro_majver="${RELEASE_NUM%%.*}"
 distro_ver="${distro_name} ${distro_majver}"
 
-distro_defines=(--define "with_check 1" --define "dist $DIST_TAG" --define "$distro_def" --define "$distro_ver")
+distro_defines=(--define "with_check 1" --define "dist $DIST_TAG" --define "$distro_ver")
 
 write_rpms_from_spec () {
     # $1 = spec file

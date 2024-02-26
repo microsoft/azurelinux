@@ -60,6 +60,14 @@ else
     export CHECK_DEFINE_NUM="0"
 fi
 
+# Define 'azl <ver>' and 'azl<ver> 1' macros for use in spec files. Normally they would be defined in the 'mariner-rpm-macros-dist' package.
+# Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
+
+# 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
+distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
+distro_majver="${PARAM_RELEASE_VER%%.*}"
+distro_ver="${distro_name} ${distro_majver}"
+
 # Assumption: pipeline has copied file: build/toolchain/toolchain_from_container.tar.gz
 # Or, if toolchain-build-all was called, both of the following will exist:
 #       build/toolchain/populated_toolchain
@@ -201,7 +209,7 @@ chroot_and_install_rpms () {
         # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
         #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
-        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
+        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --define="$distro_ver" --queryformat %{VERSION}-%{RELEASE})
         # Do not include any files with "debuginfo" in the name
         find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
@@ -237,7 +245,7 @@ chroot_and_run_rpmbuild () {
         SHELL=/bin/bash                    \
         rpmbuild --nodeps --rebuild --clean     \
             $CHECK_SETTING                 \
-            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "mariner_build_number $PARAM_BUILD_NUM" \
+            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "$distro_ver" --define "mariner_build_number $PARAM_BUILD_NUM" \
             --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
             --define "mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
@@ -326,7 +334,6 @@ start_record_timestamp "build packages/install"
 echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install mariner-rpm-macros
 chroot_and_install_rpms mariner-rpm-macros
-chroot_and_install_rpms mariner-rpm-macros-dist
 chroot_and_install_rpms mariner-check-macros
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
