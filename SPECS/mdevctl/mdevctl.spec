@@ -78,7 +78,7 @@ mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/notifiers
 
 %if %{with check}
 %check
-%cargo_test
+cargo test
 %endif
 
 %files
