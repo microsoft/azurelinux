@@ -1,5 +1,3 @@
-%bcond_without check
-
 %global crate mdevctl
 
 Name:           mdevctl
@@ -76,13 +74,11 @@ install -m 644 -T $(find ./target/%{rust_def_target}/release -name lsmdev.bash) 
 mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/callouts
 mkdir -p %{buildroot}%{_libdir}/mdevctl/scripts.d/notifiers
 
-%if %{with check}
 %check
 # Use simple cargo test rather than cargo_test macro which seems to fail
 # because there is no rpm profile in th ecargo setup (seems like this file
 # needs cargo_prep to enable cargo_test macro)
 cargo test
-%endif
 
 %files
 %license COPYING
