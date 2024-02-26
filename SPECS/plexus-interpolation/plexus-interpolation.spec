@@ -25,13 +25,10 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/%{name}
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.xml
-BuildRequires:  ant
-BuildRequires:  fdupes
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
-%if %{with tests}
-BuildRequires:  ant-junit
-%endif
+
 
 %description
 Plexus interpolator is the outgrowth of multiple iterations of development
@@ -48,32 +45,13 @@ API documentation for %{name}.
 
 %prep
 %setup -q -n %{name}-%{name}-%{version}
-cp %{SOURCE1} build.xml
-%pom_remove_plugin :maven-release-plugin
-
-%pom_remove_parent
-
-%pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>"
-
+	
 %build
-%ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
-%if %{without tests}
-  -Dtest.skip=true \
-%endif
-  jar javadoc
+%mvn_file : plexus/interpolation
+%mvn_build
 
 %install
-# jar
-install -dm 0755 %{buildroot}%{_javadir}/plexus
-install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/plexus/interpolation.jar
-# pom
-install -dm 0755 %{buildroot}%{_mavenpomdir}/plexus
-install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/plexus/interpolation.pom
-%add_maven_depmap plexus/interpolation.pom plexus/interpolation.jar
-# javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-%fdupes -s %{buildroot}%{_javadocdir}
+%mvn_install
 
 %files -f .mfiles
 
@@ -82,8 +60,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 
 %changelog
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-4
-- Rebuilt with msopenjdk-17
-- change source, target
+- Rebuilt with msopenjdk-17, and maven
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.26-3
 - Moved from extended to core
