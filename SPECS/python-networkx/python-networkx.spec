@@ -1,7 +1,7 @@
 Summary:        Creates and Manipulates Graphs and Networks
 Name:           python-networkx
-Version:        2.8.8
-Release:        3%{?dist}
+Version:        3.2.1
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,9 +11,11 @@ Patch0:         %{name}-doc.patch
 # Temporary workaround for a failing test.
 # See https://github.com/networkx/networkx/issues/5913
 Patch1:         %{name}-test.patch
+Patch2:         %{name}-pyproject.patch
 BuildRequires:  make
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
@@ -43,13 +45,14 @@ sed -i 's/\(numpydoc>=1.\)5/\14/' requirements/doc.txt
 %install
 %{pyproject_install}
 %pyproject_save_files networkx
-mv %{buildroot}%{_docdir}/networkx-%{version} ./installed-docs
-rm -f installed-docs/INSTALL.txt
 
 %files -n python3-networkx -f %{pyproject_files}
 %license LICENSE.txt
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.1-1
+- Auto-upgrade to 3.2.1 - 3.0 package upgrade
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.8-4
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License Verified
