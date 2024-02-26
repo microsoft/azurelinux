@@ -1,6 +1,6 @@
 Summary:        Internationalized Domain Names in Applications (IDNA).
 Name:           python-idna
-Version:        3.3
+Version:        3.6
 Release:        1%{?dist}
 License:        BSD-like
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ This acts as a suitable replacement for the “encodings.idna” module that com
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6-1
+- Auto-upgrade to 3.6 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 3.3-1
 - Updated Source0 and license file.
 - Updated to 3.3.
