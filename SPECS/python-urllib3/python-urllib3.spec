@@ -43,9 +43,36 @@ rm -rf test/contrib/
 %pyproject_install
 
 %check
-pip3 install --user --upgrade nox
-PATH="$PATH:/root/.local/bin/"
-nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
+pip3 install tornado>=6.2 \
+    trustme>=0.9.0 \
+    pytest>=7.4.0 \
+    pytest-cov>=2.7.1 \
+    Brotli>= 1.0.9 \
+    PySocks>=1.7.1 \
+    certifi \
+    cryptography>=1.9 \
+    flaky \
+    idna>=3.4 \
+    psutil \
+    pytest>=7.4.0 \
+    pytest-timeout>=2.1.0 \
+    pytest-xdist \
+    urllib3>=%{version} \
+    timezone
+
+# gh#urllib3/urllib3#2109
+export CI="true"
+# skip some randomly failing tests (mostly on i586, but sometimes they fail on other architectures)
+skiplist="test_ssl_read_timeout or test_ssl_failed_fingerprint_verification or test_ssl_custom_validation_failure_terminates"
+# gh#urllib3/urllib3#1752 and others: upstream's way of checking that the build
+# system has a correct system time breaks (re-)building the package after too
+# many months have passed since the last release.
+skiplist+=" or test_recent_date"
+# too slow to run in obs (checks 2GiB of data)
+skiplist+=" or test_requesting_large_resources_via_ssl"
+# Try to access external evil.com
+skiplist+=" or test_deprecated_no_scheme"
+%pytest -k "not (${skiplist})" --ignore test/with_dummyserver/test_socketlevel.py
 
 %files -n python3-urllib3
 %defattr(-,root,root,-)
