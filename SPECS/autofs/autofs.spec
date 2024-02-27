@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
-Version:        5.1.8
-Release:        4%{?dist}
+Version:        5.1.9
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,6 +66,9 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 /lib/systemd/system/autofs.service
 
 %changelog
+* Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.1.9-1
+- Auto-upgrade to 5.1.9 - Azure Linux 3.0 Upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
