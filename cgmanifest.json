@@ -24572,9 +24572,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-trove-classifier",
+          "name": "python-trove-classifiers",
           "version": "2024.2.23",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifier/trove-classifier-2024.2.23.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove-classifiers-2024.2.23.tar.gz"
         }
       }
     },

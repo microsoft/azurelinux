@@ -1,19 +1,9 @@
 # Disable tests as it requires new package python-exceptiongroup
 %global with_check 0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %undefine mariner_module_ldflags
-
-## START: Set by rpmautospec
-## (rpmautospec version 0.3.5)
-## RPMAUTOSPEC: autorelease, autochangelog
-%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 2;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
-## END: Set by rpmautospec
 
 # Let’s try to build this as early as we can, since it’s a dependency for
 # some important libraries, such as python-platformdirs.
@@ -22,7 +12,7 @@ Distribution:   Mariner
 
 Name:           python-hatch-vcs
 Version:        0.4.0
-Release:        %autorelease
+Release:        2%{?dist}
 Summary:        Hatch plugin for versioning with your preferred VCS
 
 # SPDX

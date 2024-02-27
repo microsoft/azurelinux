@@ -6,19 +6,9 @@ Distribution:   Azure Linux
 
 %undefine mariner_module_ldflags
 
-## START: Set by rpmautospec
-## (rpmautospec version 0.5.1)
-## RPMAUTOSPEC: autorelease, autochangelog
-%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 2;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
-## END: Set by rpmautospec
-
 Name:           python-%{srcname}
 Version:        1.21.1
-Release:        %autorelease
+Release:        2%{?dist}
 Summary:        The build backend used by Hatch
 
 # SPDX
