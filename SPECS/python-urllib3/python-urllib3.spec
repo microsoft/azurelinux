@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
-Version:        1.26.18
-Release:        2%{?dist}
+Version:        2.0.4
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://pypi.python.org/pypi/urllib3
 Source0:        https://github.com/urllib3/urllib3/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 Patch0:         urllib3_test_recent_date.patch
+Patch1:         change-backend-to-flit_core.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -21,9 +22,9 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-wheel
+BuildRequires:  python-flit-core
 Requires:       python3
 
 %description -n python3-urllib3
@@ -36,15 +37,44 @@ rm -rf test/with_dummyserver/
 rm -rf test/contrib/
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
-pip3 install --user --upgrade nox
-PATH="$PATH:/root/.local/bin/"
-nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
+pip3 install --upgrade pip
+pip3 install tornado>=6.2 \
+    trustme>=0.9.0 \
+    pytest>=7.4.0 \
+    pytest-cov>=2.7.1 \
+    Brotli>=1.0.9 \
+    PySocks>=1.7.1 \
+    certifi \
+    cryptography>=1.9 \
+    flaky \
+    idna>=3.4 \
+    psutil \
+    pytest>=7.4.0 \
+    pytest-timeout>=2.1.0 \
+    pytest-xdist \
+    urllib3>=%{version}
+
+# gh#urllib3/urllib3#2109
+export CI="true"
+# skip some randomly failing tests (mostly on i586, but sometimes they fail on other architectures)
+skiplist="test_ssl_read_timeout or test_ssl_failed_fingerprint_verification or test_ssl_custom_validation_failure_terminates"
+# gh#urllib3/urllib3#1752 and others: upstream's way of checking that the build
+# system has a correct system time breaks (re-)building the package after too
+# many months have passed since the last release.
+skiplist+=" or test_recent_date"
+# too slow to run in obs (checks 2GiB of data)
+skiplist+=" or test_requesting_large_resources_via_ssl"
+# Try to access external evil.com
+skiplist+=" or test_deprecated_no_scheme"
+# Skip timezone test
+skiplist+=" or test_respect_retry_after_header_sleep"
+%pytest -k "not (${skiplist})" --ignore test/with_dummyserver/test_socketlevel.py
 
 %files -n python3-urllib3
 %defattr(-,root,root,-)
@@ -52,6 +82,12 @@ nox --reuse-existing-virtualenvs --sessions test-%{python3_version}
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 02 2024 Henry Li <lihl@microsoft.com> - 2.0.4-1
+- Upgrade to version 2.0.4
+- Add patch to change backend build system to python-flit-core
+- Add python-flit-core as BR
+- Fix test section
+
 * Wed Jan 17 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.26.18-2
 - Fix test_recent_date test by updating the hard-coded date used for test
 
