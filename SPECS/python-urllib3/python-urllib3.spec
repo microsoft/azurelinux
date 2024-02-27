@@ -72,6 +72,8 @@ skiplist+=" or test_recent_date"
 skiplist+=" or test_requesting_large_resources_via_ssl"
 # Try to access external evil.com
 skiplist+=" or test_deprecated_no_scheme"
+# Skip timezone test
+skiplist+=" or test_respect_retry_after_header_sleep"
 %pytest -k "not (${skiplist})" --ignore test/with_dummyserver/test_socketlevel.py
 
 %files -n python3-urllib3
