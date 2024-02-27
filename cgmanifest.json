@@ -23923,8 +23923,8 @@
         "type": "other",
         "other": {
           "name": "python-retrying",
-          "version": "1.3.3",
-          "downloadUrl": "https://github.com/rholder/retrying/archive/refs/tags/v1.3.3.tar.gz"
+          "version": "1.3.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ce/70/15ce8551d65b324e18c5aa6ef6998880f21ead51ebe5ed743c0950d7d9dd/retrying-1.3.4.tar.gz"
         }
       }
     },
