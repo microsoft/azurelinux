@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.5
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Pytest plugin to check source code with pyflakes
 
 License:        MIT
@@ -49,6 +49,10 @@ rm -rf *.egg-info
 %{python3_sitelib}/__pycache__/pytest_flakes.*
 
 %changelog
+* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 4.0.5-8
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- license verified
+
 * Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.5-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
