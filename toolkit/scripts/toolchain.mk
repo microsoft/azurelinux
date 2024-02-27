@@ -112,7 +112,7 @@ check-aarch64-manifests: $(toolchain_spec_list)
 check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			"$(toolchain_spec_list) \
+			"$(toolchain_spec_list)" \
 			"$(SPECS_DIR)" \
 			"$(TOOLCHAIN_MANIFESTS_DIR)" \
 			"$(DIST_TAG)" \
