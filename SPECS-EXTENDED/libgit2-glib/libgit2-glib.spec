@@ -5,7 +5,7 @@ Distribution:   Mariner
 
 Name:           libgit2-glib
 Version:        0.99.0.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Git library for GLib
 
 License:        LGPLv2+
@@ -70,6 +70,9 @@ developing applications that use %{name}.
 %{_datadir}/vala/
 
 %changelog
+* Wed Feb 21 2024 Sam Meluch <sammeluch@microsoft.com> - 0.99.0.1-6
+- Dash roll to rebuild with new libgit2
+
 * Mon Mar 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.99.0.1-5
 - Adding BR on '%%{_bindir}/xsltproc'.
 - Disabled gtk doc generation to remove network dependency during build-time.
