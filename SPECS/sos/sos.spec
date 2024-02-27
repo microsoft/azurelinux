@@ -2,7 +2,7 @@
 Summary:        A set of tools to gather troubleshooting information from a system
 Name:           sos
 Version:        4.6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/sosreport/sos/archive/%{version}.tar.gz#/%{na
 # The sos-4.6.1.tar.gz is missing a commit to bump the version to 4.6.1
 # https://github.com/orgs/sosreport/discussions/3492
 Patch0:         bump-version-4-6-1.patch
+Patch1:         boot-config.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       bzip2
@@ -73,6 +74,9 @@ rm -rf %{buildroot}%{_prefix}/config/
 %config(noreplace) %{_sysconfdir}/sos/sos.conf
 
 %changelog
+* Tue Feb 27 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.6.1-2
+- Add boot-config.patch
+
 * Tue Jan 30 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 4.6.1-1
 - Upgrade to 4.6.1
 - Migrated to SPDX license

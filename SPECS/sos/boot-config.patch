@@ -1,0 +1,26 @@
+From 26dc1919fbe25e59be444943eed2709921660106 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Tue, 27 Feb 2024 10:31:15 -0800
+Subject: [PATCH] Copy /boot/config*
+
+---
+ sos/report/plugins/boot.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sos/report/plugins/boot.py b/sos/report/plugins/boot.py
+index 8752eab2..b3f4e637 100644
+--- a/sos/report/plugins/boot.py
++++ b/sos/report/plugins/boot.py
+@@ -30,7 +30,8 @@ class Boot(Plugin, IndependentPlugin):
+             "/etc/silo.conf",
+             "/boot/efi/efi/redhat/elilo.conf",
+             "/etc/yaboot.conf",
+-            "/boot/yaboot.conf"
++            "/boot/yaboot.conf",
++            "/boot/config*"
+         ])
+ 
+         self.add_cmd_output("ls -lanR /boot", tags="ls_boot")
+-- 
+2.17.1
+
