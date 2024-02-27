@@ -60,7 +60,7 @@ BuildRequires:  extra-cmake-modules
 BuildRequires:  gcc
 # Other build-time tools
 BuildRequires:  gettext
-# KF5
+# KF 6
 BuildRequires:  kf-kconfig-devel
 BuildRequires:  kf-kcoreaddons-devel
 BuildRequires:  kf-ki18n-devel
