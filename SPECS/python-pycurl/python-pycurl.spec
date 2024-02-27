@@ -20,7 +20,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  python3-devel
 Requires:       curl
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-libs
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools

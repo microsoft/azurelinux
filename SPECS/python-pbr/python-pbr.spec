@@ -21,7 +21,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  git
 BuildRequires:  gnupg2
 BuildRequires:  python3-pip

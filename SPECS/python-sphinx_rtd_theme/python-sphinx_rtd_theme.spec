@@ -26,7 +26,7 @@ BuildRequires:  %{py3_dist sphinx}
 BuildRequires:  %{py3_dist pip}
 BuildRequires:  %{py3_dist wheel}
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{py3_dist pytest}
 %endif
 

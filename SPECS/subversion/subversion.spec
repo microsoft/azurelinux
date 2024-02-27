@@ -19,7 +19,7 @@ BuildRequires:  perl(ExtUtils::Embed)
 BuildRequires:  sqlite-devel
 BuildRequires:  swig
 BuildRequires:  utf8proc-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3
 BuildRequires:  shadow-utils
 BuildRequires:  sudo

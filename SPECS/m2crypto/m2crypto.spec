@@ -23,7 +23,7 @@ BuildRequires:  python3-xml
 BuildRequires:  swig
 Requires:       openssl >= 1.1.1g-6
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

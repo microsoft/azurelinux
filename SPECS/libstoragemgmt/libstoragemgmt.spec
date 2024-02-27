@@ -29,7 +29,7 @@ BuildRequires:  sqlite-devel
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  git
 %endif
 Requires:       python3-%{name}
