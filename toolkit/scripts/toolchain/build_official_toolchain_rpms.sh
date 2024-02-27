@@ -444,14 +444,14 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
+# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/azurelinux/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
