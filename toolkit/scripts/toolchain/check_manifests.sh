@@ -9,18 +9,19 @@ SPECS_DIR=$2
 MANIFESTS_DIR=$3
 DIST_TAG=$4
 DISTRO_MACRO=$5
+ARCH=$6
 
 write_rpms_from_spec () {
     # $1 = spec file
     # $2 = file to save to
     spec_dir=$(dirname $1)
-    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="$DIST_TAG" --define="$DISTRO_MACRO" --qf="[%{EXCLUSIVEARCH} ]" --srpm 2>/dev/null)
+    exclusiveArch=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --define="$DISTRO_MACRO" --qf="[%{EXCLUSIVEARCH} ]" --srpm 2>/dev/null)
     if [[ -n "$exclusiveArch" && ! "$exclusiveArch" =~ "$ARCH" ]]; then
         return 0
     fi
 
-    version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="$DIST_TAG" --define="$DISTRO_MACRO" --qf="%{VERSION}" --srpm 2>/dev/null)
-    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="$DIST_TAG" --define="$DISTRO_MACRO" --target=$ARCH --qf="%{nvra}\n" 2>/dev/null)
+    version=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --define="$DISTRO_MACRO" --qf="%{VERSION}" --srpm 2>/dev/null)
+    rpmWithoutExtension=$(rpmspec -q $1 --define="with_check 0" --define="_sourcedir $spec_dir" --define="dist $DIST_TAG" --define="$DISTRO_MACRO" --target=$ARCH --qf="%{nvra}\n" 2>/dev/null)
 
     for rpm in $rpmWithoutExtension
     do
