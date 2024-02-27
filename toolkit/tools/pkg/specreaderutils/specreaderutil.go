@@ -296,7 +296,6 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	// These variables are common to all specs and can be reused, but we need to cache the error messages.
 	noCheckDefines := rpm.DefaultDistroDefines(false, distTag)
 	checkDefines := rpm.DefaultDistroDefines(true, distTag)
 
