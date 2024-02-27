@@ -3,7 +3,7 @@
 Summary:        NBD client library in userspace
 Name:           libnbd
 Version:        1.12.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -215,7 +215,6 @@ skip_test tests/connect-tcp6
 %{python3_sitearch}/libnbdmod*.so
 %{python3_sitearch}/nbd.py
 %{python3_sitearch}/nbdsh.py
-%{python3_sitearch}/__pycache__/nbd*.py*
 %{_bindir}/nbdsh
 %{_mandir}/man1/nbdsh.1*
 
@@ -232,6 +231,9 @@ skip_test tests/connect-tcp6
 
 
 %changelog
+* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.12.1-4
+- Fix python3.12 build issue
+
 * Thu Oct 19 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.12.1-3
 - Add patch to fix CVE-2023-5215
 
