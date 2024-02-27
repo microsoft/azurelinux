@@ -4,7 +4,7 @@
 # If you are incrementing major_version, enable bootstrapping and adjust accordingly.
 # Version should be the latest prior build. If you don't do this, RPM will break and
 # everything will grind to a halt.
-%global bootstrap 1
+%global bootstrap 0
 %global bootstrap_major_version 5.3
 %global bootstrap_version %{bootstrap_major_version}.5
 
@@ -30,7 +30,7 @@ Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 # multilib
 Source4:        luaconf.h
 Patch0:         %{name}-5.4.0-beta-autotoolize.patch
-Patch1:         %{name}-5.3.0-idsize.patch
+Patch1:         %{name}-5.4.6-idsize.patch
 #Patch2:        %%{name}-5.3.0-luac-shared-link-fix.patch
 Patch3:         %{name}-5.2.2-configure-linux.patch
 Patch4:         %{name}-5.3.0-configure-compat-module.patch
