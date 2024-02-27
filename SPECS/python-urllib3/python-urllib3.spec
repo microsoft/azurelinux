@@ -86,6 +86,7 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 - Upgrade to version 2.0.4
 - Add patch to change backend build system to python-flit-core
 - Add python-flit-core as BR
+- Fix test section
 
 * Wed Jan 17 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.26.18-2
 - Fix test_recent_date test by updating the hard-coded date used for test
