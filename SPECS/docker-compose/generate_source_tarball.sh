@@ -93,7 +93,7 @@ cp $SRC_TARBALL $tmpdir
 
 pushd $tmpdir > /dev/null
 
-PKG_NAME="moby-compose"
+PKG_NAME="docker-compose"
 NAME_VER="$PKG_NAME-$PKG_VERSION"
 VENDOR_TARBALL="$OUT_FOLDER/$NAME_VER-govendor-v$VENDOR_VERSION.tar.gz"
 
@@ -111,7 +111,7 @@ tar  --sort=name \
      --mtime="2021-04-26 00:00Z" \
      --owner=0 --group=0 --numeric-owner \
      --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-     -cf "$VENDOR_TARBALL" vendor
+     -czf "$VENDOR_TARBALL" vendor
 
 popd > /dev/null
 echo "$PKG_NAME vendored modules are available at $VENDOR_TARBALL"

@@ -1,20 +1,21 @@
 Summary:        Define and run multi-container applications with Docker
-Name:           moby-compose
-Version:        2.17.2
-Release:        6%{?dist}
+Name:           docker-compose
+Version:        2.24.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Tools/Container
 URL:            https://github.com/docker/compose
 Source0:        https://github.com/docker/compose/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
 # Leverage the `generate_source_tarball.sh` to create the vendor sources
 # NOTE: govendor-v1 format is for inplace CVE updates so that we do not have to overwrite in the blob-store.
 # After fixing any possible CVE for the vendored source, we must bump v1 -> v2
 Source1:        %{name}-%{version}-govendor-v1.tar.gz
 BuildRequires:  golang
-Requires:       moby-cli
+Requires:       docker-cli
+Obsoletes:      moby-compose < %{version}-%{release}
+Provides:       moby-compose = %{version}-%{release}
 
 
 %description
@@ -24,8 +25,7 @@ Then, with a single command, you create and start all the services from your
 configuration.
 
 %prep
-%autosetup -n compose-%{version}
-%setup -q -n compose-%{version} -T -D -a 1
+%autosetup -p1 -n compose-%{version} -a 1
 
 %build
 go build \
@@ -44,6 +44,10 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Mon Feb 26 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.24.6-1
+- Rename spec from moby-compose to docker-compose
+- Bump version to 2.24.6
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.2-6
 - Bump release to rebuild with go 1.20.10
 
