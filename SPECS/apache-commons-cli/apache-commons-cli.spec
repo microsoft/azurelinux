@@ -17,21 +17,17 @@
 %global short_name      commons-%{base_name}
 Summary:        Command Line Interface Library for Java
 Name:           apache-commons-cli
-Version:        1.4
-Release:        5%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}/
 Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/commons-cli-%{version}-src.tar.gz
-Source1:        %{name}-build.xml.tar.bz2
-Patch0:         CLI-253-workaround.patch
-BuildRequires:  ant
 BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-Requires:       java >= 1.8
 Provides:       jakarta-%{short_name} = %{version}-%{release}
 Obsoletes:      jakarta-%{short_name} < %{version}
 Provides:       apache-cli = %{version}
@@ -52,30 +48,17 @@ Obsoletes:      jakarta-%{short_name}-javadoc < %{version}
 This package contains the API documentation for %{name}.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src -a1
-%patch 0 -p1
+%autosetup -p1 -n commons-cli-%{version}-src
 
-%pom_remove_parent
+# Compatibility links
+%mvn_alias : org.apache.commons:commons-cli
+%mvn_file : commons-cli %{name}
 
 %build
-ant -Dmaven.mode.offline=true package javadoc \
-    -Dmaven.test.skip=true \
-    -lib %{_datadir}/java
+%mvn_build
 
 %install
-# jars
-install -Dpm 644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{short_name}.jar
-ln -sf %{short_name}.jar %{buildroot}%{_javadir}/%{name}.jar
-
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{short_name}.pom
-%add_maven_depmap %{short_name}.pom %{short_name}.jar -a "org.apache.commons:%{short_name}"
-
-# javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}
-%fdupes -s %{buildroot}%{_javadocdir}/%{name}
+%mvn_install
 
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
@@ -87,6 +70,10 @@ cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Feb 26 2024 George Mileka <gmileka@microsoft.com> - 1.6.0-1
+- Updated to 1.6.0-1.
+- Removed patch CLI-253-workaround.patch.
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-5
 - Moved from extended to core
 - License verified
