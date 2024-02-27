@@ -43,11 +43,12 @@ rm -rf test/contrib/
 %pyproject_install
 
 %check
+pip3 install --upgrade pip
 pip3 install tornado>=6.2 \
     trustme>=0.9.0 \
     pytest>=7.4.0 \
     pytest-cov>=2.7.1 \
-    Brotli>= 1.0.9 \
+    Brotli>=1.0.9 \
     PySocks>=1.7.1 \
     certifi \
     cryptography>=1.9 \
