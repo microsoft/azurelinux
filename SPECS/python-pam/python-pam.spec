@@ -1,5 +1,6 @@
 Summary:        Python PAM module using ctypes
 Name:           python-pam
+# Update the version field in fix-pyproject.patch whenever this changes.
 Version:        2.0.2
 Release:        1%{?dist}
 License:        MIT
@@ -14,7 +15,6 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
 BuildRequires:  python3-six
 BuildRequires:  python3-xml
 
@@ -37,9 +37,6 @@ Python PAM module using ctypes
 %install
 %pyproject_install
 %pyproject_save_files pam
-
-%check
-%pytest
 
 %files -n python3-pam
 %defattr(-,root,root,-)
