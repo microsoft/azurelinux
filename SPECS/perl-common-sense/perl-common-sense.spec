@@ -11,7 +11,7 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/common-sense
 Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 
@@ -43,7 +43,7 @@ It's supposed to be mostly the same, with much lower memory usage, as:
 %setup -q -n common-sense-%{version}
 
 # Specify POD encoding
-%patch1
+%patch 1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

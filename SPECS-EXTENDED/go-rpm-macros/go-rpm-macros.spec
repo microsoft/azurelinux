@@ -2,7 +2,7 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global forgeurl  https://pagure.io/go-rpm-macros
 Version:   3.0.9
 %forgemeta
@@ -91,7 +91,7 @@ macros provided by go-rpm-macros to create Go packages.
 
 %prep
 %forgesetup
-%patch0 -p1
+%patch 0 -p1
 
 %writevars -f rpm/macros.d/macros.go-srpm golang_arches gccgo_arches gopath
 for template in templates/rpm/*\.spec ; do

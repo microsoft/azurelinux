@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Fedora package review: http://bugzilla.redhat.com/718395
 
@@ -38,8 +38,8 @@ applications which will use %{name}.
 
 %prep
 %setup -q -n libmusicbrainz-%{version}
-%patch0 -p1 -b .doxygen
-%patch1 -p1 -b .silence-warnings
+%patch 0 -p1 -b .doxygen
+%patch 1 -p1 -b .silence-warnings
 
 # omit "Generated on ..." timestamps that induce multilib conflicts
 # this is *supposed* to be the doxygen default in fedora these days, but

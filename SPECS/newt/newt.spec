@@ -1,10 +1,10 @@
 Summary:        A library for text mode user interfaces
 Name:           newt
 Version:        0.52.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://pagure.io/newt
 Source0:        https://pagure.io/releases/%{name}/%{name}-%{version}.tar.gz
@@ -89,12 +89,14 @@ make %{?_smp_mflags} test
 %doc peanuts.py popcorn.py
 %{python3_sitearch}/*.so
 %{python3_sitearch}/*.py*
-%{python3_sitearch}/__pycache__/*.py*
 
 %files -f %{name}.lang lang
 %defattr(-,root,root)
 
 %changelog
+* Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 0.52.23-2
+- Remove reference to missing pycache files
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.52.23-1
 - Auto-upgrade to 0.52.23 - Azure Linux 3.0 - package upgrades
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Copyright 2011, Red Hat
 %global oname configshell-fb
 

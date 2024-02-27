@@ -1,55 +1,64 @@
-%define pkgname sphinxcontrib-websupport
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix websupport
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
+
 Summary:        Python API to integrate Sphinx into a web application
-Name:           python-%{pkgname}
-Version:        1.2.4
-Release:        3%{?dist}
+Name:           python-%{pypi_name}
+Version:        1.2.7
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://github.com/sphinx-doc/sphinxcontrib-websupport
-Source0:        https://github.com/sphinx-doc/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
+Distribution:   Azure Linux
+URL:            https://github.com/sphinx-doc/%{pypi_name}
+Source0:        https://github.com/sphinx-doc/%{pypi_name}/archive/%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
 Python API to integrate Sphinx into a web application
 
-%package -n python3-%{pkgname}
+%package -n python3-%{pypi_name}
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
+BuildRequires:  python-flit-core
 %if %{with check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-packaging
+BuildRequires:  python3-sphinx
 %endif
 
 Requires:       python3
 Requires:       python3-sphinxcontrib-serializinghtml
 
-%description -n python3-%{pkgname}
+%description -n python3-%{pypi_name}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
 
+%pyproject_extras_subpkg -n python3-%{pkgname} whoosh
+
 %prep
-%autosetup -n %{pkgname}-%{version} -p 1
-rm -rf *.egg-info
+%autosetup -n %{pypi_name}-%{version} -p 1
+
+%generate_buildrequires
+%pyproject_buildrequires -t
 
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{pypi_name_prefix}
 
 %check
-pip3 install tox
-tox
-
-%files -n python3-%{pkgname}
+pip3 install tox tox-current-env pytest
+%tox
+%files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/*
-%{python3_sitelib}/*.egg-info
-%{python3_sitelib}/*.pth
 
 %changelog
+* Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-1
+- Auto-upgrade to 1.2.7 - 3.0 - Upgrade
+- Use pypi macros
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.4-3
 - Updating source URL.
 

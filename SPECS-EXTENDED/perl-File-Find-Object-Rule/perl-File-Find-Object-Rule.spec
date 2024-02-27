@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %if ! (0%{?rhel})
 %{bcond_without perl_File_Find_Object_Rule_enables_optional_test}
 %else
@@ -53,7 +53,7 @@ allows you to build rules that specify the desired files and directories.
 %setup -qn File-Find-Object-Rule-%{version}
 
 # Avoid use of /usr/bin/env
-%patch0
+%patch 0
 
 %build
 perl Build.PL --installdirs=vendor

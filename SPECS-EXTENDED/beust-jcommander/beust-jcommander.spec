@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package beust
 #
@@ -54,7 +54,7 @@ This package contains the %{summary}.
 %prep
 %setup -q -n %{name}-%{version}
 rm -rf gradle* kobalt* lib
-%patch0 -p1
+%patch 0 -p1
 
 chmod -x license.txt
 cp -p %{SOURCE1} pom.xml

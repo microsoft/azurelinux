@@ -8,7 +8,7 @@ Summary:	Provide compiled List::MoreUtils functions
 # determine the license of any particular chunk of code
 License:	(GPL+ or Artistic) and ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/List-MoreUtils-XS
 Source0:	https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-XS-%{version}.tar.gz#/perl-List-MoreUtils-XS-%{version}.tar.gz
 Patch0:		List-MoreUtils-XS-0.428-unbundle.patch
@@ -53,7 +53,7 @@ This module provides accelerated versions of functions in List::MoreUtils.
 %setup -q -n List-MoreUtils-XS-%{version}
 
 # Unbundle bundled modules except private inc::Config::AutoConf::LMU
-%patch0
+%patch 0
 find inc/ -type f ! -name LMU.pm -print -delete
 
 %build

@@ -4,11 +4,11 @@
 Summary:        The blessed package to manage your versions by scm tags.
 Name:           python-setuptools_scm
 Version:        6.4.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            https://pypi.python.org/pypi/setuptools_scm
 Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
 
@@ -31,6 +31,8 @@ It also handles file finders for the supported scm’s.
 
 %package -n     python3-setuptools_scm
 Summary:        python-setuptools_scm
+
+BuildRequires:  python3-tomli
 
 Requires:       python3
 Requires:       python3-libs
@@ -62,6 +64,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 6.4.2-2
+- Add build requirement on python3-tomli to fix python 3.12 break
+
 * Sun Mar 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.4.2-1
 - Updating to version 6.4.2.
 - Adding a dependency on 'python3-tomli'.

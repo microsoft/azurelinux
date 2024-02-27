@@ -8,7 +8,7 @@ Version:        %{ver_major}.%{ver_minor}.%{ver_patch}
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.quut.com/gsm/
 Source0:        https://www.quut.com/gsm/%{name}-%{version}.tar.gz
 
@@ -58,8 +58,8 @@ full-rate speech transcoding, prI-ETS 300 036, which uses RPE/LTP
 
 %prep
 %setup -q -n gsm-%{ver_major}.%{ver_minor}-pl%{ver_patch}
-%patch0 -p1 -b .mk
-%patch1 -p1 -b .warn
+%patch 0 -p1 -b .mk
+%patch 1 -p1 -b .warn
 
 %build
 export LDFLAGS="%{?__global_ldflags}"

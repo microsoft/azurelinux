@@ -4,7 +4,7 @@ Version:        3.25
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/NetworkBlockDevice/nbd
 Source0:        https://github.com/NetworkBlockDevice/nbd/releases/download/%{name}-%{version}/%{name}-%{version}.tar.xz
 Source1:        nbd-server.service

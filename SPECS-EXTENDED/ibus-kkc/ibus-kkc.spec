@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:		ibus-kkc
 Version:	1.5.22
 Release:	16%{?dist}
@@ -30,8 +30,8 @@ rm src/*vala.stamp
 # don't touch XKB layout under Fedora
 sed -i 's!<layout>jp</layout>!<layout>default</layout>!' src/kkc.xml.in.in
 # for ibus 1.5.4 or later
-%patch0 -p1 -b .content-type
-%patch1 -p1 -b .orig
+%patch 0 -p1 -b .content-type
+%patch 1 -p1 -b .orig
 
 
 %build

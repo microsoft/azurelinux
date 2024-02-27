@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global richname QR-Code-generator
 
 %global commit0 67c62461d380352500fc39557fd9f046b7fe1d18

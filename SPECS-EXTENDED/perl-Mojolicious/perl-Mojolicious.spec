@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        A next generation web framework for Perl
 License:        Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mojolicious
 Source0:        http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz
 

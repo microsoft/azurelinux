@@ -1,10 +1,10 @@
 Summary:        Voikko is a library for spellcheckers and hyphenators
 Name:           libvoikko
 Version:        4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release URLs
 Source0:        http://www.puimula.org/voikko-sources/%{name}/%{name}-%{version}.tar.gz
@@ -104,9 +104,11 @@ install -pm 0644 python/libvoikko.py %{buildroot}%{python3_sitelib}/
 
 %files -n python3-libvoikko
 %{python3_sitelib}/%{name}.py*
-%{python3_sitelib}/__pycache__/*
 
 %changelog
+* Mon Feb 12 2024 Andrew Phelps <anphel@microsoft.com> - 4.3-2
+- Fix build with python 3.12
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.3-1
 - Auto-upgrade to 4.3 - Azure Linux 3.0 - package upgrades
 

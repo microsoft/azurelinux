@@ -2,11 +2,11 @@
 
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
-Version:        1.0.1
-Release:        6%{?dist}
+Version:        1.6.2
+Release:        1%{?dist}
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pywbem/pywbem
 Source0:        https://github.com/%{pkgname}/%{pkgname}/archive/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildArch:      noarch
@@ -33,6 +33,7 @@ BuildRequires:  python3-pbr
 BuildRequires:  python3-pip
 BuildRequires:  python3-ply
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-PyYAML
 Requires:       python3-nocasedict
@@ -73,6 +74,9 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 %doc README.rst
 
 %changelog
+* Wed Feb 21 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.6.2-1
+- Upgrade to 1.6.2
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-6
 - License verified.
 

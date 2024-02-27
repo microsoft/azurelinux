@@ -42,14 +42,21 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
 }
 
-func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
-	value := SystemConfig{
-		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "example=\"example\"",
+func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
+	invalidVerity := SystemConfig{
+		Verity: &Verity{
+			DataPartition: VerityPartition{
+				IdType: "PartUuid",
+				Id:     "incorrect-uuid-format",
+			},
+			HashPartition: VerityPartition{
+				IdType: "PartLabel",
+				Id:     "hash_partition",
+			},
 		},
 	}
 
-	err := value.IsValid()
+	err := invalidVerity.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ExtraCommandLine")
+	assert.ErrorContains(t, err, "invalid Id format")
 }

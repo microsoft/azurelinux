@@ -4,7 +4,7 @@ Version:        0.4
 Release:        23%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sourceforge.net/projects/xmltoman/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         xmltoman-0.3-timestamps.patch
@@ -20,7 +20,7 @@ for doing rougly the same job is provided.
 
 %prep
 %setup -q
-%patch0 -p1 -b .timestamps
+%patch 0 -p1 -b .timestamps
 
 %build
 %make_build PREFIX=%{_prefix}

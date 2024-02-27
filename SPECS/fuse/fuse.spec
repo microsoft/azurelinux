@@ -4,7 +4,7 @@ Version:        2.9.7
 Release:        10%{?dist}
 License:        GPL+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/libfuse/libfuse
 Source0:        https://github.com/libfuse/libfuse/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -32,14 +32,14 @@ It contains the libraries and header files to create fuse applications.
 %prep
 %setup -q
 %ifarch aarch64
-%patch0 -p1
+%patch 0 -p1
 %endif
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
 
 %build
 # fuse-gcc11.patch modifies configure.ac, so regenerate it.

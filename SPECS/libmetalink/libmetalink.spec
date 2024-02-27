@@ -4,7 +4,7 @@ Version:        0.1.3
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://launchpad.net/libmetalink
 Source0:        https://launchpad.net/%{name}/trunk/%{name}-%{version}/+download/%{name}-%{version}.tar.gz
 Patch0:         libmetalink-0.1.3-ns_uri.patch

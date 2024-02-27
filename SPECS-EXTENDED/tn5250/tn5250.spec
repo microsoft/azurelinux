@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # workaround https://bugzilla.redhat.com/show_bug.cgi?id=1290742
 %undefine _hardened_build
 
@@ -40,7 +40,7 @@ Libraries and header files to use with lib5250.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fedora
+%patch 0 -p1 -b .fedora
 
 autoreconf -vfi
 

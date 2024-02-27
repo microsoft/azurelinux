@@ -1,30 +1,22 @@
-%define upstream_name moby
-%define commit_hash 5df983c7dbe2f8914e6efd4dd6e0083a20c41ce1
+%define commit_hash f417435e5f6216828dec57958c490c4f8bae4f98
 
 Summary: The open-source application container engine
-Name:    %{upstream_name}-engine
-Version: 20.10.25
-Release: 3%{?dist}
+Name:    moby-engine
+Version: 25.0.3
+Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
 Vendor: Microsoft Corporation
-Distribution: Mariner
+Distribution: Azure Linux
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# docker-proxy binary comes from libnetwork
-# - The libnetwork version (more accurately commit hash) 
-#   that moby relies on is hard coded in 
-#   "hack/dockerfile/install/proxy.installer" (in moby github repo above)
-Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_name}-libnetwork-%{version}.tar.gz
-Source3: docker.service
-Source4: docker.socket
-Patch0:  CVE-2023-25153.patch
+Source1: docker.service
+Source2: docker.socket
 
 %{?systemd_requires}
 
 BuildRequires: bash
-BuildRequires: btrfs-progs-devel
 BuildRequires: cmake
 BuildRequires: device-mapper-devel
 BuildRequires: gcc
@@ -37,17 +29,17 @@ BuildRequires: make
 BuildRequires: pkg-config
 BuildRequires: systemd-devel
 BuildRequires: tar
-BuildRequires: golang >= 1.16.12
+BuildRequires: golang
 BuildRequires: git
 
 Requires: audit
 Requires: /bin/sh
-Requires: device-mapper-libs >= 1.02.90-1
+Requires: device-mapper-libs
 Requires: docker-init
 Requires: iptables
 Requires: libcgroup
-Requires: libseccomp >= 2.3
-Requires: moby-containerd >= 1.2
+Requires: libseccomp
+Requires: containerd
 Requires: tar
 Requires: xz
 
@@ -56,10 +48,10 @@ Conflicts: docker-io
 Conflicts: docker-engine-cs
 Conflicts: docker-ee
 
-Obsoletes: docker-ce
-Obsoletes: docker-engine
-Obsoletes: docker
-Obsoletes: docker-io
+Obsoletes: docker-ce < %{version}-%{release}
+Obsoletes: docker-engine < %{version}-%{release}
+Obsoletes: docker < %{version}-%{release}
+Obsoletes: docker-io < %{version}-%{release}
 
 %description
 Moby is an open-source project created by Docker to enable and accelerate software containerization.
@@ -67,13 +59,10 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
-tar xf %{SOURCE1} --no-same-owner
+%autosetup -p1 -n moby-%{version}
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
-LIBNETWORK_FOLDER=$(find -type d -name "libnetwork-*")
-ln -sfT %{_builddir}/%{upstream_name}-%{version}/${LIBNETWORK_FOLDER} %{OUR_GOPATH}/src/github.com/docker/libnetwork
-ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
+ln -sfT %{_builddir}/moby-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
 
 %build
 export GOPATH=%{OUR_GOPATH}
@@ -83,33 +72,23 @@ export GO111MODULE=off
 export GOGC=off
 export VERSION=%{version}
 
-# build docker daemon
 GIT_COMMIT=%{commit_hash}
-GIT_COMMIT_SHORT=${GIT_COMMIT:0:7}
-DOCKER_GITCOMMIT=${GIT_COMMIT_SHORT} DOCKER_BUILDTAGS='apparmor seccomp' hack/make.sh dynbinary
-
-# build docker proxy
-go build \
-    -o libnetwork/docker-proxy \
-    github.com/docker/libnetwork/cmd/proxy
+DOCKER_GITCOMMIT=${GIT_COMMIT:0:7} DOCKER_BUILDTAGS='seccomp' hack/make.sh dynbinary
 
 %install
-mkdir -p %{buildroot}/%{_bindir}
-cp -aLT ./bundles/dynbinary-daemon/dockerd %{buildroot}/%{_bindir}/dockerd
-cp -aT libnetwork/docker-proxy %{buildroot}/%{_bindir}/docker-proxy
+mkdir -p %{buildroot}%{_bindir}
+install -p -m 755 ./bundles/dynbinary-daemon/dockerd %{buildroot}%{_bindir}/dockerd
 
-# install udev rules
-mkdir -p %{buildroot}/%{_sysconfdir}/udev/rules.d
-install -p -m 644 contrib/udev/80-docker.rules %{buildroot}/%{_sysconfdir}/udev/rules.d/80-docker.rules
+mkdir -p %{buildroot}%{_sysconfdir}/udev/rules.d
+install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_sysconfdir}/udev/rules.d/80-docker.rules
 
-# add init scripts
-mkdir -p %{buildroot}/%{_unitdir}
-install -p -m 644 %{SOURCE3} %{buildroot}/%{_unitdir}/docker.service
-install -p -m 644 %{SOURCE4} %{buildroot}/%{_unitdir}/docker.socket
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
+install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
 
 %post
 if ! grep -q "^docker:" /etc/group; then
-	groupadd --system docker
+    groupadd --system docker
 fi
 
 %preun
@@ -118,7 +97,6 @@ fi
 %postun
 %systemd_postun_with_restart docker.service
 
-# list files owned by the package here
 %files
 %license LICENSE NOTICE
 %{_bindir}/*
@@ -126,6 +104,10 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Mon Feb 26 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-1
+- Upgrade to version 25.0.3 and clean up spec
+- Remove docker-proxy as it's no longer used (2050e085f95bb796e9ff3a325b9985e319c193cf)
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.25-3
 - Bump release to rebuild with go 1.20.10
 

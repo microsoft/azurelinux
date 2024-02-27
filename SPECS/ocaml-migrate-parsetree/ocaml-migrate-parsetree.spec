@@ -4,7 +4,7 @@ Version:        2.4.0
 Release:        1%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocaml-ppx/ocaml-migrate-parsetree
 Source0:        https://github.com/ocaml-ppx/ocaml-migrate-parsetree/releases/download/%{version}/%{name}-%{version}.tbz
 

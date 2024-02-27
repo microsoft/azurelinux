@@ -5,11 +5,11 @@
 Summary:        A fast multidimensional array facility for Python
 Name:           numpy
 Version:        1.26.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Everything is BSD except for class SafeEval in numpy/lib/utils.py which is Python
 License:        BSD AND Python AND ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.numpy.org/
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://numpy.org/doc/%{majmin}/numpy-html.zip#/numpy-html-%{version}.zip
@@ -38,7 +38,7 @@ BuildRequires:  gcc-gfortran
 BuildRequires:  lapack-devel
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools < 60
+BuildRequires:  python3-setuptools
 Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
@@ -175,15 +175,16 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 
 %files -n python3-numpy-f2py
 %{_bindir}/f2py
-%{_bindir}/f2py3
 %{_bindir}/f2py.numpy
-%{_bindir}/f2py%{python3_version}
 %{python3_sitearch}/%{name}/f2py
 
 %files -n python3-numpy-doc
 %doc docs/*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.26.3-2
+- Remove restriction on python3-setuptools < 60
+
 * Wed Jan 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.26.3-1
 - Upgrading for 3.0 release
 - Added %%{python3_sitearch}/%%{name}/{_core,_utils}

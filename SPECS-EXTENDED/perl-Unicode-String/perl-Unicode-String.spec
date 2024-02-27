@@ -9,7 +9,7 @@ Summary:        Perl modules to handle various Unicode issues
 # in String.xs is mentioned "same terms as Perl itself" which is this
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Unicode-String
 Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/Unicode-String-%{version}.tar.gz#/perl-Unicode-String-%{version}.tar.gz
 Patch0:         perl-Unicode-String-2.09-utf8doc.patch
@@ -40,7 +40,7 @@ Requires:       perl(MIME::Base64)
 # Recode documentation as UTF-8
 # Can't just use iconv because README includes an example of
 # character code conversion that would be wrong if simply recoded
-%patch0 -p1
+%patch 0 -p1
 
 %build
 CFLAGS="$RPM_OPT_FLAGS" %{__perl} Makefile.PL INSTALLDIRS=vendor

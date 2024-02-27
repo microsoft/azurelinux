@@ -1,7 +1,7 @@
 %global modname dbusmock
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:             python-%{modname}
 Version:          0.28.7
 Release:          2%{?dist}

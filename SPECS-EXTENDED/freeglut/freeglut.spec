@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        A freely licensed alternative to the GLUT library
 Name:           freeglut
 Version:        3.2.1
@@ -52,7 +52,7 @@ license.
 
 %prep
 %setup -q -a 1
-%patch0 -p0
+%patch 0 -p0
 
 %build
 %{cmake} -DFREEGLUT_BUILD_STATIC_LIBS=OFF .

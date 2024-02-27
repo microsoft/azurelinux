@@ -3,10 +3,10 @@
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
 Version:        2.11.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -24,11 +24,11 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 BuildRequires:  tar
 BuildRequires:  which
-BuildRequires:  python3-tf-nightly = 2.11.0
+BuildRequires:  python3-tf-nightly
 ExclusiveArch:  x86_64
 
 %description
-Keras is a deep learning API written in Python, running on top of the machine learning platform TensorFlow. 
+Keras is a deep learning API written in Python, running on top of the machine learning platform TensorFlow.
 
 %package -n     python3-keras
 Summary:        python-keras
@@ -69,6 +69,9 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
+- Relax requirement for python3-tf-nightly BR
+
 * Tue Aug 01 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.0-2
 - Remove bazel version.
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-mn
 Summary: Mongolian hyphenation rules
 %global upstreamid 20100531
@@ -21,7 +21,7 @@ Mongolian hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-mn
 cp -p %{SOURCE0} .
-%patch0 -p0 -b .clean
+%patch 0 -p0 -b .clean
 cp %{SOURCE1} ./LICENSE.txt
 
 %build

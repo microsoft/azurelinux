@@ -1,14 +1,14 @@
 Summary:        Python development support library
 Name:           python-py
-Version:        1.10.0
-Release:        3%{?dist}
+Version:        1.11.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pytest-dev/py
 # Must use PyPI sources. Building from GitHub's release sources fails with a message to use PyPI.
-Source0:        https://files.pythonhosted.org/packages/0d/8c/50e9f3999419bb7d9639c37e83fa9cdcf0f601a9d407162d6c37ad60be71/py-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/98/ff/fec109ceb715d2a6b4c4a85a61af3b40c723a961e8828319fbcb15b868dc/py-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -49,6 +49,9 @@ py.code: dynamic code generation and introspection
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 16 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
+- Auto-upgrade to 1.11.0 - none
+
 * Wed Feb 16 2022 Thomas Crain <thcrian@microsoft.com> - 1.10.0-3
 - Fix accidental double-packaging of python3 subpackage in main package
 

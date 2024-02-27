@@ -11,7 +11,7 @@ Release:        8%{?dist}
 Summary:        Easy API to maintain XML in Perl
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-Simple
 Source0:        https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-Simple-%{version}.tar.gz#/perl-XML-Simple-%{version}.tar.gz
 BuildArch:      noarch

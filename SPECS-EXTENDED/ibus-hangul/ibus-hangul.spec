@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global require_ibus_version 1.3.99
 %global require_libhangul_version 0.1.0
 
@@ -36,7 +36,7 @@ libhangul.
 
 %prep
 %setup -q
-%patch1 -p1 -b .setup-abspath
+%patch 1 -p1 -b .setup-abspath
 
 # autopoint -f
 # AUTOPOINT='intltoolize --automake --copy' autoreconf -fi

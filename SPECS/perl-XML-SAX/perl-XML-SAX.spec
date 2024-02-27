@@ -5,7 +5,7 @@ Release:        6%{?dist}
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-SAX
 # Original source
 # http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz
@@ -71,7 +71,7 @@ JAXP specification (SAX part), only without the javaness.
 
 %prep
 %setup -q -n XML-SAX-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 echo N | %{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1

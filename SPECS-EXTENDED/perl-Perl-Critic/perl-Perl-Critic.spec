@@ -11,7 +11,7 @@ Release:	3%{?dist}
 Summary:	Critique Perl source code for best-practices
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Perl-Critic
 Source0:	https://cpan.metacpan.org/modules/by-module/Perl/Perl-Critic-%{version}.tar.gz
 Patch0:		0001-Change-default-spell-check-tool-from-aspell-to-hunsp.patch
@@ -127,10 +127,10 @@ of Perl code were mixed directly in the test script. That sucked.
 %setup -q -n Perl-Critic-%{version}
 
 # Switch spell checker tool from aspell to hunspell
-%patch0 -p1
+%patch 0 -p1
 
 # Fix shellbang in ppidump tool
-%patch3
+%patch 3
 
 # Drop exec bits from samples/docs to avoid dependency bloat
 find tools examples -type f -exec chmod -c -x {} ';'

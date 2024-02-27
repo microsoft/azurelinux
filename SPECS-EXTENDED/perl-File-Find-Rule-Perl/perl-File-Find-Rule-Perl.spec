@@ -4,7 +4,7 @@ Release:        17%{?dist}
 Summary:        Common rules for searching for Perl things
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-Find-Rule-Perl
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/File-Find-Rule-Perl-%{version}.tar.gz#/perl-File-Find-Rule-Perl-%{version}.tar.gz
 # Filter out the files rpm generates in sourcedir.
@@ -29,7 +29,7 @@ Common rules for searching for Perl things.
 
 %prep
 %setup -q -n File-Find-Rule-Perl-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1

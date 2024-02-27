@@ -8,11 +8,11 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        6.0.0
-Release:        2%{?dist}
+Version:        6.1.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/fedora-java/javapackages
 Source0:        https://github.com/fedora-java/javapackages/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-epoch-from-java-requires.patch
@@ -30,6 +30,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
+BuildRequires:  lua
 %if %{with_check}
 BuildRequires:  python3-pip
 %endif
@@ -112,6 +113,15 @@ Requires:       %{python_interpreter}
 %description -n javapackages-generators
 RPM dependency generators to support Java packaging.
 
+%package -n javapackages-extra
+Summary:        Rarely-used macros and scripts for Java packaging support
+Requires:       javapackages-generators = %{version}-%{release}
+Requires:       lua
+
+%description -n javapackages-extra
+This package provides rarely-used and obsolete macros and scripts to
+support Java packaging.
+
 %prep
 %autosetup -p1 -n javapackages-%{version}
 
@@ -143,7 +153,9 @@ pip3 install -r test-requirements.txt
 
 %files -n javapackages-generators -f files-generators
 
-%files -n javapackages-local-bootstrap -f files-local
+%files -n javapackages-local-bootstrap -f files-common
+
+%files -n javapackages-extra -f files-extra
 
 %files -n ivy-local-bootstrap -f files-ivy
 
@@ -153,6 +165,10 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
+* Thu Feb 15 2024 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.0-1
+- Update to upstream version 6.1.0
+- Add javapackages-extra
+
 * Fri Mar 31 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 6.0.0-2
 - Added maven-local subpackage
 

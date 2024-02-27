@@ -15,7 +15,7 @@ Summary:        Build external dependencies for use in CPAN
 # object file and a static library).
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Alien-Build
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/Alien-Build-%{version}.tar.gz#/perl-Alien-Build-%{version}.tar.gz
 # Support only the most advanced pkgconfig implementation,
@@ -221,7 +221,7 @@ candidates for your Prefer plugin.
 # Remove redundant pkgconfig implementations, keep
 # Alien::Build::Plugin::PkgConfig::LibPkgConf,
 # MANIFEST is updated by Remove-redundant-pkgconfig-implementations.patch
-%patch0 -p1
+%patch 0 -p1
 rm lib/Alien/Build/Plugin/PkgConfig/{CommandLine,PP}.pm 
 rm t/alien_build_plugin_pkgconfig_{commandline,pp}.t
 

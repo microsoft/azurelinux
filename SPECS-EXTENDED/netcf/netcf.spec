@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           netcf
 Version:        0.2.8
 Release:        16%{?dist}

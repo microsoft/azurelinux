@@ -9,7 +9,7 @@ Release:        1%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/libwww-perl
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-%{version}.tar.gz#/perl-libwww-perl-%{version}.tar.gz
 # Normalize shelbangs, not suitable for an upstream
@@ -144,7 +144,7 @@ use and even classes that help you implement simple HTTP servers.
 
 %prep
 %setup -q -n libwww-perl-%{version} 
-%patch0 -p1
+%patch 0 -p1
 %if !%{with perl_libwww_perl_enables_internet_test}
 rm t/leak/no_leak.t t/redirect.t
 perl -i -ne 'print $_ unless m{^(?:t/leak/no_leak\.t|t/redirect\.t)}' MANIFEST

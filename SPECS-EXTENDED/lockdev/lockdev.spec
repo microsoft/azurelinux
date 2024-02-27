@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Where lock files are stored
 %global _lockdir /run/lock/lockdev
 
@@ -53,8 +53,8 @@ package contains the development headers.
 %setup -q -n lockdev-scm-%{co_date}
 
 # Replace access() calls with euidaccess() (600636#c33)
-%patch1 -p1 -b .access
-%patch2 -p1
+%patch 1 -p1 -b .access
+%patch 2 -p1
 
 %build
 # Generate version information from git release tag

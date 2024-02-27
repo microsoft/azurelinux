@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:    vino
 Version: 3.22.0
 Release: 20%{?dist}
@@ -43,11 +43,11 @@ connect to a running GNOME session using VNC.
 
 %prep
 %setup -q
-%patch0 -p1 -b .Return-error-if-X11-is-not-detected
-%patch1 -p1 -b .Do-not-restart-service-after-unclean-exit-code
-%patch2 -p1 -b .Do-not-listen-all-if-invalid-interface-is-provided
-%patch3 -p1 -b .Prevent-monitoring-all-interfaces-after-change-of-ot.patch
-%patch4 -p1 -b .Properly-remove-watches-when-changing-server-props.patch
+%patch 0 -p1 -b .Return-error-if-X11-is-not-detected
+%patch 1 -p1 -b .Do-not-restart-service-after-unclean-exit-code
+%patch 2 -p1 -b .Do-not-listen-all-if-invalid-interface-is-provided
+%patch 3 -p1 -b .Prevent-monitoring-all-interfaces-after-change-of-ot.patch
+%patch 4 -p1 -b .Properly-remove-watches-when-changing-server-props.patch
 
 
 %build

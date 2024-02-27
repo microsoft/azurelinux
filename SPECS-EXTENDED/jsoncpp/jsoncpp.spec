@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Build documentation in HTML with images
 %bcond_without jsoncpp_enables_doc
 

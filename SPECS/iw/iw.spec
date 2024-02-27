@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           iw
-Version:        5.9
+Version:        6.7
 Release:        1%{?dist}
 Summary:        A nl80211 based wireless configuration tool
 
@@ -41,6 +41,9 @@ make install DESTDIR=$RPM_BUILD_ROOT MANDIR=%{_mandir}
 
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.7-1
+- Auto-upgrade to 6.7 - Azure Linux 3.0 Upgrades
+
 * Tue Oct 18 2022 Henry Li <lihl@microsoft.com> - 5.9-1
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified

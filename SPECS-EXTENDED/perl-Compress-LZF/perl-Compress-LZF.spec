@@ -4,7 +4,7 @@ Version:        3.8
 Release:        21%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 ## Not in the binary packages
 # liblzf files:     BSD or GPLv2+
 # perlmulticore.h:  Public Domain or CC0
@@ -42,8 +42,8 @@ This is Perl binding to the LZF compression library.
 
 %prep
 %setup -q -n Compress-LZF-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"

@@ -6,7 +6,7 @@ URL:            https://metacpan.org/release/Test-Warnings
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-%{version}.tar.gz
 
 BuildArch:      noarch

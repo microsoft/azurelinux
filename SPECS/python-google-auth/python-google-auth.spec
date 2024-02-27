@@ -8,7 +8,7 @@ Summary:        Google Auth Python Library
 License:        ASL 2.0
 URL:            https://github.com/googleapis/google-auth-library-python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.python.org/packages/source/g/%{library}/%{library}-%{version}.tar.gz
 
 BuildArch:  noarch

@@ -5,7 +5,7 @@ Version:        1.7.2
 Release:        1%{?dist}
 License:        LGPLv2+ OR GPLv2+ OR MPLv1.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/hunspell/hunspell
 Source0:        https://github.com/hunspell/hunspell/releases/download/v%{version}/hunspell-%{version}.tar.gz
 BuildRequires:  autoconf

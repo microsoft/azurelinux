@@ -5,7 +5,7 @@ Version:        1.8.7
 Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/Azure/aad-pod-identity
 #Source0:       https://github.com/Azure/aad-pod-identity/archive/refs/tags/v%{version}.tar.gz
@@ -33,7 +33,7 @@ NMI is the resource that is used when your pods look to use their identity.
 %prep
 %autosetup -c -N -n %{name}-%{version}
 pushd aad-pod-identity-%{version}
-%patch0 -p1
+%patch 0 -p1
 popd
 
 %build

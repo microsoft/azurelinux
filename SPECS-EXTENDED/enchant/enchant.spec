@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: An Enchanting Spell Checking Library
 Name: enchant
 Version: 1.6.0

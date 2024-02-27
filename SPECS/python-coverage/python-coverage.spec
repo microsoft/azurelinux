@@ -1,10 +1,11 @@
+%global debug_package %{nil}
 Summary:        Code coverage measurement for Python.
 Name:           python-coverage
-Version:        6.3.2
-Release:        4%{?dist}
+Version:        7.4.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/coverage
 Source0:        https://files.pythonhosted.org/packages/source/c/coverage/coverage-%{version}.tar.gz
@@ -14,7 +15,7 @@ Code coverage measurement for Python.
 
 %package -n     python3-coverage
 Summary:        Code coverage measurement for Python.
-BuildRequires:  python3-devel >= 3.7
+BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 %if %{with_check}
@@ -42,8 +43,8 @@ executable, and which have been executed.
 %py3_install
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0' PyContracts
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+pip3 install -r requirements/dev.pip
+tox
 
 %files -n python3-coverage
 %defattr(-,root,root)
@@ -54,6 +55,13 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{_bindir}/coverage-%{python3_version}
 
 %changelog
+* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 7.4.1-1
+- Upgrade to version 7.4.1
+
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 6.3.2-5
+- Disable debuginfo package
+- Remove python3-devel version restriction
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 6.3.2-4
 - Update version of tox used for package tests
 

@@ -1,12 +1,12 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
-Version:        6.5.0
+Version:        6.6.0
 Release:        1%{?dist}
 License:        GPL+ and LGPLv2+
 URL:            https://xfs.wiki.kernel.org/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  readline-devel
@@ -33,7 +33,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of xfsprogs.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -53,9 +53,6 @@ find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 
 %find_lang %{name}
 
-%check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
@@ -66,7 +63,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %doc %{_docdir}/%{name}-%{version}/*
 /sbin/*
 /lib64/*.so.*.*
-%{_libdir}/xfsprogs/xfs_scrub_all.cron
+%{_datadir}/xfsprogs/xfs_scrub_all.cron
 %{_mandir}/man2/*
 %{_mandir}/man8/*
 %{_mandir}/man5/*
@@ -86,6 +83,10 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
+* Thu Feb 08 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.0-1
+- Upgrade to version 6.6.0
+- Remove faulty check section
+
 * Tue Dec 19 2023 Andrew Phelps <anphel@microsoft.com> - 6.5.0-1
 - Upgrade to version 6.5.0
 

@@ -1,6 +1,8 @@
-%global bootstrap_compiler_version 1.19.12
+%global bootstrap_compiler_version 1.19.12-1
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
+%global ms_go_revision  1
+%global ms_go_buildid   20240111.3
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -13,20 +15,21 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.20.10
-Release:        1%{?dist}
+Version:        1.21.6
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
-URL:            https://golang.org
-Source0:        https://golang.org/dl/go%{version}.src.tar.gz
-Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
-Source2:        https://dl.google.com/go/go%{bootstrap_compiler_version}.src.tar.gz
+URL:            https://github.com/microsoft/go
+Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/go.%{ms_go_buildid}.src.tar.gz
+# Same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
+Source1:        https://github.com/microsoft/go/releases/download/v1.4.0-1/go1.4-bootstrap-20171003.tar.gz
+Source2:        https://github.com/microsoft/go/releases/download/%{bootstrap_compiler_version}/go.20230802.5.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
-Obsoletes:      %{name} < %{version}
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
+Provides:       msft-golang = %{version}-%{release}
 
 %description
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
@@ -68,7 +71,7 @@ popd
 rm -rf %{_libdir}/golang
 
 # Make go%{bootstrap_compiler_version} as the new bootstrapper
-mv -v %{_topdir}/BUILD/go1.19.12 %{_libdir}/golang
+mv -v %{_topdir}/BUILD/go%{bootstrap_compiler_version} %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -88,7 +91,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{goroot}
 
-cp -R api bin doc lib pkg src misc VERSION %{buildroot}%{goroot}
+cp -R api bin doc lib pkg src misc VERSION go.env %{buildroot}%{goroot}
 
 # remove the unnecessary zoneinfo file (Go will always use the system one first)
 rm -rfv %{buildroot}%{goroot}/lib/time
@@ -141,6 +144,13 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Feb 22 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.6-2
+- Include go.env file in GOROOT
+
+* Wed Jan 24 2024 Davis Goodin <dagood@microsoft.com> - 1.21.6-1
+- Bump version to 1.21.6-1
+- Switch from upstream Go to the Microsoft build of Go
+
 * Mon Oct 16 2023 Nan Liu <liunan@microsoft.com> - 1.20.10-1
 - Bump version to 1.20.10 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533, CVE-2023-29406, CVE-2023-39325, CVE-2023-44487
 - Remove patches that no longer apply

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-wa
 Summary: Walloon hunspell dictionaries
 Version: 0.4.17
@@ -18,7 +18,7 @@ Walloon hunspell dictionaries.
 
 %prep
 %setup -q -n aspell-wa-%{version}
-%patch0 -p1 -b .buildfix
+%patch 0 -p1 -b .buildfix
 
 %build
 make myspell

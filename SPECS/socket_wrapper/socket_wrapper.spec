@@ -4,7 +4,7 @@ Release:        1%{?dist}
 License:        BSD
 Summary:        A library passing all socket communications through Unix sockets
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://cwrap.org/
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 

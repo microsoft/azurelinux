@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Convert filename encodings
 Name: convmv
 Version: 2.05
@@ -22,7 +22,7 @@ of filenames, e.g. from Latin1 to UTF-8.
 
 %prep
 %setup -q
-%patch0 -p1 -b .preserve-timestamps
+%patch 0 -p1 -b .preserve-timestamps
 tar -xf testsuite.tar
 
 %build

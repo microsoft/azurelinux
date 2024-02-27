@@ -4,7 +4,7 @@ Version:        1.2.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Cryptography
 URL:            https://gnupg.org/software/pinentry/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2

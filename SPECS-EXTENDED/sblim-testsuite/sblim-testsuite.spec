@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global debug_package %{nil}
 
 Name:           sblim-testsuite
@@ -27,9 +27,9 @@ SBLIM automated testsuite scripts.
 
 %prep
 %setup -q
-%patch0 -p1 -b .perl-errors
-%patch1 -p1 -b .docdir
-%patch2 -p1 -b .unescaped-left-brace-warning-fix
+%patch 0 -p1 -b .perl-errors
+%patch 1 -p1 -b .docdir
+%patch 2 -p1 -b .unescaped-left-brace-warning-fix
 
 %build
 %configure

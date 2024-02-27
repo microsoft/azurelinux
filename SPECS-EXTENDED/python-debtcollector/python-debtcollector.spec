@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Macros for py2/py3 compatibility
 %global pyver %{python3_pkgversion}
 %global pyver_bin python%{pyver}

@@ -4,7 +4,7 @@ Release:        9%{?dist}
 Summary:        Perform diffs on files and record sets
 License:        (GPL+ or Artistic) and (GPLv2+ or Artistic) and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Text-Diff
 Source0:        https://cpan.metacpan.org/authors/id/N/NE/NEILB/Text-Diff-%{version}.tar.gz#/perl-Text-Diff-%{version}.tar.gz
 BuildArch:      noarch

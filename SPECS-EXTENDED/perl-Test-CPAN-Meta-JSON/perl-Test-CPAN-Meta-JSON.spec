@@ -4,7 +4,7 @@ Release:	17%{?dist}
 Summary:	Validate a META.json file within a CPAN distribution
 License:	Artistic 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Test-CPAN-Meta-YAML
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-CPAN-Meta-JSON-%{version}.tar.gz#/perl-Test-CPAN-Meta-JSON-%{version}.tar.gz
 Patch0:		Test-CPAN-Meta-JSON-0.16-utf8.patch
@@ -45,7 +45,7 @@ See CPAN::Meta for further details of the CPAN Meta Specification.
 %setup -q -n Test-CPAN-Meta-JSON-%{version}
 
 # Recode LICENSE as UTF-8
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

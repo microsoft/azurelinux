@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global commit 7c8f8e2218e46b1a4aa9538520919747f1184d86
 %global shortcommit0 %(c=%{commit}; echo ${c:0:7})
 %global debug_package %{nil}

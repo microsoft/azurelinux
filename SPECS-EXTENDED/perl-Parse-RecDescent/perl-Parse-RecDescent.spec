@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Parse-RecDescent
 Version:        1.967015
 Release:        11%{?dist}
@@ -56,7 +56,7 @@ provides:
 %setup -q -n Parse-RecDescent-%{version}
 
 # Recode as UTF8
-%patch0 -p1
+%patch 0 -p1
 
 # Fix permissions and script interpreters
 chmod -c a-x demo/* tutorial/*

@@ -10,7 +10,7 @@ Release:        1%{?dist}
 License:        BSD
 Url:            https://logutils.readthedocs.io/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/l/%{pkgname}/%{pkgname}-%{version}.tar.gz
 
 BuildArch:      noarch

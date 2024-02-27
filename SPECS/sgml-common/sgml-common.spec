@@ -13,7 +13,7 @@ BuildArch: 		noarch
 #old page - only part of it is included in sgml-common package.
 URL: 			http://www.w3.org/2003/entities/
 Vendor: 		Microsoft Corporation
-Distribution: 	Mariner
+Distribution:   Azure Linux
 Source0: 		https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
 # Following 4 from openjade/pubtext - same maintainer as in SGML-common, so up2date:
 Source1: 		xml.dcl
@@ -53,9 +53,9 @@ but that don't need to be included in main package.
 
 %prep
 %setup -q
-%patch0 -p1 -b .umask
-%patch1 -p1 -b .xmldir
-%patch2 -p1 -b .quotes
+%patch 0 -p1 -b .umask
+%patch 1 -p1 -b .xmldir
+%patch 2 -p1 -b .quotes
 
 # replace bogus links with files
 automakedir=`ls -1d /usr/share/automake* | head -n +1`

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define pkg docbook-slides
 Summary: DocBook Slides document type and stylesheets
 Name: docbook-slides

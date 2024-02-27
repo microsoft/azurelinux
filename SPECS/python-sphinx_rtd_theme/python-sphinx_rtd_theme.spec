@@ -2,10 +2,10 @@
 Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rtfd/%{srcname}
 Source0:        https://github.com/rtfd/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # The koji builders do not have network access, and this file is not included
@@ -43,6 +43,8 @@ Requires:       font(fontawesome)
 Requires:       font(lato)
 Requires:       font(robotoslab)
 Requires:       fontawesome-fonts-web
+
+Provides:       python3dist(sphinx-rtd-theme)
 
 %description -n python3-%{srcname}
 This is a prototype mobile-friendly sphinx theme for readthedocs.org.
@@ -87,6 +89,9 @@ pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
 %{python3_sitelib}/%{srcname}*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.0.0-3
+- Add Provides python3dist(sphinx-rtd-theme)
+
 * Mon Apr 04 2022 Bala <balakumaran.kannan@microsoft.com> - 1.0.0-2
 - pip install latest Sphinx for test
 

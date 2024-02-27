@@ -5,7 +5,7 @@ Version:        2.16.0.0
 Release:        6%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/habnabit/vcversioner
 # Using the pypi tarball because building this rpm doesn't work with tarball from github.

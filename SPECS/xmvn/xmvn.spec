@@ -10,7 +10,7 @@ Version:        4.0.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://fedora-java.github.io/xmvn/
 Source0:        https://github.com/fedora-java/xmvn/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

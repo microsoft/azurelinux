@@ -44,7 +44,7 @@
 Summary:        Kata Containers version 2.x repository
 Name:           kata-containers
 Version:        3.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/%{name}/%{name}
@@ -70,7 +70,7 @@ BuildRequires:  make
 BuildRequires:  systemd
 BuildRequires:  gcc
 BuildRequires:  protobuf-compiler
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 BuildRequires:  dracut
 BuildRequires:  kernel
 BuildRequires:  busybox
@@ -230,6 +230,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.1.3-2
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.3-1
 - Auto-upgrade to 3.1.3 - Azure Linux 3.0 - package upgrades
 
