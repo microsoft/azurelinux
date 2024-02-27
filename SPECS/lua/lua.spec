@@ -214,6 +214,7 @@ popd
 %changelog
 * Tue Feb 27 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.6-1
 - Upgrade to version 5.4.6
+- Disable bootstrap
 
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.4-2
 - Updated patch application macros.
