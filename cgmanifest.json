@@ -22524,7 +22524,7 @@
         "other": {
           "name": "python-hatch-vcs",
           "version": "0.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch-vcs/hatch-vcs-0.4.0.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch_vcs/hatch_vcs-0.4.0.tar.gz"
         }
       }
     },
