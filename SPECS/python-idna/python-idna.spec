@@ -48,6 +48,7 @@ rm -rf idna.egg-info
 %pyproject_save_files idna
 
 %check
+pip3 install iniconfig
 %pytest
 
 %files -n python3-idna -f %pyproject_files
