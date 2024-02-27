@@ -20,8 +20,8 @@
 
 Summary:        Another Tool for Language Recognition
 Name:           antlr
-Version:        2.7.7
-Release:        124%{?dist}
+Version:        4.13.1
+Release:        1%{?dist}
 License:        Public Domain
 Group:          Development/Tools/Other
 Vendor:         Microsoft Corporation
@@ -209,6 +209,9 @@ find doc -type f | xargs chmod 0644
 %endif
 
 %changelog
+* Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.13.1-1
+- Auto-upgrade to 4.13.1 - 3.0
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.7-124
 - Fixing source URL.
 
