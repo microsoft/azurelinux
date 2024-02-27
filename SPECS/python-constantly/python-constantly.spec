@@ -1,7 +1,7 @@
 Summary:        Symbolic constants in Python
 Name:           python-constantly
 Version:        15.1.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,6 +26,9 @@ A library that provides symbolic constant support. It includes collections and c
 
 %prep
 %autosetup -n constantly-%{version}
+# SafeConfigParser class is renamed to ConfigParser in python 3.12. See: python/cpython#89336
+sed -i 's/SafeConfigParser/ConfigParser/g' ./versioneer.py
+sed -i 's/readfp/read_file/g' ./versioneer.py
 
 %build
 %py3_build
@@ -42,6 +45,9 @@ A library that provides symbolic constant support. It includes collections and c
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 15.1.0-7
+- Fix build for python 3.12
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 15.1.0-6
 - Add license to python3 package
 - Remove python2 package
