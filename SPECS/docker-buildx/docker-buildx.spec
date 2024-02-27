@@ -45,7 +45,7 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 
 %changelog
 * Tue Feb 27 2024 Henry Beberman <henry.beberman@microsoft.com> - 0.12.1-1
-- Rename package frmo moby-buildx to docker-buildx
+- Rename package from moby-buildx to docker-buildx
 - Upgrade to version 0.12.1
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.11.2-1
