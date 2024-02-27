@@ -93,8 +93,8 @@ clean-go-tools:
 
 go_ldflags := 	-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION) \
 				-X github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION) \
-				-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.DistroNameAbbreviation=$(DIST_NAME_MACRO) \
-				-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_macro)
+				-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.DistroNameAbbreviation=$(DIST_NAME_ABRV) \
+				-X github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe.DistroMajorVersion=$(dist_major_version_number)
 
 # Matching rules for the above targets
 # Tool specific pre-requisites are tracked via $(go-util): $(shell find...) dynamic variable defined above

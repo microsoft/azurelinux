@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -203,8 +204,8 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 
 func TestDistroDefines(t *testing.T) {
 	distName := "myDistro"
-	distVersion := "1234"
-	distTag := fmt.Sprintf(".%s%s", distName, distVersion)
+	distVersion := 1234
+	distTag := fmt.Sprintf(".%s%d", distName, distVersion)
 
 	// Save the original values and restore them after the test
 	originalDistroName := distNameAbreviation
@@ -214,16 +215,14 @@ func TestDistroDefines(t *testing.T) {
 		distMajorVersion = originalDistroVersion
 	})
 
-	SetDistroMacros(distName, distVersion)
-
-	defines, err := DefaultDistroDefines(true, distTag)
+	err := SetDistroMacros(distName, distVersion)
 	assert.NoError(t, err)
+	defines := DefaultDistroDefines(true, distTag)
 
+	// Check for with_check and dist tag
 	assert.Equal(t, "1", defines[definesWithCheckKey])
 	assert.Equal(t, distTag, defines[DistTagDefine])
-
-	defines, err = DefaultDistroDefines(false, distTag)
-	assert.NoError(t, err)
+	defines = DefaultDistroDefines(false, distTag)
 	assert.Equal(t, "0", defines[definesWithCheckKey])
 
 	// Check for distro name and version
@@ -231,36 +230,27 @@ func TestDistroDefines(t *testing.T) {
 	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
 
 	// Check that an empty distro tag is ok
-	defines, err = DefaultDistroDefines(false, "")
-	assert.NoError(t, err)
+	defines = DefaultDistroDefines(false, "")
 	assert.Equal(t, "", defines["dist"])
 	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
 
 	// Handle errors when distro name and version are not set
-	SetDistroMacros("", distVersion)
-	defines, err = DefaultDistroDefines(false, distTag)
+	err = SetDistroMacros("", distVersion)
 	assert.Error(t, err)
-	assert.Nil(t, defines)
 
-	SetDistroMacros("", distVersion)
-	defines, err = DefaultDistroDefines(false, distTag)
+	err = SetDistroMacros("", distVersion)
 	assert.Error(t, err)
-	assert.Nil(t, defines)
 
 	// Handle errors when version is negative
-	SetDistroMacros(distName, "-1")
-
-	defines, err = DefaultDistroDefines(false, distTag)
+	err = SetDistroMacros(distName, -1)
 	assert.Error(t, err)
-	assert.Nil(t, defines)
 }
 
 func TestDefaultDefines(t *testing.T) {
-	if exe.DistroMajorVersion == "" && exe.DistroNameAbbreviation == "" {
-		t.Skip("Skipping test because distro name and version are not set")
-	}
-	distTag := "testDistroTag"
-	defines, err := DefaultDistroDefines(true, distTag)
+	// Check that we parse the distro name and version as expected
+	expectedName := exe.DistroNameAbbreviation
+	expectedVersion, err := strconv.Atoi(exe.DistroMajorVersion)
 	assert.NoError(t, err)
-	assert.Equal(t, "3", defines["azl"])
+	assert.Equal(t, expectedName, distNameAbreviation)
+	assert.Equal(t, expectedVersion, distMajorVersion)
 }

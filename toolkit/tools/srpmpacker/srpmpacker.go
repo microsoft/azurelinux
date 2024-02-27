@@ -457,12 +457,7 @@ func specsToPackWorker(requests <-chan string, results chan<- *specState, cancel
 		containingDir := filepath.Dir(specFile)
 
 		// Find the SRPM that this SPEC will produce.
-		defines, err := rpm.DefaultDistroDefines(runCheck, distTag)
-		if err != nil {
-			result.err = fmt.Errorf("failed to retrieve default distro defines:\n%w", err)
-			results <- result
-			continue
-		}
+		defines := rpm.DefaultDistroDefines(runCheck, distTag)
 
 		// Allow the user to configure if the SPEC sources are in a nested 'SOURCES' directory.
 		// Otherwise assume source files are next to the SPEC file.
@@ -717,11 +712,7 @@ func packSingleSPEC(specFile, srpmFile, signaturesFile, buildDir, outDir, distTa
 	// This will only contain signatures that have either been validated or updated by this tool.
 	currentSignatures := make(map[string]string)
 
-	defines, err := rpm.DefaultDistroDefines(*runCheck, distTag)
-	if err != nil {
-		err = fmt.Errorf("failed to retrieve default distro defines:\n%w", err)
-		return
-	}
+	defines := rpm.DefaultDistroDefines(*runCheck, distTag)
 
 	// Hydrate all patches. Exclusively using `sourceDir`
 	err = hydrateFiles(fileTypePatch, specFile, workingDir, srcConfig, currentSignatures, defines, nil, nil)

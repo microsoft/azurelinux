@@ -94,14 +94,43 @@ var (
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
-	distNameAbreviation = exe.DistroNameAbbreviation
-	distMajorVersion    = exe.DistroMajorVersion
+	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
 )
 
+// checkDistroMacros validates the distro macro values.
+func checkDistroMacros(nameAbreviation string, majorVersion int) (string, int, error) {
+	if majorVersion < 0 || nameAbreviation == "" {
+		err := fmt.Errorf("failed to set distro defines (%s, %d), invalid name or version", nameAbreviation, majorVersion)
+		return "", 0, err
+	}
+	return nameAbreviation, majorVersion, nil
+}
+
+// loadDistroFlags will load the values of exe.DistroNameAbbreviation and exe.DistroMajorVersion into the local copies
+// after validating them.
+func loadLdDistroFlags() (string, int) {
+	version, err := strconv.Atoi(exe.DistroMajorVersion)
+	if err != nil {
+		err = fmt.Errorf("failed to convert distro major version (%s) to int:\n%w", exe.DistroMajorVersion, err)
+		panic(err)
+	}
+
+	name, ver, err := checkDistroMacros(exe.DistroNameAbbreviation, version)
+	if err != nil {
+		err = fmt.Errorf("failed to load distro defines from exe package:\n%w", err)
+		panic(err)
+	}
+	return name, ver
+}
+
 // SetDistroMacros overrides the default distro macro defines from the exe package if needed.
-func SetDistroMacros(nameAbreviation, majorVersion string) {
-	distNameAbreviation = nameAbreviation
-	distMajorVersion = majorVersion
+func SetDistroMacros(nameAbreviation string, majorVersion int) error {
+	var err error
+	distNameAbreviation, distMajorVersion, err = checkDistroMacros(nameAbreviation, majorVersion)
+	if err != nil {
+		err = fmt.Errorf("failed to set distro macros:\n%w", err)
+	}
+	return err
 }
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
@@ -258,21 +287,11 @@ func executeRpmCommandRaw(program string, args ...string) (stdout string, err er
 
 // DefaultDistroDefines returns a new map of default defines that can be used during RPM queries that also includes
 // the distro tags like '%dist', '%azl'.
-func DefaultDistroDefines(runChecks bool, distTag string) (map[string]string, error) {
+func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	defines := defaultDefines(runChecks)
-
-	majVersion, err := strconv.Atoi(distMajorVersion)
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert distro major version to int: %s", exe.DistroMajorVersion)
-	}
-
-	if majVersion < 0 || distNameAbreviation == "" {
-		return nil, fmt.Errorf("invalid distro defines: %s, %d", distNameAbreviation, majVersion)
-	}
-
 	defines[DistTagDefine] = distTag
-	defines[distNameAbreviation] = fmt.Sprintf("%d", majVersion)
-	return defines, nil
+	defines[distNameAbreviation] = fmt.Sprintf("%d", distMajorVersion)
+	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
