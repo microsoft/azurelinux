@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "libreswan-4.7.tar.gz": "ddd6337b3900063d870301c3d9f61f56107c765850fb00a163d360359ff3fc44",
-  "ikev1_dsa.fax.bz2": "030c7ac59422c2c36ed332efca925b18dd842da138619daab65c15663c687086",
-  "ikev1_psk.fax.bz2": "4698f0d8e653e20f279dd54aa1a270aadcc3e99da9e3a91852af12a644cc3531",
-  "ikev2.fax.bz2": "36f356538cdcab6a1712425ad386f32834f0dc333acbc4cc642db0f910be1d21"
- }
+  "Signatures": {
+    "ikev1_dsa.fax.bz2": "030c7ac59422c2c36ed332efca925b18dd842da138619daab65c15663c687086",
+    "ikev1_psk.fax.bz2": "4698f0d8e653e20f279dd54aa1a270aadcc3e99da9e3a91852af12a644cc3531",
+    "ikev2.fax.bz2": "36f356538cdcab6a1712425ad386f32834f0dc333acbc4cc642db0f910be1d21",
+    "libreswan-4.12.tar.gz": "0c0b113b1119f95d63d46e0abd9bdfbda3705a25e71c76d6088ef9bb2f0a2b27"
+  }
 }
