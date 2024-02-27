@@ -23,6 +23,9 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-pip
 BuildRequires:  cmake
+%if %{with_check}
+BuildRequires:  git
+%endif
 
 %description
 setuptools_scm handles managing your python package versions in scm metadata instead of declaring them as the version argument or in a scm managed file.
@@ -60,7 +63,8 @@ It also handles file finders for the supported scm’s.
 
 %if %{with_check}
 %check
-%tox -- -- -v
+pip3 install tox tox-current-env
+tox -e py%{python3_version_nodots}
 %endif
 
 %files -n python3-%{srcname}
