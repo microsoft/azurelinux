@@ -109,7 +109,7 @@ BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  readline
 BuildRequires:  readline-devel
 BuildRequires:  tzdata
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif

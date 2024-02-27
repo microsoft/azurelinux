@@ -16,7 +16,7 @@ BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-integers-devel >= 0.3.0
 BuildRequires:  ocaml-ocamldoc
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ocaml-bisect-ppx-devel
 BuildRequires:  ocaml-lwt-devel >= 3.2.0
 BuildRequires:  ocaml-ounit-devel

@@ -16,7 +16,7 @@ Source0:        https://github.com/Marco-Sulla/%{name}/releases/download/v%{vers
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

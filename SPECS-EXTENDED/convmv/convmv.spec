@@ -12,7 +12,7 @@ Patch0: convmv-2.0-preserve-timestamps.patch
 BuildArch: noarch
 BuildRequires: perl-generators
 BuildRequires: perl(Getopt::Long)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: perl(File::Find)
 %endif
 

@@ -15,7 +15,7 @@ BuildRequires:  perl-DBI >= 1.21
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 %endif
 

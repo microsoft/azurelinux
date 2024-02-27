@@ -1237,8 +1237,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.16.0",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.16.0.tar.gz"
+          "version": "0.19.1",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.19.1.tar.gz"
         }
       }
     },
@@ -2217,8 +2217,8 @@
         "type": "other",
         "other": {
           "name": "createrepo_c",
-          "version": "0.17.5",
-          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/0.17.5.tar.gz"
+          "version": "1.0.3",
+          "downloadUrl": "https://github.com/rpm-software-management/createrepo_c/archive/1.0.3.tar.gz"
         }
       }
     },
@@ -4240,8 +4240,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.13.0",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.13.0.tar.gz"
+          "version": "2.43.1",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.43.1.tar.gz"
         }
       }
     },
@@ -4950,8 +4950,8 @@
         "type": "other",
         "other": {
           "name": "gtest",
-          "version": "1.12.1",
-          "downloadUrl": "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/google/googletest/archive/refs/tags/v1.14.0.tar.gz"
         }
       }
     },
@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "kubernetes",
-          "version": "1.28.3",
-          "downloadUrl": "https://dl.k8s.io/v1.28.3/kubernetes-src.tar.gz"
+          "version": "1.28.7",
+          "downloadUrl": "https://dl.k8s.io/v1.28.7/kubernetes-src.tar.gz"
         }
       }
     },
@@ -12321,8 +12321,8 @@
         "type": "other",
         "other": {
           "name": "luajit",
-          "version": "2.1.0",
-          "downloadUrl": "https://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+          "version": "2.1.1707061634",
+          "downloadUrl": "https://github.com/LuaJIT/LuaJIT/archive/0d313b243194a0b8d2399d8b549ca5a0ff234db5/luajit-2.1.1707061634.tar.gz"
         }
       }
     },
@@ -13142,8 +13142,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.25.tar.gz"
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/moby/moby/archive/v25.0.3.tar.gz"
         }
       }
     },
@@ -14082,8 +14082,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.10",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.10.tar.gz"
+          "version": "0.8.15",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.15.tar.gz"
         }
       }
     },
@@ -21493,8 +21493,8 @@
         "type": "other",
         "other": {
           "name": "pyflakes",
-          "version": "2.5.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-2.5.0.tar.gz"
+          "version": "3.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyflakes/pyflakes-3.2.0.tar.gz"
         }
       }
     },
@@ -21503,8 +21503,8 @@
         "type": "other",
         "other": {
           "name": "pygobject3",
-          "version": "3.42.0",
-          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.42/pygobject-3.42.0.tar.xz"
+          "version": "3.46.0",
+          "downloadUrl": "https://download.gnome.org/sources/pygobject/3.46/pygobject-3.46.0.tar.xz"
         }
       }
     },
@@ -21973,8 +21973,8 @@
         "type": "other",
         "other": {
           "name": "python-coverage",
-          "version": "6.3.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-6.3.2.tar.gz"
+          "version": "7.4.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-7.4.1.tar.gz"
         }
       }
     },
@@ -22505,6 +22505,26 @@
           "name": "python-hacking",
           "version": "1.1.0",
           "downloadUrl": "https://pypi.io/packages/source/h/hacking/hacking-1.1.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hatchling",
+          "version": "1.21.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.21.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hatch-vcs",
+          "version": "0.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch_vcs/hatch_vcs-0.4.0.tar.gz"
         }
       }
     },
@@ -23133,8 +23153,8 @@
         "type": "other",
         "other": {
           "name": "python-networkx",
-          "version": "2.8.8",
-          "downloadUrl": "https://github.com/networkx/networkx/archive/networkx-2.8.8.tar.gz"
+          "version": "3.2.1",
+          "downloadUrl": "https://github.com/networkx/networkx/archive/networkx-3.2.1.tar.gz"
         }
       }
     },
@@ -23272,6 +23292,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pathspec",
+          "version": "0.12.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pathspec/pathspec-0.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pam",
           "version": "1.8.4",
           "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-1.8.4.tar.gz"
@@ -23343,8 +23373,8 @@
         "type": "other",
         "other": {
           "name": "python-platformdirs",
-          "version": "2.0.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-2.0.0.tar.gz"
+          "version": "4.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/platformdirs/platformdirs-4.2.0.tar.gz"
         }
       }
     },
@@ -24153,8 +24183,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinx",
-          "version": "4.4.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c9/08/c2932e66460cfbc8973928d276dc82ccde2d24b365055eeda9f0afc1951e/Sphinx-4.4.0.tar.gz"
+          "version": "7.2.6",
+          "downloadUrl": "https://github.com/sphinx-doc/sphinx/archive/refs/tags/v7.2.6.tar.gz"
         }
       }
     },
@@ -24283,8 +24313,8 @@
         "type": "other",
         "other": {
           "name": "python-sphinxcontrib-websupport",
-          "version": "1.2.4",
-          "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.4.tar.gz"
+          "version": "1.2.7",
+          "downloadUrl": "https://github.com/sphinx-doc/sphinxcontrib-websupport/archive/1.2.7.tar.gz"
         }
       }
     },
@@ -24463,8 +24493,8 @@
         "type": "other",
         "other": {
           "name": "python-toml",
-          "version": "0.10.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/toml/toml-0.10.1.tar.gz"
+          "version": "0.10.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/toml/toml-0.10.2.tar.gz"
         }
       }
     },
@@ -24542,6 +24572,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-trove-classifiers",
+          "version": "2024.2.23",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove-classifiers-2024.2.23.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-twisted",
           "version": "22.10.0",
           "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
@@ -24593,8 +24633,8 @@
         "type": "other",
         "other": {
           "name": "python-urllib3",
-          "version": "1.26.18",
-          "downloadUrl": "https://github.com/urllib3/urllib3/archive/1.26.18.tar.gz"
+          "version": "2.0.4",
+          "downloadUrl": "https://github.com/urllib3/urllib3/archive/2.0.4.tar.gz"
         }
       }
     },
@@ -25504,8 +25544,8 @@
         "type": "other",
         "other": {
           "name": "rpmdevtools",
-          "version": "8.10",
-          "downloadUrl": "https://releases.pagure.org/rpmdevtools/rpmdevtools-8.10.tar.xz"
+          "version": "9.6",
+          "downloadUrl": "https://releases.pagure.org/rpmdevtools/rpmdevtools-9.6.tar.xz"
         }
       }
     },

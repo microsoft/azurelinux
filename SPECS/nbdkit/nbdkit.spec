@@ -104,7 +104,7 @@ BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
 
 # Only for running the test suite:
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{_bindir}/bc
 BuildRequires:  %{_bindir}/certtool
 BuildRequires:  %{_bindir}/cut
