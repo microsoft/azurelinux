@@ -1,5 +1,5 @@
-[mariner-local]
-name=Mariner Local Repo
+[azurelinux-local]
+name=Azure Linux Local Repo
 baseurl=file:///localrepo
 enabled=1
 gpgcheck=0
