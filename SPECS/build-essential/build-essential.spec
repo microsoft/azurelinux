@@ -1,21 +1,25 @@
 Summary:        Metapackage to install all build tools
 Name:           build-essential
-Version:        0.1
-Release:        5%{?dist}
+Version:        3.0
+Release:        1%{?dist}
 License:        GPLv2
 Requires:       autoconf
 Requires:       automake
 Requires:       binutils
 Requires:       bison
 Requires:       diffutils
+Requires:       file
 Requires:       gawk
 Requires:       gcc
 Requires:       glibc-devel
+Requires:       gzip
 Requires:       installkernel
 Requires:       kernel-headers
 Requires:       libtool
 Requires:       make
 Requires:       patch
+Requires:       pkgconf
+Requires:       tar
 
 %description
 Metapackage to install all build tools
@@ -28,6 +32,10 @@ Metapackage to install all build tools
 %defattr(-,root,root,0755)
 
 %changelog
+* Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 3.0-1
+- Bump version to 3.0
+- Add file, gzip, pkgconf & tar
+
 * Wed Mar 30 2022 Chris Co <chrco@microsoft.com> - 0.1-5
 - Add installkernel
 - License verified
