@@ -39,7 +39,7 @@ BuildRequires:  perl(constant)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 # Test Suite
 BuildRequires:  perl(File::Path)
 BuildRequires:  perl(Test::More)

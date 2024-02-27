@@ -17,7 +17,7 @@ BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-pytest-runner
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
