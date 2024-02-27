@@ -13142,8 +13142,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.25",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.25.tar.gz"
+          "version": "25.0.3",
+          "downloadUrl": "https://github.com/moby/moby/archive/v25.0.3.tar.gz"
         }
       }
     },
