@@ -70,7 +70,7 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 %changelog
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.12.1-2
-- Initial Azure Linux import from Fedora 39 (license MIT)
+- Initial CBL-Mariner import from Fedora 39 (license MIT)
 - License verified.
 
 * Mon Dec 11 2023 Adrien Vergé <adrienverge@gmail.com> - 0.12.1-1

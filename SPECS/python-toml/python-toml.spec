@@ -95,7 +95,7 @@ toml-test $(pwd)/tests/decoding_test3.sh
 
 %changelog
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.10.2-14
-- Initial Azure Linux import from Fedora 39 (license: MIT)
+- Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.
 
 * Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.2-13

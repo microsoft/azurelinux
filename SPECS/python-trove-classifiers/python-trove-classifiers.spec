@@ -73,7 +73,7 @@ Summary:        %{summary}
 
 %changelog
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 2024.2.23-1
-- Initial Azure Linux import from Fedora 39 (license: MIT)
+- Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - Upgrade to latest version 2024.2.23
 - Build using setup.py. So modify the patch to update version in setup.py
 - License verified.

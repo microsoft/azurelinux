@@ -97,7 +97,7 @@ Summary:        %{summary}
 
 %changelog
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.4.0-2
-- Initial Azure Linux import from Fedora 39 (license: MIT)
+- Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.
 
 * Mon Nov 06 2023 Benjamin A. Beasley <code@musicinmybrain.net> - 0.4.0-1
