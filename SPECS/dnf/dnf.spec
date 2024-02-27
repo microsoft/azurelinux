@@ -113,7 +113,6 @@ ctest -VV
 %dir %{confdir}/vars
 %exclude %{confdir}/aliases.d/zypper.conf
 %config(noreplace) %{confdir}/%{name}.conf
-%config(noreplace) %{confdir}/protected.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.log
 %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.librepo.log
