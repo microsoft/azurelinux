@@ -38,7 +38,7 @@ DIST_NAME_ABRV       ?= azl
 dist_major_version_number := $(shell echo $(RELEASE_MAJOR_ID) | cut -d'.' -f1)
 DIST_VERSION_MACRO := $(DIST_NAME_ABRV) $(dist_major_version_number)
 
-##help:var:DIST_TAG:<dist_tag>=Distribution tag, defines the "dist" macro used by the specs. Default: '.<DIST_NAME_ABRV><dist_major_version_number>'
+##help:var:DIST_TAG:<dist_tag>=Distribution tag, defines the "dist" macro used by the specs. Default: '.<DIST_NAME_ABRV><dist_major_version_number>' e.g., ".azl3"
 DIST_TAG            ?= .$(DIST_NAME_ABRV)$(dist_major_version_number)
 
 # Mariner Image Customizer version.
