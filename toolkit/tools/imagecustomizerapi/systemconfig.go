@@ -28,7 +28,7 @@ type SystemConfig struct {
 	FinalizeImageScripts    []Script                  `yaml:"FinalizeImageScripts"`
 	Users                   []User                    `yaml:"Users"`
 	Services                Services                  `yaml:"Services"`
-	Modules                 Modules                   `yaml:"Modules"`
+	Modules                 []Module                  `yaml:"Modules"`
 	Verity                  *Verity                   `yaml:"Verity"`
 }
 
@@ -97,8 +97,11 @@ func (s *SystemConfig) IsValid() error {
 		return err
 	}
 
-	if err := s.Modules.IsValid(); err != nil {
-		return err
+	for i, module := range s.Modules {
+		err = module.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Modules item at index %d: %w", i, err)
+		}
 	}
 
 	if s.Verity != nil {

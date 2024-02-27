@@ -1,18 +1,19 @@
 SystemConfig:
   Modules:
   - Name: vfio
-    LoadMode: auto
+    LoadMode: boot
     Options:
-    - enable_unsafe_noiommu_mode: "Y"
+      enable_unsafe_noiommu_mode: "Y"
+      disable_vga: "Y"
 
-  - name: br_netfilter
-    loadMode: auto
+  - Name: br_netfilter
+    LoadMode: auto
 
-  - name: mlx5_ib
-    loadMode: boot
+  - Name: mlx5_ib
+    LoadMode: always
 
-  - name: kvm
-    loadMode: auto
+  - Name: kvm
+    LoadMode: auto
 
-  - name: mousedev
-    loadMode: disable
+  - Name: mousedev
+    LoadMode: disable

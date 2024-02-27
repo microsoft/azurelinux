@@ -4,6 +4,7 @@
 package imagecustomizerlib
 
 import (
+	"bufio"
 	"fmt"
 	"io/fs"
 	"os"
@@ -349,67 +350,288 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
+func loadOrDisableModules(modules []imagecustomizerapi.Module, imageChroot *safechroot.Chroot) error {
 	var err error
-
-	// Handle loading modules
-	modulesToLoadMap := make(map[string]bool)
 	var modulesToLoad []string
-	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module %s", module)
-		modulesToLoad = append(modulesToLoad, module)
-		modulesToLoadMap[module] = true
-	}
-
-	var modulesWithOptions []string
-	for module, moduleOptions := range modules.Options {
-		if !modulesToLoadMap[module] {
-			// Load module in options list if it is not specified in load list
-			logger.Log.Infof("Loading kernel module %s", module)
-			modulesToLoad = append(modulesToLoad, module)
-		}
-
-		var options []string
-		logger.Log.Infof("Adding kernel module options for %s", module)
-		for key, value := range moduleOptions {
-			options = append(options, fmt.Sprintf("%s=%s", key, value))
-		}
-
-		data := fmt.Sprintf("options %s %s", module, strings.Join(options, " "))
-		modulesWithOptions = append(modulesWithOptions, data)
-	}
-
-	moduleLoadFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/modules-load.conf")
-	err = file.WriteLines(modulesToLoad, moduleLoadFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to write module load configuration: %w", err)
-	}
-
-	if len(modulesWithOptions) > 0 {
-		modulesWithOptions = append(modulesWithOptions, "")
-		moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/module-options.conf")
-		err = file.WriteLines(modulesWithOptions, moduleOptionsFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module options configuration: %w", err)
-		}
-	}
-
-	// Handle disabling modules
 	var modulesToDisable []string
+	var moduleOptionsUpdates map[string]map[string]string = make(map[string]map[string]string)
 	moduleDisableFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/modules-disabled.conf")
+	moduleLoadFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/modules-load.conf")
+	moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/module-options.conf")
 
-	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module %s", module)
-		data := fmt.Sprintf("blacklist %s\n", module)
-		modulesToDisable = append(modulesToDisable, data)
+	for i, module := range modules {
+		switch module.LoadMode {
+		case "boot":
+			// If a module is disabled, remove it. Add the module to modules-load.d/. Write options if provided.
+			err = removeModuleFromDisableList(module.Name, moduleDisableFilePath)
+			if err != nil {
+				logger.Log.Infof("Error removing module %s from the disabled list", module.Name)
+				return err
+			}
+			modulesToLoad = append(modulesToLoad, module.Name)
+
+			if len(module.Options) > 0 {
+				moduleOptionsUpdates[module.Name] = module.Options
+			}
+
+		case "auto":
+			// If a module is disabled, enable it. Write options if provided
+			err = removeModuleFromDisableList(module.Name, moduleDisableFilePath)
+			if err != nil {
+				logger.Log.Infof("Error removing module %s from the disabled list", module.Name)
+				return err
+			}
+
+			if len(module.Options) > 0 {
+				moduleOptionsUpdates[module.Name] = module.Options
+			}
+
+		case "disable":
+			// Disable a module, throw error if options are provided
+			if len(module.Options) > 0 {
+				return fmt.Errorf("cannot add options for disabled module %s at index %d. Specify auto or boot as loadMode to override setting in base image", module.Name, i)
+			}
+
+			modulesToDisable = append(modulesToDisable, module.Name)
+
+		case "inherit", "":
+			// inherits the behavior of the base image, modify the options without changing the loading state
+			if len(module.Options) > 0 {
+				disabled, err := isModuleDisabled(module.Name, moduleDisableFilePath)
+				if err != nil {
+					logger.Log.Infof("Error checking %s", moduleDisableFilePath)
+					return err
+				}
+
+				if disabled {
+					return fmt.Errorf("cannot add options for disabled module %s at index %d. Specify auto or boot as loadMode to override setting in base image", module.Name, i)
+				}
+
+				if len(module.Options) > 0 {
+					moduleOptionsUpdates[module.Name] = module.Options
+				}
+			}
+		}
 	}
 
-	err = file.WriteLines(modulesToDisable, moduleDisableFilePath)
+	// Batch process module to load
+	err = ensureModulesLoaded(modulesToLoad, moduleLoadFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to write module disable configuration: %w", err)
+		return err
+	}
+
+	// Batch process module to disable
+	err = ensureModulesDisabled(modulesToDisable, moduleLoadFilePath)
+	if err != nil {
+		return err
+	}
+
+	// Batch process module options
+	aggregatedOptions := []string{}
+	if len(moduleOptionsUpdates) > 0 {
+		for moduleName, options := range moduleOptionsUpdates {
+			for key, value := range options {
+				logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
+				aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
+				if err != nil {
+					return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
+				}
+			}
+		}
+
+		file, err := os.OpenFile(moduleOptionsFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to open %s: %w", moduleOptionsFilePath, err)
+		}
+		defer file.Close()
+
+		content := strings.Join(aggregatedOptions, "\n") + "\n"
+		// Append the content to the file.
+		if _, err := file.WriteString(content); err != nil {
+			return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
+		}
 	}
 
 	return nil
+}
+
+func ensureModulesLoaded(moduleNames []string, moduleLoadFilePath string) error {
+    content, err := os.ReadFile(moduleLoadFilePath)
+    if err != nil {
+        if !os.IsNotExist(err) {
+            return fmt.Errorf("failed to read module load configuration: %w", err)
+        }
+        // If the file does not exist, initialize content as empty
+        content = []byte{}
+    }
+
+    needUpdate := false
+
+	for _, moduleName := range moduleNames {
+		if !strings.Contains(string(content), moduleName+"\n") {
+			content = append(content, (moduleName + "\n")...)
+			needUpdate = true
+			logger.Log.Infof("Loading module %s", moduleName)
+		} else {
+			logger.Log.Infof("Module %s is already loaded", moduleName)
+		}
+	}
+
+	if needUpdate {
+		err = os.WriteFile(moduleLoadFilePath, content, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to update module load configuration: %w", err)
+		}
+	}
+    return nil
+}
+
+func ensureModulesDisabled(moduleNames []string, moduleDisableFilePath string) error {
+    content, err := os.ReadFile(moduleDisableFilePath)
+    if err != nil {
+        if !os.IsNotExist(err) {
+            return fmt.Errorf("failed to read disable configuration: %w", err)
+        }
+        // If the file does not exist, initialize content as empty
+        content = []byte{}
+    }
+
+    contentString := string(content)
+    needUpdate := false
+
+    for _, moduleName := range moduleNames {
+        blacklistEntry := "blacklist " + moduleName
+        if !strings.Contains(string(content), blacklistEntry+"\n") {
+            // Module is not disabled, append it
+            contentString += blacklistEntry + "\n"
+            needUpdate = true
+            logger.Log.Infof("Disabling module %s", moduleName)
+        } else {
+			logger.Log.Infof("Module %s is already disabled\n", moduleName)
+		}
+    }
+
+    if needUpdate {
+        err = os.WriteFile(moduleDisableFilePath, []byte(contentString), 0644)
+        if err != nil {
+            return fmt.Errorf("failed to update disable configuration: %w", err)
+        }
+    }
+
+    return nil
+}
+
+func isModuleDisabled(moduleName, moduleDisableFilePath string) (bool, error) {
+	_, err := os.Stat(moduleDisableFilePath)
+	if os.IsNotExist(err) {
+		// File doesn't exist, treat as not disabled.
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	file, err := os.Open(moduleDisableFilePath)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if strings.TrimSpace(scanner.Text()) == moduleName {
+			return true, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		logger.Log.Errorf("Failed to scan file %s with error %s", moduleDisableFilePath, err)
+		return false, err
+	}
+
+	return false, nil
+}
+
+func removeModuleFromDisableList(moduleName, moduleDisableFilePath string) error {
+	disabled, err := isModuleDisabled(moduleName, moduleDisableFilePath)
+	if err != nil {
+		logger.Log.Infof("Error checking %s", moduleDisableFilePath)
+		return err
+	}
+
+	if disabled {
+		logger.Log.Infof("Module %s found in the disabled list. Removing...", moduleName)
+		lines, err := os.ReadFile(moduleDisableFilePath)
+		if err != nil {
+			return err
+		}
+
+		// Filter out the line that contains the module name.
+		var updatedLines []string
+		for _, line := range strings.Split(string(lines), "\n") {
+			if !strings.Contains(line, moduleName) {
+				updatedLines = append(updatedLines, line)
+			}
+		}
+
+		return os.WriteFile(moduleDisableFilePath, []byte(strings.Join(updatedLines, "\n")), 0644)
+	}
+
+	return nil
+}
+
+
+func aggregateModuleOptions(aggregatedOptions []string, moduleOptionsFilePath string, moduleName string, optionKey string, optionValue string) ([]string, error) {
+    found := false
+
+    if _, err := os.Stat(moduleOptionsFilePath); err != nil {
+        if os.IsNotExist(err) {
+            // If the file does not exist, append the new option and return the options
+            return append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue)), nil
+        }
+        return nil, err
+    }
+
+    // File exists, if the option exists in the file, directly update the file, otherwise, append it and return the options
+    file, err := os.Open(moduleOptionsFilePath)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+		var updatedLines []string
+        line := scanner.Text()
+        if strings.HasPrefix(line, "options "+moduleName) {
+            fields := strings.Fields(line)
+            updatedLine := fields[:1]
+            for _, field := range fields[1:] {
+                if strings.HasPrefix(field, optionKey+"=") {
+                    // Update the existing option value
+                    updatedLine = append(updatedLine, optionKey+"="+optionValue)
+                } else {
+                    // Keep other options as they are
+                    updatedLine = append(updatedLine, field)
+                }
+            }
+            line = strings.Join(updatedLine, " ")
+            found = true
+        }
+        updatedLines = append(updatedLines, line)
+		// Directly write back to file as this is updating existing option
+		os.WriteFile(moduleOptionsFilePath, []byte(strings.Join(updatedLines, "\n")), 0644)
+    }
+
+    if err := scanner.Err(); err != nil {
+        return nil, err
+    }
+
+    if !found {
+        // If not found, append this new option
+        aggregatedOptions = append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue))
+    }
+
+    return aggregatedOptions, nil
 }
 
 func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {

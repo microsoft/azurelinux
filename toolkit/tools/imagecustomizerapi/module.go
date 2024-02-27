@@ -10,49 +10,56 @@ import (
 
 type ModuleOptions map[string]string
 
-type Modules struct {
-	Load    []string                 `yaml:"Load"`
-	Disable []string                 `yaml:"Disable"`
-	Options map[string]ModuleOptions `yaml:"Options"`
+type Module struct {
+    Name     string            `yaml:"Name"`
+    LoadMode string            `yaml:"LoadMode"`
+    Options  map[string]string `yaml:"Options"`
 }
 
-func (m *Modules) IsValid() error {
-	for i, moduleName := range m.Load {
-		if err := validateModuleName(moduleName, "Load", i); err != nil {
-			return err
-		}
+func (m *Module) IsValid() error {
+	if err := validateModuleName(m.Name); err != nil {
+		return err
 	}
 
-	for i, moduleName := range m.Disable {
-		if err := validateModuleName(moduleName, "Disable", i); err != nil {
-			return err
-		}
+	if err := validateModuleLoadMode(m.LoadMode); err != nil {
+		return err
 	}
-	for moduleName, moduleOptions := range m.Options {
-		if moduleName == "" {
-			return fmt.Errorf("module name cannot be empty in Modules.Options")
-		}
 
-		for optionKey, optionValue := range moduleOptions {
+	if len(m.Options) > 0 {
+		for optionKey, optionValue := range m.Options {
 			if optionKey == "" || optionValue == "" {
-				return fmt.Errorf("option key or value cannot be empty for module %s", moduleName)
+				return fmt.Errorf("option key or value cannot be empty for module %s", m.Name)
 			}
 
 			if strings.ContainsAny(optionKey, " \n") || strings.ContainsAny(optionValue, " \n") {
-				return fmt.Errorf("option key or value cannot contain spaces or newline characters for module %s", moduleName)
+				return fmt.Errorf("option key or value cannot contain spaces or newline characters for module %s", m.Name)
 			}
 		}
 	}
-
 	return nil
 }
 
-func validateModuleName(moduleName string, source string, index int) error {
+func validateModuleName(moduleName string) error {
 	if moduleName == "" {
-		return fmt.Errorf("module name cannot be empty in Modules.%s at index %d", source, index)
+		return fmt.Errorf("module name cannot be empty")
 	}
 	if strings.ContainsAny(moduleName, " \n") {
-		return fmt.Errorf("module name cannot contain spaces or newline characters in Modules.%s at index %d", source, index)
+		return fmt.Errorf("module name cannot contain spaces or newline characters")
 	}
 	return nil
+}
+
+func validateModuleLoadMode(loadMode string) error {
+    validLoadModes := []string{"always", "boot", "disable", "auto"}
+    isValid := false
+    for _, v := range validLoadModes {
+        if loadMode == v {
+            isValid = true
+            break
+        }
+    }
+    if !isValid {
+        return fmt.Errorf("invalid module load mode '%s'; it can only be 'always', 'boot', 'disable', or 'auto'", loadMode)
+    }
+    return nil
 }
