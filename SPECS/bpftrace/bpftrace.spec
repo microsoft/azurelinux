@@ -1,7 +1,7 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.16.0
-Release:        2%{?dist}
+Version:        0.19.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,7 @@ BuildRequires:  bison
 BuildRequires:  cereal-devel
 BuildRequires:  clang-devel
 BuildRequires:  cmake
+BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gcc
@@ -51,8 +52,9 @@ mkdir build
 cd build
 
 %cmake \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_SHARED_LIBS:BOOL=OFF \
+    -DUSE_SYSTEM_BPF_BCC:BOOL=ON \
 %if !%{with_check}
     -DBUILD_TESTING=0 \
 %endif
@@ -78,6 +80,12 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Thu Jan 04 2024 Muhammad Falak <mwani@microsoft.com> - 0.19.1-1
+- Upgrade version to 0.19.1
+- Use system libbpf
+- Switch build type to RelWithDebInfo
+- Add BR on dwarves to fix %check
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.16.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
