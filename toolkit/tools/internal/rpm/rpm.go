@@ -9,8 +9,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -90,10 +92,17 @@ var (
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 
-	// distTagRegex is used to extract the distro and version from the dist tag. This will work on
-	// strings of the form ".<distro><version>".
-	distTagRegex = regexp.MustCompile(`^\.([a-zA-Z]+)([0-9]+)$`)
+	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
+	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
+	distNameAbreviation = exe.DistroNameAbreviation
+	distMajorVersion    = exe.DistroMajorVersion
 )
+
+// SetDistroMacros overrides the default distro macro defines from the exe package if needed.
+func SetDistroMacros(nameAbreviation, majorVersion string) {
+	distNameAbreviation = nameAbreviation
+	distMajorVersion = majorVersion
+}
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
 func GetRpmArch(goArch string) (rpmArch string, err error) {
@@ -250,22 +259,21 @@ func executeRpmCommandRaw(program string, args ...string) (stdout string, err er
 // DefaultDistroDefines returns a new map of default defines that can be used during RPM queries that also includes
 // the distro tags like '%dist', '%zal', '%alz<VER>'.
 // If distTag is empty, the distro tags will not be generated.
-func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
+func DefaultDistroDefines(runChecks bool, distTag string) (map[string]string, error) {
 	defines := defaultDefines(runChecks)
-	if distTag != "" {
-		defines[DistTagDefine] = distTag
-		// distTag is of the form ".<distro><version>", extract the distro and version
-		// This will be used to generate '%<distro> <version>'
-		distTagSplit := distTagRegex.FindStringSubmatch(distTag)
-		if len(distTagSplit) == 3 {
-			distroName := distTagSplit[1]
-			distroVersion := distTagSplit[2]
-			defines[distroName] = distroVersion
-		} else {
-			logger.Log.Warnf("Invalid distro tag (%s), won't generate derived distro defines", distTag)
-		}
+
+	majVersion, err := strconv.Atoi(distMajorVersion)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert distro major version to int: %s", exe.DistroMajorVersion)
 	}
-	return defines
+
+	if majVersion < 0 || distNameAbreviation == "" {
+		return nil, fmt.Errorf("invalid distro defines: %s, %d", distNameAbreviation, majVersion)
+	}
+
+	defines[DistTagDefine] = distTag
+	defines[distNameAbreviation] = fmt.Sprintf("%d", majVersion)
+	return defines, nil
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.

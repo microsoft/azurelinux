@@ -6,7 +6,6 @@
 
 ######## BUILD DEFINES ########
 
-DIST_TAG           ?= .azl3
 # Running 'git' as the owner of the repo, so it doesn't complain about the repo not belonging to root.
 GIT_COMMIT_ID := $(call shell_real_build_only, if [ -n "$$UID" ] && [ "$$UID" -eq 0 ]; then runuser -u $$(stat -c "%U" $(PROJECT_ROOT)) -- git rev-parse --short HEAD; else git rev-parse --short HEAD; fi)
 BUILD_NUMBER ?= $(GIT_COMMIT_ID)
@@ -33,6 +32,15 @@ RELEASE_VERSION := $(RELEASE_VERSION)
 
 # Image tag - empty by default. Does not apply to the initrd.
 IMAGE_TAG          ?=
+
+# Basis of the distro macros. The abreveation of the distro name and the major version are encoded into the go tools so
+# that they can be used to create the distro specific macro '<DIST_NAME_ABRV> <DIST_MAJOR_ID>'.
+DIST_NAME_MACRO     ?= azl
+dist_major_macro    := $(shell echo $(RELEASE_MAJOR_ID) | cut -d'.' -f1)
+distro_macro        := $(DIST_NAME_MACRO) $(dist_major_macro)
+
+# Dist tag will be of the form '.<ABRV><MAJOR_ID>', unless overridden by the user.
+DIST_TAG            ?= .$(DIST_NAME_MACRO)$(DIST_MAJOR_ID)
 
 # Mariner Image Customizer version.
 # This is using semantic versioning.

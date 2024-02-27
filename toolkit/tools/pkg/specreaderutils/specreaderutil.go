@@ -296,8 +296,15 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	noCheckDefines := rpm.DefaultDistroDefines(false, distTag)
-	checkDefines := rpm.DefaultDistroDefines(true, distTag)
+	// These variables are common to all specs and can be reused, but we need to cache the error messages.
+	noCheckDefines, macroErr1 := rpm.DefaultDistroDefines(false, distTag)
+	if macroErr1 != nil {
+		macroErr1 = fmt.Errorf("failed to retrieve default distro defines:\n%w", macroErr1)
+	}
+	checkDefines, macroErr2 := rpm.DefaultDistroDefines(true, distTag)
+	if macroErr2 != nil {
+		macroErr2 = fmt.Errorf("failed to retrieve default distro defines:\n%w", macroErr2)
+	}
 
 	var ts *timestamp.TimeStamp = nil
 	for specFile := range requests {
@@ -306,6 +313,14 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 			logger.Log.Debug("Cancellation signal received")
 			return
 		default:
+		}
+
+		if macroErr1 != nil {
+			sendEmptyResult(results, macroErr1)
+			continue
+		} else if macroErr2 != nil {
+			sendEmptyResult(results, macroErr2)
+			continue
 		}
 
 		// Many code paths hit 'continue', finish timing those here.

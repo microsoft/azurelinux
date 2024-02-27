@@ -73,7 +73,11 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 }
 
 func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string, testOnly bool) (filteredSpecNames []string, err error) {
-	defines := rpm.DefaultDistroDefines(testOnly, distTag)
+	defines, err := rpm.DefaultDistroDefines(testOnly, distTag)
+	if err != nil {
+		err = fmt.Errorf("failed to retrieve default distro defines:\n%w", err)
+		return
+	}
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
 		err = fmt.Errorf("failed to translate names to specs inside (%s). Error:\n%w", a.simpleToolChroot.ChrootRelativeSpecDir(), err)
@@ -115,7 +119,11 @@ func filterOutSpecsWithoutTests(specPaths []string, distTag string) (filteredSpe
 		return nil, err
 	}
 
-	defines := rpm.DefaultDistroDefines(runChecks, distTag)
+	defines, err := rpm.DefaultDistroDefines(runChecks, distTag)
+	if err != nil {
+		err = fmt.Errorf("failed to retrieve default distro defines:\n%w", err)
+		return
+	}
 	for _, specPath := range specPaths {
 		hasCheckSection, err := rpm.SpecHasCheckSection(specPath, filepath.Dir(specPath), buildArch, defines)
 		if err != nil {

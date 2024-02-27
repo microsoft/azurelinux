@@ -107,7 +107,7 @@ check-aarch64-manifests: $(toolchain_spec_list)
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
-			$(RELEASE_MAJOR_ID) \
+			$(distro_macro) \
 			aarch64
 check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
@@ -116,7 +116,7 @@ check-x86_64-manifests: $(toolchain_spec_list)
 			$(SPECS_DIR) \
 			$(TOOLCHAIN_MANIFESTS_DIR) \
 			$(DIST_TAG) \
-			$(RELEASE_MAJOR_ID) \
+			$(distro_macro) \
 			x86_64
 
 # Generate a list of a specs built as part of the toolchain.
@@ -225,6 +225,7 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
 			$(DIST_TAG) \
+			$(distro_macro) \
 			$(BUILD_NUMBER) \
 			$(RELEASE_VERSION) \
 			$(BUILD_DIR) \

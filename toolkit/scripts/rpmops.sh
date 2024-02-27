@@ -14,17 +14,9 @@ fi
 
 # Additional macros required to parse spec files.
 DIST_TAG=$(make -s -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
-RELEASE_NUM=$(make -s -f $REPO_ROOT/toolkit/Makefile get-release-major)
+DISTRO_MACRO="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-distro-macro)"
 
-# Define 'azl <ver>' macro for use in spec files. Normally they would be defined in the 'azurelinux-release' package.
-# Dist tag will be of the form '.<distro><ver>', e.g. '.azl3'., rease number will be of the form '3.0'.
-
-# 'azl <ver>': Strip the leading '.' and the trailing number from the DIST_TAG
-distro_name="$(echo ${DIST_TAG#.} | sed 's/[0-9]\+$//')"
-distro_majver="${RELEASE_NUM%%.*}"
-distro_ver="${distro_name} ${distro_majver}"
-
-DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$distro_ver")
+DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
 

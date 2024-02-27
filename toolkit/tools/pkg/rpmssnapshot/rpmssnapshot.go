@@ -120,7 +120,11 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 		specPaths    []string
 	)
 
-	defines := rpm.DefaultDistroDefines(runChecks, distTag)
+	defines, err := rpm.DefaultDistroDefines(runChecks, distTag)
+	if err != nil {
+		err = fmt.Errorf("failed to retrieve default distro defines:\n%w", err)
+		return
+	}
 	specPaths, err = rpm.BuildCompatibleSpecsList(s.simpleToolChroot.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
 		err = fmt.Errorf("failed to retrieve a list of specs inside (%s):\n%w", s.simpleToolChroot.ChrootRelativeSpecDir(), err)

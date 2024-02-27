@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -200,33 +201,66 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 	}
 }
 
-func TestDefaultDefines(t *testing.T) {
+func TestDistroDefines(t *testing.T) {
 	distName := "myDistro"
 	distVersion := "1234"
 	distTag := fmt.Sprintf(".%s%s", distName, distVersion)
-	invalidDistDag := "invalid"
 
-	defines := DefaultDistroDefines(true, distTag)
+	// Save the original values and restore them after the test
+	originalDistroName := distNameAbreviation
+	originalDistroVersion := distMajorVersion
+	t.Cleanup(func() {
+		distNameAbreviation = originalDistroName
+		distMajorVersion = originalDistroVersion
+	})
+
+	SetDistroMacros(distName, distVersion)
+
+	defines, err := DefaultDistroDefines(true, distTag)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "1", defines[definesWithCheckKey])
 	assert.Equal(t, distTag, defines[DistTagDefine])
 
-	defines = DefaultDistroDefines(false, distTag)
+	defines, err = DefaultDistroDefines(false, distTag)
+	assert.NoError(t, err)
 	assert.Equal(t, "0", defines[definesWithCheckKey])
 
 	// Check for distro name and version
 	assert.Equal(t, distTag, defines["dist"])
-	assert.Equal(t, distVersion, defines[distName])
+	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
 
-	// Check the dist macros are not in the dictionary for invalid distro tag
-	defines = DefaultDistroDefines(false, invalidDistDag)
-	assert.NotContains(t, defines, distName)
-	assert.NotContains(t, defines, distName+distVersion)
-	assert.Equal(t, invalidDistDag, defines["dist"])
+	// Check that an empty distro tag is ok
+	defines, err = DefaultDistroDefines(false, "")
+	assert.NoError(t, err)
+	assert.Equal(t, "", defines["dist"])
+	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
 
-	// Check the dist macros are not in the dictionary for empty distro tag
-	defines = DefaultDistroDefines(false, "")
-	assert.NotContains(t, defines, distName)
-	assert.NotContains(t, defines, distName+distVersion)
-	assert.NotContains(t, defines, "dist")
+	// Handle errors when distro name and version are not set
+	SetDistroMacros("", distVersion)
+	defines, err = DefaultDistroDefines(false, distTag)
+	assert.Error(t, err)
+	assert.Nil(t, defines)
+
+	SetDistroMacros("", distVersion)
+	defines, err = DefaultDistroDefines(false, distTag)
+	assert.Error(t, err)
+	assert.Nil(t, defines)
+
+	// Handle errors when version is negative
+	SetDistroMacros(distName, "-1")
+
+	defines, err = DefaultDistroDefines(false, distTag)
+	assert.Error(t, err)
+	assert.Nil(t, defines)
+}
+
+func TestDefaultDefines(t *testing.T) {
+	if exe.DistroMajorVersion == "" && exe.DistroNameAbreviation == "" {
+		t.Skip("Skipping test because distro name and version are not set")
+	}
+	distTag := "testDistroTag"
+	defines, err := DefaultDistroDefines(true, distTag)
+	assert.NoError(t, err)
+	assert.Equal(t, "3", defines["azl"])
 }
