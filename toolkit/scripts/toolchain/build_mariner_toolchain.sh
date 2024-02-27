@@ -24,8 +24,8 @@ MARINER_REHYDRATED_RPMS_DIR=${13}
 MARINER_TOOLCHAIN_MANIFESTS_FILE=${14}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${14}
-TIMESTAMP_FILE_PATH=${15}
+BLDTRACKER=${15}
+TIMESTAMP_FILE_PATH=${16}
 # =====================================================
 
 # Create toolchain subdirectory in out folder

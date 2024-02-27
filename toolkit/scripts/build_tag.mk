@@ -37,10 +37,10 @@ IMAGE_TAG          ?=
 # that they can be used to create the distro specific macro '<DIST_NAME_ABRV> <DIST_MAJOR_ID>'.
 DIST_NAME_MACRO     ?= azl
 dist_major_macro    := $(shell echo $(RELEASE_MAJOR_ID) | cut -d'.' -f1)
-distro_macro        := $(DIST_NAME_MACRO) $(dist_major_macro)
+DISTRO_MACRO        := $(DIST_NAME_MACRO) $(dist_major_macro)
 
 # Dist tag will be of the form '.<ABRV><MAJOR_ID>', unless overridden by the user.
-DIST_TAG            ?= .$(DIST_NAME_MACRO)$(DIST_MAJOR_ID)
+DIST_TAG            ?= .$(DIST_NAME_MACRO)$(dist_major_macro)
 
 # Mariner Image Customizer version.
 # This is using semantic versioning.
