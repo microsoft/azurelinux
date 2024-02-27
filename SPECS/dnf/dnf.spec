@@ -127,6 +127,7 @@ ctest -VV
 
 %files -n python3-%{name}
 %{_bindir}/%{name}-3
+%{python3_sitelib}/%{name}-*.dist-info
 %{python3_sitelib}/%{name}
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__/
