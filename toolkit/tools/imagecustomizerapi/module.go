@@ -11,9 +11,9 @@ import (
 type ModuleOptions map[string]string
 
 type Module struct {
-    Name     string            `yaml:"Name"`
-    LoadMode string            `yaml:"LoadMode"`
-    Options  map[string]string `yaml:"Options"`
+	Name     string            `yaml:"Name"`
+	LoadMode string            `yaml:"LoadMode"`
+	Options  map[string]string `yaml:"Options"`
 }
 
 func (m *Module) IsValid() error {
@@ -50,16 +50,16 @@ func validateModuleName(moduleName string) error {
 }
 
 func validateModuleLoadMode(loadMode string) error {
-    validLoadModes := []string{"always", "boot", "disable", "auto"}
-    isValid := false
-    for _, v := range validLoadModes {
-        if loadMode == v {
-            isValid = true
-            break
-        }
-    }
-    if !isValid {
-        return fmt.Errorf("invalid module load mode '%s'; it can only be 'always', 'boot', 'disable', or 'auto'", loadMode)
-    }
-    return nil
+	validLoadModes := []string{"always", "boot", "disable", "auto"}
+	isValid := false
+	for _, v := range validLoadModes {
+		if loadMode == v {
+			isValid = true
+			break
+		}
+	}
+	if !isValid {
+		return fmt.Errorf("invalid module load mode '%s'; it can only be 'always', 'boot', 'disable', or 'auto'", loadMode)
+	}
+	return nil
 }

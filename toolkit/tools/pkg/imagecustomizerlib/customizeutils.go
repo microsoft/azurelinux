@@ -456,16 +456,16 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, imageChroot *safe
 }
 
 func ensureModulesLoaded(moduleNames []string, moduleLoadFilePath string) error {
-    content, err := os.ReadFile(moduleLoadFilePath)
-    if err != nil {
-        if !os.IsNotExist(err) {
-            return fmt.Errorf("failed to read module load configuration: %w", err)
-        }
-        // If the file does not exist, initialize content as empty
-        content = []byte{}
-    }
+	content, err := os.ReadFile(moduleLoadFilePath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("failed to read module load configuration: %w", err)
+		}
+		// If the file does not exist, initialize content as empty
+		content = []byte{}
+	}
 
-    needUpdate := false
+	needUpdate := false
 
 	for _, moduleName := range moduleNames {
 		if !strings.Contains(string(content), moduleName+"\n") {
@@ -483,42 +483,42 @@ func ensureModulesLoaded(moduleNames []string, moduleLoadFilePath string) error 
 			return fmt.Errorf("failed to update module load configuration: %w", err)
 		}
 	}
-    return nil
+	return nil
 }
 
 func ensureModulesDisabled(moduleNames []string, moduleDisableFilePath string) error {
-    content, err := os.ReadFile(moduleDisableFilePath)
-    if err != nil {
-        if !os.IsNotExist(err) {
-            return fmt.Errorf("failed to read disable configuration: %w", err)
-        }
-        // If the file does not exist, initialize content as empty
-        content = []byte{}
-    }
+	content, err := os.ReadFile(moduleDisableFilePath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("failed to read disable configuration: %w", err)
+		}
+		// If the file does not exist, initialize content as empty
+		content = []byte{}
+	}
 
-    contentString := string(content)
-    needUpdate := false
+	contentString := string(content)
+	needUpdate := false
 
-    for _, moduleName := range moduleNames {
-        blacklistEntry := "blacklist " + moduleName
-        if !strings.Contains(string(content), blacklistEntry+"\n") {
-            // Module is not disabled, append it
-            contentString += blacklistEntry + "\n"
-            needUpdate = true
-            logger.Log.Infof("Disabling module %s", moduleName)
-        } else {
+	for _, moduleName := range moduleNames {
+		blacklistEntry := "blacklist " + moduleName
+		if !strings.Contains(string(content), blacklistEntry+"\n") {
+			// Module is not disabled, append it
+			contentString += blacklistEntry + "\n"
+			needUpdate = true
+			logger.Log.Infof("Disabling module %s", moduleName)
+		} else {
 			logger.Log.Infof("Module %s is already disabled\n", moduleName)
 		}
-    }
+	}
 
-    if needUpdate {
-        err = os.WriteFile(moduleDisableFilePath, []byte(contentString), 0644)
-        if err != nil {
-            return fmt.Errorf("failed to update disable configuration: %w", err)
-        }
-    }
+	if needUpdate {
+		err = os.WriteFile(moduleDisableFilePath, []byte(contentString), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to update disable configuration: %w", err)
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func isModuleDisabled(moduleName, moduleDisableFilePath string) (bool, error) {
@@ -579,59 +579,58 @@ func removeModuleFromDisableList(moduleName, moduleDisableFilePath string) error
 	return nil
 }
 
-
 func aggregateModuleOptions(aggregatedOptions []string, moduleOptionsFilePath string, moduleName string, optionKey string, optionValue string) ([]string, error) {
-    found := false
+	found := false
 
-    if _, err := os.Stat(moduleOptionsFilePath); err != nil {
-        if os.IsNotExist(err) {
-            // If the file does not exist, append the new option and return the options
-            return append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue)), nil
-        }
-        return nil, err
-    }
+	if _, err := os.Stat(moduleOptionsFilePath); err != nil {
+		if os.IsNotExist(err) {
+			// If the file does not exist, append the new option and return the options
+			return append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue)), nil
+		}
+		return nil, err
+	}
 
-    // File exists, if the option exists in the file, directly update the file, otherwise, append it and return the options
-    file, err := os.Open(moduleOptionsFilePath)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
+	// File exists, if the option exists in the file, directly update the file, otherwise, append it and return the options
+	file, err := os.Open(moduleOptionsFilePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
 		var updatedLines []string
-        line := scanner.Text()
-        if strings.HasPrefix(line, "options "+moduleName) {
-            fields := strings.Fields(line)
-            updatedLine := fields[:1]
-            for _, field := range fields[1:] {
-                if strings.HasPrefix(field, optionKey+"=") {
-                    // Update the existing option value
-                    updatedLine = append(updatedLine, optionKey+"="+optionValue)
-                } else {
-                    // Keep other options as they are
-                    updatedLine = append(updatedLine, field)
-                }
-            }
-            line = strings.Join(updatedLine, " ")
-            found = true
-        }
-        updatedLines = append(updatedLines, line)
+		line := scanner.Text()
+		if strings.HasPrefix(line, "options "+moduleName) {
+			fields := strings.Fields(line)
+			updatedLine := fields[:1]
+			for _, field := range fields[1:] {
+				if strings.HasPrefix(field, optionKey+"=") {
+					// Update the existing option value
+					updatedLine = append(updatedLine, optionKey+"="+optionValue)
+				} else {
+					// Keep other options as they are
+					updatedLine = append(updatedLine, field)
+				}
+			}
+			line = strings.Join(updatedLine, " ")
+			found = true
+		}
+		updatedLines = append(updatedLines, line)
 		// Directly write back to file as this is updating existing option
 		os.WriteFile(moduleOptionsFilePath, []byte(strings.Join(updatedLines, "\n")), 0644)
-    }
+	}
 
-    if err := scanner.Err(); err != nil {
-        return nil, err
-    }
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
 
-    if !found {
-        // If not found, append this new option
-        aggregatedOptions = append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue))
-    }
+	if !found {
+		// If not found, append this new option
+		aggregatedOptions = append(aggregatedOptions, fmt.Sprintf("options %s %s=%s", moduleName, optionKey, optionValue))
+	}
 
-    return aggregatedOptions, nil
+	return aggregatedOptions, nil
 }
 
 func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
