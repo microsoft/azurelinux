@@ -24,8 +24,8 @@
 
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
-Version:        1.44.0
-Release:        19%{?dist}
+Version:        1.52.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
