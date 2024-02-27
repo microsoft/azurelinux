@@ -21,7 +21,7 @@ Provides:       %{name}-gcrypt = %{release}-%{version}
 Provides:       %{name}-gnutls = %{release}-%{version}
 Provides:       %{name}-openssl = %{release}-%{version}
 Provides:       %{name}-nss = %{release}-%{version}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  nss-tools
 %endif
 

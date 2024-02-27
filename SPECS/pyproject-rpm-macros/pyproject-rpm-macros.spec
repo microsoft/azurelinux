@@ -41,7 +41,7 @@ Source303:      test_RECORD
 Source901:      README.md
 Source902:      LICENSE
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip

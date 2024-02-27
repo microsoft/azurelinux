@@ -32,7 +32,7 @@ BuildRequires:  python3-soupsieve
 %endif
 BuildRequires:  python3-lxml
 # html5lib BR just for test coverage
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-html5lib
 %endif
 

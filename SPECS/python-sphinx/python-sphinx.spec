@@ -49,7 +49,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-packaging
 BuildRequires:  python3-importlib-metadata
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-test
 BuildRequires:  python3-pytest
 BuildRequires:  python3-Cython
@@ -85,6 +85,8 @@ Requires:       python3-importlib-metadata
 
 Recommends:     ImageMagick
 Recommends:     graphviz
+
+Provides:       python3dist(sphinx)
 
 %description -n python%{python3_pkgversion}-sphinx
 Sphinx makes it easy to create intelligent and beautiful documentation.
@@ -223,6 +225,9 @@ pip install --upgrade \
 - Upgrade to version 7.2.6.
 - Import build and install section from Fedora 40 (license: MIT).
 - Disable some tests due to incompatible dependencies (html5lib, graphviz).
+
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.0-3
+- Add Provides python3dist(sphinx)
 
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.4.0-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).

@@ -57,7 +57,7 @@ Requires:       tdnf-cli-libs = %{version}-%{release}
 Requires:       zlib
 Obsoletes:      yum
 Provides:       yum
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  createrepo_c
 BuildRequires:  glib
 BuildRequires:  libxml2
