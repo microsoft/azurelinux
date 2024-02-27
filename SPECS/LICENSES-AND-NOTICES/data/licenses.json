@@ -1743,6 +1743,7 @@
                 "python-pytest-cov",
                 "python-pytest-expect",
                 "python-pytest-flake8",
+                "python-pytest-flakes",
                 "python-pytest-forked",
                 "python-pytest-mock",
                 "python-pytest-relaxed",
