@@ -8,16 +8,21 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-pam/
 Source0:        https://pypi.python.org/packages/source/p/python-pam/%{name}-%{version}.tar.gz
+Patch0:         fix-pyproject.patch
 BuildArch:      noarch
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
+BuildRequires:  python3-xml
 
 %description
 Python PAM module using ctypes
 
 %package -n     python3-pam
 Summary:        Python PAM module using ctypes
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
 
 %description -n python3-pam
@@ -27,13 +32,14 @@ Python PAM module using ctypes
 %autosetup -n python-pam-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files pam
 
 %check
-%python3 setup.py test
+%pytest
 
 %files -n python3-pam
 %defattr(-,root,root,-)
