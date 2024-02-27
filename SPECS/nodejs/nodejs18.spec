@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -17,6 +17,7 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
+Patch1:         CVE-2024-24806.patch
 
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
@@ -116,6 +117,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Tue Feb 27 2024 Suresh Thelkar <sthelkar@ieee.org> - 18.18.2-3
+- Patch CVE-2024-24806
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-2
 - Re-enable building debuginfo. We can just ignore the dirs conflict failure in the pipelines! :)
 
