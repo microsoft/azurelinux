@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
-Version:        2.3.1.1
-Release:        3%{?dist}
+Version:        2.9.0.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,9 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 27 2024 Henry Li <lihl@microsoft.com> - 2.9.0.4-1
+- Upgrade to version 2.9.0.4
+
 * Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
 - Add ephemeral-disk-warning.service
 
