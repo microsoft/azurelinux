@@ -14373,7 +14373,7 @@
         "type": "other",
         "other": {
           "name": "objectweb-asm",
-          "version": "7.2",
+          "version": "9.6",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/objectweb-asm-7.2.tar.xz"
         }
       }
