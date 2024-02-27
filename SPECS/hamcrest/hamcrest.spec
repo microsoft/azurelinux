@@ -21,7 +21,7 @@
 Summary:        Library of matchers for building test expressions
 Name:           hamcrest
 Version:        1.3
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -119,7 +119,7 @@ sed -i 's/\r//' LICENSE.txt
 
 %build
 export CLASSPATH=$(build-classpath qdox)
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dversion=%{version} -Dbuild.sysclasspath=last clean core generator library bigjar javadoc
+ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 -Dversion=%{version} -Dbuild.sysclasspath=last clean core generator library bigjar javadoc
 
 # inject OSGi manifests
 jar ufm build/%{name}-core-%{version}.jar %{SOURCE1}
@@ -188,6 +188,9 @@ cp -pr %{name}-examples %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.3-17
+- rebuild with msopenjdk-17
+
 * Mon Apr 3 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.3-16
 - Added provides for maven artifacts for core subpackage
 

@@ -18,7 +18,7 @@
 Summary:        Tool to extract class/interface/method definitions from sources
 Name:           qdox
 Version:        2.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -77,7 +77,7 @@ GRAMMAR_PATH=$(pwd)/src/grammar/parser.y && \
 
 # Build artifact
 mkdir -p build/classes
-javac -d build/classes -source 6 -target 6 \
+javac -d build/classes -source 8 -target 8 \
   $(find src/main/java -name \*.java)
 jar cf build/%{name}-%{version}.jar -C build/classes .
 
@@ -98,6 +98,9 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %doc README.md
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-3
+- rebuild with msopenjdk-17
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.0-2
 - Move to SPECS
 

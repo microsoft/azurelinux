@@ -94,7 +94,7 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 %{_javadir}/JFlex.jar
 
 %changelog
-* Tue Feb 27 2024 Riken Maharjan <pawelwi@microsoft.com> - 1.9.1-2
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.9.1-2
 - rebuild with msopenjdk-17
 
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.1-1
