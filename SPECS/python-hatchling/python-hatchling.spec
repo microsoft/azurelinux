@@ -76,7 +76,7 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
 
 
 %check
-%if %{with_check}
+%if 0%{?with_check}
 %pytest
 %endif
 

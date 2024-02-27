@@ -9,7 +9,7 @@ Group:          Applications/File
 URL:            https://www.gnu.org/software/grep
 Source0:        https://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
 BuildRequires:  pcre2-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Find)
 %endif
 Conflicts:      toybox

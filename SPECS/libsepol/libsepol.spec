@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/archive/refs/tags/%{version}.tar.gz#/selinux-%{version}.tar.gz
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  bison
 BuildRequires:  CUnit-devel
 BuildRequires:  flex

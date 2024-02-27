@@ -22,7 +22,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  pcsc-lite-devel
 BuildRequires:  readline-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  libcmocka-devel
 BuildRequires:  softhsm
 BuildRequires:  vim-extra
@@ -55,7 +55,7 @@ autoreconf -fvi
   --disable-notify \
   --disable-assert \
   --enable-pcsc \
-%if %{with_check}
+%if 0%{?with_check}
   --enable-cmocka \
 %endif
   --enable-sm \

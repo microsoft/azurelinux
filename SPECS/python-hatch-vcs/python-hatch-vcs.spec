@@ -70,7 +70,7 @@ Summary:        %{summary}
 
 
 %check
-%if %{with_check}
+%if 0%{?with_check}
 %if %{with tests}
 %pytest
 %else

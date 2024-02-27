@@ -34,7 +34,7 @@ BuildRequires:  glib2-devel
 # For bash-completion.
 BuildRequires:  bash-completion
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  coreutils
 BuildRequires:  gcc-c++
 BuildRequires:  gnutls-utils
