@@ -2,16 +2,22 @@
 %global sum ANSI Color formatting for output in terminal
 Summary:        %{sum}
 Name:           python-%{pypi_name}
-Version:        1.1.0
-Release:        30%{?dist}
+Version:        2.4.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/termcolor/
-Source0:        https://files.pythonhosted.org/packages/source/t/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/10/56/d7d66a84f96d804155f6ff2873d065368b25a07222a6fd51c4f24ef6d764/termcolor-2.4.0.tar.gz
+Patch0:         0001-PATCH-change-build-backend-to-flit.patch
+
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildArch:      noarch
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-wheel
 
 %description
 ANSI Color formatting for output in terminal.
@@ -24,28 +30,26 @@ Summary:        %{sum}
 A Python 3 version of ANSI Color formatting for output in terminal.
 
 %prep
-%setup -q -n %{pypi_name}-%{version}
-
+%autosetup -p1 -n %{pypi_name}-%{version}
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{pypi_name}
+ 
+%check
+%pytest
 
-
-%files -n python3-%{pypi_name}
-%doc README.rst
+%files -n python3-%{pypi_name} -f %{pyproject_files}
+%doc CHANGES.md README.md
 %license COPYING.txt
-%{python3_sitelib}/%{pypi_name}.py*
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
-
-# there is an asterisk in the name of the file,
-# because sometimes the suffix of the architecture is added
-%{python3_sitelib}/__pycache__/%{pypi_name}.cpython-%{python3_version_nodots}*.py?
 
 %changelog
+* Tue Feb 27 2024 Yash Panchal <yashpanchal@microsoft.com> - 2.4.0-1
+- Update to 2.4.0
+
 * Fri Oct 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 1.1.0-30
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.
