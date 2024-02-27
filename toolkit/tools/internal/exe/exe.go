@@ -15,8 +15,8 @@ import (
 // ToolkitVersion specifies the version of the toolkit and the reported version of all tools in it.
 var ToolkitVersion = ""
 
-// DistroNameAbreviation is the short form of the distro used for conditional tests (i.e. 'azl')
-var DistroNameAbreviation = ""
+// DistroNameAbbreviation is the short form of the distro used for conditional tests (i.e. 'azl')
+var DistroNameAbbreviation = ""
 
 // DistroMajorVersion is the major version of the distro used for conditional tests (i.e. 3)
 var DistroMajorVersion = ""

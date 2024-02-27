@@ -14,7 +14,7 @@ fi
 
 # Additional macros required to parse spec files.
 DIST_TAG=$(make -s -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
-DISTRO_MACRO="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-distro-macro)"
+DISTRO_MACRO="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-DIST_VERSION_MACRO)"
 
 DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 

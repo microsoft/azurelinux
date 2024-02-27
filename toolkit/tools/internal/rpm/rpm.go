@@ -94,7 +94,7 @@ var (
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
 	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
-	distNameAbreviation = exe.DistroNameAbreviation
+	distNameAbreviation = exe.DistroNameAbbreviation
 	distMajorVersion    = exe.DistroMajorVersion
 )
 

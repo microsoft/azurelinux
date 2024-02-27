@@ -256,7 +256,7 @@ func TestDistroDefines(t *testing.T) {
 }
 
 func TestDefaultDefines(t *testing.T) {
-	if exe.DistroMajorVersion == "" && exe.DistroNameAbreviation == "" {
+	if exe.DistroMajorVersion == "" && exe.DistroNameAbbreviation == "" {
 		t.Skip("Skipping test because distro name and version are not set")
 	}
 	distTag := "testDistroTag"
