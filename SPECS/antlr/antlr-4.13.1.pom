@@ -3,7 +3,7 @@
   <groupId>antlr</groupId>
   <artifactId>antlr</artifactId>
   <packaging>jar</packaging>
-  <version>2.7.7</version>
+  <version>4.13.1</version>
   <name>AntLR Parser Generator</name>
   <description>
     A framework for constructing recognizers, compilers,
