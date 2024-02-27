@@ -18,7 +18,7 @@
 Summary:        Lexical Analyzer Generator for Java
 Name:           jflex-bootstrap
 Version:        1.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -69,7 +69,7 @@ cd jflex
 pushd src
 export CLASSPATH=$(build-classpath java-cup java-cup-runtime junit antlr-bootstrap)
 export OPT_JAR_LIST=:
-%{ant} -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 jar
+%{ant} -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 jar
 popd
 
 %install
@@ -94,6 +94,9 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 %{_javadir}/JFlex.jar
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <pawelwi@microsoft.com> - 1.9.1-2
+- rebuild with msopenjdk-17
+
 * Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.1-1
 - Auto-upgrade to 1.9.1 - Azure Linux 3.0 - package upgrades
 
