@@ -2,7 +2,7 @@
 %define _tdnfpluginsdir %{_libdir}/tdnf-plugins
 %define _tdnf_history_db_dir %{_libdir}/sysimage/tdnf
 
-Summary:        dnf/yum equivalent using C libs
+Summary:        dnf equivalent using C libs
 Name:           tdnf
 Version:        3.5.6
 Release:        1%{?dist}
@@ -51,7 +51,6 @@ Requires:       rpm-libs
 Requires:       tdnf-cli-libs = %{version}-%{release}
 Requires:       zlib
 Obsoletes:      yum
-Provides:       yum
 %if %{with_check}
 BuildRequires:  createrepo_c
 BuildRequires:  glib
@@ -62,7 +61,7 @@ BuildRequires:  python3-xml
 %endif
 
 %description
-tdnf is a yum/dnf equivalent which uses libsolv and libcurl
+tdnf is a dnf equivalent which uses libsolv and libcurl
 
 %package    devel
 Summary:        A Library providing C API for tdnf
@@ -138,8 +137,6 @@ cd build && make %{?_smp_mflags} check
 find %{buildroot} -name '*.a' -delete -print
 mkdir -p %{buildroot}%{_var}/cache/tdnf
 mkdir -p %{buildroot}%{_tdnf_history_db_dir}
-ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tyum
-ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/yum
 ln -sf %{_bindir}/tdnf %{buildroot}%{_bindir}/tdnfj
 install -v -D -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/tdnf-cache-updateinfo
 install -v -D -m 0644 %{SOURCE2} %{buildroot}%{_libdir}/systemd/system/tdnf-cache-updateinfo.service
@@ -175,8 +172,6 @@ fi
 %{_bindir}/tdnf-cache-updateinfo
 %{_bindir}/tdnf-config
 %{_bindir}/tdnfj
-%{_bindir}/tyum
-%{_bindir}/yum
 %{_datadir}/bash-completion/completions/tdnf
 %{_libdir}/libtdnf.so.3
 %{_libdir}/libtdnf.so.3.*
@@ -223,6 +218,7 @@ fi
 * Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.6-1
 - Upgrade tdnf to version 3.5.6 for Azure Linux 3.0
 - Remove patches which are no longer needed
+- remove yum and tyum symlinks and references
 
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.5.2-3
 - Fix and rename patch tdnf-default-mariner-release.patch file into tdnf-default-azurelinux-release.patch with new changed azure linux OS files.
