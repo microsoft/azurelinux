@@ -11,11 +11,11 @@ at flit_core.buildapi.}
 
 Summary:        PEP 517 build backend for packages using Flit.
 Name:           python-%{srcname}-core
-Version:        3.7.1
-Release:        2%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://flit.readthedocs.io/en/latest/
 Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 
@@ -59,6 +59,9 @@ rm -r %{buildroot}%{python3_sitelib}/flit_core/tests/
 %{python3_sitelib}/flit_core/
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.0-1
+- Auto-upgrade to 3.9.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Mar 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.1-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - License verified.

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           latencytop
 Version:        0.5
 Release:        27%{?dist}
@@ -50,10 +50,10 @@ This package contains files needed by both the GUI and TUI builds of LatencyTOP.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p2
-%patch3 -p2
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p2
+%patch 3 -p2
 mv %{SOURCE1} ./LICENSE.txt
 
 %build

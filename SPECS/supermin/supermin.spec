@@ -20,18 +20,18 @@
 
 Summary:        Tool for creating supermin appliances
 Name:           supermin
-Version:        5.2.1
-Release:        5%{?dist}
+Version:        5.2.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libguestfs/supermin
 Source0:        https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
 # For automatic RPM dependency generation.
 # See: http://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
 Source3:        supermin.attr
 Source4:        supermin-find-requires
-Patch0:         %{name}-mariner.patch
+Patch0:         %{name}-azurelinux.patch
 
 BuildRequires:  %{_bindir}/pod2html
 BuildRequires:  %{_bindir}/pod2man
@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.38-1%{?dist}
 %endif
 
 %if %{with_check}
@@ -71,7 +71,7 @@ Requires:       dnf-plugins-core
 # RHBZ#771310
 Requires:       e2fsprogs-libs >= 1.42
 Requires:       findutils
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       rpm
 Requires:       tar
 Requires:       util-linux-ng
@@ -115,7 +115,7 @@ install -m 0755 %{SOURCE4} %{buildroot}%{_rpmconfigdir}/
 %check
 make check || {
     cat tests/test-suite.log
-    exit 1
+    false
 }
 
 %files
@@ -129,6 +129,28 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
+- Auto-upgrade to 5.2.2
+
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.2.1-11
+- Fix patch file with new changed azure linux OS files.
+- Update the runtime dependency from mariner-release to azurelinux-release
+
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-10
+- Bump release to rebuild against glibc 2.38-1
+
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 5.2.1-9
+- Bump release to rebuild against glibc 2.35-6
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 5.2.1-8
+- Bump release to rebuild against glibc 2.35-5
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.2.1-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Fri Sep 15 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-6
+- Removing 'exit 1' from the '%%check' section.
+
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 5.2.1-5
 - Bump release to rebuild against glibc 2.35-4
 

@@ -45,14 +45,12 @@ func Move(src, dst string) (err error) {
 
 	src, err = filepath.Abs(src)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move source (%s).", src)
-		return
+		return fmt.Errorf("failed to get absolute path for move source (%s):\n%w", src, err)
 	}
 
 	dst, err = filepath.Abs(dst)
 	if err != nil {
-		logger.Log.Errorf("Failed to get absolute path for move destination (%s).", dst)
-		return
+		return fmt.Errorf("failed to get absolute path for move destination (%s):\n%w", dst, err)
 	}
 
 	if src == dst {
@@ -84,6 +82,15 @@ func Copy(src, dst string) (err error) {
 // dst is assumed to be a file and not a directory. Will change the permissions to the given value.
 func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
 	return copyWithPermissions(src, dst, dirmode, true, filemode)
+}
+
+// Read reads a string from the file src.
+func Read(src string) (data string, err error) {
+	logger.Log.Debugf("Reading from (%s)", src)
+
+	bytes, err := os.ReadFile(src)
+	data = string(bytes)
+	return
 }
 
 // readLines reads file under path and returns lines as strings and any error encountered
@@ -119,13 +126,7 @@ func Create(dst string, perm os.FileMode) (err error) {
 func Write(data string, dst string) (err error) {
 	logger.Log.Debugf("Writing to (%s)", dst)
 
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer dstFile.Close()
-
-	_, err = dstFile.WriteString(data)
+	err = os.WriteFile(dst, []byte(data), 0o666)
 	return
 }
 
@@ -259,6 +260,25 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		return fmt.Errorf("source (%s) is not a file", src)
 	}
 
+	err = createDestinationDir(dst, dirmode)
+	if err != nil {
+		return
+	}
+
+	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
+	if err != nil {
+		return
+	}
+
+	if changeMode {
+		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
+		err = os.Chmod(dst, filemode)
+	}
+
+	return
+}
+
+func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -282,15 +302,39 @@ func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, 
 		}
 	}
 
-	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
-	if err != nil {
-		return
-	}
-
-	if changeMode {
-		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
-		err = os.Chmod(dst, filemode)
-	}
-
 	return
+}
+
+// CopyResourceFile copies a file from an embedded binary resource file.
+func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
+	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
+
+	err := createDestinationDir(dst, dirmode)
+	if err != nil {
+		return err
+	}
+
+	source, err := srcFS.Open(srcFile)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open source:\n%w", srcFile, dst, err)
+	}
+	defer source.Close()
+
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE, filemode)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open destination:\n%w", srcFile, dst, err)
+	}
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to copy bytes:\n%w", srcFile, dst, err)
+	}
+
+	err = os.Chmod(dst, filemode)
+	if err != nil {
+		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to set filemode:\n%w", srcFile, dst, err)
+	}
+
+	return nil
 }

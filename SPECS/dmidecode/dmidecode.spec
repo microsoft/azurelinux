@@ -7,7 +7,7 @@ URL:		http://www.nongnu.org/dmidecode/
 Group:		System Environment/Base
 Source0:	https://download.savannah.gnu.org/releases/dmidecode/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %description
 Dmidecode reports information about your system's hardware as described in your system BIOS according to the SMBIOS/DMI standard. This information typically includes system manufacturer, model name, serial number, BIOS version, asset tag as well as a lot of other details of varying level of interest and reliability depending on the manufacturer. This will often include usage status for the CPU sockets, expansion slots (e.g. AGP, PCI, ISA) and memory module slots, and the list of I/O ports (e.g. serial, parallel, USB).
 

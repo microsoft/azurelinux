@@ -1,10 +1,10 @@
 Summary:        A macro processor
 Name:           m4
 Version:        1.4.19
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/m4
 Source0:        https://ftp.gnu.org/gnu/m4/%{name}-%{version}.tar.gz
@@ -37,6 +37,9 @@ make  %{?_smp_mflags}  check
 %{_datadir}/locale/*/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.19-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Nov 24 2021 Andrew Phelps <anphel@microsoft.com> 1.4.19-1
 - Update to version 1.4.19
 - Remove patches

@@ -1,10 +1,10 @@
 Summary:        Utilities for manipulating .desktop files
 Name:           desktop-file-utils
-Version:        0.26
+Version:        0.27
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/software/desktop-file-utils
 Source0:        https://www.freedesktop.org/software/desktop-file-utils/releases/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
@@ -45,6 +45,9 @@ update-desktop-database &> /dev/null || :
 %{_mandir}/*
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.27-1
+- Auto-upgrade to 0.27 - Azure Linux 3.0 Upgrades
+
 * Thu Jan 20 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 0.26-1
 - Upgrade to 0.26.
 

@@ -1,10 +1,10 @@
 Name:           perl-IO-HTML
-Version:        1.001
-Release:        18%{?dist}
+Version:        1.004
+Release:        1%{?dist}
 Summary:        Open an HTML file with automatic character set detection
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-HTML
 Source0:        https://cpan.metacpan.org/authors/id/C/CJ/CJM/IO-HTML-%{version}.tar.gz#/perl-IO-HTML-%{version}.tar.gz
 BuildArch:      noarch
@@ -47,6 +47,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.004-1
+- Auto-upgrade to 1.004 - Azure Linux 3.0 - package upgrades
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 1.001-18
 - License Verified
 

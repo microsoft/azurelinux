@@ -1,0 +1,11 @@
+--- mutt-2.2.12/doc/Makefile.am.orig	2023-09-21 10:26:53.361364768 +0000
++++ mutt-2.2.12/doc/Makefile.am	2023-09-21 10:30:28.069062994 +0000
+@@ -151,7 +151,7 @@ uninstall-local:
+ 
+ check:
+ manual.txt: manual.html
+-	-LC_ALL=C lynx -localhost -dump -nolist -nonumbers -with_backspaces -display_charset=us-ascii manual.html > $@ || \
++	-LC_ALL=C lynx -localhost -dump -nolist -nonumbers -display_charset=us-ascii manual.html > $@ || \
+ 	LC_ALL=C w3m -T text/html -I utf-8 -O utf-8 -dump < manual.html > $@ || \
+ 	LC_ALL=C elinks -dump -no-numbering -no-references manual.html | sed -e 's,\\001, ,g' > $@
+ 

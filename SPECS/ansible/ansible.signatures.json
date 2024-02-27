@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "ansible-2.12.1.tar.gz": "69b3cdeb56513fffad95bee5323f4f96a04d5bcc9236d9897cf603eb2a50959c"
- }
+  "Signatures": {
+    "ansible-2.15.3.tar.gz": "1ce23850aefcee176931d3f4f190af8c87461e63b90d0a84a3188d30a83343c2"
+  }
 }

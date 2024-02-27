@@ -1,18 +1,17 @@
 Summary:        Programs for searching through files
 Name:           grep
-Version:        3.7
+Version:        3.11
 Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/grep
 Source0:        https://ftp.gnu.org/gnu/grep/%{name}-%{version}.tar.xz
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 %if %{with_check}
 BuildRequires:  perl(File::Find)
 %endif
-Requires:       pcre
 Conflicts:      toybox
 
 %description
@@ -57,6 +56,12 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Thu Dec 09 2023 Andrew Phelps <anphel@microsoft.com> - 3.11-2
+- Rebuild with PCRE2
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.11-1
+- Auto-upgrade to 3.11 - Azure Linux 3.0 - package upgrades
+
 * Wed Feb 23 2022 Muhammad Falak <mwani@microsoft.com> 3.7-2
 - Tweak configure opts `--with-included-regex`
 - Add an explicit BR on `perl(File::Find)` to enable ptest

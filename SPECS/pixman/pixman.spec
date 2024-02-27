@@ -1,10 +1,10 @@
 Summary:        Pixel manipulation library
 Name:           pixman
-Version:        0.42.2
+Version:        0.43.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/pixman/pixman
 Source0:        https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 
@@ -57,6 +57,9 @@ sed -i 's/120/600/' test/meson.build
 %{_libdir}/pkgconfig/pixman-1.pc
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.43.2-1
+- Auto-upgrade to 0.43.2 - Azure Linux 3.0 Upgrades
+
 * Mon Nov 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.42.2-1
 - Auto-upgrade to 0.42.2 - CVE-2022-44638
 

@@ -4,12 +4,12 @@
 Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
-Version:        0.7.1
-Release:        13%{?dist}
+Version:        0.11.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -42,6 +42,15 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.11.2-1
+- Auto-upgrade to 0.11.2 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-15
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.7.1-14
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-13
 - Bump release to rebuild with go 1.19.12
 

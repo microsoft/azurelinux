@@ -1,12 +1,12 @@
 Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Text-Template
-Version:        1.60
+Version:        1.61
 Release:        1%{?dist}
 URL:            https://metacpan.org/pod/Text::Template
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://cpan.metacpan.org/authors/id/M/MS/MSCHOUT/Text-Template-%{version}.tar.gz
 
 BuildArch:      noarch
@@ -43,6 +43,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.61-1
+- Auto-upgrade to 1.61 - Azure Linux 3.0 - package upgrades
+
 *   Fri Apr 22 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.60-1
 -   Update to 1.60
 

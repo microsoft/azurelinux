@@ -1,0 +1,66 @@
+#!/bin/sh
+set -e
+
+. "$pkgdatadir/grub-mkconfig_lib"
+
+cat <<EOF
+menuentry "Dom0" {
+    search --no-floppy --set=root --file /HvLoader.efi
+    chainloader /HvLoader.efi lxhvloader.dll MSHV_ROOT=\\\\Windows MSHV_ENABLE=TRUE MSHV_SCHEDULER_TYPE=ROOT MSHV_X2APIC_POLICY=ENABLE MSHV_SEV_SNP=TRUE MSHV_LOAD_OPTION=INCLUDETRACEMETADATA=1
+    boot
+EOF
+
+# btrfs may reside on multiple devices. We cannot pass them as value of root= parameter
+# and mounting btrfs requires user space scanning, so force UUID in this case.
+if ( [ "x${GRUB_DEVICE_UUID}" = "x" ] && [ "x${GRUB_DEVICE_PARTUUID}" = "x" ] ) \
+    || ( [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ] \
+	&& [ "x${GRUB_DISABLE_LINUX_PARTUUID}" = "xtrue" ] ) \
+    || ( ! test -e "/dev/disk/by-uuid/${GRUB_DEVICE_UUID}" \
+	&& ! test -e "/dev/disk/by-partuuid/${GRUB_DEVICE_PARTUUID}" ) \
+    || ( test -e "${GRUB_DEVICE}" && uses_abstraction "${GRUB_DEVICE}" lvm ); then
+  LINUX_ROOT_DEVICE=${GRUB_DEVICE}
+elif [ "x${GRUB_DEVICE_UUID}" = "x" ] \
+    || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ]; then
+  LINUX_ROOT_DEVICE=PARTUUID=${GRUB_DEVICE_PARTUUID}
+else
+  LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
+fi
+
+list=
+for i in /boot/vmlinuz*mshv*; do
+    if grub_file_is_not_garbage "$i" ; then list="$list $i" ; fi
+done;
+initrd_list=
+for i in /boot/initrd.img*mshv*; do
+    if grub_file_is_not_garbage "$i" ; then initrd_list="$initrd_list $i" ; fi
+done;
+
+prepare_boot_cache=
+prepare_root_cache=
+boot_device_id=
+
+linux=`version_find_latest $list`
+basename=`basename $linux`
+dirname=`dirname $linux`
+rel_dirname=`make_system_path_relative_to_its_root $dirname`
+version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
+linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
+
+initrd=`version_find_latest $initrd_list`
+initrd_basename=`basename $initrd`
+
+if [ x$dirname = x/ ]; then
+    if [ -z "${prepare_root_cache}" ]; then
+        prepare_root_cache="$(prepare_grub_to_access_device ${GRUB_DEVICE} | grub_add_tab)"
+    fi
+    printf '%s\n' "${prepare_root_cache}" | sed "s/^/$submenu_indentation/"
+else
+    if [ -z "${prepare_boot_cache}" ]; then
+        prepare_boot_cache="$(prepare_grub_to_access_device ${GRUB_DEVICE_BOOT} | grub_add_tab)"
+    fi
+    printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
+fi
+
+printf '\t%s\n' "linux ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+printf '\t%s\n' "initrd ${rel_dirname}/${initrd_basename}"
+printf '}\n'

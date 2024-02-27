@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "ruby-kafka-1.4.0.tar.gz": "2217ab0b5a2f1301e7aef4244463d7db88e20a90a3c31aeafaf289409318a8ed"
- }
+  "Signatures": {
+    "ruby-kafka-1.5.1.tar.gz": "45b755d457e6af371920ba47480be89a87495ce5d7c7f287c5375b9dc259909c"
+  }
 }

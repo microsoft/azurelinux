@@ -1,10 +1,10 @@
 Summary:        A collection of PIN or passphrase entry dialogs
 Name:           pinentry
-Version:        1.2.0
+Version:        1.2.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Cryptography
 URL:            https://gnupg.org/software/pinentry/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
@@ -41,6 +41,9 @@ They utilize the Assuan protocol as specified in the Libassuan manual.
 %exclude %{_infodir}/dir
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.2.1-1
+- Upgrade to 1.2.1
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.2.0-1
 - Upgrade to latest upstream
 - Better specify build/runtime requirements

@@ -1,12 +1,12 @@
 Summary:        Programs that show the differences between files or directories
 Name:           diffutils
-Version:        3.8
+Version:        3.10
 Release:        1%{?dist}
 License:        GPLv3+
 URL:            http://www.gnu.org/software/diffutils
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/diffutils/%{name}-%{version}.tar.xz
 BuildRequires:  coreutils
 Conflicts:      toybox
@@ -42,6 +42,12 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.10-1
+- Auto-upgrade to 3.10 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.8-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Oct 20 2021 Andrew Phelps <anphel@microsoft.com> 3.8-1
 - Update to version 3.8
 - License verified

@@ -1,17 +1,18 @@
 Summary:        Library providing support for "XML Signature" and "XML Encryption" standards
 Name:           xmlsec1
-Version:        1.2.34
+Version:        1.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.aleksey.com/xmlsec
-Source0:        %{url}/download/%{name}-%{version}.tar.gz
+Source0:        https://www.aleksey.com/xmlsec/download/older-releases/%{name}-%{version}.tar.gz
 BuildRequires:  gnutls-devel
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libltdl-devel
 BuildRequires:  libxml2-devel
+BuildRequires:  libxslt-devel
 BuildRequires:  nss-devel
 Requires:       libltdl
 Requires:       libxml2
@@ -104,6 +105,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_mandir}/man1/xmlsec1-config.1.gz
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.1-1
+- Auto-upgrade to 1.3.1 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 02 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.34-2
+- Adding BR for 'libxslt-devel' to fix a build issue.
+
 * Fri Sep 23 2022 Andrew Phelps <anphel@microsoft.com> - 1.2.34-1
 - Update to version 1.2.34
 - Add nss-tools to fix check tests

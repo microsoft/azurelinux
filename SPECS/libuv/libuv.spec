@@ -1,10 +1,10 @@
 Summary:        Cross-platform asynchronous I/O
 Name:           libuv
-Version:        1.43.0
+Version:        1.46.0
 Release:        1%{?dist}
 License:        MIT AND CC-BY
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://libuv.org/
 Source0:        https://dist.libuv.org/dist/v%{version}/%{name}-v%{version}.tar.gz
@@ -75,6 +75,9 @@ sudo -u test make -k check
 %{_libdir}/%{name}.a
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.46.0-1
+- Auto-upgrade to 1.46.0 - Azure Linux 3.0 - package upgrades
+
 * Tue Jan 25 2022 Henry Li <lihl@microsoft.com> - 1.43.0-1
 - Upgrade to version 1.43.0
 - License Verified

@@ -1,8 +1,8 @@
 Name:           nss_wrapper
-Version:        1.1.12
+Version:        1.1.15
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        BSD
 Summary:        A wrapper for the user, group and hosts NSS API
 URL:            https://cwrap.org/
@@ -82,6 +82,9 @@ popd
 %{_mandir}/man1/nss_wrapper.1*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.15-1
+- Auto-upgrade to 1.1.15 - Azure Linux 3.0 - package upgrades
+
 * Mon Jul 25 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.1.12-1
 - Bumping version to 1.1.12
 - Remove gpg signature check.

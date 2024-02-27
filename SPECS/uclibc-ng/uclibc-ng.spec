@@ -3,11 +3,11 @@
 %global debug_package %{nil}
 Summary:        C library for embedded Linux
 Name:           uclibc-ng
-Version:        1.0.43
+Version:        1.0.44
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.uclibc.org/
 Source0:        https://downloads.uclibc-ng.org/releases/%{version}/%{uclibc_name}-%{version}.tar.xz
 Source1:        uClibc.config
@@ -82,6 +82,9 @@ rm -rf  %{buildroot}/include/
 %{_libdir}/uClibc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.44-1
+- Auto-upgrade to 1.0.44 - Azure Linux 3.0 - package upgrades
+
 * Wed Jul 05 2023 Muhammad Falak <mwani@microsoft.com> - 1.0.43-1
 - Bump version to 1.0.43 to fix CVE-2022-29503.
 

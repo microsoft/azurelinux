@@ -1,11 +1,11 @@
 
 Summary:        Maven Resources Plugin
 Name:           maven-resources-plugin
-Version:        3.2.0
-Release:        9%{?dist}
+Version:        3.3.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-resources-plugin
 Source0:        https://repo1.maven.org/maven2/org/apache/maven/plugins/%{name}/%{version}/%{name}-%{version}-source-release.zip
 BuildRequires:  javapackages-bootstrap
@@ -38,6 +38,9 @@ API documentation for %{name}.
 %license LICENSE NOTICE
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.1-1
+- Auto-upgrade to 3.3.1 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.0-9
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - License verified

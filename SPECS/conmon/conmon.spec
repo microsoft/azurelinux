@@ -7,11 +7,11 @@
 %endif
 Summary:        OCI container runtime monitor
 Name:           conmon
-Version:        2.1.0
+Version:        2.1.8
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/containers/conmon
 #Source0:       https://github.com/containers/conmon/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -52,6 +52,9 @@ make PREFIX=%{buildroot}%{_prefix} install install.crio
 %dir %{_libexecdir}/crio
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.8-1
+- Auto-upgrade to 2.1.8 - Azure Linux 3.0 - package upgrades
+
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-1
 - Upgrade to latest version 2.1.0.
 - Updated SPEC file with required 2.1.0 version compatibility.

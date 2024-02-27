@@ -1,10 +1,10 @@
 Summary:        C debugger
 Name:           gdb
-Version:        11.2
+Version:        13.2
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/gdb
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
@@ -59,6 +59,7 @@ rm %{buildroot}%{_includedir}/dis-asm.h
 rm %{buildroot}%{_libdir}/libbfd.a
 rm %{buildroot}%{_libdir}/libopcodes.a
 rm %{buildroot}%{_libdir}/libctf*.a
+rm %{buildroot}%{_libdir}/libsframe.a
 rm %{buildroot}%{_datadir}/locale/de/LC_MESSAGES/opcodes.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/bfd.mo
 rm %{buildroot}%{_datadir}/locale/fi/LC_MESSAGES/opcodes.mo
@@ -88,6 +89,12 @@ rm -f $(dirname $(gcc -print-libgcc-file-name))/../specs
 %{_mandir}/*/*
 
 %changelog
+* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 13.2-1
+- Upgrade to version 13.2
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 11.2-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 11 2022 Fanzhe Lyu <falyu@microsoft.com> - 11.2
 - Upgrade to gdb 11.2
 

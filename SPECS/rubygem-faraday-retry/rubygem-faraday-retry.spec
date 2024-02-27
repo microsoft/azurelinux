@@ -2,11 +2,11 @@
 %global gem_name faraday-retry
 Summary:        Catches exceptions and retries each request a limited number of times
 Name:           rubygem-%{gem_name}
-Version:        1.0.1
+Version:        2.2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-retry
 Source0:        https://github.com/lostisland/faraday-retry/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.0-1
+- Auto-upgrade to 2.2.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.1-1
 - License verified
 - Original version for CBL-Mariner

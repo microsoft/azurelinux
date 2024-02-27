@@ -3,11 +3,11 @@
 %global luapkgdir %{_datadir}/lua/%{luaver}
 Summary:        Round Robin Database Tool to store and display time-series data
 Name:           rrdtool
-Version:        1.7.2
+Version:        1.8.0
 Release:        1%{?dist}
 License:        GPLv2 OR GPLv2 WITH FLOSS License Exception
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://oss.oetiker.ch/rrdtool/
 Source0:        https://github.com/oetiker/rrdtool-1.x/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -161,6 +161,9 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.0-1
+- Auto-upgrade to 1.8.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 03 2022 Chris Co <chrco@microsoft.com> - 1.7.2-1
 - Update to 1.7.2.
 

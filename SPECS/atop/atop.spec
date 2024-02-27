@@ -1,18 +1,18 @@
 %define _hardened_build 1
 Summary:        An advanced interactive monitor to view the load on system and process level
 Name:           atop
-Version:        2.6.0
-Release:        8%{?dist}
+Version:        2.9.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.atoptool.nl
 Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d
-Patch0:         nvme_support.patch
-Patch1:         atop-sysconfig.patch
-Patch2:         atop-2.3.0-newer-gcc.patch
-Patch3:         9cb119713b5e6be43671fe1856fb4bd49ff91fa7.patch
+
+Patch0:         atop-sysconfig.patch
+Patch1:         format.patch
+
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  ncurses-devel
@@ -41,10 +41,8 @@ http://www.atcomputing.nl/Tools/atop/kernpatch.html
 
 %prep
 %setup -q
-%patch0  -b .nvme
-%patch1  -b .sysconfig
-%patch2 -p1 -b .newer-gcc
-%patch3 -p1 -b .service
+%patch 0  -b .sysconfig
+%patch 1  -b .format
 
 # Correct unit file path
 sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service
@@ -78,7 +76,7 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 
 %files
 %license COPYING
-%doc AUTHOR README*
+%doc AUTHORS README*
 %config(noreplace) %{_sysconfdir}/sysconfig/atop
 %{_bindir}/atopsar
 %{_bindir}/atop
@@ -93,6 +91,13 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 %{_sbindir}/atopacctd
 
 %changelog
+* Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.0-1
+- Bump version to 2.9.0
+- Drop un-needed patches
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.6.0-9
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Mar 27 2023 Betty Lakes <bettylakes@microsoft.com> - 2.6.0-8
 - License verified
 - Remove distro specific macros 
@@ -153,7 +158,7 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.3.0-10
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild

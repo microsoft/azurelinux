@@ -7,11 +7,11 @@ on:
   push:
     paths:
       - '**.spec'
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
   pull_request:
     paths:
       - '**.spec'
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
 jobs:
   spec-lint:

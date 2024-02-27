@@ -17,11 +17,11 @@
 
 Summary:        CLI for managing resources in InfluxDB
 Name:           influx-cli
-Version:        2.6.1
-Release:        11%{?dist}
+Version:        2.7.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/influx-cli
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -81,6 +81,15 @@ bin/influx completion zsh > %{buildroot}/%{_datadir}/zsh/site-functions/_influx
 %{_datadir}/zsh
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.3-1
+- Upgrade to version 2.7.3
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-13
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 2.6.1-12
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.1-11
 - Bump release to rebuild with go 1.19.12
 

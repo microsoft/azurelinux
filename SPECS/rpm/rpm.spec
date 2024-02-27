@@ -1,10 +1,10 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.18.0
-Release:        3%{?dist}
+Version:        4.18.1
+Release:        2%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://rpm.org
 Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
@@ -146,6 +146,8 @@ rm -r docs/man/{fr,ja,ko,pl,ru,sk}
 %make_build
 
 pushd python
+# prevent error: could not create 'rpm.egg-info': File exists
+rm -vf %{_topdir}/BUILD/%{name}-%{version}/python/rpm.egg-info
 %py3_build
 popd
 
@@ -281,6 +283,15 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 07 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-2
+- Remove conflicting `rpm.egg-info` file
+
+* Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-1
+- Upgrade to version 4.18.1
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.18.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jun 15 2023 Andrew Phelps <anphel@microsoft.com> - 4.18.0-3
 - Remove brp-strip-debug-symbols and brp-strip-unneeded scripts
 

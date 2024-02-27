@@ -17,21 +17,21 @@
 # https://bugzilla.redhat.com/show_bug.cgi?id=1780584
 
 # enable rdma as we will only build for ARM64 and AMD64
-%bcond_without rdma 
+%bcond_without rdma
 
 # enable java openmpi subpackage by default
-%bcond_without java 
+%bcond_without java
 
 # Private openmpi libraries
 %global __provides_exclude_from %{_libdir}/openmpi/lib/(lib(mca|ompi|open-(pal|rte|trace))|openmpi/).*.so
 %global __requires_exclude lib(mca|ompi|open-(pal|rte|trace)|vt).*
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
-Version:        4.1.4
-Release:        9%{?dist}
+Version:        4.1.5
+Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.open-mpi.org/
 # We can't use %%{name} here because of _cc_name_suffix
 Source0:        https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-%{version}.tar.bz2
@@ -229,6 +229,7 @@ make check
 %{_libdir}/%{name}/bin/oshrun
 %{_libdir}/%{name}/bin/shmemrun
 %endif
+%{_libdir}/libOpenIPMIglib.so*
 %{_libdir}/%{name}/lib/*.so.40*
 %{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
 %{_libdir}/%{name}/lib/libmca*.so.41*
@@ -303,6 +304,18 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
+* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.5-2
+- Update file list
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
+- Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
+
+* Tue Sep 26 2023 Sumedh Sharma <sumsharma@microsoft.com> - 4.1.4-11
+- Bump version to recompile with pmix update for CVE-2023-41915
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.4-10
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.4-9
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License Verified.
@@ -529,7 +542,7 @@ make check
 - Rebuild with new flags from redhat-rpm-config
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.1.1-9
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Mon Feb 05 2018 Orion Poplawski <orion@cora.nwra.com> - 2.1.1-8
 - Rebuild for rdma-core 16.2

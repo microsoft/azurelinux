@@ -1,23 +1,23 @@
 {
- "Signatures": {
-  "heimdal-7.7.1.tar.gz": "117cb1ede7848db24cf27311c46f7f735a99f9c836c22e80aec92b91efe56644",
-  "heimdal-bashrc": "606045acea4cddb8f0cb7697225382aa89505aa5e0b89c244da333650a372e4f",
-  "heimdal-ipropd-master.init": "ecd6d7dd613dcf4e255bc296ad0c6f76ffd0931ee9e8e2b94b0a7edeb92d1264",
-  "heimdal-ipropd-master.service": "fc70e57eb6118132d21bad1c01bf16ee5a8572867ee369a09d3f4dbd63adbf7a",
-  "heimdal-ipropd-slave-wrapper": "635cd27b5c669454edd8dcc824fe312e32208dfae64c31f712c66e52e7e9f22a",
-  "heimdal-ipropd-slave.init": "6b231843e5ebce922cfc4babfc05066a9c4db54cdd1a85f93cd3678e26e693f0",
-  "heimdal-ipropd-slave.service": "4f47b03fe7dda11538cc5044b64000ccb5fd6f2b5e25f1a8fae3000a0b291379",
-  "heimdal-kadmind.init": "8949c6b7ff7c5d155cca1a063b5379423d343373af804dbeb221f73487fabe72",
-  "heimdal-kadmind.service": "b1e9552b1eecfb6aecef4377df1ea2f1463cd1ab5e8b8f302711ad807ccc3279",
-  "heimdal-kdc.conf": "45deebc4d962e72ab98836cb68ef1b9db983f9ff32985389b1281713c0416f0f",
-  "heimdal-kdc.init": "5638e9097dba55d0b3262a2d7fe04953fe4bbb415368e2f9ad4ade5dbaea00f9",
-  "heimdal-kdc.service": "3f8b60c93dceca5ab87968b0b6a0a4bcaf3456da581b6285d555a0aa49e51cf0",
-  "heimdal-kpasswdd.init": "9a223d4c5f3f5b6a70683732cf17d39a747c1747052c00f3577134b60efb2350",
-  "heimdal-kpasswdd.service": "4a45e86920f02099a36d540b872a2d59304752f2b398ec20151682c6e647b437",
-  "heimdal.csh": "3b39878656dc4d8cca369da7ff48a006f6cb8e8f6840a3c297126c12f052dfed",
-  "heimdal.logrotate": "a92e7da78889cde1a228d38cd018536141b1a49be7e7c728573c6c4b0ff811d5",
-  "heimdal.sh": "dbdc05028a6679fa2309b78f51e868dcb85a4b257bc2b3cb9300cb9ecca41610",
-  "heimdal.sysconfig": "39f5e7a93d3cdcebeabdda5d049d0df14620b9767eedaa2565ac2eaa8d981d3a",
-  "krb5.conf.sample": "7352381f918c539c9197ea18d415668dc37bc44395ead4ea86ba50a7431a27cb"
- }
+  "Signatures": {
+    "heimdal-bashrc": "606045acea4cddb8f0cb7697225382aa89505aa5e0b89c244da333650a372e4f",
+    "heimdal-ipropd-master.init": "ecd6d7dd613dcf4e255bc296ad0c6f76ffd0931ee9e8e2b94b0a7edeb92d1264",
+    "heimdal-ipropd-master.service": "fc70e57eb6118132d21bad1c01bf16ee5a8572867ee369a09d3f4dbd63adbf7a",
+    "heimdal-ipropd-slave-wrapper": "635cd27b5c669454edd8dcc824fe312e32208dfae64c31f712c66e52e7e9f22a",
+    "heimdal-ipropd-slave.init": "6b231843e5ebce922cfc4babfc05066a9c4db54cdd1a85f93cd3678e26e693f0",
+    "heimdal-ipropd-slave.service": "4f47b03fe7dda11538cc5044b64000ccb5fd6f2b5e25f1a8fae3000a0b291379",
+    "heimdal-kadmind.init": "8949c6b7ff7c5d155cca1a063b5379423d343373af804dbeb221f73487fabe72",
+    "heimdal-kadmind.service": "b1e9552b1eecfb6aecef4377df1ea2f1463cd1ab5e8b8f302711ad807ccc3279",
+    "heimdal-kdc.conf": "45deebc4d962e72ab98836cb68ef1b9db983f9ff32985389b1281713c0416f0f",
+    "heimdal-kdc.init": "5638e9097dba55d0b3262a2d7fe04953fe4bbb415368e2f9ad4ade5dbaea00f9",
+    "heimdal-kdc.service": "3f8b60c93dceca5ab87968b0b6a0a4bcaf3456da581b6285d555a0aa49e51cf0",
+    "heimdal-kpasswdd.init": "9a223d4c5f3f5b6a70683732cf17d39a747c1747052c00f3577134b60efb2350",
+    "heimdal-kpasswdd.service": "4a45e86920f02099a36d540b872a2d59304752f2b398ec20151682c6e647b437",
+    "heimdal.csh": "3b39878656dc4d8cca369da7ff48a006f6cb8e8f6840a3c297126c12f052dfed",
+    "heimdal.logrotate": "a92e7da78889cde1a228d38cd018536141b1a49be7e7c728573c6c4b0ff811d5",
+    "heimdal.sh": "dbdc05028a6679fa2309b78f51e868dcb85a4b257bc2b3cb9300cb9ecca41610",
+    "heimdal.sysconfig": "39f5e7a93d3cdcebeabdda5d049d0df14620b9767eedaa2565ac2eaa8d981d3a",
+    "krb5.conf.sample": "7352381f918c539c9197ea18d415668dc37bc44395ead4ea86ba50a7431a27cb",
+    "heimdal-7.8.0.tar.gz": "fd87a207846fa650fd377219adc4b8a8193e55904d8a752c2c3715b4155d8d38"
+  }
 }

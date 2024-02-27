@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define gconf2_version 2.14
 
 Summary: Editor/admin tool for GConf

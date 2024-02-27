@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "jflex-1.4.3.tar.gz": "16dd31da66bb326f1a9c561b6e3a6b4080e89e1bf191685809507aa996721e61",
-  "jflex.script": "92451ee99a6227df578a344febcf3a8ac0ec1cf138e36a7c3412e59e0f191efd",
-  "jpackage-bootstrap-prepare.sh": "e4d63ab303013608a4e1159d3da7b9c7bac5e7322ec7df217eac3775e8b6fbec"
- }
+  "Signatures": {
+    "jflex.script": "92451ee99a6227df578a344febcf3a8ac0ec1cf138e36a7c3412e59e0f191efd",
+    "jpackage-bootstrap-prepare.sh": "e4d63ab303013608a4e1159d3da7b9c7bac5e7322ec7df217eac3775e8b6fbec",
+    "jflex-1.9.1.tar.gz": "16dd31da66bb326f1a9c561b6e3a6b4080e89e1bf191685809507aa996721e61"
+  }
 }

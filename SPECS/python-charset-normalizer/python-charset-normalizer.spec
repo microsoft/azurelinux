@@ -1,10 +1,10 @@
 Summary:        The Real First Universal Charset Detector
 Name:           python-charset-normalizer
-Version:        2.0.11
-Release:        2%{?dist}
+Version:        3.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ousret/charset_normalizer
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -58,6 +58,9 @@ sed -i "/addopts = --cov/d" setup.cfg
 %{_bindir}/normalizer
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0-1
+- Auto-upgrade to 3.2.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.11-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

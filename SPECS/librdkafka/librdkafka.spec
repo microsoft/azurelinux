@@ -4,7 +4,7 @@
 %define _binary_payload w9.gzdio
 Summary:        The Apache Kafka C library
 Name:           librdkafka
-Version:        1.8.2
+Version:        2.3.0
 Release:        1%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
@@ -12,7 +12,7 @@ Release:        1%{?dist}
 # files like src/rdhdrhistogram.c are under MIT
 License:        BSD AND zlib AND ISC AND Public Domain AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/C and C++
 URL:            https://github.com/edenhill/librdkafka
 #Source0:        https://github.com/edenhill/%{name}/archive/v%{version}.tar.gz
@@ -60,6 +60,9 @@ cat config.log
 make
 examples/rdkafka_example -X builtin.features
 
+%check
+make check
+
 %install
 DESTDIR=%{buildroot} make install
 
@@ -87,12 +90,19 @@ DESTDIR=%{buildroot} make install
 %{_libdir}/librdkafka.so
 %{_libdir}/librdkafka++.a
 %{_libdir}/librdkafka++.so
+%exclude %{_libdir}/librdkafka-static.a
 %{_libdir}/pkgconfig/rdkafka++.pc
 %{_libdir}/pkgconfig/rdkafka.pc
 %{_libdir}/pkgconfig/rdkafka-static.pc
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
+* Thu Dec 21 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.3.0-1
+- Update to v2.3.0
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.8.2-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 1.8.2-1
 - Upgrade to version 1.8.2
 - Use python3 as BR instead of python2

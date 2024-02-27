@@ -14,7 +14,7 @@ diff --git a/Makefile.SH b/Makefile.SH
 index d1da0a0..7733a32 100755
 --- a/Makefile.SH
 +++ b/Makefile.SH
-@@ -70,11 +70,11 @@ true)
+@@ -64,11 +64,11 @@ true)
  				${revision}.${patchlevel}.${subversion}"
  		case "$osvers" in
  	        1[5-9]*|[2-9]*)
@@ -28,7 +28,7 @@ index d1da0a0..7733a32 100755
  			;;
  		esac
  		;;
-@@ -76,13 +76,15 @@ true)
+@@ -78,13 +78,15 @@ true)
  		;;
  	sunos*)
  		linklibperl="-lperl"
@@ -45,12 +45,12 @@ index d1da0a0..7733a32 100755
  		;;
  	aix*)
  		case "$cc" in
-@@ -120,6 +122,9 @@ true)
- 	    linklibperl='libperl.x'
- 	    DPERL_EXTERNAL_GLOB=''
- 	    ;;
+@@ -127,6 +129,9 @@ true)
+ 	           ;;
+             esac
+             ;;
 +	linux*)
-+		shrpldflags="$shrpldflags -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
++	    shrpldflags="$shrpldflags -Wl,-soname -Wl,libperl.so.${revision}.${patchlevel}"
 +	    ;;
  	esac
  	case "$ldlibpthname" in

@@ -1,0 +1,11 @@
+--- Makefile.in.org	2006-05-12 15:29:02.000000000 -0400
++++ Makefile.in	2006-05-12 15:29:10.000000000 -0400
+@@ -9,7 +9,7 @@
+ CC= gcc
+ AR=/usr/bin/ar
+ RANLIB=/usr/bin/ranlib
+-CCOPT= -O2 -Wall @PCAP_INCLUDE@ @TCL_INC@ @USE_TCL@
++CCOPT= $(CFLAGS) -Wall @PCAP_INCLUDE@ @TCL_INC@ @USE_TCL@
+ DEBUG= -g
+ #uncomment the following if you need libpcap based build under linux
+ #(not raccomanded)

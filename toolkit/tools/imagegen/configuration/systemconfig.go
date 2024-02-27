@@ -20,6 +20,7 @@ type SystemConfig struct {
 	IsKickStartBoot      bool                      `json:"IsKickStartBoot"`
 	IsIsoInstall         bool                      `json:"IsIsoInstall"`
 	BootType             string                    `json:"BootType"`
+	EnableGrubMkconfig   bool                      `json:"EnableGrubMkconfig"`
 	Hostname             string                    `json:"Hostname"`
 	Name                 string                    `json:"Name"`
 	PackageLists         []string                  `json:"PackageLists"`
@@ -38,31 +39,28 @@ type SystemConfig struct {
 	Encryption           RootEncryption            `json:"Encryption"`
 	RemoveRpmDb          bool                      `json:"RemoveRpmDb"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
-	HidepidDisabled      bool                      `json:"HidepidDisabled"`
+	EnableHidepid        bool                      `json:"EnableHidepid"`
 }
+
+const (
+	enableGrubMkconfigDefault bool = true
+)
 
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
 // will be mounted at "/", or nil if no partition is found
 func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
-	for i, p := range s.PartitionSettings {
-		if p.MountPoint == "/" {
-			// We want to reference the actual object in the slice
-			return &s.PartitionSettings[i]
-		}
-	}
-	return nil
+	return FindRootPartitionSetting(s.PartitionSettings)
+}
+
+// We assume that any image without partitions is describing a rootfs image.
+func (s *SystemConfig) IsRootFS() bool {
+	return len(s.PartitionSettings) == 0
 }
 
 // GetMountpointPartitionSetting will search the system configuration for the partition setting
 // corresponding to a mount point.
 func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
-	for i, p := range s.PartitionSettings {
-		if p.MountPoint == mountPoint {
-			// We want to reference the actual object in the slice
-			return &s.PartitionSettings[i]
-		}
-	}
-	return nil
+	return FindMountpointPartitionSetting(s.PartitionSettings, mountPoint)
 }
 
 // IsValid returns an error if the SystemConfig is not valid
@@ -86,6 +84,7 @@ func (s *SystemConfig) IsValid() (err error) {
 	if len(s.PackageLists) == 0 && len(s.Packages) == 0 {
 		return fmt.Errorf("system configuration must provide at least one package list inside the [PackageLists] or one package in the [Packages] field")
 	}
+
 	// Additional package list validation must be done via the imageconfigvalidator tool since there is no guranatee that
 	// the paths are valid at this point.
 
@@ -188,8 +187,6 @@ func (s *SystemConfig) IsValid() (err error) {
 
 	//Validate Encryption
 
-	//Validate HidepidDisabled
-
 	return
 }
 
@@ -197,6 +194,7 @@ func (s *SystemConfig) IsValid() (err error) {
 func (s *SystemConfig) UnmarshalJSON(b []byte) (err error) {
 	// Use an intermediate type which will use the default JSON unmarshal implementation
 	type IntermediateTypeSystemConfig SystemConfig
+	(*s).EnableGrubMkconfig = enableGrubMkconfigDefault
 	err = json.Unmarshal(b, (*IntermediateTypeSystemConfig)(s))
 	if err != nil {
 		return fmt.Errorf("failed to parse [SystemConfig]: %w", err)

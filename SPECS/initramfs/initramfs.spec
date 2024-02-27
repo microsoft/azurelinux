@@ -1,12 +1,13 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        13%{?dist}
+Release:        15%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 Source0:        fscks.conf
+BuildRequires:  grub2-rpm-macros
 Requires:       dracut
 Provides:       initramfs
 
@@ -82,33 +83,25 @@ echo "initramfs (re)generation" %* >&2
 #
 # So in order to be compatible with kdump, we need to make sure to add the -k
 # option when invoking mkinitrd with an explicit <image> and <kernel version>
-#
-# The old linuxloader runs entirely in the ESP (efi) partition and has no 
-# access to the ext4 /boot directory where the initramfs is installed by default.
-# Copy initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it.
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
     echo "(re)generate initramfs for all kernels," %* >&2 \
     mkinitrd -q \
-    mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || : \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
         mkinitrd -q /boot/initrd.img-$k $k -k \
-        if [[ $k == *mshv* ]]; then \
-            cp /boot/initrd.img-$k /boot/efi/initrd.img-$k \
-        fi \
     done; \
 fi \
+%grub2_post
 %removal_action
 
 %posttrans
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
-# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
+%grub2_post
 
 %postun
 echo "initramfs" %{version}-%{release} "postun" >&2
@@ -137,6 +130,13 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Wed Jan 24 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.0.15
+- Deprecate old linuxloader in file_trigger_action macro
+
+* Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14
+- Ensure grub2-mkconfig is called after the initramfs generation
+- Deprecate old linuxloader; no longer copy initrd image to efi partition 
+
 * Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
     with the old linuxloader. Let the initrd remain in /boot as well. 

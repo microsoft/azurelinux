@@ -8,6 +8,7 @@ package diskutils
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -19,6 +20,19 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+)
+
+var (
+	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
+	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
+	// /etc/mke2fs.conf.
+	// However, when building Mariner images, the defaults should be as consistent as possible and should only contain
+	// features that are supported on Mariner.
+	DefaultMkfsOptions = map[string][]string{
+		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
+		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
+		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize"},
+	}
 )
 
 type blockDevicesOutput struct {
@@ -39,9 +53,37 @@ type SystemBlockDevice struct {
 	Model       string // Example: Virtual Disk
 }
 
+type partitionInfoOutput struct {
+	Devices []PartitionInfo `json:"blockdevices"`
+}
+
+type PartitionInfo struct {
+	Name              string `json:"name"`       // Example: nbd0p1
+	Path              string `json:"path"`       // Example: /dev/nbd0p1
+	PartitionTypeUuid string `json:"parttype"`   // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+	FileSystemType    string `json:"fstype"`     // Example: vfat
+	Uuid              string `json:"uuid"`       // Example: 4BD9-3A78
+	PartUuid          string `json:"partuuid"`   // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
+	Mountpoint        string `json:"mountpoint"` // Example: /mnt/os/boot
+	PartLabel         string `json:"partlabel"`  // Example: boot
+	Type              string `json:"type"`       // Example: part
+}
+
+type loopbackListOutput struct {
+	Devices []loopbackDevice `json:"loopdevices"`
+}
+
+type loopbackDevice struct {
+	Name        string `json:"name"`
+	BackingFile string `json:"back-file"`
+}
+
 const (
 	// AutoEndSize is used as the disk's "End" value to indicate it should be picked automatically
 	AutoEndSize = 0
+
+	EfiSystemPartitionTypeUuid = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
+	BiosBootPartitionTypeUuid  = "21686148-6449-6e6f-744e-656564454649"
 )
 
 const (
@@ -182,46 +224,41 @@ func ApplyRawBinary(diskDevPath string, rawBinary configuration.RawBinary) (err 
 
 	_, stderr, err := shell.Execute("dd", ddArgs...)
 	if err != nil {
-		logger.Log.Warnf("Failed to apply raw binary with dd: %v", stderr)
+		err = fmt.Errorf("failed to apply raw binary with dd:\n%v\n%w", stderr, err)
 	}
 	return
 }
 
 // CreateEmptyDisk creates an empty raw disk in the given working directory as described in disk configuration
-func CreateEmptyDisk(workDirPath, diskName string, disk configuration.Disk) (diskFilePath string, err error) {
-	const (
-		defautBlockSize = MiB
-	)
+func CreateEmptyDisk(workDirPath, diskName string, maxSize uint64) (diskFilePath string, err error) {
 	diskFilePath = filepath.Join(workDirPath, diskName)
 
-	// Assume that Disk.MaxSize is given
-	maxSize := disk.MaxSize
-	err = sparseDisk(diskFilePath, defautBlockSize, maxSize)
+	err = CreateSparseDisk(diskFilePath, maxSize, 0o644)
 	return
 }
 
-// sparseDisk creates an empty sparse disk file.
-func sparseDisk(diskPath string, blockSize, size uint64) (err error) {
-	ddArgs := []string{
-		"if=/dev/zero",                  // Input file.
-		fmt.Sprintf("of=%s", diskPath),  // Output file.
-		fmt.Sprintf("bs=%d", blockSize), // Size of one copied block.
-		fmt.Sprintf("seek=%d", size),    // Size of the image.
-		"count=0",                       // Number of blocks to copy to the output file.
+// CreateSparseDisk creates an empty sparse disk file.
+func CreateSparseDisk(diskPath string, size uint64, perm os.FileMode) (err error) {
+	// Open and truncate the file.
+	file, err := os.OpenFile(diskPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perm)
+	if err != nil {
+		return fmt.Errorf("failed to create empty disk file:\n%w", err)
 	}
 
-	_, stderr, err := shell.Execute("dd", ddArgs...)
+	// Resize the file to the desired size.
+	err = file.Truncate(int64(size * MiB))
 	if err != nil {
-		logger.Log.Warnf("Failed to create empty disk with dd: %v", stderr)
+		return fmt.Errorf("failed to set empty disk file's size:\n%w", err)
 	}
 	return
 }
 
 // SetupLoopbackDevice creates a /dev/loop device for the given disk file
 func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
+	logger.Log.Debugf("Attaching Loopback: %v", diskFilePath)
 	stdout, stderr, err := shell.Execute("losetup", "--show", "-f", "-P", diskFilePath)
 	if err != nil {
-		logger.Log.Warnf("Failed to create loopback device using losetup: %v", stderr)
+		err = fmt.Errorf("failed to create loopback device using losetup:\n%v\n%w", stderr, err)
 		return
 	}
 	devicePath = strings.TrimSpace(stdout)
@@ -231,44 +268,60 @@ func SetupLoopbackDevice(diskFilePath string) (devicePath string, err error) {
 
 // BlockOnDiskIO waits until all outstanding operations against a disk complete.
 func BlockOnDiskIO(diskDevPath string) (err error) {
-	const (
-		// Indices for values in /proc/diskstats
-		majIdx            = 0
-		minIdx            = 1
-		outstandingOpsIdx = 11
-	)
-	var blockDevices blockDevicesOutput
-
-	logger.Log.Infof("Flushing all IO to disk for %s", diskDevPath)
-	_, _, err = shell.Execute("sync")
+	maj, min, err := GetDiskIds(diskDevPath)
 	if err != nil {
 		return
 	}
 
+	return BlockOnDiskIOByIds(diskDevPath, maj, min)
+}
+
+func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 	rawDiskOutput, stderr, err := shell.Execute("lsblk", "--nodeps", "--json", "--output", "NAME,MAJ:MIN", diskDevPath)
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("failed to find IDs for disk (%s):\n%v\n%w", diskDevPath, stderr, err)
 		return
 	}
 
 	bytes := []byte(rawDiskOutput)
+
+	var blockDevices blockDevicesOutput
 	err = json.Unmarshal(bytes, &blockDevices)
 	if err != nil {
 		return
 	}
 
 	if len(blockDevices.Devices) != 1 {
-		return fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		return
 	}
 	// MAJ:MIN is returned in the form "1:2"
 	diskIDs := strings.Split(blockDevices.Devices[0].MajMin, ":")
 	if len(diskIDs) != 2 {
-		return fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+		return
 	}
-	maj := diskIDs[0]
-	min := diskIDs[1]
+	maj = diskIDs[0]
+	min = diskIDs[1]
+	return
+}
 
-	logger.Log.Tracef("Searching /proc/diskstats for %s (%s:%s)", blockDevices.Devices[0].Name, maj, min)
+// BlockOnDiskIOById waits until all outstanding operations against a disk complete.
+func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
+	const (
+		// Indices for values in /proc/diskstats
+		majIdx            = 0
+		minIdx            = 1
+		outstandingOpsIdx = 11
+	)
+
+	logger.Log.Debugf("Flushing all IO to disk")
+	_, _, err = shell.Execute("sync")
+	if err != nil {
+		return
+	}
+
+	logger.Log.Tracef("Searching /proc/diskstats for %s (%s:%s)", debugName, maj, min)
 	for {
 		var (
 			foundEntry     = false
@@ -293,13 +346,12 @@ func BlockOnDiskIO(diskDevPath string) (err error) {
 
 		err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Error, true, "cat", "/proc/diskstats")
 		if err != nil {
-			logger.Log.Error(stderr)
 			return
 		}
 		if !foundEntry {
-			return fmt.Errorf("couldn't find entry for '%s' in /proc/diskstats", diskDevPath)
+			return fmt.Errorf("couldn't find entry for '%s' in /proc/diskstats", debugName)
 		}
-		logger.Log.Debugf("Outstanding operations on '%s': %s", diskDevPath, outstandingOps)
+		logger.Log.Debugf("Outstanding operations on '%s': %s", debugName, outstandingOps)
 
 		if outstandingOps == "0" {
 			break
@@ -313,7 +365,7 @@ func BlockOnDiskIO(diskDevPath string) (err error) {
 
 // DetachLoopbackDevice detaches the specified disk
 func DetachLoopbackDevice(diskDevPath string) (err error) {
-	logger.Log.Infof("Detaching Loopback Device Path: %v", diskDevPath)
+	logger.Log.Debugf("Detaching Loopback Device Path: %v", diskDevPath)
 	_, stderr, err := shell.Execute("losetup", "-d", diskDevPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to detach loopback device using losetup: %v", stderr)
@@ -321,8 +373,59 @@ func DetachLoopbackDevice(diskDevPath string) (err error) {
 	return
 }
 
+func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
+	if !filepath.IsAbs(diskPath) {
+		return fmt.Errorf("internal error: loopback disk path must be absolute (%s)", diskPath)
+	}
+
+	delay := 100 * time.Millisecond
+	attempts := 5
+	for failures := 0; failures < attempts; failures++ {
+		stdout, _, err := shell.Execute("losetup", "--list", "--json", "--output", "NAME,BACK-FILE")
+		if err != nil {
+			return fmt.Errorf("failed to read loopback list:\n%w", err)
+		}
+
+		var output loopbackListOutput
+		err = json.Unmarshal([]byte(stdout), &output)
+		if err != nil {
+			return fmt.Errorf("failed to parse loopback devices list JSON:\n%w", err)
+		}
+
+		found := false
+		for _, device := range output.Devices {
+			if device.Name == devicePath && device.BackingFile == diskPath {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil
+		}
+
+		time.Sleep(delay)
+		delay *= 2
+	}
+
+	return fmt.Errorf("timed out waiting for loopback device (%s) for disk (%s) to close", devicePath, diskPath)
+}
+
+// WaitForDevicesToSettle waits for all udev events to be processed on the system.
+// This can be used to wait for partitions to be discovered after mounting a disk.
+func WaitForDevicesToSettle() error {
+	logger.Log.Debugf("Waiting for devices to settle")
+	_, _, err := shell.Execute("udevadm", "settle")
+	if err != nil {
+		return fmt.Errorf("failed to wait for devices to settle:\n%w", err)
+	}
+	return nil
+}
+
 // CreatePartitions creates partitions on the specified disk according to the disk config
-func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
+func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
+	readOnlyRootConfig configuration.ReadOnlyVerityRoot,
+) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
@@ -338,12 +441,12 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 	logger.Log.Debugf("Converting partition table type (%v) to parted argument", partitionTableType)
 	partedArgument, err := partitionTableType.ConvertToPartedArgument()
 	if err != nil {
-		logger.Log.Errorf("Unable to convert partition table type (%v) to parted argument", partitionTableType)
+		err = fmt.Errorf("failed to convert partition table type (%v) to parted argument:\n%w", partitionTableType, err)
 		return
 	}
 	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
-		logger.Log.Warnf("Failed to set partition table type using parted: %v", stderr)
+		err = fmt.Errorf("failed to set partition table type using parted:\n%v\n%w", stderr, err)
 		return
 	}
 
@@ -366,27 +469,27 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
 		if err != nil {
-			logger.Log.Warnf("Failed to create single partition")
+			err = fmt.Errorf("Failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
-			logger.Log.Warnf("Failed to format partition")
+			err = fmt.Errorf("Failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize encrypted root")
+				err = fmt.Errorf("Failed to initialize encrypted root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
 			if err != nil {
-				logger.Log.Warnf("Failed to initialize read only root")
+				err = fmt.Errorf("Failed to initialize read only root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice
@@ -407,7 +510,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		timeoutInSeconds = "5"
 	)
 
-	logicalSectorSize, physicalSectorSize, err := getSectorSize(diskDevPath)
+	logicalSectorSize, physicalSectorSize, err := GetSectorSize(diskDevPath)
 	if err != nil {
 		return
 	}
@@ -425,7 +528,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 		}
 	}
 
-	// Check wehther the start sector is 4K-aligned
+	// Check whether the start sector is 4K-aligned
 	start = alignSectorAddress(start, logicalSectorSize, physicalSectorSize)
 
 	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)
@@ -436,13 +539,13 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	if end == 0 {
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fillToEndOption)
 		if err != nil {
-			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
+			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	} else {
 		_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mkpart", partType, fsType, fmt.Sprintf(sFmt, start), fmt.Sprintf(sFmt, end))
 		if err != nil {
-			logger.Log.Warnf("Failed to create partition using parted: %v", stderr)
+			err = fmt.Errorf("failed to create partition using parted:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	}
@@ -461,7 +564,7 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	// to prevent us from possibly waiting forever.
 	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe: %v", stderr)
+		err = fmt.Errorf("failed to execute partprobe:\n%v\n%w", stderr, err)
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
@@ -492,7 +595,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 		for _, testPartDevPath := range testPartDevPaths {
 			exists, err := file.PathExists(testPartDevPath)
 			if err != nil {
-				logger.Log.Errorf("Error finding device path (%s)", testPartDevPath)
+				err = fmt.Errorf("failed to find device path (%s):\n%w", testPartDevPath, err)
 				return err
 			}
 			if exists {
@@ -507,7 +610,6 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	}, totalAttempts, retryDuration)
 
 	if err != nil {
-		logger.Log.Errorf("%s", err)
 		return
 	}
 
@@ -554,7 +656,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 	// Make sure all partition information is actually updated.
 	stdout, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "partprobe", "-s", diskDevPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to execute partprobe after partition initialization: %v", stderr)
+		err = fmt.Errorf("failed to execute partprobe after partition initialization:\n%v\n%w", stderr, err)
 		return "", err
 	}
 	logger.Log.Debugf("Partprobe -s returned: %s", stdout)
@@ -563,7 +665,8 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 }
 
 // FormatSinglePartition formats the given partition to the type specified in the partition configuration
-func FormatSinglePartition(partDevPath string, partition configuration.Partition) (fsType string, err error) {
+func FormatSinglePartition(partDevPath string, partition configuration.Partition,
+) (fsType string, err error) {
 	const (
 		totalAttempts = 5
 		retryDuration = time.Second
@@ -576,11 +679,18 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 	// To handle such cases, we can retry the command.
 	switch fsType {
 	case "fat32", "fat16", "vfat", "ext2", "ext3", "ext4", "xfs":
+		mkfsOptions := DefaultMkfsOptions[fsType]
+
 		if fsType == "fat32" || fsType == "fat16" {
 			fsType = "vfat"
 		}
+
+		mkfsArgs := []string{"-t", fsType}
+		mkfsArgs = append(mkfsArgs, mkfsOptions...)
+		mkfsArgs = append(mkfsArgs, partDevPath)
+
 		err = retry.Run(func() error {
-			_, stderr, err := shell.Execute("mkfs", "-t", fsType, partDevPath)
+			_, stderr, err := shell.Execute("mkfs", mkfsArgs...)
 			if err != nil {
 				logger.Log.Warnf("Failed to format partition using mkfs: %v", stderr)
 				return err
@@ -606,7 +716,7 @@ func FormatSinglePartition(partDevPath string, partition configuration.Partition
 
 		_, stderr, err := shell.Execute("swapon", partDevPath)
 		if err != nil {
-			logger.Log.Warnf("Failed to execute swapon: %v", stderr)
+			err = fmt.Errorf("failed to execute swapon:\n%v\n%w", stderr, err)
 			return "", err
 		}
 	case "":
@@ -632,12 +742,11 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	includeFilter := strings.Join(blockDeviceMajorNumbers, ",")
 	rawDiskOutput, stderr, err := shell.Execute("lsblk", "-d", "--bytes", "-I", includeFilter, "-n", "--json", "--output", "NAME,SIZE,MODEL")
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 		return
 	}
 	if len(rawDiskOutput) == 0 {
-		err = fmt.Errorf("no supported disks found")
-		logger.Log.Errorf("%s", err)
+		err = fmt.Errorf("failed to find supported disks:\n%w", err)
 		return
 	}
 
@@ -663,6 +772,28 @@ func SystemBlockDevices() (systemDevices []SystemBlockDevice, err error) {
 	return
 }
 
+func GetDiskPartitions(diskDevPath string) ([]PartitionInfo, error) {
+	// Just in case the disk was only recently connected, wait for the OS to finish processing it.
+	err := WaitForDevicesToSettle()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
+	}
+
+	// Read the disk's partitions.
+	jsonString, _, err := shell.Execute("lsblk", diskDevPath, "--output", "NAME,PATH,PARTTYPE,FSTYPE,UUID,MOUNTPOINT,PARTUUID,PARTLABEL,TYPE", "--json", "--list")
+	if err != nil {
+		return nil, fmt.Errorf("failed to list disk (%s) partitions:\n%w", diskDevPath, err)
+	}
+
+	var output partitionInfoOutput
+	err = json.Unmarshal([]byte(jsonString), &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse disk (%s) partitions JSON:\n%w", diskDevPath, err)
+	}
+
+	return output.Devices, err
+}
+
 func createExtendedPartition(diskDevPath string, partitionTableType string, partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string) (err error) {
 	// Create a new partition object for extended partition
 	extendedPartition := configuration.Partition{}
@@ -672,7 +803,7 @@ func createExtendedPartition(diskDevPath string, partitionTableType string, part
 
 	partDevPath, err := CreateSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType, extendedPartition, extendedPartitionType)
 	if err != nil {
-		logger.Log.Warnf("Failed to create extended partition")
+		err = fmt.Errorf("failed to create extended partition:\n%w", err)
 		return
 	}
 	partIDToFsTypeMap[extendedPartition.ID] = ""
@@ -692,8 +823,7 @@ func getPartUUID(device string) (uuid string, err error) {
 
 func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 	if exists, ferr := file.PathExists(sectorFile); ferr != nil {
-		logger.Log.Errorf("Error accessing sector size file %s", sectorFile)
-		err = ferr
+		err = fmt.Errorf("failed to access sector size file (%s):\n%w", sectorFile, ferr)
 		return
 	} else if !exists {
 		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", sectorFile)
@@ -702,7 +832,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 
 	fileContent, err := file.ReadLines(sectorFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to read from %s: %s", sectorFile, err)
+		err = fmt.Errorf("failed to read from (%s):\n%w", sectorFile, err)
 		return
 	}
 
@@ -716,7 +846,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 	return
 }
 
-func getSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
+func GetSectorSize(diskDevPath string) (logicalSectorSize, physicalSectorSize uint64, err error) {
 	const (
 		diskNameStartIndex = 5
 	)

@@ -1,0 +1,22 @@
+--- script.c.orig	2006-05-12 15:32:49.000000000 -0400
++++ script.c	2006-05-12 15:33:17.000000000 -0400
+@@ -24,7 +24,7 @@
+ 
+ #include <sys/ioctl.h>
+ #include <pcap.h>
+-#include <net/bpf.h>
++#include <pcap-bpf.h>
+ 
+ #include "release.h"
+ #include "hping2.h"
+--- libpcap_stuff.c.orig	2006-05-12 15:32:44.000000000 -0400
++++ libpcap_stuff.c	2006-05-12 15:33:07.000000000 -0400
+@@ -17,7 +17,7 @@
+ #include <stdlib.h>
+ #include <sys/ioctl.h>
+ #include <pcap.h>
+-#include <net/bpf.h>
++#include <pcap-bpf.h>
+ 
+ #include "globals.h"
+ 

@@ -5,7 +5,7 @@ Version:        6.2.0
 Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/RDFLib/rdflib
 Source0:        https://github.com/RDFLib/%{srcname}/releases/download/%{version}/%{srcname}-%{version}.tar.gz
 BuildRequires:  python%{python3_pkgversion}-devel

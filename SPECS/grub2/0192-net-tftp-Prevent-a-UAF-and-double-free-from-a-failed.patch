@@ -1,0 +1,114 @@
+From 1c6072ab86e17c71dac8af86fdc9f46c8a1bf617 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 20 Sep 2021 01:12:24 +1000
+Subject: [PATCH] net/tftp: Prevent a UAF and double-free from a failed seek
+
+A malicious tftp server can cause UAFs and a double free.
+
+An attempt to read from a network file is handled by grub_net_fs_read(). If
+the read is at an offset other than the current offset, grub_net_seek_real()
+is invoked.
+
+In grub_net_seek_real(), if a backwards seek cannot be satisfied from the
+currently received packets, and the underlying transport does not provide
+a seek method, then grub_net_seek_real() will close and reopen the network
+protocol layer.
+
+For tftp, the ->close() call goes to tftp_close() and frees the tftp_data_t
+file->data. The file->data pointer is not nulled out after the free.
+
+If the ->open() call fails, the file->data will not be reallocated and will
+continue point to a freed memory block. This could happen from a server
+refusing to send the requisite ack to the new tftp request, for example.
+
+The seek and the read will then fail, but the grub_file continues to exist:
+the failed seek does not necessarily cause the entire file to be thrown
+away (e.g. where the file is checked to see if it is gzipped/lzio/xz/etc.,
+a read failure is interpreted as a decompressor passing on the file, not as
+an invalidation of the entire grub_file_t structure).
+
+This means subsequent attempts to read or seek the file will use the old
+file->data after free. Eventually, the file will be close()d again and
+file->data will be freed again.
+
+Mark a net_fs file that doesn't reopen as broken. Do not permit read() or
+close() on a broken file (seek is not exposed directly to the file API -
+it is only called as part of read, so this blocks seeks as well).
+
+As an additional defence, null out the ->data pointer if tftp_open() fails.
+That would have lead to a simple null pointer dereference rather than
+a mess of UAFs.
+
+This may affect other protocols, I haven't checked.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/net.c  | 11 +++++++++--
+ grub-core/net/tftp.c |  1 +
+ include/grub/net.h   |  1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/net/net.c b/grub-core/net/net.c
+index 4d3eb5c..2cfe1a3 100644
+--- a/grub-core/net/net.c
++++ b/grub-core/net/net.c
+@@ -1467,7 +1467,8 @@ grub_net_fs_close (grub_file_t file)
+       grub_netbuff_free (file->device->net->packs.first->nb);
+       grub_net_remove_packet (file->device->net->packs.first);
+     }
+-  file->device->net->protocol->close (file);
++  if (!file->device->net->broken)
++    file->device->net->protocol->close (file);
+   grub_free (file->device->net->name);
+   return GRUB_ERR_NONE;
+ }
+@@ -1689,7 +1690,10 @@ grub_net_seek_real (struct grub_file *file, grub_off_t offset)
+     file->device->net->stall = 0;
+     err = file->device->net->protocol->open (file, file->device->net->name);
+     if (err)
+-      return err;
++      {
++	file->device->net->broken = 1;
++	return err;
++      }
+     grub_net_fs_read_real (file, NULL, offset);
+     return grub_errno;
+   }
+@@ -1698,6 +1702,9 @@ grub_net_seek_real (struct grub_file *file, grub_off_t offset)
+ static grub_ssize_t
+ grub_net_fs_read (grub_file_t file, char *buf, grub_size_t len)
+ {
++  if (file->device->net->broken)
++    return -1;
++
+   if (file->offset != file->device->net->offset)
+     {
+       grub_err_t err;
+diff --git a/grub-core/net/tftp.c b/grub-core/net/tftp.c
+index 7f44b30..4ea8069 100644
+--- a/grub-core/net/tftp.c
++++ b/grub-core/net/tftp.c
+@@ -400,6 +400,7 @@ tftp_open (struct grub_file *file, const char *filename)
+     {
+       grub_net_udp_close (data->sock);
+       grub_free (data);
++      file->data = NULL;
+       return grub_errno;
+     }
+ 
+diff --git a/include/grub/net.h b/include/grub/net.h
+index 7ae4b6b..1c0f18a 100644
+--- a/include/grub/net.h
++++ b/include/grub/net.h
+@@ -276,6 +276,7 @@ typedef struct grub_net
+   grub_fs_t fs;
+   int eof;
+   int stall;
++  int broken;
+ } *grub_net_t;
+ 
+ extern grub_net_t (*EXPORT_VAR (grub_net_open)) (const char *name);
+-- 
+2.34.1
+

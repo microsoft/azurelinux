@@ -1,10 +1,10 @@
 Summary:        Markdown to reStructuredText converter.
 Name:           python-m2r
-Version:        0.2.1
+Version:        0.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/m2r
 Source0:        https://github.com/miyakogi/m2r/archive/v%{version}/m2r-%{version}.tar.gz
@@ -55,6 +55,9 @@ pip3 install mock
 %{python3_sitelib}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.1-1
+- Auto-upgrade to 0.3.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 07 2022 Thomas Crain <thcrain@microsoft.com> - 0.2.1-1
 - Upgrade to latest upstream version
 

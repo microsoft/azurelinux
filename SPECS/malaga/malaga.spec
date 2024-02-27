@@ -4,7 +4,7 @@ Version:        7.12
 Release:        32%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dynalabs.de/mxp/malaga/
 Source0:        https://dynalabs.de/mxp/assets/malaga-7.12.tgz
 # Fix map_file symbol conflict with samba. Upstream can be considered
@@ -51,10 +51,10 @@ Library files for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 # Remove "@" marks so that the build process is more verbose
 sed -i.debug -e 's|^\([ \t][ \t]*\)@|\1|' Makefile.in
 # Remove "-s" so binaries won't be stripped

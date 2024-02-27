@@ -1,11 +1,11 @@
 Summary:        Utilities for writing cds.
 Name:           cdrkit
 Version:        1.1.11
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Project's web page (http://cdrkit.org) is no longer online.
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.gz/efe08e2f3ca478486037b053acd512e9/%{name}-%{version}.tar.gz
 Patch0:         cdrkit-1.1.9-efi-boot.patch
@@ -25,8 +25,8 @@ The Cdrtools package contains CD recording utilities. These are useful for readi
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 make %{?_smp_mflags}
@@ -42,6 +42,9 @@ ln -s  genisoimage  %{buildroot}%{_prefix}/bin/mkisofs
 %{_datadir}/man/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.1.11-11
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 *   Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.11-10
 -   Removing the explicit %%clean stage.
 

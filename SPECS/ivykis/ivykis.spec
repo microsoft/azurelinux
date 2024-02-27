@@ -1,10 +1,10 @@
 Name:           ivykis
 Summary:        Library for asynchronous I/O readiness notification
 Version:        0.42.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/buytenh/ivykis
 #Source0:       %{url}/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -41,6 +41,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_includedir}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.42.4-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 0.42.4-3
 - Remove libtool archive files from final packaging
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hyphen-mi
 Summary: Maori hyphenation rules
 %global upstreamid 20080630

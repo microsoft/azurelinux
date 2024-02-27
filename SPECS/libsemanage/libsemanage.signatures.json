@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "libsemanage-3.2.tar.gz": "d722a55ca4fe2d4e2b30527720db657e6238b28079e69e2e4affeb8e733ee511",
+  "libsemanage-3.5.tar.gz": "f53534e50247538280ed0d76c6ce81d8fb3939bd64cadb89da10dba42e40dd9c",
   "semanage.conf": "ae4a61523757b63ff456c90c75c325db715dd69289943cedb1f3a2f242b4361b"
  }
 }

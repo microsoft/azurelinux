@@ -1,12 +1,12 @@
 Summary:	Programs to parse command-line options
 Name:		popt
-Version:	1.18
+Version:	1.19
 Release:    1%{?dist}
 License:	MIT
 URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:	http://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
 %description
 The popt package contains the popt libraries which are used by
@@ -59,6 +59,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19-1
+- Auto-upgrade to 1.19 - Azure Linux 3.0 - package upgrades
+
 * Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18-1
 - Upgrade to 1.18
 - License verified

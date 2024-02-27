@@ -2,14 +2,14 @@
 
 Summary:        Handle Common Gateway Interface requests and responses
 Name:           perl-CGI
-Version:        4.54
-Release:        3%{?dist}
+Version:        4.60
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
 URL:            http://search.cpan.org/dist/CGI
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -93,6 +93,9 @@ PERL5LIB=/root/perl5/lib/perl5 make %{?_smp_mflags} test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.60-1
+- Auto-upgrade to 4.60 - Azure Linux 3.0 - package upgrades
+
 * Thu Oct 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.54-3
 - Switched to using Mariner packages instead of external test dependencies.
 

@@ -18,14 +18,6 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
-        "SPECS/kernel-hci/kernel-hci.spec"
-    ]),
-    frozenset([
-        "SPECS-SIGNED/kernel-azure-signed/kernel-azure-signed.spec",
-        "SPECS/kernel-azure/kernel-azure.spec"
-    ]),
-    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
@@ -56,6 +48,13 @@ version_matching_groups = [
     frozenset([
         "SPECS/influxdb/influxdb.spec",
         "SPECS/influx-cli/influx-cli.spec"
+    ]),
+    frozenset([
+        "SPECS/clang/clang.spec",
+        "SPECS/compiler-rt/compiler-rt.spec",
+        "SPECS/lld/lld.spec",
+        "SPECS/lldb/lldb.spec",
+        "SPECS/llvm/llvm.spec"
     ])
 ]
 

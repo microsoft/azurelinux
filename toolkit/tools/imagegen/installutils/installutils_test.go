@@ -64,10 +64,14 @@ func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {
 }
 
 func TestCopyAdditionalFiles(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
 	proposedDir := filepath.Join(tmpDir, "TestCopyAdditionalFiles")
 	chroot := safechroot.NewChroot(proposedDir, false)
 
-	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{})
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
 	assert.NoError(t, err)
 
 	defer chroot.Close(false)

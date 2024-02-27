@@ -1,10 +1,10 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
 Version:        1.3.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -116,6 +116,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.5-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Sun Sep 11 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.3.5-3
 - Backport fix to support rpm 4.18.0 versions which moved headers around
 

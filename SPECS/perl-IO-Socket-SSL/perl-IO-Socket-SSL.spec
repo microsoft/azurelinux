@@ -1,14 +1,14 @@
 Summary:        SSL sockets with IO::Socket interface
 Name:           perl-IO-Socket-SSL
-Version:        2.074
-Release:        2%{?dist}
+Version:        2.084
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            https://metacpan.org/release/IO-Socket-SSL
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-%{version}.tar.gz
 Source1:        LICENSE.PTR
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -70,6 +70,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.084-1
+- Auto-upgrade to 2.084 - Azure Linux 3.0 - package upgrades
+
 * Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 2.074-2
 - Add BR on `perl(ExtUtils::MakeMaker)` & check deps to enable ptest
 

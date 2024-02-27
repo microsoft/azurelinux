@@ -1,10 +1,10 @@
 Summary:        The iSNS daemon and utility programs
 Name:           isns-utils
-Version:        0.101
+Version:        0.102
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/open-iscsi/open-isns
 Source0:        https://github.com/open-iscsi/open-isns/archive/v%{version}.tar.gz#/open-isns-%{version}.tar.gz
 Source1:        isnsd.service
@@ -98,8 +98,15 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/isnsd.service
 %dir %{_includedir}/libisns
 %{_includedir}/libisns/*.h
 %{_libdir}/libisns.so
+%{_libdir}/pkgconfig/libisns.pc
 
 %changelog
+* Tue Jan 16 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 0.102-1
+- Update source to v0.102
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.101-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 23 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.101-1
 - Update source to v0.101
 

@@ -1,10 +1,10 @@
 Summary:        Lightning memory-mapped database
 Name:           lmdb
-Version:        0.9.29
+Version:        0.9.31
 Release:        1%{?dist}
 License:        OpenLDAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://symas.com/lmdb
 Source0:        https://github.com/LMDB/lmdb/archive/LMDB_%{version}.tar.gz
@@ -70,6 +70,9 @@ install -m0755 %{SOURCE1} %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.9.31-1
+- Auto-upgrade to 0.9.31 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 07 2022 Henry Li <lihl@microsoft.com> - 0.9.29-1
 - Upgrade to version 0.9.29
 

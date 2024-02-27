@@ -2,11 +2,11 @@
 %global gem_name cool.io
 Summary:        Simple evented I/O for Ruby
 Name:           rubygem-cool.io
-Version:        1.7.1
+Version:        1.8.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/tarcieri/cool.io
 Source0:        https://github.com/tarcieri/cool.io/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.0-1
+- Auto-upgrade to 1.8.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.1-1
 - Update to v1.7.1.
 - Build from .tar.gz source.

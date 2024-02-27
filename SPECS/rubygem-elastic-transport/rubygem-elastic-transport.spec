@@ -2,11 +2,11 @@
 %global gem_name elastic-transport
 Summary:        Transport classes and utilities shared among Ruby Elastic client libraries
 Name:           rubygem-%{gem_name}
-Version:        8.0.1
+Version:        8.2.2
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/elastic/elastic-transport-ruby
 Source0:        https://github.com/elastic/elastic-transport-ruby/archive/refs/tags/v%{version}.tar.gz#/elastic-transport-ruby-%{version}.tar.gz
@@ -35,6 +35,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2.2-1
+- Auto-upgrade to 8.2.2 - Azure Linux 3.0 - package upgrades
+
 * Tue May 31 2021 Neha Agarwal <nehaagarwal@microsoft.com> - 8.0.1-1
 - License verified
 - Original version for CBL-Mariner

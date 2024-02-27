@@ -1,10 +1,10 @@
 Summary:        Netwide Assembler.
 Name:           nasm
-Version:        2.16
+Version:        2.16.01
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.nasm.us
 Source0:        http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
@@ -33,6 +33,9 @@ make %{?_smp_mflags} -k test
 %{_datadir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.16.01-1
+- Auto-upgrade to 2.16.01 - Azure Linux 3.0 - package upgrades
+
 * Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.16-1
 - Auto-upgrade to 2.16 - patch CVE-2022-44370
 

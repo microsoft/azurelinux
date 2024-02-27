@@ -38,7 +38,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	uniquePackages := removePackageDuplicates(repo.Repo)
 	packagesToDownload := filterOutDownloadedPackage(uniquePackages, cloner.CloneDirectory())
 
-	_, err = cloner.Clone(cloneDeps, packagesToDownload...)
+	_, err = cloner.CloneByPackageVer(cloneDeps, packagesToDownload...)
 	if err != nil {
 		return err
 	}

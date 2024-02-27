@@ -3,11 +3,11 @@
 
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
-Version:        0.186
+Version:        0.189
 Release:        1%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://sourceware.org/elfutils
 Source0:        https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version}.tar.bz2
@@ -268,6 +268,12 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.189-1
+- Auto-upgrade to 0.189 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.186-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 16 2022 Muhammad Falak <mwani@microsoft.com> - 0.186-1
 - Bump version to 0.186
 - Skip a test which can fail 'run-reverse-sections-self'

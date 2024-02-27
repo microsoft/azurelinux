@@ -1,10 +1,10 @@
 Summary:        RNG deamon and tools
 Name:           rng-tools
-Version:        6.14
+Version:        6.16
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/nhorman/rng-tools
 Source0:        https://github.com/nhorman/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -58,6 +58,12 @@ make  %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.16-1
+- Auto-upgrade to 6.16 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.14-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 6.14-1
 - Update to version 6.14.
 - Remove LICENSE.PTR file

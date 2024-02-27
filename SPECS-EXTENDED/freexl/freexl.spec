@@ -23,7 +23,7 @@ Release:        19%{?dist}
 #   - m4/libtool.m4 is (FSFULLR AND GPL-2.0-or-later)
 License:        MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gaia-gis.it/FreeXL
 Source0:        https://www.gaia-gis.it/gaia-sins/freexl-sources/%{name}-%{version}.tar.gz
 

@@ -2,11 +2,11 @@
 %global gem_name addressable
 Summary:        an alternative implementation to the URI implementation that is part of Ruby's standard library
 Name:           rubygem-%{gem_name}
-Version:        2.8.0
-Release:        2%{?dist}
+Version:        2.8.5
+Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/sporkmonger/addressable
 Source0:        https://github.com/sporkmonger/addressable/archive/refs/tags/addressable-%{version}.tar.gz#/%{gem_name}-%{gem_name}-%{version}.tar.gz
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8.5-1
+- Auto-upgrade to 2.8.5 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.8.0-2
 - Build from .tar.gz source.
 

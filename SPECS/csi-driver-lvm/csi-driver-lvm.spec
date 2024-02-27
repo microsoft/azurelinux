@@ -1,10 +1,10 @@
 Summary:        Container storage interface for logical volume management
 Name:           csi-driver-lvm
 Version:        0.4.1
-Release:        12%{?dist}
+Release:        14%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/metal-stack/csi-driver-lvm
 Source0:        https://github.com/metal-stack/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
@@ -63,6 +63,12 @@ install -D -m0755 bin/lvmplugin %{buildroot}%{_bindir}/
 %{_bindir}/lvmplugin
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-14
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.4.1-13
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.1-12
 - Bump release to rebuild with go 1.19.12
 

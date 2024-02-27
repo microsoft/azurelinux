@@ -9,7 +9,7 @@ Release:        4%{?dist}
 Summary:        Format a header and rows into a table
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Term-Table
 Source0:        https://cpan.metacpan.org/authors/id/E/EX/EXODIST/Term-Table-%{version}.tar.gz#/perl-Term-Table-%{version}.tar.gz
 # Unbundle Object::HashBase
@@ -63,7 +63,7 @@ This Perl module is able to format rows of data into tables.
 
 %prep
 %setup -q -n Term-Table-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Delete bundled Object::HashBase
 for F in lib/Term/Table/HashBase.pm t/HashBase.t; do
     perl -e 'unlink $ARGV[0] or die $!' "$F"

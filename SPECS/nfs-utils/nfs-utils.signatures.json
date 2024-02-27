@@ -4,7 +4,7 @@
   "nfs-client.target": "53b0d04b836ced37f67a690f17080fe4481df57e90ca95c17fa711c3b7725f42",
   "nfs-mountd.service": "7dc86d8993d314f598ae56f93bace853bbf0bf95100a0924a817a0f42e90416a",
   "nfs-server.service": "09f0c70aa286c84c6ef01dca525e2115cd3a436a88f1e0894341916413864837",
-  "nfs-utils-2.5.4.tar.xz": "51997d94e4c8bcef5456dd36a9ccc38e231207c4e9b6a9a2c108841e6aebe3dd",
+  "nfs-utils-2.6.4.tar.xz": "01b3b0fb9c7d0bbabf5114c736542030748c788ec2fd9734744201e9b0a1119d",
   "nfs-utils.defaults": "4aa8d1acae8d7116c14a59d7fa5aa455e01db805da33047430daa5448ed8b507",
   "rpc-statd-notify.service": "ec6e7c1c1457479b84a8d292e08cf17bdde005d4d0fd619f8bfe9dbe8c194405",
   "rpc-statd.service": "07ed5a627c8a523b1a7b216c1dd5d9b14f72718269cbd5f7fef4696b0a46b337"

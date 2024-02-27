@@ -13,7 +13,7 @@ Release:	18%{?dist}
 Summary:	Generate new packages quickly and easily
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Package-Generator
 Source0:	https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Package-Generator-%{version}.tar.gz#/perl-Package-Generator-%{version}.tar.gz
 Patch1:		Package-Generator-1.106-old-Test-More.patch
@@ -43,7 +43,7 @@ them unused names and sets up their package data, if provided.
 
 # We need to patch the test suite if we have an old version of Test::More
 %if %{old_test_more}
-%patch1
+%patch 1
 %endif
 
 %build

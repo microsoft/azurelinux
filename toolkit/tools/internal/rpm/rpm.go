@@ -4,6 +4,7 @@
 package rpm
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -86,7 +87,7 @@ var (
 	//
 	// Example:
 	//
-	//	D: ========== +++ systemd-devel-239-42.cm2 x86_64-linux 0x0
+	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 )
 
@@ -96,6 +97,23 @@ func GetRpmArch(goArch string) (rpmArch string, err error) {
 	if !ok {
 		err = fmt.Errorf("unknown GOARCH detected (%s)", goArch)
 	}
+	return
+}
+
+func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, err error) {
+
+	baseName := filepath.Base(specPath)
+	if baseName == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file name from specPath (%s).", specPath))
+	}
+
+	fileExtension := filepath.Ext(baseName)
+	if fileExtension == "" {
+		return "", errors.New(fmt.Sprintf("Cannot extract file extension from file name (%s).", baseName))
+	}
+
+	basePackageName = baseName[:len(baseName)-len(fileExtension)]
+
 	return
 }
 
@@ -116,6 +134,25 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	env := append(shell.CurrentEnvironment(), fmt.Sprintf("RPM_CONFIGDIR=%s", newMacroDir))
 	shell.SetEnvironment(env)
 
+	return
+}
+
+// ExtractNameFromRPMPath strips the version from an RPM file name. i.e. pkg-name-1.2.3-4.cm2.x86_64.rpm -> pkg-name
+func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) {
+	baseName := filepath.Base(rpmFilePath)
+
+	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
+	if !strings.Contains(baseName, "-") {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		return
+	}
+
+	rpmFileSplit := strings.Split(baseName, "-")
+	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
+	if packageName == "" {
+		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		return
+	}
 	return
 }
 
@@ -229,7 +266,7 @@ func DefaultDefines(runCheck bool) map[string]string {
 
 // GetInstalledPackages returns a string list of all packages installed on the system
 // in the "[name]-[version]-[release].[distribution].[architecture]" format.
-// Example: tdnf-2.1.0-4.cm1.x86_64
+// Example: tdnf-2.1.0-4.azl3.x86_64
 func GetInstalledPackages() (result []string, err error) {
 	const queryArg = "-qa"
 
@@ -499,7 +536,8 @@ func buildAllSpecsList(baseDir string) (specPaths []string, err error) {
 
 	specPaths, err = filepath.Glob(specFilesGlob)
 	if err != nil {
-		logger.Log.Errorf("Failed while trying to enumerate all spec files with (%s). Error: %v.", specFilesGlob, err)
+		specPaths, err = nil, fmt.Errorf("failed to enumerate all spec files with (%s):\n%w", specFilesGlob, err)
+		return
 	}
 
 	return
@@ -514,17 +552,37 @@ func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (
 		return
 	}
 
+	type specArchResult struct {
+		compatible bool
+		path       string
+		err        error
+	}
+	resultsChannel := make(chan specArchResult, len(inputSpecPaths))
+
 	for _, specFilePath := range inputSpecPaths {
 		specDirPath := filepath.Dir(specFilePath)
 
-		specCompatible, err = SpecArchIsCompatible(specFilePath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed while querrying spec (%s). Error: %v.", specFilePath, err)
+		go func(pathIter string) {
+			specCompatible, err = SpecArchIsCompatible(pathIter, specDirPath, buildArch, defines)
+			if err != nil {
+				err = fmt.Errorf("failed while querrying spec (%s). Error: %v.", pathIter, err)
+			}
+			resultsChannel <- specArchResult{
+				compatible: specCompatible,
+				path:       pathIter,
+				err:        err,
+			}
+		}(specFilePath)
+	}
+
+	for i := 0; i < len(inputSpecPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		if specCompatible {
-			filteredSpecPaths = append(filteredSpecPaths, specFilePath)
+		if result.compatible {
+			filteredSpecPaths = append(filteredSpecPaths, result.path)
 		}
 	}
 

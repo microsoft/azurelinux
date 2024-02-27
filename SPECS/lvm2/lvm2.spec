@@ -2,11 +2,11 @@
 
 Summary:        Userland logical volume management tools
 Name:           lvm2
-Version:        2.03.15
-Release:        2%{?dist}
+Version:        2.03.23
+Release:        1%{?dist}
 License:        GPLv2 AND BSD 2-Clause AND LGPLv2.1
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceware.org/lvm2/
 Source0:        https://sourceware.org/pub/lvm2/LVM2.%{version}.tgz
@@ -165,7 +165,7 @@ the device-mapper event library.
 
 %prep
 %setup -q -n LVM2.%{version}
-%patch0 -p1 -b .preferred_names
+%patch 0 -p1 -b .preferred_names
 
 %build
 %define _default_pid_dir /run
@@ -329,12 +329,19 @@ echo "disable lvm2-monitor.service" >> %{buildroot}%{_libdir}/systemd/system-pre
 %{_libdir}/tmpfiles.d/lvm2.conf
 %dir %{_sysconfdir}/lvm
 %attr(644, -, -) %config(noreplace) %{_sysconfdir}/lvm/lvm.conf
+%attr(755, -, -) %{_libexecdir}/lvresize_fs_helper
 %config(noreplace) %{_sysconfdir}/lvm/lvmlocal.conf
 %dir %{_sysconfdir}/lvm/profile
 %{_sysconfdir}/lvm/profile/*
 %ghost %{_sysconfdir}/lvm/cache/.cache
 
 %changelog
+* Fri Jan 05 2024 Alberto Perez <aperezguevar@microsoft.com> - 2.03.23-1
+- Upgrading to newest version 2.03.23
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.03.15-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Apr 21 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.03.15-2
 - Fix double-packaging of dbusd files in main package
 - Remove manual pkgconfig provide

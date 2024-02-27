@@ -6,16 +6,18 @@
 %global hv_fcopy_daemon hypervfcopyd
 # udev rules prefix
 %global udev_prefix 70
+%define mariner_version 3
+
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.131.1
+Version:        6.6.14.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz
+#Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz
 Source0:        kernel-%{version}.tar.gz
 # HYPERV KVP DAEMON
 Source1:        hypervkvpd.service
@@ -42,7 +44,7 @@ is running on Windows Host with Hyper-V.
 %package -n hypervkvpd
 Summary:        Hyper-V key value pair (KVP) daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -58,7 +60,7 @@ IP injection functionality on the Guest.
 %package -n hypervvssd
 Summary:        Hyper-V VSS daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -75,7 +77,7 @@ on the Linux Guest.
 %package -n hypervfcopyd
 Summary:        Hyper-V FCOPY daemon
 BuildRequires:  kernel-headers
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name}-license = %{version}-%{release}
 Requires(post): systemd
 Requires(postun): systemd
@@ -103,7 +105,7 @@ BuildArch:      noarch
 Contains tools and scripts useful for Hyper-V guests.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 
 %build
 pushd tools/hv
@@ -219,6 +221,27 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
+* Mon Jan 29 14:54:48 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- use "bootstrap" systemd rpm macros
+
+* Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
+- Upgrade to 6.6.12.1
+
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+
+* Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
+- Upgrade to 6.1.58.1
+
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+
 * Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
 - Auto-upgrade to 5.15.131.1
 

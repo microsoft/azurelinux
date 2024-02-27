@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Perform optional tests
 %bcond_with perl_LDAP_enables_optional_test
 # Support XML serialization of LDAP schemata (DSML languge)
@@ -167,9 +167,9 @@ Tests from %{name}-%{version}. Execute them with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n perl-ldap-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 chmod -c 644 bin/* contrib/* lib/Net/LDAP/DSML.pm
 perl -pi -e 's|^#!/usr/local/bin/perl\b|#!%{__perl}|' contrib/*
 # Remove bundled libraries

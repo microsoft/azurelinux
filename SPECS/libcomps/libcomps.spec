@@ -1,11 +1,11 @@
 %global python3_sitelib %(/usr/bin/python3 -c "import site; print(site.getsitepackages()[-1])")
 
 Name:           libcomps
-Version:        0.1.18
+Version:        0.1.19
 Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 License:        GPLv2+
 URL:            https://github.com/rpm-software-management/libcomps
@@ -77,6 +77,12 @@ popd
 %{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.1.19-1
+- Auto-upgrade to 0.1.19 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.1.18-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Nov 10 2021 Nicolas Guibourge <nicolasg@microsoft.com> 0.1.18-1
 - Upgrade to version 0.1.18.
 

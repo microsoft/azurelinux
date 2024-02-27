@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+const (
+	SELinuxPolicyDefault = "selinux-policy"
+)
+
 // KernelCommandLine holds extra command line parameters which can be
 // added to the grub config file.
 //   - ImaPolicy: A list of IMA policies which will be used together
@@ -20,6 +24,7 @@ type KernelCommandLine struct {
 	CGroup           CGroup      `json:"CGroup"`
 	ImaPolicy        []ImaPolicy `json:"ImaPolicy"`
 	SELinux          SELinux     `json:"SELinux"`
+	SELinuxPolicy    string      `json:"SELinuxPolicy"`
 	EnableFIPS       bool        `json:"EnableFIPS"`
 	ExtraCommandLine string      `json:"ExtraCommandLine"`
 }

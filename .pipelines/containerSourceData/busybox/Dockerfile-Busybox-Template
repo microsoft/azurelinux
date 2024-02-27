@@ -1,0 +1,41 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE AS BASE
+
+ARG MARINER_VERSION=2.0
+
+# Install busybox, glibc, and their dependencies into a staging location.
+# Staging directory is copied into the final scratch image.
+RUN mkdir /staging \
+    && tdnf install -y --releasever=$MARINER_VERSION --installroot /staging \
+    busybox glibc \
+    && tdnf clean all \
+    && pushd /staging \
+    && rm -rf boot media mnt opt run \
+    && rm -rf usr/lib/sysimage \
+    && rm -rf var/cache \
+    && rm -rf var/lib/rpm; \
+	ln -vL /staging/usr/sbin/busybox /staging/bin/; \
+	chroot /staging /bin/busybox --install -s /bin
+
+# Smoke Tests
+# Test and make sure it works
+RUN chroot /staging /usr/bin/env sh -xec 'true'
+
+# Ensure correct timezone (UTC)
+RUN [ "$(chroot /staging date +%Z)" = 'UTC' ]
+
+# Test and make sure DNS works too
+RUN cp -L /etc/resolv.conf /staging/etc/; \
+	chroot /staging /bin/sh -xec 'nslookup microsoft.com'; \
+	rm /staging/etc/resolv.conf
+
+FROM scratch
+
+# Copy dependencies into the scratch image.
+COPY --from=BASE /staging/ .
+
+CMD [ "sh" ]

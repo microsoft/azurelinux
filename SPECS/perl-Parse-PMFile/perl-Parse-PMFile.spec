@@ -1,11 +1,11 @@
 Name:           perl-Parse-PMFile
-Version:        0.43
+Version:        0.44
 Release:        1%{?dist}
 Summary:        Parses .pm file as PAUSE does
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Parse-PMFile
 Source0:        https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/Parse-PMFile-%{version}.tar.gz
 # Remove useless dependency on ExtUtils::MakeMaker::CPANfile
@@ -46,7 +46,7 @@ because of my modification.
 
 %prep
 %setup -q -n Parse-PMFile-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.44-1
+- Auto-upgrade to 0.44 - Azure Linux 3.0 - package upgrades
+
 * Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 0.43-1
 - Updating to 0.43
 

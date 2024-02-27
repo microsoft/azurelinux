@@ -1,12 +1,12 @@
 Summary:        Utilities for internationalization and localization
 Name:           gettext
-Version:        0.21
-Release:        2%{?dist}
+Version:        0.22
+Release:        1%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/gettext
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/gettext/%{name}-%{version}.tar.xz
 Provides:       %{name}-devel = %{version}-%{release}
 Provides:       %{name}-libs = %{version}-%{release}
@@ -58,6 +58,13 @@ make %{?_smp_mflags} check
 %{_mandir}/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.22-1
+- Auto-upgrade to 0.22 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.21-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+- License verified
+
 * Mon Sep 20 2021 Muhammad Falak <mwani@microsoft.com> 0.21-2
 - Add explicit Provides for `gettext-common-devel` & `gettext-libs`
 

@@ -1,10 +1,10 @@
 Summary:        Applying JSON Patches in Python
 Name:           python-jsonpointer
-Version:        2.2
+Version:        2.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/jsonpointer/
 Source0:        https://github.com/stefankoegl/python-json-pointer/archive/refs/tags/v%{version}.tar.gz#/python-json-pointer-%{version}.tar.gz
@@ -43,6 +43,9 @@ ln -s jsonpointer %{buildroot}%{_bindir}/jsonpointer3
 %{_bindir}/jsonpointer3
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4-1
+- Auto-upgrade to 2.4 - Azure Linux 3.0 - package upgrades
+
 * Tue Mar 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.2-1
 - Upgrade to latest upstream
 - Switch source from PyPI to GitHub

@@ -1,14 +1,13 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.2
-Release:        5%{?dist}
+Version:        4.4.3
+Release:        1%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
-Patch1:         CVE-2021-25217.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  systemd
 %description
 The ISC DHCP package contains both the client and server programs for DHCP. dhclient (the client) is used for connecting to a network which uses DHCP to assign network addresses. dhcpd (the server) is used for assigning network addresses on private networks
@@ -170,6 +169,12 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
+- Auto-upgrade to 4.4.3 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.4.2-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 28 2023 Suresh Thelkar <sthelkar@microsoft.com> - 4.4.2-5
 - Fix a bug in applying earlier patches.
 

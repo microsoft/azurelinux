@@ -44,10 +44,7 @@ type GraphBuildState struct {
 //     '0' where the subsequent nodes will no longer be rebuilt. 'maxFreshness < 0' will cause unbounded cascading rebuilds,
 //     while 'maxFreshness = 0' will cause no cascading rebuilds.
 func NewGraphBuildState(reservedFiles []string, maxFreshness uint) (g *GraphBuildState) {
-	filesMap := make(map[string]bool)
-	for _, file := range reservedFiles {
-		filesMap[file] = true
-	}
+	filesMap := sliceutils.SliceToSet[string](reservedFiles)
 
 	return &GraphBuildState{
 		activeBuilds:     make(map[int64]*BuildRequest),
@@ -127,6 +124,11 @@ func (g *GraphBuildState) ActiveBuildFromSRPM(srpmFileName string) *BuildRequest
 	return nil
 }
 
+// IsSRPMBuildActive returns true if a given SRPM is currently queued for building.
+func (g *GraphBuildState) IsSRPMBuildActive(srpmFileName string) bool {
+	return g.ActiveBuildFromSRPM(srpmFileName) != nil
+}
+
 // ActiveSRPMs returns a list of all SRPMs, which are currently being built.
 func (g *GraphBuildState) ActiveSRPMs() (builtSRPMs []string) {
 	for _, buildRequest := range g.activeBuilds {
@@ -147,6 +149,23 @@ func (g *GraphBuildState) ActiveTests() (testedSRPMs []string) {
 	}
 
 	return
+}
+
+// ActiveTestFromSRPM returns a test request for the queried SRPM file
+// or nil if the SRPM is not among the active builds.
+func (g *GraphBuildState) ActiveTestFromSRPM(srpmFileName string) *BuildRequest {
+	for _, buildRequest := range g.activeBuilds {
+		if buildRequest.Node.Type == pkggraph.TypeTest && buildRequest.Node.SRPMFileName() == srpmFileName {
+			return buildRequest
+		}
+	}
+
+	return nil
+}
+
+// IsSRPMTestActive returns true if a given SRPM is currently queued for testing.
+func (g *GraphBuildState) IsSRPMTestActive(srpmFileName string) bool {
+	return g.ActiveTestFromSRPM(srpmFileName) != nil
 }
 
 // BuildFailures returns a slice of all failed builds.
@@ -197,7 +216,8 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 
 	delete(g.activeBuilds, res.Node.ID())
 
-	if res.Err != nil {
+	failure := (res.Err != nil) || res.CheckFailed
+	if failure {
 		g.failures = append(g.failures, res)
 	}
 
@@ -211,7 +231,7 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	}
 
 	state := &nodeState{
-		available: res.Err == nil,
+		available: !failure,
 		cached:    res.UsedCache,
 		usedDelta: res.WasDelta,
 		freshness: freshness,

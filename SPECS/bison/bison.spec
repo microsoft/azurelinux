@@ -1,10 +1,10 @@
 Summary:        Contains a parser generator
 Name:           bison
-Version:        3.7.6
+Version:        3.8.2
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bison
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
@@ -55,6 +55,12 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.2-1
+- Auto-upgrade to 3.8.2 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.6-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Nov 05 2021 Andrew Phelps <anphel@microsoft.com> 3.7.6-1
 - Update to version 3.7.6
 

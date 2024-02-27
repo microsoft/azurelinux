@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
 
 	"gonum.org/v1/gonum/graph"
@@ -42,8 +43,7 @@ var (
 	filterFile      = app.Flag("rpm-filter-file", "Filter the returned packages based on this list of *.rpm filenames (defaults to the x86_64 toolchain manifest './resources/manifests/package/toolchain_x86_64.txt' if it exists)").ExistingFile()
 	filter          = app.Flag("rpm-filter", "Only print any packages that are missing from the rpm-filter-file (useful for debugging toolchain package issues for example)").Bool()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 func main() {
@@ -54,7 +54,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	// only understand verbosity from 1 - 4 (spec, rpm, details, full node)
 	if verbosity == nil || *verbosity > 4 || *verbosity < 1 {
@@ -89,7 +89,7 @@ func main() {
 	nodeListGoal := searchForGoal(graph, goalSearchList)
 
 	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
-	nodeSet := removeDuplicates(nodeLists)
+	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
 
 	if len(nodeSet) == 0 {
 		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
@@ -172,18 +172,6 @@ func searchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.P
 	return
 }
 
-func removeDuplicates(nodeList []*pkggraph.PkgNode) (uniqueNodeList []*pkggraph.PkgNode) {
-	nodeMap := make(map[*pkggraph.PkgNode]bool)
-	for _, n := range nodeList {
-		nodeMap[n] = true
-	}
-	uniqueNodeList = make([]*pkggraph.PkgNode, 0, len(nodeMap))
-	for key, _ := range nodeMap {
-		uniqueNodeList = append(uniqueNodeList, key)
-	}
-	return
-}
-
 func buildRequiresGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode) (graphOut *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
 	// Make a copy of the graph
 	newGraph, err := graphIn.DeepCopy()
@@ -242,7 +230,7 @@ func formatNode(n *pkggraph.PkgNode, verbosity int) string {
 	case 3:
 		return fmt.Sprintf("'%s' from node '%s'", filepath.Base(n.RpmPath), n.FriendlyName())
 	case 4:
-		return fmt.Sprintf("'%s'", n)
+		return fmt.Sprintf("(%v)'%#v'", n.VersionedPkg, *n)
 	default:
 		logger.Log.Fatalf("Invalid verbosity level %v", verbosity)
 	}
@@ -256,10 +244,7 @@ func isFilteredFile(path, filterFile string) bool {
 			if err != nil {
 				logger.Log.Fatalf("Failed to load filter file '%s': %s", filterFile, err)
 			}
-			reservedFiles = make(map[string]bool)
-			for _, f := range reservedFileList {
-				reservedFiles[f] = true
-			}
+			reservedFiles = sliceutils.SliceToSet[string](reservedFileList)
 		}
 		base := filepath.Base(path)
 
@@ -449,10 +434,7 @@ func printSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, 
 		}
 
 		// Contert to list and sort
-		printLines := []string{}
-		for s := range results {
-			printLines = append(printLines, s)
-		}
+		printLines := sliceutils.SetToSlice[string](results)
 		sort.Strings(printLines)
 		for _, l := range printLines {
 			fmt.Println(l)

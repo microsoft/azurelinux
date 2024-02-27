@@ -1,10 +1,10 @@
 Summary:        Rsync libraries
 Name:           librsync
-Version:        2.3.2
+Version:        2.3.4
 Release:        1%{?dist}
 License:        LGPLv2+ AND CC0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://librsync.github.io/
 #Source0:       https://github.com/librsync/librsync/archive/v%{version}.tar.gz
@@ -89,6 +89,9 @@ make test
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.4-1
+- Auto-upgrade to 2.3.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.3.2-1
 - Upgrade to version 2.3.2
 

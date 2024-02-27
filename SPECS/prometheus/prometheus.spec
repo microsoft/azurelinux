@@ -4,10 +4,10 @@
 Summary:        Prometheus monitoring system and time series database
 Name:           prometheus
 Version:        2.37.0
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/prometheus/prometheus
 Source0:        https://github.com/prometheus/prometheus/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        prometheus.service
@@ -131,6 +131,12 @@ fi
 %doc README.md RELEASE.md documentation
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-11
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 2.37.0-10
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.37.0-9
 - Bump release to rebuild with go 1.19.12
 

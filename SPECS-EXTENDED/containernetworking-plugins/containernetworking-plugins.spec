@@ -24,11 +24,11 @@
 
 Name:          %{project}-%{repo}
 Version:       1.1.1
-Release:       11%{?dist}
+Release:       13%{?dist}
 Summary:       Libraries for writing CNI plugin
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           %{git0}
 Source0: %{download_url}#/%{name}-%{version}.tar.gz
 # If go_compiler is not set to 1, there is no virtual provide. Use golang instead.
@@ -129,6 +129,12 @@ install -p plugins/ipam/dhcp/systemd/cni-dhcp.socket %{buildroot}%{_unitdir}
 %{_unitdir}/cni-dhcp.socket
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-13
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.1.1-12
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.1-11
 - Bump release to rebuild with go 1.19.12
 

@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
-Version:        0.27.0
+Version:        0.29.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/iovisor/bcc
 # Upstream now provides a release with the git submodule embedded in it
@@ -122,6 +122,15 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_datadir}/%{name}/man/*
 
 %changelog
+* Wed Dec 20 2023 Muhammad Falak <mwani@microsoft.com> - 0.29.1-1
+- Bump version to 0.29.1
+
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.28.0-1
+- Auto-upgrade to 0.28.0 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.27.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Apr 28 2023 Muhammad Falak <mwani@microsoft.com> - 0.27.0-1
 - Add an explicit BR on zip
 - Update to 0.27.0

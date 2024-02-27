@@ -26,12 +26,12 @@
 
 Summary:        Optional junit tasks for ant
 Name:           ant-junit
-Version:        1.10.11
+Version:        1.10.14
 Release:        1%{?dist}
 License:        ASL 2.0 AND W3C
 Group:          Development/Tools/Building
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ant.apache.org/
 Source0:        https://www.apache.org/dist/ant/source/apache-ant-%{version}-src.tar.gz
 Source1:        apache-ant-1.8.ant.conf
@@ -352,13 +352,13 @@ find -name \*.jar -print -delete
 
 # When bootstrapping, we don't have junit
 %if %{with bootstrap}
-%patch0 -p1
+%patch 0 -p1
 %endif
-%patch1
-%patch2 -p1
-%patch3 -p1
-%patch5 -p1
-%patch6 -p1
+%patch 1
+%patch 2 -p1
+%patch 3 -p1
+%patch 5 -p1
+%patch 6 -p1
 
 # clean jar files
 find . -name "*.jar" -print -delete
@@ -730,6 +730,9 @@ popd
 %endif
 
 %changelog
+* Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.14-1
+- Auto-upgrade to 1.10.14 - Azure Linux 3.0 - package upgrades
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.10.11-2
 - Move to SPECS 
 - Minor refactor of specfile

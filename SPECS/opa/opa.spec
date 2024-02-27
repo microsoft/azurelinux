@@ -4,15 +4,15 @@
 %global short_commit    e88ad165
 Summary:        Open source, general-purpose policy engine
 Name:           opa
-Version:        0.50.2
-Release:        5%{?dist}
+Version:        0.55.0
+Release:        1%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
 # internal/semver: ASL 2.0
 License:        ASL 2.0 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner 
+Distribution:   Azure Linux
 URL:            https://github.com/open-policy-agent/opa
 #Source0:       https://github.com/open-policy-agent/%{name}/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -53,6 +53,15 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.55.0-1
+- Auto-upgrade to 0.55.0 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-7
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.50.2-6
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-5
 - Bump release to rebuild with go 1.19.12
 

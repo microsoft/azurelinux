@@ -1,12 +1,12 @@
 Summary:        Sudo
 Name:           sudo
-Version:        1.9.13p3
-Release:        2%{?dist}
+Version:        1.9.15p5
+Release:        1%{?dist}
 License:        ISC
 URL:            https://www.sudo.ws/
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.sudo.ws/sudo/dist/%{name}-%{version}.tar.gz
 BuildRequires:  audit-devel
 BuildRequires:  man-db
@@ -27,7 +27,7 @@ The Sudo package allows a system administrator to give certain users (or groups 
 the ability to run some (or all) commands as root or another user while logging the commands and arguments.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -99,7 +99,17 @@ fi
 %exclude  /etc/sudoers.dist
 
 %changelog
-* Thu May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
+* Thu Jan 25 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 1.9.15p5-1
+- Auto-upgrade to 1.9.15p5 - Update to latest version
+- Remove NETGROUP_QUERY patch - upstream fix is added in 1.9.15p5
+
+* Tue Dec 19 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-2
+- Add patch to bug fix support for NETGROUP_QUERY
+
+* Fri Aug 25 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.14p3-1
+- Bump version to 1.9.14p3
+
+* Mon May 08 2023 Andy Zaugg <azaugg@linkedin.com> - 1.9.13p3-2
 - Add config option to sudo build to allow configuration of sudo via LDAP.
 
 * Thu Mar 16 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.9.13p3-1

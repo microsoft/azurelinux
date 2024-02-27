@@ -1,14 +1,12 @@
 %global library kubernetes
-%global basehash 06191d321491abd87caaf0d049030dc87720684a
 
 Name:       python-%{library}
-Version:    21.7.0
+Version:    28.1.0
 Release:    1%{?dist}
 Summary:    Python client for the kubernetes API.
 License:    ASL 2.0
 URL:        https://github.com/kubernetes-client/python
 Source0:    https://github.com/kubernetes-client/python/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:    https://github.com/kubernetes-client/python-base/archive/%{basehash}.tar.gz#/%{name}-base-%{version}.tar.gz
 BuildArch:  noarch
 
 %package -n python3-%{library}
@@ -45,13 +43,6 @@ Python client for the kubernetes API.
 %prep
 %autosetup -n python-%{version} -S git
 
-pushd kubernetes
-rm -rf base
-tar zxvf %{SOURCE1}
-mv python-base-%{basehash} base
-popd
-
-
 %build
 python3 setup.py build
 
@@ -75,6 +66,9 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %{python3_sitelib}/%{library}/e2e_test
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 28.1.0-1
+- Auto-upgrade to 28.1.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 07 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 21.7.0-1
 - Upgrade to 21.7.0
 

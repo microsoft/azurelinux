@@ -1,10 +1,10 @@
 Summary:        A modern implementation of a DBM
 Name:           tokyocabinet
 Version:        1.4.48
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://fallabs.com/tokyocabinet/
 Source:         http://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz 
 Patch0:         tokyocabinet-fedora.patch
@@ -43,8 +43,8 @@ needed for developing with %{name}.
 
 %prep
 %setup -q
-%patch0  -b .fedora
-%patch1 -p1 -b .manhelp
+%patch 0  -b .fedora
+%patch 1 -p1 -b .manhelp
 
 %build
 autoconf
@@ -80,6 +80,9 @@ make check
 %doc doc/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.4.48-18
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 16 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.4.48-17
 - Moved from SPECS-EXTENDED to SPECS
 - License verified

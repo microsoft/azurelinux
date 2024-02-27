@@ -1,11 +1,11 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.0.1897
+Version:        9.0.2190
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -144,6 +144,7 @@ fi
 %lang(fi) %{_datarootdir}/vim/vim*/lang/fi/LC_MESSAGES/vim.mo
 %lang(fr) %{_datarootdir}/vim/vim*/lang/fr/LC_MESSAGES/vim.mo
 %lang(ga) %{_datarootdir}/vim/vim*/lang/ga/LC_MESSAGES/vim.mo
+%lang(hu) %{_datarootdir}/vim/vim*/lang/hu/LC_MESSAGES/vim.mo
 %lang(it) %{_datarootdir}/vim/vim*/lang/it/LC_MESSAGES/vim.mo
 %lang(ja) %{_datarootdir}/vim/vim*/lang/ja/LC_MESSAGES/vim.mo
 %lang(ko.UTF-8) %{_datarootdir}/vim/vim*/lang/ko.UTF-8/LC_MESSAGES/vim.mo
@@ -186,7 +187,6 @@ fi
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
 %{_datarootdir}/vim/vim90/syntax/nosyntax.vim
-%{_datarootdir}/vim/vim90/syntax/syntax.vim
 %{_datarootdir}/vim/vim90/autoload/dist/ft.vim
 %{_bindir}/ex
 %{_bindir}/vi
@@ -197,6 +197,20 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 9.0.2190-1
+- Upgrade version to 9.0.2190
+
+* Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.2010-1
+- Update version to 9.0.2010 to fix CVE-2023-5535.
+- Remove patches that no longer apply in the new version.
+- Remove file listed twice.
+
+* Wed Oct 11 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 9.0.1897-3
+- Patch CVE-2023-5441
+
+* Mon Oct 09 2023 Mitch Zhu <mitchzhu@microsoft.com> - 9.0.1897-2
+- Patch CVE-2023-5344
+
 * Tue Sep 12 2023 Henry Li <lihl@microsoft.com> - 9.0.1897-1
 - Upgrade version to resolve CVE-2023-4738, CVE-2023-4750, CVE-2023-4781,
   CVE-2023-4752 and CVE-2023-4733

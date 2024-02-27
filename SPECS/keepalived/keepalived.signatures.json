@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "keepalived-2.2.7.tar.gz": "c61940d874154a560a54627ecf7ef47adebdf832164368d10bf242a4d9b7d49d",
-  "keepalived.service": "533fac0ed629192f87b42f5fa2ba4443bccc3ac383e9495be97369616b95d6bd"
- }
+  "Signatures": {
+    "keepalived.service": "533fac0ed629192f87b42f5fa2ba4443bccc3ac383e9495be97369616b95d6bd",
+    "keepalived-2.2.8.tar.gz": "85882eb62974f395d4c631be990a41a839594a7e62fbfebcb5649a937a7a1bb6"
+  }
 }

@@ -2,11 +2,11 @@
 %global gem_name td-client
 Summary:        Ruby Client Library for Treasure Data
 Name:           rubygem-%{gem_name}
-Version:        1.0.8
+Version:        2.0.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://www.treasuredata.com/
 Source0:        https://github.com/treasure-data/td-client-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.8-1
 - Update to v1.0.8.
 - Build from .tar.gz source.

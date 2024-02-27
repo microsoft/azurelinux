@@ -2,11 +2,11 @@
 %global gem_name excon
 Summary:        Extended http(s) Connections
 Name:           rubygem-%{gem_name}
-Version:        0.92.2
+Version:        0.102.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/excon/excon
 Source0:        https://github.com/excon/excon/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -32,6 +32,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.102.0-1
+- Auto-upgrade to 0.102.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.92.2-1
 - Update to v0.92.2.
 - Build from .tar.gz source.

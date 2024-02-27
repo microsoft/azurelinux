@@ -1,0 +1,30 @@
+From b046a6da15a2a2e31ac80d6cac19ab3e2aeb71aa Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 6 Jul 2021 14:13:40 +1000
+Subject: [PATCH] video/readers/png: Refuse to handle multiple image headers
+
+This causes the bitmap to be leaked. Do not permit multiple image headers.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/video/readers/png.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/video/readers/png.c b/grub-core/video/readers/png.c
+index e2a6b1c..8955b8e 100644
+--- a/grub-core/video/readers/png.c
++++ b/grub-core/video/readers/png.c
+@@ -258,6 +258,9 @@ grub_png_decode_image_header (struct grub_png_data *data)
+   int color_bits;
+   enum grub_video_blit_format blt;
+ 
++  if (data->image_width || data->image_height)
++    return grub_error (GRUB_ERR_BAD_FILE_TYPE, "png: two image headers found");
++
+   data->image_width = grub_png_get_dword (data);
+   data->image_height = grub_png_get_dword (data);
+ 
+-- 
+2.34.1
+

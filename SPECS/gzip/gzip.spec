@@ -1,10 +1,10 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
-Version:        1.12
+Version:        1.13
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gzip
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
@@ -42,6 +42,12 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13-1
+- Auto-upgrade to 1.13 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Sep 20 2022 Betty Lakes <bettylakes@microsoft.com> - 1.12-1
 - Upgrade to 1.12
 

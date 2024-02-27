@@ -4,11 +4,11 @@
 
 Summary:        Standalone, extensible Perl module installer
 Name:           perl-Module-Install
-Version:        1.19
-Release:        5%{?dist}
+Version:        1.21
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Module-Install/
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-%{version}.tar.gz
@@ -93,6 +93,9 @@ make %{?_smp_mflags} test AUTOMATED_TESTING=1
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21-1
+- Auto-upgrade to 1.21 - Azure Linux 3.0 - package upgrades
+
 * Wed Jan 19 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.19-5
 - Adding 'BuildRequires: perl-generators'.
 - License verified.

@@ -1,14 +1,26 @@
+%define mariner_version 3
+
+# This package doesn't contain any binaries, thus no debuginfo package is needed.
+%global debug_package %{nil}
+
+%if "%{_arch}" == "x86_64"
+    %global build_cross 1
+    %define cross_archs arm64
+%else
+    %global build_cross 0
+    %define cross_archs %{nil}
+%endif
+
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        5.15.131.1
-Release:        1%{?dist}
+Version:        6.6.14.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-#Source0:       https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%%{version}.tar.gz
-Source0:        kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 # Historical name shipped by other distros
 Provides:       glibc-kernheaders = %{version}-%{release}
 BuildArch:      noarch
@@ -16,26 +28,102 @@ BuildArch:      noarch
 %description
 The Linux API Headers expose the kernel's API for use by Glibc.
 
+%if %{build_cross}
+%package -n kernel-cross-headers
+Summary: Header files for the Linux kernel for use by cross-glibc.
+
+%description -n kernel-cross-headers
+Kernel-cross-headers includes the C header files that specify the interface
+between the Linux kernel and userspace libraries and programs.  The
+header files define structures and constants that are needed for
+building most standard programs and are also needed for rebuilding the
+cross-glibc package.
+%endif
+
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 
 %build
 make mrproper
+make headers
+
+for cross_arch in %{cross_archs}; do
+    make ARCH=$cross_arch O=usr/include-$cross_arch headers
+done
 
 %install
-cd %{_builddir}/CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
-make headers
-find usr/include -name '.*' -delete
-rm usr/include/Makefile
+find usr/include* \( -name ".*" -o -name "Makefile" \) -delete
+
 mkdir -p /%{buildroot}%{_includedir}
 cp -rv usr/include/* /%{buildroot}%{_includedir}
+
+for cross_arch in %{cross_archs}; do
+    cross_arch_includedir=/%{buildroot}%{_prefix}/${cross_arch}-linux-gnu/include
+    mkdir -p $cross_arch_includedir
+    cp -rv usr/include-$cross_arch/usr/include/* $cross_arch_includedir
+done
 
 %files
 %defattr(-,root,root)
 %license COPYING
 %{_includedir}/*
 
+%if %{build_cross}
+%files -n kernel-cross-headers
+%defattr(-,root,root)
+%{_prefix}/*-linux-gnu/*
+%endif
+
 %changelog
+* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Bump release to match kernel
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Bump release to match kernel
+
+* Sat Jan 27 11:16:08 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- update to match kernel version
+
+* Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
+- Upgrade to 6.6.12.1
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.2.1-3
+- Add the 'kernel-cross-headers' subpackage for aarch64.
+- Used Fedora 38 spec (license: MIT) for guidance.
+
+* Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
+- Bump release to match kernel
+
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+
+* Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
+- Bump release to match kernel
+
+* Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
+- Bump release to match kernel
+
+* Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
+- Upgrade to 6.1.58.1
+
+* Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
+- Bump release to match kernel
+
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+
+* Fri Sep 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+- Bump release to match kernel
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
 - Auto-upgrade to 5.15.131.1
 

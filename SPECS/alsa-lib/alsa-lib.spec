@@ -1,10 +1,10 @@
 Summary:        ALSA library
 Name:           alsa-lib
-Version:        1.2.6.1
+Version:        1.2.9
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Internet
 URL:            https://alsa-project.org
 Source0:        https://www.alsa-project.org/files/pub/lib/%{name}-%{version}.tar.bz2
@@ -46,6 +46,12 @@ make DESTDIR=%{buildroot} install
 %{_includedir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.9-1
+- Auto-upgrade to 1.2.9 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.6.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jan 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.2.6.1-1
 - Update to version 1.2.6.1
 

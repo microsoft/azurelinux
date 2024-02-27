@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: LDAP Perl module that wraps the OpenLDAP C SDK
 Name: perl-Mozilla-LDAP
 Version: 1.5.3

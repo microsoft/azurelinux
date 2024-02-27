@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tools for certain user account management tasks
 Name: usermode
 Version: 1.112
@@ -49,9 +49,9 @@ graphical tools for certain account management tasks.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure --with-selinux

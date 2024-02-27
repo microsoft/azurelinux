@@ -88,6 +88,9 @@ popd > /dev/null
 
 pushd $src_root > /dev/null
 echo "Fetching dependencies to a temporary cache"
+# The build environment's rust may not have all the features required to run
+# cargo fetch, so we need to use the bootstrap mode that disables some features.
+export RUSTC_BOOTSTRAP=1
 CARGO_HOME=$src_root/.cargo cargo fetch
 echo "Compressing the cache."
 tar --sort=name --mtime="2021-04-26 00:00Z" \
@@ -101,12 +104,12 @@ echo "get additional src tarballs"
 CONFIG_FILE="$src_root/src/stage0.json"
 RUST_RELEASE_DATE=$(cat $CONFIG_FILE | jq -r '.compiler.date')
 RUST_STAGE0_VERSION=$(cat $CONFIG_FILE | jq -r '.compiler.version')
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/cargo-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.gz
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rustc-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.gz
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rust-std-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.gz
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/cargo-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.gz
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rustc-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.gz
-wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rust-std-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.gz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/cargo-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rustc-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rust-std-$RUST_STAGE0_VERSION-x86_64-unknown-linux-gnu.tar.xz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/cargo-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.xz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rustc-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.xz
+wget https://static.rust-lang.org/dist/$RUST_RELEASE_DATE/rust-std-$RUST_STAGE0_VERSION-aarch64-unknown-linux-gnu.tar.xz
 
 
 popd > /dev/null

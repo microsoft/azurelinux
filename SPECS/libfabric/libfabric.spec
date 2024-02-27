@@ -2,11 +2,11 @@
 
 Summary:        Open Fabric Interfaces
 Name:           libfabric
-Version:        1.12.0
-Release:        2%{?dist}
+Version:        1.18.2
+Release:        1%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ofiwg/libfabric
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 
@@ -85,6 +85,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man7/*.7*
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.18.2-1
+- Auto-upgrade to 1.18.2 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.12.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Dec 01 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.12.0-2
 - Removing BR on "infinipath-psm-devel" and "libpsm2-devel".
 - Using the 1.12.0 final release version of the sources instead of the release candidate.

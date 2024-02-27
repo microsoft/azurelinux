@@ -1,17 +1,18 @@
+%define majminorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.37.4
-Release:        6%{?dist}
+Version:        2.39.2
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
-Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
+Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v%{majminorver}/%{name}-%{version}.tar.xz
 Source1:        runuser
 Source2:        runuser-l
 Source3:        su
-Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
+Source4:        su-l
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -97,6 +98,7 @@ install -vdm755 %{buildroot}%{_sysconfdir}/pam.d
 install -vm644 %{SOURCE1} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
+install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
 %check
 chown -Rv nobody .
@@ -126,6 +128,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su
+%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su-l
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -148,6 +151,15 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 2.39.2-1
+- Upgrade to 2.39.2
+
+* Thu Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
+- Add su-l file for PAM
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.37.4-7
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 2.37.4-6
 - Add SETUID bit to mount and umount.
 

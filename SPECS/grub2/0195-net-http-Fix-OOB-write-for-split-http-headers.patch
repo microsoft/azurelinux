@@ -1,0 +1,48 @@
+From be197ecee81b2c8932f65f7fd38e929b3d92ec46 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 8 Mar 2022 18:17:03 +1100
+Subject: [PATCH] net/http: Fix OOB write for split http headers
+
+GRUB has special code for handling an http header that is split
+across two packets.
+
+The code tracks the end of line by looking for a "\n" byte. The
+code for split headers has always advanced the pointer just past the
+end of the line, whereas the code that handles unsplit headers does
+not advance the pointer. This extra advance causes the length to be
+one greater, which breaks an assumption in parse_line(), leading to
+it writing a NUL byte one byte past the end of the buffer where we
+reconstruct the line from the two packets.
+
+It's conceivable that an attacker controlled set of packets could
+cause this to zero out the first byte of the "next" pointer of the
+grub_mm_region structure following the current_line buffer.
+
+Do not advance the pointer in the split header case.
+
+Fixes: CVE-2022-28734
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/net/http.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/grub-core/net/http.c b/grub-core/net/http.c
+index 833c99f..1db72fc 100644
+--- a/grub-core/net/http.c
++++ b/grub-core/net/http.c
+@@ -190,9 +190,7 @@ http_receive (grub_net_tcp_socket_t sock __attribute__ ((unused)),
+ 	  int have_line = 1;
+ 	  char *t;
+ 	  ptr = grub_memchr (nb->data, '\n', nb->tail - nb->data);
+-	  if (ptr)
+-	    ptr++;
+-	  else
++	  if (ptr == NULL)
+ 	    {
+ 	      have_line = 0;
+ 	      ptr = (char *) nb->tail;
+-- 
+2.34.1
+

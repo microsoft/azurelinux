@@ -1,10 +1,10 @@
 Summary:        administration tool for IP sets
 Name:           ipset
-Version:        7.15
+Version:        7.17
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/tools
 URL:            https://ipset.netfilter.org/
 Source0:        https://ipset.netfilter.org/%{name}-%{version}.tar.bz2
@@ -34,12 +34,13 @@ Libraries and header files for ipset.
 
 %package service
 Summary:        %{name} service for %{name}s
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-rpm-macros
 Requires:       %{name} = %{version}-%{release}
 Requires:       iptables-services
-Requires(post): systemd
-Requires(postun): systemd
-Requires(preun): systemd
+# Our build tooling cannot handle this
+#Requires(post): systemd
+#Requires(postun): systemd
+#Requires(preun): systemd
 BuildArch:      noarch
 
 %description service
@@ -104,6 +105,12 @@ fi
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 7.17-2
+- workaround "circular dependencies" from build tooling
+
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.17-1
+- Auto-upgrade to 7.17 - Azure Linux 3.0 - package upgrades
+
 * Thu Jun 15 2023 Andy Zaugg <azaugg@linkedin.com> - 7.15-2
 - Fix ipset systemd unit file
 

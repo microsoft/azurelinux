@@ -1,10 +1,10 @@
 Summary:	Tools for monitoring SMART capable hard disks
 Name:		smartmontools
-Version:	7.3
+Version:	7.4
 Release:	1%{?dist}
 License:	MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://smartmontools.sourceforge.net/
 Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source2:	smartmontools.sysconf
@@ -31,7 +31,7 @@ failure.
 
 %prep
 %setup -q 
-%patch1 -p1 -b .defaultconf
+%patch 1 -p1 -b .defaultconf
 
 # update SOURCE5 on maintainer's machine prior commiting, there's no internet connection on builders
 curl %{UrlSource5} -o %{SOURCE5} ||:
@@ -83,6 +83,9 @@ mkdir -p $RPM_BUILD_ROOT%{_sharedstatedir}/%{name}
 %{_sharedstatedir}/%{name}
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.4-1
+- Auto-upgrade to 7.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 02 2023 Vince Perri <viperri@microsoft.com> - 7.3-1
 - Upgrade to 7.3
 - License verified.

@@ -2,11 +2,11 @@
 %global gem_name faraday-rack
 Summary:        Faraday adapter for a Rack app
 Name:           rubygem-%{gem_name}
-Version:        1.0.0
+Version:        2.0.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-rack
 Source0:        https://github.com/lostisland/faraday-rack/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - License verified
 - Original version for CBL-Mariner

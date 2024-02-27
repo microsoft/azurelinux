@@ -1,12 +1,12 @@
 Summary:        Utilities for managing the XFS filesystem
 Name:           xfsprogs
-Version:        5.15.0
+Version:        6.6.0
 Release:        1%{?dist}
 License:        GPL+ and LGPLv2+
-URL:            http://oss.sgi.com/projects/xfs/
+URL:            https://xfs.wiki.kernel.org/
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
 BuildRequires:  gettext
 BuildRequires:  readline-devel
@@ -33,12 +33,12 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of xfsprogs.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
-        --enable-readline=yes	\
-	--enable-blkid=yes
+    --enable-readline=yes \
+    --enable-blkid=yes
 
 make DEBUG=-DNDEBUG     \
      INSTALL_USER=root  \
@@ -48,14 +48,10 @@ make DEBUG=-DNDEBUG     \
 make DESTDIR=%{buildroot} PKG_DOC_DIR=%{_usr}/share/doc/%{name}-%{version} install
 make DESTDIR=%{buildroot} PKG_DOC_DIR=%{_usr}/share/doc/%{name}-%{version} install-dev
 
-#find %{buildroot}/lib64/ -name '*.so' -delete
 find %{buildroot}/%{_lib64dir} -name '*.la' -delete
 find %{buildroot}/%{_lib64dir} -name '*.a' -delete
 
 %find_lang %{name}
-
-%check
-make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %post -p /sbin/ldconfig
 
@@ -67,14 +63,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %doc %{_docdir}/%{name}-%{version}/*
 /sbin/*
 /lib64/*.so.*.*
-/usr/lib64/*/*.cron
+%{_datadir}/xfsprogs/xfs_scrub_all.cron
 %{_mandir}/man2/*
 %{_mandir}/man8/*
 %{_mandir}/man5/*
 %{_sbindir}/*
-%{_datadir}/%{name}/mkfs/lts_5.15.conf
+%{_datadir}/%{name}/mkfs/*.conf
 %exclude %{_docdir}/%{name}-%{version}/CHANGES.gz
-%exclude %{_datadir}/%{name}/mkfs/*.conf
 
 %files devel
 %defattr(-,root,root)
@@ -88,6 +83,16 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %defattr(-,root,root)
 
 %changelog
+* Thu Feb 08 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.0-1
+- Upgrade to version 6.6.0
+- Remove faulty check section
+
+* Tue Dec 19 2023 Andrew Phelps <anphel@microsoft.com> - 6.5.0-1
+- Upgrade to version 6.5.0
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jul 28 2023 Andy Zaugg <azaugg@linkedin.com> - 5.15-1
 - Updated to version 5.15
 

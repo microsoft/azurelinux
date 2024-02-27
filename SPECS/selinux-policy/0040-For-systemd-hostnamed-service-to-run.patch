@@ -1,0 +1,64 @@
+From 08866e625320c86b5914a6e4fd4aee794cf30b8d Mon Sep 17 00:00:00 2001
+From: Dave Sugar <dsugar100@gmail.com>
+Date: Fri, 21 Jul 2023 09:29:30 -0400
+Subject: [PATCH 41/41] For systemd-hostnamed service to run
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+systemd_hostnamed allowed to read/update/delete /run/systemd/default-hostname
+
+○ systemd-hostnamed.service - Hostname Service
+     Loaded: loaded (/usr/lib/systemd/system/systemd-hostnamed.service; static)
+    Drop-In: /usr/lib/systemd/system/systemd-hostnamed.service.d
+             └─disable-privatedevices.conf
+     Active: inactive (dead)
+       Docs: man:systemd-hostnamed.service(8)
+             man:hostname(5)
+             man:machine-info(5)
+             man:org.freedesktop.resolve1(5)
+
+Sep 13 12:51:32 localhost systemd[1]: Starting Hostname Service...
+Sep 13 12:51:32 localhost systemd[1]: Started Hostname Service.
+Sep 13 12:51:32 localhost systemd-hostnamed[1777]: Failed to read /run/systemd/default-hostname, ignoring: Permission denied
+Sep 13 12:51:32 localhost.localdomain systemd-hostnamed[1777]: Hostname set to <localhost.localdomain> (transient)
+Sep 13 12:51:32 localhost.localdomain systemd-hostnamed[1777]: Failed to remove "/run/systemd/default-hostname": Permission denied
+Sep 13 12:52:02 localhost.localdomain systemd[1]: systemd-hostnamed.service: Deactivated successfully.
+Sep 13 12:54:09 localhost.localdomain systemd[1]: Starting Hostname Service...
+Sep 13 12:54:09 localhost.localdomain systemd[1]: Started Hostname Service.
+Sep 13 12:54:09 localhost.localdomain systemd-hostnamed[1931]: Failed to read /run/systemd/default-hostname, ignoring: Permission denied
+Sep 13 12:54:39 localhost.localdomain systemd[1]: systemd-hostnamed.service: Deactivated successfully.
+
+node=localhost type=AVC msg=audit(1689891544.345:413): avc:  denied  { read } for  pid=22094 comm="systemd-hostnam" name="default-hostname" dev="tmpfs" ino=12 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=file permissive=1
+node=localhost type=AVC msg=audit(1689891544.345:413): avc:  denied  { open } for  pid=22094 comm="systemd-hostnam" path="/run/systemd/default-hostname" dev="tmpfs" ino=12 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=file permissive=1
+node=localhost type=AVC msg=audit(1689891544.345:414): avc:  denied  { getattr } for  pid=22094 comm="systemd-hostnam" path="/run/systemd/default-hostname" dev="tmpfs" ino=12 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=file permissive=1
+node=localhost type=AVC msg=audit(1689891544.345:415): avc:  denied  { ioctl } for  pid=22094 comm="systemd-hostnam" path="/run/systemd/default-hostname" dev="tmpfs" ino=12 ioctlcmd=0x5401 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=file permissive=1
+node=localhost type=AVC msg=audit(1689891544.351:417): avc:  denied  { write } for  pid=22094 comm="systemd-hostnam" name="systemd" dev="tmpfs" ino=2 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=dir permissive=1
+node=localhost type=AVC msg=audit(1689891544.351:417): avc:  denied  { remove_name } for pid=22094 comm="systemd-hostnam" name="default-hostname" dev="tmpfs" ino=12 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=dir permissive=1
+node=localhost type=AVC msg=audit(1689891544.351:417): avc:  denied  { unlink } for  pid=22094 comm="systemd-hostnam" name="default-hostname" dev="tmpfs" ino=12 scontext=system_u:system_r:systemd_hostnamed_t:s0 tcontext=system_u:object_r:init_runtime_t:s0 tclass=file permissive=1
+
+Signed-off-by: Dave Sugar <dsugar100@gmail.com>
+---
+ policy/modules/system/systemd.te | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+MSFT_TAG: cherry picked from upstream
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 805cd868b..e51156b53 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -700,6 +700,10 @@ files_read_etc_files(systemd_hostnamed_t)
+
+ fs_getattr_all_fs(systemd_hostnamed_t)
+
++init_delete_runtime_files(systemd_hostnamed_t)
++init_read_runtime_files(systemd_hostnamed_t)
++init_write_runtime_files(systemd_hostnamed_t)
++
+ selinux_use_status_page(systemd_hostnamed_t)
+
+ seutil_read_config(systemd_hostnamed_t)
+--
+2.34.1
+

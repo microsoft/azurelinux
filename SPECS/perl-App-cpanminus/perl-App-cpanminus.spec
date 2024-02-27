@@ -1,5 +1,5 @@
 Name:           perl-App-cpanminus
-Version:        1.7045
+Version:        1.7047
 Release:        1%{?dist}
 Summary:        Get, unpack, build and install CPAN modules
 # Other files:  GPL+ OR Artistic
@@ -10,7 +10,7 @@ Summary:        Get, unpack, build and install CPAN modules
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/App-cpanminus
 Source0:        https://cpan.metacpan.org/authors/id/M/MI/MIYAGAWA/App-cpanminus-%{version}.tar.gz
 Source1:        fatunpack
@@ -146,6 +146,9 @@ make test
 %{_bindir}/cpanm
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7047-1
+- Auto-upgrade to 1.7047 - Azure Linux 3.0 - package upgrades
+
 * Tue Apr 26 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.7045-1
 - Update to 1.7045
 

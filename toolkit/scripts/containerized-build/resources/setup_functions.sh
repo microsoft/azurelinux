@@ -20,8 +20,17 @@ do
   MACROS+=("--load=$macro_file")
 done
 
-## Create SOURCES_DIR
-mkdir -p SOURCES_DIR
+# Extra arguments for tdnf
+TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
+
+# TODO Remove once PMC is available for 3.0
+if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
+    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=mariner-3.0-daily-build")
+    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
+fi
+
+## Create $SOURCES_DIR
+mkdir -p $SOURCES_DIR
 
 # Create symlink from SPECS/ to SOURCES/ when rpm is called
 rpm() {
@@ -80,7 +89,7 @@ rpmbuild() {
 refresh_local_repo() {
     echo "-------- refreshing the local repo ---------"
     pushd $RPMS_DIR
-    createrepo .
+    createrepo --compatibility .
     popd
 }
 
@@ -90,15 +99,20 @@ enable_local_repo() {
     IS_REPO_ENABLED=true
     tdnf install -y createrepo
     mv /etc/yum.repos.d/local_repo.disabled_repo /etc/yum.repos.d/local_repo.repo
-    pushd /repo
-    createrepo .
-    popd
-    mkdir -p $RPMS_DIR
-    pushd $RPMS_DIR
-    createrepo .
-    popd
-    echo "-------- the local repo is enabled ---------"
-    echo "--- Package dependencies will be installed from $RPMS_DIR, /repo and upstream server ---"
+    url_list=""
+    baseurls=$(cat /etc/yum.repos.d/local_repo.repo | grep baseurl | cut -d '=' -f 2)
+    prefixToRemove="file://"
+    for urlWithPrefix in $baseurls
+    do
+        url="${urlWithPrefix#$prefixToRemove}" #remove 'file://' prefix
+        mkdir -p $url || { echo -e "\033[31m WARNING: Could not mkdir at $url, continuing\033[0m"; continue; }
+        pushd $url
+        createrepo --compatibility .
+        popd
+        url_list+=" $url"
+    done
+    echo "-------- The local repo is enabled ---------"
+    echo "--- Package dependencies will be installed from $url_list and upstream server ---"
     #echo "You can install the following packages from it:"
     #tdnf repoquery --repoid=local_build_repo 2>/dev/null
 }
@@ -147,4 +161,11 @@ install_dependencies() {
 rpmspec() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
+}
+
+# use proper tdnf arguments
+tdnf() {
+    local args=("$@")
+    command "$FUNCNAME" "${TDNF_ARGS[@]}" "${args[@]}"
+
 }

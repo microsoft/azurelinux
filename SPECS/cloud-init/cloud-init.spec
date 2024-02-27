@@ -1,20 +1,21 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.2
-Release:        3%{?dist}
+Version:        23.3.3
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
+Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         testGetInterfacesUnitTest.patch
+Patch0:         overrideDatasourceDetection.patch
+Patch1:         make_fallback_network_config_work.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
 BuildRequires:  iproute
-BuildRequires:  mariner-release 
+BuildRequires:  azurelinux-release 
 BuildRequires:  python3
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-certifi
@@ -143,6 +144,20 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 23.3.3-2
+- Update the build dependency from mariner-release to azurelinux-release
+
+* Tue Oct 15 2023 Dan Streetman <ddstreet@ieee.org> - 23.3.3-1
+- Upgrade to cloud-init 23.3.3
+- Remove Photon-specific behavior of refusal to setup fallback network
+- Update Source0 to point to actual upstream URL
+
+* Tue Oct 10 2023 Minghe Ren <mingheren@microsoft.com> - 23.3-1
+- Upgrade to cloud-init 23.3 and remove unnecessary testGetInterfacesUnitTest.patch
+
+* Wed Sep 13 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-4
+- Add patch overrideDatasourceDetection bug from upstream
+
 * Thu Aug 24 2023 Minghe Ren <mingheren@microsoft.com> - 23.2-3
 - Remove the line prohibits cloud-init log dumping to serial console 
 

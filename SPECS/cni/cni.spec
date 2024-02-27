@@ -23,11 +23,11 @@
 %define __arch_install_post export NO_BRP_STRIP_DEBUG=true
 Summary:        Container Network Interface - networking for Linux containers
 Name:           cni
-Version:        1.0.1
-Release:        13%{?dist}
+Version:        1.1.2
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/containernetworking/cni
 #Source0:       https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz
@@ -113,6 +113,15 @@ install -m 755 -d "%{buildroot}%{cni_doc_dir}"
 %{_sbindir}/cnitool
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.2-1
+- Auto-upgrade to 1.1.2 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-15
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.0.1-14
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-13
 - Bump release to rebuild with go 1.19.12
 

@@ -10,11 +10,11 @@
 
 Name:          netavark
 Version:       1.0.3
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/containers/%{name}
 Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
@@ -219,6 +219,9 @@ popd
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.3-5
+- Bump package to rebuild with rust 1.72.0
+
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> 1.0.3-4
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
 - License verified.

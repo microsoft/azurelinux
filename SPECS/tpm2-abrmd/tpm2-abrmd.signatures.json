@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "tpm2-abrmd-2.4.0.tar.gz": "044522f1568f3d5334878f0564f808ec9fdd6a4ac5d0f3bd75ae6f2c7551a96c"
- }
+  "Signatures": {
+    "tpm2-abrmd-3.0.0.tar.gz": "d59aff34164aa705b05155b86607f6b66918a433104f754a3fcf76216dd9f465"
+  }
 }

@@ -12,13 +12,13 @@ so long as they can be imported on Python 3.}
 
 Summary:        Simplified packaging of Python modules
 Name:           python-%{srcname}
-Version:        3.7.1
-Release:        3%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 # ./flit/log.py under ASL 2.0 license
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://flit.readthedocs.io/en/latest/
 Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 # For the tests
@@ -101,6 +101,9 @@ sudo -u test %pytest -k "not test_test_writable_dir_win"
 %{_bindir}/flit
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.0-1
+- Auto-upgrade to 3.9.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jul 20 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.1-3
 - Using pip3 to install 'testpath' for ptest runs.
 

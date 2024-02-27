@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "application-gateway-kubernetes-ingress-1.4.0-vendor.tar.gz": "37323b20b23d758f1abd71a1c8cc0cc47add90071017baff73d35295250b3205",
-  "application-gateway-kubernetes-ingress-1.4.0.tar.gz": "d8ae9897c5bd0ad35783e39a5ba75e898074a53f67ff6f9829d9121818687b0b"
- }
+  "Signatures": {
+    "application-gateway-kubernetes-ingress-1.7.2-vendor.tar.gz": "c7ed26c959d032de3be6b14717ea0703b3543df299c77aa1d553f11b13b88a0e",
+    "application-gateway-kubernetes-ingress-1.7.2.tar.gz": "df1ca6b5a5c328521fea35d4fea5edc48e0214324986f263e2f7d960a8a6acd8"
+  }
 }

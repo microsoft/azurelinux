@@ -26,8 +26,8 @@ const (
 // Regular expression to extract package name, version, distribution, and architecture from values returned by 'rpmspec --builtrpms'.
 // Examples:
 //
-//	kernel-5.15.63.1-1.cm2.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
-//	python3-perf-5.15.63.1-1.cm2.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: cm2, Architecture: x86_64
+//	kernel-5.15.63.1-1.azl3.x86_64		->	Name: kernel, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
+//	python3-perf-5.15.63.1-1.azl3.x86_64	->	Name: python3-perf, Version: 5.15.63.1-1, Distribution: azl3, Architecture: x86_64
 //
 // NOTE: regular expression based on following assumptions:
 //   - Package version and release values are not allowed to contain a hyphen character.
@@ -84,7 +84,7 @@ func (s *SnapshotGenerator) GenerateSnapshot(outputFilePath, distTag string) (er
 	chrootOutputFileFullPath := filepath.Join(s.simpleToolChroot.ChrootRootDir(), chrootOutputFilePath)
 	err = file.Move(chrootOutputFileFullPath, outputFilePath)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve the snapshot from the chroot. Error: %v.", err)
+		return fmt.Errorf("failed to retrieve snapshot from chroot:\n%w", err)
 	}
 
 	return
@@ -123,7 +123,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
 	specPaths, err = rpm.BuildCompatibleSpecsList(s.simpleToolChroot.ChrootRelativeSpecDir(), []string{}, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to retrieve a list of specs inside (%s). Error: %v.", s.simpleToolChroot.ChrootRelativeSpecDir(), err)
+		err = fmt.Errorf("failed to retrieve a list of specs inside (%s):\n%w", s.simpleToolChroot.ChrootRelativeSpecDir(), err)
 		return
 	}
 
@@ -131,7 +131,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 
 	allBuiltRPMs, err = s.readBuiltRPMs(specPaths, defines)
 	if err != nil {
-		logger.Log.Errorf("Failed to extract built RPMs from specs. Error: %v.", err)
+		err = fmt.Errorf("failed to extract built RPMs from specs:\n%w", err)
 		return
 	}
 
@@ -139,38 +139,55 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 
 	repoContents, err = s.convertResultsToRepoContents(allBuiltRPMs)
 	if err != nil {
-		logger.Log.Errorf("Failed to convert RPMs list to a packages summary file. Error: %v.", err)
+		err = fmt.Errorf("failed to convert RPMs list to a packages summary file:\n%w", err)
 		return
 	}
 
 	err = jsonutils.WriteJSONFile(chrootOutputFilePath, repoContents)
 	if err != nil {
-		logger.Log.Errorf("Failed to save results into (%s). Error: %v.", chrootOutputFilePath, err)
+		err = fmt.Errorf("Failed to save results into (%s):\n%w", chrootOutputFilePath, err)
 	}
 
 	return
 }
 
 func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string]string) (allBuiltRPMs []string, err error) {
-	var builtRPMs []string
-
 	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return
 	}
+
+	type SnapshotResult struct {
+		rpms []string
+		err  error
+	}
+	resultsChannel := make(chan SnapshotResult, len(specPaths))
 
 	for _, specPath := range specPaths {
 		logger.Log.Debugf("Parsing spec (%s).", specPath)
 
 		specDirPath := filepath.Dir(specPath)
 
-		builtRPMs, err = rpm.QuerySPECForBuiltRPMs(specPath, specDirPath, buildArch, defines)
-		if err != nil {
-			logger.Log.Errorf("Failed to query built RPMs from (%s). Error: %v.", specPath, err)
+		go func(pathIter string) {
+			builtRPMs, queryErr := rpm.QuerySPECForBuiltRPMs(pathIter, specDirPath, buildArch, defines)
+			if queryErr != nil {
+				queryErr = fmt.Errorf("failed to query built RPMs from (%s):\n%w", pathIter, queryErr)
+			}
+
+			resultsChannel <- SnapshotResult{
+				rpms: builtRPMs,
+				err:  queryErr,
+			}
+		}(specPath)
+	}
+
+	for i := 0; i < len(specPaths); i++ {
+		result := <-resultsChannel
+		if result.err != nil {
+			err = result.err
 			return
 		}
-
-		allBuiltRPMs = append(allBuiltRPMs, builtRPMs...)
+		allBuiltRPMs = append(allBuiltRPMs, result.rpms...)
 	}
 
 	return

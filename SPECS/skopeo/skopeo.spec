@@ -1,10 +1,10 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
-Version:        1.12.0
-Release:        3%{?dist}
+Version:        1.14.1
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/containers/skopeo
 Source0:        https://github.com/containers/skopeo/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -46,6 +46,18 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Tue Jan 30 2024 Henry Li <lihl@microsoft.com> - 1.14.1-1
+- Upgrade to v1.14.1
+
+* Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.13.3-1
+- Update to v1.13.3 to fix CVE-2023-33199 in rekor.
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-5
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.12.0-4
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.12.0-3
 - Bump release to rebuild with go 1.19.12
 

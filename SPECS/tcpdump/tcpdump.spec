@@ -1,10 +1,10 @@
 Summary:        Packet Analyzer
 Name:           tcpdump
-Version:        4.99.1
+Version:        4.99.4
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Networking
 URL:            https://www.tcpdump.org
 Source0:        https://www.tcpdump.org/release/%{name}-%{version}.tar.gz
@@ -48,6 +48,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man1/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.99.4-1
+- Auto-upgrade to 4.99.4 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 08 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.99.1-1
 - Update to 4.99.1
 

@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "gc-8.0.0.tar.gz": "8f23f9a20883d00af2bff122249807e645bdf386de0de8cbd6cce3e0c6968f04",
-  "libatomic_ops-7.6.6.tar.gz": "99feabc5f54877f314db4fadeb109f0b3e1d1a54afb6b4b3dfba1e707e38e074"
- }
+  "Signatures": {
+    "libatomic_ops-7.6.6.tar.gz": "99feabc5f54877f314db4fadeb109f0b3e1d1a54afb6b4b3dfba1e707e38e074",
+    "gc-8.2.2.tar.gz": "f30107bcb062e0920a790ffffa56d9512348546859364c23a14be264b38836a0"
+  }
 }

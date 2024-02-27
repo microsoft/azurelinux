@@ -1,0 +1,57 @@
+diff -up XML-LibXML-2.0208/Makefile.PL.orig XML-LibXML-2.0208/Makefile.PL
+--- XML-LibXML-2.0208/Makefile.PL.orig	2022-09-30 09:47:44.807934522 +0200
++++ XML-LibXML-2.0208/Makefile.PL	2022-09-30 09:49:19.192599793 +0200
+@@ -17,15 +17,31 @@ use warnings;
+ 
+ require 5.008001;
+ 
+-use Alien::Base::Wrapper qw( Alien::Libxml2 );
+ use ExtUtils::MakeMaker;
+ use Config;
+ 
+ my $SKIP_SAX_INSTALL = $ENV{SKIP_SAX_INSTALL};
+ 
++my $libs = '';
++my $inc  = '';
++if (`xml2-config --modules 2>/dev/null`) {
++  $libs = `xml2-config --libs 2>/dev/null`;
++  $inc  = `xml2-config --cflags 2>/dev/null`;
++}
++elsif (`pkg-config --modversion libcrypto 2>/dev/null`) {
++  $libs = `pkg-config --libs libxml-2.0 2>/dev/null`;
++  $inc  = `pkg-config --cflags libxml-2.0 2>/dev/null`;
++}
++
++$libs =~ s/[\r\n]+/ /g;
++$inc  =~ s/[\r\n]+/ /g;
++
++die "Could not determine location of libxml2 libs."
++  unless $libs =~ /^-/;
++die "Could not determine location of libxml2 headers."
++  unless $inc =~ /^-/;
++
+ my %ConfigReqs = (
+-  "Alien::Libxml2" => '0.14',
+-  "Alien::Base::Wrapper" => 0,
+   "Config" => 0,
+   "ExtUtils::MakeMaker" => 0,
+ );
+@@ -68,15 +84,12 @@ my %prereqs = (
+   "warnings" => 0,
+ );
+ 
+-my %xsbuild_concat = (
++my %xsbuild = (
+   DEFINE  => '-DHAVE_UTF8',
+   OBJECT  => '$(O_FILES)',
++  LIBS    => $libs,
++  INC     => $inc,
+ );
+-my %xsbuild = Alien::Base::Wrapper->mm_args;  # Might contain a definition of DEFINE, must thus concatenate.
+-while (my ($k, $v) = each %xsbuild_concat) {
+-  my $base_val = $xsbuild{$k};
+-  $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);
+-}
+ 
+ my %WriteMakefileArgs = (
+   "NAME" => "XML::LibXML",

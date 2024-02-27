@@ -1,12 +1,12 @@
 Summary:        ALSA Utilities.
 Name:           alsa-utils
-Version:        1.2.6
+Version:        1.2.9
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://alsa-project.org
 Group:          Applications/Internet
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.alsa-project.org/files/pub/utils/%{name}-%{version}.tar.bz2
 Patch0:         ens1371.patch
 BuildRequires:  alsa-lib-devel >= %{version}
@@ -19,7 +19,7 @@ for controlling your sound card.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure --disable-alsaconf --disable-xmlto
@@ -45,6 +45,12 @@ alsactl -L store
 %{_localstatedir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.9-1
+- Auto-upgrade to 1.2.9 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.6-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Jan 4 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.2.6-1
 - Update to version 1.2.6
 - License verified

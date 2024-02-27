@@ -1,11 +1,11 @@
 Summary:        A Router Advertisement daemon
 Name:           radvd
-Version:        2.18
-Release:        5%{?dist}
+Version:        2.19
+Release:        1%{?dist}
 # The code includes the advertising clause, so it's GPL-incompatible
 License:        BSD WITH advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.litech.org/radvd/
 Source0:        %{url}dist/%{name}-%{version}.tar.xz
 Source1:        radvd-tmpfs.conf
@@ -103,6 +103,9 @@ exit 0
 %{_sbindir}/radvdump
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.19-1
+- Auto-upgrade to 2.19 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.18-5
 - License verified.
 

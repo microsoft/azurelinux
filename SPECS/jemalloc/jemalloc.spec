@@ -1,15 +1,15 @@
 %define      debug_package %{nil}
 Summary:        A General Purpose Malloc Implementation
 Name:           jemalloc
-Version:        5.2.1
-Release:        2%{?dist}
+Version:        5.3.0
+Release:        1%{?dist}
 # build-aux/config.guess is under GPLv3+
 # build-aux/install-sh is under MIT
 # msvc/test_threads/test_threads.cpp is under Public Domain
 # m4/ax_cxx_compile_stdcxx.m4 is under FSFAP
 License:        BSD AND GPLv3+ AND MIT AND Public Domain AND FSFAP
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            http://www.canonware.com/jemalloc/
 Source0:        https://github.com/jemalloc/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2
@@ -59,6 +59,12 @@ find %{buildroot}%{_libdir}/ -name '*.a' -exec rm -vf {} ';'
 %{_mandir}/man3/jemalloc.3*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.0-1
+- Auto-upgrade to 5.3.0 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.2.1-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.2.1-2
 - Removing the explicit %%clean stage.
 

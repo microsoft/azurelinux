@@ -19,11 +19,11 @@
 
 Summary:        Limit the CPU Usage of a Process
 Name:           cpulimit
-Version:        2.8
-Release:        2%{?dist}
+Version:        3.0
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Monitoring
 URL:            https://limitcpu.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/limitcpu/%{name}-%{version}.tar.gz
@@ -60,6 +60,9 @@ which can be found at http://cpulimit.sourceforge.net
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-1
+- Auto-upgrade to 3.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Jan 27 2023 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.8-2
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified

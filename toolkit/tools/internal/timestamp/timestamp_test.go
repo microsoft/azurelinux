@@ -15,45 +15,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testDataDir   = "./testdata/"
-	testOutputDir = "./testout/"
-)
-
 var (
 	defaultStartTime = time.Date(2023, 1, 1, 0, 0, 0, 0, time.UTC)
 	defaultEndTime   = time.Date(2023, 1, 1, 1, 0, 0, 0, time.UTC)
 )
 
-func setUp() {
+func TestMain(m *testing.M) {
 	// init logger to be used by the timestamp tool
 	logger.InitStderrLog()
 
-	if _, err := os.Stat(testOutputDir); os.IsNotExist(err) {
-		err = os.Mkdir(testOutputDir, 0755)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func tearDown() {
-	timestampRecordFiles, err := filepath.Glob(testOutputDir + "*.jsonl")
-	if err != nil {
-		panic(err)
-	}
-	for _, file := range timestampRecordFiles {
-		err = os.Remove(file)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func TestMain(m *testing.M) {
-	setUp()
 	retVal := m.Run()
-	tearDown()
+
 	os.Exit(retVal)
 }
 
@@ -143,7 +115,7 @@ func TestTimeStampComplete(t *testing.T) {
 func TestCreateTimeStampFile(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_create_timestamp_file.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_create_timestamp_file.jsonl")
 	_, err := BeginTiming("test", testFile)
 	defer CompleteTiming()
 
@@ -154,7 +126,7 @@ func TestCreateTimeStampFile(t *testing.T) {
 func TestResumeAndAppend(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_resume_and_append.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_resume_and_append.jsonl")
 	_, err := BeginTiming("test", testFile)
 	FlushAndCleanUpResources()
 
@@ -187,7 +159,7 @@ func TestResumeAndAppend(t *testing.T) {
 func TestStartStopEvent(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_start_stop_event.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_start_stop_event.jsonl")
 	root, err := BeginTiming("test", testFile)
 
 	assert.NoError(err)
@@ -226,7 +198,7 @@ func TestStartStopEvent(t *testing.T) {
 func TestPauseResumeEvent(t *testing.T) {
 	assert := assert.New(t)
 
-	testFile := testOutputDir + "test_pause_resume_event.jsonl"
+	testFile := filepath.Join(t.TempDir(), "test_pause_resume_event.jsonl")
 	root, _ := BeginTiming("test", testFile)
 
 	ts, _ := StartEvent("A", root)
@@ -261,4 +233,45 @@ func TestPauseResumeEvent(t *testing.T) {
 	assert.Greater(records[0].ElapsedTime(), time.Duration(0))
 	assert.Greater(records[1].ElapsedTime(), time.Duration(0))
 	assert.Less(*records[0].EndTime, *records[1].StartTime)
+}
+
+func TestRerun(t *testing.T) {
+	assert := assert.New(t)
+
+	testFile := filepath.Join(t.TempDir(), "test_rerun.jsonl")
+
+	// first, create a file and write complete timestamp data to it
+	root, _ := BeginTiming("test", testFile)
+	StartEvent("A", root)
+	StopEvent(nil)
+	StartEvent("B", root)
+	StopEvent(nil)
+	CompleteTiming()
+
+	assert.FileExists(testFile)
+
+	// now, simulate a new run on the same file, there should be no error
+	// and existing data should be erased, i.e the new file should have 1 line
+	_, err := BeginTiming("test", testFile)
+	assert.NoError(err)
+	FlushAndCleanUpResources()
+
+	records := make([]*TimeStamp, 0)
+	fd, err := os.OpenFile(testFile, os.O_RDONLY, 0644)
+	if err != nil {
+		return
+	}
+	scanner := bufio.NewScanner(fd)
+	for scanner.Scan() {
+		var record TimeStampRecord
+		err = json.Unmarshal(scanner.Bytes(), &record)
+		if err != nil {
+			return
+		}
+		records = append(records, record.TimeStamp)
+	}
+
+	root = timestampMgr.root
+	assert.Equal(len(records), 1)
+	assert.Equal(records[0].ID, root.ID)
 }

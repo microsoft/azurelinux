@@ -1,11 +1,11 @@
 Summary:        Development Libraries and headers for EFI
 Name:           gnu-efi
-Version:        3.0.9
-Release:        10%{?dist}
+Version:        3.0.17
+Release:        1%{?dist}
 License:        BSD
 URL:            https://sourceforge.net/projects/gnu-efi
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://sourceforge.net/projects/%{name}/files/%{name}-%{version}.tar.bz2
 Source1:        LICENSE.PTR
 
@@ -45,11 +45,13 @@ applications that run under EFI (Extensible Firmware Interface).
 
 %prep
 %setup -q -n gnu-efi-%{version}
-%patch0001 -p1
+%patch 0001 -p1
 
 %build
 # Remove gcc's ldflags because gnu-efi uses ld directly.
-export LDFLAGS=""
+# Add "-z noexecstack" to LDFLAGS to resolve warnings
+#   see: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ffcf9c5700e49c0aee42dcba9a12ba21338e8136
+export LDFLAGS="-z noexecstack"
 
 # Package cannot build with %%{?_smp_mflags}.
 make
@@ -74,6 +76,12 @@ mv %{buildroot}/%{_libdir}/*.lds %{buildroot}/%{_libdir}/*.o %{buildroot}/%{_lib
 %{_includedir}/efi
 
 %changelog
+* Fri Nov 17 2023 Andrew Phelps <anphel@microsoft.com> - 3.0.17-1
+- Upgrade to version 3.0.17
+
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 3.0.9-11
+- Update LDFLAGS to resolve linker warnings with binutils 2.41
+
 * Wed Mar 23 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-10
 - Updating 'Source' URL.
 

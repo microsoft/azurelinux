@@ -2,11 +2,11 @@
 %define _confdir %{_sysconfdir}
 Summary:        The Apache HTTP Server
 Name:           httpd
-Version:        2.4.56
-Release:        2%{?dist}
+Version:        2.4.58
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://httpd.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-%{version}.tar.bz2
@@ -141,9 +141,9 @@ Security (TLS) protocols.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure \
@@ -345,6 +345,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Fri Oct 20 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.58-1
+- Upgrade version to address CVE-2023-45802, CVE-2023-43622 & CVE-2023-31122
+
 * Wed Aug 16 2023 Andy Zaugg <azaugg@linkedin.com> - 2.4.56-1
 - Patch config.layout and provide and provide a real log path
 - Fix PIDfile reference to /run/httpd/httpd.pid

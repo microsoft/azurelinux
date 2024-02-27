@@ -1,11 +1,11 @@
 Name:           perl-CPAN-Meta-Check
 Summary:        Verify requirements in a CPAN::Meta object
-Version:        0.014
-Release:        14%{?dist}
+Version:        0.018
+Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CPAN-Meta-Check
 Source0:        http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
 BuildArch:      noarch
@@ -58,6 +58,9 @@ make test
 %{_mandir}/man3/CPAN::Meta::Check.3*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.018-1
+- Auto-upgrade to 0.018 - Azure Linux 3.0 - package upgrades
+
 * Wed Mar 02 2022 Muhammad Falak <mwani@microsoft.com> - 0.014-14
 - Add an explicit BR on `perl(Test::Deep)` to enable ptest
 

@@ -4,6 +4,7 @@ Date: Wed, 8 May 2019 10:16:31 -0400
 Subject: [PATCH] Use system-provided crypto-policies by default
 
 Signed-off-by: Alexander Scheel <ascheel@redhat.com>
+[antorres@redhat.com]: update patch to 3.2.1 state
 ---
  raddb/mods-available/eap        | 4 ++--
  raddb/mods-available/inner-eap  | 2 +-
@@ -12,21 +13,21 @@ Signed-off-by: Alexander Scheel <ascheel@redhat.com>
  4 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/raddb/mods-available/eap b/raddb/mods-available/eap
-index 36849e10f2..b28c0f19c6 100644
+index 62152a6dfc..9f64963034 100644
 --- a/raddb/mods-available/eap
 +++ b/raddb/mods-available/eap
-@@ -368,7 +368,7 @@ eap {
- 		#
- 		#  For EAP-FAST, use "ALL:!EXPORT:!eNULL:!SSLv2"
+@@ -400,7 +400,7 @@ eap {
+ 		#  TLS cipher suites.  The format is listed
+ 		#  in "man 1 ciphers".
  		#
 -		cipher_list = "DEFAULT"
 +		cipher_list = "PROFILE=SYSTEM"
  
- 		#  If enabled, OpenSSL will use server cipher list
- 		#  (possibly defined by cipher_list option above)
-@@ -912,7 +912,7 @@ eap {
- 		#  Note - for OpenSSL 1.1.0 and above you may need
- 		#  to add ":@SECLEVEL=0"
+ 		#  Set this option to specify the allowed
+ 		#  TLS signature algorithms for OpenSSL 1.1.1 and above.
+@@ -1082,7 +1082,7 @@ eap {
+ 		#  "DEFAULT" as "DEFAULT" contains "!aNULL" so instead it is
+ 		#  recommended "ALL:!EXPORT:!eNULL:!SSLv2" is used
  		#
 -	#	cipher_list = "ALL:!EXPORT:!eNULL:!SSLv2"
 +	#	cipher_list = "PROFILE=SYSTEM"
@@ -47,23 +48,23 @@ index 576eb7739e..ffa07188e2 100644
  		#  You may want to set a very small fragment size.
  		#  The TLS data here needs to go inside of the
 diff --git a/raddb/sites-available/abfab-tls b/raddb/sites-available/abfab-tls
-index 92f1d6330e..cd69b3905a 100644
+index b8d0626bbe..073b2933c2 100644
 --- a/raddb/sites-available/abfab-tls
 +++ b/raddb/sites-available/abfab-tls
-@@ -19,7 +19,7 @@ listen {
+@@ -20,7 +20,7 @@ listen {
  		dh_file = ${certdir}/dh
  		fragment_size = 8192
  		ca_path = ${cadir}
 -		cipher_list = "DEFAULT"
 +		cipher_list = "PROFILE=SYSTEM"
- 
  		cache {
  			enable = no
+ 			lifetime = 24 # hours
 diff --git a/raddb/sites-available/tls b/raddb/sites-available/tls
-index bbc761b1c5..83cd35b851 100644
+index 137fcbc6cc..a65f8a8711 100644
 --- a/raddb/sites-available/tls
 +++ b/raddb/sites-available/tls
-@@ -215,7 +215,7 @@ listen {
+@@ -292,7 +292,7 @@ listen {
  		# Set this option to specify the allowed
  		# TLS cipher suites.  The format is listed
  		# in "man 1 ciphers".
@@ -72,15 +73,14 @@ index bbc761b1c5..83cd35b851 100644
  
  		# If enabled, OpenSSL will use server cipher list
  		# (possibly defined by cipher_list option above)
-@@ -517,7 +517,7 @@ home_server tls {
+@@ -676,7 +676,7 @@ home_server tls {
  		# Set this option to specify the allowed
  		# TLS cipher suites.  The format is listed
  		# in "man 1 ciphers".
 -		cipher_list = "DEFAULT"
 +		cipher_list = "PROFILE=SYSTEM"
- 	}
  
- }
+ 		#
+ 		#  Connection timeout for outgoing TLS connections.
 -- 
 2.21.0
-

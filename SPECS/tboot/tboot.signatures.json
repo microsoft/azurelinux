@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "README.md": "1743821e6df5542808d5aea2e42879611cc1588ce60de379ad8a8cbf36af264b",
-  "create-drtm-policy.sh": "99144a61a17869ba2fcb75a82b477065dd689219363a21bd03fd402255bf468a",
-  "tboot-1.10.2.tar.gz": "2e179ca3b50b83cee56c2f2a5e4096c06dd1f2388f7508339c390f04fcbab111"
- }
+  "Signatures": {
+    "README.md": "1743821e6df5542808d5aea2e42879611cc1588ce60de379ad8a8cbf36af264b",
+    "create-drtm-policy.sh": "99144a61a17869ba2fcb75a82b477065dd689219363a21bd03fd402255bf468a",
+    "tboot-1.11.2.tar.gz": "7da4ddbe38d3157644a077954351cc4df53edb5e72aee8a588541c41b73fd550"
+  }
 }

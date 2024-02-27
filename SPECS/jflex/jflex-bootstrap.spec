@@ -17,12 +17,12 @@
 
 Summary:        Lexical Analyzer Generator for Java
 Name:           jflex-bootstrap
-Version:        1.4.3
-Release:        31%{?dist}
+Version:        1.9.1
+Release:        1%{?dist}
 License:        GPL-2.0+
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://www.jflex.de/
 Source0:        https://github.com/jflex-de/jflex/archive/refs/tags/release_1_4_3.tar.gz#/jflex-%{version}.tar.gz
 Source1:        jflex.script
@@ -59,8 +59,8 @@ cd jflex
 perl -pi -e 's/
 $//g' examples/standalone/sample.inp
 rm -rf src/java_cup
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 rm -rf src/JFlex/tests
 
@@ -94,6 +94,9 @@ install -p -m 0755 %{SOURCE1} %{buildroot}%{_bindir}/jflex
 %{_javadir}/JFlex.jar
 
 %changelog
+* Fri Nov 03 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.1-1
+- Auto-upgrade to 1.9.1 - Azure Linux 3.0 - package upgrades
+
 * Thu Mar 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.4.3-31
 - Remove condition macros for with/without, bootstrap; redundant with separate spec
 - Switch source to one that is actively published on github

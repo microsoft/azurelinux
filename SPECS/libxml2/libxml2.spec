@@ -1,10 +1,10 @@
 Summary:        Libxml2
 Name:           libxml2
-Version:        2.10.4
+Version:        2.11.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/General Libraries
 URL:            https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
@@ -36,7 +36,7 @@ Provides:       %{name}-devel%{?_isa} = %{version}-%{release}
 Static libraries and header files for the support library for libxml
 
 %prep
-%autosetup -n %{name}-v%{version}
+%autosetup -n %{name}-v%{version} -p1
 
 %build
 ./autogen.sh
@@ -78,6 +78,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.5-1
+- Auto-upgrade to 2.11.5 - Azure Linux 3.0 - package upgrades
+
+* Mon Oct 30 2023 Suresh Thelkar <sthelkar@microsoft.com> - 2.10.4-2
+- Backport upstream patch to fix CVE-2023-45322
+
 * Tue May 23 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.10.4-1
 - Auto-upgrade to 2.10.4 - to fix CVE-2023-28484, CVE-2023-29469
 

@@ -1,12 +1,12 @@
 Summary:        Library that Implements a typesafe callback system for standard C++.
 Name:           libsigc++30
-Version:        3.2.0
+Version:        3.4.0
 Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://github.com/libsigcplusplus/libsigcplusplus
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/libsigcplusplus/libsigcplusplus/releases/download/%{version}/libsigc++-%{version}.tar.xz
 BuildRequires:  docbook-style-xsl
 BuildRequires:  doxygen
@@ -58,6 +58,9 @@ This package contains the full API documentation for %{name}.
 %doc %{_datadir}/devhelp/
 
 %changelog
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.0-1
+- Auto-upgrade to 3.4.0 - Azure Linux 3.0 - package upgrades
+
 * Thu Feb 03 2022 Cameron Baird <cameronbaird@microsoft.com> - 3.2.0-1
 - Update to v3.2.0
 - Add doc package

@@ -5,7 +5,7 @@ $(call create_folder,$(IMAGEGEN_DIR))
 
 # Resources
 config_name              = $(notdir $(CONFIG_FILE:%.json=%))
-config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, find $(CONFIG_BASE_DIR)))
+config_other_files       = $(if $(CONFIG_FILE),$(call shell_real_build_only, $(SCRIPTS_DIR)/get_config_deps.sh $(CONFIG_FILE)),)
 assets_dir               = $(RESOURCES_DIR)/assets/
 assets_files             = $(call shell_real_build_only, find $(assets_dir))
 imggen_local_repo        = $(MANIFESTS_DIR)/image/local.repo
@@ -74,9 +74,13 @@ clean-imagegen:
 	$(SCRIPTS_DIR)/safeunmount.sh "$(IMAGEGEN_DIR)" && \
 	rm -rf $(IMAGEGEN_DIR)
 
+##help:target:fetch-image-packages=Locate and download all packages required for an image build.
 fetch-image-packages: $(image_package_cache_summary)
+
+##help:target:fetch-external-image-packages=Download all external packages required for an image build.
 fetch-external-image-packages: $(image_external_package_cache_summary)
 
+##help:target:validate-image-config=Validate the selected image config.
 # Validate the selected config file if any changes occur in the image config base directory.
 # Changes to files located outside the base directory will not be detected.
 validate-image-config: $(validate-config)
@@ -108,13 +112,14 @@ ifeq ($(USE_PREVIEW_REPO),y)
 imagepkgfetcher_extra_flags += --use-preview-repo
 endif
 
-$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms)
+$(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(toolchain_rpms) $(imggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config) $(RPMS_DIR) $(imggen_rpms)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-imagepkgfetcher) \
 		--input=$(CONFIG_FILE) \
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/imagepkgfetcher.log \
+		--log-color=$(LOG_COLOR) \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -134,6 +139,7 @@ $(image_package_cache_summary): $(go-imagepkgfetcher) $(chroot_worker) $(imggen_
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
 		--timestamp-file=$(TIMESTAMP_DIR)/imagepkgfetcher.jsonl
 
+##help:target:make-raw-image=Create the raw base image.
 make-raw-image: $(imager_disk_output_dir)
 $(imager_disk_output_dir): $(STATUS_FLAGS_DIR)/imager_disk_output.flag
 	@touch $@
@@ -149,6 +155,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/imager.log \
+		--log-color=$(LOG_COLOR) \
 		--local-repo $(local_and_external_rpm_cache) \
 		--tdnf-worker $(chroot_worker) \
 		--repo-file=$(imggen_local_repo) \
@@ -167,6 +174,7 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 # Sometimes files will have been deleted, that is fine so long as we were able to detect the change
 $(imager_disk_output_dir)/%: ;
 
+##help:target:image=Generate an image.
 image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depend_CONFIG_FILE) $(CONFIG_FILE) $(validate-config)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	VMXTEMPLATE=$(ova_vmxtemplate) OVFINFO=$(ova_ovfinfo) \
@@ -178,6 +186,7 @@ image: $(imager_disk_output_dir) $(imager_disk_output_files) $(go-roast) $(depen
 		--release-version $(RELEASE_VERSION) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/roast.log \
+		--log-color=$(LOG_COLOR) \
 		--image-tag=$(IMAGE_TAG) \
 		--cpu-prof-file=$(PROFILE_DIR)/roast.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/roast.mem.pprof \
@@ -194,6 +203,7 @@ $(image_external_package_cache_summary): $(cached_file) $(go-imagepkgfetcher) $(
 		--base-dir=$(CONFIG_BASE_DIR) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/externalimagepkgfetcher.log \
+		--log-color=$(LOG_COLOR) \
 		--rpm-dir=$(RPMS_DIR) \
 		--tmp-dir=$(image_fetcher_tmp_dir) \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
@@ -225,7 +235,10 @@ $(initrd_img): $(initrd_bundled_files) $(initrd_config_json) $(INITRD_CACHE_SUMM
 	# Recursive make call to build the initrd image $(artifact_dir)/iso-initrd.img
 	$(MAKE) image MAKEOVERRIDES= CONFIG_FILE=$(initrd_config_json) IMAGE_CACHE_SUMMARY=$(INITRD_CACHE_SUMMARY) IMAGE_TAG= RELEASE_VERSION=$(RELEASE_VERSION) BUILD_NUMBER=$(BUILD_NUMBER)
 
+##help:target:installer-initrd=Create the initrd for the ISO installer.
 installer-initrd: $(initrd_img)
+
+##help:target:iso=Create an installable ISO.
 iso: $(initrd_img) $(iso_deps)
 	$(if $(CONFIG_FILE),,$(error Must set CONFIG_FILE=))
 	$(go-isomaker) \
@@ -238,9 +251,12 @@ iso: $(initrd_img) $(iso_deps)
 		--iso-repo $(local_and_external_rpm_cache) \
 		--log-level=$(LOG_LEVEL) \
 		--log-file=$(LOGS_DIR)/imggen/isomaker.log \
+		--log-color=$(LOG_COLOR) \
 		$(if $(filter y,$(UNATTENDED_INSTALLER)),--unattended-install) \
 		--output-dir $(artifact_dir) \
 		--image-tag=$(IMAGE_TAG)
+
+##help:target:meta-user-data=Create a `meta-user-data.iso` file under `IMAGES_DIR` using `meta-data` and `user-data` from `META_USER_DATA_DIR`.
 meta-user-data: $(meta_user_data_files)
 	cp -t $(meta_user_data_tmp_dir) $(meta_user_data_files)
 	if [ -n "$(SSH_KEY_FILE)" ]; then \

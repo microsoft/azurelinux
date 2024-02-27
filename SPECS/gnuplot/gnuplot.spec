@@ -1,12 +1,12 @@
 Summary:        Gnuplot is a portable command-line driven graphing utility.
 Name:           gnuplot
-Version:        5.4.3
+Version:        5.4.8
 Release:        1%{?dist}
 License:        Gnuplot
 URL:            http://www.gnuplot.info/
 Group:          Applications
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %description
@@ -35,6 +35,9 @@ make DESTDIR=%{buildroot} install
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.4.8-1
+- Auto-upgrade to 5.4.8 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 15 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.4.3-1
 - Update source to 5.4.3
 

@@ -2,11 +2,11 @@
 %global gem_name faraday-net_http
 Summary:        Faraday adapter for Net::HTTP
 Name:           rubygem-%{gem_name}
-Version:        1.0.0
+Version:        3.0.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/lostisland/faraday-net_http
 Source0:        https://github.com/lostisland/faraday-net_http/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.2-1
+- Auto-upgrade to 3.0.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.0-1
 - License verified
 - Original version for CBL-Mariner

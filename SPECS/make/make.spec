@@ -1,10 +1,10 @@
 Summary:        Program for compiling packages
 Name:           make
-Version:        4.3
-Release:        2%{?dist}
+Version:        4.4.1
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.gnu.org/software/make
 Source0:        https://ftp.gnu.org/gnu/make/%{name}-%{version}.tar.gz
@@ -43,6 +43,12 @@ rm -rf %{buildroot}%{_infodir}
 %{_mandir}/*/*
 
 %changelog
+* Mon Jan 22 2024 Andrew Phelps <anphel@microsoft.com> - 4.4.1-1
+- Upgrade to version 4.4.1
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.3-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 20 2022 Muhammad Falak <mwani@microsoft.com> - 4.3-2
 - Fix ptest with an explicit BR on `perl(lib)`.
 

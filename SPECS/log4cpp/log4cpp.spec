@@ -1,11 +1,11 @@
 Summary:        Log for C++
 Name:           log4cpp
-Version:        1.1.3
-Release:        7%{?dist}
+Version:        1.1.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            http://log4cpp.sourceforge.net/
 Source:         https://sourceforge.net/projects/%{name}/files/%{name}-1.1.x%20%28new%29/%{name}-1.1/%{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
@@ -57,6 +57,9 @@ make DESTDIR=%{buildroot} install
 %_prefix/share/aclocal/*.m4
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4-1
+- Auto-upgrade to 1.1.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.3-7
 - Removing the explicit %%clean stage.
 

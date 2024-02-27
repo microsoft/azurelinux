@@ -1,18 +1,14 @@
 %global debug_package %{nil}
 Summary:        A language for data analysis and graphics
 Name:           R
-Version:        4.1.0
-Release:        3%{?dist}
+Version:        4.3.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://www.r-project.org
 Source0:        https://cran.r-project.org/src/base/R-4/R-%{version}.tar.gz
-# This change is a best hunch fix as the limitation on curl version 7 was set
-# in 2018. Given curl 8.0.0 is not an actual breaking change, this patch should be fine.
-# We should drop this when R eventually gets official support for build with curl >= 8.0.0
-Patch0:         0001-configure-fix-compilation-with-curl-8.0.0.patch
 BuildRequires:  build-essential
 BuildRequires:  bzip2-devel
 BuildRequires:  curl-devel
@@ -24,6 +20,7 @@ BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
+BuildRequires:  tzdata
 BuildRequires:  which
 BuildRequires:  xz
 BuildRequires:  xz-devel
@@ -121,6 +118,12 @@ TZ="Europe/Paris" make check -k -i
 %endif
 
 %changelog
+* Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.3.2-1
+- Upgrade to 4.3.2
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.1.0-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Mar 31 2023 Muhammad Falak <mwani@microsoft.com> - 4.1.0-3
 - Patch to fix build with curl >= 8.0.0
 

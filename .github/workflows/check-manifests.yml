@@ -5,9 +5,9 @@ name: Check Manifests
 
 on:
   push:
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
   pull_request:
-    branches: [main, dev, 1.0*, 2.0*, fasttrack/*]
+    branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
 jobs:
   build:
@@ -17,6 +17,11 @@ jobs:
 
     - name: Check out code
       uses: actions/checkout@v4
+
+    # This PR runner uses an older Ubuntu with rpm version 4.17, which doesn't understand some newer macros like %bcond
+    - name: Define missing rpm macros
+      run: |
+        [[ -n $(rpm --eval '%bcond test 1') ]] && echo '%bcond() %[ (%{2}) ? "%{expand:%%bcond_without %{1}}" : "%{expand:%%bcond_with %{1}}" ]' > ~/.rpmmacros
 
     - name: Check x86_64 manifests
       run: |

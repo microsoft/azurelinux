@@ -1,10 +1,10 @@
 Summary:        Multipurpose relay (SOcket CAT)
 Name:           socat
-Version:        1.7.4.3
+Version:        1.7.4.4
 Release:        1%{?dist}
 License:        GPL2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Internet
 URL:            http://www.dest-unreach.org/socat
 Source0:        http://www.dest-unreach.org/socat/download/%{name}-%{version}.tar.gz
@@ -36,6 +36,9 @@ make %{?_smp_mflags} test
 %{_mandir}/man1/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.4.4-1
+- Auto-upgrade to 1.7.4.4 - Azure Linux 3.0 - package upgrades
+
 * Mon Jan 24 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.7.4.3-1
 - Update to version 1.7.4.3.
 

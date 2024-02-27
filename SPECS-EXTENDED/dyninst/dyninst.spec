@@ -1,9 +1,9 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 9%{?dist}
+Release: 12%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL: http://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.35-4%{?dist}
+BuildRequires: glibc-static >= 2.38-1%{?dist}
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -87,11 +87,11 @@ making sure that dyninst works properly.
 %setup -q -n %{name}-%{version} -c
 %setup -q -T -D -a 1
 
-%patch1 -p1 -b.result
-%patch2 -p1 -b.gettid
-%patch3 -p1 -b.386
-%patch4 -p1 -b.aarch
-%patch5 -p1
+%patch 1 -p1 -b.result
+%patch 2 -p1 -b.gettid
+%patch 3 -p1 -b.386
+%patch 4 -p1 -b.aarch
+%patch 5 -p1
 
 # cotire seems to cause non-deterministic gcc errors
 # https://bugzilla.redhat.com/show_bug.cgi?id=1420551
@@ -194,6 +194,15 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 10.1.0-12
+- Bump release to rebuild against glibc 2.38-1
+
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 10.1.0-11
+- Bump release to rebuild against glibc 2.35-6
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 10.1.0-10
+- Bump release to rebuild against glibc 2.35-5
+
 * Wed Jul 05 2023 Andrew Phelps <anphel@microsoft.com> - 10.1.0-9
 - Bump release to rebuild against glibc 2.35-4
 

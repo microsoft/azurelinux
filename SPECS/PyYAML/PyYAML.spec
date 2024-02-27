@@ -1,20 +1,17 @@
+%global debug_package %{nil}
 Summary:        YAML parser and emitter for Python
 Name:           PyYAML
-Version:        3.13
-Release:        8%{?dist}
+Version:        6.0.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
-URL:            https://pyyaml.org/
-Source0:        https://pyyaml.org/download/pyyaml/%{name}-%{version}.tar.gz
-Patch0:         PyYAML-CVE-2017-18342.patch
-Patch1:         ConstructorError_fix.patch
-Patch2:         change_default_loader.patch
-Patch3:         PyYAML-lib3-CVE-2017-18342.patch
+URL:            https://github.com/yaml/pyyaml
+Source0:        https://github.com/yaml/pyyaml/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  libyaml-devel
 BuildRequires:  python3
-BuildRequires:  python3-Cython
+#BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 Requires:       libyaml
@@ -37,11 +34,11 @@ PyYAML is applicable for a broad range of tasks from complex
 configuration files to object serialization and persistence.
 
 %prep
-%autosetup -p 1 -n PyYAML-%{version}
-find -type f -name "*.c" -delete -print
+%autosetup -p 1 -n pyyaml-%{version}
+#find -type f -name "*.c" -delete -print
 
 %build
-export PYYAML_FORCE_CYTHON=1
+#export PYYAML_FORCE_CYTHON=1
 %py3_build
 
 %install
@@ -55,10 +52,22 @@ chmod a-x examples/yaml-highlight/yaml_hl.py
 %files
 %defattr(-,root,root,-)
 %license LICENSE
-%doc PKG-INFO README examples
+%doc CHANGES README.md examples
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 6.0.1-1
+- Upgrade to version 6.0.1
+- Fix Source0
+- Disable debuginfo package
+
+* Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 5.3.1-1
+- Upgrade to version 5.3.1
+- Disable building with Cython due to compat issue in Cython 3
+
+* Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 5.2-1
+- Upgrade to 5.2
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 3.13-8
 - Rebuild C source files using Cython for Python 3.9 compatibility
 

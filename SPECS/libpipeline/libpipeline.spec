@@ -1,10 +1,10 @@
 Summary:        Library for manipulating pipelines
 Name:           libpipeline
-Version:        1.5.5
-Release:        2%{?dist}
+Version:        1.5.7
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://libpipeline.nongnu.org
 Source0:        http://download.savannah.gnu.org/releases/libpipeline/%{name}-%{version}.tar.gz
@@ -54,6 +54,12 @@ make -C tests check
 %{_mandir}/man3/*
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.7-1
+- Auto-upgrade to 1.5.7 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.5.5-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.5.5-2
 - Remove manual pkgconfig(*) provides in toolchain specs
 

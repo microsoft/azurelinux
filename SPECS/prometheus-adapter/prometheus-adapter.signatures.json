@@ -1,5 +1,5 @@
 {
-    "Signatures": {
-        "prometheus-adapter-0.10.0.tar.gz": "4decc37007e6f894cdc44c698a7b9f293f6b18f3060369a012306954f672021b"
-    }
+  "Signatures": {
+    "prometheus-adapter-0.11.2.tar.gz": "8a39aba1daa2225eaf9309a2d89385056451412d801684ea53c60a39c58e3fe3"
+  }
 }

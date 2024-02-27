@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "3a4f39b6a9bd4f7dbd7654433feedcc26076a6545490a20f41f24686be337d72",
-  "perl-Test-LeakTrace-0.16.tar.gz": "5f089eed915f1ec8c743f6d2777c3ecd0ca01df2f7b9e10038d316952583e403"
- }
+  "Signatures": {
+    "LICENSE.PTR": "3a4f39b6a9bd4f7dbd7654433feedcc26076a6545490a20f41f24686be337d72",
+    "perl-Test-LeakTrace-0.17.tar.gz": "777d64d2938f5ea586300eef97ef03eacb43d4c1853c9c3b1091eb3311467970"
+  }
 }

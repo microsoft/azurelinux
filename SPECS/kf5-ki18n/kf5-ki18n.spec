@@ -3,13 +3,13 @@
 
 Name:           kf5-%{framework}
 Version:        5.61.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon for localization
 License:        BSD and LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
 Source0:        https://download.kde.org/stable/frameworks/%{majmin}/%{framework}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 ## upstream patches
 
@@ -90,6 +90,9 @@ make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.61.0-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 17 2022 Thomas Crain <thcrain@microsoft.com> - 5.61.0-4
 - Remove python2, replace with python3
 

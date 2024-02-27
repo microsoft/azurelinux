@@ -4,7 +4,7 @@ Release:	25%{?dist}
 Summary:	Kerberos realm enrollment service
 License:	LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		http://cgit.freedesktop.org/realmd/realmd/
 Source0:	http://www.freedesktop.org/software/realmd/releases/realmd-%{version}.tar.gz
 

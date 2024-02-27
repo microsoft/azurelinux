@@ -1,0 +1,12 @@
+diff -rupN libkml-1.3.0/tests/kml/base/string_util_test.cc libkml-1.3.0-new/tests/kml/base/string_util_test.cc
+--- libkml-1.3.0/tests/kml/base/string_util_test.cc	2015-12-21 18:23:05.000000000 +0100
++++ libkml-1.3.0-new/tests/kml/base/string_util_test.cc	2019-10-30 09:40:53.040877025 +0100
+@@ -33,7 +33,7 @@ TEST(StringUtilTest, Testb2a_hex) {
+   const uint32_t kff = 0xff;
+ 
+   const char* e = "00";
+-  static char a[2];
++  static char a[3];
+ 
+   b2a_hex(k00, a);
+   ASSERT_EQ(0, strcmp(e, a));

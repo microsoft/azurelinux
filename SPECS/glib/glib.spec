@@ -1,11 +1,11 @@
 %define majorver %(echo %{version} | cut -d. -f1-2)
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
-Version:        2.71.0
+Version:        2.78.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.gnome.org/glib/
 Source0:        https://ftp.gnome.org/pub/gnome/sources/glib/%{majorver}/%{name}-%{version}.tar.xz
@@ -96,6 +96,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %{_libdir}/libgmodule-*.so.*
 %{_libdir}/libgio-*.so.*
 %{_libdir}/libgobject-*.so.*
+%{_libexecdir}/gio-launch-desktop
 
 %files devel
 %defattr(-, root, root)
@@ -122,6 +123,12 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.78.1-1
+- Upgrade to version 2.78.1
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.71.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 10 2022 Henry Li <lihl@microsoft.com> - 2.71.0-1
 - Upgrade to version 2.71.0
 - Add python3-pygments as BR

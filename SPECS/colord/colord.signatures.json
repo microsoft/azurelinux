@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "colord-1.4.4.tar.xz": "9a0fe80160bf88efddb582a9fc0169f56065276dc3882c47dddb9eecd048c0a5",
-  "colord-LGPLv2.txt": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551"
- }
+  "Signatures": {
+    "colord-LGPLv2.txt": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+    "colord-1.4.6.tar.xz": "7407631a27bfe5d1b672e7ae42777001c105d860b7b7392283c8c6300de88e6f"
+  }
 }

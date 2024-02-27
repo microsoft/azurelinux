@@ -1,7 +1,7 @@
 Summary:        Perl extension for using OpenSSL
 Name:           perl-Net-SSLeay
 Version:        1.92
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            https://metacpan.org/pod/distribution/Net-SSLeay/lib/Net/SSLeay.pod
@@ -11,7 +11,7 @@ Patch0:         0001-local-tests-skip-2-failing-tests.patch
 Source100:      openssl-fips-2.0.9-lin64.tar.gz
 %endif
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  openssl-devel
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(English)
@@ -48,7 +48,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %if 0%{?with_fips:1}
@@ -80,6 +80,9 @@ make test
 %{_mandir}/man?/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.92-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Aug 24 2022 Muhammad Falak <mwani@microsoft.com> - 1.92-2
 - Add BR on perl-{(CPAN::*),(FindBin),(Test::*)(blib)} to enable build
 - Skip two failing tests to fix ptest build

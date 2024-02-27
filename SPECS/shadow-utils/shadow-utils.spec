@@ -1,13 +1,13 @@
 Summary:        Programs for handling passwords in a secure way
 Name:           shadow-utils
-Version:        4.9
-Release:        12%{?dist}
+Version:        4.14.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/shadow-maint/shadow/
-Source0:        https://github.com/shadow-maint/shadow/releases/download/v%{version}/shadow-%{version}.tar.xz
+Source0:        https://github.com/shadow-maint/shadow/releases/download/%{version}/shadow-%{version}.tar.xz
 Source1:        chage
 Source2:        chpasswd
 Source3:        login
@@ -20,8 +20,6 @@ Source10:       system-password
 Source11:       system-session
 Source12:       useradd-default
 Source13:       login-defs
-Patch0:         chkname-allowcase.patch
-Patch1:         libsubid-pam-link.patch
 BuildRequires:  autoconf
 BuildRequires:  audit-devel
 BuildRequires:  automake
@@ -30,6 +28,7 @@ BuildRequires:  cracklib-devel
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  itstool
+BuildRequires:  libxcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libsemanage-devel
 BuildRequires:  libtool
@@ -68,8 +67,6 @@ Libraries and headers for libsubid
 
 %prep
 %setup -q -n shadow-%{version}
-%patch0 -p1
-%patch1 -p1
 
 autoreconf -fiv
 
@@ -89,6 +86,7 @@ sed -i 's@DICTPATH.*@DICTPATH\t/usr/share/cracklib/pw_dict@' \
     --with-group-name-max-length=32 \
     --with-selinux \
     --with-audit \
+    --without-libbsd \
     --enable-man \
     --with-su=no
 %make_build
@@ -101,6 +99,9 @@ mv -v %{buildroot}%{_bindir}/passwd %{buildroot}/bin
 chmod ug-s %{buildroot}/bin/passwd
 install -vm644 %{SOURCE12} %{buildroot}%{_sysconfdir}/default/useradd
 install -vm644 %{SOURCE13} %{buildroot}%{_sysconfdir}/login.defs
+# Disable usergroups. Use "users" group by default (see /usr/sbin/useradd)
+# for all nonroot users.
+sed -i 's/USERGROUPS_ENAB.*/USERGROUPS_ENAB no/' %{buildroot}%{_sysconfdir}/login.defs
 ln -s useradd %{buildroot}%{_sbindir}/adduser
 cp etc/{limits,login.access} %{buildroot}%{_sysconfdir}
 for FUNCTION in FAIL_DELAY               \
@@ -153,6 +154,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_sbindir}/grpconv
 chmod 000 %{_sysconfdir}/shadow
 
+%postun
+/sbin/ldconfig
+
+%clean
+rm -rf %{buildroot}/*
+
 %files -f shadow.lang
 %defattr(-,root,root)
 %license COPYING
@@ -169,13 +176,25 @@ chmod 000 %{_sysconfdir}/shadow
 
 %files subid
 %license COPYING
-%{_libdir}/libsubid.so.3*
+%{_libdir}/libsubid.so.4*
 
 %files subid-devel
 %{_includedir}/shadow/subid.h
+%{_libdir}/libsubid.a
 %{_libdir}/libsubid.so
 
 %changelog
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.14.3-1
+- Auto-upgrade to 4.14.3 - 3.0 Upgrade
+- Remove obsolete patches and fix configure command
+
+* Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9-14
+- Switch to link with libxcrypt
+
+* Wed Sep 20 2023 Kanika Nema <kanikanema@microsoft.com> - 4.9-13
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+- Address CVE-2023-29383
+
 * Wed May 24 2023 Tobias Brick <tobiasb@microsoft.com> - 4.9-12
 - Add SETUID bit to passwd binary
 

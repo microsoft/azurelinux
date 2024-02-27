@@ -5,13 +5,13 @@ Subject: [PATCH] Parse an ampersand entity in SAX interface
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-
+ 
 After disabling parsing external entities in XML-LibXML-2.0202,
 XML::LibXML::SAX interface stopped expanding &amp; and &#38; entities
 in attribute values (often found in href XHTML attributes) and
 returned "&#38;" instead. This was discovered by a RDF-Trine test
 suite failure <https://github.com/kasei/perlrdf/issues/167>.
-
+ 
 First, I suspected XML-LibXML
 <https://rt.cpan.org/Ticket/Display.html?id=131498>, but it turned out
 that the unexpanded entity comes from libxml2 C library itself. And
@@ -20,11 +20,11 @@ escape sequence for "&" characters. Other XML metacharacters (like
 "<") are not affeced. Also text nodes are also not affected.  My
 finding was confirmed by an old libxml2 bug report
 <https://bugzilla.gnome.org/show_bug.cgi?id=316487>.
-
+ 
 This patch "fixes" this discepancy by replacing all "&#38;"
 subtstrings with a literal "&" in SAX interface of start_element()
 callbacks.
-
+ 
 Signed-off-by: Petr Písař <ppisar@redhat.com>
 ---
  MANIFEST          |  1 +
@@ -32,7 +32,7 @@ Signed-off-by: Petr Písař <ppisar@redhat.com>
  t/52_sax_intent.t | 40 ++++++++++++++++++++++++++++++++++++++++
  3 files changed, 83 insertions(+), 2 deletions(-)
  create mode 100755 t/52_sax_intent.t
-
+ 
 diff --git a/MANIFEST b/MANIFEST
 index 5248ea5..ccc3410 100644
 --- a/MANIFEST
@@ -177,4 +177,3 @@ index 0000000..a45b4d1
 +
 -- 
 2.21.1
-

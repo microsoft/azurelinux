@@ -5,10 +5,10 @@
 Summary:        Cyrus Simple Authentication Service Layer (SASL) library
 Name:           %{_base_name}-bootstrap
 Version:        2.1.28
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        BSD with advertising
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.cyrusimap.org/sasl/
 Source0:        https://github.com/cyrusimap/%{_base_name}/releases/download/%{_base_name}-%{version}/%{_base_name}-%{version}.tar.gz
@@ -17,13 +17,15 @@ BuildRequires:  e2fsprogs-devel
 BuildRequires:  krb5-devel >= 1.12
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
-BuildRequires:  systemd
+BuildRequires:  systemd-bootstrap-devel
+BuildRequires:  libxcrypt-devel
 
 Requires:       %{name}-lib = %{version}-%{release}
 Requires:       krb5 >= 1.12
 Requires:       openssl
 Requires:       pam
-Requires:       systemd
+# Our build tooling cannot handle this
+#Requires:       systemd
 Requires:       libdb
 
 %description
@@ -192,6 +194,12 @@ make %{?_smp_mflags} check
 %exclude %{_plugindir2}/libsql.so.%{_soversion}*
 
 %changelog
+* Mon Feb 05 2024 Dan Streetman <ddstreet@ieee.org> - 2.1.28-6
+- workaround "circular dependencies" from build tooling
+
+* Wed Nov 15 2023 Andrew Phelps <anphel@microsoft.com> - 2.1.28-5
+- Add BR for libxcrypt-devel
+
 * Mon Feb 27 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.1.28-4
 - Remove AutoProv no to address build issues in openldap
 

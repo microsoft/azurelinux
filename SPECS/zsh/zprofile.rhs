@@ -34,4 +34,3 @@ for script in /etc/profile.d/*.sh ; do
 done
 
 unset script RED GREEN NORMAL
-umask 027

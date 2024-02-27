@@ -10,16 +10,18 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.110.mshv2
+Version:        5.15.126.mshv3
 Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
-Patch0:         0001-Implement-dom0-kernel-patch-for-loader-as-of-0524.patch
+Source3:        50_mariner_mshv.cfg
+Source4:        50_mariner_mshv_menuentry
+Patch0:         perf_bpf_test_add_nonnull_argument.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -28,6 +30,7 @@ BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libdnet-devel
@@ -42,6 +45,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%{?grub2_configuration_requires}
 
 %description
 The Mariner kernel that has MSHV Host support
@@ -114,6 +118,12 @@ install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
+# Add kernel-mshv-specific boot configurations to /etc/default/grub.d
+# This configuration contains additional boot parameters required in our
+# Linux-Dom0-based images. 
+install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
+install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
+
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 mkdir -p %{buildroot}/boot/efi
@@ -127,14 +137,6 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
-
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
-mariner_linux_mshv=vmlinuz-%{uname_r}
-mariner_initrd_mshv=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
 # Register myself to initramfs
 mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
@@ -183,19 +185,11 @@ rm -rf /boot/efi/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
-if [ ! -e /boot/mariner-mshv.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner-mshv.cfg
-     fi
-fi
+%grub2_postun
 
 %post
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
+%grub2_post
 
 %files
 %defattr(-,root,root)
@@ -205,8 +199,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/efi/vmlinuz-%{uname_r}
-%config(noreplace) /boot/linux-%{uname_r}.cfg
+%config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
+%config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 %exclude /lib/modules/%{uname_r}/build
@@ -236,6 +231,28 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
+- Remove legacy /boot/mariner-mshv.cfg
+
+* Thu Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
+- Introduce 50_mariner_mshv_menuentry, which implements
+    the custom boot path when running over MSHV.
+- Check for required mshv components in 50_mariner_mshv.cfg before
+    defaulting to kernel-mshv boot. 
+
+* Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
+- Add patch for perf_bpf_test_add_nonnull_argument
+- Update config to reflect gcc 13 toolchain
+
+* Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
+- Update to v5.15.126.mshv3
+
+* Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
+- Enable grub2-mkconfig-based boot path by installing 
+    50_mariner_mshv.cfg 
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
+
 * Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
 - Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
     systemd.cfg which is packaged in systemd

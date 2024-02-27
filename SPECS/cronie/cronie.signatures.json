@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "cronie-1.5.7.tar.gz": "538bcfaf2e986e5ae1edf6d1472a77ea8271d6a9005aee2497a9ed6e13320eb3",
-  "run-parts.sh": "7ed96cde9fa88c31316b397f4a2962d32ddc10e2a4dd08411adfe66f8a6b2881"
- }
+  "Signatures": {
+    "run-parts.sh": "7ed96cde9fa88c31316b397f4a2962d32ddc10e2a4dd08411adfe66f8a6b2881",
+    "cronie-1.6.1.tar.gz": "2cd0f0dd1680e6b9c39bf1e3a5e7ad6df76aa940de1ee90a453633aa59984e62"
+  }
 }

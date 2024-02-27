@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global provider_dir %{_libdir}/cmpi
 
 Summary:        SBLIM fsvol instrumentation
@@ -49,12 +49,12 @@ SBLIM Base Fsvol Testcase Files for SBLIM Testsuite
 
 %prep
 %setup -q
-%patch0 -p1 -b .ext4-support
-%patch1 -p0 -b .mounted-fs-shown-as-disabled
-%patch2 -p1 -b .docdir
-%patch3 -p1 -b .pegasus-interop
-%patch4 -p1 -b .prov-reg-sfcb-systemd
-%patch5 -p1 -b .mounted-dm-fs-shown-as-disabled
+%patch 0 -p1 -b .ext4-support
+%patch 1 -p0 -b .mounted-fs-shown-as-disabled
+%patch 2 -p1 -b .docdir
+%patch 3 -p1 -b .pegasus-interop
+%patch 4 -p1 -b .prov-reg-sfcb-systemd
+%patch 5 -p1 -b .mounted-dm-fs-shown-as-disabled
 
 %build
 %ifarch s390 s390x ppc ppc64

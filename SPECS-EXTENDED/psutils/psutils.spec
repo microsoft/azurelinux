@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: PostScript Utilities
 Name:    psutils
 Version: 1.23
@@ -44,7 +44,7 @@ Various scripts from the psutils distribution that require perl.
 %prep
 %setup -q
 
-%patch0 -p1 -b .paperconf
+%patch 0 -p1 -b .paperconf
 # Use /usr/bin/perl instead of /usr/bin/env perl
 sed -i -e 's,/usr/bin/env perl,%{__perl},' \
   extractres psjoin

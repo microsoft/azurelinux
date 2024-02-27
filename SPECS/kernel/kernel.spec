@@ -1,11 +1,12 @@
 %global security_hardening none
 %global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
+%define mariner_version 3
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
-# The default arguments regenerate the build-id for vmlinux in the 
+# The default arguments regenerate the build-id for vmlinux in the
 # debuginfo package causing a mismatch with the build-id for vmlinuz in
-# the kernel package. Therefore, explicilty set the relevant default 
+# the kernel package. Therefore, explicilty set the relevant default
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
@@ -27,40 +28,46 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.131.1
-Release:        1%{?dist}
+Version:        6.6.14.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
-Patch0:         nvme_multipath_default_false.patch
+Source5:        cpupower
+Source6:        cpupower.service
+Source7:        10_kernel.cfg
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  build-essential
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
 BuildRequires:  flex
 BuildRequires:  gettext
 BuildRequires:  glib-devel
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  kbd
 BuildRequires:  kmod-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libdnet-devel
 BuildRequires:  libmspack-devel
+BuildRequires:  libtraceevent-devel
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  procps-ng-devel
 BuildRequires:  python3-devel
 BuildRequires:  sed
+BuildRequires:  systemd-bootstrap-rpm-macros
 %ifarch x86_64
 BuildRequires:  pciutils-devel
 %endif
@@ -68,6 +75,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -144,13 +152,6 @@ Requires:       python3
 %description -n python3-perf
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package dtb
-Summary:        This package contains common device tree blobs (dtb)
-Group:          System Environment/Kernel
-
-%description dtb
-This package contains common device tree blobs (dtb)
-
 %package -n     bpftool
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 
@@ -159,9 +160,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
-%patch0 -p1
-
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
 make mrproper
 
 cp %{config_source} .config
@@ -225,6 +224,12 @@ install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vdm 755 %{buildroot}%{_prefix}/src/linux-headers-%{uname_r}
 install -vdm 755 %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/sysconfig
+install -c -m 644 %{SOURCE5} %{buildroot}/%{_sysconfdir}/sysconfig/cpupower
+install -d -m 755 %{buildroot}%{_unitdir}
+install -c -m 644 %{SOURCE6} %{buildroot}%{_unitdir}/cpupower.service
+
 make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 %ifarch x86_64
@@ -233,7 +238,6 @@ install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
 
 %ifarch aarch64
 install -vm 600 arch/arm64/boot/Image %{buildroot}/boot/vmlinuz-%{uname_r}
-install -D -m 640 arch/arm64/boot/dts/freescale/imx8mq-evk.dtb %{buildroot}/boot/dtb/fsl-imx8mq-evk.dtb
 %endif
 
 # Restrict the permission on System.map-X file
@@ -244,13 +248,8 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro loglevel=3 no-vmw-sta crashkernel=256M
-mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
+# Add kernel boot configurations to /etc/default/grub.d
+install -Dm 755 %{SOURCE7} %{buildroot}%{_sysconfdir}/default/grub.d/10_kernel.cfg
 
 # hmac sign the kernel for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
@@ -316,20 +315,18 @@ rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
 rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
+%preun tools
+%systemd_preun cpupower.service
+
 %postun
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
+%grub2_postun
+
+%postun tools
+%systemd_postun cpupower.service
 
 %post
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %post drivers-accessibility
 /sbin/depmod -a %{uname_r}
@@ -340,6 +337,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %post drivers-sound
 /sbin/depmod -a %{uname_r}
 
+%post tools
+%systemd_post cpupower.service
+
 %files
 %defattr(-,root,root)
 %license COPYING
@@ -348,7 +348,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) /boot/linux-%{uname_r}.cfg
+%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
@@ -385,19 +385,18 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude %dir %{_libdir}/debug
 %ifarch x86_64
 %{_sbindir}/cpufreq-bench
-%{_lib64dir}/traceevent
 %{_lib64dir}/libperf-jvmti.so
 %{_lib64dir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
+%{_includedir}/powercap.h
 %{_mandir}/man1/cpupower*.gz
 %{_mandir}/man8/turbostat*.gz
 %{_datadir}/locale/*/LC_MESSAGES/cpupower.mo
 %{_datadir}/bash-completion/completions/cpupower
 %endif
 %ifarch aarch64
-%{_libdir}/traceevent
 %{_libdir}/libperf-jvmti.so
 %endif
 %{_bindir}
@@ -405,23 +404,85 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_datadir}/perf-core/strace/groups/file
 %{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
-%{_libdir}/perf/examples/bpf/*
-%{_libdir}/perf/include/bpf/*
 %{_includedir}/perf/perf_dlfilter.h
+%{_unitdir}/cpupower.service
+%config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
 %files -n python3-perf
 %{python3_sitearch}/*
-
-%ifarch aarch64
-%files dtb
-/boot/dtb/fsl-imx8mq-evk.dtb
-%endif
 
 %files -n bpftool
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Remove legacy /boot/mariner.cfg
+- Introduce /etc/default/grub.d/10_kernel.cfg
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+- Enable support for latency based cgroup IO protection
+- Enable ZRAM module
+- Enable Broadcom MPI3 Storage Controller Device Driver module
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Config changes to converge kernel-hci config with kernel
+- Remove no-vmw-sta kernel argument inherited from Photon OS
+
+* Sat Jan 27 11:07:05 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- use "bootstrap" systemd macros
+
+* Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
+- Upgrade to 6.6.12.1
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 6.6.2.1-3
+- Bump release to match kernel-headers.
+
+* Thu Dec 14 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-2
+- Add cpupower.service to kernel-tools
+- Enable user-based event tracing
+- Enable CONFIG_BPF_LSM (Thien Trung Vuong <tvuong@microsoft.com>)
+- Enable CUSE module (Juan Camposeco <juanarturoc@microsoft.com>)
+- Add IOMMU configs for aarch64 (David Daney <daviddaney@microsoft.com>)
+- Set selinux as default LSM
+- Enable CONFIG_X86_IOPL_IOPERM
+
+* Wed Dec 13 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.6.2.1-1
+- Upgrade to 6.6.2.1
+- Add libtraceevent-devel to BuildRequires
+
+* Thu Dec 07 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-3
+- Update 6.1 to have parity with ARM configs for 5.15
+
+* Fri Dec 01 2023 Cameron Baird <cameronbaird@microsoft.com> - 6.1.58.1-2
+- Remove loglevel=3, causing kernel to boot with the config-defined value,
+    CONSOLE_LOGLEVEL_DEFAULT.
+
+* Fri Oct 27 2023 Rachel Menge <rachelmenge@microsoft.com> - 6.1.58.1-1
+- Upgrade to 6.1.58.1
+- Remove support for imx8 dtb subpackage
+- Add patch for perf_bpf_test_add_nonnull_argument
+- Add cpio BuildRequires
+- Ensure parity with 2.0 kernel configs
+
+* Mon Oct 23 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.135.1-2
+- Enable CONFIG_BINFMT_MISC
+
+* Tue Oct 17 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.135.1-1
+- Auto-upgrade to 5.15.135.1
+
+* Tue Sep 26 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.133.1-1
+- Auto-upgrade to 5.15.133.1
+- Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
+
+* Thu Sep 21 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Sep 08 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.131.1-1
 - Auto-upgrade to 5.15.131.1
 

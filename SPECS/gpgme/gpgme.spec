@@ -1,10 +1,10 @@
 Summary:        High-Level Crypto API
 Name:           gpgme
-Version:        1.16.0
-Release:        1%{?dist}
+Version:        1.23.2
+Release:        2%{?dist}
 License:        GPLv3+ and LGPLv2+ and MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.gnupg.org/(it)/related_software/gpgme/index.html
 Source0:        https://www.gnupg.org/ftp/gcrypt/%{name}/%{name}-%{version}.tar.bz2
@@ -80,10 +80,18 @@ cd tests
 
 %files -n python3-gpg
 %doc lang/python/README
-%{python3_sitearch}/gpg-*.egg-info
-%{python3_sitearch}/gpg/
+%{python3_sitearch}/gpg-%{version}-*
 
 %changelog
+* Fri Feb 02 2024 Andrew Phelps <anphel@microsoft.com> - 1.23.2-2
+- Fix python3-gpg files location
+
+* Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 1.23.2-1
+- Upgrade to version 1.23.2
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.16.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.16.0-1
 - Upgrade to latest upstream version
 - Lint spec

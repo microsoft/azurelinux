@@ -53,10 +53,10 @@
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
 Version:        3.7.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.postfix.org
 Source0:        ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
 Source1:        postfix-etc-init.d-postfix
@@ -228,10 +228,10 @@ maps with Postfix, you need this.
 %prep
 %setup -q
 # Apply obligatory patches
-%patch1 -p1 -b .config
-%patch2 -p1 -b .files
-%patch3 -p1 -b .alternatives
-%patch4 -p1 -b .large-fs
+%patch 1 -p1 -b .config
+%patch 2 -p1 -b .files
+%patch 3 -p1 -b .alternatives
+%patch 4 -p1 -b .large-fs
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
@@ -241,14 +241,14 @@ src/global/mail_params.h
 %if %{with pflogsumm}
 gzip -dc %{SOURCE53} | tar xf -
 pushd pflogsumm-%{pflogsumm_ver}
-%patch9 -p1 -b .datecalc
-%patch10 -p1 -b .ipv6-warnings-fix
+%patch 9 -p1 -b .datecalc
+%patch 10 -p1 -b .ipv6-warnings-fix
 popd
 %endif
-%patch11 -p1 -b .chroot-example-fix
-%patch12 -p1 -b .glibc-234-build-fix
-%patch13 -p1 -b .whitespace-name-fix
-%patch14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
+%patch 11 -p1 -b .chroot-example-fix
+%patch 12 -p1 -b .glibc-234-build-fix
+%patch 13 -p1 -b .whitespace-name-fix
+%patch 14 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -762,6 +762,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.0-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.7.0-1
 - Updating to version 3.7.0.
 - License verified.

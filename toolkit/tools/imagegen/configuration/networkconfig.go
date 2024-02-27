@@ -76,7 +76,10 @@ func (n *Network) IsValid() (err error) {
 
 // ConfigureNetwork performs network configuration during the installation process
 func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfig) (err error) {
-	const squashErrors = false
+	const (
+		squashErrors   = false
+		networkFileDir = "/etc/systemd/network"
+	)
 
 	for _, networkData := range systemConfig.Networks {
 		deviceName, err := checkNetworkDeviceAvailability(networkData)
@@ -87,7 +90,7 @@ func ConfigureNetwork(installChroot *safechroot.Chroot, systemConfig SystemConfi
 			return err
 		}
 
-		err = createNetworkConfigFile(installChroot, networkData, deviceName)
+		err = createNetworkConfigFile(installChroot, networkData, deviceName, networkFileDir)
 		if err != nil {
 			return err
 		}
@@ -236,18 +239,15 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 	return
 }
 
-func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Network, deviceName string) (err error) {
-	const (
-		networkFileDir = "/etc/systemd/network"
-		filePrefix     = "10"
-	)
+func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Network, deviceName, networkFileDir string) (err error) {
+	const filePrefix = "10"
 
 	if exists, ferr := file.DirExists(networkFileDir); ferr != nil {
-		logger.Log.Errorf("Error accessing /etc/systemd/network/")
+		logger.Log.Errorf("Error accessing: %s", networkFileDir)
 		err = ferr
 		return
 	} else if !exists {
-		err = fmt.Errorf("/etc/systemd/network/: no such path or directory")
+		err = fmt.Errorf("%s: no such path or directory", networkFileDir)
 		return
 	}
 

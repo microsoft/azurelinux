@@ -6,7 +6,7 @@ Version:        1.9.4
 Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://commons.apache.org/beanutils
 Source0:        https://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Patch0:         jdk11.patch

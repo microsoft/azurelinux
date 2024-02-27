@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Enable python3 build by default
 %bcond_without python3
 # Disable python2 build by default
@@ -109,9 +109,9 @@ python-requests layer.
 
 %prep
 %setup -q -n requests-mock-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 # Remove bundled egg-info
 rm -rf requests_mock.egg-info

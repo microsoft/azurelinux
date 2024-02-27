@@ -12,7 +12,7 @@ Version:	0.24
 Release:	10%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	Execute code after scope compilation finishes
 URL:		https://metacpan.org/release/B-Hooks-EndOfScope
 Source0:	https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-%{version}.tar.gz#/perl-B-Hooks-EndOfScope-%{version}.tar.gz
@@ -99,7 +99,7 @@ surrounding scope.
 %setup -q -n B-Hooks-EndOfScope-%{version}
 
 # Remove shellbangs from tests to placate rpmlint
-%patch0
+%patch 0
 
 # British-English spelling LICENCE upsets US spell checker
 echo LICENCE >> xt/author/pod-spell.t

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:	A sophisticated file transfer program
 Name:		lftp
 Version:	4.9.2
@@ -30,7 +30,7 @@ Utility scripts for use with lftp.
 %prep
 %setup -q
 
-%patch1 -p1 -b .date_fmt
+%patch 1 -p1 -b .date_fmt
 
 #sed -i.rpath -e '/lftp_cv_openssl/s|-R.*lib||' configure
 sed -i.norpath -e \

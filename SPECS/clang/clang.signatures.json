@@ -1,6 +1,5 @@
 {
  "Signatures": {
-  "clang-12.0.1.src.tar.xz": "6e912133bcf56e9cfe6a346fa7e5c52c2cde3e4e48b7a6cc6fcc7c75047da45f",
-  "clang-tools-extra-12.0.1.src.tar.xz": "65659efdf97dbed70ae0caee989936b731f249dddc46f1cb4225b2f49b232ae5"
+  "llvmorg-17.0.6.tar.gz": "81494d32e6f12ea6f73d6d25424dbd2364646011bb8f7e345ca870750aa27de1"
  }
 }

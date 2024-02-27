@@ -1,22 +1,20 @@
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
-
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
-Version:        0.14.0
-Release:        16%{?dist}
+Version:        0.24.2
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/flannel-io/flannel
-#Source0:       https://github.com/flannel-io/flannel/archive/refs/tags/v0.14.0.tar.gz
-Source0:        %{name}-%{version}.tar.gz
-
+Source0:        https://github.com/flannel-io/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
-BuildRequires:  golang >= 1.18.5
+BuildRequires:  glibc-static >= 2.38-1%{?dist}
+BuildRequires:  golang >= 1.20
 BuildRequires:  kernel-headers
 
 %description
@@ -26,6 +24,9 @@ Flannel is a simple and easy way to configure a layer 3 network fabric designed 
 %autosetup -p1
 
 %build
+# create vendor folder from the vendor tarball and set vendor mode
+tar -xf %{SOURCE1} --no-same-owner
+
 export GOPATH=%{our_gopath}
 export TAG=v%{version}
 %ifarch x86_64
@@ -44,10 +45,29 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 
 %files
 %defattr(-,root,root)
+%doc README.md CONTRIBUTING.md DCO
 %license LICENSE
 %{_bindir}/flanneld
 
 %changelog
+* Tue Feb 20 2024 Sumedh Sharma <sumsharma@microsoft.com> - 0.24.2-1
+- Upgrade to version 0.24.2
+
+* Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 0.14.0-21
+- Bump release to rebuild against glibc 2.38-1
+
+* Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 0.14.0-20
+- Bump release to rebuild against glibc 2.35-6
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-19
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.14.0-18
+- Bump release to rebuild with updated version of Go.
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.14.0-17
+- Bump release to rebuild against glibc 2.35-5
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-16
 - Bump release to rebuild with go 1.19.12
 

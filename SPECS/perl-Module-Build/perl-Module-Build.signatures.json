@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "b01434e9a89f0cdf3806bb8dfad60baf1bced6cf64c4819b7ba1fda296ae59dc",
-  "Module-Build-0.4231.tar.gz": "7e0f4c692c1740c1ac84ea14d7ea3d8bc798b2fb26c09877229e04f430b2b717"
- }
+  "Signatures": {
+    "LICENSE.PTR": "b01434e9a89f0cdf3806bb8dfad60baf1bced6cf64c4819b7ba1fda296ae59dc",
+    "Module-Build-0.4234.tar.gz": "66aeac6127418be5e471ead3744648c766bd01482825c5b66652675f2bc86a8f"
+  }
 }

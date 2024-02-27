@@ -1,76 +1,139 @@
 Summary:        Basic and advanced IPV4-based networking
 Name:           iproute
-Version:        5.15.0
-Release:        2%{?dist}
+Version:        6.7.0
+Release:        1%{?dist}
 License:        GPLv2
 URL:            https://www.kernel.org/pub/linux/utils/net/iproute2
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.kernel.org/pub/linux/utils/net/iproute2/%{name}2-%{version}.tar.xz
-Patch0:         replace_killall_by_pkill.patch
-BuildRequires:  gcc
-BuildRequires:  elfutils-libelf-devel
-BuildRequires:  libselinux-devel
-BuildRequires:  make
-BuildRequires:  pkgconfig
-BuildRequires:  libmnl-devel
-BuildRequires:  sudo
-Requires:       elfutils-libelf
-Requires:       libselinux
 
+BuildRequires:      bison
+BuildRequires:      elfutils-libelf-devel
+BuildRequires:      flex
+BuildRequires:      gcc
+BuildRequires:      iptables-devel >= 1.4.5
+BuildRequires:      libbpf-devel
+BuildRequires:      libcap-devel
+BuildRequires:      libdb-devel
+BuildRequires:      libmnl-devel
+BuildRequires:      libselinux-devel
+BuildRequires:      make
+BuildRequires:      pkgconfig
+Requires:           libbpf
+Requires:           psmisc
+Provides:           /sbin/ip
+	
 %description
-The IPRoute2 package contains programs for basic and advanced
-IPV4-based networking.
-
-%package        devel
-Summary:        Header files for building application using iproute2.
-Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
-
-%description    devel
-This package contains the header files for %{name}. If you like to develop programs using %{name},
-you will need to install %{name}-devel.
-
+The iproute package contains networking utilities (ip and rtmon, for example)
+which are designed to use the advanced networking capabilities of the Linux
+kernel.
+ 
+%package tc
+Summary:            Linux Traffic Control utility
+License:            GPL-2.0-or-later
+Requires:           %{name}%{?_isa} = %{version}-%{release}
+Provides:           /sbin/tc
+ 
+%description tc
+The Traffic Control utility manages queueing disciplines, their classes and
+attached filters and actions. It is the standard tool to configure QoS in
+Linux.
+ 
+%if ! 0%{?_module_build}
+%package doc
+Summary:            Documentation for iproute2 utilities with examples
+%if 0%{?rhel}
+Group:              Applications/System
+%endif
+License:            GPL-2.0-or-later
+Requires:           %{name} = %{version}-%{release}
+ 
+%description doc
+The iproute documentation contains howtos and examples of settings.
+%endif
+ 
+%package devel
+Summary:            iproute development files
+License:            GPL-2.0-or-later
+Requires:           %{name} = %{version}-%{release}
+Provides:           iproute-static = %{version}-%{release}
+ 
+%description devel
+The libnetlink static library.
+ 
 %prep
-%setup -q -n %{name}2-%{version}
-sed -i /ARPD/d Makefile
-sed -i 's/arpd.8//' man/man8/Makefile
-sed -i 's/m_ipt.o//' tc/Makefile
-%patch0 -p1
-
+%autosetup -p1 -n %{name}2-%{version}
+ 
 %build
-# Not an autoconf configure file
-%configure
+%configure --libdir %{_libdir}
+echo -e "\nPREFIX=%{_prefix}\nCONFDIR:=%{_sysconfdir}/iproute2\nSBINDIR=%{_sbindir}" >> config.mk
 %make_build
 
 %install
 %make_install
-
-%check
-# Fix linking issue in testsuite
-sed -i 's/<libnetlink.h>/\"..\/..\/include\/libnetlink.h\"/g' tools/generate_nlmsg.c
-sed -i 's/\"libnetlink.h\"/"..\/include\/libnetlink.h\"/g' ../lib/libnetlink.c
-%make_build check
-
-%ldconfig_scriptlets
-
+echo '.so man8/tc-cbq.8' > %{buildroot}%{_mandir}/man8/cbq.8
+ 
+# libnetlink
+install -D -m644 include/libnetlink.h %{buildroot}%{_includedir}/libnetlink.h
+install -D -m644 lib/libnetlink.a %{buildroot}%{_libdir}/libnetlink.a
+ 
+# drop these files, iproute-doc package extracts files directly from _builddir
+rm -rf '%{buildroot}%{_docdir}'
+ 
+# append deprecated values to rt_dsfield for compatibility reasons
+%if 0%{?rhel} && ! 0%{?eln}
+# cat %{SOURCE1} >>%{buildroot}%{_datadir}/iproute2/rt_dsfield
+%endif
+ 
 %files
-%defattr(-,root,root)
+%dir %{_datadir}/iproute2
 %license COPYING
-%{_sysconfdir}/iproute2/*
-/sbin/*
-%{_libdir}/tc/*
+%doc README README.devel
 %{_mandir}/man7/*
+%exclude %{_mandir}/man7/tc-*
 %{_mandir}/man8/*
-%{_datadir}/bash-completion/completions/*
-
+%exclude %{_mandir}/man8/tc*
+%exclude %{_mandir}/man8/cbq*
+%attr(644,root,root) %config(noreplace) %{_datadir}/iproute2/*
+%{_sbindir}/*
+%exclude %{_sbindir}/tc
+%exclude %{_sbindir}/routel
+%{_datadir}/bash-completion/completions/devlink
+ 
+%files tc
+%license COPYING
+%{_mandir}/man7/tc-*
+%{_mandir}/man8/tc*
+%{_mandir}/man8/cbq*
+%dir %{_libdir}/tc/
+%{_libdir}/tc/*
+%{_sbindir}/tc
+%{_datadir}/bash-completion/completions/tc
+ 
+%if ! 0%{?_module_build}
+%files doc
+%license COPYING
+%doc examples
+%endif
+ 
 %files devel
-%defattr(-,root,root)
-%{_includedir}/iproute2/bpf_elf.h
+%license COPYING
 %{_mandir}/man3/*
-
+%{_libdir}/libnetlink.a
+%{_includedir}/libnetlink.h
+%{_includedir}/iproute2/bpf_elf.h
+ 
 %changelog
+* Mon Feb 05 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 6.7.0-1
+- Update libvirt to v6.7.0
+- Use Fedora 39 as basis for new packaging (tc)
+- use _datadir rather than _libdir for iproute2 files
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Feb 02 2022 Muhammad Falak <mwani@microsoft.com> - 5.15.0-2
 - Add an explict BR on 'sudo' & 'libmnl-devel' to enable check section
 

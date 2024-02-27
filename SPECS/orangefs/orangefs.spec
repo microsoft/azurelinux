@@ -10,7 +10,7 @@ the kernel module.
 Summary:        Parallel network file system client
 Name:           orangefs
 Version:        2.9.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 # ASL 2.0 src/client/jni
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
@@ -26,7 +26,7 @@ Release:        2%{?dist}
 # zlib src/common/misc/md5.h
 License:        ASL 2.0 AND BSD AND GPLv2 AND LGPLv2+ AND LGPLv2 AND MIT AND OpenLDAP AND Public Domain AND zlib
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.orangefs.org/
 Source0:        https://s3.amazonaws.com/download.orangefs.org/current/source/%{name}-%{version}.tar.gz
 Source1:        orangefs-server.service
@@ -250,6 +250,9 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_bindir}/pvfs2fuse
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.9.8-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon Feb 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.9.8-2
 - Move from Extended to Core.
 

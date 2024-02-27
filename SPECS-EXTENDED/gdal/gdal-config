@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ARCH=$(uname -m)
+case $ARCH in
+x86_64 | ppc64 | ppc64le | ia64 | s390x | sparc64 | alpha | alphaev6 | aarch64 )
+gdal-config-64 ${*}
+;;
+*)
+gdal-config-32 ${*}
+;;
+esac

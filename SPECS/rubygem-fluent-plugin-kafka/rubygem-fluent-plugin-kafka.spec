@@ -2,11 +2,11 @@
 %global gem_name fluent-plugin-kafka
 Summary:        Kafka input and output plugin for Fluentd
 Name:           rubygem-%{gem_name}
-Version:        0.17.5
+Version:        0.19.0
 Release:        1%{?dist}
 License:        Apache 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/fluent/fluent-plugin-kafka
 Source0:        https://github.com/fluent/fluent-plugin-kafka/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -36,6 +36,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.19.0-1
+- Auto-upgrade to 0.19.0 - Azure Linux 3.0 - package upgrades
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 0.17.5-1
 - Update to v0.17.5.
 - Build from .tar.gz source.

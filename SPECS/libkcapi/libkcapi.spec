@@ -58,10 +58,10 @@ ln -s libkcapi.so.%{version}.hmac                            \\\
 Summary:        User space interface to the Linux Kernel Crypto API
 Name:           libkcapi
 Version:        %{vmajor}.%{vminor}.%{vpatch}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD OR GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.chronox.de/%{name}.html
 Source0:        https://www.chronox.de/%{name}/%{name}-%{version}.tar.xz
 Source1:        sha512hmac-openssl.sh
@@ -256,6 +256,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libexecdir}/%{name}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.1-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 19 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.1-2
 - Fixing 'Obsoletes' and 'Provides' for 'fipscheck' and 'hmaccalc' subpackages.
 

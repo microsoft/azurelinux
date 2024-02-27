@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "grub2"
+    ],
+    "_comment": "grub2-mkconfig is packaged with the grub2 base package. Images that boot for the first time using the mkconfig flow must therefore have grub2 installed by the tools."
+}

@@ -1,0 +1,67 @@
+diff -up hdf-4.2.15/java/examples/Makefile.am.build hdf-4.2.15/java/examples/Makefile.am
+--- hdf-4.2.15/java/examples/Makefile.am.build	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/java/examples/Makefile.am	2020-04-30 21:34:13.856216928 -0600
+@@ -12,8 +12,8 @@ classes:
+ 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
+ 
+ pkgpath = examples
+-hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
+-jarfile = jar$(PACKAGE_TARNAME)examples.jar
++hdfjarfile = $(PACKAGE_TARNAME).jar
++jarfile = $(PACKAGE_TARNAME)examples.jar
+ 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
+ AM_JAVACFLAGS = $(H4_JAVACFLAGS) -deprecation
+diff -up hdf-4.2.15/java/src/jni/Makefile.am.build hdf-4.2.15/java/src/jni/Makefile.am
+--- hdf-4.2.15/java/src/jni/Makefile.am.build	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/java/src/jni/Makefile.am	2020-04-30 21:34:13.857216934 -0600
+@@ -16,7 +16,10 @@ AM_CPPFLAGS=-I$(top_srcdir)/hdf/src
+           $(JNIFLAGS) $(XDRINC)
+ 
+ # This is our main target
+-lib_LTLIBRARIES=libhdf_java.la
++pkglib_LTLIBRARIES=libhdf_java.la
++
++# No soname for JNI library
++libhdf_java_la_LDFLAGS = -avoid-version
+ 
+ # Source files for the library
+ libhdf_java_la_SOURCES=hdfanImp.c hdfdfpalImp.c \
+diff -up hdf-4.2.15/java/src/Makefile.am.build hdf-4.2.15/java/src/Makefile.am
+--- hdf-4.2.15/java/src/Makefile.am.build	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/java/src/Makefile.am	2020-04-30 21:34:13.857216934 -0600
+@@ -13,8 +13,8 @@ JAVAROOT = .classes
+ classes:
+ 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
+ 
+-jarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
+-hdf_javadir = $(libdir)
++jarfile = $(PACKAGE_TARNAME).jar
++hdf_javadir = $(prefix)/lib/java
+ 
+ pkgpath = hdf/hdflib
+ CLASSPATH_ENV=CLASSPATH=.:$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$$CLASSPATH
+diff -up hdf-4.2.15/java/test/junit.sh.in.build hdf-4.2.15/java/test/junit.sh.in
+--- hdf-4.2.15/java/test/junit.sh.in.build	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/java/test/junit.sh.in	2020-04-30 21:34:13.858216939 -0600
+@@ -40,7 +40,7 @@ HDFLIB_HOME="$top_srcdir/java/lib"
+ BLDLIBDIR="$top_builddir/hdf4/lib"
+ BLDDIR="."
+ HDFTEST_HOME="$top_srcdir/java/test"
+-JARFILE=jar@PACKAGE_TARNAME@-@PACKAGE_VERSION@.jar
++JARFILE=@PACKAGE_TARNAME@.jar
+ TESTJARFILE=jar@PACKAGE_TARNAME@test.jar
+ test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
+ 
+diff -up hdf-4.2.15/java/test/Makefile.am.build hdf-4.2.15/java/test/Makefile.am
+--- hdf-4.2.15/java/test/Makefile.am.build	2020-03-03 10:40:50.000000000 -0700
++++ hdf-4.2.15/java/test/Makefile.am	2020-04-30 21:41:47.966938811 -0600
+@@ -12,7 +12,7 @@ classes:
+ 	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
+ 
+ pkgpath = test
+-hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
++hdfjarfile = $(PACKAGE_TARNAME).jar
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/junit.jar:$(top_srcdir)/java/lib/hamcrest-core.jar:$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
+ 
+ jarfile = jar$(PACKAGE_TARNAME)test.jar

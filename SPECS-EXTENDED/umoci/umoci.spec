@@ -1,10 +1,10 @@
 Summary:        Open Container Image manipulation tool
 Name:           umoci
 Version:        0.4.7
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/Tools
 URL:            https://github.com/opencontainers/umoci
 Source0:        https://github.com/opencontainers/umoci/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -39,6 +39,12 @@ go test -mod=vendor
 %{_bindir}/umoci
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.7-13
+- Bump release to rebuild with go 1.20.10
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.4.7-12
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.7-11
 - Bump release to rebuild with go 1.19.12
 

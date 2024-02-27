@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "uClibc-ng-1.0.43.tar.xz": "8c1f550f14728a9c06ff1fb3e85069f7f10f4d684b03e163f4d9d41727124047",
-  "uClibc.config": "5cd0bebdcc29597e6abdcfcbb0d7309633dd843b273b0baca718e6d5f2fb0f1f"
- }
+  "Signatures": {
+    "uClibc.config": "5cd0bebdcc29597e6abdcfcbb0d7309633dd843b273b0baca718e6d5f2fb0f1f",
+    "uClibc-ng-1.0.44.tar.xz": "7df9d987955827382f1c2400da513456becbb6f868bdfd37737265f1cbeec994"
+  }
 }

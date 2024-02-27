@@ -1,10 +1,10 @@
 Summary:        A library which allows userspace access to USB devices
 Name:           libusb
-Version:        1.0.24
-Release:        2%{?dist}
+Version:        1.0.26
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://libusb.info/
 Source:         https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.bz2
@@ -59,6 +59,9 @@ popd
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.26-1
+- Auto-upgrade to 1.0.26 - Azure Linux 3.0 - package upgrades
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.0.24-2
 - Remove libtool archive files from final packaging
 

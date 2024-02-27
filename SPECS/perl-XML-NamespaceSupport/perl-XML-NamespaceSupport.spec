@@ -4,7 +4,7 @@ Release:        12%{?dist}
 Summary:        A simple generic name space support class
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Url:            https://metacpan.org/release/XML-NamespaceSupport
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-%{version}.tar.gz#/perl-XML-NamespaceSupport-%{version}.tar.gz
 BuildArch:      noarch

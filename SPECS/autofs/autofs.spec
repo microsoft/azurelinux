@@ -2,10 +2,10 @@
 Summary:        A kernel-based automounter for Linux
 Name:           autofs
 Version:        5.1.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://git.kernel.org/pub/scm/linux/storage/autofs/autofs.git/
 Source0:        https://www.kernel.org/pub/linux/daemons/%{name}/v5/%{name}-%{version}.tar.xz
@@ -66,6 +66,9 @@ rm -rf %{buildroot}%{_sysconfdir}/{init.d,rc.d}
 /lib/systemd/system/autofs.service
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.1.8-4
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jan 26 2022 Thomas Crain <thcrain@microsoft.com> - 5.1.8-3
 - Wipe buildroot's /etc/init.d in addition to /etc/rc.d
 - Use systemd-devel BR so systemd is properly detected

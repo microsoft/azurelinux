@@ -1,10 +1,10 @@
 Summary:        Good password hashing for your software and your servers.
 Name:           python-bcrypt
 Version:        3.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/bcrypt/
 Source0:        https://pypi.io/packages/source/b/bcrypt/bcrypt-%{version}.tar.gz
@@ -45,6 +45,9 @@ Good password hashing for your software and your servers.
 %{python3_sitelib}/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.2.0-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsoft.com> - 3.2.0-2
 - Add an explicit BR on 'pip' to enable ptest
 

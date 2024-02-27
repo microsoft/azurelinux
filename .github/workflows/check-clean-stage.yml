@@ -3,6 +3,7 @@
 
 name: Spec %clean stage check
 
+# NOTE - allow custom %clean section for 3.0 and later (remove this entire check after 2.0 is EOL)
 on:
   push:
     branches: [main, dev, 1.0*, 2.0*, fasttrack/*]

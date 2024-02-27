@@ -1,6 +1,6 @@
 %global libdnf_major_version 0
-%global libdnf_minor_version 63
-%global libdnf_micro_version 1
+%global libdnf_minor_version 72
+%global libdnf_micro_version 0
 
 Name:           libdnf
 Version:        %{libdnf_major_version}.%{libdnf_minor_version}.%{libdnf_micro_version}
@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -116,11 +116,18 @@ popd
 
 %files -n python3-%{name}
 %{python3_sitelib}/%{name}/
+%{python3_sitelib}/%{name}-%{version}.dist-info/METADATA
 
 %files -n python3-hawkey
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 0.72.0-1
+- Upgrade to 0.72.0
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.63.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Sep 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.63.1-1
 - Upgrade to latest upstream version
 - Lint spec
@@ -141,7 +148,7 @@ popd
 - License verified.
 
 * Mon Oct 21 2019 Ales Matej <amatej@gmail.com> - 0.35.3-6
-- Fixes for some issues on Arm platforms (RhBug:1691430) 
+- Fixes for some issues on Arm platforms (RhBug:1691430)
 
 * Sat Sep 14 2019 Jonathan Dieter <jdieter@gmail.com> - 0.35.3-5
 - Set LRO_CACHEDIR so zchunk works again

@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "nginx-1.22.1.tar.gz": "9ebb333a9e82b952acd3e2b4aeb1d4ff6406f72491bab6cd9fe69f0dea737f31",
-  "nginx-njs-0.7.12.tar.gz": "7a75a39022dfb58dbf461053903a07cc48dd4942f7d82a46601819c1b0077687",
-  "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1",
-  "opentelemetry-cpp-contrib-37e4466d882cbddff6f607a20fe327060de76166.tar.gz": "daf07cc694ee12e5e37a1aa5f70619b65ff02c24c3effe628b2e59e84a2e6444"
- }
+  "Signatures": {
+    "nginx-njs-0.7.12.tar.gz": "7a75a39022dfb58dbf461053903a07cc48dd4942f7d82a46601819c1b0077687",
+    "nginx.service": "73a1321ae35eafc4e02614cde224fc0bf20ceba97f969b3373dd73c15c22a0e1",
+    "opentelemetry-cpp-contrib-37e4466d882cbddff6f607a20fe327060de76166.tar.gz": "daf07cc694ee12e5e37a1aa5f70619b65ff02c24c3effe628b2e59e84a2e6444",
+    "nginx-1.25.2.tar.gz": "05dd6d9356d66a74e61035f2a42162f8c754c97cf1ba64e7a801ba158d6c0711"
+  }
 }

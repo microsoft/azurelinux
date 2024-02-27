@@ -24,8 +24,7 @@ import (
 var (
 	app = kingpin.New("imageconfigvalidator", "A tool for validating image configuration files")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	input       = exe.InputStringFlag(app, "Path to the image config file.")
@@ -39,7 +38,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -114,12 +113,12 @@ func validatePackages(config configuration.Config) (err error) {
 	defer timestamp.StopEvent(nil)
 
 	const (
-		selinuxPkgName     = "selinux-policy"
 		validateError      = "failed to validate package lists in config"
 		verityPkgName      = "verity-read-only-root"
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
+		grub2PkgName       = "grub2"
 	)
 
 	for _, systemConfig := range config.SystemConfigs {
@@ -131,7 +130,13 @@ func validatePackages(config configuration.Config) (err error) {
 		foundVerityInitramfsPackage := false
 		foundVerityInitramfsDebugPackage := false
 		foundDracutFipsPackage := false
+		foundGrub2Package := false
 		kernelCmdLineString := systemConfig.KernelCommandLine.ExtraCommandLine
+		selinuxPkgName := systemConfig.KernelCommandLine.SELinuxPolicy
+		if selinuxPkgName == "" {
+			selinuxPkgName = configuration.SELinuxPolicyDefault
+		}
+
 		for _, pkg := range packageList {
 			if pkg == "kernel" {
 				return fmt.Errorf("%s: kernel should not be included in a package list, add via config file's [KernelOptions] entry", validateError)
@@ -147,6 +152,9 @@ func validatePackages(config configuration.Config) (err error) {
 			}
 			if pkg == selinuxPkgName {
 				foundSELinuxPackage = true
+			}
+			if pkg == grub2PkgName {
+				foundGrub2Package = true
 			}
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
@@ -165,6 +173,11 @@ func validatePackages(config configuration.Config) (err error) {
 		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
 			if !foundSELinuxPackage {
 				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
+			}
+		}
+		if !systemConfig.IsRootFS() && systemConfig.EnableGrubMkconfig {
+			if !foundGrub2Package {
+				return fmt.Errorf("%s: [EnableGrubMkconfig] selected, but '%s' package is not included in the package lists", validateError, grub2PkgName)
 			}
 		}
 	}

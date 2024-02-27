@@ -1,15 +1,15 @@
 %global eppic_ver e8844d3793471163ae4a56d8f95897be9e5bd554
 # First 7 digits from ^
 %global eppic_shortver e8844d3
-%global mkdf_ver 1.6.8
+%global mkdf_ver 1.7.4
 
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
-Version:        2.0.23
-Release:        2%{?dist}
+Version:        2.0.27
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/horms/kexec-tools
 
@@ -37,6 +37,7 @@ Source26: live-image-kdump-howto.txt
 Source27: early-kdump-howto.txt
 Source28: kdump-udev-throttler
 Source29: kdump.sysconfig.aarch64
+Source30: 51_kexec_tools.cfg
 
 #######################################
 # These are sources for mkdumpramfs
@@ -62,6 +63,7 @@ Requires: ethtool
 Requires: awk
 Requires: dhcp-client
 Requires: squashfs-tools
+%{?grub2_configuration_requires}
 
 BuildRequires: zlib-devel
 BuildRequires: zlib
@@ -76,6 +78,7 @@ BuildRequires: snappy-devel
 BuildRequires: pkg-config
 BuildRequires: intltool
 BuildRequires: gettext
+BuildRequires: grub2-rpm-macros
 BuildRequires: systemd
 BuildRequires: automake
 BuildRequires: autoconf
@@ -107,7 +110,6 @@ Obsoletes: diskdumputils netdump kexec-tools-eppic
 #
 # Patches 601 onward are generic patches
 #
-Patch601: makedumpfile-printk-fix.patch
 
 %description
 kexec-tools provides /sbin/kexec binary that facilitates a new
@@ -122,8 +124,6 @@ component of the kernel's kexec feature.
 mkdir -p -m755 kcp
 tar -z -x -v -f %{SOURCE9}
 tar -z -x -v -f %{SOURCE19}
-
-%patch601 -p1
 
 %build
 autoreconf
@@ -185,13 +185,12 @@ install -m 644 %{SOURCE16} $RPM_BUILD_ROOT%{_unitdir}/kdump.service
 install -m 755 -D %{SOURCE22} $RPM_BUILD_ROOT%{_prefix}/lib/systemd/system-generators/kdump-dep-generator.sh
 
 %ifarch %{ix86} x86_64 aarch64
-install -m 755 makedumpfile-%{mkdf_ver}/makedumpfile $RPM_BUILD_ROOT/usr/sbin/makedumpfile
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.8.gz $RPM_BUILD_ROOT/%{_mandir}/man8/makedumpfile.8.gz
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.conf.5.gz $RPM_BUILD_ROOT/%{_mandir}/man5/makedumpfile.conf.5.gz
-install -m 644 makedumpfile-%{mkdf_ver}/makedumpfile.conf $RPM_BUILD_ROOT/%{_sysconfdir}/makedumpfile.conf.sample
+mkdir -p $RPM_BUILD_ROOT/usr/sbin
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man5
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man8
+mkdir -p $RPM_BUILD_ROOT/usr/share/makedumpfile-%{mkdf_ver}/eppic-scripts/
+make -C makedumpfile-%{mkdf_ver} install DESTDIR=$RPM_BUILD_ROOT
 install -m 755 makedumpfile-%{mkdf_ver}/eppic_makedumpfile.so $RPM_BUILD_ROOT/%{_libdir}/eppic_makedumpfile.so
-mkdir -p $RPM_BUILD_ROOT/usr/share/makedumpfile/eppic_scripts/
-install -m 644 makedumpfile-%{mkdf_ver}/eppic_scripts/* $RPM_BUILD_ROOT/usr/share/makedumpfile/eppic_scripts/
 %endif
 
 %define remove_dracut_prefix() %(echo -n %1|sed 's/.*dracut-//g')
@@ -215,6 +214,10 @@ cp %{SOURCE109} $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlyk
 chmod 755 $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlykdump/%{remove_dracut_prefix %{SOURCE108}}
 chmod 755 $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/99earlykdump/%{remove_dracut_early_kdump_prefix %{SOURCE109}}
 
+# Add kexec-tools-specific boot configurations to /etc/default/grub.d
+# This configuration sets the crashkernel space allocated at boot
+# to the AzureLinux default value
+install -Dm 755 %{SOURCE30} %{buildroot}%{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
 
 %define dracutlibdir %{_prefix}/lib/dracut
 #and move the custom dracut modules to the dracut directory
@@ -224,6 +227,7 @@ mv $RPM_BUILD_ROOT/etc/kdump-adv-conf/kdump_dracut_modules/* $RPM_BUILD_ROOT/%{d
 %post
 # Initial installation
 %systemd_post kdump.service
+%grub2_post
 
 touch /etc/kdump.conf
 # This portion of the script is temporary.  Its only here
@@ -251,6 +255,7 @@ fi
 
 %postun
 %systemd_postun_with_restart kdump.service
+%grub2_postun
 
 %preun
 # Package removal, not upgrade
@@ -292,14 +297,16 @@ done
 %files
 /usr/sbin/kexec
 /usr/sbin/makedumpfile
+/usr/sbin/makedumpfile-R.pl
 /usr/sbin/mkdumprd
 /usr/sbin/vmcore-dmesg
 %{_bindir}/*
 %{_datadir}/kdump
 %{_prefix}/lib/kdump
-%{_sysconfdir}/makedumpfile.conf.sample
+/usr/share/makedumpfile-%{mkdf_ver}/eppic-scripts/
 %config(noreplace,missingok) %{_sysconfdir}/sysconfig/kdump
 %config(noreplace,missingok) %verify(not mtime) %{_sysconfdir}/kdump.conf
+%config(noreplace) %{_sysconfdir}/default/grub.d/51_kexec_tools.cfg
 %config %{_udevrulesdir}
 %{_udevrulesdir}/../kdump-udev-throttler
 %{dracutlibdir}/modules.d/*
@@ -324,6 +331,21 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Fri Jan 19 2024 Elaheh Dehghani <edehghani@microsoft.com> - 2.0.27-3
+- Upgrade makedumpfile to 1.7.4 - Azure Linux 3.0 - package upgrades
+
+* Tue Dec 05 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.27-2
+- Enable grub2-mkconfig-based boot path by installing
+    51_kexec_tools.cfg
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
+- Auto-upgrade to 2.0.27 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Fri Mar 17 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.23-2
 - Required binary grep missing from squashfs
 - kdumpctl support for the version of hostname being shipped with Mariner
@@ -599,7 +621,7 @@ done
 - dracut-module-setup.sh: pass correct ip= param for ipv6
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.0.16-5
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Wed Feb 7 2018 Dave Young <dyoung@redhat.com> - 2.0.16-4
 - update anaconda addon migrate with Anaconda changes.
@@ -1072,7 +1094,7 @@ done
 
 * Sat Dec 21 2013 Ville Skyttä <ville.skytta@iki.fi> - 2.0.4-15
 - Fix Tamil (India) locale subdir name.
-- Fix bogus date in %%changelog.
+- Fix bogus date in changelog
 
 * Tue Dec 03 2013 WANG Chao <chaowang@redhat.com> - 2.0.4-14
 - Add rd.memdebug in kdump module

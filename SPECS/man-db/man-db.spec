@@ -1,12 +1,12 @@
 Summary:        Programs for finding and viewing man pages
 Name:           man-db
-Version:        2.10.1
+Version:        2.11.2
 Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://nongnu.org/man-db
 Group:          Applications/System
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{version}.tar.xz
 Provides:       man = %{version}-%{release}
 Requires:       libpipeline
@@ -81,6 +81,12 @@ fi
 %{_libdir}/tmpfiles.d/man-db.conf
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.11.2-1
+- Auto-upgrade to 2.11.2 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.10.1-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Feb 10 2022 Max Brodeur-Urbas <maxbr@microsoft.com> 2.10.1-1
 - Upgrading to v2.10.1
 - Correcting COPYING path in file section.

@@ -1,13 +1,13 @@
 Summary:        Wrapper Class for the various JSON classes
 Name:           perl-JSON-Any
-Version:        1.39
-Release:        10%{?dist}
+Version:        1.40
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
 Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -46,11 +46,14 @@ cpan Test::Fatal Test::Requires Test::Warnings Test::Without::Module
 make test
 
 %files
-%license LICENSE
+%license LICENCE
 %{perl_vendorlib}/*
 %{_mandir}/man?/*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.40-1
+- Auto-upgrade to 1.40 - Azure Linux 3.0 - package upgrades
+
 * Fri Jul 29 2022 Muhammad Falak <mwani@microsoft.com> - 1.39-10
 - Add BR on `perl(ExtUtils::MakeMaker)` & `cpan` to enable ptest
 

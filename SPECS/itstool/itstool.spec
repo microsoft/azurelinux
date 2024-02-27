@@ -1,10 +1,10 @@
 Summary:        ITS XML document translation tool
 Name:           itstool
-Version:        2.0.6
-Release:        4%{?dist}
+Version:        2.0.7
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            http://itstool.org
 Source0:        http://files.itstool.org/itstool/%{name}-%{version}.tar.bz2
@@ -43,6 +43,9 @@ make DESTDIR=%{buildroot} install
 %{_mandir}/man1/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.7-1
+- Auto-upgrade to 2.0.7 - Azure Linux 3.0 - package upgrades
+
 * Mon May 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.6-4
 - Update to build against Python 3 instead of Python 2.
 

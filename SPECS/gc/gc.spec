@@ -1,7 +1,7 @@
 Summary:        A garbage collector for C and C++
 Name:           gc
-Version:        8.0.0
-Release:        4%{?dist}
+Version:        8.2.2
+Release:        1%{?dist}
 # Source1 is licensed under GPLv2+. Other licenses refer to Source0.
 License:        GPLv2+ and GPLv3+ and MIT
 Url:            https://www.hboehm.info/gc/
@@ -9,7 +9,7 @@ Source0:        https://www.hboehm.info/gc/gc_source/%{name}-%{version}.tar.gz
 Source1:        http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.6.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %description
 The Boehm-Demers-Weiser conservative garbage collector can be
@@ -61,6 +61,9 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.2.2-1
+- Auto-upgrade to 8.2.2 - Azure Linux 3.0 - package upgrades
+
 * Fri Sep 10 2021 Thomas Crain <thcrain@microsoft.com> - 8.0.0-4
 - Remove libtool archive files from final packaging
 

@@ -1,12 +1,12 @@
 Summary:        Shared libraries, portable interface
 Name:           libtool
-Version:        2.4.6
-Release:        8%{?dist}
+Version:        2.4.7
+Release:        1%{?dist}
 License:        GPLv2
 URL:            http://www.gnu.org/software/libtool
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        http://ftp.gnu.org/gnu/libtool/%{name}-%{version}.tar.xz
 %description
 It wraps the complexity of using shared libraries in a
@@ -78,9 +78,12 @@ make %{?_smp_mflags} check
 
 %files -n libltdl
 %{_libdir}/libltdl.so.7
-%{_libdir}/libltdl.so.7.3.1
+%{_libdir}/libltdl.so.7.3.2
 
 %changelog
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-1
+- Auto-upgrade to 2.4.7 - Azure Linux 3.0 - package upgrades
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 2.4.6-8
 - Remove unused `%%define sha1` lines
 - License verified

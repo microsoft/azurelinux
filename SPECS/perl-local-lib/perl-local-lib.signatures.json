@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "local-lib-2.000024.tar.gz": "2e9b917bd48a0615e42633b2a327494e04610d8f710765b9493d306cead98a05",
-  "perl-homedir.csh": "eabd8d1de34302055a4e5c9ee5e8550c718925fc02b88e433a22ad850d48649a",
-  "perl-homedir.sh": "07715d9e7bb32bc6a741f1b476d2109be6815293733d2b03f89f653fe35026e7"
- }
+  "Signatures": {
+    "perl-homedir.csh": "eabd8d1de34302055a4e5c9ee5e8550c718925fc02b88e433a22ad850d48649a",
+    "perl-homedir.sh": "07715d9e7bb32bc6a741f1b476d2109be6815293733d2b03f89f653fe35026e7",
+    "local-lib-2.000029.tar.gz": "8df87a10c14c8e909c5b47c5701e4b8187d519e5251e87c80709b02bb33efdd7"
+  }
 }

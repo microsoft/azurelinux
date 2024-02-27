@@ -46,7 +46,7 @@ index cd0bb6f..0c395ac 100644
  	} else {
  	    RETVAL = NULL;
 @@ -289,15 +291,17 @@ gdbm_DESTROY(db)
- 	PREINIT:
+     PREINIT:
  	int i = store_value;
      CODE:
 -        if (gdbm_file_close(db)) {

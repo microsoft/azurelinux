@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %define git_long  e8e3d20f20da5ee3e37d347207b01890829a5475
 %define git_short e8e3d20
@@ -80,10 +80,10 @@ Requires:	%{name}-core%{?_isa} = %{version}-%{release}
 %prep
 %setup -n %{name}-core-%{version}
 
-%patch50 -p1 -b .pkgconfig
-%patch51 -p1 -b .install_contribs_lib
-%patch52 -p1 -b .CLuceneConfig
-%patch53 -p1 -b .usleep
+%patch 50 -p1 -b .pkgconfig
+%patch 51 -p1 -b .install_contribs_lib
+%patch 52 -p1 -b .CLuceneConfig
+%patch 53 -p1 -b .usleep
 
 # nuke bundled code
 rm -rfv src/ext/{boost/,zlib/}

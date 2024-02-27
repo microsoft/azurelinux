@@ -1,10 +1,10 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
-Version:        3.2
+Version:        3.5
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -106,6 +106,9 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 %{python3_sitelib}/*
 
 %changelog
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5-1
+- Auto-upgrade to 3.5 - Azure Linux 3.0 - package upgrades
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream 

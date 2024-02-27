@@ -6,11 +6,11 @@ Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.22.1
-Release:        9%{?dist}
+Version:        1.25.2
+Release:        1%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
@@ -144,6 +144,15 @@ exit 0
 %{_sysconfdir}/%{name}/modules/otel_ngx_module.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.2-1
+- Auto-upgrade to 1.25.2 - Azure Linux 3.0 - package upgrades
+
+* Thu Oct 05 2023 Dan Streetman <ddstreet@ieee.org> - 1.22.1-11
+- Fix CVE-2023-44487
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.22.1-10
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Aug 17 2023 Muhammad Falak R Wani <mwani@microsoft.com> - 1.22.1-9
 - Add otel_ngx_module subpackage
 

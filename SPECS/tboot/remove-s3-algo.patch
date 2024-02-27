@@ -1,0 +1,399 @@
+From 3f45e7fbbfd820ce24e188766b899033f91d2dd2 Mon Sep 17 00:00:00 2001
+From: Kanika Nema <kanikanema@microsoft.com>
+Date: Fri, 12 Jan 2024 09:45:10 +0000
+Subject: [PATCH] Remove SM3 algorithm
+
+tboot has dependency on openssl and requires it to enable sm3,
+which is an old crypto algorithm that is not allowed to be used in MSFT.
+Theis patch is to remove any SM3 related instances in its source code
+so that we don't need to turn on sm3 in openssl.
+
+Signed-off-by: Kanika Nema <kanikanema@microsoft.com>
+---
+ include/hash.h           |  6 +-----
+ include/lcp3.h           |  2 +-
+ lcptools-v2/crtpollist.c |  1 -
+ lcptools-v2/hash.c       | 20 --------------------
+ lcptools-v2/lcputils.c   | 23 +----------------------
+ lcptools-v2/pollist2.c   |  8 +-------
+ lcptools-v2/pollist2_1.c |  7 ++-----
+ tb_polgen/hash.c         |  4 ----
+ tboot/common/cmdline.c   |  3 ---
+ tboot/common/hash.c      | 10 ----------
+ tboot/common/tpm_20.c    |  1 -
+ tboot/include/tpm.h      |  1 -
+ tboot/include/tpm_20.h   |  3 ---
+ tboot/include/txt/heap.h |  2 --
+ tboot/txt/heap.c         |  6 ------
+ 15 files changed, 6 insertions(+), 91 deletions(-)
+
+diff --git a/include/hash.h b/include/hash.h
+index 5a60af1..b8d012e 100644
+--- a/include/hash.h
++++ b/include/hash.h
+@@ -39,7 +39,7 @@
+ #define TB_HALG_SHA1_LG 0x0000  /* legacy define for SHA1 */
+ #define TB_HALG_SHA1    0x0004 
+ #define TB_HALG_SHA256  0x000B 
+-#define TB_HALG_SM3     0x0012 
++
+ #define TB_HALG_SHA384  0x000C
+ #define TB_HALG_SHA512  0x000D
+ #define TB_HALG_NULL    0x0010
+@@ -70,8 +70,6 @@ static inline const char *hash_alg_to_string(uint16_t hash_alg)
+         return "TB_HALG_SHA1";
+     else if ( hash_alg == TB_HALG_SHA256 )
+         return "TB_HALG_SHA256";
+-    else if ( hash_alg == TB_HALG_SM3 )
+-        return "TB_HALG_SM3";
+     else if ( hash_alg == TB_HALG_SHA384 )
+         return "TB_HALG_SHA384";
+     else if ( hash_alg == TB_HALG_SHA512 )
+@@ -86,8 +84,6 @@ static inline unsigned int get_hash_size(uint16_t hash_alg)
+         return SHA1_LENGTH;
+     else if ( hash_alg == TB_HALG_SHA256 )
+         return SHA256_LENGTH;
+-    else if ( hash_alg == TB_HALG_SM3 )
+-        return SM3_LENGTH;
+     else if ( hash_alg == TB_HALG_SHA384 )
+         return SHA384_LENGTH;
+     else if ( hash_alg == TB_HALG_SHA512 )
+diff --git a/include/lcp3.h b/include/lcp3.h
+index f4fff0f..4e53a31 100644
+--- a/include/lcp3.h
++++ b/include/lcp3.h
+@@ -214,7 +214,7 @@ typedef struct __packed {
+ #define TPM_ALG_SHA384	0x000C
+ #define TPM_ALG_SHA512	0x000D
+ #define TPM_ALG_NULL	0x0010
+-#define TPM_ALG_SM3_256	0x0012
++
+ #define TPM_ALG_ECC     0x0023
+ 
+ #define TPM_ALG_MASK_NULL	    0x0000
+diff --git a/lcptools-v2/crtpollist.c b/lcptools-v2/crtpollist.c
+index 616b6d8..2a18dc6 100644
+--- a/lcptools-v2/crtpollist.c
++++ b/lcptools-v2/crtpollist.c
+@@ -700,7 +700,6 @@ int main(int argc, char *argv[])
+             if (sigalg_type != TPM_ALG_RSASSA &&
+                 sigalg_type != TPM_ALG_ECDSA &&
+                 sigalg_type != TPM_ALG_RSAPSS &&
+-                sigalg_type != TPM_ALG_SM3_256 &&
+                 sigalg_type != LCP_POLSALG_RSA_PKCS_15 &&
+                 sigalg_type != TPM_ALG_SM2) {
+                 ERROR("Error: Signature algorithm 0x%x unsupported.\n", sigalg_type);
+diff --git a/lcptools-v2/hash.c b/lcptools-v2/hash.c
+index b656481..e1f77cd 100644
+--- a/lcptools-v2/hash.c
++++ b/lcptools-v2/hash.c
+@@ -63,8 +63,6 @@ bool are_hashes_equal(const tb_hash_t *hash1, const tb_hash_t *hash2,
+         return (memcmp_s(hash1, SHA1_LENGTH, hash2, SHA1_LENGTH, &diff) == 0 && diff == 0);
+     else if ( hash_alg == TB_HALG_SHA256 )
+         return (memcmp_s(hash1, SHA256_LENGTH, hash2, SHA256_LENGTH, &diff) == 0 && diff == 0);
+-    else if ( hash_alg == TB_HALG_SM3 )
+-        return (memcmp_s(hash1, SM3_LENGTH, hash2, SM3_LENGTH, &diff) == 0 && diff == 0);
+     else if ( hash_alg == TB_HALG_SHA384 )
+         return (memcmp_s(hash1, SHA384_LENGTH, hash2, SHA384_LENGTH, &diff) == 0 && diff == 0);
+     else if ( hash_alg == TB_HALG_SHA512 )
+@@ -129,16 +127,6 @@ bool hash_buffer(const unsigned char* buf, size_t size, tb_hash_t *hash,
+         EVP_MD_CTX_destroy(ctx);
+         return true;
+     }
+-    else if (hash_alg == TB_HALG_SM3) {
+-        EVP_MD_CTX *ctx = EVP_MD_CTX_create();
+-        const EVP_MD *md;
+-        md = EVP_sm3();
+-        EVP_DigestInit(ctx, md);
+-        EVP_DigestUpdate(ctx, buf, size);
+-        EVP_DigestFinal(ctx, hash->sm3, NULL);
+-        EVP_MD_CTX_destroy(ctx);
+-        return true;
+-    }
+     else
+         return false;
+ }
+@@ -211,14 +199,6 @@ void print_hash(const tb_hash_t *hash, uint16_t hash_alg)
+         }
+         printf("\n");
+     }
+-    else if ( hash_alg == TB_HALG_SM3) {
+-        for ( unsigned int i = 0; i < SM3_LENGTH; i++ ) {
+-            printf("%02x", hash->sm3[i]);
+-            if ( i < SM3_LENGTH-1 )
+-                printf(" ");
+-        }
+-        printf("\n");
+-    }
+     else
+         return;
+ }
+diff --git a/lcptools-v2/lcputils.c b/lcptools-v2/lcputils.c
+index 4df78da..d8920bd 100644
+--- a/lcptools-v2/lcputils.c
++++ b/lcptools-v2/lcputils.c
+@@ -289,8 +289,6 @@ const char *hash_alg_to_str(uint16_t alg)
+         return "TPM_ALG_SHA384";
+     case TPM_ALG_SHA512:
+         return "TPM_ALG_SHA512";
+-    case TPM_ALG_SM3_256:
+-        return "TPM_ALG_SM3_256";
+     case TPM_ALG_SM2:
+         return "TPM_ALG_SM2";
+     case LCP_POLHALG_SHA1: //Legacy value for TPM 1.2
+@@ -326,8 +324,6 @@ const char *sig_alg_to_str(uint16_t alg)
+         return "TPM_ALG_SM2";
+     case TPM_ALG_RSAPSS:
+         return "TPM_ALG_RSAPSS";
+-    case TPM_ALG_SM3_256:
+-        return "TPM_ALG_SM3_256";
+     case TPM_ALG_NULL:
+         return "TPM_ALG_NULL";
+     case LCP_POLSALG_RSA_PKCS_15:
+@@ -348,8 +344,6 @@ uint16_t str_to_hash_alg(const char *str)
+         return TPM_ALG_SHA384;
+     else if (strcmp(str,"sha512") == 0)
+         return TPM_ALG_SHA512;
+-    else if (strcmp(str,"sm3") == 0)
+-        return TPM_ALG_SM3_256;
+     else
+         return  TPM_ALG_NULL;
+ }
+@@ -364,8 +358,6 @@ uint16_t str_to_lcp_hash_mask(const char *str)
+         return TPM_ALG_MASK_SHA384;
+     else if (strcmp(str,"sha512") == 0)
+         return TPM_ALG_MASK_SHA512;
+-    else if (strcmp(str,"sm3") == 0)
+-        return TPM_ALG_MASK_SM3_256;
+     else if(strncmp(str, "0X", 2) || strncmp(str, "0x", 2))
+         return strtoul(str, NULL, 0);
+     else
+@@ -463,8 +455,6 @@ uint16_t convert_hash_alg_to_mask(uint16_t hash_alg)
+         return TPM_ALG_MASK_SHA384;
+     case TPM_ALG_SHA512:
+         return TPM_ALG_MASK_SHA512;
+-    case TPM_ALG_SM3_256:
+-        return TPM_ALG_MASK_SM3_256;
+     default:
+         return 0;
+     }
+@@ -482,8 +472,6 @@ size_t get_lcp_hash_size(uint16_t hash_alg)
+         return SHA384_DIGEST_SIZE;
+     case TPM_ALG_SHA512:
+         return SHA512_DIGEST_SIZE;
+-    case TPM_ALG_SM3_256:
+-        return SM3_256_DIGEST_SIZE;
+     case LCP_POLHALG_SHA1: //Legacy value for TPM 1.2
+         return SHA1_DIGEST_SIZE;
+     default:
+@@ -803,13 +791,7 @@ bool verify_ec_signature(sized_buffer *data, sized_buffer *pubkey_x,
+         return false;
+     }
+     
+-    if ( hashalg == TPM_ALG_SM3_256 ) {
+-        curveId = NID_sm2;
+-        mdtype = EVP_sm3();
+-        #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+-            curveName = SN_sm2;
+-        #endif
+-    } else if ( hashalg == TPM_ALG_SHA256 ) {
++    if ( hashalg == TPM_ALG_SHA256 ) {
+         curveId = NID_secp256k1;
+         mdtype = EVP_sha256();
+         #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+@@ -1131,9 +1113,6 @@ bool ec_sign_data(sized_buffer *data, sized_buffer *r, sized_buffer *s, uint16_t
+     EVP_MD_CTX_set_pkey_ctx(mctx, pctx);
+     switch (hashalg)
+     {
+-    case TPM_ALG_SM3_256:
+-        result = EVP_DigestSignInit(mctx, &pctx, EVP_sm3(), NULL, evp_key);
+-        break;
+     case TPM_ALG_SHA256:
+         result = EVP_DigestSignInit(mctx, &pctx, EVP_sha256(), NULL, evp_key);
+         break;
+diff --git a/lcptools-v2/pollist2.c b/lcptools-v2/pollist2.c
+index 32daf4e..2a51cf0 100644
+--- a/lcptools-v2/pollist2.c
++++ b/lcptools-v2/pollist2.c
+@@ -455,10 +455,7 @@ bool verify_tpm20_ec_sig(const lcp_policy_list_t2 *pollist)
+         return false;
+     }
+     //Set hashalg - sm3 for sm2 sigs, sha384 for 384 bit keys and sha256 for 256 bit keys
+-    if (sigalg == TPM_ALG_SM2) {
+-        hashalg = TPM_ALG_SM3_256;
+-    }
+-    else if (keysize == MIN_ECC_KEY_SIZE){ // 32
++    if (keysize == MIN_ECC_KEY_SIZE){ // 32
+         hashalg = TPM_ALG_SHA256;
+     }
+     else {
+@@ -1126,9 +1123,6 @@ bool ec_sign_list2_data(lcp_policy_list_t2 *pollist, const char *privkey)
+     case TPM_ALG_ECDSA:
+         hashalg = (sig->ecc_signature.pubkey_size == 32) ? TPM_ALG_SHA256 : TPM_ALG_SHA384;
+         break;
+-    case TPM_ALG_SM2:
+-        hashalg = TPM_ALG_SM3_256;
+-        break;
+     default:
+         ERROR("Error: unsupported signature algorithm.\n");
+         result = false;
+diff --git a/lcptools-v2/pollist2_1.c b/lcptools-v2/pollist2_1.c
+index f947c1e..a8c6b53 100644
+--- a/lcptools-v2/pollist2_1.c
++++ b/lcptools-v2/pollist2_1.c
+@@ -755,8 +755,7 @@ bool verify_tpm20_pollist_2_1_ec_sig(const lcp_policy_list_t2_1 *pollist)
+         return false;
+     }
+ 
+-    if ( hashalg != TPM_ALG_SHA256 && hashalg != TPM_ALG_SHA384 && 
+-         hashalg != TPM_ALG_SM3_256) {
++    if ( hashalg != TPM_ALG_SHA256 && hashalg != TPM_ALG_SHA384) {
+         ERROR("ERROR: hash alg not supported. Expected 0x0B, 0x0C or 0x12, found: 0x%x\n",
+                                                                   hashalg);
+         return false;
+@@ -2113,9 +2112,7 @@ static lcp_policy_list_t2_1 *policy_list2_1_ec_sign(lcp_policy_list_t2_1 *pollis
+     }
+     sig->RevocationCounter = rev_ctr;
+     sig->KeyAndSignature.EccKeyAndSignature.SigScheme = sig_alg;
+-    if (sig_alg == TPM_ALG_SM2) {
+-        sig->KeyAndSignature.EccKeyAndSignature.Signature.HashAlg = TPM_ALG_SM3_256;
+-    }
++
+     pollist = add_tpm20_signature_2_1(pollist, sig, sig_alg);
+     if (pollist == NULL) {
+         ERROR("Error: failed to add lcp_signature_2_1 to list.\n");
+diff --git a/tb_polgen/hash.c b/tb_polgen/hash.c
+index 6c3e121..dcb682c 100644
+--- a/tb_polgen/hash.c
++++ b/tb_polgen/hash.c
+@@ -112,10 +112,6 @@ bool hash_buffer(const unsigned char* buf, size_t size, tb_hash_t *hash,
+             md = EVP_sha512();
+             hash_out = hash->sha512;
+             break;
+-        case TB_HALG_SM3:
+-            md = EVP_sm3();
+-            hash_out = hash->sm3;
+-            break;
+         default:
+             error_msg("unsupported hash alg (%d)\n", hash_alg);
+             return false;
+diff --git a/tboot/common/cmdline.c b/tboot/common/cmdline.c
+index b928843..5884384 100644
+--- a/tboot/common/cmdline.c
++++ b/tboot/common/cmdline.c
+@@ -529,9 +529,6 @@ void get_tboot_extpol(void)
+         printk(TBOOT_WARN"Warning: SHA1 is selected in extpol, this is an unsafe option\n");
+         tpm->extpol = TB_EXTPOL_FIXED;
+         tpm->cur_alg = TB_HALG_SHA1;
+-    } else if ( tb_strcmp(extpol, "sm3") == 0 ) {
+-        tpm->extpol = TB_EXTPOL_FIXED;
+-        tpm->cur_alg = TB_HALG_SM3;
+     } else if ( tb_strcmp(extpol, "sha384") == 0 ) {
+         tpm->extpol = TB_EXTPOL_FIXED;
+         tpm->cur_alg = TB_HALG_SHA384;
+diff --git a/tboot/common/hash.c b/tboot/common/hash.c
+index 2569afd..1cef73e 100644
+--- a/tboot/common/hash.c
++++ b/tboot/common/hash.c
+@@ -99,10 +99,6 @@ bool hash_buffer(const unsigned char* buf, size_t size, tb_hash_t *hash,
+         sha512_buffer(buf, size, hash->sha512);
+         return true;
+     }
+-    else if ( hash_alg == TB_HALG_SM3 ) {
+-        printk(TBOOT_ERR"unsupported hash alg (%u)\n", hash_alg);
+-        return false;
+-    }
+     else {
+         printk(TBOOT_ERR"unsupported hash alg (%u)\n", hash_alg);
+         return false;
+@@ -148,10 +144,6 @@ bool extend_hash(tb_hash_t *hash1, const tb_hash_t *hash2, uint16_t hash_alg)
+         sha512_buffer(buf, 2*sizeof(hash1->sha512), hash1->sha512);
+         return true;
+     }
+-    else if ( hash_alg == TB_HALG_SM3 ) {
+-        printk(TBOOT_ERR"unsupported hash alg (%u)\n", hash_alg);
+-        return false;
+-    }
+     else {
+         printk(TBOOT_ERR"unsupported hash alg (%u)\n", hash_alg);
+         return false;
+@@ -169,8 +161,6 @@ void print_hash(const tb_hash_t *hash, uint16_t hash_alg)
+         print_hex(NULL, (uint8_t *)hash->sha1, sizeof(hash->sha1));
+     else if ( hash_alg == TB_HALG_SHA256 )
+         print_hex(NULL, (uint8_t *)hash->sha256, sizeof(hash->sha256));
+-    else if ( hash_alg == TB_HALG_SM3 )
+-        print_hex(NULL, (uint8_t *)hash->sm3, sizeof(hash->sm3));
+     else if ( hash_alg == TB_HALG_SHA384 )
+         print_hex(NULL, (uint8_t *)hash->sha384, sizeof(hash->sha384));
+     else {
+diff --git a/tboot/common/tpm_20.c b/tboot/common/tpm_20.c
+index 901a06b..d849bcb 100644
+--- a/tboot/common/tpm_20.c
++++ b/tboot/common/tpm_20.c
+@@ -316,7 +316,6 @@ HASH_SIZE_INFO hash_sizes[] = {
+     {TPM_ALG_SHA256,        SHA256_DIGEST_SIZE},
+     {TPM_ALG_SHA384,        SHA384_DIGEST_SIZE},
+     {TPM_ALG_SHA512,        SHA512_DIGEST_SIZE},
+-    {TPM_ALG_SM3_256,       SM3_256_DIGEST_SIZE},
+     {TPM_ALG_NULL,0}
+ };
+ 
+diff --git a/tboot/include/tpm.h b/tboot/include/tpm.h
+index 4de900b..6f68da5 100644
+--- a/tboot/include/tpm.h
++++ b/tboot/include/tpm.h
+@@ -134,7 +134,6 @@ typedef struct __packed {
+ #define TPM_ALG_SHA512            0x000D
+ #define TPM_ALG_WHIRLPOOL512      0x000E
+ #define TPM_ALG_NULL              0x0010
+-#define TPM_ALG_SM3_256           0x0012
+ #define TPM_ALG_SM4               0x0013
+ #define TPM_ALG_RSASSA            0x0014
+ #define TPM_ALG_RSAES             0x0015
+diff --git a/tboot/include/tpm_20.h b/tboot/include/tpm_20.h
+index ed6f372..27d4952 100644
+--- a/tboot/include/tpm_20.h
++++ b/tboot/include/tpm_20.h
+@@ -615,9 +615,6 @@ typedef union {
+ #ifdef TPM_ALG_SHA256
+     u8  sha256[SHA256_DIGEST_SIZE];
+ #endif
+-#ifdef TPM_ALG_SM3_256
+-    u8  sm3_256[SM3_256_DIGEST_SIZE];
+-#endif
+ #ifdef TPM_ALG_SHA384
+     u8  sha384[SHA384_DIGEST_SIZE];
+ #endif
+diff --git a/tboot/include/txt/heap.h b/tboot/include/txt/heap.h
+index 6465036..88b1f15 100644
+--- a/tboot/include/txt/heap.h
++++ b/tboot/include/txt/heap.h
+@@ -195,8 +195,6 @@ static inline unsigned int get_evtlog_digest_id(uint16_t hash_alg)
+         return DIGEST_ALG_ID_SHA_1;
+     else if ( hash_alg == TB_HALG_SHA256 )
+         return DIGEST_ALG_ID_SHA_256;
+-    else if ( hash_alg == TB_HALG_SM3 )
+-        return DIGEST_ALG_ID_SM3;
+     else if ( hash_alg == TB_HALG_SHA384 )
+         return DIGEST_ALG_ID_SHA_384;
+     else if ( hash_alg == TB_HALG_SHA512 )
+diff --git a/tboot/txt/heap.c b/tboot/txt/heap.c
+index 6057b0e..b9ffc38 100644
+--- a/tboot/txt/heap.c
++++ b/tboot/txt/heap.c
+@@ -248,12 +248,6 @@ uint32_t print_event_2_1(void *evt)
+                     evt_data_ptr += SHA256_LENGTH;
+                     break;
+  
+-                case TB_HALG_SM3:
+-                    printk(TBOOT_INFO"SM3_256: \n");
+-                    print_hex(NULL, evt_data_ptr, SM3_LENGTH);
+-                    evt_data_ptr += SM3_LENGTH;
+-                    break;
+- 
+                 case TB_HALG_SHA384:
+                     printk(TBOOT_INFO"SHA384: \n");
+                     print_hex(NULL, evt_data_ptr, SHA384_LENGTH);
+-- 
+2.25.1
+

@@ -1,10 +1,10 @@
 Summary:        Color Management Engine
 Name:           lcms2
-Version:        2.13.1
-Release:        2%{?dist}
+Version:        2.15
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.littlecms.com/
 Source0:        https://github.com/mm2/Little-CMS/archive/refs/tags/lcms%{version}.tar.gz#/Little-CMS-lcms%{version}.tar.gz
 BuildRequires:  gcc
@@ -71,6 +71,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/lcms2.pc
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15-1
+- Auto-upgrade to 2.15 - Azure Linux 3.0 - package upgrades
+
 * Fri Mar 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.13.1-2
 - Bumping release to re-build with newer 'libtiff' libraries.
 

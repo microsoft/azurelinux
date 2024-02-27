@@ -4,7 +4,7 @@ Release:        18%{?dist}
 Summary:        Read a file backwards by lines
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/File-ReadBackwards
 Source0:        https://cpan.metacpan.org/authors/id/U/UR/URI/File-ReadBackwards-%{version}.tar.gz#/perl-File-ReadBackwards-%{version}.tar.gz
 BuildArch:      noarch

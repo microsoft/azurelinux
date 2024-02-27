@@ -2,11 +2,11 @@
 
 Summary:        Input device library
 Name:           libinput
-Version:        1.21.0
+Version:        1.25.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.freedesktop.org/wiki/Software/libinput/
 Source0:        https://gitlab.freedesktop.org/libinput/libinput/-/archive/%{version}/%{name}-%{version}.tar.bz2
 
@@ -81,12 +81,14 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 %dir %{_libexecdir}/libinput/
 %{_libexecdir}/libinput/libinput-debug-events
 %{_libexecdir}/libinput/libinput-list-devices
+%{_libexecdir}/libinput/libinput-list-kernel-devices
 %{_datadir}/libinput/*.quirks
 %dir %{_datadir}/zsh
 %dir %{_datadir}/zsh/site-functions
 %{_datadir}/zsh/site-functions/*
 %{_mandir}/man1/libinput.1*
 %{_mandir}/man1/libinput-list-devices.1*
+%{_mandir}/man1/libinput-list-kernel-devices.1*
 %{_mandir}/man1/libinput-debug-events.1*
 
 %files devel
@@ -102,6 +104,12 @@ find %{buildroot}/%{_mandir}/man1 -type f -regextype posix-egrep -regex "$UTILS_
 %{_mandir}/man1/libinput-test-suite.1*
 
 %changelog
+* Thu Feb 08 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.25.0-1
+- Upgrade to 1.25.0
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.21.0-2
+- Recompile with stack-~protection fixed gcc version (CVE-2023-4039)
+
 * Fri Jun 24 2022 Henry Beberman <henry.beberman@microsoft.com> - 1.21.0-1
 - Update to version 1.21.0 to fix CVE-2022-1215
 - Added libinput-test and libinput-test-utils to test package.

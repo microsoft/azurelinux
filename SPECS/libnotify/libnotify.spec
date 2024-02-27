@@ -6,7 +6,7 @@ Version:        0.7.9
 Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 Patch0:         disable-gtk.patch
@@ -38,7 +38,7 @@ development of programs using %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %meson -Dman=false

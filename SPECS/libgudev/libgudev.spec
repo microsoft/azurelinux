@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        LGPL2.1
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.gnome.org/browse/libgudev/
 Source0:        https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
 

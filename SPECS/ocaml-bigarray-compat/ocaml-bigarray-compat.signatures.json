@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.md": "93e9b032184bb8be4ee5d15e2a6103282ba933f11dcaf2b4e55800bbb8852977",
-  "bigarray-compat-1.0.0.tar.gz": "0d74925d2bbf22449ddd9819c71266e1bf8c027558b545b112a7fbb0baadf5ae"
- }
+  "Signatures": {
+    "LICENSE.md": "93e9b032184bb8be4ee5d15e2a6103282ba933f11dcaf2b4e55800bbb8852977",
+    "bigarray-compat-1.1.0.tar.gz": "cf09354986d1ab7d506949f58e73dd72be8aedb241c1593381c18e92a70c0bb1"
+  }
 }

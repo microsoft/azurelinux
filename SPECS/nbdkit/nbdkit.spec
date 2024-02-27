@@ -5,7 +5,7 @@
 %bcond_with blkio
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %undefine _package_note_flags
 %global _hardened_build 1
 
@@ -51,7 +51,7 @@ Distribution:   Mariner
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -104,6 +104,7 @@ BuildRequires:  tcl-devel
 BuildRequires:  lua-devel
 
 # Only for running the test suite:
+%if %{with_check}
 BuildRequires:  %{_bindir}/bc
 BuildRequires:  %{_bindir}/certtool
 BuildRequires:  %{_bindir}/cut
@@ -121,6 +122,7 @@ BuildRequires:  /sbin/sfdisk
 BuildRequires:  %{_bindir}/socat
 BuildRequires:  /sbin/ss
 BuildRequires:  %{_bindir}/stat
+%endif
 
 # nbdkit is a metapackage pulling the server and a useful subset
 # of the plugins and filters.
@@ -1193,6 +1195,12 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.35.3-4
+- Wrap test dependencies in with_check if block
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.35.3-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue May 23 2023 Vince Perri <viperri@microsoft.com> - 1.34.1-2
 - License verified.
 - Removing libxcrypt-compat requirement from vddk plugin.
@@ -2245,7 +2253,7 @@ export LIBGUESTFS_TRACE=1
 - New filters: blocksize, fua, log, nozero.
 
 * Fri Feb 09 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 1.1.28-5
-- Escape macros in %%changelog
+- Escape macros in changelog
 
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.28-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild

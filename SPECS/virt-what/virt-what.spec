@@ -1,11 +1,11 @@
 Name:           virt-what
-Version:        1.20
-Release:        4%{?dist}
+Version:        1.25
+Release:        1%{?dist}
 Summary:        Detect if we are running in a virtual machine
 License:        GPLv2+
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://people.redhat.com/~rjones/virt-what/
 Source0:        http://people.redhat.com/~rjones/virt-what/files/%{name}-%{version}.tar.gz
 
@@ -95,7 +95,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %check
 if ! make check ; then
     cat test-suite.log
-    exit 1
+    false
 fi
 
 %files
@@ -106,6 +106,12 @@ fi
 
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25-1
+- Auto-upgrade to 1.25 - Azure Linux 3.0 - package upgrades
+
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-5
+- Removing 'exit' calls from the '%%check' section.
+
 * Thu Jan 20 2022 Cameron Baird <cameronbaird@microsoft.com> 1.20-4
 - Move into SPECS
 - License verified

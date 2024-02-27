@@ -1,11 +1,11 @@
 %define soname 3
 Summary:        Tools for mapping IP address to geolocation information
 Name:           IP2Location
-Version:        8.4.1
+Version:        8.6.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ip2location.com/
 Source0:        https://github.com/chrislim2888/IP2Location-C-Library/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
@@ -137,6 +137,9 @@ install -p data/IPV6-COUNTRY.BIN %{buildroot}%{_datadir}/%{name}/IPV6-COUNTRY.SA
 %attr(644,-,-) %{_datadir}/%{name}/*.BIN
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.6.1-1
+- Auto-upgrade to 8.6.1 - Azure Linux 3.0 - package upgrades
+
 * Mon Feb 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 8.4.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified

@@ -4,7 +4,7 @@ Version:        2.9.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/%{name}
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}-Source.tar.gz
 BuildRequires:  cmake

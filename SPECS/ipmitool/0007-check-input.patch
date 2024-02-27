@@ -1,6 +1,6 @@
-diff -urNp old/doc/ipmitool.1 new/doc/ipmitool.1
---- old/doc/ipmitool.1	2017-10-03 16:10:50.446539988 +0200
-+++ new/doc/ipmitool.1	2017-10-03 16:16:37.039673239 +0200
+diff -urNp old/doc/ipmitool.1.in new/doc/ipmitool.1.in
+--- old/doc/ipmitool.1.in	2017-10-03 16:10:50.446539988 +0200
++++ new/doc/ipmitool.1.in	2017-10-03 16:16:37.039673239 +0200
 @@ -3170,13 +3170,14 @@ SOL configuration data for the currently
  
  Enable, disable or show status of SOL payload for the user on the specified channel. 

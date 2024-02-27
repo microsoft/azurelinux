@@ -1,10 +1,10 @@
 Summary:        Embedded Linux library
 Name:           libell
-Version:        0.48
-Release:        2%{?dist}
+Version:        0.61
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://01.org/ell
 Source0:        https://www.kernel.org/pub/linux/libs/ell/ell-%{version}.tar.xz
 BuildRequires:  gcc
@@ -51,6 +51,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/ell.pc
 
 %changelog
+* Wed Jan 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.61-1
+- Upgrade to 0.61
+
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58-1
+- Auto-upgrade to 0.58 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.48-3
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 0.48-2
 - Promote to Mariner base repo
 - Lint spec

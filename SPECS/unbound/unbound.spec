@@ -1,10 +1,10 @@
 Summary:        unbound dns server
 Name:           unbound
-Version:        1.16.3
+Version:        1.17.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
@@ -96,6 +96,9 @@ useradd -r -g unbound -d %{_sysconfdir}/unbound -s /sbin/nologin \
 %{_mandir}/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.17.1-1
+- Auto-upgrade to 1.17.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 12 2022 Henry Li <lihl@microsoft.com> - 1.16.3-1
 - Upgrade to version 1.16.3 to resolve CVE-2022-3204
 

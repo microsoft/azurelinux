@@ -1,0 +1,585 @@
+Submitted By:            Xi Ruoyao <xry111 at xry111.site>
+Date:                    2023-08-13
+Initial Package Version: 2.38
+Upstream Status:         Under review
+Origin:                  Upstream & Self
+  - 1/3: https://sourceware.org/git/?p=glibc.git;a=patch;h=542b11058525
+  - 2/3: https://sourceware.org/pipermail/libc-alpha/2023-August/150857.html
+  - 3/3: Trivial unused code removal
+Description:             Fixes a regression causing posix_memalign()
+                         very slow in certain conditions to avoid
+                         breaking ffmpeg-based applications.
+
+From fc01478d06658ace8d57e5328c1e717275acfe84 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Fri, 11 Aug 2023 11:18:17 +0200
+Subject: [PATCH 1/3] malloc: Enable merging of remainders in memalign (bug
+ 30723)
+
+Previously, calling _int_free from _int_memalign could put remainders
+into the tcache or into fastbins, where they are invisible to the
+low-level allocator.  This results in missed merge opportunities
+because once these freed chunks become available to the low-level
+allocator, further memalign allocations (even of the same size are)
+likely obstructing merges.
+
+Furthermore, during forwards merging in _int_memalign, do not
+completely give up when the remainder is too small to serve as a
+chunk on its own.  We can still give it back if it can be merged
+with the following unused chunk.  This makes it more likely that
+memalign calls in a loop achieve a compact memory layout,
+independently of initial heap layout.
+
+Drop some useless (unsigned long) casts along the way, and tweak
+the style to more closely match GNU on changed lines.
+
+Reviewed-by: DJ Delorie <dj@redhat.com>
+(cherry picked from commit 542b1105852568c3ebc712225ae78b8c8ba31a78)
+---
+ malloc/malloc.c | 197 +++++++++++++++++++++++++++++-------------------
+ 1 file changed, 121 insertions(+), 76 deletions(-)
+
+diff --git a/malloc/malloc.c b/malloc/malloc.c
+index e2f1a615a4..948f9759af 100644
+--- a/malloc/malloc.c
++++ b/malloc/malloc.c
+@@ -1086,6 +1086,11 @@ typedef struct malloc_chunk* mchunkptr;
+ 
+ static void*  _int_malloc(mstate, size_t);
+ static void     _int_free(mstate, mchunkptr, int);
++static void _int_free_merge_chunk (mstate, mchunkptr, INTERNAL_SIZE_T);
++static INTERNAL_SIZE_T _int_free_create_chunk (mstate,
++					       mchunkptr, INTERNAL_SIZE_T,
++					       mchunkptr, INTERNAL_SIZE_T);
++static void _int_free_maybe_consolidate (mstate, INTERNAL_SIZE_T);
+ static void*  _int_realloc(mstate, mchunkptr, INTERNAL_SIZE_T,
+ 			   INTERNAL_SIZE_T);
+ static void*  _int_memalign(mstate, size_t, size_t);
+@@ -4637,31 +4642,52 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+     if (!have_lock)
+       __libc_lock_lock (av->mutex);
+ 
+-    nextchunk = chunk_at_offset(p, size);
+-
+-    /* Lightweight tests: check whether the block is already the
+-       top block.  */
+-    if (__glibc_unlikely (p == av->top))
+-      malloc_printerr ("double free or corruption (top)");
+-    /* Or whether the next chunk is beyond the boundaries of the arena.  */
+-    if (__builtin_expect (contiguous (av)
+-			  && (char *) nextchunk
+-			  >= ((char *) av->top + chunksize(av->top)), 0))
+-	malloc_printerr ("double free or corruption (out)");
+-    /* Or whether the block is actually not marked used.  */
+-    if (__glibc_unlikely (!prev_inuse(nextchunk)))
+-      malloc_printerr ("double free or corruption (!prev)");
+-
+-    nextsize = chunksize(nextchunk);
+-    if (__builtin_expect (chunksize_nomask (nextchunk) <= CHUNK_HDR_SZ, 0)
+-	|| __builtin_expect (nextsize >= av->system_mem, 0))
+-      malloc_printerr ("free(): invalid next size (normal)");
++    _int_free_merge_chunk (av, p, size);
+ 
+-    free_perturb (chunk2mem(p), size - CHUNK_HDR_SZ);
++    if (!have_lock)
++      __libc_lock_unlock (av->mutex);
++  }
++  /*
++    If the chunk was allocated via mmap, release via munmap().
++  */
++
++  else {
++    munmap_chunk (p);
++  }
++}
++
++/* Try to merge chunk P of SIZE bytes with its neighbors.  Put the
++   resulting chunk on the appropriate bin list.  P must not be on a
++   bin list yet, and it can be in use.  */
++static void
++_int_free_merge_chunk (mstate av, mchunkptr p, INTERNAL_SIZE_T size)
++{
++  mchunkptr nextchunk = chunk_at_offset(p, size);
++
++  /* Lightweight tests: check whether the block is already the
++     top block.  */
++  if (__glibc_unlikely (p == av->top))
++    malloc_printerr ("double free or corruption (top)");
++  /* Or whether the next chunk is beyond the boundaries of the arena.  */
++  if (__builtin_expect (contiguous (av)
++			&& (char *) nextchunk
++			>= ((char *) av->top + chunksize(av->top)), 0))
++    malloc_printerr ("double free or corruption (out)");
++  /* Or whether the block is actually not marked used.  */
++  if (__glibc_unlikely (!prev_inuse(nextchunk)))
++    malloc_printerr ("double free or corruption (!prev)");
++
++  INTERNAL_SIZE_T nextsize = chunksize(nextchunk);
++  if (__builtin_expect (chunksize_nomask (nextchunk) <= CHUNK_HDR_SZ, 0)
++      || __builtin_expect (nextsize >= av->system_mem, 0))
++    malloc_printerr ("free(): invalid next size (normal)");
++
++  free_perturb (chunk2mem(p), size - CHUNK_HDR_SZ);
+ 
+-    /* consolidate backward */
+-    if (!prev_inuse(p)) {
+-      prevsize = prev_size (p);
++  /* Consolidate backward.  */
++  if (!prev_inuse(p))
++    {
++      INTERNAL_SIZE_T prevsize = prev_size (p);
+       size += prevsize;
+       p = chunk_at_offset(p, -((long) prevsize));
+       if (__glibc_unlikely (chunksize(p) != prevsize))
+@@ -4669,9 +4695,25 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+       unlink_chunk (av, p);
+     }
+ 
+-    if (nextchunk != av->top) {
++  /* Write the chunk header, maybe after merging with the following chunk.  */
++  size = _int_free_create_chunk (av, p, size, nextchunk, nextsize);
++  _int_free_maybe_consolidate (av, size);
++}
++
++/* Create a chunk at P of SIZE bytes, with SIZE potentially increased
++   to cover the immediately following chunk NEXTCHUNK of NEXTSIZE
++   bytes (if NEXTCHUNK is unused).  The chunk at P is not actually
++   read and does not have to be initialized.  After creation, it is
++   placed on the appropriate bin list.  The function returns the size
++   of the new chunk.  */
++static INTERNAL_SIZE_T
++_int_free_create_chunk (mstate av, mchunkptr p, INTERNAL_SIZE_T size,
++			mchunkptr nextchunk, INTERNAL_SIZE_T nextsize)
++{
++  if (nextchunk != av->top)
++    {
+       /* get and clear inuse bit */
+-      nextinuse = inuse_bit_at_offset(nextchunk, nextsize);
++      bool nextinuse = inuse_bit_at_offset (nextchunk, nextsize);
+ 
+       /* consolidate forward */
+       if (!nextinuse) {
+@@ -4686,8 +4728,8 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+ 	been given one chance to be used in malloc.
+       */
+ 
+-      bck = unsorted_chunks(av);
+-      fwd = bck->fd;
++      mchunkptr bck = unsorted_chunks (av);
++      mchunkptr fwd = bck->fd;
+       if (__glibc_unlikely (fwd->bk != bck))
+ 	malloc_printerr ("free(): corrupted unsorted chunks");
+       p->fd = fwd;
+@@ -4706,61 +4748,52 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+       check_free_chunk(av, p);
+     }
+ 
+-    /*
+-      If the chunk borders the current high end of memory,
+-      consolidate into top
+-    */
+-
+-    else {
++  else
++    {
++      /* If the chunk borders the current high end of memory,
++	 consolidate into top.  */
+       size += nextsize;
+       set_head(p, size | PREV_INUSE);
+       av->top = p;
+       check_chunk(av, p);
+     }
+ 
+-    /*
+-      If freeing a large space, consolidate possibly-surrounding
+-      chunks. Then, if the total unused topmost memory exceeds trim
+-      threshold, ask malloc_trim to reduce top.
+-
+-      Unless max_fast is 0, we don't know if there are fastbins
+-      bordering top, so we cannot tell for sure whether threshold
+-      has been reached unless fastbins are consolidated.  But we
+-      don't want to consolidate on each free.  As a compromise,
+-      consolidation is performed if FASTBIN_CONSOLIDATION_THRESHOLD
+-      is reached.
+-    */
++  return size;
++}
+ 
+-    if ((unsigned long)(size) >= FASTBIN_CONSOLIDATION_THRESHOLD) {
++/* If freeing a large space, consolidate possibly-surrounding
++   chunks.  Then, if the total unused topmost memory exceeds trim
++   threshold, ask malloc_trim to reduce top.  */
++static void
++_int_free_maybe_consolidate (mstate av, INTERNAL_SIZE_T size)
++{
++  /* Unless max_fast is 0, we don't know if there are fastbins
++     bordering top, so we cannot tell for sure whether threshold has
++     been reached unless fastbins are consolidated.  But we don't want
++     to consolidate on each free.  As a compromise, consolidation is
++     performed if FASTBIN_CONSOLIDATION_THRESHOLD is reached.  */
++  if (size >= FASTBIN_CONSOLIDATION_THRESHOLD)
++    {
+       if (atomic_load_relaxed (&av->have_fastchunks))
+ 	malloc_consolidate(av);
+ 
+-      if (av == &main_arena) {
++      if (av == &main_arena)
++	{
+ #ifndef MORECORE_CANNOT_TRIM
+-	if ((unsigned long)(chunksize(av->top)) >=
+-	    (unsigned long)(mp_.trim_threshold))
+-	  systrim(mp_.top_pad, av);
++	  if (chunksize (av->top) >= mp_.trim_threshold)
++	    systrim (mp_.top_pad, av);
+ #endif
+-      } else {
+-	/* Always try heap_trim(), even if the top chunk is not
+-	   large, because the corresponding heap might go away.  */
+-	heap_info *heap = heap_for_ptr(top(av));
++	}
++      else
++	{
++	  /* Always try heap_trim, even if the top chunk is not large,
++	     because the corresponding heap might go away.  */
++	  heap_info *heap = heap_for_ptr (top (av));
+ 
+-	assert(heap->ar_ptr == av);
+-	heap_trim(heap, mp_.top_pad);
+-      }
++	  assert (heap->ar_ptr == av);
++	  heap_trim (heap, mp_.top_pad);
++	}
+     }
+-
+-    if (!have_lock)
+-      __libc_lock_unlock (av->mutex);
+-  }
+-  /*
+-    If the chunk was allocated via mmap, release via munmap().
+-  */
+-
+-  else {
+-    munmap_chunk (p);
+-  }
+ }
+ 
+ /*
+@@ -5221,7 +5254,7 @@ _int_memalign (mstate av, size_t alignment, size_t bytes)
+                 (av != &main_arena ? NON_MAIN_ARENA : 0));
+       set_inuse_bit_at_offset (newp, newsize);
+       set_head_size (p, leadsize | (av != &main_arena ? NON_MAIN_ARENA : 0));
+-      _int_free (av, p, 1);
++      _int_free_merge_chunk (av, p, leadsize);
+       p = newp;
+ 
+       assert (newsize >= nb &&
+@@ -5232,15 +5265,27 @@ _int_memalign (mstate av, size_t alignment, size_t bytes)
+   if (!chunk_is_mmapped (p))
+     {
+       size = chunksize (p);
+-      if ((unsigned long) (size) > (unsigned long) (nb + MINSIZE))
++      mchunkptr nextchunk = chunk_at_offset(p, size);
++      INTERNAL_SIZE_T nextsize = chunksize(nextchunk);
++      if (size > nb)
+         {
+           remainder_size = size - nb;
+-          remainder = chunk_at_offset (p, nb);
+-          set_head (remainder, remainder_size | PREV_INUSE |
+-                    (av != &main_arena ? NON_MAIN_ARENA : 0));
+-          set_head_size (p, nb);
+-          _int_free (av, remainder, 1);
+-        }
++	  if (remainder_size >= MINSIZE
++	      || nextchunk == av->top
++	      || !inuse_bit_at_offset (nextchunk, nextsize))
++	    {
++	      /* We can only give back the tail if it is larger than
++		 MINSIZE, or if the following chunk is unused (top
++		 chunk or unused in-heap chunk).  Otherwise we would
++		 create a chunk that is smaller than MINSIZE.  */
++	      remainder = chunk_at_offset (p, nb);
++	      set_head_size (p, nb);
++	      remainder_size = _int_free_create_chunk (av, remainder,
++						       remainder_size,
++						       nextchunk, nextsize);
++	      _int_free_maybe_consolidate (av, remainder_size);
++	    }
++	}
+     }
+ 
+   check_inuse_chunk (av, p);
+-- 
+2.41.0
+
+From b37e836b7cc2dba672e1de1cc7e076ba1c712614 Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Fri, 11 Aug 2023 17:48:13 +0200
+Subject: [PATCH 2/3] malloc: Remove bin scanning from memalign (bug 30723)
+
+On the test workload (mpv --cache=yes with VP9 video decoding), the
+bin scanning has a very poor success rate (less than 2%).  The tcache
+scanning has about 50% success rate, so keep that.
+
+Update comments in malloc/tst-memalign-2 to indicate the purpose
+of the tests.  Even with the scanning removed, the additional
+merging opportunities since commit 542b1105852568c3ebc712225ae78b
+("malloc: Enable merging of remainders in memalign (bug 30723)")
+are sufficient to pass the existing large bins test.
+
+Link: https://sourceware.org/pipermail/libc-alpha/2023-August/150857.html
+---
+ malloc/malloc.c         | 127 ++--------------------------------------
+ malloc/tst-memalign-2.c |   7 ++-
+ 2 files changed, 10 insertions(+), 124 deletions(-)
+
+diff --git a/malloc/malloc.c b/malloc/malloc.c
+index 948f9759af..9c2cab7a59 100644
+--- a/malloc/malloc.c
++++ b/malloc/malloc.c
+@@ -5082,7 +5082,6 @@ _int_memalign (mstate av, size_t alignment, size_t bytes)
+   mchunkptr remainder;            /* spare room at end to split off */
+   unsigned long remainder_size;   /* its size */
+   INTERNAL_SIZE_T size;
+-  mchunkptr victim;
+ 
+   nb = checked_request2size (bytes);
+   if (nb == 0)
+@@ -5101,129 +5100,13 @@ _int_memalign (mstate av, size_t alignment, size_t bytes)
+      we don't find anything in those bins, the common malloc code will
+      scan starting at 2x.  */
+ 
+-  /* This will be set if we found a candidate chunk.  */
+-  victim = NULL;
++  /* Call malloc with worst case padding to hit alignment. */
++  m = (char *) (_int_malloc (av, nb + alignment + MINSIZE));
+ 
+-  /* Fast bins are singly-linked, hard to remove a chunk from the middle
+-     and unlikely to meet our alignment requirements.  We have not done
+-     any experimentation with searching for aligned fastbins.  */
++  if (m == 0)
++    return 0;           /* propagate failure */
+ 
+-  if (av != NULL)
+-    {
+-      int first_bin_index;
+-      int first_largebin_index;
+-      int last_bin_index;
+-
+-      if (in_smallbin_range (nb))
+-	first_bin_index = smallbin_index (nb);
+-      else
+-	first_bin_index = largebin_index (nb);
+-
+-      if (in_smallbin_range (nb * 2))
+-	last_bin_index = smallbin_index (nb * 2);
+-      else
+-	last_bin_index = largebin_index (nb * 2);
+-
+-      first_largebin_index = largebin_index (MIN_LARGE_SIZE);
+-
+-      int victim_index;                 /* its bin index */
+-
+-      for (victim_index = first_bin_index;
+-	   victim_index < last_bin_index;
+-	   victim_index ++)
+-	{
+-	  victim = NULL;
+-
+-	  if (victim_index < first_largebin_index)
+-	    {
+-	      /* Check small bins.  Small bin chunks are doubly-linked despite
+-		 being the same size.  */
+-
+-	      mchunkptr fwd;                    /* misc temp for linking */
+-	      mchunkptr bck;                    /* misc temp for linking */
+-
+-	      bck = bin_at (av, victim_index);
+-	      fwd = bck->fd;
+-	      while (fwd != bck)
+-		{
+-		  if (chunk_ok_for_memalign (fwd, alignment, nb) > 0)
+-		    {
+-		      victim = fwd;
+-
+-		      /* Unlink it */
+-		      victim->fd->bk = victim->bk;
+-		      victim->bk->fd = victim->fd;
+-		      break;
+-		    }
+-
+-		  fwd = fwd->fd;
+-		}
+-	    }
+-	  else
+-	    {
+-	      /* Check large bins.  */
+-	      mchunkptr fwd;                    /* misc temp for linking */
+-	      mchunkptr bck;                    /* misc temp for linking */
+-	      mchunkptr best = NULL;
+-	      size_t best_size = 0;
+-
+-	      bck = bin_at (av, victim_index);
+-	      fwd = bck->fd;
+-
+-	      while (fwd != bck)
+-		{
+-		  int extra;
+-
+-		  if (chunksize (fwd) < nb)
+-		    break;
+-		  extra = chunk_ok_for_memalign (fwd, alignment, nb);
+-		  if (extra > 0
+-		      && (extra <= best_size || best == NULL))
+-		    {
+-		      best = fwd;
+-		      best_size = extra;
+-		    }
+-
+-		  fwd = fwd->fd;
+-		}
+-	      victim = best;
+-
+-	      if (victim != NULL)
+-		{
+-		  unlink_chunk (av, victim);
+-		  break;
+-		}
+-	    }
+-
+-	  if (victim != NULL)
+-	    break;
+-	}
+-    }
+-
+-  /* Strategy: find a spot within that chunk that meets the alignment
+-     request, and then possibly free the leading and trailing space.
+-     This strategy is incredibly costly and can lead to external
+-     fragmentation if header and footer chunks are unused.  */
+-
+-  if (victim != NULL)
+-    {
+-      p = victim;
+-      m = chunk2mem (p);
+-      set_inuse (p);
+-      if (av != &main_arena)
+-	set_non_main_arena (p);
+-    }
+-  else
+-    {
+-      /* Call malloc with worst case padding to hit alignment. */
+-
+-      m = (char *) (_int_malloc (av, nb + alignment + MINSIZE));
+-
+-      if (m == 0)
+-	return 0;           /* propagate failure */
+-
+-      p = mem2chunk (m);
+-    }
++  p = mem2chunk (m);
+ 
+   if ((((unsigned long) (m)) % alignment) != 0)   /* misaligned */
+     {
+diff --git a/malloc/tst-memalign-2.c b/malloc/tst-memalign-2.c
+index f229283dbf..ecd6fa249e 100644
+--- a/malloc/tst-memalign-2.c
++++ b/malloc/tst-memalign-2.c
+@@ -86,7 +86,8 @@ do_test (void)
+       TEST_VERIFY (tcache_allocs[i].ptr1 == tcache_allocs[i].ptr2);
+     }
+ 
+-  /* Test for non-head tcache hits.  */
++  /* Test for non-head tcache hits.  This exercises the memalign
++     scanning code to find matching allocations.  */
+   for (i = 0; i < array_length (ptr); ++ i)
+     {
+       if (i == 4)
+@@ -113,7 +114,9 @@ do_test (void)
+   free (p);
+   TEST_VERIFY (count > 0);
+ 
+-  /* Large bins test.  */
++  /* Large bins test.  This verifies that the over-allocated parts
++     that memalign releases for future allocations can be reused by
++     memalign itself at least in some cases.  */
+ 
+   for (i = 0; i < LN; ++ i)
+     {
+-- 
+2.41.0
+
+From 26973f7b09c33e67f6bcbc79371796c8dd334528 Mon Sep 17 00:00:00 2001
+From: Xi Ruoyao <xry111@xry111.site>
+Date: Mon, 14 Aug 2023 11:05:18 +0800
+Subject: [PATCH 3/3] malloc: Remove unused functions and variables
+
+Remove unused chunk_ok_for_memalign function and unused local variables
+in _int_free.
+
+Signed-off-by: Xi Ruoyao <xry111@xry111.site>
+---
+ malloc/malloc.c | 42 ------------------------------------------
+ 1 file changed, 42 deletions(-)
+
+diff --git a/malloc/malloc.c b/malloc/malloc.c
+index 9c2cab7a59..d0bbbf3710 100644
+--- a/malloc/malloc.c
++++ b/malloc/malloc.c
+@@ -4488,12 +4488,6 @@ _int_free (mstate av, mchunkptr p, int have_lock)
+ {
+   INTERNAL_SIZE_T size;        /* its size */
+   mfastbinptr *fb;             /* associated fastbin */
+-  mchunkptr nextchunk;         /* next contiguous chunk */
+-  INTERNAL_SIZE_T nextsize;    /* its size */
+-  int nextinuse;               /* true if nextchunk is used */
+-  INTERNAL_SIZE_T prevsize;    /* size of previous contiguous chunk */
+-  mchunkptr bck;               /* misc temp for linking */
+-  mchunkptr fwd;               /* misc temp for linking */
+ 
+   size = chunksize (p);
+ 
+@@ -5032,42 +5026,6 @@ _int_realloc (mstate av, mchunkptr oldp, INTERNAL_SIZE_T oldsize,
+    ------------------------------ memalign ------------------------------
+  */
+ 
+-/* Returns 0 if the chunk is not and does not contain the requested
+-   aligned sub-chunk, else returns the amount of "waste" from
+-   trimming.  NB is the *chunk* byte size, not the user byte
+-   size.  */
+-static size_t
+-chunk_ok_for_memalign (mchunkptr p, size_t alignment, size_t nb)
+-{
+-  void *m = chunk2mem (p);
+-  INTERNAL_SIZE_T size = chunksize (p);
+-  void *aligned_m = m;
+-
+-  if (__glibc_unlikely (misaligned_chunk (p)))
+-    malloc_printerr ("_int_memalign(): unaligned chunk detected");
+-
+-  aligned_m = PTR_ALIGN_UP (m, alignment);
+-
+-  INTERNAL_SIZE_T front_extra = (intptr_t) aligned_m - (intptr_t) m;
+-
+-  /* We can't trim off the front as it's too small.  */
+-  if (front_extra > 0 && front_extra < MINSIZE)
+-    return 0;
+-
+-  /* If it's a perfect fit, it's an exception to the return value rule
+-     (we would return zero waste, which looks like "not usable"), so
+-     handle it here by returning a small non-zero value instead.  */
+-  if (size == nb && front_extra == 0)
+-    return 1;
+-
+-  /* If the block we need fits in the chunk, calculate total waste.  */
+-  if (size > nb + front_extra)
+-    return size - nb;
+-
+-  /* Can't use this chunk.  */
+-  return 0;
+-}
+-
+ /* BYTES is user requested bytes, not requested chunksize bytes.  */
+ static void *
+ _int_memalign (mstate av, size_t alignment, size_t bytes)
+-- 
+2.41.0
+

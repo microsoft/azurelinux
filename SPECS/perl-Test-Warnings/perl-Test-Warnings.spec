@@ -1,12 +1,12 @@
 Summary:        Test for warnings and the lack of them in Perl
 Name:           perl-Test-Warnings
-Version:        0.031
-Release:        2%{?dist}
+Version:        0.032
+Release:        1%{?dist}
 URL:            https://metacpan.org/release/Test-Warnings
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source:         https://cpan.metacpan.org/authors/id/E/ET/ETHER/Test-Warnings-%{version}.tar.gz
 
 BuildArch:      noarch
@@ -44,7 +44,10 @@ make test
 %{_mandir}/man?/*
 
 %changelog
-* Mon Aug 01 2022 Muhammad Falak <mwani@micosoft.com> - 0.031-2
+* Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 0.032-1
+- Upgrade to version 0.032
+
+* Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 0.031-2
 - Add BR on `perl(Test::More)` to enable ptest
 
 *   Thu Apr 14 2022 Mateusz Malisz <mateusz.malisz@microsoft.com> - 0.031-1

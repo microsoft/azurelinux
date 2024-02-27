@@ -2,11 +2,11 @@
 %global gem_name net-http-persistent
 Summary:        Thread-safe persistent connections with Net::HTTP
 Name:           rubygem-%{gem_name}
-Version:        3.1.0
+Version:        4.0.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/drbrain/net-http-persistent
 Source0:        https://github.com/drbrain/net-http-persistent/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.2-1
+- Auto-upgrade to 4.0.2 - Azure Linux 3.0 - package upgrades
+
 * Mon Jun 13 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 3.1.0-1
 - .gemspec file taken from upstream master branch (License MIT)
 - License verified

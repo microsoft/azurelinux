@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-nso
 Summary: Northern Sotho hunspell dictionaries
 %global upstreamid 20091201

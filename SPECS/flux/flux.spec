@@ -21,11 +21,11 @@
 
 Summary:        Influx data language
 Name:           flux
-Version:        0.191.0
+Version:        0.194.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Databases/Servers
 URL:            https://github.com/influxdata/flux
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -40,6 +40,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 Source1:        %{name}-%{version}-cargo.tar.gz
 Source2:        cargo_config
 Patch1:         disable-static-library.patch
+Patch2:         0001-libflux-unblock-build-by-allowing-warnings.patch
 BuildRequires:  cargo >= 1.45
 BuildRequires:  kernel-headers
 BuildRequires:  rust >= 1.45
@@ -70,6 +71,7 @@ programs using Influx data language.
 
 %prep
 %setup -q
+%patch 2 -p1
 pushd libflux
 tar -xf %{SOURCE1}
 install -D %{SOURCE2} .cargo/config
@@ -137,6 +139,15 @@ RUSTFLAGS=%{rustflags} cargo test --release
 %{_includedir}/influxdata/flux.h
 
 %changelog
+* Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.194.5-1
+- Upgrade to version 0.194.5
+
+* Thu Sep 14 2023 Muhammad Falak <mwani@microsoft.com> - 0.191.0-3
+- Introduce patch to drop warnings as build blocker
+
+* Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.191.0-2
+- Bump package to rebuild with rust 1.72.0
+
 * Mon Jan 30 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.191.0-1
 - Upgrade to version 0.191.0
 - Added patches to fix libflux.so file linking issues

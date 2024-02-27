@@ -1,0 +1,43 @@
+--- IP.pm
++++ IP.pm
+@@ -416,7 +416,9 @@ sub intip {
+ 
+     my $int = ip_bintoint($self->binip());
+ 
+-    if (!$int) {
++    # this then fails for 0.0.0.0, which is wrong.
++    #
++    if (not defined $int) {
+         $self->{error} = $ERROR;
+         $self->{errno} = $ERRNO;
+         return;
+@@ -625,9 +627,11 @@ sub last_int {
+ 
+     return ($self->{last_int}) if defined($self->{last_int});
+ 
+-    my $last_bin = $self->last_bin() or return;
++    my $last_bin = $self->last_bin();
++    return unless defined $last_bin;
+ 
+-    my $last_int = ip_bintoint($last_bin, $self->version()) or return;
++    my $last_int = ip_bintoint($last_bin, $self->version());
++    return unless defined $last_int;
+ 
+     $self->{last_int} = $last_int;
+ 
+@@ -1267,11 +1271,13 @@ sub ip_prefix_to_range {
+     # Turn into a binary
+     # Get last address
+     # Turn into an IP
+-    my $binip = ip_iptobin($ip, $ip_version) or return;
++    my $binip = ip_iptobin($ip, $ip_version);
++    return unless defined $binip;
+ 
+     return unless (ip_check_prefix($binip, $len, $ip_version));
+ 
+-    my $lastip = ip_last_address_bin($binip, $len, $ip_version) or return;
++    my $lastip = ip_last_address_bin($binip, $len, $ip_version);
++    return unless defined $lastip;
+     return unless ($lastip = ip_bintoip($lastip, $ip_version));
+ 
+     return ($ip, $lastip);

@@ -7,11 +7,11 @@
 
 Summary:        Read and write Windows Registry binary hive files
 Name:           hivex
-Version:        1.3.21
+Version:        1.3.23
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libguestfs.org/
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
 
@@ -186,12 +186,12 @@ if ! make check -k; then
         cat $f
         echo
     done
-    exit 1
+    false
 fi
 
 %files -f %{name}.lang
 %license LICENSE
-%doc README
+%doc README.md
 %{_bindir}/hivexget
 %{_bindir}/hivexml
 %{_bindir}/hivexsh
@@ -211,7 +211,7 @@ fi
 
 %if %{with ocaml}
 %files -n ocaml-%{name}
-%doc README
+%doc README.md
 %{_libdir}/ocaml/hivex
 %exclude %{_libdir}/ocaml/hivex/*.a
 %exclude %{_libdir}/ocaml/hivex/*.cmxa
@@ -244,6 +244,15 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
+* Fri Feb 16 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.3.23-1
+- Upgrate to 1.3.23.
+
+* Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.21-3
+- Removing 'exit' calls from the '%%check' section.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.21-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue May 31 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.3.20-1
 - Upgrade to 1.3.21 to fix CVE-2021-3504 and CVE-2021-3622.
 

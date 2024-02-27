@@ -1,0 +1,83 @@
+diff -up hdf-4.2.15/hdf/src/hconv.h.ppc64le hdf-4.2.15/hdf/src/hconv.h
+--- hdf-4.2.15/hdf/src/hconv.h.ppc64le	2020-04-30 21:25:25.183973672 -0600
++++ hdf-4.2.15/hdf/src/hconv.h	2020-04-30 21:25:25.191973677 -0600
+@@ -59,7 +59,7 @@
+ /* CONSTANT DEFINITIONS                                                      */
+ /*****************************************************************************/
+ /* Generally Big-Endian machines */
+-#if !defined(INTEL86) && !defined(MIPSEL) && !defined(DEC_ALPHA) && !defined(I860) && !defined(SUN386) && !(defined(__ia64) && !(defined(hpux) || defined(__hpux))) && !defined(__x86_64__) && !defined(__arm__) && !defined(__AARCH64EL__)
++#if !defined(INTEL86) && !defined(MIPSEL) && !defined(DEC_ALPHA) && !defined(I860) && !defined(SUN386) && !(defined(__ia64) && !(defined(hpux) || defined(__hpux))) && !defined(__x86_64__) && !defined(__arm__) && !defined(__AARCH64EL__) && !defined(__LITTLE_ENDIAN__)
+ #       define UI8_IN     DFKnb1b   /* Unsigned Integer, 8 bits */
+ #       define UI8_OUT    DFKnb1b
+ #       define SI16_IN    DFKnb2b   /* S = Signed */
+diff -up hdf-4.2.15/hdf/src/hdfi.h.ppc64le hdf-4.2.15/hdf/src/hdfi.h
+--- hdf-4.2.15/hdf/src/hdfi.h.ppc64le	2020-04-30 21:25:25.183973672 -0600
++++ hdf-4.2.15/hdf/src/hdfi.h	2020-04-30 21:25:25.192973677 -0600
+@@ -75,6 +75,7 @@
+ #define     DFMT_IA64           0x4441
+ #define     DFMT_LINUX64        0x4441
+ #define     DFMT_POWERPC64      0x1111
++#define     DFMT_POWERPC64LE    0x4441
+ #define     DFMT_LINUXPPC       0x1111
+ #define     DFMT_LINUXSPARC     0x1111
+ #define     DFMT_LINUX390       0x1111
+@@ -926,18 +927,24 @@ typedef int               hdf_pint_t;
+ 
+ 
+ /*-----------------------------------------------------*/
+-/* Power PC 5 64 */
+ #if defined __powerpc64__
+-
++/* powerpc 64 bits */
+ #ifdef GOT_MACHINE
+ If you get an error on this line more than one machine type has been defined.
+ Please check your Makefile.
+ #endif
+ #define GOT_MACHINE
+ 
++#ifdef __LITTLE_ENDIAN__
++/* Power PC 8 64 little endian */
++#define DF_MT             DFMT_POWERPC64LE
++#else
++/* Power PC 5 64 */
++#define DF_MT             DFMT_POWERPC64
++#endif
++
+ #include <sys/file.h>               /* for unbuffered i/o stuff */
+ #include <sys/stat.h>
+-#define DF_MT             DFMT_POWERPC64
+ typedef void              VOID;
+ typedef void              *VOIDP;
+ typedef char              *_fcd;
+@@ -973,8 +980,9 @@ typedef long              hdf_pint_t;
+ #define INCLUDES_ARE_ANSI
+ #endif
+ 
++#endif /* powerpc 64 bits */
++
+ /*-----------------------------------------------------*/
+-#endif /*power PC 5 64 */
+ /* Linux 64 */
+ #if defined(__linux__) && defined __x86_64__  && !(defined  SUN)  /* i.e. 64-bit Linux  but not SunOS on Intel */
+ 
+diff -up hdf-4.2.15/mfhdf/libsrc/xdrposix.c.ppc64le hdf-4.2.15/mfhdf/libsrc/xdrposix.c
+--- hdf-4.2.15/mfhdf/libsrc/xdrposix.c.ppc64le	2020-04-30 21:25:25.186973674 -0600
++++ hdf-4.2.15/mfhdf/libsrc/xdrposix.c	2020-04-30 21:26:18.190001127 -0600
+@@ -442,7 +442,7 @@ xdrposix_getlong(xdrs, lp)
+     long *lp;
+ {
+     unsigned char *up = (unsigned char *)lp ;
+-#if (defined AIX5L64 || defined __powerpc64__ || defined __s390x__ || (defined __hpux && __LP64__))
++#if (defined AIX5L64 || (defined __powerpc64__ && !defined __LITTLE_ENDIAN__) || defined __s390x__ || (defined __hpux && __LP64__))
+     *lp = 0 ;
+     up += (sizeof(long) - 4) ;
+ #endif
+@@ -465,7 +465,7 @@ xdrposix_putlong(xdrs, lp)
+     netlong mycopy = htonl(*lp);
+     up = (unsigned char *)&mycopy;
+ #endif
+-#if (defined AIX5L64  || defined __powerpc64__ || defined __s390x__ || (defined __hpux && __LP64__))
++#if (defined AIX5L64  || (defined __powerpc64__ && !defined __LITTLE_ENDIAN__) || defined __s390x__ || (defined __hpux && __LP64__))
+     up += (sizeof(long) - 4) ;
+ #endif
+ 

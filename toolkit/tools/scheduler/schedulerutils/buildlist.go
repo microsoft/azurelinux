@@ -88,8 +88,8 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 }
 
 // IsReservedFile determines if a given file path or filename is found in a list of reserved RPMs.
-// reservedRPMs may be a list of filenames or paths to reserved files. (e.g. 'foo-1.0.0-1.cm1.x86_64.rpm' or
-// '/path/to/foo-1.0.0-1.cm1.x86_64.rpm').
+// reservedRPMs may be a list of filenames or paths to reserved files. (e.g. 'foo-1.0.0-1.azl3.x86_64.rpm' or
+// '/path/to/foo-1.0.0-1.azl3.x86_64.rpm').
 func IsReservedFile(rpmPath string, reservedRPMs []string) bool {
 	base := filepath.Base(rpmPath)
 	for _, reservedRPM := range reservedRPMs {
@@ -123,7 +123,7 @@ func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 	}
 
 	packageVersToBuild = append(packageVersToBuild, packageVersFromConfig...)
-	packageVersToBuild = removePackageVersDuplicates(packageVersToBuild)
+	packageVersToBuild = sliceutils.RemoveDuplicatesFromSlice(packageVersToBuild)
 
 	return
 }
@@ -171,16 +171,6 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 	}
 
 	return
-}
-
-func removePackageVersDuplicates(packageVers []*pkgjson.PackageVer) []*pkgjson.PackageVer {
-	uniquePackageVersToBuild := make(map[*pkgjson.PackageVer]bool)
-
-	for _, packageVer := range packageVers {
-		uniquePackageVersToBuild[packageVer] = true
-	}
-
-	return sliceutils.SetToSlice(uniquePackageVersToBuild)
 }
 
 // packageNamesToPackages converts the input strings to PackageVer structures that are understood by the graph.

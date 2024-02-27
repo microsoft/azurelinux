@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:             adobe-mappings-cmap
 Summary:          CMap resources for Adobe's character collections
 Version:          20171205

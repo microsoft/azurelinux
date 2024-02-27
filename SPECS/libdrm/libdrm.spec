@@ -49,11 +49,11 @@ end}
 %endif
 Summary:        Direct Rendering Manager runtime library
 Name:           libdrm
-Version:        2.4.114
+Version:        2.4.120
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://dri.freedesktop.org
 Source0:        %{url}/libdrm/%{name}-%{version}.tar.xz
 Source1:        README.rst
@@ -83,6 +83,7 @@ BuildRequires:  valgrind-devel
 %if %{with udev}
 BuildRequires:  systemd-devel
 %endif
+BuildRequires:  systemd-rpm-macros
 
 %description
 Direct Rendering Manager runtime library
@@ -290,6 +291,18 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.4.120-1
+- Upgrade to 2.4.120
+
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.116-1
+- Auto-upgrade to 2.4.116 - Azure Linux 3.0 - package upgrades
+
+* Fri Oct 27 2023 Xiaohong Deng <xiaohongdeng@microsoft.com> - 2.4.115-1
+- Upgrade to 2.4.115
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.114-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Mon May 15 2023 Hideyuki Nagase <hideyukn@microsoft.com> - 2.4.114-1
 - Updating to version 2.4.114 using Fedora 39 spec (license: MIT) for guidance.
 

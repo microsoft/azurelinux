@@ -11,7 +11,7 @@ Release:        12%{?dist}
 Summary:        Safely and cleanly create closures via string eval
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Eval-Closure
 Source0:        https://cpan.metacpan.org/authors/id/D/DO/DOY/Eval-Closure-%{version}.tar.gz#/perl-Eval-Closure-%{version}.tar.gz
 BuildArch:      noarch

@@ -1,12 +1,12 @@
 Summary:    User-space infrastructure for connection tracking timeout
 Name:       libnetfilter_cttimeout
-Version:    1.0.0
-Release:        5%{?dist}
+Version:    1.0.1
+Release:        1%{?dist}
 License:    GPLv2+
 URL:        http://www.netfilter.org/projects/libnetfilter_cttimeout/index.html
 Group:      System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:    http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
 
 BuildRequires:  libmnl-devel
@@ -52,6 +52,12 @@ find %{buildroot} -type f -name '*.la' -exec rm -f {} ';'
 %{_libdir}/*.so
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.1-1
+- Auto-upgrade to 1.0.1 - Azure Linux 3.0 - package upgrades
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.0-6
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Tue Feb 08 2022 Thomas Crain <thcrain@microsoft.com> - 1.0.0-5
 - Remove unused `%%define sha1` lines
 - License verified

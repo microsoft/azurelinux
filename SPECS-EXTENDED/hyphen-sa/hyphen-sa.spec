@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global upstream_commit cec10c6cad4804d391df31d0be8e429e2231feb5
 %global upstreamid 20110915
 
@@ -23,7 +23,7 @@ Sanskrit hyphenation rules.
 %prep
 %setup -T -q -c -n hyphen-sa
 cp -p %{SOURCE0} .
-%patch0 -p0 -b .clean
+%patch 0 -p0 -b .clean
 cp %{SOURCE1} ./LICENSE.txt
 
 %build

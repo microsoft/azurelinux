@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "LICENSE.PTR": "e795614588114961fc0d5aa0e142ca79b77a9448f1cbb8d199cdcce8d926d30f",
-  "lsb-release_os-release-3.1.tar.gz": "7d0ee81b1eb5606a4c037380e461bc5b7b33a3eb7a9d3e838c6e393592abe3e9"
- }
+  "Signatures": {
+    "LICENSE.PTR": "e795614588114961fc0d5aa0e142ca79b77a9448f1cbb8d199cdcce8d926d30f",
+    "lsb-release_os-release-3.2.tar.gz": "a75b345df96d75a4c2059099dec0589e323f2d77472e92942d6546f2bc38f57b"
+  }
 }

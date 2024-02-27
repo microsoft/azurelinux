@@ -5,10 +5,10 @@ Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
 Version:        4.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
 Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz
@@ -38,6 +38,9 @@ chmod -x runme
 %_bindir/*
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jun 23 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.5-1
 - Initial CBL-Mariner import from NVIDIA (license: GPLv2)
 - License verified

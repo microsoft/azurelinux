@@ -1,12 +1,12 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      15%{?dist}
+Release:      18%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
 URL:          http://www.linuxfromscratch.org
-Distribution: Mariner
+Distribution:   Azure Linux
 
 %description
 The filesystem package is one of the basic packages that is installed
@@ -31,6 +31,8 @@ install -vdm 755 %{buildroot}/{dev,run/{media/{floppy,cdrom},lock}}
 install -vdm 755 %{buildroot}/{etc/{opt,sysconfig},home,mnt}
 install -vdm 700 %{buildroot}/boot
 install -vdm 755 %{buildroot}/{var}
+install -vdm 755 %{buildroot}/opt
+install -vdm 755 %{buildroot}/media
 install -dv -m 0750 %{buildroot}/root
 install -dv -m 1777 %{buildroot}/tmp %{buildroot}/var/tmp
 install -vdm 755 %{buildroot}/usr/{,local/}{bin,include,lib,sbin,src}
@@ -44,7 +46,6 @@ install -vdm 755 %{buildroot}/usr/lib/debug/{lib,bin,sbin,usr,.dwz}
 ln -svfn usr/lib %{buildroot}/lib
 ln -svfn usr/bin %{buildroot}/bin
 ln -svfn usr/sbin %{buildroot}/sbin
-ln -svfn run/media %{buildroot}/media
 
 ln -svfn ../bin %{buildroot}/usr/lib/debug/usr/bin
 ln -svfn ../sbin %{buildroot}/usr/lib/debug/usr/sbin
@@ -284,7 +285,6 @@ for script in /etc/profile.d/*.sh ; do
 done
 
 unset script RED GREEN NORMAL
-umask 027
 # End /etc/profile
 EOF
 #
@@ -568,6 +568,7 @@ return 0
 %dir /etc
 %dir /home
 /lib
+%dir /opt
 
 /media
 %dir /mnt
@@ -709,6 +710,15 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Thu Nov 30 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
+- Remove umask 027
+
+* Thu Oct 12 2023 Chris PeBenito <chpebeni@microsoft.com> - 1.1-17
+- Restore the /opt directory.
+
+* Mon Oct 09 2023 Chris Co <chrco@microsoft.com> - 1.1-16
+- Make /media a proper directory
+
 * Thu Jun 29 2023 Tobias Brick <tobiasb@microsoft.com> - 1.1-15
 - Revert: Remove setting umask from /etc/profile and add it to a separate file in /etc/profile.d
 

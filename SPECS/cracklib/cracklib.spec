@@ -3,13 +3,13 @@
 
 Summary:          A password strength-checking library.
 Name:             cracklib
-Version:          2.9.7
-Release:          5%{?dist}
+Version:          2.9.11
+Release:          1%{?dist}
 Group:            System Environment/Libraries
 URL:              https://github.com/cracklib/cracklib
 License:          LGPLv2+
 Vendor:           Microsoft Corporation
-Distribution:     Mariner
+Distribution:   Azure Linux
 
 Source0:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:          https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-words-%{version}.gz
@@ -100,13 +100,7 @@ CFLAGS="$RPM_OPT_FLAGS" ./configure \
   --libdir=%{_libdir} \
   --libexecdir=%{_libdir} \
   --datadir=%{_datadir} \
-  --disable-static \
-  --without-python
-
-make
-pushd python
-python3 setup.py build
-popd
+  --disable-static 
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -169,6 +163,7 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %{_includedir}/*
 %{_libdir}/libcrack.so
 %{_libdir}/libcrack.la
+%{_mandir}/man3/*
 
 %files -n python3-cracklib
 %defattr(-,root,root)
@@ -182,8 +177,13 @@ rm -f %{_datadir}/cracklib/pw_dict.pwi
 %files lang
 %defattr(-,root,root)
 %{_datadir}/locale/*
+%{_mandir}/man8/*
 
 %changelog
+* Mon Jan 15 2024 Archana Choudhary <archana1@microsoft.com> - 2.9.11-1
+- Upgrade to 2.9.11
+- Add man pages to files
+
 * Tue Jun 07 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.9.7-5
 - Remove packer symlink- not necessary, conflicts with Hashicorp's packer tool
 

@@ -1,10 +1,10 @@
 Summary:        Enhanced seccomp library
 Name:           libseccomp
-Version:        2.5.3
+Version:        2.5.4
 Release:        1%{?dist}
 License:        LGPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/seccomp/libseccomp/wiki
 Source0:        https://github.com/seccomp/libseccomp/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -62,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.4-1
+- Auto-upgrade to 2.5.4 - Azure Linux 3.0 - package upgrades
+
 * Thu Jan 13 2022 Henry Li <lihl@microsoft.com> - 2.5.3-1
 - Upgrade to version 2.5.3
 - Add gperf as BR

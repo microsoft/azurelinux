@@ -100,7 +100,7 @@ func TestStringsSetToSliceShouldCreateEmptySliceFromEmptySet(t *testing.T) {
 	assert.Empty(t, outputSlice)
 }
 
-func TestStringsSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
+func TestSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T) {
 	inputSet := map[string]bool{
 		"A": true,
 		"B": true,
@@ -115,4 +115,72 @@ func TestStringsSetToSliceShouldReturnValuesForAllTrueElementsInSet(t *testing.T
 	assert.Contains(t, outputSlice, "B")
 	assert.NotContains(t, outputSlice, "X")
 	assert.NotContains(t, outputSlice, "Y")
+}
+
+func TestSliceToSetShouldCreateEmptySetFromNil(t *testing.T) {
+	outputSet := SliceToSet[string](nil)
+
+	assert.NotNil(t, outputSet)
+	assert.Empty(t, outputSet)
+}
+
+func TestSliceToSetShouldCreateEmptySetFromEmptySlice(t *testing.T) {
+	outputSet := SliceToSet([]string{})
+
+	assert.NotNil(t, outputSet)
+	assert.Empty(t, outputSet)
+}
+
+func TestSliceToSetShouldReturnValuesForAllElementsInSlice(t *testing.T) {
+	inputSlice := []string{"A", "B", "C"}
+	outputSet := SliceToSet(inputSlice)
+
+	assert.NotNil(t, outputSet)
+	assert.Len(t, outputSet, 3)
+	assert.Contains(t, outputSet, "A")
+	assert.Contains(t, outputSet, "B")
+	assert.Contains(t, outputSet, "C")
+	assert.NotContains(t, outputSet, "X")
+}
+
+func TestShouldRemoveDuplicates(t *testing.T) {
+	inputSlice := []string{"A", "B", "C", "A", "B", "C"}
+	outputSlice := RemoveDuplicatesFromSlice(inputSlice)
+
+	assert.NotNil(t, outputSlice)
+	assert.Len(t, outputSlice, 3)
+	assert.Contains(t, outputSlice, "A")
+	assert.Contains(t, outputSlice, "B")
+	assert.Contains(t, outputSlice, "C")
+	assert.NotContains(t, outputSlice, "X")
+}
+
+// MapToSlice() should return empty slice for nil map
+func TestMapToSliceShouldCreateEmptySliceFromNil(t *testing.T) {
+	outputSlice := MapToSlice[string, any](nil)
+
+	assert.NotNil(t, outputSlice)
+	assert.Empty(t, outputSlice)
+}
+
+// MapToSlice() should return empty slice for empty map
+func TestMapToSliceShouldCreateEmptySliceFromEmptyMap(t *testing.T) {
+	outputSlice := MapToSlice(make(map[string]string))
+
+	assert.NotNil(t, outputSlice)
+	assert.Empty(t, outputSlice)
+}
+
+// MapToSlice() should return slice with all the keys in the map
+func TestMapToSliceReturnKeysInMap(t *testing.T) {
+	inputMap := map[string]bool{
+		"A": true,
+		"B": true,
+		"X": false,
+		"Y": false,
+	}
+	expectedOutput := []string{"A", "B", "X", "Y"}
+	outputSlice := MapToSlice(inputMap)
+
+	assert.ElementsMatch(t, expectedOutput, outputSlice)
 }

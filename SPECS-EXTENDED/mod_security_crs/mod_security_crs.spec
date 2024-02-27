@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: ModSecurity Rules
 Name: mod_security_crs
 Version: 3.0.0

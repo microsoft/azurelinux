@@ -1,14 +1,14 @@
 # Got the intial spec from Fedora and modified it
 Summary:        An exporter with the features of Sub::Exporter but only core dependencies
 Name:           perl-Exporter-Tiny
-Version:        1.002002
-Release:        2%{?dist}
+Version:        1.006002
+Release:        1%{?dist}
 License:        (GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Exporter-Tiny/
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
@@ -62,6 +62,9 @@ make test
 %{_mandir}/man3/Exporter::Tiny::Manual*
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.006002-1
+- Auto-upgrade to 1.006002 - Azure Linux 3.0 - package upgrades
+
 * Mon Aug 01 2022 Muhammad Falak <mwani@microsoft.com> - 1.002002-2
 - Add BR on `perl(Test::More)` to fix ptest build
 

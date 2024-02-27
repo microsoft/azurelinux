@@ -1,0 +1,30 @@
+From a3e7963320ba44e96a60b389fccb8e1cccc30674 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 19 Oct 2023 13:12:39 +0200
+Subject: [PATCH 03/46] 0003-Do-not-install-html-docs.patch
+
+Patch-name: 0003-Do-not-install-html-docs.patch
+Patch-id: 3
+Patch-status: |
+    # # Do not install html docs
+From-dist-git-commit: 5c67b5adc311af297f425c09e3e1ac7ca8483911
+---
+ Configurations/unix-Makefile.tmpl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index a48fae5fb8..56b42926e7 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -611,7 +611,7 @@ install_sw: install_dev install_engines install_modules install_runtime
+ 
+ uninstall_sw: uninstall_runtime uninstall_modules uninstall_engines uninstall_dev
+ 
+-install_docs: install_man_docs install_html_docs
++install_docs: install_man_docs
+ 
+ uninstall_docs: uninstall_man_docs uninstall_html_docs
+ 	$(RM) -r "$(DESTDIR)$(DOCDIR)"
+-- 
+2.41.0
+

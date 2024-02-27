@@ -1,10 +1,10 @@
 {
- "Signatures": {
-  "lldpd-1.0.14.tar.gz": "e36400051a10ebaf3f9ef50fe471ba55308aab61d6310873f6fdd4a0938d211b",
-  "lldpd-el6.init": "cb4605c38e690044aacaeba5f7c45786e43ee2c6d30fab04f99857926b63aef3",
-  "lldpd-el7.service": "6bb64180b449a0152bce6b4603a204b28b5c73870c9339cad71987aab9d97f14",
-  "lldpd-fedora.service": "b3d1fa3bb2091e2155ead44608af9cef6d1dc1293dfc95e49b4a1c04a86eed04",
-  "lldpd-fedora.sysconfig": "85e086d8920c844797564bc63152f496e3aa760d658929dfcdd5d3cf7d0d76cb",
-  "lldpd-tmpfiles": "489ac159516a69cc99823e72febdaa974ad60740aff7f37ec2eb95885fd8dda2"
- }
+  "Signatures": {
+    "lldpd-el6.init": "cb4605c38e690044aacaeba5f7c45786e43ee2c6d30fab04f99857926b63aef3",
+    "lldpd-el7.service": "6bb64180b449a0152bce6b4603a204b28b5c73870c9339cad71987aab9d97f14",
+    "lldpd-fedora.service": "b3d1fa3bb2091e2155ead44608af9cef6d1dc1293dfc95e49b4a1c04a86eed04",
+    "lldpd-fedora.sysconfig": "85e086d8920c844797564bc63152f496e3aa760d658929dfcdd5d3cf7d0d76cb",
+    "lldpd-tmpfiles": "489ac159516a69cc99823e72febdaa974ad60740aff7f37ec2eb95885fd8dda2",
+    "lldpd-1.0.17.tar.gz": "89ae691a4917ac9e0ec3b8b2c1e634cc402d43b804f98850c73bd1c7df380882"
+  }
 }

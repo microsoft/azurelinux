@@ -1,13 +1,13 @@
 Name:       btrfs-progs
 Version:    5.16
-Release:    101%{?dist}
+Release:    102%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
 URL:        http://btrfs.wiki.kernel.org/index.php/Main_Page
 Source0:    https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/%{name}-v%{version}.tar.xz#/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildRequires:  lzo-devel
 BuildRequires:  e2fsprogs-devel
 BuildRequires:  libacl-devel
@@ -77,6 +77,9 @@ make DISABLE_DOCUMENTATION=1 mandir=%{_mandir} bindir=%{_sbindir} libdir=%{_libd
 
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.16-102
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Thu Jan 13 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.16-1
 - Update to 5.16
 

@@ -1,10 +1,10 @@
 Summary:        A library which provides easy access to huge pages of memory
 Name:           libhugetlbfs
 Version:        2.23
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/libhugetlbfs/libhugetlbfs
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
@@ -134,6 +134,9 @@ rm -fr %{buildroot}/%{_sbindir}/
 %{_libdir}/libhugetlbfs
 
 %changelog
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.23-5
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
 * Wed Oct 05 2022 Andy Caldwell <andycaldwell@microsoft.com> - 2.23.4
 - Allow building without `glibc-static`
 
