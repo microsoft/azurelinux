@@ -17,8 +17,8 @@
 %global short_name      commons-%{base_name}
 Summary:        Command Line Interface Library for Java
 Name:           apache-commons-cli
-Version:        1.4
-Release:        5%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -87,6 +87,9 @@ cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.0-1
+- Auto-upgrade to 1.6.0 - Azure Linux 3.0 - package upgrades
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.4-5
 - Moved from extended to core
 - License verified
