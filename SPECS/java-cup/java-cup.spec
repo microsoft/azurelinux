@@ -21,7 +21,7 @@
 Summary:        LALR Parser Generator in Java
 Name:           java-cup
 Version:        0.11
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
@@ -89,7 +89,7 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 find -name "*.class" -delete
 find -name "*.jar" -delete
 %patch 4 -p1
-perl -pi -e 's/1\.2/1.6/g' build.xml
+perl -pi -e 's/1\.2/1.8/g' build.xml
 mkdir -p classes dist
 cp %{SOURCE2} license.txt
 
@@ -126,6 +126,9 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %doc manual.html
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <pawelwi@microsoft.com> - 0.11-33
+- rebuild with msopenjdk-17
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-32
 - Fixing source URL.
 
