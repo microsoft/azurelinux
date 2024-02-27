@@ -1,0 +1,96 @@
+From 0aec12d97b2036af0946e3d582144739860ac07b Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Tue, 11 Jan 2022 03:00:03 +0200
+Subject: [PATCH] net/mlx5: DR, Fix slab-out-of-bounds in
+ mlx5_cmd_dr_create_fte
+
+When adding a rule with 32 destinations, we hit the following out-of-band
+access issue:
+
+  BUG: KASAN: slab-out-of-bounds in mlx5_cmd_dr_create_fte+0x18ee/0x1e70
+
+This patch fixes the issue by both increasing the allocated buffers to
+accommodate for the needed actions and by checking the number of actions
+to prevent this issue when a rule with too many actions is provided.
+
+Fixes: 1ffd498901c1 ("net/mlx5: DR, Increase supported num of actions to 32")
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Reviewed-by: Alex Vesker <valex@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../mellanox/mlx5/core/steering/fs_dr.c       | 33 +++++++++++++++----
+ 1 file changed, 26 insertions(+), 7 deletions(-)
+
+Index: CBL-Mariner-Linux-Kernel/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+===================================================================
+--- CBL-Mariner-Linux-Kernel.orig/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
++++ CBL-Mariner-Linux-Kernel/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+@@ -232,7 +232,11 @@ static bool contain_vport_reformat_actio
+ 		dst->dest_attr.vport.flags & MLX5_FLOW_DEST_VPORT_REFORMAT_ID;
+ }
+ 
+-#define MLX5_FLOW_CONTEXT_ACTION_MAX  32
++/* We want to support a rule with 32 destinations, which means we need to
++ * account for 32 destinations plus usually a counter plus one more action
++ * for a multi-destination flow table.
++ */
++#define MLX5_FLOW_CONTEXT_ACTION_MAX  34
+ static int mlx5_cmd_dr_create_fte(struct mlx5_flow_root_namespace *ns,
+ 				  struct mlx5_flow_table *ft,
+ 				  struct mlx5_flow_group *group,
+@@ -402,9 +406,9 @@ static int mlx5_cmd_dr_create_fte(struct
+ 			enum mlx5_flow_destination_type type = dst->dest_attr.type;
+ 			u32 id;
+ 
+-			if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX ||
+-			    num_term_actions >= MLX5_FLOW_CONTEXT_ACTION_MAX) {
+-				err = -ENOSPC;
++			if (fs_dr_num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX ||
++			    num_term_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
++				err = -EOPNOTSUPP;
+ 				goto free_actions;
+ 			}
+ 
+@@ -477,8 +481,9 @@ static int mlx5_cmd_dr_create_fte(struct
+ 			    MLX5_FLOW_DESTINATION_TYPE_COUNTER)
+ 				continue;
+ 
+-			if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
+-				err = -ENOSPC;
++			if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX ||
++			    fs_dr_num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
++				err = -EOPNOTSUPP;
+ 				goto free_actions;
+ 			}
+ 
+@@ -498,15 +503,29 @@ static int mlx5_cmd_dr_create_fte(struct
+ 	params.match_sz = match_sz;
+ 	params.match_buf = (u64 *)fte->val;
+ 	if (num_term_actions == 1) {
+-		if (term_actions->reformat)
++		if (term_actions->reformat) {
++			if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
++				err = -EOPNOTSUPP;
++				goto free_actions;
++			}
+ 			actions[num_actions++] = term_actions->reformat;
++		}
+ 
++		if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
++			err = -EOPNOTSUPP;
++			goto free_actions;
++		}
+ 		actions[num_actions++] = term_actions->dest;
+ 	} else if (num_term_actions > 1) {
+ 		bool ignore_flow_level =
+ 			!!(fte->action.flags & FLOW_ACT_IGNORE_FLOW_LEVEL);
+ 		u32 flow_source = fte->flow_context.flow_source;
+ 
++		if (num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX ||
++		    fs_dr_num_actions == MLX5_FLOW_CONTEXT_ACTION_MAX) {
++			err = -EOPNOTSUPP;
++			goto free_actions;
++		}
+ 		tmp_action = mlx5dr_action_create_mult_dest_tbl(domain,
+ 								term_actions,
+ 								num_term_actions,

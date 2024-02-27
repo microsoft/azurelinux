@@ -4,7 +4,7 @@
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
 Version: 20.10.27
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -134,6 +134,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Mon Feb 12 2024 Muhammad Falak <mwani@microsoft.com> - 20.10.27-4
+- Bump release to rebuild with go 1.21.6
+
 * Mon Feb 12 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20.10.27-3
 - Fixing CVEs: 2024-23651 and 2024-23652.
 

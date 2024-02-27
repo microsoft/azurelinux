@@ -13,7 +13,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.20.10
+Version:        1.21.6
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -88,7 +88,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{goroot}
 
-cp -R api bin doc lib pkg src misc VERSION %{buildroot}%{goroot}
+cp -R api bin doc lib pkg src misc VERSION go.env %{buildroot}%{goroot}
 
 # remove the unnecessary zoneinfo file (Go will always use the system one first)
 rm -rfv %{buildroot}%{goroot}/lib/time
@@ -141,6 +141,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Feb 02 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.6-1
+- Bump version to 1.21.6
+- Include go.env in GOROOT
+
 * Mon Oct 16 2023 Nan Liu <liunan@microsoft.com> - 1.20.10-1
 - Bump version to 1.20.10 to address CVE-2023-29409, CVE-2023-39318, CVE-2023-39319, CVE-2023-39323, CVE-2023-39533, CVE-2023-29406, CVE-2023-39325, CVE-2023-44487
 - Remove patches that no longer apply

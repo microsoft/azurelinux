@@ -16,24 +16,13 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 )
 
-var (
-	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
-	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
-	// /etc/mke2fs.conf.
-	// However, for the image customizer tool, the defaults should be as consistent as possible.
-	DefaultMkfsOptions = map[string][]string{
-		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
-		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
-		"ext4": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal,extent,huge_file,flex_bg,metadata_csum,64bit,dir_nlink,extra_isize"},
-	}
-)
-
 type installOSFunc func(imageChroot *safechroot.Chroot) error
 
-func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName string) (*ImageConnection, error) {
+func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName string, includeDefaultMounts bool,
+) (*ImageConnection, error) {
 	imageConnection := NewImageConnection()
 
-	err := connectToExistingImageHelper(imageConnection, imageFilePath, buildDir, chrootDirName)
+	err := connectToExistingImageHelper(imageConnection, imageFilePath, buildDir, chrootDirName, includeDefaultMounts)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
@@ -44,7 +33,7 @@ func connectToExistingImage(imageFilePath string, buildDir string, chrootDirName
 }
 
 func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePath string,
-	buildDir string, chrootDirName string,
+	buildDir string, chrootDirName string, includeDefaultMounts bool,
 ) error {
 	// Connect to image file using loopback device.
 	err := imageConnection.ConnectLoopback(imageFilePath)
@@ -61,7 +50,7 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 	// Create chroot environment.
 	imageChrootDir := filepath.Join(buildDir, chrootDirName)
 
-	err = imageConnection.ConnectChroot(imageChrootDir, false, newMountDirectories, mountPoints)
+	err = imageConnection.ConnectChroot(imageChrootDir, false, newMountDirectories, mountPoints, includeDefaultMounts)
 	if err != nil {
 		return err
 	}
@@ -73,25 +62,25 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
 	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
 	installOS installOSFunc,
-) (*ImageConnection, error) {
-	imageConnection := &ImageConnection{}
-
-	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, bootType, kernelCommandLine,
+) error {
+	err := createNewImageHelper(filename, diskConfig, partitionSettings, bootType, kernelCommandLine,
 		buildDir, chrootDirName, installOS,
 	)
 	if err != nil {
-		imageConnection.Close()
-		return nil, fmt.Errorf("failed to create new image:\n%w", err)
+		return fmt.Errorf("failed to create new image:\n%w", err)
 	}
 
-	return imageConnection, nil
+	return nil
 }
 
-func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
+func createNewImageHelper(filename string, diskConfig imagecustomizerapi.Disk,
 	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
 	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
 	installOS installOSFunc,
 ) error {
+	imageConnection := NewImageConnection()
+	defer imageConnection.Close()
+
 	// Convert config to image config types, so that the imager's utils can be used.
 	imagerBootType, err := bootTypeToImager(bootType)
 	if err != nil {
@@ -147,6 +136,12 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 		return fmt.Errorf("failed to install bootloader:\n%w", err)
 	}
 
+	// Close image.
+	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -168,7 +163,7 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	// Set up partitions.
 	partIDToDevPathMap, partIDToFsTypeMap, _, _, err := diskutils.CreatePartitions(
 		imageConnection.Loopback().DevicePath(), imagerDiskConfig, configuration.RootEncryption{},
-		configuration.ReadOnlyVerityRoot{}, DefaultMkfsOptions)
+		configuration.ReadOnlyVerityRoot{})
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to create partitions on disk (%s):\n%w", imageConnection.Loopback().DevicePath(), err)
 	}
@@ -184,6 +179,10 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	// options for us. If we wanted to handle this more directly, we could create a golang wrapper around libmount
 	// (which is what findmnt uses). But we are already using the findmnt in other places.
 	tmpFstabFile := filepath.Join(buildDir, chrootDirName+"_fstab")
+	err = file.RemoveFileIfExists(tmpFstabFile)
+	if err != nil {
+		return nil, "", err
+	}
 
 	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, _ := installutils.CreateMountPointPartitionMap(
 		partIDToDevPathMap, partIDToFsTypeMap, imagerPartitionSettings,
@@ -205,7 +204,7 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 	// Create chroot environment.
 	imageChrootDir := filepath.Join(buildDir, chrootDirName)
 
-	err = imageConnection.ConnectChroot(imageChrootDir, false, nil, mountPoints)
+	err = imageConnection.ConnectChroot(imageChrootDir, false, nil, mountPoints, false)
 	if err != nil {
 		return nil, "", err
 	}

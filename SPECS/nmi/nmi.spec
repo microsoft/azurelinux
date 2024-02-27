@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.11-2
+- Bump release to rebuild with go 1.21.6
+
 * Fri Feb 06 2024 Tobias Brick <tobiasb@microsoft.com> - 1.8.11-1
 - Upgrade to version 1.8.11 to CVE-2022-21698 
 

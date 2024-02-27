@@ -1,7 +1,7 @@
 Summary:        Database servers made by the original developers of MySQL.
 Name:           mariadb
 Version:        10.6.9
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2 WITH exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Group:          Applications/Databases
 URL:            https://mariadb.org/
 Source0:        https://github.com/MariaDB/server/archive/mariadb-%{version}.tar.gz
 Patch0:         CVE-2022-47015.patch
+Patch1:         fix_symlink_location_db_install.patch
 BuildRequires:  cmake
 BuildRequires:  curl-devel
 BuildRequires:  e2fsprogs-devel
@@ -68,6 +69,7 @@ errmsg for maridb
 
 %prep
 %autosetup -p1
+
 # Remove PerconaFT from here because of AGPL licence
 rm -rf storage/tokudb/PerconaFT
 # Disable "embedded" directory which only contains "test-connect" test
@@ -154,7 +156,7 @@ fi
 %post server
 /sbin/ldconfig
 chown  mysql:mysql %{_sharedstatedir}/mysql || :
-mysql_install_db --datadir="%{_sharedstatedir}/mysql" --user="mysql" --basedir="%{_prefix}" >/dev/null || :
+mariadb-install-db --datadir="%{_sharedstatedir}/mysql" --user="mysql" --basedir="%{_prefix}" >/dev/null || :
 %systemd_post  mariadb.service
 
 %postun server
@@ -211,6 +213,7 @@ fi
 %{_bindir}/msql2mysql
 %{_bindir}/mysql
 %{_bindir}/mysql_find_rows
+%{_bindir}/mysql_install_db
 %{_bindir}/mysql_plugin
 %{_bindir}/mysql_waitpid
 %{_bindir}/mysqlaccess
@@ -295,7 +298,7 @@ fi
 %{_bindir}/myisamchk
 %{_bindir}/myisamlog
 %{_bindir}/myisampack
-%{_bindir}/mysql_install_db
+%{_bindir}/mariadb-install-db
 %{_bindir}/mysql_secure_installation
 %{_bindir}/mysql_tzinfo_to_sql
 %{_bindir}/mysqld_safe
@@ -462,6 +465,9 @@ fi
 %{_datadir}/mysql/hindi/errmsg.sys
 
 %changelog
+* Thu Jan 18 2024 Andy Zaugg <azaugg@linkedin.com> - 10.6.9-6
+- Fix post scripts for rpm install, missing setup(mysql_install_db) script.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 10.6.9-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

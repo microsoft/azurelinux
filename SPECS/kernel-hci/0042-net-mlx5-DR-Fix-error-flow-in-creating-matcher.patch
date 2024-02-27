@@ -1,0 +1,103 @@
+From 367ac738488c0ddfa4066c89f1b72d78e05587e6 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Tue, 14 Dec 2021 12:56:18 +0200
+Subject: [PATCH 33/58] net/mlx5: DR, Fix error flow in creating matcher
+
+The error code of nic matcher init functions wasn't checked.
+This patch improves the matcher init function and fix error flow bug:
+the handling of match parameter is moved into a separate function
+and error flow is simplified.
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Change-Id: I30724ffd28dca2c450b0de318acb9566c1f6b549
+---
+ .../mellanox/mlx5/core/steering/dr_matcher.c  | 53 +++++++++++--------
+ 1 file changed, 32 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+index 1a1494a965f9..01213045a8a8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+@@ -860,13 +860,12 @@ static int dr_matcher_init_fdb(struct mlx5dr_matcher *matcher)
+ 	return ret;
+ }
+ 
+-static int dr_matcher_init(struct mlx5dr_matcher *matcher,
+-			   struct mlx5dr_match_parameters *mask)
++static int dr_matcher_copy_param(struct mlx5dr_matcher *matcher,
++				 struct mlx5dr_match_parameters *mask)
+ {
++	struct mlx5dr_domain *dmn = matcher->tbl->dmn;
+ 	struct mlx5dr_match_parameters consumed_mask;
+-	struct mlx5dr_table *tbl = matcher->tbl;
+-	struct mlx5dr_domain *dmn = tbl->dmn;
+-	int i, ret;
++	int i, ret = 0;
+ 
+ 	if (matcher->match_criteria >= DR_MATCHER_CRITERIA_MAX) {
+ 		mlx5dr_err(dmn, "Invalid match criteria attribute\n");
+@@ -886,10 +885,36 @@ static int dr_matcher_init(struct mlx5dr_matcher *matcher,
+ 		consumed_mask.match_sz = mask->match_sz;
+ 		memcpy(consumed_mask.match_buf, mask->match_buf, mask->match_sz);
+ 		mlx5dr_ste_copy_param(matcher->match_criteria,
+-				      &matcher->mask, &consumed_mask,
+-				      true);
++				      &matcher->mask, &consumed_mask, true);
++
++		/* Check that all mask data was consumed */
++		for (i = 0; i < consumed_mask.match_sz; i++) {
++			if (!((u8 *)consumed_mask.match_buf)[i])
++				continue;
++
++			mlx5dr_dbg(dmn,
++				   "Match param mask contains unsupported parameters\n");
++			ret = -EOPNOTSUPP;
++			break;
++		}
++
++		kfree(consumed_mask.match_buf);
+ 	}
+ 
++	return ret;
++}
++
++static int dr_matcher_init(struct mlx5dr_matcher *matcher,
++			   struct mlx5dr_match_parameters *mask)
++{
++	struct mlx5dr_table *tbl = matcher->tbl;
++	struct mlx5dr_domain *dmn = tbl->dmn;
++	int ret;
++
++	ret = dr_matcher_copy_param(matcher, mask);
++	if (ret)
++		return ret;
++
+ 	switch (dmn->type) {
+ 	case MLX5DR_DOMAIN_TYPE_NIC_RX:
+ 		matcher->rx.nic_tbl = &tbl->rx;
+@@ -907,22 +932,8 @@ static int dr_matcher_init(struct mlx5dr_matcher *matcher,
+ 	default:
+ 		WARN_ON(true);
+ 		ret = -EINVAL;
+-		goto free_consumed_mask;
+-	}
+-
+-	/* Check that all mask data was consumed */
+-	for (i = 0; i < consumed_mask.match_sz; i++) {
+-		if (!((u8 *)consumed_mask.match_buf)[i])
+-			continue;
+-
+-		mlx5dr_dbg(dmn, "Match param mask contains unsupported parameters\n");
+-		ret = -EOPNOTSUPP;
+-		goto free_consumed_mask;
+ 	}
+ 
+-	ret =  0;
+-free_consumed_mask:
+-	kfree(consumed_mask.match_buf);
+ 	return ret;
+ }
+ 
+-- 
+2.31.1
+

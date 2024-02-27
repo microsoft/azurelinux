@@ -1,0 +1,41 @@
+From 4ea9891d66410da5030dababb4b825d8e41cd7bb Mon Sep 17 00:00:00 2001
+From: Rongwei Liu <rongweil@nvidia.com>
+Date: Wed, 26 Oct 2022 14:51:41 +0100
+Subject: [PATCH] net/mlx5: DR, Fix matcher disconnect error flow
+
+When 2nd flow rules arrives, it will merge together with the
+1st one if matcher criteria is the same.
+
+If merge fails, driver will rollback the merge contents, and
+reject the 2nd rule. At rollback stage, matcher can't be
+disconnected unconditionally, otherise the 1st rule can't be
+hit anymore.
+
+Add logic to check if the matcher should be disconnected or not.
+
+Fixes: cc2295cd54e4 ("net/mlx5: DR, Improve steering for empty or RX/TX-only matchers")
+Signed-off-by: Rongwei Liu <rongweil@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Link: https://lore.kernel.org/r/20221026135153.154807-4-saeed@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
+index ddfaf7891188..91ff19f67695 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_rule.c
+@@ -1200,7 +1200,8 @@ dr_rule_create_rule_nic(struct mlx5dr_rule *rule,
+ 	}
+ 
+ remove_from_nic_tbl:
+-	mlx5dr_matcher_remove_from_tbl_nic(dmn, nic_matcher);
++	if (!nic_matcher->rules)
++		mlx5dr_matcher_remove_from_tbl_nic(dmn, nic_matcher);
+ 
+ free_hw_ste:
+ 	mlx5dr_domain_nic_unlock(nic_dmn);
+-- 
+2.31.1
+

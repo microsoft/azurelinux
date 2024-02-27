@@ -33,7 +33,7 @@
 Name:         qt5-qtbase
 Summary:      Qt5 - QtBase components
 Version:      5.12.11
-Release:      10%{?dist}
+Release:      11%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:      GFDL AND LGPLv3 AND GPLv2 AND GPLv3 with exceptions AND QT License Agreement 4.0
 Vendor:       Microsoft Corporation
@@ -148,6 +148,14 @@ Patch87: CVE-2023-38197.patch
 # Fix CVE-2023-51714
 Patch88: CVE-2023-51714.patch
 
+# Fix taken from Ubuntu's backport: https://bugs.launchpad.net/ubuntu/+source/qtbase-opensource-src/+bug/1950193.
+# It's a combination of 4 commits:
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=9378ba2ae857df7e
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=81998f50d039a631
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=7f345f2a1c8d9f60
+# - https://code.qt.io/cgit/qt/qtbase.git/commit/?id=cca8ed0547405b1c
+Patch89: CVE-2021-38593.patch
+
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -257,6 +265,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch86 -p1
 %patch87 -p1
 %patch88 -p1
+%patch89 -p1
 
 ## upstream patches
 
@@ -762,6 +771,9 @@ fi
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake
 
 %changelog
+* Thu Feb 15 2024 Sumedh Sharma <sumsharma@microsoft.com> - 5.12.11-11
+- Add patch to resolve CVE-2021-38593, used Ubuntu's patch for guidance.
+
 * Fri Jan 05 2024 Henry Beberman <henry.beberman@microsoft.com> - 5.12.11-10
 - Add patch to resolve CVE-2023-51714
 

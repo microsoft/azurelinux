@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -53,7 +53,6 @@ Requires:       clang
 Requires:       kata-containers-tools
 Requires:       kata-containers-cc-tools
 Requires:       kernel-uvm
-Requires:       kernel-uvm-cvm
 # Uncomment and remove duplicates once msigvm is available
 #Requires:       msigvm
 # Python dependencies for non-packaged IGVM tool
@@ -96,6 +95,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Tue Feb 06 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-2
+- Remove dependency on kernel-uvm-cvm
+
 * Tue Dec 19 2023 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.0-1
 - Introduce kata meta-package for the UVM components.
 - License verified
