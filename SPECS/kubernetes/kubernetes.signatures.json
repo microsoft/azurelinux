@@ -1,6 +1,6 @@
 {
   "Signatures": {
     "kubelet.service": "3be41509e18552113367252397cbd7a28e2c481de04ec54f09e232ffabda16d2",
-    "kubernetes-v1.28.3.tar.gz": "a6b7f6942c9d629b97c702a47c1bdf1140adf5c849aff288555a85e4c8a70cab"
+    "kubernetes-v1.28.7.tar.gz": "faf9961225810c1cf374a51276d5e56cab36d45c4e042b20f4b0e6035aa90b07"
   }
 }
