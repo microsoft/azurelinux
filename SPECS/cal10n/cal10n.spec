@@ -1,3 +1,5 @@
+%bcond_without bootstrap
+
 #
 # spec file for package cal10n
 #
@@ -24,16 +26,16 @@ Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://github.com/qos-ch/%{name}/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  java-devel >= 1.8
+%if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
+%else
 BuildRequires:  maven-local
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.apache.maven:maven-artifact)
 BuildRequires:  mvn(org.apache.maven:maven-artifact-manager)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
 %endif
 
 BuildArch:      noarch
