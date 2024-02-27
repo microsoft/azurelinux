@@ -5,14 +5,14 @@ ARG BASE_IMAGE
 
 FROM $BASE_IMAGE AS BASE
 
-ARG MARINER_VERSION=2.0
+ARG AZL_VERSION=3.0
 ARG USERNAME=nonroot
 ARG USER_UID=65532
 ARG USER_GID=$USER_UID
 ARG SET_USER=$USERNAME
 
 RUN mkdir -p /staging/etc \
-    && tdnf install -y --releasever=$MARINER_VERSION shadow-utils \
+    && tdnf install -y --releasever=$AZL_VERSION shadow-utils \
     && groupadd --gid $USER_GID $USERNAME \
     && useradd --gid $USER_GID -g $USERNAME $USERNAME -u $USER_UID \
     && tdnf clean all \
