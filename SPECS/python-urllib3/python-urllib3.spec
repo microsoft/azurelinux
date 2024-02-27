@@ -58,8 +58,7 @@ pip3 install tornado>=6.2 \
     pytest>=7.4.0 \
     pytest-timeout>=2.1.0 \
     pytest-xdist \
-    urllib3>=%{version} \
-    timezone
+    urllib3>=%{version}
 
 # gh#urllib3/urllib3#2109
 export CI="true"
