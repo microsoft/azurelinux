@@ -257,8 +257,7 @@ func executeRpmCommandRaw(program string, args ...string) (stdout string, err er
 }
 
 // DefaultDistroDefines returns a new map of default defines that can be used during RPM queries that also includes
-// the distro tags like '%dist', '%zal', '%alz<VER>'.
-// If distTag is empty, the distro tags will not be generated.
+// the distro tags like '%dist', '%azl'.
 func DefaultDistroDefines(runChecks bool, distTag string) (map[string]string, error) {
 	defines := defaultDefines(runChecks)
 
