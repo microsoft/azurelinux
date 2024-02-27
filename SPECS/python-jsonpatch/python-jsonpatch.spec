@@ -48,8 +48,9 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 %{_bindir}/jsonpatch3
 
 %changelog
-* Mon Feb 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.33-1
+* Mon Feb 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.33-1
 - Auto-upgrade to 1.33 - Azure Linux 3.0 - package upgrades
+- Replace COPYING with LICENSE
 
 * Thu Feb 10 2022 Thomas Crain <thcrain@microsoft.com> - 1.32-1
 - Upgrade to latest upstream version
