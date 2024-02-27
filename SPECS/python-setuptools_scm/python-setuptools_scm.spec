@@ -12,7 +12,7 @@ Group:          Development/Languages/Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Url:            https://pypi.python.org/pypi/setuptools_scm
-Source0:        https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/af/54/0a75c590c1aa1908c1036de783c0b7136d8fe4beb8ce4c52e4d92b9e9ca7/setuptools-scm-8.0.3.tar.gz
 
 BuildArch:      noarch
 
