@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://github.com/oauthlib/oauthlib
 Source0:        https://github.com/oauthlib/oauthlib/archive/refs/tags/v%{version}.tar.gz#/oauthlib-%{version}.tar.gz
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

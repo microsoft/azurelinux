@@ -10,7 +10,7 @@ License:            MIT
 URL:                https://github.com/martinblech/xmltodict
 Source0:            %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
 BuildArch:          noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:          python3-pip
 %endif
 

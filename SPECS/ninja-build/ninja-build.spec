@@ -10,7 +10,7 @@ Source0:        https://github.com/ninja-build/ninja/archive/v%{version}.tar.gz#
 Source1:        macros.ninja
 BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gtest-devel
 %endif
 

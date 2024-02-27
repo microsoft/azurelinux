@@ -17,7 +17,7 @@ Requires:       gmp
 Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 BuildRequires:  perl(File::Find)
 %endif

@@ -38,7 +38,7 @@ Requires:       usermode
 # hwinfo plugin
 Requires:       util-linux
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-distro
 BuildRequires:  python3-jinja2
 BuildRequires:  python3-pip

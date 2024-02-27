@@ -25,7 +25,7 @@ BuildRequires:  systemd-bootstrap-devel
 BuildRequires:  zlib-devel
 Requires:       %{name}-connector-c
 Conflicts:      mysql
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 %endif
 

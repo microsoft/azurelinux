@@ -10,7 +10,7 @@ URL:            https://github.com/shibukawa/imagesize_py
 #Source0:       https://github.com/shibukawa/imagesize_py/archive/%{version}.tar.gz
 Source0:        https://files.pythonhosted.org/packages/a7/84/62473fb57d61e31fef6e36d64a179c8781605429fd927b5dd608c997be31/imagesize-%{version}.tar.gz
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

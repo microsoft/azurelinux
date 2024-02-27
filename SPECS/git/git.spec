@@ -30,7 +30,7 @@ Requires:       python3
 Requires:       subversion-perl
 %endif
 Provides:       git-core = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Getopt::Long)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(lib)

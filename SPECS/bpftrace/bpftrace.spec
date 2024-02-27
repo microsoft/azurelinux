@@ -33,7 +33,7 @@ Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
 Requires:       llvm >= 12.0.1-1
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gmock
 BuildRequires:  gmock-devel
 BuildRequires:  gtest

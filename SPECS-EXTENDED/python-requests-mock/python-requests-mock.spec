@@ -27,7 +27,7 @@ Patch2:         0001-tox-add-py39-environment.patch
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

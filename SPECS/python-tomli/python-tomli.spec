@@ -21,7 +21,7 @@ BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-dateutil

@@ -12,7 +12,7 @@ BuildRequires:  meson
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(rest-1.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  dconf
 BuildRequires:  glib-networking
 %endif

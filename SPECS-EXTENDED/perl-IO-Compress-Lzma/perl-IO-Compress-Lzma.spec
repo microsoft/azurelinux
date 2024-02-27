@@ -33,7 +33,7 @@ BuildRequires:  perl(constant)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  xz
 BuildRequires:  xz-lzma-compat
 BuildRequires:  perl(Carp)

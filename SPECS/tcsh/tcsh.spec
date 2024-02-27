@@ -12,7 +12,7 @@ URL:            https://www.tcsh.org/
 Source0:        https://github.com/tcsh-org/tcsh/archive/refs/tags/TCSH6_24_10.tar.gz
 BuildRequires:  ncurses-devel
 BuildRequires:  libxcrypt-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif

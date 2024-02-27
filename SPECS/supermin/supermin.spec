@@ -57,7 +57,7 @@ BuildRequires:  dietlibc-devel
 BuildRequires:  glibc-static >= 2.38-1%{?dist}
 %endif
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  augeas
 BuildRequires:  hivex
 BuildRequires:  kernel

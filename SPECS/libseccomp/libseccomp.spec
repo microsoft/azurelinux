@@ -9,7 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://github.com/seccomp/libseccomp/wiki
 Source0:        https://github.com/seccomp/libseccomp/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gperf
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  which
 %endif
 

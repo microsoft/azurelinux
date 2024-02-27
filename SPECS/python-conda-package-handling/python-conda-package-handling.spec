@@ -26,7 +26,7 @@ BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  python%{python3_pkgversion}-tqdm
 Requires:       python%{python3_pkgversion}-six
 Requires:       python%{python3_pkgversion}-tqdm
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-pip
 %endif
 

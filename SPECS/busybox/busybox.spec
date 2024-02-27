@@ -15,7 +15,7 @@ BuildRequires:  gcc
 BuildRequires:  glibc-static >= 2.38-1%{?dist}
 BuildRequires:  libselinux-devel >= 1.27.7-2
 BuildRequires:  libsepol-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  sharutils
 BuildRequires:  zip
 %endif

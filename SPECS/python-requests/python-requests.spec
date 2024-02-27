@@ -25,7 +25,7 @@ Requires:       python3-idna
 Requires:       python3-libs
 Requires:       python3-pyOpenSSL
 Requires:       python3-urllib3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-atomicwrites

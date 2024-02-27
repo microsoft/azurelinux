@@ -15,7 +15,7 @@ Requires:       python3-isodate
 Requires:       python3-pyparsing
 Requires:       python3-setuptools
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif

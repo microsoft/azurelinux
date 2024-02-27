@@ -14,7 +14,7 @@ BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  openssl-devel
 BuildRequires:  p11-kit-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  net-tools
 BuildRequires:  which
 %endif

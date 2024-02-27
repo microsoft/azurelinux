@@ -78,7 +78,7 @@ BuildRequires:  %py3_reqs
 
 # For tests
 BuildRequires:  python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-pytest-cov

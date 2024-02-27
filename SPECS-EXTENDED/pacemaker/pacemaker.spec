@@ -136,7 +136,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  pam-devel
 BuildRequires:  %{pkgname_gettext} >= 0.18
 # Required for "make check"
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  libcmocka-devel
 %endif
 BuildRequires:  corosync-devel >= 2.0.0

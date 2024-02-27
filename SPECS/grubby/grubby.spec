@@ -38,7 +38,7 @@ BuildRequires:  popt-devel
 BuildRequires:  rpm-devel
 BuildRequires:  sed
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  util-linux-ng
 %endif
 

@@ -11,7 +11,7 @@ Source0:        https://github.com/giampaolo/psutil/archive/release-%{version}.t
 # A small number of tests do not reliably run in Mariner chroots- we can skip these tests
 BuildRequires:  gcc
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  coreutils
 BuildRequires:  curl-devel
 BuildRequires:  ncurses-term

@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.mercurial-scm.org/release/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  check
 BuildRequires:  python3-setuptools
 BuildRequires:  unzip

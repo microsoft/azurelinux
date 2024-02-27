@@ -15,7 +15,7 @@ BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: nspr-devel
 BuildRequires: nss-devel
 BuildRequires: openldap-devel >= 2.4.22
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: perl(AutoLoader)
 %endif
 # Source0: https://metacpan.org/dist/perldap/source

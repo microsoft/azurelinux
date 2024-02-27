@@ -30,7 +30,7 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(version) >= 0.99.06
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 # Test Suite
 BuildRequires:  perl(Test::More) >= 0.96
 

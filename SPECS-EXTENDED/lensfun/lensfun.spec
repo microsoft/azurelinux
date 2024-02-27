@@ -82,7 +82,7 @@ mkdir %{_target_platform}
 pushd %{_target_platform}
 %cmake .. \
   -DBUILD_DOC:BOOL=ON \
-%if %{with_check}
+%if 0%{?with_check}
   -DBUILD_TESTS:BOOL=ON\
 %else
   -DBUILD_TESTS:BOOL=OFF\

@@ -15,7 +15,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(pytest)
 %endif
 

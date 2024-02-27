@@ -17,7 +17,7 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-requests-oauthlib
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

@@ -34,7 +34,7 @@ BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(base)
 BuildRequires:  perl(common::sense)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Fcntl)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(FindBin)

@@ -22,7 +22,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(docutils)
 BuildRequires:  python3dist(setuptools)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip

@@ -11,7 +11,7 @@ Source0:        https://github.com/tlsfuzzer/%{name}/archive/refs/tags/%{name}-%
 BuildRequires:  openssl
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 BuildArch:      noarch

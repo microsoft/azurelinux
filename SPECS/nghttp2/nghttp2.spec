@@ -10,7 +10,7 @@ URL:            https://nghttp2.org
 Source0:        https://github.com/nghttp2/nghttp2/releases/download/v%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  make
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  cunit
 %endif
 Provides:       libnghttp2 = %{version}-%{release}

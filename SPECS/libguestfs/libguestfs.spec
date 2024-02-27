@@ -204,7 +204,7 @@ BuildRequires:  gettext-devel
 BuildRequires:  libtool
 %endif
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  git
 %endif
 

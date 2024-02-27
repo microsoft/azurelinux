@@ -25,7 +25,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(pytest)
 
 # Missing test dependencies:

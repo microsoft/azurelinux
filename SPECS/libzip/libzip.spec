@@ -16,7 +16,7 @@ BuildRequires:  zlib-devel
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(File::Copy)

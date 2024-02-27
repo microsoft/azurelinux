@@ -30,7 +30,7 @@ BuildRequires:  perl(DynaLoader)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Storable)
 %endif
 

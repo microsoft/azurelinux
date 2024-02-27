@@ -15,7 +15,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  perl
 BuildRequires:	perl(ExtUtils::MakeMaker)
 BuildRequires:  systemd
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  net-tools
 %endif
 Requires:       systemd

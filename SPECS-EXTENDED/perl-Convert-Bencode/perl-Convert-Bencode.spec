@@ -24,7 +24,7 @@ BuildRequires:  perl(locale)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More) >= 0.45
 %endif
 

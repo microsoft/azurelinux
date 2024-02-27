@@ -24,7 +24,7 @@ BuildRequires:	gdb
 
 # Test dependencies break the package build.
 # Disabling until fixed.
-# %if %{with_check}
+# %if 0%{?with_check}
 # BuildRequires:	ncurses-devel
 # BuildRequires:	libunwind-devel
 # BuildRequires:	valgrind-devel

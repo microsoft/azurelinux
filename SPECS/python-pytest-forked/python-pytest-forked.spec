@@ -18,7 +18,7 @@ BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

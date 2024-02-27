@@ -36,7 +36,7 @@ BuildRequires:  perl(URI)
 BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(common::sense)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Math::BigInt::FastCalc)
 %endif

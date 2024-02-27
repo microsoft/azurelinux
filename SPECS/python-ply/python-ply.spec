@@ -20,7 +20,7 @@ Python Lex & Yacc
 Summary:        Python Lex & Yacc
 BuildRequires:  python3-devel
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-six
 %endif
 

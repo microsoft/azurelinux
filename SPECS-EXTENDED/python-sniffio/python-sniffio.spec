@@ -27,7 +27,7 @@ URL:            https://github.com/python-trio/sniffio
 Source0:        https://files.pythonhosted.org/packages/source/s/%{pkgname}/%{pkgname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

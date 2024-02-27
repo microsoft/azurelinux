@@ -12,7 +12,7 @@ URL: http://xdelta.org/
 BuildRequires:  gcc, gcc-c++
 BuildRequires: ncompress
 BuildRequires: xz-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: sudo
 %endif
 

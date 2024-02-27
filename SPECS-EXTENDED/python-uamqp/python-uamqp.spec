@@ -21,7 +21,7 @@ BuildRequires:  python3-devel
 BuildRequires:  %{py3_dist cython}
 BuildRequires:  %{py3_dist setuptools}
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{py3_dist certifi}
 BuildRequires:  %{py3_dist pytest-asyncio}
 BuildRequires:  python3-pip

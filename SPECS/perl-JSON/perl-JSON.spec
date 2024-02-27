@@ -28,7 +28,7 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Tie::Array)
 %endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))

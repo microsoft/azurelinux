@@ -41,7 +41,7 @@ BuildRequires:  perl(lib)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(JSON::PP) >= 2.27300
 BuildRequires:  perl(JSON::XS) >= 3.0
 BuildRequires:  perl(Test::More) >= 0.88

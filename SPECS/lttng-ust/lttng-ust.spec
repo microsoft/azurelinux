@@ -11,7 +11,7 @@ Distribution:   Azure Linux
 
 BuildRequires: libnuma-devel
 BuildRequires: userspace-rcu-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: perl
 %endif
 

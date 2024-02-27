@@ -14,7 +14,7 @@ BuildRequires:  gcc
 BuildRequires:  libattr-devel
 BuildRequires:  python3-devel
 BuildRequires:  gnupg2
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

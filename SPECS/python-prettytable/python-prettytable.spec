@@ -15,7 +15,7 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 BuildRequires:  python3-flit
 BuildRequires:  python3-flit-core >= 3.8.0
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-wcwidth
 %endif

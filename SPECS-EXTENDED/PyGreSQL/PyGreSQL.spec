@@ -17,7 +17,7 @@ BuildRequires:	libpq-devel
 BuildRequires:	python3-devel
 
 # For testsuite
-%if %{with_check}
+%if 0%{?with_check}
 # Missing test dependencies:
 # BuildRequires:	postgresql-test-rpm-macros
 %endif

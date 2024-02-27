@@ -20,7 +20,7 @@ BuildRequires: ruby-devel
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: mariadb-connector-c-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: mariadb-server
 BuildRequires: rubygem(rspec)
 # Used in mysql_install_db

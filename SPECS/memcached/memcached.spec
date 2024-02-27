@@ -18,7 +18,7 @@ Patch0:         memcached-unit.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl-generators
 BuildRequires:  perl(IO::Socket::SSL)
 BuildRequires:  perl(Test::Harness)

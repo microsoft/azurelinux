@@ -24,7 +24,7 @@ BuildRequires:  perl(File::Find)
 BuildRequires:  perl(blib)
 BuildRequires:  perl(lib)
 BuildRequires:  perl-generators
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(CPAN::Meta::YAML)
 BuildRequires:  perl(Module::Metadata)

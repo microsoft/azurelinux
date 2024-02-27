@@ -15,7 +15,7 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Exporter-Tiny
 BuildRequires:  perl-generators
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Math::Trig)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Array)

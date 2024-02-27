@@ -19,7 +19,7 @@ Patch0:         python-requests-toolbelt-fix-unhandled-exception-from-tests.patc
 # resources vanished
 Patch1:         python-requests-toolbelt-pass-session-into-tests.patch
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

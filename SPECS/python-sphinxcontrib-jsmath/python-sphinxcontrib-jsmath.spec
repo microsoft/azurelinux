@@ -19,7 +19,7 @@ BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils

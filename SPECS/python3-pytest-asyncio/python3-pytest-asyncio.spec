@@ -15,7 +15,7 @@ Source0:        https://github.com/%{project_owner}/%{github_name}/archive/v%{ve
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-async-generator >= 1.3
 BuildRequires:  python3-pip
 %endif

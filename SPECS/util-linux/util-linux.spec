@@ -24,7 +24,7 @@ Conflicts:      toybox
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ncurses-term
 %endif
 

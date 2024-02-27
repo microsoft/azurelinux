@@ -20,7 +20,7 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

@@ -13,7 +13,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  make
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  valgrind-devel
 %endif
 

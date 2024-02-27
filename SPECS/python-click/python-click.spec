@@ -15,7 +15,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/mitsuhiko/click
 Source0:        https://github.com/mitsuhiko/click/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

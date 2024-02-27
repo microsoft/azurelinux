@@ -30,7 +30,7 @@ BuildRequires:  rust
 BuildRequires:  which
 BuildRequires:  zlib-devel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-six
 %endif
 
@@ -68,7 +68,7 @@ cd js/src
     --with-system-icu \
     --enable-readline \
     --disable-jemalloc \
-%if %{with_check}
+%if 0%{?with_check}
     --enable-tests \
 %else
     --disable-tests \

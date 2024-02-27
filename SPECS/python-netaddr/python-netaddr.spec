@@ -11,7 +11,7 @@ Source0:        https://github.com/netaddr/netaddr/archive/refs/tags/%{version}.
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel

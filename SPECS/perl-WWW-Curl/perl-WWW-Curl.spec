@@ -27,7 +27,7 @@ BuildRequires:  perl(Module::CoreList)
 BuildRequires:  perl-Module-Install
 BuildRequires:  perl-YAML-Tiny
 BuildRequires:  perl-generators
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(File::Temp)
 %endif

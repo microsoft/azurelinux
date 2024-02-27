@@ -58,7 +58,7 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 
 %check
-%if %{with_check}
+%if 0%{?with_check}
 %pytest
 %endif
 

@@ -23,7 +23,7 @@ BuildRequires:  libIDL-devel >= %{libidl_version}
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  pkgconfig
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  procps-ng
 %endif
 

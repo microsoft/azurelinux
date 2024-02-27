@@ -24,7 +24,7 @@ BuildRequires:  mm-common
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  glib-networking
 %endif
 

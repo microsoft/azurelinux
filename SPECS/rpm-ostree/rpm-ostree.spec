@@ -55,7 +55,7 @@ BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-gobject
 %endif
 

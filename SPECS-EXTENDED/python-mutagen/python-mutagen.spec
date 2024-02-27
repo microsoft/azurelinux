@@ -15,7 +15,7 @@ Source0:        %{url}/releases/download/release-%{version}/%{modname}-%{version
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

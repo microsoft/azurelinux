@@ -23,7 +23,7 @@ BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 # These are only needed for the checks
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: python3-pytest
 BuildRequires: python3-numpy
 

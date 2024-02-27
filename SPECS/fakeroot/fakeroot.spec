@@ -33,7 +33,7 @@ BuildRequires:  make
 BuildRequires:  po4a
 %endif
 
-%if %{with_check}
+%if 0%{?with_check}
 # uudecode used by tests/tartest
 BuildRequires:  sharutils
 %endif

@@ -14,7 +14,7 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Net-SSLeay
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(FindBin)
 %endif

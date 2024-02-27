@@ -18,7 +18,7 @@ Summary:        World timezone definitions, modern and historical
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 BuildRequires:  unzip
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 Requires:       python3

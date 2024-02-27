@@ -8,7 +8,7 @@ URL:            https://pypi.org/project/six/
 Source0:        https://pypi.python.org/packages/source/s/six/six-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  openssl-devel
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip

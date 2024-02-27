@@ -13,7 +13,7 @@ BuildArch:      noarch
 BuildRequires:  ruby
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  rubygem(minitest) >= 5
 %endif
 

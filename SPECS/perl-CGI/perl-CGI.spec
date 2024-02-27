@@ -18,7 +18,7 @@ BuildRequires:  findutils
 BuildRequires:  make
 BuildRequires:  sed
 BuildRequires:  perl(ExtUtils::MakeMaker)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
 BuildRequires:  perl(FindBin)

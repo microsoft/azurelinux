@@ -15,7 +15,7 @@ BuildRequires:  perl
 # Still an open issue as of 15th of March 2022: https://savannah.gnu.org/support/?110503.
 Requires:       gtk-doc
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Find)
 %endif
 Requires:       m4

@@ -19,7 +19,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  xz-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  shared-mime-info
 %endif
 Requires:       glib2%{?_isa} >= %{glib2_version}

@@ -37,7 +37,7 @@ BuildRequires:  perl(overload)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(B)
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Devel::Peek)

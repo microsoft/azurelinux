@@ -43,7 +43,7 @@ Provides:       libnpymath-static = %{version}-%{release}
 Provides:       libnpymath-static%{?_isa} = %{version}-%{release}
 Provides:       numpy = %{version}-%{release}
 Provides:       numpy%{?_isa} = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  meson
 BuildRequires:  python3-pip
 %endif

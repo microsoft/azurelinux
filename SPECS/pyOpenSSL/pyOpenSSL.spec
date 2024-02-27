@@ -21,7 +21,7 @@ BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-cryptography
 Requires:       python3-six
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-asn1crypto

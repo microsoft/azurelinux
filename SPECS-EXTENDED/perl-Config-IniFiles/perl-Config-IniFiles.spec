@@ -32,7 +32,7 @@ BuildRequires:  perl(List::Util) >= 1.33
 BuildRequires:  perl(Symbol)
 BuildRequires:  perl(vars)
 # Tests:
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(English)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(File::Spec)

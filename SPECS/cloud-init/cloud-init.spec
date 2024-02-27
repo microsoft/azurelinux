@@ -52,7 +52,7 @@ Requires:       python3-six
 Requires:       python3-xml
 Requires:       systemd
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-configobj
 BuildRequires:  python3-jsonpatch
 BuildRequires:  python3-pip

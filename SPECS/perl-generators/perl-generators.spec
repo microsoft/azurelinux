@@ -13,7 +13,7 @@ BuildRequires:  coreutils
 BuildRequires:  make
 BuildRequires:  perl
 BuildRequires:  sed
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Fedora::VSP)
 BuildRequires:  perl(Test::More)

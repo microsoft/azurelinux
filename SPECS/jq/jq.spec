@@ -13,7 +13,7 @@ BuildRequires:  chrpath
 BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  oniguruma-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  which
 %endif
 

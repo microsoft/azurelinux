@@ -14,7 +14,7 @@ BuildRequires:  krb5-devel
 BuildRequires:  pam-devel
 Requires:       pam
 # for testing
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::Pod)
 BuildRequires:  perl(lib)
 %endif

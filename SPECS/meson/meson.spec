@@ -13,7 +13,7 @@ BuildRequires:  ninja-build
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  libgcrypt-devel
 BuildRequires:  glib-devel
 BuildRequires:  cmake

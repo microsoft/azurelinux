@@ -19,7 +19,7 @@ BuildRequires:  python3-pyOpenSSL
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-zope-interface
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  net-tools
 BuildRequires:  sudo

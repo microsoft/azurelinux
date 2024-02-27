@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gzip
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  less
 %endif
 

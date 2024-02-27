@@ -22,7 +22,7 @@ BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-wheel
 BuildRequires:  python-flit-core
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 

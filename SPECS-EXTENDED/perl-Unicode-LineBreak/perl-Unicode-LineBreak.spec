@@ -41,7 +41,7 @@ BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 BuildRequires:  perl(XSLoader)
 # Tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Test::More) >= 0.45
 %endif

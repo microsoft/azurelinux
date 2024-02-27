@@ -12,7 +12,7 @@ BuildRequires:  awk
 BuildRequires:  gcc
 BuildRequires:  libtool
 BuildRequires:  make
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  tzdata
 %endif
 

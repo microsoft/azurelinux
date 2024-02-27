@@ -49,7 +49,7 @@ Obsoletes:      at-sysvinit < 3.1.16-1
 %if %{with pam}
 BuildRequires:  pam-devel
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::More)

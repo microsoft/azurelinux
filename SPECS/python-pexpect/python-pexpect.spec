@@ -13,7 +13,7 @@ Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 # Upstream link: https://github.com/pexpect/pexpect/pull/629
 Patch0:         sys_executable.patch
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  man-db
 BuildRequires:  openssl
 BuildRequires:  python3-pip

@@ -33,7 +33,7 @@ BuildRequires:  libseccomp-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  systemd
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  net-tools
 BuildRequires:  tzdata
 BuildRequires:  which

@@ -22,7 +22,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libpmem-devel
 BuildRequires:  libpmemblk-devel
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  CUnit-devel
 %endif
 

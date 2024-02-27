@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/bcrypt/
 Source0:        https://pypi.io/packages/source/b/bcrypt/bcrypt-%{version}.tar.gz
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

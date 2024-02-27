@@ -26,7 +26,7 @@ BuildRequires:  perl(strict)
 # Symbol not used since perl 5.6
 BuildRequires:  perl(vars)
 # Tests:
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(FileHandle)
 BuildRequires:  perl(Test)

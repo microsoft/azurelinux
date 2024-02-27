@@ -14,7 +14,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(requests)
 BuildRequires:  python3dist(cryptography)
 BuildRequires:  python3-pip
