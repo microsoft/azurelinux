@@ -1,5 +1,5 @@
 # instance-id: cloud-host-0
-local-hostname: mariner-vm
+local-hostname: azurelinux-vm
 # ----------------------------------------------------------
 # eth0 is the default network interface enabled in the image
 # ----------------------------------------------------------
