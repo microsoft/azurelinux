@@ -20,10 +20,9 @@ BuildArch:      noarch
 BuildRequires:  font(fontawesome)
 BuildRequires:  font(lato)
 BuildRequires:  font(robotoslab)
-BuildRequires:  make
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-packaging
-BuildRequires:  %{py3_dist sphinx} > 5.0.0
+BuildRequires:  %{py3_dist sphinx}
 BuildRequires:  %{py3_dist pip}
 BuildRequires:  %{py3_dist wheel}
 
