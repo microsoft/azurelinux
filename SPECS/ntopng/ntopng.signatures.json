@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "nDPI-4.2.tar.gz": "e54ce8fe13adc5d747be7553513657fae78f796e0bd459e122c280cc06ce4daf",
-  "ntopng-5.2.1.tar.gz": "67404ccd87202864d2c3c44426e60cb59cc2e87d746c704b27e6a63d61ec7644"
+  "hiredis-1.2.0.tar.gz": "82ad632d31ee05da13b537c124f819eb88e18851d9cb0c30ae0552084811588c",
+  "nDPI-4.8.tar.gz": "8f6235ba672d4ac8e4cbebb5611bc712a74587d9d53a649f483e4bcca5b80e58",
+  "ntopng-6.0.tar.gz": "937e3dea081f68cb8d85e0a925f5277f6a358d65ba45e90e215f0fc36d2401ac"
  }
 }
