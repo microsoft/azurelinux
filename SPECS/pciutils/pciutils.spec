@@ -2,8 +2,8 @@
 
 Summary:        System utilities to list pci devices
 Name:           pciutils
-Version:        3.7.0
-Release:        3%{?dist}
+Version:        3.11.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,9 @@ make DESTDIR=%{buildroot} \
 %{_includedir}/*
 
 %changelog
+* Wed Feb 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.11.1-1
+- Upgrade to 3.11.1
+
 * Thu Apr 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.0-3
 - Do not change libpci.so rights during install
 
