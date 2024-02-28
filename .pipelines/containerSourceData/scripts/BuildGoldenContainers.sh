@@ -62,6 +62,7 @@ readonly CERT_MANAGER='cert-manager'
 readonly CERT_MANAGER_NO_DASH='certmanager'
 readonly INFLUX_DB="influxdb"
 readonly KUBEVIRT_BASE_COMPONENT="kubevirt"
+readonly MEMCACHED="memcached"
 readonly MULTUS="multus"
 readonly NGINX="nginx"
 readonly NODEJS="nodejs"
@@ -492,6 +493,23 @@ function create_azurecli_container {
         "$base_container_name/$AZURECLI"
 }
 
+# Creates memcached container
+function create_memcached_container {
+    local pkgsFileName="$MEMCACHED.pkg"
+    local packagesToInstall=()
+    getPkgsFromFile $MEMCACHED $pkgsFileName packagesToInstall
+    local packages="${packagesToInstall[*]}"
+    CreateGoldenContainer \
+        "$MEMCACHED" \
+        "$MEMCACHED" \
+        "$base_container_name" \
+        "$base_container_tag" \
+        "$packages" \
+        "Dockerfile-Memcached" \
+        1 \
+        "$base_container_name/$MEMCACHED"
+}
+
 # Creates nginx container
 function create_nginx_container {
     local pkgsFileName="$NGINX.pkg"
@@ -912,6 +930,10 @@ function start_building_containers {
 
     "$AZURECLI_NO_DASH")
         create_azurecli_container
+        ;;
+
+    "$MEMCACHED")
+        create_memcached_container
         ;;
 
     "$NGINX")

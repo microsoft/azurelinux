@@ -1,0 +1,13 @@
+diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
+index 9eec793c9fb..1b0f6bfb680 100644
+--- a/scripts/CMakeLists.txt
++++ b/scripts/CMakeLists.txt
+@@ -223,7 +223,7 @@ IF(UNIX AND NOT WITHOUT_SERVER)
+     DESTINATION ${INSTALL_SCRIPTDIR}
+     COMPONENT Server)
+
+-  INSTALL_LINK(mariadb-install-db mysql_install_db ${INSTALL_SCRIPTDIR} Server)
++  INSTALL_LINK(mariadb-install-db mysql_install_db ${INSTALL_BINDIR} Server)
+ ENDIF()
+
+ SET(prefix "${CMAKE_INSTALL_PREFIX}")

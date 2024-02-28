@@ -5,7 +5,7 @@
 Summary:        Prometheus exporter exposing process metrics from procfs
 Name:           prometheus-process-exporter
 Version:        0.7.10
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -102,6 +102,9 @@ getent passwd 'prometheus' >/dev/null || useradd -r -g 'prometheus' -d '%{_share
 %dir %attr(0755,prometheus,prometheus) %{_sharedstatedir}/prometheus
 
 %changelog
+* Tue Feb 13 2024 Muhammad Falak <mwani@microsoft.com> - 0.7.10-19
+- Bump release to rebuild with go 1.21.6
+
 * Tue Feb 13 2024 Nan Liu <liunan@microsoft.com> - 0.7.10-18
 - Patch CVE-2021-44716
 

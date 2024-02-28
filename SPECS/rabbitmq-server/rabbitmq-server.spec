@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.11.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -115,6 +115,9 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 3.11.11-2
+- Release bump with no changes to force a rebuild and consume new erlang build
+
 * Tue Mar 14 2023 Sam Meluch <sammeluch@microsoft.com> - 3.11.11-1
 - Original version for CBL-Mariner
 - License Verified

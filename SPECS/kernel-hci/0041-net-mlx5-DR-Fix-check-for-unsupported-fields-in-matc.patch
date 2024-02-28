@@ -1,0 +1,42 @@
+From 97859e6a1e23342d1b4a0d599900fb7b12a48166 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Wed, 3 Nov 2021 17:51:03 +0200
+Subject: [PATCH 31/58] net/mlx5: DR, Fix check for unsupported fields in match
+ param
+
+The existing loop doesn't cast the buffer while scanning it, which
+results in out-of-bounds read and failure to create the matcher.
+
+Fixes: 941f19798a11 ("net/mlx5: DR, Add check for unsupported fields in match param")
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Change-Id: Iea57946e92324c3535739353b280454d37fce7e4
+---
+ .../ethernet/mellanox/mlx5/core/steering/dr_matcher.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+index ce7679893544..1a1494a965f9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_matcher.c
+@@ -912,11 +912,12 @@ static int dr_matcher_init(struct mlx5dr_matcher *matcher,
+ 
+ 	/* Check that all mask data was consumed */
+ 	for (i = 0; i < consumed_mask.match_sz; i++) {
+-		if (consumed_mask.match_buf[i]) {
+-			mlx5dr_dbg(dmn, "Match param mask contains unsupported parameters\n");
+-			ret = -EOPNOTSUPP;
+-			goto free_consumed_mask;
+-		}
++		if (!((u8 *)consumed_mask.match_buf)[i])
++			continue;
++
++		mlx5dr_dbg(dmn, "Match param mask contains unsupported parameters\n");
++		ret = -EOPNOTSUPP;
++		goto free_consumed_mask;
+ 	}
+ 
+ 	ret =  0;
+-- 
+2.31.1
+

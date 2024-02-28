@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: moby-%{upstream_name}
 Version: 1.6.26
-Release: 2%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -17,6 +17,7 @@ Source1: containerd.service
 Source2: containerd.toml
 Patch0:  Makefile.patch
 Patch1:  add_ptrace_readby_tracedby_to_apparmor.patch
+Patch2:  fix_tests_for_golang1.21.patch
 
 %{?systemd_requires}
 
@@ -90,6 +91,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Feb 21 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.6.26-4
+- Backport upstream patch for no-inlining seccomp and apparmor functions to fix tests.
+
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.26-3
+- Bump release to rebuild with go 1.21.6
+
 * Wed Dec 20 2023 Ravi Prakash Pandey <rapandey@microsoft.com> - 1.6.26-2
 - Set oom_score_adj of containerd to -999 and bump the release version to 2
 

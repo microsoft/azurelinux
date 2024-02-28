@@ -13,14 +13,14 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.20.11
+Version:        1.21.6
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.20.11-1/go.20231107.4.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.%{bootstrap_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
@@ -137,6 +137,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Jan 29 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.6-1
+- Bump version to 1.21.6
+
 * Wed Nov 22 2023 Andrew Phelps <anphel@microsoft.com> - 1.20.11-1
 - Upgrade to 1.20.11
 - Keep go 1.19.12 source to provide additional go boostrap

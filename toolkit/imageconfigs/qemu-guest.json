@@ -55,6 +55,11 @@
             "KernelOptions": {
                 "default": "kernel-hci"
             },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]
