@@ -151,11 +151,11 @@ When creating your PR, please ensure the following:
 
 * Any updated packages successfully build (or no packages were changed). For guidance on building packages, see our [building instructions](toolkit/docs/building/building.md). Please ensure the package is located in the [appropriate folder](#packages).
 
-* Packages depending on static components modified in this PR (Golang, *-static subpackages, etc.) have had their `Release` tag incremented. Dependent packages are packages which contain a `BuildRequires` on the package you are updating and create static links from your package. This can be difficult to discern based on spec files alone and may require investigating `make` commands in dependent packages or consulting a Azure Linux dev.
+* Packages depending on static components modified in this PR (Golang, *-static subpackages, etc.) have had their `Release` tag incremented. Dependent packages are packages which contain a `BuildRequires` on the package you are updating and create static links from your package. This can be difficult to discern based on spec files alone and may require investigating `make` commands in dependent packages or consulting an Azure Linux dev.
 
 * Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files. When running the check section, results will not fail a build. Check the logs for the results of this section.
 
-* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by a Azure Linux developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
+* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by an Azure Linux developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
 
 * cgmanifest files are up-to-date and alphabetically sorted. The cgmanifest files are used to record all package sources. They include the following files:
 
@@ -164,7 +164,7 @@ When creating your PR, please ensure the following:
   * ./toolkit/scripts/toolchain/cgmanifest.json,
   * .github/workflows/cgmanifest.json
 
-  To validate, run the following in a Azure Linux container or Ubuntu >= 22.04
+  To validate, run the following in an Azure Linux container or Ubuntu >= 22.04
 
   ```bash
   .github/workflows/validate-cg-manifest.sh SPECS/<package name>/<package-name>.spec

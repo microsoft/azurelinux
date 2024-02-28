@@ -232,7 +232,7 @@ NOTE: ISOs require additional packaging and build steps (such as the creation of
 
 The following builds an ISO with an interactive UI and selectable image configurations.
 ```bash
-# To build a Azure Linux ISO Image (ISO folder: ../out/images/full)
+# To build an Azure Linux ISO Image (ISO folder: ../out/images/full)
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
