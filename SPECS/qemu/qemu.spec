@@ -465,80 +465,86 @@ Source30: kvm-s390x.conf
 Source31: kvm-x86.conf
 Source36: README.tests
 
-BuildRequires: meson >= %{meson_version}
 BuildRequires: bison
-BuildRequires: flex
-BuildRequires: zlib-devel
-BuildRequires: libselinux-devel
 BuildRequires: cyrus-sasl-devel
+BuildRequires: flex
 BuildRequires: libaio-devel
-BuildRequires: python3-devel
-BuildRequires: libiscsi-devel
 BuildRequires: libattr-devel
+%if %{have_libblkio}
+BuildRequires: libblkio-devel
+%endif
+BuildRequires: libbpf-devel >= 1.0.0
+
+# For virtiofs
+BuildRequires: libcap-ng-devel
+BuildRequires: libiscsi-devel
+BuildRequires: libselinux-devel
+BuildRequires: libslirp-devel
 BuildRequires: libusbx-devel >= %{libusbx_version}
-%if %{have_usbredir}
-BuildRequires: usbredir-devel >= %{usbredir_version}
-%endif
-# Required for docs. Disable for AzLinux, to reduce python package dependencies
-%if ! 0%{?azl}
-BuildRequires: python3-sphinx
-BuildRequires: python3-sphinx_rtd_theme
-%endif
-BuildRequires: libseccomp-devel >= %{libseccomp_version}
 # For network block driver
 BuildRequires: libcurl-devel
-%if %{with libssh}
-BuildRequires: libssh-devel
+%if %{have_fdt}
+BuildRequires: libfdt-devel >= %{libfdt_version}
 %endif
-%if %{have_block_rbd}
-BuildRequires: librbd-devel
+%if %{have_pmem}
+BuildRequires: libpmem-devel
 %endif
-# We need both because the 'stap' binary is probed for by configure
-BuildRequires: systemtap
-BuildRequires: systemtap-sdt-devel
 %if %{have_ui}
 # For VNC PNG support
 BuildRequires: libpng-devel
 %endif
-# For virtiofs
-BuildRequires: libcap-ng-devel
-# Hard requirement for version >= 1.3
-BuildRequires: pixman-devel
-# For rdma
-%if %{have_librdma}
-BuildRequires: rdma-core-devel
+
+%if %{have_block_rbd}
+BuildRequires: librbd-devel
 %endif
-%if %{have_fdt}
-BuildRequires: libfdt-devel >= %{libfdt_version}
+
+BuildRequires: libseccomp-devel >= %{libseccomp_version}
+%if %{with libssh}
+BuildRequires: libssh-devel
 %endif
+
 # For compressed guest memory dumps
 BuildRequires: lzo-devel snappy-devel
+# qemu-pr-helper multipath support (requires libudev too)
+BuildRequires: device-mapper-multipath-devel
+BuildRequires: meson >= %{meson_version}
 # For NUMA memory binding
 %if %{have_numactl}
 BuildRequires: numactl-devel
 %endif
-# qemu-pr-helper multipath support (requires libudev too)
-BuildRequires: device-mapper-multipath-devel
-BuildRequires: systemd-devel
-%if %{have_pmem}
-BuildRequires: libpmem-devel
-%endif
-# qemu-keymap
-%if %{have_ui}
-BuildRequires: pkgconfig(xkbcommon)
-%endif
+BuildRequires: perl-Test-Harness
+# Hard requirement for version >= 1.3
+BuildRequires: pixman-devel
 %if %{have_opengl}
 BuildRequires: pkgconfig(epoxy)
 BuildRequires: pkgconfig(libdrm)
 BuildRequires: pkgconfig(gbm)
 %endif
-BuildRequires: perl-Test-Harness
-BuildRequires: libslirp-devel
-BuildRequires: libbpf-devel >= 1.0.0
-%if %{have_libblkio}
-BuildRequires: libblkio-devel
+# qemu-keymap
+%if %{have_ui}
+BuildRequires: pkgconfig(xkbcommon)
 %endif
 
+BuildRequires: python3-devel
+# Required for docs. Disable for AzLinux, to reduce python package dependencies
+%if ! 0%{?azl}
+BuildRequires: python3-sphinx
+BuildRequires: python3-sphinx_rtd_theme
+%endif
+# For rdma
+%if %{have_librdma}
+BuildRequires: rdma-core-devel
+%endif
+BuildRequires: systemd-devel
+# We need both because the 'stap' binary is probed for by configure
+BuildRequires: systemtap
+BuildRequires: systemtap-sdt-devel
+
+%if %{have_usbredir}
+BuildRequires: usbredir-devel >= %{usbredir_version}
+%endif
+
+BuildRequires: zlib-devel
 
 # Fedora specific
 %if "%{toolchain}" == "clang"
