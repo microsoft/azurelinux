@@ -16,6 +16,7 @@
 #
 	
 %global upstream_version %(echo %{version} | tr '~' '-')
+%global debug_package %{nil}
 
 Summary:        Library of matchers for building test expressions
 Name:           hamcrest
@@ -28,12 +29,14 @@ Distribution:   Azure Linux
 URL:            https://github.com/hamcrest/JavaHamcrest
 Source0:        https://github.com/hamcrest/JavaHamcrest/archive/v%{upstream_version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://repo1.maven.org/maven2/org/hamcrest/hamcrest/%{upstream_version}/hamcrest-%{upstream_version}.pom
+Patch0:         0001-Fix-build-with-OpenJDK-11.patch
 
 BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven
 BuildRequires:  junit
+Provides:       mvn(org.hamcrest:hamcrest-core)  = %{version}-%{release}
 
 %description
 Provides a library of matcher objects (also known as constraints or
@@ -49,7 +52,8 @@ Javadoc for %{name}.
  
 %prep
 %setup -q -n JavaHamcrest-%{upstream_version}
- 
+%patch 0 -p1
+
 sed -i 's/\r//' LICENSE.txt
  
 pushd hamcrest
@@ -88,7 +92,7 @@ cp -p %{SOURCE1} pom.xml
  
 %build
 pushd hamcrest
-%mvn_build
+%mvn_build -f
 popd
  
 %install
@@ -104,8 +108,8 @@ popd
 %license LICENSE.txt
 
 %changelog
-* Wed Feb 21 2024 Mitch Zhu <mitchzhu@microsoft.com> - 2.2-1
-- Auto-upgrade to 2.2 - none
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.2-1
+- upgrade to 2.2 - none
 
 * Mon Apr 3 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.3-16
 - Added provides for maven artifacts for core subpackage
