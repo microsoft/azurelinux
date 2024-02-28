@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,7 @@ Group:          Development/Tools
 URL:            https://gcc.gnu.org/
 Source0:        https://ftp.gnu.org/gnu/gcc/%{name}-%{version}/%{name}-%{version}.tar.xz
 #Patch0:         CVE-2023-4039.patch
+Patch1:         0011-libsanitizer-Remove-crypt-and-crypt_r-interceptors.patch
 
 BuildRequires:  gmp-devel
 BuildRequires:  mpfr-devel
@@ -318,7 +319,6 @@ LD=ld \
 %configure \
     --disable-bootstrap \
     --disable-fixincludes \
-    --disable-libsanitizer \
     --disable-multilib \
     --enable-__cxa_atexit \
     --enable-clocale=gnu \
@@ -523,6 +523,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Mon Feb 26 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-3
+- Re-enable libsanitizer
+
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 13.2.0-2
 - Added cross-compilation support for aarch64.
 - Used Fedora 36 spec (license: MIT) for guidance.
