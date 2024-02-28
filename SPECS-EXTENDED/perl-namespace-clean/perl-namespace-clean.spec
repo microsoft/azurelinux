@@ -34,7 +34,7 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(vars)
 BuildRequires:	perl(warnings)
 # Test Suite
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:	perl(Config)
 BuildRequires:	perl(DB)
 BuildRequires:	perl(File::Glob)

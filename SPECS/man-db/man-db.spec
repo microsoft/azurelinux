@@ -15,7 +15,7 @@ Requires:       xz
 Requires:       groff
 Requires(pre):  /usr/sbin/useradd /usr/sbin/groupadd
 Requires(postun):/usr/sbin/userdel /usr/sbin/groupdel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  shadow-utils
 %endif
 BuildRequires:  libpipeline-devel

@@ -20,7 +20,7 @@ BuildRequires:  libisofs-devel >= %{version}
 BuildRequires:	make
 BuildRequires:  readline-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  file
 BuildRequires:  which
 %endif

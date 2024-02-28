@@ -30,7 +30,7 @@ BuildRequires:  perl(Config)
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(File::Glob)
 # Tests only
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(base)
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(Data::Dumper)
