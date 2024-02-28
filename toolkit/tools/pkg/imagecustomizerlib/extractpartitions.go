@@ -13,13 +13,10 @@ import (
 )
 
 // Extract all partitions of connected image into separate files with specified format.
-func extractPartitions(imageConnection *ImageConnection, outputImageFile string, partitionFormat string) error {
+func extractPartitions(imageLoopDevice string, outputImageFile string, partitionFormat string) error {
 
 	// Extract basename from outputImageFile. E.g. if outputImageFile is "image.qcow2", then basename is "image".
 	basename := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
-
-	// Get path of loop device associated with the image.
-	imageLoopDevice := imageConnection.Loopback().DevicePath()
 
 	// Get output directory path.
 	outDir := filepath.Dir(outputImageFile)

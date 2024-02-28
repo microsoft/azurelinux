@@ -2,7 +2,7 @@
 Summary:        elixir
 Name:           elixir
 Version:        1.14.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,9 @@ export LANG="en_US.UTF-8"
 
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.14.3-2
+- Release bump with no changes to force a rebuild and consume new erlang build
+
 * Mon Feb 27 2023 Sam Meluch <sammeluch@microsoft.com> - 1.14.3-1
 - Original version for CBL-Mariner
 - License verified

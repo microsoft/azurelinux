@@ -122,7 +122,7 @@ func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConne
 		safechroot.NewMountPoint(bootPartitionDevPath, "/boot/efi", "vfat", 0, ""),
 	}
 
-	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints)
+	err = imageConnection.ConnectChroot(rootDir, false, []string{}, mountPoints, false)
 	if err != nil {
 		imageConnection.Close()
 		return nil, err
@@ -317,12 +317,11 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	imageConnection, err := createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
+	err = createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
 		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, installOS)
 	if err != nil {
 		return "", err
 	}
-	defer imageConnection.Close()
 
 	return rawDisk, nil
 }

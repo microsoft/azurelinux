@@ -1,0 +1,42 @@
+From 9278287e8d9e30b6bf6e3bd29ac387d789b8ce7f Mon Sep 17 00:00:00 2001
+From: Mark Bloch <mbloch@nvidia.com>
+Date: Thu, 20 Jan 2022 08:52:16 +0000
+Subject: [PATCH 104/107] net/mlx5: Lag, use local variable already defined to
+ access E-Switch
+
+Use the local variable for dev0 (and add from dev1) instead of using
+the devices stored in the ldev structure. Makes the code easier
+to read.
+
+Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+index 4ddf6b330a44..0758a98a08d1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+@@ -347,6 +347,7 @@ int mlx5_activate_lag(struct mlx5_lag *ldev,
+ static int mlx5_deactivate_lag(struct mlx5_lag *ldev)
+ {
+ 	struct mlx5_core_dev *dev0 = ldev->pf[MLX5_LAG_P1].dev;
++	struct mlx5_core_dev *dev1 = ldev->pf[MLX5_LAG_P2].dev;
+ 	u32 in[MLX5_ST_SZ_DW(destroy_lag_in)] = {};
+ 	bool roce_lag = __mlx5_lag_is_roce(ldev);
+ 	u8 flags = ldev->flags;
+@@ -356,8 +357,8 @@ static int mlx5_deactivate_lag(struct mlx5_lag *ldev)
+ 	mlx5_lag_mp_reset(ldev);
+ 
+ 	if (ldev->shared_fdb) {
+-		mlx5_eswitch_offloads_destroy_single_fdb(ldev->pf[MLX5_LAG_P1].dev->priv.eswitch,
+-							 ldev->pf[MLX5_LAG_P2].dev->priv.eswitch);
++		mlx5_eswitch_offloads_destroy_single_fdb(dev0->priv.eswitch,
++							 dev1->priv.eswitch);
+ 		ldev->shared_fdb = false;
+ 	}
+ 
+-- 
+2.33.2
+

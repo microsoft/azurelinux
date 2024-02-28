@@ -9,7 +9,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -1055,6 +1055,9 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Wed Jan 17 2024 Harshit Gupta <guptaharshit@microsoft.com> - 7.10.0-6
+- Release bump with no changes to force a rebuild and consume new libssh2 build
+
 * Wed May 25 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
 

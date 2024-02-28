@@ -1,0 +1,46 @@
+From 66d82824f7ab18d12ca8020f6df31ce1c19e550c Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Wed, 10 Jan 2024 06:21:24 +0000
+Subject: [PATCH] Retain exit code in cloud-init status for recoverable errors
+
+Description: Retain exit code in cloud-init status for recoverable errors
+ (LP: #2048522).
+Author: Alberto Contreras <alberto.contreras@canonical.com>
+Last-Update: 2024-01-08
+---
+
+Modifed-by: Chris Co <chrco@microsoft.com>
+---
+ cloudinit/cmd/status.py            | 2 +-
+ tests/unittests/cmd/test_status.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cloudinit/cmd/status.py b/cloudinit/cmd/status.py
+index 249fc91..7bdfa4b 100644
+--- a/cloudinit/cmd/status.py
++++ b/cloudinit/cmd/status.py
+@@ -225,7 +225,7 @@ def handle_status_args(name, args) -> int:
+         return 1
+     # Recoverable error
+     elif details.status in UXAppStatusDegradedMap.values():
+-        return 2
++        return 0
+     return 0
+ 
+ 
+diff --git a/tests/unittests/cmd/test_status.py b/tests/unittests/cmd/test_status.py
+index 6e4eac4..244acc1 100644
+--- a/tests/unittests/cmd/test_status.py
++++ b/tests/unittests/cmd/test_status.py
+@@ -644,7 +644,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+                 },
+                 None,
+                 MyArgs(long=False, wait=False, format="json"),
+-                2,
++                0,
+                 {
+                     "boot_status_code": "enabled-by-kernel-cmdline",
+                     "datasource": "nocloud",
+-- 
+2.33.8
+
