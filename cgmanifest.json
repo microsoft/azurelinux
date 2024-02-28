@@ -2748,8 +2748,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.89",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
+          "version": "2.90",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.90.tar.xz"
         }
       }
     },
