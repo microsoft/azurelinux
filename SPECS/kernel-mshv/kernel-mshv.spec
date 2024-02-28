@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -181,7 +181,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/efi/initrd.img-%{uname_r}
+rm -rf /boot/efi/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
@@ -231,6 +231,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-5
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
 * Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
 - Remove legacy /boot/mariner-mshv.cfg
 

@@ -628,7 +628,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 			return
 		}
 		installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
-		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initramfs-*.img"))
 		if err != nil || len(initramfsPathList) != 1 {
 			return fmt.Errorf("could not find single initramfs (%v):\n%w", initramfsPathList, err)
 		}
