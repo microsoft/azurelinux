@@ -1,7 +1,7 @@
 {
   "Signatures": {
     "cbl-mariner-ca-20211013.pem": "5ef124b0924cb1047c111a0ecff1ae11e6ad7cac8d1d9b40f98f99334121f0b0",
-    "config": "e9d3ec6622cc04bfea00daf207a33ed52c981e064f74cb8a244e8d0827430a2f",
-    "kernel-5.15.148.2.tar.gz": "58488cf131b8a1c77dcac651fbad10e105e9a8d2f48b7bb8b2d08ac63483a129"
+    "config": "3cbf35e687d0be724c51849ff77bbaa06cf9bca22247e3b34ee22d6d52e54b10",
+    "kernel-5.15.149.2.tar.gz": "dafbfe1841e0e3ff21ec4d722a2c1c1745dcf0a3ffd37382f6e4633db61b3688"
   }
 }
