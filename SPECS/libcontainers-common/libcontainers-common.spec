@@ -14,11 +14,12 @@
 
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
 # commonver - version from containers/common
 %define commonver 0.44.0
+%define commonversionrelease 0.44.0-4
 # podman - version from containers/podman
 %define podmanver 3.3.1
+%define podmanversionrelease 3.3.1-4
 # storagever - version from containers/storage
 %define storagever 1.36.0
 # imagever - version from containers/image
@@ -26,7 +27,7 @@
 Summary:        Configuration files common to github.com/containers
 Name:           libcontainers-common
 Version:        20210626
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -41,13 +42,15 @@ Source3:        policy.json
 Source4:        storage.conf
 Source5:        mounts.conf
 Source6:        registries.conf
-#Source7:       https://github.com/containers/podman/archive/refs/tags/v3.3.1.tar.gz
-Source7:        %{name}-podman-%{podmanver}.tar.gz
+#Source7:        https://github.com/containers/podman/archive/refs/tags/v3.3.1.tar.gz
+Source7:        %{name}-podman-%{podmanversionrelease}.tar.gz
 Source8:        default.yaml
-#Source9:       https://github.com/containers/common/archive/refs/tags/v0.44.0.tar.gz
-Source9:        %{name}-common-%{commonver}.tar.gz
+#Source9:        https://github.com/containers/common/archive/refs/tags/v0.44.0.tar.gz
+Source9:        %{name}-common-%{commonversionrelease}.tar.gz
 Source10:       containers.conf
 Patch0:         CVE-2021-44716.patch
+Patch1:         CVE-2024-21626-podman.patch
+Patch2:         CVE-2024-21626-common.patch
 BuildRequires:  go-go-md2man
 Requires(post): grep
 Requires(post): util-linux
@@ -64,7 +67,15 @@ github.com/containers libraries, such as Buildah, CRI-O, Podman and Skopeo.
 %setup -q -T -D -b 1 -n storage-%{storagever}
 %setup -q -T -D -b 7 -n podman-%{podmanver}
 %setup -q -T -D -b 9 -n common-%{commonver}
-%patch 0 -p1
+# Skipping patching because the new vendored tarballs have updated dependencies that are not susceptible to CVE-2021-44716 and CVE-2024-21626
+#%patch 0 -p1
+#cd ..
+#pushd podman-%{podmanver}
+#%patch 1 -p1
+#popd
+#pushd common-%{commonver}
+#%patch 2 -p1
+#popd
 # copy the LICENSE file in the build root
 cd ..
 cp %{SOURCE2} .
@@ -160,6 +171,11 @@ fi
 %license LICENSE
 
 %changelog
+* Fri Mar 01 2024 Sean Dougherty <sdougherty@microsoft.com> - 20210626-4
+- Fixed CVE-2024-21626 by updating vendored runc
+- Fixed CVE-2021-44716 by updating vendored golang toolchain
+- Created generate_source_tarball.sh for updating common and podman source tarballs
+
 * Mon Feb 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 20210526-3
 - Patching CVE-2021-44716
 
