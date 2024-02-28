@@ -29346,8 +29346,8 @@
         "type": "other",
         "other": {
           "name": "wget",
-          "version": "1.21.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/wget/wget-1.21.2.tar.gz"
+          "version": "2.1.0",
+          "downloadUrl": "https://ftp.gnu.org/gnu/wget/wget2-2.1.0.tar.gz"
         }
       }
     },
