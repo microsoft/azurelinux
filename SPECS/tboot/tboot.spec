@@ -1,7 +1,7 @@
 Summary:        Trusted pre-kernel module and tools.
 Name:           tboot
 Version:        1.11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,9 @@ install -m 755 %{SOURCE2} %{buildroot}%{_docdir}/README.md
 
 
 %changelog
+* Wed Feb 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.11.2-2
+- Updated README.md to replace CBL-Mariner with Azure Linux
+
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-1
 - Auto-upgrade to 1.11.2
 - Update remove-s3 patch file for 1.11.2
