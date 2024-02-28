@@ -2,8 +2,8 @@
 %define majmin %(echo %{version} | cut -d. -f1-2)
 Summary:        Desktop notification library
 Name:           libnotify
-Version:        0.7.9
-Release:        4%{?dist}
+Version:        0.8.3
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,6 @@ BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gdk-pixbuf2-devel
 BuildRequires:  glib2-devel >= %{glib2_version}
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gtk-doc
 BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  xmlto
@@ -41,7 +40,7 @@ development of programs using %{name}.
 %patch 0 -p1
 
 %build
-%meson -Dman=false
+%meson -Dman=false -Dgtk_doc=false -Dtests=false
 %meson_build
 
 %install
@@ -54,16 +53,21 @@ development of programs using %{name}.
 %doc NEWS AUTHORS
 %{_bindir}/notify-send
 %{_libdir}/libnotify.so.*
-%{_libdir}/girepository-1.0/Notify-%{majmin}.typelib
+%{_libdir}/girepository-1.0/Notify-0.7.typelib
 
 %files devel
 %dir %{_includedir}/libnotify
 %{_includedir}/libnotify/*
 %{_libdir}/libnotify.so
 %{_libdir}/pkgconfig/libnotify.pc
-%{_datadir}/gir-1.0/Notify-%{majmin}.gir
+%{_datadir}/gir-1.0/Notify-0.7.gir
 
 %changelog
+* Wed Feb 28 2024 Sindhu Karri <lakarri@microsoft.com> - 0.8.3-1
+- Upgrade to 0.8.3
+- Update patch to use meson options to disable tests and gtk_doc
+- Remove build dependency on gtk-doc
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.9-4
 - License verified
 - Lint spec
