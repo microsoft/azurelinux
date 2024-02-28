@@ -1,7 +1,7 @@
 Summary:        Libraries for the public client interface for NIS(YP) and NIS+.
 Name:           libnsl2
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 License:        BSD AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -53,6 +53,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.1-1
+- Auto-upgrade to 2.0.1 - Azure Linux 3.0 Upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

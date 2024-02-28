@@ -10291,8 +10291,8 @@
         "type": "other",
         "other": {
           "name": "libnsl2",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v2.0.0/libnsl-2.0.0.tar.gz"
+          "version": "2.0.1",
+          "downloadUrl": "https://github.com/thkukuk/libnsl/archive/v2.0.1/libnsl-2.0.1.tar.gz"
         }
       }
     },
