@@ -25,7 +25,7 @@ function DockerBuild {
     docker build . \
         -t "$containerName" \
         -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
-        --build-arg MARINER_VERSION="$azureLinuxVersion" \
+        --build-arg AZL_VERSION="$azureLinuxVersion" \
         --build-arg IMAGE_TYPE="$imageType" \
         --build-arg PACKAGES_TO_INSTALL="$packagesToInstall" \
         --build-arg PACKAGES_TO_HOLDBACK="$packagesToHoldback" \
