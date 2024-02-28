@@ -6,11 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-<<<<<<< HEAD
-Release:        2%{?dist}
-=======
 Release:        4%{?dist}
->>>>>>> ae70b926b (Patch CVE-2024-24806 in nodejs18 (#8110))
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -21,12 +17,8 @@ URL:            https://github.com/nodejs/node
 # !!!  => use clean-source-tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
 Patch0:         disable-tlsv1-tlsv1-1.patch
-<<<<<<< HEAD
-
-=======
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2024-24806.patch
->>>>>>> ae70b926b (Patch CVE-2024-24806 in nodejs18 (#8110))
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -125,8 +117,6 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-<<<<<<< HEAD
-=======
 * Tue Feb 27 2024 Suresh Thelkar <sthelkar@ieee.org> - 18.18.2-4
 - Patch CVE-2024-24806
 
@@ -134,7 +124,6 @@ make cctest
 - Patch CVE-2023-42282
 - Unit test code is not applicable for this NodeJS version sources
 
->>>>>>> ae70b926b (Patch CVE-2024-24806 in nodejs18 (#8110))
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 18.18.2-2
 - Re-enable building debuginfo. We can just ignore the dirs conflict failure in the pipelines! :)
 
