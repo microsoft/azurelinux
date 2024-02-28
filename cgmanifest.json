@@ -14893,8 +14893,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "oclock",
-          "version": "1.0.4",
-          "downloadUrl": "https://www.x.org/pub/individual/app/oclock-1.0.4.tar.bz2"
+          "version": "1.0.5",
+          "downloadUrl": "https://www.x.org/pub/individual/app/oclock-1.0.5.tar.gz"
         }
       }
     },
@@ -29497,8 +29497,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "x11perf",
-          "version": "1.6.0",
-          "downloadUrl": "https://www.x.org/pub/individual/app/x11perf-1.6.0.tar.bz2"
+          "version": "1.6.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/x11perf-1.6.1.tar.gz"
         }
       }
     },
@@ -29618,8 +29618,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xclipboard",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xclipboard-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xclipboard-1.1.4.tar.gz"
         }
       }
     },
@@ -29629,8 +29629,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xclock",
-          "version": "1.0.9",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xclock-1.0.9.tar.bz2"
+          "version": "1.1.1",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xclock-1.1.1.tar.gz"
         }
       }
     },
@@ -29650,8 +29650,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xconsole",
-          "version": "1.0.6",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xconsole-1.0.6.tar.bz2"
+          "version": "1.0.8",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xconsole-1.0.8.tar.gz"
         }
       }
     },
@@ -29671,8 +29671,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xcursorgen",
-          "version": "1.0.6",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xcursorgen-1.0.6.tar.bz2"
+          "version": "1.0.8",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xcursorgen-1.0.8.tar.gz"
         }
       }
     },
@@ -29752,8 +29752,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xeyes",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xeyes-1.1.2.tar.bz2"
+          "version": "1.3.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xeyes-1.3.0.tar.gz"
         }
       }
     },
@@ -29773,8 +29773,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xfd",
-          "version": "1.1.2",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xfd-1.1.2.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xfd-1.1.4.tar.gz"
         }
       }
     },
@@ -29784,8 +29784,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xfontsel",
-          "version": "1.0.6",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xfontsel-1.0.6.tar.bz2"
+          "version": "1.1.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xfontsel-1.1.0.tar.gz"
         }
       }
     },
@@ -29954,8 +29954,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xload",
-          "version": "1.1.3",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xload-1.1.3.tar.bz2"
+          "version": "1.1.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xload-1.1.4.tar.gz"
         }
       }
     },
@@ -29965,8 +29965,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xlogo",
-          "version": "1.0.4",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xlogo-1.0.4.tar.bz2"
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xlogo-1.0.6.tar.gz"
         }
       }
     },
@@ -29976,8 +29976,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xmag",
-          "version": "1.0.6",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xmag-1.0.6.tar.bz2"
+          "version": "1.0.7",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xmag-1.0.7.tar.gz"
         }
       }
     },
@@ -29987,8 +29987,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xmessage",
-          "version": "1.0.5.",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xmessage-1.0.5.tar.bz2"
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xmessage-1.0.6.tar.gz"
         }
       }
     },
@@ -30229,8 +30229,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xpr",
-          "version": "1.0.5.",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xpr-1.0.5.tar.bz2"
+          "version": "1.1.0",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xpr-1.1.0.tar.gz"
         }
       }
     },
@@ -30357,8 +30357,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xvidtune",
-          "version": "1.0.3",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xvidtune-1.0.3.tar.bz2"
+          "version": "1.0.4",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xvidtune-1.0.4.tar.gz"
         }
       }
     },
@@ -30368,8 +30368,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xwd",
-          "version": "1.0.7",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xwd-1.0.7.tar.bz2"
+          "version": "1.0.9",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xwd-1.0.9.tar.gz"
         }
       }
     },
@@ -30379,8 +30379,8 @@
         "comment": "Imported as part of the 'xorg-x11-apps' package, version 7.7",
         "other": {
           "name": "xwud",
-          "version": "1.0.5",
-          "downloadUrl": "https://www.x.org/pub/individual/app/xwud-1.0.5.tar.bz2"
+          "version": "1.0.6",
+          "downloadUrl": "https://www.x.org/pub/individual/app/xwud-1.0.6.tar.gz"
         }
       }
     },
