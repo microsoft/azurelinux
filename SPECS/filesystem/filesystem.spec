@@ -173,8 +173,7 @@ cat > %{buildroot}/etc/hosts <<- "EOF"
 # Begin /etc/hosts (network card version)
 
 ::1         ipv6-localhost ipv6-loopback
-127.0.0.1   localhost.localdomain
-127.0.0.1   localhost
+127.0.0.1   localhost localhost.localdomain
 
 # End /etc/hosts (network card version)
 EOF
