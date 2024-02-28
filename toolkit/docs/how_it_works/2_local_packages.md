@@ -3,7 +3,7 @@ Local Packages
 ## Prev: [Initial Prep](1_initial_prep.md), Next: [Package Building](3_package_building.md)
 ## SPEC Files
 
-A CBL-Mariner repository normally consists of a SPECS folder (specified with `$(SPEC_DIR)`), a set of image configurations (`$(CONFIG_FILE)`), and this toolkit. The SPECS folder is a root directory containing subdirectories for each local package which will be available to a build. The subdirectories avoid name collisions between sources files.
+A Azure Linux repository normally consists of a SPECS folder (specified with `$(SPEC_DIR)`), a set of image configurations (`$(CONFIG_FILE)`), and this toolkit. The SPECS folder is a root directory containing subdirectories for each local package which will be available to a build. The subdirectories avoid name collisions between sources files.
 
 Each SPEC file is accompanied by a `*.signature.json` file which records the expected hashes for every source file used in the package.
 
