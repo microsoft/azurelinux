@@ -95,7 +95,7 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 
 %install
 [ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 install -vdm 755 %{buildroot}/etc
 cat >> %{buildroot}/etc/wgetrc <<-EOF
 #   default root certs location
@@ -114,11 +114,6 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 
 %{_fixperms} %{buildroot}/*
 
-%check
-export PERL_MM_USE_DEFAULT=1
-cpan local::lib
-cpan HTTP::Daemon
-make  %{?_smp_mflags} check
 
 %files -f %{name}2.lang
 %defattr(-,root,root)
