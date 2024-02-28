@@ -1,4 +1,5 @@
 module github.com/microsoft/azurelinux/toolkit/tools
+
 go 1.20
 
 require (
