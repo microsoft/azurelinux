@@ -10281,8 +10281,8 @@
         "type": "other",
         "other": {
           "name": "libnotify",
-          "version": "0.7.9",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libnotify/0.7/libnotify-0.7.9.tar.xz"
+          "version": "0.8.3",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/libnotify/0.8/libnotify-0.8.3.tar.xz"
         }
       }
     },
