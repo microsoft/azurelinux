@@ -183,13 +183,13 @@ function initialization {
     # Set various image names.
     BASE_IMAGE_NAME="$ACR_NAME_FULL/base/core:$IMAGE_TAG"
     BASE_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/base/core:$NONROOT_IMAGE_TAG"
-    
+
     DISTROLESS_BASE_IMAGE_NAME="$ACR_NAME_FULL/distroless/base:$IMAGE_TAG"
     DISTROLESS_BASE_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/base:$NONROOT_IMAGE_TAG"
-    
+
     DISTROLESS_MINIMAL_IMAGE_NAME="$ACR_NAME_FULL/distroless/minimal:$IMAGE_TAG"
     DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/minimal:$NONROOT_IMAGE_TAG"
-    
+
     DISTROLESS_DEBUG_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$NONROOT_IMAGE_TAG"
     DISTROLESS_DEBUG_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$IMAGE_TAG"
 
@@ -274,17 +274,20 @@ function docker_build_custom {
 
 function docker_build_marinara {
     echo "+++ Build Marinara image: $MARINARA_IMAGE_NAME"
-    
+
     local build_dir="$WORK_DIR/marinara_build_dir"
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
     pushd "$build_dir"
-    
+
     sed -E "s|^FROM mcr\..*installer$|FROM $BASE_IMAGE_NAME as installer|g" -i "dockerfile-$MARINARA"
+
     docker build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
-        --no-cache
+        --build-arg AZL_VERSION="$AZL_VERSION" \
+        --no-cache \
+        --progress=plain
 
     popd > /dev/null
     sudo rm -rf "$build_dir"
