@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,13 @@ Source1:        50-security-hardening.conf
 Source2:        systemd.cfg
 Source3:        99-dhcp-en.network
 Source4:        99-mariner.preset
+
+# Taken from systemd-255
+Source21:       macros.sysusers
+Source22:       sysusers.attr
+Source23:       sysusers.prov
+Source24:       sysusers.generate-pre.sh
+
 Patch0:         fix-journald-audit-logging.patch
 # Patch1 can be removed once we update systemd to a version containing the following commit:
 # https://github.com/systemd/systemd/commit/19193b489841a7bcccda7122ac0849cf6efe59fd
@@ -26,6 +33,7 @@ Patch4:         CVE-2022-45873.patch
 Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
 Patch7:         update-cifs-for-kernel-headers-6.1.patch
+Patch8:         use-255-macros.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -147,6 +155,12 @@ install -dm 0755 %{buildroot}/%{_sysconfdir}/systemd/network
 install -m 0644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/systemd/network
 install -D -m 0644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/99-mariner.preset
 
+# Taken from systemd-255
+install -m 0644 -D -t %{buildroot}%{_rpmconfigdir}/macros.d/ %{SOURCE21}
+install -m 0644 -D -t %{buildroot}%{_rpmconfigdir}/fileattrs/ %{SOURCE22}
+install -m 0755 -D -t %{buildroot}%{_rpmconfigdir}/ %{SOURCE23}
+install -m 0755 -D -t %{buildroot}%{_rpmconfigdir}/ %{SOURCE24}
+
 # Enable default systemd units.
 %post
 /sbin/ldconfig
@@ -248,6 +262,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Tue Feb 27 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-16
+- Take rpm-macros from the new systemd-255 package so they are interchangeable
+
 * Tue Feb 06 2024 Dan Streetman <ddstreet@ieee.org> - 250.3-15
 - do not conflict with polkit dir
 
