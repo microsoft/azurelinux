@@ -104,6 +104,11 @@ rm -f %{buildroot}%{_pgdatadir}/extension/*plpython2u* \
       %{buildroot}%{_pgdatadir}/extension/*plpythonu-* \
       %{buildroot}%{_pgdatadir}/extension/*_plpythonu.control
 
+# Remove currently unnecessary man pages.
+rm -f %{buildroot}%{_mandir}/man1/* \
+      %{buildroot}%{_mandir}/man3/* \
+      %{buildroot}%{_mandir}/man7/*
+
 %check
 chown -Rv nobody:nogroup .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
@@ -142,9 +147,6 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_docdir}/postgresql/extension/*.example
 %exclude %{_datadir}/postgresql/pg_service.conf.sample
 %exclude %{_datadir}/postgresql/psqlrc.sample
-%{_mandir}/man1/*
-%{_mandir}/man3/*
-%{_mandir}/man7/*
 
 %files docs
 %defattr(-,root,root)
@@ -191,6 +193,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %changelog
 * Tue Feb 27 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 14.11-1
 - Update to version 14.11 to fix CVE-2024-0985
+- Added the 'docs' subpackage.
 
 * Fri Dec 29 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 14.10-1
 - Upgrade to 14.10 to fix CVE-2023-5868, CVE-2023-5869 and CVE-2023-5870
