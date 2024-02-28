@@ -1,0 +1,234 @@
+From f987ccf2eed7f15aaf286fa427e80092971bdc39 Mon Sep 17 00:00:00 2001
+From: Miro Hrončok <miro@hroncok.cz>
+Date: Jan 26 2024 08:45:58 +0000
+Subject: [PATCH 1/2] CI: Skip httpbin %tox on F40+
+
+
+---
+
+diff --git a/tests/python-httpbin.spec b/tests/python-httpbin.spec
+index 9e0609a..de0618f 100644
+--- a/tests/python-httpbin.spec
++++ b/tests/python-httpbin.spec
+@@ -61,7 +61,10 @@ sed -Ei 's/\bdef (test_(relative_)?redirect_(to_post|n_(equals_to|higher_than)_1
+ 
+ %if %{with tests}
+ %check
++%if 0%{?fedora} < 40 && 0%{?rhel} < 10
++# this version of httpbin is not compatible with werkzeug 3+
+ %tox
++%endif
+ 
+ # Internal check for our macros
+ # The runtime dependencies contain raven[flask], we assert we got them.
+
+From 5aca0a60345b1481d73f027f6bfee618c0464139 Mon Sep 17 00:00:00 2001
+From: Miro Hrončok <miro@hroncok.cz>
+Date: Jan 26 2024 08:45:58 +0000
+Subject: [PATCH 2/2] Namespace pyproject-rpm-macros generated text files with %{python3_pkgversion}
+
+
+---
+
+diff --git a/macros.pyproject b/macros.pyproject
+index 710cb73..6ca9114 100644
+--- a/macros.pyproject
++++ b/macros.pyproject
+@@ -1,5 +1,9 @@
++# This is a backward-compatible suffix used in all pyproject-rpm-macros directories
++# For the main Python it's empty, for all others it's "-3.X"
++%_pyproject_files_pkgversion %{expr:"%{python3_pkgversion}" != "3" ? "-%{python3_pkgversion}" : ""}
++
+ # This is a directory where wheels are stored and installed from, absolute
+-%_pyproject_wheeldir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/pyproject-wheeldir
++%_pyproject_wheeldir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/pyproject-wheeldir%{_pyproject_files_pkgversion}
+ 
+ # This is a directory used as TMPDIR, where pip copies sources to and builds from, relative to PWD
+ # For proper debugsource packages, we create TMPDIR within PWD
+@@ -8,12 +12,12 @@
+ # This will be used in debugsource package paths (applies to extension modules only)
+ # NB: pytest collects tests from here if not hidden
+ #     https://docs.pytest.org/en/latest/reference.html#confval-norecursedirs
+-%_pyproject_builddir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/.pyproject-builddir
++%_pyproject_builddir %{_builddir}%{?buildsubdir:/%{buildsubdir}}/.pyproject-builddir%{_pyproject_files_pkgversion}
+ 
+ # We prefix all created files with this value to make them unique
+ # Ideally, we would put them into %%{buildsubdir}, but that value changes during the spec
+ # The used value is similar to the one used to define the default %%buildroot
+-%_pyproject_files_prefix %{name}-%{version}-%{release}.%{_arch}
++%_pyproject_files_prefix %{name}-%{version}-%{release}.%{_arch}%{_pyproject_files_pkgversion}
+ 
+ %pyproject_files %{_builddir}/%{_pyproject_files_prefix}-pyproject-files
+ %_pyproject_modules %{_builddir}/%{_pyproject_files_prefix}-pyproject-modules
+diff --git a/pyproject-rpm-macros.spec b/pyproject-rpm-macros.spec
+index 38388f3..443c07e 100644
+--- a/pyproject-rpm-macros.spec
++++ b/pyproject-rpm-macros.spec
+@@ -13,8 +13,8 @@ License:        MIT
+ #   Increment Y and reset Z when new macros or features are added
+ #   Increment Z when this is a bugfix or a cosmetic change
+ # Dropping support for EOL Fedoras is *not* considered a breaking change
+-Version:        1.11.0
+-Release:        3%{?dist}
++Version:        1.12.0
++Release:        1%{?dist}
+ 
+ # Macro files
+ Source001:      macros.pyproject
+@@ -171,6 +171,11 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
+ 
+ 
+ %changelog
++* Fri Jan 26 2024 Miro Hrončok <miro@hroncok.cz> - 1.12.0-1
++- Namespace pyproject-rpm-macros generated text files with %%{python3_pkgversion}
++- That way, a single-spec can be used to build packages for multiple Python versions
++- Fixes: rhbz#2209055
++
+ * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.0-3
+ - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+diff --git a/tests/mocktest.sh b/tests/mocktest.sh
+index 451364e..405e769 100755
+--- a/tests/mocktest.sh
++++ b/tests/mocktest.sh
+@@ -1,5 +1,7 @@
+ #!/usr/bin/bash -eux
+-. /etc/os-release
++if [ -z "${VERSION_ID-}" ] && [ -z "${NAME-}" ]; then
++  . /etc/os-release
++fi
+ 
+ version=$(echo "${VERSION_ID}" | cut -d. -f1)
+ arch="x86_64"
+diff --git a/tests/python-isort.spec b/tests/python-isort.spec
+index 9124d73..82956c4 100644
+--- a/tests/python-isort.spec
++++ b/tests/python-isort.spec
+@@ -9,7 +9,6 @@ License:            MIT
+ URL:                https://github.com/timothycrosley/%{modname}
+ Source0:            %{url}/archive/%{version}-2/%{modname}-%{version}-2.tar.gz
+ BuildArch:          noarch
+-BuildRequires:      python%{python3_pkgversion}-devel
+ BuildRequires:      pyproject-rpm-macros
+ 
+ %description
+@@ -18,7 +17,7 @@ Building this tests that executables are not listed when +auto is not used
+ with %%pyproject_save_files.
+ 
+ This package also uses %%{python3_pkgversion} in name and has a very limited
+-set of dependencies -- allows to set a different value for it in the CI.
++set of dependencies -- allows to set a different value for it repeatedly.
+ 
+ %package -n python%{python3_pkgversion}-%{modname}
+ Summary:            %{summary}
+@@ -26,6 +25,24 @@ Summary:            %{summary}
+ %description -n python%{python3_pkgversion}-%{modname}
+ %{summary}.
+ 
++%if 0%{?rhel} == 9
++%global python3_pkgversion 3.11
++%package -n python%{python3_pkgversion}-%{modname}
++Summary:            %{summary}
++
++%description -n python%{python3_pkgversion}-%{modname}
++%{summary}.
++
++%global python3_pkgversion 3.12
++%package -n python%{python3_pkgversion}-%{modname}
++Summary:            %{summary}
++
++%description -n python%{python3_pkgversion}-%{modname}
++%{summary}.
++
++%global python3_pkgversion 3
++%endif
++
+ 
+ %prep
+ %autosetup -n %{modname}-%{version}-2
+@@ -33,13 +50,38 @@ Summary:            %{summary}
+ 
+ %generate_buildrequires
+ %pyproject_buildrequires
++%if 0%{?rhel} == 9
++%global python3_pkgversion 3.11
++%pyproject_buildrequires
++%global python3_pkgversion 3.12
++%pyproject_buildrequires
++%global python3_pkgversion 3
++%endif
++
+ 
+ 
+ %build
+ %pyproject_wheel
++%if 0%{?rhel} == 9
++%global python3_pkgversion 3.11
++%pyproject_wheel
++%global python3_pkgversion 3.12
++%pyproject_wheel
++%global python3_pkgversion 3
++%endif
+ 
+ 
+ %install
++%if 0%{?rhel} == 9
++%global python3_pkgversion 3.11
++%pyproject_install
++%pyproject_save_files -l isort
++%global python3_pkgversion 3.12
++%pyproject_install
++%pyproject_save_files -l isort
++%global python3_pkgversion 3
++%endif
++# we keep this one last so /usr/bin/isort is installed with python3 shebang
+ %pyproject_install
+ %pyproject_save_files -l isort
+ 
+@@ -52,7 +94,32 @@ test -d %{buildroot}%{python3_sitelib}/%{modname}-%{version}.dist-info/
+ # Internal check that executables are not present when +auto was not used with %%pyproject_save_files
+ grep -F %{_bindir}/%{modname} %{pyproject_files} && exit 1 || true
+ 
++%if 0%{?rhel} == 9
++# Internal check that correct versions are in correct %%{pyproject_files}s
++diff %{pyproject_files} <(grep -F python3.9/site-packages %{pyproject_files})
++
++%global python3_pkgversion 3.11
++test -d %{buildroot}%{_usr}/lib/python3.11/site-packages/%{modname}/
++test -d %{buildroot}%{_usr}/lib/python3.11/site-packages/%{modname}-%{version}.dist-info/
++diff %{pyproject_files} <(grep -F python3.11/site-packages %{pyproject_files})
++
++%global python3_pkgversion 3.12
++test -d %{buildroot}%{_usr}/lib/python3.12/site-packages/%{modname}/
++test -d %{buildroot}%{_usr}/lib/python3.12/site-packages/%{modname}-%{version}.dist-info/
++diff %{pyproject_files} <(grep -F python3.12/site-packages %{pyproject_files})
++%global python3_pkgversion 3
++%endif
++
+ 
+ %files -n python%{python3_pkgversion}-%{modname} -f %{pyproject_files}
+ %doc README.rst *.md
+ %{_bindir}/%{modname}
++%if 0%{?rhel} == 9
++%global python3_pkgversion 3.11
++%files -n python%{python3_pkgversion}-%{modname} -f %{pyproject_files}
++%doc README.rst *.md
++%global python3_pkgversion 3.12
++%files -n python%{python3_pkgversion}-%{modname} -f %{pyproject_files}
++%doc README.rst *.md
++%global python3_pkgversion 3
++%endif
+diff --git a/tests/tests.yml b/tests/tests.yml
+index fa90a45..d45ea78 100644
+--- a/tests/tests.yml
++++ b/tests/tests.yml
+@@ -97,6 +97,9 @@
+     - config-settings-test:
+         dir: .
+         run: ./mocktest.sh config-settings-test
++    - isort_c9s:
++        dir: .
++        run: NAME="CentOS Stream" VERSION_ID=9 ./mocktest.sh python-isort
+     required_packages:
+     - mock
+     - rpmdevtools

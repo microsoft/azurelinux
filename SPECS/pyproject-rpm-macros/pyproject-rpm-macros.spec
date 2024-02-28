@@ -12,6 +12,8 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://src.fedoraproject.org/rpms/pyproject-rpm-macros
+Patch0:         namespace_pyproject-rpm-macros_generated_text_files.diff
+Patch1:         patch2.diff
 
 BuildArch:      noarch
 
@@ -79,6 +81,8 @@ which only work with setup.py.
 # Not strictly necessary but allows working on file names instead
 # of source numbers in install section
 %setup -q -c -T
+%patch -P 0 -p1
+%patch -P 1 -p1
 cp -p %{sources} .
 
 %build

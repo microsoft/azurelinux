@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%global pyproject_wheel 1
 Summary:        Core utilities for Python packages
 Name:           python-packaging
 Version:        23.2

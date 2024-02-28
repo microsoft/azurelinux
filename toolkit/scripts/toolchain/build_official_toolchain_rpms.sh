@@ -570,6 +570,11 @@ build_rpm_in_chroot_no_install grep
 build_rpm_in_chroot_no_install coreutils
 build_rpm_in_chroot_no_install findutils
 # glib requires python3-packaging
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+# chroot_and_install_rpms pyproject-rpm-macros
+# chroot_and_install_rpms python3-pip
+# build_rpm_in_chroot_no_install python-flit-core
+# chroot_and_install_rpms python3-flit-core
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python3-packaging
 build_rpm_in_chroot_no_install glib
@@ -677,7 +682,6 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install mariner-repos
-build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall

@@ -1,0 +1,231 @@
+From 5eec3f76022eb061a1a8d2488d48ec3ab477d04c Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Dec 11 2023 11:32:26 +0000
+Subject: Fix python macro memoizing to account for changing %__python3
+
+
+This adds a new `%_python_memoize` macro that caches the values of
+various python macros in a lua table based on the current value of
+`%__python` / `%__python3`. The Python macros are adjusted to use this
+macro for memoization instead of the current approach. This way,  the
+macros will return values that apply to the _current_ `%__python3` value
+when packagers create multi-python specfiles that toggle the value of
+`%python3_pkgversion`.
+
+Relates: https://bugzilla.redhat.com/2209055
+
+Co-Authored-By: Miro Hrončok <miro@hroncok.cz>
+
+---
+
+diff --git a/macros.python b/macros.python
+index e058fff..0d29ae0 100644
+--- a/macros.python
++++ b/macros.python
+@@ -1,20 +1,61 @@
++# Memoize a macro to avoid calling the same expensive code multiple times in
++# the specfile.
++# There is no error handling,
++# memoizing an undefined macro (or using such a key) has undefined behavior.
++# Options:
++#   -n - The name of the macro to wrap
++#   -k - The name of the macro to use as a cache key
++%_python_memoize(n:k:) %{lua:
++local name = opt.n
++-- NB: We use rpm.expand() here instead of the macros table to make sure errors
++-- are propogated properly.
++local cache_key = rpm.expand("%{" .. opt.k .. "}")
++if not _python_macro_cache then
++    -- This is intentionally a global lua table
++    _python_macro_cache = {}
++end
++if not _python_macro_cache[cache_key] then
++    _python_macro_cache[cache_key] = {}
++end
++if not _python_macro_cache[cache_key][name] then
++    _python_macro_cache[cache_key][name] = rpm.expand("%{" .. name .. "}")
++end
++print(_python_macro_cache[cache_key][name])
++}
++
+ # unversioned macros: used with user defined __python, no longer part of rpm >= 4.15
+ # __python is defined to error by default in the srpm macros
+ # nb: $RPM_BUILD_ROOT is not set when the macros are expanded (at spec parse time)
+ #     so we set it manually (to empty string), making our Python prefer the correct install scheme location
+ # platbase/base is explicitly set to %%{_prefix} to support custom values, such as /app for flatpaks
+-%python_sitelib %{global python_sitelib %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")}%{python_sitelib}
+-%python_sitearch %{global python_sitearch %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")}%{python_sitearch}
+-%python_version %{global python_version %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")}%{python_version}
+-%python_version_nodots %{global python_version_nodots %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")}%{python_version_nodots}
+-%python_platform %{global python_platform %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_platform())")}%{python_platform}
+-%python_platform_triplet %{global python_platform_triplet %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")}%{python_platform_triplet}
+-%python_ext_suffix %{global python_ext_suffix %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")}%{python_ext_suffix}
+-%python_cache_tag %{global python_cache_tag %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; print(sys.implementation.cache_tag)")}%{python_cache_tag}
++%__python_sitelib %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
++%python_sitelib %{_python_memoize -n __python_sitelib -k __python}
++
++%__python_sitearch %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
++%python_sitearch %{_python_memoize -n __python_sitearch -k __python}
++
++%__python_version %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
++%python_version %{_python_memoize -n __python_version -k __python}
++
++%__python_version_nodots %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
++%python_version_nodots %{_python_memoize -n __python_version_nodots -k __python}
++
++%__python_platform %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_platform())")
++%python_platform %{_python_memoize -n __python_platform -k __python}
++
++%__python_platform_triplet %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")
++%python_platform_triplet %{_python_memoize -n __python_platform_triplet -k __python}
++
++%__python_ext_suffix %(RPM_BUILD_ROOT= %{__python} -Esc "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")
++%python_ext_suffix %{_python_memoize -n __python_ext_suffix -k __python}
++
++%__python_cache_tag %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; print(sys.implementation.cache_tag)")
++%python_cache_tag %{_python_memoize -n __python_cache_tag -k __python}
+ 
+ %py_setup setup.py
+ %_py_shebang_s s
+-%_py_shebang_P %{global _py_shebang_P %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; print('P' if hasattr(sys.flags, 'safe_path') else '')")}%{_py_shebang_P}
++%__py_shebang_P %(RPM_BUILD_ROOT= %{__python} -Esc "import sys; print('P' if hasattr(sys.flags, 'safe_path') else '')")
++%_py_shebang_P %{_python_memoize -n __py_shebang_P -k __python}
+ %py_shbang_opts -%{?_py_shebang_s}%{?_py_shebang_P}
+ %py_shbang_opts_nodash %(opts=%{py_shbang_opts}; echo ${opts#-})
+ %py_shebang_flags %(opts=%{py_shbang_opts}; echo ${opts#-})
+diff --git a/macros.python3 b/macros.python3
+index 06a7db2..a813557 100644
+--- a/macros.python3
++++ b/macros.python3
+@@ -1,18 +1,35 @@
+ # nb: $RPM_BUILD_ROOT is not set when the macros are expanded (at spec parse time)
+ #     so we set it manually (to empty string), making our Python prefer the correct install scheme location
+ # platbase/base is explicitly set to %%{_prefix} to support custom values, such as /app for flatpaks
+-%python3_sitelib %{global python3_sitelib %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")}%{python3_sitelib}
+-%python3_sitearch %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
+-%python3_version %{global python3_version %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")}%{python3_version}
+-%python3_version_nodots %{global python3_version_nodots %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")}%{python3_version_nodots}
+-%python3_platform %{global python3_platform %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_platform())")}%{python3_platform}
+-%python3_platform_triplet %{global python3_platform_triplet %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")}%{python3_platform_triplet}
+-%python3_ext_suffix %{global python3_ext_suffix %(RPM_BUILD_ROOT= %{__python3} -Ic "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")}%{python3_ext_suffix}
+-%python3_cache_tag %{global python3_cache_tag %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; print(sys.implementation.cache_tag)")}%{python3_cache_tag}
++%__python3_sitelib %(RPM_BUILD_ROOT= %{__python3} -Esc "import sysconfig; print(sysconfig.get_path('purelib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
++%python3_sitelib %{_python_memoize -n __python3_sitelib -k __python3}
++
++%__python3_sitearch %(RPM_BUILD_ROOT= %{__python3} -Esc "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '%{_prefix}', 'base': '%{_prefix}'}))")
++%python3_sitearch %{_python_memoize -n __python3_sitearch -k __python3}
++
++%__python3_version %(RPM_BUILD_ROOT= %{__python3} -Esc "import sys; sys.stdout.write('{0.major}.{0.minor}'.format(sys.version_info))")
++%python3_version %{_python_memoize -n __python3_version -k __python3}
++
++%__python3_version_nodots %(RPM_BUILD_ROOT= %{__python3} -Esc "import sys; sys.stdout.write('{0.major}{0.minor}'.format(sys.version_info))")
++%python3_version_nodots %{_python_memoize -n __python3_version_nodots -k __python3}
++
++%__python3_platform %(RPM_BUILD_ROOT= %{__python3} -Esc "import sysconfig; print(sysconfig.get_platform())")
++%python3_platform %{_python_memoize -n __python3_platform -k __python3}
++
++%__python3_platform_triplet %(RPM_BUILD_ROOT= %{__python3} -Esc "import sysconfig; print(sysconfig.get_config_var('MULTIARCH'))")
++%python3_platform_triplet %{_python_memoize -n __python3_platform_triplet -k __python3}
++
++%__python3_ext_suffix %(RPM_BUILD_ROOT= %{__python3} -Esc "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")
++%python3_ext_suffix %{_python_memoize -n __python3_ext_suffix -k __python3}
++
++%__python3_cache_tag %(RPM_BUILD_ROOT= %{__python3} -Esc "import sys; print(sys.implementation.cache_tag)")
++%python3_cache_tag %{_python_memoize -n __python3_cache_tag -k __python3}
++
+ %py3dir %{_builddir}/python3-%{name}-%{version}-%{release}
+ 
+ %_py3_shebang_s s
+-%_py3_shebang_P %{global _py3_shebang_P %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; print('P' if hasattr(sys.flags, 'safe_path') else '')")}%{_py3_shebang_P}
++%__py3_shebang_P %(RPM_BUILD_ROOT= %{__python3} -Ic "import sys; print('P' if hasattr(sys.flags, 'safe_path') else '')")
++%_py3_shebang_P %{_python_memoize -n __py3_shebang_P -k __python3}
+ %py3_shbang_opts -%{?_py3_shebang_s}%{?_py3_shebang_P}
+ %py3_shbang_opts_nodash %(opts=%{py3_shbang_opts}; echo ${opts#-})
+ %py3_shebang_flags %(opts=%{py3_shbang_opts}; echo ${opts#-})
+diff --git a/python-rpm-macros.spec b/python-rpm-macros.spec
+index 322250d..e8f7a4c 100644
+--- a/python-rpm-macros.spec
++++ b/python-rpm-macros.spec
+@@ -53,7 +53,7 @@ elseif posix.stat('macros.python-srpm') then
+ end
+ }
+ Version:        %{__default_python3_version}
+-Release:        4%{?dist}
++Release:        5%{?dist}
+ 
+ BuildArch:      noarch
+ 
+@@ -163,6 +163,9 @@ grep -E '^#[^%%]*%%[^%%]' %{buildroot}%{rpmmacrodir}/macros.* && exit 1 || true
+ 
+ 
+ %changelog
++* Mon Oct 09 2023 Maxwell G <maxwell@gtmx.me> - 3.12-5
++- Fix python macro memoizing to account for changing %%__python3
++
+ * Tue Sep 05 2023 Maxwell G <maxwell@gtmx.me> - 3.12-4
+ - Remove %%py3_build_egg and %%py3_install_egg macros.
+ 
+diff --git a/tests/test_evals.py b/tests/test_evals.py
+index 2e0e6e1..69f689e 100644
+--- a/tests/test_evals.py
++++ b/tests/test_evals.py
+@@ -22,6 +22,8 @@ TESTED_FILES = os.getenv("TESTED_FILES", None)
+ 
+ 
+ def rpm_eval(expression, fails=False, **kwargs):
++    if isinstance(expression, str):
++        expression = [expression]
+     cmd = ['rpmbuild']
+     if TESTED_FILES:
+         cmd += ['--macros', TESTED_FILES]
+@@ -30,7 +32,8 @@ def rpm_eval(expression, fails=False, **kwargs):
+             cmd += ['--undefine', var]
+         else:
+             cmd += ['--define', f'{var} {value}']
+-    cmd += ['--eval', expression]
++    for e in expression:
++        cmd += ['--eval', e]
+     cp = subprocess.run(cmd, text=True, env={**os.environ, 'LANG': 'C.utf-8'},
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+     if fails:
+@@ -724,7 +727,7 @@ def test_unversioned_python_errors(macro):
+     )
+     # when the macros are %global, the error is longer
+     # we deliberately allow this extra line to be optional
+-    if len(lines) > 1:
++    if len(lines) > 1 and "error: lua script failed" not in lines[1]:
+         # the failed macro is not unnecessarily our tested macro
+         pattern = r'error: Macro %\S+ failed to expand'
+         assert re.match(pattern, lines[1])
+@@ -888,3 +891,31 @@ def test_py3_check_import_respects_shebang_flags(shebang_flags_value, expected_s
+     # Compare the last line of the command, that's where lua part is evaluated
+     expected = f'/usr/bin/python3 {expected_shebang_flags} RPMCONFIGDIR/redhat/import_all_modules.py sys'
+     assert  lines[-1].strip() == expected
++
++
++def test_multi_python(alt_x_y):
++    """
++    Ensure memoized %python_version works when switching %__python back
++    and forth.
++    """
++    versions = ['3', alt_x_y, X_Y, '3']
++    evals = []
++    for version in versions:
++        evals.extend((f'%global __python /usr/bin/python{version}', '%python_version'))
++    lines = rpm_eval(evals)
++    lines = [l for l in  lines if l]  # strip empty lines generated by %global
++    assert lines == [X_Y, alt_x_y, X_Y, X_Y]
++
++
++def test_multi_python3(alt_x_y):
++    """
++    Ensure memoized %python3_version works when switching %__python3 back
++    and forth.
++    """
++    versions = ['3', alt_x_y, X_Y, '3']
++    evals = []
++    for version in versions:
++        evals.extend((f'%global __python3 /usr/bin/python{version}', '%python3_version'))
++    lines = rpm_eval(evals)
++    lines = [l for l in  lines if l]  # strip empty lines generated by %global
++    assert lines == [X_Y, alt_x_y, X_Y, X_Y]
