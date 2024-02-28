@@ -2,11 +2,11 @@
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
-%global gnulibversion d271f868a8df9bbec29049d01e056481b7a1a263
+%global gnulibversion 9f48fb992a3d7e96610c4ce8be969cff2d61a01b
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.06
-Release:        12%{?dist}
+Version:        2.12
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -121,7 +121,7 @@ to be persistently stored on AzureLinux
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
 export LDFLAGS
 
-%autosetup -p1 -n grub-2.06
+%autosetup -p1 -n grub-%{version}
 cp %{SOURCE1} gnulib-%{gnulibversion}.tar.gz
 tar -zxf gnulib-%{gnulibversion}.tar.gz
 mv gnulib-%{gnulibversion} gnulib
