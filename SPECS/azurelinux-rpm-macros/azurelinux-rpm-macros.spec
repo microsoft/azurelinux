@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -141,6 +141,11 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-3
+- fix %_topdir macro
+- remove %_docdir
+- remove redundant macros
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-2
 - Update all python-related scripts from Fedora 40 version of python-rpm-macros
 - Sort python-related sources together
