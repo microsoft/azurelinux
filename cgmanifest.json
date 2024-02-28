@@ -2748,8 +2748,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.89",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
+          "version": "2.90",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.90.tar.xz"
         }
       }
     },
@@ -15814,8 +15814,8 @@
         "type": "other",
         "other": {
           "name": "pam",
-          "version": "1.5.1",
-          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.1/Linux-PAM-1.5.1.tar.xz"
+          "version": "1.5.3",
+          "downloadUrl": "https://github.com/linux-pam/linux-pam/releases/download/v1.5.3/Linux-PAM-1.5.3.tar.xz"
         }
       }
     },
