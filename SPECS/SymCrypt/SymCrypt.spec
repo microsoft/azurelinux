@@ -70,6 +70,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Wed Feb 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 103.0.1-1
+- Auto-upgrade to 103.0.1 - Mariner 3.0 Package Upgrade
+
 * Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 103.0.1-1
 - Update SymCrypt to v103.0.1 for FIPS certification. Run unit tests in check
 
