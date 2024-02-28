@@ -14121,16 +14121,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nodejs18",
-          "version": "18.18.2",
-          "downloadUrl": "https://nodejs.org/download/release/v18.18.2/node-v18.18.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "npth",
           "version": "1.6",
           "downloadUrl": "https://gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2"
