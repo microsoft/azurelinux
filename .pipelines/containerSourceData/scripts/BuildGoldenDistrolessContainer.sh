@@ -58,7 +58,7 @@ function create_distroless_container {
 
     echo "+++ Clone marinara repo"
     git clone "https://github.com/microsoft/$marinara.git" "$WORK_DIR/$marinaraSrcDir"
-    
+
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
     pushd "$WORK_DIR" > /dev/null
 
@@ -113,7 +113,7 @@ function create_distroless_container {
         "$rpmsPath"
 
     popd > /dev/null
-    
+
     echo "+++ Save distroless container images to file PublishedContainers-$IMAGE.txt"
     {
         echo "$standardContainerName";
