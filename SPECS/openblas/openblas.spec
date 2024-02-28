@@ -31,11 +31,11 @@ Source0:        https://github.com/OpenMathLib/OpenBLAS/archive/v%{version}/open
 Patch0:         openblas-0.2.15-system_lapack.patch
 # Drop extra p from threaded library name
 Patch1:         openblas-0.2.5-libname.patch
-# Don't use constructor priorities on too old architectures
-Patch2:         openblas-0.2.15-constructor.patch
 # Supply the proper flags to the test makefile
 # patch imported from Fedora
-Patch3:         openblas-0.3.11-tests.patch
+Patch2:         openblas-0.3.11-tests.patch
+# keep this patch to build from a containerized environment
+Patch3:         No-Fortran-Build.patch
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -192,7 +192,8 @@ cd OpenBLAS-%{version}
 %patch 0 -p1 -b .system_lapack
 %endif
 %patch 1 -p1 -b .libname
-%patch 3 -p1 -b .tests
+%patch 2 -p1 -b .tests
+%patch 3 -p1
 
 # Fix source permissions
 find -name \*.f -exec chmod 644 {} \;
@@ -557,7 +558,7 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 * Mon Feb 05 2024 Nan Liu <liunan@microsoft.com> - 0.3.26-1
 - Upgrade to 0.3.26
 - Update License to BSD-3-Clause
-- Remove uneeded patches
+- Remove unneeded patch
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.3.21-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)

@@ -43,7 +43,7 @@ It's supposed to be mostly the same, with much lower memory usage, as:
 %setup -q -n common-sense-%{version}
 
 # Specify POD encoding
-%patch1
+%patch 1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

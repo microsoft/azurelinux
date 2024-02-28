@@ -3,7 +3,7 @@
 
 ## Requirements were validated on `Mariner 2.0`
 
-This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on a Mariner host.
+This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on a Mariner host.
 
 ```bash
 # Install required dependencies.

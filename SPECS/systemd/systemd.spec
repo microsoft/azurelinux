@@ -44,7 +44,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        2%{?dist}
+Release:        4%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -133,7 +133,7 @@ BuildRequires:  pkgconfig(libcrypt)
 BuildRequires:  p11-kit-devel
 BuildRequires:  polkit-devel
 # This is required for /etc/os-release, as the systemd uses this during src/boot/efi build
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -260,6 +260,7 @@ Provides:       /bin/systemctl
 Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
+%{?azure:Obsoletes:      systemd-bootstrap <= %{version}-%{release}}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -272,7 +273,7 @@ Conflicts:      initscripts < 9.56.1
 Conflicts:      fedora-release < 23-0.12
 %endif
 # Make sure that dracut supports systemd-executor and the renames done for v255
-Conflicts:      dracut < 059-16
+Conflicts:      dracut < 059
 
 Obsoletes:      timedatex < 0.6-3
 Provides:       timedatex = 0.6-3
@@ -346,6 +347,7 @@ Systemd PAM module registers the session with systemd-logind.
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
+%{?azure:Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -362,6 +364,7 @@ Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
 Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
+%{?azure:Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
@@ -1170,6 +1173,12 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Tue Feb 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-4
+- Add Obsoletes: systemd-bootstrap* to allow systemd to replace the bootstrap version
+
+* Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 255-3
+- remove conflicts dracut release number
+
 * Thu Jan 04 2024 Dan Streetman <ddstreet@ieee.org> - 255-2
 - Change upstream parent from Photon to Fedora.
 - Following line is included only to avoid tooling failures, and does not indicate the actual license.

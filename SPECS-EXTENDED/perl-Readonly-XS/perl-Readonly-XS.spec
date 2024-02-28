@@ -45,10 +45,10 @@ scalar variables.
 %setup -q -n Readonly-XS-%{version}
 
 # Build process does not actually need perl(Readonly)
-%patch0
+%patch 0
 
 # Fix script interpreter for test suite since we're packaging it
-%patch1
+%patch 1
 
 # And tests don't need to be executable either
 chmod -c -x t/test.t

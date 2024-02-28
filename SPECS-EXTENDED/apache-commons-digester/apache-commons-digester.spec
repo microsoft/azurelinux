@@ -22,7 +22,7 @@ Requires:       commons-logging
 Provides:       %{short_name} = %{version}-%{release}
 Obsoletes:      %{short_name} < %{version}-%{release}
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ant-junit
 %endif
 

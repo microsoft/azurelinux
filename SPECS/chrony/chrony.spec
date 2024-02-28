@@ -33,7 +33,7 @@ BuildRequires:  libseccomp-devel
 BuildRequires:  nettle-devel >= 3.7.2
 BuildRequires:  systemd
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  net-tools
 BuildRequires:  tzdata
 BuildRequires:  which
@@ -61,8 +61,8 @@ service to other computers in the network.
 %prep
 
 %setup -q -n %{name}-%{version} -a 10
-%patch2 -p1 -b .service-helper
-%patch3 -p1
+%patch 2 -p1 -b .service-helper
+%patch 3 -p1
 
 # review changes in packaged configuration files and scripts
 md5sum -c <<-EOF | (! grep -v 'OK$')

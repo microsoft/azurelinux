@@ -106,7 +106,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure %{?with_pythons}

@@ -22,7 +22,7 @@ var (
 	imageFile                   = app.Flag("image-file", "Path of the base CBL-Mariner image which the customization will be applied to.").Required().String()
 	outputImageFile             = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
 	outputImageFormat           = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw, iso.").Enum("vhd", "vhdx", "qcow2", "raw", "iso")
-	outputSplitPartitionsFormat = app.Flag("output-split-partitions-format", "Format of partition files. Supported: raw, raw-zstd").Enum("raw", "raw-zstd")
+	outputSplitPartitionsFormat = app.Flag("output-split-partitions-format", "Format of partition files. Supported: raw, raw-zst").Enum("raw", "raw-zst")
 	configFile                  = app.Flag("config-file", "Path of the image customization config file.").Required().String()
 	rpmSources                  = app.Flag("rpm-source", "Path to a RPM repo config file or a directory containing RPMs.").Strings()
 	disableBaseImageRpmRepos    = app.Flag("disable-base-image-rpm-repos", "Disable the base image's RPM repos as an RPM source").Bool()

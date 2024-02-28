@@ -36,8 +36,8 @@ the foundation for future extensibility of XHTML.
 
 %prep
 %setup -q -n xhtml1-%{date}
-%patch0 -p0
-%patch1 -p1
+%patch 0 -p0
+%patch 1 -p1
 cp -p %{SOURCE1} DTD/catalog.xml
 cp %{SOURCE2} .
 

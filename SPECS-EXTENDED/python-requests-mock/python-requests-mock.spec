@@ -27,7 +27,7 @@ Patch2:         0001-tox-add-py39-environment.patch
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -109,9 +109,9 @@ python-requests layer.
 
 %prep
 %setup -q -n requests-mock-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 # Remove bundled egg-info
 rm -rf requests_mock.egg-info

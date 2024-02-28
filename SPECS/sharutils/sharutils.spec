@@ -45,7 +45,7 @@ BuildRequires:  glibc-common
 BuildRequires:  make
 BuildRequires:  sed
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  diffutils
 %endif
 
@@ -67,11 +67,11 @@ the shar files.
 
 %prep
 %setup -q
-%patch0 -p1 -b .format
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+%patch 0 -p1 -b .format
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
 
 # convert TODO, THANKS to UTF-8
 for i in TODO THANKS; do

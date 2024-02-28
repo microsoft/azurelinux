@@ -27,7 +27,7 @@ Requires:       gcc-c++
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 sed -i -e 's/\r//g' ChangeLog
 
 %build
