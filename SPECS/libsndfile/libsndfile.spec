@@ -6,7 +6,7 @@ License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/libsndfile/libsndfile
-Source0:        https://github.com/libsndfile/libsndfile/archive/refs/tags/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libsndfile/libsndfile/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch0:         libsndfile-1.2.2-system-gsm.patch
 Patch1:         revert.patch
