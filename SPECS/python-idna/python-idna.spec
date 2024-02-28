@@ -16,11 +16,11 @@ Support for the Internationalised Domain Names in Applications (IDNA) protocol a
 
 %package -n     python3-idna
 Summary:        Internationalized Domain Names in Applications (IDNA).
+BuildRequires:  python-flit-core
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  python-flit-core
 Requires:       python3
 %if %{with_check}
 BuildRequires:  python3-pytest
