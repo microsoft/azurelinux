@@ -409,7 +409,9 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 					ldDistroName, ldDistroVersion = loadLdDistroFlags()
 				})
 			} else {
-				ldDistroName, ldDistroVersion = loadLdDistroFlags()
+				assert.NotPanics(t, func() {
+					ldDistroName, ldDistroVersion = loadLdDistroFlags()
+				})
 				assert.Equal(t, tt.distroName, ldDistroName)
 				assert.Equal(t, tt.distroVersion, fmt.Sprint(ldDistroVersion))
 			}
