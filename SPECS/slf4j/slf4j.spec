@@ -18,7 +18,7 @@
 Summary:        Simple Logging Facade for Java
 Name:           slf4j
 Version:        1.7.30
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -162,6 +162,7 @@ export MAVEN_REPO_LOCAL=$(pwd)/.m2
 ant -Dmaven2.jpp.mode=true \
     -Dmaven.test.skip=true \
     -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+    -Dant.build.javac.source=8 -Dant.build.javac.target=8 \
     package javadoc \
 
 %install
@@ -234,6 +235,9 @@ rm -rf target/site
 %{_docdir}/%{name}-%{version}/site
 
 %changelog
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
+- rebuild with msopenjdk-17
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7.30-5
 - Fixing maven provides
 
