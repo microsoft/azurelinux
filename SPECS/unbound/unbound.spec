@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
-Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
+Source0:        https://github.com/nlnetlabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
 BuildRequires:  expat-devel
 BuildRequires:  libevent-devel
