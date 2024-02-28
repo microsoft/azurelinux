@@ -135,7 +135,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			fallthrough
 
 		default:
-			res.Err = fmt.Errorf("invalid node type %v on node %v", req.Node.Type, req.Node)
+			res.Err = fmt.Errorf("invalid node type (%v) on node (%v)", req.Node.Type, req.Node)
 		}
 
 		channels.Results <- res
@@ -244,7 +244,7 @@ func parseCheckSection(logFile string) (checkFailed bool, err error) {
 	logFileObject, err := os.Open(logFile)
 	// If we can't open the log file, that's a build error.
 	if err != nil {
-		logger.Log.Errorf("Failed to open log file '%s' while checking package test results. Error: %v", logFile, err)
+		err = fmt.Errorf("failed to open log file (%s) while checking package test results:\n%w", logFile, err)
 		return
 	}
 	defer logFileObject.Close()
@@ -259,7 +259,7 @@ func parseCheckSection(logFile string) (checkFailed bool, err error) {
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
 			err = file.Copy(logFile, failedLogFile)
 			if err != nil {
-				logger.Log.Errorf("Log file copy failed. Error: %v", err)
+				err = fmt.Errorf("failed to copy log file:\n%w", err)
 				return
 			}
 			checkFailed = true
@@ -307,7 +307,7 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 		checkFailed, buildErr = parseCheckSection(logFile)
 		// If the build succeeded but tests failed, we still want to retry.
 		if buildErr == nil && checkFailed {
-			buildErr = fmt.Errorf("package test for '%s' failed", basePackageName)
+			buildErr = fmt.Errorf("package test for (%s) failed", basePackageName)
 		}
 		return
 	}, checkAttempts, retryDuration)
