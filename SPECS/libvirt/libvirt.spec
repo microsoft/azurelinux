@@ -36,7 +36,7 @@
 %define with_esx           0%{!?_without_esx:1}
 %define with_hyperv        0%{!?_without_hyperv:1}
 
-# bfjelds: to maintain previous mariner settings, explicitly disable curl
+# azl: to maintain azl2.0 settings, explicitly disable curl
 # and enable driver_esx by setting with_esx=0
 %define with_esx           0
 
@@ -48,7 +48,7 @@
 %define with_storage_zfs      0
 
 %define with_storage_iscsi_direct 0%{!?_without_storage_iscsi_direct:1}
-# bfjelds: to maintain previous mariner settings, explicitly disable iscsi
+# azl: to maintain azl2.0 settings, explicitly disable iscsi
 # by setting with_storage_iscsi_direct=0
 %define with_storage_iscsi_direct 0
 
@@ -100,7 +100,7 @@
 %if %{with_lxc}
     %define with_fuse      0%{!?_without_fuse:1}
 %endif
-# bfjelds: to maintain previous mariner settings, explicitly enable fuse
+# azl: to maintain azl2.0 settings, explicitly enable fuse
 # by setting with_fuse=1
 %define with_fuse 1
 
@@ -109,19 +109,19 @@
 %define with_sanlock 0%{!?_without_sanlock:1}
 
 # Enable libssh2 transport for new enough distros
-# bfjelds: to maintain previous mariner settings, explicitly enable libssh2
+# azl: to maintain azl2.0 settings, explicitly enable libssh2
 # by setting with_libssh2=1
 %define with_libssh2 1
 
 # Enable wireshark plugins for all distros
-# bfjelds: to maintain previous mariner settings, explicitly disnable wireshark
+# azl: to maintain azl2.0 settings, explicitly disnable wireshark
 # by setting _with_wireshark=0
 %define with_wireshark 0
 %define wireshark_plugindir %(pkg-config --variable plugindir wireshark)/epan
 
 # Enable libssh transport for all distros
 %define with_libssh 0%{!?_without_libssh:1}
-# bfjelds: to maintain previous mariner settings, explicitly disable libssh
+# azl: to maintain azl2.0 settings, explicitly disable libssh
 # by setting with_libssh=0
 %define with_libssh 0
 
@@ -138,7 +138,7 @@
 # Right now that's not the case anywhere, but things should be fine by the time
 # Fedora 40 is released.
 %if %{with_qemu}
-    # bfjelds: DO WE NEED THIS TOO???
+    # bfjelds: DO WE NEED THIS?? for Fedora, it is enabled for 0%{?fedora} || 0%{?rhel} >= 9
     # %define with_nbdkit 0%{!?_without_nbdkit:1}
 %endif
 
@@ -234,41 +234,31 @@ Requires: libvirt-libs = %{version}-%{release}
 BuildRequires: python3-docutils
 BuildRequires: meson >= 0.56.0
 BuildRequires: ninja-build
-# bfjelds: NEW
 BuildRequires: git
-# bfjelds: NEW
 BuildRequires: perl-interpreter
-# bfjelds: NEW
 BuildRequires: python3
-# bfjelds: NEW
 BuildRequires: python3-pytest
 # For xmllint
 BuildRequires: libxml2
 # For xsltproc
 BuildRequires: libxslt
 BuildRequires: gettext
-# bfjelds: NEW
 BuildRequires: systemd-rpm-macros
 # Fedora build root suckage
-# bfjelds: NEW
 BuildRequires: gawk
 %if %{with_native}
-# bfjelds: NEW
 BuildRequires: gcc
     %if %{with_libxl}
 BuildRequires: xen-devel
     %endif
-# bfjelds: NEW
 BuildRequires: glib2-devel >= 2.56
 BuildRequires: libxml2-devel
 BuildRequires: readline-devel
 BuildRequires: bash-completion >= 2.0
-# bfjelds: NEW
 BuildRequires: libtasn1-devel
 BuildRequires: gnutls-devel
 BuildRequires: libattr-devel
 # For pool-build probing for existing pools
-# bfjelds: NEW
 BuildRequires: libblkid-devel >= 2.17
 # for augparse, optionally used in testing
 BuildRequires: augeas
@@ -284,7 +274,6 @@ BuildRequires: libselinux-devel
 BuildRequires: iptables
 BuildRequires: ebtables
 # For modprobe
-# bfjelds: NEW
 BuildRequires: kmod
 BuildRequires: cyrus-sasl-devel
 BuildRequires: polkit >= 0.112
@@ -309,7 +298,6 @@ BuildRequires: iscsi-initiator-utils
 BuildRequires: libiscsi-devel
     %endif
 # For disk driver
-# bfjelds: NEW
 BuildRequires: parted-devel
 # For Multipath support
 BuildRequires: device-mapper-devel
@@ -409,11 +397,7 @@ Requires: libvirt-libs = %{version}-%{release}
 Recommends: libvirt-client = %{version}-%{release}
 # for /sbin/ip
 Requires: iproute
-%if 0%{!?mariner}
-# bfjelds: FOR NOW ... to see if things build
-# for /sbin/tc
 Requires: iproute-tc
-%endif
 Requires: polkit >= 0.112
     %if %{with_dmidecode}
 # For virConnectGetSysinfo
@@ -521,11 +505,7 @@ Requires: libvirt-daemon-common = %{version}-%{release}
 Requires: libvirt-libs = %{version}-%{release}
 # needed for device enumeration
 Requires: systemd >= 185
-%if 0%{!?mariner}
-# bfjelds: FOR NOW ... to see if things build
-# For managing persistent mediated devices
 Requires: mdevctl
-%endif
 # for modprobe of pci devices
 Requires: module-init-tools
 
@@ -714,15 +694,11 @@ Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
-%if 0%{!?mariner}
-# bfjelds: FOR NOW ... to see if things build
-# bfjelds: NEW
 Requires: swtpm-tools
-%endif
         %if %{with_numad}
 Requires: numad
         %endif
-# bfjelds: DO WE NEED THIS TOO???
+# bfjelds: DO WE NEED THIS??? passt is included for Fedora %if 0%{?fedora} || 0%{?rhel} >= 9
 # Recommends: passt
 # Recommends: passt-selinux
         %if %{with_nbdkit}
