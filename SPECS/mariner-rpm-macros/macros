@@ -5,25 +5,11 @@
 #
 #   Some standard locations
 #
-%_sysconfdir        /etc
 %_lib               lib
 %_lib64             lib64
-%_prefix            /usr
-%_exec_prefix       %{_prefix}
-%_bindir            %{_exec_prefix}/bin
-%_sbindir           %{_exec_prefix}/sbin
 %_libdir            /usr/%{_lib}
 %_lib64dir          /usr/%{_lib64}
-%_libexecdir        %{_exec_prefix}/libexec
-%_datadir           %{_prefix}/share
 %_docdir            %{_datadir}/doc
-%_includedir        %{_prefix}/include
-%_infodir           %{_datadir}/info
-%_mandir            %{_datadir}/man
-%_oldincludedir     /usr/include
-%_sharedstatedir    /var/lib
-%_var               /var
-%_localstatedir     /var
 
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
@@ -102,15 +88,8 @@
 %%install\
 %{nil}
 
-# Binary macros
-%__make %{_bindir}/make
-
 # Enable linking with module_info.ld in Mariner build environment by defining: mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld
 
-# Compilation and linking flag macros
-%build_cflags %{optflags}
-%build_cxxflags %{optflags}
-%build_fflags %{optflags} -I%{_fmoddir}
 %build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?mariner_module_ldflags:%{mariner_module_ldflags}}
 
 # Deprecated names.  For backwards compatibility only.
@@ -147,29 +126,6 @@ print(result)
 %extension_cxxflags %{__extension_strip_flags build_cxxflags}
 %extension_fflags %{__extension_strip_flags build_fflags}
 %extension_ldflags %{__extension_strip_flags build_ldflags}
-
-%configure \
-  %{set_build_flags}; \
-  %{_configure} --host=%{_host} --build=%{_build} \\\
-        --program-prefix=%{?_program_prefix} \\\
-        --disable-dependency-tracking \\\
-        --prefix=%{_prefix} \\\
-        --exec-prefix=%{_exec_prefix} \\\
-        --bindir=%{_bindir} \\\
-        --sbindir=%{_sbindir} \\\
-        --sysconfdir=%{_sysconfdir} \\\
-        --datadir=%{_datadir} \\\
-        --includedir=%{_includedir} \\\
-        --libdir=%{_libdir} \\\
-        --libexecdir=%{_libexecdir} \\\
-        --localstatedir=%{_localstatedir} \\\
-        --sharedstatedir=%{_sharedstatedir} \\\
-        --mandir=%{_mandir} \\\
-        --infodir=%{_infodir}
-
-# Use SHA256 for FILEDIGESTS
-%_source_filedigest_algorithm 8
-%_binary_filedigest_algorithm 8
 
 %_hardening_cflags      -specs=/usr/lib/rpm/mariner/default-hardened-cc1
 %_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld
@@ -241,14 +197,6 @@ end
 
 # Maximum number of CPU's to use when building, 0 for unlimited.
 %_smp_ncpus_max 0
-
-%_smp_build_ncpus %([ -z "$RPM_BUILD_NCPUS" ] \\\
-	&& RPM_BUILD_NCPUS="`/usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
-        ncpus_max=%{?_smp_ncpus_max}; \\\
-        if [ -n "$ncpus_max" ] && [ "$ncpus_max" -gt 0 ] && [ "$RPM_BUILD_NCPUS" -gt "$ncpus_max" ]; then RPM_BUILD_NCPUS="$ncpus_max"; fi; \\\
-        echo "$RPM_BUILD_NCPUS";)
-
-%_smp_mflags "-j%{_smp_build_ncpus}"
 
 # A directory for appdata metainfo.
 %_metainfodir %{_datadir}/metainfo
