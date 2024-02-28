@@ -25,11 +25,7 @@ git checkout 2.0-stable
 
 ### **VHDX and VHD images**
 
-<<<<<<< HEAD
-The following builds a bootable, VHDX or VHD Azure Linux image from precompiled RPMs in the Azure Linux package repository at https://packages.microsoft.com/azurelinux/2.0/prod/.
-=======
-The following builds a bootable, VHDX or VHD CBL-Mariner image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/azurelinux/2.0/prod/.
->>>>>>> 1b65c3e64 (AZL 3.0 - set up PMC repos)
+The following builds a bootable, VHDX or VHD CBL-Mariner image from precompiled RPMs in the Azure Linux package repository at https://packages.microsoft.com/azurelinux/3.0/prod/.
 
 No user account is provisioned by default.  To sign-in to these images, the sample meta-user-data.iso image must also be built and installed in your VM's CD drive.  The cloud-init service will detect the iso and provision a user account and password.
 

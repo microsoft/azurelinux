@@ -72,7 +72,7 @@ iconv -f latin1 -t utf-8 < README > README.utf8; cp README.utf8 README
 %changelog
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 0.6.24-1
 - Upgrade to latest upstream version
-- Promote to azurelinux-official-base repo
+- Promote to mariner-official-base repo
 - Remove patches already present in source
 - Lint spec
 - License verified

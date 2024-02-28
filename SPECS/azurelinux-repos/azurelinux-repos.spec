@@ -224,13 +224,13 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Add support for extended debuginfo repositories for Mariner 2.0
 
 * Wed Apr 13 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.0-6
-- Update required dependecies for azurelinux-repos-shared sub-package.
+- Update required dependecies for mariner-repos-shared sub-package.
 
 * Mon Feb 28 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-5
 - Moving away from using 'debuginfo' in a custom package to avoid confusion.
 
 * Mon Jan 10 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-4
-- Creating a separate "azurelinux-repos-shared" subpackage to make repo configurations
+- Creating a separate "mariner-repos-shared" subpackage to make repo configurations
   independent of each other.
 
 * Thu Dec 16 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-3
@@ -270,7 +270,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Fixing distro name.
 
 * Fri Jul 17 2020 Andrew Phelps <anphel@microsoft.com> 1.0-6
-- Set sslverify=1 in [azurelinux-official-base] and [azurelinux-official-update]
+- Set sslverify=1 in [mariner-official-base] and [mariner-official-update]
 
 * Wed Nov 27 2019 Pawel Winogrodzki <pawelwi@microsoft.com> 1.0-5
 - Removing outdated repository configuration
@@ -282,7 +282,7 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - Separate repo configs for official-base and official-update
 
 * Wed Oct 23 2019 Andrew Phelps <anphel@microsoft.com> 1.0-2
-- Add azurelinux-official.repo
+- Add mariner-official.repo
 
 * Wed Sep 04 2019 Mateusz Malisz <mamalisz@microsoft.com> 1.0-1
 - Original version for CBL-Mariner.

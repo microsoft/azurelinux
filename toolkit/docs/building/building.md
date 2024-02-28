@@ -83,11 +83,7 @@
 
 ## Overview
 
-<<<<<<< HEAD
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/2.0/prod/)
-=======
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/2.0/prod/)
->>>>>>> 1b65c3e64 (AZL 3.0 - set up PMC repos)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
 If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
@@ -305,11 +301,7 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ### packages.microsoft.com Repository Structure
 
-<<<<<<< HEAD
-Azure Linux packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
-=======
-CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
->>>>>>> 1b65c3e64 (AZL 3.0 - set up PMC repos)
+CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (e.g.: 3.0). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
 

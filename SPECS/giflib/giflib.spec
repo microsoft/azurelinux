@@ -60,7 +60,7 @@ find %{buildroot} -name '*.a' -print -delete
 
 %changelog
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-6
-- Promote to azurelinux-official-base repo
+- Promote to mariner-official-base repo
 - Lint spec
 - License verified
 
