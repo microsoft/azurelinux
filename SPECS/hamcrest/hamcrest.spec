@@ -35,7 +35,6 @@ BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven
-BuildRequires:  junit
 Provides:       mvn(org.hamcrest:hamcrest-core)  = %{version}-%{release}
 
 %description
