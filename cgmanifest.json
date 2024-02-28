@@ -23123,8 +23123,8 @@
         "type": "other",
         "other": {
           "name": "python-netaddr",
-          "version": "0.8.0",
-          "downloadUrl": "https://github.com/netaddr/netaddr/archive/refs/tags/0.8.0.tar.gz"
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/netaddr/netaddr/archive/refs/tags/1.2.1.tar.gz"
         }
       }
     },
