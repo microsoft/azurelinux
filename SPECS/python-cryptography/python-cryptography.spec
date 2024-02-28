@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
 Patch0:         CVE-2023-23931.patch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

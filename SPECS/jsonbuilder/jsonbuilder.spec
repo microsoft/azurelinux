@@ -1,14 +1,17 @@
 Summary:        Modern C++ library for an efficient container for building JSON objects
 Name:           jsonbuilder
 Version:        0.2.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/microsoft/jsonbuilder
-#Source0:       https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Version 0.2.1 of 'jsonbuilder' is not compatible with the 3+ versions of 'catch'.
+# Patch required until upstream switches a newer version of 'catch'.
+# Related upstream issue: https://github.com/microsoft/jsonbuilder/issues/29.
+Patch:          catch-ver3.patch
 BuildRequires:  catch-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -28,7 +31,7 @@ Requires:       jsonbuilder = %{version}-%{release}
 This package contains the headers and symlinks for using jsonbuilder from libraries and applications.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 mkdir build && cd build
@@ -57,6 +60,9 @@ make test -C build
 %{_includedir}/jsonbuilder
 
 %changelog
+* Tue Feb 20 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.2.1-3
+- Adding a patch to fix the build with 3+ versions of 'catch'.
+
 * Wed Oct 07 2020 Thomas Crain <thcrain@microsoft.com> - 0.2.1-2
 - Updated #Source0 URL
 - Verified License field and %%license macro

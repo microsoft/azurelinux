@@ -38,7 +38,7 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-toolz >= 0.9.0
 Requires:       python%{python3_pkgversion}-toolz >= 0.9.0
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  build-essential
 BuildRequires:  python3-pip
 %endif

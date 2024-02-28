@@ -2,7 +2,6 @@
 
 Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in (configuration.go)[../../tools/imagegen/configuration/configuration.go] and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
 
-
 ## Disks
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
@@ -10,7 +9,7 @@ Disks entry specifies the disk configuration like its size (for virtual disks), 
 Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
-Artifact (non-ISO image building only) defines the name, type and optional compression of the output CBL-Mariner image.
+Artifact (non-ISO image building only) defines the name, type and optional compression of the output Azure Linux image.
 
 Sample Artifacts entry, creating a raw rootfs, compressed to .tar.gz format(note that this format does not support partitions, so there would be no "Partitions" entry):
 
@@ -174,7 +173,7 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### EnableGrubMkconfig
-EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`.
+EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `true`.
 
 ### PackageLists
 
@@ -367,7 +366,7 @@ Since users are controlled by files in `/etc`, these files are read-only when th
 Since the root partition's hash tree is stored as part of the initramfs, the initramfs cannot be stored on the same root partition (it would invalidate the measurements). To avoid this a separate `/boot` partition is needed to house the hash tree (via the initramfs).
 
 ##### ISO
-The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"CBL-Mariner Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
+The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"Azure Linux Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
 
 The GUI installer does not currently support read-only roots.
 - `Enable`: Enable dm-verity on the root filesystem

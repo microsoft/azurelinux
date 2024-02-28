@@ -24,9 +24,9 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		provides, err = rpm.QueryRPMProvides(rpmFile)
 		if err != nil {
 			if res.Ignored {
-				err = fmt.Errorf("failed to query (%s) for provides. NOTE: source spec '%s' was marked to be ignored - please check if the queried RPM is present. Error: %s", rpmFile, res.Node.SpecName(), err)
+				err = fmt.Errorf("failed to query (%s) for provides. NOTE: source spec (%s) was marked to be ignored - please check if the queried RPM is present:\n%w", rpmFile, res.Node.SpecName(), err)
 			} else {
-				err = fmt.Errorf("failed to query (%s) for provides. Error: %s", rpmFile, err)
+				err = fmt.Errorf("failed to query (%s) for provides:\n%w", rpmFile, err)
 			}
 			return
 		}
@@ -70,7 +70,7 @@ func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, pro
 
 	// If there is no clear parent node for the implicit provide error out.
 	if parentNode == nil {
-		return fmt.Errorf("unable to find suitable parent node for implicit provides (%s) with file (%s)", provides, rpmFileProviding)
+		return fmt.Errorf("failed to find suitable parent node for implicit provides (%s) with file (%s)", provides, rpmFileProviding)
 	}
 
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.

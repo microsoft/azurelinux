@@ -36,7 +36,7 @@ BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-atomicwrites
 %endif

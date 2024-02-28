@@ -67,8 +67,8 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 
 	file, err := os.Open(path)
 	if err != nil {
-		logger.Log.Errorf("Failed to open file manifest %s with error %s", path, err)
-		return nil, err
+		reservedFiles, err = nil, fmt.Errorf("failed to open file manifest (%s):\n%w", path, err)
+		return
 	}
 	defer file.Close()
 
@@ -80,8 +80,8 @@ func ReadReservedFilesList(path string) (reservedFiles []string, err error) {
 
 	err = scanner.Err()
 	if err != nil {
-		logger.Log.Errorf("Failed to scan file manifest %s with error %s", path, err)
-		return nil, err
+		reservedFiles, err = nil, fmt.Errorf("failed to scan file manifest (%s):\n%w", path, err)
+		return
 	}
 
 	return reservedFiles, nil
@@ -112,13 +112,13 @@ func calculatePackagesToBuild(packagesNamesToBuild, packagesNamesToRebuild []*pk
 
 	packageVersFromConfig, err := extractPackagesFromConfig(imageConfig, baseDirPath)
 	if err != nil {
-		err = fmt.Errorf("failed to extract packages from the image config, error:\n%w", err)
+		err = fmt.Errorf("failed to extract packages from the image config:\n%w", err)
 		return
 	}
 
 	packageVersFromConfig, err = filterLocalPackagesOnly(packageVersFromConfig, dependencyGraph, nodeGetter)
 	if err != nil {
-		err = fmt.Errorf("failed to filter local packages from the image config, error:\n%w", err)
+		err = fmt.Errorf("failed to filter local packages from the image config:\n%w", err)
 		return
 	}
 
@@ -137,7 +137,7 @@ func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*p
 
 	cfg, err := configuration.LoadWithAbsolutePaths(configFile, baseDirPath)
 	if err != nil {
-		logger.Log.Errorf("Failed to load config file (%s) with base directory (%s) for package list generation", configFile, baseDirPath)
+		err = fmt.Errorf("failed to load config file (%s) with base directory (%s) for package list generation:\n%w", configFile, baseDirPath, err)
 		return
 	}
 
@@ -200,17 +200,17 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
-				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
+				err = fmt.Errorf("failed while searching the dependency graph for package (%s):\n%w", packageOrSpecName, err)
 				return nil, err
 			}
 			if foundNode == nil {
-				err = fmt.Errorf("couldn't find package '%s' in the dependency graph", packageOrSpecName)
+				err = fmt.Errorf("failed to find package (%s) in the dependency graph", packageOrSpecName)
 				return nil, err
 			}
 
 			expectedNode := nodeGetter(foundNode)
 			if expectedNode == nil {
-				err = fmt.Errorf("found package '%s' but it doesn't have a package of the expected type", packageOrSpecName)
+				err = fmt.Errorf("found package (%s) but it doesn't have a package of the expected type", packageOrSpecName)
 				return nil, err
 			}
 
@@ -234,19 +234,19 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, rebuiltList, ignoreList []string, imageConfig, baseDirPath string, analyzedNodes []*pkggraph.PkgNode, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
 	packagesToBuild, err := packageNamesToPackages(buildList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
-		err = fmt.Errorf("unable to find nodes for the packages from the build list, error:\n%s", err)
+		err = fmt.Errorf("failed to find nodes for the packages from the build list:\n%w", err)
 		return
 	}
 
 	packagesToRebuild, err = packageNamesToPackages(rebuiltList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
-		err = fmt.Errorf("unable to find nodes for the packages from the re-built list, error:\n%s", err)
+		err = fmt.Errorf("failed to find nodes for the packages from the re-built list:\n%w", err)
 		return
 	}
 
 	prunedIgnoredPackageNames, unknownNames, err := pruneUnknownPackages(ignoreList, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
-		err = fmt.Errorf("failed to prune unknown package/spec names from the ignored list, error:\n%s", err)
+		err = fmt.Errorf("failed to prune unknown package/spec names from the ignored list:\n%w", err)
 		return
 	}
 
@@ -256,19 +256,19 @@ func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, 
 
 	packagesToIgnore, err = packageNamesToPackages(prunedIgnoredPackageNames, analyzedNodes, nodeGetter, dependencyGraph)
 	if err != nil {
-		err = fmt.Errorf("unable to find nodes for the packages from the ignore list, error:\n%s", err)
+		err = fmt.Errorf("failed to find nodes for the packages from the ignore list:\n%w", err)
 		return
 	}
 
 	ignoredAndRebuiltPackages := intersect.Hash(packagesToIgnore, packagesToRebuild)
 	if len(ignoredAndRebuiltPackages) != 0 {
-		err = fmt.Errorf("can't ignore and force a re-build of a package at the same time. Abusing packages: %v", ignoredAndRebuiltPackages)
+		err = fmt.Errorf("can't ignore and force a re-build of a package at the same time. Abusing packages: (%v)", ignoredAndRebuiltPackages)
 		return
 	}
 
 	finalPackagesToBuild, err = calculatePackagesToBuild(packagesToBuild, packagesToRebuild, imageConfig, baseDirPath, dependencyGraph, nodeGetter)
 	if err != nil {
-		err = fmt.Errorf("unable to generate the final package build list, error:\n%s", err)
+		err = fmt.Errorf("failed to generate final package build list:\n%w", err)
 		return
 	}
 	return
@@ -292,7 +292,7 @@ func pruneUnknownPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph
 			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
-				err = fmt.Errorf("failed while searching the dependency graph for package '%s', error:\n%w", packageOrSpecName, err)
+				err = fmt.Errorf("failed while searching the dependency graph for package (%s):\n%w", packageOrSpecName, err)
 				return nil, nil, err
 			}
 

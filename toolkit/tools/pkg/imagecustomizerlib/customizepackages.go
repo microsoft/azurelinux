@@ -5,10 +5,10 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"path"
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
@@ -83,7 +83,7 @@ func collectPackagesList(baseConfigPath string, packageLists []string, packages 
 	// Read in the packages from the package list files.
 	var allPackages []string
 	for _, packageListRelativePath := range packageLists {
-		packageListFilePath := path.Join(baseConfigPath, packageListRelativePath)
+		packageListFilePath := file.GetAbsPathWithBase(baseConfigPath, packageListRelativePath)
 
 		var packageList imagecustomizerapi.PackageList
 		err = imagecustomizerapi.UnmarshalYamlFile(packageListFilePath, &packageList)

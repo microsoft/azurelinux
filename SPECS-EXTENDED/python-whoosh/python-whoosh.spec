@@ -14,7 +14,7 @@ Source0:        https://github.com/mchaput/whoosh/archive/refs/tags/v%{version}.
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

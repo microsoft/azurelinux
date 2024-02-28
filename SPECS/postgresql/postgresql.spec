@@ -21,7 +21,7 @@ BuildRequires:  readline-devel
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  sudo
 %endif
 
