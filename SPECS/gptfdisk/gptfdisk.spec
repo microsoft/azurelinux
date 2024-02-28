@@ -1,6 +1,6 @@
 Summary:        gptfdisk
 Name:           gptfdisk
-Version:        1.0.8
+Version:        1.0.10
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ install -m644 *.8 %{buildroot}%{_mandir}/man8
 %{_mandir}/man8/*
 
 %changelog
+* Wed Feb 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.10-1
+- Auto-upgrade to 1.0.10 - none
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.8-2
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 

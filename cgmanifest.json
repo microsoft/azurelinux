@@ -4800,8 +4800,8 @@
         "type": "other",
         "other": {
           "name": "gptfdisk",
-          "version": "1.0.8",
-          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.8/gptfdisk-1.0.8.tar.gz"
+          "version": "1.0.10",
+          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.10/gptfdisk-1.0.10.tar.gz"
         }
       }
     },
