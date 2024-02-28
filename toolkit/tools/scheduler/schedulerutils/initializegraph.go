@@ -60,7 +60,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToR
 		logger.Log.Warn("Could not create solvable subgraph, forcing full package build")
 		goalNode = pkgGraph.FindGoalNode(allGoalNodeName)
 		if goalNode == nil {
-			err = fmt.Errorf("could not find goal node %s", allGoalNodeName)
+			err = fmt.Errorf("failed to find goal node (%s)", allGoalNodeName)
 			return
 		}
 		preparedGraph = pkgGraph
@@ -73,8 +73,7 @@ func PrepareGraphForBuild(pkgGraph *pkggraph.PkgGraph, packagesToBuild, testsToR
 func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (optimizedGraph *pkggraph.PkgGraph, goalNode *pkggraph.PkgNode, err error) {
 	buildGoalNode := pkgGraph.FindGoalNode(buildGoalNodeName)
 	if buildGoalNode == nil {
-		err = fmt.Errorf("could not find goal node %s", buildGoalNodeName)
-		logger.Log.Warnf("%s", err)
+		err = fmt.Errorf("failed to find goal node (%s)", buildGoalNodeName)
 		return
 	}
 
@@ -92,7 +91,7 @@ func OptimizeGraph(pkgGraph *pkggraph.PkgGraph, canUseCachedImplicit bool) (opti
 			return
 		}
 	} else {
-		err = fmt.Errorf("could not create solvable subgraph")
+		err = fmt.Errorf("failed to create solvable subgraph")
 	}
 
 	return

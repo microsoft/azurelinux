@@ -33,7 +33,7 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(App::cpanminus)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)

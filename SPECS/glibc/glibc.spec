@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -206,7 +206,6 @@ pushd localedata
 # Generate out of locale-archive an (en_US.) UTF-8 locale
 mkdir -p %{buildroot}%{_libdir}/locale
 I18NPATH=. GCONV_PATH=../../glibc-build/iconvdata LC_ALL=C ../../glibc-build/locale/localedef --no-archive --prefix=%{buildroot} -A ../intl/locale.alias -i locales/en_US -c -f charmaps/UTF-8 en_US.UTF-8
-mv %{buildroot}%{_libdir}/locale/en_US.utf8 %{buildroot}%{_libdir}/locale/en_US.UTF-8
 popd
 # to do not depend on /bin/bash
 sed -i 's@#! /bin/bash@#! /bin/sh@' %{buildroot}%{_bindir}/ldd
@@ -323,6 +322,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Tue Feb 27 2024 Dan Streetman <ddstreet@ieee.org> - 2.38-2
+- Do NOT rename en_US.utf8 to en_US.UTF-8 (glibc will reduce UTF-8 to utf8, but NOT utf8 to UTF-8)
+
 * Thu Nov 02 2023 Andrew Phelps <anphel@microsoft.com> - 2.38-1
 - Upgrade to version 2.38
 

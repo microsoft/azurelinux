@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/zopefoundation/zope.interface
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

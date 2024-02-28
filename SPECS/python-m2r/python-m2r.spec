@@ -12,7 +12,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-docutils
 BuildRequires:  python3-mistune
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-pygments

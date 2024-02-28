@@ -22,7 +22,7 @@ BuildRequires:  python%{python3_pkgversion}-coverage >= 4.4
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

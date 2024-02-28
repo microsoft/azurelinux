@@ -44,7 +44,7 @@ Provides:       %{name}-docs = %{version}-%{release}
 Provides:       python%{majmin} = %{version}-%{release}
 Provides:       python%{majmin_nodots} = %{version}-%{release}
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  iana-etc
 BuildRequires:  tzdata
 %endif

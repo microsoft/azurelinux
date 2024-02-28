@@ -31,7 +31,7 @@ BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
 BuildRequires:  lua
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 Requires:       coreutils

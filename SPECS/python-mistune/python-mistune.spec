@@ -9,7 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/mistune/
 Source0:        https://files.pythonhosted.org/packages/source/m/mistune/mistune-%{version}.tar.gz
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

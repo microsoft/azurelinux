@@ -1,10 +1,10 @@
 %global major_version 5.4
 # Normally, this is the same as version, but... not always.
-%global test_version 5.4.4
+%global test_version 5.4.6
 # If you are incrementing major_version, enable bootstrapping and adjust accordingly.
 # Version should be the latest prior build. If you don't do this, RPM will break and
 # everything will grind to a halt.
-%global bootstrap 1
+%global bootstrap 0
 %global bootstrap_major_version 5.3
 %global bootstrap_version %{bootstrap_major_version}.5
 
@@ -13,8 +13,8 @@
 
 Summary:        Powerful light-weight programming language
 Name:           lua
-Version:        %{major_version}.4
-Release:        2%{?dist}
+Version:        %{major_version}.6
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 # multilib
 Source4:        luaconf.h
 Patch0:         %{name}-5.4.0-beta-autotoolize.patch
-Patch1:         %{name}-5.3.0-idsize.patch
+Patch1:         %{name}-5.4.6-idsize.patch
 #Patch2:        %%{name}-5.3.0-luac-shared-link-fix.patch
 Patch3:         %{name}-5.2.2-configure-linux.patch
 Patch4:         %{name}-5.3.0-configure-compat-module.patch
@@ -40,8 +40,6 @@ Patch6:         %{name}-5.3.5-luac-shared-link-fix.patch
 %endif
 # https://www.lua.org/bugs.html
 Patch18:        %{name}-5.3.5-CVE-2020-24370.patch
-Patch21:        CVE-2022-28805.patch
-Patch23:        CVE-2022-33099.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -100,8 +98,6 @@ mv src/luaconf.h src/luaconf.h.template.in
 %patch -P 4 -p1 -z .configure-compat-all
 # Put proper version in configure.ac, patch0 hardcodes 5.3.0
 sed -i 's|5.3.0|%{version}|g' configure.ac
-%patch -P 21 -p1
-%patch -P 23 -p1
 autoreconf -ifv
 
 %if 0%{?bootstrap}
@@ -216,6 +212,10 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Tue Feb 27 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.6-1
+- Upgrade to version 5.4.6
+- Disable bootstrap
+
 * Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.4.4-2
 - Updated patch application macros.
 
@@ -437,7 +437,7 @@ popd
 - Fix libdir in lua.pc being /usr/lib on x86_64 (bz 399101)
 
 * Sun Oct 21 2007 Hans de Goede <j.w.r.degoede@hhs.nl> 5.1.2-3
-- Also use lib64 instead of lib on ia64 and sparc64 
+- Also use lib64 instead of lib on ia64 and sparc64
 
 * Sun Oct 21 2007 Hans de Goede <j.w.r.degoede@hhs.nl> 5.1.2-2
 - Fix multilib condlict in luaconf.h (bz 342561)

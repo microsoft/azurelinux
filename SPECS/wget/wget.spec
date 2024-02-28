@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 %endif
 Requires:       openssl
