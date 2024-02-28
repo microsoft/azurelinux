@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        16.20.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -18,6 +18,7 @@ Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2022-25883.patch
 Patch2:         CVE-2023-35945.patch
+Patch3:         CVE-2023-42282.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -115,6 +116,10 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Mon Feb 26 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 16.20.2-3
+- Patch CVE-2023-42282
+- Unit test code is not applicable for this NodeJS version sources
+
 * Wed Sep 06 2023 Brian Fjeldstad <bfjelds@microsoft.com> - 16.20.2-2
 - Patch CVE-2023-35945
 
