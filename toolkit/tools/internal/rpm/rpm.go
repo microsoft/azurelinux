@@ -98,12 +98,12 @@ var (
 )
 
 // checkDistroMacros validates the distro macro values.
-func checkDistroMacros(nameAbreviation string, majorVersion int) (string, int, error) {
-	if majorVersion < 0 || nameAbreviation == "" {
+func checkDistroMacros(nameAbreviation string, majorVersion int) error {
+	if majorVersion < 1 || nameAbreviation == "" {
 		err := fmt.Errorf("failed to set distro defines (%s, %d), invalid name or version", nameAbreviation, majorVersion)
-		return "", 0, err
+		return err
 	}
-	return nameAbreviation, majorVersion, nil
+	return nil
 }
 
 // loadDistroFlags will load the values of exe.DistroNameAbbreviation and exe.DistroMajorVersion into the local copies
@@ -115,22 +115,12 @@ func loadLdDistroFlags() (string, int) {
 		panic(err)
 	}
 
-	name, ver, err := checkDistroMacros(exe.DistroNameAbbreviation, version)
+	err = checkDistroMacros(exe.DistroNameAbbreviation, version)
 	if err != nil {
 		err = fmt.Errorf("failed to load distro defines from exe package:\n%w", err)
 		panic(err)
 	}
-	return name, ver
-}
-
-// SetDistroMacros overrides the default distro macro defines from the exe package if needed.
-func SetDistroMacros(nameAbreviation string, majorVersion int) error {
-	var err error
-	distNameAbreviation, distMajorVersion, err = checkDistroMacros(nameAbreviation, majorVersion)
-	if err != nil {
-		err = fmt.Errorf("failed to set distro macros:\n%w", err)
-	}
-	return err
+	return exe.DistroNameAbbreviation, version
 }
 
 // GetRpmArch converts the GOARCH arch into an RPM arch

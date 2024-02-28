@@ -21,6 +21,11 @@ const (
 	definesDistKey      = "dist"
 	definesWithCheckKey = "with_check"
 	specsDir            = "testdata"
+
+	// Distro macro intpus
+	distName    = "myDistro"
+	distVersion = 1234
+	distTag     = ".myDistro1234"
 )
 
 var buildArch = goArchToRpmArch[runtime.GOARCH]
@@ -202,48 +207,137 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 	}
 }
 
+func configureTestDistroMacros(nameAbreviation string, majorVersion int) error {
+	err := checkDistroMacros(nameAbreviation, majorVersion)
+	if err != nil {
+		err = fmt.Errorf("failed to set distro macros:\n%w", err)
+		return err
+	}
+	distNameAbreviation, distMajorVersion = nameAbreviation, majorVersion
+	return nil
+}
+
 func TestDistroDefines(t *testing.T) {
-	distName := "myDistro"
-	distVersion := 1234
-	distTag := fmt.Sprintf(".%s%d", distName, distVersion)
+	tests := []struct {
+		name          string
+		distroTag     string
+		distroName    string
+		distroVersion int
+		check         bool
+		expected      map[string]string
+		errorExpected bool
+	}{
+		{
+			name:          "valid distro name and version w/ check",
+			distroTag:     distTag,
+			distroName:    distName,
+			distroVersion: distVersion,
+			check:         true,
+			expected: map[string]string{
+				"dist":       distTag,
+				distName:     fmt.Sprint(distVersion),
+				"with_check": "1",
+			},
+			errorExpected: false,
+		},
+		{
+			name:          "valid distro name and version w/o check",
+			distroTag:     distTag,
+			distroName:    distName,
+			distroVersion: distVersion,
+			check:         false,
+			expected: map[string]string{
+				"dist":       distTag,
+				distName:     fmt.Sprint(distVersion),
+				"with_check": "0",
+			},
+			errorExpected: false,
+		},
+		{
+			name:          "empty distro tag",
+			distroTag:     "",
+			distroName:    distName,
+			distroVersion: distVersion,
+			check:         true,
+			expected: map[string]string{
+				"dist":       "",
+				distName:     fmt.Sprint(distVersion),
+				"with_check": "1",
+			},
+			errorExpected: false,
+		},
+		{
+			name:          "empty distro name",
+			distroTag:     distTag,
+			distroName:    "",
+			distroVersion: distVersion,
+			check:         true,
+			expected:      nil,
+			errorExpected: true,
+		},
+		{
+			name:       "empty distro version",
+			distroTag:  distTag,
+			distroName: distName,
+			// distroVersion is unset
+			check:         true,
+			expected:      nil,
+			errorExpected: true,
+		},
+		{
+			name:          "negative distro version",
+			distroTag:     distTag,
+			distroName:    distName,
+			distroVersion: -1,
+			check:         true,
+			expected:      nil,
+			errorExpected: true,
+		},
+		{
+			name:          "zero distro version",
+			distroTag:     distTag,
+			distroName:    distName,
+			distroVersion: 0,
+			check:         true,
+			expected:      nil,
+			errorExpected: true,
+		},
+		{
+			name:          "one distro version",
+			distroTag:     distTag,
+			distroName:    distName,
+			distroVersion: 1,
+			check:         true,
+			expected: map[string]string{
+				"dist":       distTag,
+				distName:     "1",
+				"with_check": "1",
+			},
+			errorExpected: false,
+		},
+	}
 
-	// Save the original values and restore them after the test
-	originalDistroName := distNameAbreviation
-	originalDistroVersion := distMajorVersion
-	t.Cleanup(func() {
-		distNameAbreviation = originalDistroName
-		distMajorVersion = originalDistroVersion
-	})
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Save the original values and restore them after the test
+			originalDistroName := distNameAbreviation
+			originalDistroVersion := distMajorVersion
+			t.Cleanup(func() {
+				distNameAbreviation = originalDistroName
+				distMajorVersion = originalDistroVersion
+			})
 
-	err := SetDistroMacros(distName, distVersion)
-	assert.NoError(t, err)
-	defines := DefaultDistroDefines(true, distTag)
-
-	// Check for with_check and dist tag
-	assert.Equal(t, "1", defines[definesWithCheckKey])
-	assert.Equal(t, distTag, defines[DistTagDefine])
-	defines = DefaultDistroDefines(false, distTag)
-	assert.Equal(t, "0", defines[definesWithCheckKey])
-
-	// Check for distro name and version
-	assert.Equal(t, distTag, defines["dist"])
-	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
-
-	// Check that an empty distro tag is ok
-	defines = DefaultDistroDefines(false, "")
-	assert.Equal(t, "", defines["dist"])
-	assert.Equal(t, fmt.Sprint(distVersion), defines[distName])
-
-	// Handle errors when distro name and version are not set
-	err = SetDistroMacros("", distVersion)
-	assert.Error(t, err)
-
-	err = SetDistroMacros("", distVersion)
-	assert.Error(t, err)
-
-	// Handle errors when version is negative
-	err = SetDistroMacros(distName, -1)
-	assert.Error(t, err)
+			err := configureTestDistroMacros(tt.distroName, tt.distroVersion)
+			if tt.errorExpected {
+				assert.Error(t, err)
+				return
+			} else {
+				assert.NoError(t, err)
+			}
+			defines := DefaultDistroDefines(tt.check, tt.distroTag)
+			assert.Equal(t, tt.expected, defines)
+		})
+	}
 }
 
 func TestDefaultDefines(t *testing.T) {
@@ -253,4 +347,72 @@ func TestDefaultDefines(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedName, distNameAbreviation)
 	assert.Equal(t, expectedVersion, distMajorVersion)
+}
+
+func TestDistroMacrosLdLoad(t *testing.T) {
+	tests := []struct {
+		name          string
+		distroName    string
+		distroVersion string
+		panicExpected bool
+	}{
+		{
+			name:          "valid distro name and version",
+			distroName:    distName,
+			distroVersion: fmt.Sprint(distVersion),
+			panicExpected: false,
+		},
+		{
+			name:          "empty distro name",
+			distroName:    "",
+			distroVersion: fmt.Sprint(distVersion),
+			panicExpected: true,
+		},
+		{
+			name:          "empty distro version",
+			distroName:    distName,
+			distroVersion: "",
+			panicExpected: true,
+		},
+		{
+			name:          "negative distro version",
+			distroName:    distName,
+			distroVersion: "-1",
+			panicExpected: true,
+		},
+		{
+			name:          "garbage distro version",
+			distroName:    distName,
+			distroVersion: "garbage",
+			panicExpected: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Save the original values and restore them after the test
+			originalDistroName := exe.DistroNameAbbreviation
+			originalDistroVersion := exe.DistroMajorVersion
+			t.Cleanup(func() {
+				exe.DistroNameAbbreviation = originalDistroName
+				exe.DistroMajorVersion = originalDistroVersion
+			})
+
+			exe.DistroMajorVersion = tt.distroVersion
+			exe.DistroNameAbbreviation = tt.distroName
+			var (
+				ldDistroName    string
+				ldDistroVersion int
+			)
+			if tt.panicExpected {
+				assert.Panics(t, func() {
+					ldDistroName, ldDistroVersion = loadLdDistroFlags()
+				})
+			} else {
+				ldDistroName, ldDistroVersion = loadLdDistroFlags()
+				assert.Equal(t, tt.distroName, ldDistroName)
+				assert.Equal(t, tt.distroVersion, fmt.Sprint(ldDistroVersion))
+			}
+		})
+	}
 }
