@@ -70,10 +70,6 @@ Distribution:   Azure Linux
 %if 0%{?azl}
 %global user_static 0
 %endif
-%if 0%{?rhel}
-# EPEL/RHEL do not have required -static builddeps
-%global user_static 0
-%endif
 
 %global have_kvm 0
 %if 0%{?kvm_package:1}
@@ -84,39 +80,26 @@ Distribution:   Azure Linux
 %global have_numactl 1
 
 %global have_spice 1
-%if 0%{?azl}
-%global have_spice 0
-%endif
 # Matches spice ExclusiveArch
 %ifnarch %{ix86} x86_64 %{arm} aarch64
 %global have_spice 0
 %endif
-%if 0%{?rhel} >= 9
+%if 0%{?azl}
 %global have_spice 0
 %endif
 
 # Matches xen ExclusiveArch
 %global have_xen 0
-%if 0%{?fedora}
-%ifarch x86_64 aarch64
-%global have_xen 1
-%endif
-%endif
 
 %global have_liburing 0
 %if 0%{?azl}
 %global have_liburing 1
 %endif
-%if 0%{?fedora}
-%ifnarch %{arm}
-%global have_liburing 1
-%endif
-%endif
 
-# 2.0 has this set
-%global have_virgl 0
-%if 0%{?fedora}
 %global have_virgl 1
+# 2.0 has this set, disabled till dep is available in 3.0
+%if 0%{?azl}
+%global have_virgl 0
 %endif
 
 %global have_pmem 0
@@ -128,23 +111,13 @@ Distribution:   Azure Linux
 %if 0%{?azl}
 %global have_jack 0
 %endif
-%if 0%{?rhel}
-%global have_jack 0
-%endif
 
 %global have_dbus_display 1
 %if 0%{?azl}
 %global have_dbus_display 0
 %endif
-%if %{defined rhel} && 0%{?rhel} < 9
-# RHEL/Centos 8 glib is not new enough
-%global have_dbus_display 0
-%endif
 
 %global have_libblkio 0
-%if 0%{?fedora} >= 37
-%global have_libblkio 1
-%endif
 
 %global have_gvnc_devel %{defined fedora}
 %if 0%{?azl}
@@ -187,9 +160,6 @@ Distribution:   Azure Linux
 %if 0%{?azl}
 %global have_block_gluster 0
 %endif
-%if 0%{?rhel} >= 9
-%global have_block_gluster 0
-%endif
 
 %define have_block_nfs 0
 %if 0%{?azl}
@@ -202,19 +172,12 @@ Distribution:   Azure Linux
 %define have_librdma 1
 
 %define have_libcacard 1
+# enable when dependency available in 3.0
 %if 0%{?azl}
-%define have_libcacard 0
-%endif
-%if 0%{?rhel} >= 9
 %define have_libcacard 0
 %endif
 
 %define have_rutabaga_gfx 0
-%if 0%{?fedora} >= 40
-%ifarch x86_64 aarch64
-%define have_rutabaga_gfx 1
-%endif
-%endif
 
 %global have_ui 1
 %if 0%{?azl_no_ui}
@@ -330,7 +293,7 @@ Distribution:   Azure Linux
 %endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %ifnarch %{ix86}
-%if 0%{?fedora} || 0%{?rhel} > 9 || 0%{azl}
+%if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
 %else
 %define requires_package_virtiofsd Requires: virtiofsd
@@ -697,11 +660,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %if %{user_static}
 BuildRequires: glibc-static >= 2.38-1
 BuildRequires: glib2-static zlib-static
-%if 0%{?fedora} >= 37
-BuildRequires: pcre2-static
-%else
 BuildRequires: pcre-static
-%endif
 %endif
 
 # Requires for the Fedora 'qemu' metapackage
