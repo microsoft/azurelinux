@@ -5080,8 +5080,8 @@
         "type": "other",
         "other": {
           "name": "hamcrest",
-          "version": "1.3",
-          "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-1.3.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/v2.2.tar.gz"
         }
       }
     },
