@@ -1,7 +1,7 @@
 Summary:        Metapackage to install all build tools
 Name:           build-essential
 Version:        3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Requires:       autoconf
 Requires:       automake
@@ -13,7 +13,7 @@ Requires:       gawk
 Requires:       gcc
 Requires:       glibc-devel
 Requires:       gzip
-Requires:       installkernel
+Requires:       systemd-udev
 Requires:       kernel-headers
 Requires:       libtool
 Requires:       make
@@ -32,6 +32,9 @@ Metapackage to install all build tools
 %defattr(-,root,root,0755)
 
 %changelog
+* Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
+- Use installkernel provided by systemd-udev
+
 * Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 3.0-1
 - Bump version to 3.0
 - Add file, gzip, pkgconf & tar
