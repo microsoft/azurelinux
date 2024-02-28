@@ -38,10 +38,6 @@ A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
-# jaraco.itertools and func_timeout are not available in Fedora yet
-sed -i "/import jaraco.itertools/d" test_zipp.py
-# this sed removes two lines - one import and one decorator
-sed -i "/func_timeout/d" test_zipp.py
 
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -54,10 +50,10 @@ sed -i "/func_timeout/d" test_zipp.py
 %pyproject_save_files %{pypi_name}
 
 %check
-pip3 install more-itertools
+pip3 install more-itertools iniconfig jaraco.itertools jaraco.functools
 rm -rf .pyproject-builddir
-# Skipped test needs jaraco.itertools
-%pytest -k "not test_joinpath_constant_time"
+
+%pytest
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
