@@ -22753,8 +22753,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonpatch",
-          "version": "1.32",
-          "downloadUrl": "https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v1.32.tar.gz"
+          "version": "1.33",
+          "downloadUrl": "https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v1.33.tar.gz"
         }
       }
     },
