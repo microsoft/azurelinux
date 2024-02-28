@@ -1,8 +1,4 @@
 #
-#   System settings
-#
-%_topdir            /usr/src/mariner
-#
 # This definition of %%_lib is NOT standard and overrides the standard
 # definition from the rpm platform macros file. However, we have
 # various parts of our distro that hardcode /usr/lib in various ways,
