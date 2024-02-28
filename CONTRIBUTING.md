@@ -65,7 +65,7 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 ## Develop for Azure Linux
 
-When starting to develop for Azure Linux, use the [Azure LinuxTutorials](https://github.com/microsoft/Azure LinuxTutorials) repo. This repository guides developers on using Azure Linux's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [Azure Linux](https://github.com/microsoft/azurelinux). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within Azure Linux. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
+When starting to develop for Azure Linux, use the [Azure LinuxTutorials](https://github.com/microsoft/AzureLinux-Tutorials) repo. This repository guides developers on using Azure Linux's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [Azure Linux](https://github.com/microsoft/azurelinux). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within Azure Linux. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
 
 ### Packages
 
