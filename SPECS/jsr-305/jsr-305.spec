@@ -18,7 +18,8 @@
 Summary:        Correctness annotations for Java code
 Name:           jsr-305
 Version:        0.1+%{svn_date}
-Release:        8%{?dist}# The majority of code is BSD-licensed, but some Java sources
+Release:        8%{?dist}
+# The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
 License:        BSD AND CC-BY
 Vendor:         Microsoft Corporation

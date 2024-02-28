@@ -6,7 +6,7 @@
 2. Refer to cassandra spec and install all build required dependenices.
 3. Download cassandra sources and extract under /usr/src
 4. cd /usr/src/apache-cassandra-<version>-src
-5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-17"
+5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-11"
 6. Run export ANT_OPTS="-Xmx1024m -XX:MaxPermSize=512m"
 7. Run "sudo ant -v clean jar javadoc -Drelease=true -Duse.jdk11=true"
 8. Once build completed successfully take build cache as below.
