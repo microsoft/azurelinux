@@ -17,11 +17,11 @@ BUILD_SUMMARY_FILE=$(SODIFF_OUTPUT_FOLDER)/build-summary.csv
 BUILT_PACKAGES_FILE=$(SODIFF_OUTPUT_FOLDER)/built-packages.txt
 # Repositories that SODIFF runs the checks against
 ifneq ($(build_arch),x86_64)
-# Microsoft repository only exists for x86_64 - skip that .repo file;
+# Microsoft OSS repository only exists for x86_64 - skip that .repo file;
 # otherwise package manager will signal an error due to being unable to make contact
 SODIFF_REPO_SOURCES="azurelinux-official-base.repo"
 else
-SODIFF_REPO_SOURCES="azurelinux-official-base.repo mariner-microsoft.repo"
+SODIFF_REPO_SOURCES="azurelinux-official-base.repo azurelinux-ms-oss.repo"
 endif
 
 SODIFF_REPO_FILE=$(SCRIPTS_DIR)/sodiff/sodiff.repo
