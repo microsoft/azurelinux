@@ -92,7 +92,7 @@ rm -rf doc/build
 # Mariner's 'pytest' module is below the required version 6.0.0, so we need to use pip as well.
 # The 'apipkg' module should be provided by 'python3-py' pulled in by 'python3-execnet' but the build
 # couldn't find 'apipkg' just by using the BRs.
-pip3 install more-itertools pytest pytest-xdist apipkg
+pip3 install more-itertools pytest pytest-xdist apipkg typing_extensions mypy
 PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 
 %files doc
