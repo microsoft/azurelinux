@@ -14,7 +14,9 @@ fi
 
 # Additional macros required to parse spec files.
 DIST_TAG=$(make -s -f $REPO_ROOT/toolkit/Makefile get-dist-tag)
-DEFINES=(-D "with_check 1" -D "dist $DIST_TAG")
+DISTRO_MACRO="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-DIST_VERSION_MACRO)"
+
+DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
 
@@ -39,7 +41,7 @@ function mariner_rpmspec {
     done
 
     if [[ -z $sourcedir ]]
-    then        
+    then
         echo "Must pass valid spec path to 'mariner_rpmspec'!" >&2
         return 1
     fi

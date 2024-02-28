@@ -1,6 +1,3 @@
-# Temporary define azl
-%global azl 3
-
 Name:           rpmdevtools
 Version:        9.6
 Release:        8%{?dist}

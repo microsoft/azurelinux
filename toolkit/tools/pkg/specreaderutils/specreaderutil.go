@@ -296,8 +296,8 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	noCheckDefines := rpm.DefaultDefinesWithDist(false, distTag)
-	checkDefines := rpm.DefaultDefinesWithDist(true, distTag)
+	noCheckDefines := rpm.DefaultDistroDefines(false, distTag)
+	checkDefines := rpm.DefaultDistroDefines(true, distTag)
 
 	var ts *timestamp.TimeStamp = nil
 	for specFile := range requests {
