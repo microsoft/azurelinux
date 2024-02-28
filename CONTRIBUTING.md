@@ -1,4 +1,4 @@
-# CBL-Mariner's Contribution Guide
+# Azure Linux's Contribution Guide
 
 ## Table of Contents
 
@@ -63,20 +63,20 @@ Microsoft follows the principle of [Coordinated Vulnerability Disclosure](https:
 
 <!-- END MICROSOFT SECURITY.MD BLOCK -->
 
-## Develop for CBL-Mariner
+## Develop for Azure Linux
 
-When starting to develop for CBL-Mariner, use the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repo. This repository guides developers on using CBL-Mariner's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [CBL-Mariner](https://github.com/microsoft/CBL-Mariner). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within CBL-Mariner. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
+When starting to develop for Azure Linux, use the [Azure LinuxTutorials](https://github.com/microsoft/AzureLinux-Tutorials) repo. This repository guides developers on using Azure Linux's tools to customize or add new packages or images. Once you have confirmed your change builds and functions as expected, consider whether it should be added to the core repo, [Azure Linux](https://github.com/microsoft/azurelinux). Please see our [quickstart](toolkit/docs/quick_start/quickstart.md) for a tutorial and [building instructions](toolkit/docs/building/building.md) for an in-depth overview of building within Azure Linux. Please adhere to the [Pull Request guidelines](pull-request-guidelines) when contributing.
 
 ### Packages
 
-CBL-Mariner packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXTENDED). CBL-Mariner packages that are in the `SPECS` directory have full support and coverage with timely CVE maintenance. Packages in `SPECS-EXTENDED` are for experimentation or proof-of-concept purposes only. `SPECS-EXTENDED` can be used as a staging area for iterating on packages with the possiblity of the package being graduated to `SPECS`.
+Azure Linux packages live in either [SPECS](SPECS) or [SPECS-EXTENDED](SPECS-EXTENDED). Azure Linux packages that are in the `SPECS` directory have full support and coverage with timely CVE maintenance. Packages in `SPECS-EXTENDED` are for experimentation or proof-of-concept purposes only. `SPECS-EXTENDED` can be used as a staging area for iterating on packages with the possiblity of the package being graduated to `SPECS`.
 
 | Package Support Level | Published | Supported | Comments
 |:----------------------|:----------|:--------|:------------
 |SPECS-EXTENDED         |**Yes**    |No       | - Package needs a viable upstream source which actively addresses CVEs </br> - Package must not include project specific code
 |SPECS                  |**Yes**    |**Yes**  | - Package needs a viable upstream source which actively addresses CVEs </br> - Package must not include project specific code </br> - Package needs to offer value for multiple use cases
 
-When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [GitHub issue](https://github.com/microsoft/CBL-Mariner/issues) highlighting the package's value and ensure that the following steps are completed for associated PRs.
+When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [GitHub issue](https://github.com/microsoft/azurelinux/issues) highlighting the package's value and ensure that the following steps are completed for associated PRs.
 
 1. Increment the spec's `Release` value
 1. Add changelog entries "Package promoted from SPECS-EXTENDED to SPECS" and "License verified"
@@ -87,7 +87,7 @@ When looking to graduate a package from `SPECS-EXTENDED` to `SPECS`, file a [Git
 
 ### Toolkit
 
-We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your CBL-Mariner toolkit. For guidance on building with the toolkit, see our [building instructions](toolkit/docs/building/building.md).
+We welcome tooling improvements. When contributing to the toolkit, please adhere to `golang` formatting as described by the [fmt](https://pkg.go.dev/fmt) package. To format using this package, you can run `make go-tidy-all` in your Azure Linux toolkit. For guidance on building with the toolkit, see our [building instructions](toolkit/docs/building/building.md).
 
 ### Documentation
 
@@ -151,11 +151,11 @@ When creating your PR, please ensure the following:
 
 * Any updated packages successfully build (or no packages were changed). For guidance on building packages, see our [building instructions](toolkit/docs/building/building.md). Please ensure the package is located in the [appropriate folder](#packages).
 
-* Packages depending on static components modified in this PR (Golang, *-static subpackages, etc.) have had their `Release` tag incremented. Dependent packages are packages which contain a `BuildRequires` on the package you are updating and create static links from your package. This can be difficult to discern based on spec files alone and may require investigating `make` commands in dependent packages or consulting a CBL-Mariner dev.
+* Packages depending on static components modified in this PR (Golang, *-static subpackages, etc.) have had their `Release` tag incremented. Dependent packages are packages which contain a `BuildRequires` on the package you are updating and create static links from your package. This can be difficult to discern based on spec files alone and may require investigating `make` commands in dependent packages or consulting an Azure Linux dev.
 
 * Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files. When running the check section, results will not fail a build. Check the logs for the results of this section.
 
-* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by a CBL-Mariner developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
+* All package sources are available. The sources are either in the source server or local `SPECS` folder (`SPECS/<package>/SOURCES` or `SPECS/<package>`). While it is possible to build packages with all sources inside the repo, our policy is generally to have the source compressed and placed on the source server. Uploading to the source server can only be accomplished by an Azure Linux developer. Please request help in your PR for uploading your sources to the source server. To check the source server see [https://cblmarinerstorage.blob.core.windows.net/sources/core/< source tar >].
 
 * cgmanifest files are up-to-date and alphabetically sorted. The cgmanifest files are used to record all package sources. They include the following files:
 
@@ -164,13 +164,13 @@ When creating your PR, please ensure the following:
   * ./toolkit/scripts/toolchain/cgmanifest.json,
   * .github/workflows/cgmanifest.json
 
-  To validate, run the following in a CBL-Mariner container or Ubuntu >= 22.04
+  To validate, run the following in an Azure Linux container or Ubuntu >= 22.04
 
   ```bash
   .github/workflows/validate-cg-manifest.sh SPECS/<package name>/<package-name>.spec
    ```
 
-* LICENSE-MAP files are up-to-date. These files indicate which licenses are being used by CBL-Mariner's packages and where the package may be derived from. The license files include the following files:
+* LICENSE-MAP files are up-to-date. These files indicate which licenses are being used by Azure Linux's packages and where the package may be derived from. The license files include the following files:
   * ./SPECS/LICENSES-AND-NOTICES/data/licenses.json
   * ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md
 
@@ -206,4 +206,4 @@ When creating your PR, please ensure the following:
 
 ## Bugs
 
-If the bug is security related, please use the [security guidelines](#security-vulnerabilities) above. Otherwise, please use the [issues page](https://github.com/microsoft/CBL-Mariner/issues) on CBL-Mariner to file bugs.
+If the bug is security related, please use the [security guidelines](#security-vulnerabilities) above. Otherwise, please use the [issues page](https://github.com/microsoft/azurelinux/issues) on Azure Linux to file bugs.

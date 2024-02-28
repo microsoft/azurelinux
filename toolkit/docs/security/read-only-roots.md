@@ -108,4 +108,4 @@ Once the writable mount is created it is possible to write data back to the unde
 If enough blocks are corrupted the system will eventually be unable to recover them with FEC and the error handling behavior will trigger. The default behavior is to simply return an IO error, but other options are available by setting the `"VerityErrorBehavior"` key in the configuration file.
 
 ## ISO Installers
-If a configuration used to create an ISO has a read-only root configured, the ISO installer will honor that configuration. (See `full.json`'s `"CBL-Mariner Core Read-Only"` entry).
+If a configuration used to create an ISO has a read-only root configured, the ISO installer will honor that configuration. (See `full.json`'s `"Azure Linux Core Read-Only"` entry).

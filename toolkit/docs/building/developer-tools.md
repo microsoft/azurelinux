@@ -8,7 +8,7 @@ This [tool](./../../scripts/containerized-build/) enables the user to build/test
 The user can optionally add arguments. REPO_PATH defines directory to use as Mariner repo, default is current directory. MODE can be build (default) or test. Mariner VERSION may be 2.0 (default) or 1.0. MOUNTS specify directories to mount into the container, besides the default ones. BUILD_MOUNT defines directory to mount as build directory into container, default is $REPO_PATH/build. EXTRA_PACKAGES to install into container besides the default ones. ENABLE_REPO to use local RPMs to satisfy build depenedencies. KEEP_CONTAINER to keep container on exit. By default, it is cleaned up upon exit. In addition, user may override any Mariner make definitions e.g. SPECS_DIR, SRPM_PACK_LIST, etc.
 
 ```bash
-cd CBL-Mariner/toolkit
+cd azurelinux/toolkit
 sudo make containerized-rpmbuild
 
 # To see optional arguments and usage
