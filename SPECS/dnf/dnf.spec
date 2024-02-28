@@ -51,23 +51,27 @@ Requires:       %{name} = %{version}-%{release}
 Systemd units that can periodically download package upgrades and apply them.
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
 mkdir build
-cd build
+
+%build
+pushd build
 %cmake .. -DPYTHON_DESIRED:FILEPATH="3" -DWITH_MAN=0
 %make_build
+popd
 
 %install
-
 pushd build
 %make_install
 popd
+
 %find_lang %{name}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 
 # Making DNF directories for ghosting
 mkdir -p %{buildroot}%{confdir}/vars
+mkdir -p %{buildroot}%{confdir}/aliases.d
 mkdir -p %{buildroot}%{confdir}/plugins
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.defaults.d
@@ -81,8 +85,9 @@ rm -f %{buildroot}%{_bindir}/dnf-automatic-*
 rm -f %{buildroot}%{confdir}/%{name}-strict.conf
 
 %check
-cd build
+pushd build
 ctest -VV
+popd
 
 %post automatic
 %systemd_post dnf-automatic-notifyonly.timer
