@@ -15643,8 +15643,8 @@
         "type": "other",
         "other": {
           "name": "pciutils",
-          "version": "3.7.0",
-          "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.7.0.tar.gz"
+          "version": "3.11.1",
+          "downloadUrl": "https://www.kernel.org/pub/software/utils/pciutils/pciutils-3.11.1.tar.gz"
         }
       }
     },
