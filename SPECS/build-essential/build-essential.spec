@@ -13,7 +13,6 @@ Requires:       gawk
 Requires:       gcc
 Requires:       glibc-devel
 Requires:       gzip
-Requires:       systemd-udev
 Requires:       kernel-headers
 Requires:       libtool
 Requires:       make
@@ -33,7 +32,7 @@ Metapackage to install all build tools
 
 %changelog
 * Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
-- Use installkernel provided by systemd-udev
+- Remove installkernel
 
 * Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> - 3.0-1
 - Bump version to 3.0
