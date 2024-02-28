@@ -17,15 +17,22 @@
 
 Summary:        Tool to extract class/interface/method definitions from sources
 Name:           qdox
+<<<<<<< HEAD
 Version:        2.0.0
 Release:        3%{?dist}
+=======
+Version:        2.0.3
+Release:        1%{?dist}
+>>>>>>> mitchzhu/3-0-hamcrest
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/paul-hammant/qdox
-Source0:        https://github.com/paul-hammant/qdox/archive/refs/tags/%{name}-%{version}.tar.gz
-Source1:        qdox-MANIFEST.MF
+Source0:        https://repo1.maven.org/maven2/com/thoughtworks/qdox/qdox/%{version}/%{name}-%{version}-project.tar.bz2
+Source1:        qdox-build.xml
+Patch0:         Port-to-JFlex-1.7.0.patch
+BuildRequires:  ant
 BuildRequires:  byaccj
 BuildRequires:  fdupes
 BuildRequires:  java-cup-bootstrap
@@ -39,30 +46,39 @@ QDox is a parser for extracting class/interface/method definitions
 from source files complete with JavaDoc @tags. It is designed to be
 used by active code generators or documentation tools.
 
+%package javadoc
+Summary:        Javadoc for %{name}
+Group:          Development/Libraries/Java
+
+%description javadoc
+API docs for %{name}.
+
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%autosetup -p1
+cp %{SOURCE1} build.xml
 find -name *.jar -delete
 find -name *.class -delete
 rm -rf bootstrap
 
 # We don't need these plugins
 %pom_remove_plugin :animal-sniffer-maven-plugin
+%pom_remove_plugin :maven-assembly-plugin
 %pom_remove_plugin :maven-failsafe-plugin
-%pom_remove_plugin :maven-jflex-plugin
+%pom_remove_plugin :maven-invoker-plugin
+%pom_remove_plugin :jflex-maven-plugin
 %pom_remove_plugin :maven-enforcer-plugin
-
-%pom_xpath_set pom:workingDirectory '${basedir}/src/main/java/com/thoughtworks/qdox/parser/impl'
+%pom_remove_plugin :exec-maven-plugin
 
 %pom_remove_parent .
 
 %build
 # Generate scanners (upstream does this with maven-jflex-plugin)
-# Add the --inputstreamctor option if jflex is upgraded to a version 1.6 or higher
 CLASSPATH=$(build-classpath java-cup) \
   jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/lexer.flex
 CLASSPATH=$(build-classpath java-cup) \
   jflex -d src/main/java/com/thoughtworks/qdox/parser/impl src/grammar/commentlexer.flex
 
+<<<<<<< HEAD
 # Generate the parsers using the command-line that the exec-maven-plugin uses
 GRAMMAR_PATH=$(pwd)/src/grammar/commentparser.y && \
   (cd src/main/java/com/thoughtworks/qdox/parser/impl && \
@@ -83,23 +99,52 @@ jar cf build/%{name}-%{version}.jar -C build/classes .
 
 # Inject OSGi manifests
 jar ufm build/%{name}-%{version}.jar %{SOURCE1}
+=======
+# Generate parsers (upstream does this with exec-maven-plugin)
+(cd ./src/main/java/com/thoughtworks/qdox/parser/impl
+ byaccj -v -Jnorun -Jnoconstruct -Jclass=DefaultJavaCommentParser \
+  -Jpackage=com.thoughtworks.qdox.parser.impl ../../../../../../../grammar/commentparser.y
+ byaccj -v -Jnorun -Jnoconstruct -Jclass=Parser -Jimplements=CommentHandler -Jsemantic=Value \
+  -Jpackage=com.thoughtworks.qdox.parser.impl -Jstack=500 ../../../../../../../grammar/parser.y
+)
+
+%ant jar javadoc
+>>>>>>> mitchzhu/3-0-hamcrest
 
 %install
 # jar
 install -dm 0755 %{buildroot}%{_javadir}
-install -pm 0644 build/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 # pom
 install -dm 0755 %{buildroot}%{_mavenpomdir}
 install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 %add_maven_depmap %{name}.pom %{name}.jar -a qdox:qdox
+# javadoc
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
+%fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.txt
 %doc README.md
 
+%files javadoc
+%{_javadocdir}/%{name}
+%license LICENSE.txt
+
 %changelog
+<<<<<<< HEAD
 * Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-3
 - rebuild with msopenjdk-17
+=======
+* Thu Feb 08 2024 Henry Li <lihl@microsoft.com> - 2.0.3-1
+- Upgrade to version 2.0.3
+- Update Source0
+- Remove unnecessary plugins
+- Apply patch to use jflex 1.7.0 and remove duplicate constructor definitions
+- Add build xml file to define compilation targets and procedure
+- Add qdox-javadoc subpackage
+>>>>>>> mitchzhu/3-0-hamcrest
 
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.0.0-2
 - Move to SPECS

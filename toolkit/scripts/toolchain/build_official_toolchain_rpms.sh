@@ -428,9 +428,16 @@ chroot_and_install_rpms unzip
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
+# Python3 and pam need libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
+
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
+
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
@@ -484,10 +491,7 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs libxcrypt
-build_rpm_in_chroot_no_install libxcrypt
-chroot_and_install_rpms libxcrypt
-# pam needs cracklib
+# pam needs cracklib and libxcrypt (installed above)
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam

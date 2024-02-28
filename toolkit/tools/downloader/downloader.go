@@ -134,7 +134,7 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 	if err != nil {
-		err = fmt.Errorf("failed to download (%s) to (%s). Error:\n%w", srcUrl, dstFile, err)
+		err = fmt.Errorf("failed to download (%s) to (%s):\n%w", srcUrl, dstFile, err)
 	}
 	return
 }

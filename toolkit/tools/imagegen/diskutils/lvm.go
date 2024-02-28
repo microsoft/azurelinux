@@ -63,7 +63,7 @@ func enableLVMForEncryptedRoot(devicePath string) (volumePath string, err error)
 func createPhysicalVolume(devicePath string) (err error) {
 	_, stderr, err := shell.Execute("pvcreate", "-qy", devicePath)
 	if err != nil {
-		logger.Log.Warnf("Unable to create physical volume on %v: %v", devicePath, stderr)
+		err = fmt.Errorf("failed to create physical volume on (%v):\n%v\n%w", devicePath, stderr, err)
 		return
 	}
 
