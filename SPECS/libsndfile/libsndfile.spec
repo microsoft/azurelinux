@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/libsndfile/libsndfile
 Source0:        https://github.com/libsndfile/libsndfile/archive/refs/tags/%{name}-%{version}.tar.gz
 
-Patch0:         libsndfile-1.0.31-system-gsm.patch
+Patch0:         libsndfile-1.2.2-system-gsm.patch
 Patch1:         revert.patch
 
 # CVE disputed by project's owner, no repro.
@@ -54,6 +54,7 @@ This package contains command line utilities for libsndfile.
 %prep
 %autosetup -p1
 rm -r src/GSM610
+cat Makefile.am
 
 %build
 autoreconf -I M4 -fiv # for system-gsm patch
@@ -103,7 +104,7 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 
 %files
 %license COPYING
-%doc AUTHORS README NEWS
+%doc AUTHORS README
 %{_libdir}/%{name}.so.*
 
 %files utils
