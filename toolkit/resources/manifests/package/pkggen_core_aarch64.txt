@@ -198,7 +198,7 @@ libxml2-2.11.5-1.azl3.aarch64.rpm
 libxml2-devel-2.11.5-1.azl3.aarch64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-13.azl3.noarch.rpm
-libsepol-3.5-1.azl3.aarch64.rpm
+libsepol-3.6-1.azl3.aarch64.rpm
 glib-2.78.1-1.azl3.aarch64.rpm
 libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
@@ -243,7 +243,7 @@ python3-libs-3.12.0-1.azl3.aarch64.rpm
 python3-setuptools-69.0.3-1.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm
-libselinux-3.5-1.azl3.aarch64.rpm
+libselinux-3.6-1.azl3.aarch64.rpm
 slang-2.3.3-1.azl3.aarch64.rpm
 newt-0.52.23-2.azl3.aarch64.rpm
 newt-lang-0.52.23-2.azl3.aarch64.rpm
