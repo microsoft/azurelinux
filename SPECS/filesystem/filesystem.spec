@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      18%{?dist}
+Release:      19%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -710,6 +710,10 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
+- fix /etc/hosts
+- add /etc/host.conf to enable multi
+
 * Thu Nov 30 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
 - Remove umask 027
 
