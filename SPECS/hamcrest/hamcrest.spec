@@ -35,7 +35,7 @@ BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  maven
-Provides:       mvn(org.hamcrest:hamcrest-core)  = %{version}-%{release}
+Provides:       mvn(org.hamcrest:hamcrest-core) 
 
 %description
 Provides a library of matcher objects (also known as constraints or
