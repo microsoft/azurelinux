@@ -163,7 +163,7 @@ perl-vars-1.05-504.azl3.noarch.rpm
 perl-5.38.2-504.azl3.x86_64.rpm
 texinfo-7.0.3-1.azl3.x86_64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
-autoconf-2.71-3.azl3.noarch.rpm
+autoconf-2.72-1.azl3.noarch.rpm
 automake-1.16.5-1.azl3.noarch.rpm
 openssl-3.1.4-1.azl3.x86_64.rpm
 openssl-devel-3.1.4-1.azl3.x86_64.rpm

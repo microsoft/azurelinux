@@ -775,8 +775,8 @@
         "type": "other",
         "other": {
           "name": "autoconf",
-          "version": "2.71",
-          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.71.tar.xz"
+          "version": "2.72",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz"
         }
       }
     },
