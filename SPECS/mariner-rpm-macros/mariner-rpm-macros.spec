@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -125,6 +125,12 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 2.0-25
+- fix %_topdir macro
+- remove %_lib and %_lib64 macros
+- remove %_docdir
+- remove redundant macros
+
 * Thu Nov 09 2023 George Mileka <gmileka@microsoft.com> - 2.0-24
 - Update ccache to use the compiler content for comparison.
 
