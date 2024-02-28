@@ -1087,8 +1087,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.46",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.46/bind-9.16.46.tar.xz"
+          "version": "9.16.48",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.48/bind-9.16.48.tar.xz"
         }
       }
     },

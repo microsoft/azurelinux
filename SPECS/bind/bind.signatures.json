@@ -14,6 +14,6 @@
     "named.sysconfig": "8f8eff846667b7811358e289e9fe594de17d0e47f2b8cebf7840ad8db7f34816",
     "setup-named-chroot.sh": "786fbc88c7929fadf217cf2286f2eb03b6fba14843e5da40ad43c0022dd71c3a",
     "setup-named-softhsm.sh": "3b243d9e48577acb95a08ae5dd7288c5eec4830bc02bd29b1f1724c497d12864",
-    "bind-9.16.46.tar.xz": "8d3814582348f90dead1ad410b1019094cd399d3d83930abebb2b3b1eb0b2bbb"
+    "bind-9.16.48.tar.xz": "8d3814582348f90dead1ad410b1019094cd399d3d83930abebb2b3b1eb0b2bbb"
   }
 }
