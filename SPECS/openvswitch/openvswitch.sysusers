@@ -1,0 +1,3 @@
+#Type Name         ID         GECOS                   Home directory  Shell
+u     openvswitch  -          "Open vSwitch Daemons"  /               /sbin/nologin
+m     openvswitch  hugetlbfs
