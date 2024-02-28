@@ -256,6 +256,6 @@ end
 # New version of RPM has stricter approach to encoding; turn the errors off temporarily.
 %_invalid_encoding_terminates_build 0
 
-# CBL-Mariner's sources storage URL.
+# Azure Linux's sources storage URL.
 # NOTE: only allowed to be used for source URLs when original, upstream source cannot be found.
 %_mariner_sources_url https://cblmarinerstorage.blob.core.windows.net/sources/core

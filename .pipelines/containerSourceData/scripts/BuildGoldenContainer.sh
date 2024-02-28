@@ -17,7 +17,7 @@ set -e
 # - i) Dockerfile text replacement (e.g. '@BINARY_PATH@ \"/usr/bin/acmesolver\"')
 # - j) Output directory for container artifacts.
 # - k) RPMS tarball file path (e.g. ./rpms.tar.gz)
-# - l) Container source directory (e.g. ~/workspace/CBL-Mariner/.pipelines/containerSourceData)
+# - l) Container source directory (e.g. ~/workspace/azurelinux/.pipelines/containerSourceData)
 # - m) Is HCI image (e.g. true, false. HCI images have different naming convention)
 # - n) Use rpm -qa command (e.g. true, false. Some images use rpm -qa command to get installed package)
 # - o) Repo prefix (e.g. public/azurelinux, unlisted/azurelinux, etc.)
@@ -33,8 +33,8 @@ set -e
 #   │   OUTPUT
 #   │   ├── 
 
-# Assuming CBL-Mariner repo is cloned in your home directory. Below should be the directory structure:
-#   ~/CBL-Mariner/.pipelines/containerSourceData
+# Assuming Azure Linux repo is cloned in your home directory. Below should be the directory structure:
+#   ~/azurelinux/.pipelines/containerSourceData
 #   ├── nodejs
 #   │   ├── distroless
 #   │   │   ├── holdback-nodejs18.pkg
@@ -49,10 +49,10 @@ set -e
 #   ├── azurelinuxlocal.repo
 
 # Example usage:
-# /bin/bash ~/CBL-Mariner/.pipelines/containerSourceData/scripts/BuildGoldenContainer.sh \
+# /bin/bash ~/azurelinux/.pipelines/containerSourceData/scripts/BuildGoldenContainer.sh \
 #     -a "mcr.microsoft.com/azurelinux/base/core:3.0" -b azurelinuxlocal \
 #     -c "base/nodejs" -d "nodejs" -e "nodejs18" -f nodejs18.pkg -g Dockerfile-Nodejs \
-#     -j OUTPUT -k ./rpms.tar.gz -l ~/CBL-Mariner/.pipelines/containerSourceData \
+#     -j OUTPUT -k ./rpms.tar.gz -l ~/azurelinux/.pipelines/containerSourceData \
 #     -m "false" -n "false" -p development -q "false" -u "true"
 
 while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:" OPTIONS; do
@@ -207,7 +207,7 @@ function initialization {
 
 function prepare_dockerfile {
     echo "+++ Prepare dockerfile"
-    # Copy original dockerfile from CBL-Mariner repo.
+    # Copy original dockerfile from Azure Linux repo.
     cp "$CONTAINER_SRC_DIR/$IMAGE/$DOCKERFILE" "$WORK_DIR/dockerfile"
 
     # Update the copied dockerfile for later use in container build.
@@ -234,7 +234,7 @@ function get_packages_to_install {
 
 function prepare_docker_directory {
     echo "+++ Prepare docker directory"
-    # Get additional required files for the container build from CBL-Mariner repo.
+    # Get additional required files for the container build from Azure Linux repo.
     configurationDirectoryPath="$CONTAINER_SRC_DIR/$IMAGE/configuration-files"
     if [ -d "$configurationDirectoryPath" ]; then
         cp -v "$configurationDirectoryPath"/* "$WORK_DIR"

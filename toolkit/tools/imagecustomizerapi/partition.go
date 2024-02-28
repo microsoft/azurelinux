@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Partition struct {

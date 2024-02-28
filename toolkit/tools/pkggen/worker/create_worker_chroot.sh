@@ -110,7 +110,7 @@ else
     chroot "$chroot_builder_folder" mv "$TEMP_DB_PATH" /var/lib/rpm
 fi
 
-echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
+echo "Importing Azure Linux GPG keys." | tee -a "$chroot_log"
 for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
 do
     echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
