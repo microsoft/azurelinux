@@ -170,12 +170,8 @@ EOF
 #	7.3. Customizing the /etc/hosts File"
 #
 cat > %{buildroot}/etc/hosts <<- "EOF"
-# Begin /etc/hosts (network card version)
-
 127.0.0.1   localhost localhost.localdomain
 ::1         localhost localhost.localdomain ipv6-localhost ipv6-loopback
-
-# End /etc/hosts (network card version)
 EOF
 #
 #	7.9. Configuring the setclock Script"
