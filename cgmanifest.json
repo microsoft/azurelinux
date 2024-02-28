@@ -23343,8 +23343,8 @@
         "type": "other",
         "other": {
           "name": "python-pexpect",
-          "version": "4.8.0",
-          "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+          "version": "4.9.0",
+          "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.9/pexpect-4.9.tar.gz"
         }
       }
     },
