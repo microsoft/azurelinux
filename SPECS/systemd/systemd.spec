@@ -56,7 +56,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        5%{?dist}
+Release:        6%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -134,6 +134,9 @@ Patch0490:      use-bfq-scheduler.patch
 
 # Adjust upstream config to use our shared stack
 Patch0491:      fedora-use-system-auth-in-pam-systemd-user.patch
+
+# Patches for Azure Linux
+Patch0900: do-not-test-openssl-sm3.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1189,6 +1192,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6
+- skip sm3 digest in test-openssl, we dont provide that digest
+
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-5
 - update macro use in spec
 - build with pytest-flakes
