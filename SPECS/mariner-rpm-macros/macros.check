@@ -1,4 +1,3 @@
-# RPM macros for overriding the default behavior of %check to be nonfatal.
 
 # RPM macros may not have a hyphen in their name. Since specs can, we cant just name
 # our skip macros directly after the package. Instead we must substitute hyphen with underscore.
@@ -27,16 +26,13 @@ fi \
 %{nil}
 
 
-# Use set +e to continue on failure exit status in the middle of the %check body.
 # We always want to build the package even if the test fails.
 %__spec_check_body \
 echo "====== CHECK START %{name}" \
-set +e \
 %{nil}
 
 
 # Print some sentinels for parsing the log for test status.
 %__spec_check_post \
 echo "====== CHECK DONE %{name}. EXIT STATUS $?" \
-set -e \
 %{nil}
