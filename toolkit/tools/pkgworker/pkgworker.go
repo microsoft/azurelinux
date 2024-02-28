@@ -84,7 +84,7 @@ func main() {
 
 	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
-	defines := rpm.DefaultDefinesWithDist(*runCheck, *distTag)
+	defines := rpm.DefaultDistroDefines(*runCheck, *distTag)
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
