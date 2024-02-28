@@ -1,10 +1,9 @@
-%define         upstream_name buildx
-%define         commit_hash 05846896d149da05f3d6fd1e7770da187b52a247
+%define         commit_hash 30feaa1a915b869ebc2eea6328624b49facd4bfb
 
 Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
-Name:           moby-%{upstream_name}
+Name:           docker-buildx
 # update "commit_hash" above when upgrading version
-Version:        0.11.2
+Version:        0.12.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
@@ -14,17 +13,20 @@ URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: bash
-BuildRequires: golang >= 1.17
+BuildRequires: golang
 
 # conflicting packages
 Conflicts: docker-ce
 Conflicts: docker-ee
 
+Obsoletes: moby-buildx < %{version}-%{release}
+Provides:  moby-buildx = %{version}-%{release}
+
 %description
 A Docker CLI plugin for extended build capabilities with BuildKit
 
 %prep
-%setup -q -n %{upstream_name}-%{version}
+%autosetup -p1 -n buildx-%{version}
 
 %build
 export CGO_ENABLED=0
@@ -34,14 +36,18 @@ go build -mod=vendor \
     ./cmd/buildx
 
 %install
-mkdir -p "%{buildroot}/%{_libexecdir}/docker/cli-plugins"
-cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
+mkdir -p "%{buildroot}%{_libexecdir}/docker/cli-plugins"
+install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buildx"
 
 %files
 %license LICENSE
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Tue Feb 27 2024 Henry Beberman <henry.beberman@microsoft.com> - 0.12.1-1
+- Rename package from moby-buildx to docker-buildx
+- Upgrade to version 0.12.1
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.11.2-1
 - Auto-upgrade to 0.11.2 - Azure Linux 3.0 - package upgrades
 
