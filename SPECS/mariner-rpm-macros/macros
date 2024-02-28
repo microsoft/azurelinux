@@ -9,7 +9,6 @@
 %_lib64             lib64
 %_libdir            /usr/%{_lib}
 %_lib64dir          /usr/%{_lib64}
-%_docdir            %{_datadir}/doc
 
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
