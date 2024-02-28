@@ -29118,7 +29118,7 @@
         "other": {
           "name": "unbound",
           "version": "1.19.1",
-          "downloadUrl": "https://github.com/nlnetlabs/unbound/archive/refs/tags/release-1.19.1.tar.gz"
+          "downloadUrl": "https://github.com/nlnetlabs/unbound/archive/release-1.19.1.tar.gz"
         }
       }
     },
