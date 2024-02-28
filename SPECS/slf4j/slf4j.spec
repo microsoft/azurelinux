@@ -162,7 +162,7 @@ export MAVEN_REPO_LOCAL=$(pwd)/.m2
 ant -Dmaven2.jpp.mode=true \
     -Dmaven.test.skip=true \
     -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-    -Dant.build.javac.source=8 -Dant.build.javac.target=8 \
+    -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 \
     package javadoc \
 
 %install
