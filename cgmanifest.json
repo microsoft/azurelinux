@@ -1677,8 +1677,8 @@
         "type": "other",
         "other": {
           "name": "chrony",
-          "version": "4.1",
-          "downloadUrl": "https://download.tuxfamily.org/chrony/chrony-4.1.tar.gz"
+          "version": "4.5",
+          "downloadUrl": "https://gitlab.com/chrony/chrony/-/archive/4.5/chrony-4.5.tar.gz"
         }
       }
     },
