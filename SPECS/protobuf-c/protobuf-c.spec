@@ -1,6 +1,6 @@
 Summary:        Google's data interchange format - C implementation
 Name:           protobuf-c
-Version:        1.4.1
+Version:        1.5.0
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -71,6 +71,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libprotobuf-c.a
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-1
+- Auto-upgrade to 1.5.0 - Azure Linux 3.0 Upgrades
+
 * Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
 - Auto-upgrade to 1.4.1 - to fix CVE-2022-48468
 - Remove CVE-2022-33070 patch as not required for 1.4.1
