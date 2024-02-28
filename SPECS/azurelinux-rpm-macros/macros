@@ -6,7 +6,6 @@
 #   Some standard locations
 #
 %_lib               lib
-%_docdir            %{_datadir}/doc
 
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
