@@ -1,4 +1,4 @@
-%global dnf_lowest_compatible 4.2.22
+%global dnf_lowest_compatible 4.19.0
 %global dnf_plugins_extra 2.0.0
 %global hawkey_version 0.46.1
 %global yum_utils_subpackage_name dnf-utils
@@ -22,6 +22,8 @@ BuildArch:      noarch
 BuildRequires:  %{_bindir}/sphinx-build-3
 BuildRequires:  cmake
 BuildRequires:  gettext
+
+Requires:       python3-%{name} = %{version}-%{release}
 
 Provides:       dnf-command(builddep)
 Provides:       dnf-command(changelog)
