@@ -173,6 +173,10 @@ cat > %{buildroot}/etc/hosts <<- "EOF"
 127.0.0.1   localhost localhost.localdomain
 ::1         localhost localhost.localdomain ipv6-localhost ipv6-loopback
 EOF
+# host.conf file
+cat > %{buildroot}/etc/host.conf <<- "EOF"
+multi on
+EOF
 #
 #	7.9. Configuring the setclock Script"
 #
@@ -580,6 +584,7 @@ return 0
 %dir /etc/opt
 %config(noreplace) /etc/fstab
 %config(noreplace) /etc/group
+%config(noreplace) /etc/host.conf
 %config(noreplace) /etc/hosts
 %config(noreplace) /etc/inputrc
 %config(noreplace) /etc/mtab
