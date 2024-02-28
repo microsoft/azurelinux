@@ -15253,8 +15253,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "2.17.5",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-2.17.5.tar.gz"
+          "version": "3.3.0",
+          "downloadUrl": "http://openvswitch.org/releases/openvswitch-3.3.0.tar.gz"
         }
       }
     },
