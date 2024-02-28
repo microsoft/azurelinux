@@ -134,6 +134,7 @@ not required by any other installed package.
 %package -n python3-dnf-plugin-local
 Summary:        Local Plugin for DNF
 
+
 Requires:       %{_bindir}/createrepo_c
 Requires:       python3-%{name} = %{version}-%{release}
 
