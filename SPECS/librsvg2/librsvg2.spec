@@ -7,8 +7,8 @@
 
 Summary:        An SVG library based on cairo
 Name:           librsvg2
-Version:        2.50.3
-Release:        4%{?dist}
+Version:        2.57.91
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -111,6 +111,9 @@ rm -vrf %{buildroot}%{_docdir}
 %{_mandir}/man1/rsvg-convert.1*
 
 %changelog
+* Thu Feb 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.57.91-1
+- Auto-upgrade to 2.57.91 - none
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 2.50.3-4
 - Bump package to rebuild with rust 1.72.0
 
