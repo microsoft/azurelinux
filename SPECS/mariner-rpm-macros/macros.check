@@ -3,12 +3,6 @@
 # our skip macros directly after the package. Instead we must substitute hyphen with underscore.
 %sanitized_name     %(eval echo %{name} | %{__sed} -e 's/-/_/')
 
-# Override the default behavior of the check section to enhance log collection capabilities.
-%__spec_check_template	#!%{__spec_check_shell}\
-%{__spec_check_pre} \
-%{__spec_check_body} \
-%{nil}
-
 # Return "success" immediately from check if skip_check_%{name} is set.
 # Return "success" immediately from check if select_check is defined and select_check_%{name} is not.
 %__spec_check_pre \
@@ -23,14 +17,8 @@ then \
 echo "====== SKIPPING CHECK %{name}. SKIP REASON: select_check WITHOUT select_check_%{sanitized_name}" \
 exit 0 \
 fi \
-%{nil}
-
-
-# We always want to build the package even if the test fails.
-%__spec_check_body \
 echo "====== CHECK START %{name}" \
 %{nil}
-
 
 # Print some sentinels for parsing the log for test status.
 %__spec_check_post \
