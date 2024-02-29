@@ -687,9 +687,9 @@ Requires: swtpm-tools
         %if %{with_numad}
 Requires: numad
         %endif
-# bfjelds: DO WE NEED THIS??? passt is included for Fedora %if 0%{?fedora} || 0%{?rhel} >= 9
-# Recommends: passt
-# Recommends: passt-selinux
+# azl: Upstream libivirt.spec.in adds Recommends for passt and
+#      passt-selinux here.  This is omitted for now, decision can
+#      be revisited.
         %if %{with_nbdkit}
 Recommends: nbdkit
 Recommends: nbdkit-curl-plugin
