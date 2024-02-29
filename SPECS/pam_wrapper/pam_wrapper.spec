@@ -1,6 +1,6 @@
 Name:           pam_wrapper
 Version:        1.1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
 URL:            https://cwrap.org/
@@ -136,9 +136,12 @@ popd
 %doc obj/doc/html
 
 %files -n python3-libpamtest
-%{python3_sitearch}/pypamtest.so
+#%%{python3_sitearch}/pypamtest.so
 
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.1.5-2
+- Temporarily disable pypamtest.so, which is not building
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5-1
 - Auto-upgrade to 1.1.5 - Azure Linux 3.0 - package upgrades
 
@@ -149,7 +152,7 @@ popd
 - Bumping version to 1.1.4.
 - Remove gpg signature verification
 - License verified
- 
+
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 
