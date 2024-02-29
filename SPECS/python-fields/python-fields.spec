@@ -62,7 +62,7 @@ sed -i 's/\[pytest\]/\[tool:pytest\]/' setup.cfg
 
 %build
 %py3_build
-PYTHONPATH=$PWD/src sphinx-build%{python3_pkgversion} -b html docs docs/_build/html
+PYTHONPATH=$PWD/src sphinx-build -b html docs docs/_build/html
 rm -rf docs/_build/html/.buildinfo docs/_build/html/.doctrees
 
 %install
