@@ -59,7 +59,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
 	failedBuildNodes := buildResultsSetToNodesSet(failedSRPMs)
 
-	failedSRPMsTests, _, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedSRPMsTests, _, passedSRPMsTests, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 	failedTestNodes := buildResultsSetToNodesSet(failedSRPMsTests)
 
 	csvBlob := [][]string{{"Package", "State", "Blocker", "IsTest"}}
@@ -71,7 +71,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedBuildNodes, failedBuildNodes, blockedSRPMs, false)...)
 	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMs, failedBuildNodes, blockedSRPMs, false)...)
 
-	csvBlob = append(csvBlob, successfulPackagesCSVRows(testedSRPMs, "Built", true)...)
+	csvBlob = append(csvBlob, successfulPackagesCSVRows(passedSRPMsTests, "Built", true)...)
 	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, failedTestNodes, failedTestNodes, blockedSRPMsTests, true)...)
 	csvBlob = append(csvBlob, unbuiltPackagesCSVRows(pkgGraph, blockedSRPMsTests, failedTestNodes, blockedSRPMsTests, true)...)
 
@@ -95,7 +95,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 	defer graphMutex.RUnlock()
 
 	failedSRPMs, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, blockedSRPMs := getSRPMsState(pkgGraph, buildState)
-	failedSRPMsTests, skippedSRPMsTests, testedSRPMs, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
+	failedSRPMsTests, skippedSRPMsTests, passedSRPMsTests, blockedSRPMsTests := getSRPMsTestsState(pkgGraph, buildState)
 
 	unresolvedDependencies := make(map[string]bool)
 	rpmConflicts := buildState.ConflictingRPMs()
@@ -112,7 +112,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
+	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, passedSRPMsTests, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 
 	if len(prebuiltSRPMs) != 0 {
 		logger.Log.Info(color.GreenString("Prebuilt SRPMs:"))
@@ -146,9 +146,9 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	if len(testedSRPMs) != 0 {
+	if len(passedSRPMsTests) != 0 {
 		logger.Log.Info(color.GreenString("Passed SRPMs tests:"))
-		keys := mapToSortedSlice(testedSRPMs)
+		keys := mapToSortedSlice(passedSRPMsTests)
 		for _, testedSRPM := range keys {
 			logger.Log.Infof("--> %s", filepath.Base(testedSRPM))
 		}
@@ -212,7 +212,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		}
 	}
 
-	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
+	printSummary(failedSRPMs, failedSRPMsTests, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, passedSRPMsTests, skippedSRPMsTests, unresolvedDependencies, blockedSRPMs, blockedSRPMsTests, rpmConflicts, srpmConflicts, allowToolchainRebuilds, conflictsLogger)
 }
 
 func buildResultsSetToNodesSet(statesSet map[string]*BuildResult) (result map[string]*pkggraph.PkgNode) {
@@ -261,10 +261,10 @@ func getSRPMsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (fa
 	return
 }
 
-func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, skippedSRPMsTests, testedSRPMs map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
+func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState) (failedSRPMsTests map[string]*BuildResult, skippedSRPMsTests, passedSRPMsTests map[string]bool, blockedSRPMsTests map[string]*pkggraph.PkgNode) {
 	failedSRPMsTests = make(map[string]*BuildResult)
 	skippedSRPMsTests = make(map[string]bool)
-	testedSRPMs = make(map[string]bool)
+	passedSRPMsTests = make(map[string]bool)
 	blockedSRPMsTests = make(map[string]*pkggraph.PkgNode)
 
 	for _, failure := range buildState.BuildFailures() {
@@ -277,13 +277,15 @@ func getSRPMsTestsState(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState
 		if buildState.IsNodeCached(node) {
 			skippedSRPMsTests[node.SrpmPath] = true
 			continue
-		} else if buildState.IsNodeAvailable(node) {
-			testedSRPMs[node.SrpmPath] = true
+		}
+
+		if _, testFailed := failedSRPMsTests[node.SrpmPath]; testFailed {
 			continue
 		}
 
-		_, found := failedSRPMsTests[node.SrpmPath]
-		if !found {
+		if buildState.IsNodeAvailable(node) {
+			passedSRPMsTests[node.SrpmPath] = true
+		} else {
 			blockedSRPMsTests[node.SrpmPath] = node
 		}
 	}
@@ -337,7 +339,7 @@ func unbuiltPackagesCSVRows(pkgGraph *pkggraph.PkgGraph, unbuiltPackages, failed
 }
 
 // printSummary prints summarized numbers of the build to the logger.
-func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, testedSRPMs, skippedSRPMsTests, unresolvedDependencies map[string]bool, blockedSRPMs, blockedSRPMsTests map[string]*pkggraph.PkgNode, rpmConflicts, srpmConflicts []string, allowToolchainRebuilds bool, conflictsLogger func(format string, args ...interface{})) {
+func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuiltSRPMs, prebuiltDeltaSRPMs, builtSRPMs, passedSRPMsTests, skippedSRPMsTests, unresolvedDependencies map[string]bool, blockedSRPMs, blockedSRPMsTests map[string]*pkggraph.PkgNode, rpmConflicts, srpmConflicts []string, allowToolchainRebuilds bool, conflictsLogger func(format string, args ...interface{})) {
 	logger.Log.Info("---------------------------")
 	logger.Log.Info("--------- Summary ---------")
 	logger.Log.Info("---------------------------")
@@ -346,7 +348,7 @@ func printSummary(failedSRPMs, failedSRPMsTests map[string]*BuildResult, prebuil
 	logger.Log.Infof(color.GreenString(summaryLine("Number of prebuilt delta SRPMs:", len(prebuiltDeltaSRPMs))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of skipped SRPMs tests:", len(skippedSRPMsTests))))
 	logger.Log.Infof(color.GreenString(summaryLine("Number of built SRPMs:", len(builtSRPMs))))
-	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(testedSRPMs))))
+	logger.Log.Infof(color.GreenString(summaryLine("Number of passed SRPMs tests:", len(passedSRPMsTests))))
 	printErrorInfoByCondition(len(unresolvedDependencies) > 0, summaryLine("Number of unresolved dependencies:", len(unresolvedDependencies)))
 	printErrorInfoByCondition(len(blockedSRPMs) > 0, summaryLine("Number of blocked SRPMs:", len(blockedSRPMs)))
 	printErrorInfoByCondition(len(blockedSRPMsTests) > 0, summaryLine("Number of blocked SRPMs tests:", len(blockedSRPMsTests)))
