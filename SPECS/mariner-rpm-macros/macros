@@ -1,12 +1,3 @@
-#
-# This definition of %%_lib is NOT standard and overrides the standard
-# definition from the rpm platform macros file. However, we have
-# various parts of our distro that hardcode /usr/lib in various ways,
-# and those must be fixed before we can remove these macro overrides
-# and revert to the default, standard %%_lib definition from the
-# standard rpm platform macros file.
-#
-%_lib               lib
 
 # https://fedoraproject.org/wiki/Changes/UnversionedDocdirs
 %_pkgdocdir         %{_docdir}/%{name}
@@ -19,7 +10,7 @@
 # Generate metadata linker script before prep section of each SPEC
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
-/usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}\
+%{_libdir}/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}\
 %{nil}
 
 # This section overrides the default behavior of the build macro to export
@@ -31,7 +22,7 @@
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
-%{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+%{?mariner_ccache_enabled:PATH="%{_libdir}/ccache:$PATH" ; export PATH ;}\
 %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
 %{?mariner_ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
 %{?mariner_ccache_enabled:ccache --zero-stats} \
@@ -50,7 +41,7 @@
 ## Should python bytecompilation compile outside python specific directories?
 %_python_bytecompile_extra 0
 
-%__brp_python_bytecompile /usr/lib/rpm/mariner/brp-python-bytecompile "%{__python3}" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
+%__brp_python_bytecompile %{_libdir}/rpm/mariner/brp-python-bytecompile "%{__python3}" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
 
 %_enable_debug_packages 1
 %_include_minidebuginfo 1
@@ -124,8 +115,8 @@ print(result)
 %extension_fflags %{__extension_strip_flags build_fflags}
 %extension_ldflags %{__extension_strip_flags build_ldflags}
 
-%_hardening_cflags      -specs=/usr/lib/rpm/mariner/default-hardened-cc1
-%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld
+%_hardening_cflags      -specs=%{_libdir}/rpm/mariner/default-hardened-cc1
+%_hardening_ldflags     -Wl,-z,now -specs=%{_libdir}/rpm/mariner/default-hardened-ld
 
 # Harden packages by default
 # https://fedorahosted.org/fesco/ticket/1384 (accepted on 2014-02-11)
@@ -138,7 +129,7 @@ print(result)
 # https://pagure.io/fesco/issue/1780 (accepted on 2017-10-30)
 # Use "%undefine _annotated_build" to disable.
 #%_annotated_build       1
-%_annobin_cflags        -specs=/usr/lib/rpm/mariner/default-annobin-cc1
+%_annobin_cflags        -specs=%{_libdir}/rpm/mariner/default-annobin-cc1
 %_annotated_cflags      %{?_annotated_build:%{_annobin_cflags}}
 
 # Fail linking if there are undefined symbols.  Required for proper
