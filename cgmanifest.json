@@ -23304,7 +23304,7 @@
         "other": {
           "name": "python-pam",
           "version": "2.0.2",
-          "downloadUrl": "https://github.com/firefighterblu3/python-pam/archive/refs/tags/v2.0.2.tar.gz"
+          "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-2.0.2.tar.gz"
         }
       }
     },
