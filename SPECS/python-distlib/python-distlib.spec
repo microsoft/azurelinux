@@ -54,7 +54,7 @@ rm distlib/*.exe
 %pyproject_install
 %pyproject_save_files %{srcname}
 
-if %{with_check}
+%if %{with_check}
 %check
 export PYTHONHASHSEED=0
 export SKIP_ONLINE=1
