@@ -1,0 +1,33 @@
+From f6b6236077f059e64ee315f2d7acb8fa4eda87c5 Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Wed, 3 Aug 2022 19:45:33 +0800
+Subject: [PATCH 01/13] font: Reject glyphs exceeds font->max_glyph_width or
+ font->max_glyph_height
+
+Check glyph's width and height against limits specified in font's
+metadata. Reject the glyph (and font) if such limits are exceeded.
+
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/font/font.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/grub-core/font/font.c b/grub-core/font/font.c
+index 42189c325..756ca0abf 100644
+--- a/grub-core/font/font.c
++++ b/grub-core/font/font.c
+@@ -760,7 +760,9 @@ grub_font_get_glyph_internal (grub_font_t font, grub_uint32_t code)
+ 	  || read_be_uint16 (font->file, &height) != 0
+ 	  || read_be_int16 (font->file, &xoff) != 0
+ 	  || read_be_int16 (font->file, &yoff) != 0
+-	  || read_be_int16 (font->file, &dwidth) != 0)
++	  || read_be_int16 (font->file, &dwidth) != 0
++	  || width > font->max_char_width
++	  || height > font->max_char_height)
+ 	{
+ 	  remove_font (font);
+ 	  return 0;
+-- 
+2.34.1
+
