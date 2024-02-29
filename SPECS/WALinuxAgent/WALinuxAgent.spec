@@ -55,12 +55,12 @@ install -vdm 755 %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/99-azure-product-uuid.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/rules.d
 # python refers to python2 version on CBL-Mariner hence update to use python3
-sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent
-sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_bindir}/waagent2.0
-sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}%{_libdir}/systemd/system/waagent.service
-install -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/ephemeral-disk-warning.service
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent
+sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent2.0
+sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}/lib/systemd/system/waagent.service
+install -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/ephemeral-disk-warning.service
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
-install -m 644 %{SOURCE3} %{buildroot}%{_bindir}/ephemeral-disk-warning
+install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
 
 %check
 python3 setup.py check && python3 setup.py test
@@ -76,22 +76,26 @@ python3 setup.py check && python3 setup.py test
 %systemd_postun_with_restart waagent.service
 
 %files
-%{_libdir}/systemd/system/*
+/lib/systemd/system/*
 %{_sysconfdir}/udev/rules.d/*
 %defattr(0644,root,root,0755)
 %license LICENSE.txt
-%attr(0755,root,root) %{_bindir}/waagent
-%attr(0755,root,root) %{_bindir}/waagent2.0
-%attr(0755,root,root) %{_bindir}/ephemeral-disk-warning
+%attr(0755,root,root) %{_sbindir}/waagent
+%attr(0755,root,root) %{_sbindir}/waagent2.0
+%attr(0755,root,root) %{_sbindir}/ephemeral-disk-warning
 %config %{_sysconfdir}/waagent.conf
 %config %{_sysconfdir}/ephemeral-disk-warning.conf
+%{_sysconfdir}/logrotate.d/waagent.logrotate
 %ghost %{_localstatedir}/log/waagent.log
 %dir %attr(0700, root, root) %{_sharedstatedir}/waagent
 %{python3_sitelib}/*
 
+
 %changelog
 * Tue Feb 27 2024 Henry Li <lihl@microsoft.com> - 2.9.0.4-1
 - Upgrade to version 2.9.0.4
+- Fix installation path from /usr/lib/systemd to /lib/systemd and /usr/bin to /usr/sbin
+- Add /etc/logrotate.d/waagent.logrotate to %files section
 
 * Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
 - Add ephemeral-disk-warning.service
