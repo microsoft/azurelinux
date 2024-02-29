@@ -27,9 +27,9 @@ Distribution:   Azure Linux
 # https://github.com/netwide-assembler/nasm/pull/3
 ExclusiveArch: x86_64
 
-# edk2-stable202302
-%define GITDATE        20230301
-%define GITCOMMIT      f80f052277c8
+# edk2-stable202402
+%define GITDATE        20240223
+%define GITCOMMIT      edc6681206c1
 %define TOOLCHAIN      GCC5
 %define OPENSSL_VER    1.1.1k
 
@@ -45,7 +45,7 @@ ExclusiveArch: x86_64
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    37%{?dist}
+Release:    38%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    BSD-2-Clause-Patent and OpenSSL and MIT
 URL:        http://www.tianocore.org
@@ -54,7 +54,7 @@ URL:        http://www.tianocore.org
 # COMMIT=bb1bba3d7767
 # git archive --format=tar --prefix=edk2-$COMMIT/ $COMMIT \
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
-Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/af802257f010b63d973dc909b57ee845b7734e8d494b081050ba1f197349663b081e1f2edc5244726e2479ff6d16d79d0a6fceb00f4840b59982f10b79facf66/edk2-%{GITCOMMIT}.tar.xz
+Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
 Source2: edk2-openssl-d00c3c5b8a9d6d3ea3dabfcafdf36afd61ba8bcc.tar.xz
 Source3: edk2-softfloat-%{softfloat_version}.tar.xz
@@ -696,6 +696,9 @@ $tests_ok
 
 
 %changelog
+* Thu Feb 29 2024 Elaine Zhao <elainezhao@microsoft.com> - 20230301gitf80f052277c8-38
+- Bump version to 202402
+
 * Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
 - Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
 
