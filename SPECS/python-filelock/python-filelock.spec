@@ -47,7 +47,7 @@ the same lock object twice, it will not block.
 %build
 %py3_build
 
-make -C docs html man SPHINXBUILD=sphinx-build3
+make -C docs html man SPHINXBUILD=sphinx-build
 rm docs/build/html/.buildinfo
 
 %install
