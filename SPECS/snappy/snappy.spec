@@ -1,7 +1,7 @@
 Summary:        Fast compression and decompression library
 Name:           snappy
 Version:        1.1.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Source0:        https://github.com/google/snappy/archive/%{version}.tar.gz#/%{na
 
 Patch0:         detect_system_gtest.patch
 BuildRequires:  cmake >= 3.3
+BuildRequires:  gcc-c++
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
 
@@ -43,8 +44,9 @@ It contains the libraries and header files to create applications
 %autosetup -p1
 
 %build
-mkdir build && cd build
-%cmake -DSNAPPY_BUILD_BENCHMARKS:BOOL=OFF ..
+mkdir build
+cd build
+%cmake -DCMAKE_CXX_STANDARD=14 -DSNAPPY_BUILD_BENCHMARKS:BOOL=OFF ..
 %make_build
 
 %install
@@ -72,6 +74,9 @@ make test
 %{_libdir}/cmake/Snappy/
 
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.1.10-2
+- Ensure building with C++ standard 14 to resolve build break
+
 * Mon Feb 12 2024 Betty Lakes <bettylakes@microsoft.com> - 1.1.10-1
 - Version upgrade to 1.1.10.
 - Delete snappy-inline.patch that's not needed with the new update.
