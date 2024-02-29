@@ -1,14 +1,15 @@
-%define BaseVersion 1.71
+%define BaseVersion 1.78
 Summary:        Introspection system for GObject-based libraries
 Name:           gobject-introspection
-Version:        %{BaseVersion}.0
-Release:        16%{?dist}
+Version:        %{BaseVersion}.1
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/GNOME/gobject-introspection
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/%{BaseVersion}/%{name}-%{version}.tar.xz
+Patch0:         testWorkaround.patch
 BuildRequires:  autoconf-archive
 BuildRequires:  bison
 BuildRequires:  cairo-gobject-devel
@@ -23,6 +24,9 @@ BuildRequires:  meson
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
 BuildRequires:  which
+BuildRequires:  python3-mako
+BuildRequires:  python3-markdown
+BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 Requires:       glib >= 2.58.0
 Requires:       libffi
 
@@ -55,10 +59,11 @@ Requires:       python3-%{name} = %{version}-%{release}
 Libraries and headers for gobject-introspection.
 
 %prep
-%autosetup -p 1
-
+%autosetup -p1
+mv giscanner/ast.py giscanner/gio_ast.py
+ 
 %build
-%meson -Ddoctool=disabled -Dpython=%{python3}
+%meson -Ddoctool=enabled -Dgtk_doc=true -Dpython=%{__python3}
 %meson_build
 
 %install
@@ -96,8 +101,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/introspection.m4
 %{_datadir}/gobject-introspection-1.0
 %{_mandir}/man1/*.gz
+%{_libdir}/libgirepository-1.0.so
+%{_libdir}/gobject-introspection/
+%{_libdir}/pkgconfig/gobject-introspection-1.0.pc
+%{_libdir}/pkgconfig/gobject-introspection-no-export-1.0.pc
+%{_datadir}/gir-1.0/gir-1.2.rnc
 
 %changelog
+* Tue Feb 27 2024 Betty Lakes <bettylakes@microsoft.com> - 1.78.1-1
+- Update version to 1.78.1
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.71.0-16
 - Bump release to rebuild with go 1.20.10
 
