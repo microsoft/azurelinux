@@ -25,7 +25,7 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  util-linux
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  diffutils
 %endif
 # ocamlopt runs gcc to link binaries.  Because Azure Linux includes
@@ -119,7 +119,7 @@ autoconf --force
 %configure \
     OC_CFLAGS="$CFLAGS" \
     OC_LDFLAGS="$LDFLAGS" \
-%if %{with_check}
+%if 0%{?with_check}
     --enable-ocamltest \
 %endif
     --libdir=%{_libdir}/ocaml \

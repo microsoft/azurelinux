@@ -15,7 +15,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ca-certificates-base
 BuildRequires:  python3-pytest
 %endif

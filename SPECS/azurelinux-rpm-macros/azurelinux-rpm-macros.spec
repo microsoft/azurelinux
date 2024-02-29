@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        2.0
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,6 @@ Source24:       macros.suse
 Source25:       gen-ld-script.sh
 Source26:       generate-package-note.py
 Source27:       verify-package-notes.sh
-Source28:       macros.dist
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -87,7 +86,6 @@ install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 
-sed -e 's|@DIST@|%{dist}|g' %{SOURCE28} > macros.dist
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
@@ -118,7 +116,6 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.fonts
 %{_rpmconfigdir}/macros.d/macros.forge
 %{_rpmconfigdir}/macros.d/macros.suse
-%{_rpmconfigdir}/macros.d/macros.dist
 
 %dir %{rcluadir}
 %dir %{rcluadir}/srpm
@@ -133,8 +130,11 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-25
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-26
 - Updating naming for 3.0 version of Azure Linux.
+
+* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 2.0-25
+- move macros.dist out of this package
 
 * Thu Nov 09 2023 George Mileka <gmileka@microsoft.com> - 2.0-24
 - Update ccache to use the compiler content for comparison.

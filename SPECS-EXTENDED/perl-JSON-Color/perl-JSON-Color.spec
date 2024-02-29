@@ -34,7 +34,7 @@ BuildRequires:  perl(Role::Tiny)
 BuildRequires:  perl(Term::ANSIColor) >= 3.00
 BuildRequires:  perl(parent)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)

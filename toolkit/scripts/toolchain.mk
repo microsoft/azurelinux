@@ -102,19 +102,21 @@ check-manifests: check-x86_64-manifests check-aarch64-manifests
 check-aarch64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			aarch64
+			"$(toolchain_spec_list)" \
+			"$(SPECS_DIR)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"aarch64"
 check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			x86_64
+			"$(toolchain_spec_list)" \
+			"$(SPECS_DIR)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"x86_64"
 
 # Generate a list of a specs built as part of the toolchain.
 $(toolchain_spec_list): $(toolchain_files)
@@ -221,21 +223,22 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
-			$(DIST_TAG) \
-			$(BUILD_NUMBER) \
-			$(RELEASE_VERSION) \
-			$(BUILD_DIR) \
-			$(RPMS_DIR) \
-			$(SPECS_DIR) \
-			$(RUN_CHECK) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(INCREMENTAL_TOOLCHAIN) \
-			$(BUILD_SRPMS_DIR) \
-			$(SRPMS_DIR) \
-			$(toolchain_from_repos) \
-			$(TOOLCHAIN_MANIFEST) \
-			$(go-bldtracker) \
-			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"$(BUILD_NUMBER)" \
+			"$(RELEASE_VERSION)" \
+			"$(BUILD_DIR)" \
+			"$(RPMS_DIR)" \
+			"$(SPECS_DIR)" \
+			"$(RUN_CHECK)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(INCREMENTAL_TOOLCHAIN)" \
+			"$(BUILD_SRPMS_DIR)" \
+			"$(SRPMS_DIR)" \
+			"$(toolchain_from_repos)" \
+			"$(TOOLCHAIN_MANIFEST)" \
+			"$(go-bldtracker)" \
+			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 

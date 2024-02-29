@@ -18,7 +18,7 @@ BuildRequires:  gcc
 # regression test suite uses 'ps' from procps
 BuildRequires:  procps
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: tzdata
 BuildRequires:  shadow-utils
 BuildRequires:  sudo

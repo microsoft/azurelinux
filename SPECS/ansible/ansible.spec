@@ -11,7 +11,7 @@ Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 %endif

@@ -23,6 +23,7 @@ ignore_multiple_sources=" \
 
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
+  azurelinux-repos \
   azurelinux-rpm-macros \
   ca-certificates \
   check-restart \
@@ -41,7 +42,6 @@ ignore_no_source_tarball=" \
   kf5 \
   livepatching \
   lua-rpm-macros \
-  mariner-repos \
   multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \

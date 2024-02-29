@@ -1,49 +1,47 @@
 # Component versions
-%global oclock 1.0.4
-%global x11perf 1.6.0
-%global xclipboard 1.1.3
-%global xclock 1.0.9
-%global xconsole 1.0.6
-%global xcursorgen 1.0.6
-%global xeyes 1.1.2
-%global xfd 1.1.2
-%global xfontsel 1.0.6
-%global xload 1.1.3
-%global xlogo 1.0.4
-%global xmag 1.0.6
-%global xmessage 1.0.5
-%global xpr 1.0.5
-%global xvidtune 1.0.3
-%global xwd 1.0.7
-%global xwud 1.0.5
+%global oclock 1.0.5
+%global x11perf 1.6.1
+%global xclipboard 1.1.4
+%global xclock 1.1.1
+%global xconsole 1.0.8
+%global xcursorgen 1.0.8
+%global xeyes 1.3.0
+%global xfd 1.1.4
+%global xfontsel 1.1.0
+%global xload 1.1.4
+%global xlogo 1.0.6
+%global xmag 1.0.7
+%global xmessage 1.0.6
+%global xpr 1.1.0
+%global xvidtune 1.0.4
+%global xwd 1.0.9
+%global xwud 1.0.6
 
 Summary:        X.Org X11 applications
 Name:           xorg-x11-apps
 Version:        7.7
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.x.org
-Source0:        https://www.x.org/pub/individual/app/oclock-%{oclock}.tar.bz2
-Source1:        https://www.x.org/pub/individual/app/x11perf-%{x11perf}.tar.bz2
-Source2:        https://www.x.org/pub/individual/app/xclipboard-%{xclipboard}.tar.bz2
-Source3:        https://www.x.org/pub/individual/app/xclock-%{xclock}.tar.bz2
-Source4:        https://www.x.org/pub/individual/app/xconsole-%{xconsole}.tar.bz2
-Source5:        https://www.x.org/pub/individual/app/xcursorgen-%{xcursorgen}.tar.bz2
-Source6:        https://www.x.org/pub/individual/app/xeyes-%{xeyes}.tar.bz2
-Source7:        https://www.x.org/pub/individual/app/xfd-%{xfd}.tar.bz2
-Source8:        https://www.x.org/pub/individual/app/xfontsel-%{xfontsel}.tar.bz2
-Source9:        https://www.x.org/pub/individual/app/xload-%{xload}.tar.bz2
-Source10:       https://www.x.org/pub/individual/app/xlogo-%{xlogo}.tar.bz2
-Source11:       https://www.x.org/pub/individual/app/xmag-%{xmag}.tar.bz2
-Source12:       https://www.x.org/pub/individual/app/xmessage-%{xmessage}.tar.bz2
-Source13:       https://www.x.org/pub/individual/app/xpr-%{xpr}.tar.bz2
-Source14:       https://www.x.org/pub/individual/app/xvidtune-%{xvidtune}.tar.bz2
-Source15:       https://www.x.org/pub/individual/app/xwd-%{xwd}.tar.bz2
-Source16:       https://www.x.org/pub/individual/app/xwud-%{xwud}.tar.bz2
-
-Patch0:         x11perf-1.6.0-x11perf-datadir-cleanups.patch
+Source0:        https://www.x.org/pub/individual/app/oclock-%{oclock}.tar.gz
+Source1:        https://www.x.org/pub/individual/app/x11perf-%{x11perf}.tar.gz
+Source2:        https://www.x.org/pub/individual/app/xclipboard-%{xclipboard}.tar.gz
+Source3:        https://www.x.org/pub/individual/app/xclock-%{xclock}.tar.gz
+Source4:        https://www.x.org/pub/individual/app/xconsole-%{xconsole}.tar.gz
+Source5:        https://www.x.org/pub/individual/app/xcursorgen-%{xcursorgen}.tar.gz
+Source6:        https://www.x.org/pub/individual/app/xeyes-%{xeyes}.tar.gz
+Source7:        https://www.x.org/pub/individual/app/xfd-%{xfd}.tar.gz
+Source8:        https://www.x.org/pub/individual/app/xfontsel-%{xfontsel}.tar.gz
+Source9:        https://www.x.org/pub/individual/app/xload-%{xload}.tar.gz
+Source10:       https://www.x.org/pub/individual/app/xlogo-%{xlogo}.tar.gz
+Source11:       https://www.x.org/pub/individual/app/xmag-%{xmag}.tar.gz
+Source12:       https://www.x.org/pub/individual/app/xmessage-%{xmessage}.tar.gz
+Source13:       https://www.x.org/pub/individual/app/xpr-%{xpr}.tar.gz
+Source14:       https://www.x.org/pub/individual/app/xvidtune-%{xvidtune}.tar.gz
+Source15:       https://www.x.org/pub/individual/app/xwd-%{xwd}.tar.gz
+Source16:       https://www.x.org/pub/individual/app/xwud-%{xwud}.tar.gz
 
 BuildRequires:  gettext
 BuildRequires:  libtool
@@ -54,6 +52,7 @@ BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xaw7)
 BuildRequires:  pkgconfig(xcursor)
 BuildRequires:  pkgconfig(xext)
+BuildRequires:  pkgconfig(xi)
 BuildRequires:  pkgconfig(xft)
 BuildRequires:  pkgconfig(xkbfile)
 BuildRequires:  pkgconfig(xmu)
@@ -85,7 +84,6 @@ A collection of common X Window System applications.
 
 %prep
 %setup -q -c %{name}-%{version} -a1 -a2 -a3 -a4 -a5 -a6 -a7 -a8 -a9 -a10 -a11 -a12 -a13 -a14 -a15 -a16
-%patch 0  -b .x11perf-datadir-cleanup
 
 %build
 # Build all apps
@@ -147,9 +145,30 @@ rm -r %{buildroot}%{_mandir}/man1
 %{_datadir}/X11/app-defaults/Xmessage
 %{_datadir}/X11/app-defaults/Xmessage-color
 %{_datadir}/X11/app-defaults/Xvidtune
-%{_datadir}/X11/x11perfcomp
+%{_libdir}/X11/x11perfcomp
 
 %changelog
+* Wed Feb 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 7.7-30
+- Upgraded component to latest versions for Azl3
+- oclock 1.0.5
+- x11perf 1.6.1
+- xclipboard 1.1.4
+- xclock 1.1.1
+- xconsole 1.0.8
+- xcursorgen 1.0.8
+- xeyes 1.3.0
+- xfd 1.1.4
+- xfontsel 1.1.0
+- xload 1.1.4
+- xlogo 1.0.6
+- xmag 1.0.7
+- xmessage 1.0.6
+- xpr 1.1.0
+- xvidtune 1.0.4
+- xwd 1.0.9
+- xwud 1.0.6
+- Added BuildRequires:  pkgconfig(xi)
+
 * Mon Jan 18 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.7-29
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - License verified.

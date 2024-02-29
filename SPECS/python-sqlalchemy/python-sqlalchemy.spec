@@ -1,5 +1,8 @@
 %global srcname SQLAlchemy
 
+# Added global debug_package to fix the failure of empty debugfiles.list
+%global debug_package %{nil}
+
 %global python_pkg_extras \
     asyncio \
     mssql_pymssql \
@@ -17,8 +20,8 @@
 
 Summary:        Modular and flexible ORM library for python
 Name:           python-sqlalchemy
-Version:        1.4.32
-Release:        2%{?dist}
+Version:        2.0.27
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +37,7 @@ BuildRequires:  python3-greenlet >= 1.0
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
+BuildRequires:  python3-typing-extensions
 
 %description
 SQLAlchemy is an Object Relational Mapper (ORM) that provides a flexible,
@@ -88,8 +92,8 @@ rm -rf doc/build
 # Mariner's 'pytest' module is below the required version 6.0.0, so we need to use pip as well.
 # The 'apipkg' module should be provided by 'python3-py' pulled in by 'python3-execnet' but the build
 # couldn't find 'apipkg' just by using the BRs.
-pip3 install more-itertools pytest pytest-xdist apipkg
-PYTHONPATH=. python3 -m pytest test --numprocesses=auto
+pip3 install more-itertools pytest pytest-xdist apipkg typing_extensions mypy
+PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesses=auto
 
 %files doc
 %doc doc examples
@@ -100,6 +104,9 @@ PYTHONPATH=. python3 -m pytest test --numprocesses=auto
 %{python3_sitearch}/*
 
 %changelog
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
+- Auto-upgrade to 2.0.27 - none
+
 * Thu Mar 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.32-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Removed unused BR on 'python3-pluggy'.
