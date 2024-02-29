@@ -133,15 +133,6 @@
     %endif
 %endif
 
-# We want to build with nbdkit support, but should only enable nbdkit by
-# default if the OS ships a SELinux policy that allows libvirt to launch it.
-# Right now that's not the case anywhere, but things should be fine by the time
-# Fedora 40 is released.
-%if %{with_qemu}
-    # bfjelds: DO WE NEED THIS?? for Fedora, it is enabled for 0%{?fedora} || 0%{?rhel} >= 9
-    # %define with_nbdkit 0%{!?_without_nbdkit:1}
-%endif
-
 %ifarch %{arches_dmidecode}
     %define with_dmidecode 0%{!?_without_dmidecode:1}
 %endif
