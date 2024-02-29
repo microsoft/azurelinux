@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 // These are functions which are useful for adding breakpoints into code running in a chroot, while running

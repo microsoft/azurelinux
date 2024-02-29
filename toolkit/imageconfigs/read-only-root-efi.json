@@ -93,7 +93,7 @@
                 "ExtraCommandLine": "console=tty0 console=ttyS0=9800 rd.shell=0 rd.emergency=reboot",
                 "SELinux": "permissive"
             },
-            "Hostname": "cbl-mariner",
+            "Hostname": "azurelinux",
             "Users": [
                 {
                     "Name": "root",

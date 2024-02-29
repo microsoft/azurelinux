@@ -6,7 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 )
 
 func TestParseFilePermissionsValid1(t *testing.T) {

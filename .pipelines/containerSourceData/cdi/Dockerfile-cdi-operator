@@ -11,7 +11,7 @@ ARG USER
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
 # Workaround till proper binaries are built as part of the cdi rpm & renames are removed
-# https://github.com/microsoft/CBL-Mariner/pull/5708/files#
+# https://github.com/microsoft/azurelinux/pull/5708/files#
 COPY csv-generator /usr/bin/csv-generator
 
 # workaround till binaries rename is merged

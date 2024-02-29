@@ -57,7 +57,7 @@
                 "ExtraCommandLine": "fips=1",
                 "SELinux": "permissive"
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

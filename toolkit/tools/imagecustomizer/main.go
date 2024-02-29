@@ -7,19 +7,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/imagecustomizerlib"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	app = kingpin.New("imagecustomizer", "Customizes a pre-built CBL-Mariner image")
+	app = kingpin.New("imagecustomizer", "Customizes a pre-built Azure Linux image")
 
 	buildDir                    = app.Flag("build-dir", "Directory to run build out of.").Required().String()
-	imageFile                   = app.Flag("image-file", "Path of the base CBL-Mariner image which the customization will be applied to.").Required().String()
+	imageFile                   = app.Flag("image-file", "Path of the base Azure Linux image which the customization will be applied to.").Required().String()
 	outputImageFile             = app.Flag("output-image-file", "Path to write the customized image to.").Required().String()
 	outputImageFormat           = app.Flag("output-image-format", "Format of output image. Supported: vhd, vhdx, qcow2, raw, iso.").Enum("vhd", "vhdx", "qcow2", "raw", "iso")
 	outputSplitPartitionsFormat = app.Flag("output-split-partitions-format", "Format of partition files. Supported: raw, raw-zst").Enum("raw", "raw-zst")

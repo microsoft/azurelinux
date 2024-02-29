@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 )
 
 func ModifyOSWithConfigFile(configFile string) error {

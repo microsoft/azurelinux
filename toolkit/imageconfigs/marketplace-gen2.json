@@ -80,7 +80,7 @@
             "KernelCommandLine": {
                 "ExtraCommandLine": "console=ttyS0"
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

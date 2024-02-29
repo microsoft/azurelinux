@@ -14,11 +14,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"

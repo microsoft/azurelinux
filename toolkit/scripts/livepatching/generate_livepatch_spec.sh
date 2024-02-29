@@ -66,7 +66,7 @@ function generate_livepatch_spec {
     )
     create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch.spec" "$LIVEPATCH_SPEC_PATH" template_placeholders
 
-    update_spec.sh "Original version for CBL-Mariner.\n- License verified." "$LIVEPATCH_SPEC_PATH" 1>/dev/null
+    update_spec.sh "Original version for Azure Linux.\n- License verified." "$LIVEPATCH_SPEC_PATH" 1>/dev/null
 }
 
 KERNEL_SPECS_DIR="$REPO_ROOT/SPECS/kernel"
