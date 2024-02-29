@@ -2584,7 +2584,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 // stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
 //
 // It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the mariner-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
 // To be able to cleanly exit the setup chroot, we must stop it.
 func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {

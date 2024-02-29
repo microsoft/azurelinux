@@ -7,7 +7,7 @@ FROM $BASE_IMAGE
 
 WORKDIR /app
 
-RUN tdnf install -y mariner-repos-debug && tdnf clean all
+RUN tdnf install -y azurelinux-repos-debug && tdnf clean all
 
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 

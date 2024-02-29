@@ -17,16 +17,16 @@ import (
 var (
 	validPackageRepos = []PackageRepo{
 		{
-			Name:         "mariner-official-base",
-			BaseUrl:      "https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
+			Name:         "azurelinux-official-base",
+			BaseUrl:      "https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch",
 			Install:      false,
 			GPGCheck:     true,
 			RepoGPGCheck: true,
 			GPGKeys:      "file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		},
 		{
-			Name:         "mariner-official-preview",
-			BaseUrl:      "https://packages.microsoft.com/cbl-mariner/$releasever/preview/base/$basearch",
+			Name:         "azurelinux-official-preview",
+			BaseUrl:      "https://packages.microsoft.com/azurelinux/$releasever/preview/base/$basearch",
 			Install:      true,
 			GPGCheck:     true,
 			RepoGPGCheck: true,
@@ -35,9 +35,9 @@ var (
 	}
 
 	validRepoContent = []string{
-		"[mariner-official-base]",
-		"name=mariner-official-base",
-		"baseurl=https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch",
+		"[azurelinux-official-base]",
+		"name=azurelinux-official-base",
+		"baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch",
 		"gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY",
 		"gpgcheck=1",
 		"repo_gpgcheck=1",
@@ -46,10 +46,10 @@ var (
 		"sslverify=1",
 	}
 
-	validRepoJson          = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false}`
-	validRepoNoGPGJson     = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false,"gpgcheck":false}`
-	validRepoNoRepoGPGJson = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":false,"RepoGPGCheck":false}`
-	validRepoCustomKey     = `{"name":"mariner-official-base","baseurl":"https://packages.microsoft.com/cbl-mariner/$releasever/prod/base/$basearch","install":true,"gpgkeys":"file:///etc/pki/rpm-gpg/my-custom-key"}`
+	validRepoJson          = `{"name":"azurelinux-official-base","baseurl":"https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch","install":false}`
+	validRepoNoGPGJson     = `{"name":"azurelinux-official-base","baseurl":"https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch","install":false,"gpgcheck":false}`
+	validRepoNoRepoGPGJson = `{"name":"azurelinux-official-base","baseurl":"https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch","install":false,"RepoGPGCheck":false}`
+	validRepoCustomKey     = `{"name":"azurelinux-official-base","baseurl":"https://packages.microsoft.com/azurelinux/$releasever/prod/base/$basearch","install":true,"gpgkeys":"file:///etc/pki/rpm-gpg/my-custom-key"}`
 )
 
 func TestShouldPassParsingValidPackageRepos_PackageRepo(t *testing.T) {
@@ -115,7 +115,7 @@ func TestShouldFailParsingInvalidBaseUrlBogusUrl_PackageRepo(t *testing.T) {
 func TestShouldSucceedCreatingPackageRepoFile_PackageRepo(t *testing.T) {
 	curDir, err := os.Getwd()
 	assert.NoError(t, err)
-	testRepoFile := filepath.Join(curDir, "mariner-official-base.repo")
+	testRepoFile := filepath.Join(curDir, "azurelinux-official-base.repo")
 	testPackageRepo := validPackageRepos[0]
 
 	err = createCustomPackageRepo(nil, testPackageRepo, curDir)
@@ -184,11 +184,11 @@ func TestShouldFailNonInstalledCustomKeys_PackageRepo(t *testing.T) {
 
 	err := testPackageRepo.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for package repo 'mariner-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
+	assert.Equal(t, "invalid value for package repo 'azurelinux-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
 
 	err = remarshalJSON(testPackageRepo, &checkedPackageRepo)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [PackageRepo]: invalid value for package repo 'mariner-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
+	assert.Equal(t, "failed to parse [PackageRepo]: invalid value for package repo 'azurelinux-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
 }
 
 func TestShouldSucceedlInstalledCustomKeys_PackageRepo(t *testing.T) {

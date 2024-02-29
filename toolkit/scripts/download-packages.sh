@@ -39,7 +39,7 @@ function help {
     echo '[MANDATORY] -d DIR -> space-separated list of directories in the RPM repository (passed with the -u) (e.g. "base update")'
     echo '[OPTIONAL]  -h -> print this help dialogue and exit'
     echo '[MANDATORY] -t TYPE -> select which type of packages to download. Can provide more than one type, separated by space. The valid types are: x86_64 aarch64 srpms'
-    echo '[MANDATORY] -u URL -> URL to a root directory of a repository (e.g. https://packages.microsoft.com/cbl-mariner/1.0/prod/)'
+    echo '[MANDATORY] -u URL -> URL to a root directory of a repository (e.g. https://packages.microsoft.com/azurelinux/3.0/prod/)'
     echo '[OPTIONAL]  -z -> create a tarball for each downloaded package type and clean up'
 }
 

@@ -1,7 +1,7 @@
 From 6a1f573561d06edecad15b9e93a423bf2e4fdd4d Mon Sep 17 00:00:00 2001
 From: Pawel Winogrodzki <pawelwi@microsoft.com>
 Date: Wed, 30 Nov 2022 11:25:58 -0800
-Subject: [PATCH] Adjustments for CBL-Mariner.
+Subject: [PATCH] Adjustments for Azure Linux.
 
 ---
  kpatch-build/kpatch-build | 37 +++++++++++++++++++++++++------------
@@ -30,7 +30,7 @@ index 296fa48..12ab099 100755
  	rpmname="$(basename "$SRCRPM")"
 -	ARCHVERSION="${rpmname%.src.rpm}.$(uname -m)"
 +	ARCHVERSION="${rpmname%.src.rpm}"
-+	if [[ "$DISTRO" != mariner ]]; then
++	if [[ "$DISTRO" != azurelinux ]]; then
 +		ARCHVERSION="${ARCHVERSION}.$(uname -m)"
 +	fi
  	ARCHVERSION="${ARCHVERSION#kernel-}"
@@ -41,7 +41,7 @@ index 296fa48..12ab099 100755
  if [[ "$ARCHVERSION" =~ - ]]; then
  	KREL="${ARCHVERSION##*-}"
 -	KREL="${KREL%.*}"
-+	if [[ "$DISTRO" != mariner ]]; then
++	if [[ "$DISTRO" != azurelinux ]]; then
 +		KREL="${KREL%.*}"
 +	fi
  fi
@@ -57,7 +57,7 @@ index 296fa48..12ab099 100755
 -fi
 -
 -if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]]; then
-+if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
++if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = azurelinux ]]; then
  	[[ -z "$VMLINUX" ]] && VMLINUX="/usr/lib/debug/lib/modules/$ARCHVERSION/vmlinux"
  	[[ -e "$VMLINUX" ]] || die "kernel-debuginfo-$ARCHVERSION not installed"
  
@@ -66,14 +66,14 @@ index 296fa48..12ab099 100755
  
  else
 -	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]]; then
-+	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = mariner ]]; then
++	if [[ "$DISTRO" = fedora ]] || [[ "$DISTRO" = rhel ]] || [[ "$DISTRO" = ol ]] || [[ "$DISTRO" = centos ]] || [[ "$DISTRO" = openEuler ]] || [[ "$DISTRO" = azurelinux ]]; then
  
  		[[ "$DISTRO" = fedora ]] && echo "Fedora distribution detected"
  		[[ "$DISTRO" = rhel ]] && echo "RHEL distribution detected"
  		[[ "$DISTRO" = ol ]] && echo "Oracle Linux distribution detected"
  		[[ "$DISTRO" = centos ]] && echo "CentOS distribution detected"
  		[[ "$DISTRO" = openEuler ]] && echo "OpenEuler distribution detected"
-+		[[ "$DISTRO" = mariner ]] && echo "CBL-Mariner distribution detected"
++		[[ "$DISTRO" = azurelinux ]] && echo "Azure Linux distribution detected"
  
  		clean_cache
  
@@ -81,8 +81,8 @@ index 296fa48..12ab099 100755
  		if [[ -z "$SRCRPM" ]]; then
  			if [[ "$DISTRO" = fedora ]]; then
  				wget -P "$TEMPDIR" "http://kojipkgs.fedoraproject.org/packages/kernel/$KVER/$KREL/src/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
-+			elif [[ "$DISTRO" = mariner ]]; then
-+				wget -P "$TEMPDIR" "https://packages.microsoft.com/cbl-mariner/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
++			elif [[ "$DISTRO" = azurelinux ]]; then
++				wget -P "$TEMPDIR" "https://packages.microsoft.com/azurelinux/$VERSION_ID/prod/base/srpms/kernel-$KVER-$KREL.src.rpm" 2>&1 | logger || die
  			else
  				command -v yumdownloader &>/dev/null || die "yumdownloader (yum-utils or dnf-utils) not installed"
  				yumdownloader --source --destdir "$TEMPDIR" "kernel$ALT-$KVER-$KREL" 2>&1 | logger || die
@@ -90,7 +90,7 @@ index 296fa48..12ab099 100755
  			# openEuler has two directories with the same content after 'rpm -D'
  			# openEuler 21.09 has linux-* and linux-*-source while openEuler 20.03 has linux-* and linux-*-Source
  			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-*[sS]ource "$KERNEL_SRCDIR" 2>&1 | logger || die
-+		elif [[ "$DISTRO" = mariner ]]; then
++		elif [[ "$DISTRO" = azurelinux ]]; then
 +			mv "$RPMTOPDIR"/BUILD/CBL-Mariner-Linux-Kernel-* "$KERNEL_SRCDIR" 2>&1 | logger || die
  		else
  			mv "$RPMTOPDIR"/BUILD/kernel-*/linux-* "$KERNEL_SRCDIR" 2>&1 | logger || die
@@ -99,7 +99,7 @@ index 296fa48..12ab099 100755
  		rm -rf "$KERNEL_SRCDIR/.git"
  
 -		if [[ "$ARCHVERSION" == *-* ]]; then
-+		if [[ "$DISTRO" != mariner ]] && [[ "$ARCHVERSION" == *-* ]]; then
++		if [[ "$DISTRO" != azurelinux ]] && [[ "$ARCHVERSION" == *-* ]]; then
  			sed -i "s/^EXTRAVERSION.*/EXTRAVERSION = -${ARCHVERSION##*-}/" "$KERNEL_SRCDIR/Makefile" || die
  		fi
  
@@ -107,7 +107,7 @@ index 296fa48..12ab099 100755
  
  		if [[ "$DISTRO" = openEuler ]]; then
  			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="/boot/config-${ARCHVERSION}"
-+		elif [[ "$DISTRO" = mariner ]]; then
++		elif [[ "$DISTRO" = azurelinux ]]; then
 +			[[ -z "$CONFIGFILE" ]] && CONFIGFILE="$KERNEL_SRCDIR/new_config"
 +			sed -i "s/CONFIG_LOCALVERSION=\"\"/CONFIG_LOCALVERSION=\"-$KREL\"/" "$CONFIGFILE"
  		else

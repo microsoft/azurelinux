@@ -274,7 +274,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
-	// By default, chroot ships with PMC repositories specified in mariner-repos rpm.
+	// By default, chroot ships with PMC repositories specified in azurelinux-repos rpm.
 	for _, originalRepoFilePath := range existingRepoFiles {
 		repoIDs, err := readRepoIDs(originalRepoFilePath)
 		if err != nil {

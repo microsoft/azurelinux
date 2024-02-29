@@ -8,7 +8,7 @@
 Summary:        GStreamer streaming media framework runtime
 Name:           gstreamer1
 Version:        1.20.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,7 +62,7 @@ developing applications that use %{name}.
 %build
 %meson	\
   -D package-name='CBL-Mariner GStreamer package' \
-  -D package-origin='https://packages.microsoft.com/cbl-mariner/2.0' \
+  -D package-origin='https://packages.microsoft.com/azurelinux/3.0' \
   -D tests=disabled \
   -D examples=disabled \
   -D ptp-helper-permissions=capabilities \
@@ -158,6 +158,9 @@ install -m0644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/fileattrs/gstreamer
 %{_libdir}/pkgconfig/gstreamer-net-%{majorminor}.pc
 
 %changelog
+* Wed Feb 28 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.20.0-2
+- Fix remaining issues linked to CBL-Mariner re-branding to Azure Linux
+
 * Thu Mar 03 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.0-1
 - Updating to version 1.20.0 using Fedora 36 spec (license: MIT) for guidance.
 

@@ -12,7 +12,7 @@ toolkit_component_extra_files = \
 	$(PROJECT_ROOT)/LICENSES-AND-NOTICES/LICENSE.md \
 	$(toolkit_root)/.gitignore
 
-mariner_repos_dir = $(PROJECT_ROOT)/SPECS/mariner-repos
+mariner_repos_dir = $(PROJECT_ROOT)/SPECS/azurelinux-repos
 mariner_repos_files = $(wildcard $(mariner_repos_dir)/*.repo)
 rpms_snapshot_name = rpms_snapshot.json
 specs_dir_name = $(notdir $(SPECS_DIR))

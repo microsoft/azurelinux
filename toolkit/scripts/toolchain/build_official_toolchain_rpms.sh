@@ -444,7 +444,7 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
+# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
@@ -674,7 +674,7 @@ build_rpm_in_chroot_no_install newt
 chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
-build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install azurelinux-repos
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.

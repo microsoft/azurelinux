@@ -40,7 +40,7 @@ ignore_no_source_tarball=" \
   kf5 \
   livepatching \
   lua-rpm-macros \
-  mariner-repos \
+  azurelinux-repos \
   mariner-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
