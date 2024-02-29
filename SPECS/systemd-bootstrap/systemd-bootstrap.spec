@@ -37,16 +37,16 @@ Patch7:         update-cifs-for-kernel-headers-6.1.patch
 # Directions for refreshing systemd macros:
 #    1. Update Source21->24 from main systemd directory, currently they are taken un-modified.
 #    2. Take systemd and systemd-bootstrap .src.rpms, install and run rpmbuild -bp --nodeps --noclean <srpm>.
-#    3. Personal flow to create patch:
+#    3. Create a patch:
 #         cd BUILD/systemd-stable-250 && git init && git add -A && git commit -m "init"
 #         cp ../systemd-stable-255/src/rpm/macros.systemd.in src/rpm/macros.systemd.in
-#         # Adjust changes as needed (LIBEXECDIR->ROOTLIBEXECDIR, define USER_TMPFILES_DIR), possibly split each change into its own commit
+#         # Adjust changes as needed (LIBEXECDIR->ROOTLIBEXECDIR, define USER_TMPFILES_DIR), ideally split each change into its own commit for ease of review.
 #         git add -A && git commit -m "use-255-macros"
 #         # Use -1 for a single commit, or -3 etc. for more
 #         git format-patch -1 --stdout > use-255-macros.patch
 #    4. Update patch, then rebuild to validate changes
 #    5. Repeat from 2. as needed until it builds
-#    6. Build both systemd and systemd-bootstrap, validate the contents of systemd-rpm-macros and system-bootstrap-rpm-macros are idential
+#    6. Build both systemd and systemd-bootstrap, validate the contents of systemd-rpm-macros and system-bootstrap-rpm-macros are identical
 Patch8:         use-255-macros.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
