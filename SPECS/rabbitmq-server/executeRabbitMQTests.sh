@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####   TESTING DISCLAIMER   ####
-# This script follows the steps to run the tests for RabbitMQ v3.11.9 as of 2/22/23 on Azure Linux. As a result, this script can likely 
+# This script follows the steps to run the tests for RabbitMQ v3.11.9 as of 2/22/23 on CBL-Mariner. As a result, this script can likely 
 # be used as a baseline to execute the test for future releases/upgrades to verify the package integrity. That said, some things may need
 # to be updated in order to make the tests succeed such as updating the links for erlang, elixir, bazel, and/or mandoc in order to have
 # some or all tests succeed.
