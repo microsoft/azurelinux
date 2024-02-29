@@ -10,7 +10,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl0
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation

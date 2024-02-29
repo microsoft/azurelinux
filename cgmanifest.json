@@ -8191,8 +8191,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv14",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv14.tar.gz"
+          "version": "6.1.0.mshv16",
+          "downloadUrl": null
         }
       }
     },
