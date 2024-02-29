@@ -108,6 +108,11 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 29 2024 Sindhu Karri <lakarri@microsoft.com> - 25.3-1
+- Upgrade to 25.3
+- Added BR on abseil-cpp
+- Using cmake build system
+
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
