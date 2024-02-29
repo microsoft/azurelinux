@@ -68,7 +68,7 @@ mkdir -p "$log_path"
 ORIGINAL_HOME=$HOME
 HOME=/root
 
-# These nodes are required in the chroot for certain tools (most importantly, gpg key import when installing 'mariner-repos-shared' package)
+# These nodes are required in the chroot for certain tools (most importantly, gpg key import when installing 'azurelinux-repos-shared' package)
 # This is also required to check the rpm db version to see if rebuilding the db is necessary
 mkdir -pv $chroot_builder_folder/dev
 mknod -m 600 $chroot_builder_folder/dev/console c 5 1
@@ -111,7 +111,7 @@ else
 fi
 
 echo "Importing CBL-Mariner GPG keys." | tee -a "$chroot_log"
-for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l mariner-repos-shared | grep "rpm-gpg")
+for gpg_key in $(chroot "$chroot_builder_folder" rpm -q -l azurelinux-repos-shared | grep "rpm-gpg")
 do
     echo "Importing GPG key: $gpg_key" | tee -a "$chroot_log"
     chroot "$chroot_builder_folder" rpm --import "$gpg_key"
