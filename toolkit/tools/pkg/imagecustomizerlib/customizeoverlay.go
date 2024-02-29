@@ -22,7 +22,6 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 	}
 
 	// Integrate overlay dracut module and overlay driver into initramfs img.
-	// Integrate systemd veritysetup dracut module into initramfs img.
 	overlayDracutModule := "overlayfs"
 	overlayDracutDriver := "overlay"
 	err = buildDracutModule(overlayDracutModule, overlayDracutDriver, imageChroot)

@@ -30,7 +30,7 @@ type SystemConfig struct {
 	Services                Services           `yaml:"Services"`
 	Modules                 Modules            `yaml:"Modules"`
 	Verity                  *Verity            `yaml:"Verity"`
-	Overlays                *[]Overlay                `yaml:"Overlays"`
+	Overlays                *[]Overlay         `yaml:"Overlays"`
 }
 
 func (s *SystemConfig) IsValid() error {
