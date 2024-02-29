@@ -315,11 +315,9 @@ BuildRequires: libssh2-devel >= 1.3.0
 BuildRequires: netcf-devel >= 0.2.2
     %endif
     %if %{with_esx}
-# bfjelds: NEW .. defaults to not use, do we want it?
 BuildRequires: libcurl-devel
     %endif
     %if %{with_hyperv}
-# bfjelds: NEW .. defaults to not use, do we want it?
 BuildRequires: libwsman-devel >= 2.6.3
     %endif
 BuildRequires: audit-libs-devel
@@ -2183,6 +2181,8 @@ exit 0
 %changelog
 * Thu Jan 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 10.0.0-1
 - Updating to version 10.0.0.
+- Hard code configuration options to match Mariner 2.0 configurations. Ensure that
+  each hard-coded value is commented as matching azl2.0
 
 * Wed May 24 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
