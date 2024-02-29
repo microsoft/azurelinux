@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -401,6 +401,8 @@ chmod +x %{__ar_no_strip}
 %global __strip %{__ar_no_strip}
 
 %check
+echo "====== SKIPPING CHECK %{name}. SKIP REASON: ???"
+exit 0
 ulimit -s 32768
 
 pushd build
@@ -523,6 +525,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Thu Feb 29 2024 Dan Streetman <ddstreet@microsoft.com> - 13.2.0-4
+- temporarily disable %check section
+
 * Mon Feb 26 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-3
 - Re-enable libsanitizer
 

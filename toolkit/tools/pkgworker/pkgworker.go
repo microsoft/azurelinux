@@ -51,7 +51,6 @@ var (
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
 	distroReleaseVersion = app.Flag("distro-release-version", "The distro release version that the SRPM will be built with").Required().String()
 	distroBuildNumber    = app.Flag("distro-build-number", "The distro build number that the SRPM will be built with").Required().String()
-	rpmmacrosFile        = app.Flag("rpmmacros-file", "Optional file path to an rpmmacros file for rpmbuild to use").ExistingFile()
 	runCheck             = app.Flag("run-check", "Run the check during package build").Bool()
 	packagesToInstall    = app.Flag("install-package", "Filepaths to RPM packages that should be installed before building.").Strings()
 	outArch              = app.Flag("out-arch", "Architecture of resulting package").String()
@@ -117,7 +116,7 @@ func main() {
 		defines[rpm.MaxCPUDefine] = *maxCPU
 	}
 
-	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
+	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
 	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
@@ -154,7 +153,7 @@ func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -219,7 +218,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 	defer chroot.Close(noCleanup)
 
 	// Place extra files that will be needed to build into the chroot
-	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, rpmmacrosFile, runCheck)
+	srpmFileInChroot, err := copyFilesIntoChroot(chroot, srpmFile, repoFile, runCheck)
 	if err != nil {
 		return
 	}
@@ -468,12 +467,11 @@ func removeLibArchivesFromSystem() (err error) {
 }
 
 // copyFilesIntoChroot copies several required build specific files into the chroot.
-func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacrosFile string, runCheck bool) (srpmFileInChroot string, err error) {
+func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, runCheck bool) (srpmFileInChroot string, err error) {
 	const (
 		chrootRepoDestDir = "/etc/yum.repos.d"
 		chrootSrpmDestDir = "/root/SRPMS"
 		resolvFilePath    = "/etc/resolv.conf"
-		rpmmacrosDest     = "/usr/lib/rpm/macros.d/macros.override"
 	)
 
 	repoFileInChroot := filepath.Join(chrootRepoDestDir, filepath.Base(repoFile))
@@ -488,14 +486,6 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 			Src:  srpmFile,
 			Dest: srpmFileInChroot,
 		},
-	}
-
-	if rpmmacrosFile != "" {
-		rpmmacrosCopy := safechroot.FileToCopy{
-			Src:  rpmmacrosFile,
-			Dest: rpmmacrosDest,
-		}
-		filesToCopy = append(filesToCopy, rpmmacrosCopy)
 	}
 
 	if runCheck {

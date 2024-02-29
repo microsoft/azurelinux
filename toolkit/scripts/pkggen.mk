@@ -283,7 +283,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroo
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
 		--distro-build-number="$(BUILD_NUMBER)" \
-		--rpmmacros-file="$(TOOLCHAIN_MANIFESTS_DIR)/macros.override" \
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
 		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \

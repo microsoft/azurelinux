@@ -316,7 +316,6 @@ cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen
 cp -v $SPECROOT/mariner-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/mariner/generate-package-note.py
 cp -v $SPECROOT/mariner-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/mariner/verify-package-notes.sh
 mkdir -pv $LFS/usr/lib/rpm/macros.d
-cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
 
 stop_record_timestamp "build prep"
