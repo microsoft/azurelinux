@@ -23,4 +23,5 @@ echo "====== CHECK START %{name}" \
 # Print some sentinels for parsing the log for test status.
 %__spec_check_post \
 echo "====== CHECK DONE %{name}. EXIT STATUS $?" \
+%{___build_post} \
 %{nil}
