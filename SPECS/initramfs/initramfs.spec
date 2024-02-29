@@ -1,12 +1,13 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        2.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 Source0:        fscks.conf
+BuildRequires:  grub2-rpm-macros
 Requires:       dracut
 Provides:       initramfs
 
@@ -101,14 +102,14 @@ elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
         fi \
     done; \
 fi \
+%grub2_post
 %removal_action
 
 %posttrans
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
 mkinitrd -q
-# Move initrd generated for kernel-mshv to /boot/efi, where linuxloader expects to find it
-mv /boot/initrd.img-*mshv* /boot/efi/ >/dev/null 2>&1 || :
+%grub2_post
 
 %postun
 echo "initramfs" %{version}-%{release} "postun" >&2
@@ -137,6 +138,10 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14
+- Ensure grub2-mkconfig is called after the initramfs generation
+- Deprecate old linuxloader; no longer copy initrd image to efi partition 
+
 * Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
     with the old linuxloader. Let the initrd remain in /boot as well. 

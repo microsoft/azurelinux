@@ -1,0 +1,46 @@
+From ea645f97bcec90a818dc6915d84cd0f752d9ccfd Mon Sep 17 00:00:00 2001
+From: Roi Dayan <roid@nvidia.com>
+Date: Thu, 27 Oct 2022 11:35:12 +0300
+Subject: [PATCH] net/mlx5: Bridge, Use debug instead of warn if entry doesn't
+ exists
+
+There is no need for the warn if entry already removed.
+Use debug print like in the update flow.
+Also update the messages so user can identify if the it's
+from the update flow or remove flow.
+
+Signed-off-by: Roi Dayan <roid@nvidia.com>
+Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+index 4fbff7bcc155..b176648d1343 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -1722,7 +1722,7 @@ void mlx5_esw_bridge_fdb_update_used(struct net_device *dev, u16 vport_num, u16
+ 	entry = mlx5_esw_bridge_fdb_lookup(bridge, fdb_info->addr, fdb_info->vid);
+ 	if (!entry) {
+ 		esw_debug(br_offloads->esw->dev,
+-			  "FDB entry with specified key not found (MAC=%pM,vid=%u,vport=%u)\n",
++			  "FDB update entry with specified key not found (MAC=%pM,vid=%u,vport=%u)\n",
+ 			  fdb_info->addr, fdb_info->vid, vport_num);
+ 		return;
+ 	}
+@@ -1775,9 +1775,9 @@ void mlx5_esw_bridge_fdb_remove(struct net_device *dev, u16 vport_num, u16 esw_o
+ 	bridge = port->bridge;
+ 	entry = mlx5_esw_bridge_fdb_lookup(bridge, fdb_info->addr, fdb_info->vid);
+ 	if (!entry) {
+-		esw_warn(esw->dev,
+-			 "FDB entry with specified key not found (MAC=%pM,vid=%u,vport=%u)\n",
+-			 fdb_info->addr, fdb_info->vid, vport_num);
++		esw_debug(esw->dev,
++			  "FDB remove entry with specified key not found (MAC=%pM,vid=%u,vport=%u)\n",
++			  fdb_info->addr, fdb_info->vid, vport_num);
+ 		return;
+ 	}
+ 
+-- 
+2.31.1

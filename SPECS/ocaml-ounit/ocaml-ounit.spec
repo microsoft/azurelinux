@@ -12,7 +12,7 @@
 Summary:        Unit test framework for OCaml
 Name:           ocaml-%{srcname}
 Version:        2.2.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,9 @@ Patch0:         %{name}-stdlib-shims.patch
 # Enable ocaml 4.13 compatibility. Source: Fedora 35
 # https://src.fedoraproject.org/rpms/ocaml-ounit/blob/f35/f/ounit-v2.2.4-remove-Thread-kill.patch
 Patch1:         remove-thread-kill.patch
+# Fix backtrace parsing with ocaml>=4.11. Source: Upstreamed in 2.2.3
+# https://github.com/gildor478/ounit/commit/2a9acf70aeb0f47de5a7c7c07129235a5f2ac0f0
+Patch2:         fix-backtrace-parser.patch
 
 # I believe this is actually caused by a missing Requires in another
 # package (perhaps lwt?).  In any case without this the tests fail to
@@ -190,10 +193,13 @@ find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
 %endif
 
 %changelog
+* Thu Nov 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.2.2-7
+- Add upstream patch to fix backtrace parser test
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-6
 - Cleaning-up spec. License verified.
 
-* Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 2.2.2-5
+* Tue Jan 18 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.2.2-5
 - Take Fedora patch (license: MIT) to fix building with OCaml 4.13.0
 - License verified
 

@@ -1,0 +1,26 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN set -eux && \
+    redis-cli --version && \
+    redis-server --version && \
+    mkdir /data && \
+    chown redis:redis /data
+
+VOLUME /data
+WORKDIR /data
+
+COPY redis-docker-entrypoint.sh /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/redis-docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/redis-docker-entrypoint.sh"]
+
+EXPOSE 6379
+CMD ["redis-server"]

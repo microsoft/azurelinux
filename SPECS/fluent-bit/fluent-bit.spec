@@ -1,12 +1,14 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
 Version:        2.1.10
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2023-48105.patch
+Patch1:         CVE-2023-52284.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -37,7 +39,7 @@ Requires:       %{name} = %{version}
 Development files for %{name}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 
@@ -49,8 +51,10 @@ Development files for %{name}
     -DFLB_OUT_TD=Off \
     -DFLB_OUT_ES=Off \
     -DFLB_SHARED_LIB=On \
+%if %{with_check}
     -DFLB_TESTS_RUNTIME=On \
-    -DFLB_TESTS_INTERNAL=Off \
+    -DFLB_TESTS_INTERNAL=On \
+%endif
     -DFLB_RELEASE=On \
     -DFLB_DEBUG=Off \
     -DFLB_TLS=On \
@@ -61,6 +65,9 @@ Development files for %{name}
 
 %install
 %cmake_install
+
+%check
+%ctest --exclude-regex "flb-rt-in_podman_metrics|flb-rt-filter_lua|.*\\.sh"
 
 %files
 %license LICENSE
@@ -75,6 +82,13 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Wed Jan 10 2024 Henry Li <lihl@microsoft.com> - 2.1.10-3
+- Address CVE-2023-52284
+- Change to autosetup
+
+* Wed Dec 06 2023 Chris Gunn <chrisgun@Microsoft.com> - 2.1.10-2
+- CVE-2023-48105
+
 * Tue Oct 31 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.10-1
 - Auto-upgrade to 2.1.10 - upgrade to latest
 

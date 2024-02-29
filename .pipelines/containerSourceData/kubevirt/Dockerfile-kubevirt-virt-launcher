@@ -1,0 +1,30 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# XXX Once edk2 is moved to SPECS this will not be needed
+RUN tdnf -y install mariner-repos-extended.noarch \
+  && tdnf -y install edk2-ovmf \
+  && tdnf clean all
+
+# Setup permissions and capabilities for non-root VMIs. KubeVirt sets
+# XDG_* directories to /var/run.
+RUN  cd /var && rm -rf run && ln -s ../run . \
+   && chown qemu:qemu /var/run \
+   && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher \
+   && setcap 'cap_net_bind_service=+ep' /usr/bin/virt-launcher-monitor \
+   && chmod 0755 /etc/libvirt
+
+RUN cp /usr/share/kube-virt/virt-launcher/qemu.conf /etc/libvirt/
+RUN cp /usr/share/kube-virt/virt-launcher/virtqemud.conf /etc/libvirt/
+RUN cp /usr/share/kube-virt/virt-launcher/nsswitch.conf /etc/
+
+#simple smoke test
+RUN ls /usr/bin/virt-launcher
+
+ENTRYPOINT [ "/usr/bin/virt-launcher" ]

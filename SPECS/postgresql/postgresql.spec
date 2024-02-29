@@ -1,6 +1,6 @@
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        14.8
+Version:        14.11
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -35,6 +35,12 @@ Requires:       zlib
 %description
 PostgreSQL is an object-relational database management system.
 
+%package docs
+Summary:        Extra documentation for PostgreSQL
+
+%description docs
+The postgresql-docs package includes the documentation.
+
 %package libs
 Summary:        Libraries for use with PostgreSQL
 Group:          Applications/Databases
@@ -64,10 +70,11 @@ The postgresql-devel package contains libraries and header files for
 developing applications that use postgresql.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h &&
+sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h
+
 ./configure \
     --enable-thread-safety \
     --prefix=%{_prefix} \
@@ -78,13 +85,11 @@ sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_man
     --with-readline \
     --with-system-tzdata=%{_datadir}/zoneinfo \
     --docdir=%{_docdir}/postgresql
-make -C ./src/backend generated-headers
-make %{?_smp_mflags}
-cd contrib && make %{?_smp_mflags}
+
+%make_build world
 
 %install
-make install DESTDIR=%{buildroot}
-cd contrib && make install DESTDIR=%{buildroot}
+%make_install install-world
 
 # For postgresql 10+, commands are renamed
 # Ref: https://wiki.postgresql.org/wiki/New_in_postgres_10
@@ -93,9 +98,19 @@ ln -sf pg_resetwal %{buildroot}%{_bindir}/pg_resetxlog
 ln -sf  pg_waldump %{buildroot}%{_bindir}/pg_xlogdump
 %{_fixperms} %{buildroot}/*
 
+# Remove anything related to Python 2.  These have no need to be
+# around as only Python 3 is supported.
+rm -f %{buildroot}%{_pgdatadir}/extension/*plpython2u* \
+      %{buildroot}%{_pgdatadir}/extension/*plpythonu-* \
+      %{buildroot}%{_pgdatadir}/extension/*_plpythonu.control
+
+# Remove currently unnecessary man pages.
+rm -f %{buildroot}%{_mandir}/man1/* \
+      %{buildroot}%{_mandir}/man3/* \
+      %{buildroot}%{_mandir}/man7/*
+
 %check
-sed -i '2219s/",/  ; EXIT_STATUS=$? ; sleep 5 ; exit $EXIT_STATUS",/g'  src/test/regress/pg_regress.c
-chown -Rv nobody .
+chown -Rv nobody:nogroup .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %ldconfig_scriptlets
@@ -132,6 +147,10 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_docdir}/postgresql/extension/*.example
 %exclude %{_datadir}/postgresql/pg_service.conf.sample
 %exclude %{_datadir}/postgresql/psqlrc.sample
+
+%files docs
+%defattr(-,root,root)
+%{_docdir}/postgresql/*
 
 %files libs
 %{_bindir}/clusterdb
@@ -172,6 +191,13 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Tue Feb 27 2024 Thien Trung Vuong <cblmargh@microsoft.com> - 14.11-1
+- Update to version 14.11 to fix CVE-2024-0985
+- Added the 'docs' subpackage.
+
+* Fri Dec 29 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 14.10-1
+- Upgrade to 14.10 to fix CVE-2023-5868, CVE-2023-5869 and CVE-2023-5870
+
 * Tue Jun 20 2023 Bala <balakumaran.kannan@microsoft.com> - 14.8-1
 - Upgrade to 14.8 to fix CVE-2023-2454, CVE-2023-2455 and CVE-2022-41862
 

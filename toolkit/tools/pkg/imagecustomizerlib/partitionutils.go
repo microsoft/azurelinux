@@ -81,6 +81,22 @@ func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskuti
 }
 
 func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
+	var bootPartition *diskutils.PartitionInfo
+	bootPartition, err := findBootPartitionFromEsp(efiSystemPartition, diskPartitions, buildDir)
+
+	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, err
+	}
+
+	if rootfsPartition == nil {
+		return nil, fmt.Errorf("failed to find rootfs partition using boot partition (%s)", bootPartition.Name)
+	}
+
+	return rootfsPartition, nil
+}
+
+func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	// Mount the EFI System Partition.
@@ -125,16 +141,7 @@ func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, dis
 		return nil, fmt.Errorf("failed to find boot partition with UUID (%s)", bootPartitionUuid)
 	}
 
-	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
-	if err != nil {
-		return nil, err
-	}
-
-	if rootfsPartition == nil {
-		return nil, fmt.Errorf("failed to find rootfs partition using boot partition (%s)", bootPartition.Name)
-	}
-
-	return rootfsPartition, nil
+	return bootPartition, nil
 }
 
 func findRootfsPartitionFromBiosBootPartition(biosBootLoaderPartition *diskutils.PartitionInfo,
@@ -273,7 +280,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	// Temporarily mount the rootfs partition so that the fstab file can be read.
-	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "", true)
+	rootfsPartitionMount, err := safemount.NewMount(rootfsPartition.Path, tmpDir, rootfsPartition.FileSystemType, 0, "",
+		true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to mount rootfs partition (%s):\n%w", rootfsPartition.Path, err)
 	}
@@ -281,7 +289,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 
 	// Read the fstab file.
 	fstabPath := filepath.Join(tmpDir, "/etc/fstab")
-	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+
+	mountPoints, err := findMountsFromFstabFile(fstabPath, diskPartitions)
 	if err != nil {
 		return nil, err
 	}
@@ -292,6 +301,17 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 		return nil, fmt.Errorf("failed to close rootfs partition mount (%s):\n%w", rootfsPartition.Path, err)
 	}
 
+	return mountPoints, nil
+}
+
+func findMountsFromFstabFile(fstabPath string, diskPartitions []diskutils.PartitionInfo,
+) ([]*safechroot.MountPoint, error) {
+	// Read the fstab file.
+	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+	if err != nil {
+		return nil, err
+	}
+
 	mountPoints, err := fstabEntriesToMountPoints(fstabEntries, diskPartitions)
 	if err != nil {
 		return nil, err
@@ -300,7 +320,8 @@ func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitio
 	return mountPoints, nil
 }
 
-func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitions []diskutils.PartitionInfo) ([]*safechroot.MountPoint, error) {
+func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitions []diskutils.PartitionInfo,
+) ([]*safechroot.MountPoint, error) {
 	// Convert fstab entries into mount points.
 	var mountPoints []*safechroot.MountPoint
 	var foundRoot bool

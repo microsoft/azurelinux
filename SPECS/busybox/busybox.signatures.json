@@ -2,6 +2,6 @@
  "Signatures": {
   "busybox-1.35.0.tar.bz2": "faeeb244c35a348a334f4a59e44626ee870fb07b6884d68c10ae8bc19f83a694",
   "busybox-petitboot.config": "28a4006863e0125bb564159c120067cb83b52ee0a829579cd399274cc78a10be",
-  "busybox-static.config": "6f2f534548da57df8b1f5fd4dfe6ceece0f1b97bf7d0baa4c484ac9850cf8e37"
+  "busybox-static.config": "e97bc24c897e41e5a6fc6b54955b20e3c49ea5828f9ecba6ba520f8291470e58"
  }
 }

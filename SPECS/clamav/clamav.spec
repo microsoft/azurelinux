@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.105.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -98,20 +98,24 @@ mv %{buildroot}%{_sysconfdir}/clamav/freshclam.conf{.sample,}
 chmod 600 %{buildroot}%{_sysconfdir}/clamav/freshclam.conf
 
 %pre
-if ! getent group clamav >/dev/null; then
-    groupadd -r clamav
-fi
-if ! getent passwd clamav >/dev/null; then
-    useradd -g clamav -d %{_sharedstatedir}/clamav\
-        -s /bin/false -M -r clamav
+if [ $1 -eq 1 ]; then
+    if ! getent group clamav >/dev/null; then
+        groupadd -r clamav
+    fi
+    if ! getent passwd clamav >/dev/null; then
+        useradd -g clamav -d %{_sharedstatedir}/clamav\
+            -s /bin/false -M -r clamav
+    fi
 fi
 
 %postun
-if getent passwd clamav >/dev/null; then
-    userdel clamav
-fi
-if getent group clamav >/dev/null; then
-    groupdel clamav
+if [ $1 -eq 0 ]; then
+    if getent passwd clamav >/dev/null; then
+        userdel clamav
+    fi
+    if getent group clamav >/dev/null; then
+        groupdel clamav
+    fi
 fi
 
 %files
@@ -132,6 +136,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Fri Dec 08 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.105.2-4
+- Fix resetting of user and group settings on package update
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 0.105.2-3
 - Bump package to rebuild with rust 1.72.0
 

@@ -61,8 +61,7 @@ var (
 	maxCPU               = app.Flag("max-cpu", "Max number of CPUs used for package building").Default("").String()
 	timeout              = app.Flag("timeout", "Timeout for package building").Required().Duration()
 
-	logFile  = exe.LogFileFlag(app)
-	logLevel = exe.LogLevelFlag(app)
+	logFlags = exe.SetupLogFlags(app)
 )
 
 var (
@@ -72,7 +71,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
 	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
@@ -90,7 +89,7 @@ func main() {
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
 	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
-	ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheRootDir, *ccachConfig)
+	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
 		if *useCcache {
 			buildArch, ccacheErr := rpm.GetRpmArch(runtime.GOARCH)
@@ -119,14 +118,16 @@ func main() {
 	}
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
-	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFile)
+	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
 
-	err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
-	logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
-
-	// On success write a comma-seperated list of RPMs built to stdout that can be parsed by the invoker.
-	// Any output from logger will be on stderr so stdout will only contain this output.
+	// For regular (non-test) package builds:
+	// - Copy the SRPM which produced the package to the output directory.
+	// - Write a comma-separated list of RPMs built to stdout that can be parsed by the invoker.
+	//   Any output from logger will be on stderr so stdout will only contain this output.
 	if !*runCheck {
+		err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
+		logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+
 		fmt.Print(strings.Join(builtRPMs, ","))
 	}
 }
@@ -149,11 +150,11 @@ func buildChrootDirPath(workDir, srpmFilePath string, runCheck bool) (chrootDirP
 	return filepath.Join(workDir, buildDirName)
 }
 
-func isCCacheEnabled(ccacheManager *ccachemanagerpkg.CCacheManager) bool {
+func isCCacheEnabled(ccacheManager *ccachemanager.CCacheManager) bool {
 	return ccacheManager != nil && ccacheManager.CurrentPkgGroup.Enabled
 }
 
-func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanagerpkg.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
+func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmFile, repoFile, rpmmacrosFile, outArch string, defines map[string]string, noCleanup, runCheck bool, packagesToInstall []string, ccacheManager *ccachemanager.CCacheManager, timeout time.Duration) (builtRPMs []string, err error) {
 
 	const (
 		buildHeartbeatTimeout = 30 * time.Minute
@@ -211,7 +212,7 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 		extraDirs = append(extraDirs, chrootCcacheDir)
 	}
 
-	err = chroot.Initialize(workerTar, extraDirs, mountPoints)
+	err = chroot.Initialize(workerTar, extraDirs, mountPoints, true)
 	if err != nil {
 		return
 	}

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	ccachemanagerpkg "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
@@ -103,8 +103,7 @@ var (
 	testsToRun    = app.Flag("tests", "Space separated list of tests that should be ran. Omit this argument to run package tests.").String()
 	testsToRerun  = app.Flag("rerun-tests", "Space separated list of package tests that should be re-ran.").String()
 
-	logFile       = exe.LogFileFlag(app)
-	logLevel      = exe.LogLevelFlag(app)
+	logFlags      = exe.SetupLogFlags(app)
 	profFlags     = exe.SetupProfileFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
 )
@@ -112,7 +111,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -173,7 +172,7 @@ func main() {
 		Timeout:      *timeout,
 
 		LogDir:   *buildLogsDir,
-		LogLevel: *logLevel,
+		LogLevel: *logFlags.LogLevel,
 	}
 
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)
@@ -201,7 +200,7 @@ func main() {
 
 	if *useCcache {
 		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
-		ccacheManager, ccacheErr := ccachemanagerpkg.CreateManager(*ccacheDir, *ccacheConfig)
+		ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheDir, *ccacheConfig)
 		if ccacheErr == nil {
 			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
 			if ccacheErr != nil {

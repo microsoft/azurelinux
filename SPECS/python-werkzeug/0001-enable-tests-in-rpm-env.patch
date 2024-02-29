@@ -1,0 +1,32 @@
+From 7bd6337181f1964d3a0203be2faf49f335984402 Mon Sep 17 00:00:00 2001
+From: Nick Samson <nisamson@microsoft.com>
+Date: Mon, 13 Nov 2023 17:02:11 -0800
+Subject: [PATCH] Added pythonpath fix for RPM build testing
+
+---
+ tests/conftest.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index b73202cd..0fb9657d 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -105,7 +105,14 @@ def dev_server(xprocess, request, tmp_path):
+             # Extend the existing env, otherwise Windows and CI fails.
+             # Modules will be imported from tmp_path for the reloader.
+             # Unbuffered output so the logs update immediately.
+-            env = {**os.environ, "PYTHONPATH": str(tmp_path), "PYTHONUNBUFFERED": "1"}
++            pypath = os.environ.get("PYTHONPATH", "")
++            if len(pypath) > 0:
++                pypath += os.pathsep
++            env = {
++                **os.environ,
++                "PYTHONPATH": f"{pypath}{str(tmp_path)}",
++                "PYTHONUNBUFFERED": "1",
++            }
+ 
+             @cached_property
+             def pattern(self):
+-- 
+2.34.1
+

@@ -1,0 +1,38 @@
+From ad6944baaa73cf6230f9a2bef2399b31c2130547 Mon Sep 17 00:00:00 2001
+From: Bas Zoetekouw <bas.zoetekouw@surfnet.nl>
+Date: Thu, 9 Aug 2018 22:11:58 +0200
+Subject: [PATCH] fix compiler warnings
+
+---
+ src/output.h | 4 ++--
+ src/quota.h  | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/output.h b/src/output.h
+index 5a3b640..429e053 100644
+--- a/src/output.h
++++ b/src/output.h
+@@ -17,8 +17,8 @@
+ 
+ extern int output_level;
+ 
+-inline void   output_version (void);
+-inline void   output_help (void);
++void   output_version (void);
++void   output_help (void);
+ 
+ void   output_debug (const char *format, ...);
+ void   output_info (const char *format, ...);
+diff --git a/src/quota.h b/src/quota.h
+index e783977..72b5f09 100644
+--- a/src/quota.h
++++ b/src/quota.h
+@@ -110,7 +110,7 @@ void        quota_delete   (quota_t *myquota);
+ int         quota_get      (quota_t *myquota);
+ int         quota_set      (quota_t *myquota);
+ 
+-int         xfs_reset_grace(quota_t *myquota, int grace_type);
++int         quota_reset_grace(quota_t *myquota, int grace_type);
+ 
+ 
+ #endif /* INCLUDE_QUOTATOOL_QUOTA */

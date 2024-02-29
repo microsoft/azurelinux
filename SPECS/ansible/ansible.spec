@@ -1,7 +1,7 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.12.1
-Release:        3%{?dist}
+Version:        2.14.12
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -47,6 +47,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Dec 26 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.14.12-1
+- Update to v2.14.12 to fix CVE-2023-5764
+
 * Mon Jun 26 2023 Sam Meluch <sammeluch@microsoft.com> - 2.12.1-3
 - add python-resolvelib dependency to fix ansible-galaxy
 

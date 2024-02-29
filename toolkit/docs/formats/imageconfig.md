@@ -116,9 +116,9 @@ A PartitionSetting may set a `MountIdentifier` to control how a partition is ide
 `partlabel` may not be used with `mbr` disks, and requires the `Name` key in the corresponding `Partition` be populated. An example with the rootfs mounted via `PARTLABEL=my_rootfs`, but the boot mount using the default `PARTUUID=<PARTUUID>`:
 ``` json
 "Partitions": [
-    
+
     ...
-    
+
     {
         "ID": "rootfs",
         "Name": "my_rootfs",
@@ -270,7 +270,7 @@ Fields:
 
 ### Networks
 
-The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config. 
+The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
 
 A sample Networks entry pointing to one network configuration:
 ``` json
@@ -375,7 +375,7 @@ The GUI installer does not currently support read-only roots.
 - `ValidateOnBoot`: Run a validation of the full disk at boot time, normally blocks are validated only as needed. This can take several minutes if the disk is corrupted.
 - `VerityErrorBehavior`: Indicate additional special system behavior when encountering an unrecoverable verity corruption. One of `"ignore"`, `"restart"`, `"panic"`. Normal behavior is to return an IO error when reading corrupt blocks.
 - `TmpfsOverlays`: Mount these paths as writable overlays backed by a tmpfs in memory.
-- `TmpfsOverlaySize`: Maximum amount of memory the overlays may use. Maybe be one of three forms: `"1234"`, `"1234[k,m,g]"`, `"20%"` (default is `"20%"`) 
+- `TmpfsOverlaySize`: Maximum amount of memory the overlays may use. Maybe be one of three forms: `"1234"`, `"1234[k,m,g]"`, `"20%"` (default is `"20%"`)
 - `TmpfsOverlayDebugEnabled`: Make the tmpfs overlay mounts easily accessible for debugging purposes. They can be found in /mnt/verity_overlay_debug_tmpfs. Include the
     `verity-read-only-root-debug-tools` package to create the required mount points.
 
@@ -407,8 +407,11 @@ The Security Enhanced Linux (SELinux) feature is enabled by using the `SELinux` 
 This will instruct init (systemd) to set the configured mode on boot.  The `force_enforcing` option will set enforcing in the config and also add `enforcing=1` in the kernel command line,
 which is a higher precedent than the config file. This ensures SELinux boots in enforcing even if the /etc/selinux/config was altered.
 
+#### SELinuxPolicy
+An optional field to overwrite the SELinux policy package name. If not set, the default is `selinux-policy`.
+
 #### CGroup
-The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`. 
+The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
 The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
 
@@ -426,6 +429,15 @@ A sample KernelCommandLine enabling SELinux and booting in enforcing mode:
 ``` json
 "KernelCommandLine": {
     "SELinux": "enforcing"
+},
+```
+
+A sample KernelCommandLine enabling SELinux and overwriting the default 'selinux-policy' package name:
+
+``` json
+"KernelCommandLine": {
+    "SELinux": "enforcing",
+    "SELinuxPolicy": "my-selinux-policy"
 },
 ```
 

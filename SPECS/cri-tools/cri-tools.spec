@@ -7,13 +7,14 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.28.0
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2024-21626.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang
@@ -44,6 +45,12 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-5
+- Bump release to rebuild with go 1.21.6
+
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.28.0-4
+- Patch runc for CVE-2024-21626
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-3
 - Bump release to rebuild with go 1.20.9
 

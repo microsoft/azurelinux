@@ -2,8 +2,8 @@
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
 Name:           fish
-Version:        3.5.0
-Release:        2%{?dist}
+Version:        3.6.2
+Release:        1%{?dist}
 Summary:        Friendly interactive shell
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -125,6 +125,9 @@ fi
 %{_pkgdocdir}
 
 %changelog
+* Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.6.2-1
+- Auto-upgrade to 3.6.2 - CVE-2023-49284
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.5.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
