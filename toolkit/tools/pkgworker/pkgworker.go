@@ -311,11 +311,10 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 
 func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
 	const (
-		chrootRpmBuildDir = "/usr/src/azl/RPMS"
-		rpmExtension      = ".rpm"
+		rpmExtension = ".rpm"
 	)
 
-	rpmOutDir := filepath.Join(chrootRootDir, chrootRpmBuildDir)
+	rpmOutDir := filepath.Join(chrootRootDir, os.Getenv("HOME"), "rpmbuild")
 	err = filepath.Walk(rpmOutDir, func(path string, info os.FileInfo, fileErr error) (err error) {
 		if fileErr != nil {
 			return fileErr
