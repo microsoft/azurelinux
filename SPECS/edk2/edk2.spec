@@ -696,8 +696,8 @@ $tests_ok
 
 
 %changelog
-* Thu Feb 29 2024 Elaine Zhao <elainezhao@microsoft.com> - 20230301gitf80f052277c8-38
-- Bump version to 202402
+* Thu Feb 29 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
+- Bump version to edk2-stable202302
 
 * Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
 - Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
