@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/stretchr/testify/assert"
 )
 

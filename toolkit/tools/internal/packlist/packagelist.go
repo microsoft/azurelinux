@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 )
 
 // ParsePackageListFile will parse a list of packages to pack or parse, if one is specified.
