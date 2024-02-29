@@ -4,7 +4,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        5%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -112,9 +112,6 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 %{_userpresetdir}/*.preset
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-5
-- Updating naming for 3.0 version of Azure Linux.
-
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
 - remove %%config(noreplace) from *-release files
 - define dist_version and use local macros

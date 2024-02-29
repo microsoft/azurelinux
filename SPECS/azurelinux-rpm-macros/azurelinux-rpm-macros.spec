@@ -52,7 +52,7 @@ Provides:       python-rpm-macros
 Provides:       python3-rpm-macros
 Provides:       rust-srpm-macros
 
-Obsoletes:      mariner-rpm-macros <= 2.0-24
+Obsoletes:      mariner-rpm-macros <= 2.0-25
 Provides:       mariner-rpm-macros = %{version}-%{release}
 
 BuildArch:      noarch
@@ -64,7 +64,7 @@ Azure Linux specific rpm macro files.
 Summary:        Azure Linux specific rpm macros to override default %%check behavior
 Group:          Development/System
 
-Obsoletes:      mariner-check-macros <= 2.0-24
+Obsoletes:      mariner-check-macros <= 2.0-25
 Provides:       mariner-check-macros = %{version}-%{release}
 
 %description -n azurelinux-check-macros
