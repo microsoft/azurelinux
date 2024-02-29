@@ -3,7 +3,12 @@
 #
 %_topdir            /usr/src/azl
 #
-#   Some standard locations
+# This definition of %%_lib is NOT standard and overrides the standard
+# definition from the rpm platform macros file. However, we have
+# various parts of our distro that hardcode /usr/lib in various ways,
+# and those must be fixed before we can remove these macro overrides
+# and revert to the default, standard %%_lib definition from the
+# standard rpm platform macros file.
 #
 %_lib               lib
 
