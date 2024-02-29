@@ -62,9 +62,9 @@ Requires:       findutils
 Requires:       grep
 Requires:       gzip
 Requires:       azurelinux-release
-Requires:       mariner-repos
-Requires:       mariner-repos-extras
-Requires:       mariner-repos-microsoft
+Requires:       azurelinux-repos
+Requires:       azurelinux-repos-ms-non-oss
+Requires:       azurelinux-repos-ms-oss
 Requires:       ncurses-libs
 Requires:       openssl
 Requires:       readline

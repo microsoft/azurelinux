@@ -1,0 +1,18 @@
+{
+ "Signatures": {
+  "MICROSOFT-METADATA-GPG-KEY": "1824ecffeda90cfe4178a99bddde450f09fd40e8faf4f0124fba16ea79998c4c",
+  "MICROSOFT-RPM-GPG-KEY": "1092f37ec429e58bf9c7f898df17c3c32eb2ce3c4c037afb8ffe2d2b42e16e89",
+  "azurelinux-debuginfo-preview.repo": "5230a0a5077ffbf23bf2b3625d275feb437c70501b5e697a28c56689496b5ef5",
+  "azurelinux-debuginfo.repo": "33d5b375ee3f24e01444947731235b959d96a18432589170ab5bd89ef960197e",
+  "azurelinux-extended-debuginfo-preview.repo": "a730d2d8877ac7e29936128db4b396326f7f175226d0ed2a3f976d816d6c7bc1",
+  "azurelinux-extended-debuginfo.repo": "f97d5ad35512d1d2e3c12f05f8989eebf3b94a7c4a78952c03803029eff0a8e9",
+  "azurelinux-extended-preview.repo": "beecae94aae13ed0925a388287ec5afb912c2a1baf8ac7bf89c9e1c8174a5006",
+  "azurelinux-extended.repo": "4bf12fd933bc6473a6ec5a99479219facccfd729f53b321a34887ba77317443c",
+  "azurelinux-ms-non-oss-preview.repo": "437d4da478923d8f3899844861af41017ccff39e24a9c0bf7cad40b6b5289419",
+  "azurelinux-ms-non-oss.repo": "6b449545113f9aaf8d75866a6f21882f06418855dd4acfaccc8b2a9979765a13",
+  "azurelinux-ms-oss-preview.repo": "a88ff698344c8d3e08fe74327db37689427c7bdaf2b5cf3210463c3971973637",
+  "azurelinux-ms-oss.repo": "df91cb066a87e1aa6e4c2e184e70bc6b819c2e34dac004c77b504664cdc40f8f",
+  "azurelinux-official-base.repo": "cae238430e90d3ba24ffc75ad2f56a5ac68f980fa6aa2e94350db41e06af8a09",
+  "azurelinux-official-preview.repo": "2cbcd621253d399f4afd74a4c1a3a8c5ce9db3e49bddfef8344e42f186502d4b"
+ }
+}
