@@ -1,0 +1,133 @@
+From 84d969be8f6d8a345b75f558fad26e4f62a558f6 Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Thu, 14 Jul 2022 09:02:11 +0200
+Subject: [PATCH 30/83] Monitor: use snprintf to fill device name
+
+Safe string functions are propagated in Monitor.c.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Monitor.c | 37 ++++++++++++++-----------------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index a5b11ae2..93f36ac0 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -33,8 +33,8 @@
+ #endif
+ 
+ struct state {
+-	char *devname;
+-	char devnm[32];	/* to sync with mdstat info */
++	char devname[MD_NAME_MAX + sizeof("/dev/md/")];	/* length of "/dev/md/" + device name + terminating byte*/
++	char devnm[MD_NAME_MAX];	/* to sync with mdstat info */
+ 	unsigned int utime;
+ 	int err;
+ 	char *spare_group;
+@@ -45,9 +45,9 @@ struct state {
+ 	int devstate[MAX_DISKS];
+ 	dev_t devid[MAX_DISKS];
+ 	int percent;
+-	char parent_devnm[32]; /* For subarray, devnm of parent.
+-				* For others, ""
+-				*/
++	char parent_devnm[MD_NAME_MAX]; /* For subarray, devnm of parent.
++					* For others, ""
++					*/
+ 	struct supertype *metadata;
+ 	struct state *subarray;/* for a container it is a link to first subarray
+ 				* for a subarray it is a link to next subarray
+@@ -187,15 +187,8 @@ int Monitor(struct mddev_dev *devlist,
+ 				continue;
+ 
+ 			st = xcalloc(1, sizeof *st);
+-			if (mdlist->devname[0] == '/')
+-				st->devname = xstrdup(mdlist->devname);
+-			else {
+-				/* length of "/dev/md/" + device name + terminating byte */
+-				size_t _len = sizeof("/dev/md/") + strnlen(mdlist->devname, PATH_MAX);
+-
+-				st->devname = xcalloc(_len, sizeof(char));
+-				snprintf(st->devname, _len, "/dev/md/%s", mdlist->devname);
+-			}
++			snprintf(st->devname, MD_NAME_MAX + sizeof("/dev/md/"),
++				 "/dev/md/%s", basename(mdlist->devname));
+ 			if (!is_mddev(mdlist->devname))
+ 				return 1;
+ 			st->next = statelist;
+@@ -218,7 +211,7 @@ int Monitor(struct mddev_dev *devlist,
+ 
+ 			st = xcalloc(1, sizeof *st);
+ 			mdlist = conf_get_ident(dv->devname);
+-			st->devname = xstrdup(dv->devname);
++			snprintf(st->devname, MD_NAME_MAX + sizeof("/dev/md/"), "%s", dv->devname);
+ 			st->next = statelist;
+ 			st->devnm[0] = 0;
+ 			st->percent = RESYNC_UNKNOWN;
+@@ -301,7 +294,6 @@ int Monitor(struct mddev_dev *devlist,
+ 		for (stp = &statelist; (st = *stp) != NULL; ) {
+ 			if (st->from_auto && st->err > 5) {
+ 				*stp = st->next;
+-				free(st->devname);
+ 				free(st->spare_group);
+ 				free(st);
+ 			} else
+@@ -554,7 +546,7 @@ static int check_array(struct state *st, struct mdstat_ent *mdstat,
+ 		goto disappeared;
+ 
+ 	if (st->devnm[0] == 0)
+-		strcpy(st->devnm, fd2devnm(fd));
++		snprintf(st->devnm, MD_NAME_MAX, "%s", fd2devnm(fd));
+ 
+ 	for (mse2 = mdstat; mse2; mse2 = mse2->next)
+ 		if (strcmp(mse2->devnm, st->devnm) == 0) {
+@@ -684,7 +676,7 @@ static int check_array(struct state *st, struct mdstat_ent *mdstat,
+ 	    strncmp(mse->metadata_version, "external:", 9) == 0 &&
+ 	    is_subarray(mse->metadata_version+9)) {
+ 		char *sl;
+-		strcpy(st->parent_devnm, mse->metadata_version + 10);
++		snprintf(st->parent_devnm, MD_NAME_MAX, "%s", mse->metadata_version + 10);
+ 		sl = strchr(st->parent_devnm, '/');
+ 		if (sl)
+ 			*sl = 0;
+@@ -772,14 +764,13 @@ static int add_new_arrays(struct mdstat_ent *mdstat, struct state **statelist,
+ 				continue;
+ 			}
+ 
+-			st->devname = xstrdup(name);
++			snprintf(st->devname, MD_NAME_MAX + sizeof("/dev/md/"), "%s", name);
+ 			if ((fd = open(st->devname, O_RDONLY)) < 0 ||
+ 			    md_get_array_info(fd, &array) < 0) {
+ 				/* no such array */
+ 				if (fd >= 0)
+ 					close(fd);
+ 				put_md_name(st->devname);
+-				free(st->devname);
+ 				if (st->metadata) {
+ 					st->metadata->ss->free_super(st->metadata);
+ 					free(st->metadata);
+@@ -791,7 +782,7 @@ static int add_new_arrays(struct mdstat_ent *mdstat, struct state **statelist,
+ 			st->next = *statelist;
+ 			st->err = 1;
+ 			st->from_auto = 1;
+-			strcpy(st->devnm, mse->devnm);
++			snprintf(st->devnm, MD_NAME_MAX, "%s", mse->devnm);
+ 			st->percent = RESYNC_UNKNOWN;
+ 			st->expected_spares = -1;
+ 			if (mse->metadata_version &&
+@@ -799,8 +790,8 @@ static int add_new_arrays(struct mdstat_ent *mdstat, struct state **statelist,
+ 				    "external:", 9) == 0 &&
+ 			    is_subarray(mse->metadata_version+9)) {
+ 				char *sl;
+-				strcpy(st->parent_devnm,
+-					mse->metadata_version+10);
++				snprintf(st->parent_devnm, MD_NAME_MAX,
++					 "%s", mse->metadata_version + 10);
+ 				sl = strchr(st->parent_devnm, '/');
+ 				*sl = 0;
+ 			} else
+-- 
+2.38.1
+

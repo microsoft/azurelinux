@@ -1,0 +1,33 @@
+From 6660e33edde76329bd3b7f03383856c7efee2aa9 Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Mon, 13 Mar 2023 14:42:58 +1100
+Subject: [PATCH 109/120] mdmon: change systemd unit file to use --foreground
+
+There is no value in mdmon forking when it is running under systemd -
+systemd can still track it anyway.
+
+So add --foreground option, and remove "Type=forking".
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ systemd/mdmon@.service | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index cb6482d9..bba9b0eb 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -20,8 +20,7 @@ Environment=IMSM_NO_PLATFORM=1
+ # 'takeover'.  As the '--offroot --takeover' don't hurt when
+ # not necessary, are are useful with root-on-md in dracut,
+ # have them always present.
+-ExecStart=BINDIR/mdmon --offroot --takeover %I
+-Type=forking
++ExecStart=BINDIR/mdmon --foreground --offroot --takeover %I
+ # Don't set the PIDFile.  It isn't necessary (systemd can work
+ # it out) and systemd will remove it when transitioning from
+ # initramfs to rootfs.
+-- 
+2.38.1
+
