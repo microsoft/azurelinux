@@ -155,7 +155,7 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 
 %changelog
 * Thu Feb 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.0.mshv16-1
-- Auto-upgrade to 6.1.0.mshv16
+- Auto-upgrade to 6.1.0.mshv16 for LSG v2402.26.1
 
 * Wed Nov 29 2023 Manuel Huber <mahuber@microsoft.com> - 6.1.0.mshv14-3
 - Enable tmpfs xattr for supporting use of extended attributes when container

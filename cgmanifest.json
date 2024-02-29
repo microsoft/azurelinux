@@ -8192,7 +8192,7 @@
         "other": {
           "name": "kernel-uvm",
           "version": "6.1.0.mshv16",
-          "downloadUrl": null
+          "downloadUrl": "https://lsgvirtstorage.blob.core.windows.net/dom0-mariner-sources-public/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
