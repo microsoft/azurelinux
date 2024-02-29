@@ -66,7 +66,7 @@ popd
 
 echo Creating toolchain source RPM archive
 pushd $MARINER_BUILD_DIR/toolchain
-tar -C ./populated_toolchain/usr/src/mariner -cvf toolchain_built_srpms_all.tar.gz SRPMS
+tar -C ./populated_toolchain/$HOME/rpmbuild -cvf toolchain_built_srpms_all.tar.gz SRPMS
 popd
 
 if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then

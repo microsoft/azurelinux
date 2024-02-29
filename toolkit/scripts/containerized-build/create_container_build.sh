@@ -78,7 +78,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
-topdir=/usr/src/mariner
+topdir=$HOME/rpmbuild
 enable_local_repo=false
 keep_container="--rm"
 
