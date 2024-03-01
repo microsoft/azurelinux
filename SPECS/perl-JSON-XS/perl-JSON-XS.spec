@@ -15,7 +15,7 @@ BuildRequires:  perl-common-sense
 BuildRequires:  perl-generators
 BuildRequires:  perl-Types-Serialiser
 BuildRequires:  perl(ExtUtils::MakeMaker)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Array)

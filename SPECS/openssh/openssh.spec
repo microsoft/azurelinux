@@ -43,7 +43,7 @@ BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pam-devel
 BuildRequires:  systemd-bootstrap-rpm-macros
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
 %endif

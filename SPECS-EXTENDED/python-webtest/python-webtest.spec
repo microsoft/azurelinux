@@ -17,7 +17,7 @@ Source0:        https://github.com/Pylons/webtest/archive/%{version}.tar.gz#/%{n
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 %endif

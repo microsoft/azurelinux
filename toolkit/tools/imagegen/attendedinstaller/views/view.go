@@ -7,7 +7,7 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 )
 
 // View is the interface for different "pages" in the attended installer.

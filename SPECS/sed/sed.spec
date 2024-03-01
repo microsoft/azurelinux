@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
 Conflicts:      toybox
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Find)
 %endif
 

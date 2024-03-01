@@ -73,7 +73,7 @@ BuildRequires:  systemd-devel >= 184
 %if 0%{?with_webrtc}
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  pkgconfig(check)
 %endif
 # retired along with -libs-zeroconf, add Obsoletes here for lack of anything better

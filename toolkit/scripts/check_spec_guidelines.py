@@ -70,7 +70,7 @@ ERROR: use of deprecated '%patch[number]' format (no space between '%patch' and 
 
 
 def check_release_tag(spec_path: str):
-    """Checks if the 'Release' tag is in one of CBL-Mariner's expected formats. """
+    """Checks if the 'Release' tag is in one of Azure Linux's expected formats. """
     spec = Spec.from_file(spec_path)
 
     if valid_release_tag_regex.match(spec.release) is None:
@@ -178,7 +178,7 @@ def check_spec(spec_path, toolchain_specs):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Tool for checking if an RPM spec file follows CBL-Mariner's guidelines.")
+        description="Tool for checking if an RPM spec file follows Azure Linux's guidelines.")
     parser.add_argument('toolchain_specs',
                         type=argparse.FileType('r'),
                         help='Path to a file containing a list of toolchain specs.')

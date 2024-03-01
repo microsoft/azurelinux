@@ -10,7 +10,7 @@ URL:            https://pagure.io/libaio
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 Patch0:         libaio-install-to-destdir-slash-usr.patch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  e2fsprogs-devel
 %endif
 

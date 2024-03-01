@@ -15,7 +15,7 @@ BuildRequires:  python3-setuptools
 Requires:       python3-kickstart = %{version}-%{release}
 BuildArch:      noarch
 # Only required when building with RUN_CHECK=y
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-coverage
 BuildRequires:  python3-sphinx
 %endif

@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
-Version:        2.0
-Release:        15%{?dist}
+Version:        3.0
+Release:        1%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -130,18 +130,21 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
-* Wed Jan 24 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.0.15
+* Mon Feb 26 2024 Sean Dougherty <sdougherty@microsoft.com> - 3.0-1
+- Version bump for Azure Linux 3.0
+
+* Wed Jan 24 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.0-15
 - Deprecate old linuxloader in file_trigger_action macro
 
-* Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.14
+* Fri Oct 06 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-14
 - Ensure grub2-mkconfig is called after the initramfs generation
 - Deprecate old linuxloader; no longer copy initrd image to efi partition 
 
-* Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0.13
+* Wed Jun 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 2.0-13
 - Copy the initrd image to /boot/efi to maintain backwards compatibility
     with the old linuxloader. Let the initrd remain in /boot as well. 
 
-* Fri Apr 07 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.12
+* Fri Apr 07 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0-12
 - Added fsck.xfs into initrd
 
 * Fri Mar 31 2023 Vince Perri <viperri@microsoft.com> - 2.0-11
