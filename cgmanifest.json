@@ -12831,8 +12831,8 @@
         "type": "other",
         "other": {
           "name": "mdadm",
-          "version": "4.1",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.1.tar.xz"
+          "version": "4.2",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.2.tar.gz"
         }
       }
     },

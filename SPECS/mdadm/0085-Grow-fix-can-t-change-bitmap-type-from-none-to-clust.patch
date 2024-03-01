@@ -1,0 +1,45 @@
+From d07e561810a2e33b667a8a9476edaff42eb119b9 Mon Sep 17 00:00:00 2001
+From: Heming Zhao <heming.zhao@suse.com>
+Date: Thu, 23 Feb 2023 22:39:39 +0800
+Subject: [PATCH 085/120] Grow: fix can't change bitmap type from none to
+ clustered.
+
+Commit a042210648ed ("disallow create or grow clustered bitmap with
+writemostly set") introduced this bug. We should use 'true' logic not
+'== 0' to deny setting up clustered array under WRITEMOSTLY condition.
+
+How to trigger
+
+```
+~/mdadm # ./mdadm -Ss && ./mdadm --zero-superblock /dev/sd{a,b}
+~/mdadm # ./mdadm -C /dev/md0 -l mirror -b clustered -e 1.2 -n 2 \
+/dev/sda /dev/sdb --assume-clean
+mdadm: array /dev/md0 started.
+~/mdadm # ./mdadm --grow /dev/md0 --bitmap=none
+~/mdadm # ./mdadm --grow /dev/md0 --bitmap=clustered
+mdadm: /dev/md0 disks marked write-mostly are not supported with clustered bitmap
+```
+
+Signed-off-by: Heming Zhao <heming.zhao@suse.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Grow.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Grow.c b/Grow.c
+index 8f5cf07d..bb5fe45c 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -429,7 +429,7 @@ int Grow_addbitmap(char *devname, int fd, struct context *c, struct shape *s)
+ 			dv = map_dev(disk.major, disk.minor, 1);
+ 			if (!dv)
+ 				continue;
+-			if (((disk.state & (1 << MD_DISK_WRITEMOSTLY)) == 0) &&
++			if ((disk.state & (1 << MD_DISK_WRITEMOSTLY)) &&
+ 			   (strcmp(s->bitmap_file, "clustered") == 0)) {
+ 				pr_err("%s disks marked write-mostly are not supported with clustered bitmap\n",devname);
+ 				free(mdi);
+-- 
+2.38.1
+

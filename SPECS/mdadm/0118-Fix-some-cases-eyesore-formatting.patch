@@ -1,0 +1,433 @@
+From d3bb888d885fc96fc6239fbf6c22c63143eba461 Mon Sep 17 00:00:00 2001
+From: Jes Sorensen <jes@trained-monkey.org>
+Date: Mon, 10 Apr 2023 11:40:42 -0400
+Subject: [PATCH 118/120] Fix some cases eyesore formatting
+
+Summary: No functional change .... just make it more readable.
+
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super1.c | 117 ++++++++++++++++++++++++++++---------------------------
+ 1 file changed, 60 insertions(+), 57 deletions(-)
+
+diff --git a/super1.c b/super1.c
+index 44d6ecad..1d20ef55 100644
+--- a/super1.c
++++ b/super1.c
+@@ -192,7 +192,7 @@ static unsigned int calc_sb_1_csum(struct mdp_superblock_1 * sb)
+ 	unsigned int disk_csum, csum;
+ 	unsigned long long newcsum;
+ 	int size = sizeof(*sb) + __le32_to_cpu(sb->max_dev)*2;
+-	unsigned int *isuper = (unsigned int*)sb;
++	unsigned int *isuper = (unsigned int *)sb;
+ 
+ /* make sure I can count... */
+ 	if (offsetof(struct mdp_superblock_1,data_offset) != 128 ||
+@@ -204,7 +204,7 @@ static unsigned int calc_sb_1_csum(struct mdp_superblock_1 * sb)
+ 	disk_csum = sb->sb_csum;
+ 	sb->sb_csum = 0;
+ 	newcsum = 0;
+-	for (; size>=4; size -= 4 ) {
++	for (; size >= 4; size -= 4) {
+ 		newcsum += __le32_to_cpu(*isuper);
+ 		isuper++;
+ 	}
+@@ -319,7 +319,7 @@ static inline unsigned int choose_ppl_space(int chunk)
+ static void examine_super1(struct supertype *st, char *homehost)
+ {
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	bitmap_super_t *bms = (bitmap_super_t*)(((char*)sb)+MAX_SB_SIZE);
++	bitmap_super_t *bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 	time_t atime;
+ 	unsigned int d;
+ 	int role;
+@@ -343,8 +343,9 @@ static void examine_super1(struct supertype *st, char *homehost)
+ 		printf(".0\n");
+ 	printf("    Feature Map : 0x%x\n", __le32_to_cpu(sb->feature_map));
+ 	printf("     Array UUID : ");
+-	for (i=0; i<16; i++) {
+-		if ((i&3)==0 && i != 0) printf(":");
++	for (i = 0; i < 16; i++) {
++		if ((i & 3) == 0 && i != 0)
++			printf(":");
+ 		printf("%02x", sb->set_uuid[i]);
+ 	}
+ 	printf("\n");
+@@ -416,11 +417,11 @@ static void examine_super1(struct supertype *st, char *homehost)
+ 			       UINT64_MAX - info.space_after);
+ 	}
+ 	printf("          State : %s%s\n",
+-	       (__le64_to_cpu(sb->resync_offset)+1) ? "active":"clean",
++	       (__le64_to_cpu(sb->resync_offset) + 1) ? "active":"clean",
+ 	       (info.space_after > INT64_MAX)       ? " TRUNCATED DEVICE" : "");
+ 	printf("    Device UUID : ");
+-	for (i=0; i<16; i++) {
+-		if ((i&3)==0 && i != 0)
++	for (i = 0; i < 16; i++) {
++		if ((i & 3)==0 && i != 0)
+ 			printf(":");
+ 		printf("%02x", sb->device_uuid[i]);
+ 	}
+@@ -546,7 +547,7 @@ static void examine_super1(struct supertype *st, char *homehost)
+ #if 0
+ 	/* This turns out to just be confusing */
+ 	printf("    Array Slot : %d (", __le32_to_cpu(sb->dev_number));
+-	for (i = __le32_to_cpu(sb->max_dev); i> 0 ; i--)
++	for (i = __le32_to_cpu(sb->max_dev); i > 0 ; i--)
+ 		if (__le16_to_cpu(sb->dev_roles[i-1]) != MD_DISK_ROLE_SPARE)
+ 			break;
+ 	for (d = 0; d < i; d++) {
+@@ -597,7 +598,7 @@ static void examine_super1(struct supertype *st, char *homehost)
+ #if 0
+ 	/* This is confusing too */
+ 	faulty = 0;
+-	for (i = 0; i< __le32_to_cpu(sb->max_dev); i++) {
++	for (i = 0; i < __le32_to_cpu(sb->max_dev); i++) {
+ 		int role = __le16_to_cpu(sb->dev_roles[i]);
+ 		if (role == MD_DISK_ROLE_FAULTY)
+ 			faulty++;
+@@ -616,10 +617,12 @@ static void examine_super1(struct supertype *st, char *homehost)
+ 	if (inconsistent) {
+ 		printf("WARNING Array state is inconsistent - each number should appear only once\n");
+ 		for (d = 0; d < __le32_to_cpu(sb->max_dev); d++)
+-			if (__le16_to_cpu(sb->dev_roles[d]) >= MD_DISK_ROLE_FAULTY)
++			if (__le16_to_cpu(sb->dev_roles[d]) >=
++			    MD_DISK_ROLE_FAULTY)
+ 				printf(" %d:-", d);
+ 			else
+-				printf(" %d:%d", d, __le16_to_cpu(sb->dev_roles[d]));
++				printf(" %d:%d", d,
++				       __le16_to_cpu(sb->dev_roles[d]));
+ 		printf("\n");
+ 	}
+ }
+@@ -659,7 +662,7 @@ static void brief_examine_super1(struct supertype *st, int verbose)
+ 		printf("num-devices=%d ", __le32_to_cpu(sb->raid_disks));
+ 	printf("UUID=");
+ 	for (i = 0; i < 16; i++) {
+-		if ((i&3)==0 && i != 0)
++		if ((i & 3)==0 && i != 0)
+ 			printf(":");
+ 		printf("%02x", sb->set_uuid[i]);
+ 	}
+@@ -713,7 +716,7 @@ static void export_examine_super1(struct supertype *st)
+ 	}
+ 	printf("MD_UUID=");
+ 	for (i = 0; i < 16; i++) {
+-		if ((i&3) == 0 && i != 0)
++		if ((i & 3) == 0 && i != 0)
+ 			printf(":");
+ 		printf("%02x", sb->set_uuid[i]);
+ 	}
+@@ -722,7 +725,7 @@ static void export_examine_super1(struct supertype *st)
+ 	       __le64_to_cpu(sb->utime) & 0xFFFFFFFFFFULL);
+ 	printf("MD_DEV_UUID=");
+ 	for (i = 0; i < 16; i++) {
+-		if ((i&3) == 0 && i != 0)
++		if ((i & 3) == 0 && i != 0)
+ 			printf(":");
+ 		printf("%02x", sb->device_uuid[i]);
+ 	}
+@@ -812,7 +815,7 @@ static int copy_metadata1(struct supertype *st, int from, int to)
+ 				/* have the header, can calculate
+ 				 * correct bitmap bytes */
+ 				bitmap_super_t *bms;
+-				bms = (void*)buf;
++				bms = (void *)buf;
+ 				bytes = calc_bitmap_size(bms, 512);
+ 				if (n > bytes)
+ 					n =  bytes;
+@@ -867,7 +870,7 @@ err:
+ static void detail_super1(struct supertype *st, char *homehost, char *subarray)
+ {
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	bitmap_super_t *bms = (bitmap_super_t*)(((char*)sb) + MAX_SB_SIZE);
++	bitmap_super_t *bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 	int i;
+ 	int l = homehost ? strlen(homehost) : 0;
+ 
+@@ -880,7 +883,7 @@ static void detail_super1(struct supertype *st, char *homehost, char *subarray)
+ 		printf("\n      Cluster Name : %-64s", bms->cluster_name);
+ 	printf("\n              UUID : ");
+ 	for (i = 0; i < 16; i++) {
+-		if ((i&3) == 0 && i != 0)
++		if ((i & 3) == 0 && i != 0)
+ 			printf(":");
+ 		printf("%02x", sb->set_uuid[i]);
+ 	}
+@@ -939,7 +942,7 @@ static int examine_badblocks_super1(struct supertype *st, int fd, char *devname)
+ 	}
+ 
+ 	size = __le16_to_cpu(sb->bblog_size)* 512;
+-	if (posix_memalign((void**)&bbl, 4096, size) != 0) {
++	if (posix_memalign((void **)&bbl, 4096, size) != 0) {
+ 		pr_err("could not allocate badblocks list\n");
+ 		return 0;
+ 	}
+@@ -987,7 +990,7 @@ static int match_home1(struct supertype *st, char *homehost)
+ static void uuid_from_super1(struct supertype *st, int uuid[4])
+ {
+ 	struct mdp_superblock_1 *super = st->sb;
+-	char *cuuid = (char*)uuid;
++	char *cuuid = (char *)uuid;
+ 	int i;
+ 	for (i = 0; i < 16; i++)
+ 		cuuid[i] = super->set_uuid[i];
+@@ -996,9 +999,9 @@ static void uuid_from_super1(struct supertype *st, int uuid[4])
+ static void getinfo_super1(struct supertype *st, struct mdinfo *info, char *map)
+ {
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	struct bitmap_super_s *bsb = (void*)(((char*)sb)+MAX_SB_SIZE);
++	struct bitmap_super_s *bsb = (void *)(((char *)sb) + MAX_SB_SIZE);
+ 	struct misc_dev_info *misc =
+-		(void*)(((char*)sb)+MAX_SB_SIZE+BM_SUPER_SIZE);
++		(void *)(((char *)sb) + MAX_SB_SIZE+BM_SUPER_SIZE);
+ 	int working = 0;
+ 	unsigned int i;
+ 	unsigned int role;
+@@ -1166,7 +1169,7 @@ static void getinfo_super1(struct supertype *st, struct mdinfo *info, char *map)
+ 	info->recovery_blocked = info->reshape_active;
+ 
+ 	if (map)
+-		for (i=0; i<map_disks; i++)
++		for (i = 0; i < map_disks; i++)
+ 			map[i] = 0;
+ 	for (i = 0; i < __le32_to_cpu(sb->max_dev); i++) {
+ 		role = __le16_to_cpu(sb->dev_roles[i]);
+@@ -1217,7 +1220,7 @@ static int update_super1(struct supertype *st, struct mdinfo *info,
+ 	 */
+ 	int rv = 0;
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	bitmap_super_t *bms = (bitmap_super_t*)(((char*)sb) + MAX_SB_SIZE);
++	bitmap_super_t *bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 
+ 	if (update == UOPT_HOMEHOST && homehost) {
+ 		/*
+@@ -1228,9 +1231,10 @@ static int update_super1(struct supertype *st, struct mdinfo *info,
+ 		update = UOPT_NAME;
+ 		c = strchr(sb->set_name, ':');
+ 		if (c)
+-			snprintf(info->name, sizeof(info->name), "%s", c+1);
++			snprintf(info->name, sizeof(info->name), "%s", c + 1);
+ 		else
+-			snprintf(info->name, sizeof(info->name), "%s", sb->set_name);
++			snprintf(info->name, sizeof(info->name), "%s",
++				 sb->set_name);
+ 	}
+ 
+ 	switch (update) {
+@@ -1331,7 +1335,7 @@ static int update_super1(struct supertype *st, struct mdinfo *info,
+ 		sb->dev_number = __cpu_to_le32(i);
+ 
+ 		if (i == max)
+-			sb->max_dev = __cpu_to_le32(max+1);
++			sb->max_dev = __cpu_to_le32(max + 1);
+ 		if (i > max)
+ 			return -2;
+ 
+@@ -1350,8 +1354,8 @@ static int update_super1(struct supertype *st, struct mdinfo *info,
+ 				sb->data_size = __cpu_to_le64(
+ 					ds - __le64_to_cpu(sb->data_offset));
+ 			} else {
+-				ds -= 8*2;
+-				ds &= ~(unsigned long long)(4*2-1);
++				ds -= 8 * 2;
++				ds &= ~(unsigned long long)(4 * 2 - 1);
+ 				sb->super_offset = __cpu_to_le64(ds);
+ 				sb->data_size = __cpu_to_le64(
+ 					ds - __le64_to_cpu(sb->data_offset));
+@@ -1367,7 +1371,7 @@ static int update_super1(struct supertype *st, struct mdinfo *info,
+ 		if (i > max)
+ 			return -2;
+ 		if (i == max)
+-			sb->max_dev = __cpu_to_le32(max+1);
++			sb->max_dev = __cpu_to_le32(max + 1);
+ 		sb->raid_disks = __cpu_to_le32(info->array.raid_disks);
+ 		sb->dev_roles[info->disk.number] =
+ 			__cpu_to_le16(info->disk.raid_disk);
+@@ -1645,7 +1649,7 @@ static int init_super1(struct supertype *st, mdu_array_info_t *info,
+ 	char defname[10];
+ 	int sbsize;
+ 
+-	if (posix_memalign((void**)&sb, 4096, SUPER1_SIZE) != 0) {
++	if (posix_memalign((void **)&sb, 4096, SUPER1_SIZE) != 0) {
+ 		pr_err("could not allocate superblock\n");
+ 		return 0;
+ 	}
+@@ -1679,8 +1683,8 @@ static int init_super1(struct supertype *st, mdu_array_info_t *info,
+ 		name = defname;
+ 	}
+ 	if (homehost &&
+-	    strchr(name, ':')== NULL &&
+-	    strlen(homehost)+1+strlen(name) < 32) {
++	    strchr(name, ':') == NULL &&
++	    strlen(homehost) + 1 + strlen(name) < 32) {
+ 		strcpy(sb->set_name, homehost);
+ 		strcat(sb->set_name, ":");
+ 		strcat(sb->set_name, name);
+@@ -1759,7 +1763,7 @@ static int add_to_super1(struct supertype *st, mdu_disk_info_t *dk,
+ 
+ 	if (dk->number >= (int)__le32_to_cpu(sb->max_dev) &&
+ 	    __le32_to_cpu(sb->max_dev) < MAX_DEVS)
+-		sb->max_dev = __cpu_to_le32(dk->number+1);
++		sb->max_dev = __cpu_to_le32(dk->number + 1);
+ 
+ 	sb->dev_number = __cpu_to_le32(dk->number);
+ 	sb->devflags = 0; /* don't copy another disks flags */
+@@ -1840,8 +1844,8 @@ static int store_super1(struct supertype *st, int fd)
+ 		return 4;
+ 
+ 	if (sb->feature_map & __cpu_to_le32(MD_FEATURE_BITMAP_OFFSET)) {
+-		struct bitmap_super_s *bm = (struct bitmap_super_s*)
+-			(((char*)sb)+MAX_SB_SIZE);
++		struct bitmap_super_s *bm;
++		bm = (struct bitmap_super_s *)(((char *)sb) + MAX_SB_SIZE);
+ 		if (__le32_to_cpu(bm->magic) == BITMAP_MAGIC) {
+ 			locate_bitmap1(st, fd, 0);
+ 			if (awrite(&afd, bm, sizeof(*bm)) != sizeof(*bm))
+@@ -1928,7 +1932,7 @@ static int write_empty_r5l_meta_block(struct supertype *st, int fd)
+ 
+ 	init_afd(&afd, fd);
+ 
+-	if (posix_memalign((void**)&mb, 4096, META_BLOCK_SIZE) != 0) {
++	if (posix_memalign((void **)&mb, 4096, META_BLOCK_SIZE) != 0) {
+ 		pr_err("Could not allocate memory for the meta block.\n");
+ 		return 1;
+ 	}
+@@ -2197,7 +2201,7 @@ static int compare_super1(struct supertype *st, struct supertype *tst,
+ 		return 1;
+ 
+ 	if (!first) {
+-		if (posix_memalign((void**)&first, 4096, SUPER1_SIZE) != 0) {
++		if (posix_memalign((void **)&first, 4096, SUPER1_SIZE) != 0) {
+ 			pr_err("could not allocate superblock\n");
+ 			return 1;
+ 		}
+@@ -2310,7 +2314,7 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 		return 1;
+ 	}
+ 
+-	if (posix_memalign((void**)&super, 4096, SUPER1_SIZE) != 0) {
++	if (posix_memalign((void **)&super, 4096, SUPER1_SIZE) != 0) {
+ 		pr_err("could not allocate superblock\n");
+ 		return 1;
+ 	}
+@@ -2349,10 +2353,10 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 		return 2;
+ 	}
+ 
+-	bsb = (struct bitmap_super_s *)(((char*)super)+MAX_SB_SIZE);
++	bsb = (struct bitmap_super_s *)(((char *)super) + MAX_SB_SIZE);
+ 
+ 	misc = (struct misc_dev_info*)
+-	  (((char*)super)+MAX_SB_SIZE+BM_SUPER_SIZE);
++		(((char *)super) + MAX_SB_SIZE+BM_SUPER_SIZE);
+ 	misc->device_size = dsize;
+ 	if (st->data_offset == INVALID_SECTORS)
+ 		st->data_offset = __le64_to_cpu(super->data_offset);
+@@ -2360,9 +2364,8 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 	if (st->minor_version >= 1 &&
+ 	    st->ignore_hw_compat == 0 &&
+ 	    ((role_from_sb(super) != MD_DISK_ROLE_JOURNAL &&
+-		  dsize < (__le64_to_cpu(super->data_offset) +
+-		      __le64_to_cpu(super->size)))
+-	     ||
++	      dsize < (__le64_to_cpu(super->data_offset) +
++		       __le64_to_cpu(super->size))) ||
+ 	     dsize < (__le64_to_cpu(super->data_offset) +
+ 		      __le64_to_cpu(super->data_size)))) {
+ 		if (devname)
+@@ -2391,8 +2394,8 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 	return 0;
+ 
+  no_bitmap:
+-	super->feature_map = __cpu_to_le32(__le32_to_cpu(super->feature_map)
+-					   & ~MD_FEATURE_BITMAP_OFFSET);
++	super->feature_map = __cpu_to_le32(__le32_to_cpu(super->feature_map) &
++					   ~MD_FEATURE_BITMAP_OFFSET);
+ 	return 0;
+ }
+ 
+@@ -2450,7 +2453,7 @@ static __u64 avail_size1(struct supertype *st, __u64 devsize,
+ 	if (__le32_to_cpu(super->feature_map) & MD_FEATURE_BITMAP_OFFSET) {
+ 		/* hot-add. allow for actual size of bitmap */
+ 		struct bitmap_super_s *bsb;
+-		bsb = (struct bitmap_super_s *)(((char*)super)+MAX_SB_SIZE);
++		bsb = (struct bitmap_super_s *)(((char *)super) + MAX_SB_SIZE);
+ 		bmspace = calc_bitmap_size(bsb, 4096) >> 9;
+ 	} else if (md_feature_any_ppl_on(super->feature_map)) {
+ 		bmspace = __le16_to_cpu(super->ppl.size);
+@@ -2519,7 +2522,7 @@ add_internal_bitmap1(struct supertype *st,
+ 	int creating = 0;
+ 	int len;
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	bitmap_super_t *bms = (bitmap_super_t*)(((char*)sb) + MAX_SB_SIZE);
++	bitmap_super_t *bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 	int uuid[4];
+ 
+ 	if (__le64_to_cpu(sb->data_size) == 0)
+@@ -2607,10 +2610,10 @@ add_internal_bitmap1(struct supertype *st,
+ 	max_bits = (room * 512 - sizeof(bitmap_super_t)) * 8;
+ 
+ 	min_chunk = 4096; /* sub-page chunks don't work yet.. */
+-	bits = (size*512)/min_chunk +1;
++	bits = (size * 512) / min_chunk + 1;
+ 	while (bits > max_bits) {
+ 		min_chunk *= 2;
+-		bits = (bits+1)/2;
++		bits = (bits + 1) / 2;
+ 	}
+ 	if (chunk == UnSet) {
+ 		/* For practical purpose, 64Meg is a good
+@@ -2628,8 +2631,8 @@ add_internal_bitmap1(struct supertype *st,
+ 		/* start bitmap on a 4K boundary with enough space for
+ 		 * the bitmap
+ 		 */
+-		bits = (size*512) / chunk + 1;
+-		room = ((bits+7)/8 + sizeof(bitmap_super_t) +4095)/4096;
++		bits = (size * 512) / chunk + 1;
++		room = ((bits + 7) / 8 + sizeof(bitmap_super_t) + 4095) / 4096;
+ 		room *= 8; /* convert 4K blocks to sectors */
+ 		offset = -room - bbl_size;
+ 	}
+@@ -2683,7 +2686,7 @@ static int locate_bitmap1(struct supertype *st, int fd, int node_num)
+ 
+ 	offset = __le64_to_cpu(sb->super_offset) + (int32_t)__le32_to_cpu(sb->bitmap_offset);
+ 	if (node_num) {
+-		bms = (bitmap_super_t*)(((char*)sb)+MAX_SB_SIZE);
++		bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 		bm_sectors_per_node = calc_bitmap_size(bms, 4096) >> 9;
+ 		offset += bm_sectors_per_node * node_num;
+ 	}
+@@ -2696,7 +2699,7 @@ static int locate_bitmap1(struct supertype *st, int fd, int node_num)
+ static int write_bitmap1(struct supertype *st, int fd, enum bitmap_update update)
+ {
+ 	struct mdp_superblock_1 *sb = st->sb;
+-	bitmap_super_t *bms = (bitmap_super_t*)(((char*)sb)+MAX_SB_SIZE);
++	bitmap_super_t *bms = (bitmap_super_t *)(((char *)sb) + MAX_SB_SIZE);
+ 	int rv = 0;
+ 	void *buf;
+ 	int towrite, n, len;
+@@ -2970,16 +2973,16 @@ void *super1_make_v0(struct supertype *st, struct mdinfo *info, mdp_super_t *sb0
+ 
+ 	copy_uuid(sb->set_uuid, info->uuid, super1.swapuuid);
+ 	sprintf(sb->set_name, "%d", sb0->md_minor);
+-	sb->ctime = __cpu_to_le32(info->array.ctime+1);
++	sb->ctime = __cpu_to_le32(info->array.ctime + 1);
+ 	sb->level = __cpu_to_le32(info->array.level);
+ 	sb->layout = __cpu_to_le32(info->array.layout);
+ 	sb->size = __cpu_to_le64(info->component_size);
+-	sb->chunksize = __cpu_to_le32(info->array.chunk_size/512);
++	sb->chunksize = __cpu_to_le32(info->array.chunk_size / 512);
+ 	sb->raid_disks = __cpu_to_le32(info->array.raid_disks);
+ 	if (info->array.level > 0)
+ 		sb->data_size = sb->size;
+ 	else
+-		sb->data_size = st->ss->avail_size(st, st->devsize/512, 0);
++		sb->data_size = st->ss->avail_size(st, st->devsize / 512, 0);
+ 	sb->resync_offset = MaxSector;
+ 	sb->max_dev = __cpu_to_le32(MD_SB_DISKS);
+ 	sb->dev_number = __cpu_to_le32(info->disk.number);
+-- 
+2.38.1
+

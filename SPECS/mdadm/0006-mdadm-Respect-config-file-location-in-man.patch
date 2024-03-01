@@ -1,0 +1,1533 @@
+From e9dd5644843e2013a7dd1a8a5da2b9fa35837416 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 18 Mar 2022 09:26:04 +0100
+Subject: [PATCH 06/83] mdadm: Respect config file location in man
+
+Default config file location could differ depending on OS (e.g. Debian family).
+This patch takes default config file into consideration when creating mdadm.man
+file as well as mdadm.conf.man.
+
+Rename mdadm.conf.5 to mdadm.conf.5.in. Now mdadm.conf.5 is generated automatically.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ .gitignore      |   1 +
+ Makefile        |   7 +-
+ mdadm.8.in      |  16 +-
+ mdadm.conf.5    | 706 ------------------------------------------------
+ mdadm.conf.5.in | 706 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 721 insertions(+), 715 deletions(-)
+ delete mode 100644 mdadm.conf.5
+ create mode 100644 mdadm.conf.5.in
+
+diff --git a/.gitignore b/.gitignore
+index 217fe76d..8d791c6f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -3,6 +3,7 @@
+ /*-stamp
+ /mdadm
+ /mdadm.8
++/mdadm.conf.5
+ /mdadm.udeb
+ /mdassemble
+ /mdmon
+diff --git a/Makefile b/Makefile
+index 2a51d813..bf126033 100644
+--- a/Makefile
++++ b/Makefile
+@@ -227,7 +227,12 @@ raid6check : raid6check.o mdadm.h $(CHECK_OBJS)
+ 
+ mdadm.8 : mdadm.8.in
+ 	sed -e 's/{DEFAULT_METADATA}/$(DEFAULT_METADATA)/g' \
+-	-e 's,{MAP_PATH},$(MAP_PATH),g'  mdadm.8.in > mdadm.8
++	-e 's,{MAP_PATH},$(MAP_PATH),g' -e 's,{CONFFILE},$(CONFFILE),g' \
++	-e 's,{CONFFILE2},$(CONFFILE2),g'  mdadm.8.in > mdadm.8
++
++mdadm.conf.5 : mdadm.conf.5.in
++	sed -e 's,{CONFFILE},$(CONFFILE),g' \
++	-e 's,{CONFFILE2},$(CONFFILE2),g'  mdadm.conf.5.in > mdadm.conf.5
+ 
+ mdadm.man : mdadm.8
+ 	man -l mdadm.8 > mdadm.man
+diff --git a/mdadm.8.in b/mdadm.8.in
+index e2a42425..8b21ffd4 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -267,13 +267,13 @@ the exact meaning of this option in different contexts.
+ .TP
+ .BR \-c ", " \-\-config=
+ Specify the config file or directory.  Default is to use
+-.B /etc/mdadm.conf
++.B {CONFFILE}
+ and
+-.BR /etc/mdadm.conf.d ,
++.BR {CONFFILE}.d ,
+ or if those are missing then
+-.B /etc/mdadm/mdadm.conf
++.B {CONFFILE2}
+ and
+-.BR /etc/mdadm/mdadm.conf.d .
++.BR {CONFFILE2}.d .
+ If the config file given is
+ .B "partitions"
+ then nothing will be read, but
+@@ -2014,9 +2014,9 @@ The config file is only used if explicitly named with
+ or requested with (a possibly implicit)
+ .BR \-\-scan .
+ In the later case,
+-.B /etc/mdadm.conf
++.B {CONFFILE}
+ or
+-.B /etc/mdadm/mdadm.conf
++.B {CONFFILE2}
+ is used.
+ 
+ If
+@@ -3344,7 +3344,7 @@ uses this to find arrays when
+ is given in Misc mode, and to monitor array reconstruction
+ on Monitor mode.
+ 
+-.SS /etc/mdadm.conf
++.SS {CONFFILE} (or {CONFFILE2})
+ 
+ The config file lists which devices may be scanned to see if
+ they contain MD super block, and gives identifying information
+@@ -3352,7 +3352,7 @@ they contain MD super block, and gives identifying information
+ .BR mdadm.conf (5)
+ for more details.
+ 
+-.SS /etc/mdadm.conf.d
++.SS {CONFFILE}.d (or {CONFFILE2}.d)
+ 
+ A directory containing configuration files which are read in lexical
+ order.
+diff --git a/mdadm.conf.5 b/mdadm.conf.5
+deleted file mode 100644
+index 74a21c5f..00000000
+--- a/mdadm.conf.5
++++ /dev/null
+@@ -1,706 +0,0 @@
+-.\" Copyright Neil Brown and others.
+-.\"   This program is free software; you can redistribute it and/or modify
+-.\"   it under the terms of the GNU General Public License as published by
+-.\"   the Free Software Foundation; either version 2 of the License, or
+-.\"   (at your option) any later version.
+-.\" See file COPYING in distribution for details.
+-.TH MDADM.CONF 5
+-.SH NAME
+-mdadm.conf \- configuration for management of Software RAID with mdadm
+-.SH SYNOPSIS
+-/etc/mdadm.conf
+-.SH DESCRIPTION
+-.PP
+-.I mdadm
+-is a tool for creating, managing, and monitoring RAID devices using the
+-.B md
+-driver in Linux.
+-.PP
+-Some common tasks, such as assembling all arrays, can be simplified
+-by describing the devices and arrays in this configuration file.
+-
+-.SS SYNTAX
+-The file should be seen as a collection of words separated by white
+-space (space, tab, or newline).
+-Any word that beings with a hash sign (#) starts a comment and that
+-word together with the remainder of the line is ignored.
+-
+-Spaces can be included in a word using quotation characters.  Either
+-single quotes
+-.RB ( ' )
+-or double quotes (\fB"\fP)
+-may be used.  All the characters from one quotation character to
+-next identical character are protected and will not be used to
+-separate words to start new quoted strings.  To include a single quote
+-it must be between double quotes.  To include a double quote it must
+-be between single quotes.
+-
+-Any line that starts with white space (space or tab) is treated as
+-though it were a continuation of the previous line.
+-
+-Empty lines are ignored, but otherwise each (non continuation) line
+-must start with a keyword as listed below.  The keywords are case
+-insensitive and can be abbreviated to 3 characters.
+-
+-The keywords are:
+-.TP
+-.B DEVICE
+-A
+-.B device
+-line lists the devices (whole devices or partitions) that might contain
+-a component of an MD array.  When looking for the components of an
+-array,
+-.I mdadm
+-will scan these devices (or any devices listed on the command line).
+-
+-The
+-.B device
+-line may contain a number of different devices (separated by spaces)
+-and each device name can contain wild cards as defined by
+-.BR glob (7).
+-
+-Also, there may be several device lines present in the file.
+-
+-Alternatively, a
+-.B device
+-line can contain either or both of the  words
+-.B containers
+-and
+-.BR partitions .
+-The word
+-.B containers
+-will cause
+-.I mdadm
+-to look for assembled CONTAINER arrays and included them as a source
+-for assembling further arrays.
+-
+-The word
+-.I partitions
+-will cause
+-.I mdadm
+-to read
+-.I /proc/partitions
+-and include all devices and partitions found therein.
+-.I mdadm
+-does not use the names from
+-.I /proc/partitions
+-but only the major and minor device numbers.  It scans
+-.I /dev
+-to find the name that matches the numbers.
+-
+-If no DEVICE line is present, then "DEVICE partitions containers" is assumed.
+-
+-For example:
+-.IP
+-DEVICE /dev/hda* /dev/hdc*
+-.br
+-DEV    /dev/sd*
+-.br
+-DEVICE /dev/disk/by-path/pci*
+-.br
+-DEVICE partitions
+-
+-.TP
+-.B ARRAY
+-The ARRAY lines identify actual arrays.  The second word on the line
+-may be the name of the device where the array is normally
+-assembled, such as
+-.B /dev/md1
+-or
+-.BR /dev/md/backup .
+-If the name does not start with a slash
+-.RB (' / '),
+-it is treated as being in
+-.BR /dev/md/ .
+-Alternately the word
+-.B <ignore>
+-(complete with angle brackets) can be given in which case any array
+-which matches the rest of the line will never be automatically assembled.
+-If no device name is given,
+-.I mdadm
+-will use various heuristics to determine an appropriate name.
+-
+-Subsequent words identify the array, or identify the array as a member
+-of a group. If multiple identities are given,
+-then a component device must match ALL identities to be considered a
+-match.  Each identity word has a tag, and equals sign, and some value.
+-The tags are:
+-.RS 4
+-.TP
+-.B uuid=
+-The value should be a 128 bit uuid in hexadecimal, with punctuation
+-interspersed if desired.  This must match the uuid stored in the
+-superblock.
+-.TP
+-.B name=
+-The value should be a simple textual name as was given to
+-.I mdadm
+-when the array was created.  This must match the name stored in the
+-superblock on a device for that device to be included in the array.
+-Not all superblock formats support names.
+-.TP
+-.B super\-minor=
+-The value is an integer which indicates the minor number that was
+-stored in the superblock when the array was created. When an array is
+-created as /dev/mdX, then the minor number X is stored.
+-.TP
+-.B devices=
+-The value is a comma separated list of device names or device name
+-patterns.
+-Only devices with names which match one entry in the list will be used
+-to assemble the array.  Note that the devices
+-listed there must also be listed on a DEVICE line.
+-.TP
+-.B level=
+-The value is a RAID level.  This is not normally used to
+-identify an array, but is supported so that the output of
+-
+-.B "mdadm \-\-examine \-\-scan"
+-
+-can be use directly in the configuration file.
+-.TP
+-.B num\-devices=
+-The value is the number of devices in a complete active array.  As with
+-.B level=
+-this is mainly for compatibility with the output of
+-
+-.BR "mdadm \-\-examine \-\-scan" .
+-
+-.TP
+-.B spares=
+-The value is a number of spare devices to expect the array to have.
+-The sole use of this keyword and value is as follows:
+-.B mdadm \-\-monitor
+-will report an array if it is found to have fewer than this number of
+-spares when
+-.B \-\-monitor
+-starts or when
+-.B \-\-oneshot
+-is used.
+-
+-.TP
+-.B spare\-group=
+-The value is a textual name for a group of arrays.  All arrays with
+-the same
+-.B spare\-group
+-name are considered to be part of the same group.  The significance of
+-a group of arrays is that
+-.I mdadm
+-will, when monitoring the arrays, move a spare drive from one array in
+-a group to another array in that group if the first array had a failed
+-or missing drive but no spare.
+-
+-.TP
+-.B auto=
+-This option is rarely needed with mdadm-3.0, particularly if use with
+-the Linux kernel v2.6.28 or later.
+-It tells
+-.I mdadm
+-whether to use partitionable array or non-partitionable arrays and,
+-in the absence of
+-.IR udev ,
+-how many partition devices to create.  From 2.6.28 all md array
+-devices are partitionable, hence this option is not needed.
+-
+-The value of this option can be "yes" or "md" to indicate that a
+-traditional, non-partitionable md array should be created, or "mdp",
+-"part" or "partition" to indicate that a partitionable md array (only
+-available in linux 2.6 and later) should be used.  This later set can
+-also have a number appended to indicate how many partitions to create
+-device files for, e.g.
+-.BR auto=mdp5 .
+-The default is 4.
+-
+-.TP
+-.B bitmap=
+-The option specifies a file in which a write-intent bitmap should be
+-found.  When assembling the array,
+-.I mdadm
+-will provide this file to the
+-.B md
+-driver as the bitmap file.  This has the same function as the
+-.B \-\-bitmap\-file
+-option to
+-.BR \-\-assemble .
+-
+-.TP
+-.B metadata=
+-Specify the metadata format that the array has.  This is mainly
+-recognised for comparability with the output of
+-.BR "mdadm \-Es" .
+-
+-.TP
+-.B container=
+-Specify that this array is a member array of some container.  The
+-value given can be either a path name in /dev, or a UUID of the
+-container array.
+-
+-.TP
+-.B member=
+-Specify that this array is a member array of some container.  Each
+-type of container has some way to enumerate member arrays, often a
+-simple sequence number.  The value identifies which member of a
+-container the array is.  It will usually accompany a "container=" word.
+-.RE
+-
+-.TP
+-.B MAILADDR
+-The
+-.B mailaddr
+-line gives an E-mail address that alerts should be
+-sent to when
+-.I mdadm
+-is running in
+-.B \-\-monitor
+-mode (and was given the
+-.B \-\-scan
+-option).  There should only be one
+-.B MAILADDR
+-line and it should have only one address.  Any subsequent addresses
+-are silently ignored.
+-
+-.TP
+-.B MAILFROM
+-The
+-.B mailfrom
+-line (which can only be abbreviated to at least 5 characters) gives an
+-address to appear in the "From" address for alert mails.  This can be
+-useful if you want to explicitly set a domain, as the default from
+-address is "root" with no domain.  All words on this line are
+-catenated with spaces to form the address.
+-
+-Note that this value cannot be set via the
+-.I mdadm
+-commandline.  It is only settable via the config file.
+-
+-.TP
+-.B PROGRAM
+-The
+-.B program
+-line gives the name of a program to be run when
+-.B "mdadm \-\-monitor"
+-detects potentially interesting events on any of the arrays that it
+-is monitoring.  This program gets run with two or three arguments, they
+-being the Event, the md device, and possibly the related component
+-device.
+-
+-There should only be one
+-.B program
+-line and it should be give only one program.
+-
+-
+-.TP
+-.B CREATE
+-The
+-.B create
+-line gives default values to be used when creating arrays, new members
+-of arrays, and device entries for arrays.
+-These include:
+-
+-.RS 4
+-.TP
+-.B owner=
+-.TP
+-.B group=
+-These can give user/group ids or names to use instead of system
+-defaults (root/wheel or root/disk).
+-.TP
+-.B mode=
+-An octal file mode such as 0660 can be given to override the default
+-of 0600.
+-.TP
+-.B auto=
+-This corresponds to the
+-.B \-\-auto
+-flag to mdadm.  Give
+-.BR yes ,
+-.BR md ,
+-.BR mdp ,
+-.B part
+-\(em possibly followed by a number of partitions \(em to indicate how
+-missing device entries should be created.
+-
+-.TP
+-.B metadata=
+-The name of the metadata format to use if none is explicitly given.
+-This can be useful to impose a system-wide default of version-1 superblocks.
+-
+-.TP
+-.B symlinks=no
+-Normally when creating devices in
+-.B /dev/md/
+-.I mdadm
+-will create a matching symlink from
+-.B /dev/
+-with a name starting
+-.B md
+-or
+-.BR md_ .
+-Give
+-.B symlinks=no
+-to suppress this symlink creation.
+-
+-.TP
+-.B names=yes
+-Since Linux 2.6.29 it has been possible to create
+-.B md
+-devices with a name like
+-.B md_home
+-rather than just a number, like
+-.BR md3 .
+-.I mdadm
+-will use the numeric alternative by default as other tools that interact
+-with md arrays may expect only numbers.
+-If
+-.B names=yes
+-is given in
+-.I mdadm.conf
+-then
+-.I mdadm
+-will use a name when appropriate.
+-If
+-.B names=no
+-is given, then non-numeric
+-.I md
+-device names will not be used even if the default changes in a future
+-release of
+-.IR mdadm .
+-
+-.TP
+-.B bbl=no
+-By default,
+-.I mdadm
+-will reserve space for a bad block list (bbl) on all devices
+-included in or added to any array that supports them.  Setting
+-.B bbl=no
+-will prevent this, so newly added devices will not have a bad
+-block log.
+-.RE
+-
+-.TP
+-.B HOMEHOST
+-The
+-.B homehost
+-line gives a default value for the
+-.B \-\-homehost=
+-option to mdadm.  There should normally be only one other word on the line.
+-It should either be a host name, or one of the special words
+-.BR <system>,
+-.B <none>
+-and
+-.BR <ignore> .
+-If
+-.B <system>
+-is given, then the
+-.BR gethostname ( 2 )
+-systemcall is used to get the host name.  This is the default.
+-
+-If
+-.B <ignore>
+-is given, then a flag is set so that when arrays are being
+-auto-assembled the checking of the recorded
+-.I homehost
+-is disabled.
+-If
+-.B <ignore>
+-is given it is also possible to give an explicit name which will be
+-used when creating arrays.  This is the only case when there can be
+-more that one other word on the
+-.B HOMEHOST
+-line.  If there are other words, or other
+-.B HOMEHOST
+-lines, they are silently ignored.
+-
+-If
+-.B <none>
+-is given, then the default of using
+-.BR gethostname ( 2 )
+-is over-ridden and no homehost name is assumed.
+-
+-When arrays are created, this host name will be stored in the
+-metadata.  When arrays are assembled using auto-assembly, arrays which
+-do not record the correct homehost name in their metadata will be
+-assembled using a "foreign" name.  A "foreign" name alway ends with a
+-digit string preceded by an underscore to differentiate it
+-from any possible local name. e.g.
+-.B /dev/md/1_1
+-or
+-.BR /dev/md/home_0 .
+-.TP
+-.B AUTO
+-A list of names of metadata format can be given, each preceded by a
+-plus or minus sign.  Also the word
+-.I homehost
+-is allowed as is
+-.I all
+-preceded by plus or minus sign.
+-.I all
+-is usually last.
+-
+-When
+-.I mdadm
+-is auto-assembling an array, either via
+-.I \-\-assemble
+-or
+-.I \-\-incremental
+-and it finds metadata of a given type, it checks that metadata type
+-against those listed in this line.  The first match wins, where
+-.I all
+-matches anything.
+-If a match is found that was preceded by a plus sign, the auto
+-assembly is allowed.  If the match was preceded by a minus sign, the
+-auto assembly is disallowed.  If no match is found, the auto assembly
+-is allowed.
+-
+-If the metadata indicates that the array was created for
+-.I this
+-host, and the word
+-.I homehost
+-appears before any other match, then the array is treated as a valid
+-candidate for auto-assembly.
+-
+-This can be used to disable all auto-assembly (so that only arrays
+-explicitly listed in mdadm.conf or on the command line are assembled),
+-or to disable assembly of certain metadata types which might be
+-handled by other software.  It can also be used to disable assembly of
+-all foreign arrays - normally such arrays are assembled but given a
+-non-deterministic name in
+-.BR /dev/md/ .
+-
+-The known metadata types are
+-.BR 0.90 ,
+-.BR 1.x ,
+-.BR ddf ,
+-.BR imsm .
+-
+-.B AUTO
+-should be given at most once.  Subsequent lines are silently ignored.
+-Thus an earlier config file in a config directory will over-ride
+-the setting in a later config file.
+-
+-.TP
+-.B POLICY
+-This is used to specify what automatic behavior is allowed on devices
+-newly appearing in the system and provides a way of marking spares that can
+-be moved to other arrays as well as the migration domains.
+-.I Domain
+-can be defined through
+-.I policy
+-line by specifying a domain name for a number of paths from
+-.BR /dev/disk/by-path/ .
+-A device may belong to several domains. The domain of an array is a union
+-of domains of all devices in that array.  A spare can be automatically
+-moved from one array to another if the set of the destination array's
+-.I domains
+-contains all the
+-.I domains
+-of the new disk or if both arrays have the same
+-.IR spare-group .
+-
+-To update hot plug configuration it is necessary to execute
+-.B mdadm \-\-udev\-rules
+-command after changing the config file
+-
+-Keywords used in the
+-.I POLICY
+-line and supported values are:
+-
+-.RS 4
+-.TP
+-.B domain=
+-any arbitrary string
+-.TP
+-.B metadata=
+-0.9 1.x ddf or imsm
+-.TP
+-.B path=
+-file glob matching anything from
+-.B /dev/disk/by-path
+-.TP
+-.B type=
+-either
+-.B disk
+-or
+-.BR part .
+-.TP
+-.B action=
+-include, re-add, spare, spare-same-slot, or force-spare
+-.TP
+-.B auto=
+-yes, no, or homehost.
+-
+-.P
+-The
+-.I action
+-item determines the automatic behavior allowed for devices matching the
+-.I path
+-and
+-.I type
+-in the same line.  If a device matches several lines with different
+-.I  actions
+-then the most permissive will apply. The ordering of policy lines
+-is irrelevant to the end result.
+-.TP
+-.B include
+-allows adding a disk to an array if metadata on that disk matches that array
+-.TP
+-.B re\-add
+-will include the device in the array if it appears to be a current member
+-or a member that was recently removed and the array has a
+-write-intent-bitmap to allow the
+-.B re\-add
+-functionality.
+-.TP
+-.B spare
+-as above and additionally: if the device is bare it can
+-become a spare if there is any array that it is a candidate for based
+-on domains and metadata.
+-.TP
+-.B spare\-same\-slot
+-as above and additionally if given slot was used by an array that went
+-degraded recently and the device plugged in has no metadata then it will
+-be automatically added to that array (or it's container)
+-.TP
+-.B force\-spare
+-as above and the disk will become a spare in remaining cases
+-.RE
+-
+-.TP
+-.B PART-POLICY
+-This is similar to
+-.B POLICY
+-and accepts the same keyword assignments.  It allows a consistent set
+-of policies to applied to each of the partitions of a device.
+-
+-A
+-.B PART-POLICY
+-line should set
+-.I type=disk
+-and identify the path to one or more disk devices.  Each partition on
+-these disks will be treated according to the
+-.I action=
+-setting  from this line.  If a
+-.I domain
+-is set in the line, then the domain associated with each patition will
+-be based on the domain, but with
+-.RB \(dq -part N\(dq
+-appended, when N is the partition number for the partition that was
+-found.
+-
+-.TP
+-.B SYSFS
+-The
+-.B SYSFS
+-line lists custom values of MD device's sysfs attributes which will be
+-stored in sysfs after the array is assembled. Multiple lines are allowed and each
+-line has to contain the uuid or the name of the device to which it relates.
+-.RS 4
+-.TP
+-.B uuid=
+-hexadecimal identifier of MD device. This has to match the uuid stored in the
+-superblock.
+-.TP
+-.B name=
+-name of the MD device as was given to
+-.I mdadm
+-when the array was created. It will be ignored if
+-.B uuid
+-is not empty.
+-.RE
+-
+-.TP
+-.B MONITORDELAY
+-The
+-.B monitordelay
+-line gives a delay in seconds
+-.I mdadm
+-shall wait before pooling md arrays
+-when
+-.I mdadm
+-is running in
+-.B \-\-monitor
+-mode.
+-.B \-d/\-\-delay
+-command line argument takes precedence over the config file
+-
+-.SH EXAMPLE
+-DEVICE /dev/sd[bcdjkl]1
+-.br
+-DEVICE /dev/hda1 /dev/hdb1
+-
+-# /dev/md0 is known by its UUID.
+-.br
+-ARRAY /dev/md0 UUID=3aaa0122:29827cfa:5331ad66:ca767371
+-.br
+-# /dev/md1 contains all devices with a minor number of
+-.br
+-#   1 in the superblock.
+-.br
+-ARRAY /dev/md1 superminor=1
+-.br
+-# /dev/md2 is made from precisely these two devices
+-.br
+-ARRAY /dev/md2 devices=/dev/hda1,/dev/hdb1
+-
+-# /dev/md4 and /dev/md5 are a spare-group and spares
+-.br
+-#  can be moved between them
+-.br
+-ARRAY /dev/md4 uuid=b23f3c6d:aec43a9f:fd65db85:369432df
+-.br
+-           spare\-group=group1
+-.br
+-ARRAY /dev/md5 uuid=19464854:03f71b1b:e0df2edd:246cc977
+-.br
+-           spare\-group=group1
+-.br
+-# /dev/md/home is created if need to be a partitionable md array
+-.br
+-# any spare device number is allocated.
+-.br
+-ARRAY /dev/md/home UUID=9187a482:5dde19d9:eea3cc4a:d646ab8b
+-.br
+-           auto=part
+-.br
+-# The name of this array contains a space.
+-.br
+-ARRAY /dev/md9 name='Data Storage'
+-.sp
+-POLICY domain=domain1 metadata=imsm path=pci-0000:00:1f.2-scsi-*
+-.br
+-           action=spare
+-.br
+-POLICY domain=domain1 metadata=imsm path=pci-0000:04:00.0-scsi-[01]*
+-.br
+-           action=include
+-.br
+-# One domain comprising of devices attached to specified paths is defined.
+-.br
+-# Bare device matching first path will be made an imsm spare on hot plug.
+-.br
+-# If more than one array is created on devices belonging to domain1 and
+-.br
+-# one of them becomes degraded, then any imsm spare matching any path for
+-.br
+-# given domain name can be migrated.
+-.br
+-MAILADDR root@mydomain.tld
+-.br
+-PROGRAM /usr/sbin/handle\-mdadm\-events
+-.br
+-CREATE group=system mode=0640 auto=part\-8
+-.br
+-HOMEHOST <system>
+-.br
+-AUTO +1.x homehost \-all
+-.br
+-SYSFS name=/dev/md/raid5 group_thread_cnt=4 sync_speed_max=1000000
+-.br
+-SYSFS uuid=bead5eb6:31c17a27:da120ba2:7dfda40d group_thread_cnt=4
+-sync_speed_max=1000000
+-.br
+-MONITORDELAY 60
+-
+-.SH SEE ALSO
+-.BR mdadm (8),
+-.BR md (4).
+diff --git a/mdadm.conf.5.in b/mdadm.conf.5.in
+new file mode 100644
+index 00000000..83edd008
+--- /dev/null
++++ b/mdadm.conf.5.in
+@@ -0,0 +1,706 @@
++.\" Copyright Neil Brown and others.
++.\"   This program is free software; you can redistribute it and/or modify
++.\"   it under the terms of the GNU General Public License as published by
++.\"   the Free Software Foundation; either version 2 of the License, or
++.\"   (at your option) any later version.
++.\" See file COPYING in distribution for details.
++.TH MDADM.CONF 5
++.SH NAME
++mdadm.conf \- configuration for management of Software RAID with mdadm
++.SH SYNOPSIS
++{CONFFILE}
++.SH DESCRIPTION
++.PP
++.I mdadm
++is a tool for creating, managing, and monitoring RAID devices using the
++.B md
++driver in Linux.
++.PP
++Some common tasks, such as assembling all arrays, can be simplified
++by describing the devices and arrays in this configuration file.
++
++.SS SYNTAX
++The file should be seen as a collection of words separated by white
++space (space, tab, or newline).
++Any word that beings with a hash sign (#) starts a comment and that
++word together with the remainder of the line is ignored.
++
++Spaces can be included in a word using quotation characters.  Either
++single quotes
++.RB ( ' )
++or double quotes (\fB"\fP)
++may be used.  All the characters from one quotation character to
++next identical character are protected and will not be used to
++separate words to start new quoted strings.  To include a single quote
++it must be between double quotes.  To include a double quote it must
++be between single quotes.
++
++Any line that starts with white space (space or tab) is treated as
++though it were a continuation of the previous line.
++
++Empty lines are ignored, but otherwise each (non continuation) line
++must start with a keyword as listed below.  The keywords are case
++insensitive and can be abbreviated to 3 characters.
++
++The keywords are:
++.TP
++.B DEVICE
++A
++.B device
++line lists the devices (whole devices or partitions) that might contain
++a component of an MD array.  When looking for the components of an
++array,
++.I mdadm
++will scan these devices (or any devices listed on the command line).
++
++The
++.B device
++line may contain a number of different devices (separated by spaces)
++and each device name can contain wild cards as defined by
++.BR glob (7).
++
++Also, there may be several device lines present in the file.
++
++Alternatively, a
++.B device
++line can contain either or both of the  words
++.B containers
++and
++.BR partitions .
++The word
++.B containers
++will cause
++.I mdadm
++to look for assembled CONTAINER arrays and included them as a source
++for assembling further arrays.
++
++The word
++.I partitions
++will cause
++.I mdadm
++to read
++.I /proc/partitions
++and include all devices and partitions found therein.
++.I mdadm
++does not use the names from
++.I /proc/partitions
++but only the major and minor device numbers.  It scans
++.I /dev
++to find the name that matches the numbers.
++
++If no DEVICE line is present, then "DEVICE partitions containers" is assumed.
++
++For example:
++.IP
++DEVICE /dev/hda* /dev/hdc*
++.br
++DEV    /dev/sd*
++.br
++DEVICE /dev/disk/by-path/pci*
++.br
++DEVICE partitions
++
++.TP
++.B ARRAY
++The ARRAY lines identify actual arrays.  The second word on the line
++may be the name of the device where the array is normally
++assembled, such as
++.B /dev/md1
++or
++.BR /dev/md/backup .
++If the name does not start with a slash
++.RB (' / '),
++it is treated as being in
++.BR /dev/md/ .
++Alternately the word
++.B <ignore>
++(complete with angle brackets) can be given in which case any array
++which matches the rest of the line will never be automatically assembled.
++If no device name is given,
++.I mdadm
++will use various heuristics to determine an appropriate name.
++
++Subsequent words identify the array, or identify the array as a member
++of a group. If multiple identities are given,
++then a component device must match ALL identities to be considered a
++match.  Each identity word has a tag, and equals sign, and some value.
++The tags are:
++.RS 4
++.TP
++.B uuid=
++The value should be a 128 bit uuid in hexadecimal, with punctuation
++interspersed if desired.  This must match the uuid stored in the
++superblock.
++.TP
++.B name=
++The value should be a simple textual name as was given to
++.I mdadm
++when the array was created.  This must match the name stored in the
++superblock on a device for that device to be included in the array.
++Not all superblock formats support names.
++.TP
++.B super\-minor=
++The value is an integer which indicates the minor number that was
++stored in the superblock when the array was created. When an array is
++created as /dev/mdX, then the minor number X is stored.
++.TP
++.B devices=
++The value is a comma separated list of device names or device name
++patterns.
++Only devices with names which match one entry in the list will be used
++to assemble the array.  Note that the devices
++listed there must also be listed on a DEVICE line.
++.TP
++.B level=
++The value is a RAID level.  This is not normally used to
++identify an array, but is supported so that the output of
++
++.B "mdadm \-\-examine \-\-scan"
++
++can be use directly in the configuration file.
++.TP
++.B num\-devices=
++The value is the number of devices in a complete active array.  As with
++.B level=
++this is mainly for compatibility with the output of
++
++.BR "mdadm \-\-examine \-\-scan" .
++
++.TP
++.B spares=
++The value is a number of spare devices to expect the array to have.
++The sole use of this keyword and value is as follows:
++.B mdadm \-\-monitor
++will report an array if it is found to have fewer than this number of
++spares when
++.B \-\-monitor
++starts or when
++.B \-\-oneshot
++is used.
++
++.TP
++.B spare\-group=
++The value is a textual name for a group of arrays.  All arrays with
++the same
++.B spare\-group
++name are considered to be part of the same group.  The significance of
++a group of arrays is that
++.I mdadm
++will, when monitoring the arrays, move a spare drive from one array in
++a group to another array in that group if the first array had a failed
++or missing drive but no spare.
++
++.TP
++.B auto=
++This option is rarely needed with mdadm-3.0, particularly if use with
++the Linux kernel v2.6.28 or later.
++It tells
++.I mdadm
++whether to use partitionable array or non-partitionable arrays and,
++in the absence of
++.IR udev ,
++how many partition devices to create.  From 2.6.28 all md array
++devices are partitionable, hence this option is not needed.
++
++The value of this option can be "yes" or "md" to indicate that a
++traditional, non-partitionable md array should be created, or "mdp",
++"part" or "partition" to indicate that a partitionable md array (only
++available in linux 2.6 and later) should be used.  This later set can
++also have a number appended to indicate how many partitions to create
++device files for, e.g.
++.BR auto=mdp5 .
++The default is 4.
++
++.TP
++.B bitmap=
++The option specifies a file in which a write-intent bitmap should be
++found.  When assembling the array,
++.I mdadm
++will provide this file to the
++.B md
++driver as the bitmap file.  This has the same function as the
++.B \-\-bitmap\-file
++option to
++.BR \-\-assemble .
++
++.TP
++.B metadata=
++Specify the metadata format that the array has.  This is mainly
++recognised for comparability with the output of
++.BR "mdadm \-Es" .
++
++.TP
++.B container=
++Specify that this array is a member array of some container.  The
++value given can be either a path name in /dev, or a UUID of the
++container array.
++
++.TP
++.B member=
++Specify that this array is a member array of some container.  Each
++type of container has some way to enumerate member arrays, often a
++simple sequence number.  The value identifies which member of a
++container the array is.  It will usually accompany a "container=" word.
++.RE
++
++.TP
++.B MAILADDR
++The
++.B mailaddr
++line gives an E-mail address that alerts should be
++sent to when
++.I mdadm
++is running in
++.B \-\-monitor
++mode (and was given the
++.B \-\-scan
++option).  There should only be one
++.B MAILADDR
++line and it should have only one address.  Any subsequent addresses
++are silently ignored.
++
++.TP
++.B MAILFROM
++The
++.B mailfrom
++line (which can only be abbreviated to at least 5 characters) gives an
++address to appear in the "From" address for alert mails.  This can be
++useful if you want to explicitly set a domain, as the default from
++address is "root" with no domain.  All words on this line are
++catenated with spaces to form the address.
++
++Note that this value cannot be set via the
++.I mdadm
++commandline.  It is only settable via the config file.
++
++.TP
++.B PROGRAM
++The
++.B program
++line gives the name of a program to be run when
++.B "mdadm \-\-monitor"
++detects potentially interesting events on any of the arrays that it
++is monitoring.  This program gets run with two or three arguments, they
++being the Event, the md device, and possibly the related component
++device.
++
++There should only be one
++.B program
++line and it should be give only one program.
++
++
++.TP
++.B CREATE
++The
++.B create
++line gives default values to be used when creating arrays, new members
++of arrays, and device entries for arrays.
++These include:
++
++.RS 4
++.TP
++.B owner=
++.TP
++.B group=
++These can give user/group ids or names to use instead of system
++defaults (root/wheel or root/disk).
++.TP
++.B mode=
++An octal file mode such as 0660 can be given to override the default
++of 0600.
++.TP
++.B auto=
++This corresponds to the
++.B \-\-auto
++flag to mdadm.  Give
++.BR yes ,
++.BR md ,
++.BR mdp ,
++.B part
++\(em possibly followed by a number of partitions \(em to indicate how
++missing device entries should be created.
++
++.TP
++.B metadata=
++The name of the metadata format to use if none is explicitly given.
++This can be useful to impose a system-wide default of version-1 superblocks.
++
++.TP
++.B symlinks=no
++Normally when creating devices in
++.B /dev/md/
++.I mdadm
++will create a matching symlink from
++.B /dev/
++with a name starting
++.B md
++or
++.BR md_ .
++Give
++.B symlinks=no
++to suppress this symlink creation.
++
++.TP
++.B names=yes
++Since Linux 2.6.29 it has been possible to create
++.B md
++devices with a name like
++.B md_home
++rather than just a number, like
++.BR md3 .
++.I mdadm
++will use the numeric alternative by default as other tools that interact
++with md arrays may expect only numbers.
++If
++.B names=yes
++is given in
++.I mdadm.conf
++then
++.I mdadm
++will use a name when appropriate.
++If
++.B names=no
++is given, then non-numeric
++.I md
++device names will not be used even if the default changes in a future
++release of
++.IR mdadm .
++
++.TP
++.B bbl=no
++By default,
++.I mdadm
++will reserve space for a bad block list (bbl) on all devices
++included in or added to any array that supports them.  Setting
++.B bbl=no
++will prevent this, so newly added devices will not have a bad
++block log.
++.RE
++
++.TP
++.B HOMEHOST
++The
++.B homehost
++line gives a default value for the
++.B \-\-homehost=
++option to mdadm.  There should normally be only one other word on the line.
++It should either be a host name, or one of the special words
++.BR <system>,
++.B <none>
++and
++.BR <ignore> .
++If
++.B <system>
++is given, then the
++.BR gethostname ( 2 )
++systemcall is used to get the host name.  This is the default.
++
++If
++.B <ignore>
++is given, then a flag is set so that when arrays are being
++auto-assembled the checking of the recorded
++.I homehost
++is disabled.
++If
++.B <ignore>
++is given it is also possible to give an explicit name which will be
++used when creating arrays.  This is the only case when there can be
++more that one other word on the
++.B HOMEHOST
++line.  If there are other words, or other
++.B HOMEHOST
++lines, they are silently ignored.
++
++If
++.B <none>
++is given, then the default of using
++.BR gethostname ( 2 )
++is over-ridden and no homehost name is assumed.
++
++When arrays are created, this host name will be stored in the
++metadata.  When arrays are assembled using auto-assembly, arrays which
++do not record the correct homehost name in their metadata will be
++assembled using a "foreign" name.  A "foreign" name alway ends with a
++digit string preceded by an underscore to differentiate it
++from any possible local name. e.g.
++.B /dev/md/1_1
++or
++.BR /dev/md/home_0 .
++.TP
++.B AUTO
++A list of names of metadata format can be given, each preceded by a
++plus or minus sign.  Also the word
++.I homehost
++is allowed as is
++.I all
++preceded by plus or minus sign.
++.I all
++is usually last.
++
++When
++.I mdadm
++is auto-assembling an array, either via
++.I \-\-assemble
++or
++.I \-\-incremental
++and it finds metadata of a given type, it checks that metadata type
++against those listed in this line.  The first match wins, where
++.I all
++matches anything.
++If a match is found that was preceded by a plus sign, the auto
++assembly is allowed.  If the match was preceded by a minus sign, the
++auto assembly is disallowed.  If no match is found, the auto assembly
++is allowed.
++
++If the metadata indicates that the array was created for
++.I this
++host, and the word
++.I homehost
++appears before any other match, then the array is treated as a valid
++candidate for auto-assembly.
++
++This can be used to disable all auto-assembly (so that only arrays
++explicitly listed in mdadm.conf or on the command line are assembled),
++or to disable assembly of certain metadata types which might be
++handled by other software.  It can also be used to disable assembly of
++all foreign arrays - normally such arrays are assembled but given a
++non-deterministic name in
++.BR /dev/md/ .
++
++The known metadata types are
++.BR 0.90 ,
++.BR 1.x ,
++.BR ddf ,
++.BR imsm .
++
++.B AUTO
++should be given at most once.  Subsequent lines are silently ignored.
++Thus an earlier config file in a config directory will over-ride
++the setting in a later config file.
++
++.TP
++.B POLICY
++This is used to specify what automatic behavior is allowed on devices
++newly appearing in the system and provides a way of marking spares that can
++be moved to other arrays as well as the migration domains.
++.I Domain
++can be defined through
++.I policy
++line by specifying a domain name for a number of paths from
++.BR /dev/disk/by-path/ .
++A device may belong to several domains. The domain of an array is a union
++of domains of all devices in that array.  A spare can be automatically
++moved from one array to another if the set of the destination array's
++.I domains
++contains all the
++.I domains
++of the new disk or if both arrays have the same
++.IR spare-group .
++
++To update hot plug configuration it is necessary to execute
++.B mdadm \-\-udev\-rules
++command after changing the config file
++
++Keywords used in the
++.I POLICY
++line and supported values are:
++
++.RS 4
++.TP
++.B domain=
++any arbitrary string
++.TP
++.B metadata=
++0.9 1.x ddf or imsm
++.TP
++.B path=
++file glob matching anything from
++.B /dev/disk/by-path
++.TP
++.B type=
++either
++.B disk
++or
++.BR part .
++.TP
++.B action=
++include, re-add, spare, spare-same-slot, or force-spare
++.TP
++.B auto=
++yes, no, or homehost.
++
++.P
++The
++.I action
++item determines the automatic behavior allowed for devices matching the
++.I path
++and
++.I type
++in the same line.  If a device matches several lines with different
++.I  actions
++then the most permissive will apply. The ordering of policy lines
++is irrelevant to the end result.
++.TP
++.B include
++allows adding a disk to an array if metadata on that disk matches that array
++.TP
++.B re\-add
++will include the device in the array if it appears to be a current member
++or a member that was recently removed and the array has a
++write-intent-bitmap to allow the
++.B re\-add
++functionality.
++.TP
++.B spare
++as above and additionally: if the device is bare it can
++become a spare if there is any array that it is a candidate for based
++on domains and metadata.
++.TP
++.B spare\-same\-slot
++as above and additionally if given slot was used by an array that went
++degraded recently and the device plugged in has no metadata then it will
++be automatically added to that array (or it's container)
++.TP
++.B force\-spare
++as above and the disk will become a spare in remaining cases
++.RE
++
++.TP
++.B PART-POLICY
++This is similar to
++.B POLICY
++and accepts the same keyword assignments.  It allows a consistent set
++of policies to applied to each of the partitions of a device.
++
++A
++.B PART-POLICY
++line should set
++.I type=disk
++and identify the path to one or more disk devices.  Each partition on
++these disks will be treated according to the
++.I action=
++setting  from this line.  If a
++.I domain
++is set in the line, then the domain associated with each patition will
++be based on the domain, but with
++.RB \(dq -part N\(dq
++appended, when N is the partition number for the partition that was
++found.
++
++.TP
++.B SYSFS
++The
++.B SYSFS
++line lists custom values of MD device's sysfs attributes which will be
++stored in sysfs after the array is assembled. Multiple lines are allowed and each
++line has to contain the uuid or the name of the device to which it relates.
++.RS 4
++.TP
++.B uuid=
++hexadecimal identifier of MD device. This has to match the uuid stored in the
++superblock.
++.TP
++.B name=
++name of the MD device as was given to
++.I mdadm
++when the array was created. It will be ignored if
++.B uuid
++is not empty.
++.RE
++
++.TP
++.B MONITORDELAY
++The
++.B monitordelay
++line gives a delay in seconds
++.I mdadm
++shall wait before pooling md arrays
++when
++.I mdadm
++is running in
++.B \-\-monitor
++mode.
++.B \-d/\-\-delay
++command line argument takes precedence over the config file
++
++.SH EXAMPLE
++DEVICE /dev/sd[bcdjkl]1
++.br
++DEVICE /dev/hda1 /dev/hdb1
++
++# /dev/md0 is known by its UUID.
++.br
++ARRAY /dev/md0 UUID=3aaa0122:29827cfa:5331ad66:ca767371
++.br
++# /dev/md1 contains all devices with a minor number of
++.br
++#   1 in the superblock.
++.br
++ARRAY /dev/md1 superminor=1
++.br
++# /dev/md2 is made from precisely these two devices
++.br
++ARRAY /dev/md2 devices=/dev/hda1,/dev/hdb1
++
++# /dev/md4 and /dev/md5 are a spare-group and spares
++.br
++#  can be moved between them
++.br
++ARRAY /dev/md4 uuid=b23f3c6d:aec43a9f:fd65db85:369432df
++.br
++           spare\-group=group1
++.br
++ARRAY /dev/md5 uuid=19464854:03f71b1b:e0df2edd:246cc977
++.br
++           spare\-group=group1
++.br
++# /dev/md/home is created if need to be a partitionable md array
++.br
++# any spare device number is allocated.
++.br
++ARRAY /dev/md/home UUID=9187a482:5dde19d9:eea3cc4a:d646ab8b
++.br
++           auto=part
++.br
++# The name of this array contains a space.
++.br
++ARRAY /dev/md9 name='Data Storage'
++.sp
++POLICY domain=domain1 metadata=imsm path=pci-0000:00:1f.2-scsi-*
++.br
++           action=spare
++.br
++POLICY domain=domain1 metadata=imsm path=pci-0000:04:00.0-scsi-[01]*
++.br
++           action=include
++.br
++# One domain comprising of devices attached to specified paths is defined.
++.br
++# Bare device matching first path will be made an imsm spare on hot plug.
++.br
++# If more than one array is created on devices belonging to domain1 and
++.br
++# one of them becomes degraded, then any imsm spare matching any path for
++.br
++# given domain name can be migrated.
++.br
++MAILADDR root@mydomain.tld
++.br
++PROGRAM /usr/sbin/handle\-mdadm\-events
++.br
++CREATE group=system mode=0640 auto=part\-8
++.br
++HOMEHOST <system>
++.br
++AUTO +1.x homehost \-all
++.br
++SYSFS name=/dev/md/raid5 group_thread_cnt=4 sync_speed_max=1000000
++.br
++SYSFS uuid=bead5eb6:31c17a27:da120ba2:7dfda40d group_thread_cnt=4
++sync_speed_max=1000000
++.br
++MONITORDELAY 60
++
++.SH SEE ALSO
++.BR mdadm (8),
++.BR md (4).
+-- 
+2.38.1
+

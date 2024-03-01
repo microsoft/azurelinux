@@ -1,0 +1,112 @@
+From 55c10e4de13abe3e6934895e1fff7d2d20d0b2c2 Mon Sep 17 00:00:00 2001
+From: Pawel Baldysiak <pawel.baldysiak@intel.com>
+Date: Thu, 1 Sep 2022 11:20:31 +0200
+Subject: [PATCH 56/83] Monitor: Fix statelist memory leaks
+
+Free statelist in error path in Monitor initialization.
+
+Signed-off-by: Pawel Baldysiak <pawel.baldysiak@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Monitor.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 93f36ac0..b4e954c6 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -74,6 +74,7 @@ static int add_new_arrays(struct mdstat_ent *mdstat, struct state **statelist,
+ 			  int test, struct alert_info *info);
+ static void try_spare_migration(struct state *statelist, struct alert_info *info);
+ static void link_containers_with_subarrays(struct state *list);
++static void free_statelist(struct state *statelist);
+ #ifndef NO_LIBUDEV
+ static int check_udev_activity(void);
+ #endif
+@@ -128,7 +129,6 @@ int Monitor(struct mddev_dev *devlist,
+ 	 */
+ 
+ 	struct state *statelist = NULL;
+-	struct state *st2;
+ 	int finished = 0;
+ 	struct mdstat_ent *mdstat = NULL;
+ 	char *mailfrom;
+@@ -185,12 +185,14 @@ int Monitor(struct mddev_dev *devlist,
+ 				continue;
+ 			if (strcasecmp(mdlist->devname, "<ignore>") == 0)
+ 				continue;
++			if (!is_mddev(mdlist->devname)) {
++				free_statelist(statelist);
++				return 1;
++			}
+ 
+ 			st = xcalloc(1, sizeof *st);
+ 			snprintf(st->devname, MD_NAME_MAX + sizeof("/dev/md/"),
+ 				 "/dev/md/%s", basename(mdlist->devname));
+-			if (!is_mddev(mdlist->devname))
+-				return 1;
+ 			st->next = statelist;
+ 			st->devnm[0] = 0;
+ 			st->percent = RESYNC_UNKNOWN;
+@@ -206,8 +208,10 @@ int Monitor(struct mddev_dev *devlist,
+ 		for (dv = devlist; dv; dv = dv->next) {
+ 			struct state *st;
+ 
+-			if (!is_mddev(dv->devname))
++			if (!is_mddev(dv->devname)) {
++				free_statelist(statelist);
+ 				return 1;
++			}
+ 
+ 			st = xcalloc(1, sizeof *st);
+ 			mdlist = conf_get_ident(dv->devname);
+@@ -294,16 +298,16 @@ int Monitor(struct mddev_dev *devlist,
+ 		for (stp = &statelist; (st = *stp) != NULL; ) {
+ 			if (st->from_auto && st->err > 5) {
+ 				*stp = st->next;
+-				free(st->spare_group);
++				if (st->spare_group)
++					free(st->spare_group);
++
+ 				free(st);
+ 			} else
+ 				stp = &st->next;
+ 		}
+ 	}
+-	for (st2 = statelist; st2; st2 = statelist) {
+-		statelist = st2->next;
+-		free(st2);
+-	}
++
++	free_statelist(statelist);
+ 
+ 	if (pidfile)
+ 		unlink(pidfile);
+@@ -1056,6 +1060,24 @@ static void link_containers_with_subarrays(struct state *list)
+ 				}
+ }
+ 
++/**
++ * free_statelist() - Frees statelist.
++ * @statelist: statelist to free
++ */
++static void free_statelist(struct state *statelist)
++{
++	struct state *tmp = NULL;
++
++	while (statelist) {
++		if (statelist->spare_group)
++			free(statelist->spare_group);
++
++		tmp = statelist;
++		statelist = statelist->next;
++		free(tmp);
++	}
++}
++
+ #ifndef NO_LIBUDEV
+ /* function: check_udev_activity
+  * Description: Function waits for udev to finish
+-- 
+2.38.1
+
