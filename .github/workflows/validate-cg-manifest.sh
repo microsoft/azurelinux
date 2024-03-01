@@ -108,7 +108,7 @@ function prepare_lua {
 }
 
 function specs_dir_from_spec_path {
-  # Assuming we always check specs inside CBL-Mariner's core GitHub repository.
+  # Assuming we always check specs inside Azure Linux's core GitHub repository.
   # If that's the case, the spec paths will always have the following form:
   #     [repo_directory_path]/[specs_directory]/[package_name]/[package_spec_files]
   echo "$(realpath "$(dirname "$1")/../../SPECS")/mariner-rpm-macros"

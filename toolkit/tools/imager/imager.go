@@ -10,15 +10,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -601,7 +601,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if !systemConfig.IsRootFS() {
 		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
 			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
-			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot, systemConfig.EnableGrubMkconfig)
+			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot, systemConfig.EnableGrubMkconfig, false)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader:\n%w", err)
 			return

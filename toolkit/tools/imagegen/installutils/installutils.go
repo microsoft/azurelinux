@@ -15,21 +15,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/resources"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
 )
 
@@ -989,6 +989,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
 	installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string,
 	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
+	includeLegacyGrubCfg bool,
 ) (err error) {
 	timestamp.StartEvent("configuring bootloader", nil)
 	defer timestamp.StopEvent(nil)
@@ -1056,7 +1057,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
 	err = InstallGrubDefaults(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
-		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate, includeLegacyGrubCfg)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
@@ -1106,18 +1107,41 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
+// - includeLegacyCfg specifies if the legacy grub.cfg from Mariner 2.0 should also be added.
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
-	const (
-		assetGrubDefFile = "assets/grub2/grub"
-		grubDefFile      = "etc/default/grub"
-	)
-
+func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
+	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
+	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool, includeLegacyCfg bool,
+) (err error) {
 	// Copy the bootloader's /etc/default/grub and set the file permission
-	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+	err = installGrubTemplateFile(resources.AssetsGrubDefFile, GrubDefFile, installRoot, rootDevice, bootUUID,
+		bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+	if err != nil {
+		logger.Log.Warnf("Failed to install (%s): %v", GrubDefFile, err)
+		return
+	}
 
-	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
+	if includeLegacyCfg {
+		// Add the legacy /boot/grub2/grub.cfg file, which was used in Mariner 2.0.
+		err = installGrubTemplateFile(resources.AssetsGrubCfgFile, GrubCfgFile, installRoot, rootDevice, bootUUID,
+			bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		if err != nil {
+			logger.Log.Warnf("Failed to install (%s): %v", GrubCfgFile, err)
+			return
+		}
+	}
+
+	return
+}
+
+func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, bootUUID, bootPrefix string,
+	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
+	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool,
+) (err error) {
+	installGrubDefFile := filepath.Join(installRoot, targetFile)
+
+	err = file.CopyResourceFile(resources.ResourcesFS, assetFile, installGrubDefFile, bootDirectoryDirMode,
 		bootDirectoryFileMode)
 	if err != nil {
 		return
@@ -1940,17 +1964,16 @@ func FormatMountIdentifier(identifier configuration.MountIdentifier, device stri
 // - installChroot is the installation chroot
 func enableCryptoDisk() (err error) {
 	const (
-		grubPath           = "/etc/default/grub"
 		grubCryptoDisk     = "GRUB_ENABLE_CRYPTODISK=y\n"
 		grubPreloadModules = `GRUB_PRELOAD_MODULES="lvm"`
 	)
 
-	err = file.Append(grubCryptoDisk, grubPath)
+	err = file.Append(grubCryptoDisk, GrubDefFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
 		return
 	}
-	err = file.Append(grubPreloadModules, grubPath)
+	err = file.Append(grubPreloadModules, GrubDefFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to add grub preload modules: %v", err)
 		return

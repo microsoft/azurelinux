@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "gobject-introspection",
-          "version": "1.71.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
+          "version": "1.78.1",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.78/gobject-introspection-1.78.1.tar.xz"
         }
       }
     },
@@ -4790,8 +4790,8 @@
         "type": "other",
         "other": {
           "name": "gptfdisk",
-          "version": "1.0.8",
-          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.8/gptfdisk-1.0.8.tar.gz"
+          "version": "1.0.10",
+          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.10/gptfdisk-1.0.10.tar.gz"
         }
       }
     },
@@ -8151,16 +8151,6 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kernel-uvm-cvm",
           "version": "6.1.0.mshv11",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
         }
@@ -12961,8 +12951,8 @@
         "type": "other",
         "other": {
           "name": "meson",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/1.2.1/meson-1.2.1.tar.gz"
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/1.3.1/meson-1.3.1.tar.gz"
         }
       }
     },
@@ -21273,8 +21263,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-all-3.17.3.tar.gz"
+          "version": "25.3",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v25.3/protobuf-25.3.tar.gz"
         }
       }
     },
@@ -22952,16 +22942,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-m2r",
-          "version": "0.3.1",
-          "downloadUrl": "https://github.com/miyakogi/m2r/archive/v0.3.1/m2r-0.3.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-mako",
           "version": "1.2.4",
           "downloadUrl": "https://github.com/sqlalchemy/mako/archive/refs/tags/rel_1_2_4.tar.gz"
@@ -23283,8 +23263,8 @@
         "type": "other",
         "other": {
           "name": "python-pam",
-          "version": "1.8.4",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-1.8.4.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-2.0.2.tar.gz"
         }
       }
     },
@@ -24983,8 +24963,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "6.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-6.2.0.tar.xz"
+          "version": "8.2.0",
+          "downloadUrl": "https://download.qemu.org/qemu-8.2.0.tar.xz"
         }
       }
     },
