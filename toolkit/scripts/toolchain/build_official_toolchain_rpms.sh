@@ -240,7 +240,7 @@ chroot_and_run_rpmbuild () {
             $CHECK_SETTING                 \
             --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "$MARINER_DIST_MACRO" --define "mariner_build_number $PARAM_BUILD_NUM" \
             --define "azurelinux_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
-            --define "azurelinux_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
+            --define "distro_module_ldflags  -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
 
     chroot_unmount
