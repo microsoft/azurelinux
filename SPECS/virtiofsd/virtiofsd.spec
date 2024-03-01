@@ -19,8 +19,10 @@ Distribution:   Azure Linux
 
 
 Name:           virtiofsd
-Version:        1.10.1
-Release:        2%{?dist}
+# Version to be kept in sync with the `asset.virtiofsd.version` field from
+# https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
+Version:        1.8.0
+Release:        1%{?dist}
 Summary:        vhost-user virtio-fs device backend written in Rust
 Group:          Development/Libraries/Rust
 License:        Apache-2.0
@@ -30,13 +32,10 @@ Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{n
 # Note: the %%{name}-%%{version}-vendor.tar.gz file contains the vendored
 # sources created by capturing the contents downloaded into vendor/
 # To create the tarball run:
-#   tar -xf %{name}-%{version}.tar.gz
+#   tar -xf %{name}-v%{version}.tar.gz
 #   cd %{name}-v%{version}
 #   cargo vendor
-#   tar --sort=name --mtime="2021-04-26 00:00Z" --owner=0 --group=0 \
-#   --numeric-owner \
-#   --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime -cf \
-#   %{name}-%{version}-vendor.tar.gz vendor/
+#   tar -cf %{name}-%{version}-vendor.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        cargo_config
@@ -61,7 +60,7 @@ cargo build --release --offline
 %install
 mkdir -p %{buildroot}%{_libexecdir}
 install -D -p -m 0755 %{_builddir}/%{name}-v%{version}/target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd
-install -D -p -m 0644 %{_builddir}/%{name}-v%{version}/50-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-virtiofsd.json
+install -D -p -m 0644 %{_builddir}/%{name}-v%{version}/50-qemu-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %check
 cargo test --release
@@ -71,10 +70,10 @@ cargo test --release
 %{_libexecdir}/virtiofsd
 %dir %{_datadir}/qemu
 %dir %{_datadir}/qemu/vhost-user
-%{_datadir}/qemu/vhost-user/50-virtiofsd.json
+%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
 
 %changelog
-* Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.10.1-2
+* Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.8.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
 - License verified
 - Remove build dependencies on cargo-packaging
