@@ -44,7 +44,7 @@ BuildArch:      noarch
 Summary:        A functional standard library for Python %{python3_version}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-pip
 %endif
 

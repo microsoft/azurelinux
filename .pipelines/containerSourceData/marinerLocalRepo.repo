@@ -1,6 +1,0 @@
-[mariner-local]
-name=Mariner Local Repo
-baseurl=file:///localrepo
-enabled=1
-gpgcheck=0
-skip_if_unavailable=True

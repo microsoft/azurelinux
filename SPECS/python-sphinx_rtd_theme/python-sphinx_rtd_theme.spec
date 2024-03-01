@@ -1,8 +1,8 @@
 %global srcname sphinx_rtd_theme
 Summary:        Sphinx theme for readthedocs.org
 Name:           python-%{srcname}
-Version:        1.0.0
-Release:        3%{?dist}
+Version:        2.0.0
+Release:        1%{?dist}
 License:        MIT AND OFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,20 +14,20 @@ Source1:        https://docs.readthedocs.io/en/latest/objects.inv#/%{name}-objec
 # Remove all traces of html5shiv.  We have no interest in supporting ancient
 # versions of Internet Explorer.
 Patch0:         %{name}-html5shiv.patch
-# Unbundle fonts.  Refer to local fonts instead.
-Patch1:         %{name}-unbundle-fonts.patch
 
 BuildArch:      noarch
 
-BuildRequires:  python3-devel
-BuildRequires:  python3dist(docutils)
-BuildRequires:  python3dist(setuptools)
-%if %{with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-pip
-BuildRequires:  python3-six
-BuildRequires:  python3dist(pytest)
+BuildRequires:  font(fontawesome)
+BuildRequires:  font(lato)
+BuildRequires:  font(robotoslab)
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-packaging
+BuildRequires:  %{py3_dist sphinx}
+BuildRequires:  %{py3_dist pip}
+BuildRequires:  %{py3_dist wheel}
+
+%if 0%{?with_check}
+BuildRequires:  %{py3_dist pytest}
 %endif
 
 %description
@@ -36,17 +36,16 @@ It's currently in development and includes some rtd variable checks that
 can be ignored if you're just trying to use it on your project outside
 of that site.
 
-%package -n python3-%{srcname}
-%{?python_provide:%python_provide python3-%{srcname}}
+%package -n python%{python3_pkgversion}-%{srcname}
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        Sphinx theme for readthedocs.org
 Requires:       font(fontawesome)
 Requires:       font(lato)
 Requires:       font(robotoslab)
-Requires:       fontawesome-fonts-web
 
 Provides:       python3dist(sphinx-rtd-theme)
 
-%description -n python3-%{srcname}
+%description -n python%{python3_pkgversion}-%{srcname}
 This is a prototype mobile-friendly sphinx theme for readthedocs.org.
 It's currently in development and includes some rtd variable checks that
 can be ignored if you're just trying to use it on your project outside
@@ -56,32 +55,75 @@ of that site.
 %autosetup -p1 -n %{srcname}-%{version}
 
 # Use local objects.inv for intersphinx
-sed -e "s|\('https://docs\.readthedocs\.io/en/latest/', \)None|\1'%{SOURCE1}'|" \
-    -e "s|\('http://www\.sphinx-doc\.org/en/stable/', \)None|\1'%{_docdir}/python-sphinx-doc/html/objects.inv'|" \
+sed -e "s|\('https://docs\.readthedocs\.io/en/stable/', \)None|\1'%{SOURCE1}'|" \
+    -e "s|\('https://www\.sphinx-doc\.org/en/master/', \)None|\1'%{_docdir}/python-sphinx-doc/html/objects.inv'|" \
     -i docs/conf.py
 
+# We modify the tests to avoid dependency on readthedocs-sphinx-ext.
+# According to upstream, the test dependency is only used to test integration with that dependency.
+# See https://github.com/readthedocs/readthedocs-sphinx-ext/pull/105#pullrequestreview-928253285
+sed -Ei -e "/extensions\.append\('readthedocs_ext\.readthedocs'\)/d" \
+        -e "s/'readthedocs[^']*'(, ?)?//g" \
+        tests/util.py
+	
+# We patch the theme css files to unbundle fonts (they are required from Fedora)
+# Using Web Assets shall support the use case when documentation is
+# exported via web server
+# See: https://docs.fedoraproject.org/en-US/packaging-guidelines/Web_Assets/
+pushd sphinx_rtd_theme/static/css
+ 
+rm -r fonts
+ 
+# Edit the fonts references in theme.css and badge.css
+for FONT in lato-normal=lato/Lato-Regular.ttf \
+            lato-bold=lato/Lato-Bold.ttf \
+            lato-normal-italic=lato/Lato-Italic.ttf \
+            lato-bold-italic=lato/Lato-BoldItalic.ttf \
+            Roboto-Slab-Regular=google-roboto-slab-fonts/RobotoSlab-Regular.ttf \
+            Roboto-Slab-Bold=google-roboto-slab-fonts/RobotoSlab-Bold.ttf;
+do
+  L="${FONT%=*}"
+  R="${FONT#*=}"
+  # Get the font basename from the path
+  F="${R#*/}"
+  F_BASENAME="${F/.ttf}"
+  sed \
+    -e "s|src:\(url(fonts/$L\.[^)]*) format([^)]*),\?\)\+|src:local('$F_BASENAME'),url('/.sysassets/fonts/$R') format(\"truetype\")|g" \
+    -i theme.css
+done
+ 
+sed -e "s|src:url(fonts/fontawesome-webfont\.[^)]*);||" \
+    -e "s|src:\(url(fonts/fontawesome-webfont\.[^)]*) format([^)]*),\?\)\+|src:local(\"FontAwesome\"),url('/.sysassets/fonts/fontawesome/fontawesome-webfont.ttf') format(\"truetype\")|" \
+    -i badge_only.css theme.css
+ 
+popd
+ 
 # We cannot build the Javascript from source at this time, due to many missing
 # dependencies.  Convince the build script to skip building the Javascript and
 # go on to the python.
 mkdir -p build/lib/%{srcname}/static/js
 cp -p sphinx_rtd_theme/static/js/badge_only.js build/lib/%{srcname}/static/js
 cp -p sphinx_rtd_theme/static/js/theme.js build/lib/%{srcname}/static/js
-sed -i "/'build_py'/d" setup.py
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 rst2html3 --no-datestamp README.rst README.html
 
 %install
-%py3_install
-
-# Unbundle fonts
-rm -fr %{buildroot}%{python3_sitelib}/%{srcname}/static/css/fonts
+%pyproject_install
 
 %check
-pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
 %pytest
+
+# Test that the forbidden fonts were successfully removed from the css files
+grep 'format("woff2\?")' \
+  %{buildroot}%{python3_sitelib}/%{srcname}/static/css/badge_only.css \
+  %{buildroot}%{python3_sitelib}/%{srcname}/static/css/theme.css \
+&& exit 1 || true
 
 %files -n python3-%{srcname}
 %license LICENSE OFL-License.txt
@@ -89,6 +131,10 @@ pip3 install pluggy more-itertools Sphinx readthedocs-sphinx-ext
 %{python3_sitelib}/%{srcname}*
 
 %changelog
+* Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 2.0.0-1
+- Auto-upgrade to 2.0.0 - 3.0
+- Remove outdated patches & Update with Fedora upstream
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.0.0-3
 - Add Provides python3dist(sphinx-rtd-theme)
 

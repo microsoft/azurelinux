@@ -34,7 +34,7 @@ BuildRequires:  python3-rsa
 BuildRequires:  python3-six
 BuildRequires:  python3-urllib3
 BuildRequires:  python3-websocket-client
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  python3-pip
 %endif

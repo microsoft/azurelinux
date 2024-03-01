@@ -51,7 +51,7 @@ BuildRequires:  perl(boolean)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(overload)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)

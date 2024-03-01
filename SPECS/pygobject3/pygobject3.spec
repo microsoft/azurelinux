@@ -17,7 +17,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-cairo-devel
 BuildRequires:  glib-schemas
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  dbus
 BuildRequires:  openssl-devel

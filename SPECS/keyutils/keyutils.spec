@@ -9,7 +9,7 @@ Group:          System Environment/Base
 URL:            https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/about/
 Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/%{name}-%{version}.tar.gz
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: lsb-release
 %endif
 

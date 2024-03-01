@@ -9,12 +9,14 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 const (
@@ -89,7 +91,37 @@ var (
 	//
 	//	D: ========== +++ systemd-devel-239-42.azl3 x86_64-linux 0x0
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
+
+	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
+	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
+	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
 )
+
+// checkDistroMacros validates the distro macro values.
+func checkDistroMacros(nameAbreviation string, majorVersion int) error {
+	if majorVersion < 1 || nameAbreviation == "" {
+		err := fmt.Errorf("failed to set distro defines (%s, %d), invalid name or version", nameAbreviation, majorVersion)
+		return err
+	}
+	return nil
+}
+
+// loadDistroFlags will load the values of exe.DistroNameAbbreviation and exe.DistroMajorVersion into the local copies
+// after validating them.
+func loadLdDistroFlags() (string, int) {
+	version, err := strconv.Atoi(exe.DistroMajorVersion)
+	if err != nil {
+		err = fmt.Errorf("failed to convert distro major version (%s) to int:\n%w", exe.DistroMajorVersion, err)
+		panic(err)
+	}
+
+	err = checkDistroMacros(exe.DistroNameAbbreviation, version)
+	if err != nil {
+		err = fmt.Errorf("failed to load distro defines from exe package:\n%w", err)
+		panic(err)
+	}
+	return exe.DistroNameAbbreviation, version
+}
 
 // GetRpmArch converts the GOARCH arch into an RPM arch
 func GetRpmArch(goArch string) (rpmArch string, err error) {
@@ -243,16 +275,17 @@ func executeRpmCommandRaw(program string, args ...string) (stdout string, err er
 	return
 }
 
-// DefaultDefinesWithDist returns a new map of default defines that can be used during RPM queries that also includes
-// the dist tag.
-func DefaultDefinesWithDist(runChecks bool, distTag string) map[string]string {
-	defines := DefaultDefines(runChecks)
+// DefaultDistroDefines returns a new map of default defines that can be used during RPM queries that also includes
+// the distro tags like '%dist', '%azl'.
+func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
+	defines := defaultDefines(runChecks)
 	defines[DistTagDefine] = distTag
+	defines[distNameAbreviation] = fmt.Sprintf("%d", distMajorVersion)
 	return defines
 }
 
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
-func DefaultDefines(runCheck bool) map[string]string {
+func defaultDefines(runCheck bool) map[string]string {
 	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible
 	withCheckSetting := "0"
 	if runCheck {

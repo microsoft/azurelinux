@@ -12,15 +12,15 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
 	"github.com/jinzhu/copier"
 )
@@ -296,8 +296,8 @@ func readSpecWorker(requests <-chan string, results chan<- *parseResult, cancel 
 
 	defer wg.Done()
 
-	noCheckDefines := rpm.DefaultDefinesWithDist(false, distTag)
-	checkDefines := rpm.DefaultDefinesWithDist(true, distTag)
+	noCheckDefines := rpm.DefaultDistroDefines(false, distTag)
+	checkDefines := rpm.DefaultDistroDefines(true, distTag)
 
 	var ts *timestamp.TimeStamp = nil
 	for specFile := range requests {

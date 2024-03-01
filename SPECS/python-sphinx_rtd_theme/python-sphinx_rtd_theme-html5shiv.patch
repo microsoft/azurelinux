@@ -10,14 +10,14 @@
      "lato-font": "^3.0.0",
 --- a/package-lock.json
 +++ b/package-lock.json
-@@ -3246,12 +3246,6 @@
+@@ -3314,12 +3314,6 @@
        "integrity": "sha512-8nxjcBcd8wovbeKx7h3wTji4e6+rhaVuPNpMqwWgnHh+N9ToqsCs6XztWRBPQ+UtzsoMAdKZtUENoVzU/EMtZA==",
        "dev": true
      },
 -    "html5shiv": {
 -      "version": "3.7.3",
 -      "resolved": "https://registry.npmjs.org/html5shiv/-/html5shiv-3.7.3.tgz",
--      "integrity": "sha1-14qEo2e8uacQEA1XgCw4ewhGMdI=",
+-      "integrity": "sha512-SZwGvLGNtgp8GbgFX7oXEp8OR1aBt5LliX6dG0kdD1kl3KhMonN0QcSa/A3TsTgFewaGCbIryQunjayWDXzxmw==",
 -      "dev": true
 -    },
      "http-deceiver": {
@@ -44,7 +44,7 @@
  
  module.exports = {
    entry: {
-@@ -66,11 +65,5 @@ module.exports = {
+@@ -66,11 +65,5 @@
        filename: "css/[name].css?[hash]",
        chunkFilename: "css/[name].css?[hash]"
      }),
