@@ -21,6 +21,7 @@ def getSignature(fileName) -> str:
     return sha256sum.hexdigest()
 
 def check_folder(path):
+    signatures_correct = True
     for signature_path in Path(path).glob("*.signatures.json"):
         with open(signature_path, "r") as f:
             signatures_json = json.load(f)
@@ -30,10 +31,10 @@ def check_folder(path):
                     actual_signature = getSignature(path_to_check)
                     if actual_signature != expected_signature:
                         print(f"ERROR: detected a mismatched signature for {file_to_check}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
-                        return False
+                        signatures_correct = False
                 else:
                     print(f"{file_to_check} is not found in CBL-Mariner, build to verify signature")
-    return True
+    return signatures_correct
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
