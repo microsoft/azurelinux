@@ -48,42 +48,4 @@ jobs:
           changed_folders=$(dirname $(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }}) | sort --unique)
           echo "Folders to validate: '${changed_folders}'"
           
-          for DIR in $changed_folders
-          do
-            echo "check $DIR"
-            for SIGNATURE_FILE in $(pwd)/$DIR/*.signatures.json
-            do
-              echo "check $SIGNATURE_FILE"
-              if [[ -f "$SIGNATURE_FILE" ]]
-              then
-                echo  "$SIGNATURE_FILE exists"
-                cat $SIGNATURE_FILE
-                echo  "$SIGNATURE_FILE files: [$(jq -r '.Signatures | keys[]' $SIGNATURE_FILE)]"
-                echo  "$SIGNATURE_FILE signatures: [$(jq -r '.Signatures[]' $SIGNATURE_FILE)]"
-
-                keys=$(jq -r '.Signatures | keys[]' $SIGNATURE_FILE)
-                for KEY in $keys
-                do
-                  file_to_test="$(pwd)/$DIR/$KEY"
-                  echo "check $file_to_test"
-
-                  if [[ -e $file_to_test ]]
-                  then
-                    echo "$file_to_test exists"
-
-                    echo  "$KEY: expect $(jq -r ".Signatures[\"$KEY\"]" $SIGNATURE_FILE)"
-                    echo  "$KEY: actual $(sha256sum $file_to_test  | awk '{print $1}')"
-
-                    expected_signature=$(jq -r ".Signatures[\"$KEY\"]" $SIGNATURE_FILE)
-                    actual_signature=$(sha256sum $file_to_test  | awk '{print $1}')
-                    if [[ "$actual_signature" != "$expected_signature" ]]
-                    then
-                      echo "Mismatched signatures for $file_to_test: expeceted=$expected_signature actual=$actual_signature"
-                      exit 1
-                    fi
-                  fi
-                done
-              fi
-            done
-          done
-
+          python3 toolkit/scripts/check_signatures.py ${changed_folders}
