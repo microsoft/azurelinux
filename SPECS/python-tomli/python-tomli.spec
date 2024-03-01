@@ -20,7 +20,6 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-BuildRequires:  python3-packaging
 
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites

@@ -141,7 +141,7 @@ Recommends:     graphviz
 
 Provides:       bundled(css3-mediaqueries) = 1.0
 
-Provides:       python3dist(sphinx)
+#Provides:       python3dist(sphinx)
 
 %description -n python%{python3_pkgversion}-sphinx
 Sphinx is a tool that makes it easy to create intelligent and

@@ -8,7 +8,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jaraco/zipp
-Source0:        %{pypi_source}
+Source0:        https://files.pythonhosted.org/packages/source/z/zipp/zipp-%{version}.tar.gz
 
 BuildArch:      noarch
 
