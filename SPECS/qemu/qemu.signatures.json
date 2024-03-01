@@ -1,15 +1,15 @@
 {
- "Signatures": {
-  "95-kvm-memlock.conf": "9e3aba4d5c045fd7035c79286727d45ca15fc48ac1fa665dda84bdb128b1009d",
-  "99-qemu-guest-agent.rules": "ab34240fa8f3e8ce37ced642493184a610e187b2d9e5e15f1132975b9f076c43",
-  "README.tests": "aff7743296f6db8ce40c0d116a91ef2dfd50db6c52aec6b56ffd03ea320a04c2",
-  "bridge.conf": "13deacdf79d5afb01c48984cc3cd5291341ca5b28d43298e804dc511ce581895",
-  "kvm-s390x.conf": "09aee1f49c96e77c65858daf20f1095eb6bef3267470c9d8f82a22ff164c96cd",
-  "kvm-x86.conf": "9ab7f0565e6af908350387b83ee95755250ee2e6822af787c1c2e5e9388ddcd5",
-  "kvm.conf": "3800c042f5411c6ca4f7578ab36f157212d88804090cdb033906841bfae58396",
-  "qemu-6.2.0.tar.xz": "68e15d8e45ac56326e0b9a4afa8b49a3dfe8aba3488221d098c84698bca65b45",
-  "qemu-ga.sysconfig": "d0c126093fb7bd26d255bd7b692ac59f0559394b7feef792651e6208127fd1ee",
-  "qemu-guest-agent.service": "7eb1547eeae0887bd58680e0c41a6f7bfe47babd356a98b91b4d39a5ade31501",
-  "vhost.conf": "a523b6e2082ab5b913c9541295424ce7f3ff7f8161e6f21c7a8f64d23dd22313"
- }
+  "Signatures": {
+    "95-kvm-memlock.conf": "9e3aba4d5c045fd7035c79286727d45ca15fc48ac1fa665dda84bdb128b1009d",
+    "99-qemu-guest-agent.rules": "ab34240fa8f3e8ce37ced642493184a610e187b2d9e5e15f1132975b9f076c43",
+    "README.tests": "aff7743296f6db8ce40c0d116a91ef2dfd50db6c52aec6b56ffd03ea320a04c2",
+    "bridge.conf": "13deacdf79d5afb01c48984cc3cd5291341ca5b28d43298e804dc511ce581895",
+    "kvm-s390x.conf": "09aee1f49c96e77c65858daf20f1095eb6bef3267470c9d8f82a22ff164c96cd",
+    "kvm-x86.conf": "9ab7f0565e6af908350387b83ee95755250ee2e6822af787c1c2e5e9388ddcd5",
+    "kvm.conf": "3800c042f5411c6ca4f7578ab36f157212d88804090cdb033906841bfae58396",
+    "qemu-ga.sysconfig": "d0c126093fb7bd26d255bd7b692ac59f0559394b7feef792651e6208127fd1ee",
+    "qemu-guest-agent.service": "7eb1547eeae0887bd58680e0c41a6f7bfe47babd356a98b91b4d39a5ade31501",
+    "vhost.conf": "a523b6e2082ab5b913c9541295424ce7f3ff7f8161e6f21c7a8f64d23dd22313",
+    "qemu-8.2.0.tar.xz": "bf00d2fa12010df8b0ade93371def58e632cb32a6bfdc5f5a0ff8e6a1fb1bf32"
+  }
 }
