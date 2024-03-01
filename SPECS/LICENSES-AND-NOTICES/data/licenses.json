@@ -2551,6 +2551,7 @@
                 "shapelib",
                 "slf4j",
                 "trilead-ssh2",
+                "virtiofsd",
                 "xalan-j2",
                 "xbean",
                 "xcursor-themes",
