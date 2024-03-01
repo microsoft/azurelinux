@@ -320,7 +320,7 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 	defer source.Close()
 
-	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE, filemode)
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, filemode)
 	if err != nil {
 		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open destination:\n%w", srcFile, dst, err)
 	}
