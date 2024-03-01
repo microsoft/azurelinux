@@ -1,0 +1,694 @@
+From ba44a9c29771aacf44222a2ff63e7bd6034dd92c Mon Sep 17 00:00:00 2001
+From: Fabrice Buoro <fabrice@tarides.com>
+Date: Fri, 10 Mar 2023 09:36:22 -0700
+Subject: [PATCH 3/4] Update framepointers tests to avoid false positive with
+ inlined C functions
+
+---
+ testsuite/tests/frame-pointers/c_call.ml      |  14 +-
+ .../tests/frame-pointers/c_call.reference     |   9 -
+ testsuite/tests/frame-pointers/c_call.run     |   4 -
+ testsuite/tests/frame-pointers/c_call_.c      |  14 +-
+ testsuite/tests/frame-pointers/effects.ml     |  12 +-
+ .../tests/frame-pointers/effects.reference    |  15 --
+ testsuite/tests/frame-pointers/effects.run    |   4 -
+ .../tests/frame-pointers/exception_handler.ml |   4 +-
+ .../exception_handler.reference               |  12 --
+ .../frame-pointers/exception_handler.run      |   4 -
+ .../tests/frame-pointers/filter-locations.sh  |  23 ---
+ testsuite/tests/frame-pointers/fp_backtrace.c | 186 +++++++++++-------
+ testsuite/tests/frame-pointers/reperform.ml   |   4 +-
+ .../tests/frame-pointers/reperform.reference  |   3 -
+ testsuite/tests/frame-pointers/reperform.run  |   4 -
+ .../tests/frame-pointers/stack_realloc.ml     |   4 +-
+ .../frame-pointers/stack_realloc.reference    |   3 -
+ .../tests/frame-pointers/stack_realloc.run    |   4 -
+ .../tests/frame-pointers/stack_realloc2.ml    |   4 +-
+ .../frame-pointers/stack_realloc2.reference   |   3 -
+ .../tests/frame-pointers/stack_realloc2.run   |   4 -
+ 21 files changed, 144 insertions(+), 190 deletions(-)
+ delete mode 100644 testsuite/tests/frame-pointers/c_call.run
+ delete mode 100644 testsuite/tests/frame-pointers/effects.run
+ delete mode 100644 testsuite/tests/frame-pointers/exception_handler.run
+ delete mode 100755 testsuite/tests/frame-pointers/filter-locations.sh
+ delete mode 100644 testsuite/tests/frame-pointers/reperform.run
+ delete mode 100644 testsuite/tests/frame-pointers/stack_realloc.run
+ delete mode 100644 testsuite/tests/frame-pointers/stack_realloc2.run
+
+diff --git a/testsuite/tests/frame-pointers/c_call.ml b/testsuite/tests/frame-pointers/c_call.ml
+index c2493b3a99..9b98e86520 100644
+--- a/testsuite/tests/frame-pointers/c_call.ml
++++ b/testsuite/tests/frame-pointers/c_call.ml
+@@ -7,20 +7,20 @@ all_modules = "${readonly_files} c_call.ml"
+ 
+ *)
+ 
+-external fp_backtrace : unit -> unit = "fp_backtrace"
+-external fp_backtrace_no_alloc : unit -> unit = "fp_backtrace" [@@noalloc]
+-external fp_backtrace_many_args : int -> int -> int -> int -> int -> int -> int
+-  -> int -> int -> int -> int -> unit =
++external fp_backtrace : string -> unit = "fp_backtrace"
++external fp_backtrace_no_alloc : string -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace_many_args : string -> int -> int -> int -> int -> int
++  -> int -> int -> int -> int -> int -> int -> unit =
+   "fp_backtrace_many_args_argv" "fp_backtrace_many_args"
+ 
+ let[@inline never] f () =
+   (* Check backtrace through caml_c_call_stack_args *)
+-  fp_backtrace_many_args 1 2 3 4 5 6 7 8 9 10 11;
++  fp_backtrace_many_args Sys.argv.(0) 1 2 3 4 5 6 7 8 9 10 11;
+   (* Check backtrace through caml_c_call.
+    * Also check that caml_c_call_stack_args correctly restores rbp register *)
+-  fp_backtrace ();
++  fp_backtrace Sys.argv.(0);
+   (* Check caml_c_call correctly restores rbp register *)
+-  fp_backtrace_no_alloc ();
++  fp_backtrace_no_alloc Sys.argv.(0);
+   42
+ 
+ let () = ignore (f ())
+diff --git a/testsuite/tests/frame-pointers/c_call.reference b/testsuite/tests/frame-pointers/c_call.reference
+index 92fb40a238..23095e7431 100644
+--- a/testsuite/tests/frame-pointers/c_call.reference
++++ b/testsuite/tests/frame-pointers/c_call.reference
+@@ -3,19 +3,10 @@ caml_c_call_stack_args
+ camlC_call.f
+ camlC_call.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ caml_c_call
+ camlC_call.f
+ camlC_call.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ camlC_call.f
+ camlC_call.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+diff --git a/testsuite/tests/frame-pointers/c_call.run b/testsuite/tests/frame-pointers/c_call.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/c_call.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+diff --git a/testsuite/tests/frame-pointers/c_call_.c b/testsuite/tests/frame-pointers/c_call_.c
+index 634c4dd937..a75100b213 100644
+--- a/testsuite/tests/frame-pointers/c_call_.c
++++ b/testsuite/tests/frame-pointers/c_call_.c
+@@ -16,10 +16,10 @@
+ #include <assert.h>
+ #include "caml/mlvalues.h"
+ 
+-void fp_backtrace(void);
++void fp_backtrace(value);
+ 
+-value fp_backtrace_many_args(value a, value b, value c, value d, value e,
+-    value f, value g, value h, value i, value j, value k)
++value fp_backtrace_many_args(value argv0, value a, value b, value c,
++    value d, value e, value f, value g, value h, value i, value j, value k)
+ {
+   assert(Int_val(a) == 1);
+   assert(Int_val(b) == 2);
+@@ -33,15 +33,15 @@ value fp_backtrace_many_args(value a, value b, value c, value d, value e,
+   assert(Int_val(j) == 10);
+   assert(Int_val(k) == 11);
+ 
+-  fp_backtrace();
++  fp_backtrace(argv0);
+ 
+   return Val_unit;
+ }
+ 
+-value fp_bactrace_many_args_argv(value *argv, int argc)
++value fp_bactrace_many_args_argv(value argv0, value *argv, int argc)
+ {
+   assert(argc == 11);
+ 
+-  return fp_backtrace_many_args(argv[0], argv[1], argv[2], argv[3], argv[4],
+-      argv[5], argv[6], argv[7], argv[8], argv[9], argv[10]);
++  return fp_backtrace_many_args(argv0, argv[0], argv[1], argv[2], argv[3],
++      argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10]);
+ }
+diff --git a/testsuite/tests/frame-pointers/effects.ml b/testsuite/tests/frame-pointers/effects.ml
+index e14633a374..4d14190320 100644
+--- a/testsuite/tests/frame-pointers/effects.ml
++++ b/testsuite/tests/frame-pointers/effects.ml
+@@ -11,26 +11,26 @@ open Printf
+ open Effect
+ open Effect.Deep
+ 
+-external fp_backtrace : unit -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace : string -> unit = "fp_backtrace" [@@noalloc]
+ 
+ type _ t += E : int -> int t
+ 
+ let[@inline never] f () =
+   printf "# computation f\n%!";
+-  fp_backtrace ();
++  fp_backtrace Sys.argv.(0);
+   printf "# perform effect (E 0)\n%!";
+   let v = perform (E 0) in
+   printf "# perform returns %d\n%!" v;
+-  fp_backtrace ();
++  fp_backtrace Sys.argv.(0);
+   v + 1
+ 
+ let h (type a) (eff : a t) : ((a, 'b) continuation -> 'b) option =
+   let[@inline never] h_effect_e v k =
+     printf "# caught effect (E %d). continuing...\n%!" v;
+-    fp_backtrace ();
++    fp_backtrace Sys.argv.(0);
+     let v = continue k (v + 1) in
+     printf "# continue returns %d\n%!" v;
+-    fp_backtrace ();
++    fp_backtrace Sys.argv.(0);
+     v + 1
+   in
+   match eff with
+@@ -41,7 +41,7 @@ let h (type a) (eff : a t) : ((a, 'b) continuation -> 'b) option =
+ let v =
+   let[@inline never] v_retc v =
+     printf "# done %d\n%!" v;
+-    fp_backtrace ();
++    fp_backtrace Sys.argv.(0);
+     v + 1
+   in
+   match_with f ()
+diff --git a/testsuite/tests/frame-pointers/effects.reference b/testsuite/tests/frame-pointers/effects.reference
+index c8bd0a391a..8ae3fc26df 100644
+--- a/testsuite/tests/frame-pointers/effects.reference
++++ b/testsuite/tests/frame-pointers/effects.reference
+@@ -3,39 +3,24 @@ camlEffects.f
+ caml_runstack
+ camlEffects.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ # perform effect (E 0)
+ # caught effect (E 0). continuing...
+ camlEffects.h_effect_e
+ camlEffects.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ # perform returns 1
+ camlEffects.f
+ caml_runstack
+ camlEffects.h_effect_e
+ camlEffects.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ # done 2
+ camlEffects.v_retc
+ camlEffects.h_effect_e
+ camlEffects.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ # continue returns 3
+ camlEffects.h_effect_e
+ camlEffects.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ # result=4
+diff --git a/testsuite/tests/frame-pointers/effects.run b/testsuite/tests/frame-pointers/effects.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/effects.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+diff --git a/testsuite/tests/frame-pointers/exception_handler.ml b/testsuite/tests/frame-pointers/exception_handler.ml
+index 575f7329bf..95a4f0d75c 100644
+--- a/testsuite/tests/frame-pointers/exception_handler.ml
++++ b/testsuite/tests/frame-pointers/exception_handler.ml
+@@ -8,7 +8,7 @@ all_modules = "${readonly_files} exception_handler.ml"
+ *)
+ 
+ (* https://github.com/ocaml/ocaml/pull/11031 *)
+-external fp_backtrace : unit -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace : string -> unit = "fp_backtrace" [@@noalloc]
+ 
+ exception Exn1
+ exception Exn2
+@@ -38,7 +38,7 @@ let[@inline never] handler () =
+   let _ = Sys.opaque_identity x0 in
+   let _ = Sys.opaque_identity x1 in
+   let _ = Sys.opaque_identity x2 in
+-  fp_backtrace ()
++  fp_backtrace Sys.argv.(0)
+ 
+ let[@inline never] nested i =
+   begin
+diff --git a/testsuite/tests/frame-pointers/exception_handler.reference b/testsuite/tests/frame-pointers/exception_handler.reference
+index 513ca488b9..e012fb6d4f 100644
+--- a/testsuite/tests/frame-pointers/exception_handler.reference
++++ b/testsuite/tests/frame-pointers/exception_handler.reference
+@@ -2,27 +2,15 @@ camlException_handler.handler
+ camlException_handler.bare
+ camlException_handler.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ camlException_handler.handler
+ camlException_handler.bare
+ camlException_handler.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ camlException_handler.handler
+ camlException_handler.nested
+ camlException_handler.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+ camlException_handler.handler
+ camlException_handler.nested
+ camlException_handler.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+diff --git a/testsuite/tests/frame-pointers/exception_handler.run b/testsuite/tests/frame-pointers/exception_handler.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/exception_handler.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+diff --git a/testsuite/tests/frame-pointers/filter-locations.sh b/testsuite/tests/frame-pointers/filter-locations.sh
+deleted file mode 100755
+index 31c7fc3189..0000000000
+--- a/testsuite/tests/frame-pointers/filter-locations.sh
++++ /dev/null
+@@ -1,23 +0,0 @@
+-#!/bin/sh
+-
+-set -eu
+-
+-program="${1}"
+-# https://stackoverflow.com/questions/29613304/is-it-possible-to-escape-regex-metacharacters-reliably-with-sed/29626460#29626460
+-program_escaped=$(echo ${program} | sed 's/[^^\\]/[&]/g; s/\^/\\^/g; s/\\/\\\\/g')
+-regex_backtrace='^.*(\(.*\)+0x[[:xdigit:]]*)[0x[[:xdigit:]]*]$'
+-regex_trim_fun='^\(caml.*\)_[[:digit:]]*$'
+-
+-# - Ignore backtrace not coming from the program binary
+-# - Discard the number suffix from OCaml function name
+-# - Remove strange '[0x.....]' entries inserted by some implementation
+-#   of backtrace_symbols_fd
+-# - Keep the other lines
+-sed -e \
+-  "/${regex_backtrace}/ {
+-    /^${program_escaped}/ ! d
+-    s/${regex_backtrace}/\1/
+-    s/${regex_trim_fun}/\1/
+-    s;caml_\(main\|startup\);caml_main/caml_startup;
+-  }" \
+-  -e '/^\[0x/d'
+diff --git a/testsuite/tests/frame-pointers/fp_backtrace.c b/testsuite/tests/frame-pointers/fp_backtrace.c
+index a521218a38..cef7ccd9f2 100644
+--- a/testsuite/tests/frame-pointers/fp_backtrace.c
++++ b/testsuite/tests/frame-pointers/fp_backtrace.c
+@@ -1,10 +1,17 @@
+ #include <execinfo.h>
+-#include <unistd.h>
+-#include <setjmp.h>
+-#include <signal.h>
++#include <regex.h>
++#include <stdbool.h>
+ #include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
+ 
+-#define ARRSIZE(a)  (sizeof(a) / sizeof(*(a)))
++#include "caml/mlvalues.h"
++
++#define ARR_SIZE(a)    (sizeof(a) / sizeof(*(a)))
++
++#define RE_FUNC_NAME  "^.*\\((.+)\\+0x[[:xdigit:]]+\\) \\[0x[[:xdigit:]]+\\]$"
++#define RE_TRIM_FUNC  "(caml.*)_[[:digit:]]+"
++#define CAML_ENTRY    "caml_program"
+ 
+ typedef struct frame_info
+ {
+@@ -12,99 +19,138 @@ typedef struct frame_info
+   void*               retaddr;  /* rip */
+ } frame_info;
+ 
+-jmp_buf resume_buf;
+ 
++/*
++ * A backtrace symbol looks like:
++ * ./path/to/binary(camlModule_fn_123+0xAABBCC) [0xAABBCCDDEE]
++ */
++static const char* backtrace_symbol(const struct frame_info* fi)
++{
++  char** symbols = backtrace_symbols(&fi->retaddr, 1);
++  if (!symbols) {
++    perror("backtrace_symbols");
++    return NULL;
++  }
+ 
+-static void signal_handler(int signum)
++  const char* symbol = strdup(symbols[0]);
++  free(symbols);
++  return symbol;
++}
++
++static bool is_from_executable(const char* symbol, const char* execname)
+ {
+-  /* Should be safe to be called from a signal handler.
+-   * See 21.2.1 "Performing a nonlocal goto from a signal handler" from
+-   * The Linux Programming Interface, Michael Kerrisk */
+-  siglongjmp(resume_buf, 1);
++  return strncmp(symbol, execname, strlen(execname)) == 0;
+ }
+ 
+-static int install_signal_handlers(const int signals[], struct sigaction
+-    handlers[], int count)
++static regmatch_t func_name_from_symbol(const char* symbol)
+ {
+-  for (int i = 0; i < count; i++) {
+-    struct sigaction action = { 0 };
+-    action.sa_handler = signal_handler;
+-    sigemptyset(&action.sa_mask);
+-    action.sa_flags = 0;
+-
+-    if (sigaction(signals[i], &action, &handlers[i]) != 0) {
+-      perror("sigaction");
+-      return -1;
+-    }
++  regex_t     regex;
++  regmatch_t  match[2] = { {-1, -1}, {-1, -1}};
++  char        errbuf[128];
++  int         err;
++
++  err = regcomp(&regex, RE_FUNC_NAME, REG_EXTENDED);
++  if (err) {
++    regerror(err, &regex, errbuf, ARR_SIZE(errbuf));
++    fprintf(stderr, "regcomp: %s\n", errbuf);
++    return match[0];
+   }
+-  return 0;
++
++  err = regexec(&regex, symbol, ARR_SIZE(match), match, 0);
++  if (err == REG_NOMATCH)
++    return match[0];
++
++  return match[1];
+ }
+ 
+-static int restore_signal_handlers(const int signals[], struct sigaction
+-    handlers[], int count)
++static bool is_caml_entry(const char* symbol, const regmatch_t* funcname)
+ {
+-  for (int i = 0; i < count; i++) {
+-    if (sigaction(signals[i], &handlers[i], NULL) != 0) {
+-      perror("sigaction");
+-      return -1;
+-    }
+-  }
+-  return 0;
++  //regoff_t len = funcname->rm_eo - funcname->rm_so;
++  //return strnstr(symbol + funcname->rm_so, CAML_ENTRY, len) == 0;
++  return strstr(symbol + funcname->rm_so, CAML_ENTRY) != NULL;
+ }
+ 
+-static int safe_read(const struct frame_info* fi, struct frame_info** prev,
+-    void** retaddr)
++static regmatch_t trim_func_name(const char* symbol, const regmatch_t* funcname)
+ {
+-  /* Signals to ignore while attempting to read frame_info members */
+-  const int signals[] = { SIGSEGV, SIGBUS };
+-  /* Store original signal handers */
+-  struct sigaction handlers[ARRSIZE(signals)] = { 0 };
+-  int ret = 0;
+-
+-  if (install_signal_handlers(signals, handlers, ARRSIZE(signals)) != 0)
+-    return -1;
+-
+-  if (!sigsetjmp(resume_buf, 1)) {
+-    *prev = fi->prev;
+-    *retaddr = fi->retaddr;
+-  } else {
+-    ret = -1;
++  regex_t     regex;
++  regmatch_t  match[2] = { {-1, -1}, {-1, -1}};
++  char        errbuf[128];
++  int         err;
++
++  err = regcomp(&regex, RE_TRIM_FUNC, REG_EXTENDED);
++  if (err) {
++    regerror(err, &regex, errbuf, ARR_SIZE(errbuf));
++    fprintf(stderr, "regcomp: %s\n", errbuf);
++    return match[0];
+   }
+ 
+-  if (restore_signal_handlers(signals, handlers, ARRSIZE(signals)) != 0)
+-    return -1;
++  match[0] = *funcname;
++  err = regexec(&regex, symbol, ARR_SIZE(match), match, REG_STARTEND);
++  if (err == REG_NOMATCH) {
++    /* match[0] has already been overwritten to hold the function full name for
++       regexec */
++    return match[1];
++  }
+ 
+-  return ret;
++  return match[1];
+ }
+ 
+-static void print_location(void* addr)
++static void print_symbol(const char* symbol, const regmatch_t* match)
+ {
+-  if (!addr)
+-    return;
++  regoff_t off = match->rm_so;
++  regoff_t len = match->rm_eo - match->rm_so;
+ 
+-  /* This requires the binary to be linked with '-rdynamic' */
+-  backtrace_symbols_fd(&addr, 1, STDOUT_FILENO);
++  fprintf(stdout, "%.*s\n", len, symbol + off);
++  fflush(stdout);
+ }
+ 
+-void fp_backtrace(void)
++void fp_backtrace(value argv0)
+ {
+-  struct frame_info *fi;
+-  struct frame_info* next;
+-  void* retaddr;
+-
+-  fi = __builtin_frame_address(0);
+-  retaddr = __builtin_extract_return_addr(__builtin_return_address(0));
+-
+-  for (; fi; fi = next) {
+-    if (safe_read(fi, &next, &retaddr) != 0)
+-      return;
++  const char* execname = String_val(argv0);
++  struct frame_info* next = NULL;
++  const char* symbol = NULL;
+ 
+-    print_location(retaddr);
++  for (struct frame_info* fi = __builtin_frame_address(0); fi; fi = next) {
++    next = fi->prev;
+ 
+     /* Detect the simplest kind of infinite loop */
+     if (fi == next) {
+-      printf("fp_backtrace: loop detected\n");
+-      return;
++      fprintf(stderr, "fp_backtrace: loop detected\n");
++      break;
+     }
++
++    symbol = backtrace_symbol(fi);
++    if (!symbol)
++      continue;
++
++    /* Skip entries not from the test */
++    if (!is_from_executable(symbol, execname))
++      goto skip;
++
++    /* Exctract the full function name */
++    regmatch_t funcname = func_name_from_symbol(symbol);
++    if (funcname.rm_so == -1)
++      goto skip;
++
++    /* Trim numeric suffix from caml functions */
++    regmatch_t functrimmed = trim_func_name(symbol, &funcname);
++
++    /* Use the trimmed caml name if available, otherwise use the full function
++       name */
++    const regmatch_t* match = (functrimmed.rm_so != -1) ?
++      &functrimmed : &funcname;
++
++    print_symbol(symbol, match);
++
++    /* Stop the backtrace at caml_program */
++    if (is_caml_entry(symbol, &funcname))
++      break;
++
++skip:
++    free((void*)symbol);
++    symbol = NULL;
+   }
++
++  if (symbol)
++    free((void*)symbol);
+ }
+diff --git a/testsuite/tests/frame-pointers/reperform.ml b/testsuite/tests/frame-pointers/reperform.ml
+index 1af8452e5f..da251c98a7 100644
+--- a/testsuite/tests/frame-pointers/reperform.ml
++++ b/testsuite/tests/frame-pointers/reperform.ml
+@@ -11,7 +11,7 @@ all_modules = "${readonly_files} reperform.ml"
+ open Effect
+ open Effect.Deep
+ 
+-external fp_backtrace : unit -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace : string -> unit = "fp_backtrace" [@@noalloc]
+ 
+ type _ Effect.t += E : unit t
+                  | F : unit t
+@@ -22,7 +22,7 @@ let rec foo n =
+     if n = 5 then begin
+       perform E;
+       print_endline "# resumed...";
+-      fp_backtrace ()
++      fp_backtrace Sys.argv.(0)
+     end;
+     foo (n + 1) + n
+   end
+diff --git a/testsuite/tests/frame-pointers/reperform.reference b/testsuite/tests/frame-pointers/reperform.reference
+index 9ac6681d4b..e215f77169 100644
+--- a/testsuite/tests/frame-pointers/reperform.reference
++++ b/testsuite/tests/frame-pointers/reperform.reference
+@@ -15,6 +15,3 @@ camlReperform.bar
+ caml_runstack
+ camlReperform.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+diff --git a/testsuite/tests/frame-pointers/reperform.run b/testsuite/tests/frame-pointers/reperform.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/reperform.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+diff --git a/testsuite/tests/frame-pointers/stack_realloc.ml b/testsuite/tests/frame-pointers/stack_realloc.ml
+index 79e70c2add..f24e4795d5 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc.ml
++++ b/testsuite/tests/frame-pointers/stack_realloc.ml
+@@ -13,7 +13,7 @@ open Effect.Deep
+ 
+ type _ t += E : int -> int t
+ 
+-external fp_backtrace : unit -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace : string -> unit = "fp_backtrace" [@@noalloc]
+ external c_fun : unit -> int = "c_fun"
+ 
+ let[@inline never][@local never] f x = x
+@@ -42,7 +42,7 @@ let[@inline never] consume_stack () =
+ 
+ let[@inline never] callback () =
+   consume_stack ();
+-  fp_backtrace ();
++  fp_backtrace Sys.argv.(0);
+   0
+ 
+ let _ = Callback.register "callback" callback
+diff --git a/testsuite/tests/frame-pointers/stack_realloc.reference b/testsuite/tests/frame-pointers/stack_realloc.reference
+index 016a03550a..e61d4104e0 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc.reference
++++ b/testsuite/tests/frame-pointers/stack_realloc.reference
+@@ -7,6 +7,3 @@ camlStack_realloc.f_comp
+ caml_runstack
+ camlStack_realloc.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+diff --git a/testsuite/tests/frame-pointers/stack_realloc.run b/testsuite/tests/frame-pointers/stack_realloc.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/stack_realloc.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+diff --git a/testsuite/tests/frame-pointers/stack_realloc2.ml b/testsuite/tests/frame-pointers/stack_realloc2.ml
+index a3d21bf2bf..218dd6a1c3 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc2.ml
++++ b/testsuite/tests/frame-pointers/stack_realloc2.ml
+@@ -13,7 +13,7 @@ open Effect.Deep
+ 
+ type _ t += E : int -> int t
+ 
+-external fp_backtrace : unit -> unit = "fp_backtrace" [@@noalloc]
++external fp_backtrace : string -> unit = "fp_backtrace" [@@noalloc]
+ external c_fun : unit -> int = "c_fun"
+ 
+ let[@inline never][@local never] f x = x
+@@ -41,7 +41,7 @@ let[@inline never] consume_stack () =
+   ignore (gobbler count)
+ 
+ let[@inline never] callback () =
+-  fp_backtrace ();
++  fp_backtrace Sys.argv.(0);
+   0
+ 
+ let _ = Callback.register "callback" callback
+diff --git a/testsuite/tests/frame-pointers/stack_realloc2.reference b/testsuite/tests/frame-pointers/stack_realloc2.reference
+index ae492abd88..0051f3bad0 100644
+--- a/testsuite/tests/frame-pointers/stack_realloc2.reference
++++ b/testsuite/tests/frame-pointers/stack_realloc2.reference
+@@ -7,6 +7,3 @@ camlStack_realloc2.f_comp
+ caml_runstack
+ camlStack_realloc2.entry
+ caml_program
+-caml_start_program
+-caml_main/caml_startup
+-main
+diff --git a/testsuite/tests/frame-pointers/stack_realloc2.run b/testsuite/tests/frame-pointers/stack_realloc2.run
+deleted file mode 100644
+index e96b5ea13a..0000000000
+--- a/testsuite/tests/frame-pointers/stack_realloc2.run
++++ /dev/null
+@@ -1,4 +0,0 @@
+-#!/bin/sh
+-
+-${program} 2>&1 \
+-  | ${test_source_directory}/filter-locations.sh ${program} >${output}
+-- 

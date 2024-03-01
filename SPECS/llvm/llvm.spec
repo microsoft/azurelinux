@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        17.0.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
+BuildRequires:  binutils-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
@@ -52,6 +53,7 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
+      -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev ../llvm
 
 %ninja_build LLVM
@@ -59,6 +61,9 @@ cmake -G Ninja                              \
 
 %install
 %ninja_install -C build
+
+mkdir -p %{buildroot}%{_libdir}/bfd-plugins/
+ln -s -t %{buildroot}%{_libdir}/bfd-plugins/ ../LLVMgold.so
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -83,6 +88,8 @@ ninja check-all
 %{_bindir}/*
 %{_libdir}/*.so
 %{_libdir}/*.so.*
+%{_libdir}/LLVMgold.so
+%{_libdir}/bfd-plugins/LLVMgold.so
 %dir %{_datadir}/opt-viewer
 %{_datadir}/opt-viewer/opt-diff.py
 %{_datadir}/opt-viewer/opt-stats.py
@@ -94,6 +101,8 @@ ninja check-all
 %files devel
 %{_libdir}/*.a
 %{_libdir}/cmake/*
+%{_libdir}/LLVMgold.so
+%{_libdir}/bfd-plugins/LLVMgold.so
 %{_includedir}/*
 
 %changelog
