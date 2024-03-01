@@ -57,7 +57,7 @@ const (
 	MarinerModuleLdflagsDefine = "azurelinux_module_ldflags"
 
 	// MarinerCCacheDefine enables ccache in the Mariner build system
-	MarinerCCacheDefine = "azl_ccache_enabled"
+	MarinerCCacheDefine = "ccache_enabled"
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"

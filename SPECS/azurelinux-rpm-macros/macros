@@ -43,15 +43,15 @@
 # all of the flags handled by set_build_flags. Once the configure macros
 # are consistently applied this override should be removed.
 #
-# USE_CCACHE: when 'azl_ccache_enabled' is defined, enable building with ccache
+# USE_CCACHE: when 'ccache_enabled' is defined, enable building with ccache
 #
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
-%{?azl_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
-%{?azl_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
-%{?azl_ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
-%{?azl_ccache_enabled:ccache --zero-stats} \
+%{?ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+%{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
+%{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
+%{?ccache_enabled:ccache --zero-stats} \
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -94,8 +94,8 @@
 %__os_install_post    \
     %{__os_install_post_leave_signatures} \
     %{?__brp_strip} \
-    %{?azl_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
-    %{?azl_ccache_enabled:ccache --show-stats} \
+    %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
+    %{?ccache_enabled:ccache --show-stats} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
