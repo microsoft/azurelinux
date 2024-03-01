@@ -677,6 +677,7 @@ build_rpm_in_chroot_no_install chkconfig
 build_rpm_in_chroot_no_install mariner-repos
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 
 # python-packaging requires pyproject-rpm-macros
 build_rpm_in_chroot_no_install python-packaging
