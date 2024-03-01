@@ -1,0 +1,85 @@
+From 548e9b916f86c06e2cdb50d8f49633f9bec66c7e Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:09 -0600
+Subject: [PATCH 34/83] mdadm/Grow: Fix use after close bug by closing after
+ fork
+
+The test 07reshape-grow fails most of the time. But it succeeds around
+1 in 5 times. When it does succeed, it causes the tests to die because
+mdadm has segfaulted.
+
+The segfault was caused by mdadm attempting to repoen a file
+descriptor that was already closed. The backtrace of the segfault
+was:
+
+  #0  __strncmp_avx2 () at ../sysdeps/x86_64/multiarch/strcmp-avx2.S:101
+  #1  0x000056146e31d44b in devnm2devid (devnm=0x0) at util.c:956
+  #2  0x000056146e31dab4 in open_dev_flags (devnm=0x0, flags=0)
+                         at util.c:1072
+  #3  0x000056146e31db22 in open_dev (devnm=0x0) at util.c:1079
+  #4  0x000056146e3202e8 in reopen_mddev (mdfd=4) at util.c:2244
+  #5  0x000056146e329f36 in start_array (mdfd=4,
+              mddev=0x7ffc55342450 "/dev/md0", content=0x7ffc55342860,
+              st=0x56146fc78660, ident=0x7ffc55342f70, best=0x56146fc6f5d0,
+              bestcnt=10, chosen_drive=0, devices=0x56146fc706b0, okcnt=5,
+	      sparecnt=0,  rebuilding_cnt=0, journalcnt=0, c=0x7ffc55342e90,
+	      clean=1,  avail=0x56146fc78720 "\001\001\001\001\001",
+	      start_partial_ok=0, err_ok=0, was_forced=0)
+	                  at Assemble.c:1206
+  #6  0x000056146e32c36e in Assemble (st=0x56146fc78660,
+               mddev=0x7ffc55342450 "/dev/md0", ident=0x7ffc55342f70,
+	       devlist=0x56146fc6e2d0, c=0x7ffc55342e90)
+	                 at Assemble.c:1914
+  #7  0x000056146e312ac9 in main (argc=11, argv=0x7ffc55343238)
+                         at mdadm.c:1510
+
+The file descriptor was closed early in Grow_continue(). The noted commit
+moved the close() call to close the fd above the fork which caused the
+parent process to return with a closed fd.
+
+This meant reshape_array() and Grow_continue() would return in the parent
+with the fd forked. The fd would eventually be passed to reopen_mddev()
+which returned an unhandled NULL from fd2devnm() which would then be
+dereferenced in devnm2devid.
+
+Fix this by moving the close() call below the fork. This appears to
+fix the 07revert-grow test. While we're at it, switch to using
+close_fd() to invalidate the file descriptor.
+
+Fixes: 77b72fa82813 ("mdadm/Grow: prevent md's fd from being occupied during delayed time")
+Cc: Alex Wu <alexwu@synology.com>
+Cc: BingJing Chang <bingjingc@synology.com>
+Cc: Danny Shih <dannyshih@synology.com>
+Cc: ChangSyun Peng <allenpeng@synology.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Grow.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Grow.c b/Grow.c
+index 8c520d42..97f22c75 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -3514,7 +3514,6 @@ started:
+ 			return 0;
+ 		}
+ 
+-	close(fd);
+ 	/* Now we just need to kick off the reshape and watch, while
+ 	 * handling backups of the data...
+ 	 * This is all done by a forked background process.
+@@ -3535,6 +3534,9 @@ started:
+ 		break;
+ 	}
+ 
++	/* Close unused file descriptor in the forked process */
++	close_fd(&fd);
++
+ 	/* If another array on the same devices is busy, the
+ 	 * reshape will wait for them.  This would mean that
+ 	 * the first section that we suspend will stay suspended
+-- 
+2.38.1
+

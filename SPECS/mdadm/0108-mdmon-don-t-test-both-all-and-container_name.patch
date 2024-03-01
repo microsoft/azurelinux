@@ -1,0 +1,47 @@
+From d39fd87e31024804dd7f2c16c03af0379b71f5f1 Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Mon, 13 Mar 2023 14:42:58 +1100
+Subject: [PATCH 108/120] mdmon: don't test both 'all' and 'container_name'.
+
+If 'all' is not set, then container_name must be NULL, as nothing else
+can set it.  So simplify the test to ignore container_name.
+This makes the purpose of the code more obvious.
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdmon.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/mdmon.c b/mdmon.c
+index 60ba3182..f8fd2f0f 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -352,7 +352,6 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-
+ 	if (in_initrd()) {
+ 		/*
+ 		 * set first char of argv[0] to @. This is used by
+@@ -362,12 +361,10 @@ int main(int argc, char *argv[])
+ 		argv[0][0] = '@';
+ 	}
+ 
+-	if (all == 0 && container_name == NULL) {
+-		if (argv[optind]) {
+-			container_name = get_md_name(argv[optind]);
+-			if (!container_name)
+-				return 1;
+-		}
++	if (!all && argv[optind]) {
++		container_name = get_md_name(argv[optind]);
++		if (!container_name)
++			return 1;
+ 	}
+ 
+ 	if (container_name == NULL || argc - optind > 1)
+-- 
+2.38.1
+

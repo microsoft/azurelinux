@@ -1,0 +1,36 @@
+From 5c3c3df646dd3b7e8df81152f08e9ac4ddccc671 Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Fri, 19 Aug 2022 02:55:46 +0200
+Subject: [PATCH 52/83] Assemble: check if device is container before
+ scheduling force-clean update
+
+Up to now using assemble with force flag making each array as clean.
+Force-clean should not be done for the container. This commit add
+check if device is different than container before cleaning.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Assemble.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Assemble.c b/Assemble.c
+index be2160b4..1dd82a8c 100644
+--- a/Assemble.c
++++ b/Assemble.c
+@@ -1809,10 +1809,9 @@ try_again:
+ 		}
+ #endif
+ 	}
+-	if (c->force && !clean &&
++	if (c->force && !clean && content->array.level != LEVEL_CONTAINER &&
+ 	    !enough(content->array.level, content->array.raid_disks,
+-		    content->array.layout, clean,
+-		    avail)) {
++		    content->array.layout, clean, avail)) {
+ 		change += st->ss->update_super(st, content, "force-array",
+ 					       devices[chosen_drive].devname, c->verbose,
+ 					       0, NULL);
+-- 
+2.38.1
+

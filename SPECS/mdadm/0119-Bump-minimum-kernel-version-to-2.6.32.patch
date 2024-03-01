@@ -1,0 +1,136 @@
+From f8d2c4286a92b7acb7872271a401ad1efe336096 Mon Sep 17 00:00:00 2001
+From: Jes Sorensen <jes@trained-monkey.org>
+Date: Mon, 10 Apr 2023 11:45:34 -0400
+Subject: [PATCH 119/120] Bump minimum kernel version to 2.6.32
+
+Summary: At this point it probably is reasonable to drop support for
+anything prior to 3.10.
+
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Create.c |  5 -----
+ Grow.c   | 16 ----------------
+ Manage.c | 17 -----------------
+ mdadm.c  |  4 ++--
+ super1.c |  5 -----
+ 5 files changed, 2 insertions(+), 45 deletions(-)
+
+diff --git a/Create.c b/Create.c
+index 0911bf92..aa0472dd 100644
+--- a/Create.c
++++ b/Create.c
+@@ -636,11 +636,6 @@ int Create(struct supertype *st, char *mddev,
+ 		break;
+ 	case LEVEL_LINEAR:
+ 		/* a chunksize of zero 0s perfectly valid (and preferred) since 2.6.16 */
+-		if (get_linux_version() < 2006016 && s->chunk == 0) {
+-			s->chunk = 64;
+-			if (c->verbose > 0)
+-				pr_err("chunk size defaults to 64K\n");
+-		}
+ 		break;
+ 	case 1:
+ 	case LEVEL_FAULTY:
+diff --git a/Grow.c b/Grow.c
+index 06001f2d..8fa97875 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -1708,14 +1708,6 @@ char *analyse_change(char *devname, struct mdinfo *info, struct reshape *re)
+ 		return NULL;
+ 	}
+ 
+-	if (re->after.data_disks == re->before.data_disks &&
+-	    get_linux_version() < 2006032)
+-		return "in-place reshape is not safe before 2.6.32 - sorry.";
+-
+-	if (re->after.data_disks < re->before.data_disks &&
+-	    get_linux_version() < 2006030)
+-		return "reshape to fewer devices is not supported before 2.6.30 - sorry.";
+-
+ 	re->backup_blocks = compute_backup_blocks(
+ 		info->new_chunk, info->array.chunk_size,
+ 		re->after.data_disks, re->before.data_disks);
+@@ -1895,14 +1887,6 @@ int Grow_reshape(char *devname, int fd,
+ 		return 1;
+ 	}
+ 
+-	if (s->raiddisks && s->raiddisks < array.raid_disks &&
+-	    array.level > 1 && get_linux_version() < 2006032 &&
+-	    !check_env("MDADM_FORCE_FEWER")) {
+-		pr_err("reducing the number of devices is not safe before Linux 2.6.32\n"
+-			"       Please use a newer kernel\n");
+-		return 1;
+-	}
+-
+ 	if (array.level > 1 && s->size > 1 &&
+ 	    (unsigned long long) (array.chunk_size / 1024) > s->size) {
+ 		pr_err("component size must be larger than chunk size.\n");
+diff --git a/Manage.c b/Manage.c
+index fde6aba3..f54de7c6 100644
+--- a/Manage.c
++++ b/Manage.c
+@@ -461,17 +461,6 @@ done:
+ 		goto out;
+ 	}
+ 
+-	if (get_linux_version() < 2006028) {
+-		/* prior to 2.6.28, KOBJ_CHANGE was not sent when an md array
+-		 * was stopped, so We'll do it here just to be sure.  Drop any
+-		 * partitions as well...
+-		 */
+-		if (fd >= 0)
+-			ioctl(fd, BLKRRPART, 0);
+-		if (mdi)
+-			sysfs_uevent(mdi, "change");
+-	}
+-
+ 	if (devnm[0] && use_udev()) {
+ 		struct map_ent *mp = map_by_devnm(&map, devnm);
+ 		remove_devices(devnm, mp ? mp->path : NULL);
+@@ -621,12 +610,6 @@ int attempt_re_add(int fd, int tfd, struct mddev_dev *dv,
+ 		 * though.
+ 		 */
+ 		mdu_disk_info_t disc;
+-		/* re-add doesn't work for version-1 superblocks
+-		 * before 2.6.18 :-(
+-		 */
+-		if (array->major_version == 1 &&
+-		    get_linux_version() <= 2006018)
+-			goto skip_re_add;
+ 		disc.number = mdi.disk.number;
+ 		if (md_get_disk_info(fd, &disc) != 0 ||
+ 		    disc.major != 0 || disc.minor != 0)
+diff --git a/mdadm.c b/mdadm.c
+index 4685ad6b..2296911d 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
+ 
+ 	srandom(time(0) ^ getpid());
+ 
+-	if (get_linux_version() < 2006015) {
+-		pr_err("This version of mdadm does not support kernels older than 2.6.15\n");
++	if (get_linux_version() < 2006032) {
++		pr_err("This version of mdadm does not support kernels older than 2.6.32\n");
+ 		exit(1);
+ 	}
+ 
+diff --git a/super1.c b/super1.c
+index 1d20ef55..938c3a68 100644
+--- a/super1.c
++++ b/super1.c
+@@ -2033,11 +2033,6 @@ static int write_init_super1(struct supertype *st)
+ 				/* same array, so preserve events and
+ 				 * dev_number */
+ 				sb->events = refsb->events;
+-				/* bugs in 2.6.17 and earlier mean the
+-				 * dev_number chosen in Manage must be preserved
+-				 */
+-				if (get_linux_version() >= 2006018)
+-					sb->dev_number = refsb->dev_number;
+ 			}
+ 			free_super1(refst);
+ 		}
+-- 
+2.38.1
+

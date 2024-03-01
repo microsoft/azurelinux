@@ -1,0 +1,72 @@
+From 9364dbfb264e89ab9467dfc0d2b813033e320640 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 1 Mar 2023 13:41:32 -0700
+Subject: [PATCH 102/120] mdadm: Introduce pr_info()
+
+Feedback was given to avoid informational pr_err() calls that print
+to stderr, even though that's done all through out the code.
+
+Using printf() directly doesn't maintain the same format (an "mdadm"
+prefix on every line.
+
+So introduce pr_info() which prints to stdout with the same format
+and use it for a couple informational pr_err() calls in Create().
+
+Future work can make this call used in more cases.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Reviewed-by: Xiao Ni <xni@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Coly Li <colyli@suse.de>
+Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Create.c | 7 ++++---
+ mdadm.h  | 2 ++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/Create.c b/Create.c
+index 6a044664..4acda30c 100644
+--- a/Create.c
++++ b/Create.c
+@@ -984,11 +984,12 @@ int Create(struct supertype *st, char *mddev,
+ 
+ 			mdi = sysfs_read(-1, devnm, GET_VERSION);
+ 
+-			pr_err("Creating array inside %s container %s\n",
++			pr_info("Creating array inside %s container %s\n",
+ 				mdi?mdi->text_version:"managed", devnm);
+ 			sysfs_free(mdi);
+ 		} else
+-			pr_err("Defaulting to version %s metadata\n", info.text_version);
++			pr_info("Defaulting to version %s metadata\n",
++				info.text_version);
+ 	}
+ 
+ 	map_update(&map, fd2devnm(mdfd), info.text_version,
+@@ -1145,7 +1146,7 @@ int Create(struct supertype *st, char *mddev,
+ 			ioctl(mdfd, RESTART_ARRAY_RW, NULL);
+ 		}
+ 		if (c->verbose >= 0)
+-			pr_err("array %s started.\n", mddev);
++			pr_info("array %s started.\n", mddev);
+ 		if (st->ss->external && st->container_devnm[0]) {
+ 			if (need_mdmon)
+ 				start_mdmon(st->container_devnm);
+diff --git a/mdadm.h b/mdadm.h
+index 1674ce13..4336be4d 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -1854,6 +1854,8 @@ static inline int xasprintf(char **strp, const char *fmt, ...) {
+ #endif
+ #define cont_err(fmt ...) fprintf(stderr, "       " fmt)
+ 
++#define pr_info(fmt, args...) printf("%s: "fmt, Name, ##args)
++
+ void *xmalloc(size_t len);
+ void *xrealloc(void *ptr, size_t len);
+ void *xcalloc(size_t num, size_t size);
+-- 
+2.38.1
+

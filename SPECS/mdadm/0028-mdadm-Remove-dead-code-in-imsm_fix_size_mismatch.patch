@@ -1,0 +1,34 @@
+From 751757620afb25a4c02746bf8368a7b5f22352ec Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 22 Jul 2022 08:43:48 +0200
+Subject: [PATCH 28/83] mdadm: Remove dead code in imsm_fix_size_mismatch
+
+imsm_create_metadata_update_for_size_change() that returns u_size value
+could return 0 in the past. As its behavior changed, and returned value
+is always the size of imsm_update_size_change structure, check for
+u_size is no longer needed.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super-intel.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 76b947f5..4ddfcf94 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -11869,10 +11869,6 @@ static int imsm_fix_size_mismatch(struct supertype *st, int subarray_index)
+ 		geo.size = d_size;
+ 		u_size = imsm_create_metadata_update_for_size_change(st, &geo,
+ 								     &update);
+-		if (u_size < 1) {
+-			dprintf("imsm: Cannot prepare size change update\n");
+-			goto exit;
+-		}
+ 		imsm_update_metadata_locally(st, update, u_size);
+ 		if (st->update_tail) {
+ 			append_metadata_update(st, update, u_size);
+-- 
+2.38.1
+

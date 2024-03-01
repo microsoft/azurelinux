@@ -1,0 +1,45 @@
+From c33bbda5b0e127bb161fd4ad44bcfaa2a5daf153 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 18 Mar 2022 09:26:07 +0100
+Subject: [PATCH 09/83] mdadm: Update config manual
+
+Add missing HOMECLUSTER keyword description.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ mdadm.conf.5.in | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/mdadm.conf.5.in b/mdadm.conf.5.in
+index dd331a6a..cd4e6a9d 100644
+--- a/mdadm.conf.5.in
++++ b/mdadm.conf.5.in
+@@ -439,6 +439,23 @@ from any possible local name. e.g.
+ .B /dev/md/1_1
+ or
+ .BR /dev/md/home_0 .
++
++.TP
++.B HOMECLUSTER
++The
++.B homcluster
++line gives a default value for the
++.B \-\-homecluster=
++option to mdadm.  It specifies  the  cluster name for the md device.
++The md device can be assembled only on the cluster which matches
++the name specified. If
++.B homcluster
++is not provided, mdadm tries to detect the cluster name automatically.
++
++There should only be one
++.B homecluster
++line.  Any subsequent lines will be silently ignored.
++
+ .TP
+ .B AUTO
+ A list of names of metadata format can be given, each preceded by a
+-- 
+2.38.1
+

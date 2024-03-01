@@ -1,0 +1,122 @@
+From 76c152ca9851e9fcdf52e8f6e7e6c09b936bdd14 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Tue, 21 Jun 2022 00:10:41 +0800
+Subject: [PATCH 23/83] imsm: introduce get_disk_slot_in_dev()
+
+The routine was added to remove unnecessary get_imsm_dev() and
+get_imsm_map() calls, used only to determine disk slot.
+
+Additionally, enum for IMSM return statues was added for further usage.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super-intel.c | 47 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 36 insertions(+), 11 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 3788feb9..cd1f1e3d 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -366,6 +366,18 @@ struct migr_record {
+ };
+ ASSERT_SIZE(migr_record, 128)
+ 
++/**
++ * enum imsm_status - internal IMSM return values representation.
++ * @STATUS_OK: function succeeded.
++ * @STATUS_ERROR: General error ocurred (not specified).
++ *
++ * Typedefed to imsm_status_t.
++ */
++typedef enum imsm_status {
++	IMSM_STATUS_ERROR = -1,
++	IMSM_STATUS_OK = 0,
++} imsm_status_t;
++
+ struct md_list {
+ 	/* usage marker:
+ 	 *  1: load metadata
+@@ -1183,7 +1195,7 @@ static void set_imsm_ord_tbl_ent(struct imsm_map *map, int slot, __u32 ord)
+ 	map->disk_ord_tbl[slot] = __cpu_to_le32(ord);
+ }
+ 
+-static int get_imsm_disk_slot(struct imsm_map *map, unsigned idx)
++static int get_imsm_disk_slot(struct imsm_map *map, const unsigned int idx)
+ {
+ 	int slot;
+ 	__u32 ord;
+@@ -1194,7 +1206,7 @@ static int get_imsm_disk_slot(struct imsm_map *map, unsigned idx)
+ 			return slot;
+ 	}
+ 
+-	return -1;
++	return IMSM_STATUS_ERROR;
+ }
+ 
+ static int get_imsm_raid_level(struct imsm_map *map)
+@@ -1209,6 +1221,23 @@ static int get_imsm_raid_level(struct imsm_map *map)
+ 	return map->raid_level;
+ }
+ 
++/**
++ * get_disk_slot_in_dev() - retrieve disk slot from &imsm_dev.
++ * @super: &intel_super pointer, not NULL.
++ * @dev_idx: imsm device index.
++ * @idx: disk index.
++ *
++ * Return: Slot on success, IMSM_STATUS_ERROR otherwise.
++ */
++static int get_disk_slot_in_dev(struct intel_super *super, const __u8 dev_idx,
++				const unsigned int idx)
++{
++	struct imsm_dev *dev = get_imsm_dev(super, dev_idx);
++	struct imsm_map *map = get_imsm_map(dev, MAP_0);
++
++	return get_imsm_disk_slot(map, idx);
++}
++
+ static int cmp_extent(const void *av, const void *bv)
+ {
+ 	const struct extent *a = av;
+@@ -1225,13 +1254,9 @@ static int count_memberships(struct dl *dl, struct intel_super *super)
+ 	int memberships = 0;
+ 	int i;
+ 
+-	for (i = 0; i < super->anchor->num_raid_devs; i++) {
+-		struct imsm_dev *dev = get_imsm_dev(super, i);
+-		struct imsm_map *map = get_imsm_map(dev, MAP_0);
+-
+-		if (get_imsm_disk_slot(map, dl->index) >= 0)
++	for (i = 0; i < super->anchor->num_raid_devs; i++)
++		if (get_disk_slot_in_dev(super, i, dl->index) >= 0)
+ 			memberships++;
+-	}
+ 
+ 	return memberships;
+ }
+@@ -1941,6 +1966,7 @@ void examine_migr_rec_imsm(struct intel_super *super)
+ 
+ 		/* first map under migration */
+ 		map = get_imsm_map(dev, MAP_0);
++
+ 		if (map)
+ 			slot = get_imsm_disk_slot(map, super->disks->index);
+ 		if (map == NULL || slot > 1 || slot < 0) {
+@@ -9655,10 +9681,9 @@ static int apply_update_activate_spare(struct imsm_update_activate_spare *u,
+ 		/* count arrays using the victim in the metadata */
+ 		found = 0;
+ 		for (a = active_array; a ; a = a->next) {
+-			dev = get_imsm_dev(super, a->info.container_member);
+-			map = get_imsm_map(dev, MAP_0);
++			int dev_idx = a->info.container_member;
+ 
+-			if (get_imsm_disk_slot(map, victim) >= 0)
++			if (get_disk_slot_in_dev(super, dev_idx, victim) >= 0)
+ 				found++;
+ 		}
+ 
+-- 
+2.38.1
+

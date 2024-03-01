@@ -1,0 +1,106 @@
+From 35aa44c549290e22f285896684c704acb53b7717 Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Mon, 2 Jan 2023 09:35:18 +0100
+Subject: [PATCH 70/83] super-ddf: Remove update_super_ddf.
+
+This is not supported by ddf.
+It hides errors by returning success status for some updates.
+Remove update_super_dff().
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-ddf.c | 70 -----------------------------------------------------
+ 1 file changed, 70 deletions(-)
+
+diff --git a/super-ddf.c b/super-ddf.c
+index 9d1e3b94..309812df 100644
+--- a/super-ddf.c
++++ b/super-ddf.c
+@@ -2139,75 +2139,6 @@ static void getinfo_super_ddf_bvd(struct supertype *st, struct mdinfo *info, cha
+ 		}
+ }
+ 
+-static int update_super_ddf(struct supertype *st, struct mdinfo *info,
+-			    char *update,
+-			    char *devname, int verbose,
+-			    int uuid_set, char *homehost)
+-{
+-	/* For 'assemble' and 'force' we need to return non-zero if any
+-	 * change was made.  For others, the return value is ignored.
+-	 * Update options are:
+-	 *  force-one : This device looks a bit old but needs to be included,
+-	 *        update age info appropriately.
+-	 *  assemble: clear any 'faulty' flag to allow this device to
+-	 *		be assembled.
+-	 *  force-array: Array is degraded but being forced, mark it clean
+-	 *	   if that will be needed to assemble it.
+-	 *
+-	 *  newdev:  not used ????
+-	 *  grow:  Array has gained a new device - this is currently for
+-	 *		linear only
+-	 *  resync: mark as dirty so a resync will happen.
+-	 *  uuid:  Change the uuid of the array to match what is given
+-	 *  homehost:  update the recorded homehost
+-	 *  name:  update the name - preserving the homehost
+-	 *  _reshape_progress: record new reshape_progress position.
+-	 *
+-	 * Following are not relevant for this version:
+-	 *  sparc2.2 : update from old dodgey metadata
+-	 *  super-minor: change the preferred_minor number
+-	 *  summaries:  update redundant counters.
+-	 */
+-	int rv = 0;
+-//	struct ddf_super *ddf = st->sb;
+-//	struct vd_config *vd = find_vdcr(ddf, info->container_member);
+-//	struct virtual_entry *ve = find_ve(ddf);
+-
+-	/* we don't need to handle "force-*" or "assemble" as
+-	 * there is no need to 'trick' the kernel.  When the metadata is
+-	 * first updated to activate the array, all the implied modifications
+-	 * will just happen.
+-	 */
+-
+-	if (strcmp(update, "grow") == 0) {
+-		/* FIXME */
+-	} else if (strcmp(update, "resync") == 0) {
+-//		info->resync_checkpoint = 0;
+-	} else if (strcmp(update, "homehost") == 0) {
+-		/* homehost is stored in controller->vendor_data,
+-		 * or it is when we are the vendor
+-		 */
+-//		if (info->vendor_is_local)
+-//			strcpy(ddf->controller.vendor_data, homehost);
+-		rv = -1;
+-	} else if (strcmp(update, "name") == 0) {
+-		/* name is stored in virtual_entry->name */
+-//		memset(ve->name, ' ', 16);
+-//		strncpy(ve->name, info->name, 16);
+-		rv = -1;
+-	} else if (strcmp(update, "_reshape_progress") == 0) {
+-		/* We don't support reshape yet */
+-	} else if (strcmp(update, "assemble") == 0 ) {
+-		/* Do nothing, just succeed */
+-		rv = 0;
+-	} else
+-		rv = -1;
+-
+-//	update_all_csum(ddf);
+-
+-	return rv;
+-}
+-
+ static void make_header_guid(char *guid)
+ {
+ 	be32 stamp;
+@@ -5211,7 +5142,6 @@ struct superswitch super_ddf = {
+ 	.match_home	= match_home_ddf,
+ 	.uuid_from_super= uuid_from_super_ddf,
+ 	.getinfo_super  = getinfo_super_ddf,
+-	.update_super	= update_super_ddf,
+ 
+ 	.avail_size	= avail_size_ddf,
+ 
+-- 
+2.38.1
+

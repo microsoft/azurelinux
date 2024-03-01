@@ -1,0 +1,176 @@
+From e4a030a0d3a953b8e74c118200e58dc83c2fc608 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Tue, 19 Jul 2022 14:48:22 +0200
+Subject: [PATCH 48/83] mdadm: remove symlink option
+
+The option is not used. Remove it from code.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ ReadMe.c        |  1 -
+ config.c        |  7 +------
+ mdadm.8.in      |  9 ---------
+ mdadm.c         | 20 --------------------
+ mdadm.conf.5.in | 15 ---------------
+ mdadm.h         |  2 --
+ 6 files changed, 1 insertion(+), 53 deletions(-)
+
+diff --git a/ReadMe.c b/ReadMe.c
+index 7518a32a..7f94847e 100644
+--- a/ReadMe.c
++++ b/ReadMe.c
+@@ -147,7 +147,6 @@ struct option long_options[] = {
+     {"nofailfast",0, 0,  NoFailFast},
+     {"re-add",    0, 0,  ReAdd},
+     {"homehost",  1, 0,  HomeHost},
+-    {"symlinks",  1, 0,  Symlinks},
+     {"data-offset",1, 0, DataOffset},
+     {"nodes",1, 0, Nodes}, /* also for --assemble */
+     {"home-cluster",1, 0, ClusterName},
+diff --git a/config.c b/config.c
+index 9c725457..dc1620c1 100644
+--- a/config.c
++++ b/config.c
+@@ -194,7 +194,6 @@ struct mddev_dev *load_containers(void)
+ 
+ struct createinfo createinfo = {
+ 	.autof = 2, /* by default, create devices with standard names */
+-	.symlinks = 1,
+ 	.names = 0, /* By default, stick with numbered md devices. */
+ 	.bblist = 1, /* Use a bad block list by default */
+ #ifdef DEBIAN
+@@ -310,11 +309,7 @@ static void createline(char *line)
+ 			if (!createinfo.supertype)
+ 				pr_err("metadata format %s unknown, ignoring\n",
+ 					w+9);
+-		} else if (strncasecmp(w, "symlinks=yes", 12) == 0)
+-			createinfo.symlinks = 1;
+-		else if  (strncasecmp(w, "symlinks=no", 11) == 0)
+-			createinfo.symlinks = 0;
+-		else if (strncasecmp(w, "names=yes", 12) == 0)
++		} else if (strncasecmp(w, "names=yes", 12) == 0)
+ 			createinfo.names = 1;
+ 		else if  (strncasecmp(w, "names=no", 11) == 0)
+ 			createinfo.names = 0;
+diff --git a/mdadm.8.in b/mdadm.8.in
+index 0be02e4a..f2736226 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -1048,11 +1048,6 @@ simultaneously. If not specified, this defaults to 4.
+ Specify journal device for the RAID-4/5/6 array. The journal device
+ should be a SSD with reasonable lifetime.
+ 
+-.TP
+-.BR \-\-symlinks
+-Auto creation of symlinks in /dev to /dev/md, option --symlinks must
+-be 'no' or 'yes' and work with --create and --build.
+-
+ .TP
+ .BR \-k ", " \-\-consistency\-policy=
+ Specify how the array maintains consistency in case of unexpected shutdown.
+@@ -1405,10 +1400,6 @@ Reshape can be continued later using the
+ .B \-\-continue
+ option for the grow command.
+ 
+-.TP
+-.BR \-\-symlinks
+-See this option under Create and Build options.
+-
+ .SH For Manage mode:
+ 
+ .TP
+diff --git a/mdadm.c b/mdadm.c
+index 56722ed9..180f7a9c 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
+ 	struct mddev_dev *dv;
+ 	mdu_array_info_t array;
+ 	int devs_found = 0;
+-	char *symlinks = NULL;
+ 	int grow_continue = 0;
+ 	/* autof indicates whether and how to create device node.
+ 	 * bottom 3 bits are style.  Rest (when shifted) are number of parts
+@@ -663,13 +662,6 @@ int main(int argc, char *argv[])
+ 		case O(ASSEMBLE,Auto): /* auto-creation of device node */
+ 			c.autof = parse_auto(optarg, "--auto flag", 0);
+ 			continue;
+-
+-		case O(CREATE,Symlinks):
+-		case O(BUILD,Symlinks):
+-		case O(ASSEMBLE,Symlinks): /* auto creation of symlinks in /dev to /dev/md */
+-			symlinks = optarg;
+-			continue;
+-
+ 		case O(BUILD,'f'): /* force honouring '-n 1' */
+ 		case O(BUILD,Force): /* force honouring '-n 1' */
+ 		case O(GROW,'f'): /* ditto */
+@@ -1325,18 +1317,6 @@ int main(int argc, char *argv[])
+ 		exit(2);
+ 	}
+ 
+-	if (symlinks) {
+-		struct createinfo *ci = conf_get_create_info();
+-
+-		if (strcasecmp(symlinks, "yes") == 0)
+-			ci->symlinks = 1;
+-		else if (strcasecmp(symlinks, "no") == 0)
+-			ci->symlinks = 0;
+-		else {
+-			pr_err("option --symlinks must be 'no' or 'yes'\n");
+-			exit(2);
+-		}
+-	}
+ 	/* Ok, got the option parsing out of the way
+ 	 * hopefully it's mostly right but there might be some stuff
+ 	 * missing
+diff --git a/mdadm.conf.5.in b/mdadm.conf.5.in
+index cd4e6a9d..bc2295c2 100644
+--- a/mdadm.conf.5.in
++++ b/mdadm.conf.5.in
+@@ -338,21 +338,6 @@ missing device entries should be created.
+ The name of the metadata format to use if none is explicitly given.
+ This can be useful to impose a system-wide default of version-1 superblocks.
+ 
+-.TP
+-.B symlinks=no
+-Normally when creating devices in
+-.B /dev/md/
+-.I mdadm
+-will create a matching symlink from
+-.B /dev/
+-with a name starting
+-.B md
+-or
+-.BR md_ .
+-Give
+-.B symlinks=no
+-to suppress this symlink creation.
+-
+ .TP
+ .B names=yes
+ Since Linux 2.6.29 it has been possible to create
+diff --git a/mdadm.h b/mdadm.h
+index add9c0b6..93e72786 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -394,7 +394,6 @@ struct createinfo {
+ 	int	gid;
+ 	int	autof;
+ 	int	mode;
+-	int	symlinks;
+ 	int	names;
+ 	int	bblist;
+ 	struct supertype *supertype;
+@@ -442,7 +441,6 @@ enum special_options {
+ 	BackupFile,
+ 	HomeHost,
+ 	AutoHomeHost,
+-	Symlinks,
+ 	AutoDetect,
+ 	Waitclean,
+ 	DetailPlatform,
+-- 
+2.38.1
+

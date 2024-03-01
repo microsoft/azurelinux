@@ -1,0 +1,119 @@
+From b7671c82010ffc04dfaecff2dd19ef8b2283e2b6 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Tue, 19 Jul 2022 14:48:21 +0200
+Subject: [PATCH 47/83] tests: add test for names
+
+Current behavior is not documented and tested. This test is a base for
+future improvements. It is enough to test it only with native metadata,
+because it is generic code. Generated properties are passed to metadata
+handler.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ tests/00createnames | 93 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
+ create mode 100644 tests/00createnames
+
+diff --git a/tests/00createnames b/tests/00createnames
+new file mode 100644
+index 00000000..64b81b92
+--- /dev/null
++++ b/tests/00createnames
+@@ -0,0 +1,93 @@
++set -x -e
++
++# Test how <devname> and --name= are handled for create mode.
++# We need to check three properties, generated from those parameters:
++# - devnode name
++# - link in /dev/md/ (MD_DEVNAME property from --detail --export)
++# - name in metadata (MD_NAME property from --examine --export)
++
++function _verify() {
++  local DEVNODE_NAME="$1"
++  local WANTED_LINK="$2"
++  local WANTED_NAME="$3"
++
++  local RES="$(mdadm -D --export $DEVNODE_NAME | grep MD_DEVNAME)"
++  if [[ "$?" != "0" ]]; then
++    echo "Cannot get details for $DEVNODE_NAME - unexpected devnode."
++    exit 1
++  fi
++
++  if [[ "$WANTED_LINK" != "empty" ]]; then
++    local EXPECTED="MD_DEVNAME=$WANTED_LINK"
++      if [[ "$RES" != "$EXPECTED" ]]; then
++        echo "$RES doesn't match $EXPECTED."
++        exit 1
++      fi
++  fi
++
++
++  local RES="$(mdadm -E --export $dev0 | grep MD_NAME)"
++  if [[ "$?" != "0" ]]; then
++    echo "Cannot get metadata from $dev0."
++    exit 1
++  fi
++
++  local EXPECTED="MD_NAME=$(hostname):$WANTED_NAME"
++  if [[ "$RES" != "$EXPECTED" ]]; then
++    echo "$RES doesn't match $EXPECTED."
++    exit 1
++  fi
++}
++
++function _create() {
++  local DEVNAME=$1
++  local NAME=$2
++
++  if [[ -z "$NAME" ]]; then
++    mdadm -CR "$DEVNAME" -l0 -n 1 $dev0 --force
++  else
++    mdadm -CR "$DEVNAME" --name="$NAME" -l0 -n 1 $dev0 --force
++  fi
++
++  if [[ "$?" != "0" ]]; then
++    echo "Cannot create device."
++    exit 1
++  fi
++}
++
++# The most trivial case.
++_create "/dev/md/name"
++_verify "/dev/md127" "name" "name"
++mdadm -S "/dev/md127"
++
++_create "name"
++_verify "/dev/md127" "name" "name"
++mdadm -S "/dev/md127"
++
++# Use 'mdX' as name.
++_create "/dev/md/md0"
++_verify "/dev/md127" "md0" "md0"
++mdadm -S "/dev/md127"
++
++_create "md0"
++_verify "/dev/md127" "md0" "md0"
++mdadm -S "/dev/md127"
++
++# <devnode> is used to create MD_DEVNAME but, name is used to create MD_NAME.
++_create "/dev/md/devnode" "name"
++_verify "/dev/md127" "devnode" "name"
++mdadm -S "/dev/md127"
++
++_create "devnode" "name"
++_verify "/dev/md127" "devnode" "name"
++mdadm -S "/dev/md127"
++
++# Devnode points to /dev/ directory. MD_DEVNAME doesn't exist.
++_create "/dev/md0"
++_verify "/dev/md0" "empty" "0"
++mdadm -S "/dev/md0"
++
++# Devnode points to /dev/ directory and name is set.
++_create "/dev/md0" "name"
++_verify "/dev/md0" "empty" "name"
++mdadm -S "/dev/md0"
+-- 
+2.38.1
+

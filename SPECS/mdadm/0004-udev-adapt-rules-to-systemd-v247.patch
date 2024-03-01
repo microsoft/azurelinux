@@ -1,0 +1,67 @@
+From cf9a109209aad285372b67306d54118af6fc522b Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Fri, 14 Jan 2022 16:44:33 +0100
+Subject: [PATCH 04/83] udev: adapt rules to systemd v247
+
+New events have been added in kernel 4.14 ("bind" and "unbind").
+Systemd maintainer suggests to modify "add|change" branches.
+This patches implements their suggestions. There is no issue yet because
+new event types are not used in md.
+
+Please see systemd announcement for details[1].
+
+[1] https://lists.freedesktop.org/archives/systemd-devel/2020-November/045646.html
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ udev-md-raid-arrays.rules        | 2 +-
+ udev-md-raid-assembly.rules      | 5 +++--
+ udev-md-raid-safe-timeouts.rules | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/udev-md-raid-arrays.rules b/udev-md-raid-arrays.rules
+index 13c9076e..2967ace1 100644
+--- a/udev-md-raid-arrays.rules
++++ b/udev-md-raid-arrays.rules
+@@ -3,7 +3,7 @@
+ SUBSYSTEM!="block", GOTO="md_end"
+ 
+ # handle md arrays
+-ACTION!="add|change", GOTO="md_end"
++ACTION=="remove", GOTO="md_end"
+ KERNEL!="md*", GOTO="md_end"
+ 
+ # partitions have no md/{array_state,metadata_version}, but should not
+diff --git a/udev-md-raid-assembly.rules b/udev-md-raid-assembly.rules
+index d668cddd..39b4344b 100644
+--- a/udev-md-raid-assembly.rules
++++ b/udev-md-raid-assembly.rules
+@@ -30,8 +30,9 @@ LABEL="md_inc"
+ 
+ # remember you can limit what gets auto/incrementally assembled by
+ # mdadm.conf(5)'s 'AUTO' and selectively whitelist using 'ARRAY'
+-ACTION=="add|change", IMPORT{program}="BINDIR/mdadm --incremental --export $devnode --offroot $env{DEVLINKS}"
+-ACTION=="add|change", ENV{MD_STARTED}=="*unsafe*", ENV{MD_FOREIGN}=="no", ENV{SYSTEMD_WANTS}+="mdadm-last-resort@$env{MD_DEVICE}.timer"
++ACTION!="remove", IMPORT{program}="BINDIR/mdadm --incremental --export $devnode --offroot $env{DEVLINKS}"
++ACTION!="remove", ENV{MD_STARTED}=="*unsafe*", ENV{MD_FOREIGN}=="no", ENV{SYSTEMD_WANTS}+="mdadm-last-resort@$env{MD_DEVICE}.timer"
++
+ ACTION=="remove", ENV{ID_PATH}=="?*", RUN+="BINDIR/mdadm -If $name --path $env{ID_PATH}"
+ ACTION=="remove", ENV{ID_PATH}!="?*", RUN+="BINDIR/mdadm -If $name"
+ 
+diff --git a/udev-md-raid-safe-timeouts.rules b/udev-md-raid-safe-timeouts.rules
+index 12bdcaa8..2e185cee 100644
+--- a/udev-md-raid-safe-timeouts.rules
++++ b/udev-md-raid-safe-timeouts.rules
+@@ -50,7 +50,7 @@ ENV{DEVTYPE}!="partition", GOTO="md_timeouts_end"
+ 
+ IMPORT{program}="/sbin/mdadm --examine --export $devnode"
+ 
+-ACTION=="add|change", \
++ACTION!="remove", \
+   ENV{ID_FS_TYPE}=="linux_raid_member", \
+   ENV{MD_LEVEL}=="raid[1-9]*", \
+   TEST=="/sys/block/$parent/device/timeout", \
+-- 
+2.38.1
+

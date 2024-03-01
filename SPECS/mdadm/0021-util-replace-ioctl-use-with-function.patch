@@ -1,0 +1,31 @@
+From 953cc7e5a485a91ddec7312c7a5d7779749fad5f Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Tue, 21 Jun 2022 00:10:39 +0800
+Subject: [PATCH 21/83] util: replace ioctl use with function
+
+Replace using of ioctl calling to get md array info with
+special function prepared to it.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ util.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util.c b/util.c
+index cc94f96e..38f0420e 100644
+--- a/util.c
++++ b/util.c
+@@ -267,7 +267,7 @@ int md_array_active(int fd)
+ 		 * GET_ARRAY_INFO doesn't provide access to the proper state
+ 		 * information, so fallback to a basic check for raid_disks != 0
+ 		 */
+-		ret = ioctl(fd, GET_ARRAY_INFO, &array);
++		ret = md_get_array_info(fd, &array);
+ 	}
+ 
+ 	return !ret;
+-- 
+2.38.1
+

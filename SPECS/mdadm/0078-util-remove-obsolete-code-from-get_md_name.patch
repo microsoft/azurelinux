@@ -1,0 +1,116 @@
+From b938519e7719c992dae2d61c796c45fe49e6b71b Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Mon, 2 Jan 2023 09:46:22 +0100
+Subject: [PATCH 78/83] util: remove obsolete code from get_md_name
+
+get_md_name() is used only with mdstat entries.
+Remove dead code and simplyfy function.
+
+Remove redundadnt checks from mdmon.c
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdmon.c |  8 +++-----
+ util.c  | 51 +++++++++++++++++----------------------------------
+ 2 files changed, 20 insertions(+), 39 deletions(-)
+
+diff --git a/mdmon.c b/mdmon.c
+index ecf52dc8..60ba3182 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
+ 		if (argv[optind]) {
+ 			container_name = get_md_name(argv[optind]);
+ 			if (!container_name)
+-				container_name = argv[optind];
++				return 1;
+ 		}
+ 	}
+ 
+@@ -403,11 +403,9 @@ int main(int argc, char *argv[])
+ 
+ 		return status;
+ 	} else {
+-		int mdfd = open_mddev(container_name, 1);
+-
+-		if (mdfd < 0)
+-			return 1;
++		int mdfd = open_mddev(container_name, 0);
+ 		devnm = fd2devnm(mdfd);
++
+ 		close(mdfd);
+ 	}
+ 
+diff --git a/util.c b/util.c
+index 26ffdcea..9cd89fa4 100644
+--- a/util.c
++++ b/util.c
+@@ -968,47 +968,30 @@ dev_t devnm2devid(char *devnm)
+ 	return 0;
+ }
+ 
++/**
++ * get_md_name() - Get main dev node of the md device.
++ * @devnm: Md device name or path.
++ *
++ * Function checks if the full name was passed and returns md name
++ * if it is the MD device.
++ *
++ * Return: Main dev node of the md device or NULL if not found.
++ */
+ char *get_md_name(char *devnm)
+ {
+-	/* find /dev/md%d or /dev/md/%d or make a device /dev/.tmp.md%d */
+-	/* if dev < 0, want /dev/md/d%d or find mdp in /proc/devices ... */
+-
+-	static char devname[50];
++	static char devname[NAME_MAX];
+ 	struct stat stb;
+-	dev_t rdev = devnm2devid(devnm);
+-	char *dn;
+ 
+-	if (rdev == 0)
+-		return 0;
+-	if (strncmp(devnm, "md_", 3) == 0) {
+-		snprintf(devname, sizeof(devname), "/dev/md/%s",
+-			devnm + 3);
+-		if (stat(devname, &stb) == 0 &&
+-		    (S_IFMT&stb.st_mode) == S_IFBLK && (stb.st_rdev == rdev))
+-			return devname;
+-	}
+-	snprintf(devname, sizeof(devname), "/dev/%s", devnm);
+-	if (stat(devname, &stb) == 0 && (S_IFMT&stb.st_mode) == S_IFBLK &&
+-	    (stb.st_rdev == rdev))
+-		return devname;
++	if (strncmp(devnm, "/dev/", 5) == 0)
++		snprintf(devname, sizeof(devname), "%s", devnm);
++	else
++		snprintf(devname, sizeof(devname), "/dev/%s", devnm);
+ 
+-	snprintf(devname, sizeof(devname), "/dev/md/%s", devnm+2);
+-	if (stat(devname, &stb) == 0 && (S_IFMT&stb.st_mode) == S_IFBLK &&
+-	    (stb.st_rdev == rdev))
++	if (!is_mddev(devname))
++		return NULL;
++	if (stat(devname, &stb) == 0 && (S_IFMT&stb.st_mode) == S_IFBLK)
+ 		return devname;
+ 
+-	dn = map_dev(major(rdev), minor(rdev), 0);
+-	if (dn)
+-		return dn;
+-	snprintf(devname, sizeof(devname), "/dev/.tmp.%s", devnm);
+-	if (mknod(devname, S_IFBLK | 0600, rdev) == -1)
+-		if (errno != EEXIST)
+-			return NULL;
+-
+-	if (stat(devname, &stb) == 0 && (S_IFMT&stb.st_mode) == S_IFBLK &&
+-	    (stb.st_rdev == rdev))
+-		return devname;
+-	unlink(devname);
+ 	return NULL;
+ }
+ 
+-- 
+2.38.1
+

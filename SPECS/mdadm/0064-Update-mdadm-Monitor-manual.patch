@@ -1,0 +1,119 @@
+From 725e37cd14866906ba28c970394b9f7a4cd97413 Mon Sep 17 00:00:00 2001
+From: Blazej Kucman <blazej.kucman@intel.com>
+Date: Mon, 19 Dec 2022 11:21:58 +0100
+Subject: [PATCH 64/83] Update mdadm Monitor manual.
+
+- describe monitor work modes,
+- clarify the turning off condition,
+- describe the mdmonitor.service as a prefered management way.
+
+Signed-off-by: Blazej Kucman <blazej.kucman@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdadm.8.in | 71 ++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 50 insertions(+), 21 deletions(-)
+
+diff --git a/mdadm.8.in b/mdadm.8.in
+index 70c79d1e..64f71ed1 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -2548,13 +2548,33 @@ Usage:
+ .I options... devices...
+ 
+ .PP
+-This usage causes
++Monitor option can work in two modes:
++.IP \(bu 4
++system wide mode, follow all md devices based on
++.B /proc/mdstat,
++.IP \(bu 4
++follow only specified MD devices in command line.
++.PP
++
++.B \-\-scan -
++indicates system wide mode. Option causes the
++.I monitor
++to track all md devices that appear in
++.B /proc/mdstat.
++If it is not set, then at least one
++.B device
++must be specified.
++
++Monitor usage causes
+ .I mdadm
+ to periodically poll a number of md arrays and to report on any events
+ noticed.
+-.I mdadm
+-will never exit once it decides that there are arrays to be checked,
+-so it should normally be run in the background.
++
++In both modes,
++.I monitor
++will work as long as there is an active array with redundancy and it is defined to follow (for
++.B \-\-scan
++every array is followed).
+ 
+ As well as reporting events,
+ .I mdadm
+@@ -2565,15 +2585,6 @@ or
+ .B domain
+ and if the destination array has a failed drive but no spares.
+ 
+-If any devices are listed on the command line,
+-.I mdadm
+-will only monitor those devices, otherwise, all arrays listed in the
+-configuration file will be monitored.  Further, if
+-.B \-\-scan
+-is given, then any other md devices that appear in
+-.B /proc/mdstat
+-will also be monitored.
+-
+ The result of monitoring the arrays is the generation of events.
+ These events are passed to a separate program (if specified) and may
+ be mailed to a given E-mail address.
+@@ -2586,16 +2597,34 @@ device if relevant (such as a component device that has failed).
+ 
+ If
+ .B \-\-scan
+-is given, then a program or an E-mail address must be specified on the
+-command line or in the config file.  If neither are available, then
++is given, then a
++.B program
++or an
++.B e-mail
++address must be specified on the
++command line or in the config file. If neither are available, then
+ .I mdadm
+ will not monitor anything.
+-Without
+-.B \-\-scan,
+-.I mdadm
+-will continue monitoring as long as something was found to monitor.  If
+-no program or email is given, then each event is reported to
+-.BR stdout .
++For devices given directly in command line, without
++.B program
++or
++.B email
++specified, each event is reported to
++.BR stdout.
++
++Note: For systems where
++.If mdadm monitor
++is configured via systemd,
++.B mdmonitor(mdmonitor.service)
++should be configured. The service is designed to be primary solution for array monitoring,
++it is configured to work in system wide mode.
++It is automatically started and stopped according to current state and types of MD arrays in system.
++The service may require additional configuration, like
++.B e-mail
++or
++.B delay.
++That should be done in
++.B mdadm.conf.
+ 
+ The different events are:
+ 
+-- 
+2.38.1
+

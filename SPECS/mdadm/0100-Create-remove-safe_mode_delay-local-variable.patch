@@ -1,0 +1,64 @@
+From fb2c0f6183e29b014608e5e1aa4d53cb55887326 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 1 Mar 2023 13:41:30 -0700
+Subject: [PATCH 100/120] Create: remove safe_mode_delay local variable
+
+All .getinfo_super() call sets the info.safe_mode_delay variables
+to a constant value, so no matter what the current state is
+that function will always set it to the same value.
+
+Create() calls .getinfo_super() multiple times while creating the array.
+The value is stored in a local variable for every disk in the loop
+to add disks (so the last disc call takes precedence). The local
+variable is then used in the call to sysfs_set_safemode().
+
+This can be simplified by using info.safe_mode_delay directly. The info
+variable had .getinfo_super() called on it early in the function so, by the
+reasoning above, it will have the same value as the local variable which
+can thus be removed.
+
+Doing this allows for factoring out code from Create() in a subsequent
+patch.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Reviewed-by: Xiao Ni <xni@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Create.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/Create.c b/Create.c
+index 2e8203ec..8ded81dc 100644
+--- a/Create.c
++++ b/Create.c
+@@ -137,7 +137,6 @@ int Create(struct supertype *st, char *mddev,
+ 	int did_default = 0;
+ 	int do_default_layout = 0;
+ 	int do_default_chunk = 0;
+-	unsigned long safe_mode_delay = 0;
+ 	char chosen_name[1024];
+ 	struct map_ent *map = NULL;
+ 	unsigned long long newsize;
+@@ -952,7 +951,6 @@ int Create(struct supertype *st, char *mddev,
+ 					goto abort_locked;
+ 				}
+ 				st->ss->getinfo_super(st, inf, NULL);
+-				safe_mode_delay = inf->safe_mode_delay;
+ 
+ 				if (have_container && c->verbose > 0)
+ 					pr_err("Using %s for device %d\n",
+@@ -1065,7 +1063,7 @@ int Create(struct supertype *st, char *mddev,
+ 						    "readonly");
+ 				break;
+ 			}
+-			sysfs_set_safemode(&info, safe_mode_delay);
++			sysfs_set_safemode(&info, info.safe_mode_delay);
+ 			if (err) {
+ 				pr_err("failed to activate array.\n");
+ 				ioctl(mdfd, STOP_ARRAY, NULL);
+-- 
+2.38.1
+

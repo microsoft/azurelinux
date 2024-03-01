@@ -1,0 +1,36 @@
+From ba867e2ebaead20e3d9a7e62ef8fd940176c3110 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 1 Mar 2023 13:41:29 -0700
+Subject: [PATCH 099/120] Create: goto abort_locked instead of return 1 in
+ error path
+
+The return 1 after the fstat_is_blkdev() check should be replaced
+with an error return that goes through the error path to unlock
+resources locked by this function.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Reviewed-by: Xiao Ni <xni@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Create.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Create.c b/Create.c
+index 953e7372..2e8203ec 100644
+--- a/Create.c
++++ b/Create.c
+@@ -939,7 +939,7 @@ int Create(struct supertype *st, char *mddev,
+ 						goto abort_locked;
+ 					}
+ 					if (!fstat_is_blkdev(fd, dv->devname, &rdev))
+-						return 1;
++						goto abort_locked;
+ 					inf->disk.major = major(rdev);
+ 					inf->disk.minor = minor(rdev);
+ 				}
+-- 
+2.38.1
+

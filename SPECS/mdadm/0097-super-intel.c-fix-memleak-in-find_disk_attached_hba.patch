@@ -1,0 +1,39 @@
+From 5d2434d18b6bc71bd16678b1a6d1cc3a92f1d415 Mon Sep 17 00:00:00 2001
+From: Wu Guanghao <wuguanghao3@huawei.com>
+Date: Sat, 4 Mar 2023 00:21:34 +0800
+Subject: [PATCH 097/120] super-intel.c: fix memleak in
+ find_disk_attached_hba()
+
+If disk_path = diskfd_to_devpath(), we need free(disk_path) before
+return, otherwise there will be a memory leak
+
+Signed-off-by: Wu Guanghao <wuguanghao3@huawei.com>
+Reviewed-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-intel.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 4a3da847..e155a8ae 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -713,12 +713,12 @@ static struct sys_dev* find_disk_attached_hba(int fd, const char *devname)
+ 
+ 	for (elem = list; elem; elem = elem->next)
+ 		if (path_attached_to_hba(disk_path, elem->path))
+-			return elem;
++			break;
+ 
+ 	if (disk_path != devname)
+ 		free(disk_path);
+ 
+-	return NULL;
++	return elem;
+ }
+ 
+ static int find_intel_hba_capability(int fd, struct intel_super *super,
+-- 
+2.38.1
+

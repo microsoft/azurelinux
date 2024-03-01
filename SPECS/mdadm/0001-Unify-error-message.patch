@@ -1,0 +1,47 @@
+From f1cc8ab9ab6a92c3cd94ab7590b46285e214681e Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Tue, 15 Mar 2022 09:30:30 +0100
+Subject: [PATCH 01/83] Unify error message.
+
+Provide the same error message for the same error that can occur in Grow.c and super-intel.c.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Grow.c        | 4 ++--
+ super-intel.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Grow.c b/Grow.c
+index 9c6fc95e..9a947204 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -1001,8 +1001,8 @@ int remove_disks_for_takeover(struct supertype *st,
+ 				rv = 1;
+ 			sysfs_free(arrays);
+ 			if (rv) {
+-				pr_err("Error. Cannot perform operation on /dev/%s\n", st->devnm);
+-				pr_err("For this operation it MUST be single array in container\n");
++				pr_err("Error. Cannot perform operation on %s- for this operation "
++				       "it MUST be single array in container\n", st->devnm);
+ 				return rv;
+ 			}
+ 		}
+diff --git a/super-intel.c b/super-intel.c
+index d5fad102..5ffa7636 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -11683,8 +11683,8 @@ enum imsm_reshape_type imsm_analyze_change(struct supertype *st,
+ 		struct imsm_super *mpb = super->anchor;
+ 
+ 		if (mpb->num_raid_devs > 1) {
+-			pr_err("Error. Cannot perform operation on %s- for this operation it MUST be single array in container\n",
+-			       geo->dev_name);
++			pr_err("Error. Cannot perform operation on %s- for this operation "
++			       "it MUST be single array in container\n", geo->dev_name);
+ 			change = -1;
+ 		}
+ 	}
+-- 
+2.38.1
+

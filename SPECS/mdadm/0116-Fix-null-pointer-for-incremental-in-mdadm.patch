@@ -1,0 +1,43 @@
+From 890212d6800646153210ac264ce73035cc7dd5cc Mon Sep 17 00:00:00 2001
+From: miaoguanqin <miaoguanqin@huawei.com>
+Date: Tue, 4 Apr 2023 19:31:24 +0800
+Subject: [PATCH 116/120] Fix null pointer for incremental in mdadm
+
+when we excute mdadm --assemble, udev-md-raid-assembly.rules is triggered.
+Then we stop array, we found an coredump for mdadm --incremental.func
+stack are as follows:
+
+#0  enough (level=10, raid_disks=4, layout=258, clean=1,
+    avail=avail@entry=0x0) at util.c:555
+#1  0x0000562170c26965 in Incremental (devlist=<optimized out>,
+    c=<optimized out>, st=0x5621729b6dc0) at Incremental.c:514
+#2  0x0000562170bfb6ff in main (argc=<optimized out>,
+    argv=<optimized out>) at mdadm.c:1762
+
+func enough() use array avail,avail allocate space in func count_active,
+it may not alloc space, causing a coredump.We fix this coredump.
+
+Signed-off-by: Guanqin Miao <miaoguanqin@huawei.com>
+Signed-off-by: lixiaokeng <lixiaokeng@huawei.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Incremental.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Incremental.c b/Incremental.c
+index 09b94b9f..49a71f72 100644
+--- a/Incremental.c
++++ b/Incremental.c
+@@ -507,6 +507,9 @@ int Incremental(struct mddev_dev *devlist, struct context *c,
+ 				    GET_OFFSET | GET_SIZE));
+ 	active_disks = count_active(st, sra, mdfd, &avail, &info);
+ 
++	if (!avail)
++		goto out_unlock;
++
+ 	journal_device_missing = (info.journal_device_required) && (info.journal_clean == 0);
+ 
+ 	if (info.consistency_policy == CONSISTENCY_POLICY_PPL)
+-- 
+2.38.1
+

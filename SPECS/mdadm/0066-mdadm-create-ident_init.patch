@@ -1,0 +1,148 @@
+From 7fcbfd7c620e2dcd3b539d18e93cb503ee3a8a62 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Wed, 21 Dec 2022 12:50:17 +0100
+Subject: [PATCH 66/83] mdadm: create ident_init()
+
+Add a wrapper for repeated initializations in mdadm.c and config.c.
+Move includes up.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ config.c | 45 +++++++++++++++++++++++++++++----------------
+ mdadm.c  | 16 ++--------------
+ mdadm.h  |  7 +++++--
+ 3 files changed, 36 insertions(+), 32 deletions(-)
+
+diff --git a/config.c b/config.c
+index dc1620c1..eeedd0c6 100644
+--- a/config.c
++++ b/config.c
+@@ -119,6 +119,34 @@ int match_keyword(char *word)
+ 	return -1;
+ }
+ 
++/**
++ * ident_init() - Set defaults.
++ * @ident: ident pointer, not NULL.
++ */
++inline void ident_init(struct mddev_ident *ident)
++{
++	assert(ident);
++
++	ident->assembled = false;
++	ident->autof = 0;
++	ident->bitmap_fd = -1;
++	ident->bitmap_file = NULL;
++	ident->container = NULL;
++	ident->devices = NULL;
++	ident->devname = NULL;
++	ident->level = UnSet;
++	ident->member = NULL;
++	ident->name[0] = 0;
++	ident->next = NULL;
++	ident->raid_disks = UnSet;
++	ident->spare_group = NULL;
++	ident->spare_disks = 0;
++	ident->st = NULL;
++	ident->super_minor = UnSet;
++	ident->uuid[0] = 0;
++	ident->uuid_set = 0;
++}
++
+ struct conf_dev {
+ 	struct conf_dev *next;
+ 	char *name;
+@@ -363,22 +391,7 @@ void arrayline(char *line)
+ 	struct mddev_ident mis;
+ 	struct mddev_ident *mi;
+ 
+-	mis.uuid_set = 0;
+-	mis.super_minor = UnSet;
+-	mis.level = UnSet;
+-	mis.raid_disks = UnSet;
+-	mis.spare_disks = 0;
+-	mis.devices = NULL;
+-	mis.devname = NULL;
+-	mis.spare_group = NULL;
+-	mis.autof = 0;
+-	mis.next = NULL;
+-	mis.st = NULL;
+-	mis.bitmap_fd = -1;
+-	mis.bitmap_file = NULL;
+-	mis.name[0] = 0;
+-	mis.container = NULL;
+-	mis.member = NULL;
++	ident_init(&mis);
+ 
+ 	for (w = dl_next(line); w != line; w = dl_next(w)) {
+ 		if (w[0] == '/' || strchr(w, '=') == NULL) {
+diff --git a/mdadm.c b/mdadm.c
+index 972adb52..74fdec31 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -107,25 +107,13 @@ int main(int argc, char *argv[])
+ 
+ 	srandom(time(0) ^ getpid());
+ 
+-	ident.uuid_set = 0;
+-	ident.level = UnSet;
+-	ident.raid_disks = UnSet;
+-	ident.super_minor = UnSet;
+-	ident.devices = 0;
+-	ident.spare_group = NULL;
+-	ident.autof = 0;
+-	ident.st = NULL;
+-	ident.bitmap_fd = -1;
+-	ident.bitmap_file = NULL;
+-	ident.name[0] = 0;
+-	ident.container = NULL;
+-	ident.member = NULL;
+-
+ 	if (get_linux_version() < 2006015) {
+ 		pr_err("This version of mdadm does not support kernels older than 2.6.15\n");
+ 		exit(1);
+ 	}
+ 
++	ident_init(&ident);
++
+ 	while ((option_index = -1),
+ 	       (opt = getopt_long(argc, argv, shortopt, long_options,
+ 				  &option_index)) != -1) {
+diff --git a/mdadm.h b/mdadm.h
+index 3673494e..23ffe977 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -33,8 +33,10 @@ extern __off64_t lseek64 __P ((int __fd, __off64_t __offset, int __whence));
+ # endif
+ #endif
+ 
++#include	<assert.h>
+ #include	<sys/types.h>
+ #include	<sys/stat.h>
++#include	<stdarg.h>
+ #include	<stdint.h>
+ #include	<stdlib.h>
+ #include	<time.h>
+@@ -1552,6 +1554,8 @@ extern void enable_fds(int devices);
+ extern void manage_fork_fds(int close_all);
+ extern int continue_via_systemd(char *devnm, char *service_name);
+ 
++extern void ident_init(struct mddev_ident *ident);
++
+ extern int parse_auto(char *str, char *msg, int config);
+ extern struct mddev_ident *conf_get_ident(char *dev);
+ extern struct mddev_dev *conf_get_devs(void);
+@@ -1779,8 +1783,7 @@ static inline sighandler_t signal_s(int sig, sighandler_t handler)
+ #define dprintf_cont(fmt, arg...) \
+         ({ if (0) fprintf(stderr, fmt, ##arg); 0; })
+ #endif
+-#include <assert.h>
+-#include <stdarg.h>
++
+ static inline int xasprintf(char **strp, const char *fmt, ...) {
+ 	va_list ap;
+ 	int ret;
+-- 
+2.38.1
+

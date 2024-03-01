@@ -1,0 +1,55 @@
+From 0f9a4b3e11fbe4f8631d20b1f89cf43e9219db55 Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Mon, 13 Mar 2023 14:42:58 +1100
+Subject: [PATCH 110/120] mdmon: Remove need for KillMode=none
+
+mdmon needs to keep running during the switchroot out of (at boot) and
+then back into (at shutdown) the initrd.  It runs until a new mdmon
+takes over.
+
+Killmode=none is used to achieve this, with the help of --offroot which
+sets argv[0][0] to '@' which systemd understands.
+
+This is needed because mdmon is currently run in system-mdmon.slice
+which conflicts with shutdown.target so without Killmode=none mdmon
+would get killed early in shutdown when system.mdmon.slice is removed.
+
+As described in systemd.service(5), this conflict with shutdown can be
+resolved by explicitly requesting system.slice, which is a natural
+counterpart to DefaultDependencies=no.
+
+So add that, and also add IgnoreOnIsolate=true to avoid another possible
+source of an early death.  With these we no longer need KillMode=none
+which the systemd developers have marked as "deprecated".
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ systemd/mdmon@.service | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index bba9b0eb..303ad05c 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -10,6 +10,9 @@ Description=MD Metadata Monitor on /dev/%I
+ DefaultDependencies=no
+ Before=initrd-switch-root.target
+ Documentation=man:mdmon(8)
++# Allow mdmon to keep running after switchroot, until a new
++# instance is started.
++IgnoreOnIsolate=true
+ 
+ [Service]
+ # mdmon should never complain due to lack of a platform,
+@@ -25,4 +28,6 @@ ExecStart=BINDIR/mdmon --foreground --offroot --takeover %I
+ # it out) and systemd will remove it when transitioning from
+ # initramfs to rootfs.
+ #PIDFile=/run/mdadm/%I.pid
+-KillMode=none
++# The default slice is system-mdmon.slice which Conflicts
++# with shutdown, causing mdmon to exit early.  So use system.slice.
++Slice=system.slice
+-- 
+2.38.1
+

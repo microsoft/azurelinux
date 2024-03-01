@@ -1,0 +1,316 @@
+From 239b3cc0b5da87e966746533b1873c439db54b16 Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Fri, 12 Aug 2022 16:36:02 +0200
+Subject: [PATCH 45/83] mdadm: Replace obsolete usleep with nanosleep
+
+According to POSIX.1-2001, usleep is considered obsolete.
+Replace it with a wrapper that uses nanosleep, as recommended in man.
+Add handy macros for conversions between msec, usec and nsec.
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Assemble.c    |  2 +-
+ Grow.c        |  4 ++--
+ Manage.c      | 10 +++++-----
+ managemon.c   |  8 ++++----
+ mdadm.h       |  4 ++++
+ mdmon.c       |  4 ++--
+ super-intel.c |  6 +++---
+ util.c        | 42 +++++++++++++++++++++++++++++++++---------
+ 8 files changed, 54 insertions(+), 26 deletions(-)
+
+diff --git a/Assemble.c b/Assemble.c
+index 6df6bfbc..be2160b4 100644
+--- a/Assemble.c
++++ b/Assemble.c
+@@ -1947,7 +1947,7 @@ out:
+ 						break;
+ 					close(mdfd);
+ 				}
+-				usleep(usecs);
++				sleep_for(0, USEC_TO_NSEC(usecs), true);
+ 				usecs <<= 1;
+ 			}
+ 		}
+diff --git a/Grow.c b/Grow.c
+index 97f22c75..5780635a 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -954,7 +954,7 @@ int start_reshape(struct mdinfo *sra, int already_running,
+ 			err = sysfs_set_str(sra, NULL, "sync_action",
+ 					    "reshape");
+ 			if (err)
+-				sleep(1);
++				sleep_for(1, 0, true);
+ 		} while (err && errno == EBUSY && cnt-- > 0);
+ 	}
+ 	return err;
+@@ -5058,7 +5058,7 @@ int Grow_continue_command(char *devname, int fd,
+ 			}
+ 			st->ss->getinfo_super(st, content, NULL);
+ 			if (!content->reshape_active)
+-				sleep(3);
++				sleep_for(3, 0, true);
+ 			else
+ 				break;
+ 		} while (cnt-- > 0);
+diff --git a/Manage.c b/Manage.c
+index e5e6abe4..a142f8bd 100644
+--- a/Manage.c
++++ b/Manage.c
+@@ -244,7 +244,7 @@ int Manage_stop(char *devname, int fd, int verbose, int will_retry)
+ 					    "array_state",
+ 					    "inactive")) < 0 &&
+ 		       errno == EBUSY) {
+-			usleep(200000);
++			sleep_for(0, MSEC_TO_NSEC(200), true);
+ 			count--;
+ 		}
+ 		if (err) {
+@@ -328,7 +328,7 @@ int Manage_stop(char *devname, int fd, int verbose, int will_retry)
+ 		       sysfs_get_ll(mdi, NULL, "sync_max", &old_sync_max) == 0) {
+ 			/* must be in the critical section - wait a bit */
+ 			delay -= 1;
+-			usleep(100000);
++			sleep_for(0, MSEC_TO_NSEC(100), true);
+ 		}
+ 
+ 		if (sysfs_set_str(mdi, NULL, "sync_action", "frozen") != 0)
+@@ -405,7 +405,7 @@ int Manage_stop(char *devname, int fd, int verbose, int will_retry)
+ 				 * quite started yet.  Wait a bit and
+ 				 * check  'sync_action' to see.
+ 				 */
+-				usleep(10000);
++				sleep_for(0, MSEC_TO_NSEC(10), true);
+ 				sysfs_get_str(mdi, NULL, "sync_action", buf, sizeof(buf));
+ 				if (strncmp(buf, "reshape", 7) != 0)
+ 					break;
+@@ -447,7 +447,7 @@ done:
+ 	count = 25; err = 0;
+ 	while (count && fd >= 0 &&
+ 	       (err = ioctl(fd, STOP_ARRAY, NULL)) < 0 && errno == EBUSY) {
+-		usleep(200000);
++		sleep_for(0, MSEC_TO_NSEC(200), true);
+ 		count --;
+ 	}
+ 	if (fd >= 0 && err) {
+@@ -1105,7 +1105,7 @@ int Manage_remove(struct supertype *tst, int fd, struct mddev_dev *dv,
+ 				ret = sysfs_unique_holder(devnm, rdev);
+ 				if (ret < 2)
+ 					break;
+-				usleep(100 * 1000);	/* 100ms */
++				sleep_for(0, MSEC_TO_NSEC(100), true);
+ 			} while (--count > 0);
+ 
+ 			if (ret == 0) {
+diff --git a/managemon.c b/managemon.c
+index 0e9bdf00..a7bfa8f6 100644
+--- a/managemon.c
++++ b/managemon.c
+@@ -207,7 +207,7 @@ static void replace_array(struct supertype *container,
+ 	remove_old();
+ 	while (pending_discard) {
+ 		while (discard_this == NULL)
+-			sleep(1);
++			sleep_for(1, 0, true);
+ 		remove_old();
+ 	}
+ 	pending_discard = old;
+@@ -568,7 +568,7 @@ static void manage_member(struct mdstat_ent *mdstat,
+ 		updates = NULL;
+ 		while (update_queue_pending || update_queue) {
+ 			check_update_queue(container);
+-			usleep(15*1000);
++			sleep_for(0, MSEC_TO_NSEC(15), true);
+ 		}
+ 		replace_array(container, a, newa);
+ 		if (sysfs_set_str(&a->info, NULL,
+@@ -822,7 +822,7 @@ static void handle_message(struct supertype *container, struct metadata_update *
+ 	if (msg->len <= 0)
+ 		while (update_queue_pending || update_queue) {
+ 			check_update_queue(container);
+-			usleep(15*1000);
++			sleep_for(0, MSEC_TO_NSEC(15), true);
+ 		}
+ 
+ 	if (msg->len == 0) { /* ping_monitor */
+@@ -836,7 +836,7 @@ static void handle_message(struct supertype *container, struct metadata_update *
+ 		wakeup_monitor();
+ 
+ 		while (monitor_loop_cnt - cnt < 0)
+-			usleep(10 * 1000);
++			sleep_for(0, MSEC_TO_NSEC(10), true);
+ 	} else if (msg->len == -1) { /* ping_manager */
+ 		struct mdstat_ent *mdstat = mdstat_read(1, 0);
+ 
+diff --git a/mdadm.h b/mdadm.h
+index 163f4a49..add9c0b6 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -1720,6 +1720,10 @@ extern int cluster_get_dlmlock(void);
+ extern int cluster_release_dlmlock(void);
+ extern void set_dlm_hooks(void);
+ 
++#define MSEC_TO_NSEC(msec) ((msec) * 1000000)
++#define USEC_TO_NSEC(usec) ((usec) * 1000)
++extern void sleep_for(unsigned int sec, long nsec, bool wake_after_interrupt);
++
+ #define _ROUND_UP(val, base)	(((val) + (base) - 1) & ~(base - 1))
+ #define ROUND_UP(val, base)	_ROUND_UP(val, (typeof(val))(base))
+ #define ROUND_UP_PTR(ptr, base)	((typeof(ptr)) \
+diff --git a/mdmon.c b/mdmon.c
+index c057da63..e9d035eb 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -99,7 +99,7 @@ static int clone_monitor(struct supertype *container)
+ 	if (rc)
+ 		return rc;
+ 	while (mon_tid == -1)
+-		usleep(10);
++		sleep_for(0, USEC_TO_NSEC(10), true);
+ 	pthread_attr_destroy(&attr);
+ 
+ 	mgr_tid = syscall(SYS_gettid);
+@@ -209,7 +209,7 @@ static void try_kill_monitor(pid_t pid, char *devname, int sock)
+ 		rv = kill(pid, SIGUSR1);
+ 		if (rv < 0)
+ 			break;
+-		usleep(200000);
++		sleep_for(0, MSEC_TO_NSEC(200), true);
+ 	}
+ }
+ 
+diff --git a/super-intel.c b/super-intel.c
+index 4ddfcf94..4d82af3d 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -5275,7 +5275,7 @@ static int get_super_block(struct intel_super **super_list, char *devnm, char *d
+ 	/* retry the load if we might have raced against mdmon */
+ 	if (err == 3 && devnm && mdmon_running(devnm))
+ 		for (retry = 0; retry < 3; retry++) {
+-			usleep(3000);
++			sleep_for(0, MSEC_TO_NSEC(3), true);
+ 			err = load_and_parse_mpb(dfd, s, NULL, keep_fd);
+ 			if (err != 3)
+ 				break;
+@@ -5377,7 +5377,7 @@ static int load_super_imsm(struct supertype *st, int fd, char *devname)
+ 
+ 		if (mdstat && mdmon_running(mdstat->devnm) && getpid() != mdmon_pid(mdstat->devnm)) {
+ 			for (retry = 0; retry < 3; retry++) {
+-				usleep(3000);
++				sleep_for(0, MSEC_TO_NSEC(3), true);
+ 				rv = load_and_parse_mpb(fd, super, devname, 0);
+ 				if (rv != 3)
+ 					break;
+@@ -12084,7 +12084,7 @@ int wait_for_reshape_imsm(struct mdinfo *sra, int ndata)
+ 				close(fd);
+ 				return 1;
+ 			}
+-			usleep(30000);
++			sleep_for(0, MSEC_TO_NSEC(30), true);
+ 		} else
+ 			break;
+ 	} while (retry--);
+diff --git a/util.c b/util.c
+index 38f0420e..ca48d976 100644
+--- a/util.c
++++ b/util.c
+@@ -166,7 +166,7 @@ retry:
+ 		pr_err("error %d when get PW mode on lock %s\n", errno, str);
+ 		/* let's try several times if EAGAIN happened */
+ 		if (dlm_lock_res->lksb.sb_status == EAGAIN && retry_count < 10) {
+-			sleep(10);
++			sleep_for(10, 0, true);
+ 			retry_count++;
+ 			goto retry;
+ 		}
+@@ -1085,7 +1085,7 @@ int open_dev_excl(char *devnm)
+ 	int i;
+ 	int flags = O_RDWR;
+ 	dev_t devid = devnm2devid(devnm);
+-	long delay = 1000;
++	unsigned int delay = 1; // miliseconds
+ 
+ 	sprintf(buf, "%d:%d", major(devid), minor(devid));
+ 	for (i = 0; i < 25; i++) {
+@@ -1098,8 +1098,8 @@ int open_dev_excl(char *devnm)
+ 		}
+ 		if (errno != EBUSY)
+ 			return fd;
+-		usleep(delay);
+-		if (delay < 200000)
++		sleep_for(0, MSEC_TO_NSEC(delay), true);
++		if (delay < 200)
+ 			delay *= 2;
+ 	}
+ 	return -1;
+@@ -1123,7 +1123,7 @@ void wait_for(char *dev, int fd)
+ {
+ 	int i;
+ 	struct stat stb_want;
+-	long delay = 1000;
++	unsigned int delay = 1; // miliseconds
+ 
+ 	if (fstat(fd, &stb_want) != 0 ||
+ 	    (stb_want.st_mode & S_IFMT) != S_IFBLK)
+@@ -1135,8 +1135,8 @@ void wait_for(char *dev, int fd)
+ 		    (stb.st_mode & S_IFMT) == S_IFBLK &&
+ 		    (stb.st_rdev == stb_want.st_rdev))
+ 			return;
+-		usleep(delay);
+-		if (delay < 200000)
++		sleep_for(0, MSEC_TO_NSEC(delay), true);
++		if (delay < 200)
+ 			delay *= 2;
+ 	}
+ 	if (i == 25)
+@@ -1821,7 +1821,7 @@ int hot_remove_disk(int mdfd, unsigned long dev, int force)
+ 	while ((ret = ioctl(mdfd, HOT_REMOVE_DISK, dev)) == -1 &&
+ 	       errno == EBUSY &&
+ 	       cnt-- > 0)
+-		usleep(10000);
++		sleep_for(0, MSEC_TO_NSEC(10), true);
+ 
+ 	return ret;
+ }
+@@ -1834,7 +1834,7 @@ int sys_hot_remove_disk(int statefd, int force)
+ 	while ((ret = write(statefd, "remove", 6)) == -1 &&
+ 	       errno == EBUSY &&
+ 	       cnt-- > 0)
+-		usleep(10000);
++		sleep_for(0, MSEC_TO_NSEC(10), true);
+ 	return ret == 6 ? 0 : -1;
+ }
+ 
+@@ -2375,3 +2375,27 @@ out:
+ 	close(fd_zero);
+ 	return ret;
+ }
++
++/**
++ * sleep_for() - Sleeps for specified time.
++ * @sec: Seconds to sleep for.
++ * @nsec: Nanoseconds to sleep for, has to be less than one second.
++ * @wake_after_interrupt: If set, wake up if interrupted.
++ *
++ * Function immediately returns if error different than EINTR occurs.
++ */
++void sleep_for(unsigned int sec, long nsec, bool wake_after_interrupt)
++{
++	struct timespec delay = {.tv_sec = sec, .tv_nsec = nsec};
++
++	assert(nsec < MSEC_TO_NSEC(1000));
++
++	do {
++		errno = 0;
++		nanosleep(&delay, &delay);
++		if (errno != 0 && errno != EINTR) {
++			pr_err("Error sleeping for %us %ldns: %s\n", sec, nsec, strerror(errno));
++			return;
++		}
++	} while (!wake_after_interrupt && errno == EINTR);
++}
+-- 
+2.38.1
+

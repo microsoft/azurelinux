@@ -1,0 +1,110 @@
+From 63902857b98c37c8ac4b837bb01d006b327a4532 Mon Sep 17 00:00:00 2001
+From: Heming Zhao <heming.zhao@suse.com>
+Date: Tue, 21 Jun 2022 00:10:40 +0800
+Subject: [PATCH 22/83] mdadm/super1: restore commit 45a87c2f31335 to fix
+ clustered slot issue
+
+Commit 9d67f6496c71 ("mdadm:check the nodes when operate clustered
+array") modified assignment logic for st->nodes in write_bitmap1(),
+which introduced bitmap slot issue:
+
+load_super1 didn't set up supertype.nodes, which made spare disk only
+have one slot info. Then it triggered kernel md_bitmap_load_sb to get
+wrong bitmap slot data.
+
+For fixing this issue, there are two methods:
+
+1> revert the related code of commit 9d67f6496c71. and restore the code
+   from former commit 45a87c2f31335 ("super1: add more checks for
+   NodeNumUpdate option").
+   st->nodes value would be 0 & 1 under current code logic. i.e.
+   When adding a spare disk, there is no place to init st->nodes, and
+   the value is ZERO.
+
+2> keep 9d67f6496c71, add additional ->nodes handling in load_super1(),
+   let load_super1 to set st->nodes when bitmap is BITMAP_MAJOR_CLUSTERED.
+   Under current mdadm code logic, load_super1 will be called many
+   times, any new code in load_super1 will cost mdadm running more time.
+   And more reason is I prefer as much as possible to limit clustered
+   code spreading in every corner.
+
+So I used method <1> to fix this issue.
+
+How to trigger:
+
+dd if=/dev/zero bs=1M count=1 oflag=direct of=/dev/sda
+dd if=/dev/zero bs=1M count=1 oflag=direct of=/dev/sdb
+dd if=/dev/zero bs=1M count=1 oflag=direct of=/dev/sdc
+mdadm -C /dev/md0 -b clustered -e 1.2 -n 2 -l mirror /dev/sda /dev/sdb
+mdadm -a /dev/md0 /dev/sdc
+mdadm /dev/md0 --fail /dev/sda
+mdadm /dev/md0 --remove /dev/sda
+mdadm -Ss
+mdadm -A /dev/md0 /dev/sdb /dev/sdc
+
+the output of current "mdadm -X /dev/sdc":
+(there should be (by default) 4 slot info for correct output)
+```
+        Filename : /dev/sdc
+           Magic : 6d746962
+         Version : 5
+            UUID : a74642f8:a6b1fba8:58e1f8db:cfe7b082
+          Events : 29
+  Events Cleared : 0
+           State : OK
+       Chunksize : 64 MB
+          Daemon : 5s flush period
+      Write Mode : Normal
+       Sync Size : 306176 (299.00 MiB 313.52 MB)
+          Bitmap : 5 bits (chunks), 5 dirty (100.0%)
+```
+
+And mdadm later operations will trigger kernel output error message:
+(triggered by "mdadm -A /dev/md0 /dev/sdb /dev/sdc")
+```
+kernel: md0: invalid bitmap file superblock: bad magic
+kernel: md_bitmap_copy_from_slot can't get bitmap from slot 1
+kernel: md-cluster: Could not gather bitmaps from slot 1
+kernel: md0: invalid bitmap file superblock: bad magic
+kernel: md_bitmap_copy_from_slot can't get bitmap from slot 2
+kernel: md-cluster: Could not gather bitmaps from slot 2
+kernel: md0: invalid bitmap file superblock: bad magic
+kernel: md_bitmap_copy_from_slot can't get bitmap from slot 3
+kernel: md-cluster: Could not gather bitmaps from slot 3
+kernel: md-cluster: failed to gather all resyn infos
+kernel: md0: detected capacity change from 0 to 612352
+```
+
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Heming Zhao <heming.zhao@suse.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super1.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/super1.c b/super1.c
+index e3e2f954..3a0c69fd 100644
+--- a/super1.c
++++ b/super1.c
+@@ -2674,7 +2674,17 @@ static int write_bitmap1(struct supertype *st, int fd, enum bitmap_update update
+ 		}
+ 
+ 		if (bms->version == BITMAP_MAJOR_CLUSTERED) {
+-			if (__cpu_to_le32(st->nodes) < bms->nodes) {
++			if (st->nodes == 1) {
++				/* the parameter for nodes is not valid */
++				pr_err("Warning: cluster-md at least needs two nodes\n");
++				return -EINVAL;
++			} else if (st->nodes == 0) {
++				/*
++				 * parameter "--nodes" is not specified, (eg, add a disk to
++				 * clustered raid)
++				 */
++				break;
++			} else if (__cpu_to_le32(st->nodes) < bms->nodes) {
+ 				/*
+ 				 * Since the nodes num is not increased, no
+ 				 * need to check the space enough or not,
+-- 
+2.38.1
+

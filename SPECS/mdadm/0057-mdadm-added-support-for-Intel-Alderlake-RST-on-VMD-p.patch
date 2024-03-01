@@ -1,0 +1,64 @@
+From ea7a02a3294aae223e1329aed5da7f4aa3ac05c5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Old=C5=99ich=20Jedli=C4=8Dka?= <oldium.pro@gmail.com>
+Date: Wed, 31 Aug 2022 19:57:29 +0200
+Subject: [PATCH 57/83] mdadm: added support for Intel Alderlake RST on VMD
+ platform
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Alderlake RST on VMD uses RstVmdV UEFI variable name, so detect it.
+
+Signed-off-by: Oldřich Jedlička <oldium.pro@gmail.com>
+Reviewed-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ platform-intel.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/platform-intel.c b/platform-intel.c
+index 5a8729e7..757f0b1b 100644
+--- a/platform-intel.c
++++ b/platform-intel.c
+@@ -512,7 +512,8 @@ static const struct imsm_orom *find_imsm_hba_orom(struct sys_dev *hba)
+ #define AHCI_PROP "RstSataV"
+ #define AHCI_SSATA_PROP "RstsSatV"
+ #define AHCI_TSATA_PROP "RsttSatV"
+-#define VMD_PROP "RstUefiV"
++#define VROC_VMD_PROP "RstUefiV"
++#define RST_VMD_PROP "RstVmdV"
+ 
+ #define VENDOR_GUID \
+ 	EFI_GUID(0x193dfefa, 0xa445, 0x4302, 0x99, 0xd8, 0xef, 0x3a, 0xad, 0x1a, 0x04, 0xc6)
+@@ -605,6 +606,7 @@ const struct imsm_orom *find_imsm_efi(struct sys_dev *hba)
+ 	struct orom_entry *ret;
+ 	static const char * const sata_efivars[] = {AHCI_PROP, AHCI_SSATA_PROP,
+ 						    AHCI_TSATA_PROP};
++	static const char * const vmd_efivars[] = {VROC_VMD_PROP, RST_VMD_PROP};
+ 	unsigned long i;
+ 
+ 	if (check_env("IMSM_TEST_AHCI_EFI") || check_env("IMSM_TEST_SCU_EFI"))
+@@ -636,10 +638,16 @@ const struct imsm_orom *find_imsm_efi(struct sys_dev *hba)
+ 
+ 		break;
+ 	case SYS_DEV_VMD:
+-		if (!read_efi_variable(&orom, sizeof(orom), VMD_PROP,
+-				       VENDOR_GUID))
+-			break;
+-		return NULL;
++		for (i = 0; i < ARRAY_SIZE(vmd_efivars); i++) {
++			if (!read_efi_variable(&orom, sizeof(orom),
++						vmd_efivars[i], VENDOR_GUID))
++				break;
++		}
++
++		if (i == ARRAY_SIZE(vmd_efivars))
++			return NULL;
++
++		break;
+ 	default:
+ 		return NULL;
+ 	}
+-- 
+2.38.1
+

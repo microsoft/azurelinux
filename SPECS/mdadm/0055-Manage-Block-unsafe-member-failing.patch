@@ -1,0 +1,91 @@
+From fc6fd4063769f4194c3fb8f77b32b2819e140fb9 Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Thu, 18 Aug 2022 11:47:21 +0200
+Subject: [PATCH 55/83] Manage: Block unsafe member failing
+
+Kernel may or may not block mdadm from removing member device if it
+will cause arrays failed state. It depends on raid personality
+implementation in kernel.
+Add verification on requested removal path (#mdadm --set-faulty
+command).
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Manage.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
+
+diff --git a/Manage.c b/Manage.c
+index a142f8bd..b1d0e630 100644
+--- a/Manage.c
++++ b/Manage.c
+@@ -1285,6 +1285,50 @@ int Manage_with(struct supertype *tst, int fd, struct mddev_dev *dv,
+ 	return -1;
+ }
+ 
++/**
++ * is_remove_safe() - Check if remove is safe.
++ * @array: Array info.
++ * @fd: Array file descriptor.
++ * @devname: Name of device to remove.
++ * @verbose: Verbose.
++ *
++ * The function determines if array will be operational
++ * after removing &devname.
++ *
++ * Return: True if array will be operational, false otherwise.
++ */
++bool is_remove_safe(mdu_array_info_t *array, const int fd, char *devname, const int verbose)
++{
++	dev_t devid = devnm2devid(devname + 5);
++	struct mdinfo *mdi = sysfs_read(fd, NULL, GET_DEVS | GET_DISKS | GET_STATE);
++
++	if (!mdi) {
++		if (verbose)
++			pr_err("Failed to read sysfs attributes for %s\n", devname);
++		return false;
++	}
++
++	char *avail = xcalloc(array->raid_disks, sizeof(char));
++
++	for (mdi = mdi->devs; mdi; mdi = mdi->next) {
++		if (mdi->disk.raid_disk < 0)
++			continue;
++		if (!(mdi->disk.state & (1 << MD_DISK_SYNC)))
++			continue;
++		if (makedev(mdi->disk.major, mdi->disk.minor) == devid)
++			continue;
++		avail[mdi->disk.raid_disk] = 1;
++	}
++	sysfs_free(mdi);
++
++	bool is_enough = enough(array->level, array->raid_disks,
++				array->layout, (array->state & 1),
++				avail);
++
++	free(avail);
++	return is_enough;
++}
++
+ int Manage_subdevs(char *devname, int fd,
+ 		   struct mddev_dev *devlist, int verbose, int test,
+ 		   char *update, int force)
+@@ -1598,7 +1642,14 @@ int Manage_subdevs(char *devname, int fd,
+ 			break;
+ 
+ 		case 'f': /* set faulty */
+-			/* FIXME check current member */
++			if (!is_remove_safe(&array, fd, dv->devname, verbose)) {
++				pr_err("Cannot remove %s from %s, array will be failed.\n",
++				       dv->devname, devname);
++				if (sysfd >= 0)
++					close(sysfd);
++				goto abort;
++			}
++
+ 			if ((sysfd >= 0 && write(sysfd, "faulty", 6) != 6) ||
+ 			    (sysfd < 0 && ioctl(fd, SET_DISK_FAULTY,
+ 						rdev))) {
+-- 
+2.38.1
+

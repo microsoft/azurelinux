@@ -1,0 +1,59 @@
+From 461fae7e7809670d286cc19aac5bfa861c29f93a Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Tue, 27 Dec 2022 06:50:43 +0100
+Subject: [PATCH 81/83] incremental, manage: do not verify if remove is safe
+
+Function is_remove_safe() was introduced to verify if removing
+member device won't cause failed state of the array. This
+verification should be used only with set-faulty command. Add
+special mode indicating that Incremental removal was executed.
+If this mode is used do not execute is_remove_safe() routine.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Incremental.c | 2 +-
+ Manage.c      | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/Incremental.c b/Incremental.c
+index ff3548c0..09b94b9f 100644
+--- a/Incremental.c
++++ b/Incremental.c
+@@ -1744,7 +1744,7 @@ int IncrementalRemove(char *devname, char *id_path, int verbose)
+ 
+ 	memset(&devlist, 0, sizeof(devlist));
+ 	devlist.devname = devname;
+-	devlist.disposition = 'f';
++	devlist.disposition = 'I';
+ 	/* for a container, we must fail each member array */
+ 	if (ent->metadata_version &&
+ 	    strncmp(ent->metadata_version, "external:", 9) == 0) {
+diff --git a/Manage.c b/Manage.c
+index 4d6e54b1..6184d3f7 100644
+--- a/Manage.c
++++ b/Manage.c
+@@ -1494,8 +1494,9 @@ int Manage_subdevs(char *devname, int fd,
+ 			/* Assume this is a kernel-internal name like 'sda1' */
+ 			int found = 0;
+ 			char dname[55];
+-			if (dv->disposition != 'r' && dv->disposition != 'f') {
+-				pr_err("%s only meaningful with -r or -f, not -%c\n",
++			if (dv->disposition != 'r' && dv->disposition != 'f' &&
++			    dv->disposition != 'I') {
++				pr_err("%s only meaningful with -r, -f or -I, not -%c\n",
+ 					dv->devname, dv->disposition);
+ 				goto abort;
+ 			}
+@@ -1647,7 +1648,7 @@ int Manage_subdevs(char *devname, int fd,
+ 					close(sysfd);
+ 				goto abort;
+ 			}
+-
++		case 'I': /* incremental fail */
+ 			if ((sysfd >= 0 && write(sysfd, "faulty", 6) != 6) ||
+ 			    (sysfd < 0 && ioctl(fd, SET_DISK_FAULTY,
+ 						rdev))) {
+-- 
+2.38.1
+

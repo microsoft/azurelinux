@@ -1,0 +1,30 @@
+From 42e02e613fb0b4a2c0c0d984b9e6e2933875bb44 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 22 Jul 2022 08:43:47 +0200
+Subject: [PATCH 27/83] mdadm: Fix array size mismatch after grow
+
+imsm_fix_size_mismatch() is invoked to fix the problem, but it couldn't
+proceed due to migration check. This patch allows for intended behavior.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super-intel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 8ffe485c..76b947f5 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -11854,7 +11854,7 @@ static int imsm_fix_size_mismatch(struct supertype *st, int subarray_index)
+ 		unsigned long long d_size = imsm_dev_size(dev);
+ 		int u_size;
+ 
+-		if (calc_size == d_size || dev->vol.migr_type == MIGR_GEN_MIGR)
++		if (calc_size == d_size)
+ 			continue;
+ 
+ 		/* There is a difference, confirm that imsm_dev_size is
+-- 
+2.38.1
+

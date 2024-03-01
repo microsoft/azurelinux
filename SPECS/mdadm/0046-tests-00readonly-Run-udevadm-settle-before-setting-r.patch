@@ -1,0 +1,36 @@
+From 39b381252c32275079344d30de18b76fda4bba26 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 27 Jul 2022 15:52:45 -0600
+Subject: [PATCH 46/83] tests/00readonly: Run udevadm settle before setting ro
+
+In some recent kernel versions, 00readonly fails with:
+
+  mdadm: failed to set readonly for /dev/md0: Device or resource busy
+  ERROR: array is not read-only!
+
+This was traced down to a race condition with udev holding a reference
+to the block device at the same time as trying to set it read only.
+
+To fix this, call udevadm settle before setting the array read only.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ tests/00readonly | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/00readonly b/tests/00readonly
+index 39202487..afe243b3 100644
+--- a/tests/00readonly
++++ b/tests/00readonly
+@@ -12,6 +12,7 @@ do
+ 			$dev1 $dev2 $dev3 $dev4 --assume-clean
+ 		check nosync
+ 		check $level
++		udevadm settle
+ 		mdadm -ro $md0
+ 		check readonly
+ 		state=$(cat /sys/block/md0/md/array_state)
+-- 
+2.38.1
+

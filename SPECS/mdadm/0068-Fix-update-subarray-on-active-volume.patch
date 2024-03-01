@@ -1,0 +1,54 @@
+From db10eab68e652f141169b7240e057d110d626c3d Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Mon, 2 Jan 2023 09:35:16 +0100
+Subject: [PATCH 68/83] Fix --update-subarray on active volume
+
+Options: bitmap, ppl and name should not be updated when array is active.
+Those features are mutually exclusive and share the same data area in IMSM (danger of overwriting by kernel).
+Remove check for active subarrays from super-intel.
+Since ddf is not supported, apply it globally for all options.
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Manage.c      | 7 +++++++
+ super-intel.c | 5 -----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/Manage.c b/Manage.c
+index b1d0e630..5a9ea316 100644
+--- a/Manage.c
++++ b/Manage.c
+@@ -1745,6 +1745,13 @@ int Update_subarray(char *dev, char *subarray, char *update, struct mddev_ident
+ 		goto free_super;
+ 	}
+ 
++	if (is_subarray_active(subarray, st->devnm)) {
++		if (verbose >= 0)
++			pr_err("Subarray %s in %s is active, cannot update %s\n",
++			       subarray, dev, update);
++		goto free_super;
++	}
++
+ 	if (mdmon_running(st->devnm))
+ 		st->update_tail = &st->updates;
+ 
+diff --git a/super-intel.c b/super-intel.c
+index b0565610..5f93f3d3 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -7914,11 +7914,6 @@ static int update_subarray_imsm(struct supertype *st, char *subarray,
+ 		char *ep;
+ 		int vol;
+ 
+-		if (is_subarray_active(subarray, st->devnm)) {
+-			pr_err("Unable to update name of active subarray\n");
+-			return 2;
+-		}
+-
+ 		if (!check_name(super, name, 0))
+ 			return 2;
+ 
+-- 
+2.38.1
+

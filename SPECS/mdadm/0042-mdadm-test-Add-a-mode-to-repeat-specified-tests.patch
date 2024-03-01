@@ -1,0 +1,88 @@
+From a7bfcc716e235664dfb3b6c5a9590273e611ac72 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:17 -0600
+Subject: [PATCH 42/83] mdadm/test: Add a mode to repeat specified tests
+
+Many tests fail infrequently or rarely. To help find these, add
+an option to run the tests multiple times by specifying --loop=N.
+
+If --loop=0 is specified, the test will be looped forever.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ test | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
+
+diff --git a/test b/test
+index 711a3c7a..da6db5e0 100755
+--- a/test
++++ b/test
+@@ -10,6 +10,7 @@ devlist=
+ 
+ savelogs=0
+ exitonerror=1
++loop=1
+ prefix='[0-9][0-9]'
+ 
+ # use loop devices by default if doesn't specify --dev
+@@ -117,6 +118,7 @@ do_help() {
+ 		--logdir=directory          Directory to save all logfiles in
+ 		--save-logs                 Usually use with --logdir together
+ 		--keep-going | --no-error   Don't stop on error, ie. run all tests
++		--loop=N                    Run tests N times (0 to run forever)
+ 		--dev=loop|lvm|ram|disk     Use loop devices (default), LVM, RAM or disk
+ 		--disks=                    Provide a bunch of physical devices for test
+ 		--volgroup=name             LVM volume group for LVM test
+@@ -211,6 +213,9 @@ parse_args() {
+ 		--keep-going | --no-error )
+ 			exitonerror=0
+ 			;;
++		--loop=* )
++			loop="${i##*=}"
++			;;
+ 		--disable-multipath )
+ 			unset MULTIPATH
+ 			;;
+@@ -263,19 +268,26 @@ main() {
+ 	echo "Testing on linux-$(uname -r) kernel"
+ 	[ "$savelogs" == "1" ] &&
+ 		echo "Saving logs to $logdir"
+-	if [ "x$TESTLIST" != "x" ]
+-	then
+-		for script in ${TESTLIST[@]}
+-		do
+-			do_test $testdir/$script
+-		done
+-	else
+-		for script in $testdir/$prefix $testdir/$prefix*[^~]
+-		do
+-			do_test $script
+-		done
+-	fi
+ 
++	while true; do
++		if [ "x$TESTLIST" != "x" ]
++		then
++			for script in ${TESTLIST[@]}
++			do
++				do_test $testdir/$script
++			done
++		else
++			for script in $testdir/$prefix $testdir/$prefix*[^~]
++			do
++				do_test $script
++			done
++		fi
++
++		let loop=$loop-1
++		if [ "$loop" == "0" ]; then
++			break
++		fi
++	done
+ 	exit 0
+ }
+ 
+-- 
+2.38.1
+

@@ -1,0 +1,86 @@
+From 9b429fc0a4ffd7028b3b336589d38e32fb9045dc Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Mon, 2 Jan 2023 09:46:21 +0100
+Subject: [PATCH 77/83] mdmon: fix segfault
+
+Mdmon crashes if stat2devnm returns null.
+Use open_mddev to check if device is mddevice and get name using
+fd2devnm.
+Refactor container name handling.
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Makefile |  2 +-
+ mdmon.c  | 26 ++++++++++++--------------
+ 2 files changed, 13 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ec1f99ed..5eac1a4e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -160,7 +160,7 @@ SRCS =  $(patsubst %.o,%.c,$(OBJS))
+ 
+ INCL = mdadm.h part.h bitmap.h
+ 
+-MON_OBJS = mdmon.o monitor.o managemon.o uuid.o util.o maps.o mdstat.o sysfs.o \
++MON_OBJS = mdmon.o monitor.o managemon.o uuid.o util.o maps.o mdstat.o sysfs.o config.o mapfile.o mdopen.o\
+ 	policy.o lib.o \
+ 	Kill.o sg_io.o dlink.o ReadMe.o super-intel.o \
+ 	super-mbr.o super-gpt.o \
+diff --git a/mdmon.c b/mdmon.c
+index e9d035eb..ecf52dc8 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -363,14 +363,14 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	if (all == 0 && container_name == NULL) {
+-		if (argv[optind])
+-			container_name = argv[optind];
++		if (argv[optind]) {
++			container_name = get_md_name(argv[optind]);
++			if (!container_name)
++				container_name = argv[optind];
++		}
+ 	}
+ 
+-	if (container_name == NULL)
+-		usage();
+-
+-	if (argc - optind > 1)
++	if (container_name == NULL || argc - optind > 1)
+ 		usage();
+ 
+ 	if (strcmp(container_name, "/proc/mdstat") == 0)
+@@ -402,21 +402,19 @@ int main(int argc, char *argv[])
+ 		free_mdstat(mdstat);
+ 
+ 		return status;
+-	} else if (strncmp(container_name, "md", 2) == 0) {
+-		int id = devnm2devid(container_name);
+-		if (id)
+-			devnm = container_name;
+ 	} else {
+-		struct stat st;
++		int mdfd = open_mddev(container_name, 1);
+ 
+-		if (stat(container_name, &st) == 0)
+-			devnm = xstrdup(stat2devnm(&st));
++		if (mdfd < 0)
++			return 1;
++		devnm = fd2devnm(mdfd);
++		close(mdfd);
+ 	}
+ 
+ 	if (!devnm) {
+ 		pr_err("%s is not a valid md device name\n",
+ 			container_name);
+-		exit(1);
++		return 1;
+ 	}
+ 	return mdmon(devnm, dofork && do_fork(), takeover);
+ }
+-- 
+2.38.1
+

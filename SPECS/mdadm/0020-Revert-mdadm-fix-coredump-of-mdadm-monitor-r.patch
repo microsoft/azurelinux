@@ -1,0 +1,85 @@
+From 190dc029b141c423e724566cbed5d5afbb10b05a Mon Sep 17 00:00:00 2001
+From: Nigel Croxon <ncroxon@redhat.com>
+Date: Mon, 18 Apr 2022 13:44:23 -0400
+Subject: [PATCH 20/83] Revert "mdadm: fix coredump of mdadm --monitor -r"
+
+This reverts commit 546047688e1c64638f462147c755b58119cabdc8.
+
+The change from commit mdadm: fix coredump of mdadm
+--monitor -r broke the printing of the return message when
+passing -r to mdadm --manage, the removal of a device from
+an array.
+
+If the current code reverts this commit, both issues are
+still fixed.
+
+The original problem reported that the fix tried to address
+was:  The --monitor -r option requires a parameter,
+otherwise a null pointer will be manipulated when
+converting to integer data, and a core dump will appear.
+
+The original problem was really fixed with:
+60815698c0a Refactor parse_num and use it to parse optarg.
+Which added a check for NULL in 'optarg' before moving it
+to the 'increments' variable.
+
+New issue: When trying to remove a device using the short
+argument -r, instead of the long argument --remove, the
+output is empty. The problem started when commit
+546047688e1c was added.
+
+Steps to Reproduce:
+1. create/assemble /dev/md0 device
+2. mdadm --manage /dev/md0 -r /dev/vdxx
+
+Actual results:
+Nothing, empty output, nothing happens, the device is still
+connected to the array.
+
+The output should have stated "mdadm: hot remove failed
+for /dev/vdxx: Device or resource busy", if the device was
+still active. Or it should remove the device and print
+a message:
+
+mdadm: set /dev/vdd faulty in /dev/md0
+mdadm: hot removed /dev/vdd from /dev/md0
+
+The following commit should be reverted as it breaks
+mdadm --manage -r.
+
+commit 546047688e1c64638f462147c755b58119cabdc8
+Author: Wu Guanghao <wuguanghao3@huawei.com>
+Date:   Mon Aug 16 15:24:51 2021 +0800
+mdadm: fix coredump of mdadm --monitor -r
+
+-Nigel
+
+Signed-off-by: Nigel Croxon <ncroxon@redhat.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ ReadMe.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ReadMe.c b/ReadMe.c
+index 8f873c48..bec1be9a 100644
+--- a/ReadMe.c
++++ b/ReadMe.c
+@@ -81,11 +81,11 @@ char Version[] = "mdadm - v" VERSION " - " VERS_DATE EXTRAVERSION "\n";
+  *     found, it is started.
+  */
+ 
+-char short_options[]="-ABCDEFGIQhVXYWZ:vqbc:i:l:p:m:r:n:x:u:c:d:z:U:N:safRSow1tye:k";
++char short_options[]="-ABCDEFGIQhVXYWZ:vqbc:i:l:p:m:n:x:u:c:d:z:U:N:sarfRSow1tye:k:";
+ char short_bitmap_options[]=
+-		"-ABCDEFGIQhVXYWZ:vqb:c:i:l:p:m:r:n:x:u:c:d:z:U:N:sarfRSow1tye:k:";
++		"-ABCDEFGIQhVXYWZ:vqb:c:i:l:p:m:n:x:u:c:d:z:U:N:sarfRSow1tye:k:";
+ char short_bitmap_auto_options[]=
+-		"-ABCDEFGIQhVXYWZ:vqb:c:i:l:p:m:r:n:x:u:c:d:z:U:N:sa:rfRSow1tye:k:";
++		"-ABCDEFGIQhVXYWZ:vqb:c:i:l:p:m:n:x:u:c:d:z:U:N:sa:rfRSow1tye:k:";
+ 
+ struct option long_options[] = {
+     {"manage",    0, 0, ManageOpt},
+-- 
+2.38.1
+

@@ -1,0 +1,36 @@
+From 9ae62977b51dab0f4bb46b1c8ea5ebd1705b2f4d Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:10 -0600
+Subject: [PATCH 35/83] monitor: Avoid segfault when calling NULL
+ get_bad_blocks
+
+Not all struct superswitch implement a get_bad_blocks() function,
+yet mdmon seems to call it without checking for NULL and thus
+occasionally segfaults in the test 10ddf-geometry.
+
+Fix this by checking for NULL before calling it.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ monitor.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/monitor.c b/monitor.c
+index b877e595..820a93d0 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -311,6 +311,9 @@ static int check_for_cleared_bb(struct active_array *a, struct mdinfo *mdi)
+ 	struct md_bb *bb;
+ 	int i;
+ 
++	if (!ss->get_bad_blocks)
++		return -1;
++
+ 	/*
+ 	 * Get a list of bad blocks for an array, then read list of
+ 	 * acknowledged bad blocks from kernel and compare it against metadata
+-- 
+2.38.1
+

@@ -1,0 +1,38 @@
+From 7539254342bc591717b0051734cc6c09c1b88640 Mon Sep 17 00:00:00 2001
+From: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Date: Wed, 22 Jun 2022 14:25:13 -0600
+Subject: [PATCH 38/83] tests/00raid0: add a test that validates raid0 with
+ layout fails for 0.9
+
+329dfc28debb disallows the creation of raid0 with layouts for 0.9
+metadata. This test confirms the new behavior.
+
+Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Signed-off-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ tests/00raid0 | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/tests/00raid0 b/tests/00raid0
+index 8bc18985..e6b21cc4 100644
+--- a/tests/00raid0
++++ b/tests/00raid0
+@@ -6,11 +6,9 @@ check raid0
+ testdev $md0 3 $mdsize2_l 512
+ mdadm -S $md0
+ 
+-# now with version-0.90 superblock
++# verify raid0 with layouts fail for 0.90
+ mdadm -CR $md0 -e0.90 -l0 -n4 $dev0 $dev1 $dev2 $dev3
+-check raid0
+-testdev $md0 4 $mdsize0 512
+-mdadm -S $md0
++check opposite_result
+ 
+ # now with no superblock
+ mdadm -B $md0 -l0 -n5 $dev0 $dev1 $dev2 $dev3 $dev4
+-- 
+2.38.1
+

@@ -1,0 +1,40 @@
+From c8d1c398505b62d9129a4e711f17e4469f4327ff Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Thu, 14 Jul 2022 09:02:10 +0200
+Subject: [PATCH 29/83] Monitor: use devname as char array instead of pointer
+
+Device name wasn't filled properly due to incorrect use of strcpy.
+Strcpy was used twice. Firstly to fill devname with "/dev/md/"
+and then to add chosen name. First strcpy result was overwritten by
+second one (as a result <device_name> instead of "/dev/md/<device_name>"
+was assigned). This commit changes this implementation to use snprintf
+and devname with fixed size.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Monitor.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 6ca1ebe5..a5b11ae2 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -190,9 +190,11 @@ int Monitor(struct mddev_dev *devlist,
+ 			if (mdlist->devname[0] == '/')
+ 				st->devname = xstrdup(mdlist->devname);
+ 			else {
+-				st->devname = xmalloc(8+strlen(mdlist->devname)+1);
+-				strcpy(strcpy(st->devname, "/dev/md/"),
+-				       mdlist->devname);
++				/* length of "/dev/md/" + device name + terminating byte */
++				size_t _len = sizeof("/dev/md/") + strnlen(mdlist->devname, PATH_MAX);
++
++				st->devname = xcalloc(_len, sizeof(char));
++				snprintf(st->devname, _len, "/dev/md/%s", mdlist->devname);
+ 			}
+ 			if (!is_mddev(mdlist->devname))
+ 				return 1;
+-- 
+2.38.1
+

@@ -1,0 +1,31 @@
+From dac0b5121dd77bf1659b95248423445f932dfae4 Mon Sep 17 00:00:00 2001
+From: Wu Guanghao <wuguanghao3@huawei.com>
+Date: Sat, 4 Mar 2023 00:21:32 +0800
+Subject: [PATCH 095/120] Detail.c: fix memleak in Detail()
+
+char *sysdev = xstrdup() but not free() in for loop, will cause memory
+leak
+
+Signed-off-by: Wu Guanghao <wuguanghao3@huawei.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Detail.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Detail.c b/Detail.c
+index ce7a8445..4ef26460 100644
+--- a/Detail.c
++++ b/Detail.c
+@@ -303,6 +303,7 @@ int Detail(char *dev, struct context *c)
+ 				if (path)
+ 					printf("MD_DEVICE_%s_DEV=%s\n",
+ 					       sysdev, path);
++				free(sysdev);
+ 			}
+ 		}
+ 		goto out;
+-- 
+2.38.1
+

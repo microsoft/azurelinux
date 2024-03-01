@@ -1,0 +1,172 @@
+From 420dafcd38c5949c2ddb90ad6873e7edd625db30 Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Mon, 20 Mar 2023 14:43:54 +1100
+Subject: [PATCH 113/120] Improvements for IMSM_NO_PLATFORM testing.
+
+Factor out IMSM_NO_PLATFORM testing into a single function that caches
+the result.
+
+Allow mdmon to explicitly set the result to "1" so that we don't need
+the ENV var in the unit file
+
+Check if the kernel command line contains "mdadm.imsm.test=1" and in
+that case assert NO_PLATFORM.  This simplifies testing in a virtual
+machine.
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdadm.8.in             |  5 +++++
+ mdadm.h                |  2 ++
+ mdmon.c                |  6 ++++++
+ super-intel.c          | 45 +++++++++++++++++++++++++++++++++++++++---
+ systemd/mdmon@.service |  3 ---
+ 5 files changed, 55 insertions(+), 6 deletions(-)
+
+diff --git a/mdadm.8.in b/mdadm.8.in
+index 6f0f6c13..b7159509 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -3197,6 +3197,11 @@ environment.  This can be useful for testing or for disaster
+ recovery.  You should be aware that interoperability may be
+ compromised by setting this value.
+ 
++These change can also be suppressed by adding 
++.B mdadm.imsm.test=1
++to the kernel command line. This makes it easy to test IMSM
++code in a virtual machine that doesn't have IMSM virtual hardware.
++
+ .TP
+ .B MDADM_GROW_ALLOW_OLD
+ If an array is stopped while it is performing a reshape and that
+diff --git a/mdadm.h b/mdadm.h
+index 1e518276..0d995445 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -1263,6 +1263,8 @@ extern struct superswitch super0, super1;
+ extern struct superswitch super_imsm, super_ddf;
+ extern struct superswitch mbr, gpt;
+ 
++void imsm_set_no_platform(int v);
++
+ struct metadata_update {
+ 	int	len;
+ 	char	*buf;
+diff --git a/mdmon.c b/mdmon.c
+index 096b4d76..cef5bbc8 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -318,6 +318,12 @@ int main(int argc, char *argv[])
+ 		{NULL, 0, NULL, 0}
+ 	};
+ 
++	/*
++	 * mdmon should never complain due to lack of a platform,
++	 * that is mdadm's job if at all.
++	 */
++	imsm_set_no_platform(1);
++
+ 	while ((opt = getopt_long(argc, argv, "thaF", options, NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'a':
+diff --git a/super-intel.c b/super-intel.c
+index e155a8ae..a5c86cb2 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -20,6 +20,7 @@
+ #define HAVE_STDINT_H 1
+ #include "mdadm.h"
+ #include "mdmon.h"
++#include "dlink.h"
+ #include "sha1.h"
+ #include "platform-intel.h"
+ #include <values.h>
+@@ -629,6 +630,44 @@ static const char *_sys_dev_type[] = {
+ 	[SYS_DEV_VMD] = "VMD"
+ };
+ 
++static int no_platform = -1;
++
++static int check_no_platform(void)
++{
++	static const char search[] = "mdadm.imsm.test=1";
++	FILE *fp;
++
++	if (no_platform >= 0)
++		return no_platform;
++
++	if (check_env("IMSM_NO_PLATFORM")) {
++		no_platform = 1;
++		return 1;
++	}
++	fp = fopen("/proc/cmdline", "r");
++	if (fp) {
++		char *l = conf_line(fp);
++		char *w = l;
++
++		do {
++			if (strcmp(w, search) == 0)
++				no_platform = 1;
++			w = dl_next(w);
++		} while (w != l);
++		free_line(l);
++		fclose(fp);
++		if (no_platform >= 0)
++			return no_platform;
++	}
++	no_platform = 0;
++	return 0;
++}
++
++void imsm_set_no_platform(int v)
++{
++	no_platform = v;
++}
++
+ const char *get_sys_dev_type(enum sys_dev_type type)
+ {
+ 	if (type >= SYS_DEV_MAX)
+@@ -2699,7 +2738,7 @@ static int detail_platform_imsm(int verbose, int enumerate_only, char *controlle
+ 	int result=1;
+ 
+ 	if (enumerate_only) {
+-		if (check_env("IMSM_NO_PLATFORM"))
++		if (check_no_platform())
+ 			return 0;
+ 		list = find_intel_devices();
+ 		if (!list)
+@@ -4722,7 +4761,7 @@ static int find_intel_hba_capability(int fd, struct intel_super *super, char *de
+ 		       devname);
+ 		return 1;
+ 	}
+-	if (!is_fd_valid(fd) || check_env("IMSM_NO_PLATFORM")) {
++	if (!is_fd_valid(fd) || check_no_platform()) {
+ 		super->orom = NULL;
+ 		super->hba = NULL;
+ 		return 0;
+@@ -10697,7 +10736,7 @@ static int imsm_get_allowed_degradation(int level, int raid_disks,
+  ******************************************************************************/
+ int validate_container_imsm(struct mdinfo *info)
+ {
+-	if (check_env("IMSM_NO_PLATFORM"))
++	if (check_no_platform())
+ 		return 0;
+ 
+ 	struct sys_dev *idev;
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index 23a375f6..020cc7e1 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -15,9 +15,6 @@ Documentation=man:mdmon(8)
+ IgnoreOnIsolate=true
+ 
+ [Service]
+-# mdmon should never complain due to lack of a platform,
+-# that is mdadm's job if at all.
+-Environment=IMSM_NO_PLATFORM=1
+ # The mdmon starting in the initramfs (with dracut at least)
+ # cannot see sysfs after root is mounted, so we will have to
+ # 'takeover'.  As the '--offroot --takeover' don't hurt when
+-- 
+2.38.1
+

@@ -1,0 +1,111 @@
+From ea109700563d93704ebdc540c7770d874369f667 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Fri, 9 Sep 2022 15:50:33 +0200
+Subject: [PATCH 58/83] mdadm: Add Documentation entries to systemd services
+
+Add documentation section.
+Copied from Debian.
+
+Cc: Felix Lechner <felix.lechner@lease-up.com>
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ systemd/mdadm-grow-continue@.service | 1 +
+ systemd/mdadm-last-resort@.service   | 1 +
+ systemd/mdcheck_continue.service     | 3 ++-
+ systemd/mdcheck_start.service        | 1 +
+ systemd/mdmon@.service               | 1 +
+ systemd/mdmonitor-oneshot.service    | 1 +
+ systemd/mdmonitor.service            | 1 +
+ 7 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/systemd/mdadm-grow-continue@.service b/systemd/mdadm-grow-continue@.service
+index 9fdc8ec7..64b8254a 100644
+--- a/systemd/mdadm-grow-continue@.service
++++ b/systemd/mdadm-grow-continue@.service
+@@ -8,6 +8,7 @@
+ [Unit]
+ Description=Manage MD Reshape on /dev/%I
+ DefaultDependencies=no
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ ExecStart=BINDIR/mdadm --grow --continue /dev/%I
+diff --git a/systemd/mdadm-last-resort@.service b/systemd/mdadm-last-resort@.service
+index efeb3f63..e9381125 100644
+--- a/systemd/mdadm-last-resort@.service
++++ b/systemd/mdadm-last-resort@.service
+@@ -2,6 +2,7 @@
+ Description=Activate md array %I even though degraded
+ DefaultDependencies=no
+ ConditionPathExists=!/sys/devices/virtual/block/%i/md/sync_action
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ Type=oneshot
+diff --git a/systemd/mdcheck_continue.service b/systemd/mdcheck_continue.service
+index 854317f1..f5324905 100644
+--- a/systemd/mdcheck_continue.service
++++ b/systemd/mdcheck_continue.service
+@@ -7,7 +7,8 @@
+ 
+ [Unit]
+ Description=MD array scrubbing - continuation
+-ConditionPathExistsGlob = /var/lib/mdcheck/MD_UUID_*
++ConditionPathExistsGlob=/var/lib/mdcheck/MD_UUID_*
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ Type=oneshot
+diff --git a/systemd/mdcheck_start.service b/systemd/mdcheck_start.service
+index 3bb3d130..703a6583 100644
+--- a/systemd/mdcheck_start.service
++++ b/systemd/mdcheck_start.service
+@@ -8,6 +8,7 @@
+ [Unit]
+ Description=MD array scrubbing
+ Wants=mdcheck_continue.timer
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ Type=oneshot
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index 77533958..97a1acd9 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -9,6 +9,7 @@
+ Description=MD Metadata Monitor on /dev/%I
+ DefaultDependencies=no
+ Before=initrd-switch-root.target
++Documentation=man:mdmon(8)
+ 
+ [Service]
+ # mdmon should never complain due to lack of a platform,
+diff --git a/systemd/mdmonitor-oneshot.service b/systemd/mdmonitor-oneshot.service
+index 373955a2..ba86b44e 100644
+--- a/systemd/mdmonitor-oneshot.service
++++ b/systemd/mdmonitor-oneshot.service
+@@ -7,6 +7,7 @@
+ 
+ [Unit]
+ Description=Reminder for degraded MD arrays
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ Environment=MDADM_MONITOR_ARGS=--scan
+diff --git a/systemd/mdmonitor.service b/systemd/mdmonitor.service
+index 46f7b880..9c364785 100644
+--- a/systemd/mdmonitor.service
++++ b/systemd/mdmonitor.service
+@@ -8,6 +8,7 @@
+ [Unit]
+ Description=MD array monitor
+ DefaultDependencies=no
++Documentation=man:mdadm(8)
+ 
+ [Service]
+ Environment=  MDADM_MONITOR_ARGS=--scan
+-- 
+2.38.1
+

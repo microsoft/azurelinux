@@ -1,0 +1,69 @@
+From 52c67fcdd6dadc4138ecad73e65599551804d445 Mon Sep 17 00:00:00 2001
+From: Coly Li <colyli@suse.de>
+Date: Tue, 15 Feb 2022 21:34:15 +0800
+Subject: [PATCH 012/120] mdadm/systemd: remove KillMode=none from service file
+
+For mdadm's systemd configuration, current systemd KillMode is "none" in
+following service files,
+- mdadm-grow-continue@.service
+- mdmon@.service
+
+This "none" mode is strongly againsted by systemd developers (see man 5
+systemd.kill for "KillMode=" section), and is considering to remove in
+future systemd version.
+
+As systemd developer explained in disuccsion, the systemd kill process
+is,
+1. send the signal specified by KillSignal= to the list of processes (if
+   any), TERM is the default
+2. wait until either the target of process(es) exit or a timeout expires
+3. if the timeout expires send the signal specified by FinalKillSignal=,
+   KILL is the default
+
+For "control-group", all remaining processes will receive the SIGTERM
+signal (by default) and if there are still processes after a period f
+time, they will get the SIGKILL signal.
+
+For "mixed", only the main process will receive the SIGTERM signal, and
+if there are still processes after a period of time, all remaining
+processes (including the main one) will receive the SIGKILL signal.
+
+From the above comment, currently KillMode=control-group is a proper
+kill mode. Since control-gropu is the default kill mode, the fix can be
+simply removing KillMode=none line from the service file, then the
+default mode will take effect.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: Benjamin Brunner <bbrunner@suse.com>
+Cc: Franck Bui <fbui@suse.de>
+Cc: Jes Sorensen <jes@trained-monkey.org>
+Cc: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Cc: Neil Brown <neilb@suse.de>
+Cc: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ systemd/mdadm-grow-continue@.service | 1 -
+ systemd/mdmon@.service               | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/systemd/mdadm-grow-continue@.service b/systemd/mdadm-grow-continue@.service
+index 5c667d2a..9fdc8ec7 100644
+--- a/systemd/mdadm-grow-continue@.service
++++ b/systemd/mdadm-grow-continue@.service
+@@ -14,4 +14,3 @@ ExecStart=BINDIR/mdadm --grow --continue /dev/%I
+ StandardInput=null
+ StandardOutput=null
+ StandardError=null
+-KillMode=none
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index 85a3a7c5..77533958 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -25,4 +25,3 @@ Type=forking
+ # it out) and systemd will remove it when transitioning from
+ # initramfs to rootfs.
+ #PIDFile=/run/mdadm/%I.pid
+-KillMode=none
+-- 
+2.38.1
+

@@ -1,0 +1,53 @@
+From 566844b93e6823a04ed65827ba3e03cb123b3a03 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Jan 2023 00:32:36 -0800
+Subject: [PATCH 106/120] Define alignof using _Alignof when using C11 or newer
+
+WG14 N2350 made very clear that it is an UB having type definitions
+within "offsetof" [1]. This patch enhances the implementation of macro
+alignof_slot to use builtin "_Alignof" to avoid undefined behavior on
+when using std=c11 or newer
+
+clang 16+ has started to flag this [2]
+
+Fixes build when using -std >= gnu11 and using clang16+
+
+Older compilers gcc < 4.9 or clang < 8 has buggy _Alignof even though it
+may support C11, exclude those compilers too
+
+[1] https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2350.htm
+[2] https://reviews.llvm.org/D133574
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ sha1.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/sha1.c b/sha1.c
+index 89b32f46..1e4ad5d9 100644
+--- a/sha1.c
++++ b/sha1.c
+@@ -229,7 +229,17 @@ sha1_process_bytes (const void *buffer, size_t len, struct sha1_ctx *ctx)
+   if (len >= 64)
+     {
+ #if !_STRING_ARCH_unaligned
+-# define alignof(type) offsetof (struct { char c; type x; }, x)
++/* GCC releases before GCC 4.9 had a bug in _Alignof.  See GCC bug 52023
++   <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023>.
++   clang versions < 8.0.0 have the same bug.  */
++# if (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112 \
++      || (defined __GNUC__ && __GNUC__ < 4 + (__GNUC_MINOR__ < 9) \
++   && !defined __clang__) \
++      || (defined __clang__ && __clang_major__ < 8))
++#  define alignof(type) offsetof (struct { char c; type x; }, x)
++# else
++#  define alignof(type) _Alignof(type)
++# endif
+ # define UNALIGNED_P(p) (((size_t) p) % alignof (sha1_uint32) != 0)
+       if (UNALIGNED_P (buffer))
+ 	while (len > 64)
+-- 
+2.38.1
+

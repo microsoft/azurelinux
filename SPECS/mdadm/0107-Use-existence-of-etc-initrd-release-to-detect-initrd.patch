@@ -1,0 +1,41 @@
+From eb45d0add7cf2918f838bec2d93d99cf2d9c662f Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Mon, 13 Mar 2023 14:42:58 +1100
+Subject: [PATCH 107/120] Use existence of /etc/initrd-release to detect
+ initrd.
+
+Since v183, systemd has used the existence of /etc/initrd-release to
+detect if it is running in an initrd, rather than looking at the magic
+number of the root filesystem's device.  It is time for mdadm to do the
+same.
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ util.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/util.c b/util.c
+index 9f1e1f7c..509fb43e 100644
+--- a/util.c
++++ b/util.c
+@@ -2227,15 +2227,7 @@ int continue_via_systemd(char *devnm, char *service_name)
+ 
+ int in_initrd(void)
+ {
+-	/* This is based on similar function in systemd. */
+-	struct statfs s;
+-	/* statfs.f_type is signed long on s390x and MIPS, causing all
+-	   sorts of sign extension problems with RAMFS_MAGIC being
+-	   defined as 0x858458f6 */
+-	return  statfs("/", &s) >= 0 &&
+-		((unsigned long)s.f_type == TMPFS_MAGIC ||
+-		 ((unsigned long)s.f_type & 0xFFFFFFFFUL) ==
+-		 ((unsigned long)RAMFS_MAGIC & 0xFFFFFFFFUL));
++	return access("/etc/initrd-release", F_OK) >= 0;
+ }
+ 
+ void reopen_mddev(int mdfd)
+-- 
+2.38.1
+

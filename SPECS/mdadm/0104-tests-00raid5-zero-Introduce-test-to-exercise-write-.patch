@@ -1,0 +1,44 @@
+From c918cf2af993b55bca9f396c79713e54d3f8b6fb Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 1 Mar 2023 13:41:34 -0700
+Subject: [PATCH 104/120] tests/00raid5-zero: Introduce test to exercise
+ --write-zeros.
+
+Attempt to create a raid5 array with --write-zeros. If it is successful
+check the array to ensure it is in sync.
+
+If it is unsuccessful and an unsupported error is printed, skip the
+test.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Reviewed-by: Xiao Ni <xni@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ tests/00raid5-zero | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 tests/00raid5-zero
+
+diff --git a/tests/00raid5-zero b/tests/00raid5-zero
+new file mode 100644
+index 00000000..7d0f05a1
+--- /dev/null
++++ b/tests/00raid5-zero
+@@ -0,0 +1,12 @@
++
++if mdadm -CfR $md0 -l 5 -n3 $dev0 $dev1 $dev2 --write-zeroes ; then
++  check nosync
++  echo check > /sys/block/md0/md/sync_action;
++  check wait
++elif grep "zeroing [^ ]* failed: Operation not supported" \
++     $targetdir/stderr; then
++  echo "write-zeros not supported, skipping"
++else
++  echo >&2 "ERROR: mdadm return failure without not supported message"
++  exit 1
++fi
+-- 
+2.38.1
+

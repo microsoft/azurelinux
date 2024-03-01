@@ -1,0 +1,83 @@
+From ee9dcf9549e8cbfeb51123812776cc87016c95b0 Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Thu, 2 Feb 2023 12:27:02 +0100
+Subject: [PATCH 090/120] Add helpers to determine whether directories or files
+ are soft links
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdadm.h |  2 ++
+ util.c  | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+
+diff --git a/mdadm.h b/mdadm.h
+index 13f8b4cb..1674ce13 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -1777,6 +1777,8 @@ extern void set_dlm_hooks(void);
+ #define MSEC_TO_NSEC(msec) ((msec) * 1000000)
+ #define USEC_TO_NSEC(usec) ((usec) * 1000)
+ extern void sleep_for(unsigned int sec, long nsec, bool wake_after_interrupt);
++extern bool is_directory(const char *path);
++extern bool is_file(const char *path);
+ 
+ #define _ROUND_UP(val, base)	(((val) + (base) - 1) & ~(base - 1))
+ #define ROUND_UP(val, base)	_ROUND_UP(val, (typeof(val))(base))
+diff --git a/util.c b/util.c
+index 8c7f3fd5..7fc881bf 100644
+--- a/util.c
++++ b/util.c
+@@ -2401,3 +2401,48 @@ void sleep_for(unsigned int sec, long nsec, bool wake_after_interrupt)
+ 		}
+ 	} while (!wake_after_interrupt && errno == EINTR);
+ }
++
++/* is_directory() - Checks if directory provided by path is indeed a regular directory.
++ * @path: directory path to be checked
++ *
++ * Doesn't accept symlinks.
++ *
++ * Return: true if is a directory, false if not
++ */
++bool is_directory(const char *path)
++{
++	struct stat st;
++
++	if (lstat(path, &st) != 0) {
++		pr_err("%s: %s\n", strerror(errno), path);
++		return false;
++	}
++
++	if (!S_ISDIR(st.st_mode))
++		return false;
++
++	return true;
++}
++
++/*
++ * is_file() - Checks if file provided by path is indeed a regular file.
++ * @path: file path to be checked
++ *
++ * Doesn't accept symlinks.
++ *
++ * Return: true if is  a file, false if not
++ */
++bool is_file(const char *path)
++{
++	struct stat st;
++
++	if (lstat(path, &st) != 0) {
++		pr_err("%s: %s\n", strerror(errno), path);
++		return false;
++	}
++
++	if (!S_ISREG(st.st_mode))
++		return false;
++
++	return true;
++}
+-- 
+2.38.1
+

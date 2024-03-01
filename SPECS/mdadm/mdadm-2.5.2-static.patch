@@ -1,7 +1,7 @@
---- mdadm-3.2.1/Makefile.static	2011-03-27 22:31:20.000000000 -0400
-+++ mdadm-3.2.1/Makefile	2011-03-28 10:16:55.277900184 -0400
-@@ -238,16 +238,16 @@ install : mdadm mdmon install-man instal
- 	$(INSTALL) -D $(STRIP) -m 755 mdmon $(DESTDIR)$(BINDIR)/mdmon
+--- mdadm-3.2.1/Makefile.static	2021-01-11 15:46:47.292126848 +0800
++++ mdadm-3.2.1/Makefile	2021-01-11 15:46:10.720192519 +0800
+@@ -248,16 +248,16 @@
+ install : install-bin install-man install-udev
  
  install-static : mdadm.static install-man
 -	$(INSTALL) -D $(STRIP) -m 755 mdadm.static $(DESTDIR)$(BINDIR)/mdadm

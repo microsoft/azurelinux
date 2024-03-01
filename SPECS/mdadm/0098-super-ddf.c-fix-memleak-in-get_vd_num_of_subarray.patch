@@ -1,0 +1,46 @@
+From 68b90794adf8287fa534cc8f35efb09772b133d0 Mon Sep 17 00:00:00 2001
+From: Wu Guanghao <wuguanghao3@huawei.com>
+Date: Sat, 4 Mar 2023 00:21:35 +0800
+Subject: [PATCH 098/120] super-ddf.c: fix memleak in get_vd_num_of_subarray()
+
+sra = sysfs_read() should be free before return in
+get_vd_num_of_subarray()
+
+Signed-off-by: Wu Guanghao <wuguanghao3@huawei.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-ddf.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/super-ddf.c b/super-ddf.c
+index 309812df..b86c6acd 100644
+--- a/super-ddf.c
++++ b/super-ddf.c
+@@ -1592,15 +1592,20 @@ static unsigned int get_vd_num_of_subarray(struct supertype *st)
+ 	sra = sysfs_read(-1, st->devnm, GET_VERSION);
+ 	if (!sra || sra->array.major_version != -1 ||
+ 	    sra->array.minor_version != -2 ||
+-	    !is_subarray(sra->text_version))
++	    !is_subarray(sra->text_version)) {
++		if (sra)
++			sysfs_free(sra);
+ 		return DDF_NOTFOUND;
++	}
+ 
+ 	sub = strchr(sra->text_version + 1, '/');
+ 	if (sub != NULL)
+ 		vcnum = strtoul(sub + 1, &end, 10);
+ 	if (sub == NULL || *sub == '\0' || *end != '\0' ||
+-	    vcnum >= be16_to_cpu(ddf->active->max_vd_entries))
++	    vcnum >= be16_to_cpu(ddf->active->max_vd_entries)) {
++		sysfs_free(sra);
+ 		return DDF_NOTFOUND;
++	}
+ 
+ 	return vcnum;
+ }
+-- 
+2.38.1
+

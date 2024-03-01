@@ -1,0 +1,83 @@
+From fea026b4849182fc8413014c81456e7215af28d9 Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Wed, 23 Mar 2022 15:05:19 +0100
+Subject: [PATCH 03/83] Grow_reshape: Add r0 grow size error message and update
+ man
+
+Grow size on r0 is not supported for imsm and native metadata.
+Add proper error message.
+Update man for proper use of --size.
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Grow.c     |  6 ++++++
+ mdadm.8.in | 19 ++++++++++++-------
+ 2 files changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/Grow.c b/Grow.c
+index 9a947204..aa72490b 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -1998,6 +1998,12 @@ int Grow_reshape(char *devname, int fd,
+ 			goto release;
+ 		}
+ 
++		if (array.level == 0) {
++			pr_err("Component size change is not supported for RAID0\n");
++			rv = 1;
++			goto release;
++		}
++
+ 		if (reshape_super(st, s->size, UnSet, UnSet, 0, 0, UnSet, NULL,
+ 				  devname, APPLY_METADATA_CHANGES,
+ 				  c->verbose > 0)) {
+diff --git a/mdadm.8.in b/mdadm.8.in
+index be902dba..e2a42425 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -459,7 +459,8 @@ number of spare devices.
+ 
+ .TP
+ .BR \-z ", " \-\-size=
+-Amount (in Kilobytes) of space to use from each drive in RAID levels 1/4/5/6.
++Amount (in Kilobytes) of space to use from each drive in RAID levels 1/4/5/6/10
++and for RAID 0 on external metadata.
+ This must be a multiple of the chunk size, and must leave about 128Kb
+ of space at the end of the drive for the RAID superblock.
+ If this is not specified
+@@ -478,10 +479,19 @@ To guard against this it can be useful to set the initial size
+ slightly smaller than the smaller device with the aim that it will
+ still be larger than any replacement.
+ 
++This option can be used with
++.B \-\-create
++for determining initial size of an array. For external metadata,
++it can be used on a volume, but not on a container itself.
++Setting initial size of
++.B RAID 0
++array is only valid for external metadata.
++
+ This value can be set with
+ .B \-\-grow
+-for RAID level 1/4/5/6 though
++for RAID level 1/4/5/6/10 though
+ DDF arrays may not be able to support this.
++RAID 0 array size cannot be changed.
+ If the array was created with a size smaller than the currently
+ active drives, the extra space can be accessed using
+ .BR \-\-grow .
+@@ -501,11 +511,6 @@ problems the array can be made bigger again with no loss with another
+ .B "\-\-grow \-\-size="
+ command.
+ 
+-This value cannot be used when creating a
+-.B CONTAINER
+-such as with DDF and IMSM metadata, though it perfectly valid when
+-creating an array inside a container.
+-
+ .TP
+ .BR \-Z ", " \-\-array\-size=
+ This is only meaningful with
+-- 
+2.38.1
+

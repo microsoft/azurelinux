@@ -1,0 +1,54 @@
+From 28a083955c6f58f8e582734c8c82aff909a7d461 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Thu, 2 Feb 2023 08:56:31 +0100
+Subject: [PATCH 084/120] Revert "mdadm/systemd: remove KillMode=none from
+ service file"
+
+This reverts commit 52c67fcdd6dadc4138ecad73e65599551804d445.
+
+The functionality is marked as deprecated but we don't have alternative
+solution yet. Shutdown hangs if OS is installed on external array:
+
+task:umount state:D stack: 0 pid: 6285 ppid: flags:0x00004084
+Call Trace:
+__schedule+0x2d1/0x830
+? finish_wait+0x80/0x80
+schedule+0x35/0xa0
+md_write_start+0x14b/0x220
+? finish_wait+0x80/0x80
+raid1_make_request+0x3c/0x90 [raid1]
+md_handle_request+0x128/0x1b0
+md_make_request+0x5b/0xb0
+generic_make_request_no_check+0x202/0x330
+submit_bio+0x3c/0x160
+
+Use it until new solution is implemented.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ systemd/mdadm-grow-continue@.service | 1 +
+ systemd/mdmon@.service               | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/systemd/mdadm-grow-continue@.service b/systemd/mdadm-grow-continue@.service
+index 64b8254a..9ccadca3 100644
+--- a/systemd/mdadm-grow-continue@.service
++++ b/systemd/mdadm-grow-continue@.service
+@@ -15,3 +15,4 @@ ExecStart=BINDIR/mdadm --grow --continue /dev/%I
+ StandardInput=null
+ StandardOutput=null
+ StandardError=null
++KillMode=none
+diff --git a/systemd/mdmon@.service b/systemd/mdmon@.service
+index 97a1acd9..cb6482d9 100644
+--- a/systemd/mdmon@.service
++++ b/systemd/mdmon@.service
+@@ -26,3 +26,4 @@ Type=forking
+ # it out) and systemd will remove it when transitioning from
+ # initramfs to rootfs.
+ #PIDFile=/run/mdadm/%I.pid
++KillMode=none
+-- 
+2.38.1
+

@@ -1,0 +1,110 @@
+From b6a84d4e92f876acd120d3062a8302db5dd2498c Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Thu, 2 Feb 2023 12:27:03 +0100
+Subject: [PATCH 091/120] Mdmonitor: Refactor write_autorebuild_pid()
+
+Add better error handling and check for symlinks when opening MDMON_DIR.
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Monitor.c | 55 ++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 19 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 39598ba0..14a2dfe5 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -33,6 +33,7 @@
+ #endif
+ 
+ #define EVENT_NAME_MAX 32
++#define AUTOREBUILD_PID_PATH MDMON_DIR "/autorebuild.pid"
+ 
+ struct state {
+ 	char devname[MD_NAME_MAX + sizeof("/dev/md/")];	/* length of "/dev/md/" + device name + terminating byte*/
+@@ -126,7 +127,7 @@ static int check_udev_activity(void);
+ static void link_containers_with_subarrays(struct state *list);
+ static int make_daemon(char *pidfile);
+ static void try_spare_migration(struct state *statelist);
+-static void write_autorebuild_pid(void);
++static int write_autorebuild_pid(void);
+ 
+ int Monitor(struct mddev_dev *devlist,
+ 	    char *mailaddr, char *alert_cmd,
+@@ -234,7 +235,8 @@ int Monitor(struct mddev_dev *devlist,
+ 	}
+ 
+ 	if (share)
+-		write_autorebuild_pid();
++		if (write_autorebuild_pid() != 0)
++			return 1;
+ 
+ 	if (devlist == NULL) {
+ 		mdlist = conf_get_ident(NULL);
+@@ -440,29 +442,44 @@ static int check_one_sharer(int scan)
+ 	return 0;
+ }
+ 
+-static void write_autorebuild_pid()
++/*
++ * write_autorebuild_pid() - Writes pid to autorebuild.pid file.
++ *
++ * Return: 0 on success, 1 on error
++ */
++static int write_autorebuild_pid(void)
+ {
+-	char path[PATH_MAX];
+-	int pid;
+-	FILE *fp = NULL;
+-	sprintf(path, "%s/autorebuild.pid", MDMON_DIR);
++	FILE *fp;
++	int fd;
+ 
+ 	if (mkdir(MDMON_DIR, 0700) < 0 && errno != EEXIST) {
+-		pr_err("Can't create autorebuild.pid file\n");
+-	} else {
+-		int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0700);
++		pr_err("%s: %s\n", strerror(errno), MDMON_DIR);
++		return 1;
++	}
+ 
+-		if (fd >= 0)
+-			fp = fdopen(fd, "w");
++	if (!is_directory(MDMON_DIR)) {
++		pr_err("%s is not a regular directory.\n", MDMON_DIR);
++		return 1;
++	}
+ 
+-		if (!fp)
+-			pr_err("Can't create autorebuild.pid file\n");
+-		else {
+-			pid = getpid();
+-			fprintf(fp, "%d\n", pid);
+-			fclose(fp);
+-		}
++	fd = open(AUTOREBUILD_PID_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0700);
++
++	if (fd < 0) {
++		pr_err("Error opening %s file.\n", AUTOREBUILD_PID_PATH);
++		return 1;
+ 	}
++
++	fp = fdopen(fd, "w");
++
++	if (!fp) {
++		pr_err("Error opening fd for %s file.\n", AUTOREBUILD_PID_PATH);
++		return 1;
++	}
++
++	fprintf(fp, "%d\n", getpid());
++
++	fclose(fp);
++	return 0;
+ }
+ 
+ #define BASE_MESSAGE "%s event detected on md device %s"
+-- 
+2.38.1
+
