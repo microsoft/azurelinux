@@ -314,13 +314,11 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 	return r.chroot.Run(func() (err error) {
 		err = os.MkdirAll(repoDir, os.ModePerm)
 		if err != nil {
-			err = fmt.Errorf("failed to create repo directory (%s):\n%w", repoDir, err)
-			return
+			return fmt.Errorf("failed to create repo directory (%s):\n%w", repoDir, err)
 		}
 		err = rpmrepomanager.CreateRepo(repoDir)
 		if err != nil {
-			err = fmt.Errorf("failed to create an RPM repository under (%s):\n%w", repoDir, err)
-			return
+			return fmt.Errorf("failed to create an RPM repository under (%s):\n%w", repoDir, err)
 		}
 
 		return r.refreshPackagesCache()
