@@ -676,6 +676,11 @@ build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install mariner-repos
 build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall
