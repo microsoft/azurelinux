@@ -12,7 +12,7 @@ URL: http://netpbm.sourceforge.net/
 # svn checkout https://svn.code.sf.net/p/netpbm/code/userguide netpbm-%%{version}/userguide
 # svn checkout https://svn.code.sf.net/p/netpbm/code/trunk/test netpbm-%%{version}/test
 # and removing the .svn directories ( find -name "\.svn" -type d -print0 | xargs -0 rm -rf )
-Source0:         %{_azurelinux_sources_url}/%{name}-%{version}.tar.xz
+Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.xz
 Patch0:          netpbm-security-scripts.patch
 Patch1:          netpbm-security-code.patch
 Patch2:          netpbm-ppmfadeusage.patch

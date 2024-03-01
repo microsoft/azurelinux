@@ -8,7 +8,7 @@ Summary:        PostScript Type 1 font rasterizer
 
 License:        LGPLv2+ AND GPLv2+
 URL:            https://t1lib.org/
-Source0:        %{_azurelinux_sources_url}/t1lib-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/t1lib-%{version}.tar.gz
 # Patch originally from Debian at http://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
 Patch0:         t1lib_5.1.2-3.patch
 Patch1:         t1lib-5.1.2-segf.patch

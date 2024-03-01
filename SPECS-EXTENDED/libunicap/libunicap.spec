@@ -6,7 +6,7 @@ License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.unicap-imaging.org/
-Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-filter.sh
 Patch0:         libunicap-0.9.12-includes.patch
 Patch1:         libunicap-0.9.12-memerrs.patch

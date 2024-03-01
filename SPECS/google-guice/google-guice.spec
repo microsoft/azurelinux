@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/google/guice
 # ./create-tarball.sh %%{version}
-Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch

@@ -18,7 +18,7 @@ URL:            https://metacpan.org/release/XML-SAX
 #  -2 invoke 'generate_source_tarball.sh' while in the tarball's directory
 #  -3 upload the generated tarball to src tarball server
 #
-Source0:        %{_azurelinux_sources_url}/XML-SAX-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/XML-SAX-%{version}.tar.gz
 
 # Fix rt#20126
 Patch0:         perl-XML-SAX-0.99-rt20126.patch

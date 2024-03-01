@@ -28,7 +28,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.antlr.org/
 # Upstream source under https://www.antlr2.org/download/antlr-2.7.7.tar.gz. Needs verification.
-Source0:        %{_azurelinux_sources_url}/antlr-%{version}.tar.bz2
+Source0:        %{_distro_sources_url}/antlr-%{version}.tar.bz2
 Source1:        %{name}-build.xml
 Source2:        %{name}-script
 Source3:        http://repo2.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom

@@ -6,7 +6,7 @@ Release: 23%{?dist}
 Summary: A text mode system configuration tool
 License: GPLv2+
 Url: http://git.fedorahosted.org/git/?p=setuptool.git
-Source0: %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires: newt-devel
 BuildRequires: gettext
 BuildRequires: perl-XML-Parser

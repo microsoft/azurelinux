@@ -27,7 +27,7 @@ Group:          Development/Libraries/Java
 URL:            https://javax-inject.github.io/javax-inject/
 # git clone --bare git@github.com:javax-inject/javax-inject
 # git --git-dir=javax-inject.git archive --prefix %{name}-%{base_version}/ --format tar %{git_tag} | xz >%{name}-%{base_version}.tar.xz
-Source0:        %{_azurelinux_sources_url}/%{name}-%{base_version}.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{base_version}.tar.xz
 # These manifests based on the ones shipped by eclipse.org
 Source1:        MANIFEST.MF
 Source2:        MANIFEST-TCK.MF

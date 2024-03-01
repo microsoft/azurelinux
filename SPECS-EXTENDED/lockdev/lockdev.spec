@@ -18,7 +18,7 @@ URL: https://github.com/definesat/lockdev
 
 # This is a nightly snapshot downloaded via
 # https://github.com/definesat/lockdev
-Source0: %{_azurelinux_sources_url}/lockdev-%{version}.%{checkout}.tar.gz
+Source0: %{_distro_sources_url}/lockdev-%{version}.%{checkout}.tar.gz
 
 Patch1: lockdev-euidaccess.patch
 Patch2: 0001-major-and-minor-functions-moved-to-sysmacros.h.patch

@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
-Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source2:        cpl-v10.html
 Patch1:         0001-Port-to-TestNG-6.11.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch

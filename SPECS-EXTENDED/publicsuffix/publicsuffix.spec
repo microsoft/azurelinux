@@ -25,7 +25,7 @@ Release:        4%{?dist}
 Summary:        Cross-vendor public domain suffix database
 License:        MPL-2.0
 URL:            https://publicsuffix.org/
-Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  psl-make-dafsa
 BuildArch:      noarch
 

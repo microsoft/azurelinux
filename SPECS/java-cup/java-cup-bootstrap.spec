@@ -28,7 +28,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Url:            http://www2.cs.tum.edu/projects/cup/
 # TODO the version of our 11a source is no longer published
-Source0:        %{_azurelinux_sources_url}/develop.tar.bz2
+Source0:        %{_distro_sources_url}/develop.tar.bz2
 Source1:        java-cup-generated-files.tar.bz2
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/

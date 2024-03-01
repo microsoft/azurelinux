@@ -25,7 +25,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
 # ./generate-tarball.sh
-Source0:        %{_azurelinux_sources_url}/%{name}-%{version}.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.xz
 Source1:        %{name}-%{version}-build.tar.xz
 Source2:        http://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
 Source3:        http://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/%{version}/asm-analysis-%{version}.pom
