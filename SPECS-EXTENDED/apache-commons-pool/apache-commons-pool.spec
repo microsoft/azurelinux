@@ -48,8 +48,8 @@ Pool Package.
 %setup -q -n %{short_name}-%{version}-src
 # remove all binary libs
 find . -name "*.jar" -exec rm -f {} \;
-%patch0
-%patch1 -p1
+%patch 0
+%patch 1 -p1
 
 dos2unix README.txt
 

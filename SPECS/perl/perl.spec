@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        503%{?dist}
+Release:        504%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -4076,16 +4076,7 @@ The "vmsish" pragma control VMS-specific features of the Perl language. If
 you're not running VMS, this module does nothing.
 
 %prep
-%setup -q -n perl-%{perl_version}
-%patch5 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch200 -p1
-%patch201 -p1
+%autosetup -p1 -n perl-%{perl_version}
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
@@ -6847,6 +6838,10 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-504
+- Updated patch application macros.
+- Applying missed patches 14 and 202.
+
 * Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-503
 - Upgrade to version 5.38.2 referencing Fedora 39 (license: MIT)
 

@@ -42,7 +42,7 @@ based on libzhuyin for IBus.
 %prep
 %setup -q
 %if %snapshot
-%patch0 -p1 -b .head
+%patch 0 -p1 -b .head
 %endif
 
 

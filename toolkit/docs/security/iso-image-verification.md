@@ -14,7 +14,7 @@ CHECKSUM_FILE="mariner-1.0-x86_64.iso.sha256"
 SIGNATURE_FILE="mariner-1.0-x86_64.iso.sha256.gpg"
 
 # Download the Mariner RPM signing public key
-wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/2.0/SPECS/mariner-repos/MICROSOFT-RPM-GPG-KEY
+wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/2.0/SPECS/azurelinux-repos/MICROSOFT-RPM-GPG-KEY
 
 # Import the RPM signing public key into the local GPG keystore
 gpg --import MICROSOFT-RPM-GPG-KEY

@@ -56,16 +56,16 @@ This package contains the utilities for manipulating bcache.
 %prep
 %setup -q -n bcache-tools-%{version}
 tar xzf %{SOURCE1} --strip-components=1
-%patch0 -p1 -b .man
-%patch1 -p1 -b .cmdline
-%patch2 -p1 -b .fedconfmake
+%patch 0 -p1 -b .man
+%patch 1 -p1 -b .cmdline
+%patch 2 -p1 -b .fedconfmake
 chmod +x configure
-%patch3 -p1 -b .noprobe
-%patch4 -p1 -b .util-linux-hdr
+%patch 3 -p1 -b .noprobe
+%patch 4 -p1 -b .util-linux-hdr
 
-%patch5 -p1 -b .python3
-%patch6 -p1 -b .rootgc
-%patch7 -p1 -b .man
+%patch 5 -p1 -b .python3
+%patch 6 -p1 -b .rootgc
+%patch 7 -p1 -b .man
 
 %build
 %configure

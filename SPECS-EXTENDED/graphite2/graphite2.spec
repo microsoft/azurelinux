@@ -19,7 +19,7 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 
 BuildRequires:  freetype-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

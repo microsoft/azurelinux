@@ -34,7 +34,7 @@ Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-1%{?dist}
+BuildRequires:  glibc-static >= 2.38-2%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -211,8 +211,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Thu Dec 21 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.1.1-1
+* Fri Mar 1 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.1.1-1
 - Bump package version to 1.1.1 from 0.59.0
+
+* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 0.59.0-13
+- updated glibc-static buildrequires release
 
 * Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 0.59.0-11
 - Bump release to rebuild against glibc 2.35-6

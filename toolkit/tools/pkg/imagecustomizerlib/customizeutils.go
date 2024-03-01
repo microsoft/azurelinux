@@ -11,15 +11,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
 )
 
@@ -105,6 +105,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = enableOverlays(config.SystemConfig.Overlays, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
@@ -170,7 +175,7 @@ func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
 
 func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap, imageChroot *safechroot.Chroot) error {
 	for sourceFile, fileConfigs := range additionalFiles {
-		absSourceFile := filepath.Join(baseConfigPath, sourceFile)
+		absSourceFile := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		for _, fileConfig := range fileConfigs {
 			logger.Log.Infof("Copying: %s", fileConfig.Path)
 
@@ -245,7 +250,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	password := user.Password
 	if user.PasswordPath != "" {
 		// Read password from file.
-		passwordFullPath := filepath.Join(baseConfigPath, user.PasswordPath)
+		passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.PasswordPath)
 
 		passwordFileContents, err := os.ReadFile(passwordFullPath)
 		if err != nil {
@@ -305,10 +310,7 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	// Set user's SSH keys.
 	for i, _ := range user.SSHPubKeyPaths {
-		// If absolute path is not provided, then append baseConfigPath.
-		if !filepath.IsAbs(user.SSHPubKeyPaths[i]) {
-			user.SSHPubKeyPaths[i] = filepath.Join(baseConfigPath, user.SSHPubKeyPaths[i])
-		}
+		user.SSHPubKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPubKeyPaths[i])
 	}
 
 	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)

@@ -22,7 +22,7 @@ URL:            https://github.com/praiskup/%{name}
 Source0:        %pypi_source
 
 BuildRequires: python3-setuptools python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: python3-pip
 %endif
 Requires: python3-%{name} = %{version}-%{release}

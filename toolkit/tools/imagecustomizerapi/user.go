@@ -6,7 +6,7 @@ package imagecustomizerapi
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 )
 
 type User struct {

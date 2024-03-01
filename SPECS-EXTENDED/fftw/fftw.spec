@@ -34,7 +34,7 @@ BuildRequires:  openmpi-devel
 %if %{with mpich} || %{with openmpi}
 BuildRequires:  environment-modules
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl-interpreter
 BuildRequires:  time
 %endif

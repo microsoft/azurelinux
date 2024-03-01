@@ -17,7 +17,7 @@ BuildRequires:  python3-libs
 BuildRequires:  readline-devel
 BuildRequires:  xz-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  dejagnu
 BuildRequires:  systemtap-sdt-devel
 %endif

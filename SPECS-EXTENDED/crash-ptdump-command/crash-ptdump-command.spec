@@ -24,7 +24,7 @@ Trace facility
 
 %prep
 %setup -q -n ptdump-%{version}
-%patch0 -p1 -b rhel8_build.patch
+%patch 0 -p1 -b rhel8_build.patch
 
 %build
 make -f ptdump.mk ARCH=SUPPORTED TARGET=X86_64 TARGET_CFLAGS=

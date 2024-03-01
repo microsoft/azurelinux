@@ -11,12 +11,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/systemdependency"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemdependency"
 
 	"github.com/moby/sys/mountinfo"
 	"github.com/sirupsen/logrus"
@@ -319,8 +319,7 @@ func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		}
 
 		if err != nil {
-			logger.Log.Errorf("Error copying file '%s'", f.Src)
-			return err
+			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
 		}
 	}
 	return nil
@@ -331,8 +330,7 @@ func (c *Chroot) CopyOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Copy(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error copying file '%s'", err)
-		return
+		return fmt.Errorf("failed to copy (%s):\n%w", srcPathFull, err)
 	}
 	return
 }
@@ -342,8 +340,7 @@ func (c *Chroot) MoveOutFile(srcPath string, destPath string) (err error) {
 	srcPathFull := filepath.Join(c.rootDir, srcPath)
 	err = file.Move(srcPathFull, destPath)
 	if err != nil {
-		logger.Log.Errorf("Error moving file '%s'", err)
-		return
+		return fmt.Errorf("failed to move file from (%s) to (%s):\n%w", srcPath, destPath, err)
 	}
 	return
 }

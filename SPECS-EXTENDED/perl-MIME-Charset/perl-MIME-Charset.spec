@@ -51,7 +51,7 @@ messages on Internet.
 
 %prep
 %setup -q -n MIME-Charset-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Remove bundled modules
 rm -rf ./inc
 sed -i -e '/^inc\//d' MANIFEST

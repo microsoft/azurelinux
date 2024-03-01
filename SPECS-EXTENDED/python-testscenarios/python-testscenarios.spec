@@ -18,7 +18,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-pbr
 BuildRequires:  python3-testtools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

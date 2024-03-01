@@ -66,10 +66,10 @@ from xml files first generated using cppcheck.
 
 %prep
 %setup -q
-%patch0 -p1 -b .translations
-%patch1 -p1 -b .python3
-%patch2 -p1 -b .array7
-%patch3 -p1 -b .tinyxml2
+%patch 0 -p1 -b .translations
+%patch 1 -p1 -b .python3
+%patch 2 -p1 -b .array7
+%patch 3 -p1 -b .tinyxml2
 # Make sure bundled tinyxml2 is not used
 rm -r externals/tinyxml2
 

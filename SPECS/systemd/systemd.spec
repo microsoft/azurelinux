@@ -1,10 +1,4 @@
 
-# Temporary until azure-release-common is updated to carry macros.dist that defines %azure
-%if %{defined azure}
-%{error:Once azure macro is defined in macros.dist, please remove this}
-%endif
-%global azure 3
-
 # We ship a .pc file but don't want to have a dep on pkg-config. We
 # strip the automatically generated dep here and instead co-own the
 # directory.
@@ -36,6 +30,18 @@
 # See README.build-in-place.
 %bcond inplace 0
 
+# Custom settings for Azure Linux
+#  We don't need to support FIDO hardware for cryptenroll/cryptsetup
+%bcond libfido2 0
+#  This is needed only to include a splash image when building a UKI with ukify
+%bcond pillow 0
+#  We don't need to generate any QR codes
+%bcond qrencode 0
+#  This is only used for udev tracing
+%bcond systemtap 0
+#  We don't need to support Xen
+%bcond xen 0
+
 Name:           systemd
 Url:            https://systemd.io
 %if %{without inplace}
@@ -44,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        3%{?dist}
+Release:        7%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -123,6 +129,9 @@ Patch0490:      use-bfq-scheduler.patch
 # Adjust upstream config to use our shared stack
 Patch0491:      fedora-use-system-auth-in-pam-systemd-user.patch
 
+# Patches for Azure Linux
+Patch0900: do-not-test-openssl-sm3.patch
+
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
 %endif
@@ -178,20 +187,20 @@ BuildRequires:  openssl-devel
 %if %{with gnutls}
 BuildRequires:  gnutls-devel
 %endif
-%if %{undefined azure}
+%if %{with qrencode}
 BuildRequires:  qrencode-devel
 %endif
 BuildRequires:  libmicrohttpd-devel
 BuildRequires:  libxkbcommon-devel
 BuildRequires:  iptables-devel
-%if %{undefined azure}
+%if %{with libfido2}
 BuildRequires:  pkgconfig(libfido2)
 %endif
 BuildRequires:  pkgconfig(tss2-esys)
 BuildRequires:  pkgconfig(tss2-rc)
 BuildRequires:  pkgconfig(tss2-mu)
 BuildRequires:  pkgconfig(libbpf)
-%if %{undefined azure}
+%if %{with systemtap}
 # This is required for udev tracing
 BuildRequires:  systemtap-sdt-devel
 %endif
@@ -207,10 +216,10 @@ BuildRequires:  python3-devel
 BuildRequires:  python3dist(jinja2)
 BuildRequires:  python3dist(lxml)
 BuildRequires:  python3dist(pefile)
-%if %{undefined azure}
+%if %{with pillow}
 BuildRequires:  python3dist(pillow)
-BuildRequires:  python3dist(pytest-flakes)
 %endif
+BuildRequires:  python3dist(pytest-flakes)
 BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(zstd)
 %if 0%{?want_bootloader}
@@ -233,7 +242,7 @@ BuildRequires:  bpftool
 %global have_bpf 1
 %endif
 
-%if %{undefined azure}
+%if %{with xen}
 %ifarch x86_64 aarch64
 %global have_xen 1
 # That package is only built for those two architectures
@@ -247,10 +256,12 @@ Requires(post): grep
 Requires(post): openssl-libs
 Requires:       dbus >= 1.9.18
 Requires:       %{name}-pam%{_isa} = %{version}-%{release}
-Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
+# FIXME - our toolkit can't handle logical deps like this
+#Requires(meta): (%%{name}-rpm-macros = %%{version}-%%{release} if rpm-build)
+Requires(meta): %{name}-rpm-macros = %{version}-%{release}
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
-%{?azure:Recommends:     %{name}-networkd = %{version}-%{release}}
-%{?azure:Recommends:     %{name}-resolved = %{version}-%{release}}
+Recommends:     %{name}-networkd = %{version}-%{release}
+Recommends:     %{name}-resolved = %{version}-%{release}
 Recommends:     diffutils
 # FIXME - our toolkit can't handle logical deps like this
 #Requires:       (util-linux-core or util-linux)
@@ -260,6 +271,7 @@ Provides:       /bin/systemctl
 Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
+Obsoletes:      systemd-bootstrap <= %{version}-%{release}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -291,7 +303,7 @@ Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 Recommends:     libpcre2-8.so.0%{?elf_suffix}
 Recommends:     libpwquality.so.1%{?elf_suffix}
 Recommends:     libpwquality.so.1(LIBPWQUALITY_1.0)%{?elf_bits}
-%if %{undefined azure}
+%if %{with qrencode}
 Recommends:     libqrencode.so.4%{?elf_suffix}
 %endif
 Recommends:     libbpf.so.1%{?elf_suffix}
@@ -346,6 +358,7 @@ Systemd PAM module registers the session with systemd-logind.
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
+Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -358,10 +371,13 @@ for information how to use those macros.
 Summary:        Development headers for systemd
 License:        LGPL-2.1-or-later AND MIT
 Requires:       %{name}-libs%{_isa} = %{version}-%{release}
-Requires(meta): (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
+# FIXME - our toolkit can't handle logical deps like this
+#Requires(meta): (%%{name}-rpm-macros = %%{version}-%%{release} if rpm-build)
+Requires(meta): %{name}-rpm-macros = %{version}-%{release}
 Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
+Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
@@ -398,7 +414,7 @@ Recommends:     libelf.so.1%{?elf_suffix}
 Recommends:     libelf.so.1(ELFUTILS_1.7)%{?elf_bits}
 
 # used by home, cryptsetup, cryptenroll, logind
-%if %{undefined azure}
+%if %{with libfido2}
 Recommends:     libfido2.so.1%{?elf_suffix}
 %endif
 Recommends:     libp11-kit.so.0%{?elf_suffix}
@@ -436,7 +452,7 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       python3dist(pefile)
 Requires:       python3dist(zstd)
 Requires:       python3dist(cryptography)
-%if %{undefined azure}
+%if %{with pillow}
 Recommends:     python3dist(pillow)
 %endif
 
@@ -647,14 +663,14 @@ CONFIGURE_OPTS=(
         -Dlibcryptsetup=%[%{with bootstrap}?"disabled":"enabled"]
         -Delfutils=enabled
         -Dpwquality=enabled
-        -Dqrencode=%[%{defined azure}?"disabled":"enabled"]
+        -Dqrencode=%[%{with qrencode}?"enabled":"disabled"]
         -Dgnutls=%[%{with gnutls}?"enabled":"disabled"]
         -Dmicrohttpd=enabled
         -Dvmspawn=enabled
         -Dlibidn2=enabled
         -Dlibiptc=disabled
         -Dlibcurl=enabled
-        -Dlibfido2=%[%{defined azure}?"disabled":"enabled"]
+        -Dlibfido2=%[%{with libfido2}?"enabled":"disabled"]
         -Dxenctrl=%[0%{?have_xen}?"enabled":"disabled"]
         -Defi=true
         -Dtpm=true
@@ -1170,6 +1186,19 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
+- remove use of %%azure (or %%azl) macro
+
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-6
+- skip sm3 digest in test-openssl, we dont provide that digest
+
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 255-5
+- update macro use in spec
+- build with pytest-flakes
+
+* Tue Feb 13 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-4
+- Add Obsoletes: systemd-bootstrap* to allow systemd to replace the bootstrap version
+
 * Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 255-3
 - remove conflicts dracut release number
 

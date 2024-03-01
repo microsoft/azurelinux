@@ -20,7 +20,7 @@ BuildRequires:  libisofs-devel >= %{version}
 BuildRequires:	make
 BuildRequires:  readline-devel
 BuildRequires:  zlib-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  file
 BuildRequires:  which
 %endif
@@ -67,7 +67,7 @@ DVD-RAM, BD-R and BD-RE.
 
 %prep
 %setup -q -n %{name}
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 libtoolize --force
 autoreconf --force --install

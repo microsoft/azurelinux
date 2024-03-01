@@ -37,7 +37,7 @@ BuildRequires:  perl(Coro::MakeMaker)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(XSLoader)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Coro::AnyEvent)
 %endif
 
@@ -86,8 +86,8 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n Coro-Multicore-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 %build
 export CORO_MULTICORE_CHECK=0 PERL_CANARY_STABILITY_NOPROMPT=1

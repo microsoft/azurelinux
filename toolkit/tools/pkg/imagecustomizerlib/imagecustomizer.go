@@ -11,13 +11,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -232,7 +232,7 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
 	var aggregateErr error
 	for sourceFile := range additionalFiles {
-		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
+		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
 			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
