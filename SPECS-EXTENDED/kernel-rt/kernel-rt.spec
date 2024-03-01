@@ -24,7 +24,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -249,7 +249,7 @@ cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
 # GRUB Environment Block
 mariner_cmdline=init=/lib/systemd/systemd ro no-vmw-sta crashkernel=256M
 mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
+mariner_initrd=initramfs-%{uname_r}.img
 EOF
 chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
 
@@ -310,7 +310,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
+rm -rf /boot/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %preun tools
@@ -421,6 +421,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-2
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
 * Fri Jan 26 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.7.1-1
 - Upgrade to kernel version 6.6.7.1
 
