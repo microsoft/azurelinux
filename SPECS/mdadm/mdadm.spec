@@ -146,7 +146,10 @@ Patch199:    disable-Werror.patch
 
 BuildRequires: make
 BuildRequires: glibc-static >= 2.38-2%{?dist}
-BuildRequires: systemd-rpm-macros binutils-devel gcc systemd-devel
+BuildRequires: systemd-rpm-macros 
+BuildRequires: binutils-devel 
+BuildRequires: gcc 
+BuildRequires: systemd-devel
 %if %{with libreport}
 Requires:       libreport-filesystem
 %endif
@@ -168,7 +171,7 @@ file can be used to help with some common tasks.
 make %{?_smp_mflags} CXFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" SYSCONFDIR="%{_sysconfdir}" mdadm mdmon
 
 %install
-make DESTDIR=%{buildroot} MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=/usr/lib/udev/ install install-systemd
+make DESTDIR=%{buildroot} MANDIR=%{_mandir} BINDIR=%{_sbindir} SYSTEMD_DIR=%{_unitdir} UDEVDIR=%{_libdir}/udev/ install install-systemd
 install -Dp -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/raid-check
 install -Dp -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/raid-check
 mkdir -p -m 710 %{buildroot}/run/mdadm
@@ -208,12 +211,12 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 %{_sbindir}/*
 %{_unitdir}/*
 %{_mandir}/man*/md*
-/usr/lib/systemd/system-shutdown/*
+%{_libdir}/systemd/system-shutdown/*
 %config(noreplace) %{_sysconfdir}/sysconfig/*
 %dir /run/%{name}/
 %config(noreplace) %{_tmpfilesdir}/%{name}.conf
-/etc/libreport/events.d/*
-/usr/share/mdadm/mdcheck
+%{_sysconfdir}/libreport/events.d/*
+%{_datadir}/mdadm/mdcheck
 
 %changelog
 * Thu Feb 29 2024 Yash Panchal <yashpanchal@microsoft.com> - 4.2-1
