@@ -318,7 +318,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 	// Make sure we have a valid version.
 	versionInterval, err := pkgNode.VersionedPkg.Interval()
 	if err != nil {
-		logger.Log.Errorf("Failed to create version interval for %s", pkgNode)
+		err = fmt.Errorf("failed to create version interval for (%s):\n%w", pkgNode, err)
 		return
 	}
 
@@ -403,7 +403,7 @@ func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
 	newEdge := g.NewEdge(from, to)
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to add edge: '%s' -> '%s'", from.SrpmPath, to.SrpmPath)
+			err = fmt.Errorf("failed to add edge: (%s) -> (%s):\n%s", from.SrpmPath, to.SrpmPath, r)
 		}
 	}()
 	g.SetEdge(newEdge)
@@ -442,7 +442,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 	defer func() {
 		// graph manipulation calls may panic on error (such as duplicate node IDs)
 		if r := recover(); r != nil {
-			err = fmt.Errorf("collapsing nodes (%v) into (%s) failed, error: %s", nodesToCollapse, versionedPkg, r)
+			err = fmt.Errorf("failed to collapse nodes (%v) into (%s) failed:\n%w\n%s", nodesToCollapse, versionedPkg, err, r)
 		}
 
 		if err != nil {
@@ -454,7 +454,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 			for _, node := range nodesToCollapse {
 				lookupErr := g.addToLookup(node, false)
 				if lookupErr != nil {
-					logger.Log.Errorf("Failed to add node (%s) back to lookup table. Error: %s", node.FriendlyName(), lookupErr)
+					err = fmt.Errorf("failed to add node (%s) back to lookup table:\n%w\n%w", node.FriendlyName(), lookupErr, err)
 				}
 			}
 		}
@@ -820,64 +820,64 @@ func (n PkgNode) MarshalBinary() (data []byte, err error) {
 	hasPkgPtr := (n.VersionedPkg != nil)
 	err = encoder.Encode(hasPkgPtr)
 	if err != nil {
-		err = fmt.Errorf("encoding hasPkgPtr: %s", err.Error())
+		err = fmt.Errorf("failed to encode hasPkgPtr:\n%w", err)
 		return
 	}
 	if hasPkgPtr {
 		err = encoder.Encode(n.VersionedPkg)
 		if err != nil {
-			err = fmt.Errorf("encoding VersionedPkg: %s", err.Error())
+			err = fmt.Errorf("failed to encode VersionedPkg:\n%w", err)
 			return
 		}
 	}
 	err = encoder.Encode(n.State)
 	if err != nil {
-		err = fmt.Errorf("encoding State: %s", err.Error())
+		err = fmt.Errorf("failed to encode State:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.Type)
 	if err != nil {
-		err = fmt.Errorf("encoding Type: %s", err.Error())
+		err = fmt.Errorf("failed to encode Type:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.SrpmPath)
 	if err != nil {
-		err = fmt.Errorf("encoding SrpmPath: %s", err.Error())
+		err = fmt.Errorf("failed to encode SrpmPath:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.RpmPath)
 	if err != nil {
-		err = fmt.Errorf("encoding RpmPath: %s", err.Error())
+		err = fmt.Errorf("failed to encode RpmPath:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.SpecPath)
 	if err != nil {
-		err = fmt.Errorf("encoding SpecPath: %s", err.Error())
+		err = fmt.Errorf("failed to encode SpecPath:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.SourceDir)
 	if err != nil {
-		err = fmt.Errorf("encoding SourceDir: %s", err.Error())
+		err = fmt.Errorf("failed to encode SourceDir\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.Architecture)
 	if err != nil {
-		err = fmt.Errorf("encoding Architecture: %s", err.Error())
+		err = fmt.Errorf("failed to encode Architecture:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.SourceRepo)
 	if err != nil {
-		err = fmt.Errorf("encoding SourceRepo: %s", err.Error())
+		err = fmt.Errorf("failed to encode SourceRepo:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.GoalName)
 	if err != nil {
-		err = fmt.Errorf("encoding GoalName: %s", err.Error())
+		err = fmt.Errorf("failed to encode GoalName:\n%w", err)
 		return
 	}
 	err = encoder.Encode(n.Implicit)
 	if err != nil {
-		err = fmt.Errorf("encoding Implicit: %s", err.Error())
+		err = fmt.Errorf("failed to encode Implicit: %s", err)
 		return
 	}
 	return outBuffer.Bytes(), err
@@ -889,64 +889,64 @@ func (n *PkgNode) UnmarshalBinary(inBuffer []byte) (err error) {
 	var hasPkgPtr bool
 	err = decoder.Decode(&hasPkgPtr)
 	if err != nil {
-		err = fmt.Errorf("decoding hasPkgPtr: %s", err.Error())
+		err = fmt.Errorf("failed to decode hasPkgPtr:\n%w", err)
 		return
 	}
 	if hasPkgPtr {
 		err = decoder.Decode(&n.VersionedPkg)
 		if err != nil {
-			err = fmt.Errorf("decoding VersionedPkg: %s", err.Error())
+			err = fmt.Errorf("failed to decode VersionedPkg:\n%w", err)
 			return
 		}
 	}
 	err = decoder.Decode(&n.State)
 	if err != nil {
-		err = fmt.Errorf("decoding State: %s", err.Error())
+		err = fmt.Errorf("failed to decode State:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.Type)
 	if err != nil {
-		err = fmt.Errorf("decoding Type: %s", err.Error())
+		err = fmt.Errorf("failed to decode Type:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.SrpmPath)
 	if err != nil {
-		err = fmt.Errorf("decoding SrpmPath: %s", err.Error())
+		err = fmt.Errorf("failed to decode SrpmPath:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.RpmPath)
 	if err != nil {
-		err = fmt.Errorf("decoding RpmPath: %s", err.Error())
+		err = fmt.Errorf("failed to decode RpmPath:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.SpecPath)
 	if err != nil {
-		err = fmt.Errorf("decoding SpecPath: %s", err.Error())
+		err = fmt.Errorf("failed to decode SpecPath:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.SourceDir)
 	if err != nil {
-		err = fmt.Errorf("decoding SourceDir: %s", err.Error())
+		err = fmt.Errorf("failed to decode SourceDir:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.Architecture)
 	if err != nil {
-		err = fmt.Errorf("decoding Architecture: %s", err.Error())
+		err = fmt.Errorf("failed to decode Architecture:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.SourceRepo)
 	if err != nil {
-		err = fmt.Errorf("decoding SourceRepo: %s", err.Error())
+		err = fmt.Errorf("failed to decode SourceRepo:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.GoalName)
 	if err != nil {
-		err = fmt.Errorf("decoding GoalName: %s", err.Error())
+		err = fmt.Errorf("failed to decode GoalName:\n%w", err)
 		return
 	}
 	err = decoder.Decode(&n.Implicit)
 	if err != nil {
-		err = fmt.Errorf("decoding Implicit: %s", err.Error())
+		err = fmt.Errorf("failed to decode Implicit:\n%w", err)
 		return
 	}
 	n.This = n
@@ -966,21 +966,18 @@ func (n *PkgNode) SetAttribute(attr encoding.Attribute) (err error) {
 		newID := n.nodeID
 		data, err = base64.StdEncoding.DecodeString(attr.Value)
 		if err != nil {
-			logger.Log.Errorf("Failed to decode base 64 encoding: %s", err.Error())
-			return
+			return fmt.Errorf("failed to decode base 64 encoding:\n%w", err)
 		}
 		buffer := bytes.Buffer{}
 		_, err = buffer.Write(data)
 		if err != nil {
-			logger.Log.Errorf("Failed to read gob data: %s", err.Error())
-			return
+			return fmt.Errorf("failed to read gob data:\n%w", err)
 		}
 
 		decoder := gob.NewDecoder(&buffer)
 		err = decoder.Decode(n)
 		if err != nil {
-			logger.Log.Errorf("Failed to decode gob data: %s", err.Error())
-			return
+			return fmt.Errorf("failed to decode gob data:\n%w", err)
 		}
 		// Restore the ID we were given by the deserializer
 		n.nodeID = newID
@@ -1056,8 +1053,8 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 			for _, n := range to {
 				toNames = fmt.Sprintf("%s %s", toNames, n.FriendlyName())
 			}
-			logger.Log.Errorf("Couldn't add meta node from [%s] to [%s]", fromNames, toNames)
-			logger.Log.Panicf("Adding meta node failed.")
+			err := fmt.Errorf("failed to add meta node from (%s) to (%s)", fromNames, toNames)
+			logger.Log.Panicf("Adding meta node failed:\n%v\n%v", err, r)
 		}
 	}()
 
@@ -1128,19 +1125,19 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 
 	err = g.safeAddNode(goalNode)
 	if err != nil {
-		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
+		err = fmt.Errorf("failed to add goal node (%s):\n%w", goalName, err)
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, packagesGoalSet, strict, TypeLocalRun)
 	if err != nil {
-		err = fmt.Errorf("failed to connect goal node '%s' to packages: %s", goalName, err.Error())
+		err = fmt.Errorf("failed to connect goal node (%s) to packages:\n%w", goalName, err)
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
 	if err != nil {
-		err = fmt.Errorf("failed to connect goal node '%s' to tests: %s", goalName, err.Error())
+		err = fmt.Errorf("failed to connect goal node (%s) to tests:\n%w", goalName, err)
 		return
 	}
 
@@ -1182,18 +1179,18 @@ func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode,
 
 	err = g.safeAddNode(goalNode)
 	if err != nil {
-		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
+		err = fmt.Errorf("failed to add goal node (%s):\n%w", goalName, err)
 		return
 	}
 
 	for _, node := range existingNodes {
 		if !g.HasNode(node) {
-			err = fmt.Errorf("can't add goal node '%s' from node '%s' which is not in the graph", goalName, node.FriendlyName())
+			err = fmt.Errorf("failed to add goal node (%s) from node (%s) which is not in the graph", goalName, node.FriendlyName())
 			return nil, err
 		}
 		err = g.AddEdge(goalNode, node)
 		if err != nil {
-			err = fmt.Errorf("failed to add edge from goal node '%s' to node '%s': %s", goalName, node.FriendlyName(), err.Error())
+			err = fmt.Errorf("failed to add edge from goal node (%s) to node (%s):\n%w", goalName, node.FriendlyName(), err)
 			return nil, err
 		}
 	}
@@ -1499,13 +1496,13 @@ func (g *PkgGraph) connectGoalEdges(goalNode *PkgNode, goalSet map[*pkgjson.Pack
 			case TypeTest:
 				existingNode = nodeLookup.TestNode
 			default:
-				return fmt.Errorf("unexpected node type to connect with a goal node: %s", nodeType)
+				return fmt.Errorf("unexpected node type to connect with a goal node (%s)", nodeType)
 			}
 		}
 
 		if existingNode == nil {
 			if strict {
-				return fmt.Errorf("could not find all goal nodes with strict=true (missing %+v)", pkg)
+				return fmt.Errorf("failed to find all goal nodes with strict=true (missing %+v)", pkg)
 			}
 
 			logger.Log.Warnf("Could not goal package %+v", pkg)
@@ -1614,8 +1611,7 @@ func (g *PkgGraph) replaceSRPMBuildDependency(replacedNode, newNode *PkgNode, de
 
 			err = g.AddEdge(parentNode, newNode)
 			if err != nil {
-				logger.Log.Errorf("Adding edge failed for %v -> %v.", parentNode, newNode)
-				return
+				return fmt.Errorf("failed to add edge fro (%v) -> (%v):\n%w", parentNode, newNode, err)
 			}
 		}
 	}
@@ -1749,7 +1745,6 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	for _, node := range cycle[1:] {
 		fmt.Fprintf(&cycleStringBuilder, " --> {%s}", node.FriendlyName())
 	}
-	logger.Log.Errorf("Unfixable circular dependency found:\t%s\terror: %s", cycleStringBuilder.String(), err)
 
 	// Hydrating the toolchain RPMs was required to resolve the cycles at one point. This is no longer the case, but
 	// we should leave a message here to avoid confusion.
@@ -1759,7 +1754,7 @@ func formatCycleErrorMessage(cycle []*PkgNode, err error) error {
 	logger.Log.Warn("║ graph.                                                                                         ║")
 	logger.Log.Warn("╚════════════════════════════════════════════════════════════════════════════════════════════════╝")
 
-	return fmt.Errorf("cycles detected in dependency graph")
+	return fmt.Errorf("unfixable circular dependency in dependency graph (%s):\n%w", cycleStringBuilder.String(), err)
 }
 
 // pkgNodesListToPackageVerSet converts a list of "*PkgNode" elements to a set of "*PackageVer" elements.
