@@ -6,7 +6,7 @@
 # gen-ld-script.sh
 # Generate linker script to embed ELF binaries with build metadata
 
-# /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{azurelinux_release_version}
+# /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}
 echo "gen-ld-script.sh name($1) version($2) _topdir($3) osversion($4)"
 
 OS_VERSION=$(echo $4 | cut -d. -f1,2)

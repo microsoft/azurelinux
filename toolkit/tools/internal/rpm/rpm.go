@@ -36,7 +36,7 @@ const (
 	DistTagDefine = "dist"
 
 	// DistroReleaseVersionDefine specifies the distro release version option for rpm tool commands
-	DistroReleaseVersionDefine = "azurelinux_release_version"
+	DistroReleaseVersionDefine = "distro_release_version"
 
 	// DistroBuildNumberDefine specifies the distro build number option for rpm tool commands
 	DistroBuildNumberDefine = "mariner_build_number"
