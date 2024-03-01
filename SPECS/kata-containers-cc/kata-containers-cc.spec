@@ -155,7 +155,7 @@ mkdir -p %{buildroot}/etc/systemd/system/containerd.service.d/
 # for testing policy/snapshotter without SEV SNP we use CH (with kernel-uvm and initrd) instead of CH-CVM with IGVM
 # Note: our kata-containers config toml expects cloud-hypervisor and kernel under a certain path/name, so we align this through symlinks here
 ln -s /usr/bin/cloud-hypervisor               %{buildroot}%{coco_bin}/cloud-hypervisor
-ln -s /usr/bin/cloud-hypervisor-cvm %{buildroot}%{coco_bin}/cloud-hypervisor-snp
+ln -s /usr/bin/cloud-hypervisor-cvm           %{buildroot}%{coco_bin}/cloud-hypervisor-snp
 
 # this is again for testing without SEV SNP
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
