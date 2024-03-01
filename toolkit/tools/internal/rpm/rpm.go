@@ -4,11 +4,11 @@
 package rpm
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
