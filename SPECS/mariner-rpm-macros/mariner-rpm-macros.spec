@@ -6,7 +6,7 @@
 Summary:        Mariner specific rpm macro files
 Name:           mariner-rpm-macros
 Version:        2.0
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,7 +26,6 @@ Source11:       macros.mono-srpm
 Source12:       macros.ocaml-srpm
 Source13:       macros.perl-srpm
 Source14:       gpgverify
-Source15:       pythondist.attr
 Source16:       brp-python-bytecompile
 Source17:       macros.pybytecompile
 # Use an enhanced copy of Python's compileall module for Python >= 3.4
@@ -82,8 +81,6 @@ install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 sed -e 's|@DIST@|%{dist}|g' %{SOURCE28} > macros.dist
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
-mkdir -p %{buildroot}%{_fileattrsdir}
-install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
@@ -119,12 +116,14 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{rcluadir}/srpm/*.lua
 %{_rpmconfigdir}/macros.d/macros.pybytecompile
 %{_rpmconfigdir}/macros.d/macros.python*
-%{_fileattrsdir}/pythondist.attr
 
 %files -n mariner-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 2.0-25
+- Remove pythondist.attr
+
 * Thu Nov 09 2023 George Mileka <gmileka@microsoft.com> - 2.0-24
 - Update ccache to use the compiler content for comparison.
 
