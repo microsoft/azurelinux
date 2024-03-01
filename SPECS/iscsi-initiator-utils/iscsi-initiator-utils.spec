@@ -45,7 +45,6 @@ BuildRequires: flex bison doxygen kmod-devel systemd-units
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel
 BuildRequires: isns-utils-devel
 BuildRequires: systemd-devel
-BuildRequires: systemd-rpm-macros
 BuildRequires: libselinux-devel
 Requires: %{name}-iscsiuio >= %{version}-%{release}
 %if 0%{?fedora}
