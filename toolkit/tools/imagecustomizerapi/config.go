@@ -6,15 +6,16 @@ package imagecustomizerapi
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Config struct {
 	Disks        *[]Disk      `yaml:"Disks"`
+	Iso          *Iso         `yaml:"Iso"`
 	SystemConfig SystemConfig `yaml:"SystemConfig"`
 }
 
-func (c *Config) IsValid() error {
+func (c *Config) IsValid() (err error) {
 	if c.Disks != nil {
 		disks := *c.Disks
 		if len(disks) < 1 {
@@ -32,7 +33,14 @@ func (c *Config) IsValid() error {
 		}
 	}
 
-	err := c.SystemConfig.IsValid()
+	if c.Iso != nil {
+		err = c.Iso.IsValid()
+		if err != nil {
+			return err
+		}
+	}
+
+	err = c.SystemConfig.IsValid()
 	if err != nil {
 		return err
 	}

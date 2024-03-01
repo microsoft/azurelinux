@@ -17,7 +17,7 @@ BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(English)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-generators
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Autoloader)
 BuildRequires:  perl(CPAN)
 BuildRequires:  perl(CPAN::Meta)
@@ -48,7 +48,7 @@ Net::SSLeay module basically comprise of:
 
 %prep
 %setup -q -n Net-SSLeay-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %if 0%{?with_fips:1}

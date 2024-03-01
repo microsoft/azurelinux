@@ -22,7 +22,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-mock
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -50,7 +50,7 @@ authentication.
 
 %prep
 %setup -q -n %{upstream_name}-%{commit0}
-%patch1 -p1
+%patch 1 -p1
 
 %build
 %py3_build

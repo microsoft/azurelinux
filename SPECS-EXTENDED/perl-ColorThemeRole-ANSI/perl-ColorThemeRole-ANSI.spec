@@ -21,7 +21,7 @@ BuildRequires:  perl(Role::Tiny)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(ColorTheme::Test::Static)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)

@@ -12,7 +12,7 @@ Patch0: convmv-2.0-preserve-timestamps.patch
 BuildArch: noarch
 BuildRequires: perl-generators
 BuildRequires: perl(Getopt::Long)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: perl(File::Find)
 %endif
 
@@ -22,7 +22,7 @@ of filenames, e.g. from Latin1 to UTF-8.
 
 %prep
 %setup -q
-%patch0 -p1 -b .preserve-timestamps
+%patch 0 -p1 -b .preserve-timestamps
 tar -xf testsuite.tar
 
 %build

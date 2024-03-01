@@ -4,19 +4,20 @@
 package imagecustomizerlib
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -165,7 +166,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
 		}
 	case ImageFormatIso:
-		err = createLiveOSIsoImage(buildDir, rawImageFile, outputImageDir, outputImageBase)
+		err = createLiveOSIsoImage(buildDir, baseConfigPath, config.Iso, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {
 			return err
 		}
@@ -210,6 +211,11 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 
 	partitionsCustomized := hasPartitionCustomizations(config)
 
+	err = validateIsoConfig(baseConfigPath, config.Iso)
+	if err != nil {
+		return err
+	}
+
 	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
@@ -223,6 +229,47 @@ func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
 	return config.Disks != nil
 }
 
+func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
+	var aggregateErr error
+	for sourceFile := range additionalFiles {
+		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
+		isFile, err := file.IsFile(sourceFileFullPath)
+		if err != nil {
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
+		}
+
+		if !isFile {
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
+		}
+	}
+	return aggregateErr
+}
+
+func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) error {
+	if config == nil {
+		return nil
+	}
+
+	err := validateIsoKernelCommandline(config.KernelCommandLine)
+	if err != nil {
+		return err
+	}
+
+	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validateIsoKernelCommandline(kernelCommandLine imagecustomizerapi.KernelCommandLine) error {
+	if kernelCommandLine.SELinux != imagecustomizerapi.SELinuxDefault {
+		return fmt.Errorf("unsupported SELinux configuration for the output ISO image.")
+	}
+	return nil
+}
+
 func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
 	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
@@ -233,16 +280,9 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.Syst
 		return err
 	}
 
-	for sourceFile := range config.AdditionalFiles {
-		sourceFileFullPath := filepath.Join(baseConfigPath, sourceFile)
-		isFile, err := file.IsFile(sourceFileFullPath)
-		if err != nil {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err)
-		}
-
-		if !isFile {
-			return fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile)
-		}
+	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	if err != nil {
+		return err
 	}
 
 	for i, script := range config.PostInstallScripts {

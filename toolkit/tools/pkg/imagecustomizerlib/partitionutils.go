@@ -10,11 +10,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 )
 
 var (
@@ -84,6 +84,9 @@ func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskuti
 func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
 	var bootPartition *diskutils.PartitionInfo
 	bootPartition, err := findBootPartitionFromEsp(efiSystemPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, err
+	}
 
 	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
 	if err != nil {

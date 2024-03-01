@@ -7,10 +7,11 @@ package diskutils
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
@@ -36,7 +37,7 @@ func CreateInitramfs(initramfsPath string) (initramfs InitramfsMount, err error)
 
 	initramfs.initramfsOutputFile, err = os.OpenFile(initramfsPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, initramfsModeBits)
 	if err != nil {
-		logger.Log.Errorf("Failed to create a new initramfs at '%s': %s", initramfsPath, err.Error())
+		err = fmt.Errorf("failed to create a new initramfs at (%s):\n%w", initramfsPath, err)
 	}
 
 	return
@@ -145,19 +146,19 @@ func (i *InitramfsMount) Close() (err error) {
 
 	err = i.cpioWriter.Close()
 	if err != nil {
-		logger.Log.Errorf("Failed to close initramfs cpio writer: '%s'", err.Error())
+		err = fmt.Errorf("failed to close initramfs cpio writer:\n%w", err)
 		return
 	}
 	err = i.pgzWriter.Close()
 	if err != nil {
-		logger.Log.Errorf("Failed to close initramfs pgzip writer: '%s'", err.Error())
+		err = fmt.Errorf("failed to close initramfs pgzip writer:\n%w", err)
 		return
 	}
 
 	logger.Log.Debugf("Writing %d bytes to file", i.outputBuffer.Len())
 	bytesIO, err = i.initramfsOutputFile.Write(i.outputBuffer.Bytes())
 	if err != nil {
-		logger.Log.Errorf("Failed to write initramfs file: '%s'", err.Error())
+		err = fmt.Errorf("failed to write initramfs file:\n%w", err)
 		return
 	}
 	logger.Log.Infof("Bytes writen to file: %d", bytesIO)
@@ -165,13 +166,13 @@ func (i *InitramfsMount) Close() (err error) {
 	// Explicit call to fsync, archive corruption was occuring occasionally otherwise.
 	err = i.initramfsOutputFile.Sync()
 	if err != nil {
-		logger.Log.Errorf("Failed to sync initramfs file: '%s'", err.Error())
+		err = fmt.Errorf("failed to sync initramfs file:\n%w", err)
 		return
 	}
 
 	err = i.initramfsOutputFile.Close()
 	if err != nil {
-		logger.Log.Errorf("Failed to close initramfs: '%s'", err.Error())
+		err = fmt.Errorf("failed to close initramfs:\n%w", err)
 		return
 	}
 	return
@@ -222,7 +223,7 @@ func (i *InitramfsMount) AddFileToInitramfs(sourcePath, destPath string) (err er
 	if fileInfo.Mode().IsRegular() {
 		bytesIO, err = io.Copy(i.cpioWriter, file)
 		if err != nil {
-			logger.Log.Errorf("Failed to add regular file '%s' into initramfs: %s", header.Name, err.Error())
+			err = fmt.Errorf("failed to add regular file (%s) into initramfs:\n%w", header.Name, err)
 			return
 		}
 		logger.Log.Debugf("New file '%s' caused %d bytes to be transferred to new archive", header.Name, bytesIO)
@@ -236,7 +237,7 @@ func (i *InitramfsMount) AddFileToInitramfs(sourcePath, destPath string) (err er
 		if isSymlink {
 			_, err = i.cpioWriter.Write([]byte(linkDestination))
 			if err != nil {
-				logger.Log.Errorf("Failed to add symlink '%s'->'%s' to initramfs: %s", header.Name, linkDestination, err.Error())
+				err = fmt.Errorf("failed to add symlink (%s)->(%s) to initramfs:\n%w", header.Name, linkDestination, err)
 				return
 			}
 		}

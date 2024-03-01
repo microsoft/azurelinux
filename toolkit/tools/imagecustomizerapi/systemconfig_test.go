@@ -42,26 +42,14 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 	assert.ErrorContains(t, err, "duplicate PartitionSettings ID")
 }
 
-func TestSystemConfigIsValidKernelCommandLineInvalidChars(t *testing.T) {
-	value := SystemConfig{
-		KernelCommandLine: KernelCommandLine{
-			ExtraCommandLine: "example=\"example\"",
-		},
-	}
-
-	err := value.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ExtraCommandLine")
-}
-
 func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	invalidVerity := SystemConfig{
 		Verity: &Verity{
-			DataPartition: VerityPartition{
+			DataPartition: IdentifiedPartition{
 				IdType: "PartUuid",
 				Id:     "incorrect-uuid-format",
 			},
-			HashPartition: VerityPartition{
+			HashPartition: IdentifiedPartition{
 				IdType: "PartLabel",
 				Id:     "hash_partition",
 			},
@@ -71,4 +59,16 @@ func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	err := invalidVerity.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid Id format")
+}
+
+func TestSystemConfigIsValidOverlayInvalidLowerDir(t *testing.T) {
+	overlayWithInvalidLowerDir := Overlay{
+		LowerDir: "",
+		UpperDir: "/upper",
+		WorkDir:  "/work",
+	}
+
+	err := overlayWithInvalidLowerDir.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "path cannot be empty")
 }

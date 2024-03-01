@@ -24,7 +24,7 @@ BuildRequires:  perl(JSON::PP) >= 2.00
 BuildRequires:  perl(Safe)
 BuildRequires:  perl(version) >= 0.83
 # Tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Temp) >= 0.19
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(Opcode)
@@ -46,7 +46,7 @@ because of my modification.
 
 %prep
 %setup -q -n Parse-PMFile-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1

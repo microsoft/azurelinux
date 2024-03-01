@@ -69,11 +69,11 @@ This package provides API documentation for xbean.
 # build failing on this due to doxia-sitetools problems
 rm src/site/site.xml
 
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
 
 %pom_remove_parent
 %pom_remove_dep mx4j:mx4j

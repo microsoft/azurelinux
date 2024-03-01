@@ -12,14 +12,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 )
@@ -51,6 +51,7 @@ type BuildResult struct {
 	Err            error               // Error encountered during the build.
 	LogFile        string              // Path to the log file from the build.
 	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
+	CheckFailed    bool                // Indicator if the package test failed but the build itself was correct.
 	Ignored        bool                // Indicator if the build was ignored by user request.
 	UsedCache      bool                // Indicator if we used the cached artifacts (external or earlier local build) instead of building the node.
 	WasDelta       bool                // Indicator if we used a pre-built component from an external repository instead of building the node.
@@ -120,7 +121,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			}
 
 		case pkggraph.TypeTest:
-			res.Ignored, res.LogFile, res.Err = testNode(req, graphMutex, agent, checkAttempts, ignoredTests)
+			res.CheckFailed, res.Ignored, res.LogFile, res.Err = testNode(req, graphMutex, agent, checkAttempts, ignoredTests)
 			if res.Err == nil {
 				setAncillaryBuildNodesStatus(req, graphMutex, pkggraph.StateUpToDate)
 			} else {
@@ -134,7 +135,7 @@ func BuildNodeWorker(channels *BuildChannels, agent buildagents.BuildAgent, grap
 			fallthrough
 
 		default:
-			res.Err = fmt.Errorf("invalid node type %v on node %v", req.Node.Type, req.Node)
+			res.Err = fmt.Errorf("invalid node type (%v) on node (%v)", req.Node.Type, req.Node)
 		}
 
 		channels.Results <- res
@@ -175,7 +176,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 }
 
 // testNode tests a TypeTest node.
-func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredTests []*pkgjson.PackageVer) (ignored bool, logFile string, err error) {
+func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents.BuildAgent, checkAttempts int, ignoredTests []*pkgjson.PackageVer) (checkFailed, ignored bool, logFile string, err error) {
 	node := request.Node
 	baseSrpmName := node.SRPMFileName()
 
@@ -200,7 +201,7 @@ func testNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagents
 	dependencies := getBuildDependencies(node, request.PkgGraph, graphMutex)
 
 	logger.Log.Infof("Testing: %s", baseSrpmName)
-	logFile, err = testSRPMFile(agent, checkAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
+	logFile, checkFailed, err = testSRPMFile(agent, checkAttempts, basePackageName, node.SrpmPath, node.Architecture, dependencies)
 	return
 }
 
@@ -239,11 +240,11 @@ func getBuildDependencies(node *pkggraph.PkgNode, pkgGraph *pkggraph.PkgGraph, g
 }
 
 // parseCheckSection reads the package build log file to determine if the %check section passed or not
-func parseCheckSection(logFile string) (err error) {
+func parseCheckSection(logFile string) (checkFailed bool, err error) {
 	logFileObject, err := os.Open(logFile)
 	// If we can't open the log file, that's a build error.
 	if err != nil {
-		logger.Log.Errorf("Failed to open log file '%s' while checking package test results. Error: %v", logFile, err)
+		err = fmt.Errorf("failed to open log file (%s) while checking package test results:\n%w", logFile, err)
 		return
 	}
 	defer logFileObject.Close()
@@ -258,10 +259,10 @@ func parseCheckSection(logFile string) (err error) {
 			failedLogFile = fmt.Sprintf("%s-FAILED_TEST-%d.log", failedLogFile, time.Now().UnixMilli())
 			err = file.Copy(logFile, failedLogFile)
 			if err != nil {
-				logger.Log.Errorf("Log file copy failed. Error: %v", err)
+				err = fmt.Errorf("failed to copy log file:\n%w", err)
 				return
 			}
-			err = fmt.Errorf("package test failed. Test status line: %s", currLine)
+			checkFailed = true
 			return
 		}
 	}
@@ -285,14 +286,14 @@ func buildSRPMFile(agent buildagents.BuildAgent, buildAttempts int, basePackageN
 }
 
 // testSRPMFile sends an SRPM to a build agent to test.
-func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageName string, srpmFile string, outArch string, dependencies []string) (logFile string, err error) {
+// The 'checkFailed' flag says if the package test failed as opposed
+// to the build failing for another reason, which is reflected by a non-nil 'err'.
+func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageName string, srpmFile string, outArch string, dependencies []string) (logFile string, checkFailed bool, err error) {
 	const (
 		retryDuration = time.Second
 		runCheck      = true
 	)
 
-	// checkFailed is a flag to see if a non-null buildErr is from the %check section
-	checkFailed := false
 	logBaseName := filepath.Base(srpmFile) + ".test.log"
 	err = retry.Run(func() (buildErr error) {
 		checkFailed = false
@@ -303,13 +304,16 @@ func testSRPMFile(agent buildagents.BuildAgent, checkAttempts int, basePackageNa
 			return
 		}
 
-		buildErr = parseCheckSection(logFile)
-		checkFailed = (buildErr != nil)
+		checkFailed, buildErr = parseCheckSection(logFile)
+		// If the build succeeded but tests failed, we still want to retry.
+		if buildErr == nil && checkFailed {
+			buildErr = fmt.Errorf("package test for (%s) failed", basePackageName)
+		}
 		return
 	}, checkAttempts, retryDuration)
 
-	if err != nil && checkFailed {
-		logger.Log.Warnf("Tests failed for '%s'. Error: %s", srpmFile, err)
+	if checkFailed {
+		logger.Log.Debugf("Tests failed for '%s' after %d retries.", basePackageName, checkAttempts)
 		err = nil
 	}
 	return

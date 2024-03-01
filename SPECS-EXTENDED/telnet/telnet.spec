@@ -69,35 +69,35 @@ You may enable the daemon by editing /etc/xinetd.d/telnet
 mv telnet telnet-NETKIT
 %setup -T -D -q -a 2 -n netkit-telnet-%{version}
 
-%patch1 -p0 -b .cvs
-%patch5 -p0 -b .fix
-%patch6 -p1 -b .env
-%patch10 -p0 -b .pek
-%patch7 -p1 -b .issue
-%patch8 -p1 -b .sa-01-49
-%patch11 -p1 -b .8bit
-%patch12 -p1 -b .argv
-%patch13 -p1 -b .confverb
-%patch14 -p1 -b .cleanup_race 
-%patch15 -p0 -b .pty_read
-%patch16 -p1 -b .CAN-2005-468_469
+%patch 1 -p0 -b .cvs
+%patch 5 -p0 -b .fix
+%patch 6 -p1 -b .env
+%patch 10 -p0 -b .pek
+%patch 7 -p1 -b .issue
+%patch 8 -p1 -b .sa-01-49
+%patch 11 -p1 -b .8bit
+%patch 12 -p1 -b .argv
+%patch 13 -p1 -b .confverb
+%patch 14 -p1 -b .cleanup_race 
+%patch 15 -p0 -b .pty_read
+%patch 16 -p1 -b .CAN-2005-468_469
 #%patch17 -p1 -b .linemode
-%patch18 -p1 -b .gethost
-%patch19 -p1 -b .gethost2
-%patch20 -p1 -b .nodns
-%patch21 -p1 -b .errnosysbsd
-%patch22 -p1 -b .reallynodns
-%patch23 -p1 -b .rh678324
-%patch24 -p1 -b .rh674942
-%patch25 -p1 -b .rh704604
-%patch26 -p1 -b .rh825946
-%patch27 -p1 -b .ipv6-support
-%patch28 -p1 -b .core-dump
-%patch29 -p1 -b .gcc7
-%patch30 -p1 -b .manpage
-%patch31 -p1 -b .telnetrc
-%patch32 -p1 -b .log-address
-%patch33 -p1 -b .overflow
+%patch 18 -p1 -b .gethost
+%patch 19 -p1 -b .gethost2
+%patch 20 -p1 -b .nodns
+%patch 21 -p1 -b .errnosysbsd
+%patch 22 -p1 -b .reallynodns
+%patch 23 -p1 -b .rh678324
+%patch 24 -p1 -b .rh674942
+%patch 25 -p1 -b .rh704604
+%patch 26 -p1 -b .rh825946
+%patch 27 -p1 -b .ipv6-support
+%patch 28 -p1 -b .core-dump
+%patch 29 -p1 -b .gcc7
+%patch 30 -p1 -b .manpage
+%patch 31 -p1 -b .telnetrc
+%patch 32 -p1 -b .log-address
+%patch 33 -p1 -b .overflow
 
 %build
 %ifarch s390 s390x

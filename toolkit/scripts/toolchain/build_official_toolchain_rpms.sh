@@ -7,21 +7,22 @@ echo Building RPMs for toolchain
 echo Parameters passed: $@
 
 MARINER_DIST_TAG=$1
-MARINER_BUILD_NUMBER=$2
-MARINER_RELEASE_VERSION=$3
-MARINER_BUILD_DIR=$4
-SPECROOT=$5
-RUN_CHECK=${6}
-MARINER_TOOLCHAIN_MANIFESTS_DIR=$7
-INCREMENTAL_TOOLCHAIN=${8:-n}
-MARINER_INPUT_SRPMS_DIR=$9
-MARINER_OUTPUT_SRPMS_DIR=${10}
-MARINER_REHYDRATED_RPMS_DIR=${11}
-MARINER_TOOLCHAIN_MANIFESTS_FILE=${12}
+MARINER_DIST_MACRO=$2
+MARINER_BUILD_NUMBER=$3
+MARINER_RELEASE_VERSION=$4
+MARINER_BUILD_DIR=$5
+SPECROOT=$6
+RUN_CHECK=${7}
+MARINER_TOOLCHAIN_MANIFESTS_DIR=$8
+INCREMENTAL_TOOLCHAIN=${9:-n}
+MARINER_INPUT_SRPMS_DIR=${10}
+MARINER_OUTPUT_SRPMS_DIR=${11}
+MARINER_REHYDRATED_RPMS_DIR=${12}
+MARINER_TOOLCHAIN_MANIFESTS_FILE=${13}
 #  Time stamp components
 # =====================================================
-BLDTRACKER=${13}
-TIMESTAMP_FILE_PATH=${14}
+BLDTRACKER=${14}
+TIMESTAMP_FILE_PATH=${15}
 source $(dirname  $0)/../timestamp.sh
 # =====================================================
 
@@ -201,7 +202,7 @@ chroot_and_install_rpms () {
         # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
         #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
-        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --queryformat %{VERSION}-%{RELEASE})
+        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --define="$MARINER_DIST_MACRO" --queryformat %{VERSION}-%{RELEASE})
         # Do not include any files with "debuginfo" in the name
         find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
@@ -237,7 +238,7 @@ chroot_and_run_rpmbuild () {
         SHELL=/bin/bash                    \
         rpmbuild --nodeps --rebuild --clean     \
             $CHECK_SETTING                 \
-            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "mariner_build_number $PARAM_BUILD_NUM" \
+            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "$MARINER_DIST_MACRO" --define "mariner_build_number $PARAM_BUILD_NUM" \
             --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
             --define "mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
@@ -428,15 +429,22 @@ chroot_and_install_rpms unzip
 build_rpm_in_chroot_no_install gperf
 chroot_and_install_rpms gperf
 
+# Python3 and pam need libxcrypt
+build_rpm_in_chroot_no_install libxcrypt
+chroot_and_install_rpms libxcrypt
+
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
+
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
+# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
@@ -454,7 +462,6 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
-# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -484,10 +491,7 @@ build_rpm_in_chroot_no_install curl
 # cracklib needs python3-setuptools (installed with python3)
 build_rpm_in_chroot_no_install cracklib
 
-# pam needs libxcrypt
-build_rpm_in_chroot_no_install libxcrypt
-chroot_and_install_rpms libxcrypt
-# pam needs cracklib
+# pam needs cracklib and libxcrypt (installed above)
 chroot_and_install_rpms cracklib
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
@@ -670,7 +674,7 @@ build_rpm_in_chroot_no_install newt
 chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
-build_rpm_in_chroot_no_install mariner-repos
+build_rpm_in_chroot_no_install azurelinux-repos
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.

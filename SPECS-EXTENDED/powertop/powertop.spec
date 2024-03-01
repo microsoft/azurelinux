@@ -27,8 +27,8 @@ computer use more power than necessary while it is idle.
 
 %prep
 %setup -q
-%patch0 -p1 -b .always-create-params
-%patch1 -p1
+%patch 0 -p1 -b .always-create-params
+%patch 1 -p1
 
 echo "v%{version}" > version-long
 echo '"v%{version}"' > version-short

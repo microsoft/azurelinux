@@ -11,7 +11,7 @@ Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  libqmi-devel
 BuildRequires:  systemd-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  dbus-glib
 BuildRequires:  python3-gobject
 BuildRequires:  python3-dbus

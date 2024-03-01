@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
-Version:        2.0
-Release:        9%{?dist}
+Version:        3.0
+Release:        10%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:        Metapackage defining the basic set of packages (no kernel) used by images such as VHDs, VHDXs and ISOs.
 Requires:       %{name}-container = %{version}-%{release}
 Requires:       bc
-Requires:       bridge-utils
 Requires:       chrony
 Requires:       cpio
 Requires:       cracklib-dicts
@@ -62,10 +61,10 @@ Requires:       filesystem
 Requires:       findutils
 Requires:       grep
 Requires:       gzip
-Requires:       mariner-release
-Requires:       mariner-repos
-Requires:       mariner-repos-extras
-Requires:       mariner-repos-microsoft
+Requires:       azurelinux-release
+Requires:       azurelinux-repos
+Requires:       azurelinux-repos-ms-non-oss
+Requires:       azurelinux-repos-ms-oss
 Requires:       ncurses-libs
 Requires:       openssl
 Requires:       readline
@@ -90,6 +89,12 @@ Requires:       zlib
 %files container
 
 %changelog
+* Tue Feb 27 2024 Muhammad Falak <mwani@microsoft.com> - 3.0-1
+- Bump version to 3.0 for AzureLinux 3
+
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.0-10
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Wed Jan 24 12:12:42 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.0-9
 - require broken-out systemd packages
 

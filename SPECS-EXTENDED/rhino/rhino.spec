@@ -57,8 +57,8 @@ Examples for %{name}
 
 %prep
 %setup -q -n %{name}-Rhino%{scm_version}_RELEASE
-%patch0 -b .build
-%patch1 -b .fixManifest
+%patch 0 -b .build
+%patch 1 -b .fixManifest
 cp %{SOURCE1} pom.xml
 %pom_remove_parent
 

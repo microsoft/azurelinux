@@ -1,14 +1,14 @@
 Summary:        Kpatch tooling
 Name:           kpatch
 Version:        0.9.8
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://github.com/dynup/kpatch
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         mariner_update.patch
+Patch0:         azurelinux_update.patch
 
 ExclusiveArch:  x86_64
 
@@ -35,7 +35,7 @@ It gives more control over uptime without sacrificing security or stability.
 Summary:        Tools for building livepatches with kpatch.
 Group:          Development/Tools
 
-Requires:       mariner-release
+Requires:       azurelinux-release
 Requires:       numactl-devel
 Requires:       openssl
 Requires:       patch
@@ -78,6 +78,12 @@ rm -rf %{buildroot}%{_mandir}
 %{_bindir}/kpatch-build
 
 %changelog
+* Wed Feb 28 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 0.9.8-3
+- Fix remaining issues linked to CBL-Mariner re-branding to Azure Linux
+
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.9.8-2
+- Update the runtime dependency from mariner-release to azurelinux-release
+
 * Mon Jan 29 2024 Muhammad Falak <mwani@microsoft.com> - 0.9.8-1
 - Bump version to 0.9.8
 

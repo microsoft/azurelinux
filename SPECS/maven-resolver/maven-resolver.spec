@@ -32,7 +32,7 @@ artifact transports and artifact resolution.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 # requires internet connection
 rm maven-resolver-transport-http/src/test/java/org/eclipse/aether/transport/http/HttpTransporterTest.java

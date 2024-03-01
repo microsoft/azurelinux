@@ -5,10 +5,7 @@
   "10-oomd-per-slice-defaults.conf": "3f0d6882312affecddfdc5a204a44c34b90c573839f2a4850a26b44f528520bd",
   "10-timeout-abort.conf": "ae6b234f92bc22f1201a7572b59b454c9809f33c80d13f361b9674e1801acc37",
   "20-yama-ptrace.conf": "f7881466bff200865ec2c6b5f989ed35855ac45420a55ae5ace805f9e5111828",
-  "26494.patch": "1242a0db037a2c8e5de3c8b676aad63caaae60d674227ec58d1ea11f085a996b",
-  "95-disable-systemd-oomd.preset": "f2cc3a853de7d56431644b3b54d9a850dd6db01b7f00b86e108f50a845fc8edc",
   "98-default-mac-none.link": "11efa1aee1d52e74b3ca5d1db903e9e1f3ca5e07498c25ea13e40452e2430e1a",
-  "fedora-use-system-auth-in-pam-systemd-user.patch": "b1c8206a0ca6d5283130ec01387b8277e1478d5f01a7beeaa77d350e71e6c5e4",
   "macros.sysusers": "b7c3941912208657b68a5890b8e320d626a6bc17290a223b46071e251b240160",
   "split-files.py": "ff2ace09f116028299f75ab1f81ca467a6dc4e7ad38c27c22d2e8dd1229ad0dd",
   "sysctl.conf.README": "51d16ee2e7eef12dd42e924af6b835861e8b79d11921ba0418d7d0aec7a2a93b",
@@ -20,7 +17,6 @@
   "sysusers.generate-pre.sh": "6d503de2db2374125cb5c3b6034636514b58a38dcff193550768c3c49c6d7419",
   "sysusers.prov": "0dcc4b699030c11eccedb850d4d2c097ebdc725766e17db56f942ee445b93cf6",
   "triggers.systemd": "ee7398bec872cc3717d396d201c0a9d4239b883d5f43cb609ab83b229119ceb6",
-  "use-bfq-scheduler.patch": "d47f3224b6c984ff7f4335c1e127f86380c45beadfaabc73f09dc993aac908ed",
   "yum-protect-systemd.conf": "5a5aa0a6cdfb432f890351ebd1f62d05f9a04d5aa58f57d0758686afaa8d3617"
  }
 }

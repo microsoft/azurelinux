@@ -16,7 +16,7 @@ BuildRequires:  gettext-devel
 BuildRequires:  libogg-devel
 BuildRequires:  libtool
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  sudo
 %endif
 
