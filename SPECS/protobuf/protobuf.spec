@@ -1,19 +1,22 @@
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.17.3
-Release:        2%{?dist}
+Version:        25.3
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
-Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
+Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  curl
 BuildRequires:  libstdc++
-BuildRequires:  make
+BuildRequires:  cmake
 BuildRequires:  unzip
+BuildRequires:  abseil-cpp-devel
 Provides:       %{name}-compiler = %{version}-%{release}
 Provides:       %{name}-lite = %{version}-%{release}
+
+Requires:       abseil-cpp
 
 %description
 Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data. You can find protobuf's documentation on the Google Developers site.
@@ -23,6 +26,7 @@ Summary:        Development files for protobuf
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}-lite-devel = %{version}-%{release}
+Requires:       abseil-cpp-devel
 
 %description    devel
 The protobuf-devel package contains libraries and header files for
@@ -57,57 +61,58 @@ This contains protobuf python3 libraries.
 %autosetup
 
 %build
-%configure --disable-silent-rules
-%make_build
+%{cmake} \
+    -Dprotobuf_BUILD_TESTS=OFF \
+    -Dprotobuf_ABSL_PROVIDER=package \
+    -Dprotobuf_BUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
-# build python subpackage
+%{cmake_build}
+
+export PROTOC="${PWD}/%{__cmake_builddir}/protoc"
+
 pushd python
-%py3_build
+%{py3_build}
 popd
 
 %install
-%make_install
+%{cmake_install}
 
-# install python subpackage
+export PROTOC="%{_builddir}/%{name}-%{version}/%{__cmake_builddir}/protoc"
+
 pushd python
-%py3_install
+%{py3_install}
 popd
 
-%ldconfig_scriptlets
-
-%check
-# run C++ unit tests
-%make_build check
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
 %license LICENSE
-%{_bindir}/protoc
-%{_libdir}/libprotobuf-lite.so.28*
-%{_libdir}/libprotobuf.so.28*
-%{_libdir}/libprotoc.so.28*
+%{_bindir}/protoc*
+%{_libdir}/*.so.*
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
 %{_libdir}/pkgconfig/*
-%{_libdir}/libprotobuf-lite.la
-%{_libdir}/libprotobuf-lite.so
-%{_libdir}/libprotobuf.la
-%{_libdir}/libprotobuf.so
-%{_libdir}/libprotoc.la
-%{_libdir}/libprotoc.so
+%{_libdir}/*.so
+%{_libdir}/cmake/*
 
 %files static
 %defattr(-,root,root)
-%{_libdir}/libprotobuf-lite.a
-%{_libdir}/libprotobuf.a
-%{_libdir}/libprotoc.a
+%{_libdir}/*.a
 
 %files -n python3-%{name}
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 29 2024 Sindhu Karri <lakarri@microsoft.com> - 25.3-1
+- Upgrade to 25.3
+- Added BR on abseil-cpp
+- Using cmake build system
+
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests
 
