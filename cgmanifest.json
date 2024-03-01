@@ -3820,8 +3820,8 @@
         "type": "other",
         "other": {
           "name": "freeglut",
-          "version": "3.2.1",
-          "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.2.1.tar.gz"
+          "version": "3.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.4.0.tar.gz"
         }
       }
     },
@@ -4402,6 +4402,16 @@
           "name": "glog",
           "version": "0.3.5",
           "downloadUrl": "https://github.com/google/glog/archive/v0.3.5/glog-0.3.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "glslang",
+          "version": "14.0.0",
+          "downloadUrl": "https://github.com/KhronosGroup/glslang/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -7661,8 +7671,8 @@
         "type": "other",
         "other": {
           "name": "jasper",
-          "version": "2.0.32",
-          "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.32.tar.gz"
+          "version": "4.2.1",
+          "downloadUrl": "https://github.com/jasper-software/jasper/archive/refs/tags/version-4.2.1.tar.gz"
         }
       }
     },
@@ -9421,8 +9431,8 @@
         "type": "other",
         "other": {
           "name": "libglvnd",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/NVIDIA/libglvnd/archive/v1.3.2/libglvnd-1.3.2.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v1.7.0/libglvnd-1.7.0.tar.gz"
         }
       }
     },
@@ -12931,8 +12941,8 @@
         "type": "other",
         "other": {
           "name": "mesa",
-          "version": "21.0.0",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-21.0.0.tar.xz"
+          "version": "24.0.1",
+          "downloadUrl": "https://archive.mesa3d.org/mesa-24.0.1.tar.xz"
         }
       }
     },
@@ -12941,8 +12951,8 @@
         "type": "other",
         "other": {
           "name": "mesa-libGLU",
-          "version": "9.0.1",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/glu/glu-9.0.1.tar.xz"
+          "version": "9.0.3",
+          "downloadUrl": "https://gitlab.freedesktop.org/mesa/glu/-/archive/glu-9.0.3/glu-glu-9.0.3.tar.gz"
         }
       }
     },
@@ -27727,7 +27737,7 @@
         "other": {
           "name": "spirv-headers",
           "version": "1.5.5",
-          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers/archive/b42ba6d92faf6b4938e6f22ddd186dbdacc98d78/spirv-headers-b42ba6d92faf6b4938e6f22ddd186dbdacc98d78.tar.gz"
+          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers//archive/refs/tags/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -27736,8 +27746,8 @@
         "type": "other",
         "other": {
           "name": "spirv-tools",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v2022.1.tar.gz"
+          "version": "2023.2",
+          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Tools/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
