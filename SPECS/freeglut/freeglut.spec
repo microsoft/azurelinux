@@ -1,21 +1,25 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+%global __cmake_in_source_build 1
 Summary:        A freely licensed alternative to the GLUT library
 Name:           freeglut
-Version:        3.2.1
-Release:        4%{?dist}
+Version:        3.4.0
+Release:        1%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            http://freeglut.sourceforge.net
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # For the manpages
 Source1:        https://downloads.sourceforge.net/openglut/openglut-0.6.3-doc.tar.gz
 Patch0:         common.patch
+# Patch for CVE-2024-24258 and CVE-2024-24259
+Patch1:         155.patch
 License:        MIT
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
-BuildRequires:  pkgconfig libGLU-devel libXext-devel libXxf86vm-devel
+BuildRequires:  pkgconfig libGLU-devel libXext-devel
 BuildRequires:  libXi-devel libICE-devel
+BuildRequires: make
 # The virtual Provides below is present so that this freeglut package is a
 # drop in binary replacement for "glut" which will satisfy rpm dependancies
 # properly.  The Obsoletes tag is required in order for any pre-existing
@@ -52,15 +56,16 @@ license.
 
 %prep
 %setup -q -a 1
-%patch 0 -p0
+%patch -P 0 -p0
+%patch -P 1 -p1
 
 %build
 %{cmake} -DFREEGLUT_BUILD_STATIC_LIBS=OFF .
-make %{?_smp_mflags}
+%{cmake_build}
 
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+%{make_install}
 
 mkdir -p $RPM_BUILD_ROOT/%{_mandir}/man3
 install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
@@ -70,11 +75,13 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 
 %files
-%doc AUTHORS ChangeLog COPYING README doc/*.png doc/*.html
+%license COPYING
+%doc AUTHORS ChangeLog README.md
 # don't include contents of doc/ directory as it is mostly obsolete
 %{_libdir}/libglut.so.3*
 
 %files devel
+%doc doc/html/*.png doc/html/*.html
 %{_includedir}/GL/*.h
 %{_libdir}/libglut.so
 %{_libdir}/pkgconfig/glut.pc
@@ -82,6 +89,10 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %{_libdir}/cmake/FreeGLUT/*
 
 %changelog
+* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 9.0.3-1
+- Promote and upgrade to 3.4.0 based on Fedora 40.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.1-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
