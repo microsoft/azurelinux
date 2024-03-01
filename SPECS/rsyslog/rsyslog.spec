@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2308.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,7 +26,6 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  liblognorm-devel
 BuildRequires:  librdkafka-devel
 BuildRequires:  librelp-devel
-BuildRequires:  net-snmp-devel
 BuildRequires:  postgresql-devel
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
@@ -62,6 +61,21 @@ BuildArch:      noarch
 
 %description    doc
 HTML documentation for %{name}
+
+%package mmsnmptrapd
+Summary: rsyslog support for snmptrapd
+Requires: %name = %version-%release
+
+%description mmsnmptrapd
+%{summary}
+
+%package snmp
+Summary: rsyslog support for SNMP
+Requires: %name = %version-%release
+BuildRequires: net-snmp-devel
+
+%description snmp
+%{summary}
 
 %prep
 # Unpack the code source tarball
@@ -166,6 +180,9 @@ fi
 %license COPYING
 %{_bindir}/rscryutil
 %{_sbindir}/*
+# Exclude libraries that are packaged separately
+%exclude %{_libdir}/rsyslog/mmsnmptrapd.so
+%exclude %{_libdir}/rsyslog/omsnmp.so
 %{_libdir}/rsyslog/*.so
 %{_mandir}/man5/*
 %{_mandir}/man8/*
@@ -178,7 +195,16 @@ fi
 %files doc
 %doc %{_docdir}/%{name}/html
 
+%files mmsnmptrapd
+%{_libdir}/rsyslog/mmsnmptrapd.so
+
+%files snmp
+%{_libdir}/rsyslog/omsnmp.so
+
 %changelog
+* Thu Feb 29 2024 Henry Beberman <henry.beberman@microsoft.com> - 8.2308.0-3
+- Move snmp libraries into subpackage to remove strict dependency on net-snmp-libs/perl
+
 * Thu Dec 14 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 8.2308.0-2
 - Fix resetting of passwd and group on package update
 
