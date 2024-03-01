@@ -14,16 +14,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ccachemanager"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ccachemanager"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
 	"golang.org/x/sys/unix"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -45,7 +45,7 @@ var (
 	rpmsDirPath          = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	srpmsDirPath         = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
 	toolchainDirPath     = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain a top level directory for each architecture.").Required().ExistingDir()
-	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from CBL-Mariner Base").Required().ExistingDir()
+	cacheDir             = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Azure Linux Base").Required().ExistingDir()
 	basePackageName      = app.Flag("base-package-name", "The name of the spec file used to build this package without the extension.").Required().String()
 	noCleanup            = app.Flag("no-cleanup", "Whether or not to delete the chroot folder after the build is done").Bool()
 	distTag              = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()

@@ -23,12 +23,12 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
 Optional arguments:
-    REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
+    REPO_PATH:      path to the Azure Linux repo root directory. default: "current directory"
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.

@@ -48,7 +48,7 @@ const (
 	DiskButtonRemovePartition = "[Remove Partition[]"
 
 	// Auto partition
-	DiskHelp  = "Please select a disk to install CBL-Mariner on."
+	DiskHelp  = "Please select a disk to install Azure Linux on."
 	DiskTitle = "Select a Disk"
 
 	// Custom Partition
@@ -103,7 +103,7 @@ const (
 
 // EulaView text.
 const (
-	EulaTitle = "Welcome to the CBL-Mariner Installer"
+	EulaTitle = "Welcome to the Azure Linux Installer"
 )
 
 // HostNameView text.
@@ -147,12 +147,12 @@ const (
 
 // ProgressView text.
 const (
-	ProgressTitle      = "Installing CBL-Mariner OS"
-	ProgressSpinnerFmt = "Installing CBL-Mariner, please wait %v"
+	ProgressTitle      = "Installing Azure Linux OS"
+	ProgressSpinnerFmt = "Installing Azure Linux, please wait %v"
 )
 
 // FinishView text.
 const (
-	FinishTitle   = "CBL-Mariner Installation Complete"
+	FinishTitle   = "Azure Linux Installation Complete"
 	FinishTextFmt = "Total installation time: %v seconds. Press Enter to restart."
 )

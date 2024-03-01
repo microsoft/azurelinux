@@ -4790,8 +4790,8 @@
         "type": "other",
         "other": {
           "name": "gptfdisk",
-          "version": "1.0.8",
-          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.8/gptfdisk-1.0.8.tar.gz"
+          "version": "1.0.10",
+          "downloadUrl": "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.10/gptfdisk-1.0.10.tar.gz"
         }
       }
     },
@@ -10101,8 +10101,8 @@
         "type": "other",
         "other": {
           "name": "libmspack",
-          "version": "0.10.1alpha",
-          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.10.1alpha.tar.gz"
+          "version": "0.11alpha",
+          "downloadUrl": "http://www.cabextract.org.uk/libmspack/libmspack-0.11alpha.tar.gz"
         }
       }
     },
@@ -22952,16 +22952,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-m2r",
-          "version": "0.3.1",
-          "downloadUrl": "https://github.com/miyakogi/m2r/archive/v0.3.1/m2r-0.3.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-mako",
           "version": "1.2.4",
           "downloadUrl": "https://github.com/sqlalchemy/mako/archive/refs/tags/rel_1_2_4.tar.gz"
@@ -23283,8 +23273,8 @@
         "type": "other",
         "other": {
           "name": "python-pam",
-          "version": "1.8.4",
-          "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-1.8.4.tar.gz"
+          "version": "2.0.2",
+          "downloadUrl": "https://pypi.python.org/packages/source/p/python-pam/python-pam-2.0.2.tar.gz"
         }
       }
     },
@@ -27936,8 +27926,8 @@
         "type": "other",
         "other": {
           "name": "subversion",
-          "version": "1.14.2",
-          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.2.tar.bz2"
+          "version": "1.14.3",
+          "downloadUrl": "https://archive.apache.org/dist/subversion/subversion-1.14.3.tar.bz2"
         }
       }
     },

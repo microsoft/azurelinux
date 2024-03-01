@@ -6,8 +6,8 @@ package imagecustomizerlib
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 )
 
 type ImageConnection struct {

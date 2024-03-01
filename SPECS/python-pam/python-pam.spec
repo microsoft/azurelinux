@@ -1,23 +1,28 @@
 Summary:        Python PAM module using ctypes
 Name:           python-pam
-Version:        1.8.4
-Release:        3%{?dist}
+# Update the version field in fix-pyproject.patch whenever this changes.
+Version:        2.0.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-pam/
 Source0:        https://pypi.python.org/packages/source/p/python-pam/%{name}-%{version}.tar.gz
+Patch0:         fix-pyproject.patch
 BuildArch:      noarch
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-devel
+BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-six
+BuildRequires:  python3-xml
 
 %description
 Python PAM module using ctypes
 
 %package -n     python3-pam
 Summary:        Python PAM module using ctypes
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
 Requires:       python3
 
 %description -n python3-pam
@@ -27,13 +32,11 @@ Python PAM module using ctypes
 %autosetup -n python-pam-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-
-%check
-%python3 setup.py test
+%pyproject_install
+%pyproject_save_files pam
 
 %files -n python3-pam
 %defattr(-,root,root,-)
@@ -41,6 +44,9 @@ Python PAM module using ctypes
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.2-1
+- Auto-upgrade to 2.0.2 - AzL 3.0 upgrade
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 1.8.4-3
 - Add license to python3 package
 - Remove python2 package

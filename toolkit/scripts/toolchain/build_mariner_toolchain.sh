@@ -5,7 +5,7 @@
 set -x
 set -e
 
-echo Begin building CBL-Mariner toolchain
+echo Begin building Azure Linux toolchain
 echo Parameters passed: $@
 
 MARINER_DIST_TAG=$1
@@ -54,7 +54,7 @@ mkdir -pv $MARINER_RPM_DIR/$(uname -m)
 # out/toolchain/built_rpms
 # out/toolchain/toolchain_built_rpms.tar.gz
 
-echo Full CBL-Mariner toolchain build complete
+echo Full Azure Linux toolchain build complete
 rm -rvf $MARINER_BUILD_DIR/toolchain/built_rpms_all
 mv -v $MARINER_BUILD_DIR/toolchain/built_rpms/ $MARINER_BUILD_DIR/toolchain/built_rpms_all
 pushd $MARINER_BUILD_DIR/toolchain
