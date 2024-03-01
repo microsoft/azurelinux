@@ -11,11 +11,11 @@ import (
 
 func TestVerityIsValidInvalidDataPartition(t *testing.T) {
 	invalidVerity := Verity{
-		DataPartition: VerityPartition{
+		DataPartition: IdentifiedPartition{
 			IdType: "PartUuid",
 			Id:     "incorrect-uuid-format",
 		},
-		HashPartition: VerityPartition{
+		HashPartition: IdentifiedPartition{
 			IdType: "PartLabel",
 			Id:     "hash_partition",
 		},
@@ -28,11 +28,11 @@ func TestVerityIsValidInvalidDataPartition(t *testing.T) {
 
 func TestVerityIsValidInvalidHashPartition(t *testing.T) {
 	invalidVerity := Verity{
-		DataPartition: VerityPartition{
+		DataPartition: IdentifiedPartition{
 			IdType: "PartUuid",
 			Id:     "123e4567-e89b-4d3a-a456-426614174000",
 		},
-		HashPartition: VerityPartition{
+		HashPartition: IdentifiedPartition{
 			IdType: "PartLabel",
 			Id:     "",
 		},

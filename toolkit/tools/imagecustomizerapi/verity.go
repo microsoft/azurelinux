@@ -8,8 +8,8 @@ import (
 )
 
 type Verity struct {
-	DataPartition VerityPartition `yaml:"DataPartition"`
-	HashPartition VerityPartition `yaml:"HashPartition"`
+	DataPartition IdentifiedPartition `yaml:"DataPartition"`
+	HashPartition IdentifiedPartition `yaml:"HashPartition"`
 }
 
 func (v *Verity) IsValid() error {
