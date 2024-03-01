@@ -1,20 +1,23 @@
-%global commit b42ba6d92faf6b4938e6f22ddd186dbdacc98d78
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global commit_date 20220117
-%global gitrel .%{commit_date}.git%{shortcommit}
+%global sdkver 1.3.275.0
+
 
 Name:           spirv-headers
 Version:        1.5.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Header files from the SPIR-V registry
 
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/KhronosGroup
-Source0:        %url/SPIRV-Headers/archive/%{commit}/%{name}-%{commit}.tar.gz
+URL:            https://github.com/KhronosGroup/SPIRV-Headers/
+Source0:        %{url}/archive/refs/tags/vulkan-sdk-%{sdkver}.tar.gz#/%{name}-sdk-%{sdkver}.tar.gz
 
 BuildArch:      noarch
+
+BuildRequires:  cmake3
+BuildRequires:  ninja-build
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 
 %description
 %{summary}
@@ -40,23 +43,31 @@ This includes:
 * The XML registry fil
 
 %prep
-%autosetup -n SPIRV-Headers-%{commit}
+%autosetup -n SPIRV-Headers-vulkan-sdk-%{sdkver}
 chmod a-x include/spirv/1.2/spirv.py
 
 
 %build
-
+%cmake3 -DCMAKE_INSTALL_LIBDIR=%{_lib} -GNinja
+%cmake_build
 
 %install
-mkdir -p %buildroot%{_includedir}/
-mv include/* %buildroot%{_includedir}/
+%cmake_install
 
 %files devel
 %license LICENSE
 %doc README.md
 %{_includedir}/spirv/
+%{_datadir}/cmake/SPIRV-Headers/*.cmake
+%{_datadir}/pkgconfig/SPIRV-Headers.pc
 
 %changelog
+* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 1.5.5-2
+- Upgrade sdkver 1.3.204.0 (commit b42ba6d92faf6b4938e6f22ddd186dbdacc98d78)
+- to 1.3.275 (commit 1c6bb2743599e6eb6f37b2969acc0aef812e32e3), referencing
+- Fedora 40.
+- License verified.
+
 * Mon Mar 07 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5.5-1
 - Updating to version 1.5.5 + 1.6.1 pre-release commits using Fedora 36 spec (license: MIT) for guidance.
 - License verified.

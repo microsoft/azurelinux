@@ -1,5 +1,7 @@
+%global sdkver 1.3.275.0
+
 Name:           spirv-tools
-Version:        2022.1
+Version:        2023.2
 Release:        1%{?dist}
 Summary:        API and commands for processing SPIR-V modules
 
@@ -7,9 +9,9 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/SPIRV-Tools
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/SPIRV-Tools-%{version}.tar.gz
+Source0:        %url/archive/vulkan-sdk-%{sdkver}.tar.gz#/%{name}-sdk-%{sdkver}.tar.gz
 
-Patch0:         fix-gcc12-build.patch
+Patch0: fix-gcc12-build.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gcc-c++
@@ -38,12 +40,11 @@ Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Development files for %{name}
 
 %prep
-%autosetup -p1 -n SPIRV-Tools-%{version}
+%autosetup -p1 -n SPIRV-Tools-vulkan-sdk-%{sdkver}
 
 %build
 %__mkdir_p %_target_platform
 pushd %_target_platform
-
 %cmake3 -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_LIBDIR=%{_lib} \
         -DSPIRV-Headers_SOURCE_DIR=%{_prefix} \
@@ -51,15 +52,12 @@ pushd %_target_platform
         -DSPIRV_TOOLS_BUILD_STATIC=OFF \
         -GNinja ..
 %cmake3_build
-
 popd
 
 %install
 %__mkdir_p %_target_platform
 pushd %_target_platform
-
 %cmake3_install
-
 popd
 
 %ldconfig_scriptlets libs
@@ -73,11 +71,13 @@ popd
 %{_bindir}/spirv-lesspipe.sh
 %{_bindir}/spirv-link
 %{_bindir}/spirv-lint
+%{_bindir}/spirv-objdump
 %{_bindir}/spirv-opt
 %{_bindir}/spirv-reduce
 %{_bindir}/spirv-val
 
 %files libs
+%{_libdir}/libSPIRV-Tools-diff.so
 %{_libdir}/libSPIRV-Tools-link.so
 %{_libdir}/libSPIRV-Tools-lint.so
 %{_libdir}/libSPIRV-Tools-opt.so
@@ -92,6 +92,10 @@ popd
 %{_libdir}/pkgconfig/SPIRV-Tools.pc
 
 %changelog
+* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 2023.2-1
+- Upgrade to 2023.2, referencing Fedora 40.
+- License verified.
+
 * Fri Mar 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2022.1-1
 - Updating to version 2022.1 using Fedora 36 spec (license: MIT) for guidance.
 - License verified.
