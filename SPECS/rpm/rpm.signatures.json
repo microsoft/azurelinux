@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "python.attr": "fb856ce56bfeb6fbf9857d7bb6eac2c05648c463613278a39a469d412007fabe",
+  "python.attr": "610877452569ea34886cb87ede92eb8fc8ceabbe28ffb3d56a2882f64324ba37",
   "pythonbundles.py": "b0a7e29266396997f76253ff415c2107607a11fc474977f0e745c4f18d8f6ac1",
   "pythondeps.sh": "1cc7665252eb845c7e4741ff3e832c78f54ffb05552f1cdb2d43d2c0cbf7c07d",
   "pythondist.attr": "3e4a456ede7f34571bf805bdd7217c6802bb71f8e818f2ce4e02d7d4d2de4cb4",

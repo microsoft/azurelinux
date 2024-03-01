@@ -1,4 +1,4 @@
-__python_provides() %{lua:
+%__python_provides() %{lua:
     -- Match buildroot/payload paths of the form
     --    /PATH/OF/BUILDROOT/usr/bin/pythonMAJOR.MINOR
     -- generating a line of the form
