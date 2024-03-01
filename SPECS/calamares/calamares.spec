@@ -17,7 +17,7 @@ Source0:        https://github.com/calamares/calamares/releases/download/v%{vers
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
 Source1:        calamares-users-3.0.0.tar.gz
 Source2:        calamares-finished-3.0.0.tar.gz
-Source3:        calamares-welcome-3.0.0.tar.gz
+Source3:        calamares-welcome-3.0.1.tar.gz
 Source4:        calamares-partition-3.0.0.tar.gz
 Source5:        calamares-license-3.0.0.tar.gz
 # Source20..39 - configuration files
