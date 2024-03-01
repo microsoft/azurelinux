@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,9 +10,13 @@ URL:            https://rpm.org
 Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
 # The license for the files below is the same as for RPM as they have originally came from rpm.
 # The git repo is hosted by centos. The version below is centos 8 stable.
-Source3:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/python.attr
+Source3:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/python.attr
 Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
-Source5:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondistdeps.py
+Source5:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythondistdeps.py
+Source6:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythondist.attr
+Source7:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythonname.attr
+Source8:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythonbundles.py
+
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch
@@ -176,8 +180,11 @@ find %{buildroot} -name 'perl*' -delete
 # System macros and prefix
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
 install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
+install -vm644 %{SOURCE6} %{buildroot}%{_fileattrsdir}/
+install -vm644 %{SOURCE7} %{buildroot}%{_fileattrsdir}/
 install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
+install -vm755 %{SOURCE8} %{buildroot}%{_libdir}/rpm/
 
 
 pushd python
@@ -257,6 +264,7 @@ popd
 %{_libdir}/rpm/pythondistdeps.py
 
 %{_libdir}/rpm/pythondeps.sh
+%{_libdir}/rpm/pythonbundles.py
 %{_libdir}/rpm/ocamldeps.sh
 %{_libdir}/rpm/rpmdeps
 # Because of no doxygen dependency, we do not produce manpages that require it.
@@ -283,6 +291,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-3
+- Upgrade python scripts
+
 * Thu Feb 07 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-2
 - Remove conflicting `rpm.egg-info` file
 
