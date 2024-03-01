@@ -42,3 +42,4 @@ SystemConfig:
 
   KernelCommandLine:
     ExtraCommandLine: console=tty0 console=ttyS0
+    SELinux: disabled

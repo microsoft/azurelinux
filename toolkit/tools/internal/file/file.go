@@ -305,7 +305,8 @@ func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 	return
 }
 
-// CopyResourceFile copies a file from an embedded binary resource file.
+// CopyResourceFile copies a file from an embedded binary resource file to disk.
+// This will override any existing file.
 func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
 	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
 
