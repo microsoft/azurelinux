@@ -19,7 +19,6 @@
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
 

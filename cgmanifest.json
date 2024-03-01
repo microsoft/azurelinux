@@ -8160,16 +8160,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kernel-uvm-cvm",
-          "version": "6.1.0.mshv11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "kexec-tools",
           "version": "2.0.27",
           "downloadUrl": "http://kernel.org/pub/linux/utils/kernel/kexec/kexec-tools-2.0.27.tar.xz"
@@ -21273,8 +21263,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-all-3.17.3.tar.gz"
+          "version": "25.3",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v25.3/protobuf-25.3.tar.gz"
         }
       }
     },
@@ -24973,8 +24963,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "6.2.0",
-          "downloadUrl": "https://download.qemu.org/qemu-6.2.0.tar.xz"
+          "version": "8.2.0",
+          "downloadUrl": "https://download.qemu.org/qemu-8.2.0.tar.xz"
         }
       }
     },
