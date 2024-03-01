@@ -33,7 +33,7 @@ def check_folder(path):
                         return False
                 else:
                     print(f"{file_to_check} is not found in CBL-Mariner, build to verify signature")
-        return True
+    return True
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -45,9 +45,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     signatures_correct = True
-    for folder in args.folders:
-        if not check_folder(folder):
-            signatures_correct = False
+    for folder_arg in args.folders:
+        split_folders = folder_arg.split()
+        for folder in split_folders:
+            if not check_folder(folder):
+                signatures_correct = False
 
     if signatures_correct:
         print("====================== Signatures verification PASSED ======================")
