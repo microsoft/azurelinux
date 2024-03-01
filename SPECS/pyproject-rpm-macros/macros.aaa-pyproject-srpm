@@ -1,0 +1,7 @@
+# This file is called macros.aaa-pyproject-srpm
+# to sort alphabetically before macros.pyproject.
+# When this file is installed but macros.pyproject is not
+# this macro will cause the package with the real macro to be installed.
+# When macros.pyproject is installed, it overrides this macro.
+# Note: This needs to maintain the same set of options as the real macro.
+%pyproject_buildrequires(rRxtNwe:C:) echo 'pyproject-rpm-macros' && exit 0
