@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "libcdb.pc": "098fa40a69675cb55adc62fcc3b6b31d8ffc66e395ee9a6d106ea510aa94ccf8",
-  "tinycdb-0.78.tar.gz": "50678f432d8ada8d69f728ec11c3140e151813a7847cf30a62d86f3a720ed63c"
- }
+  "Signatures": {
+    "libcdb.pc": "098fa40a69675cb55adc62fcc3b6b31d8ffc66e395ee9a6d106ea510aa94ccf8",
+    "tinycdb-0.81.tar.gz": "469de2d445bf54880f652f4b6dc95c7cdf6f5502c35524a45b2122d70d47ebc2"
+  }
 }

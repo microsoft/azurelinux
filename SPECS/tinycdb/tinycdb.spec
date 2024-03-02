@@ -1,7 +1,7 @@
 Summary:        Utility and library for manipulating constant databases
 Name:           tinycdb
-Version:        0.78
-Release:        15%{?dist}
+Version:        0.81
+Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,9 @@ cp -p debian/libcdb.pc %{buildroot}%{_libdir}/pkgconfig/libcdb.pc
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.81-1
+- Auto-upgrade to 0.81 - Azure Linux 3.0 Upgrades
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 0.78-15
 - License verified
 - Lint spec
