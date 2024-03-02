@@ -2,7 +2,7 @@
 
 Summary:        Containers for Plexus
 Name:           plexus-containers
-Version:        2.1.1
+Version:        2.2.0
 Release:        1%{?dist}
 # Most of the files are either under ASL 2.0 or MIT
 # The following files are under xpp:
@@ -124,6 +124,9 @@ rm plexus-component-metadata/src/test/java/org/codehaus/plexus/metadata/DefaultC
 %license LICENSE-2.0.txt LICENSE.MIT
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.0-1
+- Auto-upgrade to 2.2.0 - Azure Linux 3.0 Upgrades
+
 * Wed Mar 22 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.1.1-1
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
