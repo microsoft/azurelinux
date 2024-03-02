@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -60,7 +59,7 @@ func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath,
 	}
 	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true)
 	if err != nil {
-		logger.Log.Errorf("Failed to initialize chroot (%s) inside (%s). Error: %v.", workerTarPath, chrootDirPath, err)
+		err = fmt.Errorf("failed to initialize chroot (%s) inside (%s):\n%w", workerTarPath, chrootDirPath, err)
 	}
 
 	return

@@ -218,7 +218,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		// Create new root directory
 		err = os.MkdirAll(c.rootDir, os.ModePerm)
 		if err != nil {
-			logger.Log.Warnf("Could not create chroot directory (%s)", c.rootDir)
+			err = fmt.Errorf("failed to create chroot directory (%s):\n%w", c.rootDir, err)
 			return
 		}
 	}
@@ -232,13 +232,13 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
 				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 				if cleanupErr != nil {
-					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
+					err = fmt.Errorf("failed to cleanup chroot (%s) during failed initialization:\n%w\n%w", c.rootDir, cleanupErr, err)
 				}
 			} else {
 				// release chroot dir
 				cleanupErr := buildpipeline.ReleaseChrootDir(c.rootDir)
 				if cleanupErr != nil {
-					logger.Log.Warnf("Failed to release chroot (%s) during failed initialization. Error: %s", c.rootDir, cleanupErr)
+					err = fmt.Errorf("failed to release chroot (%s) during failed initialization:\n%w\n%w", c.rootDir, cleanupErr, err)
 				}
 			}
 		}
@@ -248,7 +248,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	if tarPath != "" {
 		err = extractWorkerTar(c.rootDir, tarPath)
 		if err != nil {
-			logger.Log.Warnf("Could not extract worker tar (%s)", err)
+			err = fmt.Errorf("failed to extract worker tar:\n%w", err)
 			return
 		}
 	}
@@ -257,7 +257,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	for _, dir := range extraDirectories {
 		err = os.MkdirAll(filepath.Join(c.rootDir, dir), os.ModePerm)
 		if err != nil {
-			logger.Log.Warnf("Could not create extra directory inside chroot (%s)", dir)
+			err = fmt.Errorf("failed to create extra directory inside chroot (%s):\n%w", dir, err)
 			return
 		}
 	}
@@ -289,7 +289,7 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		// Mount with the original unsorted order. Assumes the order of mounts is important.
 		err = c.createMountPoints()
 		if err != nil {
-			logger.Log.Warn("Error creating mountpoints for chroot")
+			err = fmt.Errorf("failed to create mountpoints for chroot:\n%w", err)
 			return
 		}
 
@@ -584,7 +584,7 @@ func (c *Chroot) unmountAndRemove(leaveOnDisk, lazyUnmount bool) (err error) {
 		}, totalAttempts, retryDuration, 2.0, nil)
 
 		if err != nil {
-			logger.Log.Warnf("Failed to unmount (%s). Error: %s", fullPath, err)
+			err = fmt.Errorf("failed to unmount (%s):\n%w", fullPath, err)
 			return
 		}
 	}
@@ -655,14 +655,12 @@ func (c *Chroot) createMountPoints() (err error) {
 
 		err = os.MkdirAll(fullPath, os.ModePerm)
 		if err != nil {
-			logger.Log.Warnf("Could not create directory (%s)", fullPath)
-			return
+			return fmt.Errorf("failed to create directory (%s)", fullPath)
 		}
 
 		err = unix.Mount(mountPoint.source, fullPath, mountPoint.fstype, mountPoint.flags, mountPoint.data)
 		if err != nil {
-			logger.Log.Errorf("Mount of (%s) to (%s) failed. Error: %s", mountPoint.source, fullPath, err)
-			return
+			return fmt.Errorf("failed to mount (%s) to (%s):\n%w", mountPoint.source, fullPath, err)
 		}
 
 		mountPoint.isMounted = true
