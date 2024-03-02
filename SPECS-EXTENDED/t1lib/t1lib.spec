@@ -2,13 +2,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           t1lib
 Version:        5.1.2
-Release:        28%{?dist}
+Release:        29%{?dist}
 
 Summary:        PostScript Type 1 font rasterizer
 
 License:        LGPLv2+ AND GPLv2+
 URL:            https://t1lib.org/
-Source0:        %{_mariner_sources_url}/t1lib-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/t1lib-%{version}.tar.gz
 # Patch originally from Debian at http://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
 Patch0:         t1lib_5.1.2-3.patch
 Patch1:         t1lib-5.1.2-segf.patch
@@ -145,6 +145,9 @@ touch $RPM_BUILD_ROOT%{_datadir}/t1lib/{FontDatabase,t1lib.config}
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.1.2-29
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.1.2-28
 - Rename Debian patch to fix SRPM packing
 - Fix dead upstream URL
@@ -321,4 +324,3 @@ touch $RPM_BUILD_ROOT%{_datadir}/t1lib/{FontDatabase,t1lib.config}
 
 * Sun Oct 26 2003 Marius L. Jøhndal <mariuslj at ifi.uio.no> 0:5.0.0-0.fdr.1
 - Initial RPM release.
-

@@ -3,15 +3,15 @@ Distribution:   Azure Linux
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv3+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
 # $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 #http://neugierig.org/software/ruby/ruby-enscript.tar.gz
-Source1: %{_mariner_sources_url}/%{name}-ruby-1.6.4.tar.gz
+Source1: %{_distro_sources_url}/%{name}-ruby-1.6.4.tar.gz
 #http://home.raxnet.net/downloads/viewcvs/php.st
 Source2: enscript-php-1.6.4.st
 
@@ -115,6 +115,9 @@ done
 %config(noreplace) %{_sysconfdir}/enscript.cfg
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-25
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-24
 - Updating source URLs.
 - License verified.

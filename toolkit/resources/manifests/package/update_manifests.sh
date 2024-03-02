@@ -279,7 +279,7 @@ generate_pkggen_core () {
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
         grep "^lua-" $TmpPkgGen
-        grep "^mariner-rpm-macros-" $TmpPkgGen
+        grep "^azurelinux-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen
         grep "^libassuan-" $TmpPkgGen
         grep "^libgpg-error-" $TmpPkgGen

@@ -22,13 +22,13 @@ Distribution:   Azure Linux
 %global apiver  1.0.1
 Name:           bea-stax
 Version:        1.2.0
-Release:        39%{?dist}
+Release:        40%{?dist}
 Summary:        Streaming API for XML
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            http://stax.codehaus.org/Home
 # http://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
-Source0:        %{_mariner_sources_url}/stax-src-%{version}.zip
+Source0:        %{_distro_sources_url}/stax-src-%{version}.zip
 # http://dist.codehaus.org/stax/jars/stax-%{version}.pom
 Source1:        stax-%{version}.pom
 # http://dist.codehaus.org/stax/jars/stax-api-%{apiver}.pom
@@ -106,6 +106,9 @@ install -p -m 0644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/%{name}-api-%{version}
 %endif
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-40
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.0-39
 - Updating source URLs.
 - License verified.

@@ -3,12 +3,12 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 %global pypi_name trove-classifiers
 Name:           python-trove-classifiers
 Version:        2024.2.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Canonical source for classifiers on PyPI (pypi.org)
 
 License:        Apache-2.0
@@ -72,6 +72,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2024.2.23-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 2024.2.23-1
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - Upgrade to latest version 2024.2.23

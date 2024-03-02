@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
 Version:        4.18.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +75,7 @@ Requires:       %{name}-libs = %{version}-%{release}
 Summary:        Binaries, scripts and libraries needed to build rpms.
 Requires:       %{name}-build-libs = %{version}-%{release}
 Requires:       %{name}-devel = %{version}-%{release}
+Requires:       azurelinux-rpm-macros >= 2.0-26
 Requires:       bzip2
 Requires:       cpio
 Requires:       debugedit
@@ -84,7 +85,6 @@ Requires:       elfutils-libelf
 Requires:       file
 Requires:       gzip
 Requires:       lua
-Requires:       mariner-rpm-macros >= 2.0-22
 Requires:       patch
 Requires:       sed
 Requires:       tar
@@ -133,7 +133,7 @@ sed -i 's/extra_link_args/library_dirs/g' python/setup.py.in
     --enable-ndb \
     --disable-dependency-tracking \
     --disable-static \
-    --with-vendor=mariner \
+    --with-vendor=azl \
     --enable-python \
     --with-cap \
     --disable-silent-rules \
@@ -283,6 +283,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Thu Feb 07 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-2
 - Remove conflicting `rpm.egg-info` file
 

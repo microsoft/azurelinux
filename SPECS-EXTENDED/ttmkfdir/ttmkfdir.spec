@@ -3,13 +3,13 @@ Distribution:   Azure Linux
 Summary: Utility to create fonts.scale files for truetype fonts
 Name: ttmkfdir
 Version: 3.0.9
-Release: 60%{?dist}
+Release: 61%{?dist}
 # Only licensing attribution ("GNU Library General Public License") is in README, no version.
 License: LGPLv2+
 # This is a Red Hat maintained package which is specific to
 # our distribution.  Thus the source is only available from
 # within this srpm.
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.bz2
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.bz2
 Source1: %{name}-LICENSE.txt
 Patch: ttmkfdir-3.0.9-cpp.patch
 Patch1: ttmkfdir-3.0.9-zlib.patch
@@ -55,6 +55,9 @@ cp -p %{SOURCE10} %{buildroot}%{_mandir}/man1/
 %{_mandir}/man1/ttmkfdir.1*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.9-61
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 3.0.9-61
 - Update Source0
 

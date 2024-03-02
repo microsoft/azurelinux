@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 
 %global pypi_name toml
@@ -15,7 +15,7 @@ or tomli/tomli-w.
 
 Name:           python-%{pypi_name}
 Version:        0.10.2
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        A deprecated Python Library for Tom's Obvious, Minimal Language
 
 License:        MIT
@@ -94,6 +94,9 @@ toml-test $(pwd)/tests/decoding_test3.sh
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.2-15
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.10.2-14
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.

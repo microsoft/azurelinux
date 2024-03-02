@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           meanwhile
 Version:        1.1.0
-Release:        30%{?dist}
+Release:        31%{?dist}
 Summary:        Lotus Sametime Community Client library
 License:        GPLv2+
 URL:            http://%{name}.sourceforge.net
@@ -12,7 +12,7 @@ URL:            http://%{name}.sourceforge.net
 # cvs -d:pserver:anonymous@meanwhile.cvs.sourceforge.net:/cvsroot/meanwhile co -d meanwhile-1.1.0 -r meanwhile_v1_1_0 meanwhile
 # tar -cvzf meanwhile-1.1.0.tar.gz meanwhile-1.1.0
 
-Source:         %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-crash.patch
 Patch1:         %{name}-fix-glib-headers.patch
 Patch2:         %{name}-file-transfer.patch
@@ -92,6 +92,9 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 %doc docs/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-31
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.0-30
 - Updating source URLs.
 - License verified.

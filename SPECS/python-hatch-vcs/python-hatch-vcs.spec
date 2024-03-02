@@ -3,7 +3,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 # Let’s try to build this as early as we can, since it’s a dependency for
 # some important libraries, such as python-platformdirs.
@@ -12,7 +12,7 @@ Distribution:   Azure Linux
 
 Name:           python-hatch-vcs
 Version:        0.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Hatch plugin for versioning with your preferred VCS
 
 # SPDX
@@ -86,6 +86,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.4.0-2
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.

@@ -1,4 +1,4 @@
-%global rcluadir %{_rpmconfigdir}/lua/mariner
+%global rcluadir %{_rpmconfigdir}/lua/azl
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 
 Vendor:         Microsoft Corporation
@@ -8,7 +8,7 @@ Version:   3.0.9
 %forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
-%global _spectemplatedir %{_datadir}/rpmdevtools/mariner
+%global _spectemplatedir %{_datadir}/rpmdevtools/azl
 %global _docdir_fmt     %{name}
 
 # Master definition that will be written to macro files
@@ -29,7 +29,7 @@ License:   GPLv3+
 URL:       %{forgeurl}
 # Source:  https://pagure.io/go-rpm-macros/archive/3.0.9/go-rpm-macros-3.0.9.tar.gz
 Source:    %{forgesource}
-Patch0:    fixing_ldflags_for_mariner.patch
+Patch0:    fixing_ldflags_for_azl.patch
 
 Requires:  go-srpm-macros = %{version}-%{release}
 Requires:  go-filesystem  = %{version}-%{release}

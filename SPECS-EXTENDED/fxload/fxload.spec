@@ -2,12 +2,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name: fxload
 Version: 2008_10_13
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary: A helper program to download firmware into FX and FX2 EZ-USB devices
 
 License: GPLv2+
 URL: http://linux-hotplug.sourceforge.net/
-Source0: %{_mariner_sources_url}/fxload-%{version}-noa3load.tar.gz
+Source0: %{_distro_sources_url}/fxload-%{version}-noa3load.tar.gz
 # The above file is derived from:
 # http://downloads.sourceforge.net/project/linux-hotplug/fxload/2008_10_13/fxload-2008_10_13.tar.gz
 # This file contains code that is copyright Cypress Semiconductor Inc,
@@ -50,6 +50,9 @@ install -m 644 fxload.8 %{buildroot}/%{_mandir}/man8/
 %{_mandir}/*/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2008_10_13-17
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2008_10_13-16
 - Updating source URLs.
 - License verified.
@@ -159,4 +162,3 @@ install -m 644 fxload.8 %{buildroot}/%{_mandir}/man8/
 
 * Wed Apr 12 2006 Bart Vanbrabant <bart.vanbrabant@zoeloelip.be> - 2002_04_11-1
 - First version of fxload spec based on hotplug spec
-

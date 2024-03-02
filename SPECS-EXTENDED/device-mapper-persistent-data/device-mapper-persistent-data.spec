@@ -7,12 +7,12 @@ Distribution:   Azure Linux
 Summary: Device-mapper Persistent Data Tools
 Name: device-mapper-persistent-data
 Version: 0.8.5
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv3+
 URL: https://github.com/jthornber/thin-provisioning-tools
 # Upstream source's hash is different from the Mariner one.
 # Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}.tar.gz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Patch0: device-mapper-persistent-data-avoid-strip.patch
 
 BuildRequires: autoconf, expat-devel, libaio-devel, libstdc++-devel, boost-devel, gcc-c++
@@ -84,6 +84,9 @@ make DESTDIR=%{buildroot} MANDIR=%{_mandir} install
 #% {_sbindir}/thin_show_duplicates
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-6
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.8.5-5
 - Updating source URLs.
 - License verified.

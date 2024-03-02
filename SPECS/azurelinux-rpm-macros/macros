@@ -1,7 +1,7 @@
 #
 #   System settings
 #
-%_topdir            /usr/src/mariner
+%_topdir            /usr/src/azl
 #
 #   Some standard locations
 #
@@ -36,22 +36,22 @@
 # Generate metadata linker script before prep section of each SPEC
 %__spec_prep_template   #!%{__spec_prep_shell}\
 %{__spec_prep_pre}\
-/usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}\
+/usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}\
 %{nil}
 
 # This section overrides the default behavior of the build macro to export
 # all of the flags handled by set_build_flags. Once the configure macros
 # are consistently applied this override should be removed.
 #
-# USE_CCACHE: when 'mariner_ccache_enabled' is defined, enable building with ccache
+# USE_CCACHE: when 'ccache_enabled' is defined, enable building with ccache
 #
 %__spec_build_template	#!%{__spec_build_shell}\
 %{__spec_build_pre}\
 %{set_build_flags}\
-%{?mariner_ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
-%{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
-%{?mariner_ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
-%{?mariner_ccache_enabled:ccache --zero-stats} \
+%{?ccache_enabled:PATH="/usr/lib/ccache:$PATH" ; export PATH ;}\
+%{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;}\
+%{?ccache_enabled:CCACHE_COMPILERCHECK=content ; export CCACHE_COMPILERCHECK ;}\
+%{?ccache_enabled:ccache --zero-stats} \
 %{nil}
 
 # use zstd compression for binary package payloads
@@ -67,7 +67,7 @@
 ## Should python bytecompilation compile outside python specific directories?
 %_python_bytecompile_extra 0
 
-%__brp_python_bytecompile /usr/lib/rpm/mariner/brp-python-bytecompile "%{__python3}" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
+%__brp_python_bytecompile /usr/lib/rpm/azl/brp-python-bytecompile "%{__python3}" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}"
 
 %_enable_debug_packages 1
 %_include_minidebuginfo 1
@@ -94,8 +94,8 @@
 %__os_install_post    \
     %{__os_install_post_leave_signatures} \
     %{?__brp_strip} \
-    %{?mariner_ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
-    %{?mariner_ccache_enabled:ccache --show-stats} \
+    %{?ccache_enabled:CCACHE_DIR="/ccache-dir" ; export CCACHE_DIR ;} \
+    %{?ccache_enabled:ccache --show-stats} \
     %{nil}
 
 %install %{?_enable_debug_packages:%{?buildsubdir:%{debug_package}}}\
@@ -105,13 +105,13 @@
 # Binary macros
 %__make %{_bindir}/make
 
-# Enable linking with module_info.ld in Mariner build environment by defining: mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld
+# Enable linking with module_info.ld in Azure Linux build environment by defining: distro_module_ldflags  -Wl,-dT,%{_topdir}/BUILD/module_info.ld
 
 # Compilation and linking flag macros
 %build_cflags %{optflags}
 %build_cxxflags %{optflags}
 %build_fflags %{optflags} -I%{_fmoddir}
-%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?mariner_module_ldflags:%{mariner_module_ldflags}}
+%build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?distro_module_ldflags :%{distro_module_ldflags }}
 
 # Deprecated names.  For backwards compatibility only.
 %__global_cflags %{build_cflags}
@@ -171,8 +171,8 @@ print(result)
 %_source_filedigest_algorithm 8
 %_binary_filedigest_algorithm 8
 
-%_hardening_cflags      -specs=/usr/lib/rpm/mariner/default-hardened-cc1
-%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/mariner/default-hardened-ld
+%_hardening_cflags      -specs=/usr/lib/rpm/azl/default-hardened-cc1
+%_hardening_ldflags     -Wl,-z,now -specs=/usr/lib/rpm/azl/default-hardened-ld
 
 # Harden packages by default
 # https://fedorahosted.org/fesco/ticket/1384 (accepted on 2014-02-11)
@@ -185,7 +185,7 @@ print(result)
 # https://pagure.io/fesco/issue/1780 (accepted on 2017-10-30)
 # Use "%undefine _annotated_build" to disable.
 #%_annotated_build       1
-%_annobin_cflags        -specs=/usr/lib/rpm/mariner/default-annobin-cc1
+%_annobin_cflags        -specs=/usr/lib/rpm/azl/default-annobin-cc1
 %_annotated_cflags      %{?_annotated_build:%{_annobin_cflags}}
 
 # Fail linking if there are undefined symbols.  Required for proper
@@ -215,7 +215,7 @@ print(result)
 
 # gpgverify verifies signed sources. There is documentation in the script.
 %gpgverify(k:s:d:) %{lua:
-local script = rpm.expand("%{_libdir}/rpm/mariner/gpgverify ")
+local script = rpm.expand("%{_libdir}/rpm/azl/gpgverify ")
 local keyring = rpm.expand("%{-k*}")
 local signature = rpm.expand("%{-s*}")
 local data = rpm.expand("%{-d*}")
@@ -256,6 +256,6 @@ end
 # New version of RPM has stricter approach to encoding; turn the errors off temporarily.
 %_invalid_encoding_terminates_build 0
 
-# CBL-Mariner's sources storage URL.
+# Azure Linux's sources storage URL.
 # NOTE: only allowed to be used for source URLs when original, upstream source cannot be found.
-%_mariner_sources_url https://cblmarinerstorage.blob.core.windows.net/sources/core
+%_distro_sources_url https://cblmarinerstorage.blob.core.windows.net/sources/core

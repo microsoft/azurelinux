@@ -21,14 +21,14 @@
 Summary:        Another Tool for Language Recognition
 Name:           antlr
 Version:        2.7.7
-Release:        124%{?dist}
+Release:        125%{?dist}
 License:        Public Domain
 Group:          Development/Tools/Other
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.antlr.org/
 # Upstream source under https://www.antlr2.org/download/antlr-2.7.7.tar.gz. Needs verification.
-Source0:        %{_mariner_sources_url}/antlr-%{version}.tar.bz2
+Source0:        %{_distro_sources_url}/antlr-%{version}.tar.bz2
 Source1:        %{name}-build.xml
 Source2:        %{name}-script
 Source3:        http://repo2.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
@@ -209,6 +209,9 @@ find doc -type f | xargs chmod 0644
 %endif
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.7-125
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.7.7-124
 - Fixing source URL.
 

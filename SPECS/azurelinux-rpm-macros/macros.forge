@@ -45,14 +45,14 @@
 #   -i  Print some info about the state of spec variables the macro may use or
 #       set at the end of the processing.
 %forgemeta(az:sviu:) %{lua:
-local      mariner = require "mariner.common"
-local       forge = require "mariner.srpm.forge"
+local      azl = require "azl.common"
+local       forge = require "azl.srpm.forge"
 local     verbose =  rpm.expand("%{-v}") ~= ""
 local informative =  rpm.expand("%{-i}") ~= ""
 local      silent =  rpm.expand("%{-s}") ~= ""
 local  processall = (rpm.expand("%{-a}") ~= "") and (rpm.expand("%{-z}") == "")
 if processall then
-  for _,s in pairs(mariner.getsuffixes("forgeurl")) do
+  for _,s in pairs(azl.getsuffixes("forgeurl")) do
     forge.meta(s,verbose,informative,silent)
   end
 else
@@ -66,9 +66,9 @@ end
 #   -z <number> read %{?forgesetupargs<number>}
 #   -v          be verbose
 %forgesetup(az:v) %{lua:
-local mariner = require "mariner.common"
+local azl = require "azl.common"
 if (rpm.expand("%{-z}") == "") and (rpm.expand("%{-a}") ~= "") then
-  for _,s in pairs(mariner.getsuffixes("forgesetupargs")) do
+  for _,s in pairs(azl.getsuffixes("forgesetupargs")) do
     print(rpm.expand("%setup %{!-v:-q} %{?forgesetupargs" .. s                     .. "}\\n"))
   end
 else
@@ -117,11 +117,11 @@ print(rpm.expand("%autosetup %{-v} %{-N} %{?-S} %{?-p} %{?forgesetupargs" .. rpm
 #  @@BAR@@ with the rpm evaluation of %{bar}
 # in myfile
 %writevars(f:) %{lua:
-local    mariner = require "mariner.common"
+local    azl = require "azl.common"
 local macrofile = rpm.expand("%{-f*}")
 local   rpmvars = {}
 for i = 1, rpm.expand("%#") do
   table.insert(rpmvars, rpm.expand("%" .. i))
 end
-mariner.writevars(macrofile,rpmvars)
+azl.writevars(macrofile,rpmvars)
 }

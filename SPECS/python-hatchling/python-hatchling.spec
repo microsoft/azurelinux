@@ -4,11 +4,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 Name:           python-%{srcname}
 Version:        1.21.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        The build backend used by Hatch
 
 # SPDX
@@ -91,6 +91,9 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 1.21.1-2
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.

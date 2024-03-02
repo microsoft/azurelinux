@@ -40,7 +40,7 @@ function python_bytecompile()
 	if [ "$python_version" -ge 34 ]; then
 
 		[ ! -z $exclude ] && exclude="-x '$exclude'"
-		# /usr/lib/rpm/mariner/ contains compileall2 Python module
+		# /usr/lib/rpm/azl/ contains compileall2 Python module
 		# -q disables verbose output
 		# -f forces the process to overwrite existing compiled files
 		# -x excludes paths defined by regex
@@ -48,7 +48,7 @@ function python_bytecompile()
 		# -x and -e together implements the same functionality as the Filter class below
 		# -s strips $RPM_BUILD_ROOT from the path
 		# -p prepends the leading slash to the path to make it absolute
-		PYTHONPATH=/usr/lib/rpm/mariner/ $python_binary -B $options -m compileall2 -q -f $exclude -s $RPM_BUILD_ROOT -p / -e $RPM_BUILD_ROOT $python_libdir
+		PYTHONPATH=/usr/lib/rpm/azl/ $python_binary -B $options -m compileall2 -q -f $exclude -s $RPM_BUILD_ROOT -p / -e $RPM_BUILD_ROOT $python_libdir
 	else
 #
 # Python 3.3 and lower (incl. Python 2)

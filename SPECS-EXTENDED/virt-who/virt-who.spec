@@ -19,11 +19,11 @@ Distribution:   Azure Linux
 
 Name:           virt-who
 Version:        0.24.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Agent for reporting virtual guest IDs to subscription-manager
 License:        GPLv2+
 URL:            https://github.com/candlepin/virt-who
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  %{python_ver}-devel
 BuildRequires:  %{python_ver}-setuptools
@@ -154,6 +154,9 @@ fi
 %attr(600, root, root) %config(noreplace) %{_sysconfdir}/virt-who.conf
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.24.2-4
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.24.2-3
 - Update Source0
 - Improve formatting

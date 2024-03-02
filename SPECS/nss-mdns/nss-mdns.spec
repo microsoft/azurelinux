@@ -1,11 +1,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 Name: nss-mdns
 Version: 0.15.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: glibc plugin for .local name resolution
 
 License: LGPLv2+
@@ -67,6 +67,9 @@ authselect disable-feature with-mdns4 &> /dev/null || :
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1-11
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Feb 20 2024 bala <balakumaran.kannan@microsoft.com> - 0.15.1-10
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified (LGPL-2.1)

@@ -3,11 +3,11 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags
 
 Name:           python-pathspec
 Version:        0.12.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Utility library for gitignore style pattern matching of file paths
 
 License:        MPL-2.0
@@ -69,6 +69,9 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 
 %changelog
+* Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 0.12.1-2
 - Initial CBL-Mariner import from Fedora 39 (license: MIT)
 - License verified.

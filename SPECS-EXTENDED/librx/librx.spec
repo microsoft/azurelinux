@@ -1,14 +1,14 @@
 Summary: POSIX regexp functions
 Name: librx
 Version: 1.5
-Release: 37%{?dist}
+Release: 38%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://www.gnu.org/software/rx/rx.html
 # Originally downloaded from ftp://ftp.gnu.org/gnu/rx/rx-1.5.tar.bz2
 # The FSF no longer offers this code.
-Source0: %{_mariner_sources_url}/rx-%{version}.tar.bz2
+Source0: %{_distro_sources_url}/rx-%{version}.tar.bz2
 Patch0: rx-1.5-shared.patch
 Patch1: rx-1.5-texinfo.patch
 Patch2: librx-1.5-libdir64.patch
@@ -72,6 +72,9 @@ chmod -x ${RPM_BUILD_ROOT}%{_includedir}/rxposix.h
 %{_libdir}/*.so
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-38
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.5-37
 - Updating source URLs.
 - License verified.

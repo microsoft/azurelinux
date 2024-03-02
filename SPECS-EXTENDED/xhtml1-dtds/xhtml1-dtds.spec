@@ -4,14 +4,14 @@
 # http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620#DTD
 Name:           xhtml1-dtds
 Version:        1.0
-Release:        20020803%{?dist}
+Release:        20020804%{?dist}
 Summary:        XHTML 1.0 document type definitions
 License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
-Source0:        %{_mariner_sources_url}/%{name}-%{date}.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{date}.tar.xz
 Source1:        %{name}.catalog.xml
 Source2:        LICENSE.PTR
 Source99:       %{name}-prepare-tarball.sh
@@ -112,6 +112,9 @@ cd - >/dev/null
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0-20020804
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 1.0-20020803
 - Update Source0
 - Improved formatting

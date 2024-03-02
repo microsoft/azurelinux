@@ -12,13 +12,13 @@ Distribution:   Azure Linux
 Summary: A library for locking devices
 Name: lockdev
 Version: 1.0.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: LGPLv2.1
 URL: https://github.com/definesat/lockdev
 
 # This is a nightly snapshot downloaded via
 # https://github.com/definesat/lockdev
-Source0: %{_mariner_sources_url}/lockdev-%{version}.%{checkout}.tar.gz
+Source0: %{_distro_sources_url}/lockdev-%{version}.%{checkout}.tar.gz
 
 Patch1: lockdev-euidaccess.patch
 Patch2: 0001-major-and-minor-functions-moved-to-sysmacros.h.patch
@@ -113,6 +113,9 @@ fi
 %{_includedir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-2
 - Updating source URLs.
 - License verified.

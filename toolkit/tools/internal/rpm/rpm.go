@@ -36,7 +36,7 @@ const (
 	DistTagDefine = "dist"
 
 	// DistroReleaseVersionDefine specifies the distro release version option for rpm tool commands
-	DistroReleaseVersionDefine = "mariner_release_version"
+	DistroReleaseVersionDefine = "distro_release_version"
 
 	// DistroBuildNumberDefine specifies the distro build number option for rpm tool commands
 	DistroBuildNumberDefine = "mariner_build_number"
@@ -54,10 +54,10 @@ const (
 	NoCompatibleArchError = "error: No compatible architectures found for build"
 
 	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
-	MarinerModuleLdflagsDefine = "mariner_module_ldflags"
+	MarinerModuleLdflagsDefine = "distro_module_ldflags "
 
 	// MarinerCCacheDefine enables ccache in the Mariner build system
-	MarinerCCacheDefine = "mariner_ccache_enabled"
+	MarinerCCacheDefine = "ccache_enabled"
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
