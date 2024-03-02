@@ -1,7 +1,7 @@
 Summary:        The New GNU Portable Threads Library.
 Name:           npth
-Version:        1.6
-Release:        4%{?dist}
+Version:        1.7
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,6 +54,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/%{name}.m4
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7-1
+- Auto-upgrade to 1.7 - Azure Linux 3.0 Upgrades
+
 * Mon Nov 22 2021 Thomas Crain <thcrain@microsoft.com> - 1.6-4
 - Use official URL/Source0 from gnupg.org
 - Lint spec
