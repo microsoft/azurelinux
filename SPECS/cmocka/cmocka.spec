@@ -1,7 +1,7 @@
 Summary:        An elegant unit testing framework for C with support for mock objects
 Name:           cmocka
-Version:        1.1.5
-Release:        5%{?dist}
+Version:        1.1.7
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -86,8 +86,7 @@ if test ! -e "obj"; then
 fi
 pushd obj
 %cmake \
-  -DWITH_STATIC_LIB=ON \
-  -DWITH_CMOCKERY_SUPPORT=ON \
+  -DBUILD_SHARED_LIBS=OFF \
   -DUNIT_TESTING=ON \
   %{_builddir}/%{name}-%{version}
 
@@ -129,6 +128,9 @@ popd
 %{_libdir}/cmake/cmocka/cmocka-config.cmake
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.7-1
+- Auto-upgrade to 1.1.7 - Azure Linux 3.0 Upgrades
+
 * Thu Feb 10 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.1.5-5
 - License verified.
 
