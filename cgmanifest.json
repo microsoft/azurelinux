@@ -8190,16 +8190,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "KeysInUse-OpenSSL",
-          "version": "0.3.4",
-          "downloadUrl": "https://github.com/microsoft/KeysInUse-OpenSSL/archive/v0.3.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "keyutils",
           "version": "1.6.3",
           "downloadUrl": "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/keyutils-1.6.3.tar.gz"
