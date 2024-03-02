@@ -1,3 +1,4 @@
+%bcond_without bootstrap
 
 #
 # spec file for package cal10n
@@ -16,24 +17,27 @@
 #
 Summary:        Compiler assisted localization library (CAL10N)
 Name:           cal10n
-Version:        0.7.7
-Release:        6%{?dist}
+Version:        0.8.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        https://github.com/qos-ch/cal10n/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        build.xml-0.7.7.tar.xz
-Patch0:         cal10n-0.7.7-sourcetarget.patch
-BuildRequires:  ant
-BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
+Source0:        https://github.com/qos-ch/%{name}/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+%if %{with bootstrap}
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-BuildRequires:  junit
-BuildRequires:  xz
-Requires:       java
+%else
+BuildRequires:  maven-local
+BuildRequires:  mvn(junit:junit)
+BuildRequires:  mvn(org.apache.maven:maven-artifact)
+BuildRequires:  mvn(org.apache.maven:maven-artifact-manager)
+BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
+BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
+%endif
+
 BuildArch:      noarch
 
 %description
@@ -48,83 +52,59 @@ Features:
     * automatic reloading of resource bundles upon change
 
 %package javadoc
-Summary:        Javadoc for %{name}
-Group:          Development/Libraries/Java
+Summary:        API documentation for %{name}
 
 %description javadoc
-API documentation for %{name}.
+%{summary}.
+	
+%package -n maven-%{name}-plugin
+Summary:        CAL10N maven plugin
+ 
+%description -n maven-%{name}-plugin
+Maven plugin verifying that the codes defined in
+an enum type match those in the corresponding resource bundles. 
 
 %prep
-%setup -q
-tar -xf %{SOURCE1}
-%patch 0 -p1
-find . -name "*.jar" | xargs rm
+%setup -q -n %{name}-v_%{version}
 
-# bnc#759912
-rm -rf docs cal10n-site
-cat > README.SUSE <<EOF
+find . -name "*.jar" -delete
 
-The documentation under Creative Commons Attribution-NonCommercial-ShareAlike
-2.5 License is not suitable for Linux distributors, so it has been removed.
+%pom_xpath_remove pom:extensions
+%pom_add_dep org.apache.maven:maven-artifact maven-%{name}-plugin
+%pom_disable_module %{name}-site
+%pom_disable_module maven-%{name}-plugin-smoke
+%mvn_package :*-{plugin} @1
 
-You may find the online version at
-http://cal10n.qos.ch/manual.html
+# remove maven-compiler-plugin configuration that is broken with Java 11
+%pom_xpath_remove 'pom:plugin[pom:artifactId="maven-compiler-plugin"]/pom:configuration'
 
-EOF
-
+# Disable default-jar execution of maven-jar-plugin, which is causing
+# problems with version 3.0.0 of the plugin.
+%pom_xpath_inject "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:executions" "
+    <execution>
+      <id>default-jar</id>
+      <phase>skip</phase>
+    </execution>" cal10n-api
+ 
 %build
-for dir in cal10n-api
-do
-  pushd $dir
-  export CLASSPATH=$(build-classpath \
-                     junit \
-                     ):target/classes:target/test-classes
-  ant -Dmaven.mode.offline=true package javadoc \
-      -Dmaven.test.skip=true \
-      -lib %{_datadir}/java
-  popd
-done
-
+%mvn_build -- -Dproject.build.sourceEncoding=ISO-8859-1 -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+ 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-install -m 644 cal10n-api/target/cal10n-api-%{version}.jar \
-        %{buildroot}%{_javadir}/%{name}/cal10n-api-%{version}.jar
+%mvn_install
 
-# pom
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
-%add_maven_depmap %{name}.pom
-install -pm 644 %{name}-api/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-api.pom
-%add_maven_depmap %{name}-api.pom %{name}/cal10n-api-%{version}.jar
-
-# javadoc
-pushd cal10n-api
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}-%{version}
-cp -pr target/site/apidocs*/* %{buildroot}%{_javadocdir}/%{name}-%{version}/
-rm -rf target/site/api*
-popd
-%fdupes -s %{buildroot}%{_javadocdir}/%{name}-%{version}
-
-%files
-%license LICENSE.txt
-%defattr(0644,root,root,0755)
-%doc README.SUSE
+%files -f .mfiles
 %dir %{_javadir}/%{name}
-%{_javadir}/%{name}/%{name}*.jar
-%{_mavenpomdir}/*
-%if %{defined _maven_repository}
-%{_mavendepmapfragdir}/%{name}
-%else
-%{_datadir}/maven-metadata/%{name}.xml*
-%endif
-
-%files javadoc
 %license LICENSE.txt
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}-%{version}
+ 
+%files -n maven-%{name}-plugin -f .mfiles-plugin
+ 
+%files javadoc -f .mfiles-javadoc
+%license LICENSE.txt
 
 %changelog
+* Wed Feb 14 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
+- Update to version 0.8.1
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
 - Moved from extended to core
 - Updated source URL
