@@ -23322,6 +23322,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pip",
+          "version": "24.0",
+          "downloadUrl": "https://github.com/pypa/pip/archive/24.0/pip-24.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-pkgconfig",
           "version": "1.5.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pkgconfig/pkgconfig-1.5.5.tar.gz"
