@@ -11,10 +11,9 @@ Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.
 # The license for the files below is the same as for RPM as they have originally came from rpm.
 # The git repo is hosted by centos. The version below is centos 8 stable.
 Source3:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/python.attr
-#Source4:        https://git.centos.org/rpms/python-rpm-generators/raw/c8s/f/SOURCES/pythondeps.sh
 Source5:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythondistdeps.py
 Source6:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythondist.attr
-#Source7:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythonname.attr
+Source7:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythonname.attr
 Source8:        https://src.fedoraproject.org/rpms/python-rpm-generators/raw/f40/f/pythonbundles.py
 
 Patch0:         remove-docs-from-makefile.patch
@@ -181,8 +180,8 @@ find %{buildroot} -name 'perl*' -delete
 install -dm 755 %{buildroot}%{_sysconfdir}/rpm
 install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
 install -vm644 %{SOURCE6} %{buildroot}%{_fileattrsdir}/
-#install -vm644 %{SOURCE7} %{buildroot}%{_fileattrsdir}/
-#install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
+install -vm644 %{SOURCE7} %{buildroot}%{_fileattrsdir}/
+install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE8} %{buildroot}%{_libdir}/rpm/
 
@@ -263,7 +262,6 @@ popd
 %{_libdir}/rpm/*.prov
 %{_libdir}/rpm/pythondistdeps.py
 
-#%%{_libdir}/rpm/pythondeps.sh
 %{_libdir}/rpm/pythonbundles.py
 %{_libdir}/rpm/ocamldeps.sh
 %{_libdir}/rpm/rpmdeps

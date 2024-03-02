@@ -1,5 +1,5 @@
 %__pythonname_provides() %{lua:
-    local python = require 'fedora.srpm.python'
+    local python = require 'azl.srpm.python'
     local name = rpm.expand('%{name}')
     local evr = rpm.expand('%{?epoch:%{epoch}:}%{version}-%{release}')
     local provides = python.python_altprovides_once(name, evr)
@@ -19,7 +19,7 @@
     -- This provides a clean upgrade path between major versions of CentOS/RHEL.
     -- In Fedora this is not needed as we don't ship ecosystem packages
     -- for alternative Python interpreters.
-    local python = require 'fedora.srpm.python'
+    local python = require 'azl.srpm.python'
     local name = rpm.expand('%{name}')
     local evr = rpm.expand('%{?epoch:%{epoch}:}%{version}-%{release}')
     local obsoletes = python.python_altobsoletes_once(name, evr)

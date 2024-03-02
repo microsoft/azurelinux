@@ -43,6 +43,8 @@ Source24:       macros.suse
 Source25:       gen-ld-script.sh
 Source26:       generate-package-note.py
 Source27:       verify-package-notes.sh
+# python.lua is taken from https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
+Source28:       python.lua
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -94,6 +96,7 @@ install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
 install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
+install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 
 %files
 %defattr(-,root,root)

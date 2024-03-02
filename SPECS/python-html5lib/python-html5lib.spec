@@ -39,7 +39,7 @@ Summary:        %{summary}
 A python based HTML parser/tokenizer based on the WHATWG HTML5
 specification for maximum compatibility with major desktop web browsers.
 
-%{pyproject_extras_subpkg} -n python3-html5lib lxml genshi chardet all
+%pyproject_extras_subpkg -n python3-html5lib lxml genshi chardet all
 
 %prep
 %autosetup -p1 -n html5lib-%{version}
