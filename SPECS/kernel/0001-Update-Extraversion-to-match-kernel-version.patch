@@ -1,0 +1,25 @@
+From 6e9a708f4c8b4293b6da1726effe22b04b5f665d Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Fri, 1 Mar 2024 19:37:30 -0500
+Subject: [PATCH] Update Extraversion to match kernel version
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 6bcb1e80b906..79006e025855 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@
+ VERSION = 5
+ PATCHLEVEL = 15
+ SUBLEVEL = 149
+-EXTRAVERSION = .1
++EXTRAVERSION = .2
+ NAME = Trick or Treat
+ 
+ # *DOCUMENTATION*
+-- 
+2.34.1
+
