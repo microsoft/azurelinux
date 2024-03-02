@@ -4,7 +4,7 @@
   "README.md": "c50d8418c07aafa8bfc702eb50643a13cc799dea047d840a1ae487b646bcfb57",
   "compare_mandata.py": "bf804a8112f76ce7eb565c26fcfca062046c51915b587aa149989dea4777327e",
   "macros.aaa-pyproject-srpm": "cfdd774095c84642ba473675bf4c17752a93de9b58f4727f91f7b068932c4597",
-  "macros.pyproject": "e9bb12dec022ff45b8b1fcfff21a2d900764b059f2358781bdc5657dbaa6f2a1",
+  "macros.pyproject": "8c00b39ed23efa3f4ea9463e3c8467804dfaef28e9286bbe63ae0f0a7ce2c77d",
   "pyproject_buildrequires.py": "38c131d627dd37717933f6b17606b3036720720659856443b13de1e5e49bbeaa",
   "pyproject_buildrequires_testcases.yaml": "21185aee6cabde48fe513d822a95a067efc113fc31f0be4cbe9380b3c38ff467",
   "pyproject_construct_toxenv.py": "73d77ba134e925680de7eeb60f9aaac6bb3b826d92f1b7a80603c596d6d8b241",

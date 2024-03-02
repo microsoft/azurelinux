@@ -181,10 +181,8 @@ install -dm 755 %{buildroot}%{_sysconfdir}/rpm
 install -vm644 %{SOURCE3} %{buildroot}%{_fileattrsdir}/
 install -vm644 %{SOURCE6} %{buildroot}%{_fileattrsdir}/
 install -vm644 %{SOURCE7} %{buildroot}%{_fileattrsdir}/
-install -vm755 %{SOURCE4} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE5} %{buildroot}%{_libdir}/rpm/
 install -vm755 %{SOURCE8} %{buildroot}%{_libdir}/rpm/
-
 
 pushd python
 python3 setup.py install --skip-build --prefix=%{_prefix} --root=%{buildroot}

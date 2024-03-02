@@ -90,7 +90,6 @@ install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
-install -p -m 644 -t %{buildroot}%{_fileattrsdir} pythondist.attr
 
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
@@ -131,7 +130,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Fri Mar 03 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-27
+* Fri Mar 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-27
 - Add 'python.lua', remove 'pythondist.attr'.
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-26

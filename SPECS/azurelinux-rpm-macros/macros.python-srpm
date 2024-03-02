@@ -35,11 +35,10 @@
 # - they can be used in non-Python packages where requiring pythonX-devel would
 #   be an overkill
 
-# Azure Linux only supports python3, omit python2 and preset %%python to %%__python3
-
 # use the underscored macros to redefine the behavior of %%python3_version etc.
 %__python3 /usr/bin/python%{python3_pkgversion}
 
+# Azure Linux only supports python3, omit python2 and preset %%python to %%__python3
 # use the non-underscored macros to refer to Python in spec, etc.
 %python3 %__python3
 

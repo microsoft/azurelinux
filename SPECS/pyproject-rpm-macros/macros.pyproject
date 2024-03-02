@@ -34,7 +34,7 @@
 %_set_pytest_addopts
 mkdir -p "%{_pyproject_builddir}"
 CFLAGS="${CFLAGS:-${RPM_OPT_FLAGS}}" LDFLAGS="${LDFLAGS:-${RPM_LD_FLAGS}}" TMPDIR="%{_pyproject_builddir}" \\\
-%{__python3} -Bs %{_rpmconfigdir}/mariner/pyproject_wheel.py %{?**} %{_pyproject_wheeldir}
+%{__python3} -Bs %{_rpmconfigdir}/azl/pyproject_wheel.py %{?**} %{_pyproject_wheeldir}
 }
 
 
