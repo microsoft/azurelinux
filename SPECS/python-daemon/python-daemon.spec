@@ -1,7 +1,7 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
 Version:        2.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,8 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz
 BuildArch:      noarch
+
+%define _python_dist_allow_version_zero 1
 
 %description
 This library implements the well-behaved daemon specification of PEP 3143, “Standard daemon process library”.
@@ -53,6 +55,9 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-7
+- Set _python_dist_allow_version_zero
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
 - Replace easy_install usage with pip in %%check sections
 
