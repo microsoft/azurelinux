@@ -6,7 +6,7 @@
 # gen-ld-script.sh
 # Generate linker script to embed ELF binaries with build metadata
 
-# /usr/lib/rpm/mariner/gen-ld-script.sh %{name} %{version} %{_topdir} %{mariner_release_version}
+# /usr/lib/rpm/azl/gen-ld-script.sh %{name} %{version} %{_topdir} %{distro_release_version}
 echo "gen-ld-script.sh name($1) version($2) _topdir($3) osversion($4)"
 
 OS_VERSION=$(echo $4 | cut -d. -f1,2)
@@ -33,7 +33,7 @@ MODULE_INFO_DIR="$3/BUILD/"
 
 mkdir -pv $MODULE_INFO_DIR
 
-/usr/lib/rpm/mariner/generate-package-note.py \
+/usr/lib/rpm/azl/generate-package-note.py \
    --os "mariner" \
    --osVersion "$OS_VERSION" \
    --type "rpm" \
@@ -45,4 +45,4 @@ mkdir -pv $MODULE_INFO_DIR
 
 
 # Verify if .note.package is properly included in a binary
-# /usr/lib/rpm/mariner/verify-package-notes.sh <input_binary> <input_note_section_binary> .note.package
+# /usr/lib/rpm/azl/verify-package-notes.sh <input_binary> <input_note_section_binary> .note.package

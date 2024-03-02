@@ -89,10 +89,10 @@ end
 -- See the documentation in the macros.forge file for argument description
 -- Also called directly by gometa
 local function meta(suffix, verbose, informative, silent)
-  local mariner = require "mariner.common"
+  local azl = require "azl.common"
   local ismain = (suffix == "") or (suffix == "0")
   if ismain then
-    mariner.zalias({"forgeurl", "forgesource", "forgesetupargs",
+    azl.zalias({"forgeurl", "forgesource", "forgesetupargs",
                       "archivename", "archiveext", "archiveurl",
                       "topdir", "extractdir", "repo", "owner", "namespace",
                       "scm", "tag", "commit", "shortcommit", "branch", "version",
@@ -175,7 +175,7 @@ local function meta(suffix, verbose, informative, silent)
   local forge
   forgeurl,   forge = idforge(forgeurl, silent)
   if (forge ~= nil) then
-    mariner.explicitset("forgeurl" .. suffix, forgeurl, verbose)
+    azl.explicitset("forgeurl" .. suffix, forgeurl, verbose)
     -- Custom processing of quirky forges that can not be handled with simple variables
     if (forge == "github") then
       -- Workaround the way GitHub injects "v"s before some version strings (but not all!)
@@ -190,7 +190,7 @@ local function meta(suffix, verbose, informative, silent)
       elseif (string.match(rpm.expand(fileref), "/")) then
         fileref = string.gsub(rpm.expand(fileref), "/", "-")
       end
-      mariner.safeset("fileref" .. suffix, fileref, verbose)
+      azl.safeset("fileref" .. suffix, fileref, verbose)
     elseif (forge == "code.googlesource.com") then
       if (ref == "%{?version"  .. suffix .. "}") then
         ref = "v" .. ref
@@ -200,14 +200,14 @@ local function meta(suffix, verbose, informative, silent)
         rpm.expand("%{error:All BitBucket URLs require commit value knowledge: you need to define %{commit}!}")
       end
     end
-    mariner.safeset("ref" .. suffix, ref, verbose)
+    azl.safeset("ref" .. suffix, ref, verbose)
     -- Mass setting of the remaining variables
     for k,v in pairs(variables[forge]) do
-      mariner.safeset(k .. suffix, variables[forge][k], verbose)
+      azl.safeset(k .. suffix, variables[forge][k], verbose)
     end
     for k,v in pairs(variables["default"]) do
       if (variables[forge][k] == nil) then
-        mariner.safeset(k .. suffix, variables["default"][k], verbose)
+        azl.safeset(k .. suffix, variables["default"][k], verbose)
       end
     end
   end
@@ -220,7 +220,7 @@ local function meta(suffix, verbose, informative, silent)
   if (string.match(spec["archiveurl"], "/([^/]+)$") ~= spec["archivename"] .. "." .. spec["archiveext"]) then
     forgesource     = "%{?archiveurl" .. suffix .. "}#/%{?archivename" .. suffix .. "}.%{archiveext" .. suffix .. "}"
   end
-  mariner.safeset("forgesource" .. suffix, forgesource, verbose)
+  azl.safeset("forgesource" .. suffix, forgesource, verbose)
   -- Setup processing      (computing the forgesetup and extractdir variables)
   local forgesetupargs = "-n %{extractdir" .. suffix .. "}"
   local extractdir     = "%{topdir"        .. suffix .. "}"
@@ -235,8 +235,8 @@ local function meta(suffix, verbose, informative, silent)
       forgesetupargs = "-T -D -a " .. suffix .. " " .. forgesetupargs
     end
   end
-  mariner.safeset("forgesetupargs" .. suffix, forgesetupargs, verbose)
-  mariner.safeset("extractdir"     .. suffix, extractdir, verbose)
+  azl.safeset("forgesetupargs" .. suffix, forgesetupargs, verbose)
+  azl.safeset("extractdir"     .. suffix, extractdir, verbose)
   -- dist processing       (computing the correct prefix for snapshots)
   local distprefix = ""
   if not isrelease then
@@ -272,10 +272,10 @@ local function meta(suffix, verbose, informative, silent)
     if not ismain then
       distprefix = string.gsub(distprefix, "^%.", ".s")
     end
-    mariner.safeset ("distprefix"    .. suffix, distprefix, verbose)
+    azl.safeset ("distprefix"    .. suffix, distprefix, verbose)
   end
   if ismain then
-    mariner.zalias({"forgeurl", "forgesource", "forgesetupargs",
+    azl.zalias({"forgeurl", "forgesource", "forgesetupargs",
                       "archivename", "archiveext", "archiveurl",
                       "topdir", "extractdir", "repo", "owner", "namespace",
                       "scm", "shortcommit", "distprefix"}, verbose)
@@ -283,12 +283,12 @@ local function meta(suffix, verbose, informative, silent)
   -- Final spec variable summary if the macro was called with -i
   if informative then
     rpm.expand("%{echo:Packaging variables read or set by %%forgemeta}")
-    mariner.echovars({"forgeurl", "forgesource", "forgesetupargs",
+    azl.echovars({"forgeurl", "forgesource", "forgesetupargs",
                         "archivename", "archiveext", "archiveurl",
                         "topdir", "extractdir", "repo", "owner", "namespace",
                         "scm", "tag", "commit", "shortcommit", "branch", "version",
                         "date", "distprefix"}, suffix)
-                        mariner.echovars({"dist"},"")
+                        azl.echovars({"dist"},"")
     rpm.expand("%{echo:  (snapshot date is either manually supplied or computed once %%{_sourcedir}/%%{archivename" .. suffix .. "}.%%{archiveext" .. suffix .. "} is available)}")
   end
 end

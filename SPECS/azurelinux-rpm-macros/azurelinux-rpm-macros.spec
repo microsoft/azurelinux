@@ -1,12 +1,13 @@
-%global rcdir %{_libdir}/rpm/mariner
-%global rcluadir %{_libdir}/rpm/lua/mariner
+# WARNING: the directory '<dir>' in '%{_libdir}/rpm/<dir>' must match the value passed through '--with-vendor' when building the 'rpm' package.
+%global rcdir %{_libdir}/rpm/azl
+%global rcluadir %{_libdir}/rpm/lua/azl
 # Turn off auto byte compilation since when building this spec in the toolchain the needed scripts are not installed yet.
 # __brp_python_bytecompile
 %global __brp_python_bytecompile %{nil}
-Summary:        Mariner specific rpm macro files
-Name:           mariner-rpm-macros
+Summary:        Azure Linux specific rpm macro files
+Name:           azurelinux-rpm-macros
 Version:        2.0
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,17 +51,24 @@ Provides:       python-srpm-macros
 Provides:       python-rpm-macros
 Provides:       python3-rpm-macros
 Provides:       rust-srpm-macros
+
+Obsoletes:      mariner-rpm-macros <= 2.0-25
+Provides:       mariner-rpm-macros = %{version}-%{release}
+
 BuildArch:      noarch
 
 %description
-Mariner specific rpm macro files.
+Azure Linux specific rpm macro files.
 
-%package -n mariner-check-macros
-Summary:        Mariner specific rpm macros to override default %%check behavior
+%package -n azurelinux-check-macros
+Summary:        Azure Linux specific rpm macros to override default %%check behavior
 Group:          Development/System
 
-%description -n mariner-check-macros
-Mariner specific rpm macros to override default %%check behavior
+Obsoletes:      mariner-check-macros <= 2.0-25
+Provides:       mariner-check-macros = %{version}-%{release}
+
+%description -n azurelinux-check-macros
+Azure Linux specific rpm macros to override default %%check behavior
 
 %prep
 %setup -q -c -T
@@ -118,10 +126,13 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.python*
 %{_fileattrsdir}/pythondist.attr
 
-%files -n mariner-check-macros
+%files -n azurelinux-check-macros
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-26
+- Updating naming for 3.0 version of Azure Linux.
+
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 2.0-25
 - move macros.dist out of this package
 

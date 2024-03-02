@@ -23,6 +23,8 @@ ignore_multiple_sources=" \
 
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
+  azurelinux-repos \
+  azurelinux-rpm-macros \
   ca-certificates \
   check-restart \
   core-packages \
@@ -40,16 +42,14 @@ ignore_no_source_tarball=" \
   kf5 \
   livepatching \
   lua-rpm-macros \
-  azurelinux-repos \
-  mariner-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \
   qt5-rpm-macros \
+  sgx-backwards-compatability \
   verity-read-only-root \
   web-assets \
-  sgx-backwards-compatability \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.
@@ -61,10 +61,10 @@ alt_source_tag="Source9999"
 
 function prepare_lua {
   local -a dirs_to_check
+  local azl_lua_dir
+  local azl_srpm_lua_dir
   local lua_common_file_name
   local lua_forge_file_name
-  local mariner_lua_dir
-  local mariner_srpm_lua_dir
   local rpm_lua_dir
   local rpm_macros_dir
 
@@ -73,17 +73,17 @@ function prepare_lua {
   lua_common_file_name="common.lua"
   lua_forge_file_name="forge.lua"
   rpm_lua_dir="$(rpm --eval "%_rpmluadir")"
-  mariner_lua_dir="$rpm_lua_dir/mariner"
-  mariner_srpm_lua_dir="$mariner_lua_dir/srpm"
+  azl_lua_dir="$rpm_lua_dir/azl"
+  azl_srpm_lua_dir="$azl_lua_dir/srpm"
 
   if [[ -z "$rpm_lua_dir" ]]
   then
-    echo "ERROR: no RPM LUA directory set, can't update with Mariner's LUA modules!" >&2
+    echo "ERROR: no RPM LUA directory set, can't update with Azure Linux's LUA modules!" >&2
     exit 1
   fi
 
   # We only want to clean-up directories, which were absent from the system.
-  dirs_to_check=("$rpm_lua_dir" "$mariner_lua_dir" "$mariner_srpm_lua_dir")
+  dirs_to_check=("$rpm_lua_dir" "$azl_lua_dir" "$azl_srpm_lua_dir")
   for dir_path in "${dirs_to_check[@]}"
   do
     if [[ ! -d "$dir_path" ]]
@@ -92,18 +92,18 @@ function prepare_lua {
       break
     fi
   done
-  sudo mkdir -p "$mariner_srpm_lua_dir"
+  sudo mkdir -p "$azl_srpm_lua_dir"
 
-  if [[ ! -f "$mariner_lua_dir/$lua_common_file_name" ]]
+  if [[ ! -f "$azl_lua_dir/$lua_common_file_name" ]]
   then
-    sudo cp "$rpm_macros_dir/$lua_common_file_name" "$mariner_lua_dir/$lua_common_file_name"
-    FILES_TO_CLEAN_UP+=("$mariner_lua_dir/$lua_common_file_name")
+    sudo cp "$rpm_macros_dir/$lua_common_file_name" "$azl_lua_dir/$lua_common_file_name"
+    FILES_TO_CLEAN_UP+=("$azl_lua_dir/$lua_common_file_name")
   fi
 
-  if [[ ! -f "$mariner_srpm_lua_dir/$lua_forge_file_name" ]]
+  if [[ ! -f "$azl_srpm_lua_dir/$lua_forge_file_name" ]]
   then
-    sudo cp "$rpm_macros_dir/$lua_forge_file_name" "$mariner_srpm_lua_dir/$lua_forge_file_name"
-    FILES_TO_CLEAN_UP+=("$mariner_srpm_lua_dir/$lua_forge_file_name")
+    sudo cp "$rpm_macros_dir/$lua_forge_file_name" "$azl_srpm_lua_dir/$lua_forge_file_name"
+    FILES_TO_CLEAN_UP+=("$azl_srpm_lua_dir/$lua_forge_file_name")
   fi
 }
 
@@ -111,7 +111,7 @@ function specs_dir_from_spec_path {
   # Assuming we always check specs inside Azure Linux's core GitHub repository.
   # If that's the case, the spec paths will always have the following form:
   #     [repo_directory_path]/[specs_directory]/[package_name]/[package_spec_files]
-  echo "$(realpath "$(dirname "$1")/../../SPECS")/mariner-rpm-macros"
+  echo "$(realpath "$(dirname "$1")/../../SPECS")/azurelinux-rpm-macros"
 }
 
 rm -f bad_registrations.txt
@@ -136,8 +136,8 @@ function clean_up {
 trap clean_up EXIT SIGINT SIGTERM
 
 
-mariner_macros_dir="$(specs_dir_from_spec_path "$1")"
-prepare_lua "$mariner_macros_dir"
+azl_macros_dir="$(specs_dir_from_spec_path "$1")"
+prepare_lua "$azl_macros_dir"
 
 echo "Checking $# specs."
 

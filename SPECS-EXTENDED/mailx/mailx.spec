@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 Summary: Enhanced implementation of the mailx command
 Name: mailx
 Version: 12.5
-Release: 35%{?dist}
+Release: 36%{?dist}
 # MIT .. base64.c
 # MPLv1.1 .. nss.c, nsserr.c
 # RSA .. md5.h, md5.c
@@ -14,7 +14,7 @@ License: BSD with advertising and MIT and MPLv1.1 and RSA
 URL: http://heirloom.sourceforge.net/mailx.html
 # Mailx's upstream provides only the CVS method of downloading source code.
 # Use get-upstream-tarball.sh script to download current version of mailx.
-Source0: %{_mariner_sources_url}/mailx-%{version}.tar.xz
+Source0: %{_distro_sources_url}/mailx-%{version}.tar.xz
 Source1: get-upstream-tarball.sh
 
 Patch0: nail-11.25-config.patch
@@ -167,6 +167,9 @@ popd
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-36
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-35
 - Updating source URLs.
 - License verified.
