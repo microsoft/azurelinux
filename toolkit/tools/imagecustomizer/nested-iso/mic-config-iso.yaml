@@ -1,0 +1,17 @@
+SystemConfig:
+  Users:
+  - Name: test
+    Password: testpassword
+    PrimaryGroup: sudo
+  PackagesInstall:
+    - util-linux
+  AdditionalFiles:
+    dracut/90dmsquash-live/parse-dmsquash-live.sh: /usr/lib/dracut/modules.d/90dmsquash-live/parse-dmsquash-live.sh
+    dracut/90dmsquash-live/parse-iso-scan.sh: /usr/lib/dracut/modules.d/90dmsquash-live/parse-iso-scan.sh
+    dracut/90dmsquash-live/dmsquash-live-root.sh: /usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-root.sh
+    dracut/90dmsquash-live/dmsquash-liveiso-genrules.sh: /usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-liveiso-genrules.sh
+    dracut/90dmsquash-live/dmsquash-live-genrules.sh: /usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-live-genrules.sh
+    dracut/90dmsquash-live/iso-scan.sh: /usr/lib/dracut/modules.d/90dmsquash-live/iso-scan.sh
+    dracut/90dmsquash-live/dmsquash-generator.sh: /usr/lib/dracut/modules.d/90dmsquash-live/dmsquash-generator.sh
+    dracut/90dmsquash-live/module-setup.sh: /usr/lib/dracut/modules.d/90dmsquash-live/module-setup.sh
+    dracut/98dracut-systemd/dracut-emergency.sh: /usr/lib/dracut/modules.d/98dracut-systemd/dracut-emergency.sh

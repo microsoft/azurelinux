@@ -11,26 +11,140 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
-	"github.com/microsoft/azurelinux/toolkit/tools/pkg/isomakerlib"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
 )
 
+// 			console=ttyS0,115200n8 \
+
 const (
+	// 	grubCfgTemplate = `
+	// # insmod all_video
+	// insmod gzio
+	// insmod xzio
+	// insmod part_msdos
+	// insmod squash4
+	// insmod iso9660
+	// insmod ext2
+	// insmod btrfs
+	// insmod regexp
+	// set default="0"
+	// set timeout=10
+	// # set debug=all
+
+	// # rd.break=pre-pivot \
+	// # iso-scan/filename=artifacts/wrapper.img \
+	// # debug=7 \
+
+	// menuentry "Mariner Baremetal Iso" {
+
+	// 	search --label CDROM --set root
+	// 	linux /boot/vmlinuz \
+	// 			console=tty0 \
+	// 			selinux=0 \
+	// 			apparmor=0 \
+	// 			rd.auto=1
+	// 			lockdown=integrity \
+	// 			sysctl.kernel.unprivileged=1 \
+	// 			root=live:/liveos/rootfs.img \
+	// 			rd.shell \
+	// 			rd.debug \
+	// 			rd.live.image \
+	// 			rd.live.debug=1 \
+	// 			rd.live.dir=liveos \
+	// 			rd.live.squashimg=rootfs.img \
+	// 			rd.live.overlay=1 \
+	// 			rd.live.overlay.nouserconfirmprompt
+
+	// 	initrd /boot/initrd.img
+	// }
+	// `
+
+	grubCfgTemplateTest = `
+insmod all_video
+insmod gzio
+insmod xzio
+insmod part_msdos
+insmod squash4
+insmod iso9660
+insmod ext2
+insmod btrfs
+insmod regexp
+set default="0"
+set timeout=10
+# set debug=all
+
+# rd.break=pre-pivot \
+# iso-scan/filename=artifacts/wrapper.img \
+# debug=7 \
+
+menuentry "Mariner Baremetal Iso" {
+	linux /boot/vmlinuz \
+			selinux=0 \
+			rd.shell \
+			rd.live.image \
+			rd.live.debug=1 \
+			rd.live.dir=liveos \
+			rd.live.squashimg=rootfs.img \
+			rd.live.overlay=1 \
+			rd.live.overlay.nouserconfirmprompt \
+			root=live:/liveos/rootfs.img
+
+	initrd /boot/initrd.img
+}
+`
+
+	grubCfgTemplate = `
+insmod all_video
+insmod gzio
+insmod xzio
+insmod part_msdos
+insmod squash4
+insmod iso9660
+insmod ext2
+insmod btrfs
+insmod regexp
+set default="0"
+set timeout=10
+# set debug=all
+
+search --label CDROM --set root
+
+menuentry "Mariner Baremetal Iso" {
+	linux /boot/vmlinuz \
+			console=tty0 \
+			selinux=0 \
+			rd.shell \
+			rd.live.image \
+			rd.live.debug=1 \
+			rd.live.dir=liveos \
+			rd.live.squashimg=rootfs.img \
+			rd.live.overlay=1 \
+			rd.live.overlay.nouserconfirmprompt \
+			root=live:LABEL=CDROM
+
+	initrd /boot/initrd.img
+}
+`
 	isoMediaLabel         = "CDROM"
 	searchCommandTemplate = "search --label %s --set root"
-	rootValueTemplate     = "live:LABEL=%s"
+	// searchCommandTemplate = "search --file %s --set root"
+	// isoMarkerFile         = "/boot/grub2/grub.cfg"
+	// rootValueTemplate     = "live:LABEL=%s"
+	rootValueTemplate = "live:%s"
+	liveRootImage     = "/liveos/rootfs.img"
 	// The names initrd.img and vmlinuz are expected by isomaker.
 	isoBootDir    = "boot"
 	isoInitrdPath = "/boot/initrd.img"
 	isoKernelPath = "/boot/vmlinuz"
 
 	// kernel arguments template
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsTemplate = " debug=7 rd.debug rd.live.debug=1 rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
@@ -156,6 +270,21 @@ func (b *LiveOSIsoBuilder) stageIsoMakerInitrdArtifacts(writeableRootfsDir, isoM
 		return fmt.Errorf("failed to stage vmlinuz:\n%w", err)
 	}
 
+	err = file.Copy("/bin/lsblk", targetVmlinuzLocalDir+"/lsblk")
+	if err != nil {
+		return fmt.Errorf("failed to stage lsblk:\n%w", err)
+	}
+
+	err = file.Copy("/bin/vim", targetVmlinuzLocalDir+"/vim")
+	if err != nil {
+		return fmt.Errorf("failed to stage vim:\n%w", err)
+	}
+
+	err = file.Copy("/bin/more", targetVmlinuzLocalDir+"/more")
+	if err != nil {
+		return fmt.Errorf("failed to stage more:\n%w", err)
+	}
+
 	return nil
 }
 
@@ -203,62 +332,71 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 
 func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLine string) error {
 
-	inputContentString, err := file.Read(grubCfgFileName)
-	if err != nil {
-		return err
-	}
+	/*
+		inputContentString, err := file.Read(grubCfgFileName)
+		if err != nil {
+			return err
+		}
 
-	searchCommand := fmt.Sprintf(searchCommandTemplate, isoMediaLabel)
-	rootValue := fmt.Sprintf(rootValueTemplate, isoMediaLabel)
+		searchCommand := fmt.Sprintf(searchCommandTemplate, isoMediaLabel)
+		// searchCommand := fmt.Sprintf(searchCommandTemplate, isoMarkerFile)
 
-	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
-	if err != nil {
-		return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
-	}
+		// rootValue := fmt.Sprintf(rootValueTemplate, isoMediaLabel)
+		rootValue := fmt.Sprintf(rootValueTemplate, liveRootImage)
 
-	inputContentString, oldLinuxPath, err := setLinuxPath(inputContentString, isoKernelPath)
-	if err != nil {
-		return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
+		if err != nil {
+			return fmt.Errorf("failed to update the search command in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, err = replaceToken(inputContentString, oldLinuxPath, isoKernelPath)
-	if err != nil {
-		return fmt.Errorf("failed to update all the kernel file path occurances in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, oldLinuxPath, err := setLinuxPath(inputContentString, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel file path in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, oldInitrdPath, err := setInitrdPath(inputContentString, isoInitrdPath)
-	if err != nil {
-		return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, err = replaceToken(inputContentString, oldLinuxPath, isoKernelPath)
+		if err != nil {
+			return fmt.Errorf("failed to update all the kernel file path occurances in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, err = replaceToken(inputContentString, oldInitrdPath, isoInitrdPath)
-	if err != nil {
-		return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, oldInitrdPath, err := setInitrdPath(inputContentString, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update the initrd file path in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "root", rootValue)
-	if err != nil {
-		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, err = replaceToken(inputContentString, oldInitrdPath, isoInitrdPath)
+		if err != nil {
+			return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "security", "")
-	if err != nil {
-		return fmt.Errorf("failed to update the security kernel argument in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "root", rootValue)
+		if err != nil {
+			return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "selinux", "0")
-	if err != nil {
-		return fmt.Errorf("failed to update the selinux kernel argument in the iso grub.cfg:\n%w", err)
-	}
+		inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "security", "")
+		if err != nil {
+			return fmt.Errorf("failed to update the security kernel argument in the iso grub.cfg:\n%w", err)
+		}
 
-	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
+		inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "selinux", "0")
+		if err != nil {
+			return fmt.Errorf("failed to update the selinux kernel argument in the iso grub.cfg:\n%w", err)
+		}
 
-	inputContentString, err = appendKernelCommandLineArguments(inputContentString, liveosKernelArgs)
-	if err != nil {
-		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
-	}
+		liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
 
-	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
+		inputContentString, err = appendKernelCommandLineArguments(inputContentString, liveosKernelArgs)
+		if err != nil {
+			return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
+		}
+
+
+	*/
+	inputContentString := grubCfgTemplate
+	logger.Log.Debugf("----- grub.cfg:\n%s", inputContentString)
+
+	err := os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
 		return fmt.Errorf("failed to write grub.cfg:\n%w", err)
 	}
