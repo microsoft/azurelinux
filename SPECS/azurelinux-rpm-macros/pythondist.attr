@@ -1,2 +1,0 @@
-%__pythondist_provides	%{_rpmconfigdir}/pythondistdeps.py --provides --majorver-provides
-%__pythondist_path		^/usr/lib(64)?/python[[:digit:]]\\.[[:digit:]]+/site-packages/[^/]+\\.(dist-info|egg-info|egg-link)$

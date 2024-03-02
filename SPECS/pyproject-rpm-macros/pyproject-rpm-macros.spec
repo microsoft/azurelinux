@@ -179,7 +179,7 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 
 %changelog
 * Fri Mar 1 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.12.0-1
-- Update based on f40
+- Refresh from Fedora 40 (license: MIT)
 
 * Fri Jan 26 2024 Miro Hrončok <miro@hroncok.cz> - 1.12.0-1
 - Namespace pyproject-rpm-macros generated text files with %%{python3_pkgversion}

@@ -43,10 +43,10 @@
 # use the non-underscored macros to refer to Python in spec, etc.
 %python3 %__python3
 
-# Set default python macro to the version of python shipped with the OS
-%__python /usr/bin/python3
+# Set default python macro to the version of python shipped with azl
+%__python %__python3
 
-%python %__python3
+%python %__python
 
 # Define where Python wheels will be stored and the prefix of -wheel packages
 # - In Fedora we want wheel subpackages named e.g. `python-pip-wheel` that
@@ -192,7 +192,7 @@
 }
 
 %py_provides() %{lua:
-    local python = require 'mariner.srpm.python'
+    local python = require 'azl.srpm.python'
     local rhel = rpm.expand('%{?rhel}')
     local name = rpm.expand('%1')
     if name == '%1' then
