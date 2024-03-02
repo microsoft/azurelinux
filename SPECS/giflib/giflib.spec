@@ -1,7 +1,7 @@
 Name:           giflib
 Summary:        A library and utilities for processing GIFs
-Version:        5.2.1
-Release:        6%{?dist}
+Version:        5.2.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ find %{buildroot} -name '*.a' -print -delete
 %{_mandir}/man1/*.1*
 
 %changelog
+* Thu Feb 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
+- Auto-upgrade to 5.2.2 - Azure Linux 3.0 Upgrades
+
 * Mon Jul 11 2022 Olivia Crain <oliviacrain@microsoft.com> - 5.2.1-6
 - Promote to mariner-official-base repo
 - Lint spec
