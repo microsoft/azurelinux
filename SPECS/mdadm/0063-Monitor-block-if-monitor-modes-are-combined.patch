@@ -1,0 +1,41 @@
+From f40ac0e7e6043361ad12e9db97c07e56c3977cf6 Mon Sep 17 00:00:00 2001
+From: Blazej Kucman <blazej.kucman@intel.com>
+Date: Mon, 19 Dec 2022 11:21:57 +0100
+Subject: [PATCH 63/83] Monitor: block if monitor modes are combined.
+
+Block monitoring start if --scan mode and MD devices list are combined.
+
+Signed-off-by: Blazej Kucman <blazej.kucman@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Monitor.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 0036e8cd..188cb8be 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -123,7 +123,7 @@ int Monitor(struct mddev_dev *devlist,
+ 	 *  and if we can get_disk_info and find a name
+ 	 *  Then we hot-remove and hot-add to the other array
+ 	 *
+-	 * If devlist is NULL, then we can monitor everything because --scan
++	 * If devlist is NULL, then we can monitor everything if --scan
+ 	 * was given.  We get an initial list from config file and add anything
+ 	 * that appears in /proc/mdstat
+ 	 */
+@@ -136,6 +136,11 @@ int Monitor(struct mddev_dev *devlist,
+ 	struct mddev_ident *mdlist;
+ 	int delay_for_event = c->delay;
+ 
++	if (devlist && c->scan) {
++		pr_err("Devices list and --scan option cannot be combined - not monitoring.\n");
++		return 1;
++	}
++
+ 	if (!mailaddr)
+ 		mailaddr = conf_get_mailaddr();
+ 
+-- 
+2.38.1
+

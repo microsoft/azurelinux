@@ -1,0 +1,32 @@
+From f7cbd810b639eb946ba1b3bddb1faefb9696de42 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Fri, 9 Sep 2022 15:50:34 +0200
+Subject: [PATCH 59/83] ReadMe: fix command-line help
+
+Make command-line help consistent with manual page.
+Copied from Debian.
+
+Cc: Felix Lechner <felix.lechner@lease-up.com>
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ ReadMe.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ReadMe.c b/ReadMe.c
+index 7f94847e..50a5e36d 100644
+--- a/ReadMe.c
++++ b/ReadMe.c
+@@ -477,7 +477,7 @@ char Help_assemble[] =
+ ;
+ 
+ char Help_manage[] =
+-"Usage: mdadm arraydevice options component devices...\n"
++"Usage: mdadm [mode] arraydevice [options] <component devices...>\n"
+ "\n"
+ "This usage is for managing the component devices within an array.\n"
+ "The --manage option is not needed and is assumed if the first argument\n"
+-- 
+2.38.1
+

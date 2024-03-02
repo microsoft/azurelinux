@@ -1767,8 +1767,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "23.3.3",
-          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/23.3.3.tar.gz"
+          "version": "23.4.3",
+          "downloadUrl": "https://github.com/canonical/cloud-init/archive/refs/tags/23.4.3.tar.gz"
         }
       }
     },
@@ -4580,8 +4580,8 @@
         "type": "other",
         "other": {
           "name": "gobject-introspection",
-          "version": "1.71.0",
-          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.71/gobject-introspection-1.71.0.tar.xz"
+          "version": "1.78.1",
+          "downloadUrl": "https://ftp.gnome.org/pub/GNOME/sources/gobject-introspection/1.78/gobject-introspection-1.78.1.tar.xz"
         }
       }
     },
@@ -12831,8 +12831,8 @@
         "type": "other",
         "other": {
           "name": "mdadm",
-          "version": "4.1",
-          "downloadUrl": "http://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.1.tar.xz"
+          "version": "4.2",
+          "downloadUrl": "http://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-4.2.tar.gz"
         }
       }
     },
@@ -12951,8 +12951,8 @@
         "type": "other",
         "other": {
           "name": "meson",
-          "version": "1.2.1",
-          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/1.2.1/meson-1.2.1.tar.gz"
+          "version": "1.3.1",
+          "downloadUrl": "https://github.com/mesonbuild/meson/releases/download/1.3.1/meson-1.3.1.tar.gz"
         }
       }
     },
@@ -29178,6 +29178,16 @@
           "name": "virt-who",
           "version": "0.24.2",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/virt-who-0.24.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "virtiofsd",
+          "version": "1.8.0",
+          "downloadUrl": "https://gitlab.com/virtio-fs/virtiofsd/-/archive/v1.8.0/virtiofsd-v1.8.0.tar.gz"
         }
       }
     },

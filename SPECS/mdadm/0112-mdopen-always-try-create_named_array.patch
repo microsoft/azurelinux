@@ -1,0 +1,40 @@
+From 2e10c46d0906b1a1ec40e8f5005ccb63125dcd9e Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Tue, 14 Mar 2023 11:06:25 +1100
+Subject: [PATCH 112/120] mdopen: always try create_named_array()
+
+mdopen() will use create_named_array() to ask the kernel to create the
+given md array, but only if it is given a number or name.
+If it is NOT given a name and is required to choose one itself using
+find_free_devnm() it does NOT use create_named_array().
+
+On kernels with CONFIG_BLOCK_LEGACY_AUTOLOAD not set, this can result in
+failure to assemble an array.  This can particularly seen when the
+"name" of the array begins with a host name different to the name of the
+host running the command.
+
+So add the missing call to create_named_array().
+
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217074
+Signed-off-by: NeilBrown <neilb@suse.de>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdopen.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mdopen.c b/mdopen.c
+index d18c9319..810f79a3 100644
+--- a/mdopen.c
++++ b/mdopen.c
+@@ -370,6 +370,7 @@ int create_mddev(char *dev, char *name, int autof, int trustworthy,
+ 		}
+ 		if (block_udev)
+ 			udev_block(devnm);
++		create_named_array(devnm);
+ 	}
+ 
+ 	sprintf(devname, "/dev/%s", devnm);
+-- 
+2.38.1
+
