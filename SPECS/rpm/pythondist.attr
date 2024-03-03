@@ -1,2 +1,2 @@
-%__pythondist_provides	%{_rpmconfigdir}/pythondistdeps.py --provides --normalized-names-format pep503 --package-name %{name} --majorver-provides %{?!_python_dist_allow_version_zero:--fail-if-zero}
+%__pythondist_provides	%{_rpmconfigdir}/pythondistdeps.py --provides --normalized-names-format pep503 --package-name %{name} --majorver-provides --majorver-only %{?!_python_dist_allow_version_zero:--fail-if-zero}
 %__pythondist_path	^%{?!flatpak:/usr}%{?flatpak:/app}/lib(64)?/python[3-9]\\.[[:digit:]]+/site-packages/[^/]+\\.(dist-info|egg-info|egg-link)$
