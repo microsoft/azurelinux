@@ -133,13 +133,25 @@
         <copy file="NOTICE.txt"  tofile="${build.home}/classes/META-INF/NOTICE.txt"/>
         <jar jarfile="${build.home}/${final.name}.jar">
             <manifest>
-                <attribute name="Specification-Title" value="Commons Lang"/>
-                <attribute name="Specification-Version" value="${component.version}"/>
-                <attribute name="Specification-Vendor" value="The Apache Software Foundation"/>
+                <attribute name="Automatic-Module-Name" value="org.apache.commons.lang3"/>
+                <attribute name="Bundle-Description" value="Apache Commons Lang, a package of Java utility classes for the  classes that are in java.lang's hierarchy, or are considered to be so  standard as to justify existence in java.lang."/>
+                <attribute name="Bundle-DocURL" value="http://commons.apache.org/proper/commons-lang/"/>
+                <attribute name="Bundle-License" value="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+                <attribute name="Bundle-ManifestVersion" value="2"/>
+                <attribute name="Bundle-Name" value="Apache Commons Lang"/>
+                <attribute name="Bundle-SymbolicName" value="org.apache.commons.lang3"/>
+                <attribute name="Bundle-Vendor" value="The Apache Software Foundation"/>
+                <attribute name="Bundle-Version" value="${component.version}"/>
+                <attribute name="Export-Package" value="org.apache.commons.lang3;version=&quot;${component.version}&quot;,org.apache.commons.lang3.arch;version=&quot;${component.version}&quot;,org.apache.commons.lang3.builder;version=&quot;${component.version}&quot;,org.apache.commons.lang3.concurrent;version=&quot;${component.version}&quot;,org.apache.commons.lang3.event;version=&quot;${component.version}&quot;,org.apache.commons.lang3.exception;version=&quot;${component.version}&quot;,org.apache.commons.lang3.math;version=&quot;${component.version}&quot;,org.apache.commons.lang3.mutable;version=&quot;${component.version}&quot;,org.apache.commons.lang3.reflect;version=&quot;${component.version}&quot;,org.apache.commons.lang3.text;version=&quot;${component.version}&quot;,org.apache.commons.lang3.text.translate;version=&quot;${component.version}&quot;,org.apache.commons.lang3.time;version=&quot;${component.version}&quot;,org.apache.commons.lang3.tuple;version=&quot;${component.version}&quot;"/>
                 <attribute name="Implementation-Title" value="Commons Lang"/>
                 <attribute name="Implementation-Version" value="${component.version}"/>
                 <attribute name="Implementation-Vendor" value="The Apache Software Foundation"/>
                 <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+                <attribute name="Include-Resource" value="META-INF/LICENSE.txt=LICENSE.txt,META-INF/NOTICE.txt=NOTICE.txt"/>
+                <attribute name="Require-Capability" value="osgi.ee;filter:=&quot;(&amp;(osgi.ee=JavaSE)(version=${compile.target}))&quot;"/>
+                <attribute name="Specification-Title" value="Commons Lang"/>
+                <attribute name="Specification-Version" value="${component.version}"/>
+                <attribute name="Specification-Vendor" value="The Apache Software Foundation"/>
                 <attribute name="X-Compile-Source-JDK" value="${compile.source}"/>
                 <attribute name="X-Compile-Target-JDK" value="${compile.target}"/>
             </manifest>
