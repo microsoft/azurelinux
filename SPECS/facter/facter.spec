@@ -1,18 +1,9 @@
-## START: Set by rpmautospec
-## (rpmautospec version 0.2.5)
-%define autorelease(e:s:pb:) %{?-p:0.}%{lua:
-    release_number = 1;
-    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
-    print(release_number + base_release_number - 1);
-}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{?dist}
-## END: Set by rpmautospec
-
 %global gem_name facter
 %global debug_package %{nil}
 
 Name:           facter
 Version:        4.2.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Command and ruby library for gathering system information
 Vendor:		Microsoft Corporation
 Distribution:	Mariner
@@ -100,6 +91,9 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
 %doc %{gem_docdir}
 
 %changelog
+* Thu Dec 21 2023 Sindhu Karri <lakarri@microsoft.com> - 4.2.5-3
+- Promote package to Mariner Base repo
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.5-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
