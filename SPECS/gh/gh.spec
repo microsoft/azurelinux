@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
-Version:        2.13.0
-Release:        16%{?dist}
+Version:        2.43.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,10 +27,8 @@ Source0:        https://github.com/cli/cli/archive/refs/tags/v%{version}.tar.gz#
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
-# Available upstream in 2.16.0
-Patch0:         fix-relative-time-search-tests.patch
 
-BuildRequires:  golang >= 1.17.1
+BuildRequires:  golang >= 1.21.1
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -72,6 +70,9 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Mon Feb 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.43.1-1
+- Update to v2.43.1
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.0-16
 - Bump release to rebuild with go 1.20.10
 
@@ -114,7 +115,7 @@ make test
 * Mon Aug 22 2022 Olivia Crain <oliviacrain@microsoft.com> - 2.13.0-3
 - Bump release to rebuild against Go 1.18.5
 
-* Mon Jul 05 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.13.0-2
+* Mon Jul 04 2022 Daniel McIlvaney <damcilva@microsoft.com> - 2.13.0-2
 - Bump release due to bump in fish to 3.5.0.
 
 * Thu Jun 30 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.13.0-1

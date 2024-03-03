@@ -3,7 +3,7 @@
         "required-configs": {
             "CONFIG_ARCH_HAS_CPU_FINALIZE_INIT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                    "https://github.com/microsoft/azurelinux/pull/5964"
                 ],
                 "arch": [
                     "AMD64"
@@ -15,7 +15,7 @@
             },
             "CONFIG_ARM64_ERRATUM_2054223": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                    "https://github.com/microsoft/azurelinux/pull/5916"
                 ],
                 "arch": [
                     "ARM64"
@@ -27,7 +27,7 @@
             },
             "CONFIG_ARM64_ERRATUM_2067961": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                    "https://github.com/microsoft/azurelinux/pull/5916"
                 ],
                 "arch": [
                     "ARM64"
@@ -39,7 +39,7 @@
             },
             "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5916"
+                    "https://github.com/microsoft/azurelinux/pull/5916"
                 ],
                 "arch": [
                     "ARM64"
@@ -51,7 +51,7 @@
             },
             "CONFIG_ARM_SMMU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -63,7 +63,7 @@
             },
             "CONFIG_ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -75,7 +75,7 @@
             },
             "CONFIG_ARM_SMMU_LEGACY_DT_BINDINGS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -88,7 +88,7 @@
             },
             "CONFIG_ARM_SMMU_QCOM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -100,7 +100,7 @@
             },
             "CONFIG_ARM_SMMU_QCOM_DEBUG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -112,7 +112,7 @@
             },
             "CONFIG_ARM_SMMU_V3": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -124,7 +124,7 @@
             },
             "CONFIG_ARM_SMMU_V3_SVA": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -136,8 +136,8 @@
             },
             "CONFIG_BINFMT_MISC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3300",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3300",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -148,9 +148,22 @@
                     "m"
                 ]
             },
+            "CONFIG_BLK_CGROUP_IOLATENCY": {
+                "PR": [
+                    "https://github.com/microsoft/azurelinux/pull/7794"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Enable support for latency based cgroup IO protection",
+                "value": [
+                    "y"
+                ]
+            },
             "CONFIG_BLK_DEV_IO_TRACE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                    "https://github.com/microsoft/azurelinux/pull/5417"
                 ],
                 "arch": [
                     "AMD64"
@@ -162,7 +175,7 @@
             },
             "CONFIG_BLK_DEV_NBD": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5972"
+                    "https://github.com/microsoft/azurelinux/pull/5972"
                 ],
                 "arch": [
                     "AMD64",
@@ -189,7 +202,7 @@
             },
             "CONFIG_BLK_DEV_ZONED": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3465"
+                    "https://github.com/microsoft/azurelinux/pull/3465"
                 ],
                 "arch": [
                     "AMD64"
@@ -202,7 +215,7 @@
             },
             "CONFIG_BPF_LSM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6846"
+                    "https://github.com/microsoft/azurelinux/pull/6846"
                 ],
                 "arch": [
                     "AMD64",
@@ -215,7 +228,7 @@
             },
             "CONFIG_BPF_UNPRIV_DEFAULT_OFF": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2352"
+                    "https://github.com/microsoft/azurelinux/pull/2352"
                 ],
                 "arch": [
                     "AMD64",
@@ -228,7 +241,7 @@
             },
             "CONFIG_BRIDGE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -241,7 +254,7 @@
             },
             "CONFIG_CC_CAN_LINK_STATIC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3748"
+                    "https://github.com/microsoft/azurelinux/pull/3748"
                 ],
                 "arch": [
                     "AMD64",
@@ -254,7 +267,7 @@
             },
             "CONFIG_COMPAT_32BIT_TIME": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3812"
+                    "https://github.com/microsoft/azurelinux/pull/3812"
                 ],
                 "arch": [
                     "AMD64"
@@ -267,7 +280,7 @@
             },
             "CONFIG_CONSOLE_LOGLEVEL_DEFAULT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6888"
+                    "https://github.com/microsoft/azurelinux/pull/6888"
                 ],
                 "arch": [
                     "AMD64",
@@ -280,7 +293,7 @@
             },
             "CONFIG_CPU_SRSO": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                    "https://github.com/microsoft/azurelinux/pull/5964"
                 ],
                 "arch": [
                     "AMD64"
@@ -292,7 +305,7 @@
             },
             "CONFIG_CUSE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6853"
+                    "https://github.com/microsoft/azurelinux/pull/6853"
                 ],
                 "arch": [
                     "AMD64",
@@ -347,7 +360,7 @@
             },
             "CONFIG_DEFAULT_SECURITY_SELINUX": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7332"
+                    "https://github.com/microsoft/azurelinux/pull/7332"
                 ],
                 "arch": [
                     "AMD64",
@@ -360,7 +373,7 @@
             },
             "CONFIG_DELL_RBU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -373,7 +386,7 @@
             },
             "CONFIG_DELL_SMBIOS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -386,7 +399,7 @@
             },
             "CONFIG_DELL_SMBIOS_SMM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -398,7 +411,7 @@
             },
             "CONFIG_DELL_SMBIOS_WMI": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -410,7 +423,7 @@
             },
             "CONFIG_DELL_SMO8800": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -423,7 +436,7 @@
             },
             "CONFIG_DELL_WMI": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -436,7 +449,7 @@
             },
             "CONFIG_DELL_WMI_AIO": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -449,7 +462,7 @@
             },
             "CONFIG_DELL_WMI_DESCRIPTOR": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -462,7 +475,7 @@
             },
             "CONFIG_DELL_WMI_LED": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -475,7 +488,7 @@
             },
             "CONFIG_DELL_WMI_PRIVACY": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -487,7 +500,7 @@
             },
             "CONFIG_DELL_WMI_SYSMAN": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -500,8 +513,8 @@
             },
             "CONFIG_DM_MULTIPATH_HST": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5951",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/5951",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -514,8 +527,8 @@
             },
             "CONFIG_DM_MULTIPATH_IOA": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5951",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/5951",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -528,8 +541,8 @@
             },
             "CONFIG_DM_MULTIPATH_QL": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5951",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/5951",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -542,8 +555,8 @@
             },
             "CONFIG_DM_MULTIPATH_ST": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5951",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/5951",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -556,7 +569,7 @@
             },
             "CONFIG_DRM_AMDGPU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                    "https://github.com/microsoft/azurelinux/pull/5416"
                 ],
                 "arch": [
                     "AMD64"
@@ -569,7 +582,7 @@
             },
             "CONFIG_DRM_AMDGPU_CIK": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                    "https://github.com/microsoft/azurelinux/pull/5416"
                 ],
                 "arch": [
                     "AMD64"
@@ -581,7 +594,7 @@
             },
             "CONFIG_DRM_AMDGPU_SI": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5416"
+                    "https://github.com/microsoft/azurelinux/pull/5416"
                 ],
                 "arch": [
                     "AMD64"
@@ -593,7 +606,7 @@
             },
             "CONFIG_DRM_VGEM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3227"
+                    "https://github.com/microsoft/azurelinux/pull/3227"
                 ],
                 "arch": [
                     "AMD64"
@@ -606,7 +619,7 @@
             },
             "CONFIG_DWMAC_LOONGSON": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                    "https://github.com/microsoft/azurelinux/pull/7539"
                 ],
                 "arch": [
                     "ARM64"
@@ -618,7 +631,7 @@
             },
             "CONFIG_EDAC_BLUEFIELD": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -630,7 +643,7 @@
             },
             "CONFIG_EDAC_SKX": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5487"
+                    "https://github.com/microsoft/azurelinux/pull/5487"
                 ],
                 "arch": [
                     "AMD64"
@@ -643,7 +656,7 @@
             },
             "CONFIG_FPGA_DFL_AFU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                    "https://github.com/microsoft/azurelinux/pull/6574"
                 ],
                 "arch": [
                     "AMD64",
@@ -657,7 +670,7 @@
             },
             "CONFIG_FTRACE_SYSCALLS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3210"
+                    "https://github.com/microsoft/azurelinux/pull/3210"
                 ],
                 "arch": [
                     "AMD64"
@@ -670,7 +683,7 @@
             },
             "CONFIG_FW_LOADER_COMPRESS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2201"
+                    "https://github.com/microsoft/azurelinux/pull/2201"
                 ],
                 "arch": [
                     "AMD64"
@@ -682,7 +695,7 @@
             },
             "CONFIG_GDS_FORCE_MITIGATION": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5964"
+                    "https://github.com/microsoft/azurelinux/pull/5964"
                 ],
                 "arch": [
                     "AMD64"
@@ -694,7 +707,7 @@
             },
             "CONFIG_GPIO_MLXBF": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -706,7 +719,7 @@
             },
             "CONFIG_GPIO_MLXBF2": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -718,7 +731,7 @@
             },
             "CONFIG_HIBERNATION": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/4369"
+                    "https://github.com/microsoft/azurelinux/pull/4369"
                 ],
                 "arch": [
                     "AMD64"
@@ -730,7 +743,7 @@
             },
             "CONFIG_HIST_TRIGGERS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5292"
+                    "https://github.com/microsoft/azurelinux/pull/5292"
                 ],
                 "arch": [
                     "AMD64"
@@ -742,7 +755,7 @@
             },
             "CONFIG_HW_RANDOM_TPM": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -754,7 +767,7 @@
             },
             "CONFIG_I2C_MLXBF": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -766,8 +779,8 @@
             },
             "CONFIG_INET_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -780,7 +793,7 @@
             },
             "CONFIG_INET_DIAG_DESTROY": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "ARM64"
@@ -792,7 +805,7 @@
             },
             "CONFIG_INET_RAW_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "ARM64"
@@ -804,8 +817,8 @@
             },
             "CONFIG_INET_SCTP_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -818,8 +831,8 @@
             },
             "CONFIG_INET_TCP_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -832,7 +845,7 @@
             },
             "CONFIG_INET_UDP_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -845,7 +858,7 @@
             },
             "CONFIG_INFINIBAND_BNXT_RE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -858,7 +871,7 @@
             },
             "CONFIG_INIT_ON_FREE_DEFAULT_ON": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/4829"
+                    "https://github.com/microsoft/azurelinux/pull/4829"
                 ],
                 "arch": [
                     "AMD64",
@@ -872,7 +885,7 @@
             },
             "CONFIG_INTEL_IOMMU_SVM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/84"
+                    "https://github.com/microsoft/azurelinux/pull/84"
                 ],
                 "arch": [
                     "AMD64"
@@ -884,7 +897,7 @@
             },
             "CONFIG_IOMMU_SVA": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6829"
+                    "https://github.com/microsoft/azurelinux/pull/6829"
                 ],
                 "arch": [
                     "ARM64"
@@ -896,7 +909,7 @@
             },
             "CONFIG_IO_STRICT_DEVMEM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2357"
+                    "https://github.com/microsoft/azurelinux/pull/2357"
                 ],
                 "arch": [
                     "AMD64"
@@ -908,7 +921,7 @@
             },
             "CONFIG_IO_URING": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -920,8 +933,8 @@
             },
             "CONFIG_IPV6_FOU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -934,8 +947,8 @@
             },
             "CONFIG_IPV6_FOU_TUNNEL": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -948,8 +961,8 @@
             },
             "CONFIG_IP_VS_DEBUG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -962,7 +975,7 @@
             },
             "CONFIG_IP_VS_MH": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5657"
+                    "https://github.com/microsoft/azurelinux/pull/5657"
                 ],
                 "arch": [
                     "AMD64"
@@ -974,7 +987,7 @@
             },
             "CONFIG_ISO9660_FS": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -986,7 +999,7 @@
             },
             "CONFIG_LIVEPATCH": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3107"
+                    "https://github.com/microsoft/azurelinux/pull/3107"
                 ],
                 "arch": [
                     "AMD64"
@@ -998,7 +1011,7 @@
             },
             "CONFIG_LLC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1011,7 +1024,7 @@
             },
             "CONFIG_MACVLAN": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1037,7 +1050,7 @@
             },
             "CONFIG_MELLANOX_PLATFORM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1049,7 +1062,7 @@
             },
             "CONFIG_MLXBF_BOOTCTL": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1061,7 +1074,7 @@
             },
             "CONFIG_MLXBF_GIGE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1073,7 +1086,7 @@
             },
             "CONFIG_MLXBF_PMC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1085,7 +1098,7 @@
             },
             "CONFIG_MLXBF_TMFIFO": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1097,7 +1110,7 @@
             },
             "CONFIG_MLXREG_HOTPLUG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1109,7 +1122,7 @@
             },
             "CONFIG_MLXREG_IO": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1121,7 +1134,7 @@
             },
             "CONFIG_MLX_WDT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1133,7 +1146,7 @@
             },
             "CONFIG_MMC_DW": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1145,7 +1158,7 @@
             },
             "CONFIG_MMC_DW_BLUEFIELD": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1157,7 +1170,7 @@
             },
             "CONFIG_MMC_DW_PLTFM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1169,8 +1182,8 @@
             },
             "CONFIG_NETFILTER_NETLINK_GLUE_CT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1183,7 +1196,7 @@
             },
             "CONFIG_NETFILTER_XT_MARK": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1196,8 +1209,8 @@
             },
             "CONFIG_NETFILTER_XT_MATCH_IPCOMP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1210,8 +1223,8 @@
             },
             "CONFIG_NETFILTER_XT_TARGET_AUDIT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1224,8 +1237,8 @@
             },
             "CONFIG_NETFILTER_XT_TARGET_NOTRACK": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1238,9 +1251,9 @@
             },
             "CONFIG_NETFILTER_XT_TARGET_TRACE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/3783",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/3783",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1254,7 +1267,7 @@
             },
             "CONFIG_NETLINK_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1267,9 +1280,9 @@
             },
             "CONFIG_NET_CLS_FLOWER": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/5170",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/5170",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1283,7 +1296,7 @@
             },
             "CONFIG_NET_CLS_RSVP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/azurelinux/pull/6286"
                 ],
                 "arch": [
                     "AMD64",
@@ -1296,7 +1309,7 @@
             },
             "CONFIG_NET_CLS_RSVP6": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6286"
+                    "https://github.com/microsoft/azurelinux/pull/6286"
                 ],
                 "arch": [
                     "AMD64",
@@ -1309,8 +1322,8 @@
             },
             "CONFIG_NET_FOU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1323,8 +1336,8 @@
             },
             "CONFIG_NET_FOU_IP_TUNNELS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1337,8 +1350,8 @@
             },
             "CONFIG_NFT_CONNLIMIT": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1351,7 +1364,7 @@
             },
             "CONFIG_NFT_DUP_NETDEV": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1364,8 +1377,8 @@
             },
             "CONFIG_NFT_FIB": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1378,8 +1391,8 @@
             },
             "CONFIG_NFT_FIB_IPV4": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1392,7 +1405,7 @@
             },
             "CONFIG_NFT_FWD_NETDEV": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1405,7 +1418,7 @@
             },
             "CONFIG_NFT_REJECT_NETDEV": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1418,7 +1431,7 @@
             },
             "CONFIG_NF_CT_NETLINK_HELPER": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1431,7 +1444,7 @@
             },
             "CONFIG_NF_DUP_NETDEV": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1444,8 +1457,8 @@
             },
             "CONFIG_NF_LOG_ARP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1458,8 +1471,8 @@
             },
             "CONFIG_NF_TABLES_ARP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1472,8 +1485,8 @@
             },
             "CONFIG_NF_TABLES_NETDEV": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1486,7 +1499,7 @@
             },
             "CONFIG_NVME_RDMA": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5283"
+                    "https://github.com/microsoft/azurelinux/pull/5283"
                 ],
                 "arch": [
                     "AMD64"
@@ -1499,7 +1512,7 @@
             },
             "CONFIG_NVME_TARGET_TCP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -1512,7 +1525,7 @@
             },
             "CONFIG_NVME_TCP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5283"
+                    "https://github.com/microsoft/azurelinux/pull/5283"
                 ],
                 "arch": [
                     "AMD64"
@@ -1525,7 +1538,7 @@
             },
             "CONFIG_PACKET_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1538,7 +1551,7 @@
             },
             "CONFIG_PHY_RTK_RTD_USB2PHY": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                    "https://github.com/microsoft/azurelinux/pull/7539"
                 ],
                 "arch": [
                     "ARM64"
@@ -1550,7 +1563,7 @@
             },
             "CONFIG_PHY_RTK_RTD_USB3PHY": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7539"
+                    "https://github.com/microsoft/azurelinux/pull/7539"
                 ],
                 "arch": [
                     "ARM64"
@@ -1562,7 +1575,7 @@
             },
             "CONFIG_PHY_TEGRA_XUSB": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                    "https://github.com/microsoft/azurelinux/pull/6574"
                 ],
                 "arch": [
                     "AMD64",
@@ -1576,7 +1589,7 @@
             },
             "CONFIG_PTP_1588_CLOCK_KVM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3122"
+                    "https://github.com/microsoft/azurelinux/pull/3122"
                 ],
                 "arch": [
                     "AMD64"
@@ -1589,7 +1602,7 @@
             },
             "CONFIG_RAS_CEC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                    "https://github.com/microsoft/azurelinux/pull/5417"
                 ],
                 "arch": [
                     "AMD64"
@@ -1601,7 +1614,7 @@
             },
             "CONFIG_SCHEDSTATS": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -1613,7 +1626,7 @@
             },
             "CONFIG_SCSI_LOGGING": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3826"
+                    "https://github.com/microsoft/azurelinux/pull/3826"
                 ],
                 "arch": [
                     "AMD64"
@@ -1624,9 +1637,22 @@
                     "y"
                 ]
             },
+            "CONFIG_SCSI_MPI3MR": {
+                "PR": [
+                    "https://github.com/microsoft/azurelinux/pull/7794"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for customer",
+                "value": [
+                    "m"
+                ]
+            },
             "CONFIG_SECURITY_LANDLOCK": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3484"
+                    "https://github.com/microsoft/azurelinux/pull/3484"
                 ],
                 "arch": [
                     "AMD64"
@@ -1639,8 +1665,8 @@
             },
             "CONFIG_SECURITY_SELINUX_BOOTPARAM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3480",
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/3480",
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1653,7 +1679,7 @@
             },
             "CONFIG_SECURITY_SMACK": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3080"
+                    "https://github.com/microsoft/azurelinux/pull/3080"
                 ],
                 "arch": [
                     "AMD64",
@@ -1667,7 +1693,7 @@
             },
             "CONFIG_SENSORS_DELL_SMM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -1680,7 +1706,7 @@
             },
             "CONFIG_SENSORS_MLXREG_FAN": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5896"
+                    "https://github.com/microsoft/azurelinux/pull/5896"
                 ],
                 "arch": [
                     "ARM64"
@@ -1692,7 +1718,7 @@
             },
             "CONFIG_SMB_SERVER": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                    "https://github.com/microsoft/azurelinux/pull/6574"
                 ],
                 "arch": [
                     "AMD64",
@@ -1706,7 +1732,7 @@
             },
             "CONFIG_STP": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1719,7 +1745,7 @@
             },
             "CONFIG_STX104": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6196"
+                    "https://github.com/microsoft/azurelinux/pull/6196"
                 ],
                 "arch": [
                     "AMD64",
@@ -1735,7 +1761,7 @@
             },
             "CONFIG_TARGET_CORE": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/4473"
+                    "https://github.com/microsoft/azurelinux/pull/4473"
                 ],
                 "arch": [
                     "AMD64"
@@ -1748,7 +1774,7 @@
             },
             "CONFIG_TASKSTATS": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -1760,7 +1786,7 @@
             },
             "CONFIG_TASK_DELAY_ACCT": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -1772,7 +1798,7 @@
             },
             "CONFIG_TASK_IO_ACCOUNTING": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -1784,7 +1810,7 @@
             },
             "CONFIG_TASK_XACCT": {
                 "PR": [
-                    "Initial CBL-Mariner PR"
+                    "Initial Azure Linux PR"
                 ],
                 "arch": [
                     "AMD64"
@@ -1796,7 +1822,7 @@
             },
             "CONFIG_TCG_TPM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/135"
+                    "https://github.com/microsoft/azurelinux/pull/135"
                 ],
                 "arch": [
                     "AMD64"
@@ -1808,7 +1834,7 @@
             },
             "CONFIG_TCP_CONG_BBR": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/4122"
+                    "https://github.com/microsoft/azurelinux/pull/4122"
                 ],
                 "arch": [
                     "AMD64"
@@ -1821,7 +1847,7 @@
             },
             "CONFIG_THERMAL_HWMON": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5417"
+                    "https://github.com/microsoft/azurelinux/pull/5417"
                 ],
                 "arch": [
                     "AMD64"
@@ -1834,7 +1860,7 @@
             },
             "CONFIG_TLS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5406"
+                    "https://github.com/microsoft/azurelinux/pull/5406"
                 ],
                 "arch": [
                     "AMD64"
@@ -1847,7 +1873,7 @@
             },
             "CONFIG_TUN": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1860,7 +1886,7 @@
             },
             "CONFIG_UNIX_DIAG": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7468"
+                    "https://github.com/microsoft/azurelinux/pull/7468"
                 ],
                 "arch": [
                     "AMD64",
@@ -1873,7 +1899,7 @@
             },
             "CONFIG_USER_EVENTS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7044"
+                    "https://github.com/microsoft/azurelinux/pull/7044"
                 ],
                 "arch": [
                     "AMD64",
@@ -1886,7 +1912,7 @@
             },
             "CONFIG_VCC": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/6574"
+                    "https://github.com/microsoft/azurelinux/pull/6574"
                 ],
                 "arch": [
                     "AMD64",
@@ -1900,7 +1926,7 @@
             },
             "CONFIG_VFAT_FS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3733"
+                    "https://github.com/microsoft/azurelinux/pull/3733"
                 ],
                 "arch": [
                     "AMD64"
@@ -1912,7 +1938,7 @@
             },
             "CONFIG_VFIO_NOIOMMU": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2385"
+                    "https://github.com/microsoft/azurelinux/pull/2385"
                 ],
                 "arch": [
                     "AMD64"
@@ -1924,7 +1950,7 @@
             },
             "CONFIG_VIRTIO_FS": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/3264"
+                    "https://github.com/microsoft/azurelinux/pull/3264"
                 ],
                 "arch": [
                     "AMD64"
@@ -1937,7 +1963,7 @@
             },
             "CONFIG_WIREGUARD": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/5135"
+                    "https://github.com/microsoft/azurelinux/pull/5135"
                 ],
                 "arch": [
                     "AMD64"
@@ -1950,7 +1976,7 @@
             },
             "CONFIG_X86_IOPL_IOPERM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7180"
+                    "https://github.com/microsoft/azurelinux/pull/7180"
                 ],
                 "arch": [
                     "AMD64"
@@ -1962,7 +1988,7 @@
             },
             "CONFIG_X86_PLATFORM_DRIVERS_DELL": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/2671"
+                    "https://github.com/microsoft/azurelinux/pull/2671"
                 ],
                 "arch": [
                     "AMD64"
@@ -1972,35 +1998,9 @@
                     "y"
                 ]
             },
-            "CONFIG_BLK_CGROUP_IOLATENCY": {
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
-                ],
-                "arch": [
-                    "AMD64",
-                    "ARM64"
-                ],
-                "comment": "Enable support for latency based cgroup IO protection",
-                "value": [
-                    "y"
-                ]
-            },
-            "CONFIG_SCSI_MPI3MR": {
-                "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
-                ],
-                "arch": [
-                    "AMD64",
-                    "ARM64"
-                ],
-                "comment": "Needed for customer",
-                "value": [
-                    "m"
-                ]
-            },
             "CONFIG_ZRAM": {
                 "PR": [
-                    "https://github.com/microsoft/CBL-Mariner/pull/7794"
+                    "https://github.com/microsoft/azurelinux/pull/7794"
                 ],
                 "arch": [
                     "AMD64",

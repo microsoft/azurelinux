@@ -13,7 +13,7 @@ Source0:        https://github.com/getsentry/responses/archive/refs/tags/%{versi
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-requests
 BuildRequires:  python3-urllib3

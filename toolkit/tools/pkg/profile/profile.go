@@ -7,7 +7,7 @@ import (
 	"runtime/pprof"
 	"runtime/trace"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 )
 
 type Profiler struct {

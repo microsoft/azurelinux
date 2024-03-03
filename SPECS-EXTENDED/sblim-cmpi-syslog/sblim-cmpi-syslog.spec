@@ -5,7 +5,7 @@ Distribution:   Azure Linux
 Summary:        SBLIM syslog instrumentation
 Name:           sblim-cmpi-syslog
 Version:        0.9.0
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        EPL
 URL:            http://sourceforge.net/projects/sblim/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -13,7 +13,7 @@ URL:            http://sourceforge.net/projects/sblim/
 #  cvs -z3 -d:pserver:anonymous@sblim.cvs.sourceforge.net:/cvsroot/sblim co -P cmpi-syslog
 #  mv cmpi-syslog sblim-cmpi-syslog-0.8.0
 #  tar -cJvf sblim-cmpi-syslog-0.8.0.tar.xz sblim-cmpi-syslog-0.8.0
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.bz2
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.bz2
 
 # use Pegasus' root/interop instead of root/PG_Interop
 Patch0:         sblim-cmpi-syslog-0.9.0-pegasus-interop.patch
@@ -128,6 +128,9 @@ $RPM_BUILD_ROOT/%{_datadir}/sblim-testsuite/system/linux/messagelog.sh
 %postun -p /sbin/ldconfig
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.0-20
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.9.0-19
 - Update Source0
 - Add %%doc and %%license

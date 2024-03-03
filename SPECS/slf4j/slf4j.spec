@@ -134,6 +134,11 @@ for i in */src/main/resources/META-INF/MANIFEST.MF; do
   perl -pi -e 's#\$\{slf4j\.api\.minimum\.compatible\.version\}#1\.6\.0#g' ${i}
 done
 
+for i in */maven-build.xml; do
+  sed -i 's/target="1.6"/target="1.8"/' ${i}
+  sed -i 's/source="1.6"/source="1.8"/' ${i}
+done
+
 # The general pattern is that the API package exports API classes and does
 # # not require impl classes. slf4j was breaking that causing "A cycle was
 # # detected when generating the classpath slf4j.api, slf4j.nop, slf4j.api."

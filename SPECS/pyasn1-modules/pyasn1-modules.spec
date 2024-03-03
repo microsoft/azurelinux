@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/etingof/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pyasn1
 %endif
 BuildArch:      noarch

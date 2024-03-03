@@ -10,7 +10,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/pexpect/ptyprocess
 Source0:        https://pypi.io/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 %endif

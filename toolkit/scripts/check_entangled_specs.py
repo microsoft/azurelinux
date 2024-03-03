@@ -18,10 +18,6 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
-        "SPECS/kernel-hci/kernel-hci.spec"
-    ]),
-    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
@@ -116,6 +112,6 @@ def check_matches(base_path: str):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'repo_root', help='path to the root of the CBL-Mariner repository')
+        'repo_root', help='path to the root of the Azure Linux repository')
     args = parser.parse_args()
     check_matches(args.repo_root)

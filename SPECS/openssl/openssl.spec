@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -90,10 +90,6 @@ BuildRequires: perl(Test::More)
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: coreutils
-Requires: perl
-
-Recommends: SymCrypt
-Recommends: SymCrypt-openssl
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -365,6 +361,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Feb 29 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.4-2
+- Perl will be installed with openssl-perl sub-package and not needed as default runtime dependency.
+
 * Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
 - Upgrade to 3.1.4
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).

@@ -9,8 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"golang.org/x/sys/unix"
 )
 
@@ -122,7 +122,7 @@ func (m *Mount) close(async bool) error {
 		// (This is unlikely. But "belt and braces".)
 		err = os.Remove(m.target)
 		if err != nil {
-			return fmt.Errorf("failed to delete source rpms mount directory (%s):\n%w", m.target, err)
+			return fmt.Errorf("failed to delete mount directory (%s):\n%w", m.target, err)
 		}
 
 		m.dirCreated = false

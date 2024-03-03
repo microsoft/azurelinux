@@ -10,7 +10,7 @@ URL:            https://github.com/juliastrings/utf8proc
 # Source0:  https://github.com/juliastrings/utf8proc/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  cmake
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ruby
 %endif
 

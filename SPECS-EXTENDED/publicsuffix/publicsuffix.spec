@@ -21,11 +21,11 @@ Distribution:   Azure Linux
 
 Name:           publicsuffix
 Version:        20201026
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Cross-vendor public domain suffix database
 License:        MPL-2.0
 URL:            https://publicsuffix.org/
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires:  psl-make-dafsa
 BuildArch:      noarch
 
@@ -61,6 +61,9 @@ install -m 644 -p -D public_suffix_list.dafsa \
 %{_datadir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20201026-4
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 20201026-3
 - Updated source URL.
 - License verified.

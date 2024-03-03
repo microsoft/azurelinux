@@ -3,12 +3,12 @@ Name:           symlinks
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Version:        1.7
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Copyright only
 URL:            https://ibiblio.org/pub/Linux/utils/file/
 # Upstream maintainer provided tarball, ibiblio no longer allowing uploads
 # Upstream Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # Taken from http://packages.debian.org/changelogs/pool/main/s/symlinks/symlinks_1.2-4.2/symlinks.copyright
 Source1:        symlinks-LICENSE.txt
 BuildRequires:  gcc
@@ -41,6 +41,9 @@ install -m 644 symlinks.1 %{buildroot}%{_mandir}/man1
 %{_mandir}/man1/symlinks.1*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.7-8
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.7-7
 - Re-import from Fedora 36 (license MIT)
 - Adding as run dependency for package cassandra medusa
