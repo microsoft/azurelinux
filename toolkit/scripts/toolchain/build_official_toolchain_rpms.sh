@@ -318,6 +318,10 @@ cp -v $SPECROOT/azurelinux-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/a
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
+# Copy python rpm generator scripts
+mkdir -pv $LFS/usr/lib/rpm/fileattrs
+cp -v $SPECROOT/rpm/*.attr $LFS/usr/lib/rpm/fileattrs
+cp -v $SPECROOT/rpm/*.py $LFS/usr/lib/rpm
 
 stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
@@ -328,6 +332,9 @@ echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-check-macros
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -439,6 +446,10 @@ chroot_and_install_rpms python3 python3
 
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
@@ -626,6 +637,7 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
+chroot_and_install_rpms rpm
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
@@ -675,13 +687,6 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install azurelinux-repos
-build_rpm_in_chroot_no_install pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
-
-# python-packaging requires pyproject-rpm-macros
-build_rpm_in_chroot_no_install python-packaging
-chroot_and_install_rpms python-packaging python3-packaging
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall
