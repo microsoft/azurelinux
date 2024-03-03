@@ -2,7 +2,7 @@
  "Signatures": {
   "python.attr": "610877452569ea34886cb87ede92eb8fc8ceabbe28ffb3d56a2882f64324ba37",
   "pythonbundles.py": "b0a7e29266396997f76253ff415c2107607a11fc474977f0e745c4f18d8f6ac1",
-  "pythondist.attr": "04de002f4ed4953a339d53daa557b73dabd0e36846210c7b72297929ccca2c3b",
+  "pythondist.attr": "bf40a9e2a6cad5d5803678057f429e138b31cc52a3b78c802c46f8fe7e7b50f4",
   "pythondistdeps.py": "518682fccf2c21745d27af36a30e8b050a5edd60229b240e491acd791b01dfa2",
   "pythonname.attr": "716a6738eac57a0586fe69a30f10f173e92e7c4bc21ac8b74dc894f56b9ad972",
   "rpm-4.18.1.tar.bz2": "37f3b42c0966941e2ad3f10fde3639824a6591d07197ba8fd0869ca0779e1f56"

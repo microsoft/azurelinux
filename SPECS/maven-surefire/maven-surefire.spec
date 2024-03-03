@@ -25,9 +25,13 @@ Surefire is a test framework project.
 
 %package plugin
 Summary:        Surefire plugin for maven
-Requires:       (%{name}-provider-junit = %{version}-%{release} if junit)
-Requires:       (%{name}-provider-junit5 = %{version}-%{release} if junit5)
-Requires:       (%{name}-provider-testng = %{version}-%{release} if testng)
+# FIXME - our toolkit can't handle logical deps like this
+#Requires:       (%{name}-provider-junit = %{version}-%{release} if junit)
+#Requires:       (%{name}-provider-junit5 = %{version}-%{release} if junit5)
+#Requires:       (%{name}-provider-testng = %{version}-%{release} if testng)
+Requires:       %{name}-provider-junit = %{version}-%{release}
+Requires:       %{name}-provider-junit5 = %{version}-%{release}
+Requires:       %{name}-provider-testng = %{version}-%{release}
 
 %description plugin
 Maven surefire plugin for running tests via the surefire framework.
