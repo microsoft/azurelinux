@@ -307,18 +307,18 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 * Mon Feb 07 2022 Lumír Balhar <lbalhar@redhat.com> - 1.0.0~rc2-1
 - Updated compatibility with tox4
 
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
-- Updating naming for 3.0 version of Azure Linux.
+#* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
+#- Updating naming for 3.0 version of Azure Linux.
 
-* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
-- Update version of tox used for package tests
+#* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
+#- Update version of tox used for package tests
 
-* Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
-- Adding missing test dependencies.
+#* Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
+#- Adding missing test dependencies.
 
-* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
-- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-- License verified.
+#* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
+#- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+#- License verified.
 
 * Tue Jan 25 2022 Miro Hrončok <mhroncok@redhat.com> - 1.0.0~rc1-1
 - Release version 1.0.0, first release candidate
