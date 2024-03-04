@@ -405,18 +405,6 @@ EOF
 touch %{buildroot}/etc/fstab
 
 #
-#	8.3.2. Configuring Linux Module Load Order
-#
-install -vdm 755 %{buildroot}/etc/modprobe.d
-cat > %{buildroot}/etc/modprobe.d/usb.conf <<- "EOF"
-# Begin /etc/modprobe.d/usb.conf
-
-install ohci_hcd /sbin/modprobe ehci_hcd ; /sbin/modprobe -i ohci_hcd ; true
-install uhci_hcd /sbin/modprobe ehci_hcd ; /sbin/modprobe -i uhci_hcd ; true
-
-# End /etc/modprobe.d/usb.conf
-EOF
-#
 #		chapter 9.1. The End
 #
 
@@ -473,8 +461,6 @@ return 0
 %config(noreplace) /etc/mtab
 %config(noreplace) /etc/passwd
 %config(noreplace) /etc/profile
-%dir /etc/modprobe.d
-%config(noreplace) /etc/modprobe.d/usb.conf
 %dir /etc/sysconfig
 %config(noreplace) /etc/sysconfig/clock
 %config(noreplace) /etc/sysconfig/console
@@ -582,6 +568,7 @@ return 0
 %changelog
 * Mon Mar 04 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-20
 - move filesystem-asc stuff into asc
+- move /etc/modprobe.d into kmod package
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts

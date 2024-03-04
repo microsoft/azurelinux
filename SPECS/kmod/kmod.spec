@@ -1,7 +1,7 @@
 Summary:        Utilities for loading kernel modules
 Name:           kmod
 Version:        30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2.1+ AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,8 @@ BuildRequires:  zlib-devel
 Requires:       xz
 Provides:       module-init-tools
 Provides:       /sbin/modprobe
+
+Conflicts:      filesystem < 1.1-20
 
 %description
 The Kmod package contains libraries and utilities for loading kernel modules
@@ -47,12 +49,19 @@ for target in depmod insmod lsmod modinfo modprobe rmmod; do
 done
 find %{buildroot} -type f -name "*.la" -delete -print
 
+install -vdm 755 %{buildroot}%{_sysconfdir}/depmod.d
+install -vdm 755 %{buildroot}%{_sysconfdir}/modprobe.d
+install -vdm 755 %{buildroot}%{_prefix}/lib/modprobe.d
+
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
 %license COPYING
+%dir %{_sysconfdir}/depmod.d
+%dir %{_sysconfdir}/modprobe.d
+%dir %{_prefix}/lib/modprobe.d
 /bin/*
 %{_libdir}/*.so.*
 /sbin/*
@@ -66,6 +75,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.so
 
 %changelog
+* Mon Mar 04 2024 Dan Streetman <ddstreet@microsoft.com> - 30-2
+- move /etc/modprobe.d into kmod package
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 30-1
 - Auto-upgrade to 30 - Azure Linux 3.0 - package upgrades
 
