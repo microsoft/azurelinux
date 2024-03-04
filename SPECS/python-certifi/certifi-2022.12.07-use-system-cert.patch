@@ -2,30 +2,22 @@ From c8704810b3e82a7d38bc0de7dd007b8755b83e39 Mon Sep 17 00:00:00 2001
 From: Karolina Surma <ksurma@redhat.com>
 Date: Mon, 14 Nov 2022 13:30:48 +0100
 Subject: [PATCH] certifi-2022.9.24-use-system-cert
+diff -ruN a/certifi/core.py b/certifi/core.py
+--- a/certifi/core.py   2024-03-04 10:33:25.257373811 +0000
++++ b/certifi/core.py   2024-03-04 10:35:04.241047374 +0000
+@@ -4,111 +4,10 @@
 
----
- certifi/core.py | 105 +++---------------------------------------------
- 1 file changed, 6 insertions(+), 99 deletions(-)
-
-diff --git a/certifi/core.py b/certifi/core.py
-index de02898..207116f 100644
---- a/certifi/core.py
-+++ b/certifi/core.py
-@@ -4,105 +4,12 @@ certifi.py
- 
  This module returns the installation location of cacert.pem or its contents.
  """
 -import sys
- 
-+# The RPM-packaged certifi always uses the system certificates
-+def where() -> str:
-+    return '/etc/pki/tls/certs/ca-bundle.crt'
- 
+-import atexit
+
+ def exit_cacert_ctx() -> None:
+     _CACERT_CTX.__exit__(None, None, None)  # type: ignore[union-attr]
+
+-
 -if sys.version_info >= (3, 11):
-+def contents() -> str:
-+    with open(where(), encoding='utf=8') as data:
-+        return data.read()
- 
+-
 -    from importlib.resources import as_file, files
 -
 -    _CACERT_CTX = None
@@ -52,6 +44,7 @@ index de02898..207116f 100644
 -            # we will also store that at the global level as well.
 -            _CACERT_CTX = as_file(files("certifi").joinpath("cacert.pem"))
 -            _CACERT_PATH = str(_CACERT_CTX.__enter__())
+-            atexit.register(exit_cacert_ctx)
 -
 -        return _CACERT_PATH
 -
@@ -87,6 +80,7 @@ index de02898..207116f 100644
 -            # we will also store that at the global level as well.
 -            _CACERT_CTX = get_path("certifi", "cacert.pem")
 -            _CACERT_PATH = str(_CACERT_CTX.__enter__())
+-            atexit.register(exit_cacert_ctx)
 -
 -        return _CACERT_PATH
 -
@@ -123,6 +117,6 @@ index de02898..207116f 100644
 -
 -    def contents() -> str:
 -        return read_text("certifi", "cacert.pem", encoding="ascii")
--- 
-2.37.3
-
++def contents() -> str:
++    with open(where(), encoding='utf=8') as data:
++        return data.read()

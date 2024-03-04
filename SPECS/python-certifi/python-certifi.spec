@@ -1,6 +1,6 @@
 Summary:        Python package for providing Mozilla's CA Bundle
 Name:           python-certifi
-Version:        2023.05.07
+Version:        2024.02.02
 Release:        1%{?dist}
 License:        MPL-2.0
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ rm -rf certifi/*.pem
 %doc README.rst
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2024.02.02-1
+- Upgrade to version 2024.02.02
+
 * Fri Aug 04 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2023.05.07-1
 - Removing bundled certificates.
 - Switching to Fedora 39 implementation of the spec (license: MIT).
