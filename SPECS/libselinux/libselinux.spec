@@ -11,11 +11,11 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{ve
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  swig
-BuildRequires:  python3
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-wheel
+#BuildRequires:  python3
+#BuildRequires:  python3-devel
+#BuildRequires:  python3-pip
+#BuildRequires:  python3-setuptools
+#BuildRequires:  python3-wheel
 Requires:       pcre2
 Requires:       libsepol
 
@@ -119,7 +119,7 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
-- Add -fno-semantic-interposition to CFLAGS as recommended by upstream 
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - License verified
 - Remove manual pkgconfig provides
 - Update source URL to new format
