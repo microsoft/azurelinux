@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -387,6 +387,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Feb 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-15
+- Updated sbat.csv.in to replace github link with new.
+
 * Thu Jan 25 10:49:55 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.06-14
 - remove systemd-devel build dep
 

@@ -15,7 +15,7 @@ or tomli/tomli-w.
 
 Name:           python-%{pypi_name}
 Version:        0.10.2
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        A deprecated Python Library for Tom's Obvious, Minimal Language
 
 License:        MIT
@@ -29,7 +29,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 # python3 bootstrap: this is rebuilt before the final build of python3, which
 # adds the dependency on python3-rpm-generators, so we require it manually
 # Note that the package prefix is always python3-, even if we build for 3.X
-BuildRequires:  mariner-rpm-macros
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
@@ -94,6 +94,9 @@ toml-test $(pwd)/tests/decoding_test3.sh
 
 
 %changelog
+* Mon Mar 04 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.10.2-16
+- Fix build requirement to of "mariner-rpm-macro" to update with renaming to "azurelinux-rpm-macros".
+
 * Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.10.2-15
 - Updating naming for 3.0 version of Azure Linux.
 
