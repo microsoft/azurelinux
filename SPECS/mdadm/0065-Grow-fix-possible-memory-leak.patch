@@ -1,0 +1,38 @@
+From 434b3b9bb96a76dc12f693b64cf23b581781e20b Mon Sep 17 00:00:00 2001
+From: Blazej Kucman <blazej.kucman@intel.com>
+Date: Tue, 20 Dec 2022 12:07:51 +0100
+Subject: [PATCH 65/83] Grow: fix possible memory leak.
+
+Signed-off-by: Blazej Kucman <blazej.kucman@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Grow.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Grow.c b/Grow.c
+index e362403a..b73ec2ae 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -432,6 +432,7 @@ int Grow_addbitmap(char *devname, int fd, struct context *c, struct shape *s)
+ 			if (((disk.state & (1 << MD_DISK_WRITEMOSTLY)) == 0) &&
+ 			   (strcmp(s->bitmap_file, "clustered") == 0)) {
+ 				pr_err("%s disks marked write-mostly are not supported with clustered bitmap\n",devname);
++				free(mdi);
+ 				return 1;
+ 			}
+ 			fd2 = dev_open(dv, O_RDWR);
+@@ -453,8 +454,10 @@ int Grow_addbitmap(char *devname, int fd, struct context *c, struct shape *s)
+ 				pr_err("failed to load super-block.\n");
+ 			}
+ 			close(fd2);
+-			if (rv)
++			if (rv) {
++				free(mdi);
+ 				return 1;
++			}
+ 		}
+ 		if (offset_setable) {
+ 			st->ss->getinfo_super(st, mdi, NULL);
+-- 
+2.38.1
+

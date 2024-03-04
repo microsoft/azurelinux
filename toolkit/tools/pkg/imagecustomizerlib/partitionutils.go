@@ -114,7 +114,7 @@ func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskP
 	grubConfigFilePath := filepath.Join(tmpDir, installutils.GrubCfgFile)
 	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)
+		return nil, fmt.Errorf("failed to read EFI system partition's grub.cfg file:\n%w", err)
 	}
 
 	// Close the EFI System Partition mount.

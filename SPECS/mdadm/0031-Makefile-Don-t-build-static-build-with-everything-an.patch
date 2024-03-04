@@ -1,0 +1,42 @@
+From 14ae4c37bce9a53da08d59d6c2d7e0946e9c9f47 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:06 -0600
+Subject: [PATCH 31/83] Makefile: Don't build static build with everything and
+ everything-test
+
+Running the test suite requires building everything, but it seems to be
+difficult to build the static version of mdadm now seeing there
+is no readily available static udev library.
+
+The test suite doesn't need the static binary so just don't build it
+with the everything or everything-test targets.
+
+Leave the mdadm.static and install-static targets in place in case
+someone still has a use case for the static binary.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index bf126033..ec1f99ed 100644
+--- a/Makefile
++++ b/Makefile
+@@ -182,9 +182,9 @@ check_rundir:
+ 		echo "***** or set CHECK_RUN_DIR=0"; exit 1; \
+ 	fi
+ 
+-everything: all mdadm.static swap_super test_stripe raid6check \
++everything: all swap_super test_stripe raid6check \
+ 	mdadm.Os mdadm.O2 man
+-everything-test: all mdadm.static swap_super test_stripe \
++everything-test: all swap_super test_stripe \
+ 	mdadm.Os mdadm.O2 man
+ # mdadm.uclibc doesn't work on x86-64
+ # mdadm.tcc doesn't work..
+-- 
+2.38.1
+

@@ -45,7 +45,6 @@
 /SPECS/openssl/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
-/SPECS/KeysInUse-OpenSSL/* @microsoft/cbl-mariner-openssl
 
 /SPECS/dnf/* @microsoft/cbl-mariner-package-managers
 /SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
