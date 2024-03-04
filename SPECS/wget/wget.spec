@@ -137,7 +137,6 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %changelog
 * Wed Feb 28 2024 Muhammad Falak <mwani@microsoft.com> - 2.1.0-1
 - Switch wget from 1.x to 2.x
-- Add a provides for wget
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License Verified
 
