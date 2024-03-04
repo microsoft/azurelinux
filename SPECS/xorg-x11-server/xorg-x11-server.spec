@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -56,6 +56,7 @@ Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 Patch7: CVE-2023-1594.patch
 Patch8: CVE-2023-6377.patch
 Patch9: CVE-2023-6478.patch
+Patch10: CVE-2024-21885.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -386,6 +387,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Mon Nar 4 2024 Saul Paredes <saulparedes@microsoft.com> - 1.20.10-6
+- Add patches for CVE-2024-21885
+
 * Tue Dec 26 2023 Dallas Delaney <dadelan@microsoft.com> - 1.20.10-5
 - Add patches for CVE-2023-6377 and CVE-2023-6478
 
