@@ -102,7 +102,7 @@ index b20e8aabb861..441c03e645db 100644
 +mlx5dr_get_vport_cap(struct mlx5dr_cmd_caps *caps, u16 vport)
  {
  	if (!caps->vports_caps ||
- 	    (vport >= caps->num_vports && vport != WIRE_PORT))
+ 	    (vport >= caps->num_vports && vport != MLX5_VPORT_UPLINK))
 @@ -1154,7 +1154,7 @@ int mlx5dr_cmd_set_fte_modify_and_vport(struct mlx5_core_dev *mdev,
  					u32 table_id,
  					u32 group_id,
