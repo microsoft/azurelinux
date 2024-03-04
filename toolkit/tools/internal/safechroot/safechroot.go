@@ -232,13 +232,13 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 				// Best effort cleanup in case mountpoint creation failed mid-way through. We will not try again so treat as final attempt.
 				cleanupErr := c.unmountAndRemove(leaveChrootOnDisk, unmountTypeLazy)
 				if cleanupErr != nil {
-					err = fmt.Errorf("failed to cleanup chroot (%s) during failed initialization:\n%w\n%w", c.rootDir, cleanupErr, err)
+					logger.Log.Warnf("Failed to cleanup chroot (%s) during failed initialization:\n%s", c.rootDir, cleanupErr)
 				}
 			} else {
 				// release chroot dir
 				cleanupErr := buildpipeline.ReleaseChrootDir(c.rootDir)
 				if cleanupErr != nil {
-					err = fmt.Errorf("failed to release chroot (%s) during failed initialization:\n%w\n%w", c.rootDir, cleanupErr, err)
+					logger.Log.Warnf("Failed to release chroot (%s) during failed initialization:\n%s", c.rootDir, cleanupErr)
 				}
 			}
 		}
