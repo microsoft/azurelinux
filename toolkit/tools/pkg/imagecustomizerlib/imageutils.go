@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
 )
 
 type installOSFunc func(imageChroot *safechroot.Chroot) error
@@ -102,11 +103,6 @@ func createNewImageHelper(filename string, diskConfig imagecustomizerapi.Disk,
 		return err
 	}
 
-	// Sort the partitions so that they are mounted in the correct oder.
-	sort.Slice(imagerPartitionSettings, func(i, j int) bool {
-		return imagerPartitionSettings[i].MountPoint < imagerPartitionSettings[j].MountPoint
-	})
-
 	// Create imager boilerplate.
 	mountPointMap, tmpFstabFile, err := createImageBoilerplate(imageConnection, filename, buildDir, chrootDirName, imagerDiskConfig,
 		imagerPartitionSettings)
@@ -188,8 +184,16 @@ func createImageBoilerplate(imageConnection *ImageConnection, filename string, b
 		partIDToDevPathMap, partIDToFsTypeMap, imagerPartitionSettings,
 	)
 
-	err = installutils.UpdateFstabFile(tmpFstabFile, imagerPartitionSettings, mountPointMap, mountPointToFsTypeMap,
-		mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, false, /*hidepidEnabled*/
+	mountList := sliceutils.MapToSlice(mountPointMap)
+
+	// Sort the mounts so that they are mounted in the correct oder.
+	sort.Slice(mountList, func(i, j int) bool {
+		return mountList[i] < mountList[j]
+	})
+
+	err = installutils.UpdateFstabFile(tmpFstabFile, imagerPartitionSettings, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap,
+		false, /*hidepidEnabled*/
 	)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to write temp fstab file:\n%w", err)
