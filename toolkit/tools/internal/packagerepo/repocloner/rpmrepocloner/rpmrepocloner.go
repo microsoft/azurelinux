@@ -762,7 +762,8 @@ func (r *RpmRepoCloner) refreshPackagesCache() (err error) {
 
 	stdout, stderr, err := shell.Execute("tdnf", args...)
 	if err != nil {
-		return fmt.Errorf("failed to run 'tdnf makecache': \n%s\n%s\n%w", stdout, stderr, err)
+		logger.Log.Errorf("Failed to run 'tdnf makecache'\nstdout:\n%v", stdout)
+		return fmt.Errorf("failed to run 'tdnf makecache':\n%v\n%w", stderr, err)
 	}
 
 	return

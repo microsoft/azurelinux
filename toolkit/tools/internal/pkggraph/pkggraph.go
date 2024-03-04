@@ -442,7 +442,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 	defer func() {
 		// graph manipulation calls may panic on error (such as duplicate node IDs)
 		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to collapse nodes (%v) into (%s) failed:\n%w\n%s", nodesToCollapse, versionedPkg, err, r)
+			err = fmt.Errorf("failed to collapse nodes (%v) into (%s):\n%s", nodesToCollapse, versionedPkg, r)
 		}
 
 		if err != nil {
@@ -454,7 +454,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 			for _, node := range nodesToCollapse {
 				lookupErr := g.addToLookup(node, false)
 				if lookupErr != nil {
-					err = fmt.Errorf("failed to add node (%s) back to lookup table:\n%w\n%w", node.FriendlyName(), lookupErr, err)
+					err = fmt.Errorf("%w\nfailed to add node (%s) back to lookup table:\nlookupErr:\n%w", err, node.FriendlyName(), lookupErr)
 				}
 			}
 		}
