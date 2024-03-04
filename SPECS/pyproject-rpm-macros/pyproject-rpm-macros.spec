@@ -60,7 +60,7 @@ BuildRequires:  python3dist(pytest-xdist)
 %endif
 BuildRequires:  python3dist(pyyaml)
 #BuildRequires:  python3dist(packaging)
-BuildRequires:  python-packaging
+BuildRequires:  python3-packaging
 BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(setuptools)
 %if %{with tox_tests}
