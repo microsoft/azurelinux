@@ -1,0 +1,162 @@
+From 27ad4900501c615b7c6b266bf23948e5606dba53 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 27 Jul 2022 15:52:46 -0600
+Subject: [PATCH 50/83] mdadm: Don't open md device for CREATE and ASSEMBLE
+
+The mdadm command tries to open the md device for most modes, first
+thing, no matter what. When running to create or assemble an array,
+in most cases, the md device will not exist, the open call will fail
+and everything will proceed correctly.
+
+However, when running tests, a create or assembly command may be run
+shortly after stopping an array and the old md device file may still
+be around. Then, if create_on_open is set in the kernel, a new md
+device will be created when mdadm does its initial open.
+
+When mdadm gets around to creating the new device with the new_array
+parameter it issues this error:
+
+   mdadm: Fail to create md0 when using
+   /sys/module/md_mod/parameters/new_array, fallback to creation via node
+
+This is because an mddev was already created by the kernel with the
+earlier open() call and thus the new one being created will fail with
+EEXIST. The mdadm command will still successfully be created due to
+falling back to the node creation method. However, the error message
+itself will fail any test that's running it.
+
+This issue is a race condition that is very rare, but a recent change
+in the kernel caused this to happen more frequently: about 1 in 50
+times.
+
+To fix this, don't bother trying to open the md device for CREATE,
+ASSEMBLE and BUILD commands, as the file descriptor will never be used
+anyway even if it is successfully openned. The mdfd has not been used
+for these commands since:
+
+   7f91af49ad09 ("Delay creation of array devices for assemble/build/create")
+
+The checks that were done on the open device can be changed to being
+done with stat.
+
+Side note: it would be nice to disable create_on_open as well to help
+solve this, but it seems the work for this was never finished. By default,
+mdadm will create using the old node interface when a name is specified
+unless the user specifically puts names=yes in a config file, which
+doesn't seem to be common or desirable to require this..
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ lib.c   | 12 ++++++++++++
+ mdadm.c | 40 ++++++++++++++++++++--------------------
+ mdadm.h |  1 +
+ 3 files changed, 33 insertions(+), 20 deletions(-)
+
+diff --git a/lib.c b/lib.c
+index 7e3e3d47..e395b28d 100644
+--- a/lib.c
++++ b/lib.c
+@@ -164,6 +164,18 @@ char *stat2devnm(struct stat *st)
+ 	return devid2devnm(st->st_rdev);
+ }
+ 
++bool stat_is_md_dev(struct stat *st)
++{
++	if ((S_IFMT & st->st_mode) != S_IFBLK)
++		return false;
++	if (major(st->st_rdev) == MD_MAJOR)
++		return true;
++	if (major(st->st_rdev) == (unsigned)get_mdp_major())
++		return true;
++
++	return false;
++}
++
+ char *fd2devnm(int fd)
+ {
+ 	struct stat stb;
+diff --git a/mdadm.c b/mdadm.c
+index 845e4466..972adb52 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -1329,6 +1329,9 @@ int main(int argc, char *argv[])
+ 
+ 	if (mode == MANAGE || mode == BUILD || mode == CREATE ||
+ 	    mode == GROW || (mode == ASSEMBLE && ! c.scan)) {
++		struct stat stb;
++		int ret;
++
+ 		if (devs_found < 1) {
+ 			pr_err("an md device must be given in this mode\n");
+ 			exit(2);
+@@ -1341,6 +1344,12 @@ int main(int argc, char *argv[])
+ 			mdfd = open_mddev(devlist->devname, 1);
+ 			if (mdfd < 0)
+ 				exit(1);
++
++			ret = fstat(mdfd, &stb);
++			if (ret) {
++				pr_err("fstat failed on %s.\n", devlist->devname);
++				exit(1);
++			}
+ 		} else {
+ 			char *bname = basename(devlist->devname);
+ 
+@@ -1348,30 +1357,21 @@ int main(int argc, char *argv[])
+ 				pr_err("Name %s is too long.\n", devlist->devname);
+ 				exit(1);
+ 			}
+-			/* non-existent device is OK */
+-			mdfd = open_mddev(devlist->devname, 0);
+-		}
+-		if (mdfd == -2) {
+-			pr_err("device %s exists but is not an md array.\n", devlist->devname);
+-			exit(1);
+-		}
+-		if ((int)ident.super_minor == -2) {
+-			struct stat stb;
+-			if (mdfd < 0) {
++
++			ret = stat(devlist->devname, &stb);
++			if (ident.super_minor == -2 && ret != 0) {
+ 				pr_err("--super-minor=dev given, and listed device %s doesn't exist.\n",
+-					devlist->devname);
++				       devlist->devname);
++				exit(1);
++			}
++
++			if (!ret && !stat_is_md_dev(&stb)) {
++				pr_err("device %s exists but is not an md array.\n", devlist->devname);
+ 				exit(1);
+ 			}
+-			fstat(mdfd, &stb);
+-			ident.super_minor = minor(stb.st_rdev);
+-		}
+-		if (mdfd >= 0 && mode != MANAGE && mode != GROW) {
+-			/* We don't really want this open yet, we just might
+-			 * have wanted to check some things
+-			 */
+-			close(mdfd);
+-			mdfd = -1;
+ 		}
++		if (ident.super_minor == -2)
++			ident.super_minor = minor(stb.st_rdev);
+ 	}
+ 
+ 	if (s.raiddisks) {
+diff --git a/mdadm.h b/mdadm.h
+index adb7cdaa..8208b81e 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -1672,6 +1672,7 @@ void *super1_make_v0(struct supertype *st, struct mdinfo *info, mdp_super_t *sb0
+ extern char *stat2kname(struct stat *st);
+ extern char *fd2kname(int fd);
+ extern char *stat2devnm(struct stat *st);
++bool stat_is_md_dev(struct stat *st);
+ extern char *fd2devnm(int fd);
+ extern void udev_block(char *devnm);
+ extern void udev_unblock(void);
+-- 
+2.38.1
+

@@ -1,0 +1,33 @@
+From 5ce5a15f0bf007e850e15259bba4f53736605fb2 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 25 Mar 2022 12:48:59 +0100
+Subject: [PATCH 02/83] mdadm: Fix double free
+
+If there was a size mismatch after creation it would get fixed on grow
+in imsm_fix_size_mismatch(), but due to double free "double free or corruption (fasttop)"
+error occurs and grow cannot proceed.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super-intel.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 5ffa7636..6ff336ee 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -11783,9 +11783,8 @@ static int imsm_fix_size_mismatch(struct supertype *st, int subarray_index)
+ 			st->update_tail = &st->updates;
+ 		} else {
+ 			imsm_sync_metadata(st);
++			free(update);
+ 		}
+-
+-		free(update);
+ 	}
+ 	ret_val = 0;
+ exit:
+-- 
+2.38.1
+

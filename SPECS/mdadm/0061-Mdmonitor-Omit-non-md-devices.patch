@@ -1,0 +1,58 @@
+From 8b668d4aa3305af5963162b7499b128bd71f8f29 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Thu, 22 Sep 2022 08:29:50 +0200
+Subject: [PATCH 61/83] Mdmonitor: Omit non-md devices
+
+Fix segfault commit [1] introduced check whether given device is
+mddevice, but it happend to terminate Mdmonitor if at least one of given
+devices didn't fulfill that condition. In result Mdmonitor service was
+no longer started on boot (with --scan option) when config contained some
+non-existent array entry.
+
+This commit introduces ommiting non-md devices so scan option can still
+be used when config is wrong and allow Mdmonitor service to run on boot.
+
+Giving a list of devices to monitor containing non-existing or
+non-md devices will result in monitoring only confirmed mddevices.
+
+[1] https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git/commit/?id=e702f392959d1c2ad2089e595b52235ed97b4e18
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Monitor.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index b4e954c6..7d7dc4d2 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -185,10 +185,8 @@ int Monitor(struct mddev_dev *devlist,
+ 				continue;
+ 			if (strcasecmp(mdlist->devname, "<ignore>") == 0)
+ 				continue;
+-			if (!is_mddev(mdlist->devname)) {
+-				free_statelist(statelist);
+-				return 1;
+-			}
++			if (!is_mddev(mdlist->devname))
++				continue;
+ 
+ 			st = xcalloc(1, sizeof *st);
+ 			snprintf(st->devname, MD_NAME_MAX + sizeof("/dev/md/"),
+@@ -208,10 +206,8 @@ int Monitor(struct mddev_dev *devlist,
+ 		for (dv = devlist; dv; dv = dv->next) {
+ 			struct state *st;
+ 
+-			if (!is_mddev(dv->devname)) {
+-				free_statelist(statelist);
+-				return 1;
+-			}
++			if (!is_mddev(dv->devname))
++				continue;
+ 
+ 			st = xcalloc(1, sizeof *st);
+ 			mdlist = conf_get_ident(dv->devname);
+-- 
+2.38.1
+

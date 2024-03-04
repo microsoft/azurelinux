@@ -1,0 +1,63 @@
+From 50cd06b484bb99bfacdd4f9d2f8ee5e52bfc7bd3 Mon Sep 17 00:00:00 2001
+From: Wu Guanghao <wuguanghao3@huawei.com>
+Date: Sat, 4 Mar 2023 00:21:33 +0800
+Subject: [PATCH 096/120] isuper-intel.c: fix double free in load_imsm_mpb()
+
+In load_imsm_mpb() there is potential double free issue on super->buf.
+
+The first location to free super->buf is from get_super_block() <==
+load_and_parse_mpb() <== load_imsm_mpb():
+ 4514         if (posix_memalign(&super->migr_rec_buf, MAX_SECTOR_SIZE,
+ 4515             MIGR_REC_BUF_SECTORS*MAX_SECTOR_SIZE) != 0) {
+ 4516                 pr_err("could not allocate migr_rec buffer\n");
+ 4517                 free(super->buf);
+ 4518                 return 2;
+ 4519         }
+
+If the above error condition happens, super->buf is freed and value 2
+is returned to get_super_block() eventually. Then in the following code
+block inside load_imsm_mpb(),
+ 5289  error:
+ 5290         if (!err) {
+ 5291                 s->next = *super_list;
+ 5292                 *super_list = s;
+ 5293         } else {
+ 5294                 if (s)
+ 5295                         free_imsm(s);
+ 5296                 close_fd(&dfd);
+ 5297         }
+at line 5295 when free_imsm() is called, super->buf is freed again from
+the call chain free_imsm() <== __free_imsm(), in following code block,
+ 4651         if (super->buf) {
+ 4652                 free(super->buf);
+ 4653                 super->buf = NULL;
+ 4654         }
+
+This patch sets super->buf as NULL after line 4517 in load_imsm_mpb()
+to avoid the potential double free().
+
+(Coly Li helps to re-compose the commit log)
+
+Signed-off-by: Wu Guanghao <wuguanghao3@huawei.com>
+Reviewed-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-intel.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/super-intel.c b/super-intel.c
+index 89fac626..4a3da847 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -4515,6 +4515,7 @@ static int load_imsm_mpb(int fd, struct intel_super *super, char *devname)
+ 	    MIGR_REC_BUF_SECTORS*MAX_SECTOR_SIZE) != 0) {
+ 		pr_err("could not allocate migr_rec buffer\n");
+ 		free(super->buf);
++		super->buf = NULL;
+ 		return 2;
+ 	}
+ 	super->clean_migration_record_by_mdmon = 0;
+-- 
+2.38.1
+

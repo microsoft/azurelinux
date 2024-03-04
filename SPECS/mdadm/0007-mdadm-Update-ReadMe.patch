@@ -1,0 +1,48 @@
+From c23400377bb3d8e98e810cd92dba478dac1dff82 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 18 Mar 2022 09:26:05 +0100
+Subject: [PATCH 07/83] mdadm: Update ReadMe
+
+Instead of hardcoded config file path give reference to config manual.
+
+Add missing monitordelay and homecluster parameters.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ ReadMe.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/ReadMe.c b/ReadMe.c
+index 81399765..8f873c48 100644
+--- a/ReadMe.c
++++ b/ReadMe.c
+@@ -613,7 +613,6 @@ char Help_incr[] =
+ ;
+ 
+ char Help_config[] =
+-"The /etc/mdadm.conf config file:\n\n"
+ " The config file contains, apart from blank lines and comment lines that\n"
+ " start with a hash(#), array lines, device lines, and various\n"
+ " configuration lines.\n"
+@@ -636,10 +635,12 @@ char Help_config[] =
+ " than a device must match all of them to be considered.\n"
+ "\n"
+ " Other configuration lines include:\n"
+-"  mailaddr, mailfrom, program     used for --monitor mode\n"
+-"  create, auto                    used when creating device names in /dev\n"
+-"  homehost, policy, part-policy   used to guide policy in various\n"
+-"                                  situations\n"
++"  mailaddr, mailfrom, program, monitordelay    used for --monitor mode\n"
++"  create, auto                                 used when creating device names in /dev\n"
++"  homehost, homecluster, policy, part-policy   used to guide policy in various\n"
++"                                               situations\n"
++"\n"
++"For more details see mdadm.conf(5).\n"
+ "\n"
+ ;
+ 
+-- 
+2.38.1
+

@@ -1,0 +1,39 @@
+From de045db607b1ac4b70fc2a8878463e029c2ab1dc Mon Sep 17 00:00:00 2001
+From: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Date: Wed, 22 Jun 2022 14:25:15 -0600
+Subject: [PATCH 40/83] tests/04update-metadata: avoid passing chunk size to
+ raid1
+
+'04update-metadata' test fails with error, "specifying chunk size is
+forbidden for this level" added by commit, 5b30a34aa4b5e. Hence,
+correcting the test to ignore passing chunk size to raid1.
+
+Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Signed-off-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+[logang@deltatee.com: fix if/then style and dropped unrelated hunk]
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ tests/04update-metadata | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/04update-metadata b/tests/04update-metadata
+index 08c14af7..2b72a303 100644
+--- a/tests/04update-metadata
++++ b/tests/04update-metadata
+@@ -11,7 +11,11 @@ dlist="$dev0 $dev1 $dev2 $dev3"
+ for ls in linear/4 raid1/1 raid5/3 raid6/2
+ do
+   s=${ls#*/} l=${ls%/*}
+-  mdadm -CR --assume-clean -e 0.90 $md0 --level $l -n 4 -c 64 $dlist
++  if [[ $l == 'raid1' ]]; then
++	mdadm -CR --assume-clean -e 0.90 $md0 --level $l -n 4 $dlist
++  else
++	mdadm -CR --assume-clean -e 0.90 $md0 --level $l -n 4 -c 64 $dlist
++  fi
+   testdev $md0 $s 19904 64
+   mdadm -S $md0
+   mdadm -A $md0 --update=metadata $dlist
+-- 
+2.38.1
+
