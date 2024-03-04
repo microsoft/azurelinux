@@ -21953,8 +21953,8 @@
         "type": "other",
         "other": {
           "name": "python-cryptography",
-          "version": "3.3.2",
-          "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-3.3.2.tar.gz"
+          "version": "42.0.5",
+          "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-42.0.5.tar.gz"
         }
       }
     },

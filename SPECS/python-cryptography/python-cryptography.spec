@@ -1,14 +1,14 @@
+%global debug_package %{nil}
 Summary:        Python cryptography library
 Name:           python-cryptography
-Version:        3.3.2
-Release:        5%{?dist}
+Version:        42.0.5
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
-Patch0:         CVE-2023-23931.patch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
@@ -21,7 +21,9 @@ Summary:        python-cryptography
 BuildRequires:  openssl-devel
 BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-asn1crypto
@@ -38,10 +40,10 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 %autosetup -p1 -n cryptography-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 openssl req \
@@ -64,6 +66,9 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 42.0.5-1
+- Upgrade to version 42.0.5
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.3.2-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
