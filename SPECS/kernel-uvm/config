@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 6.1.0.mshv14 Kernel Configuration
+# Linux/x86_64 6.1.0.mshv16 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 11.2.0"
 CONFIG_CC_IS_GCC=y
@@ -920,26 +920,9 @@ CONFIG_SYN_COOKIES=y
 # CONFIG_INET_ESP is not set
 # CONFIG_INET_IPCOMP is not set
 # CONFIG_INET_DIAG is not set
-CONFIG_TCP_CONG_ADVANCED=y
-# CONFIG_TCP_CONG_BIC is not set
-# CONFIG_TCP_CONG_CUBIC is not set
-# CONFIG_TCP_CONG_WESTWOOD is not set
-# CONFIG_TCP_CONG_HTCP is not set
-# CONFIG_TCP_CONG_HSTCP is not set
-# CONFIG_TCP_CONG_HYBLA is not set
-# CONFIG_TCP_CONG_VEGAS is not set
-# CONFIG_TCP_CONG_NV is not set
-# CONFIG_TCP_CONG_SCALABLE is not set
-# CONFIG_TCP_CONG_LP is not set
-# CONFIG_TCP_CONG_VENO is not set
-# CONFIG_TCP_CONG_YEAH is not set
-# CONFIG_TCP_CONG_ILLINOIS is not set
-# CONFIG_TCP_CONG_DCTCP is not set
-# CONFIG_TCP_CONG_CDG is not set
-CONFIG_TCP_CONG_BBR=y
-CONFIG_DEFAULT_BBR=y
-# CONFIG_DEFAULT_RENO is not set
-CONFIG_DEFAULT_TCP_CONG="bbr"
+# CONFIG_TCP_CONG_ADVANCED is not set
+CONFIG_TCP_CONG_CUBIC=y
+CONFIG_DEFAULT_TCP_CONG="cubic"
 CONFIG_TCP_MD5SIG=y
 CONFIG_IPV6=y
 # CONFIG_IPV6_ROUTER_PREF is not set
