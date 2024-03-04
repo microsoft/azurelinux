@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.105.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # specific event. Revert back to the original filename when a new cache is created for a different version.
 Source1:        %{name}-%{name}-%{version}-cargo-rev2.tar.gz
 Patch0:         CVE-2022-48579.patch
+Patch1:         CVE-2024-20328.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -136,6 +137,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Mar 4 2024 Saul Paredes <saulparedes@microsoft.com> - 0.105.2-5
+- Patch CVE-2024-20328
+
 * Fri Dec 08 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.105.2-4
 - Fix resetting of user and group settings on package update
 
