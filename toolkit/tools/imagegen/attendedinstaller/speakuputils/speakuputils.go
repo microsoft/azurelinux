@@ -18,7 +18,7 @@ const (
 
 // CreateVirtualKeyboard creates and returns a virtual keyboard from the uinput package
 func CreateVirtualKeyboard() (keyboard uinput.Keyboard, err error) {
-	keyboard, err = uinput.CreateKeyboard("/dev/uinput", []byte("MarinerVirtualKeyboard"))
+	keyboard, err = uinput.CreateKeyboard("/dev/uinput", []byte("AzureLinuxVirtualKeyboard"))
 	return
 }
 

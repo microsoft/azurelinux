@@ -177,7 +177,7 @@ func setupCloner() (cloner *rpmrepocloner.RpmRepoCloner, err error) {
 		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
 	}
 	if *disableDefaultRepos {
-		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagAzureLinuxDefaults
 	}
 	cloner.SetEnabledRepos(enabledRepos)
 	return

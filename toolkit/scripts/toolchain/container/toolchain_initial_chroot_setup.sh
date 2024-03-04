@@ -86,7 +86,7 @@ nogroup:x:65534:
 EOF
 
 cat > /etc/os-release << "EOF"
-NAME="Common Base Linux Mariner Toolchain"
+NAME="Common Base Linux Azure Linux Toolchain"
 VERSION="3.0.2023"
 ID=mariner
 VERSION_ID="3.0"

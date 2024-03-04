@@ -423,7 +423,7 @@ var expectedConfiguration Config = Config{
 				"local/path/file5": {{Path: "/final/system/path/file5"}},
 				"local/path/file6": {{Path: "/final/system/path/file6"}, {Path: "/final/system/path/file6_copy"}},
 			},
-			Hostname: "Mariner-Test",
+			Hostname: "Azl-Test",
 			BootType: "efi",
 			Groups: []Group{
 				{
@@ -563,7 +563,7 @@ var expectedConfiguration Config = Config{
 			KernelOptions: map[string]string{
 				"default": "kernel",
 			},
-			Hostname: "Mariner-TestA",
+			Hostname: "Azl-TestA",
 			Users: []User{
 				{
 					Name:     "basicuser",
@@ -599,7 +599,7 @@ var expectedConfiguration Config = Config{
 			KernelOptions: map[string]string{
 				"default": "kernel",
 			},
-			Hostname: "Mariner-TestB",
+			Hostname: "Azl-TestB",
 			Users: []User{
 				{
 					Name:     "basicuser",

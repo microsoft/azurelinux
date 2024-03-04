@@ -128,11 +128,11 @@ func processPartitionTableType() (err error) {
 		// whether the users prefer creation of GPT disk label or not. The value of "--gpt"
 		// is a bool where "True" indicates using GPT and "False" if not, which means using MBR.
 		// This config is set as a boot option within /proc/cmdline, which will be parsed by anaconda
-		// during installation process. Thus, Mariner will also pick the same design to reach compatibility
+		// during installation process. Thus, Azure Linux will also pick the same design to reach compatibility
 		// with kickstart scenario
 
 		// Please note that this code is only executed during kickstart installation, when "IsKickStartBoot" is set to true.
-		// Mariner installer currently does not allow direct specification of disk and partition layout within
+		// Azure Linux installer currently does not allow direct specification of disk and partition layout within
 		// the image config file for kickstart installation. So any disk/partition setting you make in the image config file
 		// will be overwritten if you enable kickstart installation mode.
 		isGPTPartitionTable, err := GetKernelCmdLineValue("--gpt")

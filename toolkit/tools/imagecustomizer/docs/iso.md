@@ -1,8 +1,8 @@
-# Mariner Image Customizer ISO Support
+# Azure Linux Image Customizer ISO Support
 
 ## Overview
 
-Given a full disk image, the Mariner Image Customizer (MIC) can generate a
+Given a full disk image, the Azure Linux Image Customizer (MIC) can generate a
 LiveOS ISO image when the `--output-image-format` is set to `iso`.
 
 The LiveOS ISO image is a bootable image that boots into the rootfs of the
@@ -43,7 +43,7 @@ The current implementation for the LiveOS ISO does not support the following:
 - The user can specify one or more files to be copied to the iso media.
 - The user can add kernel parameters.
 
-For a full list of capabilities, see Mariner Image Customizer's iso
+For a full list of capabilities, see Azure Linux Image Customizer's iso
 configuration section: [Config.ISO](./configuration.md#iso-type).
 
 ## cloud-init Support

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
-# Dockerfile to build Mariner toolchain from scratch
+# Dockerfile to build Azure Linux toolchain from scratch
 #
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20231004
 

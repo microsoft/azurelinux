@@ -24,15 +24,15 @@ import (
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
 const (
-	RepoFlagMarinerDefaults = uint64(1) << iota // External default Mariner repos pre-installed in the chroot.
-	RepoFlagDownloadedCache                     // Local repo with the cached packages downloaded from upstream.
-	RepoFlagLocalBuilds                         // Local repo with the packages built from local spec files.
-	RepoFlagPreview                             // Separate flag to control the use of the Mariner preview packages repository.
-	RepoFlagToolchain                           // Local repo with the toolchain packages.
-	RepoFlagUpstream                            // Separate flag to control the use of all upstream packages repositories.
+	RepoFlagAzureLinuxDefaults = uint64(1) << iota // External default Azure Linux repos pre-installed in the chroot.
+	RepoFlagDownloadedCache                        // Local repo with the cached packages downloaded from upstream.
+	RepoFlagLocalBuilds                            // Local repo with the packages built from local spec files.
+	RepoFlagPreview                                // Separate flag to control the use of the Azure Linux preview packages repository.
+	RepoFlagToolchain                              // Local repo with the toolchain packages.
+	RepoFlagUpstream                               // Separate flag to control the use of all upstream packages repositories.
 
 	// A compound flag enabling all supported repositories.
-	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagMarinerDefaults | RepoFlagUpstream
+	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagAzureLinuxDefaults | RepoFlagUpstream
 )
 
 const (
@@ -52,13 +52,13 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot                *safechroot.Chroot
-	chrootCloneDir        string
-	defaultMarinerRepoIDs []string
-	mountedCloneDir       string
-	repoIDCache           string
-	reposArgsList         [][]string
-	reposFlags            uint64
+	chroot                   *safechroot.Chroot
+	chrootCloneDir           string
+	defaultAzureLinuxRepoIDs []string
+	mountedCloneDir          string
+	repoIDCache              string
+	reposArgsList            [][]string
+	reposFlags               uint64
 }
 
 // ConstructCloner constructs a new RpmRepoCloner.
@@ -280,7 +280,7 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 		if err != nil {
 			return err
 		}
-		r.defaultMarinerRepoIDs = append(r.defaultMarinerRepoIDs, repoIDs...)
+		r.defaultAzureLinuxRepoIDs = append(r.defaultAzureLinuxRepoIDs, repoIDs...)
 
 		err = appendRepoFile(originalRepoFilePath, dstFile)
 		if err != nil {
@@ -734,16 +734,16 @@ func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
 		previousReposList = append(previousReposList, fmt.Sprintf("--disablerepo=%s", repoIDPreview))
 	}
 
-	if RepoFlagMarinerDefaults&reposFlags == 0 {
-		previousReposList = append(previousReposList, r.disabledDefaultMarinerReposArgs()...)
+	if RepoFlagAzureLinuxDefaults&reposFlags == 0 {
+		previousReposList = append(previousReposList, r.disabledDefaultAzureLinuxReposArgs()...)
 	}
 
 	r.reposArgsList = append(r.reposArgsList, previousReposList)
 }
 
-func (r *RpmRepoCloner) disabledDefaultMarinerReposArgs() (args []string) {
-	args = make([]string, len(r.defaultMarinerRepoIDs))
-	for i, repoID := range r.defaultMarinerRepoIDs {
+func (r *RpmRepoCloner) disabledDefaultAzureLinuxReposArgs() (args []string) {
+	args = make([]string, len(r.defaultAzureLinuxRepoIDs))
+	for i, repoID := range r.defaultAzureLinuxRepoIDs {
 		args[i] = fmt.Sprintf("--disablerepo=%s", repoID)
 	}
 

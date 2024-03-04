@@ -88,7 +88,7 @@ func main() {
 		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagUpstream
 	}
 	if *disableDefaultRepos {
-		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagMarinerDefaults
+		enabledRepos = enabledRepos & ^rpmrepocloner.RepoFlagAzureLinuxDefaults
 	}
 	cloner.SetEnabledRepos(enabledRepos)
 

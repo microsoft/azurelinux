@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.2.11
-Release:        40%{?dist}
+Release:        41%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,7 +28,7 @@ Source23:       branding.desc
 Source24:       users.conf
 Source25:       stylesheet.qss
 # Source40..100 - Assets
-Source40:       mariner-logo.png
+Source40:       azure-linux-logo.png
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_fr.ts
 # then translate the template in linguist-qt5.
@@ -41,8 +41,8 @@ Source42:       calamares-auto_de.ts
 # lupdate-qt5 show.qml -ts calamares-auto_it.ts
 # then translate the template in linguist-qt5.
 Source43:       calamares-auto_it.ts
-Source52:       mariner-welcome.png
-Source53:       mariner-eula
+Source52:       azure-linux-welcome.png
+Source53:       azure-linux-eula
 # adjust some default settings (default shipped .conf files)
 Patch0:         calamares-3.2.11-default-settings.patch
 Patch1:         use-single-job-for-progress-bar-value.patch
@@ -163,11 +163,11 @@ make %{?_smp_mflags} -C %{_target_platform}
 make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
 # create the auto branding directory
 
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner/lang
-lrelease-qt5 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_fr.qm
-lrelease-qt5 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_de.qm
-lrelease-qt5 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_it.qm
+mkdir -p %{buildroot}%{_datadir}/calamares/branding/azl
+mkdir -p %{buildroot}%{_datadir}/calamares/branding/azl/lang
+lrelease-qt5 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/azl/lang/calamares-auto_fr.qm
+lrelease-qt5 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/azl/lang/calamares-auto_de.qm
+lrelease-qt5 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/azl/lang/calamares-auto_it.qm
 
 # own the local settings directories
 mkdir -p %{buildroot}%{_sysconfdir}/calamares/modules
@@ -177,21 +177,21 @@ mkdir -p %{buildroot}%{_sysconfdir}/calamares/branding
 rm -f %{buildroot}%{_datadir}/locale/*/LC_MESSAGES/calamares-dummypythonqt.mo
 %find_lang calamares-python
 
-# Mariner branding
+# Azure Linux branding
 mkdir -p %{buildroot}%{_datadir}/calamares/branding/
 cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/calamares/branding/
 cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/modules/
 
 install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
-install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-logo.png
-install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/mariner/show.qml
-install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/mariner/branding.desc
-install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/mariner/stylesheet.qss
-install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-welcome.png
+install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/azl/azure-linux-logo.png
+install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/azl/show.qml
+install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/azl/branding.desc
+install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/azl/stylesheet.qss
+install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/azl/azure-linux-welcome.png
 
 
 # EULA
-install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
+install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azure-linux-eula
 
 %post
 
@@ -203,13 +203,13 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_datadir}/calamares/settings.conf
 %dir %{_datadir}/calamares/branding/
 %{_datadir}/calamares/branding/default/
-%dir %{_datadir}/calamares/branding/mariner/
-%{_datadir}/calamares/branding/mariner/show.qml
-%{_datadir}/calamares/branding/mariner/lang/
-%{_datadir}/calamares/branding/mariner/mariner-logo.png
-%{_datadir}/calamares/branding/mariner/mariner-welcome.png
-%{_datadir}/calamares/branding/mariner/branding.desc
-%{_datadir}/calamares/branding/mariner/stylesheet.qss
+%dir %{_datadir}/calamares/branding/azl/
+%{_datadir}/calamares/branding/azl/show.qml
+%{_datadir}/calamares/branding/azl/lang/
+%{_datadir}/calamares/branding/azl/azure-linux-logo.png
+%{_datadir}/calamares/branding/azl/azure-linux-welcome.png
+%{_datadir}/calamares/branding/azl/branding.desc
+%{_datadir}/calamares/branding/azl/stylesheet.qss
 %{_datadir}/calamares/modules/
 %{_datadir}/calamares/qml/
 %{_datadir}/applications/calamares.desktop
@@ -217,7 +217,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_mandir}/man8/calamares.8*
 %{_sysconfdir}/calamares/
 %{_sysconfdir}/calamares/settings.conf
-%{_sysconfdir}/calamares/mariner-eula
+%{_sysconfdir}/calamares/azure-linux-eula
 
 %files libs
 %{_libdir}/libcalamares.so.*
@@ -231,6 +231,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
 %{_libdir}/cmake/Calamares/
 
 %changelog
+* Mon Mar 04 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 3.2.11-41
+- Renamed eula, welcome and logo files to have "azure-linux" instead of "mariner" naming part. Changed their path to be inside of "azl" folder when installed.
+
 * Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
 - Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
 - Fix application crash when the Mariner installer process thread have already exited during progress bar installation view

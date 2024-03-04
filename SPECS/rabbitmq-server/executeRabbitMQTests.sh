@@ -17,7 +17,7 @@
 #
 # RabbitMQ depends on bazel 'latest'. As of 2/22/23, the latest bazel version is '6.0.0'.
 #
-# Some tests also rely on the 'mandoc' package. As of 2/22/23, this package was not available in Mariner. As a result, the package is
+# Some tests also rely on the 'mandoc' package. As of 2/22/23, this package was not available in Azure Linux. As a result, the package is
 # pulled from source and installed. These test break the entire run, so this dependency must be pulled in for the entire suite to succeed.
 #
 # The elixir package relies on having the UTF-8 character encoding set in your locale in order to function properly. Because of this, you 

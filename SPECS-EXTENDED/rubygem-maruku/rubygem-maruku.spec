@@ -81,7 +81,7 @@ popd
 - License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.7.2-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+- Initial CBL-Azure Linux import from Fedora 32 (license: MIT).
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
