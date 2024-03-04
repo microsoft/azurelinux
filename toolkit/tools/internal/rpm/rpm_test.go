@@ -207,6 +207,54 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 	}
 }
 
+func TestExtractArchFromRPMPath(t *testing.T) {
+	tests := []struct {
+		name          string
+		rpmFilePath   string
+		expectedArch  string
+		expectedError error
+	}{
+		{
+			name:          "valid x86_64 RPM file",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.x86_64.rpm",
+			expectedArch:  "x86_64",
+			expectedError: nil,
+		},
+		{
+			name:          "valid aarch64 RPM file",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.aarch64.rpm",
+			expectedArch:  "aarch64",
+			expectedError: nil,
+		},
+		{
+			name:          "valid noarch RPM file",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.noarch.rpm",
+			expectedArch:  "noarch",
+			expectedError: nil,
+		},
+		{
+			name:          "invalid RPM file path",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.invalid.rpm",
+			expectedArch:  "",
+			expectedError: fmt.Errorf("invalid RPM file path '/path/to/pkg-1.0.0-1.invalid.rpm', can't extract arch"),
+		},
+		{
+			name:          "RPM file path without arch",
+			rpmFilePath:   "/path/to/pkg-1.0.0-1.rpm",
+			expectedArch:  "",
+			expectedError: fmt.Errorf("invalid RPM file path '/path/to/pkg-1.0.0-1.rpm', can't extract arch"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actualArch, actualError := ExtractArchFromRPMPath(tt.rpmFilePath)
+			assert.Equal(t, tt.expectedArch, actualArch)
+			assert.Equal(t, tt.expectedError, actualError)
+		})
+	}
+}
+
 func configureTestDistroMacros(nameAbreviation string, majorVersion int) error {
 	err := checkDistroMacros(nameAbreviation, majorVersion)
 	if err != nil {

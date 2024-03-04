@@ -5,6 +5,7 @@ package schedulerutils
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -14,7 +15,7 @@ import (
 )
 
 // InjectMissingImplicitProvides will inject implicit provide nodes into the graph from a build result if they satisfy any unresolved nodes.
-func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool) (didInjectAny bool, err error) {
+func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, useCachedImplicit bool, toolchainDirPath string) (didInjectAny bool, err error) {
 	for _, rpmFile := range res.BuiltFiles {
 		var (
 			provides       []string
@@ -38,7 +39,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile)
+			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile, toolchainDirPath)
 			if err != nil {
 				return
 			}
@@ -53,28 +54,48 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
-	var parentNode *pkggraph.PkgNode
+func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding, toolchainDirPath string) (err error) {
+	var parentNode, toolchainParent *pkggraph.PkgNode
+
+	// If we don't find a local run node, we should consider the toolchain nodes as well. This is normally an error case, but it is an error we should
+	// handle gracefully. This can happen if the implicit provide is for a toolchain package that is accidentally rebuilt for some reason. Take the
+	// rpm path and replace the current parent directory with the toolchain directory path.
+	arch, err := rpm.ExtractArchFromRPMPath(rpmFileProviding)
+	if err != nil {
+		err = fmt.Errorf("failed to extract arch from rpm path (%s):\n%w", rpmFileProviding, err)
+		return
+	}
+	toolchainRpmPath := path.Join(toolchainDirPath, path.Join(arch, path.Base(rpmFileProviding)))
 
 	// Find a local run node that is backed by the same rpm as the one providing the implicit provide.
 	// Make this node the parent node for the new implicit provide node.
 	// - By making a run node the parent node, it will inherit the identical runtime dependencies of the already setup node.
 	for _, node := range pkgGraph.AllPreferredRunNodes() {
+		logger.Log.Debugf("Node: %+v", node)
 		// We need to filter out any non-local run nodes since cached remote nodes are not acceptable parent nodes for collapsed nodes.
 		if node.Type == pkggraph.TypeLocalRun && rpmFileProviding == node.RpmPath {
 			logger.Log.Debugf("Linked implicit provide (%s) to run node (%s) using file (%s)", provides, node.FriendlyName(), rpmFileProviding)
 			parentNode = node
 			break
+		} else if (node.Type == pkggraph.TypePreBuilt || node.Type == pkggraph.TypeLocalRun) && toolchainRpmPath == node.RpmPath {
+			toolchainParent = node
+			// We don't break here since we want to find the local run node if it exists.
 		}
+	}
+
+	if parentNode == nil && toolchainParent != nil {
+		logger.Log.Warnf("Implicit provide (%s) was found to be backed by a toolchain package (%s) instead of a local run package (%s). Using toolchain package as parent node instead!", provides, toolchainParent.FriendlyName(), rpmFileProviding)
+		// Even if we use the toolchain node keep the new rpm path, since we rebuilt the toolchain package but haven't updated the graph yet.
+		parentNode = toolchainParent
 	}
 
 	// If there is no clear parent node for the implicit provide error out.
 	if parentNode == nil {
-		return fmt.Errorf("failed to find suitable parent node for implicit provides (%s) with file (%s)", provides, rpmFileProviding)
+		return fmt.Errorf("failed to find suitable parent node for implicit provides (%s) with file (%s) or (%s)", provides, rpmFileProviding, toolchainRpmPath)
 	}
 
 	// Collapse the unresolved nodes into a single node backed by the new implicit provide.
-	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, nodes)
+	_, err = pkgGraph.CreateCollapsedNode(provides, parentNode, rpmFileProviding, nodes)
 
 	return
 }

@@ -422,8 +422,8 @@ func (g *PkgGraph) NewNode() graph.Node {
 // CreateCollapsedNode creates a new run node linked to a given parent node. All nodes in nodesToCollapse will be collapsed into the new node.
 // - When a node is collapsed all of its dependents will be mirrored onto the new node.
 // - The parentNode must be a run node.
-// - The collapsed node will inherit all attributes of the parent node minus the versionedPkg.
-func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentNode *PkgNode, nodesToCollapse []*PkgNode) (newNode *PkgNode, err error) {
+// - The collapsed node will inherit all attributes of the parent node minus the versionedPkg and actual rpm path used.
+func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentNode *PkgNode, actualRpmPath string, nodesToCollapse []*PkgNode) (newNode *PkgNode, err error) {
 	// enforce parent is run node
 	if parentNode.Type != TypeLocalRun {
 		err = fmt.Errorf("cannot collapse nodes to a non run node (%s)", parentNode.FriendlyName())
@@ -462,7 +462,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 
 	// Create a new node that the others will collapse into.
 	// This new node will mirror all attributes of the parent minus the versionedPkg.
-	newNode, err = g.AddPkgNode(versionedPkg, parentNode.State, parentNode.Type, parentNode.SrpmPath, parentNode.RpmPath, parentNode.SpecPath, parentNode.SourceDir, parentNode.Architecture, parentNode.SourceRepo)
+	newNode, err = g.AddPkgNode(versionedPkg, parentNode.State, parentNode.Type, parentNode.SrpmPath, actualRpmPath, parentNode.SpecPath, parentNode.SourceDir, parentNode.Architecture, parentNode.SourceRepo)
 	if err != nil {
 		return
 	}

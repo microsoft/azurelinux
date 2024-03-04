@@ -193,7 +193,7 @@ func main() {
 	signal.Notify(signals, unix.SIGINT, unix.SIGTERM)
 	go cancelBuildsOnSignal(signals, agent)
 
-	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
+	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *toolchainDirPath, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
 		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
 	}
@@ -234,7 +234,7 @@ func cancelBuildsOnSignal(signals chan os.Signal, agent buildagents.BuildAgent) 
 
 // buildGraph builds all packages in the dependency graph requested.
 // It will save the resulting graph to outputFile.
-func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
+func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, workers, buildAttempts, checkAttempts, extraLayers int, maxCascadingRebuilds uint, stopOnFailure, canUseCache bool, packagesToBuild, packagesToRebuild, ignoredPackages, testsToRun, testsToRerun, ignoredTests []*pkgjson.PackageVer, toolchainPackages []string, toolchainDirPath string, optimizeWithCachedImplicit bool, allowToolchainRebuilds bool) (err error) {
 	// graphMutex guards pkgGraph from concurrent reads and writes during build.
 	var graphMutex sync.RWMutex
 
@@ -254,7 +254,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
-	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
+	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, maxCascadingRebuilds, toolchainPackages, toolchainDirPath, allowToolchainRebuilds)
 
 	if builtGraph != nil {
 		graphMutex.RLock()
@@ -307,7 +307,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 // - Attempts to satisfy any unresolved dynamic dependencies with new implicit provides from the build result.
 // - Attempts to subgraph the graph to only contain the requested packages if possible.
 // - Repeat.
-func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, maxCascadingRebuilds uint, reservedFiles []string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
+func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRerun []*pkgjson.PackageVer, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *pkggraph.PkgNode, channels *schedulerChannels, maxCascadingRebuilds uint, reservedFiles []string, toolchainDirPath string, allowToolchainRebuilds bool) (builtGraph *pkggraph.PkgGraph, err error) {
 	var (
 		// stopBuilding tracks if the build has entered a failed state and this routine should stop as soon as possible.
 		stopBuilding bool
@@ -414,7 +414,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 						newGraph    *pkggraph.PkgGraph
 						newGoalNode *pkggraph.PkgNode
 					)
-					didOptimize, newGraph, newGoalNode, err = updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit)
+					didOptimize, newGraph, newGoalNode, err = updateGraphWithImplicitProvides(res, pkgGraph, graphMutex, useCachedImplicit, toolchainDirPath)
 					if err != nil {
 						// Failures to manipulate the graph are fatal.
 						// There is no guarantee the graph is still a directed acyclic graph and is solvable.
@@ -491,12 +491,12 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 
 // updateGraphWithImplicitProvides will update the graph with new implicit provides if available.
 // It will also attempt to subgraph the graph if it becomes solvable with the new implicit provides.
-func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
+func updateGraphWithImplicitProvides(res *schedulerutils.BuildResult, pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, useCachedImplicit bool, toolchainDirPath string) (didOptimize bool, newGraph *pkggraph.PkgGraph, newGoalNode *pkggraph.PkgNode, err error) {
 	// acquire a writer lock since this routine will collapse nodes
 	graphMutex.Lock()
 	defer graphMutex.Unlock()
 
-	didInjectAny, err := schedulerutils.InjectMissingImplicitProvides(res, pkgGraph, useCachedImplicit)
+	didInjectAny, err := schedulerutils.InjectMissingImplicitProvides(res, pkgGraph, useCachedImplicit, toolchainDirPath)
 	if err != nil {
 		logger.Log.Errorf("Failed to add implicit provides for (%s). Error: %s", res.Node.FriendlyName(), err)
 	} else if didInjectAny {
