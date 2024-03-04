@@ -20,7 +20,6 @@ BuildArch:      noarch
 %package -n python3-pip
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python3-wheel
 
 %description -n python3-pip %{_description}
 
