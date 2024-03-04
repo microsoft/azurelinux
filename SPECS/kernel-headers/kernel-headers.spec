@@ -78,7 +78,7 @@ done
 * Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
 - Bump release to match kernel
 
-* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+* Thu Feb 22 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
 - Bump release to match kernel
 
 * Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
