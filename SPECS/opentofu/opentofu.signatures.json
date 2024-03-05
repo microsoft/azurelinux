@@ -1,0 +1,6 @@
+{
+  "Signatures": {
+    "opentofu-1.6.2.tar.gz": "3bf0fc807004ba26305331ecf1334ff2160f8c131ee53c107292d60069400da6",
+    "opentofu-1.6.2-vendor.tar.gz": "58062d6565617ecc1634993aaa2f99d03701ef07eaa5a7f3473f92d980ab02bc"
+  }
+}
