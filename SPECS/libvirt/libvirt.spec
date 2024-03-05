@@ -42,6 +42,8 @@
 
 # Then the secondary host drivers, which run inside libvirtd
 %define with_storage_rbd      0%{!?_without_storage_rbd:1}
+# azl: for azl3.0 preview, disable ceph dependencies
+%define with_storage_rbd      0
 
 %define with_storage_gluster 0%{!?_without_storage_gluster:1}
 
