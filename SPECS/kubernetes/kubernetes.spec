@@ -93,7 +93,7 @@ Pause component for Microsoft Kubernetes %{version}.
 %setup -q -c -n %{name}
 
 %build
-# set version information using version file
+# set version information
 # (see k8s code: hack/lib/version.sh for more detail)
 export KUBE_GIT_TREE_STATE="clean"
 export KUBE_GIT_VERSION=v%{version}
