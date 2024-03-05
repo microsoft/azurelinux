@@ -336,9 +336,6 @@ echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-check-macros
-build_rpm_in_chroot_no_install pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 build_rpm_in_chroot_no_install python-rpm-generators
 chroot_and_install_rpms python-rpm-generators python3-rpm-generators
 build_rpm_in_chroot_no_install filesystem
@@ -446,16 +443,10 @@ chroot_and_install_rpms gperf
 build_rpm_in_chroot_no_install libxcrypt
 chroot_and_install_rpms libxcrypt
 
-# python-packaging requires pyproject-rpm-macros
-build_rpm_in_chroot_no_install python-packaging
-chroot_and_install_rpms python-packaging python3-packaging
-
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
 
-build_rpm_in_chroot_no_install python-setuptools
-chroot_and_install_rpms python-setuptools python3-setuptools
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
@@ -643,12 +634,22 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-# chroot_and_install_rpms rpm rpm
-# chroot_and_install_rpms rpm rpm-build
-# chroot_and_install_rpms rpm rpm-build-libs
-# chroot_and_install_rpms rpm rpm-devel
-# chroot_and_install_rpms rpm rpm-lang
-# chroot_and_install_rpms rpm rpm-libs
+chroot_and_install_rpms rpm rpm-libs
+chroot_and_install_rpms rpm rpm
+chroot_and_install_rpms rpm rpm-build-libs
+chroot_and_install_rpms rpm rpm-devel
+chroot_and_install_rpms rpm rpm-build
+
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
