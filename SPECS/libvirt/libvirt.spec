@@ -2185,6 +2185,7 @@ exit 0
 - Updating to version 10.0.0.
 - Hard code configuration options to match Mariner 2.0 configurations. Ensure that
   each hard-coded value is commented as matching azl2.0
+- Disable ceph-related dependencies
 
 * Wed May 24 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 7.10.0-5
 - Patch CVE-2023-2700
