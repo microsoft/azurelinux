@@ -266,6 +266,9 @@ fi
 * Tue Mar 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-1
 - Upgrade to 1.29.1
 
+* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.28.7-2
+- updated glibc-static buildrequires release
+
 * Mon Feb 26 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.7-1
 - Upgrade to 1.28.7
 
