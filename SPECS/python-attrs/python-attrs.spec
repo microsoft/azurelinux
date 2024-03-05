@@ -1,13 +1,14 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        21.4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
+Patch0:	        0001-add-version-limits.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
@@ -38,7 +39,7 @@ Attributes without boilerplate.
 pip3 install tox
 # Skip mypy tests- effort required in keeping these tests green is not justifiable,
 # as we don't ship mypy and these tests are very sensitive to mypy upstream changes
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots} -- -k 'not test_mypy'
+LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy'
 
 %files -n python3-attrs
 %defattr(-,root,root,-)
@@ -46,6 +47,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots} -- -k 'not test_mypy'
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 04 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-4
+- Add version limit to pytest-mypy-plugins to fix test crash
+
 * Thu Nov 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 21.4.0-3
 - Skip mypy tests, remove previously used test fix patch
 
