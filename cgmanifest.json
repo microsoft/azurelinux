@@ -22494,7 +22494,7 @@
         "other": {
             "name": "python-hatch-fancy-pypi-readme",
             "version": "24.1.0",
-            "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch-pypi-fancy-readme/hatch-pypi-fancy-readme-24.1.0.tar.gz"
+            "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch_pypi_fancy_readme/hatch_pypi_fancy_readme-24.1.0.tar.gz"
         }
         }
       },
