@@ -1,7 +1,7 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
-Version:        3.30
-Release:        2%{?dist}
+Version:        3.36
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,6 @@ Recommends:     %{name}-engine-rbd
 Recommends:     %{name}-engine-rdma
 %ifarch x86-64
 Recommends:     %{name}-engine-dev-dax
-Recommends:     %{name}-engine-pmemblk
 Recommends:     %{name}-engine-libpmem
 %endif
 
@@ -81,16 +80,6 @@ Read and write using device DAX to a persistent memory device
 (e.g., /dev/dax0.0) through the PMDK libpmem library.
 %endif
 
-%ifarch x86_64
-%package engine-pmemblk
-Summary:        PMDK pmemblk engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
-
-%description engine-pmemblk
-pmemblk engine for %{name}.
-Read and write using filesystem DAX to a file on a filesystem mounted with
-DAX on a persistent memory device through the PMDK libpmemblk library.
-%endif
 
 %ifarch x86_64
 %package engine-libpmem
@@ -176,11 +165,6 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %files engine-nbd
 %{_libdir}/fio/fio-nbd.so
 
-%ifarch x86_64
-%files engine-pmemblk
-%{_libdir}/fio/fio-pmemblk.so
-%endif
-
 %files engine-rados
 %{_libdir}/fio/fio-rados.so
 
@@ -191,6 +175,10 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_libdir}/fio/fio-rdma.so
 
 %changelog
+* Thu Dec 21 2023 Muhammad Falak <mwani@microsoft.com> 3.36-1
+- Bump version to 3.36
+- Drop support for pmemblk https://github.com/axboe/fio/commit/04c1cdc
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

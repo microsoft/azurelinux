@@ -3578,8 +3578,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.30",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
+          "version": "3.36",
+          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.36.tar.bz2"
         }
       }
     },
