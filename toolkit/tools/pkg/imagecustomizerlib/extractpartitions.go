@@ -1,12 +1,12 @@
 package imagecustomizerlib
 
 import (
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -22,8 +22,15 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 		return err
 	}
 
-	metadata := createSkippableFrameMetadata()
-	logger.Log.Infof("Skippable frame metadata has been created: %d", metadata)
+	// Create skippable frame metadata defined as a random 128-Bit number
+	metadata, err := createSkippableFrameMetadata()
+	if err != nil {
+		return err
+	}
+
+	// Encode metadata into a payload defined as a uint32 array
+	payload := Encode128BitLittleEndian(metadata)
+	logger.Log.Infof("Skippable frame payload has been created: %d", payload)
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
@@ -49,12 +56,13 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 
-			err = addSkippableFrame(partitionFilepath, metadata)
+			// Create a skippable frame containing the metadata payload and prepend the frame to the partition file
+			err = addSkippableFrame(partitionFilepath, payload)
 			if err != nil {
 				return err
 			}
 
-			logger.Log.Infof("Skippable frame has been added to parition: %d", metadata)
+			logger.Log.Infof("Skippable frame payload has been added to parition: %d", payload)
 
 		}
 	}
@@ -102,7 +110,7 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 }
 
 // Add a skippable frame to the specified partition file.
-func addSkippableFrame(partitionFilepath string, metadata uint32) (err error) {
+func addSkippableFrame(partitionFilepath string, payload [4]uint32) (err error) {
 	// Read existing data from the partition file.
 	existingData, err := os.ReadFile(partitionFilepath)
 	if err != nil {
@@ -110,7 +118,7 @@ func addSkippableFrame(partitionFilepath string, metadata uint32) (err error) {
 	}
 
 	// Create a skippable frame.
-	skippableFrame := createSkippableFrame(metadata)
+	skippableFrame := createSkippableFrame(payload)
 
 	// Combine the skippable frame and existing data.
 	newData := append(skippableFrame, existingData...)
@@ -124,19 +132,57 @@ func addSkippableFrame(partitionFilepath string, metadata uint32) (err error) {
 	return nil
 }
 
-// Create a skippable frame.
-func createSkippableFrame(metadata uint32) (skippableFrame []byte) {
-	skippableFrame = make([]byte, 12)
-	binary.LittleEndian.PutUint32(skippableFrame, 0x184D2A50)   // Magic_Number
-	binary.LittleEndian.PutUint32(skippableFrame[4:], 4)        // Frame_Size
-	binary.LittleEndian.PutUint32(skippableFrame[8:], metadata) // User_Data
+// Creates a skippable frame.
+func createSkippableFrame(payload [4]uint32) (skippableFrame []byte) {
+	skippableFrame = make([]byte, 24)
+	// Magic_Number
+	binary.LittleEndian.PutUint32(skippableFrame, 0x184D2A50)
+	// Frame_Size
+	binary.LittleEndian.PutUint32(skippableFrame[4:8], 4)
+	// User_Data
+	binary.LittleEndian.PutUint32(skippableFrame[8:12], payload[0])
+	binary.LittleEndian.PutUint32(skippableFrame[12:16], payload[1])
+	binary.LittleEndian.PutUint32(skippableFrame[16:20], payload[2])
+	binary.LittleEndian.PutUint32(skippableFrame[20:24], payload[3])
 	return skippableFrame
 }
 
-// Create user metadata that will be inserted into the skippable frame
-func createSkippableFrameMetadata() (metadata uint32) {
-	// Set the metadata to be the current timestamp of the run
-	currentTime := time.Now()
-	metadata = uint32(currentTime.Unix())
-	return metadata
+// Create user metadata that will be inserted into the skippable frame.
+func createSkippableFrameMetadata() (metadata [16]byte, err error) {
+	// Set the metadata to be a random 128-Bit number
+	metadata, err = generateRandom128BitNumber()
+	if err != nil {
+		return metadata, err
+	}
+	return metadata, nil
+}
+
+// Generates a Random 128-Bit number.
+func generateRandom128BitNumber() ([16]byte, error) {
+	var randomBytes [16]byte
+	_, err := rand.Read(randomBytes[:])
+	if err != nil {
+		return randomBytes, err
+	}
+	return randomBytes, nil
+}
+
+// Encodes a 128-Bit number into an array of uint32 in little-endian order.
+func Encode128BitLittleEndian(number [16]byte) [4]uint32 {
+	var encoded [4]uint32
+	for i := 0; i < 4; i++ {
+		offset := i * 4
+		encoded[i] = binary.LittleEndian.Uint32(number[offset : offset+4])
+	}
+	return encoded
+}
+
+// Decodes an array of uint32 into a 128-Bit number in little-endian order.
+func Decode128BitLittleEndian(encoded [4]uint32) [16]byte {
+	var number [16]byte
+	for i := 0; i < 4; i++ {
+		offset := i * 4
+		binary.LittleEndian.PutUint32(number[offset:offset+4], encoded[i])
+	}
+	return number
 }
