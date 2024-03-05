@@ -37,7 +37,7 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		// Check if the filesystem type is supported
 		fstype := diskPartitions[partitionNum].FileSystemType
 		if !supportedShrinkFsType(fstype) {
-			logger.Log.Infof("Unsupported filesystem type (%s) for shrinking (%s)", fstype, partitionLoopDevice)
+			logger.Log.Infof("Shrinking partition (%s): unsupported filesystem type (%s)", partitionLoopDevice, fstype)
 			continue
 		}
 
@@ -62,7 +62,8 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		}
 
 		if end == "" {
-			logger.Log.Infof("Filesystem is already at min size (%s)", partitionLoopDevice)
+			// Filesystem wasn't resized. So, there is no need to resize the partition.
+			logger.Log.Infof("Filesystem is already at its min size (%s)", partitionLoopDevice)
 			continue
 		}
 
@@ -102,9 +103,12 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 }
 
 // Get the filesystem size in sectors.
+// Returns -1 if the resize was a no-op.
 func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, imageLoopDevice string,
 ) (filesystemSizeInSectors int, err error) {
-	if strings.Contains(resize2fsStderr, "Nothing to do!") {
+	const resize2fsNopMessage = "Nothing to do!"
+	if strings.Contains(resize2fsStderr, resize2fsNopMessage) {
+		// Resize operation was a no-op.
 		return -1, nil
 	}
 
@@ -159,6 +163,7 @@ func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, 
 }
 
 // Get the new partition end in sectors.
+// Returns an empty string if the resize was a no-op.
 func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string, startSector string,
 	imageLoopDevice string,
 ) (endInSectors string, err error) {
@@ -168,6 +173,7 @@ func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string,
 	}
 
 	if filesystemSizeInSectors < 0 {
+		// Resize operation was a no-op.
 		return "", nil
 	}
 
