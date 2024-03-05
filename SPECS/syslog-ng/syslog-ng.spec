@@ -34,10 +34,6 @@ BuildRequires:  python3-rsa
 BuildRequires:  python3-six
 BuildRequires:  python3-urllib3
 BuildRequires:  python3-websocket-client
-%if 0%{?with_check}
-BuildRequires:  curl-devel
-BuildRequires:  python3-pip
-%endif
 Requires:       glib
 Requires:       json-c
 Requires:       json-glib
@@ -105,10 +101,6 @@ sed -i 's/eventlog//g'  %{buildroot}%{_libdir}/pkgconfig/syslog-ng.pc
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
 
-%check
-pip3 install unittest2 nose ply pep8
-make %{?_smp_mflags} check
-
 %post
 if [ $1 -eq 1 ] ; then
   mkdir -p %{_prefix}%{_var}/
@@ -167,6 +159,9 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Mar 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-2
+- Remove check section as unit testing is disabled in source
+
 * Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-1
 - Upgrade to v4.3.1
 - Change to using autosetup
