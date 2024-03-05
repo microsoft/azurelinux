@@ -182,15 +182,20 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 // - mountPointToFsTypeMap is the map of mountpoint to the file type
 // - mountPointToMountArgsMap is the map of mountpoint to the parameters sent to
 // - mountPointToOverlayMap is the map of mountpoint to the overlay structure containing the base image
-func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (installMap map[string]string, err error) {
-	installMap = make(map[string]string)
+func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap,
+	mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*Overlay,
+) (mountList []string, err error) {
 	for _, mountPoint := range sortMountPoints(&mountPointMap, false) {
 		device := mountPointMap[mountPoint]
-		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
+		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToFsTypeMap[mountPoint],
+			mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
 		if err != nil {
 			return
 		}
-		installMap[mountPoint] = device
+
+		// Add to the list 1-by-1 so that the we can safely unmount if mounting fails half-way through.
+		// Note: The order of 'mountList' dictates the order the /etc/fstab file is written in.
+		mountList = append(mountList, mountPoint)
 	}
 	return
 }
@@ -199,14 +204,19 @@ func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap,
 // - installRoot is the path to the root where the mountpoints exist
 // - mountPointMap is the map of mountpoints to partition device paths
 // - mountPointToOverlayMap is the map of mountpoints to overlay devices
-func DestroyInstallRoot(installRoot string, mountPointMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+func DestroyInstallRoot(installRoot string, mountList []string, mountPointMap map[string]string,
+	mountPointToOverlayMap map[string]*Overlay,
+) (err error) {
 	logger.Log.Trace("Destroying InstallRoot")
 
 	defer OverlayUnmount(mountPointToOverlayMap)
 
 	logger.Log.Trace("Destroying InstallRoot")
+
 	// Reverse order for unmounting
-	for _, mountPoint := range sortMountPoints(&mountPointMap, true) {
+	for i := len(mountList) - 1; i >= 0; i-- {
+		mountPoint := mountList[i]
+
 		err = diskutils.BlockOnDiskIO(mountPointMap[mountPoint])
 		if err != nil {
 			logger.Log.Errorf("DestroyInstallRoot flush IO Error: %s", err.Error())
@@ -381,8 +391,11 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - isRootFS specifies if the installroot is either backed by a directory (rootfs) or a raw disk
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-// - hidepidEnabled is a flag that denotes whether /proc will be mounted with the hidepid option
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild, hidepidEnabled bool) (err error) {
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string,
+	config configuration.SystemConfig, mountList []string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap,
+	partIDToDevPathMap, partIDToFsTypeMap map[string]string, isRootFS bool, encryptedRoot diskutils.EncryptedRootDevice,
+	diffDiskBuild, hidepidEnabled bool,
+) (err error) {
 	timestamp.StartEvent("populating install root", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -469,7 +482,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !isRootFS {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, hidepidEnabled)
+		err = configureSystemFiles(installChroot, hostname, config, mountList, installMap, mountPointToFsTypeMap,
+			mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, hidepidEnabled)
 		if err != nil {
 			return
 		}
@@ -619,7 +633,10 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig,
+	mountList []string, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap,
+	partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, hidepidEnabled bool,
+) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -627,13 +644,15 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
+	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, hidepidEnabled)
+
 	if err != nil {
 		return
 	}
 
 	// Update crypttab
-	err = updateCrypttab(installChroot.RootDir(), installMap, encryptedRoot)
+	err = updateCrypttab(installChroot.RootDir(), mountPointMap, encryptedRoot)
 	if err != nil {
 		return
 	}
@@ -790,21 +809,21 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap,
-	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, mountList []string,
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
 	hidepidEnabled bool,
 ) (err error) {
 	const fstabPath = "/etc/fstab"
 
 	fullFstabPath := filepath.Join(installRoot, fstabPath)
 
-	return UpdateFstabFile(fullFstabPath, partitionSettings, installMap,
+	return UpdateFstabFile(fullFstabPath, partitionSettings, mountList, mountPointMap,
 		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap,
 		hidepidEnabled)
 }
 
-func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, installMap,
-	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, mountList []string,
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
 	hidepidEnabled bool,
 ) (err error) {
 	const (
@@ -812,14 +831,17 @@ func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.Par
 	)
 	ReportAction("Configuring fstab")
 
-	for mountPoint, devicePath := range installMap {
+	for _, mountPoint := range mountList {
+		devicePath := mountPointMap[mountPoint]
+
 		if mountPoint != "" && devicePath != NullDevice {
 			partSetting := configuration.FindMountpointPartitionSetting(partitionSettings, mountPoint)
 			if partSetting == nil {
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
 			}
-			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
+			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint],
+				mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
 			if err != nil {
 				return
 			}
@@ -949,7 +971,7 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 
 func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
 	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
-	installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string,
+	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
 	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice,
 ) (err error) {
 	timestamp.StartEvent("configuring bootloader", nil)
@@ -961,15 +983,15 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	var rootDevice string
 
 	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
+	bootDevice, isBootPartitionSeparate := mountPointMap[bootMountPoint]
 	bootPrefix := ""
 	if !isBootPartitionSeparate {
-		bootDevice = installMap[rootMountPoint]
+		bootDevice = mountPointMap[rootMountPoint]
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
 	}
 
-	if installMap[rootMountPoint] == NullDevice {
+	if mountPointMap[rootMountPoint] == NullDevice {
 		// In case of overlay device being mounted at root, no need to change the bootloader.
 		return
 	}
@@ -996,7 +1018,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 	if encryptionEnable {
 		// Encrypted devices don't currently support identifiers
-		rootDevice = installMap[rootMountPoint]
+		rootDevice = mountPointMap[rootMountPoint]
 	} else if readOnlyVerityRootEnable {
 		var partIdentifier string
 		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
@@ -1007,7 +1029,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
 	} else {
 		var partIdentifier string
-		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
+		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, mountPointMap[rootMountPoint])
 		if err != nil {
 			err = fmt.Errorf("failed to get partIdentifier: %s", err)
 			return

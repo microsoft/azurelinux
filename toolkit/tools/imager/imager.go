@@ -527,17 +527,17 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		leaveChrootOnDisk = true
 	)
 
-	var installMap map[string]string
+	var mountList []string
 
 	// Only invoke CreateInstallRoot for a raw disk. This call will result in mount points being created from a raw disk
 	// into the install root. A rootfs will not have these.
 	if !isRootFS {
-		installMap, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
+		mountList, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
 		if err != nil {
 			err = fmt.Errorf("failed to create install root: %s", err)
 			return
 		}
-		defer installutils.DestroyInstallRoot(installRoot, installMap, mountPointToOverlayMap)
+		defer installutils.DestroyInstallRoot(installRoot, mountList, mountPointMap, mountPointToOverlayMap)
 	}
 
 	// Install any tools required for the setup root to function
@@ -591,7 +591,9 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot,
+		diffDiskBuild, hidepidEnabled)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -601,7 +603,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if !isRootFS {
 		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
 			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
-			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot)
+			installChroot, diskDevPath, mountPointMap, encryptedRoot, readOnlyRoot)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
