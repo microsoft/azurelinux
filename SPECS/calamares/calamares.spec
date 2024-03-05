@@ -18,14 +18,13 @@ Source0:        https://github.com/calamares/calamares/releases/download/v%{vers
 Source1:        calamares-users-3.0.1.tar.gz
 Source2:        calamares-finished-3.0.1.tar.gz
 Source3:        calamares-welcome-3.0.1.tar.gz
-Source4:        calamares-partition-3.0.0.tar.gz
+Source4:        calamares-partition-3.0.1.tar.gz
 Source5:        calamares-license-3.0.1.tar.gz
 # Source20..39 - configuration files
 Source20:       license.conf
 Source21:       settings.conf
 Source22:       show.qml
 Source23:       branding.desc
-Source24:       users.conf
 Source25:       stylesheet.qss
 # Source40..100 - Assets
 Source40:       azl-logo.png
@@ -142,7 +141,6 @@ done
 
 # Apply custom license config
 mv %{SOURCE20} src/modules/license/license.conf
-mv %{SOURCE24} src/modules/users/users.conf
 
 %patch -P 0 -p1
 #%patch3 -p1
@@ -150,86 +148,77 @@ mv %{SOURCE24} src/modules/users/users.conf
 #%patch5 -p1
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%cmake_kf ..\
+%cmake_kf \
   -DBUILD_TESTING:BOOL=OFF \
   -DWITH_PYTHONQT:BOOL=OFF \
   -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" \
   -DINSTALL_POLKIT:BOOL=OFF \
   -DWITH_QT6=ON \
   -DWITH_QML=OFF
-popd
 
-make %{?_smp_mflags} -C %{_target_platform}
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
-# create the auto branding directory
-
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/AzureLinux
+%cmake_install
+# create the branding directory
 mkdir -p %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang
 lrelease-qt6 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_fr.qm
 lrelease-qt6 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_de.qm
 lrelease-qt6 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_it.qm
 
-# own the local settings directories
-mkdir -p %{buildroot}%{_sysconfdir}/calamares/modules
-mkdir -p %{buildroot}%{_sysconfdir}/calamares/branding
-
-%find_lang calamares-python
-
-# Mariner branding
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/
-cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/calamares/branding/
-cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/modules/
-
-install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
 install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-logo.png
 install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/show.qml
 install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/branding.desc
 install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
 install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
 
+mkdir -p %{buildroot}%{_sysconfdir}/calamares
+
+cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/calamares/
+cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/
+
+install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
 
 # EULA
 install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
+
+%find_lang calamares-python
 
 %post
 
 %files -f calamares-python.lang
 %doc AUTHORS
 %{_bindir}/calamares
-%dir %{_datadir}/calamares/
-%{_datadir}/calamares/settings.conf
-%dir %{_datadir}/calamares/branding/
-%{_datadir}/calamares/branding/default/
-%dir %{_datadir}/calamares/branding/AzureLinux/
-%{_datadir}/calamares/branding/AzureLinux/show.qml
-%{_datadir}/calamares/branding/AzureLinux/lang/
+%{_datadir}/applications/calamares.desktop
 %{_datadir}/calamares/branding/AzureLinux/azl-logo.png
 %{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
 %{_datadir}/calamares/branding/AzureLinux/branding.desc
+%{_datadir}/calamares/branding/AzureLinux/lang/
+%{_datadir}/calamares/branding/AzureLinux/show.qml
 %{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
+%{_datadir}/calamares/branding/default/
 %{_datadir}/calamares/modules/
 %{_datadir}/calamares/qml/
-%{_datadir}/applications/calamares.desktop
+%{_datadir}/calamares/settings.conf
 %{_datadir}/icons/hicolor/scalable/apps/calamares.svg
 %{_mandir}/man8/calamares.8*
 %{_sysconfdir}/calamares/
-%{_sysconfdir}/calamares/settings.conf
 %{_sysconfdir}/calamares/azl-eula
+%{_sysconfdir}/calamares/settings.conf
+%dir %{_datadir}/calamares/
+%dir %{_datadir}/calamares/branding/
+%dir %{_datadir}/calamares/branding/AzureLinux/
 
 %files libs
+%{_libdir}/calamares/
 %{_libdir}/libcalamares.so.*
 %{_libdir}/libcalamaresui.so.*
-%{_libdir}/calamares/
 
 %files devel
 %{_includedir}/libcalamares/
+%{_libdir}/cmake/Calamares/
 %{_libdir}/libcalamares.so
 %{_libdir}/libcalamaresui.so
-%{_libdir}/cmake/Calamares/
 
 %changelog
 * Tue Jan 16 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-1

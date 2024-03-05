@@ -1,13 +1,13 @@
 {
  "Signatures": {
-  "branding.desc": "5d953344b241247e92b2529f291c55a1efcfb97dcdc1059ec131db0908080818",
+  "branding.desc": "e9e3f464f92d944bcda1bc2fb8c565ee166ed98c82930d26facbd6634b5a0605",
   "calamares-3.3.1.tar.gz": "c5a6dd7d2fb7dc5d8a863f37f6f64782b88f79e341f7bf8504eb98dc31f714ef",
   "calamares-auto_de.ts": "4a24d817979a83c3f08c163b05f5a4f34a992c1f798a12f3a6b50cde75a852d8",
   "calamares-auto_fr.ts": "a65dd534637607533cd725aee3151f10f56b7f606b41fbd3ceeae13d61d8a98f",
   "calamares-auto_it.ts": "16c666c68dfd16ecbf45e07312f435859a66f689faa6e751c08f15ef9cfd7a7e",
   "calamares-finished-3.0.1.tar.gz": "76f0a4093b038130644f967d387ffdc057c5a4570ac2c9a8eca979d29f488108",
   "calamares-license-3.0.1.tar.gz": "bd5d929bd77fd4fa08e5138c158bef1e17876e96f655632e5cef2ed77b9cadb4",
-  "calamares-partition-3.0.0.tar.gz": "eb27b2c243b5418f9905a9d35c6608b7a4f8f0ffc39bc8d7f2cacf77cd93e569",
+  "calamares-partition-3.0.1.tar.gz": "294712d27279cff760d778fc2edbb7660fc7a76b49f635fd28974df0071d7a96",
   "calamares-users-3.0.1.tar.gz": "0da9e01feb26be2567e2df40cbd5ecb0ecab2d688bb8e7ef64bb498280f112c0",
   "calamares-welcome-3.0.1.tar.gz": "2a6c6c1cca6600f51515093d0d4e6e1b025a1fe341d886dc948fadd4c1ebd280",
   "license.conf": "47b82c94103300158821d6f519da994656cc79dfb7456ed056da4c8b41be279e",
@@ -16,7 +16,6 @@
   "azl-welcome.png": "58d6fd0b633d01482e8072dc4d8ec376ab11c2897cf0b4a65feb7d53e8e89c4a",
   "settings.conf": "bb033dc3dffbb31007b098445779a2b479f35ebd0f69e5f8e1f9edd7a9cca234",
   "show.qml": "2fbf20110c6385749ff836a93cddcbcd6e6f111fe4063f086a29892b588e99b5",
-  "stylesheet.qss": "9707878d63c9591fd83096d1650ada773bf5e85797fd3fbfc19555ef39ffa30a",
-  "users.conf": "27d9e34da6c4c2026f1dd116834d4be9f644bcf582792c0e912dc22a2c0f8221"
+  "stylesheet.qss": "9707878d63c9591fd83096d1650ada773bf5e85797fd3fbfc19555ef39ffa30a"
  }
 }
