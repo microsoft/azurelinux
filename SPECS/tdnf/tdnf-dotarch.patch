@@ -1,0 +1,24 @@
+From 88e14d6d06c21ac4452f65a72227c7990fb44626 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sam.meluch@microsoft.com>
+Date: Thu, 15 Jun 2023 16:14:13 -0700
+Subject: [PATCH] add SELECTION_DOTARCH to solv to restore functionality
+
+---
+ solv/tdnfquery.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/solv/tdnfquery.c b/solv/tdnfquery.c
+index e5d9144..78b83f4 100644
+--- a/solv/tdnfquery.c
++++ b/solv/tdnfquery.c
+@@ -606,6 +606,7 @@ SolvApplyListQuery(
+              SELECTION_PROVIDES |
+              SELECTION_GLOB |     /* foo* */
+              SELECTION_CANON |    /* foo-1.2-3.ph4.noarch */
++	     SELECTION_DOTARCH |  /* foo.noarch */
+              SELECTION_REL;       /* foo>=1.2-3 */
+ 
+     if (pQuery->nScope == SCOPE_SOURCE) {
+-- 
+2.34.1
+
