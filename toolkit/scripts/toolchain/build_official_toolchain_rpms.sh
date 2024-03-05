@@ -339,6 +339,8 @@ chroot_and_install_rpms azurelinux-check-macros
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+build_rpm_in_chroot_no_install python-rpm-generators
+chroot_and_install_rpms python-rpm-generators python3-rpm-generators
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -641,12 +643,12 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-chroot_and_install_rpms rpm rpm
-chroot_and_install_rpms rpm rpm-build
-chroot_and_install_rpms rpm rpm-build-libs
-chroot_and_install_rpms rpm rpm-devel
-chroot_and_install_rpms rpm rpm-lang
-chroot_and_install_rpms rpm rpm-libs
+# chroot_and_install_rpms rpm rpm
+# chroot_and_install_rpms rpm rpm-build
+# chroot_and_install_rpms rpm rpm-build-libs
+# chroot_and_install_rpms rpm rpm-devel
+# chroot_and_install_rpms rpm rpm-lang
+# chroot_and_install_rpms rpm rpm-libs
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
