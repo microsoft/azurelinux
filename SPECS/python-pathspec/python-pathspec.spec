@@ -57,8 +57,8 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 %pyproject_save_files pathspec
 
 
-%check
 %if 0%{?with_check}
+%check
 %pytest
 %endif
 

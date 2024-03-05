@@ -61,8 +61,8 @@ Summary:        %{summary}
 %pyproject_save_files trove_classifiers
 
 
-%check
 %if 0%{?with_check}
+%check
 %pytest
 %endif
 

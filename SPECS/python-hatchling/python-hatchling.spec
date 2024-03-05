@@ -75,8 +75,8 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
     '%{SOURCE500}'
 
 
-%check
 %if 0%{?with_check}
+%check
 %pytest
 %endif
 
