@@ -60,6 +60,7 @@ install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} *.py
 * Mon Mar 04 2024 Andrew Phelps <anphel@microsoft.com> - 14-11
 - Promote from SPECS-EXTENDED to SPECS
 - Refresh from Fedora 40 (license: MIT)
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
