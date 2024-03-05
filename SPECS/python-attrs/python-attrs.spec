@@ -8,7 +8,7 @@ Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
-Patch0:			0001-add-version-limits.patch
+Patch0:	        0001-add-version-limits.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if %{with_check}
