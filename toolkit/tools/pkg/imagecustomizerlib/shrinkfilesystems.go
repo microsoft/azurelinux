@@ -105,7 +105,7 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, imageLoopDevice string,
 ) (filesystemSizeInSectors int, err error) {
 	if strings.Contains(resize2fsStderr, "Nothing to do!") {
-		return -1, err
+		return -1, nil
 	}
 
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
@@ -168,7 +168,7 @@ func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string,
 	}
 
 	if filesystemSizeInSectors < 0 {
-		return "", err
+		return "", nil
 	}
 
 	// Convert start sector string to int
