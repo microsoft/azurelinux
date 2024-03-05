@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -31,13 +32,16 @@ func shrinkFilesystems(imageLoopDevice string) error {
 			continue
 		}
 
+		partitionLoopDevice := diskPartitions[partitionNum].Path
+
 		// Check if the filesystem type is supported
 		fstype := diskPartitions[partitionNum].FileSystemType
 		if !supportedShrinkFsType(fstype) {
+			logger.Log.Infof("Unsupported filesystem type (%s) for shrinking (%s)", fstype, partitionLoopDevice)
 			continue
 		}
 
-		partitionLoopDevice := diskPartitions[partitionNum].Path
+		logger.Log.Infof("Shrinking partition (%s)", partitionLoopDevice)
 
 		// Check the file system with e2fsck
 		err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
@@ -52,9 +56,14 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		}
 
 		// Find the new partition end value
-		end, err := getNewPartitionEndInSectors(stdout, matchStarts[partitionNum-1][1], imageLoopDevice)
+		end, err := getNewPartitionEndInSectors(stdout, stderr, matchStarts[partitionNum-1][1], imageLoopDevice)
 		if err != nil {
 			return fmt.Errorf("failed to calculate new partition end:\n%w", err)
+		}
+
+		if end == "" {
+			logger.Log.Infof("Filesystem is already at min size (%s)", partitionLoopDevice)
+			continue
 		}
 
 		// Resize the partition with parted resizepart
@@ -93,16 +102,23 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 }
 
 // Get the filesystem size in sectors.
-func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) (filesystemSizeInSectors int, err error) {
+func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, imageLoopDevice string,
+) (filesystemSizeInSectors int, err error) {
+	if strings.Contains(resize2fsStderr, "Nothing to do!") {
+		return -1, err
+	}
+
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
 	re, err := regexp.Compile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
 	if err != nil {
 		return 0, fmt.Errorf("failed to compile regex:\n%w", err)
 	}
+
 	// Get the block count and block size
-	match := re.FindStringSubmatch(resize2fsOutput)
+	match := re.FindStringSubmatch(resize2fsStdout)
 	if match == nil {
-		return 0, fmt.Errorf("failed to parse output of resize2fs:\n%s", resize2fsOutput)
+		return 0, fmt.Errorf("failed to parse output of resize2fs:\nstdout:\n%s\nstderr:\n%s", resize2fsStdout,
+			resize2fsStderr)
 	}
 
 	blockCount, err := strconv.Atoi(match[1]) // Example: 21015
@@ -143,10 +159,16 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 }
 
 // Get the new partition end in sectors.
-func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
-	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsOutput, imageLoopDevice)
+func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string, startSector string,
+	imageLoopDevice string,
+) (endInSectors string, err error) {
+	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsStdout, resize2fsStderr, imageLoopDevice)
 	if err != nil {
 		return "", fmt.Errorf("failed to get filesystem size:\n%w", err)
+	}
+
+	if filesystemSizeInSectors < 0 {
+		return "", err
 	}
 
 	// Convert start sector string to int
