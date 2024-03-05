@@ -1,10 +1,12 @@
 package imagecustomizerlib
 
 import (
+	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -19,6 +21,9 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	if err != nil {
 		return err
 	}
+
+	metadata := createSkippableFrameMetadata()
+	logger.Log.Infof("Skippable frame metadata has been created: %d", metadata)
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
@@ -43,6 +48,14 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			}
 
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
+
+			err = addSkippableFrame(partitionFilepath, metadata)
+			if err != nil {
+				return err
+			}
+
+			logger.Log.Infof("Skippable frame has been added to parition: %d", metadata)
+
 		}
 	}
 	return nil
@@ -86,4 +99,44 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 	}
 
 	return partitionRawFilepath + ".zst", nil
+}
+
+// Add a skippable frame to the specified partition file.
+func addSkippableFrame(partitionFilepath string, metadata uint32) (err error) {
+	// Read existing data from the partition file.
+	existingData, err := os.ReadFile(partitionFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to read partition file %s:\n%w", partitionFilepath, err)
+	}
+
+	// Create a skippable frame.
+	skippableFrame := createSkippableFrame(metadata)
+
+	// Combine the skippable frame and existing data.
+	newData := append(skippableFrame, existingData...)
+
+	// Write the combined data back to the partition file.
+	err = os.WriteFile(partitionFilepath, newData, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write skippable frame to partition file %s:\n%w", partitionFilepath, err)
+	}
+
+	return nil
+}
+
+// Create a skippable frame.
+func createSkippableFrame(metadata uint32) (skippableFrame []byte) {
+	skippableFrame = make([]byte, 12)
+	binary.LittleEndian.PutUint32(skippableFrame, 0x184D2A50)   // Magic_Number
+	binary.LittleEndian.PutUint32(skippableFrame[4:], 4)        // Frame_Size
+	binary.LittleEndian.PutUint32(skippableFrame[8:], metadata) // User_Data
+	return skippableFrame
+}
+
+// Create user metadata that will be inserted into the skippable frame
+func createSkippableFrameMetadata() (metadata uint32) {
+	// Set the metadata to be the current timestamp of the run
+	currentTime := time.Now()
+	metadata = uint32(currentTime.Unix())
+	return metadata
 }
