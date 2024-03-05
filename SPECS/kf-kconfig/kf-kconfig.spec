@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        KDE Frameworks 5 Tier 1 addon with advanced configuration system
 License:        LGPLv2+
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
+Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{version}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 

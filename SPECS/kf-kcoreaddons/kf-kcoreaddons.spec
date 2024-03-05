@@ -11,7 +11,7 @@ URL:     https://cgit.kde.org/kcoreaddons.git
 %global majmin %(echo %{version} | cut -d. -f1-2)
 %global framework kcoreaddons
 
-Source0: https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
+Source0: https://invent.kde.org/frameworks/%{framework}/-/archive/v%{version}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 
 ## upstream patches
 

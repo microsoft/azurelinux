@@ -3419,7 +3419,7 @@
         "other": {
           "name": "extra-cmake-modules",
           "version": "5.249.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.249/extra-cmake-modules-5.249.0.tar.xz"
+          "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249/extra-cmake-modules-v5.249.0.tar.gz"
         }
       }
     },

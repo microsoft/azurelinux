@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with various classes on top of QtWidgets
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://cgit.kde.org/%{framework}.git
-Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{majmin}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
+Source0:        https://invent.kde.org/frameworks/%{framework}/-/archive/v%{version}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 

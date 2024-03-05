@@ -11,7 +11,7 @@ URL:          https://github.com/KDE/extra-cmake-modules
 %global docs 0
 %global tests 1
 
-Source0:   https://invent.kde.org/frameworks/%{name}/-/archive/v%{versiondir}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:   https://invent.kde.org/frameworks/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 # bundle clang python bindings here, at least until they are properly packaged elsewhere, see:

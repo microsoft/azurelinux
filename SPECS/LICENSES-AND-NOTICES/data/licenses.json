@@ -1853,7 +1853,7 @@
                 "qt5-qtserialport",
                 "qtsvg",
                 "qttools",
-                "rpm-macros",
+                "qt-rpm-macros",
                 "quagga",
                 "quota",
                 "radvd",
