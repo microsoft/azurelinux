@@ -102,16 +102,16 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	// Get the block count and block size
 	match := re.FindStringSubmatch(resize2fsOutput)
 	if match == nil {
-		return 0, fmt.Errorf("failed to parse output of resize2fs")
+		return 0, fmt.Errorf("failed to parse output of resize2fs:\n%s", resize2fsOutput)
 	}
 
 	blockCount, err := strconv.Atoi(match[1]) // Example: 21015
 	if err != nil {
-		return 0, fmt.Errorf("failed to get block count:\n%w", err)
+		return 0, fmt.Errorf("failed to parse block count (%s):\n%w", match[1], err)
 	}
 	multiplier, err := strconv.Atoi(match[2]) // Example: 4
 	if err != nil {
-		return 0, fmt.Errorf("failed to get multiplier for block size:\n%w", err)
+		return 0, fmt.Errorf("failed to parse multiplier for block size (%s):\n%w", match[2], err)
 	}
 	unit := match[3] // Example: 'k'
 
@@ -122,7 +122,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	case "k":
 		blockSize = multiplier * KiB
 	default:
-		return 0, fmt.Errorf("unrecognized unit %s", unit)
+		return 0, fmt.Errorf("unrecognized unit (%s)", unit)
 	}
 
 	filesystemSizeInBytes := blockCount * blockSize
@@ -130,7 +130,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	// Get the sector size
 	logicalSectorSize, _, err := diskutils.GetSectorSize(imageLoopDevice)
 	if err != nil {
-		fmt.Errorf("failed to get sector size")
+		return 0, fmt.Errorf("failed to get sector size:\n%w", err)
 	}
 	sectorSizeInBytes := int(logicalSectorSize) // cast from uint64 to int
 
