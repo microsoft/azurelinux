@@ -1,0 +1,75 @@
+From 9d81f71c6b8f55cf20cd56f5fe29c759df9b48cc Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Mon, 24 Oct 2022 07:15:41 +0800
+Subject: [PATCH 11/13] font: Harden grub_font_blit_glyph() and
+ grub_font_blit_glyph_mirror()
+
+As a mitigation and hardening measure add sanity checks to
+grub_font_blit_glyph() and grub_font_blit_glyph_mirror(). This patch
+makes these two functions do nothing if target blitting area isn't fully
+contained in target bitmap. Therefore, if complex calculations in caller
+overflows and malicious coordinates are given, we are still safe because
+any coordinates which result in out-of-bound-write are rejected. However,
+this patch only checks for invalid coordinates, and doesn't provide any
+protection against invalid source glyph or destination glyph, e.g.
+mismatch between glyph size and buffer size.
+
+This hardening measure is designed to mitigate possible overflows in
+blit_comb(). If overflow occurs, it may return invalid bounding box
+during dry run and call grub_font_blit_glyph() with malicious
+coordinates during actual blitting. However, we are still safe because
+the scratch glyph itself is valid, although its size makes no sense, and
+any invalid coordinates are rejected.
+
+It would be better to call grub_fatal() if illegal parameter is detected.
+However, doing this may end up in a dangerous recursion because grub_fatal()
+would print messages to the screen and we are in the progress of drawing
+characters on the screen.
+
+Reported-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/font/font.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/grub-core/font/font.c b/grub-core/font/font.c
+index 3d3d803e8..cf15dc2f9 100644
+--- a/grub-core/font/font.c
++++ b/grub-core/font/font.c
+@@ -1069,8 +1069,15 @@ static void
+ grub_font_blit_glyph (struct grub_font_glyph *target,
+ 		      struct grub_font_glyph *src, unsigned dx, unsigned dy)
+ {
++  grub_uint16_t max_x, max_y;
+   unsigned src_bit, tgt_bit, src_byte, tgt_byte;
+   unsigned i, j;
++
++  /* Harden against out-of-bound writes. */
++  if ((grub_add (dx, src->width, &max_x) || max_x > target->width) ||
++      (grub_add (dy, src->height, &max_y) || max_y > target->height))
++    return;
++
+   for (i = 0; i < src->height; i++)
+     {
+       src_bit = (src->width * i) % 8;
+@@ -1102,9 +1109,16 @@ grub_font_blit_glyph_mirror (struct grub_font_glyph *target,
+ 			     struct grub_font_glyph *src,
+ 			     unsigned dx, unsigned dy)
+ {
++  grub_uint16_t max_x, max_y;
+   unsigned tgt_bit, src_byte, tgt_byte;
+   signed src_bit;
+   unsigned i, j;
++
++  /* Harden against out-of-bound writes. */
++  if ((grub_add (dx, src->width, &max_x) || max_x > target->width) ||
++      (grub_add (dy, src->height, &max_y) || max_y > target->height))
++    return;
++
+   for (i = 0; i < src->height; i++)
+     {
+       src_bit = (src->width * i + src->width - 1) % 8;
+-- 
+2.34.1
+
