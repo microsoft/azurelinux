@@ -86,6 +86,8 @@ Requires:       python3-importlib-metadata
 Recommends:     ImageMagick
 Recommends:     graphviz
 
+Provides:       python3dist(sphinx)
+
 %description -n python%{python3_pkgversion}-sphinx
 Sphinx makes it easy to create intelligent and beautiful documentation.
 

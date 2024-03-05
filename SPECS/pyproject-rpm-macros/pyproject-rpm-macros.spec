@@ -59,8 +59,7 @@ BuildRequires:  python3dist(pytest)
 BuildRequires:  python3dist(pytest-xdist)
 %endif
 BuildRequires:  python3dist(pyyaml)
-#BuildRequires:  python3dist(packaging)
-BuildRequires:  python3-packaging
+BuildRequires:  python3dist(packaging)
 BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(setuptools)
 %if %{with tox_tests}
@@ -177,149 +176,22 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %{_rpmmacrodir}/macros.aaa-pyproject-srpm
 %license LICENSE
 
-
 %changelog
 * Fri Mar 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.12.0-2
 - Refresh from Fedora 40 (license: MIT)
 
-* Fri Jan 26 2024 Miro Hrončok <miro@hroncok.cz> - 1.12.0-1
-- Namespace pyproject-rpm-macros generated text files with %%{python3_pkgversion}
-- That way, a single-spec can be used to build packages for multiple Python versions
-- Fixes: rhbz#2209055
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
+- Updating naming for 3.0 version of Azure Linux.
 
-* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
+- Update version of tox used for package tests
 
-* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.11.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+* Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
+- Adding missing test dependencies.
 
-* Wed Sep 27 2023 Miro Hrončok <mhroncok@redhat.com> - 1.11.0-1
-- Add the -l/-L flag to %%pyproject_save_files
-- The -l flag can be used to assert at least 1 License-File was detected
-- The -L flag explicitly disables this check (which remains the default)
-- Prevent incorrect usage of %%pyproject_buildrequires -R with -x/-e/-t
-- Fixes: rhbz#2244282
-- Show a better error message when %%pyproject_install finds no wheel
-- Fixes: rhbz#2242452
-- Fix %%pyproject_buildrequires -w when the build backend is already installed and pip isn't
-- Fixes: rhbz#2169855
-
-* Wed Sep 13 2023 Python Maint <python-maint@redhat.com> - 1.10.0-1
-- Add %%_pyproject_check_import_allow_no_modules for automated environments
-- Fix handling of tox 4 provision without an explicit tox minversion
-- Fixes: rhbz#2240590
-
-* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Wed May 31 2023 Maxwell G <maxwell@gtmx.me> - 1.9.0-1
-- Allow passing config_settings to the build backend.
-- Resolves: rhbz#2192581
-
-* Wed May 31 2023 Miro Hrončok <mhroncok@redhat.com> - 1.8.1-1
-- On Python older than 3.11, use tomli instead of deprecated toml
-- Fix literal %% handling in %%{pyproject_files} on RPM 4.19
-
-* Tue May 23 2023 Miro Hrončok <mhroncok@redhat.com> - 1.8.0-2
-- Rebuilt for ELN dependency changes
-
-* Thu Apr 27 2023 Miro Hrončok <mhroncok@redhat.com> - 1.8.0-1
-- %%pyproject_buildrequires: Add support for self-referential extras requirements
-  Fixes: rhbz#2171343
-- Deprecate the provisional %%{pyproject_build_lib} macro
-  See https://lists.fedoraproject.org/archives/list/python-devel@lists.fedoraproject.org/thread/HMLOPAU3RZLXD4BOJHTIPKI3I4U6U7OE/
-
-* Fri Mar 31 2023 Miro Hrončok <mhroncok@redhat.com> - 1.7.0-1
-- %%pyproject_buildrequires: Redirect stdout to stderr via Shell
-- Dependencies are recorded to a text file that is catted at the end
-- Fixes: rhbz#2183519
-
-* Mon Feb 13 2023 Lumír Balhar <lbalhar@redhat.com> - 1.6.3-1
-- Remove .dist-info directory at the end of %%pyproject_buildrequires
-- An incomplete .dist-info directory in $PWD can confuse tests in %%check
-
-* Wed Feb 08 2023 Lumír Balhar <lbalhar@redhat.com> - 1.6.2-1
-- Improve detection of lang files
-- Fixes: rhbz#2166295
-
-* Fri Feb 03 2023 Miro Hrončok <mhroncok@redhat.com> - 1.6.1-1
-- %%pyproject_buildrequires: Avoid leaking stdout from subprocesses
-- Fixes: rhbz#2166888
-
-* Fri Jan 20 2023 Miro Hrončok <miro@hroncok.cz> - 1.6.0-1
-- Add pyproject-srpm-macros with a minimal %%pyproject_buildrequires macro
-
-* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Fri Jan 13 2023 Miro Hrončok <mhroncok@redhat.com> - 1.5.1-1
-- Adjusts %%pyproject_buildrequires tests for tox 4
-- Fixes: rhbz#2160687
-
-* Mon Nov 28 2022 Miro Hrončok <mhroncok@redhat.com> - 1.5.0-1
-- Use %%py3_test_envvars in %%tox when available
-
-* Mon Sep 19 2022 Python Maint <python-maint@redhat.com> - 1.4.0-1
-- %%pyproject_save_files: Support License-Files installed into the *Root License Directory* from PEP 639
-- Fixes: rhbz#2127946
-- %%pyproject_check_import: Import only the modules whose top-level names
-  match any of the globs provided to %%pyproject_save_files
-- Fixes: rhbz#2127958
-
-* Tue Aug 30 2022 Otto Liljalaakso <otto.liljalaakso@iki.fi> - 1.3.4-1
-- Fix typo in internal function name
-
-* Tue Aug 09 2022 Karolina Surma <ksurma@redhat.com> - 1.3.3-1
-- Don't fail %%pyproject_save_files '*' if no modules are detected
-
-* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Wed Jun 15 2022 Benjamin A. Beasley <code@musicinmybrain.net> - 1.3.2-1
-- Update %%pyproject_build_lib to support setuptools 62.1.0 and later
-- Fixes: rhbz#2097158
-- %%pyproject_buildrequires: When extension modules are built,
-  support https://fedoraproject.org/wiki/Changes/Package_information_on_ELF_objects
-- Fixes: rhbz#2097535
-
-* Fri May 27 2022 Owen Taylor <otaylor@redhat.com> - 1.3.1-1
-- %%pyproject_install: pass %%{_prefix} explicitly to pip install
-
-* Thu May 12 2022 Miro Hrončok <mhroncok@redhat.com> - 1.3.0-1
-- Use tomllib from the standard library on Python 3.11+
-
-* Wed Apr 27 2022 Miro Hrončok <mhroncok@redhat.com> - 1.2.0-1
-- %%pyproject_buildrequires: Add provisional -w flag for build backends without
-  prepare_metadata_for_build_wheel hook
-  When used, the wheel is built in %%pyproject_buildrequires
-  and information about runtime requires and extras is read from that wheel.
-- Fixes: rhbz#2076994
-
-* Tue Apr 12 2022 Miro Hrončok <mhroncok@redhat.com> - 1.1.0-1
-- %%pyproject_save_files: Support nested directories in dist-info
-- Fixes: rhbz#1985340
-
-* Tue Mar 22 2022 Miro Hrončok <mhroncok@redhat.com> - 1.0.1-1
-- Prefix paths of intermediate files (such as %%{pyproject_files}) with NVRA
-
-* Tue Mar 01 2022 Miro Hrončok <mhroncok@redhat.com> - 1.0.0-1
-- Release final version 1.0.0
-
-* Mon Feb 07 2022 Lumír Balhar <lbalhar@redhat.com> - 1.0.0~rc2-1
-- Updated compatibility with tox4
-
-#* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
-#- Updating naming for 3.0 version of Azure Linux.
-
-#* Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
-#- Update version of tox used for package tests
-
-#* Thu Jul 21 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-3
-#- Adding missing test dependencies.
-
-#* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
-#- Initial CBL-Mariner import from Fedora 36 (license: MIT).
-#- License verified.
+* Mon Feb 14 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-2
+- Initial CBL-Mariner import from Fedora 36 (license: MIT).
+- License verified.
 
 * Tue Jan 25 2022 Miro Hrončok <mhroncok@redhat.com> - 1.0.0~rc1-1
 - Release version 1.0.0, first release candidate

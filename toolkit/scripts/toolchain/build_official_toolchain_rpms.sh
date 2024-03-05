@@ -319,13 +319,13 @@ mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
 # Copy python rpm generator scripts
-mkdir -pv $LFS/usr/lib/rpm/fileattrs
-cp -v $SPECROOT/rpm/*.attr $LFS/usr/lib/rpm/fileattrs
-cp -v $SPECROOT/rpm/*.py $LFS/usr/lib/rpm
-mkdir -pv $LFS/usr/lib/rpm/lua/azl/srpm
-cp -v $SPECROOT/azurelinux-rpm-macros/common.lua $LFS/usr/lib/rpm/lua/azl
-cp -v $SPECROOT/azurelinux-rpm-macros/forge.lua $LFS/usr/lib/rpm/lua/azl/srpm
-cp -v $SPECROOT/azurelinux-rpm-macros/python.lua $LFS/usr/lib/rpm/lua/azl/srpm
+# mkdir -pv $LFS/usr/lib/rpm/fileattrs
+# cp -v $SPECROOT/rpm/*.attr $LFS/usr/lib/rpm/fileattrs
+# cp -v $SPECROOT/rpm/*.py $LFS/usr/lib/rpm
+# mkdir -pv $LFS/usr/lib/rpm/lua/azl/srpm
+# cp -v $SPECROOT/azurelinux-rpm-macros/common.lua $LFS/usr/lib/rpm/lua/azl
+# cp -v $SPECROOT/azurelinux-rpm-macros/forge.lua $LFS/usr/lib/rpm/lua/azl/srpm
+# cp -v $SPECROOT/azurelinux-rpm-macros/python.lua $LFS/usr/lib/rpm/lua/azl/srpm
 
 stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
@@ -444,16 +444,16 @@ chroot_and_install_rpms gperf
 build_rpm_in_chroot_no_install libxcrypt
 chroot_and_install_rpms libxcrypt
 
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
+
 # Python3 needs to be installed for RPM to build
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
 
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
-
-# python-packaging requires pyproject-rpm-macros
-build_rpm_in_chroot_no_install python-packaging
-chroot_and_install_rpms python-packaging python3-packaging
 
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
@@ -641,7 +641,12 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
-chroot_and_install_rpms rpm
+chroot_and_install_rpms rpm rpm
+chroot_and_install_rpms rpm rpm-build
+chroot_and_install_rpms rpm rpm-build-libs
+chroot_and_install_rpms rpm rpm-devel
+chroot_and_install_rpms rpm rpm-lang
+chroot_and_install_rpms rpm rpm-libs
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed

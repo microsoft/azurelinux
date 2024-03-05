@@ -293,7 +293,7 @@ popd
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.18.1-3
 - Updating naming for 3.0 version of Azure Linux.
 
-* Thu Feb 07 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-2
+* Wed Feb 07 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-2
 - Remove conflicting `rpm.egg-info` file
 
 * Tue Jan 30 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-1

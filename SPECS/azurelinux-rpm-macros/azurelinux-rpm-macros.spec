@@ -42,8 +42,7 @@ Source24:       macros.suse
 Source25:       gen-ld-script.sh
 Source26:       generate-package-note.py
 Source27:       verify-package-notes.sh
-# python.lua is taken from https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
-Source28:       python.lua
+Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros

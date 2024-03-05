@@ -11,10 +11,9 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{ve
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  swig
-#BuildRequires:  python3
-#BuildRequires:  python3-devel
-#BuildRequires:  python3-pip
-#BuildRequires:  python3-setuptools
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
 #BuildRequires:  python3-wheel
 Requires:       pcre2
 Requires:       libsepol

@@ -44,9 +44,7 @@ BuildRequires:  python3-devel
 
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       libtpms >= 0.6.0
-# FIXME - our toolkit can't handle logical deps like this
-#Requires:       (%{name}-selinux if selinux-policy-targeted)
-Requires:       %{name}-selinux
+Requires:       (%{name}-selinux if selinux-policy-targeted)
 
 %description
 TPM emulator built on libtpms providing TPM functionality for QEMU VMs
