@@ -3419,7 +3419,7 @@
         "other": {
           "name": "extra-cmake-modules",
           "version": "5.249.0",
-          "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249/extra-cmake-modules-v5.249.0.tar.gz"
+          "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249.0/extra-cmake-modules-v5.249.0.tar.gz"
         }
       }
     },
@@ -8202,7 +8202,7 @@
         "other": {
           "name": "kf-kconfig",
           "version": "5.249.0",
-          "downloadUrl": "https://invent.kde.org/frameworks/kconfig/-/archive/v5.249/kconfig-v5.249.0.tar.gz"
+          "downloadUrl": "https://invent.kde.org/frameworks/kconfig/-/archive/v5.249.0/kconfig-v5.249.0.tar.gz"
         }
       }
     },
@@ -8212,7 +8212,7 @@
         "other": {
           "name": "kf-kcoreaddons",
           "version": "5.249.0",
-          "downloadUrl": "https://invent.kde.org/frameworks/kcoreaddons/-/archive/v5.249/kcoreaddons-v5.249.0.tar.gz"
+          "downloadUrl": "https://invent.kde.org/frameworks/kcoreaddons/-/archive/v5.249.0/kcoreaddons-v5.249.0.tar.gz"
         }
       }
     },
@@ -8222,7 +8222,7 @@
         "other": {
           "name": "kf-ki18n",
           "version": "5.249.0",
-          "downloadUrl": "https://invent.kde.org/frameworks/ki18n/-/archive/v5.249/ki18n-v5.249.0.tar.gz"
+          "downloadUrl": "https://invent.kde.org/frameworks/ki18n/-/archive/v5.249.0/ki18n-v5.249.0.tar.gz"
         }
       }
     },
@@ -8232,7 +8232,7 @@
         "other": {
           "name": "kf-kwidgetsaddons",
           "version": "5.249.0",
-          "downloadUrl": "https://invent.kde.org/frameworks/kwidgetsaddons/-/archive/v5.249/kwidgetsaddons-v5.249.0.tar.gz"
+          "downloadUrl": "https://invent.kde.org/frameworks/kwidgetsaddons/-/archive/v5.249.0/kwidgetsaddons-v5.249.0.tar.gz"
         }
       }
     },
