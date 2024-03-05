@@ -138,7 +138,7 @@ func createSkippableFrame(payload [4]uint32) (skippableFrame []byte) {
 	// Magic_Number
 	binary.LittleEndian.PutUint32(skippableFrame, 0x184D2A50)
 	// Frame_Size
-	binary.LittleEndian.PutUint32(skippableFrame[4:8], 4)
+	binary.LittleEndian.PutUint32(skippableFrame[4:8], 16)
 	// User_Data
 	binary.LittleEndian.PutUint32(skippableFrame[8:12], payload[0])
 	binary.LittleEndian.PutUint32(skippableFrame[12:16], payload[1])
