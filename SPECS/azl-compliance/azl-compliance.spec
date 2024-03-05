@@ -37,7 +37,7 @@ package to meet FedRAMP Compliance
 %setup -c
 
 %build
-cd azl-compliance
+
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/azl-compliance/
