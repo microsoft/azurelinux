@@ -71,6 +71,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libprotobuf-c.a
 
 %changelog
+* Tue Mar 05 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-1
+- Auto-upgrade to 1.5.0 - Azure Linux 3.0 Upgrades
+
 * Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-1
 - Auto-upgrade to 1.5.0 - Azure Linux 3.0 Upgrades
 
