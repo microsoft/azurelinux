@@ -41,4 +41,4 @@ pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
 %changelog
 * Tue Feb 13 2024 Andrew Phelps anphel@microsoft.com - 24.0-1
 - License verified
-- Original version for CBL-Mariner
+- Original version for Azure Linux.
