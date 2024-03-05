@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
 Version:        3.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,6 +98,8 @@ autoreconf -vif
            --disable-daemon
 
 # build libcgroup
+export CXXFLAGS="$CXXFLAGS -std=c++14"
+
 make %{?_smp_mflags}
 
 # build test
@@ -194,6 +196,9 @@ getent group cgred >/dev/null || groupadd -r cgred
 /tests/gunit/.libs/lt-gtest
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.0-2
+- Fix build by forcing C++ 14 standard
+
 * Thu Feb 22 2024 Henry Li <lihl@microsoft.com> - 3.1.0-1
 - Upgrade to version 3.1.0
 - Add systemd-rpm-macros as BR
