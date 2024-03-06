@@ -20,6 +20,8 @@ BuildArch:      noarch
 %package -n python3-pip
 Summary:        %{summary}
 BuildRequires:  python3-devel
+# TODO: enable python3-wheel BR when this package is added to toolchain to fix non-toolchain builds
+#BuildRequires:  python3-wheel
 
 %description -n python3-pip %{_description}
 
@@ -27,6 +29,17 @@ BuildRequires:  python3-devel
 %autosetup -n %{srcname}-%{version}
 
 %build
+# Bootstrap `pip3` which casues ptest build failure.
+# The manual installation of pip in the RPM buildroot requires pip
+# to be already present in the chroot.
+# For toolchain builds, `pip3` requirement is statisfied by raw-toolchain's
+# version of python, so it does not do anything.
+# For builds other than toolchain, we would require pip to be present.
+# The line below install pip in the build chroot using the recently
+# compiled python3.
+# NOTE: This is a NO-OP for the toolchain build.
+%{__python3} %{_libdir}/python%{python3_version}/ensurepip
+
 %py3_build_wheel
 
 %install
