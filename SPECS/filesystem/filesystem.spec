@@ -61,11 +61,6 @@ install -vdm 755 %{buildroot}/mnt/cdrom
 install -vdm 755 %{buildroot}/mnt/hgfs
 
 #
-#	6.6. Creating Essential Files and Symlinks
-#
-
-touch %{buildroot}/var/log/{btmp,lastlog,wtmp}
-#
 #	Configuration files
 #
 cat > %{buildroot}/etc/passwd <<- "EOF"
@@ -552,9 +547,6 @@ return 0
 %dir /var/opt
 %dir /var/spool
 %dir /var/tmp
-%attr(-,root,root) 	/var/log/wtmp
-%attr(664,root,utmp)	/var/log/lastlog
-%attr(600,root,root)	/var/log/btmp
 /var/lock
 /var/run
 
@@ -567,6 +559,7 @@ return 0
 - move filesystem-asc stuff into asc
 - move /etc/modprobe.d into kmod package
 - move /etc/mtab from filesystem to util-linux package
+- move /var/log/* files from filesystem to systemd package
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts
