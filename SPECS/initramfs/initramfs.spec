@@ -113,7 +113,7 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 
 %changelog
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-3
-- Remove /var/log/initramfs/kernel files.
+- Remove /var/lib/initramfs/kernel files.
 
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
 - Call dracut instead of mkinitrd

@@ -147,7 +147,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-4
-- Remove /var/log/initramfs/kernel files.
+- Remove /var/lib/initramfs/kernel files.
 
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
 - Rename initrd.img-<kver> to initramfs-<kver>.img
