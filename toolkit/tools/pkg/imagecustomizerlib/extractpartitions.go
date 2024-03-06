@@ -1,6 +1,7 @@
 package imagecustomizerlib
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
@@ -22,6 +23,10 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 		return err
 	}
 
+	// Define magicNumber and frameSize for skippable frames
+	magicNumber := uint32(0x184D2A50)
+	frameSize := uint32(16)
+
 	// Create skippable frame metadata defined as a random 128-Bit number
 	metadata, err := createSkippableFrameMetadata()
 	if err != nil {
@@ -30,7 +35,6 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 	// Encode metadata into a payload defined as a uint32 array
 	payload := Encode128BitLittleEndian(metadata)
-	logger.Log.Infof("Skippable frame payload has been created: %d", payload)
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
@@ -57,13 +61,13 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 
 			// Create a skippable frame containing the metadata payload and prepend the frame to the partition file
-			err = addSkippableFrame(partitionFilepath, payload)
+			err = addSkippableFrame(partitionFilepath, magicNumber, frameSize, payload)
 			if err != nil {
 				return err
 			}
 
-			logger.Log.Infof("Skippable frame payload has been added to parition: %d", payload)
-
+			// Verify skippable frame metadata
+			verifySkippableFrameMetadataFromFile(partitionFilepath, magicNumber, frameSize, metadata)
 		}
 	}
 	return nil
@@ -109,8 +113,8 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 	return partitionRawFilepath + ".zst", nil
 }
 
-// Add a skippable frame to the specified partition file.
-func addSkippableFrame(partitionFilepath string, payload [4]uint32) (err error) {
+// Prepend a skippable frame with the metadata payload to the specified partition file.
+func addSkippableFrame(partitionFilepath string, magicNumber uint32, frameSize uint32, payload [4]uint32) (err error) {
 	// Read existing data from the partition file.
 	existingData, err := os.ReadFile(partitionFilepath)
 	if err != nil {
@@ -118,7 +122,7 @@ func addSkippableFrame(partitionFilepath string, payload [4]uint32) (err error) 
 	}
 
 	// Create a skippable frame.
-	skippableFrame := createSkippableFrame(payload)
+	skippableFrame := createSkippableFrame(magicNumber, frameSize, payload)
 
 	// Combine the skippable frame and existing data.
 	newData := append(skippableFrame, existingData...)
@@ -133,17 +137,23 @@ func addSkippableFrame(partitionFilepath string, payload [4]uint32) (err error) 
 }
 
 // Creates a skippable frame.
-func createSkippableFrame(payload [4]uint32) (skippableFrame []byte) {
-	skippableFrame = make([]byte, 24)
+func createSkippableFrame(magicNumber uint32, frameSize uint32, payload [4]uint32) (skippableFrame []byte) {
+	// Calculate the length of the byte array
+	lengthOfByteArray := 4 + 4 + (4 * len(payload))
+	// Define the Skippable frame
+	skippableFrame = make([]byte, lengthOfByteArray)
 	// Magic_Number
-	binary.LittleEndian.PutUint32(skippableFrame, 0x184D2A50)
+	binary.LittleEndian.PutUint32(skippableFrame, magicNumber)
 	// Frame_Size
-	binary.LittleEndian.PutUint32(skippableFrame[4:8], 16)
+	binary.LittleEndian.PutUint32(skippableFrame[4:8], frameSize)
 	// User_Data
 	binary.LittleEndian.PutUint32(skippableFrame[8:12], payload[0])
 	binary.LittleEndian.PutUint32(skippableFrame[12:16], payload[1])
 	binary.LittleEndian.PutUint32(skippableFrame[16:20], payload[2])
 	binary.LittleEndian.PutUint32(skippableFrame[20:24], payload[3])
+
+	logger.Log.Infof("Skippable frame has been created with the following metadata: %d", skippableFrame[8:24])
+
 	return skippableFrame
 }
 
@@ -177,12 +187,41 @@ func Encode128BitLittleEndian(number [16]byte) [4]uint32 {
 	return encoded
 }
 
-// Decodes an array of uint32 into a 128-Bit number in little-endian order.
-func Decode128BitLittleEndian(encoded [4]uint32) [16]byte {
-	var number [16]byte
-	for i := 0; i < 4; i++ {
-		offset := i * 4
-		binary.LittleEndian.PutUint32(number[offset:offset+4], encoded[i])
+// TODO
+func verifySkippableFrameDecompression(rawPartitionFilepath string, rawzstPartitionFilepath string) (err error) {
+	// Decompress the .raw.zst partition file and compare the hashes with the corresponding raw file
+	return nil
+}
+
+// Verifies that the skippable frame has been correctly prepended to the partition file with the correct data
+func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber uint32, frameSize uint32, metadata [16]byte) (err error) {
+	// Read existing data from the partition file.
+	existingData, err := os.ReadFile(partitionFilepath)
+	if err != nil {
+		return fmt.Errorf("failed to read partition file %s:\n%w", partitionFilepath, err)
 	}
-	return number
+
+	// verify that the skippable frame has been prepended to the partition file by validating magicNumber
+	var magicNumberByteArray [4]byte
+	binary.LittleEndian.PutUint32(magicNumberByteArray[:], magicNumber)
+	if !bytes.Equal(existingData[0:4], magicNumberByteArray[:]) {
+		return fmt.Errorf("skippable frame has not been prepended to the partition file:\n %d != %d", existingData[0:4], magicNumberByteArray[:])
+	}
+	logger.Log.Infof("Skippable frame had been correctly prepended to the partition file...")
+
+	// verify that the skippable frame has the correct frame size by validating frameSize
+	var frameSizeByteArray [4]byte
+	binary.LittleEndian.PutUint32(frameSizeByteArray[:], frameSize)
+	if !bytes.Equal(existingData[4:8], frameSizeByteArray[:]) {
+		return fmt.Errorf("skippable frame frameSize field does not match the defined frameSize:\n %d != %d", existingData[4:8], frameSizeByteArray[:])
+	}
+	logger.Log.Infof("Skippable frame frameSize field is correct...")
+
+	// verify that the skippable frame has the correct inserted metadata by validating metadata
+	if !bytes.Equal(existingData[8:24], metadata[:]) {
+		return fmt.Errorf("skippable frame metadata does not match the inserted metadata:\n %d != %d", existingData[8:24], metadata[:])
+	}
+	logger.Log.Infof("Skippable frame is valid and contains the correct metadata!")
+
+	return nil
 }
