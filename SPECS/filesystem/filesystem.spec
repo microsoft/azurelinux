@@ -63,8 +63,6 @@ install -vdm 755 %{buildroot}/mnt/hgfs
 #
 #	6.6. Creating Essential Files and Symlinks
 #
-ln -svfn /proc/self/mounts %{buildroot}/etc/mtab
-#touch -f %{buildroot}/etc/mtab
 
 touch %{buildroot}/var/log/{btmp,lastlog,wtmp}
 #
@@ -458,7 +456,6 @@ return 0
 %config(noreplace) /etc/host.conf
 %config(noreplace) /etc/hosts
 %config(noreplace) /etc/inputrc
-%config(noreplace) /etc/mtab
 %config(noreplace) /etc/passwd
 %config(noreplace) /etc/profile
 %dir /etc/sysconfig
@@ -569,6 +566,7 @@ return 0
 * Mon Mar 04 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-20
 - move filesystem-asc stuff into asc
 - move /etc/modprobe.d into kmod package
+- move /etc/mtab from filesystem to util-linux package
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts

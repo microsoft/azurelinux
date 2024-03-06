@@ -2,7 +2,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.39.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ BuildRequires:  pam-devel
 Requires:       %{name}-libs = %{version}-%{release}
 Requires:       audit-libs
 Conflicts:      toybox
+Conflicts:      filesystem < 1.1-20
 Provides:       %{name}-ng = %{version}-%{release}
 Provides:       hardlink = 1.3-9
 Provides:       uuidd = %{version}-%{release}
@@ -100,6 +101,8 @@ install -vm644 %{SOURCE2} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE3} %{buildroot}%{_sysconfdir}/pam.d/
 install -vm644 %{SOURCE4} %{buildroot}%{_sysconfdir}/pam.d/
 
+ln -sf ../proc/self/mounts %{buildroot}/etc/mtab
+
 %check
 chown -Rv nobody .
 sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
@@ -129,6 +132,7 @@ rm -rf %{buildroot}/lib/systemd/system
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/runuser-l
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/pam.d/su-l
+/etc/mtab
 
 %files lang -f %{name}.lang
 %defattr(-,root,root)
@@ -151,6 +155,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Mar 06 2024 Dan Streetman <ddstreet@microsoft.com> - 2.39.2-2
+- move /etc/mtab from filesystem to util-linux package
+
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 2.39.2-1
 - Upgrade to 2.39.2
 
