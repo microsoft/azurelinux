@@ -2,13 +2,11 @@
 %global __brp_python_bytecompile %{nil}
 %define majmin %(echo %{version} | cut -d. -f1-2)
 %define majmin_nodots %(echo %{majmin} | tr -d .)
-# See Lib/ensurepip/__init__.py in Source0 for the pip version number
-%global pip_version 23.2.1
 
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,17 +116,6 @@ Provides:       python%{majmin_nodots}-tools = %{version}-%{release}
 The Python package includes several development tools that are used
 to build python programs.
 
-%package        pip
-Summary:        The PyPA recommended tool for installing Python packages.
-Group:          Development/Tools
-Requires:       %{name} = %{version}-%{release}
-Provides:       python3dist(pip) = %{version}-%{release}
-Provides:       python%{majmin}dist(pip) = %{version}-%{release}
-BuildArch:      noarch
-
-%description    pip
-The PyPA recommended tool for installing Python packages.
-
 %package        test
 Summary:        Regression tests package for Python.
 Group:          Development/Tools
@@ -166,25 +153,6 @@ export OPT="%{extension_cflags} %{openssl_flags}"
 %install
 %make_install
 %{_fixperms} %{buildroot}/*
-
-# Bootstrap `pip3` which casues ptest build failure.
-# The manual installation of pip in the RPM buildroot requires pip
-# to be already present in the chroot.
-# For toolchain builds, `pip3` requirement is staisfied by raw-toolchain's
-# version of python, so it does not do anything.
-# For builds other than toolchain, we would require pip to be present.
-# The line below install pip in the build chroot using the recently
-# compiled python3.
-# NOTE: This is a NO-OP for the toolchain build.
-python3 Lib/ensurepip
-
-# Installing pip via ensurepip fails in our toolchain.
-# The versions of these tools from the raw toolchain are detected,
-# and install fails. We will install these two bundled wheels manually.
-# https://github.com/pypa/pip/issues/3063
-# https://bugs.python.org/issue31916
-pip3 install --no-cache-dir --no-index --ignore-installed --root %{buildroot} \
-    ./Lib/ensurepip/_bundled/pip-%{pip_version}-py3-none-any.whl
 
 # Windows executables get installed by pip - we don't need these.
 find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete -print
@@ -266,16 +234,13 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_bindir}/2to3-%{majmin}
 %exclude %{_bindir}/idle*
 
-%files pip
-%defattr(-,root,root,755)
-%{_libdir}/python%{majmin}/site-packages/pip/*
-%{_libdir}/python%{majmin}/site-packages/pip-%{pip_version}.dist-info/*
-%{_bindir}/pip*
-
 %files test
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-2
+- Remove pip subpackage
+
 * Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-1
 - Upgrade to version 3.12.0
 - Split python-setuptools into separate spec
