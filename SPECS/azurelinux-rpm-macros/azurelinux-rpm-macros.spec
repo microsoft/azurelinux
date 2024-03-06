@@ -6,8 +6,8 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
-Version:        2.0
-Release:        26%{?dist}
+Version:        %{azl}.0
+Release:        1%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -130,6 +130,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm forge.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Mon Mar 04 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-1
+- Version bump to match Azure Linux version.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0-26
 - Updating naming for 3.0 version of Azure Linux.
 
