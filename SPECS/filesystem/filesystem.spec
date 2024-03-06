@@ -131,20 +131,6 @@ cat > %{buildroot}/etc/host.conf <<- "EOF"
 multi on
 EOF
 #
-#	7.10. Configuring the Linux Console"
-#
-cat > %{buildroot}/etc/sysconfig/console <<- "EOF"
-# Begin /etc/sysconfig/console
-#       Begin /etc/sysconfig/console
-#       KEYMAP="us"
-#       FONT="lat1-16 -m utf8"
-#       FONT="lat1-16 -m 8859-1"
-#       KEYMAP_CORRECTIONS="euro2"
-#       UNICODE="1"
-#       LEGACY_CHARSET="iso-8859-1"
-# End /etc/sysconfig/console
-EOF
-#
 #	7.13. The Bash Shell Startup Files
 #
 cat > %{buildroot}/etc/profile <<- "EOF"
@@ -339,7 +325,6 @@ return 0
 %config(noreplace) /etc/passwd
 %config(noreplace) /etc/profile
 %dir /etc/sysconfig
-%config(noreplace) /etc/sysconfig/console
 %dir /etc/profile.d
 #	media filesystem
 %dir /run/media/cdrom
@@ -444,6 +429,7 @@ return 0
 - move /var/log/* files from filesystem to systemd package
 - remove opensuse-style 'proxy' config file
 - remove unused /etc/sysconfig/clock file
+- remove unused opensuse-style /etc/sysconfig/console file
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts
