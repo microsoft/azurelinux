@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +17,6 @@ This package provides the configuration files for initrd generation.
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/dracut.conf.d
 install -D -m644 %{SOURCE0} %{buildroot}%{_sysconfdir}/dracut.conf.d/
-install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 
 %define watched_path %{_sbindir} %{_libdir}/udev/rules.d %{_libdir}/systemd/system /lib/modules %{_sysconfdir}/dracut.conf.d
 %define watched_pkgs e2fsprogs, systemd, kpartx, device-mapper-multipath, verity-read-only-root, dracut-fips, dracut-megaraid
@@ -111,9 +110,11 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %files
 %defattr(-,root,root,-)
 %{_sysconfdir}/dracut.conf.d/fscks.conf
-%dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-3
+- Remove /var/lig/initramfs/kernel files.
+
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
 - Call dracut instead of mkinitrd
 - Rename initrd.img-<kver> to initramfs-<kver>.img
