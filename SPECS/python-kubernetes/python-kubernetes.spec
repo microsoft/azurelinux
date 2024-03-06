@@ -1,7 +1,7 @@
 %global library kubernetes
 
 Name:       python-%{library}
-Version:    28.1.0
+Version:    29.0.0
 Release:    1%{?dist}
 Summary:    Python client for the kubernetes API.
 License:    ASL 2.0
@@ -66,6 +66,9 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %{python3_sitelib}/%{library}/e2e_test
 
 %changelog
+* Tue Mar 05 2024 Henry Li <lihl@microsoft.com> - 29.0.0-1
+- Upgrade to v29.0.0
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 28.1.0-1
 - Auto-upgrade to 28.1.0 - Azure Linux 3.0 - package upgrades
 

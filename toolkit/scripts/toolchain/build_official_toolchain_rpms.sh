@@ -440,6 +440,8 @@ chroot_and_install_rpms python3 python3
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
 
+build_rpm_in_chroot_no_install python-pip
+
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
@@ -462,6 +464,7 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
+# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
