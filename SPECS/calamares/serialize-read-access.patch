@@ -1,43 +1,56 @@
-diff -ruN a/src/modules/partition/core/PartitionModel.cpp b/src/modules/partition/core/PartitionModel.cpp
---- a/src/modules/partition/core/PartitionModel.cpp	2023-01-27 14:12:11.942298970 -0800
-+++ b/src/modules/partition/core/PartitionModel.cpp	2023-01-27 14:12:06.786346392 -0800
-@@ -79,6 +79,7 @@
+From dda7d24e07ae2272731676be4be0b4e3567fe0f7 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Tue, 23 Jan 2024 16:00:27 -0800
+Subject: [PATCH] serialized read patch
+
+---
+ src/modules/partition/core/PartitionModel.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/modules/partition/core/PartitionModel.cpp b/src/modules/partition/core/PartitionModel.cpp
+index a9d49dc..fbd8bb5 100644
+--- a/src/modules/partition/core/PartitionModel.cpp
++++ b/src/modules/partition/core/PartitionModel.cpp
+@@ -74,6 +74,7 @@ PartitionModel::columnCount( const QModelIndex& ) const
  int
  PartitionModel::rowCount( const QModelIndex& parent ) const
  {
-+    QMutexLocker lock(&m_lock);
++    QMutexLocker lock( &m_lock );
      Partition* parentPartition = partitionForIndex( parent );
      if ( parentPartition )
-         return parentPartition->children().count();
-@@ -89,6 +90,7 @@
+     {
+@@ -86,6 +87,7 @@ PartitionModel::rowCount( const QModelIndex& parent ) const
  QModelIndex
  PartitionModel::index( int row, int column, const QModelIndex& parent ) const
  {
-+    QMutexLocker lock(&m_lock);
-     PartitionNode* parentPartition = parent.isValid()
-                                      ? static_cast< PartitionNode* >( partitionForIndex( parent ) )
-                                      : static_cast< PartitionNode* >( m_device->partitionTable() );
-@@ -106,6 +108,7 @@
++    QMutexLocker lock( &m_lock );
+     PartitionNode* parentPartition = parent.isValid() ? static_cast< PartitionNode* >( partitionForIndex( parent ) )
+                                                       : static_cast< PartitionNode* >( m_device->partitionTable() );
+     if ( !parentPartition )
+@@ -108,6 +110,7 @@ PartitionModel::index( int row, int column, const QModelIndex& parent ) const
  QModelIndex
  PartitionModel::parent( const QModelIndex& child ) const
  {
-+    QMutexLocker lock(&m_lock);
++    QMutexLocker lock( &m_lock );
      if ( !child.isValid() )
+     {
          return QModelIndex();
-     Partition* partition = partitionForIndex( child );
-@@ -129,6 +132,7 @@
+@@ -139,6 +142,7 @@ PartitionModel::parent( const QModelIndex& child ) const
  QVariant
  PartitionModel::data( const QModelIndex& index, int role ) const
  {
-+    QMutexLocker lock(&m_lock);
++    QMutexLocker lock( &m_lock );
      Partition* partition = partitionForIndex( index );
      if ( !partition )
-         return QVariant();
-@@ -277,7 +281,6 @@
+     {
+@@ -322,7 +326,6 @@ PartitionModel::headerData( int section, Qt::Orientation, int role ) const
  Partition*
  PartitionModel::partitionForIndex( const QModelIndex& index ) const
  {
--    QMutexLocker lock(&m_lock);
+-    QMutexLocker lock( &m_lock );
      if ( !index.isValid() )
+     {
          return nullptr;
-     return reinterpret_cast< Partition* >( index.internalPointer() );
+-- 
+2.34.1
+

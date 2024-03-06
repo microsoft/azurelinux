@@ -54,7 +54,7 @@ Presentation
         Image {
             id: background
             fillMode: Image.PreserveAspectFit
-            source: "mariner-welcome.png"
+            source: "azl-welcome.png"
             anchors.centerIn: slide
         }
 
