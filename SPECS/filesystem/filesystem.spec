@@ -131,20 +131,6 @@ cat > %{buildroot}/etc/host.conf <<- "EOF"
 multi on
 EOF
 #
-#	7.9. Configuring the setclock Script"
-#
-cat > %{buildroot}/etc/sysconfig/clock <<- "EOF"
-# Begin /etc/sysconfig/clock
-
-UTC=1
-
-# Set this to any options you might need to give to hwclock,
-# such as machine hardware clock type for Alphas.
-CLOCKPARAMS=
-
-# End /etc/sysconfig/clock
-EOF
-#
 #	7.10. Configuring the Linux Console"
 #
 cat > %{buildroot}/etc/sysconfig/console <<- "EOF"
@@ -353,7 +339,6 @@ return 0
 %config(noreplace) /etc/passwd
 %config(noreplace) /etc/profile
 %dir /etc/sysconfig
-%config(noreplace) /etc/sysconfig/clock
 %config(noreplace) /etc/sysconfig/console
 %dir /etc/profile.d
 #	media filesystem
@@ -458,6 +443,7 @@ return 0
 - move /etc/mtab from filesystem to util-linux package
 - move /var/log/* files from filesystem to systemd package
 - remove opensuse-style 'proxy' config file
+- remove unused /etc/sysconfig/clock file
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts
