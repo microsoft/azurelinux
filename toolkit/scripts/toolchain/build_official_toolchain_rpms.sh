@@ -318,14 +318,6 @@ cp -v $SPECROOT/azurelinux-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/a
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
-# Copy python rpm generator scripts
-# mkdir -pv $LFS/usr/lib/rpm/fileattrs
-# cp -v $SPECROOT/rpm/*.attr $LFS/usr/lib/rpm/fileattrs
-# cp -v $SPECROOT/rpm/*.py $LFS/usr/lib/rpm
-# mkdir -pv $LFS/usr/lib/rpm/lua/azl/srpm
-# cp -v $SPECROOT/azurelinux-rpm-macros/common.lua $LFS/usr/lib/rpm/lua/azl
-# cp -v $SPECROOT/azurelinux-rpm-macros/forge.lua $LFS/usr/lib/rpm/lua/azl/srpm
-# cp -v $SPECROOT/azurelinux-rpm-macros/python.lua $LFS/usr/lib/rpm/lua/azl/srpm
 
 stop_record_timestamp "build prep"
 start_record_timestamp "build packages"
