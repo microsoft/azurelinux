@@ -225,7 +225,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-7
-- Remove /var/lig/initramfs/kernel files.
+- Remove /var/log/initramfs/kernel files.
 
 * Fri Feb 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.126.mshv3-6
 - Updating naming for 3.0 version of Azure Linux.

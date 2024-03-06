@@ -415,7 +415,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 
 %changelog
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-3
-- Remove /var/lig/initramfs/kernel files.
+- Remove /var/log/initramfs/kernel files.
 
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-2
 - Rename initrd.img-<kver> to initramfs-<kver>.img
