@@ -3,17 +3,21 @@ From: Karolina Surma <ksurma@redhat.com>
 Date: Mon, 14 Nov 2022 13:30:48 +0100
 Subject: [PATCH] certifi-2022.9.24-use-system-cert
 diff -ruN a/certifi/core.py b/certifi/core.py
---- a/certifi/core.py   2024-03-04 10:33:25.257373811 +0000
-+++ b/certifi/core.py   2024-03-04 10:35:04.241047374 +0000
-@@ -4,111 +4,10 @@
+--- a/certifi/core.py      2024-03-04 10:33:25.257373811 +0000
++++ b/certifi/core.py      2024-03-06 07:30:09.429535995 +0000
+@@ -4,111 +4,16 @@
 
  This module returns the installation location of cacert.pem or its contents.
  """
 -import sys
 -import atexit
++#import sys
++#import atexit
 
- def exit_cacert_ctx() -> None:
-     _CACERT_CTX.__exit__(None, None, None)  # type: ignore[union-attr]
+-def exit_cacert_ctx() -> None:
+-    _CACERT_CTX.__exit__(None, None, None)  # type: ignore[union-attr]
++#def exit_cacert_ctx() -> None:
++#    _CACERT_CTX.__exit__(None, None, None)  # type: ignore[union-attr]
 
 -
 -if sys.version_info >= (3, 11):
@@ -117,6 +121,10 @@ diff -ruN a/certifi/core.py b/certifi/core.py
 -
 -    def contents() -> str:
 -        return read_text("certifi", "cacert.pem", encoding="ascii")
++# The RPM-packaged certifi always uses the system certificates
++def where() -> str:
++    return '/etc/pki/tls/certs/ca-bundle.crt'
++
 +def contents() -> str:
 +    with open(where(), encoding='utf=8') as data:
 +        return data.read()

@@ -18,6 +18,7 @@ BuildRequires:  python3-wheel
 %if 0%{?with_check}
 BuildRequires:  ca-certificates-base
 BuildRequires:  python3-pytest
+BuildRequires:  python3-packaging
 %endif
 
 %description
@@ -54,6 +55,7 @@ rm -rf certifi/*.pem
 %pyproject_save_files certifi
 
 %check
+pip3 install iniconfig
 %pytest -v
 
 %files -n python3-certifi -f %{pyproject_files}
