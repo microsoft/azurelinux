@@ -31,6 +31,7 @@ Patch5: no-googletests.patch
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: gcc
+BuildRequires: gcc-c++
 BuildRequires: coreutils
 BuildRequires: flex
 BuildRequires: make
@@ -78,9 +79,6 @@ provide scripts to manage that configuration.
 %autosetup -p1 -n %{name}
 
 %build
-# build test binaries but do not execute tests
-sed -i '/TESTS = gtest/d' ./tests/gunit/Makefile.am
-
 autoreconf -vif
 %configure --enable-pam-module-dir=%{_libdir}/security \
            --enable-opaque-hierarchy="name=systemd" \
