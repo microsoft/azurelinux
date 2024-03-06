@@ -403,7 +403,7 @@ func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
 	newEdge := g.NewEdge(from, to)
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to add edge: (%s) -> (%s):\n%s", from.SrpmPath, to.SrpmPath, r)
+			err = fmt.Errorf("failed to add edge: (%s) -> (%s):\n%v", from.SrpmPath, to.SrpmPath, r)
 		}
 	}()
 	g.SetEdge(newEdge)
@@ -442,7 +442,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 	defer func() {
 		// graph manipulation calls may panic on error (such as duplicate node IDs)
 		if r := recover(); r != nil {
-			err = fmt.Errorf("failed to collapse nodes (%v) into (%s):\n%s", nodesToCollapse, versionedPkg, r)
+			err = fmt.Errorf("failed to collapse nodes (%v) into (%s):\n%v", nodesToCollapse, versionedPkg, r)
 		}
 
 		if err != nil {
@@ -454,7 +454,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 			for _, node := range nodesToCollapse {
 				lookupErr := g.addToLookup(node, false)
 				if lookupErr != nil {
-					err = fmt.Errorf("%w\nfailed to add node (%s) back to lookup table:\nlookupErr:\n%w", err, node.FriendlyName(), lookupErr)
+					err = fmt.Errorf("%w\nlookup error: failed to add node (%s) back to lookup table:\n%w", err, node.FriendlyName(), lookupErr)
 				}
 			}
 		}
@@ -1053,8 +1053,7 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 			for _, n := range to {
 				toNames = fmt.Sprintf("%s %s", toNames, n.FriendlyName())
 			}
-			err := fmt.Errorf("failed to add meta node from (%s) to (%s)", fromNames, toNames)
-			logger.Log.Panicf("Adding meta node failed:\n%v\n%v", err, r)
+			logger.Log.Panicf("Failed to add meta node from (%s) to (%s):\n%v", fromNames, toNames, r)
 		}
 	}()
 
@@ -1729,7 +1728,7 @@ func (g *PkgGraph) removePkgNodeFromLookup(pkgNode *PkgNode) {
 func (g *PkgGraph) safeAddNode(pkgNode *PkgNode) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("adding the (%v) node failed:\n%s", pkgNode, r)
+			err = fmt.Errorf("adding the (%v) node failed:\n%v", pkgNode, r)
 		}
 	}()
 
