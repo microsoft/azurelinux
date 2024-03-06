@@ -94,12 +94,6 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
 
-# install tests
-install -d ${RPM_BUILD_ROOT}/tests/gunit
-install -d ${RPM_BUILD_ROOT}/tests/gunit/.libs
-install tests/gunit/gtest ${RPM_BUILD_ROOT}/tests/gunit
-install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
-
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}/cgconfig.d
