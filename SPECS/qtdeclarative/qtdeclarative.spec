@@ -18,8 +18,6 @@ Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtdec
 # filter qml provides
 %global __provides_exclude_from ^%{_qt_archdatadir}/qml/.*\\.so$
 
-%global examples 1
-
 BuildRequires: gcc
 # qt macros
 BuildRequires: qtbase-devel >= %{version}
