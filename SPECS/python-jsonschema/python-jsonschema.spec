@@ -18,6 +18,7 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 Summary:        An implementation of JSON Schema validation for Python
 BuildRequires:  python3-devel
 BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-fancy-pypi-readme
 BuildRequires:  python3-hatch-vcs
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pathspec
