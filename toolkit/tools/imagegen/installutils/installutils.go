@@ -96,6 +96,10 @@ func GetRequiredPackagesForInstall() []*pkgjson.PackageVer {
 		packageList = append(packageList, &pkgjson.PackageVer{Name: "grub2-pc"})
 	}
 
+	packageList = append(packageList, &pkgjson.PackageVer{Name: "systemd"})
+	packageList = append(packageList, &pkgjson.PackageVer{Name: "systemd-udev"})
+	packageList = append(packageList, &pkgjson.PackageVer{Name: "systemd-rpm-macros"})
+
 	return packageList
 }
 
