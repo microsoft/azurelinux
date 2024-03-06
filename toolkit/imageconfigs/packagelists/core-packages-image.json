@@ -1,6 +1,7 @@
 {
     "packages": [
         "shim",
+        "dracut=059-12.azl3",
         "grub2-efi-binary",
         "grub2",
         "ca-certificates",
