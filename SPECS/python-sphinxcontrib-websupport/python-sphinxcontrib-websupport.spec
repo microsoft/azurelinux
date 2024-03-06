@@ -33,7 +33,7 @@ Requires:       python3-sphinxcontrib-serializinghtml
 %description -n python3-%{pypi_name}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
 
-%pyproject_extras_subpkg -n python3-%{pkgname} whoosh
+%pyproject_extras_subpkg -n python3-%{pypi_name} whoosh
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p 1
@@ -55,6 +55,9 @@ pip3 install tox tox-current-env pytest
 %doc README.rst
 
 %changelog
+* Mon Mar 06 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-2
+- Fix bug in macro usage
+
 * Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-1
 - Auto-upgrade to 1.2.7 - 3.0 - Upgrade
 - Use pypi macros
