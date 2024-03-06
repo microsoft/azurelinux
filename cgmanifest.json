@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cmake",
-          "version": "3.21.4",
-          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4.tar.gz"
+          "version": "3.28.2",
+          "downloadUrl": "https://github.com/Kitware/CMake/releases/download/v3.28.2/cmake-3.28.2.tar.gz"
         }
       }
     },
@@ -21783,8 +21783,8 @@
         "type": "other",
         "other": {
           "name": "python-certifi",
-          "version": "2023.05.07",
-          "downloadUrl": "https://github.com/certifi/python-certifi/archive/2023.05.07/python-certifi-2023.05.07.tar.gz"
+          "version": "2024.02.02",
+          "downloadUrl": "https://github.com/certifi/python-certifi/archive/2024.02.02/python-certifi-2024.02.02.tar.gz"
         }
       }
     },
@@ -23305,6 +23305,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pip",
+          "version": "24.0",
+          "downloadUrl": "https://github.com/pypa/pip/archive/24.0/pip-24.0.tar.gz"
         }
       }
     },
