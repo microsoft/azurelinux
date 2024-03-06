@@ -470,6 +470,7 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
+# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
