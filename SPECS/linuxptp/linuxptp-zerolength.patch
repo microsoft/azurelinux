@@ -1,0 +1,37 @@
+commit 9633ab52460f58c92c6daa35e9d24e4ce9c5ab1c
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Tue Feb 23 11:01:43 2021 +0100
+
+    sk: Don't return error for zero-length messages.
+    
+    The recvmsg() call can return zero for a zero-length UDP message, which
+    should be handled as a bad message and not a fault of the port. This was
+    addressed in commit 6b61ba29c78e ("Avoid fault when receiving zero
+    length packets"), but later regressed in commit a6e0b83bd503
+    ("sk: Convey transmit path errors to the caller.").
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Fixes: a6e0b83bd503 ("sk: Convey transmit path errors to the caller.")
+
+diff --git a/sk.c b/sk.c
+index c9ef4d2..8be0708 100644
+--- a/sk.c
++++ b/sk.c
+@@ -391,7 +391,7 @@ int sk_receive(int fd, void *buf, int buflen,
+ 
+ 	if (!ts) {
+ 		memset(&hwts->ts, 0, sizeof(hwts->ts));
+-		return cnt < 1 ? -errno : cnt;
++		return cnt < 0 ? -errno : cnt;
+ 	}
+ 
+ 	switch (hwts->type) {
+@@ -407,7 +407,7 @@ int sk_receive(int fd, void *buf, int buflen,
+ 		hwts->ts = timespec_to_tmv(ts[1]);
+ 		break;
+ 	}
+-	return cnt < 1 ? -errno : cnt;
++	return cnt < 0 ? -errno : cnt;
+ }
+ 
+ int sk_set_priority(int fd, int family, uint8_t dscp)
