@@ -12,11 +12,3 @@ if [ -L /srv ]; then
 else
   echo "/srv symlink does not exist"
 fi
-
-# cleanup any logs that may have been created during the build
-if [ -d /var/log ]; then
-  echo "Clearing /var/log"
-  rm -rf /var/log/*
-else
-  echo "/var/log does not exist"
-fi
