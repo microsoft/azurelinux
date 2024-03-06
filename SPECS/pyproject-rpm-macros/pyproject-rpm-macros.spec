@@ -69,7 +69,7 @@ BuildRequires:  python3dist(wheel)
 #BuildRequires:  (python3dist(tomli) if python3 < 3.11)
 %endif
 
-# We build on top of those:
+# We build on top of those: (all 3 of the following provided by "azurelinux-rpm-macros")
 BuildRequires:  python-rpm-macros
 BuildRequires:  python-srpm-macros
 BuildRequires:  python3-rpm-macros

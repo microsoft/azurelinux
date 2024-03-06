@@ -13,16 +13,16 @@ Url:            https://src.fedoraproject.org/python-rpm-generators
 # Originally the following files were part of RPM, so the license is inherited: GPL-2.0-or-later
 # The COPYING file is grabbed from the last commit that changed the files
 Source0:        https://raw.githubusercontent.com/rpm-software-management/rpm/102eab50b3d0d6546dfe082eac0ade21e6b3dbf1/COPYING
-Source1:        python.attr
-Source2:        pythondist.attr
+Source1:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/python.attr
+Source2:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythondist.attr
 # This was crafted in-place as a fork of python.attr, hence also GPL-2.0-or-later
-Source3:        pythonname.attr
+Source3:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythonname.attr
 # This one is also originally from RPM, but it has its own license declaration: LGPL-2.1-or-later
-Source4:        pythondistdeps.py
+Source4:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythondistdeps.py
 # This was crafted in-place with the following license declaration:
 #  LicenseRef-Fedora-Public-Domain OR CC0-1.0 OR LGPL-2.1-or-later OR GPL-2.0-or-later
 # Note that CC0-1.0 is not allowed for code in Fedora, so we skip it in the package License tag
-Source5:        pythonbundles.py
+Source5:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythonbundles.py
 
 BuildArch:      noarch
 
