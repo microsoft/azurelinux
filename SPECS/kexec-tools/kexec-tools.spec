@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.27
-Release:        4%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -331,9 +331,6 @@ done
 /usr/share/makedumpfile/
 
 %changelog
-* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 2.0.27-4
-- Rename initrd.img-<kver> to initramfs-<kver>.img
-
 * Fri Jan 19 2024 Elaheh Dehghani <edehghani@microsoft.com> - 2.0.27-3
 - Upgrade makedumpfile to 1.7.4 - Azure Linux 3.0 - package upgrades
 

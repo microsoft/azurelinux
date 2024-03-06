@@ -1,7 +1,7 @@
 Summary:        initramfs
 Name:           initramfs
 Version:        3.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        Apache License
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,13 +45,13 @@ install -d -m755 %{buildroot}%{_localstatedir}/lib/initramfs/kernel
 # will be left over for the new initramfs rpm, since triggerin/un
 # in the new rpm will execute after the postun in the old rpm
 #
-# The order of the scriptlet is critical. The heavy lifting dracut is
+# The order of the scriptlet is critical. The heavy lifting mkinitrd is
 # always done post transaction, as it's always invoked in posttrans/
 # transfiletriggerin/transfiletriggerpostun. Whereas the creation of flag
 # is in the middle of transaction.
 #
 # The kernel rpm has triggers for initramfs. This is an optimization, as
-# we don't want dracut be invoked for all the kernels if some of the kernel
+# we don't want mkinitrd be invoked for all the kernels if some of the kernel
 # rpms is being installed/upgraded/uninstalled. Hence, there is no trigger
 # in initramfs watching for linux, but there is file transaction trigger
 # watching for /lib/modules. The triggerin in linux.rpm will create flag as
@@ -67,15 +67,31 @@ mkdir -p %{_localstatedir}/lib/rpm-state/initramfs \
 touch %{_localstatedir}/lib/rpm-state/initramfs/regenerate \
 echo "initramfs (re)generation" %* >&2
 
+# kdump currently uses the host system's initrd when enrolling a crash kernel
+# and initrd. There is a limitation where the kdump initrd must be generated
+# with dracut in "host-only" mode.
+#
+# The -k option forces "host-only" initrd build for the specified kernel version.
+# The -q option suppresses verbose output
+#
+# If mkinitrd is called without <image> and <kernel-version> parameters, it will
+# default to invoking dracut in "host-mode" mode on every kernel version it can
+# find in /boot.
+#
+# If mkinitrd is called with <image> and <kernel-version> parameters, it will
+# default to invoking dracut in "generic host" mode to create an initrd.
+#
+# So in order to be compatible with kdump, we need to make sure to add the -k
+# option when invoking mkinitrd with an explicit <image> and <kernel version>
 %define file_trigger_action() \
 cat > /dev/null \
 if [ -f %{_localstatedir}/lib/rpm-state/initramfs/regenerate ]; then \
     echo "(re)generate initramfs for all kernels," %* >&2 \
-    dracut --quiet --force --regenerate-all \
+    mkinitrd -q \
 elif [ -d %{_localstatedir}/lib/rpm-state/initramfs/pending ]; then \
     for k in `ls %{_localstatedir}/lib/rpm-state/initramfs/pending/`; do \
         echo "(re)generate initramfs for $k," %* >&2 \
-        dracut --quiet --force --fstab --kver $k \
+        mkinitrd -q /boot/initrd.img-$k $k -k \
     done; \
 fi \
 %grub2_post
@@ -84,7 +100,7 @@ fi \
 %posttrans
 echo "initramfs" %{version}-%{release} "posttrans" >&2
 %removal_action
-dracut --quiet --force --regenerate-all
+mkinitrd -q
 %grub2_post
 
 %postun
@@ -114,10 +130,6 @@ echo "initramfs" %{version}-%{release} "postun" >&2
 %dir %{_localstatedir}/lib/initramfs/kernel
 
 %changelog
-* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 3.0-2
-- Call dracut instead of mkinitrd
-- Rename initrd.img-<kver> to initramfs-<kver>.img
-
 * Mon Feb 26 2024 Sean Dougherty <sdougherty@microsoft.com> - 3.0-1
 - Version bump for Azure Linux 3.0
 

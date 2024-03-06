@@ -31,7 +31,7 @@ for i in /boot/vmlinuz*mshv*; do
     if grub_file_is_not_garbage "$i" ; then list="$list $i" ; fi
 done;
 initrd_list=
-for i in /boot/initramfs-*mshv*.img; do
+for i in /boot/initrd.img*mshv*; do
     if grub_file_is_not_garbage "$i" ; then initrd_list="$initrd_list $i" ; fi
 done;
 

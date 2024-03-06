@@ -797,12 +797,11 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 		const (
 			libModDir     = "/lib/modules"
 			dracutModules = "dm crypt crypt-gpg crypt-loop lvm"
-			initrdPrefix  = "/boot/initramfs-"
-			initrdSuffix  = ".img"
+			initrdPrefix  = "/boot/initrd.img-"
 			cryptTabPath  = "/etc/crypttab"
 		)
 
-		initrdPattern := fmt.Sprintf("%v*%v", initrdPrefix, initrdSuffix)
+		initrdPattern := fmt.Sprintf("%v%v", initrdPrefix, "*")
 		initrdImageSlice, err := filepath.Glob(initrdPattern)
 		if err != nil {
 			logger.Log.Warnf("Unable to get initrd image: %v", err)
@@ -821,7 +820,6 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 
 		// Get the kernel version
 		kernel := strings.TrimPrefix(initrdImage, initrdPrefix)
-		kernel = strings.TrimSuffix(kernel, initrdSuffix)
 
 		// Construct list of files to install in initramfs
 		installFiles := fmt.Sprintf("%v %v", cryptTabPath, diskutils.DefaultKeyFilePath)

@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.14.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -312,7 +312,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initramfs-%{uname_r}.img
+rm -rf /boot/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %preun tools
@@ -416,10 +416,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
-- Call dracut instead of mkinitrd
-- Rename initrd.img-<kver> to initramfs-<kver>.img
-
 * Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
 - Remove legacy /boot/mariner.cfg
 - Introduce /etc/default/grub.d/10_kernel.cfg

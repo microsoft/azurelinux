@@ -120,7 +120,7 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 # Add kernel-mshv-specific boot configurations to /etc/default/grub.d
 # This configuration contains additional boot parameters required in our
-# Linux-Dom0-based images. 
+# Linux-Dom0-based images.
 install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 
@@ -181,7 +181,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/efi/initramfs-%{uname_r}.img
+rm -rf /boot/efi/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
@@ -244,7 +244,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 - Introduce 50_mariner_mshv_menuentry, which implements
     the custom boot path when running over MSHV.
 - Check for required mshv components in 50_mariner_mshv.cfg before
-    defaulting to kernel-mshv boot. 
+    defaulting to kernel-mshv boot.
 
 * Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
 - Add patch for perf_bpf_test_add_nonnull_argument
@@ -254,21 +254,21 @@ echo "initrd of kernel %{uname_r} removed" >&2
 - Update to v5.15.126.mshv3
 
 * Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
-- Enable grub2-mkconfig-based boot path by installing 
-    50_mariner_mshv.cfg 
-- Call grub2-mkconfig to regenerate configs only if the user has 
-    previously used grub2-mkconfig for boot configuration. 
+- Enable grub2-mkconfig-based boot path by installing
+    50_mariner_mshv.cfg
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
 
 * Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
 - Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
     systemd.cfg which is packaged in systemd
 
 * Tue May 30 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-3
-- Align mariner_cmdline_mshv with the working configuration from 
+- Align mariner_cmdline_mshv with the working configuration from
     old loader's linuxloader.conf
 
 * Wed May 24 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-2
-- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader. 
+- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader.
 - Can be reverted once the kernel patch is upstreamed.
 - Introduce mariner-mshv.cfg symlink to improve grub menuentry
 
