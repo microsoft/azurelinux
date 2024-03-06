@@ -1,0 +1,7 @@
+steps to build local vhdx
+
+sudo make clean
+./scripts/setuplkgtoolchain.sh
+sudo make toolchain -j12 REBUILD_TOOLCHAIN=n REBUILD_TOOLS=y DAILY_BUILD_ID=3-0-20240305
+time sudo make build-packages DAILY_BUILD_ID=3-0-20240305 REBUILD_TOOLS=y SRPM_PACK_LIST="dracut"
+time sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y SRPM_PACK_LIST="" DAILY_BUILD_ID=3-0-20240305 REBUILD_PACKAGES=n
