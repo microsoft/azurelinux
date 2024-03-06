@@ -120,39 +120,6 @@ sudo:x:27:
 wheel:x:28:
 EOF
 #
-#   Creating Proxy Configuration"
-#
-cat > %{buildroot}/etc/sysconfig/proxy <<- "EOF"
-# Enable a generation of the proxy settings to the profile.
-# This setting allows to turn the proxy on and off while
-# preserving the particular proxy setup.
-#
-PROXY_ENABLED="no"
-
-# Some programs (e.g. wget) support proxies, if set in
-# the environment.
-# Example: HTTP_PROXY="http://proxy.provider.de:3128/"
-HTTP_PROXY=""
-
-# Example: HTTPS_PROXY="https://proxy.provider.de:3128/"
-HTTPS_PROXY=""
-
-# Example: FTP_PROXY="http://proxy.provider.de:3128/"
-FTP_PROXY=""
-
-# Example: GOPHER_PROXY="http://proxy.provider.de:3128/"
-GOPHER_PROXY=""
-
-# Example: SOCKS_PROXY="socks://proxy.example.com:8080"
-SOCKS_PROXY=""
-
-# Example: SOCKS5_SERVER="office-proxy.example.com:8881"
-SOCKS5_SERVER=""
-
-# Example: NO_PROXY="www.me.de, do.main, localhost"
-NO_PROXY="localhost, 127.0.0.1"
-EOF
-#
 #	7.3. Customizing the /etc/hosts File"
 #
 cat > %{buildroot}/etc/hosts <<- "EOF"
@@ -273,74 +240,6 @@ unset script RED GREEN NORMAL
 # End /etc/profile
 EOF
 #
-#   The Proxy Bash Shell Startup File
-#
-cat > %{buildroot}/etc/profile.d/proxy.sh <<- "EOF"
-#
-# proxy.sh:              Set proxy environment
-#
-
-sys=/etc/sysconfig/proxy
-test -s $sys || exit 0
-while read line ; do
-    case "$line" in
-    \#*|"") continue ;;
-    esac
-    eval val=${line#*=}
-    case "$line" in
-    PROXY_ENABLED=*)
-        PROXY_ENABLED="${val}"
-        ;;
-    HTTP_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        http_proxy="${val}"
-        export http_proxy
-        ;;
-    HTTPS_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        https_proxy="${val}"
-        export https_proxy
-        ;;
-    FTP_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        ftp_proxy="${val}"
-        export ftp_proxy
-        ;;
-    GOPHER_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        gopher_proxy="${val}"
-        export gopher_proxy
-        ;;
-    SOCKS_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        socks_proxy="${val}"
-        export socks_proxy
-        SOCKS_PROXY="${val}"
-        export SOCKS_PROXY
-        ;;
-    SOCKS5_SERVER=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        SOCKS5_SERVER="${val}"
-        export SOCKS5_SERVER
-        ;;
-    NO_PROXY=*)
-        test "$PROXY_ENABLED" = "yes" || continue
-        no_proxy="${val}"
-        export no_proxy
-        NO_PROXY="${val}"
-        export NO_PROXY
-    esac
-done < $sys
-unset sys line val
-
-if test "$PROXY_ENABLED" != "yes" ; then
-    unset http_proxy https_proxy ftp_proxy gopher_proxy no_proxy NO_PROXY socks_proxy SOCKS_PROXY SOCKS5_SERVER
-fi
-unset PROXY_ENABLED
-#
-# end of proxy.sh
-EOF
-#
 #	7.14. Creating the /etc/inputrc File
 #
 cat > %{buildroot}/etc/inputrc <<- "EOF"
@@ -456,9 +355,7 @@ return 0
 %dir /etc/sysconfig
 %config(noreplace) /etc/sysconfig/clock
 %config(noreplace) /etc/sysconfig/console
-%config(noreplace) /etc/sysconfig/proxy
 %dir /etc/profile.d
-%config(noreplace) /etc/profile.d/proxy.sh
 #	media filesystem
 %dir /run/media/cdrom
 %dir /run/media/floppy
@@ -560,6 +457,7 @@ return 0
 - move /etc/modprobe.d into kmod package
 - move /etc/mtab from filesystem to util-linux package
 - move /var/log/* files from filesystem to systemd package
+- remove opensuse-style 'proxy' config file
 
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts
