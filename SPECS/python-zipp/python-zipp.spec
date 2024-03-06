@@ -8,7 +8,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jaraco/zipp
-Source0:        https://files.pythonhosted.org/packages/source/z/zipp/zipp-%{version}.tar.gz
+Source0:        %{pypi_source}
 
 BuildArch:      noarch
 
@@ -63,7 +63,6 @@ rm -rf .pyproject-builddir
 %changelog
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.17.0-2
 - Add BR for python-setuptools_scm
-- Fix Source0 URL
 
 * Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.17.0-1
 - Upgrade to 3.17.0

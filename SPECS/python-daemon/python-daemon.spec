@@ -10,8 +10,6 @@ URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-%define _python_dist_allow_version_zero 1
-
 %description
 This library implements the well-behaved daemon specification of PEP 3143, “Standard daemon process library”.
 
@@ -38,7 +36,6 @@ use the instance as a context manager to enter a daemon state.
 
 %prep
 %autosetup
-sed -i 's/distclass=version.ChangelogAwareDistribution,/ /g' setup.py
 
 %build
 %py3_build
@@ -56,7 +53,7 @@ pip3 install mock testscenarios testtools
 
 %changelog
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-7
-- Set _python_dist_allow_version_zero
+- Remove change to ChangelogAwareDistribution in setup.py
 
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
 - Replace easy_install usage with pip in %%check sections

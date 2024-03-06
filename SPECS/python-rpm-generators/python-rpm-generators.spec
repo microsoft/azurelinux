@@ -32,8 +32,7 @@ BuildArch:      noarch
 %package -n python3-rpm-generators
 Summary:        %{summary}
 Requires:       python3-packaging
-# We have parametric macro generators, we need RPM 4.16 (4.15.90+ is 4.16 alpha)
-Requires:       rpm > 4.15.90-0
+Requires:       rpm
 # This contains the Lua functions we use. (Provided by azurelinux-rpm-macros)
 Requires:       python-srpm-macros
 

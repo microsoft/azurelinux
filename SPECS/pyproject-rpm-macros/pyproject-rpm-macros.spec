@@ -1,15 +1,6 @@
 Summary:        RPM macros for PEP 517 Python packages
 Name:           pyproject-rpm-macros
 
-%if 0%{?with_check}
-%bcond tests 1
-%else
-%bcond tests 0
-%endif
-# pytest-xdist and tox are not desired in RHEL
-#%%bcond pytest_xdist %%{undefined rhel}
-#%%bcond tox_tests %%{undefined rhel}
-
 # The idea is to follow the spirit of semver
 # Given version X.Y.Z:
 #   Increment X and reset Y.Z when there is a *major* incompatibility
@@ -53,20 +44,13 @@ Source303:      test_RECORD
 Source901:      README.md
 Source902:      LICENSE
 
-%if %{with tests}
+%if 0%{?with_check}
 BuildRequires:  python3dist(pytest)
-%if %{with pytest_xdist}
-BuildRequires:  python3dist(pytest-xdist)
-%endif
 BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(packaging)
 BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(setuptools)
-%if %{with tox_tests}
-BuildRequires:  python3dist(tox-current-env) >= 0.0.6
-%endif
 BuildRequires:  python3dist(wheel)
-#BuildRequires:  (python3dist(tomli) if python3 < 3.11)
 %endif
 
 # We build on top of those: (all 3 of the following provided by "azurelinux-rpm-macros")
@@ -84,11 +68,8 @@ Requires:       pyproject-srpm-macros = %{version}-%{release}
 Requires:       findutils
 Requires:       sed
 
-# This package requires the %%generate_buildrequires functionality.
-# It has been introduced in RPM 4.15 (4.14.90 is the alpha of 4.15).
-# What we need is rpmlib(DynamicBuildRequires), but that is impossible to (Build)Require.
-Requires:       rpm-build >= 4.14.90
-BuildRequires:  rpm-build >= 4.14.90
+BuildRequires:  rpm-build
+Requires:       rpm-build
 
 %description
 These macros allow projects that follow the Python packaging specifications
@@ -123,9 +104,6 @@ takes precedence.
 %setup -c -T
 cp -p %{sources} .
 
-%generate_buildrequires
-# nothing to do, this is here just to assert we have that functionality
-
 %build
 # nothing to do, sources are not buildable
 
@@ -150,9 +128,9 @@ test "$signature1" == "$signature2"
 # but also assert we are not comparing empty strings
 test "$signature1" != ""
 
-%if %{with tests}
+%if 0%{?with_check}
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
-%pytest -vv --doctest-modules %{?with_pytest_xdist:-n auto} %{!?with_tox_tests:-k "not tox"}
+%pytest -vv --doctest-modules -k "not tox"
 
 # brp-compress is provided as an argument to get the right directory macro expansion
 %{python3} compare_mandata.py -f %{_rpmconfigdir}/brp-compress
