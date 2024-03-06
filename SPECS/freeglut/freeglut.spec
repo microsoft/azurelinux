@@ -89,7 +89,7 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %{_libdir}/cmake/FreeGLUT/*
 
 %changelog
-* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 9.0.3-1
+* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 3.4.0-1
 - Promote and upgrade to 3.4.0 based on Fedora 40.
 - License verified.
 
