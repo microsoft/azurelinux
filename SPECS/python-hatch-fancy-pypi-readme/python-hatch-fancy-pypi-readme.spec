@@ -9,10 +9,12 @@ Source0:        %{pypi_source hatch_fancy_pypi_readme}#/%{name}-%{version}.tar.g
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+BuildRequires:  python3-hatchling
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-toml
 BuildRequires:  python3-wheel
 
 %global common_description %{expand:
