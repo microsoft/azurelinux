@@ -2,7 +2,7 @@
 Summary:        Manage "libnvdimm" subsystem devices (Non-volatile Memory)
 Name:           ndctl
 Version:        78
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2
 Group:          System Environment/Base
 Url:            https://github.com/pmem/ndctl
@@ -22,6 +22,7 @@ BuildRequires:  bash-completion-devel
 BuildRequires:  keyutils-devel
 BuildRequires:	meson
 BuildRequires:	iniparser-devel
+BuildRequires:  systemd
 
 %define asciidoctor -Dasciidoctor=disabled
 %define libtracefs -Dlibtracefs=disabled
@@ -202,6 +203,8 @@ libcxl is a library for enumerating and communicating with CXL devices.
 %{_mandir}/man3/libcxl.3*
 
 %changelog
+*   Tue Mar 05 2024 Saul Paredes <saulparedes@microsoft.com> - 78-2
+-   Update build requirements and fix build issue
 *   Wed Jan 31 2024 Saul Paredes <saulparedes@microsoft.com> - 78-1
 -   Update to 78
 *   Mon Apr 11 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 65-3
