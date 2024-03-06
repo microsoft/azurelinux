@@ -447,7 +447,6 @@ chroot_and_install_rpms libxcrypt
 build_rpm_in_chroot_no_install python3
 chroot_and_install_rpms python3 python3
 
-
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
@@ -651,6 +650,9 @@ chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 # python-packaging requires pyproject-rpm-macros
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging
+
+build_rpm_in_chroot_no_install python-wheel
+build_rpm_in_chroot_no_install python-flit-core
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed

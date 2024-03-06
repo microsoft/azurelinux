@@ -34,8 +34,8 @@ Summary:        %{summary}
 #Requires:       python3-packaging
 # We have parametric macro generators, we need RPM 4.16 (4.15.90+ is 4.16 alpha)
 Requires:       rpm > 4.15.90-0
-# This contains the Lua functions we use:
-Requires:       python-srpm-macros >= 3.10-15
+# This contains the Lua functions we use. (Provided by azurelinux-rpm-macros)
+Requires:       python-srpm-macros
 
 %description -n python3-rpm-generators
 %{summary}.
