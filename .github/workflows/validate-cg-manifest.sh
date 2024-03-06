@@ -46,6 +46,7 @@ ignore_no_source_tarball=" \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \
+  python-rpm-generators \
   qt5-rpm-macros \
   sgx-backwards-compatability \
   verity-read-only-root \

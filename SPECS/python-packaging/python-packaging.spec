@@ -12,7 +12,7 @@ Source0:        https://github.com/pypa/packaging/archive/refs/tags/%{version}.t
 BuildArch:      noarch
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
-BuildRequires:  python3-flit-core
+#BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 %if 0%{?with_check}
 BuildRequires:  curl-devel

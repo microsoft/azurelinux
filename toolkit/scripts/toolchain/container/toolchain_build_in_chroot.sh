@@ -974,7 +974,7 @@ sed -iE '/Always build/,+16 d' Makefile.am
         --enable-ndb \
         --without-selinux \
         --with-crypto=openssl \
-        --with-vendor=mariner
+        --with-vendor=azl
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
@@ -983,12 +983,6 @@ rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
 
 rm -rf "$RPM_FOLDER"
-
-# Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' pythondistdeps.py
-install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
-install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
-install -p python.attr /usr/lib/rpm/fileattrs/python.attr
 
 touch /logs/status_rpm_complete
 
