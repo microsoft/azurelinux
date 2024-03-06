@@ -1,5 +1,8 @@
 {
  "Signatures": {
+  "azl-eula": "0ced44f6b796bc879424b4cb790d706e6b3e38e414ae8b7be3c146ddc7a00a5e",
+  "azl-logo.png": "fdba4af22cf93cdfef3c86e4641c08f3a2245832c14d742e68b2be983f404cab",
+  "azl-welcome.png": "58d6fd0b633d01482e8072dc4d8ec376ab11c2897cf0b4a65feb7d53e8e89c4a",
   "branding.desc": "e9e3f464f92d944bcda1bc2fb8c565ee166ed98c82930d26facbd6634b5a0605",
   "calamares-3.3.1.tar.gz": "c5a6dd7d2fb7dc5d8a863f37f6f64782b88f79e341f7bf8504eb98dc31f714ef",
   "calamares-auto_de.ts": "4a24d817979a83c3f08c163b05f5a4f34a992c1f798a12f3a6b50cde75a852d8",
@@ -11,9 +14,6 @@
   "calamares-users-3.0.1.tar.gz": "0da9e01feb26be2567e2df40cbd5ecb0ecab2d688bb8e7ef64bb498280f112c0",
   "calamares-welcome-3.0.1.tar.gz": "2a6c6c1cca6600f51515093d0d4e6e1b025a1fe341d886dc948fadd4c1ebd280",
   "license.conf": "47b82c94103300158821d6f519da994656cc79dfb7456ed056da4c8b41be279e",
-  "azl-eula": "0ced44f6b796bc879424b4cb790d706e6b3e38e414ae8b7be3c146ddc7a00a5e",
-  "azl-logo.png": "fdba4af22cf93cdfef3c86e4641c08f3a2245832c14d742e68b2be983f404cab",
-  "azl-welcome.png": "58d6fd0b633d01482e8072dc4d8ec376ab11c2897cf0b4a65feb7d53e8e89c4a",
   "settings.conf": "bb033dc3dffbb31007b098445779a2b479f35ebd0f69e5f8e1f9edd7a9cca234",
   "show.qml": "2fbf20110c6385749ff836a93cddcbcd6e6f111fe4063f086a29892b588e99b5",
   "stylesheet.qss": "9707878d63c9591fd83096d1650ada773bf5e85797fd3fbfc19555ef39ffa30a"
