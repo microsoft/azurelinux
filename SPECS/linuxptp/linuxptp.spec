@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _hardened_build 1
 %global testsuite_ver ff37e2
 %global clknetsim_ver 9ed48d
@@ -45,15 +45,15 @@ Supporting legacy APIs and other platforms is not a goal.
 
 %prep
 %setup -q -a 10 -a 11 -n %{name}-%{!?gitfullver:%{version}}%{?gitfullver}
-%patch0 -p1 -b .zerolength
+%patch 0 -p1 -b .zerolength
 mv linuxptp-testsuite-%{testsuite_ver}* testsuite
 mv clknetsim-%{clknetsim_ver}* testsuite/clknetsim
 
 pushd testsuite/clknetsim
-%patch1 -p1 -R -b .phc2sys
+%patch 1 -p1 -R -b .phc2sys
 popd
 
-%patch2 -p1 -b .pre-ha
+%patch 2 -p1 -b .pre-ha
 
 %build
 %{make_build} \
