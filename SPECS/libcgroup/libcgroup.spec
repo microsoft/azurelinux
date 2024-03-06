@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
 Version:        3.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,17 +74,6 @@ It provides API to create/delete and modify cgroup nodes. It will also in the
 future allow creation of persistent configuration for control groups and
 provide scripts to manage that configuration.
 
-# libcgroup unit test (tests/gunit - make check) must be performed from a CBL-Mariner container
-# to avoid jeopardizing cgroup of the host (/proc/mounts)
-%package tests
-Summary: libcgroup's tests
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: gcc
-Requires: gtest
-
-%description tests
-Provides tests (tests/gunit) that can be used to validate libcgroup.
-
 %prep
 %autosetup -p1 -n %{name}
 
@@ -101,10 +90,6 @@ autoreconf -vif
 export CXXFLAGS="$CXXFLAGS -std=c++14"
 
 make %{?_smp_mflags}
-
-# build test
-cd tests/gunit
-make check
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
@@ -134,6 +119,10 @@ rm -f %{_mandir}/man5/cgred.conf.5*
 rm -f %{_mandir}/man5/cgrules.conf.5*
 rm -f %{_mandir}/man8/cgrulesengd.8*
 popd
+	
+%check
+export CXXFLAGS="$CXXFLAGS -std=c++14"
+make -C tests/gunit check
 
 %pre
 getent group cgred >/dev/null || groupadd -r cgred
@@ -189,13 +178,11 @@ getent group cgred >/dev/null || groupadd -r cgred
 %{_libdir}/libcgroup.so
 %{_libdir}/pkgconfig/libcgroup.pc
 
-%files tests
-%license COPYING
-%doc README
-/tests/gunit/gtest
-/tests/gunit/.libs/lt-gtest
-
 %changelog
+* Wed Mar 06 2024 Henry Li <lihl@microsoft.com> - 3.1.0-3
+- Remove libcgroup-tests subpackage
+- Force c++ 14 standard when running package tests
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.0-2
 - Fix build by forcing C++ 14 standard
 
