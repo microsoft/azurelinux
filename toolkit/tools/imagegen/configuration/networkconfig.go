@@ -268,7 +268,7 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 		if err != nil {
 			cleanupErr := os.Remove(networkFilePath)
 			if cleanupErr != nil {
-				err = fmt.Errorf("failed to clean up network file (%s):\n%w\n%w", networkFilePath, cleanupErr, err)
+				err = fmt.Errorf("%w\ncleanup-error: failed to clean up network file (%s):\n%w", err, networkFilePath, cleanupErr)
 			}
 		}
 	}()
