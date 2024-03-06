@@ -442,8 +442,6 @@ chroot_and_install_rpms python3 python3
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
 
-build_rpm_in_chroot_no_install python-pip
-
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
@@ -650,6 +648,7 @@ chroot_and_install_rpms rpm rpm-build
 
 build_rpm_in_chroot_no_install python-wheel
 build_rpm_in_chroot_no_install python-flit-core
+build_rpm_in_chroot_no_install python-pip
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
