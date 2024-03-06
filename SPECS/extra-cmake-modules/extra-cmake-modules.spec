@@ -14,10 +14,6 @@ URL:          https://github.com/KDE/extra-cmake-modules
 Source0:   https://invent.kde.org/frameworks/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
-# bundle clang python bindings here, at least until they are properly packaged elsewhere, see:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1490997
-#Source1: clang-python-4.0.1.tar.gz
-
 BuildRequires: kf-rpm-macros
 BuildRequires: qttools-devel
 BuildRequires: qtbase-devel
@@ -32,8 +28,6 @@ Additional modules for CMake build system needed by KDE Frameworks.
 %prep
 # Setup Source0
 %autosetup -n %{name}-v%{version} -p1
-# Setup Source1
-#%setup -q -T -D -a 1
 
 %build
 %cmake_kf \
@@ -45,12 +39,7 @@ Additional modules for CMake build system needed by KDE Frameworks.
 %install
 %cmake_install
 
-# hack clang-python install
-#mkdir -p %{buildroot}%{_datadir}/ECM/python/clang
-#install -m644 -p python/clang/* %{buildroot}%{_datadir}/ECM/python/clang/
-
 %check
-#export PYTHONPATH=`pwd`/python
 export CTEST_OUTPUT_ON_FAILURE=1
 make test ARGS="--output-on-failure --timeout 300" -C %{_vpath_builddir} ||:
 

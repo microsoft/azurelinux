@@ -91,12 +91,6 @@ Patch8: tell-the-truth-about-private-api.patch
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch50: qtbase-QT_VERSION_CHECK.patch
 
-# 1. Workaround moc/multilib issues
-# https://bugzilla.redhat.com/show_bug.cgi?id=1290020
-# https://bugreports.qt.io/browse/QTBUG-49972
-# 2. Workaround sysmacros.h (pre)defining major/minor a breaking stuff
-Patch52: qtbase-moc-macros.patch
-
 # drop -O3 and make -O2 by default
 Patch61: qtbase-cxxflag.patch
 
@@ -182,10 +176,9 @@ Qt libraries used for drawing widgets and OpenGL items.
 %prep
 %autosetup -n %{qt_module}-everywhere-src-%{version} -p1
 
-# move some bundled libs to ensure they're not accidentally used
+# delete some unused libs
 pushd src/3rdparty
-mkdir UNUSED
-mv harfbuzz-ng freetype libjpeg libpng zlib UNUSED/
+rm -rf harfbuzz-ng freetype libjpeg libpng zlib
 popd
 
 # builds failing mysteriously on f20
@@ -459,20 +452,20 @@ fi
 %{_libdir}/qt6/bin/qmake-qt5
 %{_libdir}/qt6/libexec/ensure_pro_file.cmake
 %{_libdir}/qt6/libexec/qt-cmake-private-install.cmake
-/usr/modules/Concurrent.json
-/usr/modules/Core.json
-/usr/modules/DBus.json
-/usr/modules/DeviceDiscoverySupportPrivate.json
-/usr/modules/ExampleIconsPrivate.json
-/usr/modules/FbSupportPrivate.json
-/usr/modules/Gui.json
-/usr/modules/InputSupportPrivate.json
-/usr/modules/Network.json
-/usr/modules/PrintSupport.json
-/usr/modules/Sql.json
-/usr/modules/Test.json
-/usr/modules/Widgets.json
-/usr/modules/Xml.json
+%{_prefix}/modules/Concurrent.json
+%{_prefix}/modules/Core.json
+%{_prefix}/modules/DBus.json
+%{_prefix}/modules/DeviceDiscoverySupportPrivate.json
+%{_prefix}/modules/ExampleIconsPrivate.json
+%{_prefix}/modules/FbSupportPrivate.json
+%{_prefix}/modules/Gui.json
+%{_prefix}/modules/InputSupportPrivate.json
+%{_prefix}/modules/Network.json
+%{_prefix}/modules/PrintSupport.json
+%{_prefix}/modules/Sql.json
+%{_prefix}/modules/Test.json
+%{_prefix}/modules/Widgets.json
+%{_prefix}/modules/Xml.json
 
 
 %if "%{_qt_prefix}" != "%{_prefix}"

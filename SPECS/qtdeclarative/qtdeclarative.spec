@@ -180,22 +180,22 @@ popd
 %dir %{_qt_libdir}/cmake/Qt6QmlTypeRegistrarPrivate
 %dir %{_qt_libdir}/cmake/Qt6QmlWorkerScript
 %dir %{_qt_libdir}/cmake/Qt6QmlXmlListModel
-/usr/modules/LabsFolderListModel.json
-/usr/modules/LabsQmlModels.json
-/usr/modules/LabsSettings.json
-/usr/modules/PacketProtocolPrivate.json
-/usr/modules/Qml.json
-/usr/modules/QmlCompiler.json
-/usr/modules/QmlCore.json
-/usr/modules/QmlDebugPrivate.json
-/usr/modules/QmlDomPrivate.json
-/usr/modules/QmlIntegration.json
-/usr/modules/QmlLocalStorage.json
-/usr/modules/QmlModels.json
-/usr/modules/QmlToolingSettingsPrivate.json
-/usr/modules/QmlTypeRegistrarPrivate.json
-/usr/modules/QmlWorkerScript.json
-/usr/modules/QmlXmlListModel.json
+%{_prefix}/modules/LabsFolderListModel.json
+%{_prefix}/modules/LabsQmlModels.json
+%{_prefix}/modules/LabsSettings.json
+%{_prefix}/modules/PacketProtocolPrivate.json
+%{_prefix}/modules/Qml.json
+%{_prefix}/modules/QmlCompiler.json
+%{_prefix}/modules/QmlCore.json
+%{_prefix}/modules/QmlDebugPrivate.json
+%{_prefix}/modules/QmlDomPrivate.json
+%{_prefix}/modules/QmlIntegration.json
+%{_prefix}/modules/QmlLocalStorage.json
+%{_prefix}/modules/QmlModels.json
+%{_prefix}/modules/QmlToolingSettingsPrivate.json
+%{_prefix}/modules/QmlTypeRegistrarPrivate.json
+%{_prefix}/modules/QmlWorkerScript.json
+%{_prefix}/modules/QmlXmlListModel.json
 
 
 %files static

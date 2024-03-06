@@ -84,8 +84,8 @@ popd
 %{_qt_libdir}/qt6/metatypes/qt6*_metatypes.json
 %dir %{_qt_libdir}/cmake/Qt6Svg/
 %dir %{_qt_libdir}/cmake/Qt6SvgWidgets/
-/usr/modules/Svg.json
-/usr/modules/SvgWidgets.json
+%{_prefix}/modules/Svg.json
+%{_prefix}/modules/SvgWidgets.json
 
 
 %changelog

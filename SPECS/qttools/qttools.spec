@@ -67,8 +67,6 @@ Requires: %{name}-common = %{version}-%{release}
 %package libs-help
 Summary: Qt6 Help runtime library
 Requires: %{name}-common = %{version}-%{release}
-# when split happened
-Conflicts: qttools < 5.4.0-0.2
 %description libs-help
 %{summary}.
 
@@ -235,18 +233,18 @@ popd
 %{_datadir}/icons/hicolor/*/apps/qdbusviewer*.*
 
 %files devel
-/usr/modules/Designer.json
-/usr/modules/DesignerComponentsPrivate.json
-/usr/modules/Help.json
-/usr/modules/Linguist.json
-/usr/modules/QDocCatchConversionsPrivate.json
-/usr/modules/QDocCatchGeneratorsPrivate.json
-/usr/modules/QDocCatchPrivate.json
-/usr/modules/Tools.json
-/usr/modules/UiPlugin.json
-/usr/modules/UiTools.json
-/usr/share/icons/hicolor/128x128/apps/assistant-qt6.png
-/usr/share/icons/hicolor/32x32/apps/assistant-qt6.png
+%{_prefix}/modules/Designer.json
+%{_prefix}/modules/DesignerComponentsPrivate.json
+%{_prefix}/modules/Help.json
+%{_prefix}/modules/Linguist.json
+%{_prefix}/modules/QDocCatchConversionsPrivate.json
+%{_prefix}/modules/QDocCatchGeneratorsPrivate.json
+%{_prefix}/modules/QDocCatchPrivate.json
+%{_prefix}/modules/Tools.json
+%{_prefix}/modules/UiPlugin.json
+%{_prefix}/modules/UiTools.json
+%{_datadir}/icons/hicolor/128x128/apps/assistant-qt6.png
+%{_datadir}/icons/hicolor/32x32/apps/assistant-qt6.png
 %{_bindir}/assistant-qt6
 %{_bindir}/pixeltool*
 %{_bindir}/qtdiag*
