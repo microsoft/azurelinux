@@ -195,6 +195,7 @@ func Encode128BitLittleEndian(number [16]byte) [4]uint32 {
 	return encoded
 }
 
+// Calculates sha256sum hash for a given file
 func calculateSHA256(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
