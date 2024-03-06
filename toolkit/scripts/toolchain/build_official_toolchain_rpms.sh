@@ -623,6 +623,17 @@ build_rpm_in_chroot_no_install libselinux
 # libcap-ng needs: swig, python3
 build_rpm_in_chroot_no_install libcap-ng
 
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
+
 # util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
 chroot_and_install_rpms libcap-ng
@@ -636,17 +647,6 @@ chroot_and_install_rpms rpm rpm
 chroot_and_install_rpms rpm rpm-build-libs
 chroot_and_install_rpms rpm rpm-devel
 chroot_and_install_rpms rpm rpm-build
-
-build_rpm_in_chroot_no_install python-setuptools
-chroot_and_install_rpms python-setuptools python3-setuptools
-
-build_rpm_in_chroot_no_install pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
-
-# python-packaging requires pyproject-rpm-macros
-build_rpm_in_chroot_no_install python-packaging
-chroot_and_install_rpms python-packaging python3-packaging
 
 build_rpm_in_chroot_no_install python-wheel
 build_rpm_in_chroot_no_install python-flit-core
