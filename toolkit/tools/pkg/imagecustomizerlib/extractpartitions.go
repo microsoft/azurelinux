@@ -3,8 +3,11 @@ package imagecustomizerlib
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -41,7 +44,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
 
-			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+			partitionRawFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
@@ -49,25 +52,36 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			switch partitionFormat {
 			case "raw":
 				// Do nothing for "raw" case.
+				logger.Log.Infof("Partition file created: %s", partitionRawFilepath)
 			case "raw-zst":
-				partitionFilepath, err = compressWithZstd(partitionFilepath)
+				partitionFilepath, err := compressWithZstd(partitionRawFilepath)
 				if err != nil {
 					return err
 				}
+				// Create a skippable frame containing the metadata payload and prepend the frame to the partition file
+				err = addSkippableFrame(partitionFilepath, magicNumber, frameSize, payload)
+				if err != nil {
+					return err
+				}
+				// Verify decompression with skippable frame
+				err = verifySkippableFrameDecompression(partitionRawFilepath, partitionFilepath)
+				if err != nil {
+					return err
+				}
+				// Remove raw file since output partition format is raw-zst.
+				err = os.Remove(partitionRawFilepath)
+				if err != nil {
+					return fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
+				}
+				// Verify skippable frame metadata
+				err = verifySkippableFrameMetadataFromFile(partitionFilepath, magicNumber, frameSize, metadata)
+				if err != nil {
+					return err
+				}
+				logger.Log.Infof("Partition file created: %s", partitionFilepath)
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
-
-			logger.Log.Infof("Partition file created: %s", partitionFilepath)
-
-			// Create a skippable frame containing the metadata payload and prepend the frame to the partition file
-			err = addSkippableFrame(partitionFilepath, magicNumber, frameSize, payload)
-			if err != nil {
-				return err
-			}
-
-			// Verify skippable frame metadata
-			verifySkippableFrameMetadataFromFile(partitionFilepath, magicNumber, frameSize, metadata)
 		}
 	}
 	return nil
@@ -102,12 +116,6 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
-	}
-
-	// Remove raw file since output partition format is raw-zst.
-	err = os.Remove(partitionRawFilepath)
-	if err != nil {
-		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
 	}
 
 	return partitionRawFilepath + ".zst", nil
@@ -187,9 +195,55 @@ func Encode128BitLittleEndian(number [16]byte) [4]uint32 {
 	return encoded
 }
 
-// TODO
-func verifySkippableFrameDecompression(rawPartitionFilepath string, rawzstPartitionFilepath string) (err error) {
-	// Decompress the .raw.zst partition file and compare the hashes with the corresponding raw file
+func calculateSHA256(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	hashInBytes := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashInBytes)
+
+	return hashString, nil
+}
+
+// Decompress the .raw.zst partition file and verifies the hash matches with the source .raw file
+func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartitionFilepath string) (err error) {
+	// Decompressing .raw.zst file
+	decompressedPartitionFilePath := "build/decompressed.raw"
+	err = shell.ExecuteLive(true, "zstd", "-d", rawZstPartitionFilepath, "-o", decompressedPartitionFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to decompress %s with zstd:\n%w", rawZstPartitionFilepath, err)
+	}
+
+	// Calculating hashes
+	rawPartitionFileHash, err := calculateSHA256(rawPartitionFilepath)
+	if err != nil {
+		return fmt.Errorf("error: %w", err)
+	}
+	decompressedPartitionFileHash, err := calculateSHA256(decompressedPartitionFilePath)
+	if err != nil {
+		return fmt.Errorf("error: %w", err)
+	}
+
+	// Verifying hashes are equal
+	if rawPartitionFileHash != decompressedPartitionFileHash {
+		return fmt.Errorf("decompressed partition file hash does not match source partition file hash: %s != %s", decompressedPartitionFileHash, rawPartitionFilepath)
+	}
+	logger.Log.Infof("Decompressed partition file hash matches source partition file hash!")
+
+	// Removing decompressed file
+	err = os.Remove(decompressedPartitionFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to remove raw file %s:\n%w", decompressedPartitionFilePath, err)
+	}
+
 	return nil
 }
 
@@ -218,8 +272,8 @@ func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber 
 	logger.Log.Infof("Skippable frame frameSize field is correct...")
 
 	// verify that the skippable frame has the correct inserted metadata by validating metadata
-	if !bytes.Equal(existingData[8:24], metadata[:]) {
-		return fmt.Errorf("skippable frame metadata does not match the inserted metadata:\n %d != %d", existingData[8:24], metadata[:])
+	if !bytes.Equal(existingData[8:8+frameSize], metadata[:]) {
+		return fmt.Errorf("skippable frame metadata does not match the inserted metadata:\n %d != %d", existingData[8:8+frameSize], metadata[:])
 	}
 	logger.Log.Infof("Skippable frame is valid and contains the correct metadata!")
 
