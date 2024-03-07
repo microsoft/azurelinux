@@ -4620,8 +4620,28 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.21.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.9-1/go.20240403.5.src.tar.gz"
+          "version": "1.19.12",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/1.19.12-1/go.20230802.5.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.20.14",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "golang",
+          "version": "1.22.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.3-1/go1.22.3-20240507.3.src.tar.gz"
         }
       }
     },
