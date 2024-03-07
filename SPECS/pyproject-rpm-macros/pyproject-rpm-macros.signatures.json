@@ -3,7 +3,6 @@
   "LICENSE": "7a89da3454e97113c7c1f7037933e8cac6882a84ae1981e3dc28c0d51654fd1d",
   "README.md": "c50d8418c07aafa8bfc702eb50643a13cc799dea047d840a1ae487b646bcfb57",
   "compare_mandata.py": "bf804a8112f76ce7eb565c26fcfca062046c51915b587aa149989dea4777327e",
-  "macros.aaa-pyproject-srpm": "cfdd774095c84642ba473675bf4c17752a93de9b58f4727f91f7b068932c4597",
   "macros.pyproject": "4dbbccebb31966ea474f3b409af1609f0ab1fc105852db6a25eb6bcb4a598fd9",
   "pyproject_buildrequires.py": "38c131d627dd37717933f6b17606b3036720720659856443b13de1e5e49bbeaa",
   "pyproject_buildrequires_testcases.yaml": "21185aee6cabde48fe513d822a95a067efc113fc31f0be4cbe9380b3c38ff467",

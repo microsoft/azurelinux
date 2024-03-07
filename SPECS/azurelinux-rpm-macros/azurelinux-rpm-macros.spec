@@ -18,31 +18,33 @@ Source2:        default-hardened-cc1
 Source3:        default-hardened-ld
 Source4:        default-annobin-cc1
 Source5:        macros.check
-Source6:        macros.python
-Source7:        macros.python3
-Source8:        macros.python-srpm
-Source9:        macros.openblas-srpm
-Source10:       macros.nodejs-srpm
-Source11:       macros.mono-srpm
-Source12:       macros.ocaml-srpm
-Source13:       macros.perl-srpm
-Source14:       gpgverify
-Source16:       brp-python-bytecompile
-Source17:       macros.pybytecompile
-# Use an enhanced copy of Python's compileall module for Python >= 3.4
-Source18:       https://github.com/fedora-python/compileall2/raw/v0.7.1/compileall2.py
-Source19:       macros.forge
-Source20:       common.lua
-Source21:       forge.lua
+Source6:        macros.openblas-srpm
+Source7:        macros.nodejs-srpm
+Source8:        macros.mono-srpm
+Source9:        macros.ocaml-srpm
+Source10:       macros.perl-srpm
+Source11:       gpgverify
+Source12:       macros.forge
+Source13:       common.lua
+Source14:       forge.lua
 # macros.rust-srpm is taken from https://pagure.io/fedora-rust/rust2rpm
-Source22:       macros.rust-srpm
+Source15:       macros.rust-srpm
 # macros.fonts is taken from the "fontpackages-devel" package.
-Source23:       macros.fonts
-Source24:       macros.suse
-Source25:       gen-ld-script.sh
-Source26:       generate-package-note.py
-Source27:       verify-package-notes.sh
-Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
+Source16:       macros.fonts
+Source17:       macros.suse
+Source18:       gen-ld-script.sh
+Source19:       generate-package-note.py
+Source20:       verify-package-notes.sh
+### The following files should eventually move to python-rpm-macros.spec
+Source21:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python
+Source22:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python3
+Source23:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.python-srpm
+Source24:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-bytecompile
+Source25:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/macros.pybytecompile
+Source26:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/compileall2.py
+Source27:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
+Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/clamp_source_mtime.py
+###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
 Provides:       ocaml-srpm-macros
@@ -82,6 +84,7 @@ install -p -m 444 -t %{buildroot}%{rcdir} default-annobin-*
 install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 install -p -m 755 -t %{buildroot}%{rcdir} compileall2.py
 install -p -m 755 -t %{buildroot}%{rcdir} brp-*
+install -p -m 644 -t %{buildroot}%{rcdir} clamp_source_mtime.py
 install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
 install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
@@ -103,6 +106,7 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{rcdir}/default-annobin-*
 %{rcdir}/gpgverify
 %{rcdir}/brp-*
+%{rcdir}/clamp_source_mtime.py
 %{rcdir}/compileall2.py
 %{rcdir}/gen-ld-script.sh
 %{rcdir}/generate-package-note.py

@@ -18,7 +18,6 @@ BuildArch:      noarch
 
 # Macro files
 Source001:      macros.pyproject
-Source002:      macros.aaa-pyproject-srpm
 
 # Implementation files
 Source101:      pyproject_buildrequires.py
@@ -111,7 +110,6 @@ cp -p %{sources} .
 mkdir -p %{buildroot}%{_rpmmacrodir}
 mkdir -p %{buildroot}%{_rpmconfigdir}/azl
 install -pm 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
-install -pm 644 macros.aaa-pyproject-srpm %{buildroot}%{_rpmmacrodir}/
 install -pm 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/azl/
 install -pm 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/azl/
 install -pm 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/azl/
@@ -121,13 +119,6 @@ install -pm 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/azl/
 install -pm 644 pyproject_wheel.py %{buildroot}%{_rpmconfigdir}/azl/
 
 %check
-# assert the two signatures of %%pyproject_buildrequires match exactly
-signature1="$(grep '^%%pyproject_buildrequires' macros.pyproject | cut -d' ' -f1)"
-signature2="$(grep '^%%pyproject_buildrequires' macros.aaa-pyproject-srpm | cut -d' ' -f1)"
-test "$signature1" == "$signature2"
-# but also assert we are not comparing empty strings
-test "$signature1" != ""
-
 %if 0%{?with_check}
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
 %pytest -vv --doctest-modules -k "not tox"
@@ -151,7 +142,6 @@ export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856
 %license LICENSE
 
 %files -n pyproject-srpm-macros
-%{_rpmmacrodir}/macros.aaa-pyproject-srpm
 %license LICENSE
 
 %changelog

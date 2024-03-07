@@ -1,6 +1,7 @@
 {
  "Signatures": {
-  "brp-python-bytecompile": "82a0a097409512946b7674cd9d6ea89e6c8c422ba643818a37b711c1ce55c5e1",
+  "brp-python-bytecompile": "cd95cdf6a3e0609632683c4c3de3801258ef1375271e093db80660df867967f1",
+  "clamp_source_mtime.py": "1234f80badc28b27efcd6b60dcd7002a06d2f92bbf39264e7bf4e29876d1f9fb",
   "common.lua": "b7fae33cabffe268b152a70ed9796cbc14d5b3e00710617ed0b3b9c8ee6d41a6",
   "compileall2.py": "b91f5c190d11eb4f0d94f39134c5c24d44a683738db068bf7d1418c2a5cfa135",
   "default-annobin-cc1": "2315f86ffa724b9121b5a94d752883c11cbce581ac5e691717269ccbdac66625",
@@ -19,10 +20,10 @@
   "macros.ocaml-srpm": "cd34e1d89cf45b1a76a8803a7fe3aefa6e5e6380e983a85d8dae4912ba360b3f",
   "macros.openblas-srpm": "bd46ab2c99aa504d3fb09de1f071f0e19a9b2605772c1a738a32cfb0129d33b8",
   "macros.perl-srpm": "27f09c386944fc7478cdde55168bbc720d03ecd11ec60ae1133a42db6432e7f7",
-  "macros.pybytecompile": "3291393302b7a73dc4bcf5b72697016bb67c12098a055858883754d331f85aad",
-  "macros.python": "791e0b9070d49790ef437d89e541287ce305d8e424afe42dafdab89f59106362",
+  "macros.pybytecompile": "5957020a5c2166e0183ea21a38ab9e8785e86f005833c57f6d93523474fdb73b",
+  "macros.python": "6b02cef551cdc0cf801e8495f3d635f7d8d6ee6999b99322d72aee08dc4f64ee",
   "macros.python-srpm": "b7e64b36315a61dcfd860c0b9a0a527120068cdbf831b3681b6ffc1e7de09c6e",
-  "macros.python3": "b5a82a6bdfa40cd481c5139c957b95d0b126ff108cc964432d0b6b90972b743b",
+  "macros.python3": "125f15397c36b62b826ac9e3b3faa5a549f726c50dcf0540e8d95713469f5924",
   "macros.rust-srpm": "ea69ab49a243c44ab75cfe506ba5d73046bf31e561698cc389ad5b4edb82f2b2",
   "macros.suse": "7cd64820e12a37fb22f3b09e4c5184b1f9eac94acbeea2783b1ec4940248e310",
   "python.lua": "7827acf97523c1f9a8d8c85227e86ad692cf14076174d5911822d0c0cb2fb5ce",
