@@ -49,14 +49,10 @@ func TestMain(m *testing.M) {
 
 func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {
 	arm64RequiredPackages := []*pkgjson.PackageVer{
-		{Name: "systemd"},
-		{Name: "systemd-udev"},
 		{Name: "systemd-rpm-macros"},
 	}
 	amd64RequiredPackages := []*pkgjson.PackageVer{
 		{Name: "grub2-pc"},
-		{Name: "systemd"},
-		{Name: "systemd-udev"},
 		{Name: "systemd-rpm-macros"},
 	}
 
