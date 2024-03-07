@@ -1,6 +1,6 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
-Version:        %{azl}.0
+Version:        3.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
