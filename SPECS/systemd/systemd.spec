@@ -1,7 +1,7 @@
 Summary:        Systemd-250
 Name:           systemd
 Version:        250.3
-Release:        17%{?dist}
+Release:        19%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,8 @@ Patch5:         backport-helper-util-macros.patch
 Patch6:         CVE-2022-4415.patch
 Patch7:         serve-stale-0001-resolved-added-serve-stale-feature-implementation-of.patch
 Patch8:         serve-stale-0002-resolved-Initialize-until_valid-while-storing-negati.patch
+# Patch9 should be dropped for mariner 3
+Patch9:         mariner-2-do-not-default-zstd-journal-files-for-backwards-compatibility.patch
 BuildRequires:  audit-devel
 BuildRequires:  cryptsetup-devel
 BuildRequires:  docbook-dtd-xml
@@ -49,6 +51,7 @@ BuildRequires:  python3-jinja2
 BuildRequires:  tpm2-tss-devel
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
+BuildRequires:  zstd-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
@@ -57,6 +60,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
+Requires:       zstd-libs
 Requires(post): audit-libs
 Requires(post): pam
 Requires(post): util-linux-libs
@@ -134,7 +138,7 @@ meson  --prefix %{_prefix}                                            \
        -Dlibcryptsetup=true                                           \
        -Dgcrypt=true                                                  \
        -Dlz4=true                                                     \
-       -Dzstd=false                                                   \
+       -Dzstd=true                                                    \
        -Ddbuspolicydir=%{_sysconfdir}/dbus-1/system.d                 \
        -Ddbussessionservicedir=%{_datadir}/dbus-1/services            \
        -Ddbussystemservicedir=%{_datadir}/dbus-1/system-services      \
@@ -283,6 +287,12 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Thu Nov 02 2023 Chris Co <chrco@microsoft.com> - 250.3-19
+- Add zstd-libs as a requires to ensure libzstd.so.1 is present
+
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-18
+- Enable zstd support for journalctl, but force journald to not use zstd to keep backwards compatibility
+
 * Fri Jul 07 2023 Dan Streetman <ddstreet@ieee.org> - 250.3-17
 - Add support to systemd-resolved to serve stale dns data
 

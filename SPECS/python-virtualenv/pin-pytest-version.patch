@@ -1,0 +1,28 @@
+From 40d446bf7f2c3ee200599ec8675a2b57ed024909 Mon Sep 17 00:00:00 2001
+From: corvus-callidus <108946721+corvus-callidus@users.noreply.github.com>
+Date: Wed, 7 Feb 2024 17:12:27 +0000
+Subject: [PATCH] Restrict pytest versions for compatibility
+
+Version 20.14.0 of virtualenv uses now-deprecated pytest APIs. Version 8 of
+pytest now treats the deprecated APIs as errors, so we need to restrict the
+version of pytest for compatibility with this older version of virtualenv.
+
+---
+ setup.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index 991979b..0fbfac7 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -96,7 +96,7 @@ testing =
+ 	coverage>=4
+ 	coverage-enable-subprocess>=1
+ 	flaky>=3
+-	pytest>=4
++	pytest>=4,<8
+ 	pytest-env>=0.6.2
+ 	pytest-freezegun>=0.4.1
+ 	pytest-mock>=2
+--
+2.33.8

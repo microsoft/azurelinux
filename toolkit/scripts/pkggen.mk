@@ -39,14 +39,19 @@ preprocessed_file = $(PKGBUILD_DIR)/preprocessed_graph.dot
 built_file        = $(PKGBUILD_DIR)/built_graph.dot
 output_csv_file   = $(PKGBUILD_DIR)/build_state.csv
 
-logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL)
+logging_command = --log-file=$(LOGS_DIR)/pkggen/workplan/$(notdir $@).log --log-level=$(LOG_LEVEL) --log-color=$(LOG_COLOR)
 $(call create_folder,$(LOGS_DIR)/pkggen/workplan)
 $(call create_folder,$(rpmbuilding_logs_dir))
 
-.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph-cache analyze-built-graph workplan
+.PHONY: clean-workplan clean-cache clean-cache-worker clean-grapher-cache-worker clean-spec-parse clean-ccache graph graph-cache graph-preprocessed analyze-built-graph workplan
+##help:target:parsed-specs=Parse package specs and generate a specs.json file encoding all dependency information.
+parse-specs: $(specs_file)
+##help:target:graph-cache=Resolve package dependencies and cache the results.
 graph-cache: $(cached_file)
-##help:target:workplan=Create the package build workplan.
-workplan: $(graph_file)
+##help:target:graph=Create the initial package build graph.
+workplan graph: $(graph_file)
+graph-preprocessed: $(preprocessed_file)
+
 clean: clean-workplan clean-cache clean-spec-parse
 clean-workplan: clean-cache clean-spec-parse clean-grapher-cache-worker
 	rm -rf $(PKGBUILD_DIR)
@@ -190,7 +195,7 @@ ifeq ($(PRECACHE),y)
 $(cached_file): $(STATUS_FLAGS_DIR)/precache.flag
 endif
 
-$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms)
+$(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_local_repo) $(depend_REPO_LIST) $(REPO_LIST) $(cached_remote_rpms) $(TOOLCHAIN_MANIFEST) $(toolchain_rpms) $(depend_EXTRA_BUILD_LAYERS)
 	mkdir -p $(remote_rpms_cache_dir) && \
 	$(go-graphpkgfetcher) \
 		--input=$(graph_file) \
@@ -200,6 +205,7 @@ $(cached_file): $(graph_file) $(go-graphpkgfetcher) $(chroot_worker) $(pkggen_lo
 		--tmp-dir=$(cache_working_dir) \
 		--tdnf-worker=$(chroot_worker) \
 		--toolchain-manifest=$(TOOLCHAIN_MANIFEST) \
+		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--tls-cert=$(TLS_CERT) \
 		--tls-key=$(TLS_KEY) \
 		$(foreach repo, $(pkggen_local_repo) $(graphpkgfetcher_cloned_repo) $(REPO_LIST),--repo-file=$(repo) ) \
@@ -227,24 +233,26 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 
 ######## PACKAGE BUILD ########
 
+cache_archive	= $(OUT_DIR)/cache.tar.gz
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
-.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms
+.PHONY: build-packages clean-build-packages hydrate-rpms compress-rpms clean-compress-rpms compress-srpms clean-compress-srpms clean-build-packages-workers
 
 ##help:target:build-packages=Build .rpm packages selected by PACKAGE_(RE)BUILD_LIST= and IMAGE_CONFIG=.
 # Execute the package build scheduler.
 build-packages: $(RPMS_DIR)
 
 clean: clean-build-packages clean-compress-rpms clean-compress-srpms
-clean-build-packages:
+clean-build-packages-workers:
+	@echo Verifying no mountpoints present in $(CHROOT_DIR)
+	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)"/* && \
+	rm -rf $(CHROOT_DIR)
+clean-build-packages: clean-build-packages-workers
 	rm -rf $(RPMS_DIR)
 	rm -rf $(LOGS_DIR)/pkggen/failures.txt
 	rm -rf $(rpmbuilding_logs_dir)
 	rm -rf $(STATUS_FLAGS_DIR)/build-rpms.flag
-	@echo Verifying no mountpoints present in $(CHROOT_DIR)
-	$(SCRIPTS_DIR)/safeunmount.sh "$(CHROOT_DIR)" && \
-	rm -rf $(CHROOT_DIR)
 clean-compress-rpms:
 	rm -rf $(pkggen_archive)
 clean-compress-srpms:
@@ -259,7 +267,7 @@ $(RPMS_DIR):
 	@touch $@
 endif
 
-$(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR)
+$(STATUS_FLAGS_DIR)/build-rpms.flag: $(no_repo_acl) $(preprocessed_file) $(chroot_worker) $(go-scheduler) $(go-pkgworker) $(depend_STOP_ON_PKG_FAIL) $(CONFIG_FILE) $(depend_CONFIG_FILE) $(depend_PACKAGE_BUILD_LIST) $(depend_PACKAGE_REBUILD_LIST) $(depend_PACKAGE_IGNORE_LIST) $(depend_MAX_CASCADING_REBUILDS) $(depend_TEST_RUN_LIST) $(depend_TEST_RERUN_LIST) $(depend_TEST_IGNORE_LIST) $(pkggen_rpms) $(srpms) $(BUILD_SRPMS_DIR) $(depend_EXTRA_BUILD_LAYERS)
 	$(go-scheduler) \
 		--input="$(preprocessed_file)" \
 		--output="$(built_file)" \
@@ -272,7 +280,6 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_w
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--srpm-dir="$(SRPMS_DIR)" \
 		--cache-dir="$(remote_rpms_cache_dir)" \
-		--ccache-dir="$(CCACHE_DIR)" \
 		--build-logs-dir="$(rpmbuilding_logs_dir)" \
 		--dist-tag="$(DIST_TAG)" \
 		--distro-release-version="$(RELEASE_VERSION)" \
@@ -281,6 +288,7 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_w
 		--build-attempts="$(PACKAGE_BUILD_RETRIES)" \
 		--check-attempts="$(CHECK_BUILD_RETRIES)" \
 		$(if $(MAX_CASCADING_REBUILDS),--max-cascading-rebuilds="$(MAX_CASCADING_REBUILDS)") \
+		--extra-layers="$(EXTRA_BUILD_LAYERS)" \
 		--build-agent="chroot-agent" \
 		--build-agent-program="$(go-pkgworker)" \
 		--ignored-packages="$(PACKAGE_IGNORE_LIST)" \
@@ -304,8 +312,11 @@ $(STATUS_FLAGS_DIR)/build-rpms.flag: no_repo_acl $(preprocessed_file) $(chroot_w
 		$(if $(filter-out y,$(CLEANUP_PACKAGE_BUILDS)),--no-cleanup) \
 		$(if $(filter y,$(DELTA_BUILD)),--optimize-with-cached-implicit) \
 		$(if $(filter y,$(USE_CCACHE)),--use-ccache) \
+		$(if $(filter y,$(USE_CCACHE)),--ccache-dir="$(CCACHE_DIR)") \
+		$(if $(filter y,$(USE_CCACHE)),--ccache-config="$(CCACHE_CONFIG)") \
 		$(if $(filter y,$(ALLOW_TOOLCHAIN_REBUILDS)),--allow-toolchain-rebuilds) \
 		--max-cpu="$(MAX_CPU)" \
+		$(if $(PACKAGE_BUILD_TIMEOUT),--timeout="$(PACKAGE_BUILD_TIMEOUT)") \
 		$(logging_command) && \
 	touch $@
 
@@ -316,6 +327,10 @@ compress-rpms:
 	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
+##help:target:compress-cached-rpms=Compresses all cached RPMs in `build/rpm_cache/cache` into `out/cache.tar.gz`.
+compress-cached-rpms:
+	tar -cvp -f $(cache_archive) -C $(remote_rpms_cache_dir)/.. $(notdir $(remote_rpms_cache_dir))
+
 ##help:target:compress-srpms=Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
@@ -323,7 +338,10 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
-# Seed the cached RPMs folder files from the archive.
+##help:target:hydrate-cached-rpms=Hydrates the external RPMs cache from the `CACHED_PACKAGES_ARCHIVE` file.
+# All of the '*.rpm' files inside the archive will be extracted into the cache directory in flat manner.
+# Any duplicates inside the archive's subdirectories will be overwritten by the last one.
+# Also see the `compress-cached-rpms` target.
 hydrate-cached-rpms:
 	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
 	@mkdir -p $(remote_rpms_cache_dir)

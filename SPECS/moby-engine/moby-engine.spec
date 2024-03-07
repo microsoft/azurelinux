@@ -3,8 +3,8 @@
 
 Summary: The open-source application container engine
 Name:    %{upstream_name}-engine
-Version: 20.10.25
-Release: 1%{?dist}
+Version: 20.10.27
+Release: 4%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -20,6 +20,13 @@ Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_n
 Source3: docker.service
 Source4: docker.socket
 Patch0:  CVE-2023-25153.patch
+Patch1:  CVE-2022-21698.patch
+# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
+# Remove once we upgrade this package at least to version 25.0+.
+Patch2:  CVE-2024-23651.patch
+# Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
+# Remove once we upgrade this package at least to version 25.0+.
+Patch3:  CVE-2024-23652.patch
 
 %{?systemd_requires}
 
@@ -68,6 +75,7 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 
 %prep
 %autosetup -p1 -n %{upstream_name}-%{version}
+
 tar xf %{SOURCE1} --no-same-owner
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
@@ -126,6 +134,24 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Mon Feb 12 2024 Muhammad Falak <mwani@microsoft.com> - 20.10.27-4
+- Bump release to rebuild with go 1.21.6
+
+* Mon Feb 12 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20.10.27-3
+- Fixing CVEs: 2024-23651 and 2024-23652.
+
+* Fri Feb 02 2024 Tobias Brick <tobiasb@microsoft.com> - 20.10.27-2
+- Patch CVE-2022-21698
+
+* Fri Dec 15 2023 Rohit Rawat <rohitrawat@microsoft.com> - 20.10.27-1
+- Upgrade version to fix CVE-2020-8694, CVE-2020-8695 and CVE-2020-12912
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.10.25-3
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 20.10.25-2
+- Bump release to rebuild with updated version of Go.
+
 * Thu Aug 17 2023 Muhammad Falak <mwani@microsoft.com> - 20.10.25-1
 - Bump version to 20.10.25
 

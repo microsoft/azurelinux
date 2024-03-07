@@ -44,25 +44,13 @@ type SystemConfig struct {
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
 // will be mounted at "/", or nil if no partition is found
 func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
-	for i, p := range s.PartitionSettings {
-		if p.MountPoint == "/" {
-			// We want to reference the actual object in the slice
-			return &s.PartitionSettings[i]
-		}
-	}
-	return nil
+	return FindRootPartitionSetting(s.PartitionSettings)
 }
 
 // GetMountpointPartitionSetting will search the system configuration for the partition setting
 // corresponding to a mount point.
 func (s *SystemConfig) GetMountpointPartitionSetting(mountPoint string) (partitionSetting *PartitionSetting) {
-	for i, p := range s.PartitionSettings {
-		if p.MountPoint == mountPoint {
-			// We want to reference the actual object in the slice
-			return &s.PartitionSettings[i]
-		}
-	}
-	return nil
+	return FindMountpointPartitionSetting(s.PartitionSettings, mountPoint)
 }
 
 // IsValid returns an error if the SystemConfig is not valid

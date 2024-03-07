@@ -1,0 +1,46 @@
+From ae73befd2a7b4867a83625228c9eec2b01246c4b Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Mon, 28 Jun 2021 14:25:17 +1000
+Subject: [PATCH] video/readers/jpeg: Refuse to handle multiple start of
+ streams
+
+An invalid file could contain multiple start of stream blocks, which
+would cause us to reallocate and leak our bitmap. Refuse to handle
+multiple start of streams.
+
+Additionally, fix a grub_error() call formatting.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/video/readers/jpeg.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/video/readers/jpeg.c b/grub-core/video/readers/jpeg.c
+index caa211f..1df1171 100644
+--- a/grub-core/video/readers/jpeg.c
++++ b/grub-core/video/readers/jpeg.c
+@@ -677,6 +677,9 @@ grub_jpeg_decode_sos (struct grub_jpeg_data *data)
+   if (data->file->offset != data_offset)
+     return grub_error (GRUB_ERR_BAD_FILE_TYPE, "jpeg: extra byte in sos");
+ 
++  if (*data->bitmap)
++    return grub_error (GRUB_ERR_BAD_FILE_TYPE, "jpeg: too many start of scan blocks");
++
+   if (grub_video_bitmap_create (data->bitmap, data->image_width,
+ 				data->image_height,
+ 				GRUB_VIDEO_BLIT_FORMAT_RGB_888))
+@@ -699,8 +702,8 @@ grub_jpeg_decode_data (struct grub_jpeg_data *data)
+   nc1 = (data->image_width + hb - 1)  >> (3 + data->log_hs);
+ 
+   if (data->bitmap_ptr == NULL)
+-    return grub_error(GRUB_ERR_BAD_FILE_TYPE,
+-		      "jpeg: attempted to decode data before start of stream");
++    return grub_error (GRUB_ERR_BAD_FILE_TYPE,
++		       "jpeg: attempted to decode data before start of stream");
+ 
+   for (; data->r1 < nr1 && (!data->dri || rst);
+        data->r1++, data->bitmap_ptr += (vb * data->image_width - hb * nc1) * 3)
+-- 
+2.34.1
+

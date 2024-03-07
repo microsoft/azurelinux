@@ -1,0 +1,8 @@
+SystemConfig:
+  Modules:
+    Load:
+      - Name: br_netfilter
+      - Name: ib_uverbs
+      - Name: mlx5_ib
+    Disable:
+      - Name: mousedev

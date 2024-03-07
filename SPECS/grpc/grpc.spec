@@ -148,8 +148,11 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
-* Fri Sep 22 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.3-1
+* Fri Oct 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.3-1
 - Auto-upgrade to 1.55.3 - Upgrade to address CVE-2023-4785
+
+* Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 1.42.0-7
+- Bump release to rebuild with updated version of Go.
 
 * Thu Jun 22 2023 Reuben Olinsky <reubeno@microsoft.com> - 1.42.0-6
 - Add cmake modules to grpc-devel package.

@@ -1,0 +1,67 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+parameters:
+  - name: buildRepoRoot
+    type: string
+    default: "$(Build.SourcesDirectory)"
+
+  - name: inputArtifactName
+    type: string
+
+  - name: inputRPMsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: sourcesWorkspace
+    type: string
+    default: "$(Agent.TempDirectory)/SourcesWorkspace"
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: "Download sources for signing"
+    inputs:
+      artifact: ${{ parameters.inputArtifactName }}
+      patterns: |
+        **/${{ parameters.inputRPMsTarballName }}
+      targetPath: "$(Agent.TempDirectory)"
+
+  - script: |
+      set -e
+
+      mkdir -p "${{ parameters.sourcesWorkspace }}"
+      find "$(Agent.TempDirectory)" -name "${{ parameters.inputRPMsTarballName }}" -print0 | xargs -0 -n 1 tar -C "${{ parameters.sourcesWorkspace }}" -xkf
+    displayName: "Extract sources tarball"
+
+  - script: |
+      echo "Validate Toolkit dir"
+      toolkit_dir="${{ parameters.buildRepoRoot }}/toolkit"
+      if [[ ! -d "$toolkit_dir" ]]; then
+        echo "ERROR: toolkit not found! Expected under '$toolkit_dir'." >&2
+        exit 1
+      fi
+
+      echo "Validate RPMS folder exists"
+      sodiff_rpms_dir="${{ parameters.sourcesWorkspace }}/RPMS"
+      if [[ ! -d "$sodiff_rpms_dir" ]]; then
+        echo "ERROR: RPMS dir not found! Expected under '$sodiff_rpms_dir'." >&2
+        exit 1
+      fi
+
+
+      sodiff_out_dir="${{ parameters.buildRepoRoot }}/out/sodiff"
+      mkdir -p $sodiff_out_dir
+
+      echo "Generate sodiff.repo file"
+      sudo make -sC "$toolkit_dir" sodiff-repo
+
+      echo "Generate input file"
+      find $sodiff_rpms_dir -type f -name '*.rpm' -exec basename {} \; > ./sodiff-rpms
+
+      sodiff_release_ver=`cat ${{ parameters.buildRepoRoot }}/SPECS/mariner-release/mariner-release.spec | grep "Version:" | cut -d " " -f 1 --complement | xargs`
+      echo "sodiff release ver: $sodiff_release_ver"
+      
+      $toolkit_dir/scripts/sodiff/mariner-sodiff.sh $sodiff_rpms_dir/ $toolkit_dir/scripts/sodiff/sodiff.repo $sodiff_release_ver $sodiff_out_dir < ./sodiff-rpms
+
+
+    displayName: "Sodiff check"

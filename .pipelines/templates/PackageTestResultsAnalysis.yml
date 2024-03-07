@@ -14,6 +14,14 @@ parameters:
     type: string
     default: "$(Build.ArtifactStagingDirectory)"
 
+  - name: outputArtifactsTestsSubfolder
+    type: string
+    default: "TESTS"
+
+  - name: testSuiteName
+    type: string
+    default: "Package test"
+
   # Local constants. Can't use variables in a template without jobs or stages.
   - name: reportFileName
     type: string
@@ -24,8 +32,8 @@ parameters:
     default: "$(Agent.TempDirectory)"
 
 steps:
-  - bash: |
-      pip3 install junit_xml
+  - bash: sudo tdnf install -y python3-junit-xml
+    retryCountOnTaskFailure: 3
     displayName: "Install Python dependencies"
 
   - task: PythonScript@0
@@ -245,7 +253,7 @@ steps:
 
         logs_dir_path = "${{ parameters.buildRepoRoot }}/build/logs/pkggen/rpmbuilding"
         report_path = "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}"
-        test_suit_name = f"[{machine()}] Package test"
+        test_suit_name = "${{ parameters.testSuiteName }}"
 
         logger = ADOPipelineLogger()
         logger.log(f"Analyzing tests results inside '{logs_dir_path}'.")
@@ -266,7 +274,7 @@ steps:
 
   - ${{ if parameters.outputArtifactsFolder }}:
       - bash: |
-          published_tests_dir="${{ parameters.outputArtifactsFolder }}/TESTS"
+          published_tests_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsTestsSubfolder }}"
           mkdir -p "$published_tests_dir"
           cp "${{ parameters.testsWorkspace }}/${{ parameters.reportFileName }}" "$published_tests_dir"
         displayName: "Copy test results to the output directory"

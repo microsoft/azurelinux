@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
 Version:        2.4.0
-Release:        13%{?dist}
+Release:        19%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,30 +10,41 @@ URL:            https://github.com/kedacore/keda
 Source0:        %{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
-# How to re-build this file:
+# A couple of notes:
+#   A: The -v2 suffix just increases as we make more vendored tarballs.
+#   B: Make sure to apply the appropriate patches before creating the tarball.
+#
+# How to re-build this file.
 #   1. wget https://github.com/kedacore/%%{name}/archive/refs/tags/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
+#   4. Apply appropriate patches
+#   5. go mod vendor
+#   6. tar  --sort=name \
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-vendor.tar.gz vendor
+#           -cf %%{name}-%%{version}-vendor-v2.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-vendor-v2.tar.gz
+# Patches the version of client_golang used in the vendored source. Should be applied before creating the vendored tarball.
+# Can be removed if we upgrade keda to 2.6.0 or later.
+Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2021-44716.patch
+
 BuildRequires:  golang >= 1.15
 
 %description
-KEDA is a Kubernetes-based Event Driven Autoscaling component. 
-It provides event driven scale for any container running in Kubernetes 
+KEDA is a Kubernetes-based Event Driven Autoscaling component.
+It provides event driven scale for any container running in Kubernetes
 
 %prep
-%setup -q
-
-%build
+%autosetup -N
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
+
+%build
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
 
 go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda main.go
@@ -55,6 +66,26 @@ cp ./bin/keda-adapter %{buildroot}%{_bindir}
 %{_bindir}/%{name}-adapter
 
 %changelog
+* Fri Feb 09 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.0-19
+- Bump release to rebuild with go 1.21.6.
+
+* Mon Feb 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2.4.0-18
+- Patch CVE-2021-44716
+
+* Mon Feb 05 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.4.0-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net/http2
+
+* Tue Jan 01 2024 Tobias Brick <tobiasb@microsoft.com> - 2.4.0-16
+- Patch CVE-2022-21698
+- Update vendored tarball
+- Move tarball expansion to %prep
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-15
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 2.4.0-14
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-13
 - Bump release to rebuild with go 1.19.12
 

@@ -1,6 +1,6 @@
 {
- "Signatures": {
-  "config": "e0318bccd7ce6f2a729d06098e4ab14e7edb9de1c5ad034f3cec10d88cb9ef30",
-  "kernel-mshv-5.15.110.mshv2.tar.gz": "380928fa07ff5007734898f111ad95282db29052726017088259a6314f77ab78"
- }
+  "Signatures": {
+    "config": "114b088b084ef87871227a1948cf02e9922ac937603a5d9bed87d2f4f9025163",
+    "kernel-uvm-6.1.0.mshv16.tar.gz": "f0453c3665387a2a87743782347dbccb6c0a2da1f1e9f35c04acd6ba9a9fd92c"
+  }
 }

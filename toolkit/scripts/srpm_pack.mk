@@ -49,6 +49,7 @@ clean: clean-input-srpms
 clean-input-srpms:
 	rm -rf $(BUILD_SRPMS_DIR)
 	rm -rf $(STATUS_FLAGS_DIR)/build_srpms.flag
+	rm -rf $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag
 	@echo Verifying no mountpoints present in $(SRPM_BUILD_CHROOT_DIR)
 	$(SCRIPTS_DIR)/safeunmount.sh "$(SRPM_BUILD_CHROOT_DIR)" && \
 	rm -rf $(SRPM_BUILD_CHROOT_DIR)
@@ -60,12 +61,12 @@ $(BUILD_SRPMS_DIR): $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@echo Finished updating $@
 
 ifeq ($(DOWNLOAD_SRPMS),y)
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_spec_sources) $(SPECS_DIR) $(go-downloader)
 	for spec in $(local_specs); do \
 		spec_file=$${spec} && \
 		srpm_file=$$(rpmspec -q $${spec_file} --srpm --define='with_check 1' --define='dist $(DIST_TAG)' --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm) && \
 		for url in $(SRPM_URL_LIST); do \
-			wget $${url}/$${srpm_file} \
+			$(go-downloader) $${url}/$${srpm_file} \
 				-O $(BUILD_SRPMS_DIR)/$${srpm_file} \
 				--no-verbose \
 				$(if $(TLS_CERT),--certificate=$(TLS_CERT)) \
@@ -99,6 +100,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_packer.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/srpm_packer.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/srpm_packer.trace \
@@ -123,6 +125,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
+		--log-color=$(LOG_COLOR) \
 		--cpu-prof-file=$(PROFILE_DIR)/srpm_toolchain_packer.cpu.pprof \
 		--mem-prof-file=$(PROFILE_DIR)/srpm_toolchain_packer.mem.pprof \
 		--trace-file=$(PROFILE_DIR)/srpm_toolchain_packer.trace \

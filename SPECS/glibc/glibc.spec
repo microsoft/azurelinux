@@ -7,7 +7,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.35
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,9 @@ Patch3:         CVE-2020-1751.nopatch
 # Rationale: Exploit requires crafted pattern in regex compiler meant only for trusted content
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
+Patch6:         CVE-2023-4911.patch
+Patch7:         CVE-2023-4806.patch
+Patch8:         CVE-2023-5156.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -319,6 +322,12 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
+- Add patches for CVE-2023-4806 and CVE-2023-5156
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.35-5
+- Patch CVE-2023-4911
+
 * Fri Jun 30 2023 Andrew Phelps <anphel@microsoft.com> - 2.35-4
 - Restore glibc-debuginfo package
 

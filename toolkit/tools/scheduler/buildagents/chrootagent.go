@@ -32,12 +32,13 @@ func (c *ChrootAgent) Initialize(config *BuildAgentConfig) (err error) {
 }
 
 // BuildPackage builds a given file and returns the output files or error.
+// - basePackageName is the base package name (i.e. 'kernel').
 // - inputFile is the SRPM to build.
 // - logName is the file name to save the package build log to.
 // - outArch is the target architecture to build for.
 // - runCheck is true if the package should run the "%check" section during the build
 // - dependencies is a list of dependencies that need to be installed before building.
-func (c *ChrootAgent) BuildPackage(inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
+func (c *ChrootAgent) BuildPackage(basePackageName, inputFile, logName, outArch string, runCheck bool, dependencies []string) (builtFiles []string, logFile string, err error) {
 	// On success, pkgworker will print a comma-seperated list of all RPMs built to stdout.
 	// This will be the last stdout line written.
 	const delimiter = ","
@@ -54,7 +55,7 @@ func (c *ChrootAgent) BuildPackage(inputFile, logName, outArch string, runCheck 
 		logger.Log.Trace(lastStdoutLine)
 	}
 
-	args := serializeChrootBuildAgentConfig(c.config, inputFile, logFile, outArch, runCheck, dependencies)
+	args := serializeChrootBuildAgentConfig(c.config, basePackageName, inputFile, logFile, outArch, runCheck, dependencies)
 	err = shell.ExecuteLiveWithCallback(onStdout, logger.Log.Trace, true, c.config.Program, args...)
 
 	if err == nil && lastStdoutLine != "" {
@@ -75,7 +76,7 @@ func (c *ChrootAgent) Close() (err error) {
 }
 
 // serializeChrootBuildAgentConfig serializes a BuildAgentConfig into arguments usable by pkgworker for the sake of building the package.
-func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
+func serializeChrootBuildAgentConfig(config *BuildAgentConfig, basePackageName, inputFile, logFile, outArch string, runCheck bool, dependencies []string) (serializedArgs []string) {
 	serializedArgs = []string{
 		fmt.Sprintf("--input=%s", inputFile),
 		fmt.Sprintf("--work-dir=%s", config.WorkDir),
@@ -85,7 +86,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 		fmt.Sprintf("--toolchain-rpms-dir=%s", config.ToolchainDir),
 		fmt.Sprintf("--srpm-dir=%s", config.SrpmDir),
 		fmt.Sprintf("--cache-dir=%s", config.CacheDir),
-		fmt.Sprintf("--ccache-dir=%s", config.CCacheDir),
+		fmt.Sprintf("--base-package-name=%s", basePackageName),
 		fmt.Sprintf("--dist-tag=%s", config.DistTag),
 		fmt.Sprintf("--distro-release-version=%s", config.DistroReleaseVersion),
 		fmt.Sprintf("--distro-build-number=%s", config.DistroBuildNumber),
@@ -93,6 +94,7 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 		fmt.Sprintf("--log-level=%s", config.LogLevel),
 		fmt.Sprintf("--out-arch=%s", outArch),
 		fmt.Sprintf("--max-cpu=%s", config.MaxCpu),
+		fmt.Sprintf("--timeout=%s", config.Timeout.String()),
 	}
 
 	if config.RpmmacrosFile != "" {
@@ -109,6 +111,8 @@ func serializeChrootBuildAgentConfig(config *BuildAgentConfig, inputFile, logFil
 
 	if config.UseCcache {
 		serializedArgs = append(serializedArgs, "--use-ccache")
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-root-dir=%s", config.CCacheDir))
+		serializedArgs = append(serializedArgs, fmt.Sprintf("--ccache-config=%s", config.CCacheConfig))
 	}
 
 	for _, dependency := range dependencies {

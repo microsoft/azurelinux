@@ -24,6 +24,10 @@
         {
             "file": "\\toolkit\\imageconfigs\\read-only-root-efi.json",
             "_justification": "Secret for a sample, non-production Mariner image."
+        },
+        {
+            "file": "\\toolkit\\tools\\imagecustomizer\\docs\\configuration.md",
+            "_justification": "Secrets from documentation samples. No production secrets."
         }
     ]
 }

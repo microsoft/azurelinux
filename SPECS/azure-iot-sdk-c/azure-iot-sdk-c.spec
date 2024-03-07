@@ -7,7 +7,7 @@ Name:           azure-iot-sdk-c
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
 Version:        2022.01.21
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Group:          Applications/File
 URL:            https://github.com/Azure/azure-iot-sdk-c
@@ -20,7 +20,7 @@ Distribution:   Mariner
 # git clone --recursive --single-branch --branch LTS_01_2022_Ref01 --depth 1 https://github.com/Azure/azure-iot-sdk-c.git
 # tar cjvf azure-iot-sdk-c-2022.01.21.tar.bz2 azure-iot-sdk-c/
 Source0:        %{name}-%{version}.tar.bz2
-
+Patch0:         CVE-2024-21646.patch
 BuildRequires:  cmake
 BuildRequires:  build-essential
 BuildRequires:  curl-devel
@@ -45,7 +45,7 @@ operating systems, tools sets, protocols and communications patterns widely in u
 %global debug_package %{nil}
 
 %prep
-%setup -qn %{name}
+%autosetup -p1 -n %{name}
 
 %build
 mkdir cmake
@@ -86,6 +86,10 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 /usr/cmake/*
 
 %changelog
+*   Tue Jan 16 2024 Minghe Ren <mingheren@microsoft.com> - 2022.01.21-2
+-   Add patch for CVE-2024-21646
+-   change to use autosetup
+
 *   Mon Jan 24 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 2022.01.21-1
 -   Upgrade to 2022.01.21.
 

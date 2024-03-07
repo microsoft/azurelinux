@@ -20,6 +20,7 @@ type KernelCommandLine struct {
 	CGroup           CGroup      `json:"CGroup"`
 	ImaPolicy        []ImaPolicy `json:"ImaPolicy"`
 	SELinux          SELinux     `json:"SELinux"`
+	SELinuxPolicy    string      `json:"SELinuxPolicy"`
 	EnableFIPS       bool        `json:"EnableFIPS"`
 	ExtraCommandLine string      `json:"ExtraCommandLine"`
 }

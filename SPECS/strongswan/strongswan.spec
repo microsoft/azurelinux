@@ -1,7 +1,7 @@
 Summary:        The OpenSource IPsec-based VPN Solution
 Name:           strongswan
 Version:        5.9.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -10,6 +10,7 @@ URL:            https://www.strongswan.org/
 Source0:        https://download.strongswan.org/%{name}-%{version}.tar.bz2
 Patch0:         strongswan-fix-make-check.patch
 Patch1:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
+Patch2:         strongswan-5.9.7-5.9.11_charon_tkm_dh_len.patch
 BuildRequires:  autoconf
 BuildRequires:  gmp-devel
 
@@ -51,6 +52,9 @@ make check
 %{_datadir}/strongswan/*
 
 %changelog
+* Wed Dec 13 2023 Elaine Zhao <@microsoft.com> - 5.9.10-3
+- Fix for CVE-2023-41913
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.9.10-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

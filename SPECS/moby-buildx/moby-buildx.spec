@@ -5,13 +5,17 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           moby-%{upstream_name}
 # update "commit_hash" above when upgrading version
 Version:        0.7.1
-Release:        13%{?dist}
+Release:        18%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Fixed in upstream v0.8.0. Can remove when we upgrade to that version.
+Patch0:         CVE-2022-21698.patch
+Patch1:         CVE-2023-44487.patch
+Patch2:         CVE-2021-44716.patch
 
 BuildRequires: bash
 BuildRequires: golang >= 1.17
@@ -24,7 +28,7 @@ Conflicts: docker-ee
 A Docker CLI plugin for extended build capabilities with BuildKit
 
 %prep
-%setup -q -n %{upstream_name}-%{version}
+%autosetup -p1 -n %{upstream_name}-%{version}
 
 %build
 export CGO_ENABLED=0
@@ -42,6 +46,21 @@ cp -aT buildx "%{buildroot}/%{_libexecdir}/docker/cli-plugins/docker-buildx"
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Mon Feb 12 2024 Nan Liu <liunan@microsoft.com> - 0.7.1-18
+- Address CVE-2021-44716 by patching vendored golang.org/x/net
+
+* Wed Feb 07 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.7.1-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Thu Feb 01 2024 Tobias Brick <tobiasb@microsoft.com> - 0.7.1-16
+- Fix CVE-2022-21698
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-15
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.7.1-14
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.7.1-13
 - Bump release to rebuild with go 1.19.12
 

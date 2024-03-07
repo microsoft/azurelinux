@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        7%{?dist}
+Release:        14%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -32,9 +32,12 @@ Source1:        disks-images-provider.yaml
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
 Patch2:         Hotplug_detach_grace_period.patch
+Patch3:         CVE-2023-44487.patch
+Patch4:         CVE-2024-21626.patch
+Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-4%{?dist}
+BuildRequires:  glibc-static >= 2.35-6%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -211,6 +214,27 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Feb 15 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 0.59.0-14
+- Add patch for render hp-volume- pod to respect blockdevices (IcM 467224770)
+
+* Wed Feb 14 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.59.0-13
+- Address CVE-2024-21626 by patching vendored github/opencontainer/runc
+
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.59.0-12
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Wed Oct 18 2023 Minghe Ren <mingheren@microsoft.com> - 0.59.0-11
+- Bump release to rebuild against glibc 2.35-6
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-10
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.59.0-9
+- Bump release to rebuild with updated version of Go.
+
+* Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.59.0-8
+- Bump release to rebuild against glibc 2.35-5
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-7
 - Bump release to rebuild with go 1.19.12
 
@@ -227,10 +251,10 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 - Bump release to rebuild with go 1.19.10
 
 * Fri May 12 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-2
-- Patch 0.59.0 with Operator Nexus patches 
+- Patch 0.59.0 with Operator Nexus patches
 
 * Fri May 05 2023 Kanika Nema <kanikanema@microsoft.com> - 0.59.0-1
-- Upgrade to v0.59.0 
+- Upgrade to v0.59.0
 
 * Wed Apr 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.58.0-7
 - Bump release to rebuild with go 1.19.8

@@ -1,0 +1,3 @@
+test__core_timer.py
+test__resolver_dnspython.py
+test_socket.py

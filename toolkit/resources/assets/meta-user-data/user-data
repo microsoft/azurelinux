@@ -1,13 +1,13 @@
 #cloud-config
 users:
  - default
- - name: mariner_user
+ - name: <YOUR USERNAME HERE>
    shell: /bin/bash
    sudo: [ "ALL=(ALL:ALL) ALL" ]
    lock_passwd: false
-   # The usage of plain_text_password and passwd is strongly discouraged in the production setting.
+   # The usage of plain_text_password and passwd is not permitted in the production setting.
    # ssh-authorized-keys should be used instead for enhanced security.
-   plain_text_passwd: p@ssw0rd
+   plain_text_passwd: <YOUR PASSWORD HERE. NOT RECOMMENDED>
    groups: sudo, docker
  - name: sshuser
    shell: /bin/bash

@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.55.0
-Release:        14%{?dist}
+Release:        17%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,6 +33,7 @@ BuildRequires:  rsync
 BuildRequires:  sed
 Provides:       cdi = %{version}-%{release}
 ExclusiveArch:  x86_64 aarch64
+Patch0:         CVE-2023-44487.patch
 
 %description
 Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes
@@ -106,8 +107,10 @@ kubernetes installation with kubectl apply.
 # Note: having bar symlink'ed to DIR/src/foo/bar does not seem to work. Looks
 # like symlinks in go path are not resolved correctly. Hence the sources need
 # to be 'physically' placed into the proper location.
-%setup -q -n go/src/kubevirt.io/%{name} -c -T
+%autosetup -N -n go/src/kubevirt.io/%{name} -c -T
+# Apply vendor before patching
 tar --strip-components=1 -xf %{SOURCE0}
+%autopatch -p1
 
 %build
 
@@ -198,6 +201,15 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.55.0-17
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.0-16
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 1.55.0-15
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.55.0-14
 - Bump release to rebuild with go 1.19.12
 

@@ -1,0 +1,23 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+ARG BINARY_NAME
+ARG USER
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# workaround till binaries rename is merged
+RUN [ -f /usr/bin/virt-cdi-uploadserver ] && mv -f /usr/bin/virt-cdi-uploadserver /usr/bin/cdi-uploadserver
+
+#simple smoke test
+RUN ls /usr/bin/cdi-uploadserver
+
+# If the user specified for this image is not root (0), create a new user in the root (0) group
+RUN if [[ $USER != 0 ]]; then adduser -u $USER --gid 0 --create-home -s /bin/bash $BINARY_NAME ; fi
+USER $USER
+
+ENTRYPOINT [ "/usr/bin/cdi-uploadserver", "-alsologtostderr" ]

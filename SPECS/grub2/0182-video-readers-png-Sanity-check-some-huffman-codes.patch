@@ -1,0 +1,42 @@
+From ae7ade4fc13c5ee85f3d8e865f16c296920142a0 Mon Sep 17 00:00:00 2001
+From: Daniel Axtens <dja@axtens.net>
+Date: Tue, 6 Jul 2021 19:19:11 +1000
+Subject: [PATCH] video/readers/png: Sanity check some huffman codes
+
+ASAN picked up two OOB global reads: we weren't checking if some code
+values fit within the cplens or cpdext arrays. Check and throw an error
+if not.
+
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/video/readers/png.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/grub-core/video/readers/png.c b/grub-core/video/readers/png.c
+index d7ed5aa..7f2ba78 100644
+--- a/grub-core/video/readers/png.c
++++ b/grub-core/video/readers/png.c
+@@ -753,6 +753,9 @@ grub_png_read_dynamic_block (struct grub_png_data *data)
+ 	  int len, dist, pos;
+ 
+ 	  n -= 257;
++	  if (((unsigned int) n) >= ARRAY_SIZE (cplens))
++	    return grub_error (GRUB_ERR_BAD_FILE_TYPE,
++			       "png: invalid huff code");
+ 	  len = cplens[n];
+ 	  if (cplext[n])
+ 	    len += grub_png_get_bits (data, cplext[n]);
+@@ -760,6 +763,9 @@ grub_png_read_dynamic_block (struct grub_png_data *data)
+ 	    return grub_errno;
+ 
+ 	  n = grub_png_get_huff_code (data, &data->dist_table);
++	  if (((unsigned int) n) >= ARRAY_SIZE (cpdist))
++	    return grub_error (GRUB_ERR_BAD_FILE_TYPE,
++			       "png: invalid huff code");
+ 	  dist = cpdist[n];
+ 	  if (cpdext[n])
+ 	    dist += grub_png_get_bits (data, cpdext[n]);
+-- 
+2.34.1
+

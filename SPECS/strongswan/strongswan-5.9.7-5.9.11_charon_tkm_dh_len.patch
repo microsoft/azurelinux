@@ -1,0 +1,41 @@
+From 027421cbd2e6e628f5f959c74d722afadc477485 Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Tue, 11 Jul 2023 12:12:25 +0200
+Subject: [PATCH] charon-tkm: Validate DH public key to fix potential buffer
+ overflow
+
+Seems this was forgotten in the referenced commit and actually could lead
+to a buffer overflow.  Since charon-tkm is untrusted this isn't that
+much of an issue but could at least be easily exploited for a DoS attack
+as DH public values are set when handling IKE_SA_INIT requests.
+
+Fixes: 0356089d0f94 ("diffie-hellman: Verify public DH values in backends")
+Fixes: CVE-2023-41913
+---
+ src/charon-tkm/src/tkm/tkm_diffie_hellman.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/charon-tkm/src/tkm/tkm_diffie_hellman.c b/src/charon-tkm/src/tkm/tkm_diffie_hellman.c
+index 2b2d103d03e9..6999ad360d7e 100644
+--- a/src/charon-tkm/src/tkm/tkm_diffie_hellman.c
++++ b/src/charon-tkm/src/tkm/tkm_diffie_hellman.c
+@@ -70,11 +70,16 @@ METHOD(key_exchange_t, get_shared_secret, bool,
+ 	return TRUE;
+ }
+ 
+-
+ METHOD(key_exchange_t, set_public_key, bool,
+ 	private_tkm_diffie_hellman_t *this, chunk_t value)
+ {
+ 	dh_pubvalue_type othervalue;
++
++	if (!key_exchange_verify_pubkey(this->group, value) ||
++		value.len > sizeof(othervalue.data))
++	{
++		return FALSE;
++	}
+ 	othervalue.size = value.len;
+ 	memcpy(&othervalue.data, value.ptr, value.len);
+ 
+-- 
+2.34.1

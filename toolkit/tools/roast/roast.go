@@ -40,8 +40,7 @@ type convertResult struct {
 var (
 	app = kingpin.New("roast", "A tool to convert raw disk file into another image type")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	inputDir  = exe.InputDirFlag(app, "A directory containing a .RAW image or a rootfs directory")
@@ -62,7 +61,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -308,6 +307,8 @@ func converterFactory(formatType string) (converter formats.Converter, err error
 		converter = formats.NewGzip()
 	case formats.TarGzipType:
 		converter = formats.NewTarGzip()
+	case formats.SquashFSType:
+		converter = formats.NewSquashFS()
 	case formats.XzType:
 		converter = formats.NewXz()
 	case formats.TarXzType:

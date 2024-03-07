@@ -1,0 +1,55 @@
+From af27842d1a6640d932407999ceec57f54a225a78 Mon Sep 17 00:00:00 2001
+From: Johan Ekenberg <johan.ekenberg@gmail.com>
+Date: Mon, 1 Apr 2019 13:19:08 +0200
+Subject: [PATCH] Fix compiler warnings
+
+__P() seems to not be used with modern compilers
+Fix switch-case attribute fallthrough warning
+---
+ src/linux/linux_quota.h | 15 +--------------
+ src/parse.c             |  2 +-
+ 2 files changed, 2 insertions(+), 15 deletions(-)
+
+diff --git a/src/linux/linux_quota.h b/src/linux/linux_quota.h
+index 11f9871..747aea7 100644
+--- a/src/linux/linux_quota.h
++++ b/src/linux/linux_quota.h
+@@ -117,7 +117,7 @@ struct if_dqinfo {
+ 	#endif
+ #endif
+ 
+-long quotactl __P((int, const char *, qid_t, caddr_t));
++long quotactl (int, const char *, qid_t, caddr_t);
+ 
+ /*
+  * runtime detection of quota format
+@@ -139,16 +139,3 @@ int kern_quota_format(fs_t *, int);
+ #include "xfs_quota.h"
+ 
+ #endif /* _QUOTA_ */
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+diff --git a/src/parse.c b/src/parse.c
+index b59c931..9e5881b 100644
+--- a/src/parse.c
++++ b/src/parse.c
+@@ -268,7 +268,7 @@ argdata_t *parse_commandline (int argc, char **argv)
+ 
+     case '?':
+       output_error ("Unrecognized option: '%c'", optopt);
+-      __attribute__ ((fallthrough));
++      // fall through
+ 
+     default:
+       output_help();

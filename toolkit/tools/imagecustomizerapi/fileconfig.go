@@ -39,7 +39,7 @@ func (l *FileConfigList) IsValid() (err error) {
 	for i, fileConfig := range *l {
 		err = fileConfig.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid FileConfig at index %d: %w", i, err)
+			return fmt.Errorf("invalid FileConfig at index %d:\n%w", i, err)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (l *FileConfigList) UnmarshalYAML(value *yaml.Node) error {
 	type IntermediateTypeFileConfigList FileConfigList
 	err = value.Decode((*IntermediateTypeFileConfigList)(l))
 	if err != nil {
-		return fmt.Errorf("failed to parse FileConfigList: %w", err)
+		return fmt.Errorf("failed to parse FileConfigList:\n%w", err)
 	}
 
 	return nil
@@ -77,7 +77,7 @@ func (f *FileConfig) IsValid() (err error) {
 	if f.Permissions != nil {
 		err = f.Permissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid Permissions value: %w", err)
+			return fmt.Errorf("invalid Permissions value:\n%w", err)
 		}
 	}
 
@@ -102,7 +102,7 @@ func (f *FileConfig) UnmarshalYAML(value *yaml.Node) error {
 	type IntermediateTypeFileConfig FileConfig
 	err = value.Decode((*IntermediateTypeFileConfig)(f))
 	if err != nil {
-		return fmt.Errorf("failed to parse FileConfig: %w", err)
+		return fmt.Errorf("failed to parse FileConfig:\n%w", err)
 	}
 
 	return nil

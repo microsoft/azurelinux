@@ -1,0 +1,12 @@
+diff -Nur hping3-20051105-orig/getifname.c hping3-20051105/getifname.c
+--- hping2-rc3-orig/getifname.c	2004-05-03 10:55:53.000000000 +0200
++++ hping2-rc3/getifname.c	2005-07-26 18:23:34.000000000 +0200
+@@ -60,7 +60,7 @@
+ 			known_output_if = 1;
+ 			if (opt_debug)
+ 				printf("DEBUG: Output interface address: %s\n",
+-					inet_ntoa(sa.sin_addr));
++					inet_ntoa(output_if_addr.sin_addr));
+ 		} else {
+ 			fprintf(stderr, "Warning: Unable to guess the output "
+ 					"interface\n");

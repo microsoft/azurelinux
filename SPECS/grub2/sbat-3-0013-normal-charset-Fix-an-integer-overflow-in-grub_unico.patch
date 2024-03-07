@@ -1,0 +1,55 @@
+From 1514678888595ef41a968a0c69b7ff769edd1e9c Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Fri, 28 Oct 2022 21:31:39 +0800
+Subject: [PATCH 13/13] normal/charset: Fix an integer overflow in
+ grub_unicode_aglomerate_comb()
+
+The out->ncomb is a bit-field of 8 bits. So, the max possible value is 255.
+However, code in grub_unicode_aglomerate_comb() doesn't check for an
+overflow when incrementing out->ncomb. If out->ncomb is already 255,
+after incrementing it will get 0 instead of 256, and cause illegal
+memory access in subsequent processing.
+
+This patch introduces GRUB_UNICODE_NCOMB_MAX to represent the max
+acceptable value of ncomb. The code now checks for this limit and
+ignores additional combining characters when limit is reached.
+
+Reported-by: Daniel Axtens <dja@axtens.net>
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/normal/charset.c | 3 +++
+ include/grub/unicode.h     | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/grub-core/normal/charset.c b/grub-core/normal/charset.c
+index 000e687bd..4f6647116 100644
+--- a/grub-core/normal/charset.c
++++ b/grub-core/normal/charset.c
+@@ -472,6 +472,9 @@ grub_unicode_aglomerate_comb (const grub_uint32_t *in, grub_size_t inlen,
+ 	  if (!haveout)
+ 	    continue;
+ 
++	  if (out->ncomb == GRUB_UNICODE_NCOMB_MAX)
++	    continue;
++
+ 	  if (comb_type == GRUB_UNICODE_COMB_MC
+ 	      || comb_type == GRUB_UNICODE_COMB_ME
+ 	      || comb_type == GRUB_UNICODE_COMB_MN)
+diff --git a/include/grub/unicode.h b/include/grub/unicode.h
+index 71a4d1a54..9360b0b97 100644
+--- a/include/grub/unicode.h
++++ b/include/grub/unicode.h
+@@ -147,7 +147,9 @@ struct grub_unicode_glyph
+   grub_uint8_t bidi_level:6; /* minimum: 6 */
+   enum grub_bidi_type bidi_type:5; /* minimum: :5 */
+ 
++#define GRUB_UNICODE_NCOMB_MAX ((1 << 8) - 1)
+   unsigned ncomb:8;
++
+   /* Hint by unicode subsystem how wide this character usually is.
+      Real width is determined by font. Set only in UTF-8 stream.  */
+   int estimated_width:8;
+-- 
+2.34.1
+

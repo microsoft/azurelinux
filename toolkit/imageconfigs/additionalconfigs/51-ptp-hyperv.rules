@@ -1,0 +1,2 @@
+
+ACTION=="add", SUBSYSTEM=="ptp", ATTR{clock_name}=="hyperv", TAG+="systemd"

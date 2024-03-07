@@ -1,0 +1,3 @@
+#Type Name     ID  GECOS           Home directory        Shell
+u     radiusd  95  "radiusd user"  /var/lib/radiusd      /sbin/nologin
+g     radiusd  95  -               -                     -

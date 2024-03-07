@@ -1,7 +1,7 @@
 Summary:        GNU Crypto Libraries
 Name:           libgcrypt
-Version:        1.9.4
-Release:        2%{?dist}
+Version:        1.10.3
+Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and BSD and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -59,6 +59,9 @@ rm -rf %{buildroot}%{_infodir}
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Mon Dec 11 2023 Andrew Phelps <anphel@microsoft.com> - 1.10.3-1
+- Upgrade to 1.10.3
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.9.4-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

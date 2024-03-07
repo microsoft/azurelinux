@@ -4,7 +4,7 @@
 
 Name:           chrony
 Version:        4.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,9 +44,6 @@ Requires(pre):  shadow-utils
 
 # The 'chrony.helper' script requires the 'dig' command from 'bind-utils'.
 Requires:       bind-utils
-
-# Old NetworkManager expects the dispatcher scripts in a different place
-Conflicts:      NetworkManager < 1.20
 
 # suggest drivers for hardware reference clocks
 Suggests:       ntp-refclock
@@ -124,7 +121,6 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/{sysconfig,logrotate.d}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/{lib,log}/chrony
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d
 mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d
 mkdir -p $RPM_BUILD_ROOT{%{_unitdir},%{_prefix}/lib/systemd/ntp-units.d}
 
 install -m 644 -p chrony.conf $RPM_BUILD_ROOT%{_sysconfdir}/chrony.conf
@@ -138,10 +134,6 @@ install -m 644 -p examples/chrony.logrotate \
 
 install -m 644 -p examples/chronyd.service \
         $RPM_BUILD_ROOT%{_unitdir}/chronyd.service
-install -m 755 -p examples/chrony.nm-dispatcher.dhcp \
-        $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d/20-chrony-dhcp
-install -m 755 -p examples/chrony.nm-dispatcher.onoffline \
-        $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d/20-chrony-onoffline
 install -m 644 -p examples/chrony-wait.service \
         $RPM_BUILD_ROOT%{_unitdir}/chrony-wait.service
 install -m 644 -p %{SOURCE5} $RPM_BUILD_ROOT%{_unitdir}/chrony-dnssrv@.service
@@ -195,7 +187,6 @@ systemctl start chronyd.service
 %{_bindir}/chronyc
 %{_sbindir}/chronyd
 %{_libexecdir}/chrony-helper
-%{_prefix}/lib/NetworkManager
 %{_prefix}/lib/systemd/ntp-units.d/*.list
 %{_unitdir}/chrony*.service
 %{_unitdir}/chrony*.timer
@@ -206,6 +197,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Mon Oct 30 2023 Andy Zaugg <azaugg@linkedin.com> - 4.1-3
+- Removed references to NetworkManager
+
 * Thu May 18 2023 Tobias Brick <tobiasb@microsoft.com> - 4.1-2
 - Explicitly run chronyd as the user chrony
 

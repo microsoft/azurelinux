@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.15.0
-Release:        12%{?dist}
+Release:        15%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Source0:        https://github.com/Azure/azure-storage-azcopy/archive/refs/tags/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        azure-storage-%{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.17.9
 BuildRequires:  git
@@ -40,10 +41,12 @@ AzCopy V10 presents easy-to-use commands that are optimized for high
 performance and throughput.
 
 %prep
-%setup -q -n azure-storage-%{name}-%{version}
+%autosetup -N -n azure-storage-%{name}-%{version}
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
 go build -buildmode=pie -mod=vendor
 
@@ -61,6 +64,15 @@ go test -mod=vendor
 %{_bindir}/azcopy
 
 %changelog
+* Thu Feb 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 10.15.0-15
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.15.0-14
+- Bump release to rebuild with go 1.20.9
+
+* Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 10.15.0-13
+- Bump release to rebuild with updated version of Go.
+
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 10.15.0-12
 - Bump release to rebuild with go 1.19.12
 

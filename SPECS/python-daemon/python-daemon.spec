@@ -1,13 +1,15 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
 Version:        2.2.0
-Release:        6%{?dist}
-License:        ASL 2.0
+Release:        7%{?dist}
+License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz
+# Upstream: https://pagure.io/python-daemon/c/b7089121e305ef29dee9b72bfdb8b1496ffed48c
+Patch0:         fix-test-socket-errors.patch
 BuildArch:      noarch
 
 %description
@@ -35,7 +37,7 @@ daemon program. A DaemonContext instance holds the behaviour and configured proc
 use the instance as a context manager to enter a daemon state.
 
 %prep
-%autosetup
+%autosetup -p1
 sed -i 's/distclass=version.ChangelogAwareDistribution,/ /g' setup.py
 
 %build
@@ -45,7 +47,8 @@ sed -i 's/distclass=version.ChangelogAwareDistribution,/ /g' setup.py
 %py3_install
 
 %check
-pip3 install mock testscenarios testtools
+# Pinned versions are the most recent releases prior to changes that break the test suite
+pip3 install 'mock==4.0.3' testscenarios 'testtools==2.4.0'
 %python3 -m unittest discover
 
 %files -n python3-daemon
@@ -53,10 +56,15 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
-* Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
+* Mon Dec 04 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-7
+- Add upstream patch to fix socket errors during tests
+- Pin versions of mock, testtools from PyPI used during tests
+- Use SPDX license expression in license tag
+
+* Fri Dec 03 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-6
 - Replace easy_install usage with pip in %%check sections
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-5
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 2.2.0-5
 - Add license to python3 package
 - Remove python2 package
 - Lint spec

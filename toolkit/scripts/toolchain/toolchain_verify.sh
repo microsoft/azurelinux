@@ -13,14 +13,14 @@ echo Verify machine is ready to build toolchain
 mount > output_mount
 if grep toolchain output_mount; then
   echo It looks like a toolchain directory is still mounted
-  echo Unmount the directory, then run make toolchain-cleanup
+  echo Unmount the directory, then run 'make clean-toolchain'
   exit 1
 else
   echo No mounted toolchain directories found
 fi
 if grep $MARINER_BUILD_DIR output_mount; then
   echo It looks like a stage directory is still mounted
-  echo Unmount the directory, then run make toolchain-cleanup
+  echo Unmount the directory, then run 'make clean-toolchain'
   exit 1
 else
   echo No mounted stage directories found

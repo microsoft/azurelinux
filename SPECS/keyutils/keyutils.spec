@@ -1,14 +1,13 @@
 Summary:        Linux Key Management Utilities
 Name:           keyutils
-Version:        1.6.1
+Version:        1.6.3
 Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
-URL:            https://people.redhat.com/~dhowells/keyutils/
-Source0:        https://people.redhat.com/~dhowells/keyutils/%{name}-%{version}.tar.bz2
-Patch0:         tests_endianness_check_fix.patch
+URL:            https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/about/
+Source0:        https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/%{name}-%{version}.tar.gz
 
 %if %{with_check}
 BuildRequires: lsb-release
@@ -74,6 +73,10 @@ find %{buildroot} -name '*.a'  -delete
 %{_mandir}/man3/*
 
 %changelog
+* Fri Oct 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.6.3-1
+- Update to version 1.6.3
+- Update URL and Source0
+
 * Wed Nov 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.1-1
 - Update to version 1.6.1.
 - Enabled tests.

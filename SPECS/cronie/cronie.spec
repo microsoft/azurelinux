@@ -1,7 +1,7 @@
 Summary:        Cron Daemon
 Name:           cronie
 Version:        1.5.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2+ AND MIT AND BSD AND ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -58,15 +58,14 @@ extra features.
 
 %prep
 %setup -q
-sed -i 's/^\s*auth\s*include\s*password-auth$/auth       include    system-auth/g;
-     s/^\s*account\s*include\s*password-auth$/account    include    system-account/g;
-     s/^\s*session\s*include\s*password-auth$/session    include    system-session/g;' pam/crond
+sed -i 's/^\s*account\s*include\s*system-auth$/account    include    system-account/g;
+        s/^\s*session\s*include\s*system-auth$/session    include    system-session/g;' pam/crond
 
 %build
 ./configure \
     --prefix=%{_prefix} \
-    --sysconfdir=%{_sysconfdir}   \
-    --localstatedir=/var\
+    --sysconfdir=%{_sysconfdir} \
+    --localstatedir=/var \
     --with-pam          \
     --with-selinux      \
     --enable-anacron    \
@@ -166,6 +165,9 @@ make %{?_smp_mflags} check
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/cron.d/dailyjobs
 
 %changelog
+* Fri Oct 27 2023 Andrew Phelps <anphel@microsoft.com> - 1.5.7-3
+- Fix pam/crond file contents
+
 * Thu Jul 21 2022 Minghe Ren <mingheren@microsoft.com> - 1.5.7-2
 - Change file permission to improve security
 

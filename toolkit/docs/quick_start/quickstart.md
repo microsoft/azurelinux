@@ -44,6 +44,9 @@ sudo make image REBUILD_TOOLS=y REBUILD_PACKAGES=n CONFIG_FILE=./imageconfigs/co
 ```
 
 **Build the cloud-init configuration image**
+
+Note that the cloud-init configuration file does not build by default.  You will need to edit it to set a username and password or SSH Key.  The file is located in ./resources/assets/meta-user-data/user-data.
+
 ```Bash
 # Build the cloud-init configuration image
 # The output image is ../out/images/meta-user-data.iso
@@ -84,11 +87,7 @@ choose DVD Drive and press Add.
 
 1. Right click your VM and select _Connect..._.
 1. Select _Start_.
-1. Wait for CBL-Mariner to boot to the login prompt, then sign in with:
-
-       mariner_user
-       p@ssw0rd
-
+1. Wait for CBL-Mariner to boot to the login prompt, then sign in with the username and password you provisioned in the meta-user-data.iso above.
 
 ### ISO Image
 

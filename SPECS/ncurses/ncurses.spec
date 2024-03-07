@@ -1,9 +1,9 @@
-%global patchlevel     20230408
+%global patchlevel     20230423
 
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -233,6 +233,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Thu Nov 16 2023 Tobias Brick <tobiasb@microsoft.com> - 6.4-2
+- Update to version 6.4-20230423 to fix crash in tmux
+
 * Wed Apr 26 2023 Sindhu Karri <lakarri@microsoft.com> - 6.4-1
 - Update to version 6.4-20230408 to fix CVE-2023-29491
 
