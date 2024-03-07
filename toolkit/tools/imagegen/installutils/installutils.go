@@ -2040,7 +2040,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	}
 
 	// Set the boot prefix path
-	prefixPath := filepath.Join(bootPrefix, "grub2")
+	prefixPath := filepath.Join("/", bootPrefix, "grub2")
 	err = setGrubCfgPrefixPath(prefixPath, grubFinalPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set prefixPath in grub.cfg: %v", err)
