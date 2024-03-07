@@ -61,18 +61,19 @@ ignore_known_issues=" \
 alt_source_tag="Source9999"
 
 function prepare_lua {
-  local -a dirs_to_check
   local azl_lua_dir
   local azl_srpm_lua_dir
-  local lua_common_file_name
-  local lua_forge_file_name
+  local lua_common_path
+  local lua_forge_path
+  local lua_python_path
   local rpm_lua_dir
   local rpm_macros_dir
 
   rpm_macros_dir="$1"
 
-  lua_common_file_name="common.lua"
-  lua_forge_file_name="forge.lua"
+  lua_common_path="common.lua"
+  lua_forge_path="srpm/forge.lua"
+  lua_python_path="srpm/python.lua"
   rpm_lua_dir="$(rpm --eval "%_rpmluadir")"
   azl_lua_dir="$rpm_lua_dir/azl"
   azl_srpm_lua_dir="$azl_lua_dir/srpm"
@@ -84,8 +85,7 @@ function prepare_lua {
   fi
 
   # We only want to clean-up directories, which were absent from the system.
-  dirs_to_check=("$rpm_lua_dir" "$azl_lua_dir" "$azl_srpm_lua_dir")
-  for dir_path in "${dirs_to_check[@]}"
+  for dir_path in "$rpm_lua_dir" "$azl_lua_dir" "$azl_srpm_lua_dir"
   do
     if [[ ! -d "$dir_path" ]]
     then
@@ -95,17 +95,15 @@ function prepare_lua {
   done
   sudo mkdir -p "$azl_srpm_lua_dir"
 
-  if [[ ! -f "$azl_lua_dir/$lua_common_file_name" ]]
-  then
-    sudo cp "$rpm_macros_dir/$lua_common_file_name" "$azl_lua_dir/$lua_common_file_name"
-    FILES_TO_CLEAN_UP+=("$azl_lua_dir/$lua_common_file_name")
-  fi
-
-  if [[ ! -f "$azl_srpm_lua_dir/$lua_forge_file_name" ]]
-  then
-    sudo cp "$rpm_macros_dir/$lua_forge_file_name" "$azl_srpm_lua_dir/$lua_forge_file_name"
-    FILES_TO_CLEAN_UP+=("$azl_srpm_lua_dir/$lua_forge_file_name")
-  fi
+  for file_path in "$lua_common_path" "$lua_forge_path" "$lua_python_path"
+  do
+    system_lua_path="$azl_lua_dir/$file_path"
+    if [[ ! -f "$system_lua_path" ]]
+    then
+      sudo cp "$rpm_macros_dir/$(basename "$file_path")" "$system_lua_path"
+      FILES_TO_CLEAN_UP+=("$system_lua_path")
+    fi
+  done
 }
 
 function specs_dir_from_spec_path {
