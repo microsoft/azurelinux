@@ -233,6 +233,7 @@ BuildRequires: git
 BuildRequires: perl-interpreter
 BuildRequires: python3
 BuildRequires: python3-pytest
+BuildRequires: python3-pip
 # For xmllint
 BuildRequires: libxml2
 # For xsltproc
@@ -1281,7 +1282,7 @@ mv $RPM_BUILD_ROOT%{_datadir}/systemtap/tapset/libvirt_qemu_probes.stp \
 %endif
 
 %check
-
+pip3 install iniconfig
 %if %{with_native}
 # Building on slow archs, like emulated s390x in Fedora copr, requires
 # raising the test timeout
