@@ -59,6 +59,7 @@ find examples -type f -exec chmod 0644 \{\} \;
 %py3_install
 
 %check
+pip3 install iniconfig
 %pytest
 
 %files -n python3-libvirt
