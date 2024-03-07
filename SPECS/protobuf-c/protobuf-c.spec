@@ -62,7 +62,7 @@ find %{buildroot} -type f -name "libprotobuf-c.a" -delete -print
 %{_libdir}/libprotobuf-c.so
 
 %changelog
-* Tue Mar 06 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-3
+* Wed Mar 06 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-3
 - Remove protobuf-c static sub-package
 
 * Tue Mar 05 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-2
