@@ -1,5 +1,5 @@
 %global libdnf_major_version 0
-%global libdnf_minor_version 72
+%global libdnf_minor_version 73
 %global libdnf_micro_version 0
 
 Name:           libdnf
@@ -122,6 +122,9 @@ popd
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Wed Mar 06 2024 Sam Meluch <sammeluch@microsoft.com> - 0.73.0-1
+- upgrade to version 0.73.0
+
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 0.72.0-1
 - Upgrade to 0.72.0
 
