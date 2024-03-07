@@ -1,13 +1,13 @@
 Summary:        Shell script to auto detect free size on disk and grow partition.
 Name:           cloud-utils-growpart
-Version:        0.32
-Release:        3%{?dist}
+Version:        0.33
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment
-URL:            https://launchpad.net/cloud-utils
-Source0:        https://launchpad.net/cloud-utils/trunk/%{version}/+download/cloud-utils-%{version}.tar.gz
+URL:            https://github.com/canonical/cloud-utils
+Source0:        cloud-utils-0.33.tar.gz
 Requires:       gawk
 Requires:       gptfdisk
 Requires:       util-linux
@@ -35,6 +35,9 @@ cp man/growpart.* $RPM_BUILD_ROOT/%{_mandir}/man1/
 %doc %{_mandir}/man1/growpart.*
 
 %changelog
+* Wed Mar 06 2024 Minghe Ren <mingheren@microsoft.com> - 0.33-1
+- Upgrade to version to 0.33
+
 * Thu Jun 03 2021 Chris Co <chrco@microsoft.com> - 0.32-3
 - Remove patch now that unexpected timeout was root caused and fixed
 
