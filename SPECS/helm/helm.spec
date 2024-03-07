@@ -55,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Thu Mar 07 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 3.14.2-1
+- Bump release to 3.14.2 to address CVE-2024-26147
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.0-2
 - Bump release to rebuild with go 1.21.6
 
