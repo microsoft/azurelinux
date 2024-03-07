@@ -48,13 +48,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestShouldReturnCorrectRequiredPackagesForArch(t *testing.T) {
-	arm64RequiredPackages := []*pkgjson.PackageVer{
-		{Name: "systemd-rpm-macros"},
-	}
-	amd64RequiredPackages := []*pkgjson.PackageVer{
-		{Name: "grub2-pc"},
-		{Name: "systemd-rpm-macros"},
-	}
+	arm64RequiredPackages := []*pkgjson.PackageVer{}
+	amd64RequiredPackages := []*pkgjson.PackageVer{{Name: "grub2-pc"}}
 
 	requiredPackages := GetRequiredPackagesForInstall()
 
