@@ -87,7 +87,7 @@ EOF
 
 cat > /etc/os-release << "EOF"
 NAME="Azure Linux Toolchain"
-VERSION="3.0.2023"
+VERSION="3.0.2024"
 ID=azurelinux
 VERSION_ID="3.0"
 PRETTY_NAME="Azure Linux 3.0"
