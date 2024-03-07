@@ -20,7 +20,7 @@
 clamp_source_mtime () {\
     python_binary="%{__env_unset_source_date_epoch_if_not_clamp_mtime} %1"\
     bytecode_compilation_path="%2"\
-    PYTHONPATH="%{_rpmconfigdir}/redhat" $python_binary -s -B -m clamp_source_mtime $bytecode_compilation_path \
+    PYTHONPATH="%{_rpmconfigdir}/azl" $python_binary -s -B -m clamp_source_mtime $bytecode_compilation_path \
 }\
 \
 py2_byte_compile () {\
@@ -35,12 +35,12 @@ py2_byte_compile () {\
 py34_byte_compile () {\
     python_binary="%{__env_unset_source_date_epoch_if_not_clamp_mtime} PYTHONHASHSEED=0 %1"\
     bytecode_compilation_path="%2"\
-    PYTHONPATH="%{_rpmconfigdir}/redhat" $python_binary -s -B -m compileall2 %{?_smp_build_ncpus:-j%{_smp_build_ncpus}} -o 0 -o 1 -s $RPM_BUILD_ROOT -p / --hardlink-dupes $bytecode_compilation_path \
+    PYTHONPATH="%{_rpmconfigdir}/azl" $python_binary -s -B -m compileall2 %{?_smp_build_ncpus:-j%{_smp_build_ncpus}} -o 0 -o 1 -s $RPM_BUILD_ROOT -p / --hardlink-dupes $bytecode_compilation_path \
 }\
 py37_byte_compile () {\
     python_binary="%{__env_unset_source_date_epoch_if_not_clamp_mtime} PYTHONHASHSEED=0 %1"\
     bytecode_compilation_path="%2"\
-    PYTHONPATH="%{_rpmconfigdir}/redhat" $python_binary -s -B -m compileall2 %{?_smp_build_ncpus:-j%{_smp_build_ncpus}} -o 0 -o 1 -s $RPM_BUILD_ROOT -p / --hardlink-dupes --invalidation-mode=timestamp $bytecode_compilation_path \
+    PYTHONPATH="%{_rpmconfigdir}/azl" $python_binary -s -B -m compileall2 %{?_smp_build_ncpus:-j%{_smp_build_ncpus}} -o 0 -o 1 -s $RPM_BUILD_ROOT -p / --hardlink-dupes --invalidation-mode=timestamp $bytecode_compilation_path \
 }\
 \
 py39_byte_compile () {\

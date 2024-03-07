@@ -76,9 +76,9 @@
 %__env_unset_source_date_epoch_if_not_clamp_mtime %[0%{?clamp_mtime_to_source_date_epoch} == 0 ? "env -u SOURCE_DATE_EPOCH" : "env"]
 
 ## The individual BRP scripts
-%__brp_python_bytecompile %{__env_unset_source_date_epoch_if_not_clamp_mtime} %{_rpmconfigdir}/redhat/brp-python-bytecompile "" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}" "%{?_smp_build_ncpus:-j%{_smp_build_ncpus}}"
-%__brp_fix_pyc_reproducibility %{_rpmconfigdir}/redhat/brp-fix-pyc-reproducibility
-%__brp_python_hardlink %{_rpmconfigdir}/redhat/brp-python-hardlink
+%__brp_python_bytecompile %{__env_unset_source_date_epoch_if_not_clamp_mtime} %{_rpmconfigdir}/azl/brp-python-bytecompile "" "%{?_python_bytecompile_errors_terminate_build}" "%{?_python_bytecompile_extra}" "%{?_smp_build_ncpus:-j%{_smp_build_ncpus}}"
+%__brp_fix_pyc_reproducibility %{_rpmconfigdir}/azl/brp-fix-pyc-reproducibility
+%__brp_python_hardlink %{_rpmconfigdir}/azl/brp-python-hardlink
 
 ## This macro is included in redhat-rpm-config's %%__os_install_post
 # Note that the order matters:

@@ -59,8 +59,6 @@ BuildRequires:  python3-rpm-macros
 Requires:       python-rpm-macros
 Requires:       python-srpm-macros
 Requires:       python3-rpm-macros
-# FIXME - our toolkit can't handle logical deps like this
-#Requires:       (pyproject-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release} if pyproject-srpm-macros)
 Requires:       pyproject-srpm-macros = %{version}-%{release}
 
 # We use the following tools outside of coreutils
@@ -87,8 +85,8 @@ which only work with setup.py.
 
 %package -n pyproject-srpm-macros
 Summary:        Minimal implementation of %%pyproject_buildrequires
-Requires:       pyproject-rpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
-Requires:       rpm-build >= 4.14.90
+Requires:       pyproject-rpm-macros
+Requires:       rpm-build
 
 %description -n pyproject-srpm-macros
 This package contains a minimal implementation of %%pyproject_buildrequires.

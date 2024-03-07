@@ -65,7 +65,7 @@ print(_python_macro_cache[cache_key][name])
   else
     shebang_flags="-ka%{py_shebang_flags}"
   fi
-  %{__python} -B %{_rpmconfigdir}/redhat/pathfix.py -pni %{__python} $shebang_flags}
+  %{__python} -B %{_rpmconfigdir}/azl/pathfix.py -pni %{__python} $shebang_flags}
 
 # Use the slashes after expand so that the command starts on the same line as
 # the macro
@@ -114,7 +114,7 @@ print(_python_macro_cache[cache_key][name])
   if rpm.expand("%{?py_shebang_flags}") ~= "" then
     command = command .. "-%{py_shebang_flags}"
   end
-  command = command .. " %{_rpmconfigdir}/redhat/import_all_modules.py "
+  command = command .. " %{_rpmconfigdir}/azl/import_all_modules.py "
   -- handle multiline arguments correctly, see https://bugzilla.redhat.com/2018809
   local args=rpm.expand('%{?**}'):gsub("[%s\\\\]*%s+", " ")
   print(command .. args)

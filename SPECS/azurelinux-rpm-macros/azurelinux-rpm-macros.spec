@@ -6,7 +6,7 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
-Version:        %{azl}.0
+Version:        3.0
 Release:        1%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
@@ -44,6 +44,10 @@ Source25:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/
 Source26:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/compileall2.py
 Source27:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/python.lua
 Source28:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/clamp_source_mtime.py
+Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/pathfix.py
+Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-fix-pyc-reproducibility
+Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
+Source32:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
 ###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
@@ -84,6 +88,8 @@ install -p -m 444 -t %{buildroot}%{rcdir} default-annobin-*
 install -p -m 755 -t %{buildroot}%{rcdir} gpgverify
 install -p -m 755 -t %{buildroot}%{rcdir} compileall2.py
 install -p -m 755 -t %{buildroot}%{rcdir} brp-*
+install -p -m 755 -t %{buildroot}%{rcdir} pathfix.py
+install -p -m 755 -t %{buildroot}%{rcdir} import_all_modules.py
 install -p -m 644 -t %{buildroot}%{rcdir} clamp_source_mtime.py
 install -p -m 755 -t %{buildroot}%{rcdir} gen-ld-script.sh
 install -p -m 755 -t %{buildroot}%{rcdir} generate-package-note.py
@@ -106,6 +112,8 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{rcdir}/default-annobin-*
 %{rcdir}/gpgverify
 %{rcdir}/brp-*
+%{rcdir}/import_all_modules.py
+%{rcdir}/pathfix.py
 %{rcdir}/clamp_source_mtime.py
 %{rcdir}/compileall2.py
 %{rcdir}/gen-ld-script.sh

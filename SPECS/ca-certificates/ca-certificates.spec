@@ -44,7 +44,7 @@ Name:           ca-certificates
 
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "prebuilt-ca-certificates*" packages as well.
 Epoch:          1
-Version:        %{azl}.0.0
+Version:        3.0.0
 Release:        3%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation

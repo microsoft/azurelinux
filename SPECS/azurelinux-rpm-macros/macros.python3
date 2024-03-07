@@ -39,7 +39,7 @@
   else
     shebang_flags="-ka%{py3_shebang_flags}"
   fi
-  %{__python3} -B %{_rpmconfigdir}/redhat/pathfix.py -pni %{__python3} $shebang_flags}
+  %{__python3} -B %{_rpmconfigdir}/azl/pathfix.py -pni %{__python3} $shebang_flags}
 
 # Use the slashes after expand so that the command starts on the same line as
 # the macro
@@ -88,7 +88,7 @@
   if rpm.expand("%{?py3_shebang_flags}") ~= "" then
     command = command .. "-%{py3_shebang_flags}"
   end
-  command = command .. " %{_rpmconfigdir}/redhat/import_all_modules.py "
+  command = command .. " %{_rpmconfigdir}/azl/import_all_modules.py "
   -- handle multiline arguments correctly, see https://bugzilla.redhat.com/2018809
   local args=rpm.expand('%{?**}'):gsub("[%s\\\\]*%s+", " ")
   print(command .. args)
