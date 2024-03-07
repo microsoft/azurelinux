@@ -22,7 +22,8 @@ VALID_SOURCE_ATTRIBUTIONS = {
     "OpenSUSE":                       r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from openSUSE \w+ \(license: same as "License" tag\)(\.|\n|$)',
     "Photon":                         r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from Photon \(license: Apache2\)(\.|\n|$)',
     "Sysbench source":                r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from Sysbench source \(license: GPLv2\+\)(\.|\n|$)',
-    "RPM software management source": r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from RPM software management source \(license: GPLv2\+\)(\.|\n|$)'
+    "RPM software management source": r'\n-\s+Initial (CBL-Mariner|Azure Linux) import from RPM software management source \(license: GPLv2\+\)(\.|\n|$)',
+    "Source project":                 r'\n-\s+Initial Azure Linux import from the source project \(license: same as "License" tag\)(\.|\n|$)',           
 }
 
 KNOWN_SOURCE_ORIGINS = VALID_SOURCE_ATTRIBUTIONS.keys()
