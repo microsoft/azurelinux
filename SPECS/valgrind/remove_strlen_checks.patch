@@ -1,0 +1,32 @@
+diff --git a/coregrind/m_redir.c b/coregrind/m_redir.c
+index cef241b4f..449e916cc 100644
+--- a/coregrind/m_redir.c
++++ b/coregrind/m_redir.c
+@@ -1372,9 +1372,6 @@ void VG_(redir_initialise) ( void )
+       add_hardwired_spec(
+          "ld-linux.so.2", "index",
+          (Addr)&VG_(x86_linux_REDIR_FOR_index), mandatory);
+-      add_hardwired_spec(
+-         "ld-linux.so.2", "strlen",
+-         (Addr)&VG_(x86_linux_REDIR_FOR_strlen), mandatory);
+    }
+ 
+ #  elif defined(VGP_amd64_linux)
+@@ -1399,17 +1396,6 @@ void VG_(redir_initialise) ( void )
+       add_hardwired_spec(
+          "ld-linux-x86-64.so.2", "index",
+          (Addr)&VG_(amd64_linux_REDIR_FOR_index), NULL);
+-      add_hardwired_spec(
+-         "ld-linux-x86-64.so.2", "strlen",
+-         (Addr)&VG_(amd64_linux_REDIR_FOR_strlen),
+-#        ifndef GLIBC_MANDATORY_STRLEN_REDIRECT
+-         NULL
+-#        else
+-         /* for glibc-2.10 and later, this is mandatory - can't sanely
+-            continue without it */
+-         complain_about_stripped_glibc_ldso
+-#        endif
+-      );   
+    }
+ 
+ #  elif defined(VGP_ppc32_linux)
