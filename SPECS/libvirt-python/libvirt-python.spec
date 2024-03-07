@@ -59,14 +59,10 @@ find examples -type f -exec chmod 0644 \{\} \;
 %py3_install
 
 %check
-pip3 install \
-    more-itertools \
-    pluggy
-python3 setup.py test
+%pytest
 
 %files -n python3-libvirt
-%license COPYING COPYING.LESSER
-%doc ChangeLog AUTHORS README examples/
+%doc ChangeLog AUTHORS README COPYING examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
 %{python3_sitearch}/libvirt_qemu.py*
