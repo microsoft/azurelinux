@@ -3057,6 +3057,12 @@
                 "dnf5"
             ]
         },
+        "Source project": {
+            "license": "Same as the source project.",
+            "specs": [
+                "python-nocaselist"
+            ]
+        },
         "Sysbench source": {
             "license": "[GPLv2+ License](https://github.com/akopytov/sysbench/blob/master/COPYING)",
             "specs": [
