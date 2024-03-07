@@ -389,6 +389,7 @@ This package provides the glusterfs libgfapi library.
 
 %package -n libgfapi-devel
 Summary:          Development Libraries
+Requires:         libgfapi0
 Requires:         libglusterfs-devel%{?_isa} = %{version}-%{release}
 Requires:         libacl-devel
 Obsoletes:        %{name}-api-devel <= %{version}-%{release}
