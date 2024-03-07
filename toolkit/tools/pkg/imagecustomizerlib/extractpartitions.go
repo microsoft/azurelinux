@@ -49,32 +49,10 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			case "raw":
 				// Do nothing for "raw" case.
 			case "raw-zst":
-				partitionRawFilepath := partitionFilepath
-				partitionFilepath, err := compressWithZstd(partitionRawFilepath)
+				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata)
 				if err != nil {
 					return err
 				}
-				// Create a skippable frame containing the metadata and prepend the frame to the partition file
-				err = addSkippableFrame(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
-				if err != nil {
-					return err
-				}
-				// Verify decompression with skippable frame
-				err = verifySkippableFrameDecompression(partitionRawFilepath, partitionFilepath)
-				if err != nil {
-					return err
-				}
-				// Remove raw file since output partition format is raw-zst.
-				err = os.Remove(partitionRawFilepath)
-				if err != nil {
-					return fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
-				}
-				// Verify skippable frame metadata
-				err = verifySkippableFrameMetadataFromFile(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
-				if err != nil {
-					return err
-				}
-				logger.Log.Infof("Partition file created: %s", partitionFilepath)
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
@@ -82,6 +60,36 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 		}
 	}
 	return nil
+}
+
+// Extract raw-zstd partition
+func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFrameSize]byte) (partitionFilepath string, err error) {
+	// Compress raw partition with zstd and output it
+	partitionFilepath, err = compressWithZstd(partitionRawFilepath)
+	if err != nil {
+		return "", err
+	}
+	// Create a skippable frame containing the metadata and prepend the frame to the partition file
+	err = addSkippableFrame(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
+	if err != nil {
+		return "", err
+	}
+	// Verify decompression with skippable frame
+	err = verifySkippableFrameDecompression(partitionRawFilepath, partitionFilepath)
+	if err != nil {
+		return "", err
+	}
+	// Remove raw file since output partition format is raw-zst.
+	err = os.Remove(partitionRawFilepath)
+	if err != nil {
+		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
+	}
+	// Verify skippable frame metadata
+	err = verifySkippableFrameMetadataFromFile(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
+	if err != nil {
+		return "", err
+	}
+	return partitionFilepath, nil
 }
 
 // Creates .raw file for the mentioned partition path.
