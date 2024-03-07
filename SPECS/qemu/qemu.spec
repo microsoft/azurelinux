@@ -6,7 +6,6 @@ Distribution:   Azure Linux
 %bcond_without check
 
 # This spec is for AzLinux
-%global azl 3
 %global azl_no_ui 1
 
 %global __strip /bin/true
