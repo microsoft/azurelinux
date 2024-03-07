@@ -14354,7 +14354,7 @@
         "other": {
           "name": "nmi",
           "version": "1.8.17",
-          "downloadUrl": "https://github.com/azure/aad-pod-identity/archive/refs/tags/v1.8.17.tar.gz"
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.17.tar.gz"
         }
       }
     },
