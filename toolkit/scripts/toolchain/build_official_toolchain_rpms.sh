@@ -541,6 +541,17 @@ chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 build_rpm_in_chroot_no_install gtk-doc
 
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
+
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
@@ -620,17 +631,6 @@ build_rpm_in_chroot_no_install libselinux
 
 # libcap-ng needs: swig, python3
 build_rpm_in_chroot_no_install libcap-ng
-
-build_rpm_in_chroot_no_install python-setuptools
-chroot_and_install_rpms python-setuptools python3-setuptools
-
-build_rpm_in_chroot_no_install pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
-chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
-
-# python-packaging requires pyproject-rpm-macros
-build_rpm_in_chroot_no_install python-packaging
-chroot_and_install_rpms python-packaging python3-packaging
 
 # util-linux and rpm require libselinux and libcap-ng
 chroot_and_install_rpms libselinux
