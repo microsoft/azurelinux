@@ -84,7 +84,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 	tlsKey, tlsCert = strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
 	err = r.addNetworkFiles(tlsCert, tlsKey)
 	if err != nil {
-		err = fmt.Errorf("failed to customize RPM repo cloner. Error:\n%w", err)
+		err = fmt.Errorf("failed to customize RPM repo cloner:\n%w", err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// Ensure that if initialization fails, the chroot is closed
 	defer func() {
 		if err != nil {
-			logger.Log.Warnf("Failed to initialize cloner. Error: %s", err)
+			logger.Log.Warnf("Failed to initialize cloner:\n%v", err)
 			if r.chroot != nil {
 				closeErr := r.chroot.Close(leaveChrootFilesOnDisk)
 				if closeErr != nil {
@@ -134,7 +134,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// Create the directory to download into
 	err = os.MkdirAll(destinationDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Warnf("Could not create download directory (%s)", destinationDir)
+		err = fmt.Errorf("failed to create download directory (%s):\n%w", destinationDir, err)
 		return
 	}
 
@@ -176,11 +176,10 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
 	reposToInitialize := []string{chrootLocalRpmsDir, chrootCloneDirRegular, chrootCloneDirContainer, chrootLocalToolchainDir}
 	for _, repoToInitialize := range reposToInitialize {
-		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
+		logger.Log.Debugf("Initializing the (%s) repository", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
 		if err != nil {
-			logger.Log.Errorf("Failed while trying to initialize the '%s' repository.", repoToInitialize)
-			return
+			return fmt.Errorf("failed to initialize repository (%s):\n%w", repoToInitialize, err)
 		}
 	}
 
@@ -245,16 +244,14 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Create the directory for the repo file in case there wasn't already one there
 	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
 	if err != nil {
-		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
-		return
+		return fmt.Errorf("failed to create directory for chroot repo file (%s):\n%w", fullRepoFilePath, err)
 	}
 
 	// Get a list of the existing repofiles that are part of the chroot, if any
 	// We need to capture this list before we add 'allrepos.repo'.
 	existingRepoFiles, err := filepath.Glob(filepath.Join(fullRepoDirPath, "*"))
 	if err != nil {
-		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
-		return
+		return fmt.Errorf("failed to list existing repo files (%s):\n%w", fullRepoDirPath, err)
 	}
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -317,13 +314,11 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 	return r.chroot.Run(func() (err error) {
 		err = os.MkdirAll(repoDir, os.ModePerm)
 		if err != nil {
-			logger.Log.Errorf("Failed to create repo directory '%s'.", repoDir)
-			return
+			return fmt.Errorf("failed to create repo directory (%s):\n%w", repoDir, err)
 		}
 		err = rpmrepomanager.CreateRepo(repoDir)
 		if err != nil {
-			logger.Log.Errorf("Failed to create an RPM repository under '%s'.", repoDir)
-			return
+			return fmt.Errorf("failed to create an RPM repository under (%s):\n%w", repoDir, err)
 		}
 
 		return r.refreshPackagesCache()
@@ -520,6 +515,9 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		// Docker based build doesn't use overlay so cache repo
 		// must be explicitly initialized
 		err = r.initializeMountedChrootRepo(chrootCloneDirContainer)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -764,7 +762,8 @@ func (r *RpmRepoCloner) refreshPackagesCache() (err error) {
 
 	stdout, stderr, err := shell.Execute("tdnf", args...)
 	if err != nil {
-		logger.Log.Errorf("Failed to run 'tdnf makecache'. Stdout:\n%s\nStderr:\n%s\nError: %s.", stdout, stderr, err)
+		logger.Log.Errorf("Failed to run 'tdnf makecache'\nstdout:\n%v", stdout)
+		return fmt.Errorf("failed to run 'tdnf makecache':\n%v\n%w", stderr, err)
 	}
 
 	return

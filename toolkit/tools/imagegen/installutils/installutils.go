@@ -1815,12 +1815,14 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 		if err != nil {
 			return err
 		}
-	}
 
-	// Cleanup temporary directory.
-	err = os.RemoveAll(targetRootPath)
-	if err != nil {
-		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+		// Cleanup the temporary directory.
+		// Note: This is intentionally done within the for loop to ensure the directory is always empty for the next
+		// mount. For example, if a parent directory mount is processed after a nested child directory mount.
+		err = os.RemoveAll(targetRootPath)
+		if err != nil {
+			return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+		}
 	}
 
 	return
@@ -2038,7 +2040,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	}
 
 	// Set the boot prefix path
-	prefixPath := filepath.Join(bootPrefix, "grub2")
+	prefixPath := filepath.Join("/", bootPrefix, "grub2")
 	err = setGrubCfgPrefixPath(prefixPath, grubFinalPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set prefixPath in grub.cfg: %v", err)

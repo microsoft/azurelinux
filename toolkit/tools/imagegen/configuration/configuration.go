@@ -112,7 +112,7 @@ func GetKernelCmdLineValue(option string) (cmdlineValue string, err error) {
 
 	content, err := os.ReadFile(cmdlineFile)
 	if err != nil {
-		logger.Log.Errorf("failed to read from %s", cmdlineFile)
+		err = fmt.Errorf("failed to read from (%s):\n%w", cmdlineFile, err)
 		return
 	}
 
@@ -154,7 +154,7 @@ func checkDeviceMapperFlags(config *Config) (err error) {
 				return fmt.Errorf("can't find a [Disk] [Partition] to match with [PartitionSetting] '%s'", rootPartSetting.ID)
 			}
 			if !rootDiskPart.HasFlag(PartitionFlagDeviceMapperRoot) {
-				return fmt.Errorf("[Partition] '%s' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] '%s's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", rootDiskPart.ID, sysConfig.Name)
+				return fmt.Errorf("[Partition] (%s) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (%s)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", rootDiskPart.ID, sysConfig.Name)
 			}
 		}
 		// There is currently a limitation in diskutils.CreatePartitions() which requires us to know our device-mapper
@@ -166,7 +166,7 @@ func checkDeviceMapperFlags(config *Config) (err error) {
 			part := config.GetDiskPartByID(partSetting.ID)
 			if part != nil && part.HasFlag(PartitionFlagDeviceMapperRoot) {
 				if dmRoot != nil {
-					return fmt.Errorf("[SystemConfig] '%s' includes two (or more) device mapper root [PartitionSettings] '%s' and '%s', include only one", sysConfig.Name, dmRoot.ID, part.ID)
+					return fmt.Errorf("[SystemConfig] (%s) includes two (or more) device mapper root [PartitionSettings] (%s) and (%s), include only one", sysConfig.Name, dmRoot.ID, part.ID)
 				}
 				dmRoot = part
 			}
@@ -180,7 +180,7 @@ func checkForMissingDiskPartitions(config *Config) (err error) {
 	for _, sysConfig := range config.SystemConfigs {
 		for _, partSetting := range sysConfig.PartitionSettings {
 			if config.GetDiskPartByID(partSetting.ID) == nil {
-				return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' which has no corresponding partition on a [Disk]", sysConfig.Name, partSetting.ID)
+				return fmt.Errorf("[SystemConfig] (%s) mounts a [Partition] (%s) which has no corresponding partition on a [Disk]", sysConfig.Name, partSetting.ID)
 			}
 		}
 	}
@@ -196,7 +196,7 @@ func checkDuplicatePartitionIDs(config *Config) (err error) {
 			id := part.ID
 			otherDisk, alreadyUsed := idUsed[id]
 			if alreadyUsed {
-				return fmt.Errorf("a [Partition] on a [Disk] '%d' shares an ID '%s' with another partition (on disk '%d')", otherDisk, id, i)
+				return fmt.Errorf("a [Partition] on a [Disk] (%d) shares an ID (%s) with another partition (on disk (%d))", otherDisk, id, i)
 			} else {
 				idUsed[id] = i
 			}
@@ -216,11 +216,11 @@ func checkInvalidMountIdentifiers(config *Config) (err error) {
 				disk := config.GetDiskContainingPartition(diskPart)
 
 				if disk.PartitionTableType != PartitionTableTypeGpt {
-					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", sysConfig.Name, partSetting.ID)
+					return fmt.Errorf("[SystemConfig] (%s) mounts a [Partition] (%s) via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", sysConfig.Name, partSetting.ID)
 				}
 
 				if diskPart.Name == "" {
-					return fmt.Errorf("[SystemConfig] '%s' mounts a [Partition] '%s' via PARTLABEL, but it has no [Name]", sysConfig.Name, partSetting.ID)
+					return fmt.Errorf("[SystemConfig] (%s) mounts a [Partition] (%s) via PARTLABEL, but it has no [Name]", sysConfig.Name, partSetting.ID)
 				}
 			}
 		}
@@ -232,30 +232,30 @@ func checkInvalidMountIdentifiers(config *Config) (err error) {
 func (c *Config) IsValid() (err error) {
 	for _, disk := range c.Disks {
 		if err = disk.IsValid(); err != nil {
-			return fmt.Errorf("invalid [Disks]: %w", err)
+			return fmt.Errorf("invalid [Disks]:\n%w", err)
 		}
 	}
 
 	// Check that we will be able to reliably find our disk partitions for each SystemConfig
 	err = checkForMissingDiskPartitions(c)
 	if err != nil {
-		return fmt.Errorf("invalid [Config]: %w", err)
+		return fmt.Errorf("invalid [Config]:\n%w", err)
 	}
 
 	err = checkDuplicatePartitionIDs(c)
 	if err != nil {
-		return fmt.Errorf("invalid [Config]: %w", err)
+		return fmt.Errorf("invalid [Config]:\n%w", err)
 	}
 
 	// Check the flags for the disks
 	err = checkDeviceMapperFlags(c)
 	if err != nil {
-		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: %w", err)
+		return fmt.Errorf("a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n%w", err)
 	}
 
 	err = checkInvalidMountIdentifiers(c)
 	if err != nil {
-		return fmt.Errorf("invalid [Config]: %w", err)
+		return fmt.Errorf("invalid [Config]:\n%w", err)
 	}
 
 	if len(c.SystemConfigs) == 0 {
@@ -263,7 +263,7 @@ func (c *Config) IsValid() (err error) {
 	}
 	for _, sysConfig := range c.SystemConfigs {
 		if err = sysConfig.IsValid(); err != nil {
-			return fmt.Errorf("invalid [SystemConfigs]: %w", err)
+			return fmt.Errorf("invalid [SystemConfigs]:\n%w", err)
 		}
 	}
 	defaultFound := false
@@ -284,13 +284,13 @@ func (c *Config) UnmarshalJSON(b []byte) (err error) {
 	type IntermediateTypeConfig Config
 	err = json.Unmarshal(b, (*IntermediateTypeConfig)(c))
 	if err != nil {
-		return fmt.Errorf("failed to parse [Config]: %w", err)
+		return fmt.Errorf("failed to parse [Config]:\n%w", err)
 	}
 
 	// Now validate the resulting unmarshaled object
 	err = c.IsValid()
 	if err != nil {
-		return fmt.Errorf("failed to parse [Config]: %w", err)
+		return fmt.Errorf("failed to parse [Config]:\n%w", err)
 	}
 	return
 }
@@ -320,7 +320,7 @@ func LoadWithAbsolutePaths(configFilePath, baseDirPath string) (config Config, e
 
 	baseDirPath, err = resolveBaseDirPath(baseDirPath, configFilePath)
 	if err != nil {
-		logger.Log.Errorf("Failed to resolve base directory path (%s) for config under (%s)", baseDirPath, configFilePath)
+		err = fmt.Errorf("failed to resolve base directory path (%s) for config under (%s):\n%w", baseDirPath, configFilePath, err)
 		return
 	}
 

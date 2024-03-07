@@ -8,7 +8,7 @@
 
 Name:         kata-containers-cc
 Version:      0.6.1
-Release:      3%{?dist}
+Release:      4%{?dist}
 Summary:      Kata Confidential Containers
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -41,18 +41,16 @@ BuildRequires:  fuse-devel
 
 # needed to build the tarfs module, see next comment - we currently build the tarfs module for both kernels
 BuildRequires:  kernel-uvm-devel
-BuildRequires:  kernel-uvm-cvm-devel
 
 # kernel-uvm is required for allowing to test the kata-cc handler w/o SEV SNP but with the
 # policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy features
 Requires:  kernel-uvm
-Requires:  kernel-uvm-cvm
 Requires:  moby-containerd-cc
 
 %description
 Kata Confidential Containers.
 
-# This subpackage is used to build the uvm and therefore has dependencies on the kernel-uvm(-cvm) binaries
+# This subpackage is used to build the uvm and therefore has dependencies on the kernel-uvm binaries
 %package tools
 Summary:        Kata CC tools package for building UVM components
 Requires:       cargo
@@ -62,7 +60,6 @@ Requires:       curl
 Requires:       veritysetup
 Requires:       opa >= 0.50.2
 Requires:       kernel-uvm
-Requires:       kernel-uvm-cvm
 
 %description tools
 This package contains the UVM osbuilder files
@@ -105,33 +102,17 @@ cargo build --release
 popd
 
 # kernel modules
-pushd /usr/src/linux-headers*cvm
-header_dir=$(basename $PWD)
-KERNEL_CVM_VER=${header_dir#"linux-headers-"}
-KERNEL_CVM_MODULE_VER=${KERNEL_CVM_VER%%-*}
-popd
-
-pushd /usr/src/$(ls /usr/src | grep linux-header | grep -v cvm)
+pushd /usr/src/linux-headers*
 header_dir=$(basename $PWD)
 KERNEL_VER=${header_dir#"linux-headers-"}
 KERNEL_MODULE_VER=${KERNEL_VER%%-*}
 popd
-
-# make a copy of the tarfs folder for cvm modules
-mkdir -p %{_builddir}/%{name}-%{version}/src/tarfs-cvm
-cp -aR %{_builddir}/%{name}-%{version}/src/tarfs/* %{_builddir}/%{name}-%{version}/src/tarfs-cvm/
 
 pushd %{_builddir}/%{name}-%{version}/src/tarfs
 make KDIR=/usr/src/linux-headers-${KERNEL_VER}
 make KDIR=/usr/src/linux-headers-${KERNEL_VER} install
 popd
 %global KERNEL_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs/_install/lib/modules/${KERNEL_MODULE_VER}
-
-pushd %{_builddir}/%{name}-%{version}/src/tarfs-cvm
-make KDIR=/usr/src/linux-headers-${KERNEL_CVM_VER}
-make KDIR=/usr/src/linux-headers-${KERNEL_CVM_VER} install
-popd
-%global KERNEL_CVM_MODULES_DIR %{_builddir}/%{name}-%{version}/src/tarfs-cvm/_install/lib/modules/${KERNEL_CVM_MODULE_VER}
 
 %install
 %define coco_path     /opt/confidential-containers
@@ -148,7 +129,6 @@ mkdir -p %{buildroot}%{osbuilder}/ci
 
 # kernel modules
 cp -aR %{KERNEL_MODULES_DIR} %{buildroot}%{osbuilder}
-cp -aR %{KERNEL_CVM_MODULES_DIR} %{buildroot}%{osbuilder}
 
 # osbuilder
 pushd %{_builddir}/%{name}-%{version}
@@ -290,6 +270,11 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+*   Thu Feb 29 2024 Cameron Baird <cameronbaird@microsoft.com> - 0.6.1-4
+-   Remove kernel-uvm-cvm(-devel) dependency
+-   Remove kernel-uvm-cvm modules/sources/files
+-   Remove instructions to build kernel-uvm-cvm related binaries
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
 - Bump release to rebuild with go 1.20.10
 
