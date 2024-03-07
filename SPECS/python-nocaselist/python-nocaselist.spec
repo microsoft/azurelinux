@@ -28,7 +28,7 @@ BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
 %if 0%{?with_check}
-BuildRequires: python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-six
 %endif
@@ -56,4 +56,5 @@ pip install iniconfig
 
 %changelog
 * Wed Mar 06 2024 Yash Panchal <yashpanchal@microsoft.com> - 2.0.0-1
-- Initial packaging for Azure Linux
+- Initial Azure Linux import from the source project (license: same as "License" tag).
+- License verified.
