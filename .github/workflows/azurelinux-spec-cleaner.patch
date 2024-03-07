@@ -98,7 +98,7 @@ index 0000000..9577d23
 +
 +steps:
 +- bash: |
-+    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
++    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/azurelinux-spec-cleaner.patch
 +
 +- task: PublishBuildArtifacts@1
 +  inputs:
@@ -10682,7 +10682,7 @@ index c701543..326c724 100644
 -    """
      parser = argparse.ArgumentParser(
 -        prog='spec-cleaner',
-+        prog='mariner-spec-cleaner',
++        prog='azurelinux-spec-cleaner',
          formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 -        description='Cleans the given spec file according to style guide and returns the result. If "#nospeccleaner"'
 -        'tag is used in the spec file than the spec file will not be cleaned.',
