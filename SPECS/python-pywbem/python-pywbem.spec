@@ -27,7 +27,6 @@ easiest way to write providers on the planet.
 
 %package -n python3-%{pkgname}
 Summary:        Python3 WBEM Client and Provider Interface
-BuildRequires:  python3-nocaselist
 BuildRequires:  python3-PyYAML
 BuildRequires:  python3-devel
 BuildRequires:  python3-pbr
@@ -38,11 +37,11 @@ BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-PyYAML
 Requires:       python3-nocasedict
+Requires:       python3-nocaselist
 Requires:       python3-ply
 Requires:       python3-requests
 Requires:       python3-xml
 Requires:       python3-yamlloader
-AutoReqProv:    no
 Provides:       python3dist(pywbem) = %{version}-%{release}
 Provides:       python3.7dist(pyweb) = %{version}-%{release}
 BuildArch:      noarch
