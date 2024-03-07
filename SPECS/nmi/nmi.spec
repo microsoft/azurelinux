@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        Node Managed Identity
 Name:           nmi
-Version:        1.8.11
-Release:        2%{?dist}
+Version:        1.8.17
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -61,6 +61,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Thu Mar 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.17-1
+- Auto-upgrade to 1.8.17 - CVE-2022-41717
+
 * Fri Feb 09 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.11-2
 - Bump release to rebuild with go 1.21.6
 
