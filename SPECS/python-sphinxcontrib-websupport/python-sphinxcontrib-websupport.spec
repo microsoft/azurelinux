@@ -6,7 +6,7 @@
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pypi_name}
 Version:        1.2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ Requires:       python3-sphinxcontrib-serializinghtml
 %description -n python3-%{pypi_name}
 The python-sphinxcontrib-websupport package provides a Python API to easily integrate Sphinx documentation into your Web application.
 
-%pyproject_extras_subpkg -n python3-%{pkgname} whoosh
+%pyproject_extras_subpkg -n python3-%{pypi_name} whoosh
 
 %prep
 %autosetup -n %{pypi_name}-%{version} -p 1
@@ -55,6 +55,9 @@ pip3 install tox tox-current-env pytest
 %doc README.rst
 
 %changelog
+* Web Mar 06 2024 Andrew Phelps <anphel@microsoft.com> - 1.2.7-2
+- Fix macro usage in pyproject_extras_subpkg
+
 * Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-1
 - Auto-upgrade to 1.2.7 - 3.0 - Upgrade
 - Use pypi macros
