@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "cloud-utils-growpart",
-          "version": "0.32",
-          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.32/+download/cloud-utils-0.32.tar.gz"
+          "version": "0.33",
+          "downloadUrl": "https://github.com/canonical/cloud-utils/archive/refs/tags/0.33.tar.gz"
         }
       }
     },

@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/canonical/cloud-utils
-Source0:        cloud-utils-0.33.tar.gz
+Source0:        https://github.com/canonical/cloud-utils/archive/refs/tags/%{version}.tar.gz
 Requires:       gawk
 Requires:       gptfdisk
 Requires:       util-linux
