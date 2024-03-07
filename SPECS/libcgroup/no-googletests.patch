@@ -1,17 +1,18 @@
 diff --git a/tests/gunit/Makefile.am b/tests/gunit/Makefile.am
-index 353567b..612eb3b 100644
+index 353567b..fbedb50 100644
 --- a/tests/gunit/Makefile.am
 +++ b/tests/gunit/Makefile.am
-@@ -9,8 +9,6 @@
+@@ -9,19 +9,14 @@
  AM_CPPFLAGS = -I$(top_srcdir)/include \
  	      -I$(top_srcdir)/src \
  	      -I$(top_srcdir)/src/tools \
 -	      -I$(top_srcdir)/googletest/googletest/include \
 -	      -I$(top_srcdir)/googletest/googletest \
- 	      -std=c++11 \
+-	      -std=c++11 \
++	      -std=c++14 \
  	      -Wno-write-strings \
  	      -DSTATIC= \
-@@ -18,10 +16,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include \
+ 	      -DUNIT_TEST
  LDADD = $(top_builddir)/src/.libs/libcgroupfortesting.la \
  	$(top_builddir)/src/tools/.libs/libcgset.la
  

@@ -31,7 +31,6 @@ Patch5: no-googletests.patch
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: gcc
-BuildRequires: gcc-c++
 BuildRequires: coreutils
 BuildRequires: flex
 BuildRequires: make
@@ -85,8 +84,6 @@ autoreconf -vif
            --disable-daemon
 
 # build libcgroup
-export CXXFLAGS="$CXXFLAGS -std=c++14"
-
 make %{?_smp_mflags}
 
 %install
