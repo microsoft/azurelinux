@@ -17,6 +17,12 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
+// Define global constants
+const (
+	MagicNumber uint32 = 0x184D2A50
+	FrameSize   uint32 = 16
+)
+
 // Extract all partitions of connected image into separate files with specified format.
 func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
 
@@ -25,10 +31,6 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	if err != nil {
 		return err
 	}
-
-	// Define magicNumber and frameSize for skippable frames
-	magicNumber := uint32(0x184D2A50)
-	frameSize := uint32(16)
 
 	// Create skippable frame metadata defined as a random 128-Bit number
 	metadata, err := createSkippableFrameMetadata()
@@ -44,7 +46,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
 
-			partitionRawFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+			partitionFilePath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
 			if err != nil {
 				return err
 			}
@@ -52,29 +54,29 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			switch partitionFormat {
 			case "raw":
 				// Do nothing for "raw" case.
-				logger.Log.Infof("Partition file created: %s", partitionRawFilepath)
 			case "raw-zst":
-				partitionFilepath, err := compressWithZstd(partitionRawFilepath)
+				partitionRawFilePath := partitionFilePath
+				partitionFilepath, err := compressWithZstd(partitionRawFilePath)
 				if err != nil {
 					return err
 				}
 				// Create a skippable frame containing the metadata payload and prepend the frame to the partition file
-				err = addSkippableFrame(partitionFilepath, magicNumber, frameSize, payload)
+				err = addSkippableFrame(partitionFilepath, MagicNumber, FrameSize, payload)
 				if err != nil {
 					return err
 				}
 				// Verify decompression with skippable frame
-				err = verifySkippableFrameDecompression(partitionRawFilepath, partitionFilepath)
+				err = verifySkippableFrameDecompression(partitionRawFilePath, partitionFilepath)
 				if err != nil {
 					return err
 				}
 				// Remove raw file since output partition format is raw-zst.
-				err = os.Remove(partitionRawFilepath)
+				err = os.Remove(partitionRawFilePath)
 				if err != nil {
-					return fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
+					return fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilePath, err)
 				}
 				// Verify skippable frame metadata
-				err = verifySkippableFrameMetadataFromFile(partitionFilepath, magicNumber, frameSize, metadata)
+				err = verifySkippableFrameMetadataFromFile(partitionFilepath, MagicNumber, FrameSize, metadata)
 				if err != nil {
 					return err
 				}
@@ -82,6 +84,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
+			logger.Log.Infof("Partition file created: %s", partitionFilePath)
 		}
 	}
 	return nil
