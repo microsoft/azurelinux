@@ -1,0 +1,122 @@
+From 1066ab83dbe9a4cc20f7db44a40aa2cbb9d5eed6 Mon Sep 17 00:00:00 2001
+From: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Date: Fri, 13 May 2022 09:19:42 +0200
+Subject: [PATCH 13/83] mdmon: Stop parsing duplicate options
+
+Introduce new function is_duplicate_opt() to check if given option
+was already used and prevent setting it again along with an error
+message.
+
+Move parsing above in_initrd() check to be able to detect --offroot
+option duplicates.
+
+Now help option is executed after parsing to prevent executing commands
+like: 'mdmon --help --ndlksnlksajndfjksndafasj'.
+
+Signed-off-by: Lukasz Florczak <lukasz.florczak@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ mdmon.c | 44 +++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 35 insertions(+), 9 deletions(-)
+
+diff --git a/mdmon.c b/mdmon.c
+index 5570574b..c057da63 100644
+--- a/mdmon.c
++++ b/mdmon.c
+@@ -288,6 +288,15 @@ void usage(void)
+ 	exit(2);
+ }
+ 
++static bool is_duplicate_opt(const int opt, const int set_val, const char *long_name)
++{
++	if (opt == set_val) {
++		pr_err("--%s option duplicated!\n", long_name);
++		return true;
++	}
++	return false;
++}
++
+ static int mdmon(char *devnm, int must_fork, int takeover);
+ 
+ int main(int argc, char *argv[])
+@@ -299,6 +308,7 @@ int main(int argc, char *argv[])
+ 	int all = 0;
+ 	int takeover = 0;
+ 	int dofork = 1;
++	bool help = false;
+ 	static struct option options[] = {
+ 		{"all", 0, NULL, 'a'},
+ 		{"takeover", 0, NULL, 't'},
+@@ -308,37 +318,50 @@ int main(int argc, char *argv[])
+ 		{NULL, 0, NULL, 0}
+ 	};
+ 
+-	if (in_initrd()) {
+-		/*
+-		 * set first char of argv[0] to @. This is used by
+-		 * systemd to signal that the task was launched from
+-		 * initrd/initramfs and should be preserved during shutdown
+-		 */
+-		argv[0][0] = '@';
+-	}
+-
+ 	while ((opt = getopt_long(argc, argv, "thaF", options, NULL)) != -1) {
+ 		switch (opt) {
+ 		case 'a':
++			if (is_duplicate_opt(all, 1, "all"))
++				exit(1);
+ 			container_name = argv[optind-1];
+ 			all = 1;
+ 			break;
+ 		case 't':
++			if (is_duplicate_opt(takeover, 1, "takeover"))
++				exit(1);
+ 			takeover = 1;
+ 			break;
+ 		case 'F':
++			if (is_duplicate_opt(dofork, 0, "foreground"))
++				exit(1);
+ 			dofork = 0;
+ 			break;
+ 		case OffRootOpt:
++			if (is_duplicate_opt(argv[0][0], '@', "offroot"))
++				exit(1);
+ 			argv[0][0] = '@';
+ 			break;
+ 		case 'h':
++			if (is_duplicate_opt(help, true, "help"))
++				exit(1);
++			help = true;
++			break;
+ 		default:
+ 			usage();
+ 			break;
+ 		}
+ 	}
+ 
++
++	if (in_initrd()) {
++		/*
++		 * set first char of argv[0] to @. This is used by
++		 * systemd to signal that the task was launched from
++		 * initrd/initramfs and should be preserved during shutdown
++		 */
++		argv[0][0] = '@';
++	}
++
+ 	if (all == 0 && container_name == NULL) {
+ 		if (argv[optind])
+ 			container_name = argv[optind];
+@@ -353,6 +376,9 @@ int main(int argc, char *argv[])
+ 	if (strcmp(container_name, "/proc/mdstat") == 0)
+ 		all = 1;
+ 
++	if (help)
++		usage();
++
+ 	if (all) {
+ 		struct mdstat_ent *mdstat, *e;
+ 		int container_len = strlen(container_name);
+-- 
+2.38.1
+

@@ -1,4 +1,7 @@
-%global pypi_name sphinxcontrib-qthelp
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix qthelp
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
 
 Summary:        Sphinx extension for QtHelp documents
 Name:           python-%{pypi_name}
@@ -8,7 +11,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
-Source0:        https://files.pythonhosted.org/packages/ac/29/705cd4e93e98a8473d62b5c32288e6de3f0c9660d3c97d4e80d3dbbad82b/sphinxcontrib_qthelp-1.0.7.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/ac/29/705cd4e93e98a8473d62b5c32288e6de3f0c9660d3c97d4e80d3dbbad82b/%{pypi_name_underscore}-%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -19,7 +22,7 @@ BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-wheel
 BuildRequires:  python-flit-core
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils
@@ -43,7 +46,7 @@ Summary:        %{summary}
 sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document.
 
 %prep
-%autosetup -p1 -n sphinxcontrib_qthelp-%{version}
+%autosetup -p1 -n %{pypi_name_underscore}-%{version}
 find -name '*.mo' -delete
 
 %build
@@ -76,8 +79,8 @@ pip3 install sphinx exceptiongroup iniconfig tomli
 %files -n python%{python3_pkgversion}-%{pypi_name} -f sphinxcontrib.qthelp.lang
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_qthelp-%{version}.dist-info/
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}.dist-info/
 
 %changelog
 * Wed Feb 21 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.7-1

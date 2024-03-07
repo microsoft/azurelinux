@@ -11,10 +11,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -73,7 +73,7 @@ func TestShouldFailEmptySystemConfig(t *testing.T) {
 
 	err := ValidateConfiguration(config)
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [SystemConfigs]: missing [Name] field", err.Error())
+	assert.Equal(t, "invalid [SystemConfigs]:\nmissing [Name] field", err.Error())
 }
 
 func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
@@ -98,7 +98,7 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 			config.Disks[0].PartitionTableType = configuration.PartitionTableType("not_a_real_partition_type")
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "invalid [Disks]: invalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)", err.Error())
+			assert.Equal(t, "invalid [Disks]:\ninvalid [PartitionTableType]: invalid value for PartitionTableType (not_a_real_partition_type)", err.Error())
 
 			return
 		}

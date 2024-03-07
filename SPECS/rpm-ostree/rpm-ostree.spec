@@ -42,7 +42,7 @@ BuildRequires:  libsolv-devel
 BuildRequires:  libtool
 BuildRequires:  libxslt
 BuildRequires:  azurelinux-release
-BuildRequires:  mariner-repos
+BuildRequires:  azurelinux-repos
 BuildRequires:  openssl-devel
 BuildRequires:  ostree-devel
 BuildRequires:  polkit-devel
@@ -55,7 +55,7 @@ BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-gobject
 %endif
 

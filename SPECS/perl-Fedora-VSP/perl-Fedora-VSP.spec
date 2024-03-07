@@ -19,7 +19,7 @@ Provides:       perl(Fedora::VSP) = %{version}
 BuildRequires:  perl-generators
 %endif
 BuildRequires:  perl(ExtUtils::MakeMaker)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 %endif
 

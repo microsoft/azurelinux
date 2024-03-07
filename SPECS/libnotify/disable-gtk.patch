@@ -26,24 +26,3 @@ index 088b7ed..bafeb7d 100644
  
  conf = configuration_data()
  conf.set_quoted('VERSION', meson.project_version())
-diff --git a/meson_options.txt b/meson_options.txt
-index c57b364..c4b9c0c 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,6 +1,6 @@
- option('tests',
-   type: 'boolean',
--  value: true,
-+  value: false,
-   description: 'Build tests')
- option('introspection',
-   type: 'feature',
-@@ -12,7 +12,7 @@ option('man',
-   description: 'Enable generating the manual page (depends on xsltproc)')
- option('gtk_doc',
-   type: 'boolean',
--  value: true,
-+  value: false,
-   description: 'Enable generating the API reference (depends on GTK-Doc)')
- option('docbook_docs',
-   type: 'feature',

@@ -1,15 +1,15 @@
 Summary:        SELinux binary policy manipulation library
 Name:           libsepol
-Version:        3.5
+Version:        3.6
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
-Source0:        https://github.com/SELinuxProject/selinux/archive/refs/tags/%{version}.tar.gz#/selinux-%{version}.tar.gz
+Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  bison
 BuildRequires:  CUnit-devel
 BuildRequires:  flex
@@ -44,7 +44,7 @@ The libsepol-devel package contains the libraries and header files
 needed for developing applications that manipulate binary policies.
 
 %prep
-%autosetup -n selinux-%{version}/%{name}
+%autosetup
 sed  -i 's/int rc;/int rc = SEPOL_OK;/' ./cil/src/cil_binary.c
 
 %build
@@ -65,15 +65,6 @@ rm -f %{buildroot}%{_bindir}/genpolusers
 rm -f %{buildroot}%{_bindir}/chkcon
 rm -rf %{buildroot}%{_mandir}/man8
 rm -rf %{buildroot}%{_mandir}/ru/man8
-
-%check
-# Tests require the "checkpolicy" project to be built as well. That in turn requires "libsepol-devel".
-%make_install DESTDIR=/ LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}"
-pushd ../checkpolicy
-%make_build CFLAGS="%{build_cflags} -fno-semantic-interposition"
-popd
-
-%make_build test
 
 %post
 /sbin/ldconfig
@@ -105,6 +96,9 @@ exit 0
 %{_mandir}/man3/*.3.gz
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
+- Upgrade to version 3.6
+
 * Fri Nov 24 2023 Andrew Phelps <anphel@microsoft.com> - 3.5-1
 - Upgrade to version 3.5
 

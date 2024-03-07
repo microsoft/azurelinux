@@ -1,0 +1,38 @@
+From ef6236da232e968dcf08b486178cd20d5ea97e2a Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Thu, 23 Mar 2023 12:50:00 +0100
+Subject: [PATCH 115/120] Create: Fix checking for container in update_metadata
+
+The commit 8a4ce2c05386 ("Create: Factor out add_disks() helpers")
+introduced a regression that caused timeouts and udev failing to create
+links.
+
+Steps to reproduce the issue were as following:
+$ mdadm -CR imsm -e imsm -n4 /dev/nvme[0-3]n1
+$ mdadm -CR vol -l5 -n4 /dev/nvme[0-3]n1 --assume-clean
+
+I found the check for container was wrong because negation was missing.
+
+Fixes: 8a4ce2c05386 ("Create: Factor out add_disks() helpers")
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Create.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Create.c b/Create.c
+index bbe9e13d..0911bf92 100644
+--- a/Create.c
++++ b/Create.c
+@@ -328,7 +328,7 @@ static int update_metadata(int mdfd, struct shape *s, struct supertype *st,
+ 	 * again returns container info.
+ 	 */
+ 	st->ss->getinfo_super(st, &info_new, NULL);
+-	if (st->ss->external && is_container(s->level) &&
++	if (st->ss->external && !is_container(s->level) &&
+ 	    !same_uuid(info_new.uuid, info->uuid, 0)) {
+ 		map_update(map, fd2devnm(mdfd),
+ 			   info_new.text_version,
+-- 
+2.38.1
+

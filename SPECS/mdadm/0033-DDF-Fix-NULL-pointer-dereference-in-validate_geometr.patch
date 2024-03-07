@@ -1,0 +1,49 @@
+From 2b93288a5650bb811932836f67f30d63c5ddcfbd Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:08 -0600
+Subject: [PATCH 33/83] DDF: Fix NULL pointer dereference in
+ validate_geometry_ddf()
+
+A relatively recent patch added a call to validate_geometry() in
+Manage_add() that has level=LEVEL_CONTAINER and chunk=NULL.
+
+This causes some ddf tests to segfault which aborts the test suite.
+
+To fix this, avoid dereferencing chunk when the level is
+LEVEL_CONTAINER or LEVEL_NONE.
+
+Fixes: 1f5d54a06df0 ("Manage: Call validate_geometry when adding drive to external container")
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-ddf.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/super-ddf.c b/super-ddf.c
+index 9d867f69..949e7d15 100644
+--- a/super-ddf.c
++++ b/super-ddf.c
+@@ -3369,9 +3369,6 @@ static int validate_geometry_ddf(struct supertype *st,
+ 	 * If given BVDs, we make an SVD, changing all the GUIDs in the process.
+ 	 */
+ 
+-	if (*chunk == UnSet)
+-		*chunk = DEFAULT_CHUNK;
+-
+ 	if (level == LEVEL_NONE)
+ 		level = LEVEL_CONTAINER;
+ 	if (level == LEVEL_CONTAINER) {
+@@ -3381,6 +3378,9 @@ static int validate_geometry_ddf(struct supertype *st,
+ 						       freesize, verbose);
+ 	}
+ 
++	if (*chunk == UnSet)
++		*chunk = DEFAULT_CHUNK;
++
+ 	if (!dev) {
+ 		mdu_array_info_t array = {
+ 			.level = level,
+-- 
+2.38.1
+

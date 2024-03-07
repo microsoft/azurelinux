@@ -27,7 +27,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
 # ./generate-tarball.sh
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        https://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
 Source2:        https://repo1.maven.org/maven2/org/ow2/asm/asm-analysis/%{version}/asm-analysis-%{version}.pom
 Source3:        https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/%{version}/asm-commons-%{version}.pom
@@ -112,6 +112,9 @@ done
 %license LICENSE.txt
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-4
 - Fixing source URL.
 

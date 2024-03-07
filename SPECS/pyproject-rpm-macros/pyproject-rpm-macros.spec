@@ -7,7 +7,7 @@ Name:           pyproject-rpm-macros
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
 Version:        1.0.0~rc1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,7 +41,7 @@ Source303:      test_RECORD
 Source901:      README.md
 Source902:      LICENSE
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip
@@ -86,14 +86,14 @@ cp -p %{sources} .
 
 %install
 mkdir -p %{buildroot}%{_rpmmacrodir}
-mkdir -p %{buildroot}%{_rpmconfigdir}/mariner
+mkdir -p %{buildroot}%{_rpmconfigdir}/azl
 install -m 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
-install -m 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/mariner/
-install -m 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/mariner/
-install -m 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/mariner/
-install -m 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/mariner/
-install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/mariner/
-install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/mariner/
+install -m 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/azl/
+install -m 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/azl/
+install -m 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/azl/
+install -m 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/azl/
+install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/azl/
+install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/azl/
 
 %check
 pip3 install more_itertools pytest>=3.9 toml 'tox>=3.27.1,<4.0.0'
@@ -109,14 +109,17 @@ test_status=$?
 %license LICENSE
 %doc README.md
 %{_rpmmacrodir}/macros.pyproject
-%{_rpmconfigdir}/mariner/pyproject_buildrequires.py
-%{_rpmconfigdir}/mariner/pyproject_convert.py
-%{_rpmconfigdir}/mariner/pyproject_save_files.py
-%{_rpmconfigdir}/mariner/pyproject_preprocess_record.py
-%{_rpmconfigdir}/mariner/pyproject_construct_toxenv.py
-%{_rpmconfigdir}/mariner/pyproject_requirements_txt.py
+%{_rpmconfigdir}/azl/pyproject_buildrequires.py
+%{_rpmconfigdir}/azl/pyproject_convert.py
+%{_rpmconfigdir}/azl/pyproject_save_files.py
+%{_rpmconfigdir}/azl/pyproject_preprocess_record.py
+%{_rpmconfigdir}/azl/pyproject_construct_toxenv.py
+%{_rpmconfigdir}/azl/pyproject_requirements_txt.py
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 1.0.0~rc1-4
 - Update version of tox used for package tests
 

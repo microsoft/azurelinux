@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner/rpmrepocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -117,7 +117,7 @@ func main() {
 func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (newRunNode *pkggraph.PkgNode, err error) {
 	logger.Log.Debugf("Adding unresolved %s", pkgVer)
 	if *strictUnresolved {
-		err = fmt.Errorf("strict-unresolved does not allow unresolved packages, attempting to add %s", pkgVer)
+		err = fmt.Errorf("strict-unresolved does not allow unresolved packages, attempting to add (%s)", pkgVer)
 		return
 	}
 
@@ -126,7 +126,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 	if nodes != nil {
-		err = fmt.Errorf(`attempted to mark a local package "%+v" as unresolved`, pkgVer)
+		err = fmt.Errorf("attempted to mark a local package (%+v) as unresolved", pkgVer)
 		return
 	}
 
@@ -136,7 +136,7 @@ func addUnresolvedPackage(g *pkggraph.PkgGraph, pkgVer *pkgjson.PackageVer) (new
 		return
 	}
 
-	logger.Log.Infof("Adding unresolved node '%s'.", newRunNode.FriendlyName())
+	logger.Log.Infof("Adding unresolved node (%s)", newRunNode.FriendlyName())
 
 	return
 }
@@ -177,7 +177,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	// A "run" node has an implicit dependency on its corresponding "build" node, encode that here.
 	err = g.AddEdge(newRunNode, newBuildNode)
 	if err != nil {
-		logger.Log.Errorf("Adding run -> build edge failed for %+v", pkg.Provides)
+		err = fmt.Errorf("failed to add run -> build edge failed for (%+v):\n%w", pkg.Provides, err)
 		return
 	}
 
@@ -197,7 +197,7 @@ func addNodesForPackage(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (foundDuplic
 	// any decisions about running the tests.
 	err = g.AddEdge(newTestNode, newBuildNode)
 	if err != nil {
-		logger.Log.Errorf("Adding test -> build edge failed for %+v", pkg.Provides)
+		err = fmt.Errorf("failed to add test -> build edge for (%+v):\n%w", pkg.Provides, err)
 		return
 	}
 
@@ -212,14 +212,14 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 	logger.Log.Tracef("Adding a dependency from %+v to %+v", packageNode.VersionedPkg, dependency)
 	nodes, err := g.FindBestPkgNode(dependency)
 	if err != nil {
-		logger.Log.Errorf("Unable to check lookup list for %+v (%s)", dependency, err)
+		err = fmt.Errorf("failed to check lookup list for (%+v):\n%w", dependency, err)
 		return err
 	}
 
 	if nodes == nil {
 		dependentNode, err = addUnresolvedPackage(g, dependency)
 		if err != nil {
-			logger.Log.Errorf(`Could not add a package "%s"`, dependency.Name)
+			err = fmt.Errorf("failed to add a package (%s):\n%w", dependency.Name, err)
 			return err
 		}
 	} else {
@@ -246,7 +246,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 
 	err = g.AddEdge(packageNode, dependentNode)
 	if err != nil {
-		logger.Log.Errorf("Failed to add edge failed between %+v and %+v.", packageNode, dependency)
+		err = fmt.Errorf("failed to add edge between (%+v) and (%+v):\n%w", packageNode, dependency, err)
 	}
 
 	return err
@@ -271,7 +271,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	for _, dependency := range pkg.Requires {
 		err = addSingleDependency(g, nodes.RunNode, dependency)
 		if err != nil {
-			logger.Log.Errorf("Unable to add run-time dependencies for %+v", pkg)
+			err = fmt.Errorf("failed to add run-time dependencies for (%+v):\n%w", pkg, err)
 			return
 		}
 		dependenciesAdded++
@@ -281,7 +281,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	for _, dependency := range pkg.BuildRequires {
 		err = addSingleDependency(g, nodes.BuildNode, dependency)
 		if err != nil {
-			logger.Log.Errorf("Unable to add build-time dependencies for %+v", pkg)
+			err = fmt.Errorf("failed to add build-time dependencies for (%+v):\n%w", pkg, err)
 			return
 		}
 		dependenciesAdded++
@@ -296,7 +296,7 @@ func addPkgDependencies(g *pkggraph.PkgGraph, pkg *pkgjson.Package) (dependencie
 	for _, dependency := range pkg.TestRequires {
 		err = addSingleDependency(g, nodes.TestNode, dependency)
 		if err != nil {
-			logger.Log.Errorf("Unable to add test-time dependencies for %+v", pkg)
+			err = fmt.Errorf("failed to add test-time dependencies for (%+v):\n%w", pkg, err)
 			return
 		}
 		dependenciesAdded++
@@ -321,7 +321,7 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	for _, pkg := range packages {
 		foundDuplicate, err := addNodesForPackage(graph, pkg)
 		if err != nil {
-			logger.Log.Errorf("Failed to add local package %+v", pkg)
+			err = fmt.Errorf("failed to add local package (%+v):\n%w", pkg, err)
 			return err
 		}
 
@@ -340,7 +340,7 @@ func populateGraph(graph *pkggraph.PkgGraph, repo *pkgjson.PackageRepo) (err err
 	for uniquePkg := range uniquePackages {
 		num, err := addPkgDependencies(graph, uniquePkg)
 		if err != nil {
-			logger.Log.Errorf("Failed to add dependency %+v", uniquePkg)
+			err = fmt.Errorf("failed to add dependency (%+v):\n%w", uniquePkg, err)
 			return err
 		}
 		dependenciesAdded += num

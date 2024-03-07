@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.28.3
-Release:        2%{?dist}
+Version:        1.29.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-1%{?dist}
+BuildRequires:  glibc-static >= 2.38-2%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -93,9 +93,10 @@ Pause component for Microsoft Kubernetes %{version}.
 %setup -q -c -n %{name}
 
 %build
-# set version information using version file
+# set version information
 # (see k8s code: hack/lib/version.sh for more detail)
-export KUBE_GIT_VERSION_FILE=%{_builddir}/%{name}/version-file.sh
+export KUBE_GIT_TREE_STATE="clean"
+export KUBE_GIT_VERSION=v%{version}
 
 # build host and container image related components
 echo "+++ build kubernetes components"
@@ -262,6 +263,15 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Mar 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-1
+- Upgrade to 1.29.1
+
+* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.28.7-2
+- updated glibc-static buildrequires release
+
+* Mon Feb 26 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.7-1
+- Upgrade to 1.28.7
+
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 1.28.3-2
 - Bump release to rebuild against glibc 2.38-1
 

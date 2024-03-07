@@ -15,15 +15,11 @@
 /SPECS/core-packages/* @microsoft/cbl-mariner-admins
 
 # Modification to specific packages go to specific teams
-/SPECS/installkernel/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel/* @microsoft/cbl-mariner-kernel
-/SPECS/kernel-hci/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
-/SPECS-SIGNED/kernel-hci-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
 
 /SPECS/grub2/* @microsoft/cbl-mariner-bootloader
@@ -49,21 +45,20 @@
 /SPECS/openssl/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
-/SPECS/KeysInUse-OpenSSL/* @microsoft/cbl-mariner-openssl
 
 /SPECS/dnf/* @microsoft/cbl-mariner-package-managers
 /SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
 /SPECS/rpm/* @microsoft/cbl-mariner-package-managers
 /SPECS/tdnf/* @microsoft/cbl-mariner-package-managers
 
-/SPECS/moby-buildx/* @microsoft/cbl-mariner-container-runtime
-/SPECS/moby-cli/* @microsoft/cbl-mariner-container-runtime
-/SPECS/moby-containerd/* @microsoft/cbl-mariner-container-runtime
+/SPECS/containerd/* @microsoft/cbl-mariner-container-runtime
+/SPECS/docker-buildx/* @microsoft/cbl-mariner-container-runtime
+/SPECS/docker-cli/* @microsoft/cbl-mariner-container-runtime
+/SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
+/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
 /SPECS/runc/* @microsoft/cbl-mariner-container-runtime
-/SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/virtiofsd/* @microsoft/cbl-mariner-kata-containers
 
 /SPECS/cloud-hypervisor/* @microsoft/cbl-mariner-virtualization

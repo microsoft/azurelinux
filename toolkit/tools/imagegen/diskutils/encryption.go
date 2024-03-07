@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -40,19 +40,19 @@ type EncryptedRootDevice struct {
 func AddDefaultKeyfile(keyFileDir, devPath string, encrypt configuration.RootEncryption) (fullKeyPath string, err error) {
 	fullKeyPath, err = createDefaultKeyFile(keyFileDir)
 	if err != nil {
-		logger.Log.Warnf("Unable to create default keyfile: %v", err)
+		err = fmt.Errorf("failed to create default keyfile:\n%w", err)
 		return
 	}
 
 	_, stderr, err := shell.ExecuteWithStdin(encrypt.Password, "cryptsetup", "luksAddKey", devPath, fullKeyPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to add keyfile to encrypted devce: %v", stderr)
+		err = fmt.Errorf("failed to add keyfile to encrypted devce:\n%v\n%w", stderr, err)
 		return
 	}
 
 	err = os.Chmod(fullKeyPath, 000)
 	if err != nil {
-		logger.Log.Warnf("Unable to change permissions on keyfile: %v", stderr)
+		err = fmt.Errorf("failed to change permissions on keyfile:\n%v\n%w", stderr, err)
 		return
 	}
 
@@ -69,20 +69,20 @@ func CleanupEncryptedDisks(encryptedRoot EncryptedRootDevice, isOfflineInstall b
 	// Order matters for below functions
 	err = deactivateLVM()
 	if err != nil {
-		logger.Log.Warnf("Unable to deactive LVM: %v", err)
+		err = fmt.Errorf("failed to deactive LVM:\n%w", err)
 		return
 	}
 
 	err = closeEncryptedDisks()
 	if err != nil {
-		logger.Log.Warnf("Unable to close encrypted disks: %v", err)
+		err = fmt.Errorf("failed to close encrypted disks:\n%w", err)
 		return
 	}
 
 	if isOfflineInstall {
 		err = restartLVMetadataService()
 		if err != nil {
-			logger.Log.Warnf("Unable to restart lvm metadata service: %v", err)
+			err = fmt.Errorf("failed to restart lvm metadata service:\n%w", err)
 			return
 		}
 	}
@@ -143,7 +143,7 @@ func encryptRootPartition(partDevPath string, partition configuration.Partition,
 	_, stderr, err := shell.ExecuteWithStdin(encrypt.Password, "cryptsetup", cryptsetupArgs...)
 
 	if err != nil {
-		logger.Log.Warnf("Unable to encrypt partition %v. Error: %v.", partDevPath, stderr)
+		err = fmt.Errorf("failed to encrypt partition (%v):\n%v\n%w", partDevPath, stderr, err)
 		return
 	}
 
@@ -152,7 +152,7 @@ func encryptRootPartition(partDevPath string, partition configuration.Partition,
 	// Open the partition
 	uuid, err := getPartUUID(partDevPath)
 	if err != nil || uuid == "" {
-		logger.Log.Warnf("Unable to get UUID for partition %v", partDevPath)
+		err = fmt.Errorf("failed to get UUID for partition (%v):\n%w", partDevPath, err)
 		return
 	}
 
@@ -162,21 +162,21 @@ func encryptRootPartition(partDevPath string, partition configuration.Partition,
 
 	_, stderr, err = shell.ExecuteWithStdin(encrypt.Password, "cryptsetup", "-q", "open", partDevPath, blockDevice)
 	if err != nil {
-		logger.Log.Warnf("Failed to open encrypted partition %v. Error: %v", partDevPath, stderr)
+		err = fmt.Errorf("failed to open encrypted partition (%v):\n%v\n%w", partDevPath, stderr, err)
 		return
 	}
 
 	// Add the LVM
 	fullMappedPath, err := enableLVMForEncryptedRoot(filepath.Join(mappingFilePath, blockDevice))
 	if err != nil {
-		logger.Log.Warnf("Unable to enable LVM for encrypted root. Error: %v", err)
+		err = fmt.Errorf("failed to enable LVM for encrypted root:\n%w", err)
 		return
 	}
 
 	// Create the file system
 	_, stderr, err = shell.Execute("mkfs", "-t", partition.FsType, fullMappedPath)
 	if err != nil {
-		logger.Log.Warnf("Failed to mkfs for partition %v. Error: %v", partDevPath, stderr)
+		err = fmt.Errorf("failed to mkfs for partition (%v):\n%v\n%w", partDevPath, stderr, err)
 	}
 
 	return
@@ -215,7 +215,7 @@ func createDefaultKeyFile(keyFileDir string) (fullPath string, err error) {
 func deleteDefaultKeyFile(hostKeyFile string) (err error) {
 	_, stderr, err := shell.Execute("rm", hostKeyFile)
 	if err != nil {
-		logger.Log.Warnf("Unable to delete default keyfile: %v", stderr)
+		err = fmt.Errorf("failed to delete default keyfile:\n%v\n%w", stderr, err)
 		return
 	}
 
@@ -225,7 +225,7 @@ func deleteDefaultKeyFile(hostKeyFile string) (err error) {
 func closeEncryptedDisks() (err error) {
 	stdout, stderr, err := shell.Execute("dmsetup", "info", "-c", "-o", "Name", "--noheadings")
 	if err != nil {
-		logger.Log.Warnf("Unable to run dmsetup: %v", stderr)
+		err = fmt.Errorf("failed to run dmsetup:\n%v\n%w", stderr, err)
 		return
 	}
 
@@ -236,7 +236,7 @@ func closeEncryptedDisks() (err error) {
 			logger.Log.Infof("Closing Encrypted Device: %v", device)
 			_, stderr, err := shell.Execute("cryptsetup", "close", device)
 			if err != nil {
-				logger.Log.Warnf("Unable to close encrypted disk: %v", stderr)
+				err = fmt.Errorf("failed to close encrypted disk:\n%v\n%w", stderr, err)
 				return err
 			}
 		}

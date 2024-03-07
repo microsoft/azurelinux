@@ -1,0 +1,32 @@
+{
+ "Signatures": {
+  "brp-python-bytecompile": "82a0a097409512946b7674cd9d6ea89e6c8c422ba643818a37b711c1ce55c5e1",
+  "common.lua": "b7fae33cabffe268b152a70ed9796cbc14d5b3e00710617ed0b3b9c8ee6d41a6",
+  "compileall2.py": "b91f5c190d11eb4f0d94f39134c5c24d44a683738db068bf7d1418c2a5cfa135",
+  "default-annobin-cc1": "2315f86ffa724b9121b5a94d752883c11cbce581ac5e691717269ccbdac66625",
+  "default-hardened-cc1": "2102bdfbb06934d95ceb3c81f789c59c9f77f91b0f996fd39588e0aa052d6f77",
+  "default-hardened-ld": "4dbb822a27eed292759bc4e9cabb4b84f34fc6701535fcac2fdddac33328678b",
+  "forge.lua": "79e710a646811de99643a0a7a4d429417556aa5071e745acaefa18321125114b",
+  "gen-ld-script.sh": "1204146a11095b0c3e4651aff1a1df86c23c1e4ac8811e21e8ee443d8f3af648",
+  "generate-package-note.py": "bd76a8e88a1356fed74863c38e5cf6a20c1c26426ac94ba21dd172578e8ca2a2",
+  "gpgverify": "db0e050f56b694497d70603a6f5c17dd60ddbcf7cee670616851cd389f6767c4",
+  "macros": "348741813b676ad05698e1bb0c52be7940a7b3e976a5a77be0bdeb479e938868",
+  "macros.check": "79367176c3c7d10c0158b6e5d881e0fc3c8fd50c5957dad2f097c2d4a37833e7",
+  "macros.fonts": "f52edc646414c5dd0f5f4cdd570f2f9dbe6fb97d4f0db360908deb56d96492f8",
+  "macros.forge": "52cdffd48217cafe33afe47c625cd6aac6460848cd76de66fe61031c26beeaf4",
+  "macros.mono-srpm": "a9201ae36fc482e966134e38f42412378e955faf296b214cb6dd63981af8bc49",
+  "macros.nodejs-srpm": "b2515cc7fad3f14849cff8593b10543a3f73edccff4c3c6d0d2764dae19c38e8",
+  "macros.ocaml-srpm": "cd34e1d89cf45b1a76a8803a7fe3aefa6e5e6380e983a85d8dae4912ba360b3f",
+  "macros.openblas-srpm": "bd46ab2c99aa504d3fb09de1f071f0e19a9b2605772c1a738a32cfb0129d33b8",
+  "macros.perl-srpm": "27f09c386944fc7478cdde55168bbc720d03ecd11ec60ae1133a42db6432e7f7",
+  "macros.pybytecompile": "3291393302b7a73dc4bcf5b72697016bb67c12098a055858883754d331f85aad",
+  "macros.python": "791e0b9070d49790ef437d89e541287ce305d8e424afe42dafdab89f59106362",
+  "macros.python-srpm": "27701acb0aa4a35e1c81e34e469e6c8a3b5be7aad41066ec70cd6bf065a58d11",
+  "macros.python3": "b5a82a6bdfa40cd481c5139c957b95d0b126ff108cc964432d0b6b90972b743b",
+  "macros.rust-srpm": "ea69ab49a243c44ab75cfe506ba5d73046bf31e561698cc389ad5b4edb82f2b2",
+  "macros.suse": "7cd64820e12a37fb22f3b09e4c5184b1f9eac94acbeea2783b1ec4940248e310",
+  "pythondist.attr": "9162c91b09e01bc0c9c2e8b730424eda11ca4de35304434353dc3c8d9469419d",
+  "rpmrc": "c197369d806430f581de9d5f0e89384d231745712f394ce39497ada47d1f4efe",
+  "verify-package-notes.sh": "121715379dcfda33f4e66b3eb5520c80c55c1b0d88348f8895d45d3b89dfe965"
+ }
+}

@@ -1,8 +1,8 @@
-%define libsepolver 3.5-1
-%define libselinuxver 3.5-1
+%define libsepolver 3.6-1
+%define libselinuxver 3.6-1
 Summary:        SELinux binary policy manipulation library
 Name:           libsemanage
-Version:        3.5
+Version:        3.6
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -87,7 +87,6 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %config(noreplace) %{_sysconfdir}/selinux/semanage.conf
 %{_libdir}/libsemanage.so.2
 %{_mandir}/man5/*
-%{_mandir}/ru/man5/*
 %dir %{_libexecdir}/selinux
 %dir %{_sharedstatedir}/selinux
 %dir %{_sharedstatedir}/selinux/tmp
@@ -103,10 +102,15 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %files python3
 %{python3_sitelib}/*.so
 %{python3_sitelib}/semanage.py*
-%{python3_sitelib}/__pycache__/semanage.cpython*.pyc
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
+- Upgrade to version 3.6
+
+* Mon Feb 12 2024 Andrew Phelps <anphel@microsoft.com> - 3.5-2
+- Fix build with python 3.12
+
 * Fri Nov 24 2023 Andrew Phelps <anphel@microsoft.com> - 3.5-1
 - Upgrade to version 3.5
 
@@ -339,7 +343,7 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 - Rebuilt for https://fedoraproject.org/wiki/Changes/Python_3.4
 
 * Tue May 6 2014 Dan Walsh <dwalsh@redhat.com> - 2.3-1
-- Update to upstream 
+- Update to upstream
 	* Fix memory leak in semanage_genhomedircon from Thomas Hurd.
 
 * Sun Mar 30 2014 Dan Walsh <dwalsh@redhat.com> - 2.2-3
@@ -350,7 +354,7 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 - Move semanage.conf man page from devel package to main package
 
 * Thu Oct 31 2013 Dan Walsh <dwalsh@redhat.com> - 2.2-1
-- Update to upstream 
+- Update to upstream
 	* Avoid duplicate list entries from Dan Walsh.
 	* Add audit support to libsemanage from Dan Walsh.
 	* Remove policy.kern and replace with symlink from Dan Walsh.
@@ -394,7 +398,7 @@ Resolves: #952237
 - Allways build python3 version
 
 * Mon Apr 22 2013 Dan Walsh <dwalsh@redhat.com> - 2.1.10-4
-- 
+-
 
 * Thu Apr 11 2013 Dan Walsh <dwalsh@redhat.com> - 2.1.10-3
 - Fix test suite to build
@@ -403,7 +407,7 @@ Resolves: #952237
 - Revert some changes which are causing the wrong policy version file to be created
 
 * Thu Feb 7 2013 Dan Walsh <dwalsh@redhat.com> - 2.1.10-1
-- Update to upstream 
+- Update to upstream
 	* Add sefcontext_compile to compile regex everytime policy is rebuilt
 	* Cleanup/fix enable/disable/remove module.
 	* redo genhomedircon minuid
@@ -413,9 +417,9 @@ Resolves: #952237
 	* genhomedircon: double free in get_home_dirs
 	* fcontext_record: do not leak on error in semanage_fcontext_key_create
 	* genhomedircon: do not leak on failure in write_gen_home_dir_context
-	* semanage_store: do not leak fd 
+	* semanage_store: do not leak fd
 	* genhomedircon: do not leak shells list
-	* semanage_store: do not leak on strdup failure 
+	* semanage_store: do not leak on strdup failure
 	* semanage_store: rewrite for readability
 
 * Wed Jan 16 2013 Dan Walsh <dwalsh@redhat.com> 2.1.9-4
@@ -431,7 +435,7 @@ Resolves: #952237
 - Previous to this fix the first module beginning with foo would get deleted.
 
 * Thu Sep 13 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.9-1
-- Update to upstream 
+- Update to upstream
 	* libsemanage: do not set soname needlessly
 	* libsemanage: remove PYTHONLIBDIR and ruby equivalent
 	* do boolean name substitution
@@ -447,14 +451,14 @@ Resolves: #952237
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Fri Jul 13 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.8-3
-- Attempt to allocate memory for selinux_binary_policy_path and free memory 
+- Attempt to allocate memory for selinux_binary_policy_path and free memory
 - allocated by asprintf.
 
 * Thu Jul 12 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.8-2
 - Fix asprintf within an asprintf call
 
 * Wed Jul 4 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.8-1
-- Update to upstream 
+- Update to upstream
 	* remove build warning when build swig c files
 	* additional makefile support for rubywrap
 	* ignore 80 column limit for readability
@@ -466,7 +470,7 @@ Resolves: #952237
 - Apply patch from Sven Vermeulen to fix problem with python3 bindings.
 
 * Thu Mar 29 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.7-1
-- Update to upstream 
+- Update to upstream
 	* Alternate path for semanage.conf
 	* do not link against libpython, this is considered bad in Debian
 	* Allow to build for several ruby version
@@ -479,7 +483,7 @@ Resolves: #952237
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Fri Jan 6 2012 Dan Walsh <dwalsh@redhat.com> - 2.1.6-2
-- Add patch form Xin Ouyang to make library use private semanage.conf 
+- Add patch form Xin Ouyang to make library use private semanage.conf
 
 * Wed Dec 21 2011 Dan Walsh <dwalsh@redhat.com> - 2.1.6-1
 -Update to upstream
@@ -541,7 +545,7 @@ Resolves: #952237
 - More fixes for disabled modules
 
 * Tue Jun 7 2011 Dan Walsh <dwalsh@redhat.com> - 2.0.46-5
-- Change libsemanage mechanism for handling disabled modules. Now it will only create a flag for a module 
+- Change libsemanage mechanism for handling disabled modules. Now it will only create a flag for a module
 indicating the module is disabled.  MODULE.pp.disabled, it will no longer rename the module.  This way we can
 ship active modules in rpm.
 
@@ -637,7 +641,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Wed Sep 9 2009 Dan Walsh <dwalsh@redhat.com> - 2.0.37-1
 - Update to upstream
-  * Fix persistent dontaudit support to rebuild policy if the 
+  * Fix persistent dontaudit support to rebuild policy if the
         dontaudit state is changed from Chad Sellers.
 - Move load_policy to /sbin
 
@@ -881,7 +885,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Fri Dec 22 2006 Dan Walsh <dwalsh@redhat.com> - 1.9.2-1
 - Upgrade to latest from NSA
-  * Merged patch to optionally reduce disk usage by removing 
+  * Merged patch to optionally reduce disk usage by removing
     the backup module store and linked policy from Karl MacMillan
   * Merged patch to correctly propagate return values in libsemanage
 
@@ -909,7 +913,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Merged patch to not destroy sepol handle on error path of
     connect from James Athey.
   * Merged patch to add genhomedircon path to semanage.conf from
-    James Athey. 
+    James Athey.
 
 * Thu Aug 31 2006 Dan Walsh <dwalsh@redhat.com> - 1.6.16-3
 - Fix semanage to not load if is not the correct policy type and it is installing
@@ -943,7 +947,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Tue Jul 11 2006 Dan Walsh <dwalsh@redhat.com> - 1.6.12-1
 - Upgrade to latest from NSA
-  * Merged support for read operations on read-only fs from 
+  * Merged support for read operations on read-only fs from
     Caleb Case (Tresys Technology).
 
 * Tue Jul 4 2006 Dan Walsh <dwalsh@redhat.com> - 1.6.11-1
@@ -964,7 +968,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 * Mon May 15 2006 Dan Walsh <dwalsh@redhat.com> - 1.6.8-1
 - Upgrade to latest from NSA
   * Updated default location for setfiles to /sbin to
-    match policycoreutils.  This can also be adjusted via 
+    match policycoreutils.  This can also be adjusted via
     semanage.conf using the syntax:
     [setfiles]
     path = /path/to/setfiles
@@ -985,7 +989,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 - Upgrade to latest from NSA
   * Merged updated file context sorting patch from Christopher
     Ashworth, with bug fix for escaped character flag.
-  * Merged file context sorting code from Christopher Ashworth 
+  * Merged file context sorting code from Christopher Ashworth
     (Tresys Technology), based on fc_sort.c code in refpolicy.
   * Merged python binding t_output_helper removal patch from Dan Walsh.
   * Regenerated swig files.
@@ -1021,7 +1025,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Merged paths array patch from Ivan Gyurdiev.
   * Merged bug fix patch from Ivan Gyurdiev.
   * Merged improve bindings patch from Ivan Gyurdiev.
-  * Merged use PyList patch from Ivan Gyurdiev.  
+  * Merged use PyList patch from Ivan Gyurdiev.
   * Merged memory leak fix patch from Ivan Gyurdiev.
   * Merged nodecon support patch from Ivan Gyurdiev.
   * Merged cleanups patch from Ivan Gyurdiev.
@@ -1043,21 +1047,21 @@ invoking the appropriate config tool (or by hardcoding the old value for
 * Tue Feb 07 2006 Dan Walsh <dwalsh@redhat.com> - 1.5.21-1
 - Upgrade to latest from NSA
   * Merged seuser/user_extra support patch from Joshua Brindle.
-  * Merged remote system dbase patch from Ivan Gyurdiev.  
+  * Merged remote system dbase patch from Ivan Gyurdiev.
 
 * Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 1.5.20-1.1
 - rebuilt for new gcc4.1 snapshot and glibc changes
 
 * Thu Feb 2 2006 Dan Walsh <dwalsh@redhat.com> 1.5.20-1
 - Upgrade to latest from NSA
-  * Merged clone record on set_con patch from Ivan Gyurdiev.  
+  * Merged clone record on set_con patch from Ivan Gyurdiev.
 
 * Mon Jan 30 2006 Dan Walsh <dwalsh@redhat.com> 1.5.19-1
 - Upgrade to latest from NSA
   * Merged fname parameter patch from Ivan Gyurdiev.
   * Merged more size_t -> unsigned int fixes from Ivan Gyurdiev.
   * Merged seusers.system patch from Ivan Gyurdiev.
-  * Merged improve port/fcontext API patch from Ivan Gyurdiev.  
+  * Merged improve port/fcontext API patch from Ivan Gyurdiev.
 
 * Fri Jan 27 2006 Dan Walsh <dwalsh@redhat.com> 1.5.18-1
 - Upgrade to latest from NSA
@@ -1109,12 +1113,12 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Re-applied string and file optimization patch from Russell Coker,
     with bug fix.
   * Reverted string and file optimization patch from Russell Coker.
-  * Clarified error messages from parse_module_headers and 
+  * Clarified error messages from parse_module_headers and
     parse_base_headers for base/module mismatches.
 
 * Fri Jan 6 2006 Dan Walsh <dwalsh@redhat.com> 1.5.6-1
 - Upgrade to latest from NSA
-  * Clarified error messages from parse_module_headers and 
+  * Clarified error messages from parse_module_headers and
     parse_base_headers for base/module mismatches.
   * Merged string and file optimization patch from Russell Coker.
   * Merged swig header reordering patch from Ivan Gyurdiev.
@@ -1194,7 +1198,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 - Upgrade to latest from NSA
   * Merged Makefile python definitions patch from Dan Walsh.
   * Removed is_selinux_mls_enabled() conditionals in seusers and users
-    file parsers. 
+    file parsers.
 
 * Wed Nov 23 2005 Dan Walsh <dwalsh@redhat.com> 1.3.59-1
 - Add additional swig objects
@@ -1209,7 +1213,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 - Upgrade to latest from NSA
   * Fixed free->key_free bug.
   * Merged clear obsolete patch from Ivan Gyurdiev.
-  * Merged modified swigify patch from Dan Walsh 
+  * Merged modified swigify patch from Dan Walsh
     (original patch from Joshua Brindle).
   * Merged move genhomedircon call patch from Chad Sellers.
 
@@ -1246,7 +1250,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Disabled calls to port dbase for merge and commit and stubbed
     out calls to sepol_port interfaces since they are not exported.
   * Merged rename instead of copy patch from Joshua Brindle (Tresys).
-  * Added hidden_def/hidden_proto for exported symbols used within 
+  * Added hidden_def/hidden_proto for exported symbols used within
     libsemanage to eliminate relocations.  Wrapped type definitions
     in exported headers as needed to avoid conflicts.  Added
     src/context_internal.h and src/iface_internal.h.
@@ -1294,7 +1298,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Tue Oct 25 2005 Dan Walsh <dwalsh@redhat.com> 1.3.34-1
 - Update from NSA
-  * Merged resync to sepol changes and booleans fixes/improvements 
+  * Merged resync to sepol changes and booleans fixes/improvements
     patches from Ivan Gyurdiev.
   * Merged support for genhomedircon/homedir template, store selection,
     explicit policy reload, and semanage.conf relocation from Joshua
@@ -1318,11 +1322,11 @@ invoking the appropriate config tool (or by hardcoding the old value for
 - Update from NSA
   * Merged interface renaming patch from Ivan Gyurdiev.
   * Merged policy component patch from Ivan Gyurdiev.
-  * Renamed 'check=' configuration value to 'expand-check=' for 
+  * Renamed 'check=' configuration value to 'expand-check=' for
     clarity.
-  * Changed semanage_commit_sandbox to check for and report errors 
+  * Changed semanage_commit_sandbox to check for and report errors
     on rename(2) calls performed during rollback.
-  * Added optional check= configuration value to semanage.conf 
+  * Added optional check= configuration value to semanage.conf
     and updated call to sepol_expand_module to pass its value
     to control assertion and hierarchy checking on module expansion.
   * Merged fixes for make DESTDIR= builds from Joshua Brindle.
@@ -1359,7 +1363,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
   * Merged user and port APIs - policy database patch from Ivan
   Gyurdiev.
   * Converted calls to sepol link_packages and expand_module interfaces
-  from using buffers to using sepol handles for error reporting, and 
+  from using buffers to using sepol handles for error reporting, and
   changed direct_connect/disconnect to create/destroy sepol handles.
 
 * Sat Oct 15 2005 Dan Walsh <dwalsh@redhat.com> 1.3.18-1
@@ -1426,7 +1430,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Wed Sep 21 2005 Dan Walsh <dwalsh@redhat.com> 1.3.3-1
 - Update from NSA
-  * Merged boolean record, stub record handler, and status codes 
+  * Merged boolean record, stub record handler, and status codes
     patches from Ivan Gyurdiev.
 
 * Tue Sep 20 2005 Dan Walsh <dwalsh@redhat.com> 1.3.2-1
@@ -1459,8 +1463,8 @@ invoking the appropriate config tool (or by hardcoding the old value for
     Coverity.
   * Fixed several other bugs and warnings.
   * Merged patch to move module read/write code from libsemanage
-    to libsepol from Jason Tang (Tresys).  
+    to libsepol from Jason Tang (Tresys).
   * Merged relay records patch from Ivan Gyurdiev.
   * Merged key extract patch from Ivan Gyurdiev.
 - Initial version
-- Created by Stephen Smalley <sds@epoch.ncsc.mil> 
+- Created by Stephen Smalley <sds@epoch.ncsc.mil>
