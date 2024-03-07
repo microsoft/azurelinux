@@ -39,7 +39,7 @@ ignore_no_source_tarball=" \
   initramfs \
   javapackages-tools-meta \
   kde-filesystem \
-  kf5 \
+  kf \
   livepatching \
   lua-rpm-macros \
   multilib-rpm-config \
@@ -47,7 +47,7 @@ ignore_no_source_tarball=" \
   patterns-ceph-containers \
   pyproject-rpm-macros \
   python-rpm-generators \
-  qt5-rpm-macros \
+  qt-rpm-macros \
   sgx-backwards-compatability \
   verity-read-only-root \
   web-assets \

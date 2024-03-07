@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "calamares",
-          "version": "3.2.11",
-          "downloadUrl": "https://github.com/calamares/calamares/releases/download/v3.2.11/calamares-3.2.11.tar.gz"
+          "version": "3.3.1",
+          "downloadUrl": "https://github.com/calamares/calamares/releases/download/v3.3.1/calamares-3.3.1.tar.gz"
         }
       }
     },
@@ -3418,8 +3418,8 @@
         "type": "other",
         "other": {
           "name": "extra-cmake-modules",
-          "version": "5.109.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.109/extra-cmake-modules-5.109.0.tar.xz"
+          "version": "5.249.0",
+          "downloadUrl": "https://invent.kde.org/frameworks/extra-cmake-modules/-/archive/v5.249.0/extra-cmake-modules-v5.249.0.tar.gz"
         }
       }
     },
@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kde-settings",
-          "version": "36.0",
-          "downloadUrl": "https://pagure.io/fedora-kde/kde-settings/archive/36.0/kde-settings-36.0.tar.gz"
+          "version": "39.1",
+          "downloadUrl": "https://pagure.io/fedora-kde/kde-settings/archive/39.1/kde-settings-39.1.tar.gz"
         }
       }
     },
@@ -8200,9 +8200,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kf5-kconfig",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kconfig-5.61.0.tar.xz"
+          "name": "kf-kconfig",
+          "version": "5.249.0",
+          "downloadUrl": "https://invent.kde.org/frameworks/kconfig/-/archive/v5.249.0/kconfig-v5.249.0.tar.gz"
         }
       }
     },
@@ -8210,9 +8210,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kf5-kcoreaddons",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kcoreaddons-5.61.0.tar.xz"
+          "name": "kf-kcoreaddons",
+          "version": "5.249.0",
+          "downloadUrl": "https://invent.kde.org/frameworks/kcoreaddons/-/archive/v5.249.0/kcoreaddons-v5.249.0.tar.gz"
         }
       }
     },
@@ -8220,9 +8220,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kf5-ki18n",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/ki18n-5.61.0.tar.xz"
+          "name": "kf-ki18n",
+          "version": "5.249.0",
+          "downloadUrl": "https://invent.kde.org/frameworks/ki18n/-/archive/v5.249.0/ki18n-v5.249.0.tar.gz"
         }
       }
     },
@@ -8230,9 +8230,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "kf5-kwidgetsaddons",
-          "version": "5.61.0",
-          "downloadUrl": "https://download.kde.org/stable/frameworks/5.61/kwidgetsaddons-5.61.0.tar.xz"
+          "name": "kf-kwidgetsaddons",
+          "version": "5.249.0",
+          "downloadUrl": "https://invent.kde.org/frameworks/kwidgetsaddons/-/archive/v5.249.0/kwidgetsaddons-v5.249.0.tar.gz"
         }
       }
     },
@@ -8271,8 +8271,8 @@
         "type": "other",
         "other": {
           "name": "kpmcore",
-          "version": "3.3.0",
-          "downloadUrl": "http://download.kde.org/stable/kpmcore/3.3.0/src/kpmcore-3.3.0.tar.xz"
+          "version": "24.01.95",
+          "downloadUrl": "https://github.com/KDE/kpmcore/archive/refs/tags/v24.01.95.tar.gz"
         }
       }
     },
@@ -11981,8 +11981,8 @@
         "type": "other",
         "other": {
           "name": "linuxptp",
-          "version": "2.0",
-          "downloadUrl": "https://github.com/richardcochran/linuxptp/archive/e05809/linuxptp-e05809.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://sourceforge.net/projects/linuxptp/files/v3.1/linuxptp-3.1.1.tgz"
         }
       }
     },
@@ -21082,6 +21082,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "polkit-qt-1",
+          "version": "0.175.0",
+          "downloadUrl": "https://invent.kde.org/libraries/polkit-qt-1/-/archive/v0.175.0/polkit-qt-1-v0.175.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "popt",
           "version": "1.19",
           "downloadUrl": "http://ftp.rpm.org/popt/releases/popt-1.x/popt-1.19.tar.gz"
@@ -25012,9 +25022,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtbase",
-          "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtbase-everywhere-src-5.12.11.tar.xz"
+          "name": "qtbase",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz"
         }
       }
     },
@@ -25032,9 +25042,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtdeclarative",
-          "version": "5.12.5",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qtdeclarative-everywhere-src-5.12.5.tar.xz"
+          "name": "qtdeclarative",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtdeclarative-everywhere-src-6.6.1.tar.xz"
         }
       }
     },
@@ -25062,9 +25072,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qtsvg",
-          "version": "5.12.11",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.11/submodules/qtsvg-everywhere-src-5.12.11.tar.xz"
+          "name": "qtsvg",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtsvg-everywhere-src-6.6.1.tar.xz"
         }
       }
     },
@@ -25072,9 +25082,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qt5-qttools",
-          "version": "5.12.5",
-          "downloadUrl": "https://download.qt.io/archive/qt/5.12/5.12.5/submodules/qttools-everywhere-src-5.12.5.tar.xz"
+          "name": "qttools",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qttools-everywhere-src-6.6.1.tar.xz"
         }
       }
     },

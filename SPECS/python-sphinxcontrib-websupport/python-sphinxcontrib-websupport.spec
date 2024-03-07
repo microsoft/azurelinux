@@ -55,8 +55,8 @@ pip3 install tox tox-current-env pytest
 %doc README.rst
 
 %changelog
-* Web Mar 06 2024 Andrew Phelps <anphel@microsoft.com> - 1.2.7-2
-- Fix macro usage in pyproject_extras_subpkg
+* Mon Mar 06 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-2
+- Fix bug in macro usage
 
 * Mon Feb 19 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 1.2.7-1
 - Auto-upgrade to 1.2.7 - 3.0 - Upgrade

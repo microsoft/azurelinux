@@ -6,7 +6,7 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
-Version:        3.0
+Version:        %{azl}.0
 Release:        1%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
@@ -133,8 +133,8 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
-* Tue Mar 05 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-1
-- Upgrade version to 3.0
+* Mon Mar 04 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-1
+- Version bump to match Azure Linux version.
 
 * Fri Mar 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.0-27
 - Add 'python.lua', remove 'pythondist.attr'.
