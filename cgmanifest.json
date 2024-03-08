@@ -9021,8 +9021,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.72.0",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.72.0.tar.gz"
+          "version": "0.73.0",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.73.0.tar.gz"
         }
       }
     },
@@ -11361,8 +11361,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "7.10.0",
-          "downloadUrl": "https://libvirt.org/sources/libvirt-7.10.0.tar.xz"
+          "version": "10.0.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-10.0.0.tar.xz"
         }
       }
     },
@@ -11401,8 +11401,8 @@
         "type": "other",
         "other": {
           "name": "libvirt-python",
-          "version": "7.10.0",
-          "downloadUrl": "https://libvirt.org/sources/python/libvirt-python-7.10.0.tar.gz"
+          "version": "10.0.0",
+          "downloadUrl": "https://libvirt.org/sources/python/libvirt-python-10.0.0.tar.gz"
         }
       }
     },
@@ -23132,6 +23132,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-nocaselist",
+          "version": "2.0.0",
+          "downloadUrl": "https://github.com/pywbem/nocaselist/archive/refs/tags/2.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-nose2",
           "version": "0.10.0",
           "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.10.0.tar.gz"
@@ -28296,8 +28306,8 @@
         "type": "other",
         "other": {
           "name": "tdnf",
-          "version": "3.5.2",
-          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.5.2.tar.gz"
+          "version": "3.5.6",
+          "downloadUrl": "https://github.com/vmware/tdnf/archive/v3.5.6.tar.gz"
         }
       }
     },
