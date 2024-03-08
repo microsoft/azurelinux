@@ -530,6 +530,11 @@ make check
 #---------------------------------------------------------------------------------
 
 %changelog
+* Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 12.40-1
+- Promoted package from extended to core
+- Upgraded to 12.40
+- Imported and adopted the spec from Fedora
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.27-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

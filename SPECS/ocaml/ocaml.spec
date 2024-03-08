@@ -468,6 +468,9 @@ hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
 
 
 %changelog
+* Fri Mar 08 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
+- Upgraded ocaml to 5.1.1 importing and adopting spec changes from Fedora.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
 - Updating naming for 3.0 version of Azure Linux.
 

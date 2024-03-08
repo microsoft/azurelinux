@@ -97,7 +97,7 @@ ninja check-all
 %{_datadir}/opt-viewer/optpmap.py
 %{_datadir}/opt-viewer/optrecord.py
 %{_datadir}/opt-viewer/style.css
-
+.
 %files devel
 %{_libdir}/*.a
 %{_libdir}/cmake/*
@@ -106,6 +106,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 17.0.6-4
+- Added LLVMgold.so files to the main and devel packages
+
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
 - Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
   compile files for the specified targets.
