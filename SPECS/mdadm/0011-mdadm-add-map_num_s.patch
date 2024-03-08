@@ -1,0 +1,382 @@
+From 5f21d67472ad08c1e96b4385254adba79aa1c467 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Thu, 20 Jan 2022 13:18:33 +0100
+Subject: [PATCH 11/83] mdadm: add map_num_s()
+
+map_num() returns NULL if key is not defined. This patch adds
+alternative, non NULL version for cases where NULL is not expected.
+
+There are many printf() calls where map_num() is called on variable
+without NULL verification. It works, even if NULL is passed because
+gcc is able to ignore NULL argument quietly but the behavior is
+undefined. For safety reasons such usages will use map_num_s() now.
+It is a potential point of regression.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Assemble.c    |  6 ++----
+ Create.c      |  2 +-
+ Detail.c      |  4 ++--
+ Grow.c        | 16 ++++++++--------
+ Query.c       |  4 ++--
+ maps.c        | 24 ++++++++++++++++++++++++
+ mdadm.c       | 20 ++++++++++----------
+ mdadm.h       |  2 +-
+ super-ddf.c   |  6 +++---
+ super-intel.c |  2 +-
+ super0.c      |  2 +-
+ super1.c      |  2 +-
+ sysfs.c       |  9 +++++----
+ 13 files changed, 61 insertions(+), 38 deletions(-)
+
+diff --git a/Assemble.c b/Assemble.c
+index 704b8293..9eac9ce0 100644
+--- a/Assemble.c
++++ b/Assemble.c
+@@ -63,7 +63,7 @@ static void set_array_assembly_status(struct context *c,
+ 				   struct assembly_array_info *arr)
+ {
+ 	int raid_disks = arr->preexist_cnt + arr->new_cnt;
+-	char *status_msg = map_num(assemble_statuses, status);
++	char *status_msg = map_num_s(assemble_statuses, status);
+ 
+ 	if (c->export && result)
+ 		*result |= status;
+@@ -77,9 +77,7 @@ static void set_array_assembly_status(struct context *c,
+ 		fprintf(stderr, " (%d new)", arr->new_cnt);
+ 	if (arr->exp_cnt)
+ 		fprintf(stderr, " ( + %d for expansion)", arr->exp_cnt);
+-	if (status_msg)
+-		fprintf(stderr, " %s", status_msg);
+-	fprintf(stderr, ".\n");
++	fprintf(stderr, " %s.\n", status_msg);
+ }
+ 
+ static int name_matches(char *found, char *required, char *homehost, int require_homehost)
+diff --git a/Create.c b/Create.c
+index 9ea19de0..c84c1ac8 100644
+--- a/Create.c
++++ b/Create.c
+@@ -83,7 +83,7 @@ int default_layout(struct supertype *st, int level, int verbose)
+ 
+ 	if (layout_map) {
+ 		layout = map_name(layout_map, "default");
+-		layout_name = map_num(layout_map, layout);
++		layout_name = map_num_s(layout_map, layout);
+ 	}
+ 	if (layout_name && verbose > 0)
+ 		pr_err("layout defaults to %s\n", layout_name);
+diff --git a/Detail.c b/Detail.c
+index 95d4cc70..ce7a8445 100644
+--- a/Detail.c
++++ b/Detail.c
+@@ -495,8 +495,8 @@ int Detail(char *dev, struct context *c)
+ 			if (array.state & (1 << MD_SB_CLEAN)) {
+ 				if ((array.level == 0) ||
+ 				    (array.level == LEVEL_LINEAR))
+-					arrayst = map_num(sysfs_array_states,
+-							  sra->array_state);
++					arrayst = map_num_s(sysfs_array_states,
++							       sra->array_state);
+ 				else
+ 					arrayst = "clean";
+ 			} else {
+diff --git a/Grow.c b/Grow.c
+index 18c5719b..8a242b0f 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -547,7 +547,7 @@ int Grow_consistency_policy(char *devname, int fd, struct context *c, struct sha
+ 	if (s->consistency_policy != CONSISTENCY_POLICY_RESYNC &&
+ 	    s->consistency_policy != CONSISTENCY_POLICY_PPL) {
+ 		pr_err("Operation not supported for consistency policy %s\n",
+-		       map_num(consistency_policies, s->consistency_policy));
++		       map_num_s(consistency_policies, s->consistency_policy));
+ 		return 1;
+ 	}
+ 
+@@ -578,14 +578,14 @@ int Grow_consistency_policy(char *devname, int fd, struct context *c, struct sha
+ 
+ 	if (sra->consistency_policy == (unsigned)s->consistency_policy) {
+ 		pr_err("Consistency policy is already %s\n",
+-		       map_num(consistency_policies, s->consistency_policy));
++		       map_num_s(consistency_policies, s->consistency_policy));
+ 		ret = 1;
+ 		goto free_info;
+ 	} else if (sra->consistency_policy != CONSISTENCY_POLICY_RESYNC &&
+ 		   sra->consistency_policy != CONSISTENCY_POLICY_PPL) {
+ 		pr_err("Current consistency policy is %s, cannot change to %s\n",
+-		       map_num(consistency_policies, sra->consistency_policy),
+-		       map_num(consistency_policies, s->consistency_policy));
++		       map_num_s(consistency_policies, sra->consistency_policy),
++		       map_num_s(consistency_policies, s->consistency_policy));
+ 		ret = 1;
+ 		goto free_info;
+ 	}
+@@ -704,8 +704,8 @@ int Grow_consistency_policy(char *devname, int fd, struct context *c, struct sha
+ 	}
+ 
+ 	ret = sysfs_set_str(sra, NULL, "consistency_policy",
+-			    map_num(consistency_policies,
+-				    s->consistency_policy));
++			    map_num_s(consistency_policies,
++					 s->consistency_policy));
+ 	if (ret)
+ 		pr_err("Failed to change array consistency policy\n");
+ 
+@@ -2241,7 +2241,7 @@ size_change_error:
+ 		info.new_layout = UnSet;
+ 		if (info.array.level == 6 && info.new_level == UnSet) {
+ 			char l[40], *h;
+-			strcpy(l, map_num(r6layout, info.array.layout));
++			strcpy(l, map_num_s(r6layout, info.array.layout));
+ 			h = strrchr(l, '-');
+ 			if (h && strcmp(h, "-6") == 0) {
+ 				*h = 0;
+@@ -2266,7 +2266,7 @@ size_change_error:
+ 			info.new_layout = info.array.layout;
+ 		else if (info.array.level == 5 && info.new_level == 6) {
+ 			char l[40];
+-			strcpy(l, map_num(r5layout, info.array.layout));
++			strcpy(l, map_num_s(r5layout, info.array.layout));
+ 			strcat(l, "-6");
+ 			info.new_layout = map_name(r6layout, l);
+ 		} else {
+diff --git a/Query.c b/Query.c
+index 23fbf8aa..adcd231e 100644
+--- a/Query.c
++++ b/Query.c
+@@ -93,7 +93,7 @@ int Query(char *dev)
+ 	else {
+ 		printf("%s: %s %s %d devices, %d spare%s. Use mdadm --detail for more detail.\n",
+ 		       dev, human_size_brief(larray_size,IEC),
+-		       map_num(pers, level), raid_disks,
++		       map_num_s(pers, level), raid_disks,
+ 		       spare_disks, spare_disks == 1 ? "" : "s");
+ 	}
+ 	st = guess_super(fd);
+@@ -131,7 +131,7 @@ int Query(char *dev)
+ 		       dev,
+ 		       info.disk.number, info.array.raid_disks,
+ 		       activity,
+-		       map_num(pers, info.array.level),
++		       map_num_s(pers, info.array.level),
+ 		       mddev);
+ 		if (st->ss == &super0)
+ 			put_md_name(mddev);
+diff --git a/maps.c b/maps.c
+index a4fd2797..20fcf719 100644
+--- a/maps.c
++++ b/maps.c
+@@ -166,6 +166,30 @@ mapping_t sysfs_array_states[] = {
+ 	{ NULL, ARRAY_UNKNOWN_STATE }
+ };
+ 
++/**
++ * map_num_s() - Safer alternative of map_num() function.
++ * @map: map to search.
++ * @num: key to match.
++ *
++ * Shall be used only if key existence is quaranted.
++ *
++ * Return: Pointer to name of the element.
++ */
++char *map_num_s(mapping_t *map, int num)
++{
++	char *ret = map_num(map, num);
++
++	assert(ret);
++	return ret;
++}
++
++/**
++ * map_num() - get element name by key.
++ * @map: map to search.
++ * @num: key to match.
++ *
++ * Return: Pointer to name of the element or NULL.
++ */
+ char *map_num(mapping_t *map, int num)
+ {
+ 	while (map->name) {
+diff --git a/mdadm.c b/mdadm.c
+index 26299b2e..be40686c 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -280,8 +280,8 @@ int main(int argc, char *argv[])
+ 			else
+ 				fprintf(stderr, "-%c", opt);
+ 			fprintf(stderr, " would set mdadm mode to \"%s\", but it is already set to \"%s\".\n",
+-				map_num(modes, newmode),
+-				map_num(modes, mode));
++				map_num_s(modes, newmode),
++				map_num_s(modes, mode));
+ 			exit(2);
+ 		} else if (!mode && newmode) {
+ 			mode = newmode;
+@@ -544,7 +544,7 @@ int main(int argc, char *argv[])
+ 			switch(s.level) {
+ 			default:
+ 				pr_err("layout not meaningful for %s arrays.\n",
+-					map_num(pers, s.level));
++					map_num_s(pers, s.level));
+ 				exit(2);
+ 			case UnSet:
+ 				pr_err("raid level must be given before layout.\n");
+@@ -1248,10 +1248,10 @@ int main(int argc, char *argv[])
+ 		if (option_index > 0)
+ 			pr_err(":option --%s not valid in %s mode\n",
+ 				long_options[option_index].name,
+-				map_num(modes, mode));
++				map_num_s(modes, mode));
+ 		else
+ 			pr_err("option -%c not valid in %s mode\n",
+-				opt, map_num(modes, mode));
++				opt, map_num_s(modes, mode));
+ 		exit(2);
+ 
+ 	}
+@@ -1276,7 +1276,7 @@ int main(int argc, char *argv[])
+ 		if (s.consistency_policy != CONSISTENCY_POLICY_UNKNOWN &&
+ 		    s.consistency_policy != CONSISTENCY_POLICY_JOURNAL) {
+ 			pr_err("--write-journal is not supported with consistency policy: %s\n",
+-			       map_num(consistency_policies, s.consistency_policy));
++			       map_num_s(consistency_policies, s.consistency_policy));
+ 			exit(2);
+ 		}
+ 	}
+@@ -1285,12 +1285,12 @@ int main(int argc, char *argv[])
+ 	    s.consistency_policy != CONSISTENCY_POLICY_UNKNOWN) {
+ 		if (s.level <= 0) {
+ 			pr_err("--consistency-policy not meaningful with level %s.\n",
+-			       map_num(pers, s.level));
++			       map_num_s(pers, s.level));
+ 			exit(2);
+ 		} else if (s.consistency_policy == CONSISTENCY_POLICY_JOURNAL &&
+ 			   !s.journaldisks) {
+ 			pr_err("--write-journal is required for consistency policy: %s\n",
+-			       map_num(consistency_policies, s.consistency_policy));
++			       map_num_s(consistency_policies, s.consistency_policy));
+ 			exit(2);
+ 		} else if (s.consistency_policy == CONSISTENCY_POLICY_PPL &&
+ 			   s.level != 5) {
+@@ -1300,14 +1300,14 @@ int main(int argc, char *argv[])
+ 			   (!s.bitmap_file ||
+ 			    strcmp(s.bitmap_file, "none") == 0)) {
+ 			pr_err("--bitmap is required for consistency policy: %s\n",
+-			       map_num(consistency_policies, s.consistency_policy));
++			       map_num_s(consistency_policies, s.consistency_policy));
+ 			exit(2);
+ 		} else if (s.bitmap_file &&
+ 			   strcmp(s.bitmap_file, "none") != 0 &&
+ 			   s.consistency_policy != CONSISTENCY_POLICY_BITMAP &&
+ 			   s.consistency_policy != CONSISTENCY_POLICY_JOURNAL) {
+ 			pr_err("--bitmap is not compatible with consistency policy: %s\n",
+-			       map_num(consistency_policies, s.consistency_policy));
++			       map_num_s(consistency_policies, s.consistency_policy));
+ 			exit(2);
+ 		}
+ 	}
+diff --git a/mdadm.h b/mdadm.h
+index cd72e711..09915a00 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -770,7 +770,7 @@ extern int restore_stripes(int *dest, unsigned long long *offsets,
+ #endif
+ 
+ #define SYSLOG_FACILITY LOG_DAEMON
+-
++extern char *map_num_s(mapping_t *map, int num);
+ extern char *map_num(mapping_t *map, int num);
+ extern int map_name(mapping_t *map, char *name);
+ extern mapping_t r0layout[], r5layout[], r6layout[],
+diff --git a/super-ddf.c b/super-ddf.c
+index 3f304cdc..8cda23a7 100644
+--- a/super-ddf.c
++++ b/super-ddf.c
+@@ -1477,13 +1477,13 @@ static void examine_vds(struct ddf_super *sb)
+ 		printf("\n");
+ 		printf("         unit[%d] : %d\n", i, be16_to_cpu(ve->unit));
+ 		printf("        state[%d] : %s, %s%s\n", i,
+-		       map_num(ddf_state, ve->state & 7),
++		       map_num_s(ddf_state, ve->state & 7),
+ 		       (ve->state & DDF_state_morphing) ? "Morphing, ": "",
+ 		       (ve->state & DDF_state_inconsistent)? "Not Consistent" : "Consistent");
+ 		printf("   init state[%d] : %s\n", i,
+-		       map_num(ddf_init_state, ve->init_state&DDF_initstate_mask));
++		       map_num_s(ddf_init_state, ve->init_state & DDF_initstate_mask));
+ 		printf("       access[%d] : %s\n", i,
+-		       map_num(ddf_access, (ve->init_state & DDF_access_mask) >> 6));
++		       map_num_s(ddf_access, (ve->init_state & DDF_access_mask) >> 6));
+ 		printf("         Name[%d] : %.16s\n", i, ve->name);
+ 		examine_vd(i, sb, ve->guid);
+ 	}
+diff --git a/super-intel.c b/super-intel.c
+index 6ff336ee..ba3bd41f 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -5625,7 +5625,7 @@ static int init_super_imsm_volume(struct supertype *st, mdu_array_info_t *info,
+ 		free(dev);
+ 		free(dv);
+ 		pr_err("imsm does not support consistency policy %s\n",
+-		       map_num(consistency_policies, s->consistency_policy));
++		       map_num_s(consistency_policies, s->consistency_policy));
+ 		return 0;
+ 	}
+ 
+diff --git a/super0.c b/super0.c
+index b79b97a9..61c9ec1d 100644
+--- a/super0.c
++++ b/super0.c
+@@ -288,7 +288,7 @@ static void export_examine_super0(struct supertype *st)
+ {
+ 	mdp_super_t *sb = st->sb;
+ 
+-	printf("MD_LEVEL=%s\n", map_num(pers, sb->level));
++	printf("MD_LEVEL=%s\n", map_num_s(pers, sb->level));
+ 	printf("MD_DEVICES=%d\n", sb->raid_disks);
+ 	if (sb->minor_version >= 90)
+ 		printf("MD_UUID=%08x:%08x:%08x:%08x\n",
+diff --git a/super1.c b/super1.c
+index a12a5bc8..e3e2f954 100644
+--- a/super1.c
++++ b/super1.c
+@@ -671,7 +671,7 @@ static void export_examine_super1(struct supertype *st)
+ 	int len = 32;
+ 	int layout;
+ 
+-	printf("MD_LEVEL=%s\n", map_num(pers, __le32_to_cpu(sb->level)));
++	printf("MD_LEVEL=%s\n", map_num_s(pers, __le32_to_cpu(sb->level)));
+ 	printf("MD_DEVICES=%d\n", __le32_to_cpu(sb->raid_disks));
+ 	for (i = 0; i < 32; i++)
+ 		if (sb->set_name[i] == '\n' || sb->set_name[i] == '\0') {
+diff --git a/sysfs.c b/sysfs.c
+index 2995713d..0d98a65f 100644
+--- a/sysfs.c
++++ b/sysfs.c
+@@ -689,7 +689,7 @@ int sysfs_set_array(struct mdinfo *info, int vers)
+ 	if (info->array.level < 0)
+ 		return 0; /* FIXME */
+ 	rv |= sysfs_set_str(info, NULL, "level",
+-			    map_num(pers, info->array.level));
++			    map_num_s(pers, info->array.level));
+ 	if (info->reshape_active && info->delta_disks != UnSet)
+ 		raid_disks -= info->delta_disks;
+ 	rv |= sysfs_set_num(info, NULL, "raid_disks", raid_disks);
+@@ -724,9 +724,10 @@ int sysfs_set_array(struct mdinfo *info, int vers)
+ 	}
+ 
+ 	if (info->consistency_policy == CONSISTENCY_POLICY_PPL) {
+-		if (sysfs_set_str(info, NULL, "consistency_policy",
+-				  map_num(consistency_policies,
+-					  info->consistency_policy))) {
++		char *policy = map_num_s(consistency_policies,
++					    info->consistency_policy);
++
++		if (sysfs_set_str(info, NULL, "consistency_policy", policy)) {
+ 			pr_err("This kernel does not support PPL. Falling back to consistency-policy=resync.\n");
+ 			info->consistency_policy = CONSISTENCY_POLICY_RESYNC;
+ 		}
+-- 
+2.38.1
+

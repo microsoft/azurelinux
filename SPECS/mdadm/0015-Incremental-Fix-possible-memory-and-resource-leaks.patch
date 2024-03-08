@@ -1,0 +1,90 @@
+From de064c93e3819d72720e4fba6575265ba10e1553 Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Mon, 13 Jun 2022 12:11:25 +0200
+Subject: [PATCH 15/83] Incremental: Fix possible memory and resource leaks
+
+map allocated through map_by_uuid() is not freed if mdfd is invalid.
+In addition mdfd is not closed, and mdinfo list is not freed too.
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Change-Id: I25e726f0e2502cf7e8ce80c2bd7944b3b1e2b9dc
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Incremental.c | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
+
+diff --git a/Incremental.c b/Incremental.c
+index a57fc323..4d0cd9d6 100644
+--- a/Incremental.c
++++ b/Incremental.c
+@@ -1499,7 +1499,7 @@ static int Incremental_container(struct supertype *st, char *devname,
+ 		return 0;
+ 	}
+ 	for (ra = list ; ra ; ra = ra->next) {
+-		int mdfd;
++		int mdfd = -1;
+ 		char chosen_name[1024];
+ 		struct map_ent *mp;
+ 		struct mddev_ident *match = NULL;
+@@ -1514,6 +1514,12 @@ static int Incremental_container(struct supertype *st, char *devname,
+ 
+ 		if (mp) {
+ 			mdfd = open_dev(mp->devnm);
++			if (!is_fd_valid(mdfd)) {
++				pr_err("failed to open %s: %s.\n",
++				       mp->devnm, strerror(errno));
++				rv = 2;
++				goto release;
++			}
+ 			if (mp->path)
+ 				strcpy(chosen_name, mp->path);
+ 			else
+@@ -1573,21 +1579,25 @@ static int Incremental_container(struct supertype *st, char *devname,
+ 					    c->autof,
+ 					    trustworthy,
+ 					    chosen_name, 0);
++
++			if (!is_fd_valid(mdfd)) {
++				pr_err("create_mddev failed with chosen name %s: %s.\n",
++				       chosen_name, strerror(errno));
++				rv = 2;
++				goto release;
++			}
+ 		}
+-		if (only && (!mp || strcmp(mp->devnm, only) != 0))
+-			continue;
+ 
+-		if (mdfd < 0) {
+-			pr_err("failed to open %s: %s.\n",
+-				chosen_name, strerror(errno));
+-			return 2;
++		if (only && (!mp || strcmp(mp->devnm, only) != 0)) {
++			close_fd(&mdfd);
++			continue;
+ 		}
+ 
+ 		assemble_container_content(st, mdfd, ra, c,
+ 					   chosen_name, &result);
+ 		map_free(map);
+ 		map = NULL;
+-		close(mdfd);
++		close_fd(&mdfd);
+ 	}
+ 	if (c->export && result) {
+ 		char sep = '=';
+@@ -1610,7 +1620,11 @@ static int Incremental_container(struct supertype *st, char *devname,
+ 		}
+ 		printf("\n");
+ 	}
+-	return 0;
++
++release:
++	map_free(map);
++	sysfs_free(list);
++	return rv;
+ }
+ 
+ static void run_udisks(char *arg1, char *arg2)
+-- 
+2.38.1
+

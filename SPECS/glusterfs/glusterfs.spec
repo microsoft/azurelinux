@@ -126,7 +126,7 @@
 Summary:        Distributed File System
 Name:           glusterfs
 Version:        11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 OR LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -389,6 +389,7 @@ This package provides the glusterfs libgfapi library.
 
 %package -n libgfapi-devel
 Summary:          Development Libraries
+Requires:         libgfapi0
 Requires:         libglusterfs-devel%{?_isa} = %{version}-%{release}
 Requires:         libacl-devel
 Obsoletes:        %{name}-api-devel <= %{version}-%{release}
@@ -1297,6 +1298,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Mar 06 2024  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-2
+- Add libgfapi0 as Requires for libgfapi-devel
+
 * Thu Dec 14 2023  Brian Fjeldstad <bfjelds@microsoft.com> - 11.1-1
 - Upgrade to 11.1 using Fedora 39 spec for guidance (license: MIT)
 - add include-eventtypes-always.patch to fix 11.1 build error

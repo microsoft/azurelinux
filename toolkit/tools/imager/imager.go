@@ -152,7 +152,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-	// Mariner images don't work appropriately when azurelinux-release is not installed.
+	// Azure Linux images don't work appropriately when azurelinux-release is not installed.
 	// As a stopgap to this, azurelinux-release will now be added to all images regardless
 	// of presence in the CONFIG_FILE
 	packagesToInstall = append([]string{distroReleasePackage}, packagesToInstall...)
@@ -530,17 +530,17 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		leaveChrootOnDisk = true
 	)
 
-	var installMap map[string]string
+	var mountList []string
 
 	// Only invoke CreateInstallRoot for a raw disk. This call will result in mount points being created from a raw disk
 	// into the install root. A rootfs will not have these.
 	if !systemConfig.IsRootFS() {
-		installMap, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
+		mountList, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
 		if err != nil {
 			err = fmt.Errorf("failed to create install root:\n%w", err)
 			return
 		}
-		defer installutils.DestroyInstallRoot(installRoot, installMap, mountPointToOverlayMap)
+		defer installutils.DestroyInstallRoot(installRoot, mountList, mountPointMap, mountPointToOverlayMap)
 	}
 
 	// Install any tools required for the setup root to function
@@ -591,7 +591,9 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, diffDiskBuild)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot,
+		diffDiskBuild)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents:\n%w", err)
 		return
@@ -601,7 +603,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if !systemConfig.IsRootFS() {
 		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
 			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
-			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot, systemConfig.EnableGrubMkconfig, false)
+			installChroot, diskDevPath, mountPointMap, encryptedRoot, readOnlyRoot,
+			systemConfig.EnableGrubMkconfig, false)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader:\n%w", err)
 			return
@@ -628,7 +631,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 			return
 		}
 		installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
-		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initramfs-*.img"))
 		if err != nil || len(initramfsPathList) != 1 {
 			return fmt.Errorf("could not find single initramfs (%v):\n%w", initramfsPathList, err)
 		}

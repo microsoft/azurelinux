@@ -30,19 +30,19 @@
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
 Version:        23.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libnuma-devel
 BuildRequires:  libpcap-devel
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  meson
 BuildRequires:  python3-pyelftools
 BuildRequires:  python3-sphinx
@@ -179,7 +179,10 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
-* Tue Jan 23 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 23.07-1
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.11-2
+- Updating naming for 3.0 version of Azure Linux.
+
+* Tue Jan 23 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 23.11-1
 - Update to version 23.11 for 3.0 upgrades
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
