@@ -1,8 +1,10 @@
 package imagecustomizerlib
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +12,7 @@ import (
 	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
@@ -29,12 +32,17 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 		return err
 	}
 
-	// Create skippable frame metadata defined as a random 128-Bit number
-	skippableFrameMetadata, err := createSkippableFrameMetadata()
+	// Write partition metadata JSON to a file.
+	jsonFilename := basename + "_partition_metadata.json"
+	err = writePartitionMetadataJson(diskPartitions, outDir, jsonFilename)
 	if err != nil {
 		return err
 	}
 
+	// Create skippable frame metadata defined as a random 128-Bit number
+	skippableFrameMetadata, err := createSkippableFrameMetadata()
+
+	// Extract partitions to files.
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
 			partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
@@ -189,4 +197,29 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 		return randomBytes, err
 	}
 	return randomBytes, nil
+}
+
+func writePartitionMetadataJson(diskPartition []diskutils.PartitionInfo, outDir string, name string) (err error) {
+	// Get the JSON encoding of disk partition info
+	diskPartitionInfoJSON, err := json.Marshal(&diskPartition)
+	if err != nil {
+		return fmt.Errorf("failed to marshal:\n%w", err)
+	}
+
+	// Indent the JSON to make it more readable
+	var indentedJSON bytes.Buffer
+	err = json.Indent(&indentedJSON, diskPartitionInfoJSON, "", "\t")
+	if err != nil {
+		return fmt.Errorf("failed to indent json:\n%w", err)
+	}
+
+	// Write the JSON string to file
+	fullPath := filepath.Join(outDir, name)
+	err = file.Write(indentedJSON.String(), fullPath)
+	if err != nil {
+		return fmt.Errorf("failed to write partition metadata json to file")
+	}
+
+	logger.Log.Infof("Partition metadata file created: %s", fullPath)
+	return nil
 }
