@@ -21,7 +21,7 @@ RUN if [[ "${enable_local_repo}" == "true" ]]; then echo "enable_local_repo" >> 
 RUN echo "cat /mariner_setup_dir/splash.txt"                     >> /root/.bashrc && \
     echo "show_help"                                             >> /root/.bashrc
 
-RUN if [[ "${mode}" == "build" ]]; then echo "cd /usr/src/azl || { echo \"ERROR: Could not change directory to /usr/src/azl \"; exit 1; }"  >> /root/.bashrc; fi
+RUN if [[ "${mode}" == "build" ]]; then echo "cd $HOME/rpmbuild || { echo \"ERROR: Could not change directory to $HOME/rpmbuild \"; exit 1; }"  >> /root/.bashrc; fi
 RUN if [[ "${mode}" == "test" ]]; then echo "cd /mnt || { echo \"ERROR: Could not change directory to /mnt \"; exit 1; }"  >> /root/.bashrc; fi
 
 # Install packages from bashrc so we can use the previously setup tdnf defaults.
