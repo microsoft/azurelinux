@@ -199,6 +199,7 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 	return randomBytes, nil
 }
 
+// Write partition metadata as JSON to a file.
 func writePartitionMetadataJson(diskPartition []diskutils.PartitionInfo, outDir string, name string) (err error) {
 	// Get the JSON encoding of disk partition info
 	diskPartitionInfoJSON, err := json.Marshal(&diskPartition)
