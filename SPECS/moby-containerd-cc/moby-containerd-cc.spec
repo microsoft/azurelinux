@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.1
-Release: 6%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -19,7 +19,6 @@ Source2: containerd.toml
 
 %{?systemd_requires}
 
-BuildRequires: btrfs-progs-devel
 BuildRequires: git
 BuildRequires: golang >= 1.19.0
 BuildRequires: go-md2man
@@ -77,6 +76,12 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-8
+- Add OOMScoreAdjust -999 to containerd.service
+
+* Wed Mar 06 2024 Manuel Huber <mahuber@microsoft.com> - 1.7.1-7
+- Drop obsolete 'btrfs-progs-devel' build dependency
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.7.1-6
 - Bump release to rebuild with go 1.20.10
 

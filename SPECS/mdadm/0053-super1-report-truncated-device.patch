@@ -1,0 +1,112 @@
+From 171e9743881edf2dfb163ddff483566fbf913ccd Mon Sep 17 00:00:00 2001
+From: NeilBrown <neilb@suse.de>
+Date: Fri, 26 Aug 2022 08:55:56 +1000
+Subject: [PATCH 53/83] super1: report truncated device
+
+When the metadata is at the start of the device, it is possible that it
+describes a device large than the one it is actually stored on.  When
+this happens, report it loudly in --examine.
+
+....
+   Unused Space : before=1968 sectors, after=-2047 sectors DEVICE TOO SMALL
+          State : clean TRUNCATED DEVICE
+....
+
+Also report in --assemble so that the failure which the kernel will
+report will be explained.
+
+mdadm: Device /dev/sdb is not large enough for data described in superblock
+mdadm: no RAID superblock on /dev/sdb
+mdadm: /dev/sdb has no superblock - assembly aborted
+
+Scenario can be demonstrated as follows:
+
+mdadm: Note: this array has metadata at the start and
+    may not be suitable as a boot device.  If you plan to
+    store '/boot' on this device please ensure that
+    your boot-loader understands md/v1.x metadata, or use
+    --metadata=0.90
+mdadm: Defaulting to version 1.2 metadata
+mdadm: array /dev/md/test started.
+mdadm: stopped /dev/md/test
+   Unused Space : before=1968 sectors, after=-2047 sectors DEVICE TOO SMALL
+          State : clean TRUNCATED DEVICE
+   Unused Space : before=1968 sectors, after=-2047 sectors DEVICE TOO SMALL
+          State : clean TRUNCATED DEVICE
+
+Signed-off-by: NeilBrown <neilb@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super1.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/super1.c b/super1.c
+index 71af860c..58345e68 100644
+--- a/super1.c
++++ b/super1.c
+@@ -406,12 +406,18 @@ static void examine_super1(struct supertype *st, char *homehost)
+ 
+ 	st->ss->getinfo_super(st, &info, NULL);
+ 	if (info.space_after != 1 &&
+-	    !(__le32_to_cpu(sb->feature_map) & MD_FEATURE_NEW_OFFSET))
+-		printf("   Unused Space : before=%llu sectors, after=%llu sectors\n",
+-		       info.space_before, info.space_after);
+-
+-	printf("          State : %s\n",
+-	       (__le64_to_cpu(sb->resync_offset)+1)? "active":"clean");
++	    !(__le32_to_cpu(sb->feature_map) & MD_FEATURE_NEW_OFFSET)) {
++		printf("   Unused Space : before=%llu sectors, ",
++		       info.space_before);
++		if (info.space_after < INT64_MAX)
++			printf("after=%llu sectors\n", info.space_after);
++		else
++			printf("after=-%llu sectors DEVICE TOO SMALL\n",
++			       UINT64_MAX - info.space_after);
++	}
++	printf("          State : %s%s\n",
++	       (__le64_to_cpu(sb->resync_offset)+1) ? "active":"clean",
++	       (info.space_after > INT64_MAX)       ? " TRUNCATED DEVICE" : "");
+ 	printf("    Device UUID : ");
+ 	for (i=0; i<16; i++) {
+ 		if ((i&3)==0 && i != 0)
+@@ -2206,6 +2212,7 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 		tst.ss = &super1;
+ 		for (tst.minor_version = 0; tst.minor_version <= 2;
+ 		     tst.minor_version++) {
++			tst.ignore_hw_compat = st->ignore_hw_compat;
+ 			switch(load_super1(&tst, fd, devname)) {
+ 			case 0: super = tst.sb;
+ 				if (bestvers == -1 ||
+@@ -2312,7 +2319,6 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 		free(super);
+ 		return 2;
+ 	}
+-	st->sb = super;
+ 
+ 	bsb = (struct bitmap_super_s *)(((char*)super)+MAX_SB_SIZE);
+ 
+@@ -2322,6 +2328,21 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 	if (st->data_offset == INVALID_SECTORS)
+ 		st->data_offset = __le64_to_cpu(super->data_offset);
+ 
++	if (st->minor_version >= 1 &&
++	    st->ignore_hw_compat == 0 &&
++	    (dsize < (__le64_to_cpu(super->data_offset) +
++		      __le64_to_cpu(super->size))
++	     ||
++	     dsize < (__le64_to_cpu(super->data_offset) +
++		      __le64_to_cpu(super->data_size)))) {
++		if (devname)
++			pr_err("Device %s is not large enough for data described in superblock\n",
++			       devname);
++		free(super);
++		return 2;
++	}
++	st->sb = super;
++
+ 	/* Now check on the bitmap superblock */
+ 	if ((__le32_to_cpu(super->feature_map)&MD_FEATURE_BITMAP_OFFSET) == 0)
+ 		return 0;
+-- 
+2.38.1
+

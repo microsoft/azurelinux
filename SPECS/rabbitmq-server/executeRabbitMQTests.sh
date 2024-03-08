@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ####   TESTING DISCLAIMER   ####
-# This script follows the steps to run the tests for RabbitMQ v3.11.9 as of 2/22/23 on CBL-Mariner. As a result, this script can likely 
+# This script follows the steps to run the tests for RabbitMQ v3.11.9 as of 2/22/23 on Azure Linux. As a result, this script can likely 
 # be used as a baseline to execute the test for future releases/upgrades to verify the package integrity. That said, some things may need
 # to be updated in order to make the tests succeed such as updating the links for erlang, elixir, bazel, and/or mandoc in order to have
 # some or all tests succeed.
@@ -17,7 +17,7 @@
 #
 # RabbitMQ depends on bazel 'latest'. As of 2/22/23, the latest bazel version is '6.0.0'.
 #
-# Some tests also rely on the 'mandoc' package. As of 2/22/23, this package was not available in Mariner. As a result, the package is
+# Some tests also rely on the 'mandoc' package. As of 2/22/23, this package was not available in Azure Linux. As a result, the package is
 # pulled from source and installed. These test break the entire run, so this dependency must be pulled in for the entire suite to succeed.
 #
 # The elixir package relies on having the UTF-8 character encoding set in your locale in order to function properly. Because of this, you 

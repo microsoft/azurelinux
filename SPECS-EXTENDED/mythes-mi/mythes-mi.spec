@@ -4,10 +4,10 @@ Name: mythes-mi
 Summary: Maori thesaurus
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
-Release: 23%{?dist}
+Release: 24%{?dist}
 # Source is dead now
 # Source: http://packages.papakupu.maori.nz/mythes/mythes-mi-0.1.%%{upstreamid}-beta.tar.gz
-Source: %{_mariner_sources_url}/mythes-mi-0.1.%{upstreamid}-beta.tar.gz
+Source: %{_distro_sources_url}/mythes-mi-0.1.%{upstreamid}-beta.tar.gz
 URL: http://papakupu.maori.nz/
 License: Public Domain
 BuildArch: noarch
@@ -34,6 +34,9 @@ cp -p mi.idx $RPM_BUILD_ROOT/%{_datadir}/mythes/th_mi_NZ_v2.idx
 %{_datadir}/mythes/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-24
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20080630-23
 - Updating source URLs.
 - License verified.

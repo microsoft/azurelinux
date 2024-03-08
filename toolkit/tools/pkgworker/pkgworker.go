@@ -87,7 +87,7 @@ func main() {
 	defines := rpm.DefaultDistroDefines(*runCheck, *distTag)
 	defines[rpm.DistroReleaseVersionDefine] = *distroReleaseVersion
 	defines[rpm.DistroBuildNumberDefine] = *distroBuildNumber
-	defines[rpm.MarinerModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
+	defines[rpm.AzureLinuxModuleLdflagsDefine] = "-Wl,-dT,%{_topdir}/BUILD/module_info.ld"
 
 	ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheRootDir, *ccachConfig)
 	if ccacheErr == nil {
@@ -97,7 +97,7 @@ func main() {
 				ccacheErr = ccacheManager.SetCurrentPkgGroup(*basePackageName, buildArch)
 				if ccacheErr == nil {
 					if ccacheManager.CurrentPkgGroup.Enabled {
-						defines[rpm.MarinerCCacheDefine] = "true"
+						defines[rpm.AzureLinuxCCacheDefine] = "true"
 					}
 				} else {
 					logger.Log.Warnf("Failed to set package ccache configuration:\n%v", ccacheErr)
@@ -311,7 +311,7 @@ func buildRPMFromSRPMInChroot(srpmFile, outArch string, runCheck bool, defines m
 
 func moveBuiltRPMs(chrootRootDir, dstDir string) (builtRPMs []string, err error) {
 	const (
-		chrootRpmBuildDir = "/usr/src/mariner/RPMS"
+		chrootRpmBuildDir = "/usr/src/azl/RPMS"
 		rpmExtension      = ".rpm"
 	)
 

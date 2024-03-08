@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Helper script to generate maven build caches.
-## CBL-MARINER builds do not have access to internet when building rpms.
+## Azure Linux builds do not have access to internet when building rpms.
 ## Generating build cache as tarballs to be used when buidling offline.
 set -e
 

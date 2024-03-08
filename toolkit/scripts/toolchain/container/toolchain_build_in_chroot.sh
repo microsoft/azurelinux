@@ -645,7 +645,7 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/azl/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd
@@ -677,7 +677,7 @@ echo wheel-0.42.0
 tar xf wheel-0.42.0.tar.gz
 pushd wheel-0.42.0
 pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
-pip3 install --no-index --find-links=dist wheel
+pip3 install --no-index --find-links dist wheel
 popd
 rm -rf wheel-0.42.0
 touch /logs/status_wheel_0420_complete
@@ -974,7 +974,7 @@ sed -iE '/Always build/,+16 d' Makefile.am
         --enable-ndb \
         --without-selinux \
         --with-crypto=openssl \
-        --with-vendor=mariner
+        --with-vendor=azl
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
@@ -983,12 +983,6 @@ rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
 
 rm -rf "$RPM_FOLDER"
-
-# Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' pythondistdeps.py
-install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
-install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
-install -p python.attr /usr/lib/rpm/fileattrs/python.attr
 
 touch /logs/status_rpm_complete
 

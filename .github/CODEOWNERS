@@ -1,4 +1,4 @@
-# By default, all files require a review by at least one member of the CBL-Mariner developers team.
+# By default, all files require a review by at least one member of the Azure Linux developers team.
 # See teams here: https://github.com/orgs/microsoft/teams?query=mariner
 * @microsoft/cbl-mariner-devs
 
@@ -19,7 +19,6 @@
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
 
@@ -46,7 +45,6 @@
 /SPECS/openssl/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
-/SPECS/KeysInUse-OpenSSL/* @microsoft/cbl-mariner-openssl
 
 /SPECS/dnf/* @microsoft/cbl-mariner-package-managers
 /SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
@@ -72,10 +70,10 @@
 # Modifications to the toolkit requires reviews from the toolkit team
 /toolkit/ @microsoft/cbl-mariner-tooling
 
-# Docs to be reviewed by general CBL-Mariner devs
+# Docs to be reviewed by general Azure Linux devs
 /toolkit/docs/ @microsoft/cbl-mariner-devs
 
-# Default image configurations to be reviewed by general CBL-Mariner devs
+# Default image configurations to be reviewed by general Azure Linux devs
 /toolkit/imageconfigs/ @microsoft/cbl-mariner-devs
 
 # Package and toolchain manifests to be reviewed by toolchain team

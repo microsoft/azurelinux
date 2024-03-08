@@ -12,10 +12,10 @@ IS_REPO_ENABLED=false
 
 # General setup
 
-## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+## Azure Linux macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
-for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+for macro_file in "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
@@ -75,7 +75,7 @@ show_help() {
     echo "******************************************************************************************"
 }
 
-# Refresh repo cache with newly built RPM, use Mariner specific DEFINES
+# Refresh repo cache with newly built RPM, use Azure Linux specific DEFINES
 rpmbuild() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
@@ -178,7 +178,7 @@ install_dependencies() {
     return $exit_code
 }
 
-# use Mariner specific DEFINES
+# use Azure Linux specific DEFINES
 rpmspec() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"

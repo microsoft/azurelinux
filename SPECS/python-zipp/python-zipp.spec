@@ -3,7 +3,7 @@
 Summary:        Backport of pathlib-compatible object wrapper for zip files
 Name:           python-%{pypi_name}
 Version:        3.17.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools_scm
 
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
@@ -60,6 +61,9 @@ rm -rf .pyproject-builddir
 %doc README.rst
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.17.0-2
+- Add BR for python-setuptools_scm
+
 * Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.17.0-1
 - Upgrade to 3.17.0
 

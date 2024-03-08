@@ -1,0 +1,77 @@
+From 2257de106cbf17a7f1df33a10cfd2be0d5a064cb Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Mon, 2 Jan 2023 09:35:17 +0100
+Subject: [PATCH 69/83] Add code specific update options to enum.
+
+Some of update options aren't taken from user input, but are hard-coded
+as strings.
+Include those options in enum.
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ maps.c  | 21 +++++++++++++++++++++
+ mdadm.h | 15 +++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/maps.c b/maps.c
+index b586679a..c59036f1 100644
+--- a/maps.c
++++ b/maps.c
+@@ -194,6 +194,27 @@ mapping_t update_options[] = {
+ 	{ "byteorder", UOPT_BYTEORDER },
+ 	{ "help", UOPT_HELP },
+ 	{ "?", UOPT_HELP },
++	/*
++	 * Those enries are temporary and will be removed in this patchset.
++	 *
++	 * Before update_super:update can be changed to enum,
++	 * all update_super sub-functions must be adapted first.
++	 * Update options will be passed as string (as it is for now),
++	 * and then mapped, so all options must be handled temporarily.
++	 *
++	 * Those options code specific and should not be accessible for user.
++	 */
++	{ "force-one", UOPT_SPEC_FORCE_ONE },
++	{ "force-array", UOPT_SPEC_FORCE_ARRAY },
++	{ "assemble", UOPT_SPEC_ASSEMBLE },
++	{ "linear-grow-new", UOPT_SPEC_LINEAR_GROW_NEW },
++	{ "linear-grow-update", UOPT_SPEC_LINEAR_GROW_UPDATE },
++	{ "_reshape_progress", UOPT_SPEC__RESHAPE_PROGRESS },
++	{ "writemostly", UOPT_SPEC_WRITEMOSTLY },
++	{ "readwrite", UOPT_SPEC_READWRITE },
++	{ "failfast", UOPT_SPEC_FAILFAST },
++	{ "nofailfast", UOPT_SPEC_NOFAILFAST },
++	{ "revert-reshape-nobackup", UOPT_SPEC_REVERT_RESHAPE_NOBACKUP },
+ 	{ NULL, UOPT_UNDEFINED}
+ };
+ 
+diff --git a/mdadm.h b/mdadm.h
+index 51f1db2d..31db25f5 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -523,6 +523,21 @@ enum update_opt {
+ 	UOPT_LAYOUT_UNSPECIFIED,
+ 	UOPT_BYTEORDER,
+ 	UOPT_HELP,
++	UOPT_USER_ONLY,
++	/*
++	 * Code specific options, cannot be set by the user
++	 */
++	UOPT_SPEC_FORCE_ONE,
++	UOPT_SPEC_FORCE_ARRAY,
++	UOPT_SPEC_ASSEMBLE,
++	UOPT_SPEC_LINEAR_GROW_NEW,
++	UOPT_SPEC_LINEAR_GROW_UPDATE,
++	UOPT_SPEC__RESHAPE_PROGRESS,
++	UOPT_SPEC_WRITEMOSTLY,
++	UOPT_SPEC_READWRITE,
++	UOPT_SPEC_FAILFAST,
++	UOPT_SPEC_NOFAILFAST,
++	UOPT_SPEC_REVERT_RESHAPE_NOBACKUP,
+ 	UOPT_UNDEFINED
+ };
+ extern void fprint_update_options(FILE *outf, enum update_opt update_mode);
+-- 
+2.38.1
+

@@ -11,12 +11,12 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv3
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
@@ -138,12 +138,6 @@ install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-# Register myself to initramfs
-mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
-EOF
-
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 mkdir -p %{buildroot}/lib/modules/%{uname_r}
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -181,7 +175,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/efi/initrd.img-%{uname_r}
+rm -rf /boot/efi/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
@@ -200,7 +194,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/vmlinuz-%{uname_r}
 /boot/efi/vmlinuz-%{uname_r}
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
@@ -231,6 +224,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-7
+- Remove /var/lib/initramfs/kernel files.
+
+* Fri Feb 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.126.mshv3-6
+- Updating naming for 3.0 version of Azure Linux.
+
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-5
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
 * Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
 - Remove legacy /boot/mariner-mshv.cfg
 

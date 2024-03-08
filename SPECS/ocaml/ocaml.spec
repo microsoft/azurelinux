@@ -468,6 +468,9 @@ hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
 - Introduce a patch to remove unused vars in test to enable ptest
 
