@@ -9,7 +9,7 @@
 Summary:        SELinux policy core utilities
 Name:           policycoreutils
 Version:        3.2
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -182,6 +182,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 
 %files python3
 %license python/COPYING
+%{python3_sitelib}/__pycache__
 %{python3_sitelib}/seobject.py*
 %{python3_sitelib}/sepolgen
 %dir %{python3_sitelib}/sepolicy
@@ -350,9 +351,6 @@ The policycoreutils-restorecond package contains the restorecond service.
 %systemd_postun_with_restart restorecond.service
 
 %changelog
-* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 3.2-2
-- Remove pycache directory to fix python 3.12 build
-
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Switch source to use upstream's combined tarball
