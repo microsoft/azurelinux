@@ -63,11 +63,11 @@ fi
 
 SHARED_RPM_MACROS=(                                                         \
     -D "$MARINER_DIST_MACRO"                                                \
-    -D "dist                    '$PARAM_DIST_TAG'"                          \
+    -D "dist                    $PARAM_DIST_TAG"                            \
     -D "distro_module_ldflags   -Wl,-dT,%{_topdir}/BUILD/module_info.ld"    \
-    -D "distro_release_version  '$PARAM_RELEASE_VER'"                       \
-    -D "mariner_build_number    '$PARAM_BUILD_NUM'"                         \
-    -D "with_check              '$CHECK_DEFINE_NUM'"                        \
+    -D "distro_release_version  $PARAM_RELEASE_VER"                         \
+    -D "mariner_build_number    $PARAM_BUILD_NUM"                           \
+    -D "with_check              $CHECK_DEFINE_NUM"                          \
     )
 
 # Assumption: pipeline has copied file: build/toolchain/toolchain_from_container.tar.gz
