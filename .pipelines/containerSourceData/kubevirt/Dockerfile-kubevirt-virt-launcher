@@ -8,7 +8,7 @@ FROM $BASE_IMAGE
 @INCLUDE_MAIN_RUN_INSTRUCTION@
 
 # XXX Once edk2 is moved to SPECS this will not be needed
-RUN tdnf -y install mariner-repos-extended.noarch \
+RUN tdnf -y install azurelinux-repos-extended.noarch \
   && tdnf -y install edk2-ovmf \
   && tdnf clean all
 

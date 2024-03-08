@@ -14,7 +14,7 @@ BuildRequires:  gnupg2
 BuildRequires:  gnutls-utils
 BuildRequires:  pkgconfig(nss)
 BuildRequires:  openssl
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  nss-tools
 BuildRequires:  softhsm
 BuildRequires:  opensc

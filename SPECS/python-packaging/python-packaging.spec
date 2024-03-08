@@ -1,7 +1,8 @@
+%global debug_package %{nil}
 Summary:        Core utilities for Python packages
 Name:           python-packaging
 Version:        23.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD OR ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,7 +14,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-pyparsing
@@ -54,6 +55,9 @@ Core utilities for Python packages
 %license LICENSE
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 23.2-2
+- Disable debuginfo package to fix build with python 3.12
+
 * Fri Feb 09 2024 Aurelien Bombo <abombo@microsoft.com> - 23.2-1
 - AzL 3.0 package upgrade
 

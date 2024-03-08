@@ -17,7 +17,7 @@ BuildRequires:  gobject-introspection-devel
 BuildRequires:  gtk-doc
 BuildRequires:  make
 %global with_check 1
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-devel
 %endif
 Requires:       glib

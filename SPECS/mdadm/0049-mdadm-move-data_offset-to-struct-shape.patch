@@ -1,0 +1,232 @@
+From ae5dfc56b7a96805d5a0b50eaf93b9fec8604298 Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Tue, 19 Jul 2022 14:48:23 +0200
+Subject: [PATCH 49/83] mdadm: move data_offset to struct shape
+
+Data offset is a shape property so move it there to remove additional
+parameter from some functions.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Create.c | 16 ++++++++--------
+ Grow.c   |  7 +++----
+ mdadm.c  | 20 +++++++++-----------
+ mdadm.h  |  5 ++---
+ 4 files changed, 22 insertions(+), 26 deletions(-)
+
+diff --git a/Create.c b/Create.c
+index c84c1ac8..e06ec2ae 100644
+--- a/Create.c
++++ b/Create.c
+@@ -95,7 +95,7 @@ int Create(struct supertype *st, char *mddev,
+ 	   char *name, int *uuid,
+ 	   int subdevs, struct mddev_dev *devlist,
+ 	   struct shape *s,
+-	   struct context *c, unsigned long long data_offset)
++	   struct context *c)
+ {
+ 	/*
+ 	 * Create a new raid array.
+@@ -288,7 +288,7 @@ int Create(struct supertype *st, char *mddev,
+ 	newsize = s->size * 2;
+ 	if (st && ! st->ss->validate_geometry(st, s->level, s->layout, s->raiddisks,
+ 					      &s->chunk, s->size*2,
+-					      data_offset, NULL,
++					      s->data_offset, NULL,
+ 					      &newsize, s->consistency_policy,
+ 					      c->verbose >= 0))
+ 		return 1;
+@@ -323,10 +323,10 @@ int Create(struct supertype *st, char *mddev,
+ 	info.array.working_disks = 0;
+ 	dnum = 0;
+ 	for (dv = devlist; dv; dv = dv->next)
+-		if (data_offset == VARIABLE_OFFSET)
++		if (s->data_offset == VARIABLE_OFFSET)
+ 			dv->data_offset = INVALID_SECTORS;
+ 		else
+-			dv->data_offset = data_offset;
++			dv->data_offset = s->data_offset;
+ 
+ 	for (dv=devlist; dv && !have_container; dv=dv->next, dnum++) {
+ 		char *dname = dv->devname;
+@@ -342,7 +342,7 @@ int Create(struct supertype *st, char *mddev,
+ 			missing_disks ++;
+ 			continue;
+ 		}
+-		if (data_offset == VARIABLE_OFFSET) {
++		if (s->data_offset == VARIABLE_OFFSET) {
+ 			doff = strchr(dname, ':');
+ 			if (doff) {
+ 				*doff++ = 0;
+@@ -350,7 +350,7 @@ int Create(struct supertype *st, char *mddev,
+ 			} else
+ 				dv->data_offset = INVALID_SECTORS;
+ 		} else
+-			dv->data_offset = data_offset;
++			dv->data_offset = s->data_offset;
+ 
+ 		dfd = open(dname, O_RDONLY);
+ 		if (dfd < 0) {
+@@ -535,7 +535,7 @@ int Create(struct supertype *st, char *mddev,
+ 			if (!st->ss->validate_geometry(st, s->level, s->layout,
+ 						       s->raiddisks,
+ 						       &s->chunk, minsize*2,
+-						       data_offset,
++						       s->data_offset,
+ 						       NULL, NULL,
+ 						       s->consistency_policy, 0)) {
+ 				pr_err("devices too large for RAID level %d\n", s->level);
+@@ -754,7 +754,7 @@ int Create(struct supertype *st, char *mddev,
+ 		}
+ 	}
+ 	if (!st->ss->init_super(st, &info.array, s, name, c->homehost, uuid,
+-				data_offset))
++				s->data_offset))
+ 		goto abort_locked;
+ 
+ 	total_slots = info.array.nr_disks;
+diff --git a/Grow.c b/Grow.c
+index 5780635a..868bdc3a 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -1775,7 +1775,6 @@ static int reshape_container(char *container, char *devname,
+ 
+ int Grow_reshape(char *devname, int fd,
+ 		 struct mddev_dev *devlist,
+-		 unsigned long long data_offset,
+ 		 struct context *c, struct shape *s)
+ {
+ 	/* Make some changes in the shape of an array.
+@@ -1821,7 +1820,7 @@ int Grow_reshape(char *devname, int fd,
+ 		return 1;
+ 	}
+ 
+-	if (data_offset != INVALID_SECTORS && array.level != 10 &&
++	if (s->data_offset != INVALID_SECTORS && array.level != 10 &&
+ 	    (array.level < 4 || array.level > 6)) {
+ 		pr_err("--grow --data-offset not yet supported\n");
+ 		return 1;
+@@ -2179,7 +2178,7 @@ size_change_error:
+ 	if ((s->level == UnSet || s->level == array.level) &&
+ 	    (s->layout_str == NULL) &&
+ 	    (s->chunk == 0 || s->chunk == array.chunk_size) &&
+-	    data_offset == INVALID_SECTORS &&
++	    s->data_offset == INVALID_SECTORS &&
+ 	    (s->raiddisks == 0 || s->raiddisks == array.raid_disks)) {
+ 		/* Nothing more to do */
+ 		if (!changed && c->verbose >= 0)
+@@ -2379,7 +2378,7 @@ size_change_error:
+ 		}
+ 		sync_metadata(st);
+ 		rv = reshape_array(container, fd, devname, st, &info, c->force,
+-				   devlist, data_offset, c->backup_file,
++				   devlist, s->data_offset, c->backup_file,
+ 				   c->verbose, 0, 0, 0);
+ 		frozen = 0;
+ 	}
+diff --git a/mdadm.c b/mdadm.c
+index 180f7a9c..845e4466 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
+ 	int i;
+ 
+ 	unsigned long long array_size = 0;
+-	unsigned long long data_offset = INVALID_SECTORS;
+ 	struct mddev_ident ident;
+ 	char *configfile = NULL;
+ 	int devmode = 0;
+@@ -79,6 +78,7 @@ int main(int argc, char *argv[])
+ 		.layout		= UnSet,
+ 		.bitmap_chunk	= UnSet,
+ 		.consistency_policy	= CONSISTENCY_POLICY_UNKNOWN,
++		.data_offset = INVALID_SECTORS,
+ 	};
+ 
+ 	char sys_hostname[256];
+@@ -479,15 +479,15 @@ int main(int argc, char *argv[])
+ 
+ 		case O(CREATE,DataOffset):
+ 		case O(GROW,DataOffset):
+-			if (data_offset != INVALID_SECTORS) {
++			if (s.data_offset != INVALID_SECTORS) {
+ 				pr_err("data-offset may only be specified one. Second value is %s.\n", optarg);
+ 				exit(2);
+ 			}
+ 			if (mode == CREATE && strcmp(optarg, "variable") == 0)
+-				data_offset = VARIABLE_OFFSET;
++				s.data_offset = VARIABLE_OFFSET;
+ 			else
+-				data_offset = parse_size(optarg);
+-			if (data_offset == INVALID_SECTORS) {
++				s.data_offset = parse_size(optarg);
++			if (s.data_offset == INVALID_SECTORS) {
+ 				pr_err("invalid data-offset: %s\n",
+ 					optarg);
+ 				exit(2);
+@@ -1416,7 +1416,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	if (c.backup_file && data_offset != INVALID_SECTORS) {
++	if (c.backup_file && s.data_offset != INVALID_SECTORS) {
+ 		pr_err("--backup-file and --data-offset are incompatible\n");
+ 		exit(2);
+ 	}
+@@ -1587,8 +1587,7 @@ int main(int argc, char *argv[])
+ 
+ 		rv = Create(ss, devlist->devname,
+ 			    ident.name, ident.uuid_set ? ident.uuid : NULL,
+-			    devs_found-1, devlist->next,
+-			    &s, &c, data_offset);
++			    devs_found - 1, devlist->next, &s, &c);
+ 		break;
+ 	case MISC:
+ 		if (devmode == 'E') {
+@@ -1706,10 +1705,9 @@ int main(int argc, char *argv[])
+ 						   c.verbose);
+ 		else if (s.size > 0 || s.raiddisks || s.layout_str ||
+ 			 s.chunk != 0 || s.level != UnSet ||
+-			 data_offset != INVALID_SECTORS) {
++			 s.data_offset != INVALID_SECTORS) {
+ 			rv = Grow_reshape(devlist->devname, mdfd,
+-					  devlist->next,
+-					  data_offset, &c, &s);
++					  devlist->next, &c, &s);
+ 		} else if (s.consistency_policy != CONSISTENCY_POLICY_UNKNOWN) {
+ 			rv = Grow_consistency_policy(devlist->devname, mdfd, &c, &s);
+ 		} else if (array_size == 0)
+diff --git a/mdadm.h b/mdadm.h
+index 93e72786..adb7cdaa 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -595,6 +595,7 @@ struct shape {
+ 	int	assume_clean;
+ 	int	write_behind;
+ 	unsigned long long size;
++	unsigned long long data_offset;
+ 	int	consistency_policy;
+ };
+ 
+@@ -1431,7 +1432,6 @@ extern int Grow_addbitmap(char *devname, int fd,
+ 			  struct context *c, struct shape *s);
+ extern int Grow_reshape(char *devname, int fd,
+ 			struct mddev_dev *devlist,
+-			unsigned long long data_offset,
+ 			struct context *c, struct shape *s);
+ extern int Grow_restart(struct supertype *st, struct mdinfo *info,
+ 			int *fdlist, int cnt, char *backup_file, int verbose);
+@@ -1462,8 +1462,7 @@ extern int Create(struct supertype *st, char *mddev,
+ 		  char *name, int *uuid,
+ 		  int subdevs, struct mddev_dev *devlist,
+ 		  struct shape *s,
+-		  struct context *c,
+-		  unsigned long long data_offset);
++		  struct context *c);
+ 
+ extern int Detail(char *dev, struct context *c);
+ extern int Detail_Platform(struct superswitch *ss, int scan, int verbose, int export, char *controller_path);
+-- 
+2.38.1
+

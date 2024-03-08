@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      18%{?dist}
+Release:      19%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -170,13 +170,12 @@ EOF
 #	7.3. Customizing the /etc/hosts File"
 #
 cat > %{buildroot}/etc/hosts <<- "EOF"
-# Begin /etc/hosts (network card version)
-
-::1         ipv6-localhost ipv6-loopback
-127.0.0.1   localhost.localdomain
-127.0.0.1   localhost
-
-# End /etc/hosts (network card version)
+127.0.0.1   localhost localhost.localdomain
+::1         localhost localhost.localdomain ipv6-localhost ipv6-loopback
+EOF
+# host.conf file
+cat > %{buildroot}/etc/host.conf <<- "EOF"
+multi on
 EOF
 #
 #	7.9. Configuring the setclock Script"
@@ -585,6 +584,7 @@ return 0
 %dir /etc/opt
 %config(noreplace) /etc/fstab
 %config(noreplace) /etc/group
+%config(noreplace) /etc/host.conf
 %config(noreplace) /etc/hosts
 %config(noreplace) /etc/inputrc
 %config(noreplace) /etc/mtab
@@ -710,6 +710,10 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
+- fix /etc/hosts
+- add /etc/host.conf to enable multi
+
 * Thu Nov 30 2023 Dan Streetman <ddstreet@ieee.org> - 1.1-18
 - Remove umask 027
 

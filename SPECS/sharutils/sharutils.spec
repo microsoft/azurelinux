@@ -45,7 +45,7 @@ BuildRequires:  glibc-common
 BuildRequires:  make
 BuildRequires:  sed
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  diffutils
 %endif
 

@@ -1,0 +1,52 @@
+From 071f839ea549e2a384cd13bba445245cd87e48b1 Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Fri, 28 Oct 2022 04:51:17 +0200
+Subject: [PATCH 82/83] super-intel: make freesize not required for chunk size
+ migration
+
+Freesize is needed to be set for migrations where size of RAID could
+be changed - expand. It tells how many free space is determined for
+members. In chunk size migartion freesize is not needed to be set,
+pointer shouldn't be checked if exists. This commit moves check to
+condition which contains size calculations, instead of checking it
+always at the first step.
+Fix return value when superblock is not set.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super-intel.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/super-intel.c b/super-intel.c
+index 1f5f6eda..89fac626 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -7719,11 +7719,11 @@ static int validate_geometry_imsm(struct supertype *st, int level, int layout,
+ 		struct intel_super *super = st->sb;
+ 
+ 		/*
+-		 * Autolayout mode, st->sb and freesize must be set.
++		 * Autolayout mode, st->sb must be set.
+ 		 */
+-		if (!super || !freesize) {
+-			pr_vrb("freesize and superblock must be set for autolayout, aborting\n");
+-			return 1;
++		if (!super) {
++			pr_vrb("superblock must be set for autolayout, aborting\n");
++			return 0;
+ 		}
+ 
+ 		if (!validate_geometry_imsm_orom(st->sb, level, layout,
+@@ -7731,7 +7731,7 @@ static int validate_geometry_imsm(struct supertype *st, int level, int layout,
+ 						 verbose))
+ 			return 0;
+ 
+-		if (super->orom) {
++		if (super->orom && freesize) {
+ 			imsm_status_t rv;
+ 			int count = count_volumes(super->hba, super->orom->dpa,
+ 					      verbose);
+-- 
+2.38.1
+

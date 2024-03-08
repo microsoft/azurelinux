@@ -15,8 +15,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // IsDir check if a given file path is a directory.
@@ -305,7 +305,8 @@ func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 	return
 }
 
-// CopyResourceFile copies a file from an embedded binary resource file.
+// CopyResourceFile copies a file from an embedded binary resource file to disk.
+// This will override any existing file.
 func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
 	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
 
@@ -320,7 +321,7 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 	defer source.Close()
 
-	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE, filemode)
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, filemode)
 	if err != nil {
 		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open destination:\n%w", srcFile, dst, err)
 	}

@@ -9,7 +9,7 @@ Disks entry specifies the disk configuration like its size (for virtual disks), 
 Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
-Artifact (non-ISO image building only) defines the name, type and optional compression of the output CBL-Mariner image.
+Artifact (non-ISO image building only) defines the name, type and optional compression of the output Azure Linux image.
 
 Sample Artifacts entry, creating a raw rootfs, compressed to .tar.gz format(note that this format does not support partitions, so there would be no "Partitions" entry):
 
@@ -366,7 +366,7 @@ Since users are controlled by files in `/etc`, these files are read-only when th
 Since the root partition's hash tree is stored as part of the initramfs, the initramfs cannot be stored on the same root partition (it would invalidate the measurements). To avoid this a separate `/boot` partition is needed to house the hash tree (via the initramfs).
 
 ##### ISO
-The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"CBL-Mariner Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
+The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"Azure Linux Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
 
 The GUI installer does not currently support read-only roots.
 - `Enable`: Enable dm-verity on the root filesystem
@@ -556,7 +556,7 @@ A sample image configuration, producing a VHDX disk image:
                 "ImaPolicy": ["tcb"],
                 "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

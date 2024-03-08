@@ -12,11 +12,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/azureblobstorage"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/azureblobstorage"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // CCacheManager
@@ -158,8 +158,7 @@ type RemoteStoreConfig struct {
 
 // CCacheGroupConfig is where package groups are defined.
 // A package group is a group of packages that can share the same ccache
-// artifacts. This is typical for packages like kernel and kernel-hci, for
-// example.
+// artifacts. This is typical for packages like the kernel.
 // A package group can have an arbitrary name, and a list of package names
 // associated with it.
 // A package group can also be disabled if the ccache breaks its build. This
