@@ -11,13 +11,13 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/isomakerlib"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/isomakerlib"
 )
 
 const (
@@ -239,6 +239,16 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "root", rootValue)
 	if err != nil {
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "security", "")
+	if err != nil {
+		return fmt.Errorf("failed to update the security kernel argument in the iso grub.cfg:\n%w", err)
+	}
+
+	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "selinux", "0")
+	if err != nil {
+		return fmt.Errorf("failed to update the selinux kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)

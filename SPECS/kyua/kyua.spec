@@ -64,7 +64,7 @@ Obsoletes:      kyua-testers-tests < 0.10
 %install
 %make_install %{_make_args} doc_DATA=
 
-%if %{with_check}
+%if 0%{?with_check}
 %check
 # Tests expect dumping core to file which is different from machine to machine
 HOME=$(pwd)/check %make_build check %{_make_args} || :

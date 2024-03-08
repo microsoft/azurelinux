@@ -56,7 +56,7 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

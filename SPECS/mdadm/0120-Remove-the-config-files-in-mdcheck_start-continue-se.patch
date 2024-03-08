@@ -1,0 +1,42 @@
+From 76c224c6cfc8ff154bd041d30b9551faecd593c1 Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Fri, 7 Apr 2023 08:45:28 +0800
+Subject: [PATCH 120/120] Remove the config files in mdcheck_start|continue
+ service
+
+We set MDADM_CHECK_DURATION in the mdcheck_start|continue.service files.
+And mdcheck doesn't use any configs from the config file. So we can remove
+the dependencies.
+
+Signed-off-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ systemd/mdcheck_continue.service | 2 --
+ systemd/mdcheck_start.service    | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/systemd/mdcheck_continue.service b/systemd/mdcheck_continue.service
+index f5324905..70892a1f 100644
+--- a/systemd/mdcheck_continue.service
++++ b/systemd/mdcheck_continue.service
+@@ -13,6 +13,4 @@ Documentation=man:mdadm(8)
+ [Service]
+ Type=oneshot
+ Environment="MDADM_CHECK_DURATION=6 hours"
+-EnvironmentFile=-/run/sysconfig/mdadm
+-ExecStartPre=-/usr/lib/mdadm/mdadm_env.sh
+ ExecStart=/usr/share/mdadm/mdcheck --continue --duration ${MDADM_CHECK_DURATION}
+diff --git a/systemd/mdcheck_start.service b/systemd/mdcheck_start.service
+index 703a6583..fc4fc438 100644
+--- a/systemd/mdcheck_start.service
++++ b/systemd/mdcheck_start.service
+@@ -13,6 +13,4 @@ Documentation=man:mdadm(8)
+ [Service]
+ Type=oneshot
+ Environment="MDADM_CHECK_DURATION=6 hours"
+-EnvironmentFile=-/run/sysconfig/mdadm
+-ExecStartPre=-/usr/lib/mdadm/mdadm_env.sh
+ ExecStart=/usr/share/mdadm/mdcheck --duration ${MDADM_CHECK_DURATION}
+-- 
+2.38.1
+

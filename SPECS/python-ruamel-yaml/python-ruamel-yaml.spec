@@ -24,7 +24,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
 Requires:       python%{python3_pkgversion}-setuptools
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

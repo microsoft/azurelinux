@@ -1,4 +1,4 @@
-# CBL-Mariner operating system security features
+# Azure Linux operating system security features
 
 | **Type**              | **Feature**                           | **Status** |**Additional information** |
 |-----------------------|---------------------------------------|------------|---------------------------|

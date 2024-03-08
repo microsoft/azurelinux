@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -281,7 +281,7 @@ autoconf -f -I config-scripts
 export CC=%{__cc}
 export CXX=%{__cxx}
 # add Mariner specific flags to DSOFLAGS
-export DSOFLAGS="$DSOFLAGS -L../cgi-bin -L../filter -L../ppdc -L../scheduler -Wl,-z,relro -Wl,-z,now -specs=%{_libdir}/rpm/mariner/default-hardened-ld -Wl,-z,relro,-z,now -fPIE -pie"
+export DSOFLAGS="$DSOFLAGS -L../cgi-bin -L../filter -L../ppdc -L../scheduler -Wl,-z,relro -Wl,-z,now -specs=%{_libdir}/rpm/azl/default-hardened-ld -Wl,-z,relro,-z,now -fPIE -pie"
 export CFLAGS="%{optflags} -fstack-protector-all -DLDAP_DEPRECATED=1"
 # --enable-debug to avoid stripping binaries
 %configure --with-docdir=%{_datadir}/%{name}/www --enable-debug \
@@ -650,6 +650,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.3op2-6
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3op2-5
 - License verified
 - Lint spec

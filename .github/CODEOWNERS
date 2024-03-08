@@ -19,7 +19,6 @@
 /SPECS/kernel-headers/* @microsoft/cbl-mariner-kernel
 /SPECS/kernel-mshv/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kernel-uvm/* @microsoft/cbl-mariner-kata-containers
-/SPECS/kernel-uvm-cvm/* @microsoft/cbl-mariner-kata-containers
 /SPECS-SIGNED/kernel-signed/* @microsoft/cbl-mariner-kernel
 /SPECS-SIGNED/kernel-mstflint-signed/* @microsoft/cbl-mariner-kernel
 
@@ -46,7 +45,6 @@
 /SPECS/openssl/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt-OpenSSL/* @microsoft/cbl-mariner-openssl
 /SPECS/SymCrypt/* @microsoft/cbl-mariner-openssl
-/SPECS/KeysInUse-OpenSSL/* @microsoft/cbl-mariner-openssl
 
 /SPECS/dnf/* @microsoft/cbl-mariner-package-managers
 /SPECS/dnf-plugins-core/* @microsoft/cbl-mariner-package-managers
@@ -54,10 +52,10 @@
 /SPECS/tdnf/* @microsoft/cbl-mariner-package-managers
 
 /SPECS/containerd/* @microsoft/cbl-mariner-container-runtime
+/SPECS/docker-buildx/* @microsoft/cbl-mariner-container-runtime
 /SPECS/docker-cli/* @microsoft/cbl-mariner-container-runtime
 /SPECS/kata-containers/* @microsoft/cbl-mariner-kata-containers
 /SPECS/kata-containers-cc/* @microsoft/cbl-mariner-kata-containers
-/SPECS/moby-buildx/* @microsoft/cbl-mariner-container-runtime
 /SPECS/moby-containerd-cc/* @microsoft/cbl-mariner-kata-containers
 /SPECS/moby-engine/* @microsoft/cbl-mariner-container-runtime
 /SPECS/runc/* @microsoft/cbl-mariner-container-runtime

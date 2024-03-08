@@ -6,7 +6,7 @@ package formats
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 )
 
 // Ext4Type represents the ext4 file system format

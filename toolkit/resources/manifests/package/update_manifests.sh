@@ -81,7 +81,7 @@ remove_packages_for_pkggen_core () {
     sed -i '/lua-devel/d' $TmpPkgGen
     sed -i '/lua-rpm/d' $TmpPkgGen
     sed -i '/lua-srpm/d' $TmpPkgGen
-    sed -ri '/mariner-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
+    sed -ri '/azurelinux-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
     sed -i '/nghttp2-devel/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
     sed -i '/pcre-devel/d' $TmpPkgGen
@@ -279,7 +279,7 @@ generate_pkggen_core () {
         grep "^libltdl-" $TmpPkgGen
         grep "^pcre-" $TmpPkgGen
         grep "^lua-" $TmpPkgGen
-        grep "^mariner-rpm-macros-" $TmpPkgGen
+        grep "^azurelinux-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen
         grep "^libassuan-" $TmpPkgGen
         grep "^libgpg-error-" $TmpPkgGen
@@ -289,8 +289,8 @@ generate_pkggen_core () {
         grep "^pinentry-" $TmpPkgGen
         grep "^gnupg2-" $TmpPkgGen
         grep "^gpgme-" $TmpPkgGen
-        grep "^mariner-repos-shared" $TmpPkgGen
-        grep "^mariner-repos" $TmpPkgGen
+        grep "^azurelinux-repos-shared" $TmpPkgGen
+        grep "^azurelinux-repos" $TmpPkgGen
         grep "^libffi-" $TmpPkgGen
         grep "^libtasn1-" $TmpPkgGen
         grep "^p11-kit-" $TmpPkgGen

@@ -25,7 +25,7 @@ BuildRequires:  perl(Regexp::Pattern::Perl::Module)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IO::Handle)

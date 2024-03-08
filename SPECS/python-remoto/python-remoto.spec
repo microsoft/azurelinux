@@ -10,7 +10,7 @@ URL:            https://github.com/alfredodeza/remoto
 Source0:        https://pypi.io/packages/source/r/%{pkgname}/%{pkgname}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-execnet
 BuildRequires:  python3-pip
 %endif

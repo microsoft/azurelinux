@@ -44,7 +44,7 @@ Requires:       lz4
 Requires:       nettle
 Requires:       satyr >= 0.24
 Requires:       xz
-%if %{with_check} && 0%{?mariner_failing_tests}
+%if 0%{?with_check} && 0%{?mariner_failing_tests}
 # A test case uses zh_CN locale to verify XML event translations
 BuildRequires:  glibc-all-langpacks
 %endif

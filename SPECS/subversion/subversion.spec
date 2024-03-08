@@ -1,6 +1,6 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
-Version:        1.14.2
+Version:        1.14.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -19,7 +19,7 @@ BuildRequires:  perl(ExtUtils::Embed)
 BuildRequires:  sqlite-devel
 BuildRequires:  swig
 BuildRequires:  utf8proc-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
@@ -103,6 +103,9 @@ sudo -u test make check && userdel test -r -f
 %{_mandir}/man3/SVN*
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.3-1
+- Auto-upgrade to 1.14.3 - Azure Linux 3.0 Upgrades
+
 * Mon Jun 06 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.14.2-1
 - Updating to 1.14.2 to fix CVE-2021-28544.
 
