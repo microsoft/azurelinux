@@ -48,30 +48,15 @@ func TestAddSkippableFrame(t *testing.T) {
 
 func createTestRawPartitionFile(filename string) (string, error) {
 	// Test data
-	data := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
+	testData := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
 
-	err := writeToFile(filename, data)
+	err := os.WriteFile(filename, testData, PartitionFilePermissions)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to write skippable frame to partition file %s:\n%w", filename, err)
 	} else {
 		logger.Log.Infof("Test raw partition file created: %s", filename)
 		return filename, nil
 	}
-}
-
-func writeToFile(filename string, data []byte) error {
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = file.Write(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Decompress the .raw.zst partition file and verify the hash matches with the source .raw file

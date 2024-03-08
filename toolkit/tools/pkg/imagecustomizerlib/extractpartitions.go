@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,8 +15,9 @@ import (
 )
 
 const (
-	SkippableFrameMagicNumber uint32 = 0x184D2A50
-	SkippableFrameSize        uint32 = 16
+	SkippableFrameMagicNumber uint32      = 0x184D2A50
+	SkippableFrameSize        uint32      = 16
+	PartitionFilePermissions  fs.FileMode = 0644
 )
 
 // Extract all partitions of connected image into separate files with specified format.
@@ -128,8 +130,8 @@ func addSkippableFrame(partitionFilepath string, magicNumber uint32, frameSize u
 	// Combine the skippable frame and existing data.
 	newData := append(skippableFrame, existingData...)
 
-	// Write the combined data back to the partition file.
-	err = os.WriteFile(partitionFilepath, newData, 0644)
+	// Write the combined data back to the partition file with the same permissions as the original partition file.
+	err = os.WriteFile(partitionFilepath, newData, PartitionFilePermissions)
 	if err != nil {
 		return fmt.Errorf("failed to write skippable frame to partition file %s:\n%w", partitionFilepath, err)
 	}
