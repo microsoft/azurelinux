@@ -3,7 +3,7 @@
 - **Recommended if you want to try Azure Linux.**
 - Quickly build the **Standard Azure Linux** image, install and use.
 
-## [Tutorial for Building Custom Mariner Based Images](https://github.com/microsoft/azurelinux-tutorials)
+## [Tutorial for Building Custom Azure Linux Based Images](https://github.com/microsoft/azurelinux-tutorials)
 
 - **Recommended if you are a developer and want to experiment with Azure Linux.**
 - Quickly build a **Custom Azure Linux** image, install and use.
