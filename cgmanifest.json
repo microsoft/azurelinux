@@ -1087,8 +1087,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.44",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.44/bind-9.16.44.tar.xz"
+          "version": "9.16.48",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.48/bind-9.16.48.tar.xz"
         }
       }
     },
@@ -2748,8 +2748,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.89",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.89.tar.xz"
+          "version": "2.90",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.90.tar.xz"
         }
       }
     },
@@ -8041,8 +8041,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.1.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8051,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.3.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -9441,8 +9441,8 @@
         "type": "other",
         "other": {
           "name": "libgit2",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.4.5/libgit2-1.4.5.tar.gz"
+          "version": "1.6.5",
+          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.6.5/libgit2-1.6.5.tar.gz"
         }
       }
     },
@@ -13363,8 +13363,8 @@
         "type": "other",
         "other": {
           "name": "moby-compose",
-          "version": "2.17.2",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.2.tar.gz"
+          "version": "2.17.3",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.17.3.tar.gz"
         }
       }
     },
@@ -15706,6 +15706,16 @@
           "name": "osinfo-db-tools",
           "version": "1.10.0",
           "downloadUrl": "https://releases.pagure.org/libosinfo/osinfo-db-tools-1.10.0.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "osslsigncode",
+          "version": "2.7",
+          "downloadUrl": "https://github.com/mtrojnar/osslsigncode/archive/refs/tags/2.7.tar.gz"
         }
       }
     },
@@ -21444,8 +21454,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "14.10",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.10/postgresql-14.10.tar.bz2"
+          "version": "14.11",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v14.11/postgresql-14.11.tar.bz2"
         }
       }
     },
@@ -29117,8 +29127,8 @@
         "type": "other",
         "other": {
           "name": "unbound",
-          "version": "1.16.3",
-          "downloadUrl": "https://github.com/NLnetLabs/unbound/archive/release-1.16.3.tar.gz"
+          "version": "1.19.1",
+          "downloadUrl": "https://github.com/nlnetlabs/unbound/archive/release-1.19.1.tar.gz"
         }
       }
     },
