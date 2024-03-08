@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -88,8 +88,7 @@ Summary:        The libraries and header files needed for Python development.
 Group:          Development/Libraries
 Requires:       expat-devel >= 2.1.0
 Requires:       %{name} = %{version}-%{release}
-# python3-setuptools is required, but provided in default worker chroot environment.
-#Requires:       python3-setuptools
+Requires:       python3-setuptools
 Provides:       python3-devel
 Provides:       python%{majmin}-devel = %{version}-%{release}
 Provides:       python%{majmin_nodots}-devel = %{version}-%{release}
@@ -161,6 +160,8 @@ find %{buildroot}%{_libdir}/python%{majmin}/site-packages -name '*.exe' -delete 
 cp -pv %{SOURCE1} %{buildroot}%{_bindir}/pathfix%{majmin}.py
 ln -s ./pathfix%{majmin}.py %{buildroot}%{_bindir}/pathfix.py
 
+ln -sfv %{name} %{buildroot}%{_bindir}/python
+
 # Remove unused stuff
 find %{buildroot}%{_libdir} -name '*.pyc' -delete
 find %{buildroot}%{_libdir} -name '*.pyo' -delete
@@ -178,6 +179,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %license LICENSE
 %doc README.rst
 %{_bindir}/pydoc*
+%{_bindir}/python
 %{_bindir}/python3
 %{_bindir}/python%{majmin}
 %{_mandir}/*/*
@@ -238,6 +240,10 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-3
+- Add %%{_bindir}/python link to python3
+- Add python3-setuptools requires to python3-devel
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-2
 - Remove pip subpackage
 
