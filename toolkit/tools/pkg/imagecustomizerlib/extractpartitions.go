@@ -68,9 +68,14 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 // Extract raw-zst partition
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionFilename string, outDir string) (partitionFilepath string, err error) {
 	// Compress raw partition with zstd
-	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath)
+	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath, partitionFilename, outDir)
 	if err != nil {
 		return "", err
+	}
+	// Remove raw file since output partition format is raw-zst
+	err = os.Remove(partitionRawFilepath)
+	if err != nil {
+		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
 	}
 	// Create a skippable frame containing the metadata and prepend the frame to the partition file
 	partitionFilepath, err = addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
@@ -81,11 +86,6 @@ func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata 
 	err = os.Remove(tempPartitionFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to remove temp file %s:\n%w", partitionRawFilepath, err)
-	}
-	// Remove raw file since output partition format is raw-zst
-	err = os.Remove(partitionRawFilepath)
-	if err != nil {
-		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
 	}
 	return partitionFilepath, nil
 }
@@ -114,14 +114,16 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 }
 
 // Compress file from .raw to .raw.zst format using zstd.
-func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, err error) {
+func compressWithZstd(partitionRawFilepath string, partitionFilename string, outDir string) (partitionFilepath string, err error) {
+	// Define output file.
+	outputPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
 	// Using -f to overwrite a file with same name if it exists.
-	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath)
+	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath, "-o", outputPartitionFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
 
-	return partitionRawFilepath + ".zst", nil
+	return outputPartitionFilepath, nil
 }
 
 // Prepend a skippable frame with the metadata to the specified partition file.
@@ -134,7 +136,7 @@ func addSkippableFrame(tempPartitionFilepath string, skippableFrameMetadata [Ski
 	// Create a skippable frame
 	skippableFrame := createSkippableFrame(SkippableFrameMagicNumber, SkippableFramePayloadSize, skippableFrameMetadata)
 	// Define the final partition file path
-	partitionFilepath = outDir + "/" + partitionFilename + "_final" + ".raw.zst"
+	partitionFilepath = outDir + "/" + partitionFilename + ".raw.zst"
 	// Create partition file
 	finalFile, err := os.Create(partitionFilepath)
 	if err != nil {
