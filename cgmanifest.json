@@ -195,8 +195,8 @@
         "type": "other",
         "other": {
           "name": "annobin",
-          "version": "9.27",
-          "downloadUrl": "https://nickc.fedorapeople.org/annobin-9.27.tar.xz"
+          "version": "12.40",
+          "downloadUrl": "https://nickc.fedorapeople.org/annobin-12.40.tar.xz"
         }
       }
     },
@@ -14352,8 +14352,8 @@
         "type": "other",
         "other": {
           "name": "ocaml",
-          "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "version": "5.1.1",
+          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-5.1/ocaml-5.1.1.tar.xz"
         }
       }
     },

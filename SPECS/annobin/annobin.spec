@@ -534,6 +534,7 @@ make check
 - Promoted package from extended to core
 - Upgraded to 12.40
 - Imported and adopted the spec from Fedora
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 9.27-4
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
