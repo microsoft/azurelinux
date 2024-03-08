@@ -26,7 +26,6 @@ func TestAddSkippableFrame(t *testing.T) {
 	// Compress to .raw.zst partition file
 	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath)
 	assert.NoError(t, err)
-	logger.Log.Infof("temp: %s", tempPartitionFilepath)
 
 	// Test adding the skippable frame
 	partitionFilepath, err := addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionfileName, testDir)
