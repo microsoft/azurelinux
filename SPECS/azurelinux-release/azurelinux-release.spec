@@ -1,5 +1,6 @@
 
 %define dist_version 3
+%define distro_release_version_no_time %(echo %{distro_release_version} | cut -d. -f 1-3)
 
 Summary:        Azure Linux release files
 Name:           azurelinux-release
@@ -35,13 +36,13 @@ install -d %{buildroot}%{_rpmmacrodir}
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/azurelinux-release
 %{distribution} %{version}
-AZURELINUX_BUILD_NUMBER=%{distro_release_version}
+AZURELINUX_BUILD_NUMBER=%{distro_release_version_no_time}
 EOF
 ln -sv ..%{_libdir}/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/lsb-release
 DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{distro_release_version}"
+DISTRIB_RELEASE="%{distro_release_version_no_time}"
 DISTRIB_CODENAME=AzureLinux
 DISTRIB_DESCRIPTION="%{distribution} %{version}"
 EOF
@@ -49,7 +50,7 @@ ln -sv ..%{_libdir}/lsb-release %{buildroot}%{_sysconfdir}/lsb-release
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/os-release
 NAME="Microsoft %{distribution}"
-VERSION="%{distro_release_version}"
+VERSION="%{distro_release_version_no_time}"
 ID=azurelinux
 VERSION_ID="%{version}"
 PRETTY_NAME="Microsoft %{distribution} %{version}"
@@ -113,7 +114,7 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 
 %changelog
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-5
-- Add 'Microsoft' to names in release files
+- Add 'Microsoft' to names in release files and welcome message
 - Restore full version number in release files
 
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
