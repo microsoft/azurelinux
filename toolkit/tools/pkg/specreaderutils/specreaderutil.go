@@ -197,7 +197,7 @@ func FindSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 				specFiles = append(specFiles, matchingSpecFiles[0])
 			}
 		}
-		if (specParseErrMsg.Len() != 0){
+		if specParseErrMsg.Len() != 0 {
 			return nil, fmt.Errorf("failed to parse specs: %s", specParseErrMsg.String())
 		}
 	}
