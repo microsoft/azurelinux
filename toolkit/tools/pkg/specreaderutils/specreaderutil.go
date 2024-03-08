@@ -183,22 +183,22 @@ func FindSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 			return nil, err
 		}
 	} else {
-		var specParseErrMsg string
+		var specParseErrMsg strings.Builder
 		for specName := range specListSet {
 			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
 			matchingSpecFiles, err := filepath.Glob(specSearch)
 
 			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
-				specParseErrMsg += fmt.Sprintf("\nspec search failed on (%s):\n%v", specSearch, err)
+				specParseErrMsg.WriteString(fmt.Sprintf("\nspec search failed on (%s):\n%v", specSearch, err))
 			} else if len(matchingSpecFiles) != 1 {
-				specParseErrMsg += fmt.Sprintf("\nunexpected number of matches (%d) for spec file (%s) in directory (%s)", len(matchingSpecFiles), specName, specsDir)
+				specParseErrMsg.WriteString(fmt.Sprintf("\nunexpected number of matches (%d) for spec file (%s) in directory (%s)", len(matchingSpecFiles), specName, specsDir))
 			} else {
 				specFiles = append(specFiles, matchingSpecFiles[0])
 			}
 		}
-		if specParseErrMsg != "" {
-			return nil, fmt.Errorf("failed to parse specs: %s", specParseErrMsg)
+		if (specParseErrMsg.Len() != 0){
+			return nil, fmt.Errorf("failed to parse specs: %s", specParseErrMsg.String())
 		}
 	}
 	return
