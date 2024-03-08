@@ -20,8 +20,7 @@ BuildArch:      noarch
 %package -n python3-pip
 Summary:        %{summary}
 BuildRequires:  python3-devel
-# TODO: enable python3-wheel BR when this package is added to toolchain to fix non-toolchain builds
-#BuildRequires:  python3-wheel
+BuildRequires:  python3-wheel
 
 %description -n python3-pip %{_description}
 
