@@ -59,11 +59,11 @@ func main() {
 	defer timestamp.CompleteTiming()
 
 	if *workers <= 0 {
-		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
+		logger.Log.Panicf("Value in --workers must be greater than zero. Found (%d)", *workers)
 	}
 
 	toolchainRPMs, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
-	logger.PanicOnError(err, "Unable to read toolchain manifest file '%s': %s", *toolchainManifest, err)
+	logger.PanicOnError(err, "Unable to read toolchain manifest file (%s): %s", *toolchainManifest, err)
 
 	// A parse list may be provided, if so only parse this subset.
 	// If none is provided, parse all specs.
@@ -72,7 +72,7 @@ func main() {
 
 	// Convert specsDir to an absolute path
 	specsAbsDir, err := filepath.Abs(*specsDir)
-	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
+	logger.PanicOnError(err, "Unable to get absolute path for specs directory (%s): %s", *specsDir, err)
 
 	err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)

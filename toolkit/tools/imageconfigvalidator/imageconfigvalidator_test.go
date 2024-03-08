@@ -102,7 +102,7 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 			return
 		}
 	}
-	assert.Failf(t, "Could not find config", "Could not find image config file '%s' to test", filepath.Join(configDirectory, targetPackage))
+	assert.Failf(t, "Could not find config", "Could not find image config file (%s) to test", filepath.Join(configDirectory, targetPackage))
 }
 
 func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {

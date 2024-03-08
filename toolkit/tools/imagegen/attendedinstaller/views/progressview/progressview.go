@@ -122,7 +122,7 @@ func (pv *ProgressView) Primitive() tview.Primitive {
 // OnShow gets called when the view is shown to the user.
 func (pv *ProgressView) OnShow() {
 	if pv.alreadyShown {
-		logger.Log.Panicf("ProgressView shown more than once, unsupported behavior.")
+		logger.Log.Panicf("ProgressView shown more than once, unsupported behavior")
 	}
 
 	pv.alreadyShown = true

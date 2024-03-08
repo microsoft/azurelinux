@@ -171,7 +171,7 @@ func installOrUpdatePackages(action string, allPackagesToAdd []string, imageChro
 				tnfInstallArgs...)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to %s package (%s):\n%w", action, packageName, err)
+			return fmt.Errorf("failed to (%s) package (%s):\n%w", action, packageName, err)
 		}
 	}
 

@@ -64,7 +64,7 @@ func newTimeStamp(name string, parent *TimeStamp) (ts *TimeStamp, err error) {
 func newTimeStampByPath(root *TimeStamp, path string) (ts *TimeStamp, err error) {
 	components := strings.Split(path, pathSeparator)
 	if components[0] != root.Name {
-		err = fmt.Errorf("timestamp root mismatch ('%s', expected '%s')", components[0], root.Name)
+		err = fmt.Errorf("timestamp root mismatch ((%s), expected (%s))", components[0], root.Name)
 		return
 	}
 	parent, err := getTimeStampFromPath(root, components[:len(components)-1], 1)
@@ -82,7 +82,7 @@ func getTimeStampFromPath(root *TimeStamp, path []string, nextIndex int) (ts *Ti
 	}
 	nextNode, present := root.subSteps[path[nextIndex]]
 	if !present {
-		err = fmt.Errorf("node at index %d does not exist in the path from root: %v", nextIndex, path)
+		err = fmt.Errorf("node at index (%d) does not exist in the path from root: %v", nextIndex, path)
 		return &TimeStamp{}, err
 	}
 	return getTimeStampFromPath(nextNode, path, nextIndex+1)

@@ -332,7 +332,7 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 func (r *RpmRepoCloner) CloneByPackageVer(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
 	packageNames := []string{}
 	for _, packageToClone := range packagesToClone {
-		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		logger.Log.Debugf("Cloning (%s)", packageToClone)
 		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
 	}
 	return r.CloneByName(cloneDeps, packageNames...)
@@ -345,7 +345,7 @@ func (r *RpmRepoCloner) CloneByPackageVer(cloneDeps bool, packagesToClone ...*pk
 func (r *RpmRepoCloner) CloneByPackageVerSingleTransaction(cloneDeps bool, packagesToClone ...*pkgjson.PackageVer) (allPackagesPrebuilt bool, err error) {
 	packageNames := []string{}
 	for _, packageToClone := range packagesToClone {
-		logger.Log.Debugf("Cloning (%s).", packageToClone)
+		logger.Log.Debugf("Cloning (%s)", packageToClone)
 		packageNames = append(packageNames, convertPackageVersionToTdnfArg(packageToClone))
 	}
 	return r.CloneByNameSingleTransaction(cloneDeps, packageNames...)
@@ -391,7 +391,7 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 		r.chrootCloneDir,
 	}
 
-	logger.Log.Debugf("Will clone in total %d items.", len(rawPackageNames))
+	logger.Log.Debugf("Will clone in total (%d) items", len(rawPackageNames))
 
 	// Create a list of lists for each transaction. Each transaction will be cloned separately. Generally either all
 	// packages will be cloned in a single transaction or each package will be cloned in its own transaction.
@@ -406,7 +406,7 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 
 	allPackagesPrebuilt = true
 	for _, packageNamesToClone := range transactions {
-		logger.Log.Debugf("Cloning raw names (%v).", packageNamesToClone)
+		logger.Log.Debugf("Cloning raw names (%v)", packageNamesToClone)
 
 		finalArgs := append(constantArgs, packageNamesToClone...)
 		err = r.chroot.Run(func() (chrootErr error) {
@@ -452,10 +452,10 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			completeArgs := append(baseArgs, reposArgs...)
 
 			stdout, stderr, err := shell.Execute("tdnf", completeArgs...)
-			logger.Log.Debugf("tdnf search for provide '%s':\n%s", pkgVer.Name, stdout)
+			logger.Log.Debugf("tdnf search for provide (%s):\n%s", pkgVer.Name, stdout)
 
 			if err != nil {
-				logger.Log.Debugf("Failed to lookup provide '%s', tdnf error: '%s'", pkgVer.Name, stderr)
+				logger.Log.Debugf("Failed to lookup provide (%s), tdnf error: (%s)", pkgVer.Name, stderr)
 				return
 			}
 
@@ -465,7 +465,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 			for _, matches := range tdnf.PackageLookupNameMatchRegex.FindAllStringSubmatch(stdout, -1) {
 				packageName := matches[tdnf.PackageNameIndex]
 				packageNames = append(packageNames, packageName)
-				logger.Log.Debugf("'%s' is available from package '%s'", pkgVer.Name, packageName)
+				logger.Log.Debugf("(%s) is available from package (%s)", pkgVer.Name, packageName)
 			}
 
 			return
@@ -475,7 +475,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		}
 
 		if len(packageNames) > 0 {
-			logger.Log.Debug("Found required package(s), skipping further search in other repos.")
+			logger.Log.Debug("Found required package(s), skipping further search in other repos")
 			break
 		}
 	}
@@ -485,7 +485,7 @@ func (r *RpmRepoCloner) WhatProvides(pkgVer *pkgjson.PackageVer) (packageNames [
 		return
 	}
 
-	logger.Log.Debugf("Translated '%s' to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
+	logger.Log.Debugf("Translated (%s) to package(s): %s", pkgVer.Name, strings.Join(packageNames, " "))
 	return
 }
 
@@ -623,7 +623,7 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 		logger.Log.Debugf("stderr: %s", stderr)
 
 		if err != nil {
-			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n '%s'", stderr)
+			logger.Log.Debugf("tdnf error (will continue if the only errors are toybox conflicts):\n (%s)", stderr)
 		}
 
 		// ============== TDNF SPECIFIC IMPLEMENTATION ==============
@@ -675,9 +675,9 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	case "=":
 		tdnfArg = fmt.Sprintf("%s-%s", pkgVer.Name, pkgVer.Version)
 	case "<=", "<":
-		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
+		tdnfArg = fmt.Sprintf("%s (%s) %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
 	case ">", ">=":
-		logger.Log.Warnf("Discarding '%s' version constraint for: %v", pkgVer.Condition, pkgVer)
+		logger.Log.Warnf("Discarding (%s) version constraint for: %v", pkgVer.Condition, pkgVer)
 	default:
 		logger.Log.Errorf("Unsupported version constraint: %s", pkgVer.Condition)
 	}
@@ -697,7 +697,7 @@ func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
 	previousReposList := []string{fmt.Sprintf("--disablerepo=%s", repoIDAll)}
 
 	defer func() {
-		logger.Log.Debugf("Enabled repos: %v.", r.reposArgsList)
+		logger.Log.Debugf("Enabled repos: %v", r.reposArgsList)
 	}()
 
 	// Do NOT change the order of the following 'if' statements!

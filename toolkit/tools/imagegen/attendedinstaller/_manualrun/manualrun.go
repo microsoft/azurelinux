@@ -174,7 +174,7 @@ func performInstallation(cfg configuration.Config, progress chan int, status cha
 	}
 
 	if testPanicInInstallation {
-		logger.Log.Panicf("Simulated panic during installation, expected behavior is to drop to shell cleanly in terminal mode.")
+		logger.Log.Panicf("Simulated panic during installation, expected behavior is to drop to shell cleanly in terminal mode")
 	}
 
 	if testErrorInInstallation {

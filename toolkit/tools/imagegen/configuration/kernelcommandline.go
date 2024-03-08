@@ -55,7 +55,7 @@ func (k *KernelCommandLine) IsValid() (err error) {
 
 	// A character needs to be set aside for use as the sed delimiter, make sure it isn't included in the provided string
 	if strings.Contains(k.ExtraCommandLine, k.GetSedDelimeter()) {
-		return fmt.Errorf("the 'ExtraCommandLine' field contains the %s character which is reserved for use by sed", k.GetSedDelimeter())
+		return fmt.Errorf("the 'ExtraCommandLine' field contains the (%s) character which is reserved for use by sed", k.GetSedDelimeter())
 	}
 
 	return

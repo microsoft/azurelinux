@@ -265,7 +265,7 @@ func StopEventByPath(path string) (ts *TimeStamp, err error) {
 
 	components := strings.Split(path, pathSeparator)
 	if components[0] != timestampMgr.root.Name {
-		err = fmt.Errorf("timestamp root mismatch ('%s', expected '%s')", components[0], timestampMgr.root.Name)
+		err = fmt.Errorf("timestamp root mismatch ((%s), expected (%s))", components[0], timestampMgr.root.Name)
 		return
 	}
 	ts, err = getTimeStampFromPath(timestampMgr.root, components, 1)
@@ -353,7 +353,7 @@ func (writeMgr *TimeStampWriteManager) flush() {
 	}
 	err := writeMgr.fileDescriptor.Sync()
 	if err != nil {
-		logger.Log.Warnf("Failed to save file %s to disk: %v", writeMgr.filePath, err)
+		logger.Log.Warnf("Failed to save file (%s) to disk: %v", writeMgr.filePath, err)
 		return
 	}
 	writeMgr.writeBuffer = nil

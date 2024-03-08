@@ -113,7 +113,7 @@ func (fv *FinishView) Primitive() tview.Primitive {
 // OnShow gets called when the view is shown to the user
 func (fv *FinishView) OnShow() {
 	if fv.alreadyShown {
-		logger.Log.Panicf("FinishView shown more than once, unsupported behavior.")
+		logger.Log.Panicf("FinishView shown more than once, unsupported behavior")
 	}
 	fv.alreadyShown = true
 

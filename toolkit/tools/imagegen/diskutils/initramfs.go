@@ -46,7 +46,7 @@ func CreateInitramfs(initramfsPath string) (initramfs InitramfsMount, err error)
 // OpenInitramfs makes an existing initramfs editable
 // Caller is responsible for calling initramfs.Close() when finished
 func OpenInitramfs(initramfsPath string) (initramfs InitramfsMount, err error) {
-	logger.Log.Debugf("Opening intramfs '%s'", initramfsPath)
+	logger.Log.Debugf("Opening intramfs (%s)", initramfsPath)
 	inputFile, err := os.Open(initramfsPath)
 	if err != nil {
 		return
@@ -103,7 +103,7 @@ func OpenInitramfs(initramfsPath string) (initramfs InitramfsMount, err error) {
 			var bytesWrittenInt int
 
 			// Write returns an int, cast it to an int64 afterwards
-			logger.Log.Tracef("Creating link %s -> %s", nextFileHeader.Name, nextFileHeader.Linkname)
+			logger.Log.Tracef("Creating link (%s) -> %s", nextFileHeader.Name, nextFileHeader.Linkname)
 			bytesWrittenInt, err = initramfs.cpioWriter.Write(linkPayload)
 			bytesIO = int64(bytesWrittenInt)
 		} else {
@@ -114,8 +114,8 @@ func OpenInitramfs(initramfsPath string) (initramfs InitramfsMount, err error) {
 			return
 		}
 
-		logger.Log.Tracef("File %s caused %d bytes to be transferred to new archive", nextFileHeader.Name, bytesIO)
-		logger.Log.Tracef("Buffer unread length: %d", initramfs.outputBuffer.Len())
+		logger.Log.Tracef("File (%s) caused (%d) bytes to be transferred to new archive", nextFileHeader.Name, bytesIO)
+		logger.Log.Tracef("Buffer unread length: (%d)", initramfs.outputBuffer.Len())
 	}
 
 	inputFile.Close()
@@ -136,7 +136,7 @@ func OpenInitramfs(initramfsPath string) (initramfs InitramfsMount, err error) {
 func (i *InitramfsMount) Close() (err error) {
 	var bytesIO int
 
-	logger.Log.Debugf("Closing initramfs file '%s'", i.initramfsOutputFile.Name())
+	logger.Log.Debugf("Closing initramfs file (%s)", i.initramfsOutputFile.Name())
 
 	// Defer close calls to make sure we handle any errors, failing to
 	// close the file means we can't close the install root.
@@ -155,13 +155,13 @@ func (i *InitramfsMount) Close() (err error) {
 		return
 	}
 
-	logger.Log.Debugf("Writing %d bytes to file", i.outputBuffer.Len())
+	logger.Log.Debugf("Writing (%d) bytes to file", i.outputBuffer.Len())
 	bytesIO, err = i.initramfsOutputFile.Write(i.outputBuffer.Bytes())
 	if err != nil {
 		err = fmt.Errorf("failed to write initramfs file:\n%w", err)
 		return
 	}
-	logger.Log.Infof("Bytes writen to file: %d", bytesIO)
+	logger.Log.Infof("Bytes writen to file: (%d)", bytesIO)
 
 	// Explicit call to fsync, archive corruption was occuring occasionally otherwise.
 	err = i.initramfsOutputFile.Sync()
@@ -226,11 +226,11 @@ func (i *InitramfsMount) AddFileToInitramfs(sourcePath, destPath string) (err er
 			err = fmt.Errorf("failed to add regular file (%s) into initramfs:\n%w", header.Name, err)
 			return
 		}
-		logger.Log.Debugf("New file '%s' caused %d bytes to be transferred to new archive", header.Name, bytesIO)
+		logger.Log.Debugf("New file (%s) caused (%d) bytes to be transferred to new archive", header.Name, bytesIO)
 	} else {
 		// Special files (unix sockets, directories, symlinks, ...) need to be handled differently
 		// since a simple byte transfer of the file's content into the CPIO archive can't be achieved.
-		logger.Log.Debugf("Adding special file '%s' to initramfs", header.Name)
+		logger.Log.Debugf("Adding special file (%s) to initramfs", header.Name)
 
 		// For a symlink the reported size will be the size (in bytes) of the link's target.
 		// Write this data into the archive.

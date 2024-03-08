@@ -28,7 +28,7 @@ func RestoreClonedRepoContents(cloner repocloner.RepoCloner, srcFile string) (er
 	timestamp.StartEvent("restoring cloned repo", nil)
 	defer timestamp.StopEvent(nil)
 
-	logger.Log.Infof("Restoring cloned repository contents from (%s).", srcFile)
+	logger.Log.Infof("Restoring cloned repository contents from (%s)", srcFile)
 
 	var repo *repocloner.RepoContents
 	err = jsonutils.ReadJSONFile(srcFile, &repo)
@@ -104,11 +104,11 @@ func filterOutDownloadedPackage(packages []*repocloner.RepoPackage, cloneDirecto
 
 		exists, _ := file.PathExists(expectedFile)
 		if exists {
-			logger.Log.Debugf("Package (%s) already cloned, skipping restoration.", rpmName)
+			logger.Log.Debugf("Package (%s) already cloned, skipping restoration", rpmName)
 			continue
 		}
 
-		logger.Log.Infof("Found missing package to restore: %s.", rpmName)
+		logger.Log.Infof("Found missing package to restore: %s", rpmName)
 
 		// Setup a PackageVer that points at the exact package to clone with the pkgVersion and distribution tag included.
 		packageVers[index] = &pkgjson.PackageVer{
@@ -123,10 +123,10 @@ func filterOutDownloadedPackage(packages []*repocloner.RepoPackage, cloneDirecto
 }
 
 func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner.RepoPackage) (err error) {
-	logger.Log.Infof("Verifying cloned repo contents.")
+	logger.Log.Infof("Verifying cloned repo contents")
 
 	if len(expectedPackages) != len(clonedRepoContents) {
-		return fmt.Errorf("cloned repo has %d packages, expected %d", len(expectedPackages), len(clonedRepoContents))
+		return fmt.Errorf("cloned repo has (%d) packages, expected (%d)", len(expectedPackages), len(clonedRepoContents))
 	}
 
 	expectedPackagesSet := map[string]bool{}
@@ -154,7 +154,7 @@ func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner
 		return fmt.Errorf("packages mismatch. Unexpected extra packages: %v.\n Expected missing packages: %v", extraPackages, missingPackages)
 	}
 
-	logger.Log.Infof("Cloned repo contents verified successfully.")
+	logger.Log.Infof("Cloned repo contents verified successfully")
 
 	return
 }

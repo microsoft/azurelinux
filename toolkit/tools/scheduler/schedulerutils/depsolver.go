@@ -71,7 +71,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 	// Print a summary of the nodes causing the subgraph to be unsolvable
 	if len(unsolvedNodes) > 0 {
 		var warningString strings.Builder
-		warningString.WriteString(fmt.Sprintf("Found %d unsolved implicit nodes, cannot optimize subgraph yet...\n", len(unsolvedNodes)))
+		warningString.WriteString(fmt.Sprintf("Found (%d) unsolved implicit nodes, cannot optimize subgraph yet...\n", len(unsolvedNodes)))
 		printCount := 5
 		if len(unsolvedNodes) <= 5 {
 			printCount = len(unsolvedNodes)
@@ -80,7 +80,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 			warningString.WriteString(fmt.Sprintf("\tUnsolvable node: %v\n", node))
 		}
 		if len(unsolvedNodes) > 5 {
-			warningString.WriteString(fmt.Sprintf("\t...and %d more\n", len(unsolvedNodes)-printCount))
+			warningString.WriteString(fmt.Sprintf("\t...and (%d) more\n", len(unsolvedNodes)-printCount))
 		}
 		logger.Log.Warn(warningString.String())
 	}
@@ -127,7 +127,7 @@ func LeafNodes(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, goalNode *
 		return
 	})
 
-	logger.Log.Debugf("Discovered %d leaf nodes", len(leafNodes))
+	logger.Log.Debugf("Discovered (%d) leaf nodes", len(leafNodes))
 
 	return
 }

@@ -68,7 +68,7 @@ func (g *PkgGraph) FindAnyDirectedCycle() (nodes []*PkgNode, err error) {
 func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, err error) {
 	// Recursing on a node that has already been visited indicates a fatal error with the search.
 	if metaData.state[rootID] != unvisited {
-		err = fmt.Errorf("node %d is in a bad state (%d)", rootID, metaData.state[rootID])
+		err = fmt.Errorf("node (%d) is in a bad state (%d)", rootID, metaData.state[rootID])
 		return
 	}
 
@@ -121,7 +121,7 @@ func cycleDFS(g *PkgGraph, rootID int64, metaData *dfsData) (foundCycle bool, er
 			foundCycle = true
 			return
 		default:
-			err = fmt.Errorf("node %d is in a bad state (%d)", v, metaData.state[v])
+			err = fmt.Errorf("node (%d) is in a bad state (%d)", v, metaData.state[v])
 			return
 		}
 	}

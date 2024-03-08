@@ -45,7 +45,7 @@ func main() {
 
 	specNames := append(packagesToBuild, packagesToRebuild...)
 	if len(specNames) == 0 {
-		logger.Log.Fatalf("No specs were provided to filter.")
+		logger.Log.Fatalf("No specs were provided to filter")
 	}
 
 	archChecker, err := specarchchecker.New(*buildDirPath, *workerTar, *specsDirPath)
@@ -59,9 +59,9 @@ func main() {
 		}
 	}()
 
-	logger.Log.Infof("Filtering spec list in (%s).", *specsDirPath)
-	logger.Log.Debugf("Distribution tag: %s.", *distTag)
-	logger.Log.Debugf("Input list: %v.", specNames)
+	logger.Log.Infof("Filtering spec list in (%s)", *specsDirPath)
+	logger.Log.Debugf("Distribution tag: %s", *distTag)
+	logger.Log.Debugf("Input list: %v", specNames)
 	filteredSpecNames, err := archChecker.FilterSpecsByArch(specNames, *distTag, *testOnly)
 	if err != nil {
 		logger.Log.Fatalf("Failed to filter specs folder (%s) Error:\n%s", *specsDirPath, err)

@@ -102,7 +102,7 @@ func initLogFile(filePath string, color string) (err error) {
 func InitStderrLog() {
 	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
-		log.Panic("Failed to get caller info.")
+		log.Panic("Failed to get caller info")
 	}
 
 	initStderrLogInternal(callerFilePath, colorModeAuto)
@@ -130,16 +130,16 @@ func InitBestEffort(lf *LogFlags) {
 
 	_, callerFilePath, _, ok := runtime.Caller(parentCallerLevel)
 	if !ok {
-		log.Panic("Failed to get caller info.")
+		log.Panic("Failed to get caller info")
 	}
 
 	initStderrLogInternal(callerFilePath, color)
 
 	if path != "" {
-		PanicOnError(initLogFile(path, color), "Failed while setting log file (%s).", path)
+		PanicOnError(initLogFile(path, color), "Failed while setting log file (%s)", path)
 	}
 
-	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level.")
+	PanicOnError(SetStderrLogLevel(level), "Failed while setting log level")
 }
 
 // Levels returns list of strings representing valid log levels.
@@ -179,7 +179,7 @@ func StreamOutput(pipe io.Reader, logFunction func(...interface{}), wg *sync.Wai
 		line := scanner.Text()
 		logFunction(line)
 
-		Log.Tracef("StreamOutput:\t'%s'", line)
+		Log.Tracef("StreamOutput:\t(%s)", line)
 
 		// Optionally buffer the output to print in the event of an error
 		if outputChan != nil {

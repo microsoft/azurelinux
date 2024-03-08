@@ -26,7 +26,7 @@ import (
 // - imageConfig: the path to the image config file. Used to extract additional packages to build.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsToBuild, pkgsToRebuild, pkgsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
-	logger.Log.Debug("Generating a package list for build nodes.")
+	logger.Log.Debug("Generating a package list for build nodes")
 
 	buildNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
@@ -45,7 +45,7 @@ func ParseAndGeneratePackageBuildList(dependencyGraph *pkggraph.PkgGraph, pkgsTo
 // - imageConfig: the path to the image config file. Used to extract additional packages to test.
 // - baseDirPath: the path to the base directory for the image. Used to resolve relative paths in the image config.
 func ParseAndGeneratePackageTestList(dependencyGraph *pkggraph.PkgGraph, testsToRun, testsToRerun, testsToIgnore []string, imageConfig, baseDirPath string) (finalPackagesToBuild, packagesToRebuild, packagesToIgnore []*pkgjson.PackageVer, err error) {
-	logger.Log.Debug("Generating a package list for test nodes.")
+	logger.Log.Debug("Generating a package list for test nodes")
 
 	testNodeGetter := func(node *pkggraph.LookupNode) *pkggraph.PkgNode {
 		if node != nil {
@@ -154,7 +154,7 @@ func extractPackagesFromConfig(configFile, baseDirPath string) (packageList []*p
 
 // filterLocalPackagesOnly returns the subset of packageVersionsInConfig that only contains local packages.
 func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, dependencyGraph *pkggraph.PkgGraph, nodeGetter func(*pkggraph.LookupNode) *pkggraph.PkgNode) (filteredPackages []*pkgjson.PackageVer, err error) {
-	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file.")
+	logger.Log.Debug("Filtering out external packages from list of packages extracted from the image config file")
 
 	for _, pkgVer := range packageVersionsInConfig {
 		pkgNode, _ := dependencyGraph.FindBestPkgNode(pkgVer)
@@ -166,7 +166,7 @@ func filterLocalPackagesOnly(packageVersionsInConfig []*pkgjson.PackageVer, depe
 		if filteredNode != nil {
 			filteredPackages = append(filteredPackages, pkgVer)
 		} else {
-			logger.Log.Debugf("Found external package to filter out: %v.", pkgVer)
+			logger.Log.Debugf("Found external package to filter out: %v", pkgVer)
 		}
 	}
 
@@ -192,12 +192,12 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 	packageVersMap := make(map[*pkgjson.PackageVer]bool)
 	for _, packageOrSpecName := range packageOrSpecNames {
 		if nodes, ok := specToPackageNodes[packageOrSpecName]; ok {
-			logger.Log.Debugf("Name '%s' matched a spec name. Adding all packages PackageVers from this spec to the list.", packageOrSpecName)
+			logger.Log.Debugf("Name (%s) matched a spec name. Adding all packages PackageVers from this spec to the list", packageOrSpecName)
 			for _, pkg := range nodes {
 				packageVersMap[pkg.VersionedPkg] = true
 			}
 		} else {
-			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
+			logger.Log.Debugf("Name (%s) not found among known spec names. Searching among known package names", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
 				err = fmt.Errorf("failed while searching the dependency graph for package (%s):\n%w", packageOrSpecName, err)
@@ -214,7 +214,7 @@ func packageNamesToPackages(packageOrSpecNames []string, analyzedNodes []*pkggra
 				return nil, err
 			}
 
-			logger.Log.Debugf("Name '%s' matched a package name. Adding it to the list.", packageOrSpecName)
+			logger.Log.Debugf("Name (%s) matched a package name. Adding it to the list", packageOrSpecName)
 			packageVersMap[expectedNode.VersionedPkg] = true
 		}
 	}
@@ -251,7 +251,7 @@ func parseAndGeneratePackageList(dependencyGraph *pkggraph.PkgGraph, buildList, 
 	}
 
 	if len(unknownNames) != 0 {
-		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v.", unknownNames)
+		logger.Log.Warnf("The following ignored items matched neither a spec nor a package name: %v", unknownNames)
 	}
 
 	packagesToIgnore, err = packageNamesToPackages(prunedIgnoredPackageNames, analyzedNodes, nodeGetter, dependencyGraph)
@@ -286,10 +286,10 @@ func pruneUnknownPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph
 
 	for _, packageOrSpecName := range packageOrSpecNames {
 		if specNames[packageOrSpecName] {
-			logger.Log.Tracef("Name '%s' matched a spec name, keeping it in the list.", packageOrSpecName)
+			logger.Log.Tracef("Name (%s) matched a spec name, keeping it in the list", packageOrSpecName)
 			prunedNames = append(prunedNames, packageOrSpecName)
 		} else {
-			logger.Log.Debugf("Name '%s' not found among known spec names. Searching among known package names.", packageOrSpecName)
+			logger.Log.Debugf("Name (%s) not found among known spec names. Searching among known package names", packageOrSpecName)
 			foundNode, err := dependencyGraph.FindBestPkgNode(&pkgjson.PackageVer{Name: packageOrSpecName})
 			if err != nil {
 				err = fmt.Errorf("failed while searching the dependency graph for package (%s):\n%w", packageOrSpecName, err)
@@ -297,12 +297,12 @@ func pruneUnknownPackages(packageOrSpecNames []string, analyzedNodes []*pkggraph
 			}
 
 			if nodeGetter(foundNode) == nil {
-				logger.Log.Tracef("Couldn't find package '%s' in the dependency graph. Pruning from the list.", packageOrSpecName)
+				logger.Log.Tracef("Couldn't find package (%s) in the dependency graph. Pruning from the list", packageOrSpecName)
 				unknownNames = append(unknownNames, packageOrSpecName)
 				continue
 			}
 
-			logger.Log.Debugf("Name '%s' matched a package name, keeping it in the list.", packageOrSpecName)
+			logger.Log.Debugf("Name (%s) matched a package name, keeping it in the list", packageOrSpecName)
 			prunedNames = append(prunedNames, packageOrSpecName)
 		}
 	}

@@ -78,10 +78,10 @@ func (p *PackageRepo) IsValid() (err error) {
 	// if we are installing the repo file, as the repo file will not be usable in the installer.
 	if (p.GPGCheck || p.RepoGPGCheck) && p.GPGKeys != packageRepoDefaultGPGKeys {
 		if !p.Install {
-			err = fmt.Errorf("invalid value for package repo '%s' [GPGKeys] (%s), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", p.Name, p.GPGKeys)
+			err = fmt.Errorf("invalid value for package repo (%s) [GPGKeys] (%s), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", p.Name, p.GPGKeys)
 			return
 		} else {
-			logger.Log.Warnf("Warning: Custom GPG keys are only supported for repos that are installed into the final image after the ISO runs. The repo file for '%s' will not be usable during the installation process.", p.Name)
+			logger.Log.Warnf("Warning: Custom GPG keys are only supported for repos that are installed into the final image after the ISO runs. The repo file for (%s) will not be usable during the installation process.", p.Name)
 		}
 	}
 

@@ -73,7 +73,7 @@ func main() {
 	defer timestamp.CompleteTiming()
 
 	if *workers <= 0 {
-		logger.Log.Panicf("Value in --workers must be greater than zero. Found %d", *workers)
+		logger.Log.Panicf("Value in --workers must be greater than zero. Found (%d)", *workers)
 	}
 
 	inDirPath, err := filepath.Abs(*inputDir)
@@ -197,7 +197,7 @@ func retrievePartitionSettings(systemConfig *configuration.SystemConfig, searche
 			return
 		}
 	}
-	logger.Log.Warningf("Couldn't find partition setting '%s' under system config '%s'", searchedID, systemConfig.Name)
+	logger.Log.Warningf("Couldn't find partition setting (%s) under system config (%s)", searchedID, systemConfig.Name)
 	return
 }
 

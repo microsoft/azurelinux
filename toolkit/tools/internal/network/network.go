@@ -44,7 +44,7 @@ func DownloadFile(url, dst string, caCerts *x509.CertPool, tlsCerts []tls.Certif
 		if err != nil {
 			cleanupErr := file.RemoveFileIfExists(dst)
 			if cleanupErr != nil {
-				logger.Log.Errorf("Failed to remove failed network download file '%s': %s", dst, err)
+				logger.Log.Errorf("Failed to remove failed network download file (%s): %s", dst, err)
 			}
 		}
 		dstFile.Close()

@@ -30,7 +30,7 @@ func ReadJSONDescriptor(jsonFile *os.File, data interface{}) error {
 		return err
 	}
 
-	logger.Log.Tracef("Read %#x bytes of JSON data.", len(jsonData))
+	logger.Log.Tracef("Read %#x bytes of JSON data", len(jsonData))
 
 	return json.Unmarshal(jsonData, &data)
 }
@@ -59,7 +59,7 @@ func WriteJSONDescriptor(jsonFile *os.File, data interface{}) error {
 		return fmt.Errorf("passed nil file descriptor to WriteJSONDescriptor()")
 	}
 
-	logger.Log.Tracef("Writing %#x bytes of JSON data.", len(outputBytes))
+	logger.Log.Tracef("Writing %#x bytes of JSON data", len(outputBytes))
 	err = jsonFile.Truncate(0)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func WriteJSONDescriptor(jsonFile *os.File, data interface{}) error {
 
 	numBytes, err := jsonFile.WriteAt(outputBytes, 0)
 	if numBytes != len(outputBytes) && err == nil {
-		err = fmt.Errorf("only wrote %d byte of the expected %d", numBytes, len(outputBytes))
+		err = fmt.Errorf("only wrote (%d) byte of the expected (%d)", numBytes, len(outputBytes))
 	}
 	return err
 }
@@ -80,7 +80,7 @@ func WriteJSONFile(outputFilePath string, data interface{}) error {
 		return err
 	}
 
-	logger.Log.Tracef("Writing %#x bytes of JSON data.", len(outputBytes))
+	logger.Log.Tracef("Writing %#x bytes of JSON data", len(outputBytes))
 
 	return os.WriteFile(outputFilePath, outputBytes, defaultJsonFilePermission)
 }

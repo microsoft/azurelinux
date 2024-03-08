@@ -121,11 +121,11 @@ func main() {
 
 	if *workers <= 0 {
 		*workers = runtime.NumCPU()
-		logger.Log.Debugf("No worker count supplied, discovered %d logical CPUs.", *workers)
+		logger.Log.Debugf("No worker count supplied, discovered (%d) logical CPUs", *workers)
 	}
 
 	if *buildAttempts <= 0 {
-		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found %d.", *buildAttempts)
+		logger.Log.Fatalf("Value in --build-attempts must be greater than zero. Found (%d)", *buildAttempts)
 	}
 
 	dependencyGraph, err := pkggraph.ReadDOTGraphFile(*inputGraphFile)
@@ -145,7 +145,7 @@ func main() {
 
 	toolchainPackages, err := schedulerutils.ReadReservedFilesList(*toolchainManifest)
 	if err != nil {
-		logger.Log.Fatalf("unable to read toolchain manifest file '%s': %s.", *toolchainManifest, err)
+		logger.Log.Fatalf("unable to read toolchain manifest file (%s): %s", *toolchainManifest, err)
 	}
 
 	// Setup a build agent to handle build requests from the scheduler.
@@ -177,12 +177,12 @@ func main() {
 
 	agent, err := buildagents.BuildAgentFactory(*buildAgent)
 	if err != nil {
-		logger.Log.Fatalf("Unable to select build agent, error: %s.", err)
+		logger.Log.Fatalf("Unable to select build agent, error: %s", err)
 	}
 
 	err = agent.Initialize(buildAgentConfig)
 	if err != nil {
-		logger.Log.Fatalf("Unable to initialize build agent, error: %s.", err)
+		logger.Log.Fatalf("Unable to initialize build agent, error: %s", err)
 	}
 
 	// Setup cleanup routines to ensure no builds are left running when scheduler is exiting.
@@ -195,7 +195,7 @@ func main() {
 
 	err = buildGraph(*inputGraphFile, *outputGraphFile, agent, *workers, *buildAttempts, *checkAttempts, *extraLayers, *maxCascadingRebuilds, *stopOnFailure, !*noCache, finalPackagesToBuild, packagesToRebuild, packagesToIgnore, finalTestsToRun, testsToRerun, ignoredTests, toolchainPackages, *optimizeWithCachedImplicit, *allowToolchainRebuilds)
 	if err != nil {
-		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s.", err)
+		logger.Log.Fatalf("Unable to build package graph.\nFor details see the build summary section above.\nError: %s", err)
 	}
 
 	if *useCcache {
@@ -204,7 +204,7 @@ func main() {
 		if ccacheErr == nil {
 			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
 			if ccacheErr != nil {
-				logger.Log.Warnf("Failed to archive CCache artifacts:\n%v.", err)
+				logger.Log.Warnf("Failed to archive CCache artifacts:\n%v", err)
 			}
 		} else {
 			logger.Log.Warnf("Failed to initialize the ccache manager:\n%v", err)
@@ -251,7 +251,7 @@ func buildGraph(inputFile, outputFile string, agent buildagents.BuildAgent, work
 	numberOfNodes := pkgGraph.Nodes().Len()
 
 	channels := startWorkerPool(agent, workers, buildAttempts, checkAttempts, numberOfNodes, &graphMutex, ignoredPackages, ignoredTests)
-	logger.Log.Infof("Building %d nodes with %d workers", numberOfNodes, workers)
+	logger.Log.Infof("Building (%d) nodes with (%d) workers", numberOfNodes, workers)
 
 	// After this call pkgGraph will be given to multiple routines and accessing it requires acquiring the mutex.
 	builtGraph, err := buildAllNodes(stopOnFailure, canUseCache, packagesToRebuild, testsToRerun, pkgGraph, &graphMutex, goalNode, channels, maxCascadingRebuilds, toolchainPackages, allowToolchainRebuilds)
@@ -331,7 +331,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 	nodesToBuild := schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 
 	for {
-		logger.Log.Debugf("Found %d unblocked nodes: %v.", len(nodesToBuild), nodesToBuild)
+		logger.Log.Debugf("Found (%d) unblocked nodes: %v", len(nodesToBuild), nodesToBuild)
 
 		// Each node that is ready to build must be converted into a build request and submitted to the worker pool.
 		newRequests, requestError := schedulerutils.ConvertNodesToRequests(pkgGraph, graphMutex, nodesToBuild, packagesToRebuild, testsToRerun, buildState, canUseCache)
@@ -374,7 +374,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 				err = fmt.Errorf("could not build all packages")
 				break
 			} else {
-				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies.")
+				logger.Log.Warn("Enabling cached packages to satisfy unresolved dynamic dependencies")
 				useCachedImplicit = true
 				nodesToBuild = schedulerutils.LeafNodes(pkgGraph, graphMutex, goalNode, buildState, useCachedImplicit)
 				continue
@@ -395,7 +395,7 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		if !stopBuilding {
 			if res.Err == nil {
 				if res.Node.Type == pkggraph.TypeLocalBuild && res.WasDelta {
-					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for '%v'.", res.Node)
+					logger.Log.Tracef("This is a delta result, update the graph with the new delta files for (%v)", res.Node)
 					// We will need to update the graph with paths to any delta files that were actually rebuilt.
 					err = setAssociatedDeltaPaths(res, pkgGraph, graphMutex)
 					if err != nil {
@@ -463,12 +463,12 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		}
 
 		if res.Node.Type == pkggraph.TypeLocalBuild || res.Node.Type == pkggraph.TypeTest {
-			logger.Log.Infof("%d currently active build(s): %v.", activeSRPMsCount, activeSRPMs)
+			logger.Log.Infof("%d currently active build(s): %v", activeSRPMsCount, activeSRPMs)
 
 			if buildRunsTests {
 				activeTests := buildState.ActiveTests()
 
-				logger.Log.Infof("%d currently active test(s): %v.", len(activeTests), activeTests)
+				logger.Log.Infof("%d currently active test(s): %v", len(activeTests), activeTests)
 			}
 		}
 	}
@@ -538,13 +538,13 @@ func setAssociatedDeltaPaths(res *schedulerutils.BuildResult, pkgGraph *pkggraph
 			// We only care about nodes that are deltas
 			if node.State == pkggraph.StateDelta {
 				// Update the node to point at the actual RPM path from our map of built files
-				logger.Log.Debugf("Updating delta run node '%s' path from '%s' to '%s'", node, node.RpmPath, builtFile)
+				logger.Log.Debugf("Updating delta run node (%s) path from (%s) to (%s)", node, node.RpmPath, builtFile)
 				node.RpmPath = builtFile
 			} else if !node.Implicit && node.RpmPath != builtFile {
 				// Implicit nodes will point to the cached RPM path, but we don't care about them and will update their
 				// paths to the actual RPM path in a later step so ignore them here.
 				// Sanity check that any non-delta node has an exact match to the real RPM path
-				err = fmt.Errorf("non-delta run node '%s' has unexpected path '%s' (expected non-delta path of '%s')", node, node.RpmPath, builtFile)
+				err = fmt.Errorf("non-delta run node (%s) has unexpected path (%s) (expected non-delta path of (%s))", node, node.RpmPath, builtFile)
 				return
 			}
 		}

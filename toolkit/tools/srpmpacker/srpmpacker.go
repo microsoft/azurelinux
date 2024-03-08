@@ -97,7 +97,7 @@ type specState struct {
 }
 
 var (
-	app = kingpin.New("srpmpacker", "A tool to package a SRPM.")
+	app = kingpin.New("srpmpacker", "A tool to package a SRPM")
 
 	specsDir      = exe.InputDirFlag(app, "Path to the SPEC directory to create SRPMs from.")
 	outDir        = exe.OutputDirFlag(app, "Directory to place the output SRPM.")
@@ -423,7 +423,7 @@ func calculateSPECsToRepack(specFiles []string, distTag, outDir string, nestedSo
 		return
 	}
 
-	logger.Log.Infof("Packing %d/%d SPECs", totalToRepack, len(specFiles))
+	logger.Log.Infof("Packing (%d)/%d SPECs", totalToRepack, len(specFiles))
 	return
 }
 
@@ -671,10 +671,10 @@ func readSignatures(signaturesFilePath string) (readSignatures map[string]string
 	if err != nil {
 		if os.IsNotExist(err) {
 			// Non-fatal as some SPECs may not have sources
-			logger.Log.Debugf("The signatures file (%s) doesn't exist, will not pre-populate signatures.", signaturesFilePath)
+			logger.Log.Debugf("The signatures file (%s) doesn't exist, will not pre-populate signatures", signaturesFilePath)
 			err = nil
 		} else {
-			logger.Log.Errorf("Failed to read the signatures file (%s): %v.", signaturesFilePath, err)
+			logger.Log.Errorf("Failed to read the signatures file (%s): %v", signaturesFilePath, err)
 		}
 	}
 
@@ -945,7 +945,7 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		cancelled, internalErr := retry.RunWithExpBackoff(func() error {
 			downloadErr := network.DownloadFile(url, destinationFile, srcConfig.caCerts, srcConfig.tlsCerts)
 			if downloadErr != nil {
-				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s.", url, downloadErr)
+				logger.Log.Debugf("Failed an attempt to download (%s). Error: %s", url, downloadErr)
 			}
 
 			return downloadErr
@@ -963,20 +963,20 @@ func hydrateFromRemoteSource(fileHydrationState map[string]bool, newSourceDir st
 		}
 
 		if internalErr != nil {
-			logger.Log.Errorf("Failed to download (%s). Error: %s.", url, internalErr)
+			logger.Log.Errorf("Failed to download (%s). Error: %s", url, internalErr)
 			continue
 		}
 
 		if !skipSignatureHandling {
 			internalErr = validateSignature(destinationFile, srcConfig, currentSignatures)
 			if internalErr != nil {
-				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s.", destinationFile, internalErr)
+				logger.Log.Errorf("Signature validation for (%s) failed. Error: %s", destinationFile, internalErr)
 
 				// If the delete fails, just warn as there will be another cleanup
 				// attempt when exiting the program.
 				internalErr = os.Remove(destinationFile)
 				if internalErr != nil {
-					logger.Log.Warnf("Failed to delete file (%s) after signature validation failure. Error: %s.", destinationFile, internalErr)
+					logger.Log.Warnf("Failed to delete file (%s) after signature validation failure. Error: %s", destinationFile, internalErr)
 				}
 				continue
 			}

@@ -138,11 +138,11 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 	}
 
 	// Install the repoquery package from upstream, then clean up any existing repos
-	logger.Log.Infof("Installing '%s' package to get 'repoquery' command", dnfUtilsPackageName)
+	logger.Log.Infof("Installing (%s) package to get 'repoquery' command", dnfUtilsPackageName)
 	err = queryChroot.Run(func() error {
 		_, chrootErr := installutils.TdnfInstall(dnfUtilsPackageName, rootDir)
 		if chrootErr != nil {
-			chrootErr = fmt.Errorf("failed to install '%s':\n%w", dnfUtilsPackageName, err)
+			chrootErr = fmt.Errorf("failed to install (%s):\n%w", dnfUtilsPackageName, err)
 			return chrootErr
 		}
 
@@ -151,7 +151,7 @@ func createChroot(workerTar, chrootDir string, leaveChrootOnDisk bool) (queryChr
 		return chrootErr
 	})
 	if err != nil {
-		err = fmt.Errorf("failed to install '%s' in chroot:\n%w", dnfUtilsPackageName, err)
+		err = fmt.Errorf("failed to install (%s) in chroot:\n%w", dnfUtilsPackageName, err)
 		return
 	}
 	return

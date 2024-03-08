@@ -70,7 +70,7 @@ func (abs *AzureBlobStorage) Download(
 		if err != nil {
 			cleanupErr := file.RemoveFileIfExists(localFileName)
 			if cleanupErr != nil {
-				logger.Log.Warnf("Failed to remove failed network download file '%s': %v", localFileName, err)
+				logger.Log.Warnf("Failed to remove failed network download file (%s): %v", localFileName, err)
 			}
 		}
 	}()
@@ -147,5 +147,5 @@ func Create(tenantId string, userName string, password string, storageAccount st
 
 	}
 
-	return nil, errors.New("Unknown authentication type.")
+	return nil, errors.New("Unknown authentication type")
 }

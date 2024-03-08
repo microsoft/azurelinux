@@ -597,7 +597,7 @@ func filterCompatibleSpecs(inputSpecPaths []string, defines map[string]string) (
 		go func(pathIter string) {
 			specCompatible, err = SpecArchIsCompatible(pathIter, specDirPath, buildArch, defines)
 			if err != nil {
-				err = fmt.Errorf("failed while querrying spec (%s). Error: %v.", pathIter, err)
+				err = fmt.Errorf("failed while querrying spec (%s). Error: %v", pathIter, err)
 			}
 			resultsChannel <- specArchResult{
 				compatible: specCompatible,

@@ -578,7 +578,7 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 
 	chroot := safechroot.NewChroot(rootfsSourceDir, true /*isExistingDir*/)
 	if chroot == nil {
-		return fmt.Errorf("failed to create a new chroot object for %s.", rootfsSourceDir)
+		return fmt.Errorf("failed to create a new chroot object for %s", rootfsSourceDir)
 	}
 	defer chroot.Close(true /*leaveOnDisk*/)
 

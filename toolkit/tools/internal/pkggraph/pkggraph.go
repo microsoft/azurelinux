@@ -252,7 +252,7 @@ func (g *PkgGraph) initLookup() {
 		endOfValidData := 0
 		for _, n := range g.nodeLookup[idx] {
 			if n.RunNode == nil && n.TestNode == nil {
-				logger.Log.Debugf("Lookup for %s has neither a run node nor a test node. Lost in a cycle fix? Removing it", idx)
+				logger.Log.Debugf("Lookup for (%s) has neither a run node nor a test node. Lost in a cycle fix? Removing it", idx)
 				g.RemoveNode(n.BuildNode.ID())
 			} else {
 				g.nodeLookup[idx][endOfValidData] = n
@@ -343,7 +343,7 @@ func (g *PkgGraph) validateNodeForLookup(pkgNode *PkgNode) (valid bool, err erro
 func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 	// We only care about run/build nodes or remote dependencies
 	if !lookupNodesTypes[pkgNode.Type] {
-		logger.Log.Tracef("Skipping %+v, not valid for lookup", pkgNode)
+		logger.Log.Tracef("Skipping (%+v), not valid for lookup", pkgNode)
 		return
 	}
 
@@ -352,7 +352,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 		return
 	}
 
-	logger.Log.Tracef("Adding %+v to lookup", pkgNode)
+	logger.Log.Tracef("Adding (%+v) to lookup", pkgNode)
 	// Get the existing package lookup, or create it
 	pkgName := pkgNode.VersionedPkg.Name
 
@@ -398,7 +398,7 @@ func (g *PkgGraph) addToLookup(pkgNode *PkgNode, deferSort bool) (err error) {
 
 // AddEdge creates a new edge between the provided nodes.
 func (g *PkgGraph) AddEdge(from *PkgNode, to *PkgNode) (err error) {
-	logger.Log.Tracef("Adding edge: %s -> %s", from.FriendlyName(), to.FriendlyName())
+	logger.Log.Tracef("Adding edge: (%s) -> %s", from.FriendlyName(), to.FriendlyName())
 
 	newEdge := g.NewEdge(from, to)
 	defer func() {
@@ -430,7 +430,7 @@ func (g *PkgGraph) CreateCollapsedNode(versionedPkg *pkgjson.PackageVer, parentN
 		return
 	}
 
-	logger.Log.Debugf("Collapsing (%v) into (%s) with (%s) as a parent.", nodesToCollapse, versionedPkg, parentNode)
+	logger.Log.Debugf("Collapsing (%v) into (%s) with (%s) as a parent", nodesToCollapse, versionedPkg, parentNode)
 
 	// Remove the nodes to collapse from the lookup table so they do not conflict with the new node.
 	// This operation can be undone on failure.
@@ -566,7 +566,7 @@ func (g *PkgGraph) FindDoubleConditionalPkgNodeFromPkg(pkgVer *pkgjson.PackageVe
 	// is never found during the build, we have no way to
 	// fall back to the local package at this time.
 	if bestLocalNode != nil && bestLocalNode != lookupEntry {
-		logger.Log.Warnf("Resolving '%s' to remote node '%s' instead of local node '%s'", pkgVer, lookupEntry.RunNode.String(), bestLocalNode.RunNode.String())
+		logger.Log.Warnf("Resolving (%s) to remote node (%s) instead of local node (%s)", pkgVer, lookupEntry.RunNode.String(), bestLocalNode.RunNode.String())
 	}
 	return
 }
@@ -775,7 +775,7 @@ func (n *PkgNode) String() string {
 		name = NoName
 	}
 
-	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from '%s' in '%s'", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
+	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from (%s) in (%s)", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
 }
 
 // Equal returns true if these nodes represent the same data
@@ -809,7 +809,7 @@ func (n *PkgNode) Equal(otherNode *PkgNode) bool {
 }
 
 func registerTypes() {
-	logger.Log.Debug("Registering pkggraph.Node for marshalling.")
+	logger.Log.Debug("Registering pkggraph.Node for marshalling")
 	gob.Register(PkgNode{})
 }
 
@@ -1068,14 +1068,14 @@ func (g *PkgGraph) AddMetaNode(from []*PkgNode, to []*PkgNode) (metaNode *PkgNod
 
 	logger.Log.Trace("Adding edges TO the meta node:")
 	for _, n := range from {
-		logger.Log.Tracef("\t'%s' -> '%s'", n.FriendlyName(), metaNode.FriendlyName())
+		logger.Log.Tracef("\t(%s) -> (%s)", n.FriendlyName(), metaNode.FriendlyName())
 		edge := g.NewEdge(n, metaNode)
 		g.SetEdge(edge)
 	}
 
 	logger.Log.Trace("Adding edges FROM the meta node:")
 	for _, n := range to {
-		logger.Log.Tracef("\t'%s' -> '%s'", metaNode.FriendlyName(), n.FriendlyName())
+		logger.Log.Tracef("\t(%s) -> (%s)", metaNode.FriendlyName(), n.FriendlyName())
 		edge := g.NewEdge(metaNode, n)
 		g.SetEdge(edge)
 	}
@@ -1105,7 +1105,7 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 		return
 	}
 
-	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
+	logger.Log.Debugf("Adding a goal node (%s)", goalName)
 
 	packagesGoalSet := g.buildGoalSet(packages, TypeLocalRun)
 	testsGoalSet := g.buildGoalSet(tests, TypeTest)
@@ -1162,7 +1162,7 @@ func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode,
 		return
 	}
 
-	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
+	logger.Log.Debugf("Adding a goal node (%s)", goalName)
 
 	// Create goal node and add an edge to all the other requested nodes
 	goalNode = &PkgNode{
@@ -1210,7 +1210,7 @@ func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode,
 //	E.g., if "y_run" -> "y_build" -> "<Some Meta Node>" -> "x_run" -> "x_build", and we are expanding from "x"
 //	with layers=1, only "y_run" will be added to the goal nodes since "y_build" and "<Some Meta Node>" are not run nodes.
 func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
-	logger.Log.Debugf("Expanding goal node '%s' by %d layers", goalNode.GoalName, layers)
+	logger.Log.Debugf("Expanding goal node (%s) by (%d) layers", goalNode.GoalName, layers)
 
 	var expandedGoalNodes []*PkgNode
 	// Use a set to keep track of the nodes we already added so we can avoid processing them again
@@ -1235,7 +1235,7 @@ func (g *PkgGraph) addGoalNodeLayers(goalNode *PkgNode, layers int) {
 			continue
 		}
 		if !g.HasEdgeFromTo(goalNode.ID(), expandedNode.ID()) {
-			logger.Log.Debugf("Adding edge from '%s' to '%s'", goalNode.FriendlyName(), expandedNode.FriendlyName())
+			logger.Log.Debugf("Adding edge from (%s) to (%s)", goalNode.FriendlyName(), expandedNode.FriendlyName())
 			g.SetEdge(g.NewEdge(goalNode, expandedNode))
 		}
 	}
@@ -1252,10 +1252,10 @@ func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet map[*PkgNode]bool, curr
 	// The expandedGoalNodesSet will ensure we don't add the same node twice.
 	for _, goalNode := range currentGoalNodes {
 		if expandedGoalNodesSet[goalNode] {
-			logger.Log.Tracef("Already expanded from '%s', skipping", goalNode.FriendlyName())
+			logger.Log.Tracef("Already expanded from (%s), skipping", goalNode.FriendlyName())
 			continue
 		} else {
-			logger.Log.Debugf("Expanding goal nodes from '%s'", goalNode.FriendlyName())
+			logger.Log.Debugf("Expanding goal nodes from (%s)", goalNode.FriendlyName())
 			expandedGoalNodesSet[goalNode] = true
 		}
 
@@ -1271,13 +1271,13 @@ func (g *PkgGraph) getNextGoalLayer(expandedGoalNodesSet map[*PkgNode]bool, curr
 			case TypeLocalRun:
 				fallthrough
 			case TypeTest:
-				logger.Log.Debugf("Adding '%s' to expanded goal nodes", dependentNode.FriendlyName())
+				logger.Log.Debugf("Adding (%s) to expanded goal nodes", dependentNode.FriendlyName())
 				expandedGoalNodes = append(expandedGoalNodes, dependentNode)
 			case TypeGoal:
-				logger.Log.Tracef("Skipping '%s' since it is a goal node", dependentNode.FriendlyName())
+				logger.Log.Tracef("Skipping (%s) since it is a goal node", dependentNode.FriendlyName())
 			default:
 				// If the node is not a run node we need to keep expanding from the non-run node.
-				logger.Log.Tracef("Continuing to expand past '%s' since it is not a run node", dependentNode.FriendlyName())
+				logger.Log.Tracef("Continuing to expand past (%s) since it is not a run node", dependentNode.FriendlyName())
 				expandedGoalNodes = append(expandedGoalNodes, g.getNextGoalLayer(expandedGoalNodesSet, []*PkgNode{dependentNode})...)
 			}
 		}
@@ -1312,7 +1312,7 @@ func (g *PkgGraph) CreateSubGraph(rootNode *PkgNode) (subGraph *PkgGraph, err er
 	})
 
 	subgraphSize := subGraph.Nodes().Len()
-	logger.Log.Debugf("Created sub graph with %d nodes rooted at \"%s\"", subgraphSize, rootNode.FriendlyName())
+	logger.Log.Debugf("Created sub graph with (%d) nodes rooted at \"%s\"", subgraphSize, rootNode.FriendlyName())
 
 	return
 }
@@ -1446,7 +1446,7 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 // buildGoalSet returns a set of package versions that are the goal of the graph.
 func (g *PkgGraph) buildGoalSet(packageVers []*pkgjson.PackageVer, nodeType NodeType) (goalSet map[*pkgjson.PackageVer]bool) {
 	if len(packageVers) > 0 {
-		logger.Log.Debugf("Adding a goal for selected nodes of type '%s': %v", nodeType, packageVers)
+		logger.Log.Debugf("Adding a goal for selected nodes of type (%s): %v", nodeType, packageVers)
 
 		goalSet = make(map[*pkgjson.PackageVer]bool)
 		for _, pkg := range packageVers {
@@ -1454,7 +1454,7 @@ func (g *PkgGraph) buildGoalSet(packageVers []*pkgjson.PackageVer, nodeType Node
 			goalSet[pkg] = true
 		}
 	} else {
-		logger.Log.Debugf("Adding a goal for all nodes of type '%s'", nodeType)
+		logger.Log.Debugf("Adding a goal for all nodes of type (%s)", nodeType)
 
 		if nodeType == TypeTest {
 			goalSet = pkgNodesListToPackageVerSet(g.AllTestNodes())
@@ -1508,7 +1508,7 @@ func (g *PkgGraph) connectGoalEdges(goalNode *PkgNode, goalSet map[*pkgjson.Pack
 			continue
 		}
 
-		logger.Log.Tracef("Found %s to satisfy %s", existingNode, pkg)
+		logger.Log.Tracef("Found (%s) to satisfy %s", existingNode, pkg)
 
 		err = g.AddEdge(goalNode, existingNode)
 		if err != nil {
@@ -1539,18 +1539,18 @@ func (g *PkgGraph) fixCycle(cycle []*PkgNode, resolveCyclesFromUpstream, ignoreV
 // fixIntraSpecCycle attempts to fix a cycle if none of the cycle nodes are build nodes.
 // If a cycle can be fixed an additional meta node will be added to represent the interdependencies of the cycle.
 func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
-	logger.Log.Debug("Checking if cycle contains build nodes.")
+	logger.Log.Debug("Checking if cycle contains build nodes")
 
 	for _, currentNode := range trimmedCycle {
 		if currentNode.Type == TypeLocalBuild {
-			logger.Log.Debug("Cycle contains build dependencies, cannot be solved this way.")
+			logger.Log.Debug("Cycle contains build dependencies, cannot be solved this way")
 			return fmt.Errorf("cycle contains build dependencies, unresolvable")
 		}
 	}
 
 	// Breaking the cycle by removing all edges between in-cycle nodes.
 	// Their dependency on each other will be reflected by a new meta node.
-	logger.Log.Debugf("Breaking cycle edges.")
+	logger.Log.Debugf("Breaking cycle edges")
 	cycleLength := len(trimmedCycle)
 	for i, currentNode := range trimmedCycle {
 		currentNodeID := currentNode.ID()
@@ -1559,12 +1559,12 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 			nextNodeID := nextNode.ID()
 
 			if g.Edge(currentNodeID, nextNodeID) != nil {
-				logger.Log.Tracef("\t'%s' -> '%s'", currentNode.FriendlyName(), nextNode.FriendlyName())
+				logger.Log.Tracef("\t(%s) -> (%s)", currentNode.FriendlyName(), nextNode.FriendlyName())
 				g.RemoveEdge(currentNodeID, nextNodeID)
 			}
 
 			if g.Edge(nextNodeID, currentNodeID) != nil {
-				logger.Log.Tracef("\t'%s' -> '%s'", nextNode.FriendlyName(), currentNode.FriendlyName())
+				logger.Log.Tracef("\t(%s) -> (%s)", nextNode.FriendlyName(), currentNode.FriendlyName())
 				g.RemoveEdge(nextNodeID, currentNodeID)
 			}
 		}
@@ -1574,7 +1574,7 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 	// meta node, then have the meta node depend on all cycle nodes.
 	groupedDependencies := make(map[int64]bool)
 	for _, currentNode := range trimmedCycle {
-		logger.Log.Debugf("Breaking NON-cycle edges connected to cycle node '%s'.", currentNode.FriendlyName())
+		logger.Log.Debugf("Breaking NON-cycle edges connected to cycle node (%s)", currentNode.FriendlyName())
 
 		currentNodeID := currentNode.ID()
 
@@ -1583,7 +1583,7 @@ func (g *PkgGraph) fixIntraSpecCycle(trimmedCycle []*PkgNode) (err error) {
 			toNode := toNodes.Node().(*PkgNode)
 			toNodeID := toNode.ID()
 
-			logger.Log.Tracef("\t'%s' -> '%s'", toNode.FriendlyName(), currentNode.FriendlyName())
+			logger.Log.Tracef("\t(%s) -> (%s)", toNode.FriendlyName(), currentNode.FriendlyName())
 
 			groupedDependencies[toNodeID] = true
 			g.RemoveEdge(toNodeID, currentNodeID)
@@ -1615,7 +1615,7 @@ func (g *PkgGraph) replaceSRPMBuildDependency(replacedNode, newNode *PkgNode, de
 		}
 	}
 
-	logger.Log.Infof("Successful. Updated dependency for nodes depending on '%s'.", replacedNode.FriendlyName())
+	logger.Log.Infof("Successful. Updated dependency for nodes depending on (%s)", replacedNode.FriendlyName())
 	return
 }
 
@@ -1626,14 +1626,14 @@ func (g *PkgGraph) cloneAndReplaceRunToRemote(runNode *PkgNode, buildNodeToUpdat
 		return fmt.Errorf("failed to add a remote node:\n%w", err)
 	}
 
-	logger.Log.Debugf("Added a 'Remote' node '%s' with ID %d.", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
+	logger.Log.Debugf("Added a 'Remote' node (%s) with ID (%d)", upstreamAvailableNode.FriendlyName(), upstreamAvailableNode.ID())
 	return g.replaceSRPMBuildDependency(runNode, upstreamAvailableNode, buildNodeToUpdate.SrpmPath)
 }
 
 // fixCyclesWithExistingRPMS attempts to fix a cycle if at least one node is a pre-built. It also searches upstream RPMS when the flag RESOLVE_CYCLES_FROM_UPSTREAM is enabled
 // If a cycle can be fixed, edges representing the build dependencies of the pre-built/available-upstream node will be removed.
 func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyclesFromUpstream, ignoreVersionToResolveSelfDep bool, cloner *rpmrepocloner.RpmRepoCloner) (err error) {
-	logger.Log.Debug("Checking if cycle contains pre-built SRPMs.")
+	logger.Log.Debug("Checking if cycle contains pre-built SRPMs")
 
 	var cycleStringBuilder strings.Builder
 
@@ -1656,14 +1656,14 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 			continue
 		}
 		if _, missingRPMs := FindRPMFiles(currentNode.SrpmPath, g, nil); len(missingRPMs) == 0 {
-			logger.Log.Debugf("Cycle contains pre-built SRPM '%s'. Replacing edges from build nodes associated with '%s' with an edge to a new 'PreBuilt' node.",
+			logger.Log.Debugf("Cycle contains pre-built SRPM (%s). Replacing edges from build nodes associated with (%s) with an edge to a new 'PreBuilt' node",
 				currentNode.SrpmPath, previousNode.SrpmPath)
 
 			preBuiltNode := g.CloneNode(currentNode)
 			preBuiltNode.State = StateUpToDate
 			preBuiltNode.Type = TypePreBuilt
 
-			logger.Log.Debugf("Adding a 'PreBuilt' node '%s' with id %d.", preBuiltNode.FriendlyName(), preBuiltNode.ID())
+			logger.Log.Debugf("Adding a 'PreBuilt' node (%s) with id (%d)", preBuiltNode.FriendlyName(), preBuiltNode.ID())
 
 			err = g.replaceSRPMBuildDependency(currentNode, preBuiltNode, previousNode.SrpmPath)
 			if err != nil {
@@ -1686,7 +1686,7 @@ func (g *PkgGraph) fixCyclesWithExistingRPMS(trimmedCycle []*PkgNode, resolveCyc
 	}
 
 	if ignoreVersionToResolveSelfDep && resolveCyclesFromUpstream {
-		logger.Log.Debug("Trying to resolve cycle by searching packages in PMC after ignoring package version.")
+		logger.Log.Debug("Trying to resolve cycle by searching packages in PMC after ignoring package version")
 
 		currentNode = trimmedCycle[len(trimmedCycle)-1]
 		for _, previousNode := range trimmedCycle {
@@ -1811,7 +1811,7 @@ func (g *PkgGraph) tryReplaceLocalNodeWithUpstream(currentNode, previousNode *Pk
 		return false, nil
 	}
 
-	logger.Log.Debugf("Cycle contains a dependency '%s' that is available in upstream repo. Replacing edges from build nodes associated with '%s' with an edge to a new remote unresolved node.", currentNode.FriendlyName(), previousNode.SRPMFileName())
+	logger.Log.Debugf("Cycle contains a dependency (%s) that is available in upstream repo. Replacing edges from build nodes associated with (%s) with an edge to a new remote unresolved node", currentNode.FriendlyName(), previousNode.SRPMFileName())
 
 	err = g.cloneAndReplaceRunToRemote(currentNode, previousNode)
 	if err != nil {

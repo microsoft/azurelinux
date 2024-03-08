@@ -479,7 +479,7 @@ func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *
 	if !selinuxConfigFileExists {
 		return fmt.Errorf("SELinux is enabled but the (%s) file is missing:\n"+
 			"please ensure an SELinux policy is installed:\n"+
-			"the '%s' package provides the default policy",
+			"the (%s) package provides the default policy",
 			installutils.SELinuxConfigFile, configuration.SELinuxPolicyDefault)
 	}
 

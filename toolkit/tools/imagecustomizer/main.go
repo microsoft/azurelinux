@@ -44,11 +44,11 @@ func main() {
 	logger.InitBestEffort(logFlags)
 
 	if *enableShrinkFilesystems && *outputSplitPartitionsFormat == "" {
-		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems.")
+		logger.Log.Fatalf("--output-split-partitions-format must be specified to use --shrink-filesystems")
 	}
 
 	if *enableShrinkFilesystems && *outputImageFormat != "" {
-		logger.Log.Fatalf("--output-image-format cannot be used with --shrink-filesystems enabled.")
+		logger.Log.Fatalf("--output-image-format cannot be used with --shrink-filesystems enabled")
 	}
 
 	prof, err := profile.StartProfiling(profFlags)

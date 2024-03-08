@@ -57,7 +57,7 @@ func validatePath(path string) error {
 
 	// Check if the path contains spaces
 	if strings.Contains(path, " ") {
-		return fmt.Errorf("path '%s' contains spaces and is invalid", path)
+		return fmt.Errorf("path (%s) contains spaces and is invalid", path)
 	}
 
 	return nil

@@ -31,7 +31,7 @@ func ReportActionf(format string, args ...interface{}) {
 // It also prints the output to the log at debug level regardless of EnableEmittingProgress.
 func ReportAction(status string) {
 	emitUpdate("action", status)
-	logger.Log.Debugf("ReportAction: '%s'", status)
+	logger.Log.Debugf("ReportAction: (%s)", status)
 }
 
 func emitUpdate(key string, value interface{}) {

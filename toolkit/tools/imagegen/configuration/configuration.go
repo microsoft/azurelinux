@@ -141,7 +141,7 @@ func checkDeviceMapperFlags(config *Config) (err error) {
 		var dmRoot *Partition
 		if sysConfig.ReadOnlyVerityRoot.Enable || sysConfig.Encryption.Enable {
 			if len(config.Disks) == 0 {
-				logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", sysConfig.Name)
+				logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config (%s). This is only valid for ISO installers", sysConfig.Name)
 				continue
 			}
 
@@ -151,7 +151,7 @@ func checkDeviceMapperFlags(config *Config) (err error) {
 			}
 			rootDiskPart := config.GetDiskPartByID(rootPartSetting.ID)
 			if rootDiskPart == nil {
-				return fmt.Errorf("can't find a [Disk] [Partition] to match with [PartitionSetting] '%s'", rootPartSetting.ID)
+				return fmt.Errorf("can't find a [Disk] [Partition] to match with [PartitionSetting] (%s)", rootPartSetting.ID)
 			}
 			if !rootDiskPart.HasFlag(PartitionFlagDeviceMapperRoot) {
 				return fmt.Errorf("[Partition] (%s) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (%s)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", rootDiskPart.ID, sysConfig.Name)
@@ -297,7 +297,7 @@ func (c *Config) UnmarshalJSON(b []byte) (err error) {
 
 // Load loads the config schema from a JSON file found under the 'configFilePath'.
 func Load(configFilePath string) (config Config, err error) {
-	logger.Log.Debugf("Reading config file from '%s'.", configFilePath)
+	logger.Log.Debugf("Reading config file from (%s)", configFilePath)
 
 	err = jsonutils.ReadJSONFile(configFilePath, &config)
 	if err != nil {

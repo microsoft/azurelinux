@@ -87,7 +87,7 @@ func main() {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Found %d available packages", len(packagesAvailableFromRepos))
+	logger.Log.Infof("Found (%d) available packages", len(packagesAvailableFromRepos))
 	if logger.Log.IsLevelEnabled(logrus.DebugLevel) {
 		for _, pkg := range packagesAvailableFromRepos {
 			logger.Log.Debugf("Found package: %s", pkg)
@@ -99,7 +99,7 @@ func main() {
 		logger.PanicOnError(err)
 	}
 
-	logger.Log.Infof("Downloaded %d packages into the cache", len(downloadedPackages))
+	logger.Log.Infof("Downloaded (%d) packages into the cache", len(downloadedPackages))
 	err = writeSummaryFile(*outputSummaryFile, downloadedPackages)
 	if err != nil {
 		logger.PanicOnError(err)
@@ -173,17 +173,17 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 		case result := <-results:
 			switch result.resultType {
 			case downloadResultTypeSkipped:
-				logger.Log.Debugf("Skipping pre-caching '%s'. File already exists", result.pkgName)
+				logger.Log.Debugf("Skipping pre-caching (%s). File already exists", result.pkgName)
 				skipped++
 			case downloadResultTypeSuccess:
-				logger.Log.Debugf("Pre-caching '%s' succeeded", result.pkgName)
+				logger.Log.Debugf("Pre-caching (%s) succeeded", result.pkgName)
 				downloadedPackages = append(downloadedPackages, result.pkgName)
 				downloaded++
 			case downloadResultTypeFailure:
 				logger.Log.Warnf("Failed to download: %s", result.pkgName)
 				failed++
 			case downloadResultTypeUnavailable:
-				logger.Log.Warnf("Could not find '%s' in any repos", result.pkgName)
+				logger.Log.Warnf("Could not find (%s) in any repos", result.pkgName)
 				unavailable++
 			}
 		case <-doneChannel:
@@ -261,7 +261,7 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 		<-netOpsSemaphore
 	}()
 
-	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
+	logger.Log.Debugf("Pre-caching (%s) from (%s)", fileName, url)
 	_, err = retry.RunWithExpBackoff(func() error {
 		err := network.DownloadFile(url, fullFilePath, nil, nil)
 		if err != nil {
@@ -289,7 +289,7 @@ func formatName(pkg *repocloner.RepoPackage) (pkgName, fileName string) {
 }
 
 func writeSummaryFile(summaryFile string, downloadedPackages []string) (err error) {
-	logger.Log.Infof("Writing summary file to '%s'", summaryFile)
+	logger.Log.Infof("Writing summary file to (%s)", summaryFile)
 	err = file.WriteLines(downloadedPackages, summaryFile)
 	if err != nil {
 		err = fmt.Errorf("failed to write pre-caching summary file:\n%w", err)

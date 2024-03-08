@@ -45,7 +45,7 @@ func GetChrootDir(proposedDir string) (chrootDir string, err error) {
 	// is indicated by an env variable
 	chrootPoolFolder, varExist := unix.Getenv(rootBaseDirEnv)
 	if !varExist || len(chrootPoolFolder) == 0 {
-		err = fmt.Errorf("env variable %s not defined", rootBaseDirEnv)
+		err = fmt.Errorf("env variable (%s) not defined", rootBaseDirEnv)
 		logger.Log.Errorf("%s", err.Error())
 		return "", err
 	}
@@ -92,13 +92,13 @@ func GetChrootDir(proposedDir string) (chrootDir string, err error) {
 			_, err := os.Stat(inUseFilePath)
 			if err == nil {
 				// chroot in use => check next
-				logger.Log.Debugf("chroot %s currently used", fullChrootPath)
+				logger.Log.Debugf("chroot (%s) currently used", fullChrootPath)
 				continue
 			} else if os.IsNotExist(err) {
 				// chroot not in use
 				inUseFile, err := os.Create(inUseFilePath)
 				if err != nil {
-					logger.Log.Errorf("Cannot indicate that chroot %s is now used - %s", fullChrootPath, err.Error())
+					logger.Log.Errorf("Cannot indicate that chroot (%s) is now used - %s", fullChrootPath, err.Error())
 					return "", err
 				}
 
@@ -136,7 +136,7 @@ func ReleaseChrootDir(chrootDir string) (err error) {
 	// is indicated by an env variable
 	chrootPoolFolder, varExist := unix.Getenv(rootBaseDirEnv)
 	if !varExist || len(chrootPoolFolder) == 0 {
-		err = fmt.Errorf("env variable %s not defined", rootBaseDirEnv)
+		err = fmt.Errorf("env variable (%s) not defined", rootBaseDirEnv)
 		logger.Log.Errorf("%s", err.Error())
 		return
 	}
@@ -161,7 +161,7 @@ func ReleaseChrootDir(chrootDir string) (err error) {
 	logger.Log.Debugf("Release chroot -> %s", filepath.Join(chrootDir, chrootUse))
 	err = os.Remove(filepath.Join(chrootDir, chrootUse))
 	if err != nil {
-		logger.Log.Errorf("Failed to remove %s - %s", filepath.Join(chrootDir, chrootUse), err.Error())
+		logger.Log.Errorf("Failed to remove (%s) - %s", filepath.Join(chrootDir, chrootUse), err.Error())
 		return
 	}
 
@@ -206,14 +206,14 @@ func CleanupDockerChroot(chroot string) (err error) {
 
 	rootFolder, err := os.Open(chroot)
 	if err != nil {
-		logger.Log.Warnf("Open chroot %s failed - %s", chroot, err)
+		logger.Log.Warnf("Open chroot (%s) failed - %s", chroot, err)
 		return err
 	}
 
 	defer rootFolder.Close()
 	names, err := rootFolder.Readdirnames(-1)
 	if err != nil {
-		logger.Log.Warnf("Reading files and folders under chroot %s failed - %s", chroot, err)
+		logger.Log.Warnf("Reading files and folders under chroot (%s) failed - %s", chroot, err)
 		return err
 	}
 
@@ -228,7 +228,7 @@ func CleanupDockerChroot(chroot string) (err error) {
 		if toDelete {
 			err = os.RemoveAll(filepath.Join(chroot, name))
 			if err != nil {
-				logger.Log.Warnf("Removing files in chroot %s failed: %s", chroot, err)
+				logger.Log.Warnf("Removing files in chroot (%s) failed: %s", chroot, err)
 			}
 		}
 	}
@@ -237,7 +237,7 @@ func CleanupDockerChroot(chroot string) (err error) {
 	for _, folder := range folderToCreate {
 		err = os.Mkdir(filepath.Join(chroot, folder), os.ModePerm)
 		if err != nil {
-			logger.Log.Warnf("Creation of %s folder in chroot %s failed: %s", folder, chroot, err)
+			logger.Log.Warnf("Creation of (%s) folder in chroot (%s) failed: %s", folder, chroot, err)
 		}
 	}
 

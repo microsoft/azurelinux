@@ -58,12 +58,12 @@ func nameCheck(name string) (err error) {
 
 	for pos, char := range name {
 		if char > unicode.MaxASCII {
-			return fmt.Errorf("[Name] (%s) contains a non-ASCII character '%c' at position (%d)", name, char, pos)
+			return fmt.Errorf("[Name] (%s) contains a non-ASCII character (%c) at position (%d)", name, char, pos)
 		}
 	}
 
 	if stringLengthWithNull > maxLength {
-		return fmt.Errorf("[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (%s) needs %d bytes", name, stringLengthWithNull*2)
+		return fmt.Errorf("[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (%s) needs (%d) bytes", name, stringLengthWithNull*2)
 	}
 	return
 }

@@ -208,11 +208,11 @@ func addEdgeHelper(g *PkgGraph, pkg1 PkgNode, pkg2 PkgNode) (err error) {
 
 	lu1, err = g.FindExactPkgNodeFromPkg(pkg1.VersionedPkg)
 	if lu1 == nil || err != nil {
-		return fmt.Errorf("couldn't find %s (%v)", pkg1.String(), lu1)
+		return fmt.Errorf("couldn't find (%s) (%v)", pkg1.String(), lu1)
 	}
 	lu2, err = g.FindExactPkgNodeFromPkg(pkg2.VersionedPkg)
 	if lu2 == nil || err != nil {
-		return fmt.Errorf("couldn't find %s (%v)", pkg2.String(), lu2)
+		return fmt.Errorf("couldn't find (%s) (%v)", pkg2.String(), lu2)
 	}
 
 	if pkg1.Type == TypeLocalBuild {
@@ -251,14 +251,14 @@ func checkEqualComponents(t *testing.T, expected, actual []*PkgNode) {
 		for _, n := range actual {
 			foundPackage = foundPackage || mustHave.Equal(n)
 		}
-		assert.True(t, foundPackage, "expected to find %s in actual", mustHave.String())
+		assert.True(t, foundPackage, "expected to find (%s) in actual", mustHave.String())
 	}
 	for _, doHave := range actual {
 		foundPackage := false
 		for _, n := range expected {
 			foundPackage = foundPackage || doHave.Equal(n)
 		}
-		assert.True(t, foundPackage, "found %s in actual, but it was unexpected", doHave.String())
+		assert.True(t, foundPackage, "found (%s) in actual, but it was unexpected", doHave.String())
 	}
 }
 

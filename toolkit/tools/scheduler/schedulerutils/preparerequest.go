@@ -232,7 +232,7 @@ func canUseCacheForNode(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, bui
 		}
 
 		if shouldRebuild {
-			logger.Log.Debugf("Can't use cached version of %v because %v has been rebuilt with a freshness of %d", node.FriendlyName(), dependency.FriendlyName(), inheritedFreshness)
+			logger.Log.Debugf("Can't use cached version of %v because %v has been rebuilt with a freshness of (%d)", node.FriendlyName(), dependency.FriendlyName(), inheritedFreshness)
 			canUseCache = false
 		}
 	}

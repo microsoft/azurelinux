@@ -292,13 +292,13 @@ func GetDiskIds(diskDevPath string) (maj string, min string, err error) {
 	}
 
 	if len(blockDevices.Devices) != 1 {
-		err = fmt.Errorf("couldn't find disk IDs for %s (%s), expecting only one result", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for (%s) (%s), expecting only one result", diskDevPath, rawDiskOutput)
 		return
 	}
 	// MAJ:MIN is returned in the form "1:2"
 	diskIDs := strings.Split(blockDevices.Devices[0].MajMin, ":")
 	if len(diskIDs) != 2 {
-		err = fmt.Errorf("couldn't find disk IDs for %s (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
+		err = fmt.Errorf("couldn't find disk IDs for (%s) (%s), couldn't parse MAJ:MIN", diskDevPath, rawDiskOutput)
 		return
 	}
 	maj = diskIDs[0]
@@ -321,7 +321,7 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 		return
 	}
 
-	logger.Log.Tracef("Searching /proc/diskstats for %s (%s:%s)", debugName, maj, min)
+	logger.Log.Tracef("Searching /proc/diskstats for (%s) (%s:%s)", debugName, maj, min)
 	for {
 		var (
 			foundEntry     = false
@@ -349,9 +349,9 @@ func BlockOnDiskIOByIds(debugName string, maj string, min string) (err error) {
 			return
 		}
 		if !foundEntry {
-			return fmt.Errorf("couldn't find entry for '%s' in /proc/diskstats", debugName)
+			return fmt.Errorf("couldn't find entry for (%s) in /proc/diskstats", debugName)
 		}
-		logger.Log.Debugf("Outstanding operations on '%s': %s", debugName, outstandingOps)
+		logger.Log.Debugf("Outstanding operations on (%s): %s", debugName, outstandingOps)
 
 		if outstandingOps == "0" {
 			break
@@ -531,8 +531,8 @@ func CreateSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	// Check whether the start sector is 4K-aligned
 	start = alignSectorAddress(start, logicalSectorSize, physicalSectorSize)
 
-	logger.Log.Debugf("Input partition start: %d, aligned start sector: %d", partition.Start, start)
-	logger.Log.Debugf("Input partition end: %d, end sector: %d", partition.End, end)
+	logger.Log.Debugf("Input partition start: (%d), aligned start sector: (%d)", partition.Start, start)
+	logger.Log.Debugf("Input partition end: (%d), end sector: (%d)", partition.End, end)
 
 	fsType := partition.FsType
 
@@ -604,7 +604,7 @@ func InitializeSinglePartition(diskDevPath string, partitionNumber int, partitio
 			}
 			logger.Log.Debugf("Could not find partition path (%s). Checking other naming convention", testPartDevPath)
 		}
-		logger.Log.Warnf("Could not find any valid partition paths. Will retry up to %d times", totalAttempts)
+		logger.Log.Warnf("Could not find any valid partition paths. Will retry up to (%d) times", totalAttempts)
 		err = fmt.Errorf("could not find partition to initialize in /dev")
 		return err
 	}, totalAttempts, retryDuration)
@@ -826,7 +826,7 @@ func getSectorSizeFromFile(sectorFile string) (sectorSize uint64, err error) {
 		err = fmt.Errorf("failed to access sector size file (%s):\n%w", sectorFile, ferr)
 		return
 	} else if !exists {
-		err = fmt.Errorf("could not find the hw sector size file %s to obtain the sector size of the system", sectorFile)
+		err = fmt.Errorf("could not find the hw sector size file (%s) to obtain the sector size of the system", sectorFile)
 		return
 	}
 

@@ -177,7 +177,7 @@ func (im *IsoMaker) Make() (err error) {
 func (im *IsoMaker) buildIsoImage() error {
 	isoImageFilePath := im.buildIsoImageFilePath()
 
-	logger.Log.Infof("Generating ISO image under '%s'.", isoImageFilePath)
+	logger.Log.Infof("Generating ISO image under (%s)", isoImageFilePath)
 
 	// For detailed parameter explanation see: https://linux.die.net/man/8/mkisofs.
 	// Mkisofs requires all argument paths to be relative to the input directory.
@@ -227,7 +227,7 @@ func (im *IsoMaker) prepareIsoBootLoaderFilesAndFolders() (err error) {
 func (im *IsoMaker) copyInitrd() error {
 	initrdDestinationPath := filepath.Join(im.buildDirPath, im.osFilesPath, "initrd.img")
 
-	logger.Log.Debugf("Copying initrd from '%s'.", im.initrdPath)
+	logger.Log.Debugf("Copying initrd from (%s)", im.initrdPath)
 
 	return file.Copy(im.initrdPath, initrdDestinationPath)
 }
@@ -240,7 +240,7 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		numberOfBlocksToCopy = 3
 	)
 
-	logger.Log.Info("Preparing ISO's bootloaders.")
+	logger.Log.Info("Preparing ISO's bootloaders")
 
 	ddArgs := []string{
 		"if=/dev/zero",                                // Zero device to read a stream of zeroed bytes from.
@@ -248,13 +248,13 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		fmt.Sprintf("bs=%d", blockSizeInBytes),        // Size of one copied block. Used together with "count".
 		fmt.Sprintf("count=%d", numberOfBlocksToCopy), // Number of blocks to copy to the output file.
 	}
-	logger.Log.Debugf("Creating an empty '%s' file of %d bytes.", im.efiBootImgPath, blockSizeInBytes*numberOfBlocksToCopy)
+	logger.Log.Debugf("Creating an empty (%s) file of (%d) bytes", im.efiBootImgPath, blockSizeInBytes*numberOfBlocksToCopy)
 	err = shell.ExecuteLive(false /*squashErrors*/, "dd", ddArgs...)
 	if err != nil {
 		return err
 	}
 
-	logger.Log.Debugf("Formatting '%s' as an MS-DOS filesystem.", im.efiBootImgPath)
+	logger.Log.Debugf("Formatting (%s) as an MS-DOS filesystem", im.efiBootImgPath)
 	err = shell.ExecuteLive(false /*squashErrors*/, "mkdosfs", im.efiBootImgPath)
 	if err != nil {
 		return err
@@ -276,7 +276,7 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 	}
 	defer mount.Close()
 
-	logger.Log.Debug("Copying EFI modules into efiboot.img.")
+	logger.Log.Debug("Copying EFI modules into efiboot.img")
 	// Copy Shim (boot<arch>64.efi) and grub2 (grub<arch>64.efi)
 	if runtime.GOARCH == "arm64" {
 		err = im.copyShimFromInitrd(efiBootImgTempMountDir, "bootaa64.efi", "grubaa64.efi")
@@ -381,11 +381,11 @@ func (im *IsoMaker) createIsoRpmsRepo() (err error) {
 
 	isoRpmsRepoDirPath := filepath.Join(im.buildDirPath, "RPMS")
 
-	logger.Log.Debugf("Creating ISO RPMs repo under '%s'.", isoRpmsRepoDirPath)
+	logger.Log.Debugf("Creating ISO RPMs repo under (%s)", isoRpmsRepoDirPath)
 
 	err = os.MkdirAll(isoRpmsRepoDirPath, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to mkdir '%s'", isoRpmsRepoDirPath)
+		return fmt.Errorf("failed to mkdir (%s)", isoRpmsRepoDirPath)
 	}
 
 	fetchedRepoDirContentsPath := filepath.Join(im.fetchedRepoDirPath, "*")
@@ -400,30 +400,30 @@ func (im *IsoMaker) createIsoRpmsRepo() (err error) {
 // prepareWorkDirectory makes sure we start with a clean directory
 // under "im.buildDirPath". The work directory will contain the contents of the ISO image.
 func (im *IsoMaker) prepareWorkDirectory() (err error) {
-	logger.Log.Infof("Building ISO under '%s'.", im.buildDirPath)
+	logger.Log.Infof("Building ISO under (%s)", im.buildDirPath)
 
 	exists, err := file.DirExists(im.buildDirPath)
 	if err != nil {
-		return fmt.Errorf("failed while checking if directory '%s' exists:\n%w", im.buildDirPath, err)
+		return fmt.Errorf("failed while checking if directory (%s) exists:\n%w", im.buildDirPath, err)
 	}
 	if exists {
-		logger.Log.Warningf("Unexpected: temporary ISO build path '%s' exists. Removing", im.buildDirPath)
+		logger.Log.Warningf("Unexpected: temporary ISO build path (%s) exists. Removing", im.buildDirPath)
 		err = os.RemoveAll(im.buildDirPath)
 		if err != nil {
-			return fmt.Errorf("failed while removing directory '%s':\n%w", im.buildDirPath, err)
+			return fmt.Errorf("failed while removing directory (%s):\n%w", im.buildDirPath, err)
 		}
 	}
 
 	err = os.Mkdir(im.buildDirPath, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed while creating directory '%s':\n%w", im.buildDirPath, err)
+		return fmt.Errorf("failed while creating directory (%s):\n%w", im.buildDirPath, err)
 	}
 
 	im.deferIsoMakerCleanUp(func() (removeErr error) {
-		logger.Log.Debugf("Removing '%s'.", im.buildDirPath)
+		logger.Log.Debugf("Removing (%s)", im.buildDirPath)
 		removeErr = os.RemoveAll(im.buildDirPath)
 		if removeErr != nil {
-			removeErr = fmt.Errorf("failed to remove '%s':\n%w", im.buildDirPath, err)
+			removeErr = fmt.Errorf("failed to remove (%s):\n%w", im.buildDirPath, err)
 		}
 		return removeErr
 	})
@@ -462,7 +462,7 @@ func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 	if im.resourcesDirPath != "" {
 		staticIsoRootFilesPath := filepath.Join(im.resourcesDirPath, "assets/isomaker/iso_root_static_files/*")
 
-		logger.Log.Debugf("Copying static ISO root files from '%s' to '%s'", staticIsoRootFilesPath, im.buildDirPath)
+		logger.Log.Debugf("Copying static ISO root files from (%s) to (%s)", staticIsoRootFilesPath, im.buildDirPath)
 
 		err = recursiveCopyDereferencingLinks(staticIsoRootFilesPath, im.buildDirPath)
 		if err != nil {
@@ -506,7 +506,7 @@ func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() error {
 
 	architectureDependentFilesDirectory := filepath.Join(im.resourcesDirPath, isoRootArchDependentDirPath, runtime.GOARCH, "*")
 
-	logger.Log.Debugf("Copying architecture-dependent (%s) ISO root files from '%s'.", runtime.GOARCH, architectureDependentFilesDirectory)
+	logger.Log.Debugf("Copying architecture-dependent (%s) ISO root files from (%s)", runtime.GOARCH, architectureDependentFilesDirectory)
 
 	return recursiveCopyDereferencingLinks(architectureDependentFilesDirectory, im.buildDirPath)
 }
@@ -516,12 +516,12 @@ func (im *IsoMaker) copyArchitectureDependentIsoRootFiles() error {
 func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 	const configDirName = "config"
 
-	logger.Log.Debugf("Copying the config JSON and required files to the ISO's root.")
+	logger.Log.Debugf("Copying the config JSON and required files to the ISO's root")
 
 	configFilesAbsDirPath := filepath.Join(im.buildDirPath, configDirName)
 	err = os.Mkdir(configFilesAbsDirPath, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to create ISO's config files directory under '%s':\n%w", configFilesAbsDirPath, err)
+		return fmt.Errorf("failed to create ISO's config files directory under (%s):\n%w", configFilesAbsDirPath, err)
 	}
 	err = im.copyAndRenameAdditionalFiles(configFilesAbsDirPath)
 	if err != nil {
@@ -708,7 +708,7 @@ func (im *IsoMaker) saveConfigJSON(configFilesAbsDirPath string) (err error) {
 
 	err = jsonutils.WriteJSONFile(isoConfigFileAbsPath, &im.config)
 	if err != nil {
-		return fmt.Errorf("failed to save config JSON to '%s':\n%w", isoConfigFileAbsPath, err)
+		return fmt.Errorf("failed to save config JSON to (%s):\n%w", isoConfigFileAbsPath, err)
 	}
 	return nil
 }
@@ -722,17 +722,17 @@ func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDi
 
 	err = os.MkdirAll(configFileSubDirAbsPath, os.ModePerm)
 	if err != nil {
-		return "", fmt.Errorf("failed to create ISO's config subdirectory '%s':\n%w", configFileSubDirAbsPath, err)
+		return "", fmt.Errorf("failed to create ISO's config subdirectory (%s):\n%w", configFileSubDirAbsPath, err)
 	}
 
 	isoRelativeFilePath = filepath.Join(configFileSubDirRelativePath, fileName)
 	isoAbsFilePath := filepath.Join(configFilesAbsDirPath, isoRelativeFilePath)
 
-	logger.Log.Tracef("Copying file to ISO's config root '%s' from '%s'.", isoAbsFilePath, localAbsFilePath)
+	logger.Log.Tracef("Copying file to ISO's config root (%s) from (%s)", isoAbsFilePath, localAbsFilePath)
 
 	err = file.Copy(localAbsFilePath, isoAbsFilePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to copy file to ISO's config root '%s' from '%s':\n%w", isoAbsFilePath, localAbsFilePath, err)
+		return "", fmt.Errorf("failed to copy file to ISO's config root (%s) from (%s):\n%w", isoAbsFilePath, localAbsFilePath, err)
 	}
 
 	im.configSubDirNumber++
@@ -744,7 +744,7 @@ func (im *IsoMaker) copyFileToConfigRoot(configFilesAbsDirPath, configFilesSubDi
 func (im *IsoMaker) initializePaths() (err error) {
 	im.buildDirPath, err = filepath.Abs(im.buildDirPath)
 	if err != nil {
-		return fmt.Errorf("failed while retrieving absolute path from source root path: '%s':\n%w", im.buildDirPath, err)
+		return fmt.Errorf("failed while retrieving absolute path from source root path: (%s):\n%w", im.buildDirPath, err)
 	}
 
 	im.efiBootImgPath = filepath.Join(im.buildDirPath, efiBootImgPathRelativeToIsoRoot)
@@ -790,7 +790,7 @@ func (im *IsoMaker) isoMakerCleanUp() (err error) {
 func readConfigFile(configFilePath, baseDirPath string) (config configuration.Config, err error) {
 	config, err = configuration.LoadWithAbsolutePaths(configFilePath, baseDirPath)
 	if err != nil {
-		return configuration.Config{}, fmt.Errorf("failed while reading config file from '%s' with base directory '%s':\n%w", configFilePath, baseDirPath, err)
+		return configuration.Config{}, fmt.Errorf("failed while reading config file from (%s) with base directory (%s):\n%w", configFilePath, baseDirPath, err)
 	}
 	return config, nil
 }

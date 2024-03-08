@@ -36,7 +36,7 @@ func (d *Disk) IsValid() error {
 	for i, partition := range d.Partitions {
 		err := partition.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
+			return fmt.Errorf("invalid partition at index (%d):\n%w", i, err)
 		}
 
 		if _, existingName := partitionIDSet[partition.Id]; existingName {

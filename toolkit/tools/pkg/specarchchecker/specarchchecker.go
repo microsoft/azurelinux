@@ -62,7 +62,7 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 			return
 		}
 		if len(fullSpecPath) != 1 {
-			err = fmt.Errorf("expected to find exactly one spec file with (%s). Found %d", specFilesGlob, len(fullSpecPath))
+			err = fmt.Errorf("expected to find exactly one spec file with (%s). Found (%d)", specFilesGlob, len(fullSpecPath))
 			return
 		}
 
@@ -94,7 +94,7 @@ func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string,
 		}
 	}
 
-	logger.Log.Debugf("Got filtered specs: %v.", filteredSpecs)
+	logger.Log.Debugf("Got filtered specs: %v", filteredSpecs)
 
 	for _, filteredSpec := range filteredSpecs {
 		// We only want the base name of the spec file, without the .spec extension.

@@ -127,7 +127,7 @@ func (s *SystemConfig) IsValid() (err error) {
 
 	if s.ReadOnlyVerityRoot.Enable || s.Encryption.Enable {
 		if len(mountPointUsed) == 0 {
-			logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config '%s'. This is only valid for ISO installers", s.Name)
+			logger.Log.Warnf("[ReadOnlyVerityRoot] or [Encryption] is enabled, but no partitions are listed as part of System Config (%s). This is only valid for ISO installers", s.Name)
 		} else {
 			if !mountPointUsed["/"] {
 				return fmt.Errorf("invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'")

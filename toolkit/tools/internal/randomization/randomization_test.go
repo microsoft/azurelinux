@@ -63,7 +63,7 @@ func runTrials(inputString string, length int, t *testing.T) {
 
 	enoughTrials, probOfFailure := checkSufficientTrials(len([]rune(inputString)), length)
 	if !enoughTrials {
-		assert.FailNowf(t, "Insufficient string length", "Require more than %d characters to reach required threshold (Probability of failure is: %v, we want: %v)", length, probOfFailure.String(), maxAllowableFailureRate)
+		assert.FailNowf(t, "Insufficient string length", "Require more than (%d) characters to reach required threshold (Probability of failure is: %v, we want: %v)", length, probOfFailure.String(), maxAllowableFailureRate)
 	}
 
 	randomString, err := RandomString(length, inputString)
@@ -74,13 +74,13 @@ func runTrials(inputString string, length int, t *testing.T) {
 	expectedCount := (length / len(inputString)) / 2
 	for _, c := range inputString {
 		count := strings.Count(randomString, string(c))
-		assert.Truef(t, count > expectedCount, "Char '%c' from '%s' did not show up expected number of times in random string (found %d, expected %d)", c, randomString, count, expectedCount)
+		assert.Truef(t, count > expectedCount, "Char (%c) from (%s) did not show up expected number of times in random string (found (%d), expected (%d))", c, randomString, count, expectedCount)
 	}
 
 	// Make sure we only have runes from the input string in our output
 	for i, c := range randomString {
 		if !strings.Contains(inputString, string(c)) {
-			assert.FailNowf(t, "Illegal character in return", "Random string '%s' contained an unexpected character '%c' at index '%d' not found in set '%s'", randomString, c, i, inputString)
+			assert.FailNowf(t, "Illegal character in return", "Random string (%s) contained an unexpected character (%c) at index (%d) not found in set (%s)", randomString, c, i, inputString)
 		}
 	}
 }

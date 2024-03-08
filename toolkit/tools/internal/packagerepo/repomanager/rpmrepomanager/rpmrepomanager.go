@@ -92,12 +92,12 @@ func ValidateRpmPaths(repoDir string) (err error) {
 			calculatedRpmFilename := fmt.Sprintf("%s.rpm", calculatedRpmName[0])
 			if calculatedRpmFilename != filepath.Base(rpmFile) {
 				logger.Log.Warnf("!!!!! Detected mismatched filename !!!!!!")
-				logger.Log.Warnf("---- filename   == '%s'", filepath.Base(rpmFile))
-				logger.Log.Warnf("---- calculated == '%s'", calculatedRpmFilename)
-				validationErrors = append(validationErrors, fmt.Sprintf("'%s' != '%s'", filepath.Base(rpmFile), calculatedRpmFilename))
+				logger.Log.Warnf("---- filename   == (%s)", filepath.Base(rpmFile))
+				logger.Log.Warnf("---- calculated == (%s)", calculatedRpmFilename)
+				validationErrors = append(validationErrors, fmt.Sprintf("(%s) != (%s)", filepath.Base(rpmFile), calculatedRpmFilename))
 			}
 		} else {
-			err = fmt.Errorf("failed to validate rpm file '%s': '%s'", rpmFile, stderr)
+			err = fmt.Errorf("failed to validate rpm file (%s): (%s)", rpmFile, stderr)
 			return
 		}
 	}

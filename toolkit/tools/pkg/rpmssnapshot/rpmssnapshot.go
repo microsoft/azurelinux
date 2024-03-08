@@ -127,7 +127,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 		return
 	}
 
-	logger.Log.Infof("Found %d compatible specs.", len(specPaths))
+	logger.Log.Infof("Found (%d) compatible specs", len(specPaths))
 
 	allBuiltRPMs, err = s.readBuiltRPMs(specPaths, defines)
 	if err != nil {
@@ -135,7 +135,7 @@ func (s *SnapshotGenerator) generateSnapshotInChroot(distTag string) (err error)
 		return
 	}
 
-	logger.Log.Infof("The specs build %d packages in total.", len(allBuiltRPMs))
+	logger.Log.Infof("The specs build (%d) packages in total", len(allBuiltRPMs))
 
 	repoContents, err = s.convertResultsToRepoContents(allBuiltRPMs)
 	if err != nil {
@@ -164,7 +164,7 @@ func (s *SnapshotGenerator) readBuiltRPMs(specPaths []string, defines map[string
 	resultsChannel := make(chan SnapshotResult, len(specPaths))
 
 	for _, specPath := range specPaths {
-		logger.Log.Debugf("Parsing spec (%s).", specPath)
+		logger.Log.Debugf("Parsing spec (%s)", specPath)
 
 		specDirPath := filepath.Dir(specPath)
 

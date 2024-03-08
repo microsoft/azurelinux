@@ -388,7 +388,7 @@ func (c *Chroot) UnsafeRun(toRun func() error) (err error) {
 	}
 	defer originalWd.Close()
 
-	logger.Log.Debugf("Entering Chroot: '%s'", c.rootDir)
+	logger.Log.Debugf("Entering Chroot: (%s)", c.rootDir)
 	err = unix.Chroot(c.rootDir)
 	if err != nil {
 		return
@@ -528,7 +528,7 @@ func cleanupAllChroots() {
 	}
 
 	if failedToUnmount {
-		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed.")
+		logger.Log.Fatalf("Failed to unmount a chroot, manual unmount required. See above errors for details on which mounts failed")
 	} else {
 		logger.Log.Info("Cleanup finished")
 	}
@@ -638,7 +638,7 @@ func defaultMountPoints() []*MountPoint {
 // restoreRoot will restore the original root of the GO application, cleaning up
 // after the run command. Will panic on error.
 func (c *Chroot) restoreRoot(originalRoot, originalWd *os.File) {
-	logger.Log.Debugf("Exiting Chroot: '%s'", c.rootDir)
+	logger.Log.Debugf("Exiting Chroot: (%s)", c.rootDir)
 
 	err := originalRoot.Chdir()
 	if err != nil {

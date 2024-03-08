@@ -60,7 +60,7 @@ type installationDetails struct {
 
 func handleCtrlC(signals chan os.Signal) {
 	<-signals
-	logger.Log.Error("Installation in progress, please wait until finished.")
+	logger.Log.Error("Installation in progress, please wait until finished")
 }
 
 func main() {
@@ -119,7 +119,7 @@ func installerFactory(forceAttended bool, configFile, templateConfigFile string)
 	if isAttended {
 		templateExists, _ := file.PathExists(templateConfigFile)
 		if !templateExists {
-			logger.Log.Panicf("Attended installation requires a template config file. Specified template (%s) does not exist.", templateConfigFile)
+			logger.Log.Panicf("Attended installation requires a template config file. Specified template (%s) does not exist", templateConfigFile)
 		}
 	}
 
@@ -138,7 +138,7 @@ func installerFactory(forceAttended bool, configFile, templateConfigFile string)
 
 func updateBootOrder(installDetails installationDetails) (err error) {
 	if installDetails.finalConfig.DefaultSystemConfig.BootType != "efi" {
-		logger.Log.Info("No BootType of 'efi' detected. Not attempting to set EFI boot order.")
+		logger.Log.Info("No BootType of 'efi' detected. Not attempting to set EFI boot order")
 		return
 	}
 
@@ -202,7 +202,7 @@ func ejectDisk() (err error) {
 		// If there was an error ejecting the CD-ROM, assume this is a USB installation and prompt the user
 		// to remove the USB device before rebooting.
 		logger.Log.Info("==================================================================================")
-		logger.Log.Info("Installation Complete. Please Remove USB installation media and reboot if present.")
+		logger.Log.Info("Installation Complete. Please Remove USB installation media and reboot if present")
 		logger.Log.Info("==================================================================================")
 	}
 	return

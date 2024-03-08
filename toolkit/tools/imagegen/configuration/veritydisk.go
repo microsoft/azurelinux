@@ -91,7 +91,7 @@ func (v *ReadOnlyVerityRoot) IsValid() (err error) {
 
 	if v.ErrorCorrectionEnable {
 		if v.ErrorCorrectionEncodingRoots < minErrorCorrectionEncodingRoots || v.ErrorCorrectionEncodingRoots > maxErrorCorrectionEncodingRoots {
-			return fmt.Errorf("verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( %d <= N <= %d), currently %d", minErrorCorrectionEncodingRoots, maxErrorCorrectionEncodingRoots, v.ErrorCorrectionEncodingRoots)
+			return fmt.Errorf("verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( (%d) <= N <= (%d)), currently (%d)", minErrorCorrectionEncodingRoots, maxErrorCorrectionEncodingRoots, v.ErrorCorrectionEncodingRoots)
 		}
 	}
 

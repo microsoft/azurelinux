@@ -447,7 +447,7 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !config.RemoveRpmDb {
 		// User wants to avoid removing the RPM database.
-		logger.Log.Debug("RemoveRpmDb is not turned on. Skipping RPM database cleanup.")
+		logger.Log.Debug("RemoveRpmDb is not turned on. Skipping RPM database cleanup")
 	} else {
 		defer func() {
 			// Signal an error if cleanup fails; don't overwrite the previous error though.
@@ -768,7 +768,7 @@ func calculateTotalPackages(packages []string, installRoot string) (installedPac
 		}
 	}
 
-	logger.Log.Debugf("Total number of packages to be installed: %d", len(installedPackages.Repo))
+	logger.Log.Debugf("Total number of packages to be installed: (%d)", len(installedPackages.Repo))
 
 	return
 }
@@ -1415,14 +1415,14 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 
 	// If no root entry was specified in the config file, never expire the root password
 	if !rootUserAdded {
-		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire.")
+		logger.Log.Debugf("No root user entry found in config file. Setting root password to never expire")
 
 		// Ignore updating if there is no shadow file to update in the target image
 		installChrootShadowFile := filepath.Join(installChroot.RootDir(), userutils.ShadowFile)
 		if exists, ferr := file.PathExists(installChrootShadowFile); ferr != nil {
 			return fmt.Errorf("failed to access shadow file:\n%w", ferr)
 		} else if !exists {
-			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire.")
+			logger.Log.Debugf("No shadow file to update. Skipping setting password to never expire")
 			return
 		}
 		err = Chage(installChroot, -1, "root")
@@ -1481,7 +1481,7 @@ func createUserWithPassword(installChroot *safechroot.Chroot, user configuration
 			err = fmt.Errorf("failed to access shadow file:\n%w", ferr)
 			return
 		} else if !exists {
-			logger.Log.Debugf("No shadow file to update. Skipping updating password expiration.")
+			logger.Log.Debugf("No shadow file to update. Skipping updating password expiration")
 			return
 		}
 
@@ -1532,7 +1532,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 			fields := strings.Split(entry, ":")
 			// Any value other than totalFieldsCount indicates error in parsing
 			if len(fields) != totalFieldsCount {
-				return fmt.Errorf("invalid shadow entry (%v) for user (%s): %d fields expected, but %d found", fields, username, totalFieldsCount, len(fields))
+				return fmt.Errorf("invalid shadow entry (%v) for user (%s): (%d) fields expected, but (%d) found", fields, username, totalFieldsCount, len(fields))
 			}
 
 			if passwordExpirationInDays == passwordNeverExpiresValue {
@@ -1545,7 +1545,7 @@ func Chage(installChroot safechroot.ChrootInterface, passwordExpirationInDays in
 				done = true
 			} else if passwordExpirationInDays < passwordNeverExpiresValue {
 				// Values smaller than -1 make no sense
-				return fmt.Errorf("invalid value for maximum user's (%s) password expiration: %d; should be greater than %d", username, passwordExpirationInDays, passwordNeverExpiresValue)
+				return fmt.Errorf("invalid value for maximum user's (%s) password expiration: (%d); should be greater than (%d)", username, passwordExpirationInDays, passwordNeverExpiresValue)
 			} else {
 				// If passwordExpirationInDays has any other value, it's the maximum expiration date: set it accordingly
 				// To do so, we need to ensure that passwordChangedField holds a valid value and then sum it with passwordExpirationInDays.
@@ -1620,7 +1620,7 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 		return
 	}
 
-	logger.Log.Debugf("Updating user '%s' startup command to '%s'.", username, startupCommand)
+	logger.Log.Debugf("Updating user (%s) startup command to (%s)", username, startupCommand)
 
 	findPattern := fmt.Sprintf(`^\(%s.*\):[^:]*$`, username)
 	replacePattern := fmt.Sprintf(`\1:%s`, startupCommand)
@@ -1657,20 +1657,20 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
-		logger.Log.Warnf("Error accessing %s file : %v", authorizedKeysTempFile, err)
+		logger.Log.Warnf("Error accessing (%s) file : %v", authorizedKeysTempFile, err)
 		return
 	}
 	if !exists {
-		logger.Log.Debugf("File %s does not exist. Creating file...", authorizedKeysTempFile)
+		logger.Log.Debugf("File (%s) does not exist. Creating file...", authorizedKeysTempFile)
 		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
 		if err != nil {
-			logger.Log.Warnf("Failed to create %s file : %v", authorizedKeysTempFile, err)
+			logger.Log.Warnf("Failed to create (%s) file : %v", authorizedKeysTempFile, err)
 			return
 		}
 	} else {
 		err = os.Truncate(authorizedKeysTempFile, 0)
 		if err != nil {
-			logger.Log.Warnf("Failed to truncate %s file : %v", authorizedKeysTempFile, err)
+			logger.Log.Warnf("Failed to truncate (%s) file : %v", authorizedKeysTempFile, err)
 			return
 		}
 	}
@@ -1728,7 +1728,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 		err = file.Append(pubKey, authorizedKeysTempFile)
 		if err != nil {
-			logger.Log.Warnf("Failed to append to %s : %v", authorizedKeysTempFile, err)
+			logger.Log.Warnf("Failed to append to (%s) : %v", authorizedKeysTempFile, err)
 			return
 		}
 	}
@@ -1778,7 +1778,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 ) (err error) {
 	timestamp.StartEvent("SELinux", nil)
 	defer timestamp.StopEvent(nil)
-	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
+	logger.Log.Infof("Preconfiguring SELinux policy in (%s) mode", selinuxMode)
 
 	err = SELinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
@@ -1881,7 +1881,7 @@ func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 					lastFile = fmt.Sprintf("%v", args)
 				}
 				if (files % 1000) == 0 {
-					ReportActionf("SELinux: labelled %d files", files)
+					ReportActionf("SELinux: labelled (%d) files", files)
 				}
 			}
 			err := shell.ExecuteLiveWithCallback(onStdout, logger.Log.Warn, squashErrors, "setfiles", "-m", "-v", "-r",
@@ -1889,7 +1889,7 @@ func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 			if err != nil {
 				return fmt.Errorf("failed while labeling files (last file: %s) %w", lastFile, err)
 			}
-			ReportActionf("SELinux: labelled %d files", files)
+			ReportActionf("SELinux: labelled (%d) files", files)
 			return err
 		})
 		if err != nil {
@@ -2338,7 +2338,7 @@ func setGrubCfgAdditionalCmdLine(grubPath string, kernelCommandline configuratio
 		extraPattern = "{{.ExtraCommandLine}}"
 	)
 
-	logger.Log.Debugf("Adding ExtraCommandLine('%s') to '%s'", kernelCommandline.ExtraCommandLine, grubPath)
+	logger.Log.Debugf("Adding ExtraCommandLine((%s)) to (%s)", kernelCommandline.ExtraCommandLine, grubPath)
 	err = sed(extraPattern, kernelCommandline.ExtraCommandLine, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to append extra paramters to grub.cfg: %v", err)
@@ -2359,7 +2359,7 @@ func setGrubCfgIMA(grubPath string, kernelCommandline configuration.KernelComman
 		ima += fmt.Sprintf("%v%v ", imaPrefix, policy)
 	}
 
-	logger.Log.Debugf("Adding ImaPolicy('%s') to '%s'", ima, grubPath)
+	logger.Log.Debugf("Adding ImaPolicy((%s)) to (%s)", ima, grubPath)
 	err = sed(imaPattern, ima, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's IMA setting: %v", err)
@@ -2383,7 +2383,7 @@ func setGrubCfgSELinux(grubPath string, kernelCommandline configuration.KernelCo
 		selinux = ""
 	}
 
-	logger.Log.Debugf("Adding SELinuxConfiguration('%s') to '%s'", selinux, grubPath)
+	logger.Log.Debugf("Adding SELinuxConfiguration((%s)) to (%s)", selinux, grubPath)
 	err = sed(selinuxPattern, selinux, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's SELinux setting: %v", err)
@@ -2411,7 +2411,7 @@ func setGrubCfgFIPS(isBootPartitionSeparate bool, bootUUID, grubPath string, ker
 		}
 	}
 
-	logger.Log.Debugf("Adding EnableFIPS('%s') to '%s'", fipsKernelArgument, grubPath)
+	logger.Log.Debugf("Adding EnableFIPS((%s)) to (%s)", fipsKernelArgument, grubPath)
 	err = sed(enableFIPSPattern, fipsKernelArgument, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's EnableFIPS setting: %v", err)
@@ -2436,7 +2436,7 @@ func setGrubCfgCGroup(grubPath string, kernelCommandline configuration.KernelCom
 		cgroup = ""
 	}
 
-	logger.Log.Debugf("Adding CGroupConfiguration('%s') to '%s'", cgroup, grubPath)
+	logger.Log.Debugf("Adding CGroupConfiguration((%s)) to (%s)", cgroup, grubPath)
 	err = sed(cgroupPattern, cgroup, kernelCommandline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's CGroup setting: %v", err)
@@ -2467,7 +2467,7 @@ func setGrubCfgReadOnlyVerityRoot(grubPath string, readOnlyRoot diskutils.Verity
 
 	if readOnlyRoot.MappedName != "" {
 		// Basic set of verity arguments common to all use cases
-		verityArgs = fmt.Sprintf("%s %s %s %s %s %s %s %s",
+		verityArgs = fmt.Sprintf("%s (%s) %s (%s) %s (%s) %s %s",
 			verityMountArg,
 			verityHashArg,
 			verityRootHashArg,
@@ -2479,14 +2479,14 @@ func setGrubCfgReadOnlyVerityRoot(grubPath string, readOnlyRoot diskutils.Verity
 		)
 		// Only include the FEC arguments if we have FEC enabled
 		if readOnlyRoot.FecRoots > 0 {
-			verityArgs = fmt.Sprintf("%s %s %s", verityArgs, verityFECDataArg, verityFECRootsArg)
+			verityArgs = fmt.Sprintf("%s (%s) %s", verityArgs, verityFECDataArg, verityFECRootsArg)
 		}
 		if readOnlyRoot.UseRootHashSignature {
 			verityArgs = fmt.Sprintf("%s %s", verityArgs, verityRootHashSigArg)
 		}
 	}
 
-	logger.Log.Debugf("Adding Verity Root ('%s') to %s", verityArgs, grubPath)
+	logger.Log.Debugf("Adding Verity Root ((%s)) to %s", verityArgs, grubPath)
 	err = sed(verityPattern, verityArgs, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's Verity Root setting: %v", err)
@@ -2507,7 +2507,7 @@ func setGrubCfgLVM(grubPath, luksUUID string) (err error) {
 		lvm = fmt.Sprintf("%v%v", lvmPrefix, diskutils.GetEncryptedRootVolPath())
 	}
 
-	logger.Log.Debugf("Adding lvm('%s') to '%s'", lvm, grubPath)
+	logger.Log.Debugf("Adding lvm((%s)) to (%s)", lvm, grubPath)
 	err = sed(lvmPattern, lvm, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's LVM setting: %v", err)
@@ -2529,7 +2529,7 @@ func setGrubCfgLuksUUID(grubPath, uuid string) (err error) {
 		luksUUID = fmt.Sprintf("%v%v", luksUUIDPrefix, uuid)
 	}
 
-	logger.Log.Debugf("Adding luks('%s') to '%s'", luksUUID, grubPath)
+	logger.Log.Debugf("Adding luks((%s)) to (%s)", luksUUID, grubPath)
 	err = sed(luksUUIDPattern, luksUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's luksUUID: %v", err)
@@ -2545,7 +2545,7 @@ func setGrubCfgBootUUID(bootUUID, grubPath string) (err error) {
 	)
 	var cmdline configuration.KernelCommandLine
 
-	logger.Log.Debugf("Adding UUID('%s') to '%s'", bootUUID, grubPath)
+	logger.Log.Debugf("Adding UUID((%s)) to (%s)", bootUUID, grubPath)
 	err = sed(bootUUIDPattern, bootUUID, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootUUID: %v", err)
@@ -2574,7 +2574,7 @@ func setGrubCfgBootPrefix(bootPrefix, grubPath string) (err error) {
 	)
 	var cmdline configuration.KernelCommandLine
 
-	logger.Log.Debugf("Adding BootPrefix('%s') to '%s'", bootPrefix, grubPath)
+	logger.Log.Debugf("Adding BootPrefix((%s)) to (%s)", bootPrefix, grubPath)
 	err = sed(bootPrefixPattern, bootPrefix, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's bootPrefix: %v", err)
@@ -2591,7 +2591,7 @@ func setGrubCfgEncryptedVolume(grubPath string) (err error) {
 	var cmdline configuration.KernelCommandLine
 
 	encryptedVol := fmt.Sprintf("%v%v%v%v", "(", lvmPrefix, diskutils.GetEncryptedRootVol(), ")")
-	logger.Log.Debugf("Adding EncryptedVolume('%s') to '%s'", encryptedVol, grubPath)
+	logger.Log.Debugf("Adding EncryptedVolume((%s)) to (%s)", encryptedVol, grubPath)
 	err = sed(encryptedVolPattern, encryptedVol, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to grub.cfg's encryptedVolume: %v", err)
@@ -2610,7 +2610,7 @@ func setGrubCfgRootDevice(rootDevice, grubPath, luksUUID string) (err error) {
 		rootDevice = diskutils.GetEncryptedRootVolMapping()
 	}
 
-	logger.Log.Debugf("Adding RootDevice('%s') to '%s'", rootDevice, grubPath)
+	logger.Log.Debugf("Adding RootDevice((%s)) to (%s)", rootDevice, grubPath)
 	err = sed(rootDevicePattern, rootDevice, cmdline.GetSedDelimeter(), grubPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set grub.cfg's rootDevice: %v", err)
@@ -2757,7 +2757,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 				continue
 			}
 			kernelName := filepath.Base(kernelPath)
-			logger.Log.Tracef("Processing kernel %s derived from %s (required for option %s)", kernelName, kernelPath, name)
+			logger.Log.Tracef("Processing kernel (%s) derived from (%s) (required for option %s)", kernelName, kernelPath, name)
 			packageList = append(packageList, &pkgjson.PackageVer{Name: kernelName})
 		}
 	}

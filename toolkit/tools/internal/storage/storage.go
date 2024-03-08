@@ -28,7 +28,7 @@ func CheckDiskSpace(filepath string, quota int) (err error) {
 	sizeInBytes := stat.Bavail * uint64(stat.Bsize)
 	availInKbs := sizeInBytes / 1024
 	if availInKbs < uint64(quota) {
-		err = fmt.Errorf("not enough space on disk containing file %s. Expected %d 1K Blocks found %d", filepath, quota, availInKbs)
+		err = fmt.Errorf("not enough space on disk containing file %s. Expected (%d) 1K Blocks found %d", filepath, quota, availInKbs)
 	}
 	return
 }

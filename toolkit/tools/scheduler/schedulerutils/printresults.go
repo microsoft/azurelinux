@@ -30,15 +30,15 @@ func PrintBuildResult(res *BuildResult) {
 	switch res.Node.Type {
 	case pkggraph.TypeLocalBuild:
 		if res.Ignored {
-			logger.Log.Warnf("Ignored build for '%s' per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
+			logger.Log.Warnf("Ignored build for (%s) per user request. RPMs expected to be present: %v", baseSRPMName, res.BuiltFiles)
 		} else if res.UsedCache {
-			logger.Log.Infof("Prebuilt: %s -> %v", baseSRPMName, res.BuiltFiles)
+			logger.Log.Infof("Prebuilt: (%s) -> %v", baseSRPMName, res.BuiltFiles)
 		} else {
-			logger.Log.Infof("Built: %s -> %v", baseSRPMName, res.BuiltFiles)
+			logger.Log.Infof("Built: (%s) -> %v", baseSRPMName, res.BuiltFiles)
 		}
 	case pkggraph.TypeTest:
 		if res.Ignored {
-			logger.Log.Warnf("Ignored test for '%s' per user request.", baseSRPMName)
+			logger.Log.Warnf("Ignored test for (%s) per user request", baseSRPMName)
 		} else if res.UsedCache {
 			logger.Log.Infof("Skipped test: %s", baseSRPMName)
 		} else if res.CheckFailed {
@@ -77,7 +77,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 
 	csvFile, err := os.Create(outputPath)
 	if err != nil {
-		logger.Log.Warnf("Unable to create '%s' file. Error: %s", outputPath, err)
+		logger.Log.Warnf("Unable to create (%s) file. Error: %s", outputPath, err)
 		return
 	}
 	defer csvFile.Close()
@@ -85,7 +85,7 @@ func RecordBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, b
 	csvWriter := csv.NewWriter(csvFile)
 	err = csvWriter.WriteAll(csvBlob)
 	if err != nil {
-		logger.Log.Warnf("Failed to write to CSV file '%s'. Error: %s", outputPath, err)
+		logger.Log.Warnf("Failed to write to CSV file (%s). Error: %s", outputPath, err)
 	}
 }
 
@@ -142,7 +142,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		logger.Log.Info(color.GreenString("Built SRPMs:"))
 		keys := mapToSortedSlice(builtSRPMs)
 		for _, builtSRPM := range keys {
-			logger.Log.Infof("--> %s ", filepath.Base(builtSRPM))
+			logger.Log.Infof("--> (%s) ", filepath.Base(builtSRPM))
 		}
 	}
 
@@ -199,7 +199,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		keys := mapToSortedSlice(failedSRPMs)
 		for _, key := range keys {
 			failure := failedSRPMs[key]
-			logger.Log.Infof("--> %s , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
+			logger.Log.Infof("--> (%s) , error: %s, for details see: %s", failure.Node.SRPMFileName(), failure.Err, failure.LogFile)
 		}
 	}
 
@@ -208,7 +208,7 @@ func PrintBuildSummary(pkgGraph *pkggraph.PkgGraph, graphMutex *sync.RWMutex, bu
 		keys := mapToSortedSlice(failedSRPMsTests)
 		for _, key := range keys {
 			failure := failedSRPMsTests[key]
-			logger.Log.Infof("--> %s , for details see: %s", failure.Node.SRPMFileName(), failure.LogFile)
+			logger.Log.Infof("--> (%s) , for details see: %s", failure.Node.SRPMFileName(), failure.LogFile)
 		}
 	}
 

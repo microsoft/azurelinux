@@ -175,7 +175,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		kernelPkg, err = installutils.SelectKernelPackage(systemConfig, *liveInstallFlag)
 		// Rootfs images will usually not set a kernel, ignore errors
 		if err != nil {
-			logger.Log.Debugf("Rootfs did not find a kernel, this is normal: '%s'", err.Error())
+			logger.Log.Debugf("Rootfs did not find a kernel, this is normal: (%s)", err.Error())
 		} else {
 			logger.Log.Infof("Rootfs is including a kernel (%s)", kernelPkg)
 			packagesToInstall = append([]string{kernelPkg}, packagesToInstall...)
@@ -347,7 +347,7 @@ func setupRootFS(outputDir, installRoot string) (extraMountPoints []*safechroot.
 
 	// Ensure there is not already a directory at rootFSOutDir
 	exists, err := file.DirExists(rootFSOutDir)
-	logger.PanicOnError(err, "Failed while checking if directory (%s) exists.", rootFSOutDir)
+	logger.PanicOnError(err, "Failed while checking if directory (%s) exists", rootFSOutDir)
 	if exists {
 		err = fmt.Errorf("output rootfs directory (%s) already exists", rootFSOutDir)
 		return
@@ -512,7 +512,7 @@ func cleanupExtraFiles() (err error) {
 }
 
 func cleanupExtraFilesInChroot(chroot *safechroot.Chroot) (err error) {
-	logger.Log.Infof("Proceeding to cleanup extra files in chroot %s.", chroot.RootDir())
+	logger.Log.Infof("Proceeding to cleanup extra files in chroot %s", chroot.RootDir())
 	err = chroot.Run(func() error {
 		return cleanupExtraFiles()
 	})

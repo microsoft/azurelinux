@@ -81,7 +81,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 
 	for _, file := range verityFiles {
 		filePath := filepath.Join(verityWorkingDirectory, file.Name())
-		logger.Log.Debugf("Adding '%s' to initramfs", filePath)
+		logger.Log.Debugf("Adding (%s) to initramfs", filePath)
 		// Place each file in the root of the initramfs
 		err = initramfs.AddFileToInitramfs(filePath, file.Name())
 		if err != nil {
@@ -158,7 +158,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	}
 	rootHash := matches[1]
 
-	logger.Log.Infof("Verity partition completed, root hash: '%s'", rootHash)
+	logger.Log.Infof("Verity partition completed, root hash: (%s)", rootHash)
 	_, err = rootHashFile.WriteString(rootHash)
 	if err != nil {
 		return
@@ -191,7 +191,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 // - readOnlyConfig is the root read-only settings
 func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, readOnlyConfig configuration.ReadOnlyVerityRoot) (readOnlyDevice VerityDevice, err error) {
 	const (
-		linearTable = `0 %d linear %s 0`
+		linearTable = `0 (%d) linear (%s) 0`
 	)
 
 	if !readOnlyConfig.Enable {
@@ -245,7 +245,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 		return
 	}
 
-	logger.Log.Debugf("Remapped partition %s for read-only prep to %s", partition.ID, readOnlyDevice.MappedDevice)
+	logger.Log.Debugf("Remapped partition (%s) for read-only prep to %s", partition.ID, readOnlyDevice.MappedDevice)
 
 	return
 }

@@ -67,8 +67,8 @@ const (
 	FormDiskSizeLabel        = RequiredInputMark + DiskSizeLabel
 
 	// Errors
-	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type '%s'"
-	InvalidRootPartitionErrorFmt       = "Must specify a partition to have the mount point '%s'"
+	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type (%s)"
+	InvalidRootPartitionErrorFmt       = "Must specify a partition to have the mount point (%s)"
 	InvalidRootDeviceMapperError       = "Must have a root to use with device mapper roots (Encryption, Read-Only)"
 	InvalidRootPartitionErrorFormatFmt = "Root partition cannot be %s"
 	MountPointAlreadyInUseError        = "Mount point is already in use"
@@ -82,7 +82,7 @@ const (
 	PartitionExceedsDiskErrorFmt       = "Device space exceeded by partition (%d)"
 	SizeStartError                     = "Size can not start with `0`"
 	SizeInvalidCharacterError          = "Size must be a number"
-	UnexpectedPartitionErrorFmt        = "Unexpected partition size '%s'"
+	UnexpectedPartitionErrorFmt        = "Unexpected partition size (%s)"
 )
 
 // EncryptView text.
@@ -114,11 +114,11 @@ const (
 	HostNameSegment   = "host name"
 	DomainNameSegment = "domain name"
 
-	FQDNEmptyErrorFmt         = "empty %s is not allowed"
+	FQDNEmptyErrorFmt         = "empty (%s) is not allowed"
 	FQDNEndsInDashErrorFmt    = "%s should not end with '-'"
 	FQDNInvalidRuneErrorFmt   = "%s should only contain alpha-numeric, '.' and '-' characters"
 	FQDNInvalidStartErrorFmt  = "%s should start with an alpha character"
-	FQDNInvalidLengthErrorFmt = "host name must be <= %d characters"
+	FQDNInvalidLengthErrorFmt = "host name must be <= (%d) characters"
 )
 
 // InstallationView text.
@@ -142,7 +142,7 @@ const (
 	UserNameEmptyError            = "user name cannot be empty"
 	UserNameInvalidRuneError      = "user name should only contain alpha-numeric and '-', '.' or '_' characters"
 	UserNameInvalidStartError     = "user name should start with an alpha-numeric character"
-	UserNameInvalidLengthErrorFmt = "user name must be <= %d characters"
+	UserNameInvalidLengthErrorFmt = "user name must be <= (%d) characters"
 )
 
 // ProgressView text.

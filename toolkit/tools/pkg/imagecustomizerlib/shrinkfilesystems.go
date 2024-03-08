@@ -46,13 +46,13 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		// Check the file system with e2fsck
 		err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to check %s with e2fsck:\n%w", partitionLoopDevice, err)
+			return fmt.Errorf("failed to check (%s) with e2fsck:\n%w", partitionLoopDevice, err)
 		}
 
 		// Shrink the file system with resize2fs -M
 		stdout, stderr, err := shell.Execute("sudo", "resize2fs", "-M", partitionLoopDevice)
 		if err != nil {
-			return fmt.Errorf("failed to resize %s with resize2fs:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resize (%s) with resize2fs:\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Find the new partition end value
@@ -70,7 +70,7 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		// Resize the partition with parted resizepart
 		_, stderr, err = shell.ExecuteWithStdin("yes" /*stdin*/, "sudo", "parted", "---pretend-input-tty", imageLoopDevice, "resizepart", strconv.Itoa(partitionNum), end)
 		if err != nil {
-			return fmt.Errorf("failed to resizepart %s with parted:\n%v", partitionLoopDevice, stderr)
+			return fmt.Errorf("failed to resizepart (%s) with parted:\n%v", partitionLoopDevice, stderr)
 		}
 
 		// Re-read the partition table

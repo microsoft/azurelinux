@@ -454,7 +454,7 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 
 	err = shell.ExecuteLiveWithErr(1, "qemu-nbd", "-c", nbdDevice, "-f", "raw", buildImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to connect nbd %s to image %s: %s", nbdDevice, buildImageFile, err)
+		return fmt.Errorf("failed to connect nbd (%s) to image %s: %s", nbdDevice, buildImageFile, err)
 	}
 	defer func() {
 		// Disconnect the NBD device when the function returns

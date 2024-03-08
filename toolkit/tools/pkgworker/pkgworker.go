@@ -74,13 +74,13 @@ func main() {
 	logger.InitBestEffort(logFlags)
 
 	rpmsDirAbsPath, err := filepath.Abs(*rpmsDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory '%s'", *rpmsDirPath)
+	logger.PanicOnError(err, "Unable to find absolute path for RPMs directory (%s)", *rpmsDirPath)
 
 	toolchainDirAbsPath, err := filepath.Abs(*toolchainDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for toolchain RPMs directory '%s'", *toolchainDirPath)
+	logger.PanicOnError(err, "Unable to find absolute path for toolchain RPMs directory (%s)", *toolchainDirPath)
 
 	srpmsDirAbsPath, err := filepath.Abs(*srpmsDirPath)
-	logger.PanicOnError(err, "Unable to find absolute path for SRPMs directory '%s'", *srpmsDirPath)
+	logger.PanicOnError(err, "Unable to find absolute path for SRPMs directory (%s)", *srpmsDirPath)
 
 	chrootDir := buildChrootDirPath(*workDir, *srpmFile, *runCheck)
 
@@ -118,7 +118,7 @@ func main() {
 	}
 
 	builtRPMs, err := buildSRPMInChroot(chrootDir, rpmsDirAbsPath, toolchainDirAbsPath, *workerTar, *srpmFile, *repoFile, *rpmmacrosFile, *outArch, defines, *noCleanup, *runCheck, *packagesToInstall, ccacheManager, *timeout)
-	logger.PanicOnError(err, "Failed to build SRPM '%s'. For details see log file: %s .", *srpmFile, *logFlags.LogFile)
+	logger.PanicOnError(err, "Failed to build SRPM (%s). For details see log file: %s", *srpmFile, *logFlags.LogFile)
 
 	// For regular (non-test) package builds:
 	// - Copy the SRPM which produced the package to the output directory.
@@ -126,7 +126,7 @@ func main() {
 	//   Any output from logger will be on stderr so stdout will only contain this output.
 	if !*runCheck {
 		err = copySRPMToOutput(*srpmFile, srpmsDirAbsPath)
-		logger.PanicOnError(err, "Failed to copy SRPM '%s' to output directory '%s'.", *srpmFile, rpmsDirAbsPath)
+		logger.PanicOnError(err, "Failed to copy SRPM (%s) to output directory (%s)", *srpmFile, rpmsDirAbsPath)
 
 		fmt.Print(strings.Join(builtRPMs, ","))
 	}
@@ -170,17 +170,17 @@ func buildSRPMInChroot(chrootDir, rpmDirPath, toolchainDirPath, workerTar, srpmF
 
 	quit := make(chan bool)
 	go func() {
-		logger.Log.Infof("Building (%s).", srpmBaseName)
+		logger.Log.Infof("Building (%s)", srpmBaseName)
 
 		for {
 			select {
 			case <-quit:
 				if err == nil {
-					logger.Log.Infof("Built (%s) -> %v.", srpmBaseName, builtRPMs)
+					logger.Log.Infof("Built (%s) -> %v", srpmBaseName, builtRPMs)
 				}
 				return
 			case <-time.After(buildHeartbeatTimeout):
-				logger.Log.Infof("Heartbeat: still building (%s).", srpmBaseName)
+				logger.Log.Infof("Heartbeat: still building (%s)", srpmBaseName)
 			}
 		}
 	}()
@@ -499,7 +499,7 @@ func copyFilesIntoChroot(chroot *safechroot.Chroot, srpmFile, repoFile, rpmmacro
 	}
 
 	if runCheck {
-		logger.Log.Debug("Enabling network access because we're running package tests.")
+		logger.Log.Debug("Enabling network access because we're running package tests")
 
 		resolvFileCopy := safechroot.FileToCopy{
 			Src:  resolvFilePath,

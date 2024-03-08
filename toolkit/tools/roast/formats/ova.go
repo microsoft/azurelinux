@@ -43,7 +43,7 @@ func filePathFromEnv(variable string) (path string, err error) {
 
 	fileExist, _ := file.PathExists(path)
 	if !fileExist {
-		err = fmt.Errorf("file from environment variable %s not found: %s", variable, path)
+		err = fmt.Errorf("file from environment variable (%s) not found: %s", variable, path)
 		return
 	}
 	return
@@ -170,7 +170,7 @@ func (o *Ova) Convert(input, output string, isInputFile bool) (err error) {
 	artifactsFolder, _ := filepath.Split(vmdkDisk1FilePath)
 
 	// cd into the common directory to tar files at the toplevel directory
-	logger.Log.Debugf("Changing directory to %s to run tar for OVA generation.", artifactsFolder)
+	logger.Log.Debugf("Changing directory to (%s) to run tar for OVA generation", artifactsFolder)
 	currentPwd, err := os.Getwd()
 	if err != nil {
 		return
@@ -180,7 +180,7 @@ func (o *Ova) Convert(input, output string, isInputFile bool) (err error) {
 	// OVA is just a tar archive with .ovf, .mf and other artifacts (disk)
 	err = shell.ExecuteLiveWithCallback(logger.Log.Info, logger.Log.Warn, false, "tar", "-cf", output, "--format=ustar", ovfFileBase, mfFileBase, vmdkDisk1FileBase)
 
-	logger.Log.Debugf("Changing directory back to %s after running tar for OVA generation.", currentPwd)
+	logger.Log.Debugf("Changing directory back to (%s) after running tar for OVA generation", currentPwd)
 	os.Chdir(currentPwd)
 
 	// Check error from creating OVA after going back to the old WD

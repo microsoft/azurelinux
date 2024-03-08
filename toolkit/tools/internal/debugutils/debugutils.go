@@ -23,11 +23,11 @@ func ic(i *int) {
 // Useful for breaking in with a debugger when running privileged code.
 func WaitForDebugger(tag string) {
 	i := 1
-	logger.Log.Errorf("Freezing at %s for debugger", tag)
+	logger.Log.Errorf("Freezing at (%s) for debugger", tag)
 	logger.Log.Errorf("Use 'break ic', then 'c' to jump to the busy loop")
 
 	for i != 0 {
-		logger.Log.Errorf("Waiting for debugger %d, once broken in run `so` to step out, `set i=0`, then `c`", i)
+		logger.Log.Errorf("Waiting for debugger (%d), once broken in run `so` to step out, `set i=0`, then `c`", i)
 		// Intentionally use a pointer here so nothing gets optimized.
 		ic(&i)
 		time.Sleep(time.Second)

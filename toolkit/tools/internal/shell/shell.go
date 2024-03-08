@@ -194,7 +194,7 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutpu
 		close(outputChan)
 	}
 	if err != nil && printOutputOnError {
-		logger.Log.Errorf("Call to %s returned error, last %d lines of output:", program, outputChanBufferSize)
+		logger.Log.Errorf("Call to (%s) returned error, last (%d) lines of output:", program, outputChanBufferSize)
 		for line := range outputChan {
 			logger.Log.Warn(line)
 		}
@@ -250,7 +250,7 @@ func ExecuteAndLogToFile(filepath string, command string, args ...string) {
 	cmd := exec.Command(command, args...)
 	outfile, err := os.Create(filepath)
 	if err != nil {
-		logger.Log.Errorf("Unable to create file '%s'. Error: %s", filepath, err)
+		logger.Log.Errorf("Unable to create file (%s). Error: %s", filepath, err)
 		return
 	}
 	defer outfile.Close()
@@ -258,12 +258,12 @@ func ExecuteAndLogToFile(filepath string, command string, args ...string) {
 	cmd.Stderr = &errBuf
 	err = cmd.Start()
 	if err != nil {
-		logger.Log.Errorf("Unable to start command '%s %s'. Error: '%s'", command, strings.Join(args, " "), err)
+		logger.Log.Errorf("Unable to start command '%s %s'. Error: (%s)", command, strings.Join(args, " "), err)
 		return
 	}
 	err = cmd.Wait()
 	if err != nil {
-		logger.Log.Errorf("Command '%s' failed with: '%s'. Error: '%s'", command, errBuf.String(), err)
+		logger.Log.Errorf("Command (%s) failed with: (%s). Error: (%s)", command, errBuf.String(), err)
 		return
 	}
 	return
@@ -276,7 +276,7 @@ func MustExecuteLive(command string, args ...string) {
 
 	err := ExecuteLive(squashErrors, command, args...)
 	if err != nil {
-		logger.Log.Panicf("Command '%s' failed with error: %v", command, err)
+		logger.Log.Panicf("Command (%s) failed with error: %v", command, err)
 	}
 }
 

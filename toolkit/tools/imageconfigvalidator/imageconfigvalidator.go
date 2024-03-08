@@ -57,14 +57,14 @@ func main() {
 	logger.Log.Infof("Reading configuration file (%s)", inPath)
 	config, err := configuration.LoadWithAbsolutePaths(inPath, baseDir)
 	if err != nil {
-		logger.Log.Fatalf("Failed while loading image configuration '%s': %s", inPath, err)
+		logger.Log.Fatalf("Failed while loading image configuration (%s): %s", inPath, err)
 	}
 	// Basic validation will occur during load, but we can add additional checking here.
 	err = ValidateConfiguration(config)
 	if err != nil {
 		// Log an error here as opposed to panicing to keep the output simple
 		// and only contain the error with the config file.
-		logger.Log.Fatalf("Invalid configuration '%s': %s", inPath, err)
+		logger.Log.Fatalf("Invalid configuration (%s): %s", inPath, err)
 	}
 
 	return
@@ -154,20 +154,25 @@ func validatePackages(config configuration.Config) (err error) {
 		}
 		if systemConfig.ReadOnlyVerityRoot.Enable {
 			if !foundVerityInitramfsPackage {
-				return fmt.Errorf("%s: [ReadOnlyVerityRoot] selected, but '%s' package is not included in the package lists", validateError, verityPkgName)
+				return fmt.Errorf("%s: [ReadOnlyVerityRoot] selected, but (%s) package is not included in the package lists", validateError, verityPkgName)
 			}
 			if systemConfig.ReadOnlyVerityRoot.TmpfsOverlayDebugEnabled && !foundVerityInitramfsDebugPackage {
-				return fmt.Errorf("%s: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but '%s' package is not included in the package lists", validateError, verityDebugPkgName)
+				return fmt.Errorf("%s: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but (%s) package is not included in the package lists", validateError, verityDebugPkgName)
 			}
 		}
 		if strings.Contains(kernelCmdLineString, fipsKernelCmdLine) || systemConfig.KernelCommandLine.EnableFIPS {
 			if !foundDracutFipsPackage {
-				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but '%s' package is not included in the package lists", validateError, dracutFipsPkgName)
+				return fmt.Errorf("%s: 'fips=1' provided on kernel cmdline, but (%s) package is not included in the package lists", validateError, dracutFipsPkgName)
 			}
 		}
 		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
 			if !foundSELinuxPackage {
-				return fmt.Errorf("%s: [SELinux] selected, but '%s' package is not included in the package lists", validateError, selinuxPkgName)
+				return fmt.Errorf("%s: [SELinux] selected, but (%s) package is not included in the package lists", validateError, selinuxPkgName)
+			}
+		}
+		if !systemConfig.IsRootFS() && systemConfig.EnableGrubMkconfig {
+			if !foundGrub2Package {
+				return fmt.Errorf("%s: [EnableGrubMkconfig] selected, but (%s) package is not included in the package lists", validateError, grub2PkgName)
 			}
 		}
 	}

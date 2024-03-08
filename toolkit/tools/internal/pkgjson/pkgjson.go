@@ -110,7 +110,7 @@ func (pkgVer *PackageVer) Interval() (interval PackageVerInterval, err error) {
 	v2 := versioncompare.New(pkgVer.SVersion)
 
 	if err = pkgVer.validatedIntervals(); err != nil {
-		err = fmt.Errorf("invalid intervals for '%s': %v", pkgVer.Name, err)
+		err = fmt.Errorf("invalid intervals for (%s): %v", pkgVer.Name, err)
 		return
 	}
 
@@ -248,7 +248,7 @@ func (pkgVer *PackageVer) validatedIntervals() error {
 
 // String prints the contents of the given PackageVer struct.
 func (pkgVer *PackageVer) String() string {
-	return fmt.Sprintf("%s:C:'%s'V:'%s',C2:'%s'V2:'%s'", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
+	return fmt.Sprintf("%s:C:(%s)V:(%s),C2:(%s)V2:(%s)", pkgVer.Name, pkgVer.Condition, pkgVer.Version, pkgVer.SCondition, pkgVer.SVersion)
 }
 
 // PackageStringToPackageVer converts a package string into an instance of PackageVer.

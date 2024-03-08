@@ -69,7 +69,7 @@ func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err
 		}
 	}()
 
-	logger.Log.Infof("Creating chroot environment to validate '%s' against '%s'", workerTarPath, manifestPath)
+	logger.Log.Infof("Creating chroot environment to validate (%s) against (%s)", workerTarPath, manifestPath)
 
 	chroot = safechroot.NewChroot(chrootDir, isExistingDir)
 	rpmMount := safechroot.NewMountPoint(rpmsDir, chrootToolchainRpmsDir, "", safechroot.BindMountPointFlags, "")
@@ -92,7 +92,7 @@ func validateWorker(rpmsDir, chrootDir, workerTarPath, manifestPath string) (err
 			archMatches := packageArchLookupRegex.FindStringSubmatch(rpm)
 			if len(archMatches) != 2 {
 				logger.Log.Errorf("%v", archMatches)
-				return fmt.Errorf("'%s' is an invalid rpm file path", rpm)
+				return fmt.Errorf("(%s) is an invalid rpm file path", rpm)
 			}
 			arch := archMatches[1]
 			rpmPath := path.Join(chrootToolchainRpmsDir, arch, rpm)
