@@ -5,7 +5,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,7 +28,7 @@ func TestShouldSucceedValidatingDefaultConfigs(t *testing.T) {
 		configDirectory = "../../imageconfigs/"
 	)
 	checkedConfigs := 0
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	for _, file := range configFiles {
@@ -81,7 +80,7 @@ func TestShouldFailDeeplyNestedParsingError(t *testing.T) {
 		configDirectory string = "../../imageconfigs/"
 		targetPackage          = "core-efi.json"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Pick the first config file and mess something up which is deeply
@@ -112,7 +111,7 @@ func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {
 		targetPackage                = "read-only-root-efi.json"
 		roRootPackageListFile        = "read-only-root-packages.json"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Pick the read-only-root config file, but remove the dm-verity dracut package list
@@ -150,7 +149,7 @@ func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 		targetPackage              = "read-only-root-efi.json"
 		readOnlyPackageList        = "packagelists/read-only-root-packages.json"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Skip this test if the package list DOES include it, but print an error
@@ -194,7 +193,7 @@ func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
 		targetPackage              = "core-fips.json"
 		fipsPackageListFile        = "fips-packages.json"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Pick the core-fips config file, but remove the fips package list
@@ -232,7 +231,7 @@ func TestShouldFailMissingSELinuxPackageWithSELinux(t *testing.T) {
 		targetPackage     = "core-efi.json"
 		targetPackageList = "selinux.json"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Pick the core-efi config file, then enable SELinux
@@ -270,7 +269,7 @@ func TestShouldSucceedSELinuxPackageDefinedInline(t *testing.T) {
 		targetPackageList = "selinux.json"
 		selinuxPkgName    = "selinux-policy"
 	)
-	configFiles, err := ioutil.ReadDir(configDirectory)
+	configFiles, err := os.ReadDir(configDirectory)
 	assert.NoError(t, err)
 
 	// Pick the core-efi config file, then enable SELinux
