@@ -1,4 +1,8 @@
 
+# We can't use iso-codes to generate locales, as it would create a
+# "circular dependency" in our toolkit
+%bcond locales 0
+
 Summary: The basic directory layout for a Linux system
 Name: filesystem
 Version: 3.18
@@ -7,10 +11,12 @@ License: LicenseRef-Fedora-Public-Domain
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 URL: https://pagure.io/filesystem
+%if %{with locales}
 Source1: https://pagure.io/filesystem/raw/master/f/lang-exceptions
 Source2: iso_639.sed
 Source3: iso_3166.sed
 BuildRequires: iso-codes
+%endif
 
 # We don't order the same as Fedora here, although maybe we should.
 # If ordering is changed, be sure to coordinate with setup
@@ -33,8 +39,10 @@ rm -f $RPM_BUILD_DIR/filelist
 %install
 rm -rf %{buildroot}
 mkdir %{buildroot}
+%if %{with locales}
 install -p -c -m755 %SOURCE2 %{buildroot}/iso_639.sed
 install -p -c -m755 %SOURCE3 %{buildroot}/iso_3166.sed
+%endif
 
 cd %{buildroot}
 
@@ -63,6 +71,7 @@ ln -snf usr/%{_lib} usr/lib/debug/%{_lib}
 ln -snf ../.dwz usr/lib/debug/usr/.dwz
 ln -snf usr/sbin usr/lib/debug/sbin
 
+%if %{with locales}
 sed -n -f %{buildroot}/iso_639.sed /usr/share/xml/iso-codes/iso_639.xml \
   >%{buildroot}/iso_639.tab
 sed -n -f %{buildroot}/iso_3166.sed /usr/share/xml/iso-codes/iso_3166.xml \
@@ -105,6 +114,12 @@ rm -f %{buildroot}/iso_639.tab
 rm -f %{buildroot}/iso_639.sed
 rm -f %{buildroot}/iso_3166.tab
 rm -f %{buildroot}/iso_3166.sed
+%else
+# We provide NO locales
+touch $RPM_BUILD_DIR/filelist
+# But still own /usr/share/locale
+mkdir -p -m 755 %{buildroot}/usr/share/locale
+%endif
 
 cat $RPM_BUILD_DIR/filelist | grep "locale" | while read a b ; do
     mkdir -p -m 755 %{buildroot}/$b/LC_MESSAGES
