@@ -67,8 +67,10 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 // Extract raw-zst partition
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionFilename string, outDir string) (partitionFilepath string, err error) {
+	// Define file path for temporary partition
+	tempPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
 	// Compress raw partition with zstd
-	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath, partitionFilename, outDir)
+	tempPartitionFilepath, err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
 	if err != nil {
 		return "", err
 	}
@@ -114,9 +116,7 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 }
 
 // Compress file from .raw to .raw.zst format using zstd.
-func compressWithZstd(partitionRawFilepath string, partitionFilename string, outDir string) (partitionFilepath string, err error) {
-	// Define output file.
-	outputPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
+func compressWithZstd(partitionRawFilepath string, outputPartitionFilepath string) (partitionFilepath string, err error) {
 	// Using -f to overwrite a file with same name if it exists.
 	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath, "-o", outputPartitionFilepath)
 	if err != nil {

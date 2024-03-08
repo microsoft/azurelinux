@@ -19,16 +19,17 @@ func TestAddSkippableFrame(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create test raw partition file
-	partitionfileName := "test"
-	partitionRawFilepath, err := createTestRawPartitionFile(partitionfileName)
+	partitionFilename := "test"
+	partitionRawFilepath, err := createTestRawPartitionFile(partitionFilename)
 	assert.NoError(t, err)
 
 	// Compress to .raw.zst partition file
-	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath, partitionfileName, testDir)
+	tempPartitionFilepath := testDir + partitionFilename + "_temp.raw.zst"
+	tempPartitionFilepath, err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
 	assert.NoError(t, err)
 
 	// Test adding the skippable frame
-	partitionFilepath, err := addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionfileName, testDir)
+	partitionFilepath, err := addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionFilename, testDir)
 	assert.NoError(t, err)
 
 	// Verify decompression with skippable frame
