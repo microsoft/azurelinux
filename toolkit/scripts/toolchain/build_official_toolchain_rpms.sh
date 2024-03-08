@@ -328,6 +328,8 @@ echo Building final list of toolchain RPMs
 build_rpm_in_chroot_no_install azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-rpm-macros
 chroot_and_install_rpms azurelinux-check-macros
+build_rpm_in_chroot_no_install python-rpm-generators
+chroot_and_install_rpms python-rpm-generators python3-rpm-generators
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -440,8 +442,6 @@ chroot_and_install_rpms python3 python3
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
 
-build_rpm_in_chroot_no_install python-pip
-
 # libxml2 is required for at least: libxslt, createrepo_c
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
@@ -464,7 +464,6 @@ chroot_and_install_rpms lua lua
 build_rpm_in_chroot_no_install lua-rpm-macros
 chroot_and_install_rpms lua-rpm-macros
 
-# Build tdnf-3.5.2
 build_rpm_in_chroot_no_install kmod
 build_rpm_in_chroot_no_install perl-XML-Parser
 build_rpm_in_chroot_no_install libssh2
@@ -540,6 +539,17 @@ chroot_and_install_rpms docbook-dtd-xml
 chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 build_rpm_in_chroot_no_install gtk-doc
+
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
 
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
@@ -629,6 +639,15 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
+chroot_and_install_rpms rpm rpm-libs
+chroot_and_install_rpms rpm rpm
+chroot_and_install_rpms rpm rpm-build-libs
+chroot_and_install_rpms rpm rpm-devel
+chroot_and_install_rpms rpm rpm-build
+
+build_rpm_in_chroot_no_install python-wheel
+build_rpm_in_chroot_no_install python-flit-core
+build_rpm_in_chroot_no_install python-pip
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
@@ -678,7 +697,6 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install azurelinux-repos
-build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall
