@@ -54,13 +54,13 @@ func createTestRawPartitionFile(filename string) (string, error) {
 	if err != nil {
 		return "", err
 	} else {
-		logger.Log.Infof("File %s created successfully with dummy data.", filename)
+		logger.Log.Infof("Test raw partition file created: %s", filename)
 		return filename, nil
 	}
 }
 
-func writeToFile(fileName string, data []byte) error {
-	file, err := os.Create(fileName)
+func writeToFile(filename string, data []byte) error {
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func writeToFile(fileName string, data []byte) error {
 	return nil
 }
 
-// Decompress the .raw.zst partition file and verifies the hash matches with the source .raw file
+// Decompress the .raw.zst partition file and verify the hash matches with the source .raw file
 func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartitionFilepath string) (err error) {
 	// Decompressing .raw.zst file
 	decompressedPartitionFilepath := "decompressed.raw"
@@ -86,11 +86,11 @@ func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartit
 	// Calculating hashes
 	rawPartitionFileHash, err := file.GenerateSHA256(rawPartitionFilepath)
 	if err != nil {
-		return fmt.Errorf("error: %w", err)
+		return fmt.Errorf("error generating SHA256:\n%w", err)
 	}
 	decompressedPartitionFileHash, err := file.GenerateSHA256(decompressedPartitionFilepath)
 	if err != nil {
-		return fmt.Errorf("error: %w", err)
+		return fmt.Errorf("error generating SHA256:\n%w", err)
 	}
 
 	// Verifying hashes are equal
@@ -110,13 +110,13 @@ func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartit
 
 // Verifies that the skippable frame has been correctly prepended to the partition file with the correct data
 func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFrameSize]byte) (err error) {
-	// Read existing data from the partition file.
+	// Read existing data from the partition file
 	existingData, err := os.ReadFile(partitionFilepath)
 	if err != nil {
 		return fmt.Errorf("failed to read partition file %s:\n%w", partitionFilepath, err)
 	}
 
-	// verify that the skippable frame has been prepended to the partition file by validating magicNumber
+	// Verify that the skippable frame has been prepended to the partition file by validating magicNumber
 	var magicNumberByteArray [4]byte
 	binary.LittleEndian.PutUint32(magicNumberByteArray[:], magicNumber)
 	if !bytes.Equal(existingData[0:4], magicNumberByteArray[:]) {
@@ -124,7 +124,7 @@ func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber 
 	}
 	logger.Log.Infof("Skippable frame had been correctly prepended to the partition file...")
 
-	// verify that the skippable frame has the correct frame size by validating frameSize
+	// Verify that the skippable frame has the correct frame size by validating frameSize
 	var frameSizeByteArray [4]byte
 	binary.LittleEndian.PutUint32(frameSizeByteArray[:], frameSize)
 	if !bytes.Equal(existingData[4:8], frameSizeByteArray[:]) {
@@ -132,7 +132,7 @@ func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber 
 	}
 	logger.Log.Infof("Skippable frame frameSize field is correct...")
 
-	// verify that the skippable frame has the correct inserted metadata by validating skippableFrameMetadata
+	// Verify that the skippable frame has the correct inserted metadata by validating skippableFrameMetadata
 	if !bytes.Equal(existingData[8:8+frameSize], skippableFrameMetadata[:]) {
 		return fmt.Errorf("skippable frame metadata does not match the inserted metadata:\n %d != %d", existingData[8:8+frameSize], skippableFrameMetadata[:])
 	}

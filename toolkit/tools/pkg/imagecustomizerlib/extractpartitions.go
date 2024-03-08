@@ -62,7 +62,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 // Extract raw-zst partition
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFrameSize]byte) (partitionFilepath string, err error) {
-	// Compress raw partition with zstd and output it
+	// Compress raw partition with zstd
 	partitionFilepath, err = compressWithZstd(partitionRawFilepath)
 	if err != nil {
 		return "", err
@@ -72,7 +72,7 @@ func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata 
 	if err != nil {
 		return "", err
 	}
-	// Remove raw file since output partition format is raw-zst.
+	// Remove raw file since output partition format is raw-zst
 	err = os.Remove(partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
