@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,10 +15,9 @@ import (
 )
 
 const (
-	SkippableFrameMagicNumber uint32      = 0x184D2A50
-	SkippableFramePayloadSize uint32      = 16
-	SkippableFrameHeaderSize  int         = 8
-	PartitionFilePermissions  fs.FileMode = 0644
+	SkippableFrameMagicNumber uint32 = 0x184D2A50
+	SkippableFramePayloadSize uint32 = 16
+	SkippableFrameHeaderSize  int    = 8
 )
 
 // Extract all partitions of connected image into separate files with specified format.
@@ -70,7 +68,7 @@ func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata 
 	// Define file path for temporary partition
 	tempPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
 	// Compress raw partition with zstd
-	tempPartitionFilepath, err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
+	err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
 	if err != nil {
 		return "", err
 	}
@@ -116,20 +114,20 @@ func copyBlockDeviceToFile(outDir, devicePath, name string) (filename string, er
 }
 
 // Compress file from .raw to .raw.zst format using zstd.
-func compressWithZstd(partitionRawFilepath string, outputPartitionFilepath string) (partitionFilepath string, err error) {
+func compressWithZstd(partitionRawFilepath string, outputPartitionFilepath string) (err error) {
 	// Using -f to overwrite a file with same name if it exists.
 	err = shell.ExecuteLive(true, "zstd", "-f", "-9", "-T0", partitionRawFilepath, "-o", outputPartitionFilepath)
 	if err != nil {
-		return "", fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
+		return fmt.Errorf("failed to compress %s with zstd:\n%w", partitionRawFilepath, err)
 	}
 
-	return outputPartitionFilepath, nil
+	return nil
 }
 
 // Prepend a skippable frame with the metadata to the specified partition file.
 func addSkippableFrame(tempPartitionFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionFilename string, outDir string) (partitionFilepath string, err error) {
 	// Open tempPartitionFile for reading
-	tempPartitionFile, err := os.OpenFile(tempPartitionFilepath, os.O_RDWR, PartitionFilePermissions)
+	tempPartitionFile, err := os.OpenFile(tempPartitionFilepath, os.O_RDWR, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("failed to open partition file %s:\n%w", tempPartitionFilepath, err)
 	}

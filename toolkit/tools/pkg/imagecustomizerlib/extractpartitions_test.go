@@ -25,7 +25,7 @@ func TestAddSkippableFrame(t *testing.T) {
 
 	// Compress to .raw.zst partition file
 	tempPartitionFilepath := testDir + partitionFilename + "_temp.raw.zst"
-	tempPartitionFilepath, err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
+	err = compressWithZstd(partitionRawFilepath, tempPartitionFilepath)
 	assert.NoError(t, err)
 
 	// Test adding the skippable frame
@@ -57,7 +57,7 @@ func createTestRawPartitionFile(filename string) (string, error) {
 	outputFilename := filename + ".raw"
 
 	// Write data to file
-	err := os.WriteFile(outputFilename, testData, PartitionFilePermissions)
+	err := os.WriteFile(outputFilename, testData, os.ModePerm)
 	if err != nil {
 		return "", fmt.Errorf("failed to write test data to partition file %s:\n%w", filename, err)
 	}
