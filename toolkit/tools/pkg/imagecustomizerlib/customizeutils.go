@@ -332,25 +332,25 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 
 	// Handle enabling services
 	for _, service := range services.Enable {
-		logger.Log.Infof("Enabling service (%s)", service.Name)
+		logger.Log.Infof("Enabling service (%s)", service)
 
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service.Name)
+			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to enable service (%s):\n%w", service.Name, err)
+			return fmt.Errorf("failed to enable service (%s):\n%w", service, err)
 		}
 	}
 
 	// Handle disabling services
 	for _, service := range services.Disable {
-		logger.Log.Infof("Disabling service (%s)", service.Name)
+		logger.Log.Infof("Disabling service (%s)", service)
 
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service.Name)
+			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to disable service (%s):\n%w", service.Name, err)
+			return fmt.Errorf("failed to disable service (%s):\n%w", service, err)
 		}
 	}
 
