@@ -83,7 +83,7 @@
 
 ## Overview
 
-The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
 If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
@@ -214,13 +214,13 @@ All images are generated in the `out/images` folder.
 ### Virtual Hard Disks and Containers
 
 ```bash
-# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
+# To build an Azure Linux VHD Image (VHD folder: ../out/images/core-legacy)
 sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 
-# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
+# To build an Azure Linux VHDX Image (VHDX folder ../out/images/core-efi)
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
-# To build a core Mariner Contianer (Container Folder: ../out/images/core-container/*.tar.gz
+# To build a core Azure Linux Container (Container Folder: ../out/images/core-container/*.tar.gz
 sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
@@ -301,7 +301,7 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ### packages.microsoft.com Repository Structure
 
-CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (e.g.: 3.0). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+Azure Linux packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (e.g.: 3.0). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
 
@@ -363,7 +363,7 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Mariner source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 

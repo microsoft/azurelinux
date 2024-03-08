@@ -98,7 +98,7 @@ index 0000000..9577d23
 +
 +steps:
 +- bash: |
-+    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/mariner-spec-cleaner.patch
++    git diff --diff-algorithm=minimal $(git rev-parse refs/tags/$(upstreamTag))..HEAD > $(Build.ArtifactStagingDirectory)/azurelinux-spec-cleaner.patch
 +
 +- task: PublishBuildArtifacts@1
 +  inputs:
@@ -212,7 +212,7 @@ index e89d188..b4e231d 100644
 -[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/rpm-software-management/spec-cleaner.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rpm-software-management/spec-cleaner/context:python)
 -[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 -[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-+spec-cleaner is a tool that cleans the given RPM spec file according to the Mariner style and returns the result.
++spec-cleaner is a tool that cleans the given RPM spec file according to the Azure Linux style and returns the result.
  
 -
 -spec-cleaner is a tool that cleans the given RPM spec file according to the style guide and returns the result.
@@ -10682,11 +10682,11 @@ index c701543..326c724 100644
 -    """
      parser = argparse.ArgumentParser(
 -        prog='spec-cleaner',
-+        prog='mariner-spec-cleaner',
++        prog='azurelinux-spec-cleaner',
          formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 -        description='Cleans the given spec file according to style guide and returns the result. If "#nospeccleaner"'
 -        'tag is used in the spec file than the spec file will not be cleaned.',
-+        description='Cleans the given spec file according to the Mariner style guide and returns the result.'
++        description='Cleans the given spec file according to the Azure Linux style guide and returns the result.'
 +        'If "#nospeccleaner" tag is used in the spec file, then the spec file will not be cleaned.',
      )
  
@@ -11579,7 +11579,7 @@ index 9e2490c..64bfd8d 100644
              'summary': self.reg.re_summary,
              # for url we have a special match - http -> https replacement
 +            # for vendor, we force it to match "Microsoft"
-+            # for distribution, we force it to match "Mariner"
++            # for distribution, we force it to match "Azure Linux"
              'group': self.reg.re_group,
              'nosource': self.reg.re_nosource,
              # for source, we have a special match to keep the source number
@@ -11794,7 +11794,7 @@ index 9e2490c..64bfd8d 100644
 +            self._add_line_value_to('vendor', 'Microsoft Corporation', key='Vendor')
 +
 +        elif self.reg.re_distribution.match(line):
-+            self._add_line_value_to('distribution', 'Mariner', key='Distribution')
++            self._add_line_value_to('distribution', 'Azure Linux', key='Distribution')
 +
          elif self.reg.re_source.match(line):
              match = self.reg.re_source.match(line)
@@ -21672,7 +21672,7 @@ index 54715dc..0000000
 -NOTE:
 -
 -To make sure your perldoc/Pod viewing setup for viewing this page is
--working: The six-letter word "résumé" should look like "resume" with an "/"
+-working: The six-letter word "rÃ©sumÃ©" should look like "resume" with an "/"
 -accent on each "e".
 -
 -For further tests, and help if that doesn't work, see below, A POD ENCODING

@@ -274,7 +274,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return "", fmt.Errorf("failed to make build directory (%s):\n%w", buildDir, err)
 	}
 
-	// Use a prototypical Mariner image partition config.
+	// Use a prototypical Azure Linux image partition config.
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
 		MaxSize:            4096,

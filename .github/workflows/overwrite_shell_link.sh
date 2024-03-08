@@ -13,7 +13,7 @@ fi
 
 if [[ "$original_rpm_shell" != "bash" ]]
 then
-  echo "Host system's '$shell_link_path' links to '$original_rpm_shell'. Mariner specs require 'bash' - updating."
+  echo "Host system's '$shell_link_path' links to '$original_rpm_shell'. Azure Linux specs require 'bash' - updating."
 
   sudo rm -f $shell_link_path
   sudo ln -s bash "$shell_link_path"

@@ -6,7 +6,7 @@ Image configuration consists of two sections - Disks and SystemConfigs - that de
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
-Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
+Required when building unattended ISO installer. This field defines the physical disk to which Azure Linux should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
 Artifact (non-ISO image building only) defines the name, type and optional compression of the output Azure Linux image.
@@ -216,11 +216,11 @@ All scripts follow the same format in the image config .json file:
 
 #### PreInstallScripts
 
-There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
+There are customer requests that would like to use a Kickstart file to install Azure Linux OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
 
 The preinstall scripts are run from the context of the installer, NOT the installed system (since it doesn't exist yet).
 
-**NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
+**NOTE**: currently, Azure Linux's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Azure Linux's image building tools.
 
 #### PostInstallScripts
 
@@ -272,7 +272,7 @@ Fields:
 
 ### Networks
 
-The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
+The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Azure Linux tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
 
 A sample Networks entry pointing to one network configuration:
 ``` json
@@ -413,8 +413,8 @@ which is a higher precedent than the config file. This ensures SELinux boots in 
 An optional field to overwrite the SELinux policy package name. If not set, the default is `selinux-policy`.
 
 #### CGroup
-The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
-The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
+The version for CGroup in Azure Linux images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
+The `version_two` value will set the cgroupv2 to be used in Azure Linux by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
 
 A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:

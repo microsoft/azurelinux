@@ -138,7 +138,7 @@ func (s *SystemConfig) IsValid() error {
 			}
 		}
 		// Enforce that only one or zero persistent partitions to support
-		// Overlays. Currently, the Overlayfs Dracut module from CBL-Mariner RPM
+		// Overlays. Currently, the Overlayfs Dracut module from Azure Linux RPM
 		// supports at most one persistent partition across all configured
 		// overlays. While multiple overlays can be defined, only one of these
 		// can be configured with a persistent storage option to ensure

@@ -10,14 +10,14 @@ Distribution:   Azure Linux
 
 BuildArch:      noarch
 
-# Must contain only architectures not supported by CBL-Mariner!
+# Must contain only architectures not supported by Azure Linux!
 ExcludeArch:    i686
 
-# Must contain an architecture for each of the supported builds of CBL-Mariner!
+# Must contain an architecture for each of the supported builds of Azure Linux!
 ExclusiveArch:  x86_64 aarch64
 
 %description
-Test spec. Make sure "ExclusiveArch" contains an entry for each architecture supported by CBL-Mariner!
+Test spec. Make sure "ExclusiveArch" contains an entry for each architecture supported by Azure Linux!
 
 %prep
 

@@ -52,11 +52,11 @@ const (
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
 
-	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
-	MarinerModuleLdflagsDefine = "distro_module_ldflags "
+	// Azure LinuxModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
+	AzureLinuxModuleLdflagsDefine = "distro_module_ldflags "
 
-	// MarinerCCacheDefine enables ccache in the Mariner build system
-	MarinerCCacheDefine = "ccache_enabled"
+	// Azure LinuxCCacheDefine enables ccache in the Azure Linux build system
+	AzureLinuxCCacheDefine = "ccache_enabled"
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
@@ -92,7 +92,7 @@ var (
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
-	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
+	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
 	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
 )
 

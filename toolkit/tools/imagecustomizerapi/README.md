@@ -1,9 +1,9 @@
-# Mariner Image Customizer API
+# Azure Linux Image Customizer API
 
-The Mariner image customizer (imgcustomizer) will be released as a standalone tool and
+The Azure Linux image customizer (imgcustomizer) will be released as a standalone tool and
 will provide strong backwards compatibility guarantees (after the first official
 release).
-This is contrast to the Mariner toolkit's new image config, which isn't officially
+This is contrast to the Azure Linux toolkit's new image config, which isn't officially
 released and doesn't provide any backwards compatibility guarantees.
 
 While currently the new image config and imgcustomizer config are very similar, in the

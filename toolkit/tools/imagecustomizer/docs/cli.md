@@ -1,4 +1,4 @@
-# Mariner Image Customizer command line
+# Azure Linux Image Customizer command line
 
 ## --help
 
@@ -16,8 +16,8 @@ Required.
 
 The base image file to customize.
 
-This file is typically one of the standard Mariner core images.
-But it can also be a Mariner image that has been customized.
+This file is typically one of the standard Azure Linux core images.
+But it can also be an Azure Linux image that has been customized.
 
 Supported image file formats: vhd, vhdx, qcow2, and raw.
 
@@ -36,7 +36,7 @@ Options: vhd, vhdx, qcow2, raw, and iso.
 At least one of `--output-image-format` and `--output-split-partitions-format` is required.
 
 When the output image format is set to iso, the generated image is a LiveOS
-iso image. For more details on this format, see: [Mariner Image Customizer ISO Support](./iso.md).
+iso image. For more details on this format, see: [Azure Linux Image Customizer ISO Support](./iso.md).
 
 ## --output-split-partitions-format=FORMAT
 
@@ -61,7 +61,7 @@ The file path of the YAML (or JSON) configuration file that specifies how to cus
 the image.
 
 For documentation on the supported configuration options, see:
-[Mariner Image Customizer configuration](./docs/configuration.md)
+[Azure Linux Image Customizer configuration](./docs/configuration.md)
 
 ## --rpm-source=PATH
 

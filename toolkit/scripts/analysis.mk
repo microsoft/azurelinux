@@ -6,7 +6,7 @@
 #	- Run check for ABI changes of built packages.
 #	- Run check for .so files version change of built packages.
 
-# Requires DNF on Mariner / yum and yum-utils on Ubuntu.
+# Requires DNF on Azure Linux / yum and yum-utils on Ubuntu.
 
 # A folder with sodiff-related artifacts
 SODIFF_OUTPUT_FOLDER=$(BUILD_DIR)/sodiff

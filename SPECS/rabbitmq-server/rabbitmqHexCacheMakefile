@@ -63,7 +63,7 @@ generate-hex-cache: generate-time-file
 # field) and `ets:tab2file()` produces a different file each time it's
 # called.
 #
-# For Mariner, we fix the time of the `last_update` field to the time of
+# For Azure Linux, we fix the time of the `last_update` field to the time of
 # creation for the hex-cache.ets and dump the content of the
 # table as an Erlang term to a text file.
 #

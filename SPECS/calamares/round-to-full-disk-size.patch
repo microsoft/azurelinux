@@ -5,7 +5,7 @@ diff -ru calamares-3.2.11-orig/src/modules/partition/jobs/CreatePartitionTableJo
          currentPartition[KeyFlags] = QJsonArray::fromStringList(PartitionTable::flagNames(PartitionInfo::flags(x)));
          currentPartition[KeyStart] = (x->firstByte() / MiBSize);
  
--        // Since Mariner installer does not use the last MiB,
+-        // Since Azure Linux installer does not use the last MiB,
 -        // we have to report additional 1MiB per partition end
 -        currentPartition[KeyEnd] = x->lastByte() / MiBSize + 1;
 +        // check if we're almost at capacity and set end to 0 in json (full size)
@@ -16,7 +16,7 @@ diff -ru calamares-3.2.11-orig/src/modules/partition/jobs/CreatePartitionTableJo
 +        }
 +        else
 +        {
-+            // Since Mariner installer does not use the last MiB,
++            // Since Azure Linux installer does not use the last MiB,
 +            // we have to report additional 1MiB per partition end
 +            currentPartition[KeyEnd] = x->lastByte() / MiBSize + 1;
 +        }

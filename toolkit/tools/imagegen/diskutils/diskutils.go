@@ -26,8 +26,8 @@ var (
 	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
 	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
 	// /etc/mke2fs.conf.
-	// However, when building Mariner images, the defaults should be as consistent as possible and should only contain
-	// features that are supported on Mariner.
+	// However, when building Azure Linux images, the defaults should be as consistent as possible and should only contain
+	// features that are supported on Azure Linux.
 	DefaultMkfsOptions = map[string][]string{
 		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
 		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},

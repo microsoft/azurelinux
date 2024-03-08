@@ -65,7 +65,7 @@ function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
 	npm config set cache "$homeCacheDir/.npm" --global
-	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
+	# Default node/npm versions in Azure Linux fails to build dependency node module versions due to known
 	# incompatibilities.
 	# Backward compatible with node@v14.18.0
 	# When installing modules via npm to default prefix='/usr/local' in mariner, the permissions for 'others'

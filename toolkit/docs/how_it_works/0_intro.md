@@ -4,7 +4,7 @@
 
 ## General Build Flow
 
-This section is intended to give an overview of Mariner's build process and toolkit. The diagrams below follow conventions stated in the key.
+This section is intended to give an overview of Azure Linux's build process and toolkit. The diagrams below follow conventions stated in the key.
 
 ```mermaid
 ---
@@ -30,7 +30,7 @@ flowchart TD
 
 ### High-level RPM flow
 
-Mariner is an RPM based distro. A single package (or RPM) is built using a combination of sources and a spec file. A signature file is used to verify the sources' hashes.
+Azure Linux is an RPM based distro. A single package (or RPM) is built using a combination of sources and a spec file. A signature file is used to verify the sources' hashes.
 
 ```mermaid
 flowchart LR
@@ -66,7 +66,7 @@ flowchart LR
 
 ### High-level build flow
 
- The build process can be split into three components: tooling, package generation, and image generation. When building, `make` options can be used to build Mariner from end to end or to download prebuilt artifacts.
+ The build process can be split into three components: tooling, package generation, and image generation. When building, `make` options can be used to build Azure Linux from end to end or to download prebuilt artifacts.
 
 ```mermaid
 flowchart LR

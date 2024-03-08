@@ -38,7 +38,7 @@ const (
 )
 
 var (
-	// Version specifies the version of the Mariner Image Customizer tool.
+	// Version specifies the version of the Azure Linux Image Customizer tool.
 	// The value of this string is inserted during compilation via a linker flag.
 	ToolVersion = ""
 )

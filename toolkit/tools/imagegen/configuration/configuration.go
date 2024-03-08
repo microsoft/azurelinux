@@ -18,7 +18,7 @@ import (
 )
 
 // Artifact [non-ISO image building only] defines the name, type
-// and optional compression of the output Mariner image.
+// and optional compression of the output Azure Linux image.
 type Artifact struct {
 	Compression string `json:"Compression"`
 	Name        string `json:"Name"`
@@ -34,7 +34,7 @@ type RawBinary struct {
 }
 
 // TargetDisk [kickstart-only] defines the physical disk, to which
-// Mariner should be installed.
+// Azure Linux should be installed.
 type TargetDisk struct {
 	Type  string `json:"Type"`
 	Value string `json:"Value"`
