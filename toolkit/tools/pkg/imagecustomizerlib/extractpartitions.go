@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -16,7 +17,8 @@ import (
 
 const (
 	SkippableFrameMagicNumber uint32      = 0x184D2A50
-	SkippableFrameSize        uint32      = 16
+	SkippableFramePayloadSize uint32      = 16
+	SkippableFrameHeaderSize  int         = 8
 	PartitionFilePermissions  fs.FileMode = 0644
 )
 
@@ -37,7 +39,8 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
-			rawFilename := basename + "_" + strconv.Itoa(partitionNum) + ".raw"
+			partitionfileName := basename + "_" + strconv.Itoa(partitionNum)
+			rawFilename := partitionfileName + ".raw"
 			partitionLoopDevice := diskPartitions[partitionNum].Path
 
 			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
@@ -49,7 +52,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			case "raw":
 				// Do nothing for "raw" case.
 			case "raw-zst":
-				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata)
+				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionfileName, outDir)
 				if err != nil {
 					return err
 				}
@@ -63,16 +66,21 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 }
 
 // Extract raw-zst partition
-func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFrameSize]byte) (partitionFilepath string, err error) {
+func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionfileName string, outDir string) (partitionFilepath string, err error) {
 	// Compress raw partition with zstd
-	partitionFilepath, err = compressWithZstd(partitionRawFilepath)
+	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath)
 	if err != nil {
 		return "", err
 	}
 	// Create a skippable frame containing the metadata and prepend the frame to the partition file
-	err = addSkippableFrame(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
+	partitionFilepath, err = addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionfileName, outDir)
 	if err != nil {
 		return "", err
+	}
+	// Remove temp partition file
+	err = os.Remove(tempPartitionFilepath)
+	if err != nil {
+		return "", fmt.Errorf("failed to remove temp file %s:\n%w", partitionRawFilepath, err)
 	}
 	// Remove raw file since output partition format is raw-zst
 	err = os.Remove(partitionRawFilepath)
@@ -117,32 +125,38 @@ func compressWithZstd(partitionRawFilepath string) (partitionFilepath string, er
 }
 
 // Prepend a skippable frame with the metadata to the specified partition file.
-func addSkippableFrame(partitionFilepath string, magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFrameSize]byte) (err error) {
-	// Read existing data from the partition file.
-	existingData, err := os.ReadFile(partitionFilepath)
+func addSkippableFrame(tempPartitionFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionfileName string, outDir string) (partitionFilepath string, err error) {
+	// Open tempPartitionFile for reading
+	tempPartitionFile, err := os.OpenFile(tempPartitionFilepath, os.O_RDWR, PartitionFilePermissions)
 	if err != nil {
-		return fmt.Errorf("failed to read partition file %s:\n%w", partitionFilepath, err)
+		return "", fmt.Errorf("failed to open partition file %s:\n%w", tempPartitionFilepath, err)
 	}
-
-	// Create a skippable frame.
-	skippableFrame := createSkippableFrame(magicNumber, frameSize, skippableFrameMetadata)
-
-	// Combine the skippable frame and existing data.
-	newData := append(skippableFrame, existingData...)
-
-	// Write the combined data back to the partition file with the same permissions as the original partition file.
-	err = os.WriteFile(partitionFilepath, newData, PartitionFilePermissions)
+	// Create a skippable frame
+	skippableFrame := createSkippableFrame(SkippableFrameMagicNumber, SkippableFramePayloadSize, skippableFrameMetadata)
+	// Define the final partition file path
+	partitionFilepath = outDir + "/" + partitionfileName + "_final" + ".raw.zst"
+	// Create partition file
+	finalFile, err := os.Create(partitionFilepath)
 	if err != nil {
-		return fmt.Errorf("failed to write skippable frame to partition file %s:\n%w", partitionFilepath, err)
+		return "", err
 	}
-
-	return nil
+	// Write the skippable frame to file
+	_, err = finalFile.Write(skippableFrame)
+	if err != nil {
+		return "", err
+	}
+	// Copy the data from the tempPartitionFile into finalFile
+	_, err = io.Copy(finalFile, tempPartitionFile)
+	if err != nil {
+		return "", err
+	}
+	return partitionFilepath, nil
 }
 
 // Creates a skippable frame.
-func createSkippableFrame(magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFrameSize]byte) (skippableFrame []byte) {
+func createSkippableFrame(magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFramePayloadSize]byte) (skippableFrame []byte) {
 	// Calculate the length of the byte array
-	lengthOfByteArray := 4 + 4 + len(skippableFrameMetadata)
+	lengthOfByteArray := SkippableFrameHeaderSize + len(skippableFrameMetadata)
 	// Define the Skippable frame
 	skippableFrame = make([]byte, lengthOfByteArray)
 	// Magic_Number
@@ -150,15 +164,15 @@ func createSkippableFrame(magicNumber uint32, frameSize uint32, skippableFrameMe
 	// Frame_Size
 	binary.LittleEndian.PutUint32(skippableFrame[4:8], frameSize)
 	// User_Data
-	copy(skippableFrame[8:24], skippableFrameMetadata[:])
+	copy(skippableFrame[8:8+frameSize], skippableFrameMetadata[:])
 
-	logger.Log.Infof("Skippable frame has been created with the following metadata: %d", skippableFrame[8:24])
+	logger.Log.Infof("Skippable frame has been created with the following metadata: %d", skippableFrame[8:8+frameSize])
 
 	return skippableFrame
 }
 
 // Create user metadata that will be inserted into the skippable frame.
-func createSkippableFrameMetadata() (skippableFrameMetadata [SkippableFrameSize]byte, err error) {
+func createSkippableFrameMetadata() (skippableFrameMetadata [SkippableFramePayloadSize]byte, err error) {
 	// Set the skippableFrameMetadata to be a random 128-Bit number
 	skippableFrameMetadata, err = generateRandom128BitNumber()
 	if err != nil {
@@ -168,8 +182,8 @@ func createSkippableFrameMetadata() (skippableFrameMetadata [SkippableFrameSize]
 }
 
 // Generates a Random 128-Bit number.
-func generateRandom128BitNumber() ([SkippableFrameSize]byte, error) {
-	var randomBytes [SkippableFrameSize]byte
+func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
+	var randomBytes [SkippableFramePayloadSize]byte
 	_, err := rand.Read(randomBytes[:])
 	if err != nil {
 		return randomBytes, err

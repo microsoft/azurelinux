@@ -19,15 +19,17 @@ func TestAddSkippableFrame(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Create test raw partition file
-	partitionRawFilepath, err := createTestRawPartitionFile("test.raw")
+	partitionfileName := "test"
+	partitionRawFilepath, err := createTestRawPartitionFile(partitionfileName)
 	assert.NoError(t, err)
 
 	// Compress to .raw.zst partition file
-	partitionFilepath, err := compressWithZstd(partitionRawFilepath)
+	tempPartitionFilepath, err := compressWithZstd(partitionRawFilepath)
 	assert.NoError(t, err)
+	logger.Log.Infof("temp: %s", tempPartitionFilepath)
 
 	// Test adding the skippable frame
-	err = addSkippableFrame(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
+	partitionFilepath, err := addSkippableFrame(tempPartitionFilepath, skippableFrameMetadata, partitionfileName, testDir)
 	assert.NoError(t, err)
 
 	// Verify decompression with skippable frame
@@ -35,13 +37,14 @@ func TestAddSkippableFrame(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify skippable frame metadata
-	err = verifySkippableFrameMetadataFromFile(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
+	err = verifySkippableFrameMetadataFromFile(partitionFilepath, SkippableFrameMagicNumber, SkippableFramePayloadSize, skippableFrameMetadata)
 	assert.NoError(t, err)
 
 	// Remove test partition files
 	err = os.Remove(partitionRawFilepath)
 	assert.NoError(t, err)
-
+	err = os.Remove(tempPartitionFilepath)
+	assert.NoError(t, err)
 	err = os.Remove(partitionFilepath)
 	assert.NoError(t, err)
 }
@@ -50,13 +53,16 @@ func createTestRawPartitionFile(filename string) (string, error) {
 	// Test data
 	testData := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
 
-	err := os.WriteFile(filename, testData, PartitionFilePermissions)
+	// Output file name
+	outputFilename := filename + ".raw"
+
+	// Write data to file
+	err := os.WriteFile(outputFilename, testData, PartitionFilePermissions)
 	if err != nil {
-		return "", fmt.Errorf("failed to write skippable frame to partition file %s:\n%w", filename, err)
-	} else {
-		logger.Log.Infof("Test raw partition file created: %s", filename)
-		return filename, nil
+		return "", fmt.Errorf("failed to write test data to partition file %s:\n%w", filename, err)
 	}
+	logger.Log.Infof("Test raw partition file created: %s", outputFilename)
+	return outputFilename, nil
 }
 
 // Decompress the .raw.zst partition file and verify the hash matches with the source .raw file
@@ -94,7 +100,7 @@ func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartit
 }
 
 // Verifies that the skippable frame has been correctly prepended to the partition file with the correct data
-func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFrameSize]byte) (err error) {
+func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFramePayloadSize]byte) (err error) {
 	// Read existing data from the partition file
 	existingData, err := os.ReadFile(partitionFilepath)
 	if err != nil {
@@ -102,20 +108,16 @@ func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber 
 	}
 
 	// Verify that the skippable frame has been prepended to the partition file by validating magicNumber
-	var magicNumberByteArray [4]byte
-	binary.LittleEndian.PutUint32(magicNumberByteArray[:], magicNumber)
-	if !bytes.Equal(existingData[0:4], magicNumberByteArray[:]) {
-		return fmt.Errorf("skippable frame has not been prepended to the partition file:\n %d != %d", existingData[0:4], magicNumberByteArray[:])
+	if binary.LittleEndian.Uint32(existingData[0:4]) != magicNumber {
+		return fmt.Errorf("skippable frame has not been prepended to the partition file:\n %d != %d", binary.LittleEndian.Uint32(existingData[0:4]), magicNumber)
 	}
-	logger.Log.Infof("Skippable frame had been correctly prepended to the partition file...")
+	logger.Log.Infof("Skippable frame had been correctly prepended to the partition file.")
 
 	// Verify that the skippable frame has the correct frame size by validating frameSize
-	var frameSizeByteArray [4]byte
-	binary.LittleEndian.PutUint32(frameSizeByteArray[:], frameSize)
-	if !bytes.Equal(existingData[4:8], frameSizeByteArray[:]) {
-		return fmt.Errorf("skippable frame frameSize field does not match the defined frameSize:\n %d != %d", existingData[4:8], frameSizeByteArray[:])
+	if binary.LittleEndian.Uint32(existingData[4:8]) != frameSize {
+		return fmt.Errorf("skippable frame frameSize field does not match the defined frameSize:\n %d != %d", binary.LittleEndian.Uint32(existingData[4:8]), frameSize)
 	}
-	logger.Log.Infof("Skippable frame frameSize field is correct...")
+	logger.Log.Infof("Skippable frame frameSize field is correct.")
 
 	// Verify that the skippable frame has the correct inserted metadata by validating skippableFrameMetadata
 	if !bytes.Equal(existingData[8:8+frameSize], skippableFrameMetadata[:]) {
