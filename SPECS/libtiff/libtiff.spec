@@ -61,7 +61,7 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
-* Mon Mar 7 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.0-2
+* Thu Mar 7 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.0-2
 - Add patches for CVE-2023-52356
 
 * Fri Oct 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 4.6.0-1
