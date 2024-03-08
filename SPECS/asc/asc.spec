@@ -1,6 +1,6 @@
 Summary:        Package for Mariner to meet Azure Security Baseline 
 Name:           asc
-Version:        3.0
+Version:        %{azl}.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
