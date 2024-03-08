@@ -117,14 +117,11 @@ install -pm 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/azl/
 install -pm 644 pyproject_wheel.py %{buildroot}%{_rpmconfigdir}/azl/
 
 %check
-%if 0%{?with_check}
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
 %pytest -vv --doctest-modules -k "not tox"
 
 # brp-compress is provided as an argument to get the right directory macro expansion
 %{python3} compare_mandata.py -f %{_rpmconfigdir}/brp-compress
-%endif
-
 
 %files
 %{_rpmmacrodir}/macros.pyproject

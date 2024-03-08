@@ -544,11 +544,11 @@ build_rpm_in_chroot_no_install gtk-doc
 build_rpm_in_chroot_no_install python-setuptools
 chroot_and_install_rpms python-setuptools python3-setuptools
 
+# python-packaging requires pyproject-rpm-macros
 build_rpm_in_chroot_no_install pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
 chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
 
-# python-packaging requires pyproject-rpm-macros
 build_rpm_in_chroot_no_install python-packaging
 chroot_and_install_rpms python-packaging python3-packaging
 
