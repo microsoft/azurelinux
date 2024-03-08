@@ -14353,7 +14353,7 @@
         "other": {
           "name": "ocaml",
           "version": "5.1.1",
-          "downloadUrl": "https://github.com/ocaml/ocaml/archive/5.1.1/ocaml-5.1.1.tar.xz"
+          "downloadUrl": "https://github.com/ocaml/ocaml/archive/5.1.1/ocaml-5.1.1.tar.gz"
         }
       }
     },
