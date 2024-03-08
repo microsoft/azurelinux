@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -76,6 +76,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-8
+- Add OOMScoreAdjust -999 to containerd.service
+
 * Wed Mar 06 2024 Manuel Huber <mahuber@microsoft.com> - 1.7.1-7
 - Drop obsolete 'btrfs-progs-devel' build dependency
 
