@@ -99,12 +99,12 @@ BuildRequires:  python3-pygments
 # Compressed marshaling requires libzstd-devel.
 Requires:       gcc
 Requires:       redhat-rpm-config
-Requires:       libzstd-devel%{?_isa}
+Requires:       libzstd-devel
 
 # Because we pass -c flag to ocaml-find-requires (to avoid circular
 # dependencies) we also have to explicitly depend on the right version
 # of ocaml-runtime.
-Requires:       ocaml-runtime%{?_isa} = %{version}-%{release}
+Requires:       ocaml-runtime% = %{version}-%{release}
 
 # Force ocaml-srpm-macros to be at the latest version, both for builds
 # and installs, since OCaml 5.1 has a different set of native code
@@ -154,7 +154,7 @@ bytecode.
 
 %package source
 Summary:        Source code for OCaml libraries
-Requires:       ocaml%{?_isa} = %{version}-%{release}
+Requires:       ocaml% = %{version}-%{release}
 
 %description source
 Source code for OCaml libraries.
@@ -165,7 +165,7 @@ Source code for OCaml libraries.
 # LicenseRef-Fedora-Public-Domain: ocamldoc/ocamldoc.sty
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception AND LicenseRef-Fedora-Public-Domain
 Summary:        Documentation generator for OCaml
-Requires:       ocaml%{?_isa} = %{version}-%{release}
+Requires:       ocaml% = %{version}-%{release}
 Provides:       ocamldoc = %{version}
 
 %description ocamldoc
@@ -187,7 +187,7 @@ This package contains man pages.
 
 %package        compiler-libs
 Summary:        Compiler libraries for OCaml
-Requires:       ocaml%{?_isa} = %{version}-%{release}
+Requires:       ocaml% = %{version}-%{release}
 
 
 %description compiler-libs
