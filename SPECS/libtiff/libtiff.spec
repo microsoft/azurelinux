@@ -29,7 +29,6 @@ It contains the libraries and header files to create applications
 
 %prep
 %autosetup -p1 -n libtiff-v%{version}
-%autopatch
 
 %build
 export CFLAGS="%{optflags} -fno-strict-aliasing"
@@ -63,7 +62,7 @@ make %{?_smp_mflags} -k check
 
 %changelog
 * Mon Mar 7 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.0-2
-- Add patches for CVE-2023-52356.patch
+- Add patches for CVE-2023-52356
 
 * Fri Oct 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 4.6.0-1
 - Upgrade to v4.6.0 to fix CVE-2023-40745 and CVE-2023-41175
