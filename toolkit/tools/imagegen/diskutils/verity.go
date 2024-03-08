@@ -191,7 +191,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 // - readOnlyConfig is the root read-only settings
 func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, readOnlyConfig configuration.ReadOnlyVerityRoot) (readOnlyDevice VerityDevice, err error) {
 	const (
-		linearTable = `0 (%d) linear (%s) 0`
+		linearTable = `0 %d linear %s 0`
 	)
 
 	if !readOnlyConfig.Enable {

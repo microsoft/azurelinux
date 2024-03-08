@@ -306,10 +306,10 @@ func resolveGraphNodes(dependencyGraph *pkggraph.PkgGraph, inputSummaryFile stri
 		logger.Log.Warnf("(%s): failed to resolve graph node (%s):\n(%s)", progressHeader, n, resolveErr)
 		cachingSucceeded = false
 		errorMessage := strings.Builder{}
-		errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving (%s)\n", n))
+		errorMessage.WriteString(fmt.Sprintf("Failed to resolve all nodes in the graph while resolving '%s'\n", n))
 		errorMessage.WriteString("Nodes which have this as a dependency:\n")
 		for _, dependant := range graph.NodesOf(dependencyGraph.To(n.ID())) {
-			errorMessage.WriteString(fmt.Sprintf("\t(%s) depends on (%s)\n", dependant.(*pkggraph.PkgNode), n))
+			errorMessage.WriteString(fmt.Sprintf("\t'%s' depends on '%s'\n", dependant.(*pkggraph.PkgNode), n))
 		}
 		logger.Log.Debugf(errorMessage.String())
 	}
@@ -378,7 +378,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 	// Replace all '/' with '_' in the package name to get a valid timestamp name
 	// e.g. "bin/ls" -> "bin_ls"
 	tsName := strings.ReplaceAll(buildNode.VersionedPkg.Name, "/", "_")
-	timestamp.StartEvent(fmt.Sprintf("downloading delta node (%s)", tsName), nil)
+	timestamp.StartEvent(fmt.Sprintf("downloading delta node %s", tsName), nil)
 	defer timestamp.StopEvent(nil)
 
 	lookup, err = realDependencyGraph.FindExactPkgNodeFromPkg(buildNode.VersionedPkg)
@@ -462,7 +462,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	// Resolve nodes to exact package names so they can be referenced in the graph.
 	resolvedPackages, err := cloner.WhatProvides(node.VersionedPkg)
 	if err != nil {
-		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error:%s", node.VersionedPkg, err)
+		msg := fmt.Sprintf("Failed to resolve (%s) to a package. Error: %s", node.VersionedPkg, err)
 		// It is not an error if an implicit node could not be resolved as it may become available later in the build.
 		// If it does not become available scheduler will print an error at the end of the build.
 		if node.Implicit || node.State == pkggraph.StateDelta {

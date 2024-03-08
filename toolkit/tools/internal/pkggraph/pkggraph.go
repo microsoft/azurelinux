@@ -775,7 +775,7 @@ func (n *PkgNode) String() string {
 		name = NoName
 	}
 
-	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from (%s) in (%s)", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
+	return fmt.Sprintf("%s(%s):<ID:%d Type:%s State:%s Rpm:%s> from '%s' in '%s'", name, version, n.nodeID, n.Type.String(), n.State.String(), n.RpmPath, n.SrpmPath, n.SourceRepo)
 }
 
 // Equal returns true if these nodes represent the same data

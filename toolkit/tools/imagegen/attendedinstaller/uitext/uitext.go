@@ -70,7 +70,7 @@ const (
 	InvalidBootPartitionErrorFmt       = "Invalid boot partition: first partition must be of type (%s)"
 	InvalidRootPartitionErrorFmt       = "Must specify a partition to have the mount point (%s)"
 	InvalidRootDeviceMapperError       = "Must have a root to use with device mapper roots (Encryption, Read-Only)"
-	InvalidRootPartitionErrorFormatFmt = "Root partition cannot be %s"
+	InvalidRootPartitionErrorFormatFmt = "Root partition cannot be (%s)"
 	MountPointAlreadyInUseError        = "Mount point is already in use"
 	MountPointStartError               = "Mount point must start with `/`"
 	MountPointInvalidCharacterError    = "Mount point only supports alphanumeric characters and `/`"
@@ -148,11 +148,11 @@ const (
 // ProgressView text.
 const (
 	ProgressTitle      = "Installing Azure Linux OS"
-	ProgressSpinnerFmt = "Installing Azure Linux, please wait (%v)"
+	ProgressSpinnerFmt = "Installing Azure Linux, please wait %v"
 )
 
 // FinishView text.
 const (
 	FinishTitle   = "Azure Linux Installation Complete"
-	FinishTextFmt = "Total installation time: (%v) seconds. Press Enter to restart."
+	FinishTextFmt = "Total installation time: %v seconds. Press Enter to restart."
 )
