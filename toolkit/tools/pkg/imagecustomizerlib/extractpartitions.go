@@ -1,7 +1,6 @@
 package imagecustomizerlib
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
@@ -10,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
@@ -74,20 +72,10 @@ func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata 
 	if err != nil {
 		return "", err
 	}
-	// Verify decompression with skippable frame
-	err = verifySkippableFrameDecompression(partitionRawFilepath, partitionFilepath)
-	if err != nil {
-		return "", err
-	}
 	// Remove raw file since output partition format is raw-zst.
 	err = os.Remove(partitionRawFilepath)
 	if err != nil {
 		return "", fmt.Errorf("failed to remove raw file %s:\n%w", partitionRawFilepath, err)
-	}
-	// Verify skippable frame metadata
-	err = verifySkippableFrameMetadataFromFile(partitionFilepath, SkippableFrameMagicNumber, SkippableFrameSize, skippableFrameMetadata)
-	if err != nil {
-		return "", err
 	}
 	return partitionFilepath, nil
 }
@@ -185,71 +173,4 @@ func generateRandom128BitNumber() ([SkippableFrameSize]byte, error) {
 		return randomBytes, err
 	}
 	return randomBytes, nil
-}
-
-// Decompress the .raw.zst partition file and verifies the hash matches with the source .raw file
-func verifySkippableFrameDecompression(rawPartitionFilepath string, rawZstPartitionFilepath string) (err error) {
-	// Decompressing .raw.zst file
-	decompressedPartitionFilepath := "build/decompressed.raw"
-	err = shell.ExecuteLive(true, "zstd", "-d", rawZstPartitionFilepath, "-o", decompressedPartitionFilepath)
-	if err != nil {
-		return fmt.Errorf("failed to decompress %s with zstd:\n%w", rawZstPartitionFilepath, err)
-	}
-
-	// Calculating hashes
-	rawPartitionFileHash, err := file.GenerateSHA256(rawPartitionFilepath)
-	if err != nil {
-		return fmt.Errorf("error: %w", err)
-	}
-	decompressedPartitionFileHash, err := file.GenerateSHA256(decompressedPartitionFilepath)
-	if err != nil {
-		return fmt.Errorf("error: %w", err)
-	}
-
-	// Verifying hashes are equal
-	if rawPartitionFileHash != decompressedPartitionFileHash {
-		return fmt.Errorf("decompressed partition file hash does not match source partition file hash: %s != %s", decompressedPartitionFileHash, rawPartitionFilepath)
-	}
-	logger.Log.Debugf("Decompressed partition file hash matches source partition file hash!")
-
-	// Removing decompressed file
-	err = os.Remove(decompressedPartitionFilepath)
-	if err != nil {
-		return fmt.Errorf("failed to remove raw file %s:\n%w", decompressedPartitionFilepath, err)
-	}
-
-	return nil
-}
-
-// Verifies that the skippable frame has been correctly prepended to the partition file with the correct data
-func verifySkippableFrameMetadataFromFile(partitionFilepath string, magicNumber uint32, frameSize uint32, skippableFrameMetadata [SkippableFrameSize]byte) (err error) {
-	// Read existing data from the partition file.
-	existingData, err := os.ReadFile(partitionFilepath)
-	if err != nil {
-		return fmt.Errorf("failed to read partition file %s:\n%w", partitionFilepath, err)
-	}
-
-	// verify that the skippable frame has been prepended to the partition file by validating magicNumber
-	var magicNumberByteArray [4]byte
-	binary.LittleEndian.PutUint32(magicNumberByteArray[:], magicNumber)
-	if !bytes.Equal(existingData[0:4], magicNumberByteArray[:]) {
-		return fmt.Errorf("skippable frame has not been prepended to the partition file:\n %d != %d", existingData[0:4], magicNumberByteArray[:])
-	}
-	logger.Log.Infof("Skippable frame had been correctly prepended to the partition file...")
-
-	// verify that the skippable frame has the correct frame size by validating frameSize
-	var frameSizeByteArray [4]byte
-	binary.LittleEndian.PutUint32(frameSizeByteArray[:], frameSize)
-	if !bytes.Equal(existingData[4:8], frameSizeByteArray[:]) {
-		return fmt.Errorf("skippable frame frameSize field does not match the defined frameSize:\n %d != %d", existingData[4:8], frameSizeByteArray[:])
-	}
-	logger.Log.Infof("Skippable frame frameSize field is correct...")
-
-	// verify that the skippable frame has the correct inserted metadata by validating skippableFrameMetadata
-	if !bytes.Equal(existingData[8:8+frameSize], skippableFrameMetadata[:]) {
-		return fmt.Errorf("skippable frame metadata does not match the inserted metadata:\n %d != %d", existingData[8:8+frameSize], skippableFrameMetadata[:])
-	}
-	logger.Log.Infof("Skippable frame is valid and contains the correct metadata!")
-
-	return nil
 }
