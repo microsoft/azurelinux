@@ -73,8 +73,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_mandir}/man1/*
 
 %changelog
-* Fri Mar 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.4-1
+* Fri Mar 08 2024 Archana Choudhary <archana1@microsoft.com> - 1.5.4-1
 - Auto-upgrade to 1.5.4 - CVE-2022-4899
+- License verified
 
 * Tue Oct 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
 - Upgrade to latest upstream version
