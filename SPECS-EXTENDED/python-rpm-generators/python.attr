@@ -1,4 +1,0 @@
-%__python_provides	%{_rpmconfigdir}/pythondeps.sh --provides
-%__python_requires	%{_rpmconfigdir}/pythondeps.sh --requires
-%__python_path	^((/usr/lib(64)?/python[[:digit:]]\\.[[:digit:]]+/.*\\.(py[oc]?|so))|(^%{_bindir}/python[[:digit:]]\\.[[:digit:]]+))$
-%__python_magic		[Pp]ython.*(executable|byte-compiled)

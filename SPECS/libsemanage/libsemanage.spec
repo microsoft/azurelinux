@@ -102,14 +102,12 @@ ln -sf  %{_libdir}/libsemanage.so.2 %{buildroot}/%{_libdir}/libsemanage.so
 %files python3
 %{python3_sitelib}/*.so
 %{python3_sitelib}/semanage.py*
+%{python3_sitelib}/__pycache__/semanage.cpython*.pyc
 %{_libexecdir}/selinux/semanage_migrate_store
 
 %changelog
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
 - Upgrade to version 3.6
-
-* Mon Feb 12 2024 Andrew Phelps <anphel@microsoft.com> - 3.5-2
-- Fix build with python 3.12
 
 * Fri Nov 24 2023 Andrew Phelps <anphel@microsoft.com> - 3.5-1
 - Upgrade to version 3.5

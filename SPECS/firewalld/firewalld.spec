@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        2.0.2
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -241,15 +241,25 @@ fi
 
 %files -n python3-firewall
 %attr(0755,root,root) %dir %{python3_sitelib}/firewall
+%attr(0755,root,root) %dir %{python3_sitelib}/firewall/__pycache__
 %attr(0755,root,root) %dir %{python3_sitelib}/firewall/config
+%attr(0755,root,root) %dir %{python3_sitelib}/firewall/config/__pycache__
 %attr(0755,root,root) %dir %{python3_sitelib}/firewall/core
+%attr(0755,root,root) %dir %{python3_sitelib}/firewall/core/__pycache__
 %attr(0755,root,root) %dir %{python3_sitelib}/firewall/core/io
+%attr(0755,root,root) %dir %{python3_sitelib}/firewall/core/io/__pycache__
 %attr(0755,root,root) %dir %{python3_sitelib}/firewall/server
-%{python3_sitelib}/firewall/*.py
-%{python3_sitelib}/firewall/config/*.py
-%{python3_sitelib}/firewall/core/*.py
-%{python3_sitelib}/firewall/core/io/*.py
-%{python3_sitelib}/firewall/server/*.py
+%attr(0755,root,root) %dir %{python3_sitelib}/firewall/server/__pycache__
+%{python3_sitelib}/firewall/__pycache__/*.py*
+%{python3_sitelib}/firewall/*.py*
+%{python3_sitelib}/firewall/config/*.py*
+%{python3_sitelib}/firewall/config/__pycache__/*.py*
+%{python3_sitelib}/firewall/core/*.py*
+%{python3_sitelib}/firewall/core/__pycache__/*.py*
+%{python3_sitelib}/firewall/core/io/*.py*
+%{python3_sitelib}/firewall/core/io/__pycache__/*.py*
+%{python3_sitelib}/firewall/server/*.py*
+%{python3_sitelib}/firewall/server/__pycache__/*.py*
 
 %files -n firewalld-filesystem
 %dir %{_libdir}/firewalld
@@ -294,9 +304,6 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
-* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.0.2-3
-- Remove pycache files to fix build with python 3.12
-
 * Sun Feb 04 2024 Dan Streetman <ddstreet@ieee.org> - 2.0.2-2
 - workaround "circular dependencies" from build tooling
 

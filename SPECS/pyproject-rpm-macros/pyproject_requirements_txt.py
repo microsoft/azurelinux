@@ -98,6 +98,4 @@ def expand_env_vars(lines):
             return match['var']
         return value
     for line in lines:
-        if match := ENV_VAR_RE.search(line):
-            var = match['var']
         yield ENV_VAR_RE.sub(repl, line)

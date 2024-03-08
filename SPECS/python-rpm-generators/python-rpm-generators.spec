@@ -1,23 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-# Disable automatic bytecompilation. We install only one script and we will
-# never "import" it.
-%undefine py_auto_byte_compile
-
 Name:           python-rpm-generators
 Summary:        Dependency generators for Python RPMs
-Version:        10
-Release:        5%{?dist}
-
-# Originally all those files were part of RPM, so license is kept here
-License:        GPLv2+
+Version:        14
+Release:        11%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Group:          Applications/System
+# See individual licenses above Source declarations
+# Originally, this was simplified to GPL-2.0-or-later, but "effective license" analysis is no longer allowed
+License:        GPL-2.0-or-later AND LGPL-2.1-or-later AND (LicenseRef-Fedora-Public-Domain OR LGPL-2.1-or-later OR GPL-2.0-or-later)
 Url:            https://src.fedoraproject.org/python-rpm-generators
-# Commit is the last change in following files
+
+# Originally the following files were part of RPM, so the license is inherited: GPL-2.0-or-later
+# The COPYING file is grabbed from the last commit that changed the files
 Source0:        https://raw.githubusercontent.com/rpm-software-management/rpm/102eab50b3d0d6546dfe082eac0ade21e6b3dbf1/COPYING
-Source1:        python.attr
-Source2:        pythondist.attr
-Source3:        pythondeps.sh
-Source4:        pythondistdeps.py
+Source1:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/python.attr
+Source2:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythondist.attr
+# This was crafted in-place as a fork of python.attr, hence also GPL-2.0-or-later
+Source3:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythonname.attr
+# This one is also originally from RPM, but it has its own license declaration: LGPL-2.1-or-later
+Source4:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythondistdeps.py
+# This was crafted in-place with the following license declaration:
+#  LicenseRef-Fedora-Public-Domain OR CC0-1.0 OR LGPL-2.1-or-later OR GPL-2.0-or-later
+# Note that CC0-1.0 is not allowed for code in Fedora, so we skip it in the package License tag
+Source5:        https://src.fedoraproject.org/rpms/python-rpm-generators/blob/f40/f/pythonbundles.py
 
 BuildArch:      noarch
 
@@ -26,11 +31,10 @@ BuildArch:      noarch
 
 %package -n python3-rpm-generators
 Summary:        %{summary}
-Requires:       python3-setuptools
-# The point of split
-Conflicts:      rpm-build < 4.13.0.1-2
-# Breaking change, change a way how depgen is enabled
-Conflicts:      python-rpm-macros < 3-35
+Requires:       python3-packaging
+Requires:       rpm
+# This contains the Lua functions we use. (Provided by azurelinux-rpm-macros)
+Requires:       python-srpm-macros
 
 %description -n python3-rpm-generators
 %{summary}.
@@ -40,17 +44,23 @@ Conflicts:      python-rpm-macros < 3-35
 cp -a %{sources} .
 
 %install
-install -Dpm0644 -t %{buildroot}%{_fileattrsdir} python.attr pythondist.attr
-install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} pythondeps.sh pythondistdeps.py
+install -Dpm0644 -t %{buildroot}%{_fileattrsdir} *.attr
+install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} *.py
 
 %files -n python3-rpm-generators
 %license COPYING
 %{_fileattrsdir}/python.attr
 %{_fileattrsdir}/pythondist.attr
-%{_rpmconfigdir}/pythondeps.sh
+%{_fileattrsdir}/pythonname.attr
 %{_rpmconfigdir}/pythondistdeps.py
+%{_rpmconfigdir}/pythonbundles.py
 
 %changelog
+* Mon Mar 04 2024 Andrew Phelps <anphel@microsoft.com> - 14-11
+- Promote from SPECS-EXTENDED to SPECS
+- Refresh from Fedora 40 (license: MIT)
+- License verified
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 10-5
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 

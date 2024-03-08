@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "COPYING": "437cfdada284e3c10e7439cdbd0c3180d897f5a218cf156ebfcd170df40b3bc9",
-  "python.attr": "fcd501d30f69ef4af47b2597d25f5339aa62d0947dfc31806fd6997f9241717a",
-  "pythondeps.sh": "1cc7665252eb845c7e4741ff3e832c78f54ffb05552f1cdb2d43d2c0cbf7c07d",
-  "pythondist.attr": "96e85d1b28dac793a030bf7c0c82b9439b46d8559c4fcda9031217dc65d9ada8",
-  "pythondistdeps.py": "b74afcae87b989ded5ce10dfa65bcb1f56630d07dbe670592e1205d5c2bf0ef8"
- }
-}

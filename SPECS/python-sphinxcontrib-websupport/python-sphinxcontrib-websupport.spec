@@ -6,7 +6,7 @@
 Summary:        Python API to integrate Sphinx into a web application
 Name:           python-%{pypi_name}
 Version:        1.2.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
