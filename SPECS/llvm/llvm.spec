@@ -97,7 +97,7 @@ ninja check-all
 %{_datadir}/opt-viewer/optpmap.py
 %{_datadir}/opt-viewer/optrecord.py
 %{_datadir}/opt-viewer/style.css
-.
+
 %files devel
 %{_libdir}/*.a
 %{_libdir}/cmake/*
