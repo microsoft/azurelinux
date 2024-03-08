@@ -1,11 +1,11 @@
 %define jsonpointer_min_ver 1.9
 Summary:        Applying JSON Patches in Python
 Name:           python-jsonpatch
-Version:        1.32
+Version:        1.33
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/jsonpatch
 Source0:        https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v%{version}.tar.gz#/python-json-patch-%{version}.tar.gz
@@ -40,7 +40,7 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 
 %files -n python3-jsonpatch
 %defattr(-,root,root)
-%license COPYING
+%license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/jsondiff
 %{_bindir}/jsondiff3
@@ -48,6 +48,10 @@ ln -s jsonpatch %{buildroot}%{_bindir}/jsonpatch3
 %{_bindir}/jsonpatch3
 
 %changelog
+* Mon Feb 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.33-1
+- Auto-upgrade to 1.33 - Azure Linux 3.0 - package upgrades
+- Replace COPYING with LICENSE
+
 * Thu Feb 10 2022 Thomas Crain <thcrain@microsoft.com> - 1.32-1
 - Upgrade to latest upstream version
 - Use github source tarball

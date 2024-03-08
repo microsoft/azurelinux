@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
 %global _python_bytecompile_extra 1
@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 
 # Test dependencies break the package build.
 # Disabling until fixed.
-# %if %{with_check}
+# %if 0%{?with_check}
 # BuildRequires:  libappstream-glib
 # BuildRequires:  desktop-file-utils
 # BuildRequires:  python3-mock

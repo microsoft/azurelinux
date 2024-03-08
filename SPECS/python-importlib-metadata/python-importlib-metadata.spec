@@ -1,10 +1,10 @@
 Summary:        Library to access the metadata for a Python package
 Name:           python-importlib-metadata
 Version:        6.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://importlib-metadata.readthedocs.io/
 Source0:        https://files.pythonhosted.org/packages/33/44/ae06b446b8d8263d712a211e959212083a5eda2bf36d57ca7415e03f6f36/importlib_metadata-%{version}.tar.gz
 
@@ -14,8 +14,9 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools_scm
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
@@ -70,6 +71,9 @@ rm -rf .pyproject-builddir
 %doc README.rst
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 6.8.0-2
+- Add BR for python-setuptools_scm
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.8.0-1
 - Auto-upgrade to 6.8.0 - Azure Linux 3.0 - package upgrades
 

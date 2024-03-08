@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global opt %(test -x %{_bindir}/ocamlopt && echo 1 || echo 0)
 %global debug_package %{nil}
 
@@ -7,7 +7,7 @@ Distribution:   Mariner
 
 Name:           ocaml-xml-light
 Version:        2.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
 License:        LGPLv2.1
@@ -25,7 +25,7 @@ URL:            http://tech.motion-twin.com/xmllight.html
 #       cd ocamllibs/xml-light/
 #       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
 #         (where NNN is the svnrev above)
-Source0:        %{_mariner_sources_url}/xml-light-%{svnrev}.tar.gz
+Source0:        %{_distro_sources_url}/xml-light-%{svnrev}.tar.gz
 Source1:        LICENSE.PTR
 
 BuildRequires:  ocaml >= 4.00.1
@@ -107,6 +107,9 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 %{_libdir}/ocaml/xml-light/*.mli
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3-2
 - Updated source URL.
 - Improved formatting.

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package objectweb-anttask
 #
@@ -20,12 +20,12 @@ Distribution:   Mariner
 
 Name:           objectweb-anttask
 Version:        1.2
-Release:        266%{?dist}
+Release:        267%{?dist}
 Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
 Url:            http://forge.objectweb.org/projects/monolog/
-Source0:        %{_mariner_sources_url}/ow_util_ant_tasks_1.2.zip
+Source0:        %{_distro_sources_url}/ow_util_ant_tasks_1.2.zip
 Source1:        %{name}-LICENSE.txt
 Patch1:         objectweb-anttask-ant17.patch
 Patch2:         objectweb-anttask-java5.patch
@@ -42,8 +42,8 @@ ObjectWeb Ant task
 
 %prep
 %setup -q -c -n %{name}
-%patch1
-%patch2 -p1
+%patch 1
+%patch 2 -p1
 find . -name "*.class" -exec rm {} \;
 find . -name "*.jar" -exec rm {} \;
 
@@ -69,6 +69,9 @@ popd
 %{_javadir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-267
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.2-266
 - Updated source URL.
 

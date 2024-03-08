@@ -11,8 +11,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 )
 
 const (
@@ -47,7 +45,7 @@ var (
 func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpartitionSettings []PartitionSetting, err error) {
 	file, err := os.Open(partitionFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
+		err = fmt.Errorf("failed to open file (%s)", partitionFile)
 		return
 	}
 	defer file.Close()
@@ -55,13 +53,13 @@ func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpa
 	// Check if the file is empty
 	_, err = file.Stat()
 	if err != nil {
-		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
+		err = fmt.Errorf("empty partition file (%s)", partitionFile)
 		return
 	}
 
 	err = initializePrerequisitesForParser()
 	if err != nil {
-		logger.Log.Errorf("Error initialzing parameters of the parser (%s)", err)
+		err = fmt.Errorf("failed to initialize parameters of the parser:\n%w", err)
 		return
 	}
 

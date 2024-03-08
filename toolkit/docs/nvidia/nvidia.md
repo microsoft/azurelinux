@@ -1,7 +1,7 @@
 # Nvidia Repository Configuration
 
 ## Overview
-The following documentation describes how to access CBL-Mariner packages from the NVIDIA RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/nvidia/)
+The following documentation describes how to access Azure Linux packages from the NVIDIA RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/nvidia/)
 
 ## Licensing
 The software in the NVIDIA RPM repository is subject to the following:

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package gnu-getopt
 #
@@ -55,7 +55,7 @@ classes.
 
 %prep
 %setup -q -c
-%patch0
+%patch 0
 mv gnu/getopt/buildx.xml build.xml
 
 %build

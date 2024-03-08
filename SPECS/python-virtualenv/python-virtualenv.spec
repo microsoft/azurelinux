@@ -1,10 +1,10 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -20,13 +20,13 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
 Requires:       python3
 Requires:       python3-filelock
-Requires:       python3-platformdirs = 2.0.0
+Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
 Provides:       %{name}-doc = %{version}-%{release}
 
@@ -53,6 +53,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 20.14.0-4
+- Remove version restriction on python3-platformdirs Requires
+
 * Wed Dec 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 20.14.0-3
 - Add missing runtime dependencies
 

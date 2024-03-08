@@ -4,7 +4,7 @@ Version:        0.500002
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CPAN-Changes
 Source0:        https://cpan.metacpan.org/modules/by-module/CPAN/CPAN-Changes-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -30,7 +30,7 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(version) >= 0.99.06
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 # Test Suite
 BuildRequires:  perl(Test::More) >= 0.96
 

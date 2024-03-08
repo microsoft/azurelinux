@@ -2,13 +2,13 @@
 
 Summary:        A libudev binding
 Name:           python-%{srcname}
-Version:        0.22.0
-Release:        3%{?dist}
+Version:        0.24.1
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/pyudev
-Source0:        https://files.pythonhosted.org/packages/72/c8/4660d815a79b1d42c409012aaa10ebd6b07a47529b4cb6880f27a24bd646/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/20/b6/16961ac3575575260c72928f17df9c99c2a696871e486965ec6e2fa2aff4/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -76,6 +76,9 @@ rm -rf pyudev.egg-info
 %exclude %{python3_sitelib}/pyudev/__pycache__/wx.*
 
 %changelog
+* Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 0.24.1-1
+- Upgrade to 0.24.1
+
 * Thu Sep 30 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.22.0-3
 - Breaking circular dependency on 'systemd' by using 'Recommends' instead of 'Requires'.
 

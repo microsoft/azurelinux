@@ -1,9 +1,7 @@
 %global commit0			c26218d9f8afdca44a492a4c3811648bd2880b26
 
 # Disable python2 build by default
-# %bcond python2 0
 %bcond_with python2
-# %bcond python3 1
 %bcond_without python3
 
 Summary:        iSCSI daemon and utility programs
@@ -12,7 +10,7 @@ Version:        2.1.9
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.open-iscsi.com/
 Source0:        https://github.com/open-iscsi/open-iscsi/archive/%{commit0}.tar.gz#/open-iscsi-%{version}-%{commit0}.tar.gz
 Source4:        04-iscsi
@@ -47,6 +45,7 @@ BuildRequires: flex bison doxygen kmod-devel systemd-units
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel
 BuildRequires: isns-utils-devel
 BuildRequires: systemd-devel
+BuildRequires: libselinux-devel
 Requires: %{name}-iscsiuio >= %{version}-%{release}
 %if 0%{?fedora}
 Requires: (fedora-release-common >= 38-0.23 if fedora-release-common)

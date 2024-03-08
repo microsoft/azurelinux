@@ -7,7 +7,7 @@ Release:        2%{?dist}
 # ecb.h:        BSD or GPLv2+
 License:        GPLv3+ AND (BSD OR GPLv2+)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CBOR-XS
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/CBOR-XS-%{version}.tar.gz
 # Use system libecb
@@ -36,7 +36,7 @@ BuildRequires:  perl(URI)
 BuildRequires:  perl(XSLoader)
 BuildRequires:  perl(common::sense)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Math::BigInt::FastCalc)
 %endif

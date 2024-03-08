@@ -3,7 +3,7 @@
 #
 # Dockerfile to build Mariner toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20231004
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20240123
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR
@@ -63,7 +63,7 @@ RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolch
 # Disable downloading from remote sources by default. The 'toolchain-local-wget-list' generated for the above line will download from $(SOURCE_URL)
 # The 'toolchain-remote-wget-list' is still available and can be used as an alternate to $(SOURCE_URL) if desired.
 #RUN wget -nv --no-clobber --timeout=30 --continue --input-file=$LFS/tools/toolchain-remote-wget-list --directory-prefix=$LFS/sources; exit 0
-RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.1.58.1.tar.gz -O kernel-6.1.58.1.tar.gz --directory-prefix=$LFS/sources; exit 0
+RUN wget -nv --no-clobber --timeout=30 --continue https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.14.1.tar.gz -O kernel-6.6.14.1.tar.gz --directory-prefix=$LFS/sources; exit 0
 USER root
 
 RUN mkdir -pv $LFS/{etc,var} $LFS/usr/{bin,lib,sbin} && \
@@ -93,7 +93,6 @@ COPY [ "./.bashrc", \
 USER lfs
 COPY [ "./toolchain_build_temp_tools.sh", \
        "./sanity_check.sh", \
-       "./coreutils-fix-get-sys_getdents-aarch64.patch", \
        "./CVE-2023-4039.patch", \
        "./rpm-define-RPM-LD-FLAGS.patch", \
        "$LFS/tools/" ]

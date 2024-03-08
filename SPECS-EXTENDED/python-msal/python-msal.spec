@@ -7,7 +7,7 @@
 %bcond_with     tests
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Version:        1.18.0~b1
 Name:           python-%{srcname}
 Release:        3%{?dist}
@@ -26,7 +26,7 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(pytest)
 %endif
 

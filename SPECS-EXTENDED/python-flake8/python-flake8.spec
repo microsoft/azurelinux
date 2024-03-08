@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global modname flake8
 
 %global entrypoints_dep >= 0.3
@@ -16,7 +16,7 @@ License:          MIT
 URL:              https://gitlab.com/pycqa/flake8
 Source0:          https://files.pythonhosted.org/packages/source/f/%{modname}/%{modname}-%{version}.tar.gz#/python-%{modname}-%{version}.tar.gz
 BuildArch:        noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:    python3-pip
 %endif
 

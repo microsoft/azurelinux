@@ -3,11 +3,11 @@
 
 Summary:        The libvirt virtualization API python3 binding
 Name:           libvirt-python
-Version:        7.10.0
+Version:        10.0.0
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libvirt.org
 Source0:        https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
 
@@ -59,14 +59,11 @@ find examples -type f -exec chmod 0644 \{\} \;
 %py3_install
 
 %check
-pip3 install \
-    more-itertools \
-    pluggy
-python3 setup.py test
+pip3 install iniconfig
+%pytest
 
 %files -n python3-libvirt
-%license COPYING COPYING.LESSER
-%doc ChangeLog AUTHORS README examples/
+%doc ChangeLog AUTHORS README COPYING examples/
 %{python3_sitearch}/libvirt.py*
 %{python3_sitearch}/libvirtaio.py*
 %{python3_sitearch}/libvirt_qemu.py*
@@ -79,6 +76,9 @@ python3 setup.py test
 %{python3_sitearch}/*egg-info
 
 %changelog
+* Wed Mar 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 10..00-1
+- Upgrade to 10.0.0.
+
 * Wed Jan 05 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.10.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.

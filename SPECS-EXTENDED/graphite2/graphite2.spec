@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           graphite2
 Version:        1.3.14
 Release:        3%{?dist}
@@ -19,7 +19,7 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 
 BuildRequires:  freetype-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

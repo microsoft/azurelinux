@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           gavl
 Version:        1.4.0
 Release:        21%{?dist}
@@ -39,7 +39,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-%patch1 -p1 -b .gdither
+%patch 1 -p1 -b .gdither
 
 #Disable buildtime cpu detection
 sed -i -i 's/LQT_TRY_CFLAGS/dnl LQT_TRY_CFLAGS/g' configure.ac

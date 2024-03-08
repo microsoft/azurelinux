@@ -4,7 +4,7 @@ Version:        1.66
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Pod-Parser
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-%{version}.tar.gz
 BuildArch:      noarch
@@ -26,7 +26,7 @@ BuildRequires:  perl(strict)
 # Symbol not used since perl 5.6
 BuildRequires:  perl(vars)
 # Tests:
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Basename)
 BuildRequires:  perl(FileHandle)
 BuildRequires:  perl(Test)

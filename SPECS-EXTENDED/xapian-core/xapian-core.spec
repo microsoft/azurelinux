@@ -4,7 +4,7 @@ Version:        1.4.20
 Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.xapian.org/
 Source0:        https://www.oligarchy.co.uk/xapian/%{version}/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
@@ -13,7 +13,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  make
 BuildRequires:  zlib-devel
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  valgrind-devel
 %endif
 

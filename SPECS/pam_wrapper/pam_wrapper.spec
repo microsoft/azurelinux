@@ -1,11 +1,11 @@
 Name:           pam_wrapper
 Version:        1.1.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool to test PAM applications and PAM modules
 License:        GPLv3+
 URL:            https://cwrap.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
@@ -59,17 +59,6 @@ License:        GPLv3+
 
 %description -n libpamtest-doc
 Documentation for libpamtest development.
-
-%package -n python3-libpamtest
-Summary:        A python wrapper for libpamtest
-License:        GPLv3+
-Requires:       libpamtest = %{version}-%{release}
-Requires:       pam_wrapper = %{version}-%{release}
-
-%description -n python3-libpamtest
-If you plan to develop python tests for a PAM module you can use this
-library, which simplifies testing of modules. This subpackage includes
-the header files for libpamtest
 
 %prep
 %autosetup -S git
@@ -135,10 +124,10 @@ popd
 %license LICENSE
 %doc obj/doc/html
 
-%files -n python3-libpamtest
-%{python3_sitearch}/pypamtest.so
-
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.1.5-2
+- Temporarily remove python3-libpamtest subpackage, which is not building with python 3.12
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.5-1
 - Auto-upgrade to 1.1.5 - Azure Linux 3.0 - package upgrades
 
@@ -149,7 +138,7 @@ popd
 - Bumping version to 1.1.4.
 - Remove gpg signature verification
 - License verified
- 
+
 * Tue Jun 08 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.3-3
 - Remove python2 macros
 

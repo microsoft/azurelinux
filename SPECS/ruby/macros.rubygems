@@ -187,3 +187,22 @@ EOR\
 echo "$gemspec_remove_file_script" | ruby \
 unset -v gemspec_remove_file_script \
 %{nil}
+
+# Some gems define a signing key and certificate chain in their .gemspec fields.
+# Azure Linux doesn't sign gems and rely on signing whole RPM packages
+# and verifying the hashes of the gem sources instead.
+# This macro stops Ruby from trying to look for the signing key and certificate chain.
+#
+# Arguments:
+# -f <gem_spec> - The path to the <gem_name>.gemspec file.
+#                 Overrides the value from the "%%gem_spec" macro.
+%gemspec_clear_signing(f:) %{expand: \
+%{!-f:
+  %{!?gem_name:
+    %{error:Must set the gemspec path when using the "gemspec_clear_signing" macro. \\
+Either set the "gem_name" macro, or use "%%gemspec_clear_signing" with the "-f <gem_spec>" option.
+    }
+  }
+}
+sed -Ei '/spec.(cert_chain|signing_key)/d' "%{-f*}%{!-f:%{gem_name}.gemspec}"
+}

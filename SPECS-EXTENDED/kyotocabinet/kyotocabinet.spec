@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary:        A straightforward implementation of DBM
 Name:           kyotocabinet
 Version:        1.2.78
@@ -52,9 +52,9 @@ applications that use Kyoto Cabinet.
 
 %prep
 %setup -q
-%patch0 -p1 -b .cflags
-%patch1 -p1 -b .8-byte-atomics
-%patch2 -p1 -b .random-failures
+%patch 0 -p1 -b .cflags
+%patch 1 -p1 -b .8-byte-atomics
+%patch 2 -p1 -b .random-failures
 
 %build
 %configure --disable-opt --enable-lzo --enable-lzma

@@ -5,7 +5,7 @@ Version:        3.0.12
 Release:        13%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/benediktschmitt/py-filelock
 Source0:        https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -47,7 +47,7 @@ the same lock object twice, it will not block.
 %build
 %py3_build
 
-make -C docs html man SPHINXBUILD=sphinx-build3
+make -C docs html man SPHINXBUILD=sphinx-build
 rm docs/build/html/.buildinfo
 
 %install

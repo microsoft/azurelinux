@@ -1,10 +1,10 @@
 Summary:        A library that provides compression and decompression of file formats used by Microsoft
 Name:           libmspack
-Version:        0.10.1alpha
-Release:        2%{?dist}
+Version:        0.11alpha
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.cabextract.org.uk/libmspack/
 Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
@@ -50,6 +50,9 @@ make -k check
 %{_libdir}/*.so
 
 %changelog
+* Wed Feb 28 2024 Himaja Kesari <himajakesari@microsoft.com> - 0.11alpha-1
+- Upgrade to version 0.11alpha
+
 * Thu Feb 10 2022 Muhammad Falak <mwani@microsfot.com> - 0.10.1alpha-2
 - Use `make -k check` to enable ptest
 

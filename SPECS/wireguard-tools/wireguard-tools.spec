@@ -4,7 +4,7 @@ Version:        1.0.20210914
 Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.wireguard.com/
 Source0:        https://git.zx2c4.com/wireguard-tools/snapshot/wireguard-tools-%{version}.tar.xz
 Source1:        %{name}.conf

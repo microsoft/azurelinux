@@ -4,14 +4,14 @@ Version:        1.25.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://c-ares.haxx.se/
 Source0:        https://c-ares.haxx.se/download/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gmock
 BuildRequires:  gmock-devel
 BuildRequires:  gtest
@@ -41,7 +41,7 @@ f=CHANGES ; iconv -f iso-8859-1 -t utf-8 $f -o $f.utf8 ; mv $f.utf8 $f
 autoreconf -if
 %configure --enable-shared \
            --disable-static \
-%if %{with_check}
+%if 0%{?with_check}
 	   --enable-tests \
 %endif
            --disable-dependency-tracking

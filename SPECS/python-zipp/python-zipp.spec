@@ -2,11 +2,11 @@
 
 Summary:        Backport of pathlib-compatible object wrapper for zip files
 Name:           python-%{pypi_name}
-Version:        3.8.0
+Version:        3.17.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/jaraco/zipp
 Source0:        %{pypi_source}
 
@@ -16,8 +16,9 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools_scm
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
@@ -38,10 +39,6 @@ A pathlib-compatible Zipfile object wrapper. A backport of the Path object.
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
-# jaraco.itertools and func_timeout are not available in Fedora yet
-sed -i "/import jaraco.itertools/d" test_zipp.py
-# this sed removes two lines - one import and one decorator
-sed -i "/func_timeout/d" test_zipp.py
 
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -54,16 +51,22 @@ sed -i "/func_timeout/d" test_zipp.py
 %pyproject_save_files %{pypi_name}
 
 %check
-pip3 install more-itertools
+pip3 install more-itertools iniconfig jaraco.itertools jaraco.functools
 rm -rf .pyproject-builddir
-# Skipped test needs jaraco.itertools
-%pytest -k "not test_joinpath_constant_time"
+
+%pytest
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %license LICENSE
 %doc README.rst
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.17.0-2
+- Add BR for python-setuptools_scm
+
+* Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 3.17.0-1
+- Upgrade to 3.17.0
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.8.0-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT).
 - Cleaning-up spec. License verified.

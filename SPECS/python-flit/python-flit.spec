@@ -18,7 +18,7 @@ Release:        1%{?dist}
 # ./flit/upload.py under PSF license
 License:        BSD AND ASL 2.0 AND Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://flit.readthedocs.io/en/latest/
 Source0:        https://github.com/takluyver/flit/archive/%{version}/%{srcname}-%{version}.tar.gz
 # For the tests
@@ -32,7 +32,7 @@ BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 BuildRequires:  python3-tomli
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils

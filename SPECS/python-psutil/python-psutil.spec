@@ -4,14 +4,14 @@ Version:        5.9.7
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/psutil
 Source0:        https://github.com/giampaolo/psutil/archive/release-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # A small number of tests do not reliably run in Mariner chroots- we can skip these tests
 BuildRequires:  gcc
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  coreutils
 BuildRequires:  curl-devel
 BuildRequires:  ncurses-term

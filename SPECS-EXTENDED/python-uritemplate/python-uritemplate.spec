@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global modname uritemplate
 %global altname uritemplate.py
 
@@ -16,7 +16,7 @@ Source0:        https://github.com/sigmavirus24/%{modname}/archive/%{version}/%{
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

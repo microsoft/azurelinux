@@ -1,10 +1,10 @@
 Summary:        Command line tool for updating bootloader configs
 Name:           grubby
 Version:        8.40
-Release:        46%{?dist}
+Release:        47%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rhinstaller/grubby
 # we only pull git snaps at the moment
 # git clone git@github.com:rhinstaller/grubby.git
@@ -38,14 +38,14 @@ BuildRequires:  popt-devel
 BuildRequires:  rpm-devel
 BuildRequires:  sed
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  util-linux-ng
 %endif
 
 Requires:       findutils
 Requires:       grub2-tools
 Requires:       grub2-tools-minimal
-Requires:       installkernel
+Requires:       systemd-udev
 Requires:       util-linux
 
 %description
@@ -68,9 +68,7 @@ users with existing grubby users.
 %install
 %make_install mandir=%{_mandir} sbindir=%{_sbindir} libexecdir=%{_libexecdir}
 
-# Do not supply the default installkernel script from grubby. Instead this
-# script will be supplied from the dedicated installkernel package, which
-# is a package requires for this grubby package.
+# installkernel is provided by systemd-udev
 rm %{buildroot}%{_sbindir}/installkernel
 
 mkdir -p %{buildroot}%{_libexecdir}/{grubby}/ %{buildroot}%{_sbindir}/
@@ -112,6 +110,9 @@ current boot environment.
 %{_mandir}/man8/*.8*
 
 %changelog
+* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 8.40-47
+- use installkernel provided by systemd-udev
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.40-46
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

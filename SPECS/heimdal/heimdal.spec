@@ -15,7 +15,7 @@ Version:        7.8.0
 Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.heimdal.software/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source3:        %{name}.sysconfig

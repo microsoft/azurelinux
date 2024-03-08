@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global gitfullrev 08767aa863cd27d1755ba0aff65b8cc1a0c1446a
 %global gitrev %(c=%{gitfullrev}; echo ${c:0:6})
 Name:           urlview
@@ -23,7 +23,7 @@ view a specific item.
 
 %prep
 %setup -q -n %{name}-%{gitfullrev}
-%patch1 -p1 -b .default
+%patch 1 -p1 -b .default
 
 %build
 %configure

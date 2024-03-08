@@ -1,23 +1,24 @@
+%global sover 12
 
 Name:           kpmcore
-Version:        3.3.0
-Release:        7%{?dist}
+Version:        24.01.95
+Release:        1%{?dist}
 Summary:        Library for managing partitions by KDE programs
 License:        GPLv3+
 URL:            https://github.com/KDE/kpmcore
-#Source0:       http://download.kde.org/stable/%{name}/%{version}/src/%{name}-%{version}.tar.xz
-Source0:        %{name}-%{version}.tar.xz
+Source0:        https://github.com/KDE/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules
 BuildRequires:  gettext
-BuildRequires:  kf5-kcoreaddons-devel
-BuildRequires:  kf5-ki18n-devel
-BuildRequires:  kf5-kwidgetsaddons-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  kf5-rpm-macros
+BuildRequires:  kf-kcoreaddons-devel
+BuildRequires:  kf-ki18n-devel
+BuildRequires:  kf-kwidgetsaddons-devel
+BuildRequires:  kf-rpm-macros
+BuildRequires:  qtbase-devel
+BuildRequires:  polkit-qt6-1-devel
 
 BuildRequires:  util-linux-devel
 BuildRequires:  libatasmart-devel
@@ -26,7 +27,7 @@ BuildRequires:  parted
 
 Requires:       parted
 Requires:       e2fsprogs
-Requires:       kf5-filesystem
+Requires:       kf-filesystem
 
 %description
 KPMcore contains common code for managing partitions by KDE Partition Manager 
@@ -36,46 +37,46 @@ and other KDE projects
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt5-qtbase-devel
+Requires:       qtbase-devel
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}
 
-
 %prep
-%setup -q
+%autosetup -p1
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%{cmake_kf5} ..
-popd
-
-make %{?_smp_mflags} -C %{_target_platform}
-
+%cmake_kf
+%cmake_build
 
 %install
-make install/fast -C %{_target_platform} DESTDIR=%{buildroot}
-%find_lang %{name} --with-kde
+%cmake_install
+%find_lang %{name}
+%find_lang %{name}._policy_
 
-
-
-%files -f %{name}.lang
-%license COPYING.GPL3
-%{_kf5_libdir}/libkpmcore.so.*
-%{_kf5_qtplugindir}/libpm*.so
-%{_kf5_datadir}/kservices5/pm*backendplugin.desktop
-%{_kf5_datadir}/kservicetypes5/pm*backendplugin.desktop
+%files -f %{name}.lang -f %{name}._policy_.lang
+%license LICENSES/*
+%doc README.md
+%{_kf_libdir}/libkpmcore.so.%{sover}
+%{_kf_libdir}/libkpmcore.so.%{version}
+%{_kf_qtplugindir}/kpmcore
+%{_libexecdir}/kpmcore_externalcommand
+%{_datadir}/dbus-1/system.d/org.kde.kpmcore.*.conf
+%{_datadir}/dbus-1/system-services/org.kde.kpmcore.*.service
+%{_datadir}/polkit-1/actions/org.kde.kpmcore.externalcommand.policy
 
 %files devel
 %{_includedir}/%{name}/
-%{_kf5_libdir}/cmake/KPMcore
-%{_kf5_libdir}/libkpmcore.so
+%{_kf_libdir}/cmake/KPMcore
+%{_kf_libdir}/libkpmcore.so
 
 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 24.01.95-1
+- Upgrade for Azure Linux 3.0
+
 * Mon Nov 28 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.3.0-7
 - License verified.
 

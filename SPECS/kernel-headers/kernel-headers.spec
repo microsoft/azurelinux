@@ -13,11 +13,11 @@
 
 Summary:        Linux API header files
 Name:           kernel-headers
-Version:        6.6.12.1
-Release:        1%{?dist}
+Version:        6.6.14.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
@@ -75,6 +75,24 @@ done
 %endif
 
 %changelog
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
+- Bump release to match kernel
+
+* Tue Feb 27 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
+- Bump release to match kernel
+
+* Thu Feb 22 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Bump release to match kernel
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Bump release to match kernel
+
+* Sat Jan 27 11:16:08 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
+- update to match kernel version
+
 * Fri Jan 26 2024 Rachel Menge <rachelmenge@microsoft.com> - 6.6.12.1-1
 - Upgrade to 6.6.12.1
 

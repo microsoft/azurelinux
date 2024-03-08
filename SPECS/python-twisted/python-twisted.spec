@@ -5,7 +5,7 @@ Version:        22.10.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
 Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.tar.gz
@@ -19,7 +19,7 @@ BuildRequires:  python3-pyOpenSSL
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildRequires:  python3-zope-interface
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  net-tools
 BuildRequires:  sudo

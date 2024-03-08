@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: The libglade library for loading user interfaces
 Name: libglade2
 Version: 2.6.4
@@ -44,8 +44,8 @@ that you can use to develop libglade applications.
 %prep
 %setup -q -n libglade-%{version}
 
-%patch1 -p1 -b .nowarning
-%patch2 -p1 -b .secondary
+%patch 1 -p1 -b .nowarning
+%patch 2 -p1 -b .secondary
 
 %build
 %configure --disable-gtk-doc --disable-static

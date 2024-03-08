@@ -6,7 +6,7 @@ Version:        2.14.19
 Release:        30%{?dist}
 License:        LGPLv2+ AND GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.gnome.org/projects/ORBit2
 Source:         https://download.gnome.org/sources/%{name}/2.14/%{name}-%{version}.tar.gz
 Patch0:         ORBit2-2.14.3-multilib.patch
@@ -23,7 +23,7 @@ BuildRequires:  libIDL-devel >= %{libidl_version}
 BuildRequires:  libtool
 BuildRequires:  make
 BuildRequires:  pkgconfig
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  procps-ng
 %endif
 

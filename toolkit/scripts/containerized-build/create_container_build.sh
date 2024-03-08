@@ -23,12 +23,12 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
 Optional arguments:
-    REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
+    REPO_PATH:      path to the Azure Linux repo root directory. default: "current directory"
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
@@ -78,7 +78,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
-topdir=/usr/src/mariner
+topdir=/usr/src/azl
 enable_local_repo=false
 keep_container="--rm"
 
@@ -136,7 +136,7 @@ lkg_file="${tmp_dir}/lkg-3.0-dev.json"
 if [[ "${version}" == "3.0" ]]; then
     if [[ -z "${DAILY_BUILD_ID}" ]]; then
         echo "Downloading latest daily-repo-id ..."
-        rm ${lkg_file}*
+        rm -f ${lkg_file}*
         wget -nv -P ${tmp_dir} ${lkg_url}
         DAILY_BUILD_ID=$(cat ${lkg_file} | jq -r .date | tr -d '-')
         [[ "$DAILY_BUILD_ID" = "null" ]] && { print_error "Unable to fetch latest daily-repo-id, please provide DAILY_REPO_ID"; exit 1; }
@@ -231,9 +231,9 @@ if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
     cp resources/mariner-3_repo $tmp_dir/mariner-3_repo
     sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/mariner-3_repo
     if [[ $(uname -m) == "x86_64" ]]; then
-        sed -i "s~<ARCH>~amd64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~x86-64~" $tmp_dir/mariner-3_repo
     else
-        sed -i "s~<ARCH>~arm64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~aarch64~" $tmp_dir/mariner-3_repo
     fi
 fi
 

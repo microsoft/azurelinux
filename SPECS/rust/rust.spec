@@ -3,16 +3,16 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0.json" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2023-07-13
-%define stage0_version 1.71.0
+%define release_date 2023-11-16
+%define stage0_version 1.74.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.72.0
-Release:        6%{?dist}
+Version:        1.75.0
+Release:        3%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.rust-lang.org/
 # Notes:
@@ -56,8 +56,8 @@ BuildRequires:  ninja-build
 # make sure rust relies on openssl from CBL-Mariner (instead of using its vendored flavor)
 BuildRequires:  openssl-devel
 BuildRequires:  python3
-%if %{with_check}
-BuildRequires:  glibc-static >= 2.38-1%{?dist}
+%if 0%{?with_check}
+BuildRequires:  glibc-static >= 2.38-2%{?dist}
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
 Requires:       binutils
@@ -111,7 +111,7 @@ sh ./configure \
     --enable-extended \
     --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
     --release-channel="stable" \
-    --release-description="CBL-Mariner %{version}-%{release}"
+    --release-description="Azure Linux %{version}-%{release}"
 
 # SUDO_USER=root bypasses a check in the python bootstrap that
 # makes rust refuse to pull sources from the internet
@@ -123,8 +123,8 @@ USER=root SUDO_USER=root %make_build
 mkdir -p .github/workflows
 ./x.py run src/tools/expand-yaml-anchors
 
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
-ln -s %{_prefix}/src/mariner/BUILD/rustc-%{version}-src/vendor/ /root/vendor
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage2-tools-bin/rustfmt %{_topdir}/BUILD/rustc-%{version}-src/build/x86_64-unknown-linux-gnu/stage0/bin/
+ln -s %{_topdir}/BUILD/rustc-%{version}-src/vendor/ /root/vendor
 # remove rustdoc ui flaky test issue-98690.rs (which is tagged with 'unstable-options')
 rm -v ./tests/rustdoc-ui/issue-98690.*
 %make_build check
@@ -146,7 +146,6 @@ rm %{buildroot}%{_bindir}/*.old
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
-%{_libexecdir}/cargo-credential-1password
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
@@ -168,6 +167,15 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Feb 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.75.0-3
+- Updating naming for 3.0 version of Azure Linux.
+
+* Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.75.0-2
+- updated glibc-static buildrequires release
+
+* Mon Jan 29 2024 Muhammad Falak <mwani@microsoft.com> - 1.75.0-1
+- Bump version to 1.75.0
+
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 1.72.0-6
 - Bump release to rebuild against glibc 2.38-1
 

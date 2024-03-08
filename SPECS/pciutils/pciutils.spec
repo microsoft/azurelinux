@@ -2,11 +2,11 @@
 
 Summary:        System utilities to list pci devices
 Name:           pciutils
-Version:        3.7.0
-Release:        3%{?dist}
+Version:        3.11.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/System Utilities
 URL:            https://mj.ucw.cz/sw/pciutils
 Source0:        https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.gz
@@ -48,6 +48,7 @@ make DESTDIR=%{buildroot} \
 %files
 %doc README ChangeLog pciutils.lsm
 %defattr(-,root,root)
+%{_bindir}/lspci
 %{_sbindir}/*
 %{_datadir}/misc/*
 %{_mandir}/*
@@ -63,6 +64,10 @@ make DESTDIR=%{buildroot} \
 %{_includedir}/*
 
 %changelog
+* Wed Feb 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.11.1-1
+- Upgrade to 3.11.1
+- Package new binary, lspci
+
 * Thu Apr 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 3.7.0-3
 - Do not change libpci.so rights during install
 

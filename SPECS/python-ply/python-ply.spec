@@ -5,7 +5,7 @@ Version:        3.11
 Release:        8%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.dabeaz.com/ply/
 #Source0:       http://www.dabeaz.com/ply/ply-%{version}.tar.gz
@@ -20,7 +20,7 @@ Python Lex & Yacc
 Summary:        Python Lex & Yacc
 BuildRequires:  python3-devel
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-six
 %endif
 

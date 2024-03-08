@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global use_nss 1
 %global mailrc %{_sysconfdir}/mail.rc
 
 Summary: Enhanced implementation of the mailx command
 Name: mailx
 Version: 12.5
-Release: 35%{?dist}
+Release: 36%{?dist}
 # MIT .. base64.c
 # MPLv1.1 .. nss.c, nsserr.c
 # RSA .. md5.h, md5.c
@@ -14,7 +14,7 @@ License: BSD with advertising and MIT and MPLv1.1 and RSA
 URL: http://heirloom.sourceforge.net/mailx.html
 # Mailx's upstream provides only the CVS method of downloading source code.
 # Use get-upstream-tarball.sh script to download current version of mailx.
-Source0: %{_mariner_sources_url}/mailx-%{version}.tar.xz
+Source0: %{_distro_sources_url}/mailx-%{version}.tar.xz
 Source1: get-upstream-tarball.sh
 
 Patch0: nail-11.25-config.patch
@@ -79,21 +79,21 @@ as well as "nail" (the initial name of this project).
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch14 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
+%patch 8 -p1
+%patch 9 -p1
+%patch 10 -p1
+%patch 11 -p1
+%patch 12 -p1
+%patch 13 -p1
+%patch 14 -p1
 sed -i 's,/etc/nail.rc,%{mailrc},g' mailx.1
 
 
@@ -167,6 +167,9 @@ popd
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-36
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 12.5-35
 - Updating source URLs.
 - License verified.

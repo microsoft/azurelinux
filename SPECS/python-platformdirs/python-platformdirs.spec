@@ -1,21 +1,31 @@
+# Disable tests as it requires new package python-exceptiongroup
+%global with_check 0
 %global srcname platformdirs
+%bcond_without tests
 %global common_description %{expand:
 A small Python module for determining appropriate platform-specific dirs, e.g.
 a "user data dir".}
 Summary:        Python module for determining appropriate platform-specific dirs
 Name:           python-%{srcname}
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        4.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/platformdirs/platformdirs
 Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-six
 BuildRequires:  python3-wheel
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-tomli
+BuildRequires:  python3-trove-classifiers
 BuildArch:      noarch
 
 %description %{common_description}
@@ -41,15 +51,24 @@ BuildRequires:  python3-devel
 
 
 %check
-pip3 install tox
-%tox
+%if 0%{?with_check}
+%if %{with tests}
+%pytest
+%else
+%pyproject_check_import
+%endif
+%endif
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
-%license LICENSE.txt
-%doc README.rst CHANGES.rst
+%license %{python3_sitearch}/%{srcname}-%{version}.dist-info/licenses/LICENSE
+%doc README.rst
 
 %changelog
+* Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-1
+- Upgraded to 4.2.0
+- Disable tests as pytest requires new package python-exceptiongroup
+
 * Wed Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Initial CBL-Mariner import from Fedora 33 (license: MIT)
 - License verified.

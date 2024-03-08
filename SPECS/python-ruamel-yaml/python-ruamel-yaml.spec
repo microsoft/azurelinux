@@ -7,7 +7,7 @@ Version:        0.16.6
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pypi.org/project/ruamel.yaml/
 # Repository lives on https://sourceforge.net/projects/ruamel-yaml/; however, the snapshot is an unreliable link
 Source0:        https://files.pythonhosted.org/packages/b3/c3/1bd29f827237b420f4c978716fd9343ba14b1c6746a638dfeb7bbc7adcf9/%{pypi_name}-%{version}.tar.gz
@@ -24,7 +24,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 Requires:       python%{python3_pkgversion}-ruamel-yaml-clib
 Requires:       python%{python3_pkgversion}-setuptools
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

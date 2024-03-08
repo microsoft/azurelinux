@@ -1,12 +1,12 @@
 Summary:    A minimalistic user-space library oriented to Netlink developers.
 Name:       libmnl
-Version:    1.0.4
-Release:        6%{?dist}
+Version:    1.0.5
+Release:        1%{?dist}
 License:    LGPLv2+
 URL:        http://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:     http://netfilter.org/projects/libmnl/files/%{name}-%{version}.tar.bz2
 Obsoletes:  libmnl-static
 
@@ -52,6 +52,9 @@ make %{?_smp_mflags} -k check
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.5-1
+- Auto-upgrade to 1.0.5 - Azure Linux 3.0 Upgrades
+
 * Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.4-6
 - Removing the explicit %%clean stage.
 - License verified.

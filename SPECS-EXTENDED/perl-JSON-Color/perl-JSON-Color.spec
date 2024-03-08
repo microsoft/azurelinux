@@ -6,7 +6,7 @@ Version:        0.133
 Release:        3%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/JSON-Color/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/JSON-Color-%{version}.tar.gz
 BuildArch:      noarch
@@ -34,7 +34,7 @@ BuildRequires:  perl(Role::Tiny)
 BuildRequires:  perl(Term::ANSIColor) >= 3.00
 BuildRequires:  perl(parent)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)

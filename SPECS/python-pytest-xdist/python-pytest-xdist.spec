@@ -15,13 +15,13 @@ The pytest-xdist plugin extends py.test with some unique test execution modes:
 
 Summary:        py.test plugin for distributed testing and loop-on-failing modes
 Name:           python-%{pypi_name}
-Version:        2.5.0
+Version:        3.5.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pytest-dev/pytest-xdist
-Source0:        https://files.pythonhosted.org/packages/5d/43/9dbc32d297d6eae85d6c05dc8e8d3371061bd6cbe56a2f645d9ea4b53d9b/%{pypi_name}-%{version}.tar.gz
+Source0:        https://github.com/pytest-dev/%{pypi_name}/releases/download/v%{version}/%{pypi_name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -44,14 +44,16 @@ Requires:       python3-py
 
 %description -n python3-%{pypi_name} %{_description}
 
+%pyproject_extras_subpkg -n python3-%{pypi_name} psutil setproctitle
+
 %prep
 %autosetup -n %{pypi_name}-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %check
 # Skip test_warning_captured_deprecated_in_pytest_6
@@ -75,6 +77,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/xdist/
 
 %changelog
+* Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 5.5.0-1
+- Updating to version 3.5.0.
+
 * Fri Mar 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.5.0-1
 - Updating to version 2.5.0.
 

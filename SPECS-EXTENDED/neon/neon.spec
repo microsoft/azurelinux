@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %bcond_without tests
 
 Summary: An HTTP and WebDAV client library
@@ -38,7 +38,7 @@ The development library for the C language HTTP and WebDAV client library.
 
 %prep
 %setup -q
-%patch0 -p1 -b .multilib
+%patch 0 -p1 -b .multilib
 
 # prevent installation of HTML docs
 sed -ibak '/^install-docs/s/install-html//' Makefile.in

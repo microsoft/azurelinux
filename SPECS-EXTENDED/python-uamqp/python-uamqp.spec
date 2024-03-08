@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname uamqp
 %global _description %{expand:An AMQP 1.0 client library for Python.}
 
@@ -21,7 +21,7 @@ BuildRequires:  python3-devel
 BuildRequires:  %{py3_dist cython}
 BuildRequires:  %{py3_dist setuptools}
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{py3_dist certifi}
 BuildRequires:  %{py3_dist pytest-asyncio}
 BuildRequires:  python3-pip

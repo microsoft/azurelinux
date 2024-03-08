@@ -3,10 +3,10 @@
 Summary:        Mozilla's JavaScript engine.
 Name:           mozjs
 Version:        78.10.0
-Release:        6%{?dist}
+Release:        5%{?dist}
 License:        BSD AND MIT AND MPLv2.0 AND Unicode
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey
 Source0:        https://ftp.mozilla.org/pub/firefox/releases/%{version}esr/source/firefox-%{version}esr.source.tar.xz
@@ -18,7 +18,7 @@ Patch3:         spidermonkey_checks_disable.patch
 Patch4:         fix-soname.patch
 Patch5:         CVE-2022-48285.patch
 
-BuildRequires:  autoconf
+BuildRequires:  autoconf213
 BuildRequires:  gcc
 BuildRequires:  icu-devel
 BuildRequires:  llvm
@@ -30,7 +30,7 @@ BuildRequires:  rust
 BuildRequires:  which
 BuildRequires:  zlib-devel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-six
 %endif
 
@@ -68,7 +68,7 @@ cd js/src
     --with-system-icu \
     --enable-readline \
     --disable-jemalloc \
-%if %{with_check}
+%if 0%{?with_check}
     --enable-tests \
 %else
     --disable-tests \
@@ -128,9 +128,6 @@ fi
 %{_libdir}/pkgconfig/mozjs-%{major}.pc
 
 %changelog
-* Mon Oct 23 2023 Andrew Phelps <anphel@microsoft.com> - 78.10.0-6
-- Replace BR for autoconf213 with autoconf
-
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 78.10.0-5
 - Bump package to rebuild with rust 1.72.0
 

@@ -1,17 +1,23 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
-Version:        3.5
+Version:        3.6
 Release:        1%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  libsepol-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  swig
-Requires:       pcre-libs
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+# python3-wheel (non-toolchain package) cannot be added as a BR to libselinux (since it is a toolchain package)
+# The raw toolchain environment does already provide python3-wheel
+#BuildRequires:  python3-wheel
+Requires:       pcre2
 Requires:       libsepol
 
 %description
@@ -89,8 +95,6 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 %{_sbindir}/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
-%{_mandir}/ru/man5/*
-%{_mandir}/ru/man8/*
 
 %files devel
 %defattr(-,root,root,-)
@@ -106,12 +110,17 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
+- Upgrade to version 3.6
+- Build against pcre2
+- Include python dependencies
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5-1
 - Auto-upgrade to 3.5 - Azure Linux 3.0 - package upgrades
 
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
-- Add -fno-semantic-interposition to CFLAGS as recommended by upstream 
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - License verified
 - Remove manual pkgconfig provides
 - Update source URL to new format

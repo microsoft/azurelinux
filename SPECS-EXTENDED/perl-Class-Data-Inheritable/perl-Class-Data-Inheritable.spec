@@ -7,16 +7,16 @@
 
 Name:           perl-Class-Data-Inheritable
 Version:        0.08
-Release:        36%{?dist}
+Release:        37%{?dist}
 Summary:        Inheritable, overridable class data
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Data-Inheritable
 # has non-free and outdated jp docs
 # rm -rf doc
 # Source0:      https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-%%{version}.tar.gz
-Source0:        %{_mariner_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
+Source0:        %{_distro_sources_url}/Class-Data-Inheritable-%{version}-clean.tar.gz
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -66,6 +66,9 @@ make test
 %{_mandir}/man3/Class::Data::Inheritable.3pm*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.08-37
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.08-36
 - Updated source URL.
 - License verified.

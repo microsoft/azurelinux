@@ -2,12 +2,12 @@
 %global gem_name minitest
 Summary:        Minitest provides a complete suite of testing facilities
 Name:           rubygem-%{gem_name}
-Version:        5.15.0
-Release:        2%{?dist}
+Version:        5.19.0
+Release:        1%{?dist}
 # minitest source is licensed under MIT and minitest.gemspec is taken from ruby source, licensed under the rest
 License:        MIT AND (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/seattlerb/minitest
 Source0:        https://github.com/minitest/minitest/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
@@ -53,6 +53,9 @@ cp README.rdoc %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.19.0-1
+- Auto-upgrade to 5.19.0 - azl3.0
+
 * Mon Oct 24 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.0-2
 - Adding 'Obsoletes: ruby <= 3.1.2-2'.
 

@@ -43,7 +43,7 @@ Release:        2%{?dist}
 # Zend/asm is Boost
 License:        PHP AND Zend AND BSD AND MIT AND ASL 1.0 AND NCSA AND Boost
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.php.net/
 Source0:        https://www.php.net/distributions/php-%{version}.tar.xz
 Source1:        php.conf
@@ -699,25 +699,25 @@ in pure PHP.
 %prep
 %setup -q
 
-%patch1 -p1 -b .mpmcheck
-%patch5 -p1 -b .includedir
-%patch6 -p1 -b .embed
-%patch8 -p1 -b .libdb
+%patch 1 -p1 -b .mpmcheck
+%patch 5 -p1 -b .includedir
+%patch 6 -p1 -b .embed
+%patch 8 -p1 -b .libdb
 
-%patch41 -p1 -b .syslib
-%patch42 -p1 -b .systzdata
-%patch43 -p1 -b .headers
+%patch 41 -p1 -b .syslib
+%patch 42 -p1 -b .systzdata
+%patch 43 -p1 -b .headers
 
-%patch45 -p1 -b .ldap_r
+%patch 45 -p1 -b .ldap_r
 
-%patch47 -p1 -b .phpinfo
+%patch 47 -p1 -b .phpinfo
 
 # upstream patches
 
 # security patches
 
 # Fixes for tests
-%patch300 -p1 -b .datetests
+%patch 300 -p1 -b .datetests
 
 
 # Prevent %%doc confusion over LICENSE files

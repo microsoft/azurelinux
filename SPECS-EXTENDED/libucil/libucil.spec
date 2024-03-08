@@ -1,12 +1,12 @@
 Summary:        Library to render text and graphic overlays onto video images
 Name:           libucil
 Version:        0.9.10
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.unicap-imaging.org/
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # check return value of theora_encode_init() (#627890)
 Patch0:         libucil-0.9.8-bz627890.patch
 # fix some memory leaks
@@ -82,6 +82,9 @@ rm -f %{buildroot}%{_libdir}/%{name}.{a,la}
 %exclude %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.10-23
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.10-22
 - Configure with 'disable-gtk-doc'
 - Switch to `%autosetup`

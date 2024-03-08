@@ -4,7 +4,7 @@ Version:        0.3.9
 Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/libgovirt
 Source0:        https://download.gnome.org/sources/libgovirt/0.3/%{name}-%{version}.tar.xz
 Patch1:         0001-Fix-i18n-generation.patch
@@ -12,7 +12,7 @@ BuildRequires:  meson
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(rest-1.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  dconf
 BuildRequires:  glib-networking
 %endif

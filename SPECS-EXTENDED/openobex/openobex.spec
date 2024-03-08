@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global udevdir %{_prefix}/lib/udev
 
 Summary: Library for using OBEX
@@ -45,10 +45,10 @@ calendar entries (vCal) and business cards (vCard) using the OBEX protocol.
 
 %prep
 %setup -q -n %{name}-%{version}-Source
-%patch0 -p1 -b .flush
-%patch1 -p1 -b .push
-%patch2 -p1 -b .udev
-%patch3 -p1 -b .strtoul
+%patch 0 -p1 -b .flush
+%patch 1 -p1 -b .push
+%patch 2 -p1 -b .udev
+%patch 3 -p1 -b .strtoul
 
 %build
 export CFLAGS="%{optflags} -std=gnu99 -D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE"

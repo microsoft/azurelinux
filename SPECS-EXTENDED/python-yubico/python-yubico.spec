@@ -1,7 +1,7 @@
 %global srcname yubico
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{srcname}
 Version:        1.3.3
 Release:        9%{?dist}

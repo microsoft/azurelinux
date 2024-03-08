@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global modname mutagen
 # Share doc between python2- and python3-
 %global _docdir_fmt %{name}
@@ -15,7 +15,7 @@ Source0:        %{url}/releases/download/release-%{version}/%{modname}-%{version
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

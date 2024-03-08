@@ -10,7 +10,7 @@ Version:        1.6.21
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.memcached.org/
 Source0:        https://www.memcached.org/files/%{name}-%{version}.tar.gz
 Source1:        memcached.sysconfig
@@ -18,7 +18,7 @@ Patch0:         memcached-unit.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl-generators
 BuildRequires:  perl(IO::Socket::SSL)
 BuildRequires:  perl(Test::Harness)

@@ -10,11 +10,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
@@ -69,8 +69,9 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	// Check if the dracut module configuration file already exists.
 	if _, err := os.Stat(dracutConfigFile); os.IsNotExist(err) {
 		lines := []string{
-			"add_dracutmodules+=\"" + dracutModuleName + "\"",
-			"add_drivers+=\"" + dracutDriverName + "\"",
+			// Add white spaces on both sides for dracut config syntax.
+			"add_dracutmodules+=\" " + dracutModuleName + " \"",
+			"add_drivers+=\" " + dracutDriverName + " \"",
 		}
 		err = file.WriteLines(lines, dracutConfigFile)
 		if err != nil {

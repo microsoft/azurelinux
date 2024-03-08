@@ -1,11 +1,11 @@
 Summary:        A fast and lightweight key/value database library by Google
 Name:           leveldb
 Version:        1.23
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/google/leveldb
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # leveldb git repo contains submodules that must be part of source tarball (adapt version number)
 # 1) clone git repo                           => 'git clone https://github.com/google/leveldb.git'
@@ -69,7 +69,7 @@ Libs: -l%{name}
 EOF
 
 %build
-%cmake
+%cmake -DCMAKE_CXX_STANDARD=14
 %make_build
 
 %install
@@ -102,7 +102,10 @@ ctest -V %{?_smp_mflags}
 %{_libdir}/cmake/%{name}/
 
 %changelog
-* Thu Apr 06 2023 Bala <balakumaran.kannan@microsoft.com> 1.23.3
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 1.23.3-4
+- Fix build by forcing C++ 14 standard
+
+* Thu Apr 06 2023 Bala <balakumaran.kannan@microsoft.com> 1.23.3-3
 - Remove __cmake_in_source_build macro undefine to match make_build with cmake
 
 * Wed Mar 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> 1.23-2

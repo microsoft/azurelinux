@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # package options
 %global with_tls	yes
 %global with_sasl2	yes
@@ -185,31 +185,31 @@ This package includes the milter shared library.
 %prep
 %setup -q
 
-%patch3 -p1 -b .makemapman
-%patch4 -p1 -b .smrsh_paths
-%patch7 -p1 -b .pid
-%patch10 -p1 -b .manpage
-%patch11 -p1 -b .dynamic
-%patch12 -p1 -b .cyrus
-%patch13 -p1 -b .aliases_dir
-%patch14 -p1 -b .vacation
-%patch15 -p1 -b .noversion
-%patch16 -p1 -b .localdomain
+%patch 3 -p1 -b .makemapman
+%patch 4 -p1 -b .smrsh_paths
+%patch 7 -p1 -b .pid
+%patch 10 -p1 -b .manpage
+%patch 11 -p1 -b .dynamic
+%patch 12 -p1 -b .cyrus
+%patch 13 -p1 -b .aliases_dir
+%patch 14 -p1 -b .vacation
+%patch 15 -p1 -b .noversion
+%patch 16 -p1 -b .localdomain
 
 cp devtools/M4/UNIX/{,shared}library.m4
-%patch17 -p1 -b .sharedmilter
+%patch 17 -p1 -b .sharedmilter
 
-%patch18 -p1 -b .switchfile
-%patch23 -p1 -b .sasl2-in-etc
-%patch25 -p1 -b .qos
-%patch26 -p1 -b .libmilter-socket-activation
-%patch27 -p1 -b .smtp-session-reuse-fix
-%patch28 -p1 -b .openssl-1.1.0-fix
-%patch29 -p1 -b .format-security
-%patch30 -p1 -b .openssl-1.1.0-ecdhe-fix
-%patch31 -p1 -b .gethostbyname2
-%patch32 -p1 -b .fix-covscan-issues
-%patch33 -p1 -b .gcc-10-fix
+%patch 18 -p1 -b .switchfile
+%patch 23 -p1 -b .sasl2-in-etc
+%patch 25 -p1 -b .qos
+%patch 26 -p1 -b .libmilter-socket-activation
+%patch 27 -p1 -b .smtp-session-reuse-fix
+%patch 28 -p1 -b .openssl-1.1.0-fix
+%patch 29 -p1 -b .format-security
+%patch 30 -p1 -b .openssl-1.1.0-ecdhe-fix
+%patch 31 -p1 -b .gethostbyname2
+%patch 32 -p1 -b .fix-covscan-issues
+%patch 33 -p1 -b .gcc-10-fix
 
 for f in RELEASE_NOTES contrib/etrn.0; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&

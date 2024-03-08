@@ -5,7 +5,7 @@ Summary:        Provide utility methods for factory classes
 
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Class-Factory-Util            
 Source0: https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Class-Factory-Util-%{version}.tar.gz        
 

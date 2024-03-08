@@ -6,7 +6,7 @@ License:        GPLv2+
 URL:            https://alsa-project.org
 Group:          Applications/Internet
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.alsa-project.org/files/pub/utils/%{name}-%{version}.tar.bz2
 Patch0:         ens1371.patch
 BuildRequires:  alsa-lib-devel >= %{version}
@@ -19,7 +19,7 @@ for controlling your sound card.
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 
 %build
 %configure --disable-alsaconf --disable-xmlto

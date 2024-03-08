@@ -19,7 +19,7 @@ Version:        3.3.10
 Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.fftw.org
 Source0:        https://www.fftw.org/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-gfortran
@@ -34,7 +34,7 @@ BuildRequires:  openmpi-devel
 %if %{with mpich} || %{with openmpi}
 BuildRequires:  environment-modules
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl-interpreter
 BuildRequires:  time
 %endif

@@ -13,11 +13,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // PackageRepo defines the RPM repo to pull packages from during the installation
@@ -98,11 +98,10 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 	)
 
 	if exists, ferr := file.DirExists(repoFileDir); ferr != nil {
-		logger.Log.Errorf("Error accessing repo file directory %s.", repoFileDir)
-		err = ferr
+		err = fmt.Errorf("failed to access repo file directory (%s):\n%w", repoFileDir, ferr)
 		return
 	} else if !exists {
-		err = fmt.Errorf("could not find the repo file directory %s to update package repo", repoFileDir)
+		err = fmt.Errorf("failed to find the repo file directory (%s) to update package repo", repoFileDir)
 		return
 	}
 
@@ -114,9 +113,9 @@ func UpdatePackageRepo(installChroot *safechroot.Chroot, config SystemConfig) (e
 	defer func() {
 		// Delete all files under /etc/yum.repos.d/
 		if err != nil {
-			err = shell.ExecuteLive(squashErrors, "rm", fmt.Sprintf("%s/*", repoFileDir))
-			if err != nil {
-				logger.Log.Errorf("Failed to clean up repo files under %s. Error: %s", repoFileDir, err)
+			cleanupErr := shell.ExecuteLive(squashErrors, "rm", fmt.Sprintf("%s/*", repoFileDir))
+			if cleanupErr != nil {
+				err = fmt.Errorf("%w\ncleanup-error: failed to clean up repo files under (%s):\n%w", err, repoFileDir, cleanupErr)
 			}
 		}
 	}()
@@ -158,7 +157,7 @@ func (p *PackageRepo) repoUrlIsValid() (err error) {
 
 	_, err = url.ParseRequestURI(p.BaseUrl)
 	if err != nil {
-		logger.Log.Errorf("Failed to parse input URL %s, Error: %s", p.BaseUrl, err)
+		return fmt.Errorf("failed to parse input URL (%s):\n%w", p.BaseUrl, err)
 	}
 	return
 }
@@ -175,8 +174,7 @@ func writeAdditionalFields(stringBuilder *strings.Builder) (err error) {
 	for _, additionalField := range additionalFields {
 		_, err = stringBuilder.WriteString(additionalField)
 		if err != nil {
-			logger.Log.Errorf("Error writing additional field '%s' out of all fields: %s. Error: %s", additionalField, additionalFields, err)
-			return
+			return fmt.Errorf("failed to write additional field (%s) out of all fields (%s):\n%w", additionalField, additionalFields, err)
 		}
 	}
 
@@ -198,16 +196,15 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 
 	err = file.Create(fileName, 0644)
 	if err != nil {
-		logger.Log.Errorf("Error creating file (%s)", fileName)
-		return
+		return fmt.Errorf("failed to create file (%s):\n%w", fileName, err)
 	}
 
 	defer func() {
 		// Delete the repo file on failure
 		if err != nil {
-			err = os.Remove(fileName)
-			if err != nil {
-				logger.Log.Errorf("Failed to clean up repo file: %s. Error: %s", fileName, err)
+			cleanupErr := os.Remove(fileName)
+			if cleanupErr != nil {
+				err = fmt.Errorf("%w\ncleanup-error: failed to clean up repo file (%s):\n%w", err, fileName, cleanupErr)
 			}
 		}
 	}()
@@ -216,7 +213,7 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	repoId := fmt.Sprintf("[%s]\n", packageRepo.Name)
 	_, err = stringBuilder.WriteString(repoId)
 	if err != nil {
-		logger.Log.Errorf("Error writing repo ID: %s. Error: %s", repoId, err)
+		err = fmt.Errorf("failed to write repo ID (%s):\n%w", repoId, err)
 		return
 	}
 
@@ -224,7 +221,7 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	repoName := fmt.Sprintf("name=%s\n", packageRepo.Name)
 	_, err = stringBuilder.WriteString(repoName)
 	if err != nil {
-		logger.Log.Errorf("Error writing repo Name: %s. Error: %s", repoName, err)
+		err = fmt.Errorf("failed to write repo Name (%s):\n%w", repoName, err)
 		return
 	}
 
@@ -232,7 +229,7 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	repoUrl := fmt.Sprintf("baseurl=%s\n", packageRepo.BaseUrl)
 	_, err = stringBuilder.WriteString(repoUrl)
 	if err != nil {
-		logger.Log.Errorf("Error writing repo URL: %s. Error: %s", repoUrl, err)
+		err = fmt.Errorf("failed to write repo URL (%s):\n%w", repoUrl, err)
 		return
 	}
 
@@ -240,21 +237,21 @@ func createCustomRepoFile(fileName string, packageRepo PackageRepo) (err error) 
 	gpgKey := fmt.Sprintf("gpgkey=%s\n", packageRepo.GPGKeys)
 	_, err = stringBuilder.WriteString(gpgKey)
 	if err != nil {
-		logger.Log.Errorf("Error writing repo GPGKey: %s. Error: %s", gpgKey, err)
+		err = fmt.Errorf("failed to write repo GPGKey (%s):\n%w", gpgKey, err)
 		return
 	}
 
 	// Write the  GPGCheck field
 	_, err = stringBuilder.WriteString(convertBoolToRepoFlag("gpgcheck", packageRepo.GPGCheck))
 	if err != nil {
-		logger.Log.Errorf("Error writing GPGCheck. Error: %s", err)
+		err = fmt.Errorf("failed to write GPGCheck:\n%w", err)
 		return
 	}
 
 	// Write the repo GPGCheck field
 	_, err = stringBuilder.WriteString(convertBoolToRepoFlag("repo_gpgcheck", packageRepo.RepoGPGCheck))
 	if err != nil {
-		logger.Log.Errorf("Error writing repo RepoGPGCheck. Error: %s", err)
+		err = fmt.Errorf("failed to write repo RepoGPGCheck:\n%w", err)
 		return
 	}
 

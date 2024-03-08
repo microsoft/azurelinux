@@ -6,14 +6,14 @@ Version:        2.0.1
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pywbem/nocasedict
 Source0:        https://github.com/pywbem/nocasedict/archive/refs/tags/%{version}.tar.gz#/%{pkgname}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six >= %{six_version}
 BuildRequires:  python3-wheel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 BuildArch:      noarch

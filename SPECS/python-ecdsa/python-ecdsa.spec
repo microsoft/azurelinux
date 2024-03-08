@@ -4,14 +4,14 @@ Version:        0.18.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://pypi.python.org/pypi/ecdsa
 Source0:        https://github.com/tlsfuzzer/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 BuildRequires:  openssl
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 BuildArch:      noarch

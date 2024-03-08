@@ -6,14 +6,14 @@ Version:        4.8.0
 Release:        11%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pexpect/pexpect
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 # sys_executable.patch fixes package tests on systems without a /usr/bin/python executable
 # Upstream link: https://github.com/pexpect/pexpect/pull/629
 Patch0:         sys_executable.patch
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  man-db
 BuildRequires:  openssl
 BuildRequires:  python3-pip

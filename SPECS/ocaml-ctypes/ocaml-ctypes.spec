@@ -4,7 +4,7 @@ Version:        0.18.0
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ocamllabs/ocaml-ctypes
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
@@ -16,7 +16,7 @@ BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-integers-devel >= 0.3.0
 BuildRequires:  ocaml-ocamldoc
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  ocaml-bisect-ppx-devel
 BuildRequires:  ocaml-lwt-devel >= 3.2.0
 BuildRequires:  ocaml-ounit-devel

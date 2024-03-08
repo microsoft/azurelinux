@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           libmodplug
 Version:        0.8.9.0
 Release:        12%{?dist}
@@ -27,7 +27,7 @@ Requires:       gcc-c++
 
 %prep
 %setup -q
-%patch0 -p1
+%patch 0 -p1
 sed -i -e 's/\r//g' ChangeLog
 
 %build

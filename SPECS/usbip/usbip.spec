@@ -3,10 +3,10 @@
 Name:		   usbip
 Summary:	   USB/IP user-space
 Version:	   5.15.34.1
-Release:	   2%{?dist}
+Release:	   3%{?dist}
 License:	   GPLv2+
 Vendor:            Microsoft Corporation
-Distribution:      Mariner
+Distribution:   Azure Linux
 Group:             System/Kernel
 # https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%%{version}.tar.gz
 # In the interests of keeping the source rpm from being ridiculously large,
@@ -16,7 +16,7 @@ URL:		   https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # The kernel modules require working USB and there's no USB for s390x
 # See bug #1483403
 ExcludeArch:       s390x
-Source:		   %{_mariner_sources_url}/usbip-%{version}.tar.xz
+Source:		   %{_distro_sources_url}/usbip-%{version}.tar.xz
 Source1:	   usbip-server.service
 Source2:	   usbip-client.service
 Source99:	   extract_usbip.sh
@@ -91,6 +91,9 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_unitdir}
 %{_libdir}/*.so
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.34.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.34.1-2
 - Updating source URL.
 

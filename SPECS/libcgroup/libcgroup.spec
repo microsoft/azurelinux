@@ -1,27 +1,30 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
-Version:        2.0.1
+Version:        3.1.0
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/libcgroup/libcgroup
 
 # libcgroup git repo contains submodules that must be part of source tarball (adapt version number)
 # 1) clone git repo                           => 'git clone https://github.com/libcgroup/libcgroup.git'
-# 2) checkout tag corresponding to version    => 'git checkout v2.0.1'
+# 2) checkout tag corresponding to version    => 'git checkout v3.1.0'
 # 3) get submodule                            => 'git submodule init' then 'git submodule update'
 # 4) create source tarball                    => 'tar --sort=name \
 #                                                     --mtime="2021-04-26 00:00Z" \
 #                                                     --owner=0 --group=0 --numeric-owner \
 #                                                     --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#                                                     -czf libcgroup-2.0.1.tar.gz libcgroup'
+#                                                     -czf libcgroup-3.1.0.tar.gz libcgroup'
 Source0:        https://github.com/libcgroup/libcgroup/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        cgconfig.service
 
 Patch0: fedora-config.patch
-Patch1: libcgroup-0.40.rc1.patch
-Patch2: no-googletests.patch
+Patch1: libcgroup-0.37-chmod.patch
+Patch2: libcgroup-0.40.rc1-coverity.patch
+Patch3: libcgroup-0.40.rc1-fread.patch
+Patch4: libcgroup-0.40.rc1-templates-fix.patch
+Patch5: no-googletests.patch
 
 %{?systemd_requires}
 
@@ -33,6 +36,7 @@ BuildRequires: flex
 BuildRequires: make
 BuildRequires: pam-devel
 BuildRequires: systemd-devel
+BuildRequires: systemd-rpm-macros
 
 # required to build tests
 BuildRequires: gtest-devel
@@ -94,6 +98,8 @@ autoreconf -vif
            --disable-daemon
 
 # build libcgroup
+export CXXFLAGS="$CXXFLAGS -std=c++14"
+
 make %{?_smp_mflags}
 
 # build test
@@ -112,8 +118,8 @@ install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}/cgconfig.d
-install -m 644 samples/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
-install -m 644 samples/cgsnapshot_blacklist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_blacklist.conf
+install -m 644 samples/config/cgconfig.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgconfig.conf
+install -m 644 samples/config/cgsnapshot_denylist.conf $RPM_BUILD_ROOT/%{_sysconfdir}/cgsnapshot_denylist.conf
 
 # install unit and sysconfig files
 install -d ${RPM_BUILD_ROOT}%{_unitdir}
@@ -150,19 +156,21 @@ getent group cgred >/dev/null || groupadd -r cgred
 %license COPYING
 %doc README README_systemd
 %config(noreplace) %{_sysconfdir}/cgconfig.conf
-%config(noreplace) %{_sysconfdir}/cgsnapshot_blacklist.conf
+%config(noreplace) %{_sysconfdir}/cgsnapshot_denylist.conf
 %dir %{_sysconfdir}/cgconfig.d
 %{_bindir}/cgcreate
 %{_bindir}/cgget
 %{_bindir}/cgset
+%{_bindir}/cgxget
+%{_bindir}/cgxset
 %{_bindir}/cgdelete
 %{_bindir}/lscgroup
 %{_bindir}/lssubsys
 %{_sbindir}/cgconfigparser
-%{_sbindir}/cgclear
 %{_bindir}/cgsnapshot
+%{_bindir}/cgclassify
+%{_bindir}/libcgroup_systemd_idle_thread
 %attr(2755, root, cgred) %{_bindir}/cgexec
-%attr(2755, root, cgred) %{_bindir}/cgclassify
 %attr(0644, root, root) %{_mandir}/man1/*
 %attr(0644, root, root) %{_mandir}/man5/*
 %attr(0644, root, root) %{_mandir}/man8/*
@@ -188,6 +196,18 @@ getent group cgred >/dev/null || groupadd -r cgred
 /tests/gunit/.libs/lt-gtest
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.0-2
+- Fix build by forcing C++ 14 standard
+
+* Thu Feb 22 2024 Henry Li <lihl@microsoft.com> - 3.1.0-1
+- Upgrade to version 3.1.0
+- Add systemd-rpm-macros as BR
+- Break libcgroup-0.40.rc1.patch into multiple smaller patches
+- Update no-gooletests.patch
+- Fix config file path and file name
+- Remove cgclear as it is no longer provided by the new source and
+  add cgxget, cgxset, cgclassify and libcgroup_systemd_idle_thread
+
 * Tue Aug 29 2023 Andy Zaugg <azaugg@linkedin.com> - 2.0.1-2
 - Create CGCONFIG_CONF_DIR directories on package install
 

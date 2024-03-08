@@ -11,7 +11,7 @@ Version:	0.27
 Release:	15%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:		https://metacpan.org/release/namespace-clean
 Source0:	https://cpan.metacpan.org/authors/id/R/RI/RIBASUSHI/namespace-clean-%{version}.tar.gz#/perl-namespace-clean-%{version}.tar.gz
 BuildArch:	noarch
@@ -34,7 +34,7 @@ BuildRequires:	perl(strict)
 BuildRequires:	perl(vars)
 BuildRequires:	perl(warnings)
 # Test Suite
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:	perl(Config)
 BuildRequires:	perl(DB)
 BuildRequires:	perl(File::Glob)

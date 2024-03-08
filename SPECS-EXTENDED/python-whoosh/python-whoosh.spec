@@ -8,13 +8,13 @@ Summary:        Fast, pure-Python full text indexing, search, and spell checking
 
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/mchaput/whoosh
 Source0:        https://github.com/mchaput/whoosh/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package apache-commons-collections4
 #
@@ -54,9 +54,9 @@ This package provides %{summary}.
 
 %prep
 %setup -q -n commons-collections4-%{version}-src
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %pom_remove_parent
 

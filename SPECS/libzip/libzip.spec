@@ -4,7 +4,7 @@ Version:        1.10.1
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libzip.org/
 Source0:        https://libzip.org/download/libzip-%{version}.tar.xz
 BuildRequires:  bzip2-devel
@@ -16,7 +16,7 @@ BuildRequires:  zlib-devel
 # Needed to run the test suite
 # find regress/ -type f | /usr/lib/rpm/perl.req
 # find regress/ -type f | /usr/lib/rpm/perl.prov
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 BuildRequires:  perl(Cwd)
 BuildRequires:  perl(File::Copy)

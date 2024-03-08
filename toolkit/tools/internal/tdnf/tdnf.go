@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 )
 
 var (
@@ -97,7 +97,7 @@ var (
 
 // GetReleaseverCliArg returns a TDNF CLI argument suitable for resolving the `$releasever` variable in
 // Mariner's RPM repo files to the major version of the toolkit. This argument allows TDNF to resolve
-// without the presence of the `mariner-release` package.
+// without the presence of the `azurelinux-release` package.
 func GetReleaseverCliArg() (arg string, err error) {
 	if releaseverArgumentPopulatedCache == "" {
 		var majorVersion string

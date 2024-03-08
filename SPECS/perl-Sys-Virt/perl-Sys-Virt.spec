@@ -4,7 +4,7 @@ Version:        6.1.0
 Release:        4%{?dist}
 License:        GPLv2+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Sys-Virt
 Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz#/%{name}-v%{version}.tar.gz
 
@@ -27,7 +27,7 @@ BuildRequires:  perl(overload)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Sys::Hostname)
 # Optional tests only
 BuildRequires:  perl(Test::CPAN::Changes)

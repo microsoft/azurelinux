@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-memcached
 Version:        1.59
 Release:        7%{?dist}
@@ -13,7 +13,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{_bindir}/memcached
 BuildRequires:  python3-pytest
 %endif

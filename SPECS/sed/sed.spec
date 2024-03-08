@@ -6,10 +6,10 @@ License:        GPLv3
 URL:            https://www.gnu.org/software/sed
 Group:          Applications/Editors
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
 Conflicts:      toybox
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Find)
 %endif
 

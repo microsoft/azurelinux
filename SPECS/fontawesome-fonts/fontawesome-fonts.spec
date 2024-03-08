@@ -7,7 +7,7 @@ Version:        6.5.1
 Release:        1%{?dist}
 License:        OFL AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fontawesome.com
 Source0:        https://github.com/FortAwesome/Font-Awesome/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        README-Trademarks.txt
@@ -19,6 +19,7 @@ BuildRequires:  fontpackages-devel
 BuildRequires:  ttembed
 
 Requires:       fontpackages-filesystem
+Provides:       fontawesome5-free-fonts = %{version}-%{release}
 
 %description
 Font Awesome gives you scalable vector icons that can instantly be
@@ -31,6 +32,7 @@ locally.
 %package web
 Summary:        Iconic font set, web files
 Requires:       %{fontname}-fonts = %{version}-%{release}
+Provides:       fontawesome5-fonts-web = %{version}-%{release}
 
 %description web
 Font Awesome gives you scalable vector icons that can instantly be

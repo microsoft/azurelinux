@@ -4,14 +4,14 @@ Version:        0.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment
 URL:            https://github.com/microsoft/tracelogging
 Source0:        https://github.com/microsoft/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  cmake >= 3.6
 BuildRequires:  gcc
 BuildRequires:  lttng-ust-devel >= 2.13
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  catch-devel > 2.0
 %endif
 
@@ -35,7 +35,7 @@ applications and libraries with tracelogging.
 %build
 mkdir build && cd build
 %cmake \
-%if %{with_check}
+%if 0%{?with_check}
     -DTRACELOGGING_BUILD_TESTS=ON \
 %else
     -DTRACELOGGING_BUILD_TESTS=OFF \

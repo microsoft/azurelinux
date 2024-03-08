@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Enable python3 build by default
 %bcond_without python3
@@ -9,7 +9,7 @@ Distribution:   Mariner
 
 Name:		python-hwdata
 Version:	2.3.7
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Python bindings to hwdata package
 BuildArch:  noarch
 License:	GPLv2
@@ -17,7 +17,7 @@ URL:		https://github.com/xsuchy/python-hwdata
 # git clone https://github.com/xsuchy/python-hwdata.git
 # cd python-hwdata
 # tito build --tgz
-Source0:	%{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:	%{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 %description
 Provide python interface to database stored in hwdata package.
@@ -111,6 +111,9 @@ pylint-3 hwdata.py example.py || :
 %endif # with python3
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.3.7-11
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.3.7-10
 - Updated source URL.
 - License verified.

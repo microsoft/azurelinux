@@ -20,15 +20,15 @@
 Summary:        APIs for DOM, SAX, and JAXP
 Name:           xml-commons-apis
 Version:        1.4.01
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0 AND W3C AND SUSE-Public-Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://xml.apache.org/commons/
 # From source control because the published tarball doesn't include some docs:
 #   toolkit/scripts/svn2source.sh https://svn.apache.org/repos/asf/xerces/xml-commons/tags/xml-commons-external-%%{underscore_version}/java/external %%{name}-%%{version}
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-MANIFEST.MF
 Source2:        %{name}-ext-MANIFEST.MF
 Source3:        https://repo1.maven.org/maven2/xml-apis/xml-apis/2.0.2/xml-apis-2.0.2.pom
@@ -114,6 +114,9 @@ rm -rf build/docs/javadoc
 %{_javadir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-9
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 15 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.01-8
 - Updating source URL.
 

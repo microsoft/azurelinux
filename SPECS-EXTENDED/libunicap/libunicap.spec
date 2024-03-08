@@ -1,12 +1,12 @@
 Summary:        Library to access different kinds of (video) capture devices
 Name:           libunicap
 Version:        0.9.12
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.unicap-imaging.org/
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        %{name}-filter.sh
 Patch0:         libunicap-0.9.12-includes.patch
 Patch1:         libunicap-0.9.12-memerrs.patch
@@ -103,6 +103,9 @@ mv -f %{buildroot}%{_sysconfdir}/udev/rules.d/50-euvccam.rules %{buildroot}%{_ud
 %exclude %{_datadir}/gtk-doc/html/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.9.12-29
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Dec 28 2022 Muhammad Falak <mwani@microsoft.com> - 0.9.12-28
 - Switch to '%autosetup'
 - Configure with 'disable-gtk-doc'

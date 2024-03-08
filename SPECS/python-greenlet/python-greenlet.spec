@@ -8,14 +8,14 @@ and are synchronized with data exchanges on "channels".
 
 Summary:        Lightweight in-process concurrent programming
 Name:           python-%{modname}
-Version:        2.0.2
+Version:        3.0.3
 Release:        1%{?dist}
 # Most is MIT except for these, which are under the Python Software License:
 # - src/greenlet/slp_platformselect.h
 # - src/greenlet/platform/ directory
 License:        MIT AND Python
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/python-greenlet/greenlet
 Source0:        %{url}/archive/%{version}/%{modname}-%{version}.tar.gz
 
@@ -67,6 +67,9 @@ PYTHONPATH="%{buildroot}%{python3_sitearch}" %{python3} -m unittest discover gre
 %{_includedir}/python%{python3_version}*/%{modname}/
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.3-1
+- Upgrade to version 3.0.3
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.2-1
 - Auto-upgrade to 2.0.2 - Azure Linux 3.0 - package upgrades
 

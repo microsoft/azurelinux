@@ -14,11 +14,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/network"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/network"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
 	"github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -27,8 +27,7 @@ import (
 var (
 	app = kingpin.New("downloader", "Download files to a location")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	noClobber = app.Flag("no-clobber", "Do not overwrite existing files").Bool()
 	noVerbose = app.Flag("no-verbose", "Do not print verbose output").Bool()
 
@@ -44,7 +43,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 	if *noVerbose {
 		logger.Log.SetLevel(logrus.WarnLevel)
 	}
@@ -135,7 +134,7 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 	}, downloadRetryAttempts, downloadRetryDuration, failureBackoffBase, cancel)
 
 	if err != nil {
-		err = fmt.Errorf("failed to download (%s) to (%s). Error:\n%w", srcUrl, dstFile, err)
+		err = fmt.Errorf("failed to download (%s) to (%s):\n%w", srcUrl, dstFile, err)
 	}
 	return
 }

@@ -1,13 +1,13 @@
 Summary:        Glib networking modules
 Name:           glib-networking
-Version:        2.70.0
+Version:        2.78.0
 Release:        1%{?dist}
 License:        GPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Development
 URL:            https://gitlab.gnome.org/GNOME/glib-networking/
-Source0:        https://download.gnome.org/sources/%{name}/2.70/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/2.78/%{name}-%{version}.tar.xz
 BuildRequires:  gcc
 BuildRequires:  gettext
 BuildRequires:  meson
@@ -47,6 +47,9 @@ implementation.
 %{_libdir}/gio/modules/libgiognutls.so
 
 %changelog
+* Tue Feb 13 2024 Vince Perri <viperri@microsoft.com> - 2.78.0-1
+- Upgrade to 2.78.0
+
 * Fri Feb 11 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-1
 - Update source to v2.70.0
 

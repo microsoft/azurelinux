@@ -4,7 +4,7 @@ Release:        5%{?dist}
 Summary:        Convert singular to plural, select "a" or "an"
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Lingua-EN-Inflect
 Source0:        https://cpan.metacpan.org/authors/id/D/DC/DCONWAY/Lingua-EN-Inflect-%{version}.tar.gz#/perl-Lingua-EN-Inflect-%{version}.tar.gz
 BuildArch:      noarch

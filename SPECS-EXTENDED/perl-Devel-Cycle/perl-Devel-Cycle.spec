@@ -4,7 +4,7 @@ Release:        18%{?dist}
 Summary:        Find memory cycles in objects
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Devel-Cycle
 Source0:        https://cpan.metacpan.org/modules/by-module/Devel/Devel-Cycle-%{version}.tar.gz#/perl-Devel-Cycle-%{version}.tar.gz
 Patch0:         Devel-Cycle-1.11-512.patch
@@ -40,7 +40,7 @@ based memory management, circular references will cause memory leaks.
 %setup -q -n Devel-Cycle-%{version}
 
 # Fix a Perl 5.12 incompatibility (#757274, CPAN RT#56681)
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

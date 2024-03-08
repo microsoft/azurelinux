@@ -4,7 +4,7 @@ Version:        20230802.1
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -12,7 +12,7 @@ BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
 BuildRequires:  make
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gmock >= 1.12.0
 BuildRequires:  gmock-devel >= 1.12.0
 BuildRequires:  gtest >= 1.12.0
@@ -50,7 +50,7 @@ pushd build
 %cmake \
   -DABSL_PROPAGATE_CXX_STD=ON \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-%if %{with_check}
+%if 0%{?with_check}
   -DABSL_BUILD_TESTING=ON \
   -DABSL_FIND_GOOGLETEST=ON \
   -DABSL_USE_EXTERNAL_GOOGLETEST=ON \

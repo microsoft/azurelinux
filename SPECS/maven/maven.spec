@@ -13,18 +13,18 @@
 Summary:        Apache Maven
 Name:           maven
 Version:        3.9.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://maven.apache.org/
 Source0:        https://archive.apache.org/dist/%{name}/%{name}-3/%{version}/source/apache-%{name}-%{version}-src.tar.gz
 # Since bootstrap has been removed for maven, it requires a pre-built maven binary to build itself.
 # Relying on 2.0 maven rpm to provide the mvn binary for the build.
 
-Source1:        %{_mariner_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
-Source2:        %{_mariner_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
+Source1:        %{_distro_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.x86_64.rpm
+Source2:        %{_distro_sources_url}/%{name}-%{mvn_2_0_pmc_ver}.cm2.aarch64.rpm
 # CBL-Mariner build are without network connection. Hence, we need to generate build caches
 # as tarballs to build rpms in offline mode.
 # In order to generate tarballs, use "maven_build_caches.sh".
@@ -157,6 +157,9 @@ echo JAVA_HOME=%{_lib}/jvm/msopenjdk-11 >%{buildroot}%{_sysconfdir}/java/maven.c
 %config /etc/java/maven.conf-openjdk11
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.6-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Jan 12 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.9.6-1
 - Upgrade to 3.9.6
 

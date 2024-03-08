@@ -5,12 +5,12 @@ Release:        1%{?dist}
 License:        LGPLv2+
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://pagure.io/libaio
 Source0:        https://releases.pagure.org/%{name}/%{name}-%{version}.tar.gz
 Patch0:         libaio-install-to-destdir-slash-usr.patch
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  e2fsprogs-devel
 %endif
 

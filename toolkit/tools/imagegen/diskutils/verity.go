@@ -14,10 +14,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/randomization"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -64,7 +64,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 	// Measure the disk and generate the hash and fec files
 	err = v.createVerityDisk(verityWorkingDirectory)
 	if err != nil {
-		return fmt.Errorf("failed while generating a verity disk: %w", err)
+		return fmt.Errorf("failed while generating a verity disk:\n%w", err)
 	}
 
 	// Now place them in the initramfs
@@ -72,7 +72,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 	initramfs, err := OpenInitramfs(initramfsPath)
 	defer initramfs.Close()
 	if err != nil {
-		return fmt.Errorf("failed to open the initramfs: %w", err)
+		return fmt.Errorf("failed to open the initramfs:\n%w", err)
 	}
 
 	verityFiles, err := ioutil.ReadDir(verityWorkingDirectory)
@@ -86,7 +86,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 		// Place each file in the root of the initramfs
 		err = initramfs.AddFileToInitramfs(filePath, file.Name())
 		if err != nil {
-			return fmt.Errorf("failed adding %s to initramfs: %w", filePath, err)
+			return fmt.Errorf("failed to add (%s) to initramfs:\n%w", filePath, err)
 		}
 	}
 
@@ -146,7 +146,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	logger.Log.Info("Generating a dm-verity read-only partition")
 	verityOutput, stderr, err := shell.Execute("veritysetup", append(verityFecArgs, verityArgs...)...)
 	if err != nil {
-		err = fmt.Errorf("unable to create verity disk '%s': %w", stderr, err)
+		err = fmt.Errorf("failed to create verity disk:\n%v:\n%w", stderr, err)
 		return
 	}
 
@@ -154,7 +154,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	matches := rootHashLineRegex.FindStringSubmatch(verityOutput)
 
 	if len(matches) != 2 {
-		err = fmt.Errorf("unable to extract root hash from veritysetup output: '%s', matched: '%#v'", verityOutput, matches)
+		err = fmt.Errorf("failed to extract root hash from veritysetup output: (%s), matched: (%#v)", verityOutput, matches)
 		return
 	}
 	rootHash := matches[1]
@@ -178,8 +178,7 @@ func (v *VerityDevice) createVerityDisk(verityDirectory string) (err error) {
 	logger.Log.Info("Verifying the verity partition")
 	verityOutput, stderr, err = shell.Execute("veritysetup", verityVerifyArgs...)
 	if err != nil {
-		logger.Log.Errorf("Verity error: '%s'", verityOutput)
-		err = fmt.Errorf("unable to validate new verity disk '%s': %w", stderr, err)
+		err = fmt.Errorf("failed to validate new verity disk (%s):\n%v\n%w", verityOutput, stderr, err)
 	}
 
 	return
@@ -197,7 +196,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	)
 
 	if !readOnlyConfig.Enable {
-		err = fmt.Errorf("verity is not enabled, can't update partition '%s'", partition.ID)
+		err = fmt.Errorf("verity is not enabled, can't update partition (%s)", partition.ID)
 		return
 	}
 
@@ -225,12 +224,12 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	// linear mappings need to know the size of the disk in blocks ahead of time
 	deviceSizeStr, stderr, err := shell.Execute("blockdev", "--getsz", readOnlyDevice.BackingDevice)
 	if err != nil {
-		err = fmt.Errorf("unable to get loopback device size %s. Error: %s", partDevPath, stderr)
+		err = fmt.Errorf("failed to get loopback device size (%s):\n%v\n%w", partDevPath, stderr, err)
 		return
 	}
 	deviceSizeInt, err := strconv.ParseUint(strings.TrimSpace(deviceSizeStr), 10, 64)
 	if err != nil {
-		err = fmt.Errorf("unable to convert disk size '%s' to integer: %w", deviceSizeStr, err)
+		err = fmt.Errorf("failed to convert disk size (%s) to integer:\n%w", deviceSizeStr, err)
 		return
 	}
 
@@ -243,7 +242,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 	}
 	_, stderr, err = shell.Execute("dmsetup", dmsetupArgs...)
 	if err != nil {
-		err = fmt.Errorf("unable to create a device mapper device '%s': %w", stderr, err)
+		err = fmt.Errorf("failed to create a device mapper device (%s):\n%w", stderr, err)
 		return
 	}
 
@@ -256,8 +255,7 @@ func PrepReadOnlyDevice(partDevPath string, partition configuration.Partition, r
 func (v *VerityDevice) CleanupVerityDevice() (err error) {
 	stdout, stderr, err := shell.Execute("dmsetup", "remove", v.MappedName)
 	if err != nil {
-		err = fmt.Errorf("unable to clean up device mapper device '%s' '%s': %w", stdout, stderr, err)
-		logger.Log.Error(err.Error())
+		err = fmt.Errorf("failed to clean up device mapper device:%s\n%v\n%w", stdout, stderr, err)
 		return
 	}
 	return
@@ -275,13 +273,13 @@ func (v *VerityDevice) SwitchDeviceToReadOnly(mountPointOrDevice, mountArgs stri
 	// Suspending the mapped device will force a sync
 	_, stderr, err := shell.Execute("dmsetup", "suspend", v.MappedName)
 	if err != nil {
-		return fmt.Errorf("failed to suspend device '%s' : '%v': %w", v.MappedDevice, stderr, err)
+		return fmt.Errorf("failed to suspend device (%s):\n%v\n%w", v.MappedDevice, stderr, err)
 	}
 
 	// Need to get the table data to "recreate" the device with read-only set
 	table, stderr, err := shell.Execute("dmsetup", "table", v.MappedName)
 	if err != nil {
-		return fmt.Errorf("failed to get table for device '%s' : '%v': %w", v.MappedDevice, stderr, err)
+		return fmt.Errorf("failed to get table for device (%s):\n%v\n%w", v.MappedDevice, stderr, err)
 	}
 
 	// Switch the linear map to read-only
@@ -294,19 +292,19 @@ func (v *VerityDevice) SwitchDeviceToReadOnly(mountPointOrDevice, mountArgs stri
 	}
 	_, stderr, err = shell.Execute("dmsetup", dmsetupArgs...)
 	if err != nil {
-		return fmt.Errorf("failed to reload device '%s' in read-only mode  : '%v': %w", v.MappedDevice, stderr, err)
+		return fmt.Errorf("failed to reload device (%s) in read-only mode:\n%v\n%w", v.MappedDevice, stderr, err)
 	}
 
 	// Re-enable the device
 	_, stderr, err = shell.Execute("dmsetup", "resume", v.MappedName)
 	if err != nil {
-		return fmt.Errorf("failed to resume device '%s' : '%v': %w", v.MappedDevice, stderr, err)
+		return fmt.Errorf("failed to resume device (%s):\n%v\n%w", v.MappedDevice, stderr, err)
 	}
 
 	// Mounts don't respect the read-only nature of the underlying device, force a remount
 	_, stderr, err = shell.Execute("mount", "-o", mountArgs+remountOptions, mountPointOrDevice)
 	if err != nil {
-		return fmt.Errorf("failed to remount '%s': '%s': %w", mountPointOrDevice, stderr, err)
+		return fmt.Errorf("failed to remount (%s):\n%v\n%w", mountPointOrDevice, stderr, err)
 	}
 	return
 }

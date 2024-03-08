@@ -2,7 +2,7 @@
 %global _binaries_in_noarch_packages_terminate_build   0
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname Genshi
 
 Name:           python-genshi

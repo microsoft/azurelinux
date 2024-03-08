@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           discount
 Version:        2.2.4
 Release:        5%{?dist}
@@ -38,7 +38,7 @@ libmarkdown.
 %prep
 %setup -q
 
-%patch0 -p1
+%patch 0 -p1
 
 
 %build

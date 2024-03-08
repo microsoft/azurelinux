@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global srcname suds
 
 Summary: A python SOAP client
@@ -14,7 +14,7 @@ URL: https://github.com/suds-community/suds
 BuildRequires: python3-devel
 BuildRequires: python3-six
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires: python3-pip
 %endif
 

@@ -1,5 +1,5 @@
 %global libdnf_major_version 0
-%global libdnf_minor_version 72
+%global libdnf_minor_version 73
 %global libdnf_micro_version 0
 
 Name:           libdnf
@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        Library providing simplified C and Python API to libsolv.
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/libdnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -122,6 +122,9 @@ popd
 %{python3_sitelib}/hawkey/
 
 %changelog
+* Wed Mar 06 2024 Sam Meluch <sammeluch@microsoft.com> - 0.73.0-1
+- upgrade to version 0.73.0
+
 * Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 0.72.0-1
 - Upgrade to 0.72.0
 

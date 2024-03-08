@@ -1,12 +1,15 @@
-%global pypi_name sphinxcontrib-jsmath
+%global pypi_name_prefix sphinxcontrib
+%global pypi_name_suffix jsmath
+%global pypi_name %{pypi_name_prefix}-%{pypi_name_suffix}
+%global pypi_name_underscore %{pypi_name_prefix}_%{pypi_name_suffix}
 
 Summary:        Sphinx extension for math in HTML via JavaScript
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://sphinx-doc.org/
 Source0:        %{pypi_source}
 Patch0:         test_jsmath_path_fix.patch
@@ -16,7 +19,7 @@ BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python%{python3_pkgversion}-atomicwrites
 BuildRequires:  python%{python3_pkgversion}-attrs
 BuildRequires:  python%{python3_pkgversion}-docutils
@@ -49,17 +52,20 @@ via JavaScript.
 %py3_install
 
 %check
-pip3 install more-itertools Sphinx
+pip3 install more-itertools sphinx exceptiongroup iniconfig tomli
 python3 -m pytest
 
 %files -n python%{python3_pkgversion}-%{pypi_name}
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/sphinxcontrib/
-%{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}-*.pth
-%{python3_sitelib}/sphinxcontrib_jsmath-%{version}-py%{python3_version}.egg-info/
+%{python3_sitelib}/%{pypi_name_prefix}/
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}-py%{python3_version}-*.pth
+%{python3_sitelib}/%{pypi_name_underscore}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Fri Feb 23 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.0.1-17
+- Installing packages needed for tests to run. 
+
 * Mon Jun 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-16
 - Fixing ptests.
 

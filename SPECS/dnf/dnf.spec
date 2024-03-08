@@ -2,11 +2,11 @@
 %global py3pluginpath %{python3_sitelib}/%{name}-plugins
 Summary:        Python 3 version of the DNF package manager.
 Name:           dnf
-Version:        4.8.0
-Release:        2%{?dist}
+Version:        4.19.0
+Release:        1%{?dist}
 License:        GPLv2+ OR GPL
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/rpm-software-management/dnf
 #Source0:       %{url}/archive/%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
@@ -51,23 +51,27 @@ Requires:       %{name} = %{version}-%{release}
 Systemd units that can periodically download package upgrades and apply them.
 
 %prep
-%setup -q
+%autosetup -p1
 sed -i "s/emit_via = stdio/emit_via = motd/g" etc/dnf/automatic.conf
 mkdir build
-cd build
+
+%build
+pushd build
 %cmake .. -DPYTHON_DESIRED:FILEPATH="3" -DWITH_MAN=0
 %make_build
+popd
 
 %install
-
 pushd build
 %make_install
 popd
+
 %find_lang %{name}
 mkdir -p %{buildroot}%{py3pluginpath}/__pycache__/
 
 # Making DNF directories for ghosting
 mkdir -p %{buildroot}%{confdir}/vars
+mkdir -p %{buildroot}%{confdir}/aliases.d
 mkdir -p %{buildroot}%{confdir}/plugins
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.d
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}/modules.defaults.d
@@ -81,8 +85,9 @@ rm -f %{buildroot}%{_bindir}/dnf-automatic-*
 rm -f %{buildroot}%{confdir}/%{name}-strict.conf
 
 %check
-cd build
+pushd build
 ctest -VV
+popd
 
 %post automatic
 %systemd_post dnf-automatic-notifyonly.timer
@@ -113,7 +118,6 @@ ctest -VV
 %dir %{confdir}/vars
 %exclude %{confdir}/aliases.d/zypper.conf
 %config(noreplace) %{confdir}/%{name}.conf
-%config(noreplace) %{confdir}/protected.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.log
 %ghost %attr(644,-,-) %{_localstatedir}/log/%{name}.librepo.log
@@ -128,6 +132,7 @@ ctest -VV
 
 %files -n python3-%{name}
 %{_bindir}/%{name}-3
+%{python3_sitelib}/%{name}-*.dist-info
 %{python3_sitelib}/%{name}
 %dir %{py3pluginpath}
 %dir %{py3pluginpath}/__pycache__/
@@ -146,6 +151,9 @@ ctest -VV
 %{python3_sitelib}/%{name}/automatic
 
 %changelog
+* Mon Feb 26 2024 Sam Meluch <sammeluch@microsoft.com> - 4.19.0-1
+- Upgrade to version 4.19.0 for Azure Linux 3.0
+
 * Thu Apr 14 2022 Chris Co <chrco@microsoft.com> - 4.8.0-2
 - Emit dnf-automatic messages through motd
 - Start dnf-automatic-notifyonly timer

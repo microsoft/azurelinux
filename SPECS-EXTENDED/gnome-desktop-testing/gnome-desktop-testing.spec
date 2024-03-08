@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           gnome-desktop-testing
 Version:        2018.1
 Release:        4%{?dist}

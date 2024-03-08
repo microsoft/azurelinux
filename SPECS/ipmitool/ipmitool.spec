@@ -7,7 +7,7 @@ Version:       1.8.19
 Release:       1%{?dist}
 License:       BSD
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/ipmitool/ipmitool
 
 Source0:       https://github.com/%{name}/%{name}/archive/%{gitname}_%{gitversion}/%{name}-%{version}.tar.gz

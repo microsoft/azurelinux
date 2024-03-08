@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #
 # spec file for package xmldb-api
 #
@@ -22,13 +22,13 @@ Distribution:   Mariner
 %define cvs_version 20041010
 Name:           xmldb-api
 Version:        0.1
-Release:        28%{?dist}
+Release:        29%{?dist}
 Summary:        XML:DB API for Java
 License:        Apache-1.1
 Url:            http://xmldb-org.sourceforge.net
 # cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org login
 # cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org export -D 2004-10-10 xapi
-Source0:        %{_mariner_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
+Source0:        %{_distro_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
 Patch0:         xmldb-api-java5-enum.patch
 BuildRequires:  ant >= 1.6
 BuildRequires:  javapackages-tools
@@ -90,7 +90,7 @@ implementation is also provided.
 
 %prep
 %setup -q -n xapi
-%patch0 -p1
+%patch 0 -p1
 find . -name "*.jar" | xargs -t rm
 # FIXME: (dwalluck): These use org.apache.xalan.xpath
 rm src/common/org/xmldb/common/xml/queries/xalan/XPathQueryImpl.java
@@ -140,6 +140,9 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-29
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 0.1-28
 - Update Source0
 - Improve formatting

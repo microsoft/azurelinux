@@ -9,9 +9,9 @@ package main
 import (
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -27,7 +27,7 @@ var (
 	scriptName = app.Flag("script-name", "The name of the current tool.").Required().String()
 	stepPath   = app.Flag("step-path", "A '/' separated path of steps").Default("").String()
 	outPath    = app.Flag("out-path", "The file that stores timestamp CSVs.").Required().String() // currently must be absolute
-	logLevel   = exe.LogLevelFlag(app)
+	logFlags   = exe.SetupLogFlags(app)
 	validModes = []string{initializeMode, recordMode, stopMode, finishMode}
 	mode       = app.Flag("mode", "The mode of this tool. Could be 'initialize' ('i') or 'record' ('r').").Required().Enum(validModes...)
 )
@@ -35,7 +35,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	setupLogger(*logLevel)
+	setupLogger(*logFlags.LogLevel)
 
 	// Perform different actions based on the input "mode".
 	switch *mode {

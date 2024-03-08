@@ -9,7 +9,7 @@ License:        BSD and ASL 2.0 and LGPLv2+ and MIT
 # adapters/ftp.py is ASL 2.0
 URL:            http://conda.pydata.org/docs/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://github.com/conda/conda/archive/%{version}/%{name}-%{version}.tar.gz
 # bash completion script moved to a separate project
 Source1:        https://raw.githubusercontent.com/tartansandal/conda-bash-completion/1.5/conda
@@ -78,7 +78,7 @@ BuildRequires:  %py3_reqs
 
 # For tests
 BuildRequires:  python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python%{python3_pkgversion}-mock
 BuildRequires:  python%{python3_pkgversion}-pytest-cov

@@ -6,7 +6,7 @@ Version:        4.10
 Release:        1%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/JSON
 Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  coreutils
@@ -28,7 +28,7 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  perl(base)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(lib)
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Tie::Array)
 %endif
 Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))

@@ -7,7 +7,7 @@ Release:        1%{?dist}
 # + install-sh is MIT license with changes under Public Domain
 License:        GPLv3+ AND GPLv2+ AND ISC AND MIT AND Public Domain
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ftp.debian.org/debian/pool/main/a/at
 Source:         https://salsa.debian.org/debian/at/-/archive/release/%{version}/at-release-%{version}.tar.gz
 # git upstream source https://salsa.debian.org/debian/at.git/
@@ -49,7 +49,7 @@ Obsoletes:      at-sysvinit < 3.1.16-1
 %if %{with pam}
 BuildRequires:  pam-devel
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::More)

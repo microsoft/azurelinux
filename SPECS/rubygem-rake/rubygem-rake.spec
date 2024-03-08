@@ -5,7 +5,7 @@ Version:        13.0.6
 Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://ruby.github.io/rake/
 Source0:        https://github.com/ruby/rake/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildArch:      noarch
@@ -13,7 +13,7 @@ BuildArch:      noarch
 BuildRequires:  ruby
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  rubygem(minitest) >= 5
 %endif
 

@@ -4,10 +4,10 @@
 Summary:        OCaml compiler and programming environment
 Name:           ocaml
 Version:        4.13.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        QPL and (LGPLv2+ with exceptions)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.ocaml.org
 Source0:        https://caml.inria.fr/pub/distrib/%{name}-%{majmin}/%{name}-%{version}.tar.xz
 Patch0001:      0001-Don-t-add-rpaths-to-libraries.patch
@@ -25,13 +25,13 @@ BuildRequires:  make
 BuildRequires:  ncurses-devel
 BuildRequires:  perl-interpreter
 BuildRequires:  util-linux
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  diffutils
 %endif
-# ocamlopt runs gcc to link binaries.  Because Mariner includes
-# hardening flags automatically, mariner-rpm-macros is also required.
+# ocamlopt runs gcc to link binaries.  Because Azure Linux includes
+# hardening flags automatically, azurelinux-rpm-macros is also required.
+Requires:       azurelinux-rpm-macros
 Requires:       gcc
-Requires:       mariner-rpm-macros
 # Because we pass -c flag to ocaml-find-requires (to avoid circular
 # dependencies) we also have to explicitly depend on the right version
 # of ocaml-runtime.
@@ -114,12 +114,12 @@ autoconf --force
 #
 # OC_CFLAGS/OC_LDFLAGS control what flags OCaml passes to the linker
 # when doing final linking of OCaml binaries.  Setting these is
-# necessary to ensure that generated binaries have Mariner hardening
+# necessary to ensure that generated binaries have Azure Linux hardening
 # features.
 %configure \
     OC_CFLAGS="$CFLAGS" \
     OC_LDFLAGS="$LDFLAGS" \
-%if %{with_check}
+%if 0%{?with_check}
     --enable-ocamltest \
 %endif
     --libdir=%{_libdir}/ocaml \
@@ -258,6 +258,9 @@ make -j1 all
 %{_libdir}/ocaml/compiler-libs/*.o
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Feb 28 2022 Muhammad Falak <mwani@microsoft.com> - 4.13.1-2
 - Introduce a patch to remove unused vars in test to enable ptest
 

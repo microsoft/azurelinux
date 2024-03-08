@@ -4,7 +4,7 @@ Version:        21.0.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/python-hyper/hyperlink
 #Source0:       https://github.com/python-hyper/hyperlink/archive/refs/tags/v%{version}.tar.gz
@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-idna

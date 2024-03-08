@@ -1,16 +1,16 @@
 %global _hardened_build 1
-%global clknetsim_ver f89702
+%global clknetsim_ver 5d1dc05
 %bcond_without debug
 
 Name:           chrony
-Version:        4.1
-Release:        2%{?dist}
+Version:        4.5
+Release:        1%{?dist}
 Summary:        An NTP client/server
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        GPLv2
-URL:            https://chrony.tuxfamily.org
-Source0:        https://download.tuxfamily.org/%{name}/%{name}-%{version}.tar.gz
+URL:            https://chrony-project.org/
+Source0:        https://gitlab.com/%{name}/%{name}/-/archive/%{version}/%{name}-%{version}.tar.gz
 # Source 1-2 left for a possible GPG check
 Source3:        chrony.dhclient
 Source4:        chrony.helper
@@ -20,9 +20,7 @@ Source6:        chrony-dnssrv@.timer
 Source10:       https://github.com/mlichvar/clknetsim/archive/%{clknetsim_ver}/clknetsim-%{clknetsim_ver}.tar.gz
 
 # add NTP servers from DHCP when starting service
-Patch2:         chrony-service-helper.patch
-# fix test 099-scfilter with glibc 2.34
-Patch3:         sys-linux-testfix.patch
+Patch0:         chrony-service-helper.patch
 
 BuildRequires:  bison
 BuildRequires:  gcc
@@ -31,10 +29,12 @@ BuildRequires:  libcap-devel
 BuildRequires:  libedit-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  nettle-devel >= 3.7.2
+BuildRequires:  rubygem-asciidoctor
 BuildRequires:  systemd
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  net-tools
+BuildRequires:  procps-ng
 BuildRequires:  tzdata
 BuildRequires:  which
 %endif
@@ -59,21 +59,8 @@ can also operate as an NTPv4 (RFC 5905) server and peer to provide a time
 service to other computers in the network.
 
 %prep
-
-%setup -q -n %{name}-%{version} -a 10
-%patch2 -p1 -b .service-helper
-%patch3 -p1
-
-# review changes in packaged configuration files and scripts
-md5sum -c <<-EOF | (! grep -v 'OK$')
-        bc563c1bcf67b2da774bd8c2aef55a06  examples/chrony-wait.service
-        2d01b94bc1a7b7fb70cbee831488d121  examples/chrony.conf.example2
-        96999221eeef476bd49fe97b97503126  examples/chrony.keys.example
-        6a3178c4670de7de393d9365e2793740  examples/chrony.logrotate
-        d0984e98fe3ac9c4dc8d94d9b037f6ef  examples/chrony.nm-dispatcher.dhcp
-        8f5a98fcb400a482d355b929d04b5518  examples/chrony.nm-dispatcher.onoffline
-        56d221eba8ce8a2e03d3e0dd87999a81  examples/chronyd.service
-EOF
+# Unpack clksim within the chrony folder
+%autosetup -p1 -a 10
 
 # use example chrony.conf as the default config with some modifications:
 # - use Windows NTP server (time.windows.com) instead of a pool
@@ -186,7 +173,7 @@ systemctl start chronyd.service
 
 %files
 %license COPYING
-%doc FAQ NEWS README
+%doc NEWS README
 %config(noreplace) %{_sysconfdir}/chrony.conf
 %config(noreplace) %verify(not md5 size mtime) %attr(640,root,chrony) %{_sysconfdir}/chrony.keys
 %config(noreplace) %{_sysconfdir}/logrotate.d/chrony
@@ -206,6 +193,9 @@ systemctl start chronyd.service
 %dir %attr(-,chrony,chrony) %{_localstatedir}/log/chrony
 
 %changelog
+* Mon Feb 26 2024 Henry Beberman <henry.beberman@microsoft.com> - 4.5-1
+- Upgrade to version 4.5
+
 * Thu May 18 2023 Tobias Brick <tobiasb@microsoft.com> - 4.1-2
 - Explicitly run chronyd as the user chrony
 

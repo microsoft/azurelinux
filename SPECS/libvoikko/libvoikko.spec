@@ -4,7 +4,7 @@ Version:        4.3
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release URLs
 Source0:        http://www.puimula.org/voikko-sources/%{name}/%{name}-%{version}.tar.gz
@@ -103,8 +103,8 @@ install -pm 0644 python/libvoikko.py %{buildroot}%{python3_sitelib}/
 %{_libdir}/pkgconfig/libvoikko.pc
 
 %files -n python3-libvoikko
-%{python3_sitelib}/%{name}.py*
 %{python3_sitelib}/__pycache__/*
+%{python3_sitelib}/%{name}.py*
 
 %changelog
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.3-1

@@ -19,8 +19,7 @@ toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
 toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
-toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
-populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
+populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/azl/RPMS
 toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
@@ -58,6 +57,8 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
+##help:target:toolchain_spec_list=Generate a file containing a list of toolchain specs.
+toolchain_spec_list: $(toolchain_spec_list)
 
 clean: clean-toolchain
 
@@ -101,19 +102,21 @@ check-manifests: check-x86_64-manifests check-aarch64-manifests
 check-aarch64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			aarch64
+			"$(toolchain_spec_list)" \
+			"$(SPECS_DIR)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"aarch64"
 check-x86_64-manifests: $(toolchain_spec_list)
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			x86_64
+			"$(toolchain_spec_list)" \
+			"$(SPECS_DIR)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"x86_64"
 
 # Generate a list of a specs built as part of the toolchain.
 $(toolchain_spec_list): $(toolchain_files)
@@ -121,6 +124,7 @@ $(toolchain_spec_list): $(toolchain_files)
 		./list_toolchain_specs.sh \
 			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
 			$(toolchain_spec_list)
+	@echo "Toolchain spec list created under '$(toolchain_spec_list)'."
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
@@ -219,21 +223,22 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
-			$(DIST_TAG) \
-			$(BUILD_NUMBER) \
-			$(RELEASE_VERSION) \
-			$(BUILD_DIR) \
-			$(RPMS_DIR) \
-			$(SPECS_DIR) \
-			$(RUN_CHECK) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(INCREMENTAL_TOOLCHAIN) \
-			$(BUILD_SRPMS_DIR) \
-			$(SRPMS_DIR) \
-			$(toolchain_from_repos) \
-			$(TOOLCHAIN_MANIFEST) \
-			$(go-bldtracker) \
-			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"$(BUILD_NUMBER)" \
+			"$(RELEASE_VERSION)" \
+			"$(BUILD_DIR)" \
+			"$(RPMS_DIR)" \
+			"$(SPECS_DIR)" \
+			"$(RUN_CHECK)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(INCREMENTAL_TOOLCHAIN)" \
+			"$(BUILD_SRPMS_DIR)" \
+			"$(SRPMS_DIR)" \
+			"$(toolchain_from_repos)" \
+			"$(TOOLCHAIN_MANIFEST)" \
+			"$(go-bldtracker)" \
+			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 

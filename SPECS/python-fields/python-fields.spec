@@ -5,7 +5,7 @@ Version:        5.0.0
 Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ionelmc/python-fields
 Source0:        https://github.com/ionelmc/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Compatibility with python-sphinx >= 1.3, already applied upstream
@@ -41,7 +41,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -62,7 +62,7 @@ sed -i 's/\[pytest\]/\[tool:pytest\]/' setup.cfg
 
 %build
 %py3_build
-PYTHONPATH=$PWD/src sphinx-build%{python3_pkgversion} -b html docs docs/_build/html
+PYTHONPATH=$PWD/src sphinx-build -b html docs docs/_build/html
 rm -rf docs/_build/html/.buildinfo docs/_build/html/.doctrees
 
 %install

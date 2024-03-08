@@ -6,7 +6,7 @@ Version:        1.6
 Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-pool/
 Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
@@ -48,8 +48,8 @@ Pool Package.
 %setup -q -n %{short_name}-%{version}-src
 # remove all binary libs
 find . -name "*.jar" -exec rm -f {} \;
-%patch0
-%patch1 -p1
+%patch 0
+%patch 1 -p1
 
 dos2unix README.txt
 

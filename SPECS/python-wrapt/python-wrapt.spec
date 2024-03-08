@@ -9,10 +9,10 @@ function wrappers and decorator functions.
 Summary:        A Python module for decorators, wrappers and monkey patching
 Name:           python-%{sname}
 Version:        1.15.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/GrahamDumpleton/wrapt
 Source0:        https://github.com/GrahamDumpleton/%{sname}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
@@ -67,9 +67,12 @@ popd
 %doc README.rst
 %license LICENSE
 %{python3_sitearch}/%{sname}
-%{python3_sitearch}/%{sname}-%{version}-py?.?.egg-info
+%{python3_sitearch}/%{sname}-%{version}-py*.egg-info
 
 %changelog
+* Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.15.0-2
+- Fix path to .egg-info
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.0-1
 - Auto-upgrade to 1.15.0 - Azure Linux 3.0 - package upgrades
 

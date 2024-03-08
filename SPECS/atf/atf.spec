@@ -4,7 +4,7 @@ Release:       2%{?dist}
 License:       BSD
 Summary:       Automated Testing Framework
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 URL:           https://github.com/jmmv/atf
 Source0:       https://github.com/jmmv/atf/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:       README
@@ -43,7 +43,7 @@ sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags} pkgtestsdir=%{_testsdir} testsdir=%{_testsdir}
 
-%if %{with_check}
+%if 0%{?with_check}
 %check
 make check
 %endif

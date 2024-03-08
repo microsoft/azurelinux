@@ -16,7 +16,7 @@ Version:        16.1
 Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            http://www.freedesktop.org/wiki/Software/PulseAudio
 Source0:        https://freedesktop.org/software/%{name}/releases/%{name}-%{version}.tar.gz
 # revert upstream commit to rely solely on autospawn for autostart, instead
@@ -73,7 +73,7 @@ BuildRequires:  systemd-devel >= 184
 %if 0%{?with_webrtc}
 BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  pkgconfig(check)
 %endif
 # retired along with -libs-zeroconf, add Obsoletes here for lack of anything better

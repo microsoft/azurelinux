@@ -8,13 +8,13 @@ URL:            https://metacpan.org/release/IO-Socket-SSL
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Socket-SSL-%{version}.tar.gz
 Source1:        LICENSE.PTR
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Net-SSLeay
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(FindBin)
 %endif

@@ -1,12 +1,13 @@
+%global debug_package %{nil}
 %global srcname conda-package-handling
 %global pkgname conda_package_handling
 Summary:        Create and extract conda packages of various formats
 Name:           python-%{srcname}
-Version:        1.7.2
-Release:        3%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/conda/conda-package-handling
 Source0:        https://github.com/conda/%{srcname}/archive/%{version}/%{srcname}-%{version}.tar.gz
 BuildRequires:  gcc
@@ -25,8 +26,8 @@ BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  python%{python3_pkgversion}-tqdm
 Requires:       python%{python3_pkgversion}-six
 Requires:       python%{python3_pkgversion}-tqdm
-%if %{with_check}
-BuildRequires:  python3-pip
+%if 0%{?with_check}
+BuildRequires:  python%{python3_pkgversion}-pip
 %endif
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -60,12 +61,15 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE
-%doc AUTHORS.txt CHANGELOG.md README.md
+%doc AUTHORS.md CHANGELOG.md README.md
 %{_bindir}/cph
 %{python3_sitelib}/%{pkgname}-*.egg-info/
 %{python3_sitelib}/%{pkgname}/
 
 %changelog
+* Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-1
+- Upgrade to version 2.2.0
+
 * Wed Jun 23 2021 Rachel Menge <rachelmenge@microsoft.com> - 1.7.2-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

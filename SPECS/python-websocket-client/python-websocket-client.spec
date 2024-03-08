@@ -4,7 +4,7 @@ Version:        1.6.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/websocket-client
 Source0:        https://github.com/websocket-client/websocket-client/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -19,7 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-atomicwrites

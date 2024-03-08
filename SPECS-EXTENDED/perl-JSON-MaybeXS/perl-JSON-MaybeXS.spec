@@ -11,7 +11,7 @@ Version:        1.004003
 Release:        5%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/JSON-MaybeXS
 Source0:        https://cpan.metacpan.org/modules/by-module/JSON/JSON-MaybeXS-%{version}.tar.gz
 
@@ -41,7 +41,7 @@ BuildRequires:  perl(lib)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(JSON::PP) >= 2.27300
 BuildRequires:  perl(JSON::XS) >= 3.0
 BuildRequires:  perl(Test::More) >= 0.88

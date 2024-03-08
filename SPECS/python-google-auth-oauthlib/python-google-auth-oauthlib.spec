@@ -6,7 +6,7 @@ Version:        1.0.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/googleapis/google-auth-library-python-oauthlib
 Source0:        https://files.pythonhosted.org/packages/e3/b4/ef2170c5f6aa5bc2461bab959a84e56d2819ce26662b50038d2d0602223e/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-click
@@ -17,7 +17,7 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-requests-oauthlib
 BuildRequires:  python3-setuptools
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

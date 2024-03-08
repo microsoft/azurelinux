@@ -11,13 +11,13 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/roast/formats"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
+	"github.com/microsoft/azurelinux/toolkit/tools/roast/formats"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -40,8 +40,7 @@ type convertResult struct {
 var (
 	app = kingpin.New("roast", "A tool to convert raw disk file into another image type")
 
-	logFile   = exe.LogFileFlag(app)
-	logLevel  = exe.LogLevelFlag(app)
+	logFlags  = exe.SetupLogFlags(app)
 	profFlags = exe.SetupProfileFlags(app)
 
 	inputDir  = exe.InputDirFlag(app, "A directory containing a .RAW image or a rootfs directory")
@@ -62,7 +61,7 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {

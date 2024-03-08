@@ -10,10 +10,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 )
 
 var (
@@ -83,6 +84,9 @@ func findSystemBootPartition(diskPartitions []diskutils.PartitionInfo) (*diskuti
 func findRootfsPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
 	var bootPartition *diskutils.PartitionInfo
 	bootPartition, err := findBootPartitionFromEsp(efiSystemPartition, diskPartitions, buildDir)
+	if err != nil {
+		return nil, err
+	}
 
 	rootfsPartition, err := tryFindRootfsPartitionFromBootPartition(bootPartition, diskPartitions, buildDir)
 	if err != nil {
@@ -107,10 +111,10 @@ func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskP
 	defer efiSystemPartitionMount.Close()
 
 	// Read the grub.cfg file.
-	grubConfigFilePath := filepath.Join(tmpDir, "boot/grub2/grub.cfg")
+	grubConfigFilePath := filepath.Join(tmpDir, installutils.GrubCfgFile)
 	grubConfigFile, err := os.ReadFile(grubConfigFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read grub.cfg file:\n%w", err)
+		return nil, fmt.Errorf("failed to read EFI system partition's grub.cfg file:\n%w", err)
 	}
 
 	// Close the EFI System Partition mount.

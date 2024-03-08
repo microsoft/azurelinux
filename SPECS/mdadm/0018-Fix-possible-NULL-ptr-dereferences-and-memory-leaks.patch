@@ -1,0 +1,73 @@
+From 626bc45396c4959f2c4685c2faa7c4f553f4efdf Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Mon, 13 Jun 2022 11:59:34 +0200
+Subject: [PATCH 18/83] Fix possible NULL ptr dereferences and memory leaks
+
+In Assemble there was a NULL check for sra variable,
+which effectively didn't stop the execution in every case.
+That might have resulted in a NULL pointer dereference.
+
+Also in super-ddf, mu variable was set to NULL for some condition,
+and then immidiately dereferenced.
+Additionally some memory wasn't freed as well.
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Assemble.c  | 7 ++++++-
+ super-ddf.c | 9 +++++++--
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/Assemble.c b/Assemble.c
+index 9eac9ce0..4b213560 100644
+--- a/Assemble.c
++++ b/Assemble.c
+@@ -1982,7 +1982,12 @@ int assemble_container_content(struct supertype *st, int mdfd,
+ 	}
+ 
+ 	sra = sysfs_read(mdfd, NULL, GET_VERSION|GET_DEVS);
+-	if (sra == NULL || strcmp(sra->text_version, content->text_version) != 0) {
++	if (sra == NULL) {
++		pr_err("Failed to read sysfs parameters\n");
++		return 1;
++	}
++
++	if (strcmp(sra->text_version, content->text_version) != 0) {
+ 		if (content->array.major_version == -1 &&
+ 		    content->array.minor_version == -2 &&
+ 		    c->readonly &&
+diff --git a/super-ddf.c b/super-ddf.c
+index 8cda23a7..abbc8b09 100644
+--- a/super-ddf.c
++++ b/super-ddf.c
+@@ -5125,13 +5125,16 @@ static struct mdinfo *ddf_activate_spare(struct active_array *a,
+ 	 */
+ 	vc = find_vdcr(ddf, a->info.container_member, rv->disk.raid_disk,
+ 		       &n_bvd, &vcl);
+-	if (vc == NULL)
++	if (vc == NULL) {
++		free(rv);
+ 		return NULL;
++	}
+ 
+ 	mu = xmalloc(sizeof(*mu));
+ 	if (posix_memalign(&mu->space, 512, sizeof(struct vcl)) != 0) {
+ 		free(mu);
+-		mu = NULL;
++		free(rv);
++		return NULL;
+ 	}
+ 
+ 	mu->len = ddf->conf_rec_len * 512 * vcl->conf.sec_elmnt_count;
+@@ -5161,6 +5164,8 @@ static struct mdinfo *ddf_activate_spare(struct active_array *a,
+ 			pr_err("BUG: can't find disk %d (%d/%d)\n",
+ 			       di->disk.raid_disk,
+ 			       di->disk.major, di->disk.minor);
++			free(mu);
++			free(rv);
+ 			return NULL;
+ 		}
+ 		vc->phys_refnum[i_prim] = ddf->phys->entries[dl->pdnum].refnum;
+-- 
+2.38.1
+

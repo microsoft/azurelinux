@@ -5,7 +5,7 @@ Version:        4.2.3
 Release:        15%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/thkukuk/yp-tools
 Source:         https://github.com/thkukuk/yp-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch1:         yp-tools-2.12-hash.patch
@@ -52,11 +52,11 @@ Install yp-tools-devel package for developing applications that use yp-tools
 
 %prep
 %setup -q
-%patch1 -p1 -b .hash
-%patch2 -p1 -b .crypt
-%patch3 -p1 -b .adjunct
-%patch4 -p1 -b .strict-prototypes
-%patch5 -p1
+%patch 1 -p1 -b .hash
+%patch 2 -p1 -b .crypt
+%patch 3 -p1 -b .adjunct
+%patch 4 -p1 -b .strict-prototypes
+%patch 5 -p1
 
 
 autoreconf -i -f -v

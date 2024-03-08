@@ -10,7 +10,7 @@ Version:        1.4.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pytest-dev/pytest-forked
 Source0:        https://files.pythonhosted.org/packages/f1/bc/0121a2e386b261b69f4f5aa48e5304c947451dce70d68628cb28d5cd0d28/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
@@ -18,7 +18,7 @@ BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

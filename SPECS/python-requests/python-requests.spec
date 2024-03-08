@@ -4,7 +4,7 @@ Version:        2.31.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            http://python-requests.org
 Source0:        https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz#/requests-%{version}.tar.gz
@@ -25,7 +25,7 @@ Requires:       python3-idna
 Requires:       python3-libs
 Requires:       python3-pyOpenSSL
 Requires:       python3-urllib3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-atomicwrites

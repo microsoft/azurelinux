@@ -1,12 +1,12 @@
-%define libselinuxver 3.2-1
-%define libsepolver 3.2-1
+%define libselinuxver 3.6-1
+%define libsepolver 3.6-1
 Summary:        SELinux policy compiler
 Name:           checkpolicy
-Version:        3.2
+Version:        3.6
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  bison
@@ -31,7 +31,7 @@ This package contains checkpolicy, the SELinux policy compiler.
 Only required for building policies.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 %make_build clean
@@ -47,18 +47,22 @@ mkdir -p %{buildroot}%{_bindir}
 install test/dismod %{buildroot}%{_bindir}/sedismod
 install test/dispol %{buildroot}%{_bindir}/sedispol
 
+%check
+%make_build test
+
 %files
-%license COPYING
+%license LICENSE
 %{_bindir}/checkpolicy
 %{_bindir}/checkmodule
 %{_bindir}/sedismod
 %{_bindir}/sedispol
 %{_mandir}/man8/checkpolicy.8.gz
 %{_mandir}/man8/checkmodule.8.gz
-%{_mandir}/ru/man8/checkpolicy.8.gz
-%{_mandir}/ru/man8/checkmodule.8.gz
 
 %changelog
+* Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
+- Upgrade to version 3.6
+
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
 - Add -fno-semantic-interposition to CFLAGS as recommended by upstream

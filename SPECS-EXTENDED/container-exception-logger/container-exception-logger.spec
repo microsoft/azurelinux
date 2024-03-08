@@ -1,10 +1,10 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global _hardened_build 1
 
 Name: container-exception-logger
 Version: 1.0.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Logging from a container to a host
 
 License: GPLv3+
@@ -12,7 +12,7 @@ URL: https://github.com/abrt/container-exception-logger
 # source is created by:
 # git clone https://github.com/abrt/container-exception-logger
 # cd container-exception-logger; tito build --tgz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: asciidoc
@@ -42,6 +42,9 @@ cp man/container-exception-logger.1 %{buildroot}/%{_mandir}/man1/container-excep
 %license COPYING
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-7
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.3-6
 - Updating source URLs.
 - License verified.

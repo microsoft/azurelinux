@@ -1,12 +1,12 @@
 Summary:       Setup RHEL-RT environment details
 Name:          rt-setup
 Version:       2.1
-Release:       5%{?dist}
+Release:       6%{?dist}
 License:       GPL+
 Vendor:        Microsoft Corporation
-Distribution:  Mariner
+Distribution:   Azure Linux
 Group:         System Environment/Base
-Source:        %{_mariner_sources_url}/rt-setup-%{version}.tar.bz2
+Source:        %{_distro_sources_url}/rt-setup-%{version}.tar.bz2
 Patch0:        no-annobin.patch
 ExclusiveArch: x86_64
 Requires:      /usr/sbin/groupadd
@@ -32,7 +32,7 @@ The 'rt-setup' package configures details required by RHEL-RT environment.
 
 %prep
 %setup -q
-%patch0
+%patch 0
 
 %build
 %set_build_flags
@@ -93,6 +93,9 @@ fi
 %attr(0644, root, root) %{_unitdir}/rt-entsk.service
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1-6
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1-5
 - Updating source URL.
 

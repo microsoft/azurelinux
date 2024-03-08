@@ -4,7 +4,7 @@ Version:        1.16.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cffi
 Source0:        https://pypi.python.org/packages/source/c/cffi/cffi-%{version}.tar.gz
@@ -19,7 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pycparser
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-pip

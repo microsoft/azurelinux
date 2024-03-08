@@ -3,13 +3,13 @@
 
 Summary:        Waitress WSGI server
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{srcname}
 Version:        1.4.4
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ZPLv2.1
 URL:            https://github.com/Pylons/%{srcname}
-Source0:        %{_mariner_sources_url}/%{name}-%{version}-nodocs.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}-nodocs.tar.gz
 # Upstream ships non free docs files.
 # We do not even want them in our src.rpms
 # So we remove them before uploading.
@@ -59,6 +59,9 @@ Python 3 version.
 %{python3_sitelib}/%{srcname}-*.egg-info/
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.4-8
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 03 2023 Muhammad Falak <mwani@microsoft.com> - 1.4.4-7
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified

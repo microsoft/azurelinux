@@ -4,7 +4,7 @@ Version:        3.36
 Release:        2%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fedoraproject.org/wiki/pykickstart
 Source0:        https://github.com/pykickstart/%{name}/archive/refs/tags/r%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gettext
@@ -15,7 +15,7 @@ BuildRequires:  python3-setuptools
 Requires:       python3-kickstart = %{version}-%{release}
 BuildArch:      noarch
 # Only required when building with RUN_CHECK=y
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-coverage
 BuildRequires:  python3-sphinx
 %endif

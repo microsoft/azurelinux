@@ -4,7 +4,7 @@ Version:        4.0.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/chardet/chardet
 #Source0:       https://github.com/chardet/chardet/archive/refs/tags/%{version}.tar.gz
@@ -22,7 +22,7 @@ BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 Requires:       python3
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
 %endif
 

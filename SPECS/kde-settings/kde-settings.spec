@@ -1,12 +1,12 @@
 
 Summary:        Config files for kde
 Name:           kde-settings
-Version:        36.0
+Version:        39.1
 Release:        1%{?dist}
 License:        MIT
 Url:            https://pagure.io/fedora-kde/kde-settings
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://pagure.io/fedora-kde/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:        COPYING
 
@@ -34,7 +34,7 @@ Summary: Configuration files for Qt
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 # omit crud
 rm -fv Makefile
@@ -89,19 +89,21 @@ rm -fv %{buildroot}%{_datadir}/plasma/look-and-feel/org.fedoraproject.fedora.des
 
 %files
 %license COPYING
-%config(noreplace) %{_sysconfdir}/profile.d/kde.*
+# drop noreplace, so we can be sure to get the new kiosk bits
+%{_datadir}/applications/kde-mimeapps.list
 %{_sysconfdir}/kde/env/env.sh
 %{_sysconfdir}/kde/env/gpg-agent-startup.sh
-%{_sysconfdir}/kde/shutdown/gpg-agent-shutdown.sh
 %{_sysconfdir}/kde/env/gtk2_rc_files.sh
-%config(noreplace) %{_sysconfdir}/xdg/kcm-about-distrorc
-%config(noreplace) %{_sysconfdir}/xdg/kdebugrc
+%{_sysconfdir}/kde/shutdown/gpg-agent-shutdown.sh
+%config %{_sysconfdir}/kde4rc
+%config %{_sysconfdir}/kderc
 %config(noreplace) %{_sysconfdir}/pam.d/kcheckpass
 %config(noreplace) %{_sysconfdir}/pam.d/kscreensaver
-# drop noreplace, so we can be sure to get the new kiosk bits
-%config %{_sysconfdir}/kderc
-%config %{_sysconfdir}/kde4rc
-%{_datadir}/applications/kde-mimeapps.list
+%config(noreplace) %{_sysconfdir}/profile.d/kde.*
+%config(noreplace) %{_sysconfdir}/xdg/kcm-about-distrorc
+%config(noreplace) %{_sysconfdir}/xdg/kdebugrc
+%{_sysconfdir}/fonts/conf.d/10-sub-pixel-rgb-for-kde.conf
+%{_libdir}/sddm/sddm.conf.d/kde_settings.conf
 
 %files -n qt-settings
 %license COPYING
@@ -109,6 +111,9 @@ rm -fv %{buildroot}%{_datadir}/plasma/look-and-feel/org.fedoraproject.fedora.des
 
 
 %changelog
+* Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 39.1-1
+- Upgrade for Azure Linux 3.0
+
 * Tue Feb 08 2022 Cameron Baird <cameronbaird@microsoft.com> 36.0-1
 - Update source to v36.0
 - License verified

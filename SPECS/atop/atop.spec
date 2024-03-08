@@ -5,7 +5,7 @@ Version:        2.9.0
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://www.atoptool.nl
 Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d
@@ -41,8 +41,8 @@ http://www.atcomputing.nl/Tools/atop/kernpatch.html
 
 %prep
 %setup -q
-%patch0  -b .sysconfig
-%patch1  -b .format
+%patch 0  -b .sysconfig
+%patch 1  -b .format
 
 # Correct unit file path
 sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service

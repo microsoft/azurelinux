@@ -1,10 +1,10 @@
 Summary:        A utility for patching ELF binaries
 Name:           patchelf
-Version:        0.14.3
+Version:        0.18.0
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://nixos.org/patchelf.html
 Source0:        https://github.com/NixOS/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  autoconf
@@ -32,13 +32,13 @@ rm src/elf.h
 %build
 sh ./bootstrap.sh
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %check
-make check
+make check || (cat tests/*.log; exit 1)
 
 %install
-make install DESTDIR=%{buildroot}
+%make_install
 
 # the docs get put in a funny place, so delete and include in the
 # standard way in the docs section below
@@ -49,8 +49,14 @@ rm -rf %{buildroot}%{_docdir}/%{name}
 %doc README.md
 %{_bindir}/patchelf
 %{_mandir}/man1/patchelf.1*
+%dir %{_datadir}/zsh            
+%dir %{_datadir}/zsh/site-functions            
+%{_datadir}/zsh/site-functions/_patchelf
 
 %changelog
+* Sat Feb 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.18.0-1
+- Upgrade to 1.18.0 in Mariner 3.0
+
 * Wed Jan 26 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 0.14.3-1
 - Upgraded to v0.14.3
 - Removed patch to disable set-interpreter-long test.

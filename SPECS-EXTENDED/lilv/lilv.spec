@@ -7,7 +7,7 @@ Version:        0.24.14
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://drobilla.net/software/lilv
 Source0:        https://download.drobilla.net/%{name}-%{version}.tar.bz2
 BuildRequires:  doxygen
@@ -27,7 +27,7 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
 %endif
 Requires:       lv2 >= 1.18.0
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  lcov
 %endif
 

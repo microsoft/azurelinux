@@ -6,10 +6,10 @@
 Summary:        Serial graphics BIOS option rom
 Name:           sgabios
 Version:        0.%{date}git
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/qemu/sgabios
 # There are no upstream releases.  This archive is prepared as follows:
 #
@@ -18,7 +18,7 @@ URL:            https://github.com/qemu/sgabios
 # hash=`git log -1 --format='%h'`
 # date=`git log -1 --format='%cd' --date=short | tr -d -`
 # git archive --prefix sgabios-${date}-git${hash}/ ${hash} | xz -7e > ../openbios-${date}-git${hash}.tar.xz
-Source0:        %{_mariner_sources_url}/%{name}-%{date}-git%{hash}.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{date}-git%{hash}.tar.xz
 BuildRequires:  gcc
 Requires:       %{name}-bin = %{version}-%{release}
 ExclusiveArch:  x86_64
@@ -59,6 +59,9 @@ install -m 0644 sgabios.bin %{buildroot}%{_datadir}/sgabios
 %{_datadir}/sgabios/sgabios.bin
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20180715git-9
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Apr 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.20180715git-8
 - Updating source URL.
 

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global cpan_version 1.40
 
 Name:           perl-Crypt-PasswdMD5
@@ -38,7 +38,7 @@ This package provides MD5-based crypt() functions.
 # Specify version requirement for Digest::MD5
 # This avoids the need to add an explicit dependency in the spec file
 # and the need to filter the underspecified auto-generated dependency
-%patch0
+%patch 0
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor

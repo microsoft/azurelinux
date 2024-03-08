@@ -24,7 +24,7 @@ Release:        4%{?dist}
 Summary:        A Drawing Library for Programs That Use PNG and JPEG Output
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://libgd.github.io/
 Source:         https://github.com/libgd/libgd/releases/download/%{name}-%{version}/%{prjname}-%{version}.tar.xz
 Source1:        baselibs.conf
@@ -38,7 +38,7 @@ BuildRequires:  fontconfig-devel
 # needed for tests
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  fontawesome-fonts
 %endif
 BuildRequires:  pkgconfig
@@ -80,9 +80,9 @@ the formats accepted for inline images by most browsers.
 
 %prep
 %setup -q -n %{prjname}-%{version}
-%patch1
-%patch2
-%patch3
+%patch 1
+%patch 2
+%patch 3
 chmod 644 COPYING
 
 %build

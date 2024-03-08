@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global debug_package   %{nil}
 
 Name:           PEGTL
@@ -33,7 +33,7 @@ applications that use %{name}.
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch0 -p1 -b .compiler
+%patch 0 -p1 -b .compiler
 
 %check
 make

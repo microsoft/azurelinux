@@ -4,7 +4,7 @@ Version:        3.2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/ousret/charset_normalizer
 Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
@@ -15,7 +15,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(pytest)
 %endif
 

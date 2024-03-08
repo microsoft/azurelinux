@@ -1,19 +1,21 @@
 Summary:        A library that implements the client-side of the ACVP protocol
 Name:           libacvp
-Version:        1.3.0
-Release:        3%{?dist}
+Version:        2.0.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/cisco/libacvp
 Source0:        https://github.com/cisco/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         openssl.patch
-Patch1:         non-static-configure.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
+BuildRequires:  curl-devel
 BuildRequires:  gcc
 BuildRequires:  make
+
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description
 A library that implements the client-side of the ACVP protocol.
@@ -22,19 +24,35 @@ A library that implements the client-side of the ACVP protocol.
 Summary:        LibACVP application for OpenSSL
 Group:          Applications/System
 BuildRequires:  openssl-devel
-Requires:       openssl-libs
 
 %description app
 This app provides the glue between the OpenSSL module under test
 and the library itself.
+
+%package devel
+Summary:        LibACVP application for OpenSSL
+Group:          Applications/System
+Requires:       %{name} = %{version}-%{release}
+
+%description devel
+Development files for LibACVP.
+
+%package libs
+Summary:        LibACVP application for OpenSSL
+Group:          Applications/System
+
+%description libs
+LibACVP shared libraries.
 
 %prep
 %autosetup -p1
 
 %build
 ./configure \
+    --disable-static \
     --prefix=%{_prefix} \
-    --enable-offline \
+    --with-libcurl-dir=%{_prefix} \
+    --with-ssl-dir=%{_prefix} \
     CFLAGS="-pthread -DACVP_NO_RUNTIME -DOPENSSL_KWP -DOPENSSL_KDF_SUPPORT -O2 -g -fcommon" \
     LIBS="-ldl"
 make clean
@@ -46,14 +64,25 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files
 %license LICENSE
-%{_datadir}/README.md
-%{_libdir}/libacvp.a
-%{_includedir}/acvp/*
+%doc %{_datadir}/README.md
 
 %files app
 %{_bindir}/acvp_app
 
+%files devel
+%{_includedir}/acvp/*
+%{_libdir}/libacvp.so
+
+%files libs
+%{_libdir}/libacvp.so.*
+
 %changelog
+* Tue Mar 05 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-1
+- Update to version 2.0.1.
+- Split out -devel and -libs subpackages.
+- Disabled static library build.
+- Disabled offline mode.
+
 * Wed Oct 05 2022 Andy Caldwell <andycaldwell@microsoft.com> - 1.3.0-3
 - Enable building without `glibc-static`
 

@@ -1,6 +1,6 @@
 diff -ruN a/td.gemspec b/td.gemspec
---- a/td.gemspec	2022-07-12 14:17:54.063278628 -0700
-+++ b/td.gemspec	2022-07-12 14:19:50.824670663 -0700
+--- a/td.gemspec        2024-02-29 21:18:18.870483966 +0000
++++ b/td.gemspec        2024-02-29 21:19:09.654145224 +0000
 @@ -10,9 +10,9 @@
    gem.version               = TreasureData::TOOLBELT_VERSION
    gem.authors               = ["Treasure Data, Inc."]
@@ -13,4 +13,4 @@ diff -ruN a/td.gemspec b/td.gemspec
 +  gem.executables           = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
    gem.require_paths         = ['lib']
    gem.required_ruby_version = '>= 2.1'
- 
+   gem.licenses              = ["Apache-2.0"]

@@ -8,14 +8,14 @@ Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{version}.tar.gz
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl-Exporter-Tiny
 BuildRequires:  perl-generators
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Math::Trig)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Tie::Array)

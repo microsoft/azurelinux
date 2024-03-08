@@ -1,0 +1,29 @@
+--- wordlist-rel-2020.12.07/varcon/split	2022-09-20 10:51:01.659480534 +0100
++++ wordlist-rel-2020.12.07/varcon/split	2022-09-20 10:50:55.565414190 +0100
+@@ -4,7 +4,6 @@
+ use warnings;
+ use IO::Handle;
+ 
+-use lib '.';
+ use varcon qw(%map $NUM_SP);
+ 
+ $varcon::MAX_VARIANT_LEVEL = 3;
+--- wordlist-rel-2020.12.07/varcon/w_variant	2022-09-20 11:11:26.393907205 +0100
++++ wordlist-rel-2020.12.07/varcon/w_variant	2022-09-20 11:11:30.693955056 +0100
+@@ -4,7 +4,6 @@
+ use warnings;
+ use IO::Handle;
+ 
+-use lib '.';
+ use varcon qw(%map);
+ 
+ my %F;
+--- wordlist-rel-2020.12.07/varcon/make-variant	2022-09-20 11:30:49.892916137 +0100
++++ wordlist-rel-2020.12.07/varcon/make-variant	2022-09-20 11:30:55.760982118 +0100
+@@ -1,6 +1,5 @@
+ #!/usr/bin/perl
+ 
+-use lib '.';
+ use varcon;
+ 
+ sub add 

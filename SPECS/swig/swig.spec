@@ -4,14 +4,14 @@ Version:        4.1.1
 Release:        1%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://swig.sourceforge.net/
 #Source0:       https://github.com/swig/swig/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  pcre-devel
 BuildRequires:  pcre2-devel
 Requires:       pcre
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
@@ -31,7 +31,7 @@ interpreted programming environments, systems integration, and as a
 tool for building user interfaces
 
 %prep
-%if %{with_check}
+%if 0%{?with_check}
 pip3 install 2to3
 %endif
 %autosetup

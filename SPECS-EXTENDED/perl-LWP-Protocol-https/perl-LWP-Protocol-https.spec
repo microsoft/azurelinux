@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 # Perform tests that need the Internet
 %bcond_with perl_LWP_Protocol_https_enables_internet_test
 
@@ -62,8 +62,8 @@ access sites using HTTP over SSL/TLS.
 
 %prep
 %setup -q -n LWP-Protocol-https-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 %if !%{with perl_LWP_Protocol_https_enables_internet_test}
 rm t/apache.t
 perl -i -ne 'print $_ unless m{^t/apache.t}' MANIFEST

@@ -1,16 +1,16 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: PostScript Utilities
 Name:    psutils
 Version: 1.23
-Release: 19%{?dist}
+Release: 20%{?dist}
 License: psutils
 
 # We can't follow https://fedoraproject.org/wiki/Packaging:SourceURL#Github
 # and use upstream tarball for building because ./bootstrap downloads gnulib.
 # wget https://github.com/rrthomas/psutils/archive/master.zip && unzip master.zip && cd psutils-master/
 # ./bootstrap && autoreconf -vfi && ./configure && make dist-xz
-Source: %{_mariner_sources_url}/psutils-%{version}.tar.xz
+Source: %{_distro_sources_url}/psutils-%{version}.tar.xz
 URL:    https://github.com/rrthomas/psutils
 
 # BZ#1072371
@@ -44,7 +44,7 @@ Various scripts from the psutils distribution that require perl.
 %prep
 %setup -q
 
-%patch0 -p1 -b .paperconf
+%patch 0 -p1 -b .paperconf
 # Use /usr/bin/perl instead of /usr/bin/env perl
 sed -i -e 's,/usr/bin/env perl,%{__perl},' \
   extractres psjoin
@@ -83,6 +83,9 @@ sed -i -e 's,/usr/bin/env perl,%{__perl},' \
 
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.23-20
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Apr 26 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.23-19
 - Updated source URL.
 - License verified.

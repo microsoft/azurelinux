@@ -69,9 +69,9 @@ Version:        1.0.0
 Release:        0%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://github.com/microsoft/CBL-Mariner
+URL:            https://github.com/microsoft/azurelinux
 Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/%{kernel_version}.tar.gz#/kernel-%{kernel_version}.tar.gz
 Source1:        config-%{kernel_version_release}
 Source2:        mariner-%{kernel_version_release}.pem

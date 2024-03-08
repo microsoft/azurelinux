@@ -19,15 +19,15 @@
 Summary:        Dependency injection specification for Java (JSR-330)
 Name:           atinject
 Version:        %{base_version}+%{git_version}
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://javax-inject.github.io/javax-inject/
 # git clone --bare git@github.com:javax-inject/javax-inject
 # git --git-dir=javax-inject.git archive --prefix %{name}-%{base_version}/ --format tar %{git_tag} | xz >%{name}-%{base_version}.tar.xz
-Source0:        %{_mariner_sources_url}/%{name}-%{base_version}.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{base_version}.tar.xz
 # These manifests based on the ones shipped by eclipse.org
 Source1:        MANIFEST.MF
 Source2:        MANIFEST-TCK.MF
@@ -114,6 +114,9 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-5
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1+20100611git1f74ea7-4
 - Moved from extended to core
 

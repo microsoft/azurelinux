@@ -1,10 +1,10 @@
 Summary:        A python based HTML parser/tokenizer
 Name:           python-html5lib
 Version:        1.1
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/html5lib/html5lib-python
 Source:         %{pypi_source html5lib}
 # Fix compatibility with pytest 6
@@ -16,7 +16,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-docutils
@@ -39,7 +39,7 @@ Summary:        %{summary}
 A python based HTML parser/tokenizer based on the WHATWG HTML5
 specification for maximum compatibility with major desktop web browsers.
 
-%{pyproject_extras_subpkg} -n python3-html5lib lxml genshi chardet all
+%pyproject_extras_subpkg -n python3-html5lib lxml genshi chardet all
 
 %prep
 %autosetup -p1 -n html5lib-%{version}
@@ -67,6 +67,9 @@ pip3 install more-itertools umsgpack webencodings
 %doc CHANGES.rst README.rst
 
 %changelog
+* Mon Mar 04 2024 Andrew Phelps <anphel@microsoft.com> - 1.1-10
+- Correct usage of %%pyproject_extras_subpkg macro
+
 * Fri Apr 08 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-9
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - Cleaning-up spec. License verified.

@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name: hunspell-it
 Summary: Italian hunspell dictionaries
 Version: 2.4
@@ -19,7 +19,7 @@ Italian hunspell dictionaries.
 
 %prep
 %setup -q -c -n hunspell-it
-%patch0 -p0 -b .cleandic
+%patch 0 -p0 -b .cleandic
 
 %build
 chmod -x *

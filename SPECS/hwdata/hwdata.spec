@@ -1,19 +1,28 @@
 Summary:        Hardware identification and configuration data
 Name:           hwdata
-Version:        0.356
+Version:        0.378
 Release:        1%{?dist}
 License:        GPLv2+ OR XFree86 1.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/vcrhonek/hwdata
 #WARNING: the source file downloads as 'v%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
 #Source0:       %%{url}/archive/v%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      noarch
+BuildRequires:  make
 
 %description
 hwdata contains various hardware identification and configuration data,
 such as the pci.ids and usb.ids databases.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name} = %{version}-%{release}
+ 
+%description    devel
+The %{name}-devel package contains files for developing applications that use
+%{name}.
 
 %prep
 %setup -q
@@ -31,7 +40,15 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 %{_libdir}/modprobe.d/dist-blacklist.conf
 %{_datadir}/%{name}/*
 
+%files devel
+%{_datadir}/pkgconfig/%{name}.pc
+
 %changelog
+* Thu Feb 02 2024 Nan Liu <liunan@microsoft.com> - 0.378-1
+- Upgrade to 0.378
+- Update License
+- Add devel package with pkgconfig file and BuildRequires
+
 * Fri Feb 18 2022 Cameron Baird <cameronbaird@microsoft.com> - 0.356-1
 - Update source to v0.356
 

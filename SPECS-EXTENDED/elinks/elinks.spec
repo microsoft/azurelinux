@@ -3,7 +3,7 @@ Summary:   A text-mode Web browser
 Version:   0.16.0
 Release:   3%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:   GPLv2
 URL:       https://github.com/rkd77/elinks
 Source:    https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz

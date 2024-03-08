@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global	gem_name	pkg-config
 
 %undefine        _changelog_trimtime
@@ -19,7 +19,7 @@ Patch0:   rubygem-pkg-config-1.4.4-cflags-result-sort.patch
 Requires:	ruby(release)
 BuildRequires:	ruby(release)
 BuildRequires:	rubygems-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:	rubygem(test-unit)
 BuildRequires:	ruby-devel
 BuildRequires:	cairo-devel

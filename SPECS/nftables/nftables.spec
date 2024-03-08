@@ -1,22 +1,17 @@
 Summary:        Netfilter Tables userspace utillites
 Name:           nftables
-Version:        1.0.1
-Release:        2%{?dist}
+Version:        1.0.9
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://netfilter.org/projects/nftables/
-Source0:        %{url}/files/%{name}-%{version}.tar.bz2
+Source0:        %{url}/files/%{name}-%{version}.tar.xz
 Source1:        nftables.service
 Source2:        nftables.conf
 Source3:        main.nft
 Source4:        router.nft
 Source5:        nat.nft
-
-# already upstream at https://git.netfilter.org/nftables/commit/?id=8492878961248b4b53fa97383c7c1b15d7062947
-Patch1:         nftables-1.0.1-drop-historyh.patch
-# already upstream at https://git.netfilter.org/nftables/commit/?id=3847fccf004525ceb97db6fbc681835b0ac9a61a
-Patch2:         nftables-1.0.1-fix-terse.patch
 
 BuildRequires:  asciidoc
 BuildRequires:  bison
@@ -30,6 +25,10 @@ BuildRequires:  libmnl-devel
 BuildRequires:  libnftnl-devel
 BuildRequires:  make
 BuildRequires:  python3-devel
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 BuildRequires:  readline-devel
 BuildRequires:  systemd
 
@@ -62,10 +61,17 @@ The nftables python module provides an interface to libnftables via ctypes.
 %configure --disable-silent-rules --with-xtables --with-json \
 	--enable-python --with-python-bin=%{__python3}
 %make_build
+pushd py/ >/dev/null
+%pyproject_wheel
+popd >/dev/null
 
 %install
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
+
+pushd py/ >/dev/null
+%pyproject_install
+popd >/dev/null
 
 # Don't ship static lib (for now at least)
 rm -f %{buildroot}/%{_libdir}/libnftables.a
@@ -124,10 +130,13 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{_mandir}/man3/libnftables.3*
 
 %files -n python3-nftables
-%{python3_sitelib}/nftables-*.egg-info
+%{python3_sitelib}/nftables-0.1.dist-info/
 %{python3_sitelib}/nftables/
 
 %changelog
+* Mon Feb 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.9-1
+- Update to v1.0.9
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.0.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

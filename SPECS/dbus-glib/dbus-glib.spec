@@ -4,7 +4,7 @@ Version:        0.112
 Release:        2%{?dist}
 License:        AFL OR GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dbus.freedesktop.org/doc/dbus-glib/
 Source0:        https://dbus.freedesktop.org/releases/dbus-glib/%{name}-%{version}.tar.gz
@@ -30,7 +30,7 @@ Headers and static libraries for the D-Bus GLib bindings
 
 %build
 %configure \
-%if %{with_check}
+%if 0%{?with_check}
     --enable-tests \
     --enable-asserts \
 %endif

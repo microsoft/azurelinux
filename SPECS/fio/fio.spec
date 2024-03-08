@@ -4,7 +4,7 @@ Version:        3.30
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
 Source0:        https://brick.kernel.dk/snaps/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
@@ -22,7 +22,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libpmem-devel
 BuildRequires:  libpmemblk-devel
 %endif
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  CUnit-devel
 %endif
 

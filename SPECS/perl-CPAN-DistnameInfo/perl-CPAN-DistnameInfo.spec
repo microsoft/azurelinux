@@ -5,7 +5,7 @@ Summary:        Extract distribution name and version from a distribution filena
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CPAN-DistnameInfo
 Source0:        https://cpan.metacpan.org/authors/id/G/GB/GBARR/CPAN-DistnameInfo-%{version}.tar.gz
 BuildArch:      noarch
@@ -17,7 +17,7 @@ BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Tests:
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(Data::Dumper)
 BuildRequires:  perl(Test::More)
 %endif

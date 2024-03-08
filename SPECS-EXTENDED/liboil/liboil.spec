@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Library of Optimized Inner Loops, CPU optimized functions
 Name: liboil
 Version: 0.3.16
@@ -39,7 +39,7 @@ extended instructions provided by modern CPUs (Altivec, MMX, SSE, etc.).
 
 %prep
 %setup -q
-%patch4 -p0 -b .disable-ppc64-opts
+%patch 4 -p0 -b .disable-ppc64-opts
 
 %build
 %configure

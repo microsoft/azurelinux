@@ -5,7 +5,7 @@ Version:        1.5.0
 Release:        6%{?dist}
 Summary:        Python 3 compatible NTLM library
 Vendor:		Microsoft Corporation
-Distribution:	Mariner
+Distribution:   Azure Linux
 License:        LGPLv3+
 URL:            https://pypi.python.org/pypi/ntlm-auth
 Source:         https://github.com/jborean93/ntlm-auth/archive/v%{version}/%{srcname}-%{version}.tar.gz
@@ -14,7 +14,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3dist(requests)
 BuildRequires:  python3dist(cryptography)
 BuildRequires:  python3-pip

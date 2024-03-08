@@ -1,17 +1,17 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: A plain ASCII to PostScript converter
 Name: enscript
 Version: 1.6.6
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv3+
 URL: http://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
 # $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 #http://neugierig.org/software/ruby/ruby-enscript.tar.gz
-Source1: %{_mariner_sources_url}/%{name}-ruby-1.6.4.tar.gz
+Source1: %{_distro_sources_url}/%{name}-ruby-1.6.4.tar.gz
 #http://home.raxnet.net/downloads/viewcvs/php.st
 Source2: enscript-php-1.6.4.st
 
@@ -58,17 +58,17 @@ includes many options for customizing printouts
 
 %prep
 %setup -q
-%patch3 -p1 -b .locale
-%patch8 -p1 -b .wrap_header
-%patch10 -p1 -b .rh457720
-%patch12 -p1 -b .rh477382
-%patch13 -p1 -b .build
-%patch14 -p1 -b .manfixes
-%patch15 -p1 -b .bufpos-crash
+%patch 3 -p1 -b .locale
+%patch 8 -p1 -b .wrap_header
+%patch 10 -p1 -b .rh457720
+%patch 12 -p1 -b .rh477382
+%patch 13 -p1 -b .build
+%patch 14 -p1 -b .manfixes
+%patch 15 -p1 -b .bufpos-crash
 # 1664367 - [RFE] Add support for 885915 encoding in enscript
-%patch16 -p1 -b .newencodings
+%patch 16 -p1 -b .newencodings
 # CVE in gnulib
-%patch17 -p1 -b .vasnprintf
+%patch 17 -p1 -b .vasnprintf
 
 %{__tar} -C states/hl -zxf %{SOURCE1} ruby.st
 install -pm 644 %{SOURCE2} states/hl/php.st
@@ -115,6 +115,9 @@ done
 %config(noreplace) %{_sysconfdir}/enscript.cfg
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-25
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-24
 - Updating source URLs.
 - License verified.

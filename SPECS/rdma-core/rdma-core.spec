@@ -4,7 +4,7 @@ Version:        49.1
 Release:        1%{?dist}
 URL:            https://github.com/linux-rdma/rdma-core
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 # Almost everything is licensed under the OFA dual GPLv2, 2 Clause BSD license
 #  providers/ipathverbs/ Dual licensed using a BSD license with an extra patent clause
@@ -20,17 +20,16 @@ Patch1: 0001-kernel-boot-Do-not-perform-device-rename-on-OPA-devi.patch
 # 32-bit arm is missing required arch-specific memory barriers,
 ExcludeArch: %{arm}
 
-%global azl3 1
 BuildRequires: binutils
 BuildRequires: cmake >= 2.8.11
 BuildRequires: gcc
 BuildRequires: pkg-config
 BuildRequires: pkgconfig(libnl-3.0)
 BuildRequires: pkgconfig(libnl-route-3.0)
-# Disable pyverbs for azl3, as pyverbs cannot build with cython > 3
+# Disable pyverbs for azl, as pyverbs cannot build with cython > 3
 # pyverbs/device.c: error: redefinition of '__Pyx_Enum_ibv_event_type_to_py'
 # and non-matching exception definitions
-%if 0%{azl3}
+%if 0%{azl}
 %define with_pyverbs 0
 %endif
 %if %{with_pyverbs}
@@ -348,7 +347,7 @@ fi
 %systemd_postun_with_restart iwpmd.service
 
 %files
-%license COPYING.BSD_FB COPYING.BSD_MIT COPYING.GPL2 COPYING.md 
+%license COPYING.BSD_FB COPYING.BSD_MIT COPYING.GPL2 COPYING.md
 %dir %{_sysconfdir}/rdma
 %dir %{_docdir}/%{name}
 %doc %{_docdir}/%{name}/README.md

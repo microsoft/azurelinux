@@ -1,10 +1,10 @@
 Summary:        Google's data interchange format - C implementation
 Name:           protobuf-c
-Version:        1.4.1
-Release:        1%{?dist}
+Version:        1.5.0
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://github.com/protobuf-c/protobuf-c
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -14,6 +14,8 @@ BuildRequires:  make
 BuildRequires:  pkg-config
 BuildRequires:  unzip
 BuildRequires:  pkgconfig(protobuf) >= 2.6.0
+BuildRequires:  protobuf
+BuildRequires:  protobuf-static
 Requires:       protobuf
 Provides:       %{name}-compiler = %{version}-%{release}
 
@@ -29,14 +31,6 @@ Requires:       %{name} = %{version}-%{release}
 The protobuf-c-devel package contains libraries and header files for
 developing applications that use protobuf-c.
 
-%package        static
-Summary:        protobuf-c static lib
-Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
-
-%description    static
-The protobuf-c-static package contains static protobuf-c libraries.
-
 %prep
 %autosetup -p1
 
@@ -47,6 +41,7 @@ The protobuf-c-static package contains static protobuf-c libraries.
 %install
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
+find %{buildroot} -type f -name "libprotobuf-c.a" -delete -print
 
 %check
 %make_build check
@@ -66,11 +61,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/*
 %{_libdir}/libprotobuf-c.so
 
-%files static
-%defattr(-,root,root)
-%{_libdir}/libprotobuf-c.a
-
 %changelog
+* Wed Mar 06 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-3
+- Remove protobuf-c static sub-package
+
+* Tue Mar 05 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-2
+- Add missing dependencies protobuf and protobuf-static
+
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.0-1
+- Auto-upgrade to 1.5.0 - Azure Linux 3.0 Upgrades
+
 * Mon Apr 24 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.4.1-1
 - Auto-upgrade to 1.4.1 - to fix CVE-2022-48468
 - Remove CVE-2022-33070 patch as not required for 1.4.1

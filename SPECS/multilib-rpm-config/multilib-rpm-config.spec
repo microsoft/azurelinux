@@ -4,10 +4,10 @@
 Summary:        Multilib packaging helpers
 Name:           multilib-rpm-config
 Version:        1
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://fedoraproject.org/wiki/PackagingDrafts/MultilibTricks
 Source0:        multilib-fix
 Source1:        macros.ml
@@ -16,7 +16,7 @@ Source3:        COPYING
 Source4:        multilib-library
 Source5:        multilib-info
 BuildRequires:  gcc
-Requires:       mariner-rpm-macros
+Requires:       azurelinux-rpm-macros
 BuildArch:      noarch
 
 %description
@@ -106,6 +106,9 @@ test `$capable --arch ppc64p7` = true
 %{macrosdir}/*
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1-18
+- Updating naming for 3.0 version of Azure Linux.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 1-17
 - License verified
 - Lint spec

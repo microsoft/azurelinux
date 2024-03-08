@@ -6,14 +6,18 @@ written in Python, to simplify the task of adding retry behavior to\
 just about anything.\
 
 Name:           python-%{pypi_name}
-Version:        1.3.3
-Release:        6%{?dist}
+Version:        1.3.4
+Release:        1%{?dist}
 Summary:        General-purpose retrying library in Python
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
-URL:            https://github.com/rholder/retrying
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{pypi_name}-%{version}.tar.gz
+Distribution:   Azure Linux
+URL:            https://pypi.org/project/retrying
+Source0:        https://files.pythonhosted.org/packages/ce/70/15ce8551d65b324e18c5aa6ef6998880f21ead51ebe5ed743c0950d7d9dd/retrying-1.3.4.tar.gz
+
+# The tarball does not contain the tests, so add them here
+Source1:        test_retrying.py
+
 BuildArch:      noarch
 
 %description %{_description}
@@ -24,14 +28,16 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 Requires:       python3-six
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-six
+BuildRequires:  python3-pip
 %endif
 
 %description -n python3-%{pypi_name} %{_description}
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
+cp -p %{SOURCE1} .
 
 %build
 %py3_build
@@ -50,6 +56,9 @@ BuildRequires:  python3-six
 %{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Mon Feb 26 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.3.4-1
+- Upgrade to 1.3.4
+
 * Wed Jul 06 2022 Sumedh Sharma <sumsharma@microsoft.com> - 1.3.3-6
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Adding as run dependency for package cassandra medusa

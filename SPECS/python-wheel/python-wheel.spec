@@ -6,7 +6,7 @@ Version:        0.33.6
 Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/pypa/wheel
 Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
 %global pypi_name wheel
@@ -20,7 +20,7 @@ A wheel is a ZIP-format archive with a specially formatted filename and the\
 compatible install in a way that is very close to the on-disk format.
 BuildArch:      noarch
 %{?python_enable_dependency_generator}
-%if %{with_check}
+%if 0%{?with_check}
 # several tests compile extensions
 # those tests are skipped if gcc is not found
 BuildRequires:  gcc
@@ -33,7 +33,7 @@ Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{pypi_name}}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
 BuildRequires:  python3-attrs
 BuildRequires:  python3-pip

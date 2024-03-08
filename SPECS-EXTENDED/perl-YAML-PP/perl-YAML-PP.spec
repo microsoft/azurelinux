@@ -8,7 +8,7 @@ Version:        0.031
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/YAML-PP/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-PP-%{version}.tar.gz
 BuildArch:      noarch
@@ -51,7 +51,7 @@ BuildRequires:  perl(boolean)
 BuildRequires:  perl(constant)
 BuildRequires:  perl(overload)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::File)
 BuildRequires:  perl(IO::Handle)

@@ -4,7 +4,7 @@ Version:        1.3.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.aleksey.com/xmlsec
 Source0:        https://www.aleksey.com/xmlsec/download/older-releases/%{name}-%{version}.tar.gz
@@ -21,7 +21,7 @@ Provides:       %{name}-gcrypt = %{release}-%{version}
 Provides:       %{name}-gnutls = %{release}-%{version}
 Provides:       %{name}-openssl = %{release}-%{version}
 Provides:       %{name}-nss = %{release}-%{version}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  nss-tools
 %endif
 

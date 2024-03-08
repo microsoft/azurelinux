@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global upstream_name requests-kerberos
 %global module_name requests_kerberos
 %global commit0 393e49c698904c76ad9f56c6e4dbd2dbc55a7c42
@@ -22,7 +22,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-mock
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -50,7 +50,7 @@ authentication.
 
 %prep
 %setup -q -n %{upstream_name}-%{commit0}
-%patch1 -p1
+%patch 1 -p1
 
 %build
 %py3_build

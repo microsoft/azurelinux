@@ -1,0 +1,122 @@
+From 9a7df595bbe360132cb37c8b39aa1fd9ac24b43f Mon Sep 17 00:00:00 2001
+From: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Date: Tue, 21 Jun 2022 00:10:43 +0800
+Subject: [PATCH 25/83] imsm: block changing slots during creation
+
+If user specifies drives for array creation, then slot order across
+volumes is not preserved.
+Ideally, it should be checked in validate_geometry() but it is not
+possible in current implementation (order is determined later).
+Add verification in add_to_super_imsm_volume() and throw error if
+mismatch is detected.
+IMSM allows to use only same members within container.
+This is not hardware dependency but metadata limitation.
+Therefore, 09-imsm-overlap test is removed. Testing it is pointless.
+After this patch, creation in this scenario is blocked. Offset
+verification is covered in other tests.
+
+Signed-off-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ super-intel.c        | 33 ++++++++++++++++++++++-----------
+ tests/09imsm-overlap | 28 ----------------------------
+ 2 files changed, 22 insertions(+), 39 deletions(-)
+ delete mode 100644 tests/09imsm-overlap
+
+diff --git a/super-intel.c b/super-intel.c
+index deef7c87..8ffe485c 100644
+--- a/super-intel.c
++++ b/super-intel.c
+@@ -5789,6 +5789,10 @@ static int add_to_super_imsm_volume(struct supertype *st, mdu_disk_info_t *dk,
+ 	struct imsm_map *map;
+ 	struct dl *dl, *df;
+ 	int slot;
++	int autolayout = 0;
++
++	if (!is_fd_valid(fd))
++		autolayout = 1;
+ 
+ 	dev = get_imsm_dev(super, super->current_vol);
+ 	map = get_imsm_map(dev, MAP_0);
+@@ -5799,25 +5803,32 @@ static int add_to_super_imsm_volume(struct supertype *st, mdu_disk_info_t *dk,
+ 		return 1;
+ 	}
+ 
+-	if (!is_fd_valid(fd)) {
+-		/* we're doing autolayout so grab the pre-marked (in
+-		 * validate_geometry) raid_disk
+-		 */
+-		for (dl = super->disks; dl; dl = dl->next)
++	for (dl = super->disks; dl ; dl = dl->next) {
++		if (autolayout) {
+ 			if (dl->raiddisk == dk->raid_disk)
+ 				break;
+-	} else {
+-		for (dl = super->disks; dl ; dl = dl->next)
+-			if (dl->major == dk->major &&
+-			    dl->minor == dk->minor)
+-				break;
++		} else if (dl->major == dk->major && dl->minor == dk->minor)
++			break;
+ 	}
+ 
+ 	if (!dl) {
+-		pr_err("%s is not a member of the same container\n", devname);
++		if (!autolayout)
++			pr_err("%s is not a member of the same container.\n",
++			       devname);
+ 		return 1;
+ 	}
+ 
++	if (!autolayout && super->current_vol > 0) {
++		int _slot = get_disk_slot_in_dev(super, 0, dl->index);
++
++		if (_slot != dk->raid_disk) {
++			pr_err("Member %s is in %d slot for the first volume, but is in %d slot for a new volume.\n",
++			       dl->devname, _slot, dk->raid_disk);
++			pr_err("Raid members are in different order than for the first volume, aborting.\n");
++			return 1;
++		}
++	}
++
+ 	if (mpb->num_disks == 0)
+ 		if (!get_dev_sector_size(dl->fd, dl->devname,
+ 					 &super->sector_size))
+diff --git a/tests/09imsm-overlap b/tests/09imsm-overlap
+deleted file mode 100644
+index ff5d2093..00000000
+--- a/tests/09imsm-overlap
++++ /dev/null
+@@ -1,28 +0,0 @@
+-
+-. tests/env-imsm-template
+-
+-# create raid arrays with varying degress of overlap
+-mdadm -CR $container -e imsm -n 6 $dev0 $dev1 $dev2 $dev3 $dev4 $dev5
+-imsm_check container 6
+-
+-size=1024
+-level=1
+-num_disks=2
+-mdadm -CR $member0 $dev0 $dev1 -n $num_disks -l $level -z $size
+-mdadm -CR $member1 $dev1 $dev2 -n $num_disks -l $level -z $size
+-mdadm -CR $member2 $dev2 $dev3 -n $num_disks -l $level -z $size
+-mdadm -CR $member3 $dev3 $dev4 -n $num_disks -l $level -z $size
+-mdadm -CR $member4 $dev4 $dev5 -n $num_disks -l $level -z $size
+-
+-udevadm settle
+-
+-offset=0
+-imsm_check member $member0 $num_disks $level $size 1024 $offset
+-offset=$((offset+size+4096))
+-imsm_check member $member1 $num_disks $level $size 1024 $offset
+-offset=$((offset+size+4096))
+-imsm_check member $member2 $num_disks $level $size 1024 $offset
+-offset=$((offset+size+4096))
+-imsm_check member $member3 $num_disks $level $size 1024 $offset
+-offset=$((offset+size+4096))
+-imsm_check member $member4 $num_disks $level $size 1024 $offset
+-- 
+2.38.1
+

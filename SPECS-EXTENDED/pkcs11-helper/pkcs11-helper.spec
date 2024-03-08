@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           pkcs11-helper
 Version:        1.22
 Release:        11%{?dist}
@@ -37,7 +37,7 @@ programs using the pkcs11-helper library.
 
 %prep
 %setup -q
-%patch2 -p1
+%patch 2 -p1
 
 %build
 %configure --disable-static --enable-doc

@@ -63,7 +63,7 @@
 %undefine _package_note_file
 
 # Skip module metadata notes for perl due to issue with embedded build ldflags
-%undefine mariner_module_ldflags
+%undefine distro_module_ldflags 
 
 Name:           perl
 # These are all found licenses. They are distributed among various
@@ -127,11 +127,11 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        503%{?dist}
+Release:        505%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.cpan.org/src/5.0/perl-%{perl_version}.tar.xz
 Source3:        macros.perl
 # Tom Christiansen confirms Pod::Html uses the same license as perl
@@ -472,9 +472,9 @@ Recommends:     perl-doc = %{perl_version}-%{release}
 Requires:       perl(Devel::PPPort)
 # Compiler and linker options stored into perl and used when building XS
 # modules refer to hardening profiles like
-# /usr/lib/rpm/mariner/default-hardened-cc1 that are delivered by
-# mariner-rpm-macros. Bug #1557667.
-Requires:       mariner-rpm-macros
+# /usr/lib/rpm/azl/default-hardened-cc1 that are delivered by
+# azurelinux-rpm-macros. Bug #1557667.
+Requires:       azurelinux-rpm-macros
 
 %if %{defined perl_bootstrap}
 Requires:       %perl_compat
@@ -4076,16 +4076,7 @@ The "vmsish" pragma control VMS-specific features of the Perl language. If
 you're not running VMS, this module does nothing.
 
 %prep
-%setup -q -n perl-%{perl_version}
-%patch5 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-%patch200 -p1
-%patch201 -p1
+%autosetup -p1 -n perl-%{perl_version}
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
@@ -6847,6 +6838,13 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-505
+- Updating naming for 3.0 version of Azure Linux.
+
+* Thu Feb 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4:5.38.2-504
+- Updated patch application macros.
+- Applying missed patches 14 and 202.
+
 * Thu Dec 14 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-503
 - Upgrade to version 5.38.2 referencing Fedora 39 (license: MIT)
 
@@ -8833,5 +8831,3 @@ related to tests!
 
 * Thu Nov 29 2007 Robin Norwood <rnorwood@redhat.com> - 4:5.10.0_RC2-0.1
 - first attempt at building 5.10.0
-
-

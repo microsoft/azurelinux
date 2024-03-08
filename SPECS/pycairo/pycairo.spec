@@ -3,7 +3,7 @@ Name:           pycairo
 Version:        1.24.0
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 License:        MPLv1.1 or LGPLv2
 URL:            https://cairographics.org/pycairo
 Source0:        https://github.com/pygobject/pycairo/releases/download/v%{version}/%{name}-%{version}.tar.gz
@@ -13,7 +13,7 @@ BuildRequires:  pkgconfig
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 

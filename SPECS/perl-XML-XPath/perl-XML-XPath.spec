@@ -11,7 +11,7 @@ Release:        1%{?dist}
 # Others: Artistic 2.0
 License:        Artistic 2.0 AND (GPL+ OR Artistic)
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-XPath
 Source0:        https://cpan.metacpan.org/authors/id/M/MA/MANWAR/XML-XPath-%{version}.tar.gz
 BuildArch:      noarch
@@ -33,7 +33,7 @@ BuildRequires:  perl(strict)
 BuildRequires:  perl(vars)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(App::cpanminus)
 BuildRequires:  perl(Test)
 BuildRequires:  perl(Test::More)

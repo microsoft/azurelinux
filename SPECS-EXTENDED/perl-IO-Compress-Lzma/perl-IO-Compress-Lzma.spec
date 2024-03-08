@@ -4,7 +4,7 @@ Version:        2.101
 Release:        5%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/IO-Compress-Lzma
 Source0:        https://cpan.metacpan.org/modules/by-module/IO/IO-Compress-Lzma-%{version}.tar.gz
 Source1:        LICENSE.PTR
@@ -33,7 +33,7 @@ BuildRequires:  perl(constant)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  xz
 BuildRequires:  xz-lzma-compat
 BuildRequires:  perl(Carp)

@@ -10,10 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 
 	"gonum.org/v1/gonum/graph"
 	graphpath "gonum.org/v1/gonum/graph/path"
@@ -36,15 +36,14 @@ var (
 	app            = kingpin.New("graphanalytics", "A tool to print analytics of a given dependency graph.")
 	inputGraphFile = exe.InputFlag(app, "Path to the DOT graph file to analyze.")
 	maxResults     = app.Flag("max-results", "The number of results to print per category. Set 0 to print unlimited.").Default(defaultMaxResults).Int()
-	logFile        = exe.LogFileFlag(app)
-	logLevel       = exe.LogLevelFlag(app)
+	logFlags       = exe.SetupLogFlags(app)
 )
 
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	err := analyzeGraph(*inputGraphFile, *maxResults)
 	if err != nil {

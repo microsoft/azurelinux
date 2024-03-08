@@ -5,12 +5,12 @@ Version:            0.12.0
 Release:            15%{?dist}
 Summary:            Python to transform XML to JSON
 Vendor:		    Microsoft Corporation
-Distribution:	    Mariner
+Distribution:   Azure Linux
 License:            MIT
 URL:                https://github.com/martinblech/xmltodict
 Source0:            %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
 BuildArch:          noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:          python3-pip
 %endif
 

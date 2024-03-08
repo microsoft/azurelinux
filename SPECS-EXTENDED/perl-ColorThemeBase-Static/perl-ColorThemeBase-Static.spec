@@ -6,7 +6,7 @@ Version:        0.008
 Release:        6%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/ColorThemeBase-Static/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeBase-Static-%{version}.tar.gz
 
@@ -22,7 +22,7 @@ BuildRequires:  perl(parent)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)
 BuildRequires:  perl(IPC::Open3)

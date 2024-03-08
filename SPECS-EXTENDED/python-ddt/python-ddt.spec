@@ -13,7 +13,7 @@ different test data, and make it appear as multiple test cases. It is used in
 combination with other testing frameworks like unittest and nose.}
 
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{pkgname}
 Version:        1.4.2
 Release:        6%{?dist}
@@ -31,7 +31,7 @@ BuildArch:      noarch
 Summary:        %{summary}
 BuildRequires:  python3-devel
 BuildRequires:  %{py3_dist setuptools}
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  %{py3_dist pytest pyyaml six}
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}

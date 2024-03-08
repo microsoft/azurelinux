@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global provider_dir %{_libdir}/cmpi
 
 Name:           sblim-cmpi-nfsv4
@@ -45,9 +45,9 @@ SBLIM Base Fsvol Testcase Files for SBLIM Testsuite
 
 %prep
 %setup -q
-%patch0 -p1 -b .docdir
-%patch1 -p1 -b .pegasus-interop
-%patch2 -p1 -b .prov-reg-sfcb-systemd
+%patch 0 -p1 -b .docdir
+%patch 1 -p1 -b .pegasus-interop
+%patch 2 -p1 -b .prov-reg-sfcb-systemd
 
 %build
 %ifarch s390 s390x ppc ppc64

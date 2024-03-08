@@ -1,12 +1,12 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 #global prever rcX
 %global _hardened_build 1
 
 Summary: DNSSEC key and zone management software
 Name: opendnssec
 Version: 2.1.7
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: BSD
 Url: http://www.opendnssec.org/
 Source0: http://www.opendnssec.org/files/source/%{?prever:testing/}%{name}-%{version}%{?prever}.tar.gz
@@ -50,7 +50,7 @@ name server. It requires a PKCS#11 crypto module library, such as softhsm
 sed -i "s/1024/2048/" conf/kasp.xml.in
 
 %build
-export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/mariner/default-hardened-ld"
+export LDFLAGS="-Wl,-z,relro,-z,now -pie -specs=/usr/lib/rpm/azl/default-hardened-ld"
 export CFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wextra -Wformat -Wformat-nonliteral -Wformat-security"
 export CXXFLAGS="$RPM_OPT_FLAGS -fPIE -pie -Wformat-nonliteral -Wformat-security"
 %if 0%{?prever:1}
@@ -179,6 +179,10 @@ ods-enforcer update all >/dev/null 2>/dev/null ||:
 %systemd_postun_with_restart ods-signerd.service
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-5
+- Updating naming for 3.0 version of Azure Linux.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.1.7-4
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

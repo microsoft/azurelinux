@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %define libxml2_version 2.4.12
 %define glib2_version 2.25.9
 %define dbus_version 1.0.1
@@ -82,12 +82,12 @@ development using GConf.
 
 %prep
 %setup -q -n GConf-%{version}
-%patch0 -p1 -b .gettext
-%patch1 -p1 -b .drop-spew
-%patch2 -p1 -b .abi-break
+%patch 0 -p1 -b .gettext
+%patch 1 -p1 -b .drop-spew
+%patch 2 -p1 -b .abi-break
 
-%patch99 -p1 -b .workaround-crash
-%patch100 -p1 -b .pkill-hack
+%patch 99 -p1 -b .workaround-crash
+%patch 100 -p1 -b .pkill-hack
 
 autoreconf -i -f
 

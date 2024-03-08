@@ -8,7 +8,7 @@ Version:        2.13.1
 Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://abrt.readthedocs.org/
 Source:         https://github.com/abrt/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         0001-gui-wizard-gtk-Fix-segfault.patch
@@ -44,7 +44,7 @@ Requires:       lz4
 Requires:       nettle
 Requires:       satyr >= 0.24
 Requires:       xz
-%if %{with_check} && 0%{?mariner_failing_tests}
+%if 0%{?with_check} && 0%{?mariner_failing_tests}
 # A test case uses zh_CN locale to verify XML event translations
 BuildRequires:  glibc-all-langpacks
 %endif

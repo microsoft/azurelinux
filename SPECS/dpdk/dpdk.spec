@@ -29,20 +29,20 @@
 %bcond_without tools
 Summary:        Set of libraries and drivers for fast packet processing
 Name:           dpdk
-Version:        21.11.2
+Version:        23.11
 Release:        2%{?dist}
 License:        BSD AND LGPLv2 AND GPLv2
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://dpdk.org
 Source0:        https://fast.%{name}.org/rel/%{name}-%{version}.tar.xz
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  kernel-headers
 BuildRequires:  libnuma-devel
 BuildRequires:  libpcap-devel
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  meson
 BuildRequires:  python3-pyelftools
 BuildRequires:  python3-sphinx
@@ -103,10 +103,10 @@ as L2 and L3 forwarding.
 %define incdir %{_includedir}/%{name}
 %define pmddir %{_libdir}/%{name}-pmds
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %prep
-%autosetup -p1 -n dpdk-stable-%{version}
+%autosetup -p1 -n dpdk-%{version}
 
 %build
 CFLAGS="$(echo %{optflags} -fcommon)" \
@@ -122,7 +122,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %else
   --default-library=static
 %endif
- 
+
 %meson_build
 
 %install
@@ -179,6 +179,12 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 %endif
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 23.11-2
+- Updating naming for 3.0 version of Azure Linux.
+
+* Tue Jan 23 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 23.11-1
+- Update to version 23.11 for 3.0 upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 21.11.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
@@ -400,7 +406,7 @@ CFLAGS="$(echo %{optflags} -fcommon)" \
 - Remove ix86 from ExclusiveArch -- it does not build with above changes
 
 * Thu Jul 10 2014 - Neil Horman <nhorman@tuxdriver.com> - 1.7.0-1.0
-- Update source to official 1.7.0 release 
+- Update source to official 1.7.0 release
 
 * Thu Jul 03 2014 - Neil Horman <nhorman@tuxdriver.com>
 - Fixing up release numbering

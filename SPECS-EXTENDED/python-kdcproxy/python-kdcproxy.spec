@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global realname kdcproxy
 
 Name:           python-%{realname}
@@ -17,7 +17,7 @@ BuildRequires:  git
 BuildRequires:  python3-asn1crypto
 BuildRequires:  python3-devel
 BuildRequires:  python3-dns
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-coverage
 BuildRequires:  python3-mock
 BuildRequires:  python3-pip

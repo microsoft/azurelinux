@@ -1,10 +1,10 @@
 Summary:        Wayland Compositor Infrastructure
 Name:           wayland
-Version:        1.21.0
+Version:        1.22.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://wayland.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/%{name}/%{name}/-/releases/%{version}/downloads/%{name}-%{version}.tar.xz
 BuildRequires:  docbook-style-xsl
@@ -94,7 +94,7 @@ Wayland server library
 %{_datadir}/wayland/wayland.dtd
 
 %files doc
-%doc README
+%doc README.md
 
 %files -n libwayland-client
 %license COPYING
@@ -113,6 +113,9 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Tue Feb 13 2024 Vince Perri <viperri@microsoft.com> - 1.22.0-1
+- Upgrade to 1.22.0
+
 * Wed Oct 05 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 1.21.0-1
 - Upgrade to version 1.21.0 to fix CVE-2021-3782
 

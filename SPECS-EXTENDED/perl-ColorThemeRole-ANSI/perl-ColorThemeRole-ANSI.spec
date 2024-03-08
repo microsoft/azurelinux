@@ -4,7 +4,7 @@ Version:        0.001
 Release:        6%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/ColorThemeRole-ANSI/
 Source0:        https://cpan.metacpan.org/authors/id/P/PE/PERLANCAR/ColorThemeRole-ANSI-%{version}.tar.gz
 
@@ -21,7 +21,7 @@ BuildRequires:  perl(Role::Tiny)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(ColorTheme::Test::Static)
 BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(IO::Handle)

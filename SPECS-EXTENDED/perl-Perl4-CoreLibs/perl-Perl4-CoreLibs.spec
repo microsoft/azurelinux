@@ -1,5 +1,5 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           perl-Perl4-CoreLibs
 Version:        0.004
 Release:        11%{?dist}
@@ -82,7 +82,7 @@ predates satisfactory replacements.
 
 %prep
 %setup -q -n Perl4-CoreLibs-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 perl Build.PL installdirs=vendor

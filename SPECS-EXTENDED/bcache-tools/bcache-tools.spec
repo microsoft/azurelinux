@@ -1,22 +1,22 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Summary: Tools for Linux kernel block layer cache
 Name: bcache-tools
 Version: 1.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 URL: http://bcache.evilpiepirate.org/
 VCS: git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # cd bcache-tools/
 # git archive --format=tar --prefix=bcache-tools-1.1/ bcache-tools-1.1 | gzip > ../bcache-tools-1.1.tar.gz
-Source0: %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # This part is a prerelease version obtained by https://gist.github.com/djwong/6343451:
 # git clone https://gist.github.com/6343451.git
 # cd 6343451/
 # git archive --format=tar --prefix=bcache-status-20140220/ 6d278f9886ab5f64bd896080b1b543ba7ef6c7a6 | gzip > ../bcache-status-20140220.tar.gz
 # see also http://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
-Source1: %{_mariner_sources_url}/bcache-status-20140220.tar.gz
+Source1: %{_distro_sources_url}/bcache-status-20140220.tar.gz
 # bcache status not provided as a true package, so this is a self maintained
 # man page for it
 # http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
@@ -56,16 +56,16 @@ This package contains the utilities for manipulating bcache.
 %prep
 %setup -q -n bcache-tools-%{version}
 tar xzf %{SOURCE1} --strip-components=1
-%patch0 -p1 -b .man
-%patch1 -p1 -b .cmdline
-%patch2 -p1 -b .fedconfmake
+%patch 0 -p1 -b .man
+%patch 1 -p1 -b .cmdline
+%patch 2 -p1 -b .fedconfmake
 chmod +x configure
-%patch3 -p1 -b .noprobe
-%patch4 -p1 -b .util-linux-hdr
+%patch 3 -p1 -b .noprobe
+%patch 4 -p1 -b .util-linux-hdr
 
-%patch5 -p1 -b .python3
-%patch6 -p1 -b .rootgc
-%patch7 -p1 -b .man
+%patch 5 -p1 -b .python3
+%patch 6 -p1 -b .rootgc
+%patch 7 -p1 -b .man
 
 %build
 %configure
@@ -108,6 +108,9 @@ install -p  -m 755 bcache-status %{buildroot}%{_sbindir}/bcache-status
 %{dracutlibdir}/modules.d/90bcache
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1-2
 - Updating source URLs.
 - License verified.

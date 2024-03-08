@@ -1,14 +1,13 @@
 Summary:        gptfdisk
 Name:           gptfdisk
-Version:        1.0.8
+Version:        1.0.10
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Filesystem and Disk management
 URL:            https://sourceforge.net/projects/gptfdisk/
 Source0:        https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
-Patch0:         fix-format-security.patch
 BuildRequires:  gcc
 BuildRequires:  libuuid-devel
 BuildRequires:  make
@@ -45,6 +44,11 @@ install -m644 *.8 %{buildroot}%{_mandir}/man8
 %{_mandir}/man8/*
 
 %changelog
+* Wed Feb 28 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.10-1
+- Upgrade to latest upstream version
+- verified that fix for -Werror=format-security detailed below is present in the
+    new upstream sources
+
 * Fri Jun 17 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.0.8-2
 - Add upstream patch to fix -Werror=format-security errors after ncurses 6.3 upgrade
 

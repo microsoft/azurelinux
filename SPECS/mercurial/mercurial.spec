@@ -1,15 +1,15 @@
 Summary:        A free, distributed source control management tool.
 Name:           mercurial
-Version:        6.0.3
-Release:        2%{?dist}
+Version:        6.5.1
+Release:        1%{?dist}
 License:        GPLv2+
 URL:            https://www.mercurial-scm.org
 Group:          System Environment/Security
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        https://www.mercurial-scm.org/release/%{name}-%{version}.tar.gz
 BuildRequires:  python3-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  check
 BuildRequires:  python3-setuptools
 BuildRequires:  unzip
@@ -51,14 +51,22 @@ popd
 %postun
 /sbin/ldconfig
 
+# tries to set zsh_completions_dir or fallback to default value. Used in %files section
+%define zsh_completions_dir %(pkg-config --variable=completionsdir zsh 2>/dev/null || echo '%{_datadir}/zsh/site-functions')
+
 %files
 %defattr(-,root,root)
 %license COPYING
+/usr/share/bash-completion/completions/hg
+%{zsh_completions_dir}/_hg
 /.hgrc
 %{_bindir}/hg
 %{python3_sitelib}/*
 
 %changelog
+* Tue Feb 06 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.5.1-1
+- Auto-upgrade to 6.5.1 - 3.0 package upgrade
+
 * Tue Mar 28 2022 Olivia Crain <oliviacrain@microsoft.com> - 6.0.3-2
 - Remove unwanted check-time dependency on python-setuptools (replace with py3 version)
 

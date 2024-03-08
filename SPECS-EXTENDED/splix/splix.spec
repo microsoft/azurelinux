@@ -1,18 +1,18 @@
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 %global checkout 20130902svn
 
 Summary: Driver for QPDL/SPL2 printers (Samsung and several Xerox printers)
 Name: splix
 Version: 2.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 URL: http://splix.sourceforge.net/
 
 # This is a SVN snapshot downloaded via 'Download Snapshot' from
 # https://sourceforge.net/p/splix/code/315/tree/
 # and renamed to follow naming guidelines
-Source0: %{_mariner_sources_url}/%{name}-%{version}.%{checkout}.tar.bz2
+Source0: %{_distro_sources_url}/%{name}-%{version}.%{checkout}.tar.bz2
 
 # IEEE 1284 Device IDs
 Patch0:  splix-deviceID.patch
@@ -50,8 +50,8 @@ pushd ppd
 make distclean
 popd
 
-%patch0 -p1 -b .deviceID
-%patch1 -p1 -b .ldflags
+%patch 0 -p1 -b .deviceID
+%patch 1 -p1 -b .ldflags
 
 %build
 %set_build_flags
@@ -72,6 +72,9 @@ make install DRV_ONLY=1 CUPSDRV=%{_datadir}/cups/drv/splix DESTDIR=%{buildroot}
 %{_datadir}/cups/drv/splix
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.0.1-3
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.0.1-2
 - Update Source0
 - License verified.

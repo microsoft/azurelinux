@@ -2,7 +2,7 @@
 
 Summary:        Test utilities for code working with files and commands
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Name:           python-%{pypi_name}
 Version:        0.5.0
 Release:        4%{?dist}
@@ -17,7 +17,7 @@ BuildRequires:  python3-flit
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
 
-%if %{with_check}
+%if 0%{?with_check}
 # Tests:
 BuildRequires:  python3-pytest
 %endif

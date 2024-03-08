@@ -5,11 +5,11 @@ Version:        1.7.4
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://apr.apache.org/
 Source0:        https://dlcdn.apache.org/%{name}/%{name}-%{version}.tar.gz
-%if %{with_check}
+%if 0%{?with_check}
 # test_serv_by_name test requires /etc/services file from iana-etc package
 BuildRequires:  iana-etc
 %endif

@@ -1,24 +1,39 @@
 Summary:        Next generation system logger facilty
 Name:           syslog-ng
-Version:        3.33.2
-Release:        4%{?dist}
+Version:        4.3.1
+Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          System Environment/Daemons
 URL:            https://syslog-ng.org/
 Source0:        https://github.com/balabit/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        60-syslog-ng-journald.conf
 Source2:        syslog-ng.service
+Patch0:         remove-hardcoded-python-module-versioning.patch
 BuildRequires:  glib-devel
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  python3-devel
 BuildRequires:  systemd-devel
-%if %{with_check}
-BuildRequires:  curl-devel
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-cachetools
+BuildRequires:  python3-certifi
+BuildRequires:  python3-charset-normalizer
+BuildRequires:  python3-google-auth
+BuildRequires:  python3-idna
+BuildRequires:  python3-kubernetes
+BuildRequires:  python3-oauthlib
+BuildRequires:  python3-pyasn1
+BuildRequires:  python3-pyasn1-modules
+BuildRequires:  python3-dateutil
+BuildRequires:  python3-PyYAML
+BuildRequires:  python3-requests
+BuildRequires:  python3-requests-oauthlib
+BuildRequires:  python3-rsa
+BuildRequires:  python3-six
+BuildRequires:  python3-urllib3
+BuildRequires:  python3-websocket-client
 Requires:       glib
 Requires:       json-c
 Requires:       json-glib
@@ -50,7 +65,7 @@ Requires:       %{name} = %{version}-%{release}
  needed to build applications using syslog-ng APIs.
 
 %prep
-%setup -q
+%autosetup -p1
 rm -rf ../p3dir
 cp -a . ../p3dir
 
@@ -67,6 +82,7 @@ cp -a . ../p3dir
     --disable-java \
     --disable-redis \
     --with-python=3 \
+    --with-python-packages=system \
     PYTHON=/bin/python3 \
     PKG_CONFIG_PATH=%{_prefix}/local/lib/pkgconfig/
 make %{?_smp_mflags}
@@ -85,10 +101,6 @@ sed -i 's/eventlog//g'  %{buildroot}%{_libdir}/pkgconfig/syslog-ng.pc
 install -vdm755 %{buildroot}%{_libdir}/systemd/system-preset
 echo "disable syslog-ng.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-syslog-ng.preset
 
-%check
-pip3 install unittest2 nose ply pep8
-make %{?_smp_mflags} check
-
 %post
 if [ $1 -eq 1 ] ; then
   mkdir -p %{_prefix}%{_var}/
@@ -105,7 +117,6 @@ fi
 %defattr(-,root,root)
 %license COPYING GPL.txt LGPL.txt
 %config(noreplace) %{_sysconfdir}/syslog-ng/syslog-ng.conf
-%config(noreplace) %{_sysconfdir}/syslog-ng/scl.conf
 %{_sysconfdir}/systemd/journald.conf.d/*
 %{_libdir}/systemd/system/syslog-ng.service
 %{_libdir}/systemd/system-preset/50-syslog-ng.preset
@@ -137,6 +148,7 @@ fi
 %files -n python3-syslog-ng
 %defattr(-,root,root,-)
 %{_libdir}/syslog-ng/python/*
+%{_sysconfdir}/%{name}/python/README.md
 
 %files devel
 %defattr(-,root,root)
@@ -147,6 +159,18 @@ fi
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Thu Mar 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-2
+- Remove check section as unit testing is disabled in source
+
+* Thu Feb 01 2024 Henry Li <lihl@microsoft.com> - 4.3.1-1
+- Upgrade to v4.3.1
+- Change to using autosetup
+- Apply patch to disable hardcoded python module versioning
+- Add multiple python packages as build requirements
+- Add --with-python-packages=system to load the python modules in the system instead of
+  from virtual environment which is default setting
+- Add README.md to python3-syslog-ng sub-package
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.33.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

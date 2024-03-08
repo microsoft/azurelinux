@@ -4,7 +4,7 @@ Release:        3%{?dist}
 Summary:        Handy utf8 tests
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Test-utf8
 Source0:        https://cpan.metacpan.org/modules/by-module/Test/Test-utf8-%{version}.tar.gz#/perl-Test-utf8-%{version}.tar.gz
 Source1:        LICENSE.PTR
@@ -45,8 +45,8 @@ strings in Perl.
 
 %prep
 %setup -q -n Test-utf8-%{version}
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 # Remove bundled modules
 rm -rf ./inc/*
 sed -i -e '/^inc\//d' MANIFEST
