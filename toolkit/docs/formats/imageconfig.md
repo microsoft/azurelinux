@@ -556,7 +556,7 @@ A sample image configuration, producing a VHDX disk image:
                 "ImaPolicy": ["tcb"],
                 "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

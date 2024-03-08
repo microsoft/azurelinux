@@ -1,0 +1,54 @@
+From 24d329fc97a64ec185ef27e59730f3f058c09029 Mon Sep 17 00:00:00 2001
+From: Xiao Ni <xni@redhat.com>
+Date: Thu, 5 Jan 2023 00:29:20 +0800
+Subject: [PATCH 79/83] mdadm/udev: Don't handle change event on raw devices
+
+The raw devices are ready when add event happpens and the raid
+can be assembled. So there is no need to handle change events.
+And it can cause some inconvenient problems.
+
+For example, the OS is installed on md0(/root) and md1(/home).
+md0 and md1 are created on partitions. When it wants to re-install
+OS, anaconda can't clear the storage configure. It deletes one
+partition and does some jobs. The change event happens. Now
+the raid device is assembled again. It can't delete the other
+partitions.
+
+So in this patch, we don't handle change event on raw devices
+anymore.
+
+Signed-off-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ udev-md-raid-assembly.rules | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/udev-md-raid-assembly.rules b/udev-md-raid-assembly.rules
+index 39b4344b..d4a7f0a5 100644
+--- a/udev-md-raid-assembly.rules
++++ b/udev-md-raid-assembly.rules
+@@ -11,6 +11,11 @@ SUBSYSTEM!="block", GOTO="md_inc_end"
+ ENV{SYSTEMD_READY}=="0", GOTO="md_inc_end"
+ 
+ # handle potential components of arrays (the ones supported by md)
++# For member devices which are md/dm devices, we don't need to
++# handle add event. Because md/dm devices need to do some init jobs.
++# Then the change event happens.
++# When adding md/dm devices, ID_FS_TYPE can only be linux_raid_member
++# after change event happens.
+ ENV{ID_FS_TYPE}=="linux_raid_member", GOTO="md_inc"
+ 
+ # "noiswmd" on kernel command line stops mdadm from handling
+@@ -28,6 +33,9 @@ GOTO="md_inc_end"
+ 
+ LABEL="md_inc"
+ 
++# Bare disks are ready when add event happens, the raid can be assembled.
++ACTION=="change", KERNEL!="dm-*|md*", GOTO="md_inc_end"
++
+ # remember you can limit what gets auto/incrementally assembled by
+ # mdadm.conf(5)'s 'AUTO' and selectively whitelist using 'ARRAY'
+ ACTION!="remove", IMPORT{program}="BINDIR/mdadm --incremental --export $devnode --offroot $env{DEVLINKS}"
+-- 
+2.38.1
+

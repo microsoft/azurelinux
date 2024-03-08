@@ -1,0 +1,56 @@
+From 33831d845a48b9a2ac4d1e954c88a3dd8cb15753 Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 1 Mar 2023 13:41:35 -0700
+Subject: [PATCH 105/120] manpage: Add --write-zeroes option to manpage
+
+Document the new --write-zeroes option in the manpage.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Kinga Tanska <kinga.tanska@linux.intel.com>
+Reviewed-by: Xiao Ni <xni@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ mdadm.8.in | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/mdadm.8.in b/mdadm.8.in
+index 64f71ed1..6f0f6c13 100644
+--- a/mdadm.8.in
++++ b/mdadm.8.in
+@@ -837,6 +837,22 @@ array is resynced at creation.  From Linux version 3.0,
+ .B \-\-assume\-clean
+ can be used with that command to avoid the automatic resync.
+ 
++.TP
++.BR \-\-write-zeroes
++When creating an array, send write zeroes requests to all the block
++devices.  This should zero the data area on all disks such that the
++initial sync is not necessary and, if successfull, will behave
++as if
++.B \-\-assume\-clean
++was specified.
++.IP
++This is intended for use with devices that have hardware offload for
++zeroing, but despite this zeroing can still take several minutes for
++large disks.  Thus a message is printed before and after zeroing and
++each disk is zeroed in parallel with the others.
++.IP
++This is only meaningful with --create.
++
+ .TP
+ .BR \-\-backup\-file=
+ This is needed when
+@@ -1370,7 +1386,7 @@ and
+ .B layout\-alternate
+ options are for RAID0 arrays with non-uniform devices size that were in
+ use before Linux 5.4.  If the array was being used with Linux 3.13 or
+-earlier, then to assemble the array on a new kernel, 
++earlier, then to assemble the array on a new kernel,
+ .B \-\-update=layout\-original
+ must be given.  If the array was created and used with a kernel from Linux 3.14 to
+ Linux 5.3, then
+-- 
+2.38.1
+

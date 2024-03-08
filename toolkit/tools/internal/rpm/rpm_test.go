@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -182,19 +182,19 @@ func TestExtractNameFromRPMPath(t *testing.T) {
 			name:     "invalid rpm file",
 			rpmFile:  "/path/to/garbage.rpm",
 			expected: "",
-			err:      fmt.Errorf("invalid RPM file path '%s', can't extract name", "/path/to/garbage.rpm"),
+			err:      fmt.Errorf("invalid RPM file path (%s), can't extract name", "/path/to/garbage.rpm"),
 		},
 		{
 			name:     "empty rpm file",
 			rpmFile:  "",
 			expected: "",
-			err:      fmt.Errorf("invalid RPM file path '%s', can't extract name", ""),
+			err:      fmt.Errorf("invalid RPM file path (%s), can't extract name", ""),
 		},
 		{
 			name:     "just a hyphen",
 			rpmFile:  "-",
 			expected: "",
-			err:      fmt.Errorf("invalid RPM file path '%s', can't extract name", "-"),
+			err:      fmt.Errorf("invalid RPM file path (%s), can't extract name", "-"),
 		},
 	}
 

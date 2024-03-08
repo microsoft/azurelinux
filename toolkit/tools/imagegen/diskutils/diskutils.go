@@ -15,11 +15,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 var (
@@ -469,27 +469,27 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
 		if err != nil {
-			err = fmt.Errorf("Failed to create single partition:\n%w", err)
+			err = fmt.Errorf("failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
-			err = fmt.Errorf("Failed to format partition:\n%w", err)
+			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				err = fmt.Errorf("Failed to initialize encrypted root:\n%w", err)
+				err = fmt.Errorf("failed to initialize encrypted root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
 			if err != nil {
-				err = fmt.Errorf("Failed to initialize read only root:\n%w", err)
+				err = fmt.Errorf("failed to initialize read only root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice

@@ -15,21 +15,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/resources"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
 )
 
@@ -211,15 +211,20 @@ func createOverlayPartition(partitionSetting configuration.PartitionSetting, mou
 // - mountPointToFsTypeMap is the map of mountpoint to the file type
 // - mountPointToMountArgsMap is the map of mountpoint to the parameters sent to
 // - mountPointToOverlayMap is the map of mountpoint to the overlay structure containing the base image
-func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (installMap map[string]string, err error) {
-	installMap = make(map[string]string)
+func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap,
+	mountPointToMountArgsMap map[string]string, mountPointToOverlayMap map[string]*Overlay,
+) (mountList []string, err error) {
 	for _, mountPoint := range sortMountPoints(&mountPointMap, false) {
 		device := mountPointMap[mountPoint]
-		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
+		err = mountSingleMountPoint(installRoot, mountPoint, device, mountPointToFsTypeMap[mountPoint],
+			mountPointToMountArgsMap[mountPoint], mountPointToOverlayMap[mountPoint])
 		if err != nil {
 			return
 		}
-		installMap[mountPoint] = device
+
+		// Add to the list 1-by-1 so that the we can safely unmount if mounting fails half-way through.
+		// Note: The order of 'mountList' dictates the order the /etc/fstab file is written in.
+		mountList = append(mountList, mountPoint)
 	}
 	return
 }
@@ -228,14 +233,19 @@ func CreateInstallRoot(installRoot string, mountPointMap, mountPointToFsTypeMap,
 // - installRoot is the path to the root where the mountpoints exist
 // - mountPointMap is the map of mountpoints to partition device paths
 // - mountPointToOverlayMap is the map of mountpoints to overlay devices
-func DestroyInstallRoot(installRoot string, mountPointMap map[string]string, mountPointToOverlayMap map[string]*Overlay) (err error) {
+func DestroyInstallRoot(installRoot string, mountList []string, mountPointMap map[string]string,
+	mountPointToOverlayMap map[string]*Overlay,
+) (err error) {
 	logger.Log.Trace("Destroying InstallRoot")
 
 	defer OverlayUnmount(mountPointToOverlayMap)
 
 	logger.Log.Trace("Destroying InstallRoot")
+
 	// Reverse order for unmounting
-	for _, mountPoint := range sortMountPoints(&mountPointMap, true) {
+	for i := len(mountList) - 1; i >= 0; i-- {
+		mountPoint := mountList[i]
+
 		err = diskutils.BlockOnDiskIO(mountPointMap[mountPoint])
 		if err != nil {
 			logger.Log.Errorf("DestroyInstallRoot flush IO Error: %s", err.Error())
@@ -408,7 +418,11 @@ func PackageNamesFromConfig(config configuration.Config) (packageList []*pkgjson
 // - partIDToFsTypeMap is a map of partition IDs to filesystem type
 // - encryptedRoot stores information about the encrypted root device if root encryption is enabled
 // - diffDiskBuild is a flag that denotes whether this is a diffdisk build or not
-func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, diffDiskBuild bool) (err error) {
+func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []string,
+	config configuration.SystemConfig, mountList []string, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap,
+	partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice,
+	diffDiskBuild bool,
+) (err error) {
 	timestamp.StartEvent("populating install root", nil)
 	defer timestamp.StopEvent(nil)
 
@@ -495,7 +509,8 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	if !config.IsRootFS() {
 		// Configure system files
-		err = configureSystemFiles(installChroot, hostname, config, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot)
+		err = configureSystemFiles(installChroot, hostname, config, mountList, installMap, mountPointToFsTypeMap,
+			mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot)
 		if err != nil {
 			return
 		}
@@ -645,7 +660,10 @@ func TdnfInstallWithProgress(packageName, installRoot string, currentPackagesIns
 	return
 }
 
-func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice) (err error) {
+func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, config configuration.SystemConfig,
+	mountList []string, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap,
+	partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice,
+) (err error) {
 	// Update hosts file
 	err = updateHosts(installChroot.RootDir(), hostname)
 	if err != nil {
@@ -653,13 +671,14 @@ func configureSystemFiles(installChroot *safechroot.Chroot, hostname string, con
 	}
 
 	// Update fstab
-	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, config.EnableHidepid)
+	err = UpdateFstab(installChroot.RootDir(), config.PartitionSettings, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, config.EnableHidepid)
 	if err != nil {
 		return
 	}
 
 	// Update crypttab
-	err = updateCrypttab(installChroot.RootDir(), installMap, encryptedRoot)
+	err = updateCrypttab(installChroot.RootDir(), mountPointMap, encryptedRoot)
 	if err != nil {
 		return
 	}
@@ -778,11 +797,12 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 		const (
 			libModDir     = "/lib/modules"
 			dracutModules = "dm crypt crypt-gpg crypt-loop lvm"
-			initrdPrefix  = "/boot/initrd.img-"
+			initrdPrefix  = "/boot/initramfs-"
+			initrdSuffix  = ".img"
 			cryptTabPath  = "/etc/crypttab"
 		)
 
-		initrdPattern := fmt.Sprintf("%v%v", initrdPrefix, "*")
+		initrdPattern := fmt.Sprintf("%v*%v", initrdPrefix, initrdSuffix)
 		initrdImageSlice, err := filepath.Glob(initrdPattern)
 		if err != nil {
 			logger.Log.Warnf("Unable to get initrd image: %v", err)
@@ -801,6 +821,7 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 
 		// Get the kernel version
 		kernel := strings.TrimPrefix(initrdImage, initrdPrefix)
+		kernel = strings.TrimSuffix(kernel, initrdSuffix)
 
 		// Construct list of files to install in initramfs
 		installFiles := fmt.Sprintf("%v %v", cryptTabPath, diskutils.DefaultKeyFilePath)
@@ -828,21 +849,21 @@ func updateInitramfsForEncrypt(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, installMap,
-	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+func UpdateFstab(installRoot string, partitionSettings []configuration.PartitionSetting, mountList []string,
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
 	hidepidEnabled bool,
 ) (err error) {
 	const fstabPath = "/etc/fstab"
 
 	fullFstabPath := filepath.Join(installRoot, fstabPath)
 
-	return UpdateFstabFile(fullFstabPath, partitionSettings, installMap,
+	return UpdateFstabFile(fullFstabPath, partitionSettings, mountList, mountPointMap,
 		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap,
 		hidepidEnabled)
 }
 
-func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, installMap,
-	mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
+func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.PartitionSetting, mountList []string,
+	mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap map[string]string,
 	hidepidEnabled bool,
 ) (err error) {
 	const (
@@ -850,14 +871,17 @@ func UpdateFstabFile(fullFstabPath string, partitionSettings []configuration.Par
 	)
 	ReportAction("Configuring fstab")
 
-	for mountPoint, devicePath := range installMap {
+	for _, mountPoint := range mountList {
+		devicePath := mountPointMap[mountPoint]
+
 		if mountPoint != "" && devicePath != NullDevice {
 			partSetting := configuration.FindMountpointPartitionSetting(partitionSettings, mountPoint)
 			if partSetting == nil {
 				err = fmt.Errorf("unable to find PartitionSetting for '%s", mountPoint)
 				return
 			}
-			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint], mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
+			err = addEntryToFstab(fullFstabPath, mountPoint, devicePath, mountPointToFsTypeMap[mountPoint],
+				mountPointToMountArgsMap[mountPoint], partSetting.MountIdentifier, !doPseudoFsMount)
 			if err != nil {
 				return
 			}
@@ -987,8 +1011,9 @@ func addEntryToCrypttab(installRoot string, devicePath string, encryptedRoot dis
 
 func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVerityRootEnable bool,
 	partitionSettings []configuration.PartitionSetting, kernelCommandLine configuration.KernelCommandLine,
-	installChroot *safechroot.Chroot, diskDevPath string, installMap map[string]string,
+	installChroot *safechroot.Chroot, diskDevPath string, mountPointMap map[string]string,
 	encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, enableGrubMkconfig bool,
+	includeLegacyGrubCfg bool,
 ) (err error) {
 	timestamp.StartEvent("configuring bootloader", nil)
 	defer timestamp.StopEvent(nil)
@@ -999,15 +1024,15 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	var rootDevice string
 
 	// Add bootloader. Prefer a separate boot partition if one exists.
-	bootDevice, isBootPartitionSeparate := installMap[bootMountPoint]
+	bootDevice, isBootPartitionSeparate := mountPointMap[bootMountPoint]
 	bootPrefix := ""
 	if !isBootPartitionSeparate {
-		bootDevice = installMap[rootMountPoint]
+		bootDevice = mountPointMap[rootMountPoint]
 		// If we do not have a separate boot partition we will need to add a prefix to all paths used in the configs.
 		bootPrefix = "/boot"
 	}
 
-	if installMap[rootMountPoint] == NullDevice {
+	if mountPointMap[rootMountPoint] == NullDevice {
 		// In case of overlay device being mounted at root, no need to change the bootloader.
 		return
 	}
@@ -1034,7 +1059,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 	rootMountIdentifier := rootPartitionSetting.MountIdentifier
 	if encryptionEnable {
 		// Encrypted devices don't currently support identifiers
-		rootDevice = installMap[rootMountPoint]
+		rootDevice = mountPointMap[rootMountPoint]
 	} else if readOnlyVerityRootEnable {
 		var partIdentifier string
 		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, readOnlyRoot.BackingDevice)
@@ -1045,7 +1070,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 		rootDevice = fmt.Sprintf("verityroot:%v", partIdentifier)
 	} else {
 		var partIdentifier string
-		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, installMap[rootMountPoint])
+		partIdentifier, err = FormatMountIdentifier(rootMountIdentifier, mountPointMap[rootMountPoint])
 		if err != nil {
 			err = fmt.Errorf("failed to get partIdentifier: %s", err)
 			return
@@ -1056,7 +1081,7 @@ func ConfigureDiskBootloader(bootType string, encryptionEnable bool, readOnlyVer
 
 	// Grub will always use filesystem UUID, never PARTUUID or PARTLABEL
 	err = InstallGrubDefaults(installChroot.RootDir(), rootDevice, bootUUID, bootPrefix, encryptedRoot,
-		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		kernelCommandLine, readOnlyRoot, isBootPartitionSeparate, includeLegacyGrubCfg)
 	if err != nil {
 		err = fmt.Errorf("failed to install main grub config file: %s", err)
 		return
@@ -1106,18 +1131,41 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
+// - includeLegacyCfg specifies if the legacy grub.cfg from Mariner 2.0 should also be added.
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
-func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string, encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine, readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool) (err error) {
-	const (
-		assetGrubDefFile = "assets/grub2/grub"
-		grubDefFile      = "etc/default/grub"
-	)
-
+func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
+	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
+	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool, includeLegacyCfg bool,
+) (err error) {
 	// Copy the bootloader's /etc/default/grub and set the file permission
-	installGrubDefFile := filepath.Join(installRoot, grubDefFile)
+	err = installGrubTemplateFile(resources.AssetsGrubDefFile, GrubDefFile, installRoot, rootDevice, bootUUID,
+		bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+	if err != nil {
+		logger.Log.Warnf("Failed to install (%s): %v", GrubDefFile, err)
+		return
+	}
 
-	err = file.CopyResourceFile(resources.ResourcesFS, assetGrubDefFile, installGrubDefFile, bootDirectoryDirMode,
+	if includeLegacyCfg {
+		// Add the legacy /boot/grub2/grub.cfg file, which was used in Mariner 2.0.
+		err = installGrubTemplateFile(resources.AssetsGrubCfgFile, GrubCfgFile, installRoot, rootDevice, bootUUID,
+			bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
+		if err != nil {
+			logger.Log.Warnf("Failed to install (%s): %v", GrubCfgFile, err)
+			return
+		}
+	}
+
+	return
+}
+
+func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, bootUUID, bootPrefix string,
+	encryptedRoot diskutils.EncryptedRootDevice, kernelCommandLine configuration.KernelCommandLine,
+	readOnlyRoot diskutils.VerityDevice, isBootPartitionSeparate bool,
+) (err error) {
+	installGrubDefFile := filepath.Join(installRoot, targetFile)
+
+	err = file.CopyResourceFile(resources.ResourcesFS, assetFile, installGrubDefFile, bootDirectoryDirMode,
 		bootDirectoryFileMode)
 	if err != nil {
 		return
@@ -1767,12 +1815,14 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 		if err != nil {
 			return err
 		}
-	}
 
-	// Cleanup temporary directory.
-	err = os.RemoveAll(targetRootPath)
-	if err != nil {
-		return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+		// Cleanup the temporary directory.
+		// Note: This is intentionally done within the for loop to ensure the directory is always empty for the next
+		// mount. For example, if a parent directory mount is processed after a nested child directory mount.
+		err = os.RemoveAll(targetRootPath)
+		if err != nil {
+			return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
+		}
 	}
 
 	return
@@ -1940,17 +1990,16 @@ func FormatMountIdentifier(identifier configuration.MountIdentifier, device stri
 // - installChroot is the installation chroot
 func enableCryptoDisk() (err error) {
 	const (
-		grubPath           = "/etc/default/grub"
 		grubCryptoDisk     = "GRUB_ENABLE_CRYPTODISK=y\n"
 		grubPreloadModules = `GRUB_PRELOAD_MODULES="lvm"`
 	)
 
-	err = file.Append(grubCryptoDisk, grubPath)
+	err = file.Append(grubCryptoDisk, GrubDefFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to add grub cryptodisk: %v", err)
 		return
 	}
-	err = file.Append(grubPreloadModules, grubPath)
+	err = file.Append(grubPreloadModules, GrubDefFile)
 	if err != nil {
 		logger.Log.Warnf("Failed to add grub preload modules: %v", err)
 		return
@@ -1991,7 +2040,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	}
 
 	// Set the boot prefix path
-	prefixPath := filepath.Join(bootPrefix, "grub2")
+	prefixPath := filepath.Join("/", bootPrefix, "grub2")
 	err = setGrubCfgPrefixPath(prefixPath, grubFinalPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set prefixPath in grub.cfg: %v", err)
@@ -2584,7 +2633,7 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 // stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
 //
 // It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the mariner-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
 // To be able to cleanly exit the setup chroot, we must stop it.
 func stopGPGAgent(installChroot *safechroot.Chroot) {
 	installChroot.UnsafeRun(func() error {

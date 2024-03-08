@@ -38,7 +38,7 @@ TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
 set -ex
 
 export LFS=$MARINER_BUILD_DIR/toolchain/populated_toolchain
-TOPDIR=/usr/src/mariner
+TOPDIR=/usr/src/azl
 CHROOT_BUILDROOT_DIR=$LFS$TOPDIR/BUILDROOT
 CHROOT_SOURCES_DIR=$LFS$TOPDIR/SOURCES
 CHROOT_SPECS_DIR=$LFS$TOPDIR/SPECS
@@ -239,8 +239,8 @@ chroot_and_run_rpmbuild () {
         rpmbuild --nodeps --rebuild --clean     \
             $CHECK_SETTING                 \
             --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "$MARINER_DIST_MACRO" --define "mariner_build_number $PARAM_BUILD_NUM" \
-            --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
-            --define "mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
+            --define "distro_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
+            --define "distro_module_ldflags  -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
 
     chroot_unmount
@@ -310,11 +310,11 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
-cp -v $SPECROOT/mariner-rpm-macros/macros $LFS/usr/etc/rpm/macros
-mkdir -pv $LFS/usr/lib/rpm/mariner
-cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
-cp -v $SPECROOT/mariner-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/mariner/generate-package-note.py
-cp -v $SPECROOT/mariner-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/mariner/verify-package-notes.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/macros $LFS/usr/etc/rpm/macros
+mkdir -pv $LFS/usr/lib/rpm/azl
+cp -v $SPECROOT/azurelinux-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/azl/gen-ld-script.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/azl/generate-package-note.py
+cp -v $SPECROOT/azurelinux-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/azl/verify-package-notes.sh
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
@@ -325,9 +325,11 @@ start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
-build_rpm_in_chroot_no_install mariner-rpm-macros
-chroot_and_install_rpms mariner-rpm-macros
-chroot_and_install_rpms mariner-check-macros
+build_rpm_in_chroot_no_install azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-check-macros
+build_rpm_in_chroot_no_install python-rpm-generators
+chroot_and_install_rpms python-rpm-generators python3-rpm-generators
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -444,7 +446,7 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms
+# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
@@ -538,6 +540,17 @@ chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 build_rpm_in_chroot_no_install gtk-doc
 
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
+
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
 chroot_and_install_rpms python3-Cython
@@ -626,6 +639,15 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
+chroot_and_install_rpms rpm rpm-libs
+chroot_and_install_rpms rpm rpm
+chroot_and_install_rpms rpm rpm-build-libs
+chroot_and_install_rpms rpm rpm-devel
+chroot_and_install_rpms rpm rpm-build
+
+build_rpm_in_chroot_no_install python-wheel
+build_rpm_in_chroot_no_install python-flit-core
+build_rpm_in_chroot_no_install python-pip
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
@@ -674,8 +696,7 @@ build_rpm_in_chroot_no_install newt
 chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
-build_rpm_in_chroot_no_install mariner-repos
-build_rpm_in_chroot_no_install pyproject-rpm-macros
+build_rpm_in_chroot_no_install azurelinux-repos
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall

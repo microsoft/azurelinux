@@ -11,15 +11,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safemount"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
 )
 
@@ -101,6 +101,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	err = deleteResolvConf(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = enableOverlays(config.SystemConfig.Overlays, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -327,25 +332,25 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 
 	// Handle enabling services
 	for _, service := range services.Enable {
-		logger.Log.Infof("Enabling service (%s)", service.Name)
+		logger.Log.Infof("Enabling service (%s)", service)
 
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service.Name)
+			return shell.ExecuteLiveWithErr(1, "systemctl", "enable", service)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to enable service (%s):\n%w", service.Name, err)
+			return fmt.Errorf("failed to enable service (%s):\n%w", service, err)
 		}
 	}
 
 	// Handle disabling services
 	for _, service := range services.Disable {
-		logger.Log.Infof("Disabling service (%s)", service.Name)
+		logger.Log.Infof("Disabling service (%s)", service)
 
 		err = imageChroot.UnsafeRun(func() error {
-			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service.Name)
+			return shell.ExecuteLiveWithErr(1, "systemctl", "disable", service)
 		})
 		if err != nil {
-			return fmt.Errorf("failed to disable service (%s):\n%w", service.Name, err)
+			return fmt.Errorf("failed to disable service (%s):\n%w", service, err)
 		}
 	}
 
