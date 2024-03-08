@@ -190,7 +190,7 @@ func FindSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 
 			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
-				specParseErrMsg += fmt.Sprintf("\nspec search failed on (%s):\n%w", specSearch, err)
+				specParseErrMsg += fmt.Sprintf("\nspec search failed on (%s):\n%v", specSearch, err)
 			} else if len(matchingSpecFiles) != 1 {
 				specParseErrMsg += fmt.Sprintf("\nunexpected number of matches (%d) for spec file (%s) in directory (%s)", len(matchingSpecFiles), specName, specsDir)
 			} else {
