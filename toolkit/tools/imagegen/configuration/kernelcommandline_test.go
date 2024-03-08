@@ -114,11 +114,11 @@ func TestShouldFailWrongSedDelimeter_KernelCommandLine(t *testing.T) {
 
 	err := invalidSedExtraCommandLine.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "the 'ExtraCommandLine' field contains the ` character which is reserved for use by sed", err.Error())
+	assert.Equal(t, "the 'ExtraCommandLine' field contains the (`) character which is reserved for use by sed", err.Error())
 
 	err = remarshalJSON(invalidSedExtraCommandLine, &checkedCommandline)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the ` character which is reserved for use by sed", err.Error())
+	assert.Equal(t, "failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the (`) character which is reserved for use by sed", err.Error())
 }
 
 func TestShouldSucceedParsingValidJSON_KernelCommandLine(t *testing.T) {
@@ -139,5 +139,5 @@ func TestShouldFailParsingInvalidJSON_KernelCommandLine(t *testing.T) {
 	checkedCommandline = KernelCommandLine{}
 	err = marshalJSONString(invalidExtraComandLineJSON2, &checkedCommandline)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the ` character which is reserved for use by sed", err.Error())
+	assert.Equal(t, "failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the (`) character which is reserved for use by sed", err.Error())
 }

@@ -135,7 +135,7 @@ func configureFilterFiles(filterFile *string, filter *bool) {
 
 	// If we are just trying to use the default, its fine if its missing.
 	if !isFile && setDefault {
-		logger.Log.Warnf("Default toolchain filter file ((%s)) not found, setting to ''", *filterFile)
+		logger.Log.Warnf("Default toolchain filter file (%s) not found, setting to ''", *filterFile)
 		*filterFile = ""
 	}
 

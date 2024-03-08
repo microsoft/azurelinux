@@ -291,7 +291,7 @@ func startWorkerPool(agent buildagents.BuildAgent, workers, buildAttempts, check
 
 	// Start the workers now so they begin working as soon as a new job is queued.
 	for i := 0; i < workers; i++ {
-		logger.Log.Debugf("Starting worker #%d", i)
+		logger.Log.Debugf("Starting worker #(%d)", i)
 		go schedulerutils.BuildNodeWorker(directionalChannels, agent, graphMutex, buildAttempts, checkAttempts, ignoredPackages, ignoredTests)
 	}
 
@@ -463,12 +463,12 @@ func buildAllNodes(stopOnFailure, canUseCache bool, packagesToRebuild, testsToRe
 		}
 
 		if res.Node.Type == pkggraph.TypeLocalBuild || res.Node.Type == pkggraph.TypeTest {
-			logger.Log.Infof("%d currently active build(s): %v", activeSRPMsCount, activeSRPMs)
+			logger.Log.Infof("(%d) currently active build(s): %v", activeSRPMsCount, activeSRPMs)
 
 			if buildRunsTests {
 				activeTests := buildState.ActiveTests()
 
-				logger.Log.Infof("%d currently active test(s): %v", len(activeTests), activeTests)
+				logger.Log.Infof("(%d) currently active test(s): %v", len(activeTests), activeTests)
 			}
 		}
 	}

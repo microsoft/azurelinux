@@ -135,7 +135,7 @@ func TestShouldFailMissingVerityPackageWithVerityRoot(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] selected, but 'verity-read-only-root' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] selected, but (verity-read-only-root) package is not included in the package lists", err.Error())
 
 			return
 		}
@@ -179,7 +179,7 @@ func TestShouldFailMissingVerityDebugPackageWithVerityDebug(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but 'verity-read-only-root-debug-tools' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: [ReadOnlyVerityRoot] and [TmpfsOverlayDebugEnabled] selected, but (verity-read-only-root-debug-tools) package is not included in the package lists", err.Error())
 
 			return
 		}
@@ -217,7 +217,7 @@ func TestShouldFailMissingFipsPackageWithFipsCmdLine(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but 'dracut-fips' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: 'fips=1' provided on kernel cmdline, but (dracut-fips) package is not included in the package lists", err.Error())
 
 			return
 		}
@@ -254,7 +254,7 @@ func TestShouldFailMissingSELinuxPackageWithSELinux(t *testing.T) {
 
 			err = ValidateConfiguration(config)
 			assert.Error(t, err)
-			assert.Equal(t, "failed to validate package lists in config: [SELinux] selected, but 'selinux-policy' package is not included in the package lists", err.Error())
+			assert.Equal(t, "failed to validate package lists in config: [SELinux] selected, but (selinux-policy) package is not included in the package lists", err.Error())
 
 			return
 		}

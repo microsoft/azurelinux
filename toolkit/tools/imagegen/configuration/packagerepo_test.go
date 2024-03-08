@@ -184,11 +184,11 @@ func TestShouldFailNonInstalledCustomKeys_PackageRepo(t *testing.T) {
 
 	err := testPackageRepo.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid value for package repo 'azurelinux-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
+	assert.Equal(t, "invalid value for package repo (azurelinux-official-base) [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
 
 	err = remarshalJSON(testPackageRepo, &checkedPackageRepo)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [PackageRepo]: invalid value for package repo 'azurelinux-official-base' [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
+	assert.Equal(t, "failed to parse [PackageRepo]: invalid value for package repo (azurelinux-official-base) [GPGKeys] (file:///etc/pki/rpm-gpg/my-custom-key), custom GPG keys are only supported for repos that are installed into the final image by setting 'Install=true'", err.Error())
 }
 
 func TestShouldSucceedlInstalledCustomKeys_PackageRepo(t *testing.T) {

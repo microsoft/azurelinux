@@ -74,11 +74,11 @@ func TestShouldFailLongNormalName_Partition(t *testing.T) {
 
 	err := longNamePartition.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+	assert.Equal(t, "[Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs (74) bytes", err.Error())
 
 	err = remarshalJSON(longNamePartition, &checkedPartition)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Partition]: [Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs 74 bytes", err.Error())
+	assert.Equal(t, "failed to parse [Partition]: [Name] is too long, GPT header can hold only 72 bytes of UTF-16 (35 normal characters + null) while (abcdefghijklmnopqrstuvwxyz0123456789) needs (74) bytes", err.Error())
 }
 
 func TestShouldFailSymbolName_Partition(t *testing.T) {
@@ -88,11 +88,11 @@ func TestShouldFailSymbolName_Partition(t *testing.T) {
 
 	err := symbolNamePartition.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "[Name] (( •_•)>⌐■~■) contains a non-ASCII character '•' at position (2)", err.Error())
+	assert.Equal(t, "[Name] (( •_•)>⌐■~■) contains a non-ASCII character (•) at position (2)", err.Error())
 
 	err = remarshalJSON(symbolNamePartition, &checkedPartition)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Partition]: [Name] (( •_•)>⌐■~■) contains a non-ASCII character '•' at position (2)", err.Error())
+	assert.Equal(t, "failed to parse [Partition]: [Name] (( •_•)>⌐■~■) contains a non-ASCII character (•) at position (2)", err.Error())
 
 }
 

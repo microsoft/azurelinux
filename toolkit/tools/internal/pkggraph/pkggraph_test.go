@@ -413,14 +413,14 @@ func TestDOTID(t *testing.T) {
 
 // TestNodeString tests the built-in String() function for PkgNodes
 func TestNodeString(t *testing.T) {
-	expectedARunString := fmt.Sprintf("A(1,):<ID:%d Type:Run State:Meta Rpm:A.rpm> from 'A.src.rpm' in 'test_repo'", pkgARun.ID())
+	expectedARunString := fmt.Sprintf("A(1,):<ID:%d Type:Run State:Meta Rpm:A.rpm> from (A.src.rpm) in (test_repo)", pkgARun.ID())
 	assert.Equal(t, expectedARunString, pkgARun.String())
 
-	expectedD1UnresolvedString := fmt.Sprintf("D(<1,):<ID:%d Type:Remote State:Unresolved Rpm:url://D.rpm> from 'url://D.src.rpm' in 'test_repo'", pkgD1Unresolved.ID())
+	expectedD1UnresolvedString := fmt.Sprintf("D(<1,):<ID:%d Type:Remote State:Unresolved Rpm:url://D.rpm> from (url://D.src.rpm) in (test_repo)", pkgD1Unresolved.ID())
 	assert.Equal(t, expectedD1UnresolvedString, pkgD1Unresolved.String())
 
 	goalNode := PkgNode{GoalName: "goal", Type: TypeGoal, State: StateMeta}
-	assert.Equal(t, "goal():<ID:0 Type:Goal State:Meta Rpm:> from '' in ''", goalNode.String())
+	assert.Equal(t, "goal():<ID:0 Type:Goal State:Meta Rpm:> from () in ()", goalNode.String())
 
 	emptyNode := PkgNode{}
 	assert.Panics(t, func() { _ = emptyNode.String() })

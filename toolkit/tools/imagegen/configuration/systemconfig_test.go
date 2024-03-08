@@ -163,11 +163,11 @@ func TestShouldFailParsingBadKernelCommandLine_SystemConfig(t *testing.T) {
 
 	err := badKernelCommandConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [KernelCommandLine]: the 'ExtraCommandLine' field contains the ` character which is reserved for use by sed", err.Error())
+	assert.Equal(t, "invalid [KernelCommandLine]: the 'ExtraCommandLine' field contains the (`) character which is reserved for use by sed", err.Error())
 
 	err = remarshalJSON(badKernelCommandConfig, &checkedSystemConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the ` character which is reserved for use by sed", err.Error())
+	assert.Equal(t, "failed to parse [SystemConfig]: failed to parse [KernelCommandLine]: the 'ExtraCommandLine' field contains the (`) character which is reserved for use by sed", err.Error())
 }
 
 func TestShouldFailParsingInvalidHostName_SystemConfig(t *testing.T) {

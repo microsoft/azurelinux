@@ -240,7 +240,7 @@ func addSingleDependency(g *pkggraph.PkgGraph, packageNode *pkggraph.PkgNode, de
 		dependentNode.Type == pkggraph.TypeLocalRun &&
 		packageNode.RpmPath == dependentNode.RpmPath {
 
-		logger.Log.Debugf("(%+v) requires (%+v) which is provided by the same RP", packageNode, dependentNode)
+		logger.Log.Debugf("(%+v) requires (%+v) which is provided by the same RPM", packageNode, dependentNode)
 		return nil
 	}
 

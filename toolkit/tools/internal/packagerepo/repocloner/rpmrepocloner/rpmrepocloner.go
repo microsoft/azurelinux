@@ -675,7 +675,7 @@ func convertPackageVersionToTdnfArg(pkgVer *pkgjson.PackageVer) (tdnfArg string)
 	case "=":
 		tdnfArg = fmt.Sprintf("%s-%s", pkgVer.Name, pkgVer.Version)
 	case "<=", "<":
-		tdnfArg = fmt.Sprintf("%s (%s) %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
+		tdnfArg = fmt.Sprintf("%s %s %s", pkgVer.Name, pkgVer.Condition, pkgVer.Version)
 	case ">", ">=":
 		logger.Log.Warnf("Discarding (%s) version constraint for: %v", pkgVer.Condition, pkgVer)
 	default:

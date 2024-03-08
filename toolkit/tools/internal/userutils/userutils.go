@@ -171,7 +171,7 @@ func UIDIsValid(uid int) error {
 	)
 
 	if uid < uidLowerBound || uid > uidUpperBound {
-		return fmt.Errorf("invalid value for UID (%d), not within [%d, (%d)]", uid, uidLowerBound, uidUpperBound)
+		return fmt.Errorf("invalid value for UID (%d), not within [%d, %d]", uid, uidLowerBound, uidUpperBound)
 	}
 
 	return nil

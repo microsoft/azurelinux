@@ -115,9 +115,9 @@ const (
 	DomainNameSegment = "domain name"
 
 	FQDNEmptyErrorFmt         = "empty (%s) is not allowed"
-	FQDNEndsInDashErrorFmt    = "%s should not end with '-'"
-	FQDNInvalidRuneErrorFmt   = "%s should only contain alpha-numeric, '.' and '-' characters"
-	FQDNInvalidStartErrorFmt  = "%s should start with an alpha character"
+	FQDNEndsInDashErrorFmt    = "(%s) should not end with '-'"
+	FQDNInvalidRuneErrorFmt   = "(%s) should only contain alpha-numeric, '.' and '-' characters"
+	FQDNInvalidStartErrorFmt  = "(%s) should start with an alpha character"
 	FQDNInvalidLengthErrorFmt = "host name must be <= (%d) characters"
 )
 
@@ -148,11 +148,11 @@ const (
 // ProgressView text.
 const (
 	ProgressTitle      = "Installing Azure Linux OS"
-	ProgressSpinnerFmt = "Installing Azure Linux, please wait %v"
+	ProgressSpinnerFmt = "Installing Azure Linux, please wait (%v)"
 )
 
 // FinishView text.
 const (
 	FinishTitle   = "Azure Linux Installation Complete"
-	FinishTextFmt = "Total installation time: %v seconds. Press Enter to restart."
+	FinishTextFmt = "Total installation time: (%v) seconds. Press Enter to restart."
 )

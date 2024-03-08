@@ -92,22 +92,22 @@ func TestShouldFailUnreasonableErrorCorrectionEncodingN_ReadOnlyVerityRoot(t *te
 
 	err := invalidReadOnlyVerityRoot.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( 2 <= N <= 24), currently 25", err.Error())
+	assert.Equal(t, "verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( (2) <= N <= (24)), currently (25)", err.Error())
 
 	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( 2 <= N <= 24), currently 25", err.Error())
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( (2) <= N <= (24)), currently (25)", err.Error())
 
 	// Test too small
 	invalidReadOnlyVerityRoot.ErrorCorrectionEncodingRoots = 1
 
 	err = invalidReadOnlyVerityRoot.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( 2 <= N <= 24), currently 1", err.Error())
+	assert.Equal(t, "verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( (2) <= N <= (24)), currently (1)", err.Error())
 
 	err = remarshalJSON(invalidReadOnlyVerityRoot, &checkedReadOnlyVerityRoot)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( 2 <= N <= 24), currently 1", err.Error())
+	assert.Equal(t, "failed to parse [ReadOnlyVerityRoot]: verity FEC [ErrorCorrectionEncodingRoots] out of bounds ( (2) <= N <= (24)), currently (1)", err.Error())
 }
 
 func TestShouldFailInvalidErrorBehavior_ReadOnlyVerityRoot(t *testing.T) {

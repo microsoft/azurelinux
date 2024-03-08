@@ -276,11 +276,11 @@ func (g *CCachePkgGroup) UpdateTarPaths(remoteStoreConfig *RemoteStoreConfig, lo
 
 func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstorage.AzureBlobStorage, containerName string) (string, error) {
 
-	logger.Log.Infof("  checking if (%s) already exists...", g.TagFile.LocalSourcePath)
+	logger.Log.Infof("checking if (%s) already exists...", g.TagFile.LocalSourcePath)
 	_, err := os.Stat(g.TagFile.LocalSourcePath)
 	if err != nil {
 		// If file is not available locally, try downloading it...
-		logger.Log.Infof("  downloading (%s) to (%s)...", g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
+		logger.Log.Infof("downloading (%s) to (%s)...", g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
 		err = azureBlobStorage.Download(context.Background(), containerName, g.TagFile.RemoteSourcePath, g.TagFile.LocalSourcePath)
 		if err != nil {
 			return "", fmt.Errorf("Unable to download ccache tag file:\n%w", err)
@@ -341,7 +341,7 @@ func (m *CCacheManager) setCurrentPkgGroupInternal(groupName string, groupEnable
 				logger.Log.Infof("updating (%s) to (%s)...", m.Configuration.RemoteStoreConfig.DownloadFolder, latestTag)
 				m.Configuration.RemoteStoreConfig.DownloadFolder = latestTag
 			} else {
-				logger.Log.Warnf("  unable to get the latest ccache tag. Might be the first run and no ccache tag has been uploaded before")
+				logger.Log.Warnf("unable to get the latest ccache tag. Might be the first run and no ccache tag has been uploaded before")
 			}
 		}
 
@@ -360,7 +360,7 @@ func (m *CCacheManager) setCurrentPkgGroupInternal(groupName string, groupEnable
 
 func loadConfiguration(configFileName string) (configuration *CCacheConfiguration, err error) {
 
-	logger.Log.Infof("  loading ccache configuration file: %s", configFileName)
+	logger.Log.Infof("loading ccache configuration file: %s", configFileName)
 
 	err = jsonutils.ReadJSONFile(configFileName, &configuration)
 	if err != nil {
@@ -435,7 +435,7 @@ func uncompressFile(archiveName string, targetDir string) (err error) {
 
 func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err error) {
 	logger.Log.Infof("* Creating a ccache manager instance *")
-	logger.Log.Infof("  ccache root folder         : (%s)", rootDir)
+	logger.Log.Infof("ccache root folder         : (%s)", rootDir)
 	logger.Log.Infof("  ccache remote configuration: (%s)", configFileName)
 
 	if rootDir == "" {
@@ -451,7 +451,7 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 		return nil, fmt.Errorf("Failed to load remote store configuration:\n%w", err)
 	}
 
-	logger.Log.Infof("  creating blob storage client...")
+	logger.Log.Infof("creating blob storage client...")
 	accessType := azureblobstorage.AnonymousAccess
 	if configuration.RemoteStoreConfig.UploadEnabled {
 		accessType = azureblobstorage.ManagedIdentityAccess
@@ -518,12 +518,12 @@ func (m *CCacheManager) findGroup(basePackageName string) (groupName string, gro
 	for _, group := range m.Configuration.Groups {
 		for _, packageName := range group.PackageNames {
 			if packageName == basePackageName {
-				logger.Log.Infof("  found group (%s) for base package (%s)...", group.Name, basePackageName)
+				logger.Log.Infof("found group (%s) for base package (%s)...", group.Name, basePackageName)
 				groupName = group.Name
 				groupEnabled = group.Enabled
 				groupSize = len(group.PackageNames)
 				if !groupEnabled {
-					logger.Log.Infof("  ccache is explicitly disabled for this group in the ccache configuration")
+					logger.Log.Infof("ccache is explicitly disabled for this group in the ccache configuration")
 				}
 				found = true
 				break
@@ -574,11 +574,11 @@ func (m *CCacheManager) DownloadPkgGroupCCache() (err error) {
 
 	remoteStoreConfig := m.Configuration.RemoteStoreConfig
 	if !remoteStoreConfig.DownloadEnabled {
-		logger.Log.Infof("  downloading archived ccache artifacts is disabled. Skipping download...")
+		logger.Log.Infof("downloading archived ccache artifacts is disabled. Skipping download...")
 		return nil
 	}
 
-	logger.Log.Infof("  downloading (%s) to (%s)...", m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
+	logger.Log.Infof("downloading (%s) to (%s)...", m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
 	err = m.AzureBlobStorage.Download(context.Background(), remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteSourcePath, m.CurrentPkgGroup.TarFile.LocalSourcePath)
 	if err != nil {
 		return fmt.Errorf("Unable to download ccache archive:\n%w", err)
@@ -604,13 +604,13 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 		return fmt.Errorf("Failed to enumerate the contents of (%s):\n%w", m.CurrentPkgGroup.CCacheDir, err)
 	}
 	if len(pkgCCacheDirContents) == 0 {
-		logger.Log.Infof("%s is empty. Nothing to archive and upload. Skipping...", m.CurrentPkgGroup.CCacheDir)
+		logger.Log.Infof("(%s) is empty. Nothing to archive and upload. Skipping...", m.CurrentPkgGroup.CCacheDir)
 		return nil
 	}
 
 	remoteStoreConfig := m.Configuration.RemoteStoreConfig
 	if !remoteStoreConfig.UploadEnabled {
-		logger.Log.Infof("  ccache update is disabled for this build")
+		logger.Log.Infof("ccache update is disabled for this build")
 		return nil
 	}
 
@@ -620,14 +620,14 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 	}
 
 	// Upload the ccache archive
-	logger.Log.Infof("  uploading ccache archive (%s) to (%s)...", m.CurrentPkgGroup.TarFile.LocalTargetPath, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
+	logger.Log.Infof("uploading ccache archive (%s) to (%s)...", m.CurrentPkgGroup.TarFile.LocalTargetPath, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 	err = m.AzureBlobStorage.Upload(context.Background(), m.CurrentPkgGroup.TarFile.LocalTargetPath, remoteStoreConfig.ContainerName, m.CurrentPkgGroup.TarFile.RemoteTargetPath)
 	if err != nil {
 		return fmt.Errorf("Unable to upload ccache archive:\n%w", err)
 	}
 
 	if remoteStoreConfig.UpdateLatest {
-		logger.Log.Infof("  update latest is enabled")
+		logger.Log.Infof("update latest is enabled")
 		// If KeepLatestOnly is true, we need to capture the current source
 		// ccache archive path which is about to be dereferenced. That way,
 		// we can delete it after we update the latest tag to point to the
@@ -736,7 +736,7 @@ func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 					// build starts and hence by reaching this method, it
 					// should not be there.
 					//
-					logger.Log.Infof("  ccache is explicitly disabled for this group in the ccache configuration. Skipping...")
+					logger.Log.Infof("ccache is explicitly disabled for this group in the ccache configuration. Skipping...")
 					continue
 				}
 
@@ -751,7 +751,7 @@ func (m *CCacheManager) UploadMultiPkgGroupCCaches() (err error) {
 					logger.Log.Warnf("Failed to get ccache dir for architecture (%s) and group name (%s):\n%v", architecture, groupName, err)
 					errorsOccured = true
 				}
-				logger.Log.Infof("  processing ccache folder (%s)...", groupCCacheDir)
+				logger.Log.Infof("processing ccache folder (%s)...", groupCCacheDir)
 
 				m.setCurrentPkgGroupInternal(groupName, groupEnabled, groupSize, architecture)
 
