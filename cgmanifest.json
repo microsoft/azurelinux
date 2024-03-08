@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "7.0.2",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/7.0.2/bazel-7.0.2-dist.zip"
+          "version": "6.5.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/6.5.0/bazel-6.5.0-dist.zip"
         }
       }
     },
@@ -1777,8 +1777,8 @@
         "type": "other",
         "other": {
           "name": "cloud-utils-growpart",
-          "version": "0.32",
-          "downloadUrl": "https://launchpad.net/cloud-utils/trunk/0.32/+download/cloud-utils-0.32.tar.gz"
+          "version": "0.33",
+          "downloadUrl": "https://github.com/canonical/cloud-utils/archive/refs/tags/0.33.tar.gz"
         }
       }
     },
@@ -21963,8 +21963,8 @@
         "type": "other",
         "other": {
           "name": "python-cryptography",
-          "version": "3.3.2",
-          "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-3.3.2.tar.gz"
+          "version": "42.0.5",
+          "downloadUrl": "https://pypi.io/packages/source/c/cryptography/cryptography-42.0.5.tar.gz"
         }
       }
     },
