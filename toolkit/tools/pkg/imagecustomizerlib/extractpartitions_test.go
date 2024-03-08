@@ -47,7 +47,7 @@ func TestAddSkippableFrame(t *testing.T) {
 }
 
 func createTestRawPartitionFile(filename string) (string, error) {
-	// Dummy data
+	// Test data
 	data := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
 
 	err := writeToFile(filename, data)
