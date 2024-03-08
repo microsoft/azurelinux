@@ -1,10 +1,8 @@
 package imagecustomizerlib
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -12,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
@@ -201,25 +199,9 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 
 // Write partition metadata as JSON to a file.
 func writePartitionMetadataJson(diskPartition []diskutils.PartitionInfo, outDir string, name string) (err error) {
-	// Get the JSON encoding of disk partition info
-	diskPartitionInfoJSON, err := json.Marshal(&diskPartition)
-	if err != nil {
-		return fmt.Errorf("failed to marshal:\n%w", err)
-	}
-
-	// Indent the JSON to make it more readable
-	var indentedJSON bytes.Buffer
-	err = json.Indent(&indentedJSON, diskPartitionInfoJSON, "", "\t")
-	if err != nil {
-		return fmt.Errorf("failed to indent json:\n%w", err)
-	}
-
 	// Write the JSON string to file
 	fullPath := filepath.Join(outDir, name)
-	err = file.Write(indentedJSON.String(), fullPath)
-	if err != nil {
-		return fmt.Errorf("failed to write partition metadata json to file")
-	}
+	jsonutils.WriteJSONFile(fullPath, &diskPartition)
 
 	logger.Log.Infof("Partition metadata file created: %s", fullPath)
 	return nil
