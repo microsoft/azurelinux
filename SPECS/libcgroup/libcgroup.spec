@@ -25,6 +25,7 @@ Patch2: libcgroup-0.40.rc1-coverity.patch
 Patch3: libcgroup-0.40.rc1-fread.patch
 Patch4: libcgroup-0.40.rc1-templates-fix.patch
 Patch5: no-googletests.patch
+Patch6: remove-API_FUZZ_test.patch
 
 %{?systemd_requires}
 
