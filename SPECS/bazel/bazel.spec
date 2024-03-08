@@ -3,7 +3,7 @@
 %define __os_install_post %{_libdir}/rpm/brp-compress %{nil}
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
-Version:        7.0.2
+Version:        6.5.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -46,8 +46,8 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
-* Fri Jan 26 2024 Riken Maharjan <rmaharjan@microsoft.com> - 7.0.2-1
-- Upgrade to 7.0.2
+* Tue Mar 05 2024 Riken Maharjan <rmaharjan@microsoft.com> - 6.5.0
+- Upgrade to 6.5.0
 
 * Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.2-1
 - Auto-upgrade to 5.3.2 - CVE-2022-3474

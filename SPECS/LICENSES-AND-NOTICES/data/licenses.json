@@ -546,11 +546,11 @@
                 "kexec-tools",
                 "keybinder3",
                 "keycloak-httpd-client-install",
-                "kf5",
-                "kf5-kconfig",
-                "kf5-kcoreaddons",
-                "kf5-ki18n",
-                "kf5-kwidgetsaddons",
+                "kf",
+                "kf-kconfig",
+                "kf-kcoreaddons",
+                "kf-ki18n",
+                "kf-kwidgetsaddons",
                 "kpmcore",
                 "kronosnet",
                 "ksh",
@@ -1577,6 +1577,7 @@
                 "poetry",
                 "policycoreutils",
                 "polkit-pkla-compat",
+                "polkit-qt-1",
                 "portreserve",
                 "postfix",
                 "potrace",
@@ -1845,14 +1846,14 @@
                 "qpdf",
                 "qperf",
                 "qr-code-generator",
-                "qt5-qtbase",
+                "qt-rpm-macros",
                 "qt5-qtconnectivity",
-                "qt5-qtdeclarative",
                 "qt5-qtsensors",
                 "qt5-qtserialport",
-                "qt5-qtsvg",
-                "qt5-qttools",
-                "qt5-rpm-macros",
+                "qtbase",
+                "qtdeclarative",
+                "qtsvg",
+                "qttools",
                 "quagga",
                 "quota",
                 "radvd",
@@ -2260,6 +2261,7 @@
                 "python-nocasedict",
                 "python-opt-einsum",
                 "python-pecan",
+                "python-pip",
                 "python-pyrpm",
                 "python-remoto",
                 "python-repoze-lru",
@@ -3053,6 +3055,12 @@
             "license": "[GPLv2+ License](https://github.com/rpm-software-management/dnf5/blob/main/COPYING.md)",
             "specs": [
                 "dnf5"
+            ]
+        },
+        "Source project": {
+            "license": "Same as the source project.",
+            "specs": [
+                "python-nocaselist"
             ]
         },
         "Sysbench source": {

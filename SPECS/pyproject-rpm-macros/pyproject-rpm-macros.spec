@@ -1,13 +1,14 @@
 Summary:        RPM macros for PEP 517 Python packages
 Name:           pyproject-rpm-macros
+
 # The idea is to follow the spirit of semver
 # Given version X.Y.Z:
 #   Increment X and reset Y.Z when there is a *major* incompatibility
 #   Increment Y and reset Z when new macros or features are added
 #   Increment Z when this is a bugfix or a cosmetic change
 # Dropping support for EOL Fedoras is *not* considered a breaking change
-Version:        1.0.0~rc1
-Release:        5%{?dist}
+Version:        1.12.0
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +26,7 @@ Source103:      pyproject_convert.py
 Source104:      pyproject_preprocess_record.py
 Source105:      pyproject_construct_toxenv.py
 Source106:      pyproject_requirements_txt.py
+Source107:      pyproject_wheel.py
 
 # Tests
 Source201:      test_pyproject_buildrequires.py
@@ -42,24 +44,29 @@ Source901:      README.md
 Source902:      LICENSE
 
 %if 0%{?with_check}
-BuildRequires:  python3-atomicwrites
-BuildRequires:  python3-attrs
-BuildRequires:  python3-pip
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-six
+BuildRequires:  python3dist(pytest)
+BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(packaging)
 BuildRequires:  python3dist(pip)
-BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(tox-current-env) >= 0.0.6
 BuildRequires:  python3dist(wheel)
 %endif
 
-Requires:       %{_bindir}/find
-Requires:       /bin/sed
+# We build on top of those: (all 3 of the following provided by "azurelinux-rpm-macros")
+BuildRequires:  python-rpm-macros
+BuildRequires:  python-srpm-macros
+BuildRequires:  python3-rpm-macros
 Requires:       python-rpm-macros
 Requires:       python-srpm-macros
 Requires:       python3-rpm-macros
+Requires:       pyproject-srpm-macros = %{version}-%{release}
+
+# We use the following tools outside of coreutils
+Requires:       findutils
+Requires:       sed
+
+BuildRequires:  rpm-build
+Requires:       rpm-build
 
 %description
 These macros allow projects that follow the Python packaging specifications
@@ -75,10 +82,23 @@ They work for:
 These macros replace %%py3_build and %%py3_install,
 which only work with setup.py.
 
+
+%package -n pyproject-srpm-macros
+Summary:        Minimal implementation of %%pyproject_buildrequires
+Requires:       pyproject-rpm-macros
+Requires:       rpm-build
+
+%description -n pyproject-srpm-macros
+This package contains a minimal implementation of %%pyproject_buildrequires.
+When used in %%generate_buildrequires, it will generate BuildRequires
+for pyproject-rpm-macros. When both packages are installed, the full version
+takes precedence.
+
+
 %prep
 # Not strictly necessary but allows working on file names instead
 # of source numbers in install section
-%setup -q -c -T
+%setup -c -T
 cp -p %{sources} .
 
 %build
@@ -87,27 +107,23 @@ cp -p %{sources} .
 %install
 mkdir -p %{buildroot}%{_rpmmacrodir}
 mkdir -p %{buildroot}%{_rpmconfigdir}/azl
-install -m 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
-install -m 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/azl/
-install -m 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/azl/
-install -m 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/azl/
-install -m 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/azl/
-install -m 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/azl/
-install -m 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 macros.pyproject %{buildroot}%{_rpmmacrodir}/
+install -pm 644 pyproject_buildrequires.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_convert.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_save_files.py  %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_preprocess_record.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_construct_toxenv.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_requirements_txt.py %{buildroot}%{_rpmconfigdir}/azl/
+install -pm 644 pyproject_wheel.py %{buildroot}%{_rpmconfigdir}/azl/
 
 %check
-pip3 install more_itertools pytest>=3.9 toml 'tox>=3.27.1,<4.0.0'
 export HOSTNAME="rpmbuild"  # to speedup tox in network-less mock, see rhbz#1856356
-%{python3} -m pytest -vv --doctest-modules
-test_status=$?
+%pytest -vv --doctest-modules -k "not tox"
 
 # brp-compress is provided as an argument to get the right directory macro expansion
 %{python3} compare_mandata.py -f %{_rpmconfigdir}/brp-compress
-[[ $? -eq 0 && $test_status -eq 0 ]]
 
 %files
-%license LICENSE
-%doc README.md
 %{_rpmmacrodir}/macros.pyproject
 %{_rpmconfigdir}/azl/pyproject_buildrequires.py
 %{_rpmconfigdir}/azl/pyproject_convert.py
@@ -115,8 +131,18 @@ test_status=$?
 %{_rpmconfigdir}/azl/pyproject_preprocess_record.py
 %{_rpmconfigdir}/azl/pyproject_construct_toxenv.py
 %{_rpmconfigdir}/azl/pyproject_requirements_txt.py
+%{_rpmconfigdir}/azl/pyproject_wheel.py
+
+%doc README.md
+%license LICENSE
+
+%files -n pyproject-srpm-macros
+%license LICENSE
 
 %changelog
+* Fri Mar 01 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.12.0-2
+- Refresh from Fedora 40 (license: MIT)
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.0~rc1-5
 - Updating naming for 3.0 version of Azure Linux.
 

@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.5
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -303,12 +303,6 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
-* Thu Feb 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.1.5-3
-- Update file list
-
-* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.5-2
-- Update file list
-
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
 - Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
 
