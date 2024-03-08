@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.42.0
-Release:        7%{?dist}
+Version:        1.62.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  protobuf-devel
+BuildRequires:  protobuf-static
 BuildRequires:  re2-devel
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(openssl)
@@ -148,6 +149,9 @@ export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
 
 
 %changelog
+* Thu Mar 07 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.62.0-1
+- Upgrade to 1.62.0
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 1.42.0-7
 - Bump release to rebuild with updated version of Go.
 
