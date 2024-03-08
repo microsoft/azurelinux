@@ -85,7 +85,7 @@ func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata 
 	// Remove temp partition file
 	err = os.Remove(tempPartitionFilepath)
 	if err != nil {
-		return "", fmt.Errorf("failed to remove temp file %s:\n%w", partitionRawFilepath, err)
+		return "", fmt.Errorf("failed to remove temp file %s:\n%w", tempPartitionFilepath, err)
 	}
 	return partitionFilepath, nil
 }
