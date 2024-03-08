@@ -72,7 +72,7 @@
 # Top-level description.
 #
 
-##help:desc:[1mThis Makefile is the primary entry point for the Mariner Toolkit.[0m
+##help:desc:[1mThis Makefile is the primary entry point for the Azure Linux Toolkit.[0m
 ##help:desc:
 ##help:desc:For full details, please consult the documentation under toolkit/docs.
 
