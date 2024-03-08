@@ -7,14 +7,13 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
-Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/%{name}-%{version}.tar.xz
-Patch0:         CVE-2023-0361.patch
+Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  guile-devel
 BuildRequires:  libtasn1-devel
 BuildRequires:  nettle-devel >= 3.7.2
-BuildRequires:  openssl-devel
+
 BuildRequires:  p11-kit-devel
 %if %{with_check}
 BuildRequires:  net-tools
@@ -97,6 +96,7 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %changelog
 * Fri Mar 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.3-1
 - Auto-upgrade to 3.8.3 - CVE-2024-0567
+- Remove CVE-2023-0361.patch as it is included in >=3.8.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.7-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
