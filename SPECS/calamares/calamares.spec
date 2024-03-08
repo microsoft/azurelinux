@@ -1,13 +1,13 @@
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+%global py_byte_compile 1
 Summary:        Installer from a live CD/DVD/USB to disk
 # do not use QtWebEngine because it no longer works with QtWebEngine >= 5.11
 # (it now refuses to run as root unless "export QTWEBENGINE_DISABLE_SANDBOX=1")
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.3.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -221,6 +221,9 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 %{_libdir}/libcalamaresui.so
 
 %changelog
+* Fri Mar 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-3
+- Fix python macros for calamares
+
 * Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.1-2
 - Updated reference to distro in patch file from "Mariner" to "Azure Linux"
 
