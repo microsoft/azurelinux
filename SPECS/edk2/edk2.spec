@@ -97,7 +97,6 @@ Patch0005: 0005-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
 Patch0006: 0006-OvmfPkg-enable-DEBUG_VERBOSE-RHEL-only.patch
 Patch0007: 0008-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
 Patch0008: 0009-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
-Patch0010: 0011-CryptoPkg-OpensslLib-list-RHEL8-specific-OpenSSL-fil.patch
 Patch0011: 0012-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
 Patch0012: 0013-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
 Patch0013: 0014-SecurityPkg-add-TIS-sanity-check-tpm2.patch
