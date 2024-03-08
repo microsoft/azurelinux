@@ -1,6 +1,6 @@
 # Azure Linux Image Customizer
 
-The Azure Linux Image Customizer (MIC) is a tool that can take an existing generic Azure Linux
+The Azure Linux Image Customizer is a tool that can take an existing generic Azure Linux
 image and modify it to be suited for particular scenario.
 
 MIC uses [chroot](https://en.wikipedia.org/wiki/Chroot) (and loopback block devices) to
@@ -29,7 +29,7 @@ Disadvantages:
 
 ## Getting started
 
-1. Download a Azure Linux core image.
+1. Download an Azure Linux core image.
 
 2. Create a customization config file.
 

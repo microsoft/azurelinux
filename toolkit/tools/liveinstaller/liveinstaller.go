@@ -182,7 +182,7 @@ func removeOldAzureLinuxBootTargets() (err error) {
 		"|", "grep", "\"Azure Linux\"", // Filter boot order for Azure Linux boot targets
 		"|", "sed", "'s/* Azure Linux//g'", // Pruning for just the bootnum
 		"|", "sed", "'s/Boot*//g'", // Pruning for just the bootnum
-		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B", // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with a Azure Linux label
+		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B", // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with an Azure Linux label
 	}
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return

@@ -388,7 +388,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %changelog
 * Wed Feb 28 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-15
-- Updated sbat.csv.in to replace github link with new.
+- Updated sbat.csv.in to reflect new distro name.
 
 * Thu Jan 25 10:49:55 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.06-14
 - remove systemd-devel build dep

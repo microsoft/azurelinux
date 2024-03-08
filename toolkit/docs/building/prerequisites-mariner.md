@@ -1,9 +1,9 @@
 
 # Build Requirements on `Azure Linux`
 
-## Requirements were validated on `Azure Linux 2.0`
+## Requirements were validated on `Azure Linux`
 
-This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on a Azure Linux host.
+This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Azure Linux host.
 
 ```bash
 # Install required dependencies.

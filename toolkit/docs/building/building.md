@@ -214,13 +214,13 @@ All images are generated in the `out/images` folder.
 ### Virtual Hard Disks and Containers
 
 ```bash
-# To build a Azure Linux VHD Image (VHD folder: ../out/images/core-legacy)
+# To build an Azure Linux VHD Image (VHD folder: ../out/images/core-legacy)
 sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 
-# To build a Azure Linux VHDX Image (VHDX folder ../out/images/core-efi)
+# To build an Azure Linux VHDX Image (VHDX folder ../out/images/core-efi)
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
-# To build a core Azure Linux Contianer (Container Folder: ../out/images/core-container/*.tar.gz
+# To build a core Azure Linux Container (Container Folder: ../out/images/core-container/*.tar.gz
 sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Given a full disk image, the Azure Linux Image Customizer (MIC) can generate a
+Given a full disk image, the Azure Linux Image Customizer can generate a
 LiveOS ISO image when the `--output-image-format` is set to `iso`.
 
 The LiveOS ISO image is a bootable image that boots into the rootfs of the

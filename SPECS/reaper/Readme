@@ -9,7 +9,7 @@
 # d. /usr/local - Current nodejs/npm versions cause build to fail due to incompatible node-sass/node-gyp version dependencies added in reaper's sources - package.json. This requires downgraded nodejs version of 14.18.0 and corresponding npm v6 that needs to be installed.
 # e. <sources>/src/ui/bower_components - bower artifacts built in sources directory
 # f. <sources>/src/ui/node_modules - npm-install related modeuls built in sources directory
-1. Boot up Azure Linux Core 2.0
+1. Boot up Azure Linux Core
 2. Refer to reaper spec and install all build required dependenices.
 3. Download reaper sources and extract under /usr/src
 4. cd /usr/src/cassandra-reaper-<version>

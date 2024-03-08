@@ -24,15 +24,15 @@ import (
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
 const (
-	RepoFlagAzureLinuxDefaults = uint64(1) << iota // External default Azure Linux repos pre-installed in the chroot.
-	RepoFlagDownloadedCache                        // Local repo with the cached packages downloaded from upstream.
-	RepoFlagLocalBuilds                            // Local repo with the packages built from local spec files.
-	RepoFlagPreview                                // Separate flag to control the use of the Azure Linux preview packages repository.
-	RepoFlagToolchain                              // Local repo with the toolchain packages.
-	RepoFlagUpstream                               // Separate flag to control the use of all upstream packages repositories.
+	RepoFlagDistroDefaults  = uint64(1) << iota // External default Azure Linux repos pre-installed in the chroot.
+	RepoFlagDownloadedCache                     // Local repo with the cached packages downloaded from upstream.
+	RepoFlagLocalBuilds                         // Local repo with the packages built from local spec files.
+	RepoFlagPreview                             // Separate flag to control the use of the Azure Linux preview packages repository.
+	RepoFlagToolchain                           // Local repo with the toolchain packages.
+	RepoFlagUpstream                            // Separate flag to control the use of all upstream packages repositories.
 
 	// A compound flag enabling all supported repositories.
-	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagAzureLinuxDefaults | RepoFlagUpstream
+	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagDistroDefaults | RepoFlagUpstream
 )
 
 const (
@@ -732,7 +732,7 @@ func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
 		previousReposList = append(previousReposList, fmt.Sprintf("--disablerepo=%s", repoIDPreview))
 	}
 
-	if RepoFlagAzureLinuxDefaults&reposFlags == 0 {
+	if RepoFlagDistroDefaults&reposFlags == 0 {
 		previousReposList = append(previousReposList, r.disabledDefaultAzureLinuxReposArgs()...)
 	}
 

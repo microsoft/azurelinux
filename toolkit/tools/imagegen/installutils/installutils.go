@@ -1131,7 +1131,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
-// - includeLegacyCfg specifies if the legacy grub.cfg from Azure Linux 2.0 should also be added.
+// - includeLegacyCfg specifies if the legacy grub.cfg from Azure Linux should also be added.
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
 func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,

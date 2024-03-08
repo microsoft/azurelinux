@@ -17,7 +17,7 @@ Required.
 The base image file to customize.
 
 This file is typically one of the standard Azure Linux core images.
-But it can also be a Azure Linux image that has been customized.
+But it can also be an Azure Linux image that has been customized.
 
 Supported image file formats: vhd, vhdx, qcow2, and raw.
 

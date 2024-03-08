@@ -21,8 +21,7 @@ Instructions for building Azure Linux may be found here: [Toolkit Documentation]
 
 You can try Azure Linux with the following ISO images:
 
-- [Azure Linux 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso).
-- [Azure Linux 1.0 x86_64 ISO](https://aka.ms/mariner-1.0-x86_64-iso).
+- [Mariner 2.0 x86_64 ISO](https://aka.ms/mariner-2.0-x86_64-iso).
 
 Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
 

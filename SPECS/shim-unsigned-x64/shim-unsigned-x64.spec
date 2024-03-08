@@ -2,7 +2,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim-unsigned-x64
 Version:        15.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ make VENDOR_CERT_FILE=cert.der test
 %{_datadir}/%{name}/shimx64.efi
 
 %changelog
+* Thu Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 15.4-3
+- Updated sbat.csv.in to reflect new distro name.
+
 * Wed Jan 05 2022 Chris Co <chrco@microsoft.com> - 15.4-2
 - Update key
 - License verified

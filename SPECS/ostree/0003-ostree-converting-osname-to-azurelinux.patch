@@ -26,7 +26,7 @@ index 976c4b5..263e2f5 100644
      }
  
 -  /* Copying Photon Specific config files to sutiable location */
-+  /* Copying Azure Linux Specific config files to sutiable location */
++  /* Copying distribution Specific config files to sutiable location */
    if (kernel_layout->kernelcfg_srcpath)
      {
        if (!glnx_fstatat_allow_noent (bootcsum_dfd, kernel_layout->kernelcfg_namever, &stbuf, 0, error))
