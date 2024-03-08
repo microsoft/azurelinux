@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -71,11 +71,13 @@ cat > %{buildroot}/etc/dhcp/dhclient.conf << "EOF"
 #
 # Basic dhclient.conf(5)
 
+option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
+
 #prepend domain-name-servers 127.0.0.1;
 request subnet-mask, broadcast-address, time-offset, routers,
         domain-name, domain-name-servers, domain-search, host-name,
         netbios-name-servers, netbios-scope, interface-mtu,
-        ntp-servers;
+        ntp-servers, rfc3442-classless-static-routes;
 require subnet-mask, domain-name-servers;
 #timeout 60;
 #retry 60;
@@ -169,6 +171,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Fri Mar 08 2024 Chris Patterson <cpatterson@microsoft.com> - 4.4.3-2
+- Request classless static route configuration in dhclient.conf
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
 - Auto-upgrade to 4.4.3 - Azure Linux 3.0 - package upgrades
 
