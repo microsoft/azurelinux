@@ -1073,14 +1073,14 @@
       }
     },
     {
-      "component": { 
-      "type": "other", 
-      "other": { 
-        "name": "bind", 
-        "version": "9.19.21", 
-        "downloadUrl": "https://ftp.isc.org/isc/bind9/9.19.21/bind-9.19.21.tar.xz" 
-      } 
-    } 
+      "component": {
+      "type": "other",
+      "other": {
+        "name": "bind",
+        "version": "9.19.21",
+        "downloadUrl": "https://ftp.isc.org/isc/bind9/9.19.21/bind-9.19.21.tar.xz"
+      }
+    }
     },
     {
       "component": {
