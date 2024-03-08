@@ -1,3 +1,5 @@
+%define _build_id_links none
+
 # Shared object version of libkcapi.
 %global vmajor            1
 %global vminor            5
@@ -36,6 +38,7 @@ for app in %{apps_hmaccalc}; do                                  \
   { %{sha512hmac} "$bin_path"/$app || exit 1; }                    \\\
     | cut -f 1 -d ' ' >"$lib_path"/hmaccalc/$app.hmac            \
 done                                                             \
+mkdir "$lib_path"/fipscheck/                                     \
 for app in %{apps_fipscheck}; do                                 \
   test -e "$bin_path"/$app || continue                           \
   %{fipshmac} -d "$lib_path"/fipscheck "$bin_path"/$app || exit 1  \
@@ -236,14 +239,11 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/%{name}.pc
 
 %files hmaccalc
-%{_bindir}/sha*hmac
-%{_bindir}/sm*hmac
-/%{_lib}/hmaccalc/sha*hmac.hmac
-/%{_lib}/hmaccalc/sm*hmac.hmac
+%{_libexecdir}/%{name}/sha*hmac
+%{_libexecdir}/%{name}/sm*hmac
 
 %files fipscheck
-%{_bindir}/fips*
-/%{_lib}/fipscheck/fips*.hmac
+%{_libexecdir}/%{name}/fips*
 
 %files static
 /%{_lib}/%{name}.a
