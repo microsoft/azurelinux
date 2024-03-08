@@ -468,7 +468,7 @@ hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
 
 
 %changelog
-* Fri Mar 08 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
+* Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
 - Upgraded ocaml to 5.1.1
 - Importing and adopting spec changes from Fedora.
 - Removed unused patch files and added new.
