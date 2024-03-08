@@ -92,21 +92,20 @@ Source90: DBXUpdate-%{DBXDATE}.x64.bin
 Source91: DBXUpdate-%{DBXDATE}.ia32.bin
 
 Patch0001: 0001-BaseTools-do-not-build-BrotliCompress-RH-only.patch
-Patch0002: 0003-MdeModulePkg-TerminalDxe-set-xterm-resolution-on-mod.patch
-Patch0003: 0004-OvmfPkg-take-PcdResizeXterm-from-the-QEMU-command-li.patch
-Patch0006: 0005-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
-Patch0007: 0006-OvmfPkg-enable-DEBUG_VERBOSE-RHEL-only.patch
-Patch0008: 0007-OvmfPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuVide.patch
-Patch0009: 0008-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
-Patch0010: 0009-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
-Patch0011: 0010-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
-Patch0012: 0011-CryptoPkg-OpensslLib-list-RHEL8-specific-OpenSSL-fil.patch
-Patch0013: 0012-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
-Patch0014: 0013-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
-Patch0015: 0014-SecurityPkg-add-TIS-sanity-check-tpm2.patch
-Patch0016: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
-Patch0017: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
-Patch0018: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
+Patch0002: 0004-OvmfPkg-take-PcdResizeXterm-from-the-QEMU-command-li.patch
+Patch0003: 0005-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
+Patch0004: 0006-OvmfPkg-enable-DEBUG_VERBOSE-RHEL-only.patch
+Patch0005: 0007-OvmfPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuVide.patch
+Patch0006: 0008-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
+Patch0007: 0009-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
+Patch0008: 0010-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
+Patch0009: 0011-CryptoPkg-OpensslLib-list-RHEL8-specific-OpenSSL-fil.patch
+Patch0010: 0012-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
+Patch0011: 0013-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
+Patch0012: 0014-SecurityPkg-add-TIS-sanity-check-tpm2.patch
+Patch0013: 0015-SecurityPkg-add-TIS-sanity-check-tpm12.patch
+Patch0014: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
+Patch0015: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 
 Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
@@ -695,8 +694,8 @@ $tests_ok
 
 
 %changelog
-* Thu Feb 29 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
-- Bump version to edk2-stable202302
+* Fri Mar 8 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
+- Bump version to edk2-stable202402
 
 * Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
 - Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
