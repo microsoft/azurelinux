@@ -1,6 +1,6 @@
 Summary:        Tools for zstd compression and decompression
 Name:           zstd
-Version:        1.5.0
+Version:        1.5.4
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
@@ -73,6 +73,9 @@ find %{buildroot} -type f -name "*.a" -delete -print
 %{_mandir}/man1/*
 
 %changelog
+* Fri Mar 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.4-1
+- Auto-upgrade to 1.5.4 - CVE-2022-4899
+
 * Tue Oct 12 2021 Thomas Crain <thcrain@microsoft.com> - 1.5.0-1
 - Upgrade to latest upstream version
 - Change license tag to properly reflect dual licensing situation
