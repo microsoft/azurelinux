@@ -44,7 +44,7 @@ make VENDOR_CERT_FILE=cert.der test
 %{_datadir}/%{name}/shimaa64.efi
 
 %changelog
-* Thu Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 15.4-2
+* Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 15.4-2
 - Updated sbat.csv.in to reflect new distro name.
 
 * Tue Mar 30 2021 Chris Co <chrco@microsoft.com> - 15.4-1
