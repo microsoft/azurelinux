@@ -60,7 +60,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	return nil
 }
 
-// Extract raw-zstd partition
+// Extract raw-zst partition
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFrameSize]byte) (partitionFilepath string, err error) {
 	// Compress raw partition with zstd and output it
 	partitionFilepath, err = compressWithZstd(partitionRawFilepath)
