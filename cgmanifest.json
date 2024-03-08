@@ -8351,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.1.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.1.1.tar.gz"
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.2.0.tar.gz"
         }
       }
     },
