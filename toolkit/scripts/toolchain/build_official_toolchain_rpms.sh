@@ -446,7 +446,7 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
+# Download JDK rpms (from Azure Linux 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)

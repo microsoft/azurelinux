@@ -45,7 +45,7 @@ If the `TOOLCHAIN_ARCHIVE` variable is not set, but `REBUILD_TOOLCHAIN=y` is, th
 The chroot worker is an archive containing all the toolchain RPMs installed into a chroot environment. This archive can be extracted into a folder, then a chroot call can be made to switch into the environment. Once in the chroot environment only the RPM based tools and filesystem are available. This creates a clean build environment.
 
 The chroot worker is used at several points to perform various tasks using the RPM packaged tools without interfering with the host system. The three major ones are:
-1) Processing spec files using Mariner's RPM macros.
+1) Processing spec files using Azure Linux's RPM macros.
 2) Using `tdnf` to download packages.
 3) Building new packages using only the RPM based compilers/tools etc.
 

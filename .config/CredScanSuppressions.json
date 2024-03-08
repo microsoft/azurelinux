@@ -19,11 +19,11 @@
         },
         {
             "file": "\\toolkit\\docs\\quick_start\\quickstart.md",
-            "_justification": "Secrets for sample, non-production Mariner images."
+            "_justification": "Secrets for sample, non-production Azure Linux images."
         },
         {
             "file": "\\toolkit\\imageconfigs\\read-only-root-efi.json",
-            "_justification": "Secret for a sample, non-production Mariner image."
+            "_justification": "Secret for a sample, non-production Azure Linux image."
         }
     ]
 }
