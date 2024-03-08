@@ -9,6 +9,7 @@ ExecStart=/usr/bin/containerd
 Restart=always
 Delegate=yes
 KillMode=process
+OOMScoreAdjust=-999
 
 [Install]
 WantedBy=multi-user.target
