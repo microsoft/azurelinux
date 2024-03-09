@@ -87,7 +87,7 @@ BuildRequires:  gawk
 BuildRequires:  hardlink
 BuildRequires:  perl-interpreter
 BuildRequires:  util-linux
-BuildRequires:  annocheck
+BuildRequires:  /usr/bin/annocheck
 BuildRequires:  pkgconfig(libzstd)
 
 # Documentation requirements
@@ -316,8 +316,8 @@ echo %{version} > $RPM_BUILD_ROOT%{_libdir}/ocaml/fedora-ocaml-release
 # Remove the installed documentation.  We will install it using %%doc
 rm -rf $RPM_BUILD_ROOT%{_docdir}/ocaml
 
-mkdir -p $RPM_BUILD_ROOT%{rpmmacrodir}
-install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{rpmmacrodir}/macros.ocaml-rpm
+mkdir -p $RPM_BUILD_ROOT%{_rpmmacrodir}
+install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_rpmmacrodir}/macros.ocaml-rpm
 
 mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/redhat
 install -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/redhat
@@ -463,7 +463,7 @@ hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
 
 
 %files rpm-macros
-%{rpmmacrodir}/macros.ocaml-rpm
+%{_rpmmacrodir}/macros.ocaml-rpm
 %{_rpmconfigdir}/redhat/ocaml_files.py
 
 
