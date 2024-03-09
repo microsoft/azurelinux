@@ -442,7 +442,7 @@ mv %{buildroot}/%{llvm_plugin_dir}/annobin-for-clang.so %{buildroot}/%{clang_plu
 # Note - we cannot just store %%{gcc_vr} as sometimes the gcc rpm version changes
 # without the NVR being altered.  See BZ #2030671 for more discussion on this.
 mkdir -p                             %{buildroot}/%{ANNOBIN_GCC_PLUGIN_DIR}
-%{gcc_vr} > %{buildroot}/%{ANNOBIN_GCC_PLUGIN_DIR}/%{aver}
+echo "%{gcc_vr}" > %{buildroot}/%{ANNOBIN_GCC_PLUGIN_DIR}/%{aver}
 
 # Also install a copy of the sources into the build tree.
 mkdir -p                            %{buildroot}%{annobin_source_dir}
