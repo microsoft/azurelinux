@@ -230,7 +230,7 @@ BuildRequires: gcc-c++ gcc-plugin-devel
 #
 # The following implements the above:
 
-%global gcc_vr %(gcc --version | head -n 1 | sed -e 's|.*(GCC)\ ||g' -e 's|)$||g')
+%global gcc_vr %(gcc --version | head -n 1 | sed -e 's|.*(GCC)||g')
 
 # We need the major version of gcc.
 %global gcc_major %(echo "%{gcc_vr}" | cut -f1 -d".")
