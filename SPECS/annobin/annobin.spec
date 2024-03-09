@@ -219,25 +219,18 @@ BuildRequires: gcc-c++ gcc-plugin-devel
 #
 # So we instead query the version from gcc's output.
 #
-# gcc.spec has:
-#   Version: %%{gcc_version}
-#   Release: %%{gcc_release}%%{?dist}
-#   ...snip...
-#   echo 'Red Hat %%{version}-%%{gcc_release}' > gcc/DEV-PHASE
-#
 # So, given this output:
 #
-#   $ gcc --version
-#   gcc (GCC) 4.6.1 20110908 (Red Hat 4.6.1-9)
-#   Copyright (C) 2011 Free Software Foundation, Inc.
-#   This is free software; see the source for copying conditions.  There is NO
-#   warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# gcc (GCC) 13.2.0"
+# Copyright (C) 2023 Free Software Foundation, Inc."
+# This is free software; see the source for copying conditions.  There is NO"
+# warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-# we can scrape out the "4.6.1" from the version line.
+# we can scrape out the "13.2.0" from the version line.
 #
 # The following implements the above:
 
-%global gcc_vr %(gcc --version | head -n 1 | sed -e 's|.*(Red\ Hat\ ||g' -e 's|)$||g')
+%global gcc_vr %(gcc --version | head -n 1 | sed -e 's|.*(GCC)\ ||g' -e 's|)$||g')
 
 # We need the major version of gcc.
 %global gcc_major %(echo "%{gcc_vr}" | cut -f1 -d".")
