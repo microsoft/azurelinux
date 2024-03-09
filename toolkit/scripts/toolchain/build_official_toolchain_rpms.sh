@@ -278,7 +278,7 @@ build_rpm_in_chroot_no_install () {
         srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName
         cp $srpmPath $CHROOT_SRPMS_DIR
-        chroot_and_run_rpmbuild $srpmName 2>&1 | awk '{ print strftime("time=\"%Y-%m-%dT%T%Z\""), $0; fflush(); }' | tee $TOOLCHAIN_LOGS/$srpmName.log
+        chroot_and_run_rpmbuild $srpmName 2>&1 | tee $TOOLCHAIN_LOGS/$srpmName.log
         copy_built_rpms $builtRpms
         cp $srpmPath $MARINER_OUTPUT_SRPMS_DIR
         echo "$1" >> $TEMP_BUILT_SPECS_LIST
