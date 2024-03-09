@@ -99,7 +99,6 @@ Patch0007: 0008-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
 Patch0008: 0009-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
 Patch0011: 0012-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
 Patch0012: 0013-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
-Patch0015: 0016-OvmfPkg-Clarify-invariants-for-NestedInterruptTplLib.patch
 Patch0016: 0017-OvmfPkg-Relax-assertion-that-interrupts-do-not-occur.patch
 
 Patch1000: CVE-2023-0464.patch
