@@ -5,11 +5,13 @@ package file
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"io/fs"
 	"os"
@@ -18,6 +20,8 @@ import (
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
+
+const compareBufferSize = 4096
 
 // IsDir check if a given file path is a directory.
 func IsDir(filePath string) (isDir bool, err error) {
@@ -84,6 +88,93 @@ func Copy(src, dst string) (err error) {
 // dst is assumed to be a file and not a directory. Will change the permissions to the given value.
 func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
 	return copyWithPermissions(src, dst, dirmode, true, filemode)
+}
+
+func readOneCompareBlock(in io.Reader, buffer *[]byte) (readSize int, err error) {
+	readSize = 0
+	for currentRead := 0; readSize < compareBufferSize; {
+		currentRead, err = in.Read((*buffer)[readSize:])
+		readSize += currentRead
+		if err != nil {
+			break
+		}
+	}
+	return
+}
+
+func compareFileByteStreams(in1, in2 io.Reader) (isSame bool, err error) {
+	buffer1 := make([]byte, compareBufferSize)
+	buffer2 := make([]byte, compareBufferSize)
+	isSame = true
+	for {
+		var readSize1 int
+		readSize1, err = readOneCompareBlock(in1, &buffer1)
+		if err != nil && err != io.EOF {
+			err = fmt.Errorf("unable to read from input 1 while comparing files:\n%w", err)
+			isSame = false
+			return
+		} else {
+			err = nil
+		}
+
+		var readSize2 int
+		readSize2, err = readOneCompareBlock(in2, &buffer2)
+		if err != nil && err != io.EOF {
+			err = fmt.Errorf("unable to read from input 2 while comparing files:\n%w", err)
+			isSame = false
+			return
+		} else {
+			err = nil
+		}
+
+		if readSize1 != readSize2 {
+			isSame = false
+			return
+		}
+		if readSize1 == 0 {
+			break
+		}
+		if !bytes.Equal(buffer1, buffer2) {
+			isSame = false
+			return
+		}
+	}
+	return
+}
+
+func ContentsAreSame(src, dst string) (isSame bool, err error) {
+	isSame = false
+	srcExists, err := PathExists(src)
+	if err != nil {
+		err = fmt.Errorf("unable to check if destination file exists:\n%w", err)
+		return
+	}
+	dstExists, err := PathExists(dst)
+	if err != nil {
+		err = fmt.Errorf("unable to check if destination file exists:\n%w", err)
+		return
+	}
+	if srcExists && dstExists {
+		var srcFile, dstFile *os.File
+		srcFile, err = os.Open(src)
+		if err != nil {
+			err = fmt.Errorf("unable to open source file:\n%w", err)
+			return
+		}
+		defer srcFile.Close()
+		dstFile, err = os.Open(dst)
+		if err != nil {
+			err = fmt.Errorf("unable to open destination file:\n%w", err)
+			return
+		}
+		defer dstFile.Close()
+		isSame, err = compareFileByteStreams(srcFile, dstFile)
+		if err != nil {
+			err = fmt.Errorf("unable to compare files:\n%w", err)
+			return
+		}
+	}
+	return
 }
 
 // readLines reads file under path and returns lines as strings and any error encountered
@@ -171,43 +262,55 @@ func RemoveFileIfExists(path string) (err error) {
 	return
 }
 
-// GenerateSHA1 calculates a sha1 of a file
-func GenerateSHA1(path string) (hash string, err error) {
-	file, err := os.Open(path)
+// GenerateSHA1String calculates a sha1 of a file
+func GenerateSHA1String(path string) (hash string, err error) {
+	rawHash, err := CalculateSHA1Bytes([]string{path})
 	if err != nil {
 		return
 	}
-	defer file.Close()
-
-	sha1Generator := sha1.New()
-	_, err = io.Copy(sha1Generator, file)
-	if err != nil {
-		return
-	}
-
-	rawHash := sha1Generator.Sum(nil)
 	hash = hex.EncodeToString(rawHash)
-
 	return
 }
 
-// GenerateSHA256 calculates a sha256 of a file
-func GenerateSHA256(path string) (hash string, err error) {
-	file, err := os.Open(path)
+// GenerateSHA256String calculates a sha256 of a file
+func GenerateSHA256String(path string) (hash string, err error) {
+	rawHash, err := CalculateSHA256Bytes([]string{path})
 	if err != nil {
 		return
 	}
-	defer file.Close()
-
-	sha256Generator := sha256.New()
-	_, err = io.Copy(sha256Generator, file)
-	if err != nil {
-		return
-	}
-
-	rawHash := sha256Generator.Sum(nil)
 	hash = hex.EncodeToString(rawHash)
+	return
+}
 
+func CalculateSHA1Bytes(inputFiles []string) (hash []byte, err error) {
+	fileHasher := sha1.New()
+	err = calculateHashForFiles(inputFiles, fileHasher)
+	hash = fileHasher.Sum(nil)
+	return
+}
+
+func CalculateSHA256Bytes(inputFiles []string) (hash []byte, err error) {
+	fileHasher := sha256.New()
+	err = calculateHashForFiles(inputFiles, fileHasher)
+	hash = fileHasher.Sum(nil)
+	return
+}
+
+func calculateHashForFiles(inputFiles []string, fileHasher hash.Hash) (err error) {
+	for _, inputFile := range inputFiles {
+		// Read the file, and pass into the hasher
+		var data []byte
+		data, err = os.ReadFile(inputFile)
+		if err != nil {
+			err = fmt.Errorf("unable to read input file:\n%w", err)
+			return
+		}
+		_, err = fileHasher.Write(data)
+		if err != nil {
+			err = fmt.Errorf("unable to hash file:\n%w", err)
+			return
+		}
+	}
 	return
 }
 
