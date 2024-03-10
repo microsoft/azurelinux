@@ -20,7 +20,6 @@ BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 %ifarch x86_64
 BuildRequires:  libpmem-devel
-BuildRequires:  libpmemblk-devel
 %endif
 %if 0%{?with_check}
 BuildRequires:  CUnit-devel
@@ -421,40 +420,40 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.11-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
-* Tue Jul 15 2014 Eric Sandeen <sandeen@redhat.com> 2.1.11-1 
+* Tue Jul 15 2014 Eric Sandeen <sandeen@redhat.com> 2.1.11-1
 - New upstream version
 
-* Mon Jun 16 2014 Eric Sandeen <sandeen@redhat.com> 2.1.10-1 
+* Mon Jun 16 2014 Eric Sandeen <sandeen@redhat.com> 2.1.10-1
 - New upstream version
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
-* Tue May 13 2014 Eric Sandeen <sandeen@redhat.com> 2.1.9-1 
+* Tue May 13 2014 Eric Sandeen <sandeen@redhat.com> 2.1.9-1
 - New upstream version
 
-* Mon Apr 14 2014 Eric Sandeen <sandeen@redhat.com> 2.1.8-1 
+* Mon Apr 14 2014 Eric Sandeen <sandeen@redhat.com> 2.1.8-1
 - New upstream version
 
-* Mon Apr 07 2014 Eric Sandeen <sandeen@redhat.com> 2.1.7-1 
+* Mon Apr 07 2014 Eric Sandeen <sandeen@redhat.com> 2.1.7-1
 - New upstream version
 
-* Wed Feb 12 2014 Eric Sandeen <sandeen@redhat.com> 2.1.5-1 
+* Wed Feb 12 2014 Eric Sandeen <sandeen@redhat.com> 2.1.5-1
 - New upstream version
 
-* Wed Sep 25 2013 Eric Sandeen <sandeen@redhat.com> 2.1.3-1 
+* Wed Sep 25 2013 Eric Sandeen <sandeen@redhat.com> 2.1.3-1
 - New upstream version
 
-* Thu Aug 08 2013 Eric Sandeen <sandeen@redhat.com> 2.1.2-1 
+* Thu Aug 08 2013 Eric Sandeen <sandeen@redhat.com> 2.1.2-1
 - New upstream version
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Wed May 15 2013 Eric Sandeen <sandeen@redhat.com> 2.1-1 
+* Wed May 15 2013 Eric Sandeen <sandeen@redhat.com> 2.1-1
 - New upstream version
 
-* Wed Apr 17 2013 Eric Sandeen <sandeen@redhat.com> 2.0.15-1 
+* Wed Apr 17 2013 Eric Sandeen <sandeen@redhat.com> 2.0.15-1
 - New upstream version
 
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.13-2
@@ -466,16 +465,16 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Tue Jan 01 2013 Dan Horák <dan[at]danny.cz> - 2.0.12.2-2
 - fix build on arches without ARCH_HAVE_CPU_CLOCK (arm, s390)
 
-* Fri Dec 21 2012 Eric Sandeen <sandeen@redhat.com> 2.0.12.2-1 
+* Fri Dec 21 2012 Eric Sandeen <sandeen@redhat.com> 2.0.12.2-1
 - New upstream version
 
-* Sat Nov 24 2012 Eric Sandeen <sandeen@redhat.com> 2.0.11-1 
+* Sat Nov 24 2012 Eric Sandeen <sandeen@redhat.com> 2.0.11-1
 - New upstream version
 
 * Thu Nov 15 2012 Peter Robinson <pbrobinson@fedoraproject.org> 2.0.10-2
 - Merge latest from F16 to master, bump release
 
-* Fri Oct 12 2012 Eric Sandeen <sandeen@redhat.com> 2.0.10-1 
+* Fri Oct 12 2012 Eric Sandeen <sandeen@redhat.com> 2.0.10-1
 - New upstream version
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-2
