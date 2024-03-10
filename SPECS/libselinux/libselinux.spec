@@ -14,7 +14,9 @@ BuildRequires:  swig
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-wheel
+# python3-wheel (non-toolchain package) cannot be added as a BR to libselinux (since it is a toolchain package)
+# The raw toolchain environment does already provide python3-wheel
+#BuildRequires:  python3-wheel
 Requires:       pcre2
 Requires:       libsepol
 
