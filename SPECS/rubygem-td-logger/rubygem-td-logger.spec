@@ -15,7 +15,7 @@ BuildRequires:  git
 BuildRequires:  ruby
 Requires:       rubygem-fluent-logger < 2.0
 Requires:       rubygem-msgpack < 2.0
-Requires:       rubygem-td-client < 2.0
+Requires:       rubygem-td-client
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
 
 %description
