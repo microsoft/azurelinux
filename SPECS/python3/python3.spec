@@ -243,7 +243,6 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %changelog
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-3
 - Add %%{_bindir}/python link to python3
-- Add python3-setuptools requires to python3-devel
 
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-2
 - Remove pip subpackage
