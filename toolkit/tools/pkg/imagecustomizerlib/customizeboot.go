@@ -204,14 +204,10 @@ func replaceKernelCommandLineArgumentValue(inputGrubCfgContent string, name stri
 	return outputGrubCfgContent, oldValue, nil
 }
 
-func handleKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments, imageChroot *safechroot.Chroot, partitionsCustomized bool) error {
+func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
+	imageChroot *safechroot.Chroot,
+) error {
 	var err error
-
-	if partitionsCustomized {
-		// ExtraCommandLine was handled when the new image was created and the grub.cfg file was regenerated from
-		// scatch.
-		return nil
-	}
 
 	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
 	if extraCommandLine == "" {
