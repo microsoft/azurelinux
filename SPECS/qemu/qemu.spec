@@ -622,7 +622,7 @@ BuildRequires: libudev-devel
 # qauth infrastructure
 BuildRequires: pam-devel
 %if %{have_liburing}
-# liburing support. Library isn't built for arm
+# liburing support.
 BuildRequires: liburing-devel
 %endif
 # zstd compression support
