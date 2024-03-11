@@ -62,8 +62,8 @@ sed -i 's/ \"pytest-icdiff\", \"coverage\[toml\]\", //g' pyproject.toml
 
 %files -n python3-hatch-fancy-pypi-readme -f %{pyproject_files}
 %license LICENSE.txt
+%license %{python3_sitelib}/hatch_fancy_pypi_readme-%{version}.dist-info/licenses/LICENSE.txt
 %doc README.md
-# fedora-review tool reported to mark this as %%doc or %%license file
 %doc %{python3_sitelib}/hatch_fancy_pypi_readme-%{version}.dist-info/licenses/AUTHORS.md
 %{_bindir}/hatch-fancy-pypi-readme
 
