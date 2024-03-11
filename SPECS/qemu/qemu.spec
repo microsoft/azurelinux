@@ -192,7 +192,7 @@ Distribution:   Azure Linux
 %ifarch x86_64
 %global firmwaredirs "%{_datadir}/qemu-firmware:%{_datadir}/ipxe/qemu:%{_datadir}/seavgabios:%{_datadir}/seabios:%{_datadir}/sgabios"
 %else
-%global firmwaredirs "%{_datadir}/qemu-firmware
+%global firmwaredirs "%{_datadir}/qemu-firmware"
 %endif
 %endif
 
