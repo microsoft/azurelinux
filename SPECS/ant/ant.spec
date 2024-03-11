@@ -34,10 +34,10 @@ Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}

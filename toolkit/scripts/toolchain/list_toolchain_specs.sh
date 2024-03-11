@@ -18,5 +18,5 @@ OUTPUT_FILE=$2
 # `sort -u` is for eliminating duplicates- we don't actually care about the order
 sed -nE 's/^\s*build_rpm_in_chroot_no_install\s+([A-Za-z0-9_-]+).*$/\1/pgm' $TOOLCHAIN_BUILD_FILE | sort -u > $OUTPUT_FILE
 
-# Special case to add msopenjdk-11 RPM which is downloaded instead of built
-echo "msopenjdk-11" >> $OUTPUT_FILE
+# Special case to add msopenjdk-17 RPM which is downloaded instead of built
+echo "msopenjdk-17" >> $OUTPUT_FILE

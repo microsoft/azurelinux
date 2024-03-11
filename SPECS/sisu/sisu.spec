@@ -2,7 +2,7 @@
 Summary:        Eclipse dependency injection framework
 Name:           sisu
 Version:        0.3.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 # sisu is EPL-1.0, the bundled asm is BSD
 License:        EPL-1.0 AND BSD
 Vendor:         Microsoft Corporation
@@ -54,7 +54,7 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 %{mvn_alias} :org.eclipse.sisu.plexus org.sonatype.sisu:sisu-inject-plexus
 
 %build
-%{mvn_build}
+%{mvn_build} -X  -- -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
 
 %install
 %{mvn_install}
@@ -63,6 +63,10 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 %license sisu-inject/LICENSE.txt
 
 %changelog
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-5
+- Rebuilt with msopenjdk-17
+- change source, target and release version
+
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-4
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

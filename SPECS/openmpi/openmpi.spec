@@ -143,8 +143,8 @@ OpenMPI support for Python 3.
 	--enable-ipv6 \
 %if %{with java}
 	--enable-mpi-java \
-	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-11/bin \
-	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-11/include \
+	--with-jdk-bindir=%{_libdir}/jvm/msopenjdk-17/bin \
+	--with-jdk-headers=%{_libdir}/jvm/msopenjdk-17/include \
 %endif
 	--enable-mpi1-compatibility \
 	--with-sge \

@@ -24,7 +24,7 @@ BuildRequires:  ant-junit
 Requires:       jna
 Requires:       jpackage-utils
 Requires:       libvirt-client >= 0.9.12
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 
 %description
 Libvirt-java is a base framework allowing to use libvirt, the virtualization
