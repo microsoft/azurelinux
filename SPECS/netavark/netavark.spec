@@ -4,13 +4,14 @@
 
 %global debug_package %{nil}
 
-%global built_tag v1.0.3
+%global built_tag v1.10.3
 %global built_tag_strip %(b=%{built_tag}; echo ${b:1})
 %global gen_version %(b=%{built_tag_strip}; echo ${b/-/"~"})
+%global _unitdir /usr/lib/systemd/system
 
 Name:          netavark
-Version:       1.0.3
-Release:       5%{?dist}
+Version:       1.10.3
+Release:       1%{?dist}
 Summary:       OCI network stack
 License:       ASL 2.0 and BSD and MIT
 Vendor:        Microsoft Corporation
@@ -20,10 +21,12 @@ Source0:       %{url}/archive/%{built_tag}/%{version}.tar.gz#/%{name}-%{version}
 Source1:       %{url}/releases/download/%{built_tag}/%{name}-%{built_tag}-vendor.tar.gz
 BuildRequires: cargo
 BuildRequires: make
+BuildRequires: protobuf-c
+BuildRequires: protobuf-compiler
 BuildRequires: rust
 BuildRequires: git
 BuildRequires: go-md2man
-Recommends:    aardvark-dns >= 1.0.3-1
+Recommends:    aardvark-dns >= 1.10.3-1
 Provides:      container-network-stack = 2
 # Generated using:
 # cargo tree --prefix none | awk '{print "Provides: bundled(crate("$1")) = "$2}' | sort | uniq
@@ -91,7 +94,7 @@ Provides:      bundled(crate(matches)) = v0.1.9
 Provides:      bundled(crate(memchr)) = v2.5.0
 Provides:      bundled(crate(memoffset)) = v0.6.5
 Provides:      bundled(crate(mio)) = v0.8.2
-Provides:      bundled(crate(netavark)) = v1.0.3
+Provides:      bundled(crate(netavark)) = v1.10.3
 Provides:      bundled(crate(netlink-packet-core)) = v0.4.2
 Provides:      bundled(crate(netlink-packet-route)) = v0.11.0
 Provides:      bundled(crate(netlink-packet-utils)) = v0.5.1
@@ -217,8 +220,14 @@ popd
 %dir %{_libexecdir}/podman
 %{_libexecdir}/podman/%{name}
 %{_mandir}/man1/%{name}.1*
+%{_unitdir}/%{name}-dhcp-proxy.service
+%{_unitdir}/%{name}-dhcp-proxy.socket
+%{_unitdir}/%{name}-firewalld-reload.service
 
 %changelog
+* Thu Feb 22 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.10.3-1
+- upgrade to v1.10.3
+
 * Thu Sep 07 2023 Daniel McIlvaney <damcilva@microsoft.com> - 1.0.3-5
 - Bump package to rebuild with rust 1.72.0
 

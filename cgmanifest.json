@@ -13812,8 +13812,8 @@
         "type": "other",
         "other": {
           "name": "netavark",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
+          "version": "1.10.3",
+          "downloadUrl": "https://github.com/containers/netavark/archive/v1.10.3/1.10.3.tar.gz"
         }
       }
     },
