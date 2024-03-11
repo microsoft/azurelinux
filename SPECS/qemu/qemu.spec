@@ -291,16 +291,10 @@ Distribution:   Azure Linux
 %define requires_device_display_virtio_vga_gl %{nil}
 %endif
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
-%ifnarch %{ix86}
 %if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
 %else
 %define requires_package_virtiofsd Requires: virtiofsd
-%endif
-%define obsoletes_package_virtiofsd %{nil}
-%else
-%define requires_package_virtiofsd %{nil}
-%define obsoletes_package_virtiofsd Obsoletes: %{name}-virtiofsd < %{evr}
 %endif
 
 %if %{have_virgl}
