@@ -13,8 +13,8 @@
 2. Refer to reaper spec and install all build required dependenices.
 3. Download reaper sources and extract under /usr/src
 4. cd /usr/src/cassandra-reaper-<version>
-5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-11"
-6. Run "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/msopenjdk-11/lib/jli"
+5. Run "export JAVA_HOME=/usr/lib/jvm/msopenjdk-17"
+6. Run "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/jvm/msopenjdk-17/lib"
 7. Run "sudo npm install -g bower"
 8. Run "sudo npm install -g n"
 9. Run "sudo n 14.18.0"
