@@ -318,10 +318,10 @@ rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
 # Python3 bind
 mkdir -p %{buildroot}%{python3_sitelib}
-find / -name "*.egg-info" -exec bash -c 'cp -r {} %{buildroot}%{python3_sitelib}' \;
+find / -name "*.egg-info" -exec bash -c 'ln -s {} %{buildroot}%{python3_sitelib}' \;
 
 # libcrypto.so
-find / -name "libcrypto.so*" -exec bash -c 'cp -r {} %{buildroot}%{_libdir}' \;
+find / -name "libcrypto.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
 
 %post -p /sbin/ldconfig
 %postun
