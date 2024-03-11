@@ -36,7 +36,6 @@ var (
 	toolchainManifest       = app.Flag("toolchain-manifest", "Path to a list of RPMs which are created by the toolchain. Will mark RPMs from this list as prebuilt.").ExistingFile()
 	existingToolchainRpmDir = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	distTag                 = app.Flag("dist-tag", "The distribution tag the SPEC will be built with.").Required().String()
-	workerTar               = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.  If this argument is empty, specs will be parsed in the host environment.").ExistingFile()
 	targetArch              = app.Flag("target-arch", "The architecture of the machine the RPM binaries run on").String()
 	runCheck                = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 	logFlags                = exe.SetupLogFlags(app)
@@ -73,7 +72,6 @@ func main() {
 	// Convert specsDir to an absolute path
 	specsAbsDir, err := filepath.Abs(*specsDir)
 	logger.PanicOnError(err, "Unable to get absolute path for specs directory '%s': %s", *specsDir, err)
-
-	err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *workerTar, *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
+	err = specreaderutils.ParseSPECsWrapper(*buildDir, specsAbsDir, *rpmsDir, *srpmsDir, *existingToolchainRpmDir, *distTag, *output, *targetArch, specListSet, toolchainRPMs, *workers, *runCheck)
 	logger.PanicOnError(err)
 }

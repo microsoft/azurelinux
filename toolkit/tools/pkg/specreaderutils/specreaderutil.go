@@ -12,13 +12,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
@@ -55,58 +52,31 @@ type parseResult struct {
 	err      error
 }
 
-// ParseSPECsWrapper wraps parseSPECs to conditionally run it inside a chroot.
-// If workerTar is non-empty, parsing will occur inside a chroot, otherwise it will run on the host system.
-func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, workerTar, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
+// ParseSPECsWrapper wraps parseSPECs to run on the host system.
+func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, outputFile, targetArch string, specListSet map[string]bool, toolchainRPMs []string, workers int, runCheck bool) (err error) {
 	var (
-		chroot      *safechroot.Chroot
 		packageRepo *pkgjson.PackageRepo
 	)
-
-	if workerTar != "" {
-		const leaveFilesOnDisk = false
-		chroot, err = createChroot(workerTar, buildDir, specsDir, srpmsDir)
-		if err != nil {
-			return
-		}
-		defer chroot.Close(leaveFilesOnDisk)
-	}
 
 	buildArch, err := rpm.GetRpmArch(runtime.GOARCH)
 	if err != nil {
 		return
 	}
 
-	doParse := func() error {
-		var parseError error
+	logger.Log.Info("Parsing SPECs in the host environment")
 
-		if targetArch == "" {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, specListSet, toolchainRPMs, workers, runCheck)
-			if parseError != nil {
-				err := fmt.Errorf("failed to parse native specs:\n%w", parseError)
-				return err
-			}
-		} else {
-			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, targetArch, specListSet, toolchainRPMs, workers, runCheck)
-			if parseError != nil {
-				err := fmt.Errorf("failed to parse cross specs:\n%w", parseError)
-				return err
-			}
+	if targetArch == "" {
+		packageRepo, err = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, specListSet, toolchainRPMs, workers, runCheck)
+		if err != nil {
+			err = fmt.Errorf("failed to parse native specs:\n%w", err)
+			return err
 		}
-
-		return parseError
-	}
-
-	if chroot != nil {
-		logger.Log.Info("Parsing SPECs inside a chroot environment")
-		err = chroot.Run(doParse)
 	} else {
-		logger.Log.Info("Parsing SPECs in the host environment")
-		err = doParse()
-	}
-
-	if err != nil {
-		return
+		packageRepo, err = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, targetArch, specListSet, toolchainRPMs, workers, runCheck)
+		if err != nil {
+			err = fmt.Errorf("failed to parse cross specs:\n%w", err)
+			return err
+		}
 	}
 
 	b, err := json.MarshalIndent(packageRepo, "", "  ")
@@ -119,51 +89,6 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 	if err != nil {
 		logger.Log.Errorf("Failed to write file (%s)", outputFile)
 		return
-	}
-
-	return
-}
-
-// createChroot creates a chroot to parse SPECs inside of.
-func createChroot(workerTar, buildDir, specsDir, srpmsDir string) (chroot *safechroot.Chroot, err error) {
-	const (
-		chrootName       = "specparser_chroot"
-		existingDir      = false
-		leaveFilesOnDisk = false
-	)
-
-	// Mount the specs and srpms directories to an identical path inside the chroot.
-	// Since specreader saves the full paths to specs in its output that grapher will then consume,
-	// the pathing needs to be preserved from the host system.
-	var extraDirectories []string
-
-	extraMountPoints := []*safechroot.MountPoint{
-		safechroot.NewMountPoint(specsDir, specsDir, "", safechroot.BindMountPointFlags, ""),
-		safechroot.NewMountPoint(srpmsDir, srpmsDir, "", safechroot.BindMountPointFlags, ""),
-	}
-
-	chrootDir := filepath.Join(buildDir, chrootName)
-	chroot = safechroot.NewChroot(chrootDir, existingDir)
-
-	err = chroot.Initialize(workerTar, extraDirectories, extraMountPoints, true)
-	if err != nil {
-		return
-	}
-
-	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
-	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir, srpmsDir}
-		for _, dir := range dirsToCopy {
-			dirInChroot := filepath.Join(chroot.RootDir(), dir)
-			err = directory.CopyContents(dir, dirInChroot)
-			if err != nil {
-				closeErr := chroot.Close(leaveFilesOnDisk)
-				if closeErr != nil {
-					logger.Log.Errorf("Failed to close chroot, err: %s", err)
-				}
-				return
-			}
-		}
 	}
 
 	return

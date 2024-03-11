@@ -90,7 +90,7 @@ analyze-built-graph: $(go-graphanalytics)
 # We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
 # is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
 # actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
+$(specs_file): $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
 		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
@@ -100,7 +100,6 @@ $(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $
 		--toolchain-manifest="$(TOOLCHAIN_MANIFEST)" \
 		--toolchain-rpms-dir="$(TOOLCHAIN_RPMS_DIR)" \
 		--dist-tag $(DIST_TAG) \
-		--worker-tar $(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		$(logging_command) \
 		--cpu-prof-file=$(PROFILE_DIR)/specreader.cpu.pprof \
