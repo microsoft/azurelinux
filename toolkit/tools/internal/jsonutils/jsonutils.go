@@ -8,7 +8,7 @@ package jsonutils
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -25,7 +25,7 @@ func ReadJSONDescriptor(jsonFile *os.File, data interface{}) error {
 		return fmt.Errorf("passed nil file descriptor to WriteJSONDescriptor()")
 	}
 
-	jsonData, err := ioutil.ReadAll(jsonFile)
+	jsonData, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return err
 	}
@@ -82,5 +82,5 @@ func WriteJSONFile(outputFilePath string, data interface{}) error {
 
 	logger.Log.Tracef("Writing %#x bytes of JSON data.", len(outputBytes))
 
-	return ioutil.WriteFile(outputFilePath, outputBytes, defaultJsonFilePermission)
+	return os.WriteFile(outputFilePath, outputBytes, defaultJsonFilePermission)
 }

@@ -5,7 +5,6 @@ package directory
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -53,7 +52,7 @@ func CopyContents(srcDir, dstDir string) (err error) {
 		return
 	}
 
-	fds, err := ioutil.ReadDir(srcDir)
+	fds, err := os.ReadDir(srcDir)
 	if err != nil {
 		return
 	}

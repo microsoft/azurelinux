@@ -5,7 +5,7 @@ package eulaview
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/gdamore/tcell"
@@ -120,7 +120,7 @@ func populateEULA(eulaFile string, text *tview.TextView) (err error) {
 	}
 	defer file.Close()
 
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		return
 	}

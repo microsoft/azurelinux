@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -288,7 +287,7 @@ func (g *CCachePkgGroup) getLatestTag(azureBlobStorage *azureblobstorage.AzureBl
 		}
 	}
 
-	latestBuildTagData, err := ioutil.ReadFile(g.TagFile.LocalSourcePath)
+	latestBuildTagData, err := os.ReadFile(g.TagFile.LocalSourcePath)
 	if err != nil {
 		return "", fmt.Errorf("Unable to read ccache tag file contents:\n%w", err)
 	}
@@ -655,7 +654,7 @@ func (m *CCacheManager) UploadPkgGroupCCache() (err error) {
 
 		// Create the latest tag file...
 		logger.Log.Infof("  creating a tag file (%s) with content: (%s)...", m.CurrentPkgGroup.TagFile.LocalTargetPath, remoteStoreConfig.UploadFolder)
-		err = ioutil.WriteFile(m.CurrentPkgGroup.TagFile.LocalTargetPath, []byte(remoteStoreConfig.UploadFolder), 0644)
+		err = os.WriteFile(m.CurrentPkgGroup.TagFile.LocalTargetPath, []byte(remoteStoreConfig.UploadFolder), 0644)
 		if err != nil {
 			return fmt.Errorf("Unable to write tag information to temporary file:\n%w", err)
 		}

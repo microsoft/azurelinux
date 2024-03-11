@@ -7,7 +7,6 @@ package diskutils
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -75,7 +74,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 		return fmt.Errorf("failed to open the initramfs:\n%w", err)
 	}
 
-	verityFiles, err := ioutil.ReadDir(verityWorkingDirectory)
+	verityFiles, err := os.ReadDir(verityWorkingDirectory)
 	if err != nil {
 		return
 	}

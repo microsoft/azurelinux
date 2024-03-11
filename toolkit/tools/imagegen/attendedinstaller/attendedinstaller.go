@@ -6,7 +6,7 @@ package attendedinstaller
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -125,7 +125,7 @@ func (ai *AttendedInstaller) Run() (config configuration.Config, installationQui
 	// with the TUI (terminal UI) and result in undefined behavior.
 	// The log hooks that enable file logging will remain intact and still record
 	// logs.
-	originalStderrWriter := logger.ReplaceStderrWriter(ioutil.Discard)
+	originalStderrWriter := logger.ReplaceStderrWriter(io.Discard)
 	defer func() {
 		logger.ReplaceStderrWriter(originalStderrWriter)
 	}()
