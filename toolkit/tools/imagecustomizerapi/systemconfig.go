@@ -110,8 +110,6 @@ func (s *SystemConfig) IsValid() error {
 	if s.Overlays != nil {
 		upperDirs := make(map[string]bool)
 		workDirs := make(map[string]bool)
-		// Initialize a counter for overlays with a specified persistent partition
-		persistentPartitionCount := 0
 
 		for i, overlay := range *s.Overlays {
 			// Validate the overlay itself

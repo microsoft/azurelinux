@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Description: This script is designed to mount a DM-Verity root filesystem and
 # set up OverlayFS. It is driven by kernel parameters and is invoked during the
@@ -60,8 +60,8 @@ mount_volatile_persistent_volume() {
 
     mkdir -p "${_overlay_mount}"
 
-    if [ -z "${_volume}" ]; then
-        # Fallback to volatile overlay if no persistent volume is specified
+    if [[ "${_volume}" == "volatile" ]]; then
+        # Fallback to volatile overlay if no persistent volume is specified.
         echo "No overlayfs persistent volume specified. Creating a volatile overlay."
         mount -t tmpfs tmpfs -o ${OVERLAY_MNT_OPTS} "${_overlay_mount}" || \
             die "Failed to create overlay tmpfs at ${_overlay_mount}"
@@ -72,7 +72,7 @@ mount_volatile_persistent_volume() {
                 die "Failed to assemble RAID volume."
         fi
 
-        # Mount the specified persistent volume
+        # Mount the specified persistent volume.
         mount "${_volume}" "${_overlay_mount}" || \
             die "Failed to mount ${_volume} at ${_overlay_mount}"
     fi
@@ -87,7 +87,7 @@ create_overlayfs() {
 
     mkdir -p "${_upper}" && \
     mkdir -p "${_work}" && \
-    mount -t overlay overlay -o rw,lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
+    mount -t overlay overlay -o ro,lowerdir="${_lower}",upperdir="${_upper}",workdir="${_work}" "${_lower}" || \
         die "Failed to mount overlay in ${_lower}"
 }
 
@@ -111,18 +111,23 @@ mount_overlayfs() {
     echo "Starting to create OverlayFS"
     for _group in ${overlayfs}; do
         IFS=',' read -r overlay upper work volume <<< "$_group"
-        
-        # Check if volume is already in the map
-        if [[ -z "${volume_mount_map[$volume]}" ]]; then
-            # Not in map, so mount and update the map
+
+        if [[ "$volume" == "" ]]; then
             overlay_mount_with_cnt="${OVERLAY_MOUNT}/${cnt}"
-            mount_volatile_persistent_volume $volume $overlay_mount_with_cnt
-            volume_mount_map[$volume]=$overlay_mount_with_cnt
-            ((cnt++))
+            mount_volatile_persistent_volume "volatile" $overlay_mount_with_cnt
         else
-            # Volume already mounted, retrieve existing mount point from map
-            overlay_mount_with_cnt=${volume_mount_map[$volume]}
+            if [[ -n "${volume_mount_map[$volume]}" ]]; then
+                # Volume already mounted, retrieve existing mount point from map.
+                overlay_mount_with_cnt=${volume_mount_map[$volume]}
+            else
+                # Not in map, so mount and update the map.
+                overlay_mount_with_cnt="${OVERLAY_MOUNT}/${cnt}"
+                mount_volatile_persistent_volume $volume $overlay_mount_with_cnt
+                volume_mount_map[$volume]=$overlay_mount_with_cnt
+            fi
         fi
+        cnt=$((cnt + 1))
+
         echo "Creating OverlayFS with overlay: $overlay, upper: ${overlay_mount_with_cnt}/${upper}, work: ${overlay_mount_with_cnt}/${work}"
         create_overlayfs "${VERITY_MOUNT}/${overlay}" "${overlay_mount_with_cnt}/${upper}" "${overlay_mount_with_cnt}/${work}"
     done
