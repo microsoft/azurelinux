@@ -46,9 +46,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 
 	// Iterate over each Overlay configuration
 	for _, overlay := range overlays {
-		if overlay.Partition == nil {
-			formattedPartition = ""
-		}
+		formattedPartition = ""
 		if overlay.Partition != nil {
 			formattedPartition, err = systemdFormatPartitionId(overlay.Partition.IdType, overlay.Partition.Id)
 			if err != nil {
