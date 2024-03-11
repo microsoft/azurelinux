@@ -320,8 +320,9 @@ rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 mkdir -p %{buildroot}%{python3_sitelib}
 find / -name "*.egg-info" -exec bash -c 'ln -s {} %{buildroot}%{python3_sitelib}' \;
 
-# libcrypto.so
+# Missing lib dependencies
 find / -name "libcrypto.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
+find / -name "libssl.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
 
 %post -p /sbin/ldconfig
 %postun
@@ -365,6 +366,7 @@ fi;
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
 %{_libdir}/libcrypto*
+%{_libdir}/libssl*
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
 %config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
@@ -433,6 +435,7 @@ fi;
 %files libs
 %{_libdir}/*-%{version}*.so
 %{_libdir}/libcrypto*
+%{_libdir}/libssl*
 
 %files license
 %license LICENSE
@@ -457,6 +460,7 @@ fi;
 %files dnssec-utils
 %{_bindir}/dnssec*
 %{_libdir}/libcrypto*
+%{_libdir}/libssl*
 
 %files dnssec-doc
 %{_mandir}/man1/dnssec*.1*
@@ -502,6 +506,7 @@ fi;
 %files utils
 %defattr(-,root,root)
 %{_libdir}/libcrypto*
+%{_libdir}/libssl*
 %{_sbindir}/ddns-confgen
 %{_sbindir}/tsig-keygen
 %{_bindir}/nsec3hash
