@@ -1,15 +1,17 @@
 Summary:        Programs for monitoring processes
 Name:           procps-ng
 Version:        4.0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 AND LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://gitlab.com/procps-ng/procps
 Source0:        https://sourceforge.net/projects/procps-ng/files/Production/%{name}-%{version}.tar.xz
+Source1:        10-console-messages.conf
 BuildRequires:  ncurses-devel
 Requires:       ncurses
+Recommends:     systemd
 Conflicts:      toybox
 Provides:       /bin/ps
 Provides:       procps = %{version}-%{release}
@@ -55,10 +57,21 @@ ln -s %{_bindir}/pidof %{buildroot}%{_sbindir}/pidof
 find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name} --all-name --with-man
 
+install -Dm 644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysctl.d/10-console-messages.conf
+
 %check
 make %{?_smp_mflags} check
 
-%post   -p /sbin/ldconfig
+%post 
+/sbin/ldconfig
+if [ -x %{_libdir}/systemd/systemd-sysctl ] ; then
+%if 0%{?sysctl_apply}
+  %{sysctl_apply} 10-console-messages.conf
+%else
+  %{_libdir}/systemd/systemd-sysctl %{_sysconfdir}/sysctl.d/10-console-messages.conf > /dev/null 2>&1 || :
+%endif
+fi
+
 %postun -p /sbin/ldconfig
 
 %files
@@ -87,6 +100,7 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*
 %{_libdir}/libproc2.so.*
 /sbin/sysctl
+%{_sysconfdir}/sysctl.d/10-console-messages.conf
 
 %files devel
 %{_includedir}/libproc2/diskstats.h
@@ -105,6 +119,9 @@ make %{?_smp_mflags} check
 %defattr(-,root,root)
 
 %changelog
+* Fri Mar 08 2024 Chris Co <chrco@microsoft.com> - 4.0.4-2
+- Supply 10-console-messages.conf sysctl to lower the default kernel messages to the console
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.0.4-1
 - Auto-upgrade to 4.0.4 - Azure Linux 3.0 - package upgrades
 
