@@ -3463,7 +3463,7 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 %changelog
 * Mon Mar 11 2024 Kanika Nema <kanikanema@microsoft.com> - 8.2.0-2
-- Cleanup
+- Fix spec for ARM builds and minor cleanup
 
 * Mon Feb 19 2024 Kanika Nema <kanikanema@microsoft.com>  - 8.2.0-1
 - Initial CBL-Mariner import from Fedora 40 (license: MIT)
