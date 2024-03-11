@@ -49,6 +49,7 @@ BuildRequires:  postgresql-devel
 BuildRequires:  python3
 BuildRequires:  python3-ply
 BuildRequires:  sqlite-devel
+BuildRequires:  systemd-libs
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  userspace-rcu-devel
 
