@@ -293,6 +293,7 @@ Distribution:   Azure Linux
 %define requires_package_qemu_pr_helper Requires: qemu-pr-helper
 %if 0%{azl}
 %define requires_package_virtiofsd Requires: vhostuser-backend(fs)
+%define obsoletes_package_virtiofsd Obsoletes: %{name}-virtiofsd < %{evr}
 %else
 %define requires_package_virtiofsd Requires: virtiofsd
 %endif
