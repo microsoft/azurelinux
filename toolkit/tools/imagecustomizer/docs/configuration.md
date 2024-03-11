@@ -35,9 +35,12 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 10. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
 
-11. If [ResetBootLoaderType](#resetbootloadertype-string) is specified, then reset the
-    boot-loader.
-    Otherwise, append kernel command-line args to existing boot-loader config.
+11. If [ResetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+    reset the boot-loader.
+
+    If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then
+    append the [ExtraCommandLine](#extracommandline-string) value to the existing
+    `grub.cfg` file.
 
 12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
 
@@ -328,8 +331,9 @@ Additional Linux kernel command line options to add to the image.
 
 If [ResetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, then the
 `ExtraCommandLine` value will be appended to the new `grub.cfg` file.
-Otherwise, the `ExtraCommandLine` value will be appended to the existing `grub.cfg`
-file.
+
+If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then the
+`ExtraCommandLine` value will be appended to the existing `grub.cfg` file.
 
 ### SELinux
 
