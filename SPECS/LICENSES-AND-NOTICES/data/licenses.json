@@ -2319,6 +2319,7 @@
                 "rubygem-fluent-plugin-systemd",
                 "rubygem-fluent-plugin-webhdfs",
                 "rubygem-fluent-plugin-windows-exporter",
+                "rubygem-fluentd",
                 "rubygem-hirb",
                 "rubygem-hocon",
                 "rubygem-hoe",
