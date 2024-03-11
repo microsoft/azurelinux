@@ -320,16 +320,8 @@ rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 mkdir -p %{buildroot}%{python3_sitelib}
 find / -name "*.egg-info" -exec bash -c 'cp -r {} %{buildroot}%{python3_sitelib}' \;
 
-%pre
-if [ $1 -eq 1 ]; then
-  if ! getent group named >/dev/null; then
-      groupadd -r named
-  fi
-  if ! getent passwd named >/dev/null; then
-      useradd -g named -d %{_sharedstatedir}/bind\
-          -s /bin/false -M -r named
-  fi
-fi
+# libcrypto.so
+find / -name "libcrypto.so*" -exec bash -c 'cp -r {} %{buildroot}%{_libdir}' \;
 
 %post -p /sbin/ldconfig
 %postun
@@ -372,6 +364,7 @@ fi;
 %{_libdir}/bind/filter-aaaa.so
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
+%{_libdir}/libcrypto*
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
 %config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
@@ -439,6 +432,7 @@ fi;
 
 %files libs
 %{_libdir}/*-%{version}*.so
+%{_libdir}/libcrypto*
 
 %files license
 %license LICENSE
@@ -462,6 +456,7 @@ fi;
 
 %files dnssec-utils
 %{_bindir}/dnssec*
+%{_libdir}/libcrypto*
 
 %files dnssec-doc
 %{_mandir}/man1/dnssec*.1*
@@ -506,6 +501,7 @@ fi;
 
 %files utils
 %defattr(-,root,root)
+%{_libdir}/libcrypto*
 %{_sbindir}/ddns-confgen
 %{_sbindir}/tsig-keygen
 %{_bindir}/nsec3hash
