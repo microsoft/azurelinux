@@ -18,9 +18,6 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-toml
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-wheel
-%if %{with_check}
-BuildRequires:  python3-iniconfig
-%endif
 
 %global common_description %{expand:
 This provides a Hatch metadata plugin for everyone who cares about the
@@ -56,6 +53,7 @@ sed -i 's/ \"pytest-icdiff\", \"coverage\[toml\]\", //g' pyproject.toml
 %pyproject_save_files hatch_fancy_pypi_readme
 
 %check
+pip3 install iniconfig
 %pyproject_check_import
 # test_end_to_end need network access
 %pytest -v -k "not test_end_to_end"
