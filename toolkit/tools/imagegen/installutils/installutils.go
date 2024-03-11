@@ -1766,6 +1766,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
 	targetRootPath := "/mnt/_bindmountroot"
+	targetRootFullPath := filepath.Join(installChroot.RootDir(), targetRootPath)
 
 	for _, mountToLabel := range listOfMountsToLabel {
 		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
@@ -1819,7 +1820,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 		// Cleanup the temporary directory.
 		// Note: This is intentionally done within the for loop to ensure the directory is always empty for the next
 		// mount. For example, if a parent directory mount is processed after a nested child directory mount.
-		err = os.RemoveAll(targetRootPath)
+		err = os.RemoveAll(targetRootFullPath)
 		if err != nil {
 			return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
 		}
