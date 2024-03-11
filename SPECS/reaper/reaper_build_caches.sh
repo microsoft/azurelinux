@@ -93,8 +93,8 @@ function buildReaperSources {
 	wget $SOURCE_URL -O reaper.tar.gz
 	tar -xf reaper.tar.gz
 	cd cassandra-reaper-${VERSION}
-	export JAVA_HOME="/usr/lib/jvm/msopenjdk-11"
-	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-11/lib/jli"
+	export JAVA_HOME="/usr/lib/jvm/msopenjdk-17"
+	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-17/lib"
 	echo "Building reaper in online mode."
 	mvn -DskipTests package
 	popd
@@ -143,8 +143,8 @@ echo "Generate cassandra reaper build caches..."
 
 checkInternet
 
-echo "Installing msopenjdk-11."
-sudo tdnf install -y msopenjdk-11
+echo "Installing msopenjdk-17."
+sudo tdnf install -y msopenjdk-17
 
 echo "Installing maven modules."
 sudo tdnf install -y maven
