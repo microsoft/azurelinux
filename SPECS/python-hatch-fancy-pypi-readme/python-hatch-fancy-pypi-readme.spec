@@ -16,6 +16,7 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-toml
+BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-wheel
 
 %global common_description %{expand:
