@@ -25,6 +25,8 @@ Obsoletes:      python3-setuptools <= 3.9.14
 BuildArch:      noarch
 
 # Note: these build requirements are only for the non-toolchain build environment (since they are already available in the toolchain environment)
+Provides:       python3dist(setuptools) = %{version}-%{release}
+Provides:       python%{python3_majmin}dist(setuptools) = %{version}-%{release}
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
