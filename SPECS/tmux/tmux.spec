@@ -1,6 +1,6 @@
 Summary:        Terminal multiplexer
 Name:           tmux
-Version:        3.3a
+Version:        3.4
 Release:        1%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
@@ -37,6 +37,9 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4-1
+- Auto-upgrade to 3.4 - Azure Linux 3.0 Upgrades
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3a-1
 - Auto-upgrade to 3.3a - Azure Linux 3.0 - package upgrades
 

@@ -12,10 +12,10 @@ IS_REPO_ENABLED=false
 
 # General setup
 
-## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+## Azure Linux macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
-for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+for macro_file in "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
@@ -75,7 +75,7 @@ show_help() {
     echo "******************************************************************************************"
 }
 
-# Refresh repo cache with newly built RPM, use Mariner specific DEFINES
+# Refresh repo cache with newly built RPM, use Azure Linux specific DEFINES
 rpmbuild() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
@@ -146,18 +146,39 @@ get_pkg_dependency() {
 
 # Install package dependencies listed as BuildRequires in spec
 install_dependencies() {
-    local PKG=("$@")
-    if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
+    # Accept a single argument, which is a pattern to find spec files.
+    if [ "$#" -ne 1 ]; then
+        echo "Usage: $0 <pkg_pattern>"
+        return 1
+    fi
+
+    local PKG="$1"
+
     echo "-------- installing build dependencies ---------"
-    spec_file=$SPECS_DIR/$PKG/$PKG.spec
-    dep_list=$(grep "BuildRequires:" $spec_file | cut -d ':' -f 2)
-    for dependency in $dep_list
+
+    # Find all spec files for the package pattern given.
+    spec_file_pattern=$SPECS_DIR/$PKG/$PKG.spec
+    echo "using spec file pattern: '$spec_file_pattern'"
+    spec_files=($spec_file_pattern)
+
+    # Install dependencies for each spec file found, preserving tdnf error codes.
+    echo "found ${#spec_files[@]} spec files; installing dependencies for each spec file sequentially"
+    exit_code=0
+    for spec_file in "${spec_files[@]}"
     do
-        tdnf install -y $dependency 2>&1
+        echo "installing dependencies for spec file: '$spec_file'"
+
+        # Get the list of dependencies from the spec file.
+        mapfile -t dep_list < <(rpmspec -q --buildrequires $spec_file)
+
+        # Install all the dependencies.
+        tdnf install -y "${dep_list[@]}" || exit_code=$?
     done
+
+    return $exit_code
 }
 
-# use Mariner specific DEFINES
+# use Azure Linux specific DEFINES
 rpmspec() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"

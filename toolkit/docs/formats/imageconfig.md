@@ -2,15 +2,14 @@
 
 Image configuration consists of two sections - Disks and SystemConfigs - that describe the produced artifact(image). Image configuration code can be found in (configuration.go)[../../tools/imagegen/configuration/configuration.go] and validity of the configuration file can be verified by the [imageconfigvalidator](../../tools/imageconfigvalidator/imageconfigvalidator.go)
 
-
 ## Disks
 Disks entry specifies the disk configuration like its size (for virtual disks), partitions and partition table.
 
 ## TargetDisk
-Required when building unattended ISO installer. This field defines the physical disk to which Mariner should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
+Required when building unattended ISO installer. This field defines the physical disk to which Azure Linux should be installed. The `Type` field must be set to `path` and the `Value` field must be set to the desired target disk path.
 
 ### Artifacts
-Artifact (non-ISO image building only) defines the name, type and optional compression of the output CBL-Mariner image.
+Artifact (non-ISO image building only) defines the name, type and optional compression of the output Azure Linux image.
 
 Sample Artifacts entry, creating a raw rootfs, compressed to .tar.gz format(note that this format does not support partitions, so there would be no "Partitions" entry):
 
@@ -174,7 +173,7 @@ A sample `ParitionSettings` entry using `overlay` algorithm:
 `OverlayBaseImage` represents the base image when `overlay` algorithm is used.
 
 ### EnableGrubMkconfig
-EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `false`.
+EnableGrubMkconfig is a optional boolean that controls whether the image uses grub2-mkconfig to generate the boot configuration (/boot/grub2/grub.cfg) or not. If EnableGrubMkconfig is specified, only valid values are `true` and `false`. Default is `true`.
 
 ### PackageLists
 
@@ -217,11 +216,11 @@ All scripts follow the same format in the image config .json file:
 
 #### PreInstallScripts
 
-There are customer requests that would like to use a Kickstart file to install Mariner OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
+There are customer requests that would like to use a Kickstart file to install Azure Linux OS. Kickstart installation normally includes pre-install scripts that run before installation begins and are normally used to handle tasks like network configuration, determining partition schema etc. The `PreInstallScripts` field allows for running customs scripts for similar purposes. Sample Kickstart pre-install script [here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/installation_guide/s1-kickstart2-preinstallconfig). You must set the `IsKickStartBoot` to true in order to make the installer execute the preinstall scripts.
 
 The preinstall scripts are run from the context of the installer, NOT the installed system (since it doesn't exist yet).
 
-**NOTE**: currently, Mariner's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Mariner's image building tools.
+**NOTE**: currently, Azure Linux's pre-install scripts are mostly intended to provide support for partitioning schema configuration. For this purpose, make sure the script creates a proper configuration file (example [here](https://www.golinuxhub.com/2018/05/sample-kickstart-partition-example-raid/)) under `/tmp/part-include` in order for it to be consumed by Azure Linux's image building tools.
 
 #### PostInstallScripts
 
@@ -273,7 +272,7 @@ Fields:
 
 ### Networks
 
-The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Mariner tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
+The `Networks` entry is added to enable the users to specify the network configuration parameters to enable users to set IP address, configure the hostname, DNS etc. Currently, the Azure Linux tooling only supports a subset of the kickstart network command options: `bootproto`, `gateway`, `ip`, `net mask`, `DNS` and `device`. Hostname can be configured using the `Hostname` entry of the image config.
 
 A sample Networks entry pointing to one network configuration:
 ``` json
@@ -367,7 +366,7 @@ Since users are controlled by files in `/etc`, these files are read-only when th
 Since the root partition's hash tree is stored as part of the initramfs, the initramfs cannot be stored on the same root partition (it would invalidate the measurements). To avoid this a separate `/boot` partition is needed to house the hash tree (via the initramfs).
 
 ##### ISO
-The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"CBL-Mariner Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
+The ISO command line installer supports enabling read-only roots if they are configured through the configuration JSON file (see [full.json's](../../imageconfigs/full.json) `"Azure Linux Core Read-Only"` entry). The automatic partition creation mode will create the required `/boot` partition if the read-only root is enabled.
 
 The GUI installer does not currently support read-only roots.
 - `Enable`: Enable dm-verity on the root filesystem
@@ -414,8 +413,8 @@ which is a higher precedent than the config file. This ensures SELinux boots in 
 An optional field to overwrite the SELinux policy package name. If not set, the default is `selinux-policy`.
 
 #### CGroup
-The version for CGroup in Mariner images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
-The `version_two` value will set the cgroupv2 to be used in Mariner by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
+The version for CGroup in Azure Linux images can be enabled by using the `CGroup` key with value containing which version to use on boot. The value that can be chosen is either `version_one` or `version_two`.
+The `version_two` value will set the cgroupv2 to be used in Azure Linux by setting the config value `systemd.unified_cgroup_hierarchy=1` in the default kernel command line. The value `version_one` or no value set will keep cgroupv1 (current default) to be enabled on boot.
 For more information about cgroups with Kubernetes, see [About cgroupv2](https://kubernetes.io/docs/concepts/architecture/cgroups/).
 
 A sample KernelCommandLine enabling a basic IMA mode and passing two additional parameters:
@@ -557,7 +556,7 @@ A sample image configuration, producing a VHDX disk image:
                 "ImaPolicy": ["tcb"],
                 "ExtraCommandLine": "my_first_param=foo my_second_param=\"bar baz\""
             },
-            "Hostname": "cbl-mariner"
+            "Hostname": "azurelinux"
         }
     ]
 }

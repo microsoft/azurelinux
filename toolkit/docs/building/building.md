@@ -21,8 +21,8 @@
       - [Ignoring Packages](#ignoring-packages)
       - [Source Hashes](#source-hashes)
   - [packages.microsoft.com Repository Structure](#packagesmicrosoftcom-repository-structure)
-      - [CBL-Mariner 1.0](#cbl-mariner-10)
-      - [CBL-Mariner 2.0](#cbl-mariner-20)
+      - [Azure Linux 1.0](#azure-linux-10)
+      - [Azure Linux 2.0](#azure-linux-20)
   - [Keys, Certs, and Remote Sources](#keys-certs-and-remote-sources)
     - [Sources](#sources)
     - [Authentication](#authentication)
@@ -83,11 +83,11 @@
 
 ## Overview
 
-The following documentation describes how to fully build CBL-Mariner end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of CBL-Mariner _**is not**_ generally needed.  All CBL-Mariner packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/)
+The following documentation describes how to fully build Azure Linux end-to-end as well as advanced techniques for performing toolchain, or package builds.  Full builds of Azure Linux _**is not**_ generally needed.  All Azure Linux packages are built signed and released to an RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/)
 
-If you simply want to test-drive CBL-Mariner you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with CBL-Mariner and build custom images or add packages in a more focused environment, refer to the tutorial in the [CBL-MarinerTutorials](https://github.com/microsoft/CBL-MarinerTutorials) repository.
+If you simply want to test-drive Azure Linux you may download and install the ISO (see: [readme.md](../../README.md)).  If you want to experiment with Azure Linux and build custom images or add packages in a more focused environment, refer to the tutorial in the [AzureLinux-Tutorials](https://github.com/microsoft/AzureLinux-Tutorials) repository.
 
-The CBL-Mariner build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
+The Azure Linux build system consists of several phases and tools, but at a high level it can be viewed simply as 3 distinct build stages:
 
 - **Toolchain** This stage builds a bootstrap toolchain and then builds the official toolchain.  The official toolchain is used in the subsequent package build stage.  Building is highly scripted and serialized in this stage.
 
@@ -108,20 +108,20 @@ Prepare your system by installing the necessary prerequisites [here](prerequisit
 
 ## **Clone and Sync To Stable Commit**
 
-Clone the 2.0-stable build of CBL-Mariner as shown here.
+Clone the 2.0-stable build of Azure Linux as shown here.
 
 ```bash
 # Get the source code
-git clone https://github.com/microsoft/CBL-Mariner.git
-cd CBL-Mariner/toolkit
+git clone https://github.com/microsoft/azurelinux.git
+cd azurelinux/toolkit
 
 # Checkout the desired release branch. The 2.0-stable tag tracks the most recent successful release of the 2.0 branch.
 git checkout 2.0-stable
 ```
 
-**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of CBL-Mariner of the 2.0 branch. A similar tag, 1.0-stable, exists for the 1.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
+**IMPORTANT:** The 2.0-stable tag always points to the latest known good build of Azure Linux of the 2.0 branch. A similar tag, 1.0-stable, exists for the 1.0 branch. Other branchses are also buildable but not guarnateed to be stable.  The 1.0 and 2.0 branches are periodically updated with bug fixes, security vulnerability fixes or occasional feature enhancements.  As those fixes are integrated into the branch the head of a branch may be temporarily unstable.  The 2.0-stable tag will remain fixed until the tip of the branch is validated and the latest source and binary packages (SRPMs and RPMs) are published.  At that point, the 2.0-stable tag is advanced.  To ensure you have the latest invoke _git fetch --tags_ before building.
 
-It is also possible to build an older version of CBL-Mariner from the 2.0 branch.  CBL-Mariner may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/CBL-Mariner/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
+It is also possible to build an older version of Azure Linux from the 2.0 branch.  Azure Linux may be updated at any time, but an aggregate release is declared monthly and [tagged in github](https://github.com/microsoft/azurelinux/releases).  These monthly builds are stable and their tags can be substituted for the 2.0-stable label above.
 
 Alternate branches are not generally buildable because community builds require the SRPMs and/or RPMs be published.  At this time, published files are only available for the 2.0 branch.
 
@@ -135,7 +135,7 @@ For expediency, the toolchain may be populated from upstream binaries, or may be
 
 ### **Populate Toolchain**
 
-A set of bootstrapped toolchain packages (gcc etc.) are used to build CBL-Mariner packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
+A set of bootstrapped toolchain packages (gcc etc.) are used to build Azure Linux packages and images.  Rather than build the toolchain, the prebuilt binaries can be downloaded to your local machine.  This happens automatically when the `REBUILD_TOOLCHAIN=` parameter is set to `n` (the default).
 
 ```bash
 # Populate Toolchain from pre-existing binaries
@@ -153,7 +153,7 @@ sudo make toolchain REBUILD_TOOLS=y REBUILD_TOOLCHAIN=y
 
 ## **Package Stage**
 
-After the toolchain is built or populated, package building is possible.  The CBL-Mariner ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the CBL-Mariner packages needed for an image are built.
+After the toolchain is built or populated, package building is possible.  The Azure Linux ecosystem provides a significant number of packages, but most of those packages are not used in an image.  When rebuilding packages, you can choose to build everything, or you can choose to build just what you need for a specific image.  This can save significant time because only the subset of the Azure Linux packages needed for an image are built.
 
 The CONFIG_FILE argument provides a quick way to declare what to build. To manually build **all** packages you can use the default configuration (`CONFIG_FILE=""`) and invoke the package build target.  To build packages needed for a specific image, you must set the CONFIG_FILE= parameter to an image configuration file of your choice.  The standard image configuration files are in the toolkit/imageconfigs folder.
 
@@ -163,11 +163,11 @@ There are several more package build options.  For example it's possible to buil
 
 ### **Rebuild All Packages**
 
-The following command rebuilds all CBL-Mariner packages.
+The following command rebuilds all Azure Linux packages.
 
 ```bash
 # Build ALL packages
-# (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
+# (NOTE: Azure Linux compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
 sudo make build-packages -j$(nproc) REBUILD_TOOLS=y
 ```
 
@@ -177,14 +177,14 @@ The following command rebuilds packages for the basic VHD.
 
 ```bash
 # Build the subset of packages needed to build the basic VHD
-# (NOTE: CBL-Mariner compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
+# (NOTE: Azure Linux compiles natively, an ARM64 build machine is required to create ARM64 packages/images)
 sudo make build-packages -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 ```
 
 Note that the image config file passed to the CONFIG_FILE option _only_ builds the packages included in the image plus all packages needed to build those packages.  That is, more will be built than needed by the image, but only a subset of packages will be built.
 
 ### **Targeted Package Building**
-Beginning with the CBL-Mariner 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to CBL-Mariner.
+Beginning with the Azure Linux 2.0's 2022 October Release (2.0.20221007) it is possible to rapidly build one or more packages "in-tree".  This technique can be helpful for modifying an existing SPEC file or adding a new one to Azure Linux.
 
 ```bash
 # Build targeted packages
@@ -205,7 +205,7 @@ sudo make build-packages -j$(nproc) REBUILD_TOOLS=y SRPM_PACK_LIST="at" PACKAGE_
 
 ## **Image Stage**
 
-Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/CBL-MarinerTutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/CBL-Mariner/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
+Different images and image formats can be produced from the build system.  Images are assembled from a combination of _Image Configuration_ files and _Package list_ files.  Each [Package List](https://github.com/microsoft/AzureLinux-Tutorials#package-lists) file (in [toolkit/imageconfigs/packagelists](https://github.com/microsoft/azurelinux/tree/2.0/toolkit/imageconfigs/packagelists)) describes a set of packages to install in an image.  Each Image Configuration file defines the image output format and selects one or more Package Lists to include in the image.
 
 By default, the `make image` and `make iso` commands (discussed below) build missing packages before starting the image build sequence.  By adding the `REBUILD_PACKAGES=n` argument, the image build phase will supplement missing packages with those on packages.microsoft.com.  This can accelerate the image build process, especially when performing targeted package builds ([targeted Package Building](#targeted-package-building)
 
@@ -214,29 +214,29 @@ All images are generated in the `out/images` folder.
 ### Virtual Hard Disks and Containers
 
 ```bash
-# To build a Mariner VHD Image (VHD folder: ../out/images/core-legacy)
+# To build an Azure Linux VHD Image (VHD folder: ../out/images/core-legacy)
 sudo make image CONFIG_FILE=./imageconfigs/core-legacy.json REBUILD_TOOLS=y
 
-# To build a Mariner VHDX Image (VHDX folder ../out/images/core-efi)
+# To build an Azure Linux VHDX Image (VHDX folder ../out/images/core-efi)
 sudo make image CONFIG_FILE=./imageconfigs/core-efi.json REBUILD_TOOLS=y
 
-# To build a core Mariner Contianer (Container Folder: ../out/images/core-container/*.tar.gz
+# To build a core Azure Linux Container (Container Folder: ../out/images/core-container/*.tar.gz
 sudo make image CONFIG_FILE=./imageconfigs/core-container.json REBUILD_TOOLS=y
 ```
 
 ### ISO Images
-ISOs are bootable images that install CBL-Mariner to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
+ISOs are bootable images that install Azure Linux to either a physical or virtual machine.  The installation process can be manually guided through user prompting, or automated through unattended installation.
 
 NOTE: ISOs require additional packaging and build steps (such as the creation of a separate `initrd` installer image used to install the final image to disk).  These additional resources are stored in the toolkit/resources/imagesconfigs folder.
 
 
 The following builds an ISO with an interactive UI and selectable image configurations.
 ```bash
-# To build a CBL-Mariner ISO Image (ISO folder: ../out/images/full)
+# To build an Azure Linux ISO Image (ISO folder: ../out/images/full)
 sudo make iso CONFIG_FILE=./imageconfigs/full.json REBUILD_TOOLS=y
 ```
 
-To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) that only specifies a _single_ SystemConfig.
+To create an unattended ISO installer (no interactive UI) use `UNATTENDED_INSTALLER=y` and run with a [`CONFIG_FILE`](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) that only specifies a _single_ SystemConfig.
 
 ```bash
 # Build the standard ISO with unattended installer that installs onto the default Gen1 HyperV VM. Needs to cloud-init provision the user once unattended installation finishes.
@@ -247,7 +247,7 @@ sudo make iso -j$(nproc) CONFIG_FILE=./imageconfigs/core-legacy-unattended-hyper
 
 ## Packages
 
-The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
+The toolkit can download packages from remote RPM repositories, or build them locally. By default any `*.spec` files found in `SPECS_DIR="./SPECS"` will be built locally. Dependencies will be downloaded as needed. Only those packages needed to build the current [config](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) will be built (`core-efi.json` by default). An additional space separated list of packages may be added using the `PACKAGE_BUILD_LIST=` variable.
 
 Build all local packages needed for the default `core-efi.json`:
 
@@ -301,30 +301,30 @@ sudo make input-srpms SRPM_FILE_SIGNATURE_HANDLING=update
 
 ### packages.microsoft.com Repository Structure
 
-CBL-Mariner packages are available on [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/). The CBL-Mariner repositories are divided into major release folders (1.0, 2.0, etc). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
+Azure Linux packages are available on [packages.microsoft.com](https://packages.microsoft.com/azurelinux/). The Azure Linux repositories are divided into major release folders (e.g.: 3.0). Each top level folder is subdivided into "preview" and "production" (prod) repositories.
 
 The "preview" and "production" folders are further subdivided into purpose, and then again for architecture. This includes locations for source-rpms.
 
-#### CBL-Mariner 1.0
+#### Azure Linux 1.0
 
-For CBL-Mariner 1.0, the repositories are structured as follows:
+For Azure Linux 1.0, the repositories are structured as follows:
 
-- **Base:** Packages released with CBL-Mariner 1.0.
-- **Update:** Base packages added or updated since CBL-Mariner 1.0's release date.
+- **Base:** Packages released with Azure Linux 1.0.
+- **Update:** Base packages added or updated since Azure Linux 1.0's release date.
 - **CoreUI:** Targeted UI related packages.
-- **Extras:** CBL-Mariner 1.0 packages that are built by Microsoft and are closed source.
+- **Extras:** Azure Linux 1.0 packages that are built by Microsoft and are closed source.
 - **NVIDIA:** Specially licensed NVIDIA packages.
-- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
+- **Microsoft:** Packages built by other, non-Azure Linux, Microsoft teams.
 
-#### CBL-Mariner 2.0
+#### Azure Linux 2.0
 
-For CBL-Mariner 2.0, the repositories are structured as follows:
+For Azure Linux 2.0, the repositories are structured as follows:
 
-- **Base:** Packages released with CBL-Mariner 2.0 and their updates.
-- **Extras:** CBL-Mariner 2.0 packages that are built by Microsoft and are closed source
-- **Extended:** CBL-Mariner 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
+- **Base:** Packages released with Azure Linux 2.0 and their updates.
+- **Extras:** Azure Linux 2.0 packages that are built by Microsoft and are closed source
+- **Extended:** Azure Linux 2.0 packages that are not considered part of core. Generally, viewed as experimental or for development purposes.
 - **NVIDIA:** Specially licensed NVIDIA packages.
-- **Microsoft:** Packages built by other, non-CBL-Mariner, Microsoft teams.
+- **Microsoft:** Packages built by other, non-Azure Linux, Microsoft teams.
 
 ## Keys, Certs, and Remote Sources
 
@@ -339,8 +339,8 @@ Direct file downloads are by default pulled from:
 
 ```makefile
 SOURCE_URL         ?=
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
-SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
+SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 ```
 
 While `tdnf` uses a list of repo files:
@@ -350,7 +350,7 @@ REPO_LIST ?=
 ```
 
 The `REPO_LIST` variable supports multiple repo files, and they are prioritized in the order they appear in the list.
-The CBL-Mariner base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
+The Azure Linux base repo is implicitly provided and an optional preview repo is available by setting `USE_PREVIEW_REPO=y`.
 If `DISABLE_UPSTREAM_REPOS=y` is set, any repo that is accessed through the network is disabled.
 
 ### Authentication
@@ -363,14 +363,14 @@ sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/root
 
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Mariner source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://cblmarinerstorage.blob.core.windows.net/sources/core`**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
 ```makefile
 SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/core
-PACKAGE_URL_LIST   ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
-SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
+SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 REPO_LIST          ?=
 ```
 
@@ -472,12 +472,11 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `REPO_LIST=...`
 
-> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. CBL-Mariner provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
+> Space separated list of `.repo` files pointing to RPM repositories to pull packages from. These packages are used to satisfy dependencies during the build process, and to compose a final image. Locally available packages are always prioritized. The repos are prioritized based on the order they appear in the list: repos earlier in the list are higher priority. Azure Linux provides a set of pre-populated RPM repositories accessible inside the toolkit folder under `toolkit/repos`:
 >
-> - `mariner-official-base.repo` and `mariner-official-update.repo` - default, always-on CBL-Mariner repositories.
-> - `mariner-preview.repo` - CBL-Mariner repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
-> - `mariner-ui.repo` and `mariner-ui-preview.repo` - CBL-Mariner repository containing packages related to any UI components. The preview version serves the same purpose as the official preview repo.
-> - `mariner-extras.repo` and `mariner-extras-preview.repo` - CBL-Mariner repository containing proprietory RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
+> - `azurelinux-official-base.repo` - default, always-on Azure Linux repositories.
+> - `azurelinux-preview.repo` - Azure Linux repository containing pre-release versions of RPMs **subject to change without notice**. Using this .repo file is equivalent to adding the [`USE_PREVIEW_REPO=y`](#use_preview_repoy) argument to your build command.
+> - `mariner-ms-non-oss.repo` and `mariner-ms-non-oss-preview.repo` - Azure Linux repository containing Microsoft non open Source RPMs with sources not viewable to the public. The preview version serves the same purpose as the official preview repo.
 >
 
 #### Build Enable/Disable Flags
@@ -717,7 +716,7 @@ Since the summary files are regenerated every build, if you wish to reproduce a 
 | Image Build                   | `$(IMAGEGEN_DIR)/{imagename}/image_deps.json`                                                          | Generated every image build. Can be saved and used later with the `IMAGE_CACHE_SUMMARY` variable to reproduce an image build. Contains **all (both external and local)** packages required to build the image.
 | Initrd Build                  | `$(IMAGEGEN_DIR)/iso_initrd/image_deps.json`                                                           | Generated every initrd and ISO build. Can be saved and used later with the `INITRD_CACHE_SUMMARY` variable to reproduce an initrd build. Contains **all (both external and local)** packages required to build the image. However, unless you modified the initrd image packages JSON or have your own version of its PMC packages locally, all the required packages are external.
 
-**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core CBL-Mariner's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
+**WARNING**: the `graph_external_deps.json` contains **ALL** external packages required to build your local spec files. If you depend on any external packages outside the core Azure Linux's PMC repository, you **MUST** make sure you still have access to them when attempting to reproduce a build.
 
 ### Building From Summaries
 
@@ -759,8 +758,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 
 | Variable                      | Default                                                                                                | Description
 |:------------------------------|:-------------------------------------------------------------------------------------------------------|:---
-| CONFIG_FILE                   | `""`                                                                                                   | [Image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file) to build.
-| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/CBL-MarinerTutorials#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
+| CONFIG_FILE                   | `""`                                                                                                   | [Image config file](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file) to build.
+| CONFIG_BASE_DIR               | `$(dir $(CONFIG_FILE))`                                                                                | Base directory on the **build machine** to search for any **relative** file paths mentioned inside the [image config file](https://github.com/microsoft/AzureLinux-Tutorials#image-config-file). This has no effect on **absolute** file paths or file paths on the **built image**.
 | UNATTENDED_INSTALLER          |                                                                                                        | Create unattended ISO installer if set. Overrides all other installer options.
 | PACKAGE_BUILD_LIST            |                                                                                                        | Explicit list of packages to build. The package will be skipped if the build system thinks it is already up-to-date. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
 | PACKAGE_REBUILD_LIST          |                                                                                                        | Always rebuild this package, even if it is up-to-date. Base package name, will match all virtual packages produced as well. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
@@ -795,8 +794,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | Variable                      | Default                                                                                                  | Description
 |:------------------------------|:---------------------------------------------------------------------------------------------------------|:---
 | SOURCE_URL                    |                                                                                                          | URL to request package sources from
-| SRPM_URL_LIST                 | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space separated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
-| PACKAGE_URL_LIST              | `https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`...              | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
+| SRPM_URL_LIST                 | `https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms`                         | Space separated list of URLs to request packed SRPMs from if `$(DOWNLOAD_SRPMS)` is set to `y`
+| PACKAGE_URL_LIST              | `https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)`...              | Space separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `$(REBUILD_TOOLCHAIN)` is set to `y`.
 | REPO_LIST                     |                                                                                                          | Space separated list of repo files for tdnf to pull packages form
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources

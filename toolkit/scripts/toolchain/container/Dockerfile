@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 #
-# Dockerfile to build Mariner toolchain from scratch
+# Dockerfile to build Azure Linux toolchain from scratch
 #
-FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20231004
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0.20240123
 
 # Tag the layers so we can clean up all the containers associated with a build directory
 ARG MARINER_BUILD_DIR

@@ -1,21 +1,21 @@
 ## [Quick Start Guide](docs/quick_start/quickstart.md)
 
-- **Recommended if you want to try CBL-Mariner.**
-- Quickly build the **Standard CBL-Mariner** image, install and use.
+- **Recommended if you want to try Azure Linux.**
+- Quickly build the **Standard Azure Linux** image, install and use.
 
-## [Tutorial for Building Custom Mariner Based Images](https://github.com/microsoft/CBL-MarinerTutorials)
+## [Tutorial for Building Custom Azure Linux Based Images](https://github.com/microsoft/azurelinux-tutorials)
 
-- **Recommended if you are a developer and want to experiment with CBL-Mariner.**
-- Quickly build a **Custom CBL-Mariner** image, install and use.
-- Learn how to add new or existing packages to CBL-Mariner at build time.
-- Learn how to customize the CBL-Mariner Kernel.
+- **Recommended if you are a developer and want to experiment with Azure Linux.**
+- Quickly build a **Custom Azure Linux** image, install and use.
+- Learn how to add new or existing packages to Azure Linux at build time.
+- Learn how to customize the Azure Linux Kernel.
 - Learn how to create an Unattended Installer.
 - Other Advanced Topics.
 
 ## [Build Users Guide](docs/building/building.md)
 
-- **Recommended if you are a developer and want to learn how to fully build CBL-Mariner.**
-- Build CBL-Mariner end-to-end.
+- **Recommended if you are a developer and want to learn how to fully build Azure Linux.**
+- Build Azure Linux end-to-end.
 - Advanced building topics.
 - Build parameters and environment variables.
 - packages.microsoft.com repository structure breakdown.

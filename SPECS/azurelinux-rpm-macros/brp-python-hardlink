@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# If using normal root, avoid changing anything.
+if [ -z "$RPM_BUILD_ROOT" ] || [ "$RPM_BUILD_ROOT" = "/" ]; then
+	exit 0
+fi
+
+hardlink_if_same() {
+	if cmp -s "$1" "$2" ; then
+		ln -f "$1" "$2"
+		return 0
+	fi
+	return 1
+}
+
+# Hardlink identical *.pyc, *.pyo, and *.opt-[12].pyc.
+# Originally from PLD's rpm-build-macros
+find "$RPM_BUILD_ROOT" -type f -name "*.pyc" -not -name "*.opt-[12].pyc" | while read pyc ; do
+	hardlink_if_same "$pyc" "${pyc%c}o"
+	o1pyc="${pyc%pyc}opt-1.pyc"
+	hardlink_if_same "$pyc" "$o1pyc"
+	o2pyc="${pyc%pyc}opt-2.pyc"
+	hardlink_if_same "$pyc" "$o2pyc" || hardlink_if_same "$o1pyc" "$o2pyc"
+done
+exit 0

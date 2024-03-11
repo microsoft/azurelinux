@@ -885,7 +885,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 - If there is no executable we don't want to print a part of STANDARD FILE CONTEXT
 
 * Tue May 6 2014 Dan Walsh <dwalsh@redhat.com> - 2.3-1
-- Update to upstream 
+- Update to upstream
         * Add -P semodule option to man page from Dan Walsh.
         * selinux_current_policy_path will return none on a disabled SELinux system from Dan Walsh.
         * Add new icons for sepolicy gui from Dan Walsh.
@@ -903,7 +903,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 - Apply patch to use setcon in seunshare from luto@mit.edu
 
 * Wed Apr 30 2014 Dan Walsh <dwalsh@redhat.com> - 2.2.5-14
-- Remove requirement for systemd-units 
+- Remove requirement for systemd-units
 
 * Fri Apr 25 2014 Miroslav Grepl <mgreplh@redhat.com> - 2.2.5-13
 - Fix previous Fix-STANDARD_FILE_CONTEXT patch to exclude if non_exec does not exist
@@ -951,7 +951,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 - Do not require /usr/share/selinux/devel/Makefile to build permissive domains
 
 * Mon Jan 6 2014 Dan Walsh <dwalsh@redhat.com> - 2.2.5-1
-- Update to upstream 
+- Update to upstream
         * Ignore selevel/serange if MLS is disabled from Sven Vermeulen.
 
 * Fri Jan 3 2014 Dan Walsh <dwalsh@redhat.com> - 2.2.4-8
@@ -981,14 +981,14 @@ The policycoreutils-restorecond package contains the restorecond service.
 -   ptrace should be a part of deny_ptrace boolean in TEMPLATETYPE_admin
 
 * Tue Dec 3 2013 Dan Walsh <dwalsh@redhat.com> - 2.2.4-1
-- Update to upstream 
+- Update to upstream
         * Revert automatic setting of serange and seuser in seobject; was breaking non-MLS systems.
 - Add patches for sepolicy gui from mgrepl to
   Fix advanced_item_button_push() to allow to select an application in advanced search menu
   Fix previously_modified_initialize() to show modified changes properly for all selections
 
 * Fri Nov 22 2013 Dan Walsh <dwalsh@redhat.com> - 2.2.3-1
-- Update to upstream 
+- Update to upstream
         * Apply polkit check on all dbus interfaces and restrict to active user from Dan Walsh.
         * Fix typo in sepolicy gui dbus.relabel_on_boot call from Dan Walsh.
 - Apply Miroslav Grepl patch to fix TEMPLATETYPE_domtrans description in sepolicy generate
@@ -999,7 +999,7 @@ The policycoreutils-restorecond package contains the restorecond service.
 * Fri Nov 15 2013 Dan Walsh <dwalsh@redhat.com> - 2.2.2-1
 - Speed up startup time of sepolicy gui
 - Clean up ports screen to only show enabled ports.
-- Update to upstream 
+- Update to upstream
         * Remove import policycoreutils.default_encoding_utf8 from semanage from Dan Walsh.
         * Make yum/extract_rpms optional for sepolicy generate from Dan Walsh.
         * Add test suite for audit2allow and sepolgen-ifgen from Dan Walsh.
@@ -1009,7 +1009,7 @@ The policycoreutils-restorecond package contains the restorecond service.
         * semodule_* packages are required for devel.
 
 * Thu Oct 31 2013 Dan Walsh <dwalsh@redhat.com> - 2.2-1
-- Update to upstream 
+- Update to upstream
         * Properly build the swig exception file from Laurent Bigonville.
         * Fix man pages from Laurent Bigonville.
         * Support overriding PATH and INITDIR in Makefile from Laurent Bigonville.

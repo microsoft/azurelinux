@@ -1,7 +1,7 @@
 # Nvidia Repository Configuration
 
 ## Overview
-The following documentation describes how to access CBL-Mariner packages from the NVIDIA RPM repository at [packages.microsoft.com](https://packages.microsoft.com/cbl-mariner/2.0/prod/nvidia/)
+The following documentation describes how to access Azure Linux packages from the NVIDIA RPM repository at [packages.microsoft.com](https://packages.microsoft.com/azurelinux/3.0/prod/nvidia/)
 
 ## Licensing
 The software in the NVIDIA RPM repository is subject to the following:
@@ -15,5 +15,5 @@ The following instructions register the nvidia package store with the package ma
 cd /etc/yum.repos.d
 
 # Copy the configuration to your directory to register the NVIDIA RPM repository with your package manager
-sudo wget https://raw.githubusercontent.com/microsoft/CBL-Mariner/2.0/toolkit/docs/nvidia/mariner-nvidia.repo
+sudo wget https://raw.githubusercontent.com/microsoft/Azure Linux/2.0/toolkit/docs/nvidia/mariner-nvidia.repo
 ```

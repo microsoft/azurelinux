@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 // nodeState represents the build state of a single node
@@ -216,8 +216,8 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 
 	delete(g.activeBuilds, res.Node.ID())
 
-	failure := (res.Err != nil) || res.CheckFailed
-	if failure {
+	available := res.Err == nil
+	if !available || res.CheckFailed {
 		g.failures = append(g.failures, res)
 	}
 
@@ -226,12 +226,12 @@ func (g *GraphBuildState) RecordBuildResult(res *BuildResult, allowToolchainRebu
 	// max, so that subsequent dependant nodes will be rebuilt. Also ensure that the freshness is not greater than the max.
 	freshness := res.Freshness
 	if freshness > g.GetMaxFreshness() {
-		err = fmt.Errorf("unexpected freshness value of %d for node '%s'. Should be: (<freshness> <= %d)", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
+		err = fmt.Errorf("unexpected freshness value of (%d) for node (%s). Should be: (<freshness> <= (%d))", freshness, res.Node.FriendlyName(), g.GetMaxFreshness())
 		return
 	}
 
 	state := &nodeState{
-		available: !failure,
+		available: available,
 		cached:    res.UsedCache,
 		usedDelta: res.WasDelta,
 		freshness: freshness,

@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        14%{?dist}
+Release:        16%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -90,6 +90,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  python3
 BuildRequires:  xz-devel
 Requires:       device-mapper
+Requires:       systemd-udev
 Requires:       xz
 Requires:       %{name}-configuration = %{version}-%{release}
 
@@ -387,6 +388,12 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
+- Updated sbat.csv.in to reflect new distro name.
+
+* Tue Mar 05 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-15
+- Explicitly depend on systemd-udev for image install
+
 * Thu Jan 25 10:49:55 EST 2024 Dan Streetman <ddstreet@ieee.org> - 2.06-14
 - remove systemd-devel build dep
 

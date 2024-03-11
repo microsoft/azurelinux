@@ -23,12 +23,12 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/CBL-Mariner] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
 
 Starts a docker container with the specified version of mariner.
 
 Optional arguments:
-    REPO_PATH:      path to the CBL-Mariner repo root directory. default: "current directory"
+    REPO_PATH:      path to the Azure Linux repo root directory. default: "current directory"
     MODE            build or test. default:"build"
                         In 'test' mode it will use a pre-built mariner chroot image.
                         In 'build' mode it will use the latest published container.
@@ -41,7 +41,7 @@ Optional arguments:
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
     KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
 
-    * User can override Mariner make definitions. Some useful overrides could be
+    * User can override Azure Linux make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
                     SRPM_PACK_LIST: provide a list of SRPMS to build by providing SRPM_PACK_LIST=\"srpm1 srpm2 ...\". default: builds all SRPMS from $SPECS_DIR
                     RPMS_DIR: choose which built RPMs to mount into container by providing RPMS_DIR=path/to/custom/out/RPMS. default: $REPO_PATH/out/RPMS
@@ -78,7 +78,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 script_dir=$(realpath $(dirname "${BASH_SOURCE[0]}"))
-topdir=/usr/src/mariner
+topdir=/usr/src/azl
 enable_local_repo=false
 keep_container="--rm"
 
@@ -103,7 +103,7 @@ done
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="3.0"
 
-# Set relevant folder definitions using Mariner Makefile that can be overriden by user
+# Set relevant folder definitions using Azure Linux Makefile that can be overriden by user
 # Default values are populated from toolkit/Makefile
 PROJECT_ROOT=$repo_path
 toolkit_root="$PROJECT_ROOT/toolkit"
@@ -149,10 +149,10 @@ cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir
 
 # ==================== Setup ====================
 
-# Get Mariner GitHub branch at $repo_path
+# Get Azure Linux GitHub branch at $repo_path
 repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 
-# Generate text based on mode (Use figlet to generate splash text once available on Mariner)
+# Generate text based on mode (Use figlet to generate splash text once available on Azure Linux)
 if [[ "${mode}" == "build" ]]; then
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
     echo -e "\033[31m ----------------------------------- MARINER BUILDER ! ----------------------------------- \033[0m" >> ${tmp_dir}/splash.txt

@@ -1,0 +1,41 @@
+From a0151041642dffff2421c22e18fb7b02b58787d9 Mon Sep 17 00:00:00 2001
+From: Coly Li <colyli@suse.de>
+Date: Sat, 4 Mar 2023 00:21:30 +0800
+Subject: [PATCH 093/120] util.c: reorder code lines in parse_layout_faulty()
+
+Resort the code lines in parse_layout_faulty() to make it more
+comfortable, no logic change.
+
+Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ util.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/util.c b/util.c
+index 7fc881bf..b0b7aec4 100644
+--- a/util.c
++++ b/util.c
+@@ -421,12 +421,15 @@ int parse_layout_10(char *layout)
+ 
+ int parse_layout_faulty(char *layout)
+ {
++	int ln, mode;
++	char *m;
++
+ 	if (!layout)
+ 		return -1;
++
+ 	/* Parse the layout string for 'faulty' */
+-	int ln = strcspn(layout, "0123456789");
+-	char *m = xstrdup(layout);
+-	int mode;
++	ln = strcspn(layout, "0123456789");
++	m = xstrdup(layout);
+ 	m[ln] = 0;
+ 	mode = map_name(faultylayout, m);
+ 	if (mode == UnSet)
+-- 
+2.38.1
+

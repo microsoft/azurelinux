@@ -28,7 +28,7 @@
 Summary:        Open Message Passing Interface
 Name:           openmpi%{?_cc_name_suffix}
 Version:        4.1.5
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -229,7 +229,6 @@ make check
 %{_libdir}/%{name}/bin/oshrun
 %{_libdir}/%{name}/bin/shmemrun
 %endif
-%{_libdir}/libOpenIPMIglib.so*
 %{_libdir}/%{name}/lib/*.so.40*
 %{_libdir}/%{name}/lib/libmca_common_ofi.so.10*
 %{_libdir}/%{name}/lib/libmca*.so.41*
@@ -304,9 +303,6 @@ make check
 %{python3_sitearch}/openmpi.pth
 
 %changelog
-* Thu Dec 07 2023 Andrew Phelps <anphel@microsoft.com> - 4.1.5-2
-- Update file list
-
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.5-1
 - Auto-upgrade to 4.1.5 - Azure Linux 3.0 - package upgrades
 

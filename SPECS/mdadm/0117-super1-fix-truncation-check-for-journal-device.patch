@@ -1,0 +1,33 @@
+From 1c6f2a1dbfe17df14dd5b062fc53a60c5c387e47 Mon Sep 17 00:00:00 2001
+From: Hristo Venev <hristo@venev.name>
+Date: Sat, 1 Apr 2023 23:01:35 +0300
+Subject: [PATCH 117/120] super1: fix truncation check for journal device
+
+The journal device can be smaller than the component devices.
+
+Fixes: 171e9743881e ("super1: report truncated device")
+Signed-off-by: Hristo Venev <hristo@venev.name>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ super1.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/super1.c b/super1.c
+index f7020320..44d6ecad 100644
+--- a/super1.c
++++ b/super1.c
+@@ -2359,8 +2359,9 @@ static int load_super1(struct supertype *st, int fd, char *devname)
+ 
+ 	if (st->minor_version >= 1 &&
+ 	    st->ignore_hw_compat == 0 &&
+-	    (dsize < (__le64_to_cpu(super->data_offset) +
+-		      __le64_to_cpu(super->size))
++	    ((role_from_sb(super) != MD_DISK_ROLE_JOURNAL &&
++		  dsize < (__le64_to_cpu(super->data_offset) +
++		      __le64_to_cpu(super->size)))
+ 	     ||
+ 	     dsize < (__le64_to_cpu(super->data_offset) +
+ 		      __le64_to_cpu(super->data_size)))) {
+-- 
+2.38.1
+

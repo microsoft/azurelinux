@@ -13,9 +13,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
 type Network struct {
@@ -43,13 +43,13 @@ func (n *Network) UnmarshalJSON(b []byte) (err error) {
 	type IntermediateTypeNetwork Network
 	err = json.Unmarshal(b, (*IntermediateTypeNetwork)(n))
 	if err != nil {
-		return fmt.Errorf("failed to parse [Network]: %w", err)
+		return fmt.Errorf("failed to parse [Network]:\n%w", err)
 	}
 
 	// Now validate the resulting unmarshaled object
 	err = n.IsValid()
 	if err != nil {
-		return fmt.Errorf("failed to parse [Network]: %w", err)
+		return fmt.Errorf("failed to parse [Network]:\n%w", err)
 	}
 	return
 }
@@ -122,20 +122,20 @@ func (n *Network) validateIPAddress(ip string) (err error) {
 // ipAddressesAreValid returns an error if ip, gateway, netmask or nameserver inputs are invalid ip addresses
 func (n *Network) ipAddressesAreValid() (err error) {
 	if err = n.validateIPAddress(n.Ip); err != nil {
-		return fmt.Errorf("invalid input for IP: %w", err)
+		return fmt.Errorf("invalid input for IP:\n%w", err)
 	}
 
 	if err = n.validateIPAddress(n.NetMask); err != nil {
-		return fmt.Errorf("invalid input for netmask: %w", err)
+		return fmt.Errorf("invalid input for netmask:\n%w", err)
 	}
 
 	if err = n.validateIPAddress(n.GateWay); err != nil {
-		return fmt.Errorf("invalid input for gateway: %w", err)
+		return fmt.Errorf("invalid input for gateway:\n%w", err)
 	}
 
 	for _, nameserver := range n.NameServers {
 		if err = n.validateIPAddress(nameserver); err != nil {
-			return fmt.Errorf("invalid input for nameserver: %w", err)
+			return fmt.Errorf("invalid input for nameserver:\n%w", err)
 		}
 	}
 
@@ -181,7 +181,7 @@ func checkNetworkDeviceAvailability(networkData Network) (deviceName string, err
 	if networkData.Device == "bootif" {
 		networkData.Device, err = findBootIfValue()
 		if err != nil {
-			logger.Log.Errorf("Failed to read bootif value from /proc/cmdline")
+			err = fmt.Errorf("failed to read bootif value from /proc/cmdline")
 			return
 		}
 	}
@@ -201,7 +201,7 @@ func populateMatchSection(networkData Network, fileName, deviceName string) (err
 	matchSection := fmt.Sprintf("[Match]\nName=%s\n", deviceName)
 	err = file.Append(matchSection, fileName)
 	if err != nil {
-		logger.Log.Errorf("Failed to write [Match] section: %s", err)
+		return fmt.Errorf("failed to write [Match] section:\n%w", err)
 	}
 
 	return
@@ -233,7 +233,7 @@ func populateNetworkSection(networkData Network, fileName string) (err error) {
 
 	err = file.Append(networkSection.String(), fileName)
 	if err != nil {
-		logger.Log.Errorf("Failed to write [Network] section: %s", err)
+		return fmt.Errorf("failed to write [Network] section:\n%w", err)
 	}
 
 	return
@@ -243,12 +243,9 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	const filePrefix = "10"
 
 	if exists, ferr := file.DirExists(networkFileDir); ferr != nil {
-		logger.Log.Errorf("Error accessing: %s", networkFileDir)
-		err = ferr
-		return
+		return fmt.Errorf("failed to access (%s):\n%w", networkFileDir, ferr)
 	} else if !exists {
-		err = fmt.Errorf("%s: no such path or directory", networkFileDir)
-		return
+		return fmt.Errorf("%s: no such path or directory", networkFileDir)
 	}
 
 	logger.Log.Debugf("Start creating network file")
@@ -256,24 +253,22 @@ func createNetworkConfigFile(installChroot *safechroot.Chroot, networkData Netwo
 	networkFilePath := fmt.Sprintf("%s/%s-%s-%s.network", networkFileDir, filePrefix, networkData.BootProto, deviceName)
 	exists, err := file.PathExists(networkFilePath)
 	if err != nil {
-		logger.Log.Errorf("Error checking file path (%s): %s", networkFilePath, err)
-		return err
+		return fmt.Errorf("failed to check file path (%s):\n%w", networkFilePath, err)
 	} else if exists {
 		return fmt.Errorf("network file (%s) already exists", networkFilePath)
 	}
 
 	err = file.Create(networkFilePath, 0644)
 	if err != nil {
-		logger.Log.Errorf("Error creating file %s: %s", networkFilePath, err)
-		return
+		return fmt.Errorf("failed to create file (%s):\n%w", networkFilePath, err)
 	}
 
 	defer func() {
 		// Delete the network file on failure
 		if err != nil {
-			err = os.Remove(networkFilePath)
-			if err != nil {
-				logger.Log.Errorf("Failed to clean up network file (%s). Error: %s", networkFilePath, err)
+			cleanupErr := os.Remove(networkFilePath)
+			if cleanupErr != nil {
+				err = fmt.Errorf("%w\ncleanup-error: failed to clean up network file (%s):\n%w", err, networkFilePath, cleanupErr)
 			}
 		}
 	}()

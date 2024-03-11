@@ -1,6 +1,6 @@
-# Mariner Image Customizer configuration
+# Azure Linux Image Customizer configuration
 
-The Mariner Image Customizer is configured using a YAML (or JSON) file.
+The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 ### Operation ordering
 
@@ -74,7 +74,7 @@ SystemConfig:
   - kernel
 
   PackagesInstall:
-  - kernel-hci
+  - kernel-uvm
 ```
 
 ## Schema Overview
@@ -338,7 +338,7 @@ If this field is not specified, then the existing SELinux mode in the base image
 maintained.
 Otherwise, the image is modified to match the requested SELinux mode.
 
-The Mariner Image Customizer tool can enable SELinux on a base image with SELinux
+The Azure Linux Image Customizer tool can enable SELinux on a base image with SELinux
 disabled and it can disable SELinux on a base image that has SELinux enabled.
 However, using a base image that already has the required SELinux mode will speed-up the
 customization process.
@@ -362,7 +362,7 @@ Supported options:
 Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
 This package contains the default SELinux rules and is required for SELinux-enabled
 images to be functional.
-The Mariner Image Customizer tool will report an error if the package is missing from
+The Azure Linux Image Customizer tool will report an error if the package is missing from
 the image.
 
 Note: If you wish to apply additional SELinux policies on top of the base SELinux

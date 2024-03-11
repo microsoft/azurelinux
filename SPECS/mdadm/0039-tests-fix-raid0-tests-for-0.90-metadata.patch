@@ -1,0 +1,99 @@
+From 14c2161edb77d7294199e8aa7daa9f9d1d0ad5d7 Mon Sep 17 00:00:00 2001
+From: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Date: Wed, 22 Jun 2022 14:25:14 -0600
+Subject: [PATCH 39/83] tests: fix raid0 tests for 0.90 metadata
+
+Some of the test cases fail because raid0 creation fails with the error,
+"0.90 metadata does not support layouts for RAID0" added by commit,
+329dfc28debb. Fix some of the test cases by switching from raid0 to
+linear level for 0.9 metadata where possible.
+
+Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Signed-off-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ tests/00raid0           | 4 ++--
+ tests/00readonly        | 4 ++++
+ tests/03r0assem         | 6 +++---
+ tests/04r0update        | 4 ++--
+ tests/04update-metadata | 2 +-
+ 5 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/tests/00raid0 b/tests/00raid0
+index e6b21cc4..9b8896cb 100644
+--- a/tests/00raid0
++++ b/tests/00raid0
+@@ -20,8 +20,8 @@ mdadm -S $md0
+ # now same again with different chunk size
+ for chunk in 4 32 256
+ do
+-  mdadm -CR $md0 -e0.90 -l raid0 --chunk $chunk -n3 $dev0 $dev1 $dev2
+-  check raid0
++  mdadm -CR $md0 -e0.90 -l linear --chunk $chunk -n3 $dev0 $dev1 $dev2
++  check linear
+   testdev $md0 3 $mdsize0 $chunk
+   mdadm -S $md0
+ 
+diff --git a/tests/00readonly b/tests/00readonly
+index 28b0fa13..39202487 100644
+--- a/tests/00readonly
++++ b/tests/00readonly
+@@ -4,6 +4,10 @@ for metadata in 0.9 1.0 1.1 1.2
+ do
+ 	for level in linear raid0 raid1 raid4 raid5 raid6 raid10
+ 	do
++		if [[ $metadata == "0.9" && $level == "raid0" ]];
++		then
++			continue
++		fi
+ 		mdadm -CR $md0 -l $level -n 4 --metadata=$metadata \
+ 			$dev1 $dev2 $dev3 $dev4 --assume-clean
+ 		check nosync
+diff --git a/tests/03r0assem b/tests/03r0assem
+index 6744e322..44df0645 100644
+--- a/tests/03r0assem
++++ b/tests/03r0assem
+@@ -68,9 +68,9 @@ mdadm -S $md2
+ ### Now for version 0...
+ 
+ mdadm --zero-superblock $dev0 $dev1 $dev2
+-mdadm -CR $md2 -l0 --metadata=0.90 -n3 $dev0 $dev1 $dev2
+-check raid0
+-tst="testdev $md2 3 $mdsize0 512"
++mdadm -CR $md2 -llinear --metadata=0.90 -n3 $dev0 $dev1 $dev2
++check linear
++tst="testdev $md2 3 $mdsize0 1"
+ $tst
+ 
+ uuid=`mdadm -Db $md2 | sed 's/.*UUID=//'`
+diff --git a/tests/04r0update b/tests/04r0update
+index 73ee3b9f..b95efb06 100644
+--- a/tests/04r0update
++++ b/tests/04r0update
+@@ -1,7 +1,7 @@
+ 
+ # create a raid0, re-assemble with a different super-minor
+-mdadm -CR -e 0.90 $md0 -l0 -n3 $dev0 $dev1 $dev2
+-testdev $md0 3 $mdsize0 512
++mdadm -CR -e 0.90 $md0 -llinear -n3 $dev0 $dev1 $dev2
++testdev $md0 3 $mdsize0 1
+ minor1=`mdadm -E $dev0 | sed -n -e 's/.*Preferred Minor : //p'`
+ mdadm -S /dev/md0
+ 
+diff --git a/tests/04update-metadata b/tests/04update-metadata
+index 232fc1ff..08c14af7 100644
+--- a/tests/04update-metadata
++++ b/tests/04update-metadata
+@@ -8,7 +8,7 @@ set -xe
+ 
+ dlist="$dev0 $dev1 $dev2 $dev3"
+ 
+-for ls in raid0/4 linear/4 raid1/1 raid5/3 raid6/2
++for ls in linear/4 raid1/1 raid5/3 raid6/2
+ do
+   s=${ls#*/} l=${ls%/*}
+   mdadm -CR --assume-clean -e 0.90 $md0 --level $l -n 4 -c 64 $dlist
+-- 
+2.38.1
+
