@@ -320,7 +320,7 @@ rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 mkdir -p %{buildroot}%{python3_sitelib}
 find / -name "*.egg-info" -exec bash -c 'ln -s {} %{buildroot}%{python3_sitelib}' \;
 
-# Missing lib dependencies
+# Adding OpenSSL libraries
 find / -name "libcrypto.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
 find / -name "libssl.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
 
