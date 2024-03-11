@@ -86,11 +86,11 @@ nogroup:x:65534:
 EOF
 
 cat > /etc/os-release << "EOF"
-NAME="Common Base Linux Mariner Toolchain"
-VERSION="3.0.2023"
-ID=mariner
+NAME="Azure Linux Toolchain"
+VERSION="3.0.2024"
+ID=azurelinux
 VERSION_ID="3.0"
-PRETTY_NAME="Azure Linux"
+PRETTY_NAME="Azure Linux 3.0"
 ANSI_COLOR="1;34"
 HOME_URL="https://aka.ms/cbl-mariner"
 BUG_REPORT_URL="https://aka.ms/cbl-mariner"

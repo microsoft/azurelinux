@@ -2,7 +2,7 @@
 # apply pre-downloaded cassandra-build-cache which is
 # required for cassandra to build based on ant build.xml
 # Generate cassandra-build-cache when ever update to latest version.
-1. Boot up Mariner Core 2.0
+1. Boot up Azure Linux Core
 2. Refer to cassandra spec and install all build required dependenices.
 3. Download cassandra sources and extract under /usr/src
 4. cd /usr/src/apache-cassandra-<version>-src
