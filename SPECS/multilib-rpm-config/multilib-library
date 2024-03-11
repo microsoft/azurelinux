@@ -1,6 +1,6 @@
 progname=$(basename "$0")
 opt_verbose=:
-opt_arch=$(uname -i)
+opt_arch=$(uname -m)
 
 multilib_arches="
     i386  x86_64
@@ -46,6 +46,10 @@ fix_arch ()
         # See rhbz#1242873 for more info.
         ppc64p7)
             eval "$1=ppc64"
+            ;;
+        # Related to rhbz#2158752.
+        i?86)
+            eval "$1=i386"
             ;;
     esac
 }
