@@ -26,6 +26,7 @@ BuildRequires:  python3-pathspec
 BuildRequires:  python3-pip
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
@@ -56,7 +57,6 @@ rm jsonschema/tests/test_jsonschema_test_suite.py
 
 %if %{with_check}
 %check
-pip3 install hatch-fancy-pypi-readme
 PYTHONPATH=%{buildroot}%{python3_sitelib} trial-3 jsonschema
 %endif
 
