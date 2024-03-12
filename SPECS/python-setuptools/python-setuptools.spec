@@ -59,7 +59,8 @@ EOF
 
 %changelog
 * Mon Mar 11 2024 Andrew Phelps <anphel@microsoft.com> - 69.0.3-2
-- Change Requires to python3
+- Change Requires from python3-devel to python3
+- Add BuildRequires to fix regular package build
 * Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 69.0.3-1
 - License verified
 - Original version for CBL-Mariner
