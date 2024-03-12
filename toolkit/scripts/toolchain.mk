@@ -188,6 +188,7 @@ $(toolchain_rpms_rehydrated): $(TOOLCHAIN_MANIFEST) $(go-downloader)
 	@rpm_filename="$(notdir $@)" && \
 	rpm_dir="$(dir $@)" && \
 	log_file="$(toolchain_downloads_logs_dir)/$$rpm_filename.log" && \
+	> $$log_file && \
 	echo "Attempting to download toolchain RPM: $$rpm_filename" | tee -a "$$log_file" && \
 	mkdir -p $$rpm_dir && \
 	cd $$rpm_dir && \
