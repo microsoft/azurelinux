@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        6%{?dist}
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -316,6 +316,9 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Mar 12 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-1
+- Rebase to upstream release 2.20240226.
+
 * Fri Dec 15 2023 Aditya Dubey <adityadubey@microsoft.com> - 2.20221101-6
 - Adding modules_checksum file
 - removed exclude for policy.linked, seusers.linked, and users_extra.linked files
