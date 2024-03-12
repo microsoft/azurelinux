@@ -562,6 +562,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	if err != nil {
+		return
+	}
+
+	// The system should be fully populated with packages, we can clear the tdnf cache now to free up space.
+	if !config.PreserveTdnfCache {
+		err = cleanupTdnfCache(installChroot)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -2180,6 +2191,33 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	}
 
 	return
+}
+
+func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
+	const (
+		squashErrors      = false
+		rpmCacheDirectory = "/var/cache/tdnf"
+	)
+
+	ReportActionf("Cleaning tdnf cache")
+	err := installChroot.UnsafeRun(func() error {
+		chrootErr := shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
+		return chrootErr
+	})
+
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup tdnf cache:\n%w", err)
+		return err
+	}
+
+	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
+	err = os.RemoveAll(cacheDir)
+	if err != nil {
+		err = fmt.Errorf("failed to remove tdnf cache directory (%s):\n%w", cacheDir, err)
+		return err
+	}
+
+	return nil
 }
 
 func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
