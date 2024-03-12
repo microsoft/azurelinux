@@ -34,7 +34,7 @@ Requires:       python3
 jsonschema is JSON Schema validator currently based on
 http://tools.ietf.org/html/draft-zyp-json-schema-03
 
-%pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
+#%pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
 
 %prep
 %autosetup -n jsonschema-%{version}
