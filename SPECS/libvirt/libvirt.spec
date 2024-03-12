@@ -688,8 +688,6 @@ Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
-Requires: swtpm-tools
-        %if %{with_numad}
 Requires: numad
         %endif
 # azl: Upstream libivirt.spec.in adds Recommends for passt and
