@@ -60,7 +60,6 @@ BuildRequires:  glibc-devel
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  gpgme-devel
-BuildRequires:  libapparmor-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  sed

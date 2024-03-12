@@ -49,6 +49,7 @@ developing applications.
 
 %prep
 %setup -q
+sed -i 's/-Werror=declaration-after-statement/-Wno-error=declaration-after-statement/g' configure.ac
 
 %build
 alias python=python3
