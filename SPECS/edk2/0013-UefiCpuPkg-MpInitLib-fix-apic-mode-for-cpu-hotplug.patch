@@ -1,0 +1,42 @@
+From 0f6473788f32179caaebcb5b0b2050cba5d05eac Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 28 Feb 2023 15:47:00 +0100
+Subject: [PATCH 13/17] UefiCpuPkg/MpInitLib: fix apic mode for cpu hotplug
+
+In case the number of CPUs can in increase beyond 255
+due to CPU hotplug choose x2apic mode.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ UefiCpuPkg/Library/MpInitLib/MpLib.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/UefiCpuPkg/Library/MpInitLib/MpLib.c b/UefiCpuPkg/Library/MpInitLib/MpLib.c
+index cdfb570e61a0..7bc93dfa1319 100644
+--- a/UefiCpuPkg/Library/MpInitLib/MpLib.c
++++ b/UefiCpuPkg/Library/MpInitLib/MpLib.c
+@@ -533,7 +533,9 @@ CollectProcessorCount (
+   //
+   // Enable x2APIC mode if
+   //  1. Number of CPU is greater than 255; or
+-  //  2. There are any logical processors reporting an Initial APIC ID of 255 or greater.
++  //  2. The platform exposed the exact *boot* CPU count to us in advance, and
++  //     more than 255 logical processors are possible later, with hotplug; or
++  //  3. There are any logical processors reporting an Initial APIC ID of 255 or greater.
+   //
+   X2Apic = FALSE;
+   if (CpuMpData->CpuCount > 255) {
+@@ -541,6 +543,10 @@ CollectProcessorCount (
+     // If there are more than 255 processor found, force to enable X2APIC
+     //
+     X2Apic = TRUE;
++  } else if ((PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) &&
++             (PcdGet32 (PcdCpuMaxLogicalProcessorNumber) > 255))
++  {
++    X2Apic = TRUE;
+   } else {
+     CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+-- 
+2.43.1
+

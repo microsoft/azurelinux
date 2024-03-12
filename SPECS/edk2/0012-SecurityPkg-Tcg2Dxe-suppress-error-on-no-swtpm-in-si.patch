@@ -1,7 +1,7 @@
-From 8d5230a47e76ce2a10d722f1fb0349650c4287ed Mon Sep 17 00:00:00 2001
+From 58bb314e849e0a2a30efbc0a9567e0bf33f100f8 Mon Sep 17 00:00:00 2001
 From: Laszlo Ersek <lersek@redhat.com>
 Date: Wed, 24 Jun 2020 11:40:09 +0200
-Subject: [PATCH 13/14] SecurityPkg/Tcg2Dxe: suppress error on no swtpm in
+Subject: [PATCH 12/17] SecurityPkg/Tcg2Dxe: suppress error on no swtpm in
  silent aa64 build (RH)
 
 Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
@@ -78,5 +78,5 @@ index f6ea8b2bbf18..681eb7e08b98 100644
    }
  
 -- 
-2.39.2
+2.43.1
 
