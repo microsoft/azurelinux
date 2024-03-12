@@ -46,6 +46,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 
 	// Iterate over each Overlay configuration
 	for _, overlay := range overlays {
+		formattedPartition = ""
 		if overlay.Partition != nil {
 			formattedPartition, err = systemdFormatPartitionId(overlay.Partition.IdType, overlay.Partition.Id)
 			if err != nil {
@@ -54,8 +55,8 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 		}
 		// Construct the argument for each Overlay
 		overlayConfig := fmt.Sprintf(
-			"%s,%s,%s",
-			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir,
+			"%s,%s,%s,%s",
+			overlay.LowerDir, overlay.UpperDir, overlay.WorkDir, formattedPartition,
 		)
 		overlayConfigs = append(overlayConfigs, overlayConfig)
 	}
@@ -65,10 +66,6 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 
 	// Construct the final cmdline argument
 	newArgs := fmt.Sprintf("rd.overlayfs=\"%s\"", concatenatedOverlays)
-
-	if formattedPartition != "" { // Check if formattedPartition was set
-		newArgs = fmt.Sprintf("%s rd.overlayfs_persistent_volume=\"%s\"", newArgs, formattedPartition) // Append the persistent volume if exists
-	}
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 	lines, err := file.ReadLines(grubCfgPath)
@@ -85,8 +82,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 		trimmedLine := strings.TrimSpace(line)
 		if linuxLineRegex.MatchString(trimmedLine) {
 			// Replace existing arguments for overlays.
-			overlayRegexPattern := `rd.overlayfs=[^ ]*` +
-				`( rd.overlayfs_persistent_volume=[^ ]*)?`
+			overlayRegexPattern := `rd.overlayfs=[^ ]*`
 			overlayRegex, err := regexp.Compile(overlayRegexPattern)
 			if err != nil {
 				return fmt.Errorf("failed to compile overlay regex: %w", err)
