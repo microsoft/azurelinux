@@ -18,8 +18,7 @@
             },
             "KernelOptions": {
                 "default": "kernel"
-            },
-            "EnableGrubMkconfig": true
+            }
         },
         {
             "Name": "Azure Linux Core",
@@ -30,8 +29,7 @@
             ],
             "KernelOptions": {
                 "default": "kernel"
-            },
-            "EnableGrubMkconfig": true
+            }
         }
     ]
 }
