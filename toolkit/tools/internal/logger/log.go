@@ -86,7 +86,7 @@ func initLogFile(filePath string, color string) (err error) {
 		return
 	}
 
-	file, err := os.Create(filePath)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
