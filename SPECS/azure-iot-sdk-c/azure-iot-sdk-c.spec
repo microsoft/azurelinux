@@ -22,6 +22,7 @@ Distribution:   Mariner
 Source0:        %{name}-%{version}.tar.bz2
 Patch0:         CVE-2024-21646.patch
 Patch1:         CVE-2024-25110.patch
+Patch2:         CVE-2024-27099.patch
 BuildRequires:  cmake
 BuildRequires:  build-essential
 BuildRequires:  curl-devel
@@ -89,6 +90,7 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 %changelog
 *   Tue Mar 12 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 2022.01.21-3
 -   Add patch for CVE-2024-25110
+-   Add patch for CVE-2024-27099
 
 *   Tue Jan 16 2024 Minghe Ren <mingheren@microsoft.com> - 2022.01.21-2
 -   Add patch for CVE-2024-21646
