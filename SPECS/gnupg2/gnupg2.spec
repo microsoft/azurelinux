@@ -16,6 +16,7 @@ BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
 BuildRequires:  libgpg-error-devel >= 1.46
+BuildRequires:  gnutls-devel
 Requires:       libksba > 1.3.4
 Requires:       libgcrypt >= 1.9.1
 Requires:       libgpg-error >= 1.46
