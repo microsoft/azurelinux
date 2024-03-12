@@ -152,6 +152,7 @@ func (iv *InstallationView) applyConfiguration(sysConfig *configuration.SystemCo
 	sysConfig.AdditionalFiles = selectedConfig.AdditionalFiles
 	sysConfig.PostInstallScripts = selectedConfig.PostInstallScripts
 	sysConfig.FinalizeImageScripts = selectedConfig.FinalizeImageScripts
+	sysConfig.EnableGrubMkconfig = selectedConfig.EnableGrubMkconfig
 }
 
 func (iv *InstallationView) populateInstallOptions() (err error) {

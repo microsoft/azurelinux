@@ -3,6 +3,7 @@
         {
             "Name": "Azure Linux Full",
             "PackageLists": [
+                "packagelists/grub2-mkconfig.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image.json",
@@ -17,17 +18,20 @@
             },
             "KernelOptions": {
                 "default": "kernel"
-            }
+            },
+            "EnableGrubMkconfig": true
         },
         {
             "Name": "Azure Linux Core",
             "PackageLists": [
+                "packagelists/grub2-mkconfig.json",
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
-            }
+            },
+            "EnableGrubMkconfig": true
         }
     ]
 }
