@@ -31,6 +31,8 @@ type FileToCopy struct {
 	Src         string
 	Dest        string
 	Permissions *os.FileMode
+	// Set to true to copy symlinks as symlinks.
+	NoDereference bool
 }
 
 // MountPoint represents a system mount point used by a Chroot.
@@ -312,7 +314,9 @@ func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
 
 		var err error
-		if f.Permissions != nil {
+		if f.NoDereference {
+			err = file.CopyNoDereference(f.Src, dest)
+		} else if f.Permissions != nil {
 			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
 		} else {
 			err = file.Copy(f.Src, dest)
