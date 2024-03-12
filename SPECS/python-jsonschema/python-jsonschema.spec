@@ -16,6 +16,7 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %package -n     python3-jsonschema
 Summary:        An implementation of JSON Schema validation for Python
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-hatch-fancy-pypi-readme
@@ -34,7 +35,7 @@ Requires:       python3
 jsonschema is JSON Schema validator currently based on
 http://tools.ietf.org/html/draft-zyp-json-schema-03
 
-#%pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
+%pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
 
 %prep
 %autosetup -n jsonschema-%{version}
