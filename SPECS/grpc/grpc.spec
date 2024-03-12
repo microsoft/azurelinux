@@ -4,7 +4,7 @@ Version:        1.62.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -14,16 +14,18 @@ BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  git
+BuildRequires:  ninja-build
+BuildRequires:  pkgconfig(openssl)
 BuildRequires:  protobuf-devel
 BuildRequires:  protobuf-static
 BuildRequires:  re2-devel
+BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
-BuildRequires:  pkgconfig(openssl)
-BuildRequires:  ninja-build
 Requires:       abseil-cpp
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
+Requires:       systemd
 Requires:       zlib
 
 # Python
@@ -71,6 +73,13 @@ Python language bindings for gRPC.
 %setup -q -n %{name}-%{version}
 %setup -T -D -a 1
 
+# remove third party code taken from installed packages (build requires)
+rm -r %{_builddir}/%{name}-%{version}/third_party/abseil-cpp
+rm -r %{_builddir}/%{name}-%{version}/third_party/cares
+rm -r %{_builddir}/%{name}-%{version}/third_party/protobuf
+rm -r %{_builddir}/%{name}-%{version}/third_party/re2
+rm -r %{_builddir}/%{name}-%{version}/third_party/zlib
+
 %build
 # Updating used C++ version to be compatible with the build dependencies.
 # Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
@@ -79,19 +88,23 @@ CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2
 
 mkdir -p cmake/build
 pushd cmake/build
-%cmake ../.. -GNinja                         \
-   -DgRPC_INSTALL=ON                         \
-   -DBUILD_SHARED_LIBS=ON                    \
+
+%cmake ../..                                 \
+   -DCMAKE_MESSAGE_LOG_LEVEL=TRACE           \
    -DCMAKE_BUILD_TYPE=Release                \
    -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
-   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
-   -DgRPC_ABSL_PROVIDER:STRING='package'     \
-   -DgRPC_CARES_PROVIDER:STRING='package'    \
-   -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
-   -DgRPC_RE2_PROVIDER:STRING='package'      \
-   -DgRPC_SSL_PROVIDER:STRING='package'      \
-   -DgRPC_ZLIB_PROVIDER:STRING='package'
-%cmake_build 
+   \
+   -DgRPC_INSTALL=ON                         \
+   -DgRPC_BUILD_TESTS=OFF                    \
+   -DgRPC_ABSL_PROVIDER:STRING=package       \
+   -DgRPC_CARES_PROVIDER:STRING=package      \
+   -DgRPC_PROTOBUF_PROVIDER:STRING=package   \
+   -DgRPC_RE2_PROVIDER:STRING=package        \
+   -DgRPC_SSL_PROVIDER:STRING=package        \
+   -DgRPC_ZLIB_PROVIDER:STRING=package
+
+cmake --build . -j1
+
 popd
 #uncommenting below line causes the whole build to get stuck in aarch64 machine 
 #py3_build
