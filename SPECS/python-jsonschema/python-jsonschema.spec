@@ -27,6 +27,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-pluggy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-trove-classifers
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
