@@ -4,7 +4,7 @@
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
 Version:        0.189
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,15 +15,14 @@ Source0:        https://sourceware.org/elfutils/ftp/%{version}/%{name}-%{version
 BuildRequires:  bison >= 1.875
 BuildRequires:  bzip2-devel
 BuildRequires:  flex >= 2.5.4a
-BuildRequires:  gcc >= 4.1.2-33
+BuildRequires:  gcc
 BuildRequires:  gettext
-BuildRequires:  glibc >= 2.7
 BuildRequires:  m4
+AutoReq:        no
 
 Requires:       %{name}-default-yama-scope = %{version}-%{release}
 Requires:       %{name}-libelf = %{version}-%{release}
 Requires:       bzip2-libs
-Requires:       glibc >= 2.7
 
 Provides:       %{name}-libs = %{version}-%{release}
 
@@ -111,8 +110,6 @@ Group:          Development/Tools
 
 Requires:       %{name}-libelf = %{version}-%{release}
 
-Conflicts:      libelf-devel
-
 %description libelf-devel
 The elfutils-libelf-devel package contains the libraries to create
 applications for handling compiled objects.  libelf allows you to
@@ -125,8 +122,6 @@ License:        GPLv2+ OR LGPLv3+
 Group:          Development/Tools
 
 Requires:       %{name}-libelf-devel = %{version}-%{release}
-
-Conflicts:      libelf-devel
 
 %description libelf-devel-static
 The elfutils-libelf-static package contains the static archive
@@ -268,6 +263,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Mon Mar 11 2024 Andrew Phelps <anphel@microsoft.com> - 0.189-2
+- Remove unnecessary requirements and disable AutoReq
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.189-1
 - Auto-upgrade to 0.189 - Azure Linux 3.0 - package upgrades
 
