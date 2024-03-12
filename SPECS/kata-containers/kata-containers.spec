@@ -97,6 +97,7 @@ tar -xf %{SOURCE1}
 %build
 export PATH=$PATH:"$(pwd)/go/bin"
 export GOPATH="$(pwd)/go"
+export OPENSSL_NO_VENDOR=1
 
 mkdir -p go/src/github.com/%{name}
 ln -s $(pwd)/../%{name}-%{version} go/src/github.com/%{name}/%{name}
