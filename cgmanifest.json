@@ -26524,8 +26524,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rdiscount",
-          "version": "2.2.0.2",
-          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.0.2.tar.gz"
+          "version": "2.2.7.1",
+          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.7.tar.gz"
         }
       }
     },
