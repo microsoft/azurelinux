@@ -125,6 +125,7 @@ popd
 # - CgroupCreateCgroupTest.CgroupCreateCgroupV2
 # - CgroupCreateCgroupTest.CgroupCreateCgroupV1AndV2
 make -C tests/gunit check
+cat /usr/src/azl/BUILD/libcgroup/tests/gunit/test-suite.log
 
 %pre
 getent group cgred >/dev/null || groupadd -r cgred
