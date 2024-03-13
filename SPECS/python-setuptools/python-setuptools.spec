@@ -6,7 +6,7 @@ Setuptools is a fully-featured, actively-maintained, and stable library designed
 Summary:        Easily build and distribute Python packages
 Name:           python-setuptools
 Version:        69.0.3
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ Source0:        https://pypi.org/packages/source/s/setuptools/setuptools-%{versi
 %package -n python3-setuptools
 Summary:        %{summary}
 
-Requires:       python3
+Requires:       python3-devel
 # Early builds of Azure Linux 3.0 included python3-setuptools with the python3.spec. Obsolete to prevent build conflicts.
 Obsoletes:      python3-setuptools <= 3.9.14
 BuildArch:      noarch
@@ -57,8 +57,6 @@ EOF
 %{python3_sitelib}/setuptools-%{version}.dist-info/*
 
 %changelog
-* Mon Mar 11 2024 Andrew Phelps <anphel@microsoft.com> - 69.0.3-2
-- Change Requires to python3
-* Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 69.0.3-1
+* Tue Feb 13 2024 Andrew Phelps anphel@microsoft.com - 69.0.3-1
 - License verified
 - Original version for CBL-Mariner
