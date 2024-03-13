@@ -65,7 +65,6 @@ install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
 install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
 install -m 644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/50-waagent.preset
 
-
 %check
 python3 setup.py check && python3 setup.py test
 
