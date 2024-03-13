@@ -247,7 +247,7 @@ tests_ok=true
 %{python3} jit-test/jit_test.py -s -t 2400 --no-progress ../../js/src/dist/bin/js%{major} basic || tests_ok=false
 %endif
 
-tests_ok
+$tests_ok
 
 %files
 %doc README.html
