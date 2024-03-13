@@ -33,6 +33,7 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
 %if %{with_check}
 BuildRequires:  python3-twisted
+BuildRequires:  python3-typing-extensions
 %endif
 Requires:       python3
 
