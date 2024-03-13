@@ -1,13 +1,14 @@
 Summary:        TIFF libraries and associated utilities.
 Name:           libtiff
 Version:        4.6.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        libtiff
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
 URL:            https://gitlab.com/libtiff/libtiff
 Source0:        https://gitlab.com/libtiff/libtiff/-/archive/v%{version}/libtiff-v%{version}.tar.gz
+Patch0:         CVE-2023-52356.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libjpeg-turbo-devel
@@ -60,6 +61,9 @@ make %{?_smp_mflags} -k check
 %{_docdir}/*
 
 %changelog
+* Thu Mar 7 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 4.6.0-2
+- Add patches for CVE-2023-52356
+
 * Fri Oct 20 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 4.6.0-1
 - Upgrade to v4.6.0 to fix CVE-2023-40745 and CVE-2023-41175
 
