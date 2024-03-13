@@ -95,7 +95,7 @@ func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMod
 	return copyWithPermissions(src, dst, dirmode, true, filemode, false)
 }
 
-// Copy copies a file from src to dst, creating directories for the destination if needed.
+// CopyNoDereference copies a file from src to dst, creating directories for the destination if needed.
 // dst is assumed to be a file and not a directory. Will preserve permissions and symlinks.
 func CopyNoDereference(src, dst string) (err error) {
 	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm, true)
@@ -263,13 +263,23 @@ func GetAbsPathWithBase(baseDirPath, inputPath string) string {
 }
 
 func IsDirEmpty(path string) (bool, error) {
-	contents, err := os.ReadDir(path)
+	file, err := os.Open(path)
 	if err != nil {
-		return false, fmt.Errorf("failed to check if dir is empty (%s):\n%w", path, err)
+		return false, err
+	}
+	defer file.Close()
+
+	_, err = file.Readdirnames(1)
+	if err == io.EOF {
+		// Directory has no children.
+		return true, nil
+	}
+	if err != nil {
+		return false, err
 	}
 
-	empty := len(contents) == 0
-	return empty, nil
+	// Directory has at least 1 child.
+	return false, nil
 }
 
 // copyWithPermissions copies a file from src to dst, creating directories with the requested mode for the destination if needed.
