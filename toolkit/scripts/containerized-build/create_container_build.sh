@@ -41,7 +41,7 @@ Optional arguments:
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
     KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
 
-    * User can override Mariner make definitions. Some useful overrides could be
+    * User can override Azure Linux make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
                     SRPM_PACK_LIST: provide a list of SRPMS to build by providing SRPM_PACK_LIST=\"srpm1 srpm2 ...\". default: builds all SRPMS from $SPECS_DIR
                     RPMS_DIR: choose which built RPMs to mount into container by providing RPMS_DIR=path/to/custom/out/RPMS. default: $REPO_PATH/out/RPMS
@@ -103,7 +103,7 @@ done
 [[ -z "${mode}" ]] && mode="build"
 [[ -z "${version}" ]] && version="3.0"
 
-# Set relevant folder definitions using Mariner Makefile that can be overriden by user
+# Set relevant folder definitions using Azure Linux Makefile that can be overriden by user
 # Default values are populated from toolkit/Makefile
 PROJECT_ROOT=$repo_path
 toolkit_root="$PROJECT_ROOT/toolkit"
@@ -149,10 +149,10 @@ cd "${script_dir}"  || { print_error "Could not change directory to ${script_dir
 
 # ==================== Setup ====================
 
-# Get Mariner GitHub branch at $repo_path
+# Get Azure Linux GitHub branch at $repo_path
 repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 
-# Generate text based on mode (Use figlet to generate splash text once available on Mariner)
+# Generate text based on mode (Use figlet to generate splash text once available on Azure Linux)
 if [[ "${mode}" == "build" ]]; then
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
     echo -e "\033[31m ----------------------------------- MARINER BUILDER ! ----------------------------------- \033[0m" >> ${tmp_dir}/splash.txt

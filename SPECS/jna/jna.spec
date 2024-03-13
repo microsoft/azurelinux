@@ -51,10 +51,10 @@ BuildRequires:  libffi-devel
 BuildRequires:  libX11-devel
 BuildRequires:  libXt-devel
 BuildRequires:  make
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  objectweb-asm
 Requires:       libffi
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 
 %description
 JNA provides Java programs easy access to native shared libraries

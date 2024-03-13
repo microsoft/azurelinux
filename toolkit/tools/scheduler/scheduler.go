@@ -63,7 +63,7 @@ var (
 	rpmDir           = app.Flag("rpm-dir", "The directory to use as the local repo and to submit RPM packages to").Required().ExistingDir()
 	toolchainDirPath = app.Flag("toolchain-rpms-dir", "Directory that contains already built toolchain RPMs. Should contain top level directories for architecture.").Required().ExistingDir()
 	srpmDir          = app.Flag("srpm-dir", "The output directory for source RPM packages").Required().String()
-	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Mariner Base").Required().ExistingDir()
+	cacheDir         = app.Flag("cache-dir", "The cache directory containing downloaded dependency RPMS from Azure Linux Base").Required().ExistingDir()
 	buildLogsDir     = app.Flag("build-logs-dir", "Directory to store package build logs").Required().ExistingDir()
 
 	imageConfig = app.Flag("image-config-file", "Optional image config file to extract a package list from.").String()

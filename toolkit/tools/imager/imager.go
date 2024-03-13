@@ -152,7 +152,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		return
 	}
 
-	// Mariner images don't work appropriately when azurelinux-release is not installed.
+	// Azure Linux images don't work appropriately when azurelinux-release is not installed.
 	// As a stopgap to this, azurelinux-release will now be added to all images regardless
 	// of presence in the CONFIG_FILE
 	packagesToInstall = append([]string{distroReleasePackage}, packagesToInstall...)

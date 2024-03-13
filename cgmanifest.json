@@ -975,8 +975,8 @@
         "type": "other",
         "other": {
           "name": "bazel",
-          "version": "7.0.2",
-          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/7.0.2/bazel-7.0.2-dist.zip"
+          "version": "6.5.0",
+          "downloadUrl": "https://github.com/bazelbuild/bazel/releases/download/6.5.0/bazel-6.5.0-dist.zip"
         }
       }
     },
@@ -5130,8 +5130,8 @@
         "type": "other",
         "other": {
           "name": "hamcrest",
-          "version": "1.3",
-          "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-1.3.tar.gz"
+          "version": "2.2",
+          "downloadUrl": "https://github.com/hamcrest/JavaHamcrest/archive/v2.2.tar.gz"
         }
       }
     },
@@ -7143,6 +7143,16 @@
           "name": "iftop",
           "version": "1.0",
           "downloadUrl": "http://www.ex-parrot.com/~pdw/iftop/download/iftop-1.0pre4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ig",
+          "version": "0.25.0",
+          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.25.0.tar.gz"
         }
       }
     },
@@ -9771,8 +9781,8 @@
         "type": "other",
         "other": {
           "name": "libkcapi",
-          "version": "1.3.1",
-          "downloadUrl": "https://www.chronox.de/libkcapi/libkcapi-1.3.1.tar.xz"
+          "version": "1.5.0",
+          "downloadUrl": "https://www.chronox.de/libkcapi/releases/1.5.0/libkcapi-1.5.0.tar.xz"
         }
       }
     },
@@ -13041,16 +13051,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "mlnx-ofa_kernel",
-          "version": "23.04",
-          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-23.04-0.5.3.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "mlnx-tools",
           "version": "5.2.0",
           "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/mlnx-tools_5.2.0.orig.tar.gz"
@@ -13331,9 +13331,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "msopenjdk-11",
-          "version": "11.0.18-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.18-1.aarch64.rpm"
+          "name": "msopenjdk-17",
+          "version": "17.0.9-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm"
         }
       }
     },
@@ -13341,9 +13341,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "msopenjdk-11",
-          "version": "11.0.18-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.18-1.x86_64.rpm"
+          "name": "msopenjdk-17",
+          "version": "17.0.9-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm"
         }
       }
     },
@@ -13812,8 +13812,8 @@
         "type": "other",
         "other": {
           "name": "netavark",
-          "version": "1.0.3",
-          "downloadUrl": "https://github.com/containers/netavark/archive/v1.0.3/1.0.3.tar.gz"
+          "version": "1.10.3",
+          "downloadUrl": "https://github.com/containers/netavark/archive/v1.10.3/1.10.3.tar.gz"
         }
       }
     },
@@ -22492,9 +22492,19 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-hatchling",
-          "version": "1.21.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.21.1.tar.gz"
+            "name": "python-hatch-fancy-pypi-readme",
+            "version": "24.1.0",
+            "downloadUrl": "https://files.pythonhosted.org/packages/b4/c2/c9094283a07dd96c5a8f7a5f1910259d40d2e29223b95dd875a6ca13b58f/hatch_fancy_pypi_readme-24.1.0.tar.gz"
+        }
+        }
+      },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hatch-vcs",
+          "version": "0.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch_vcs/hatch_vcs-0.4.0.tar.gz"
         }
       }
     },
@@ -22743,8 +22753,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "2.6.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+          "version": "4.21.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-4.21.1.tar.gz"
         }
       }
     },
@@ -26093,16 +26103,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-fluent-plugin-td",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/treasure-data/fluent-plugin-td/archive/refs/tags/v1.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-fluent-plugin-webhdfs",
           "version": "1.5.0",
           "downloadUrl": "https://github.com/fluent/fluent-plugin-webhdfs/archive/refs/tags/v1.5.0.tar.gz"
@@ -26696,36 +26696,6 @@
           "name": "rubygem-systemd-journal",
           "version": "1.4.2",
           "downloadUrl": "https://github.com/ledbettj/systemd-journal/archive/refs/tags/v1.4.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td",
-          "version": "0.17.1",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-client",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/treasure-data/td-client-ruby/archive/refs/tags/v2.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-logger",
-          "version": "0.3.27",
-          "downloadUrl": "https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v0.3.27.tar.gz"
         }
       }
     },

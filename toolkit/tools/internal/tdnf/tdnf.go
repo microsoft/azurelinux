@@ -85,7 +85,7 @@ var (
 	// separated by a dot.
 	//
 	// Limiting this to digits only is a normative limitation based on past versioning
-	// of Mariner and its repositories.
+	// of Azure Linux and its repositories.
 	//
 	// Examples: "1.0", "2.0", "3.0"
 	majorVersionRegex = regexp.MustCompile(`^(\d+\.\d+)(\..+)?$`)
@@ -96,7 +96,7 @@ var (
 )
 
 // GetReleaseverCliArg returns a TDNF CLI argument suitable for resolving the `$releasever` variable in
-// Mariner's RPM repo files to the major version of the toolkit. This argument allows TDNF to resolve
+// Azure Linux's RPM repo files to the major version of the toolkit. This argument allows TDNF to resolve
 // without the presence of the `azurelinux-release` package.
 func GetReleaseverCliArg() (arg string, err error) {
 	if releaseverArgumentPopulatedCache == "" {
@@ -118,7 +118,7 @@ func GetReleaseverCliArg() (arg string, err error) {
 // `ToolkitVersion` string.
 func getMajorVersionFromToolkitVersion() (arg string, err error) {
 	if exe.ToolkitVersion == "" {
-		err = fmt.Errorf("failed to get Mariner major version- toolkit version not set in exe package at link-time")
+		err = fmt.Errorf("failed to get Azure Linux major version- toolkit version not set in exe package at link-time")
 		return
 	}
 	arg, err = getMajorVersionFromString(exe.ToolkitVersion)
@@ -129,7 +129,7 @@ func getMajorVersionFromToolkitVersion() (arg string, err error) {
 // Specifically, we look for the first submatch in the input string using `majorVersionRegex`.
 func getMajorVersionFromString(version string) (majorVersion string, err error) {
 	const (
-		errorFormatString = "failed to extract major Mariner version from the following string: %s"
+		errorFormatString = "failed to extract major Azure Linux version from the following string: %s"
 	)
 
 	matches := majorVersionRegex.FindStringSubmatch(version)
