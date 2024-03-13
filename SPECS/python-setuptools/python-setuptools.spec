@@ -27,7 +27,6 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-Requires:       python3
 
 Provides:       python3dist(setuptools) = %{version}-%{release}
 Provides:       python%{python3_majmin}dist(setuptools) = %{version}-%{release}
