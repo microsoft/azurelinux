@@ -52,15 +52,11 @@ def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
 def check_folder(folder):
     signatures_correct = True
 
-    print(f"check {folder}")
-
     # find YY (maybe ancestor of path) that has xx/YY/YY.spec
     path = find_spec_folder_with_signatures_json(folder)
     if path is None:
         # no spec/signature files found in path or its ancestors
         return signatures_correct
-
-    print(f"actually check {path}")
 
     for signature_path in Path(path).glob("*.signatures.json"):
         with open(signature_path, "r") as f:
