@@ -3,7 +3,7 @@
 # Licensed under the MIT License.
 
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import argparse
 import hashlib
@@ -39,14 +39,35 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
 
     return None
 
+def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
+    names: List[str] = []
+    # Search for all spec files (XXX.spec)
+    for spec_path in Path(path).glob("*.spec"):
+        with open(spec_path, "r") as f:
+            name = Path(spec_path).stem
+            signature_path = os.path.join(path, f"{name}.signatures.json")
+            with open(signature_path, "r") as ff:
+                # If there is a matching signature file (XXX.signatures.json),
+                # add it to list
+                names.append(name)
+    return names
+
 def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
+    # Use this path if there are any spec files (XXX.spec) that have
+    # a matching signature file (XXX.signatures.json)
+    names = find_name_of_all_spec_and_signatures_json_pairs(path)
+    if len(names) > 0:
+        return path
+
+    # No spec/signatures.json combo found in this folder,
+    # check the parent folder (unless the parent folder IS
+    # THE SAME as this folder)
     current = Path(path)
-    if Path(os.path.join(path, f"{current.name}.spec")).is_file():
-        if Path(os.path.join(path, f"{current.name}.signatures.json")).is_file():
-            return path
     parent = current.parent
     if parent != current:
         return find_spec_folder_with_signatures_json(f"{parent}")
+
+    # If nothing is found, return None
     return None
 
 def check_folder(folder):
@@ -58,7 +79,9 @@ def check_folder(folder):
         # no spec/signature files found in path or its ancestors
         return signatures_correct
 
-    for signature_path in Path(path).glob("*.signatures.json"):
+    names = find_name_of_all_spec_and_signatures_json_pairs(path)
+    for name in names:
+        signature_path = os.path.join(path, f"{name}.signatures.json")
         with open(signature_path, "r") as f:
             signatures_json = json.load(f)
             for file_to_check, expected_signature in signatures_json["Signatures"].items():
