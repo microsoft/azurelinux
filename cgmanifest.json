@@ -26093,16 +26093,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-fluent-plugin-td",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/treasure-data/fluent-plugin-td/archive/refs/tags/v1.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-fluent-plugin-webhdfs",
           "version": "1.5.0",
           "downloadUrl": "https://github.com/fluent/fluent-plugin-webhdfs/archive/refs/tags/v1.5.0.tar.gz"
@@ -26696,36 +26686,6 @@
           "name": "rubygem-systemd-journal",
           "version": "1.4.2",
           "downloadUrl": "https://github.com/ledbettj/systemd-journal/archive/refs/tags/v1.4.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td",
-          "version": "0.17.1",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-client",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/treasure-data/td-client-ruby/archive/refs/tags/v2.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-logger",
-          "version": "0.3.27",
-          "downloadUrl": "https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v0.3.27.tar.gz"
         }
       }
     },
