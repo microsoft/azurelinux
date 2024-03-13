@@ -23,7 +23,7 @@ BuildRequires:  python3-wheel
 
 %global common_description %{expand:
 This provides a Hatch metadata plugin for everyone who cares about the
-first impression of their projectâ€™s PyPI landing page. It allows you to
+first impression of their project's PyPI landing page. It allows you to
 define your PyPI project description in terms of concatenated fragments
 that are based on static strings, files, and most importantly: parts of
 files defined using cut-off points or regular expressions.}
