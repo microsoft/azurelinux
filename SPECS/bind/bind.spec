@@ -190,12 +190,17 @@ Summary:        BIND utilities
 %setup -q
 %patch 0 -p1
 
+# Copying auxiliary files with libtoolize. Some files will be replaced by libtoolize -c -f.
+# The files "compile", "depcomp", and "missing" will be deleted by this process, as some
+# temporary files have the same name. The "compile" file is necessary for "configure",
+# so we need to save a bachkup of these files.
 mkdir backup
 mv compile depcomp missing backup/
 libtoolize -c -f; %{_bindir}/aclocal -I m4 --force; %{_bindir}/autoconf -f 
 mv backup/* .
 rmdir backup
 
+%build
 # DLZ modules do not support oot builds. Copy files into build
 mkdir -p build/contrib/dlz
 cp -frp contrib/dlz/modules build/contrib/dlz/modules
@@ -509,6 +514,13 @@ fi;
 %changelog
 * Tue Feb 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.19.21-1
 - Auto-upgrade to 9.19.21 - Mariner 3.0 package upgrade
+- Update the locations of files in the new build
+- Remove configure flags that no longer exist
+- Add patch to avoid error when not downloading bind source from git
+- Add backup of compile file to avoid deleting it by error
+- Remove libbind9 and libirs as they are part of the removed features in 9.19
+- Remove PKCS-11 subpackages as starting from BIND 9.18, native PKCS#11 support has been removed 
+- Update subpackages dependencies
 
 * Thu Dec 14 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 9.16.44-2
 - Fix resetting of passwd and group on package update
