@@ -26,15 +26,16 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
     if Path(path_to_check).is_file():
         actual_signature = getSignature(path_to_check)
         if actual_signature != expected_signature:
+            print(f"ERROR: detected a mismatched signature for {filename}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
             return False
         else:
             return True
     
-    for content in os.listdir(path) :
+    for content in os.listdir(path):
         path_to_check = os.path.join(path, content)
         if os.path.isdir(path_to_check):
             result = find_file_and_check(path_to_check, filename, expected_signature)
-            if result == True:
+            if result is True:
                 return True
 
 def check_folder(path):
@@ -46,8 +47,7 @@ def check_folder(path):
                 result = find_file_and_check(path, file_to_check, expected_signature)
                 if result is None:
                     print(f"{file_to_check} is not found in CBL-Mariner, build to verify signature")
-                elif result == False:
-                    print(f"ERROR: detected a mismatched signature for {file_to_check}, expected [{expected_signature}] does not equal actual [{actual_signature}]")                    
+                elif result is False:
                     signatures_correct = False
     return signatures_correct
 
