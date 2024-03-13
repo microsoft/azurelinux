@@ -43,10 +43,10 @@ def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
     names: List[str] = []
     # Search for all spec files (XXX.spec)
     for spec_path in Path(path).glob("*.spec"):
-        with open(spec_path, "r") as f:
+        if os.path.exists(spec_path):
             name = Path(spec_path).stem
             signature_path = os.path.join(path, f"{name}.signatures.json")
-            with open(signature_path, "r") as ff:
+            if os.path.exists(signature_path):
                 # If there is a matching signature file (XXX.signatures.json),
                 # add it to list
                 names.append(name)
