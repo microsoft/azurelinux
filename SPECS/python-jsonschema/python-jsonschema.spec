@@ -62,7 +62,7 @@ rm jsonschema/tests/test_jsonschema_test_suite.py
 
 %if %{with_check}
 %check
-pip3 install referencing
+pip3 install jsonschema-specifications referencing
 PYTHONPATH=%{buildroot}%{python3_sitelib} trial3 jsonschema
 %endif
 
