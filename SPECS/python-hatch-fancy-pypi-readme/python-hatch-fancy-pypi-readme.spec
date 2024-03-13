@@ -5,7 +5,7 @@ Summary:        Hatch plugin for writing fancy PyPI readmes
 
 License:        MIT
 URL:            https://github.com/hynek/hatch-fancy-pypi-readme
-Source0:        %{pypi_source hatch_fancy_pypi_readme}#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/b4/c2/c9094283a07dd96c5a8f7a5f1910259d40d2e29223b95dd875a6ca13b58f/${name}-${version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
