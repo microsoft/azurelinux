@@ -1,6 +1,6 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
-Version:        3.0
+Version:        %{azl}.0
 Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation

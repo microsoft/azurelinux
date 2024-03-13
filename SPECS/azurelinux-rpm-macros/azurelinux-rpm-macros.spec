@@ -6,7 +6,7 @@
 %global __brp_python_bytecompile %{nil}
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
-Version:        3.0
+Version:        %{azl}.0
 Release:        2%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation

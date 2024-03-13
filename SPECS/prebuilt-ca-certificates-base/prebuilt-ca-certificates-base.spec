@@ -2,7 +2,7 @@ Summary:        Prebuilt version of ca-certificates-base package.
 Name:           prebuilt-ca-certificates-base
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
-Version:        3.0.0
+Version:        %{azl}.0.0
 Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
