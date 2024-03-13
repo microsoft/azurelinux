@@ -50,6 +50,7 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %changelog
 * Tue Mar 05 2024 Riken Maharjan <rmaharjan@microsoft.com> - 6.5.0-1
 - Upgrade to 6.5.0
+- Added msopenjdk-17 patch
 
 * Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.2-1
 - Auto-upgrade to 5.3.2 - CVE-2022-3474
