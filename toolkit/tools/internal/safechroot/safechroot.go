@@ -311,17 +311,15 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
-
-		var err error
+		fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
 		if f.NoDereference {
-			err = file.CopyNoDereference(f.Src, dest)
-		} else if f.Permissions != nil {
-			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
-		} else {
-			err = file.Copy(f.Src, dest)
+			fileCopyOp = fileCopyOp.SetNoDereference()
+		}
+		if f.Permissions != nil {
+			fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
 		}
 
+		err := fileCopyOp.Run()
 		if err != nil {
 			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
 		}

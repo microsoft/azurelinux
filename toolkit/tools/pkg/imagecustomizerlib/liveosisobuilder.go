@@ -326,7 +326,9 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 			copiedByIsoMaker = true
 		}
 
-		err = file.CopyNoDereference(sourcePath, targetPath)
+		err = file.NewFileCopyBuilder(sourcePath, targetPath).
+			SetNoDereference().
+			Run()
 		if err != nil {
 			return err
 		}

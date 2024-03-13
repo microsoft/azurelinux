@@ -86,19 +86,7 @@ func Move(src, dst string) (err error) {
 // Copy copies a file from src to dst, creating directories for the destination if needed.
 // dst is assumed to be a file and not a directory. Will preserve permissions.
 func Copy(src, dst string) (err error) {
-	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm, false)
-}
-
-// CopyAndChangeMode copies a file from src to dst, creating directories with the given access rights for the destination if needed.
-// dst is assumed to be a file and not a directory. Will change the permissions to the given value.
-func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
-	return copyWithPermissions(src, dst, dirmode, true, filemode, false)
-}
-
-// CopyNoDereference copies a file from src to dst, creating directories for the destination if needed.
-// dst is assumed to be a file and not a directory. Will preserve permissions and symlinks.
-func CopyNoDereference(src, dst string) (err error) {
-	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm, true)
+	return NewFileCopyBuilder(src, dst).Run()
 }
 
 // Read reads a string from the file src.
@@ -280,58 +268,6 @@ func IsDirEmpty(path string) (bool, error) {
 
 	// Directory has at least 1 child.
 	return false, nil
-}
-
-// copyWithPermissions copies a file from src to dst, creating directories with the requested mode for the destination if needed.
-// Depending on the changeMode parameter, it may also change the file mode.
-func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, filemode os.FileMode,
-	noDereference bool,
-) (err error) {
-	const squashErrors = false
-
-	logger.Log.Debugf("Copying (%s) -> (%s)", src, dst)
-
-	if noDereference {
-		isSrcFileOrSymlink, err := IsFileOrSymlink(src)
-		if err != nil {
-			return err
-		}
-		if !isSrcFileOrSymlink {
-			return fmt.Errorf("source (%s) is not a file or a symlink", src)
-		}
-	} else {
-		isSrcFile, err := IsFile(src)
-		if err != nil {
-			return err
-		}
-		if !isSrcFile {
-			return fmt.Errorf("source (%s) is not a file", src)
-		}
-	}
-
-	err = createDestinationDir(dst, dirmode)
-	if err != nil {
-		return
-	}
-
-	args := []string(nil)
-	if noDereference {
-		args = append(args, "--no-dereference")
-	}
-
-	args = append(args, "--preserve=mode", src, dst)
-
-	err = shell.ExecuteLive(squashErrors, "cp", args...)
-	if err != nil {
-		return
-	}
-
-	if changeMode {
-		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
-		err = os.Chmod(dst, filemode)
-	}
-
-	return
 }
 
 func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
