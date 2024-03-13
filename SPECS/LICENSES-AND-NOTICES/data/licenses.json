@@ -1674,6 +1674,7 @@
                 "python-greenlet",
                 "python-gssapi",
                 "python-h5py",
+                "python-hatch-fancy-pypi-readme",
                 "python-hatch-vcs",
                 "python-hatchling",
                 "python-hs-dbus-signature",
