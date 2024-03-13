@@ -68,6 +68,7 @@ Patch21:        0001-Skip-failing-tests-on-ppc64-and-s390x.patch
 # AzLinux CVE patches
 Patch30:       CVE-2022-48285.patch
 
+# AzLinux packages cargo and rustfmt in the rust package
 %if !0%{?azl}
 BuildRequires:  cargo
 %endif
