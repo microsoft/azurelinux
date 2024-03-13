@@ -67,7 +67,7 @@ pip3 install exceptiongroup iniconfig tomli
 # test_is_writable assumes we're not the root user
 # and does not like that we have write access to /etc
 
-%pytest -k "not test_sequencer_basic"
+%pytest -k "not test_is_writable and not test_sequencer_basic"
 %endif
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
