@@ -39,22 +39,32 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
                 return True
 
 def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
+    print(f"what folder to use for {path}")
     current = Path(path)
     if Path(os.path.join(path, f"{current.name}.spec")).is_file():
         if Path(os.path.join(path, f"{current.name}.signatures.json")).is_file():
+            print(f"use {path}")
             return path
 
     parent = current.parent
     if parent != current:
         return find_spec_folder_with_signatures_json(f"{parent}")
 
+    print(f"do not use {path}")
     return None
 
 def check_folder(folder):
     signatures_correct = True
 
+    print(f"check {folder}")
+
     # find YY (maybe ancestor of path) that has xx/YY/YY.spec
     path = find_spec_folder_with_signatures_json(folder)
+    if path is None:
+        # no spec/signature files found in path or its ancestors
+        return signatures_correct
+
+    print(f"actually check {path}")
 
     for signature_path in Path(path).glob("*.signatures.json"):
         with open(signature_path, "r") as f:
