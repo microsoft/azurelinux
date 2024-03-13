@@ -80,7 +80,7 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  m4
 BuildRequires:  make
-%if !0%{?rhel}
+%ifarch x86_64
 BuildRequires:  nasm
 %endif
 BuildRequires:  libicu-devel
