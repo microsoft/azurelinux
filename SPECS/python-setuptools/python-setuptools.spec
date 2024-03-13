@@ -19,6 +19,7 @@ Source0:        https://pypi.org/packages/source/s/setuptools/setuptools-%{versi
 %package -n python3-setuptools
 Summary:        %{summary}
 
+Requires:       python3
 # Early builds of Azure Linux 3.0 included python3-setuptools with the python3.spec. Obsolete to prevent build conflicts.
 Obsoletes:      python3-setuptools <= 3.9.14
 BuildArch:      noarch
@@ -27,7 +28,6 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
-Requires:       python3
 
 Provides:       python3dist(setuptools) = %{version}-%{release}
 Provides:       python%{python3_majmin}dist(setuptools) = %{version}-%{release}
