@@ -1,3 +1,4 @@
+%bcond_without python3
 %define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Boost
 Name:           boost
@@ -11,6 +12,8 @@ URL:            https://www.boost.org/
 Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_version}.tar.bz2
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
+
+%global sonamever %{version}
 
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
@@ -34,6 +37,49 @@ Requires:       %{name} = %{version}-%{release}
 %description    static
 The boost-static package contains boost static libraries.
 
+%package filesystem
+Summary: Run-time component of boost filesystem library
+Requires: %{name}-system%{?_isa} = %{version}-%{release}
+ 
+%description filesystem
+Run-time support for the Boost Filesystem Library, which provides
+portable facilities to query and manipulate paths, files, and
+directories.
+
+%package random
+Summary: Run-time component of boost random library
+ 
+%description random
+Run-time support for boost random library.
+
+%package system
+Summary: Run-time component of boost system support library
+ 
+%description system
+Run-time component of Boost operating system support library, including
+the diagnostics support that is part of the C++11 standard library.
+
+%package program-options
+Summary:  Run-time component of boost program_options library
+ 
+%description program-options
+Run-time support of boost program options library, which allows program
+developers to obtain (name, value) pairs from the user, via
+conventional methods such as command-line and configuration file.
+
+%if %{with python3}
+%package python3
+Summary: Run-time component of boost python library for Python 3
+Requires: python(abi) = %{python3_version}
+ 
+%description python3
+The Boost Python Library is a framework for interfacing Python and
+C++. It allows you to quickly and seamlessly expose C++ classes,
+functions and objects to Python, and vice versa, using no special
+tools -- just your C++ compiler.  This package contains run-time
+support for the Boost Python Library compiled for Python 3.
+%endif
+ 
 %prep
 %autosetup -n %{name}_%{underscore_version}
 
@@ -61,7 +107,32 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %defattr(-,root,root)
 %{_libdir}/libboost_*.a
 
+%files filesystem
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_filesystem.so.%{sonamever}
+
+%files program-options
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_program_options.so.%{sonamever}
+	
+%if %{with python3}
+%files python3
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_python%{python3_version_nodots}.so.%{sonamever}
+%endif
+
+%files random
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_random.so.%{sonamever}
+
+%files system
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_system.so.%{sonamever}
+
 %changelog
+* Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
+- Add filesystem, random, system, program-options, python3 packages 
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.83.0-1
 - Upgrade to version 1.83.0-1
 
