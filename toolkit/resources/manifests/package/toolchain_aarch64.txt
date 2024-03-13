@@ -96,8 +96,7 @@ file-5.45-1.azl3.aarch64.rpm
 file-debuginfo-5.45-1.azl3.aarch64.rpm
 file-devel-5.45-1.azl3.aarch64.rpm
 file-libs-5.45-1.azl3.aarch64.rpm
-filesystem-1.1-19.azl3.aarch64.rpm
-filesystem-asc-1.1-19.azl3.aarch64.rpm
+filesystem-3.18-9.azl3.aarch64.rpm
 findutils-4.9.0-1.azl3.aarch64.rpm
 findutils-debuginfo-4.9.0-1.azl3.aarch64.rpm
 findutils-lang-4.9.0-1.azl3.aarch64.rpm
@@ -152,9 +151,9 @@ itstool-2.0.7-1.azl3.noarch.rpm
 kbd-2.2.0-2.azl3.aarch64.rpm
 kbd-debuginfo-2.2.0-2.azl3.aarch64.rpm
 kernel-headers-6.6.14.1-4.azl3.noarch.rpm
-kmod-30-1.azl3.aarch64.rpm
-kmod-debuginfo-30-1.azl3.aarch64.rpm
-kmod-devel-30-1.azl3.aarch64.rpm
+kmod-30-2.azl3.aarch64.rpm
+kmod-debuginfo-30-2.azl3.aarch64.rpm
+kmod-devel-30-2.azl3.aarch64.rpm
 krb5-1.21.2-1.azl3.aarch64.rpm
 krb5-debuginfo-1.21.2-1.azl3.aarch64.rpm
 krb5-devel-1.21.2-1.azl3.aarch64.rpm
@@ -562,6 +561,7 @@ rpm-libs-4.18.1-4.azl3.aarch64.rpm
 sed-4.9-1.azl3.aarch64.rpm
 sed-debuginfo-4.9-1.azl3.aarch64.rpm
 sed-lang-4.9-1.azl3.aarch64.rpm
+setup-2.14.5-3.azl3.noarch.rpm
 slang-2.3.3-1.azl3.aarch64.rpm
 slang-debuginfo-2.3.3-1.azl3.aarch64.rpm
 slang-devel-2.3.3-1.azl3.aarch64.rpm
@@ -589,11 +589,11 @@ texinfo-7.0.3-1.azl3.aarch64.rpm
 texinfo-debuginfo-7.0.3-1.azl3.aarch64.rpm
 unzip-6.0-20.azl3.aarch64.rpm
 unzip-debuginfo-6.0-20.azl3.aarch64.rpm
-util-linux-2.39.2-1.azl3.aarch64.rpm
-util-linux-debuginfo-2.39.2-1.azl3.aarch64.rpm
-util-linux-devel-2.39.2-1.azl3.aarch64.rpm
-util-linux-lang-2.39.2-1.azl3.aarch64.rpm
-util-linux-libs-2.39.2-1.azl3.aarch64.rpm
+util-linux-2.39.2-2.azl3.aarch64.rpm
+util-linux-debuginfo-2.39.2-2.azl3.aarch64.rpm
+util-linux-devel-2.39.2-2.azl3.aarch64.rpm
+util-linux-lang-2.39.2-2.azl3.aarch64.rpm
+util-linux-libs-2.39.2-2.azl3.aarch64.rpm
 which-2.21-8.azl3.aarch64.rpm
 which-debuginfo-2.21-8.azl3.aarch64.rpm
 xz-5.4.4-1.azl3.aarch64.rpm

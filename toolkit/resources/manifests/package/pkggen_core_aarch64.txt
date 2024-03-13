@@ -1,4 +1,5 @@
-filesystem-1.1-19.azl3.aarch64.rpm
+filesystem-3.18-9.azl3.aarch64.rpm
+setup-2.14.5-3.azl3.noarch.rpm
 kernel-headers-6.6.14.1-4.azl3.noarch.rpm
 glibc-2.38-3.azl3.aarch64.rpm
 glibc-devel-2.38-3.azl3.aarch64.rpm
@@ -66,9 +67,9 @@ make-4.4.1-1.azl3.aarch64.rpm
 patch-2.7.6-9.azl3.aarch64.rpm
 libcap-ng-0.8.3-1.azl3.aarch64.rpm
 libcap-ng-devel-0.8.3-1.azl3.aarch64.rpm
-util-linux-2.39.2-1.azl3.aarch64.rpm
-util-linux-devel-2.39.2-1.azl3.aarch64.rpm
-util-linux-libs-2.39.2-1.azl3.aarch64.rpm
+util-linux-2.39.2-2.azl3.aarch64.rpm
+util-linux-devel-2.39.2-2.azl3.aarch64.rpm
+util-linux-libs-2.39.2-2.azl3.aarch64.rpm
 tar-1.35-1.azl3.aarch64.rpm
 xz-5.4.4-1.azl3.aarch64.rpm
 xz-devel-5.4.4-1.azl3.aarch64.rpm

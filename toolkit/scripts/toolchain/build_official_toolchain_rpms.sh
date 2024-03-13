@@ -674,6 +674,7 @@ chroot_and_install_rpms ncurses
 # p11-kit needs libtasn1, systemd-bootstrap
 chroot_and_install_rpms libtasn1
 chroot_and_install_rpms systemd-bootstrap
+build_rpm_in_chroot_no_install setup
 build_rpm_in_chroot_no_install p11-kit
 
 # asciidoc needs python3

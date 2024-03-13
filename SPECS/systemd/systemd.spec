@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        7%{?dist}
+Release:        8%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -285,6 +285,8 @@ Conflicts:      fedora-release < 23-0.12
 %endif
 # Make sure that dracut supports systemd-executor and the renames done for v255
 Conflicts:      dracut < 059
+# Moved /var/log/* files from filesystem to here
+Conflicts:      filesystem < 1.1-20
 
 Obsoletes:      timedatex < 0.6-3
 Provides:       timedatex = 0.6-3
@@ -1186,6 +1188,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Mar 06 2024 Dan Streetman <ddstreet@microsoft.com> - 255-8
+- move /var/log/* files from filesystem to systemd package
+
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
 - remove use of %%azure (or %%azl) macro
 
