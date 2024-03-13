@@ -10,7 +10,7 @@ Summary:        Canonical source for classifiers on PyPI (pypi.org)
 
 License:        Apache-2.0
 URL:            https://github.com/pypa/trove-classifiers
-Source:         %{pypi_source trove-classifiers}
+Source:         https://github.com/pypa/trove-classifiers/archive/refs/tags/2024.3.3.tar.gz#/trove-classifiers-%{version}.tar.gz
 
 
 # Drop dependency on calver and use PEP 621 declarative metadata.
