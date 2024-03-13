@@ -17,7 +17,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
+func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot, imageConnection *ImageConnection) error {
 	var err error
 
 	if verity == nil {
@@ -28,6 +28,11 @@ func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safec
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
 	err = buildDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = updateFstab(buildDir, imageChroot, imageConnection)
 	if err != nil {
 		return err
 	}
@@ -86,6 +91,47 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	})
 	if err != nil {
 		return fmt.Errorf("failed to build initrd img for kernel - (%s):\n%w", kernelVersion, err)
+	}
+
+	return nil
+}
+
+func updateFstab(buildDir string, imageChroot *safechroot.Chroot, imageConnection *ImageConnection) error {
+	var err error
+
+	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	if err != nil {
+		return err
+	}
+
+	rootfsPartition, err := findRootfsPartition(buildDir, diskPartitions)
+	if err != nil {
+		return err
+	}
+
+	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
+	lines, err := file.ReadLines(fstabFile)
+	if err != nil {
+		return fmt.Errorf("failed to read fstab file: %v", err)
+	}
+
+	var updatedLines []string
+	fstabLineRegex := regexp.MustCompile(`^PARTUUID=` + rootfsPartition.PartUuid + ` .*`)
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if fstabLineRegex.MatchString(trimmedLine) {
+			// Replace existing root partition line with the Verity target.
+			updatedLine := fmt.Sprintf("/dev/mapper/root / ext4 ro,defaults 0 1")
+			updatedLines = append(updatedLines, updatedLine)
+		} else {
+			// Add other lines unchanged
+			updatedLines = append(updatedLines, line)
+		}
+	}
+
+	err = file.WriteLines(updatedLines, fstabFile)
+	if err != nil {
+		return fmt.Errorf("failed to write updated fstabFile: %v", err)
 	}
 
 	return nil
