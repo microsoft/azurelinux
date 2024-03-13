@@ -54,7 +54,7 @@ rm jsonschema/tests/test_jsonschema_test_suite.py
 
 %install
 %pyproject_install
-%pyproject_save_files 
+%pyproject_save_files python3-jsonschema
 
 %if %{with_check}
 %check
