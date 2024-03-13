@@ -23,7 +23,7 @@
 %global big_endian 1
 %endif
 
-Name:           mozjs%{major}
+Name:           mozjs
 Version:        102.15.1
 Release:        1%{?dist}
 Summary:        SpiderMonkey JavaScript library
@@ -269,8 +269,9 @@ ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 
 %changelog
 * Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 102.15.1-1
-- Initial import of mozjs 102.15.1 for Azure Linux
+- Initial Azure Linux import from Fedora 39 (license: MIT).
 - License verified
+- Replaced Photon spec for v78 with Fedora spec for new version.
 
 * Mon Mar 13 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 102.9.0-1
 - mozjs102-102.9.0 (fixes RHBZ#2177727)

@@ -24564,7 +24564,7 @@
         "other": {
           "name": "python-trove-classifiers",
           "version": "2024.3.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove-classifiers-2024.3.3.tar.gz"
+          "downloadUrl": "https://github.com/pypa/trove-classifiers/archive/refs/tags/2024.3.3.tar.gz"
         }
       }
     },

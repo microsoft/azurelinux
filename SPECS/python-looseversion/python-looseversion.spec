@@ -66,5 +66,5 @@ pip3 install iniconfig
 
 %changelog
 * Mon Mar 11 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.3.0-1
-- Initial import from Fedora 39 for Azure Linux
+- Initial Azure Linux import from Fedora 39 (license: MIT)
 - License verified
