@@ -4,7 +4,7 @@
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
 Version:        0.189
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -220,7 +220,11 @@ fi
 %{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
 %{_libdir}/libasm.so.*
+%{_libdir}/libdebuginfod-%{version}.so
+%{_libdir}/libdebuginfod.so.*
 %{_libdir}/libdw.so.*
+/etc/profile.d/debuginfod.csh
+/etc/profile.d/debuginfod.sh
 %{_mandir}/man1/*
 %exclude %{_mandir}/man7/*
 
@@ -230,8 +234,6 @@ fi
 %files devel
 %defattr(-,root,root)
 %{_includedir}/dwarf.h
-/etc/profile.d/debuginfod.csh
-/etc/profile.d/debuginfod.sh
 %dir %{_includedir}/elfutils
 %{_includedir}/elfutils/elf-knowledge.h
 %{_includedir}/elfutils/libdw.h
@@ -240,7 +242,7 @@ fi
 %{_includedir}/elfutils/libdwelf.h
 %{_includedir}/elfutils/debuginfod.h
 %{_libdir}/libdw.so
-%{_libdir}/libdebuginfod*
+%{_libdir}/libdebuginfod.so
 %{_libdir}/pkgconfig/*.pc
 %{_mandir}/man3/*
 
@@ -268,6 +270,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Tue Mar 12 2024 Andrew Phelps <anphel@microsoft.com> - 0.189-2
+- Re-organize debuginfod files to cut dependency on devel packages
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.189-1
 - Auto-upgrade to 0.189 - Azure Linux 3.0 - package upgrades
 
