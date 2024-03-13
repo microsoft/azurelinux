@@ -1,5 +1,3 @@
-# Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -7,7 +5,7 @@ Distribution:   Azure Linux
 
 Name:           python-pathspec
 Version:        0.12.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Utility library for gitignore style pattern matching of file paths
 
 License:        MPL-2.0
@@ -21,7 +19,9 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 BuildRequires:  python3-devel
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
+%endif
 BuildRequires:  python3-flit-core
 
 
@@ -58,9 +58,8 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 
 %check
-%if 0%{?with_check}
+pip3 install iniconfig
 %pytest
-%endif
 
 
 %files -n python3-pathspec -f %{pyproject_files}
@@ -69,6 +68,9 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 
 %changelog
+* Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.12.1-4
+- Re-enable tests
+
 * Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.12.1-3
 - Updating naming for 3.0 version of Azure Linux.
 

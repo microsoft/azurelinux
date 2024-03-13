@@ -1,4 +1,3 @@
-%global azl 3
 %global major 102
 
 # LTO - Enable in Release builds, but consider disabling for development as it increases compile time
@@ -269,8 +268,9 @@ ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 %{_includedir}/mozjs-%{major}/
 
 %changelog
-* Thu Feb 29 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 102.15.1-1
+* Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 102.15.1-1
 - Initial import of mozjs 102.15.1 for Azure Linux
+- License verified
 
 * Mon Mar 13 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 102.9.0-1
 - mozjs102-102.9.0 (fixes RHBZ#2177727)

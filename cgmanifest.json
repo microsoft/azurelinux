@@ -13282,8 +13282,8 @@
         "type": "other",
         "other": {
           "name": "mozjs",
-          "version": "78.10.0",
-          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/78.10.0esr/source/firefox-78.10.0esr.source.tar.xz"
+          "version": "102.15.1",
+          "downloadUrl": "https://ftp.mozilla.org/pub/firefox/releases/102.15.1esr/source/firefox-102.15.1esr.source.tar.xz"
         }
       }
     },
@@ -22932,6 +22932,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-looseversion",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/effigies/looseversion/archive/refs/tags/1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-lxml",
           "version": "4.9.3",
           "downloadUrl": "https://github.com/lxml/lxml/releases/download/lxml-4.9.3/lxml-4.9.3.tar.gz"
@@ -24563,8 +24573,8 @@
         "type": "other",
         "other": {
           "name": "python-trove-classifiers",
-          "version": "2024.2.23",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove-classifiers-2024.2.23.tar.gz"
+          "version": "2024.3.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/trove-classifiers/trove-classifiers-2024.3.3.tar.gz"
         }
       }
     },
