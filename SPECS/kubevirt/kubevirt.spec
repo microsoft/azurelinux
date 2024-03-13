@@ -211,7 +211,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Fri Mar 1 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1.2.0-1
+* Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
 - Bump package version to 1.2.0 from 0.59.0
 
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 0.59.0-13
