@@ -21,7 +21,7 @@
 Summary:        A command line tool used for creating OCI Images
 Name:           buildah
 Version:        1.18.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,7 +32,7 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  git
 BuildRequires:  glib2-devel
-BuildRequires:  glibc-static >= 2.38-2%{?dist}
+BuildRequires:  glibc-static >= 2.38-3%{?dist}
 BuildRequires:  go-md2man
 BuildRequires:  go-rpm-macros
 BuildRequires:  golang
@@ -123,6 +123,9 @@ cp imgtype %{buildroot}/%{_bindir}/%{name}-imgtype
 %{_datadir}/%{name}/test
 
 %changelog
+* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.18.0-24
+- update to build dep latest glibc-static version
+
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.18.0-23
 - updated glibc-static buildrequires release
 

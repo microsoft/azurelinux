@@ -2204,6 +2204,7 @@
                 "gtk-update-icon-cache",
                 "helm",
                 "hvloader",
+                "ig",
                 "intel-pf-bb-config",
                 "ivykis",
                 "jsonbuilder",
@@ -2412,7 +2413,6 @@
             "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "libnvidia-container",
-                "mlnx-ofa_kernel",
                 "mlnx-tools",
                 "mlx-bootctl",
                 "nvidia-container-runtime",
