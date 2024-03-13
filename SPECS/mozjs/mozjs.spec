@@ -3,9 +3,6 @@
 # LTO - Enable in Release builds, but consider disabling for development as it increases compile time
 %global build_with_lto    1
 
-# Require tests to pass?
-%global require_tests     1
-
 %if 0%{?build_with_lto}
 # LTO is the default
 %else
@@ -235,26 +232,21 @@ ln -s libmozjs-%{major}.so.0.0.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so.0
 ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 
 %check
+tests_ok=true
+
 # Run SpiderMonkey tests
-%if 0%{?require_tests}
-%{python3} tests/jstests.py -d -s -t 2400 --exclude-file=known_failures.txt --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major}
-%else
-%{python3} tests/jstests.py -d -s -t 2400 --exclude-file=known_failures.txt --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major} || :
-%endif
+%{python3} tests/jstests.py -d -s -t 2400 --exclude-file=known_failures.txt --no-progress --wpt=disabled ../../js/src/dist/bin/js%{major} || tests_ok=false
 
 # Run basic JIT tests
-%if 0%{?require_tests}
 
 # large-arraybuffers/basic.js fails on s390x
 %ifarch s390 s390x
-%{python3} jit-test/jit_test.py -s -t 2400 --no-progress -x large-arraybuffers/basic.js ../../js/src/dist/bin/js%{major} basic
+%{python3} jit-test/jit_test.py -s -t 2400 --no-progress -x large-arraybuffers/basic.js ../../js/src/dist/bin/js%{major} basic || tests_ok=false
 %else
-%{python3} jit-test/jit_test.py -s -t 2400 --no-progress ../../js/src/dist/bin/js%{major} basic
+%{python3} jit-test/jit_test.py -s -t 2400 --no-progress ../../js/src/dist/bin/js%{major} basic || tests_ok=false
 %endif
 
-%else
-%{python3} jit-test/jit_test.py -s -t 2400 --no-progress ../../js/src/dist/bin/js%{major} basic || :
-%endif
+tests_ok
 
 %files
 %doc README.html
@@ -272,6 +264,7 @@ ln -s libmozjs-%{major}.so.0 %{buildroot}%{_libdir}/libmozjs-%{major}.so
 - Initial Azure Linux import from Fedora 39 (license: MIT).
 - License verified
 - Replaced Photon spec for v78 with Fedora spec for new version.
+- Removed conditional option %%{require_tests}. This variable controlled whether the %%check section failed on failing tests or ignored failures. We always want to know if tests fail.
 
 * Mon Mar 13 2023 Frantisek Zatloukal <fzatlouk@redhat.com> - 102.9.0-1
 - mozjs102-102.9.0 (fixes RHBZ#2177727)

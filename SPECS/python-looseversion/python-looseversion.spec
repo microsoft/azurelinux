@@ -30,7 +30,9 @@ BuildArch:      noarch
 %package -n python3-looseversion
 Summary:        %{summary}
 BuildRequires:  python3-devel
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
+%endif
 
 BuildRequires:  python-rpm-macros
 BuildRequires:  python3-hatchling
