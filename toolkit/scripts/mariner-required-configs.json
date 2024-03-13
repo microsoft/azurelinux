@@ -1373,6 +1373,19 @@
                 "PR": [
                     "https://github.com/microsoft/CBL-Mariner/pull/7897"
                 ]
+            },
+            "CONFIG_NFT_OBJREF": {
+                "value": [
+                    "m"
+                ],
+                "arch": [
+                    "AMD64",
+                    "ARM64"
+                ],
+                "comment": "Needed for nftables",
+                "PR": [
+                    "https://github.com/microsoft/CBL-Mariner/pull/8362"
+                ]
             }
         }
     }
