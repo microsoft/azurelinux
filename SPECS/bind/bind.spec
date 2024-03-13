@@ -316,14 +316,6 @@ popd
 # Remove unwanted files
 rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
-# Python3 bind
-mkdir -p %{buildroot}%{python3_sitelib}
-find / -name "*.egg-info" -exec bash -c 'ln -s {} %{buildroot}%{python3_sitelib}' \;
-
-# Adding OpenSSL libraries
-find / -name "libcrypto.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
-find / -name "libssl.so*" -exec bash -c 'ln -s {} %{buildroot}%{_libdir}' \;
-
 %post -p /sbin/ldconfig
 %postun
 /sbin/ldconfig
@@ -363,10 +355,11 @@ fi;
 %dir %{_libdir}/bind
 %{_libdir}/bind/filter-a.so
 %{_libdir}/bind/filter-aaaa.so
+%{_libdir}/libdns*.so
+%{_libdir}/libisc*.so
+%{_libdir}/libns*.so
 %dir %{_libdir}/named
 %{_libdir}/named/*.so
-%{_libdir}/libcrypto*
-%{_libdir}/libssl*
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/sysconfig/named
 %config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.root.key
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
@@ -434,19 +427,15 @@ fi;
 
 %files libs
 %{_libdir}/*-%{version}*.so
-%{_libdir}/libcrypto*
-%{_libdir}/libssl*
 
 %files license
 %license LICENSE
 %license COPYRIGHT
 
 %files devel
-%{_libdir}/libisccc.so
-%{_libdir}/libns.so
-%{_libdir}/libdns.so
-%{_libdir}/libisc.so
-%{_libdir}/libisccfg.so
+%{_libdir}/libisc*.so
+%{_libdir}/libns*.so
+%{_libdir}/libdns*.so
 %dir %{_includedir}/bind9
 %{_includedir}/bind9/config.h
 %{_includedir}/bind9/isccc
@@ -459,15 +448,12 @@ fi;
 
 %files dnssec-utils
 %{_bindir}/dnssec*
-%{_libdir}/libcrypto*
-%{_libdir}/libssl*
 
 %files dnssec-doc
 %{_mandir}/man1/dnssec*.1*
 
 %files -n python3-bind
-%{python3_sitelib}/*.egg-info
-# %{python3_sitelib}/isc/
+%exclude %{python3_sitelib}/python3-ply-*.noarch
 
 %files chroot
 %config(noreplace) %{_sysconfdir}/named-chroot.files
@@ -505,8 +491,6 @@ fi;
 
 %files utils
 %defattr(-,root,root)
-%{_libdir}/libcrypto*
-%{_libdir}/libssl*
 %{_sbindir}/ddns-confgen
 %{_sbindir}/tsig-keygen
 %{_bindir}/nsec3hash
