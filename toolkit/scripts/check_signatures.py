@@ -25,12 +25,11 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
     path_to_check = os.path.join(path, filename)
     if Path(path_to_check).is_file():
         actual_signature = getSignature(path_to_check)
-        if actual_signature != expected_signature:
-            print(f"ERROR: detected a mismatched signature for {filename}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
-            return False
-        else:
+        if actual_signature == expected_signature:
             return True
-    
+        print(f"ERROR: detected a mismatched signature for {filename}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
+        return False
+
     for content in os.listdir(path):
         path_to_check = os.path.join(path, content)
         if os.path.isdir(path_to_check):
@@ -38,19 +37,16 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
             if result is True:
                 return True
 
+    return None
+
 def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
-    print(f"what folder to use for {path}")
     current = Path(path)
     if Path(os.path.join(path, f"{current.name}.spec")).is_file():
         if Path(os.path.join(path, f"{current.name}.signatures.json")).is_file():
-            print(f"use {path}")
             return path
-
     parent = current.parent
     if parent != current:
         return find_spec_folder_with_signatures_json(f"{parent}")
-
-    print(f"do not use {path}")
     return None
 
 def check_folder(folder):
