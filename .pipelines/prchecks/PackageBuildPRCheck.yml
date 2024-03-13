@@ -38,8 +38,6 @@ variables:
     value: Toolchain
   - name: system.debug
     value: 'true'
-  - name: LinuxContainerImage
-    value: 'mcr.microsoft.com/onebranch/cbl-mariner/build:2.0'
 
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
