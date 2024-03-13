@@ -34,8 +34,8 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
         path_to_check = os.path.join(path, content)
         if os.path.isdir(path_to_check):
             result = find_file_and_check(path_to_check, filename, expected_signature)
-            if result is True:
-                return True
+            if result is not None:
+                return result
 
     return None
 
