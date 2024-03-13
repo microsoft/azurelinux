@@ -17,6 +17,9 @@ Version:        1.3.0
 Release:        1%{?dist}
 Summary:        Version numbering for anarchists and software realists
 
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+
 License:        PSF-2.0
 URL:            https://pypi.org/pypi/looseversion
 Source0:        https://github.com/effigies/looseversion/archive/refs/tags/%{version}.tar.gz#/python-looseversion-%{version}.tar.gz
@@ -30,34 +33,38 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
 
 BuildRequires:  python-rpm-macros
-
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pathspec
 BuildRequires:  python3-pip
 BuildRequires:  python3-trove-classifiers
-# lyrydber - tomli should not be required because python 3.12 includes libtoml,
-# but including it does make the weird failed build dependency go away
-#BuildRequires:  python3-tomli
-
-
 
 %description -n python3-looseversion %_description
+
 %prep
 %autosetup -n looseversion-%{version}
 
 %generate_buildrequires
 %pyproject_buildrequires
+
 %build
 %pyproject_wheel
+
 %install
 %pyproject_install
 %pyproject_save_files looseversion
+# Removing unpackaged license file - we add it through the %%license macro.
+find %{buildroot}%{python3_sitelib} -name LICENSE -delete
 
 %check
+pip3 install iniconfig
 %pytest -v tests.py
 
 %files -n python3-looseversion -f %{pyproject_files}
+%license LICENSE
 %doc README.md CHANGES.md
 
 %changelog
+* Mon Mar 11 2024 corvus-callidus <> - 1.3.0-1
+- Initial import from Fedora 39 for Azure Linux
+- License verified
