@@ -321,6 +321,17 @@ popd
 # Remove unwanted files
 rm -f %{buildroot}%{_prefix}%{_sysconfdir}/bind.keys
 
+%pre
+if [ $1 -eq 1 ]; then
+  if ! getent group named >/dev/null; then
+      groupadd -r named
+  fi
+  if ! getent passwd named >/dev/null; then
+      useradd -g named -d %{_sharedstatedir}/bind\
+          -s /bin/false -M -r named
+  fi
+fi
+
 %post -p /sbin/ldconfig
 %postun
 /sbin/ldconfig
