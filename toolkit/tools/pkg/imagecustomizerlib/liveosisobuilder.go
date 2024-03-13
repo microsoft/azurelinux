@@ -21,7 +21,6 @@ import (
 )
 
 const (
-	isoMediaLabel         = "CDROM"
 	searchCommandTemplate = "search --label %s --set root"
 	rootValueTemplate     = "live:LABEL=%s"
 	// The names initrd.img and vmlinuz are expected by isomaker.
@@ -208,8 +207,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return err
 	}
 
-	searchCommand := fmt.Sprintf(searchCommandTemplate, isoMediaLabel)
-	rootValue := fmt.Sprintf(rootValueTemplate, isoMediaLabel)
+	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
+	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
 
 	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
 	if err != nil {

@@ -25,6 +25,8 @@ import (
 )
 
 const (
+	DefaultVolumeId = "CDROM"
+
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
 	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
@@ -182,7 +184,7 @@ func (im *IsoMaker) buildIsoImage() error {
 
 	mkisofsArgs = append(mkisofsArgs,
 		// General mkisofs parameters.
-		"-R", "-l", "-D", "-o", isoImageFilePath)
+		"-R", "-l", "-D", "-o", isoImageFilePath, "-V", DefaultVolumeId)
 
 	if im.enableBiosBoot {
 		mkisofsArgs = append(mkisofsArgs,
