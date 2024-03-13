@@ -45,9 +45,9 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/cloud-init-packages.json",
                 "packagelists/baremetal-packages.json",
                 "packagelists/base-image-packages.json",
+                "packagelists/cloud-init-packages.json",
                 "packagelists/selinux.json"
             ],
             "KernelCommandLine": {
