@@ -50,6 +50,9 @@ ignore_no_source_tarball=" \
   python-rpm-generators \
   qt-rpm-macros \
   sgx-backwards-compatibility \
+  shim \
+  shim-aa64 \
+  shim-x64 \
   verity-read-only-root \
   web-assets \
   "
