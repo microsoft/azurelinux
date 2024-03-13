@@ -24,8 +24,12 @@
   "edk2-build.fedora.platforms": "dd50f91d43adceedbab91358b67973983762f2410af33fedb3a03ccaf03197d8",
   "edk2-build.py": "e16f06792e664918d4664081ae2c718e502530f3dae852ccb5339b5beeabd74b",
   "edk2-edc6681206c1.tar.xz": "d03bb91ce61c9993dd0612299278fff3ae747ff28cb3587c8834ba2a2df5745e",
-  "edk2-platforms-b5fa396700e7.tar.xz": "102ea5103c3522c5666209e4b933686678d4c4e3298f83e1b7dba418e69712e3",
-  "edk2-jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
-  "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8"
+  "edk2-platforms-b5fa396700e7.tar.xz": "97de63a4722b429ce0bb4abd9d32439f2debf1e45e3bcbc15a3e2a2aabf6e3c5",
+  "jansson-2.13.1.tar.bz2": "ee90a0f879d2b7b7159124ff22b937a2a9a8c36d3bb65d1da7dd3f04370a10bd",
+  "openssl-rhel-db0287935122edceb91dcda8dfb53b4090734e22.tar.xz": "9fcc5b49513d6ae21c7ddc3d1bbb1f8973cfbe76f2392d10106a8cd435e3eb47",
+  "softfloat-20180726-gitb64af41.tar.xz": "c7f2172357ca3022621b9464fd92bf2b462256bda3e019bf9a669fa6b5aeea91",
+  "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8",
+  "edk2-build.rhel-9": "53d3385d32ebc11e859f68d113d0e15a05445a34b7b86ddd8a89bb6bc5f3bddf",
+  "README.experimental": "71ce0b179d0e1325723cc444e45f7eeb67cce4cc1b336f3c5f586de16a6a78fd"
  }
 }

@@ -135,6 +135,7 @@ Patch1000: CVE-2023-0464.patch
 Patch1001: CVE-2023-3817.patch
 Patch1002: CVE-2023-0465.patch
 Patch1003: CVE-2023-2650.patch
+Patch1004: improve-safety-of-DH.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -330,6 +331,17 @@ git config am.keepcr true
 
 cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
+# Need to patch CVE-2023-0464 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
+# Need to patch CVE-2023-3817 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
+# Need to patch CVE-2023-0465 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1002}
+# Need to patch CVE-2023-2650 in the bundled openssl
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1003}
+# Apply patch "improve-safety-of-DH.patch"
+(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1004}
+
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
 tar -xf %{SOURCE4} --strip-components=1 "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
@@ -800,6 +812,9 @@ done
 %changelog
 * Fri Mar 8 2024 Elaine Zhao <elainezhao@microsoft.com> - 20240223gitedc6681206c1-1
 - Bump version to edk2-stable202402
+
+* Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 20230301gitf80f052277c8-38
+- Apply patch to vendored source
 
 * Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
 - Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
