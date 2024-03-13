@@ -31,6 +31,9 @@ BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-vcversioner
 BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-twisted
+%endif
 Requires:       python3
 
 %description -n python3-jsonschema
