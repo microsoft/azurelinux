@@ -63,7 +63,8 @@ func New(calamaresInstallFunc func()) *InstallerView {
 	if err != nil {
 		logger.Log.Debugf("Calamares not found, defaulting to terminal based installer")
 	} else {
-		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
+		logger.Log.Debugf("Calamares found, but the gui installer is temporarily disabled until stabilized")
+		// iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
 	}
 
 	iv.needsToPrompt = (len(iv.installerOptions) != 1)

@@ -110,8 +110,6 @@ func (s *SystemConfig) IsValid() error {
 	if s.Overlays != nil {
 		upperDirs := make(map[string]bool)
 		workDirs := make(map[string]bool)
-		// Initialize a counter for overlays with a specified persistent partition
-		persistentPartitionCount := 0
 
 		for i, overlay := range *s.Overlays {
 			// Validate the overlay itself
@@ -131,26 +129,6 @@ func (s *SystemConfig) IsValid() error {
 				return fmt.Errorf("duplicate WorkDir '%s' found in Overlay (LowerDir: '%s') at index %d", overlay.WorkDir, overlay.LowerDir, i)
 			}
 			workDirs[overlay.WorkDir] = true
-
-			// Check if the overlay has a specified persistent partition
-			if overlay.Partition != nil {
-				persistentPartitionCount++
-			}
-		}
-		// Enforce that only one or zero persistent partitions to support
-		// Overlays. Currently, the Overlayfs Dracut module from Azure Linux RPM
-		// supports at most one persistent partition across all configured
-		// overlays. While multiple overlays can be defined, only one of these
-		// can be configured with a persistent storage option to ensure
-		// compatibility with the underlying system architecture and to prevent
-		// conflicts during the mount process. It's important to note that this
-		// is a temporary limitation. Future optimizations are planned to
-		// enhance the Overlayfs Dracut module's capabilities, allowing each
-		// overlay to optionally have its own persistent partition. The
-		// development team is actively working on these improvements to support
-		// a more versatile and robust overlay filesystem configuration.
-		if persistentPartitionCount > 1 {
-			return fmt.Errorf("more than one overlay has a specified persistent partition, which is not supported")
 		}
 	}
 
