@@ -3,7 +3,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-# Disable errexit as this ia cleanup script & failure can be ignored.
+# Failure can be ignored.
 set +e
 set -x
 
@@ -29,8 +29,7 @@ tdnf clean all
 # remove all python py cache files
 find /usr/lib/python* -type d -name '__pycache__' -exec rm -rf {} +
 
-# /usr/share/doc containers documentation for installed packages and is not
-# needed in the image
+# remove installed packages documentation
 rm -rf /usr/share/doc/*
 rm -rf /usr/share/man/*
 
