@@ -174,7 +174,7 @@ chmod +x configure
   --enable-tests \
 %else
   --disable-tests \
-}
+%endif
   --disable-strip \
   --with-intl-api \
   --enable-readline \
