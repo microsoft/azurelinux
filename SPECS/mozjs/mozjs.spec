@@ -1,3 +1,4 @@
+%global azl 3
 %global major 102
 
 # LTO - Enable in Release builds, but consider disabling for development as it increases compile time
@@ -71,7 +72,9 @@ Patch21:        0001-Skip-failing-tests-on-ppc64-and-s390x.patch
 # AzLinux CVE patches
 Patch30:       CVE-2022-48285.patch
 
-# BuildRequires:  cargo  # AzL provides this in the rust package
+%if !0%{?azl}
+BuildRequires:  cargo
+%endif
 %if !0%{?rhel}
 BuildRequires:  ccache
 %endif
@@ -86,13 +89,17 @@ BuildRequires:  nasm
 BuildRequires:  libicu-devel
 BuildRequires:  llvm
 BuildRequires:  rust
-# BuildRequires:  rustfmt  # AzL provides this in the rust package
+%if !0%{?azl}
+BuildRequires:  rustfmt
+%endif
 BuildRequires:  perl-devel
 BuildRequires:  pkgconfig(libffi)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-# BuildRequires:  python3-looseversion  # AzL does not provide looseversion
+%if !0%{?azl}
+BuildRequires:  python3-looseversion
+%endif
 BuildRequires:  python3-six
 BuildRequires:  readline-devel
 BuildRequires:  wget
@@ -123,10 +130,12 @@ rm third_party/python/six/six.py
 # Link the system six library (build tooling expects that)
 ln -s /usr/lib/python%{python3_version}/site-packages/six.py third_party/python/six/six.py
 
-# # Set up looseversion
-# mkdir third_party/python/looseversion
-# ln -s /usr/lib/python%{python3_version}/site-packages/looseversion/__init__.py third_party/python/looseversion/looseversion.py
-# echo "vendored:third_party/python/looseversion" >>  python/sites/mach.txt
+%if !0%{?azl}
+# Set up looseversion
+mkdir third_party/python/looseversion
+ln -s /usr/lib/python%{python3_version}/site-packages/looseversion/__init__.py third_party/python/looseversion/looseversion.py
+echo "vendored:third_party/python/looseversion" >>  python/sites/mach.txt
+%endif
 
 # Copy out the LICENSE file
 cp LICENSE js/src/
