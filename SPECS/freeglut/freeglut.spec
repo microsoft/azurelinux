@@ -14,12 +14,16 @@ Patch0:         common.patch
 Patch1:         155.patch
 License:        MIT
 
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  cmake
-BuildRequires:  pkgconfig libGLU-devel libXext-devel
-BuildRequires:  libXi-devel libICE-devel
+BuildRequires: gcc
+BuildRequires: gcc-c++
+BuildRequires: cmake
+BuildRequires: pkgconfig
+BuildRequires: libGLU-devel
+BuildRequires: libXext-devel
+BuildRequires: libXi-devel
+BuildRequires: libICE-devel
 BuildRequires: make
+
 # The virtual Provides below is present so that this freeglut package is a
 # drop in binary replacement for "glut" which will satisfy rpm dependancies
 # properly.  The Obsoletes tag is required in order for any pre-existing
