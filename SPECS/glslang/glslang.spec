@@ -37,7 +37,7 @@ interpretation of the specifications for these languages.
 find . -name '*.h' -or -name '*.cpp' -or -name '*.hpp'| xargs chmod a-x
 
 %build
-%cmake3 -DBUILD_SHARED_LIBS=OFF
+%cmake3 -DBUILD_SHARED_LIBS=ON
 %cmake_build
 
 %install
@@ -58,17 +58,21 @@ popd
 %{_bindir}/glslang
 %{_bindir}/glslangValidator
 %{_bindir}/spirv-remap
+%{_libdir}/libglslang-default-resource-limits.so
+%{_libdir}/libglslang-default-resource-limits.so.14
+%{_libdir}/libglslang-default-resource-limits.so.14.0.0
+%{_libdir}/libglslang.so
+%{_libdir}/libglslang.so.14
+%{_libdir}/libglslang.so.14.0.0
+%{_libdir}/libSPIRV.so
+%{_libdir}/libSPIRV.so.14
+%{_libdir}/libSPIRV.so.14.0.0
+%{_libdir}/libSPVRemapper.so
+%{_libdir}/libSPVRemapper.so.14
+%{_libdir}/libSPVRemapper.so.14.0.0
 
 %files devel
 %{_includedir}/glslang/
-%{_libdir}/libOSDependent.a
-%{_libdir}/libSPIRV.a
-%{_libdir}/libSPVRemapper.a
-%{_libdir}/libglslang.a
-%{_libdir}/libGenericCodeGen.a
-%{_libdir}/libMachineIndependent.a
-%{_libdir}/libglslang-default-resource-limits.a
-%{_libdir}/pkgconfig/glslang.pc
 %{_libdir}/pkgconfig/spirv.pc
 %{_libdir}/cmake/*
 
