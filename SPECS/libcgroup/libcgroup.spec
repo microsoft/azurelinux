@@ -27,7 +27,7 @@ Patch4: libcgroup-0.40.rc1-templates-fix.patch
 Patch5: no-googletests.patch
 # Note: Commenting out the API fuzz cgroup_set_permissions which causes failure
 # but requires further investigation 
-Patch6: remove-API_FUZZ_test.patch
+#Patch6: remove-API_FUZZ_test.patch
 
 %{?systemd_requires}
 
