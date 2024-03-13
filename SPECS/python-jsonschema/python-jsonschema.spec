@@ -58,7 +58,7 @@ rm jsonschema/tests/test_jsonschema_test_suite.py
 
 %if %{with_check}
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} trial-3 jsonschema
+PYTHONPATH=%{buildroot}%{python3_sitelib} trial3 jsonschema
 %endif
 
 %files -n python3-jsonschema -f %{pyproject_files}
