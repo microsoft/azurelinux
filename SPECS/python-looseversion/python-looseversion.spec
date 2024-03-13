@@ -30,17 +30,12 @@ BuildArch:      noarch
 %package -n python3-looseversion
 Summary:        %{summary}
 BuildRequires:  python3-devel
-BuildRequires:  python-rpm-macros
-
-%if 0%{with_check}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-iniconfig
-%endif
 
+BuildRequires:  python-rpm-macros
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pathspec
-BuildRequires:  python3-pluggy
 BuildRequires:  python3-pip
 BuildRequires:  python3-trove-classifiers
 
@@ -62,7 +57,7 @@ BuildRequires:  python3-trove-classifiers
 find %{buildroot}%{python3_sitelib} -name LICENSE -delete
 
 %check
-#pip3 install iniconfig
+pip3 install iniconfig
 %pytest -v tests.py
 
 %files -n python3-looseversion -f %{pyproject_files}

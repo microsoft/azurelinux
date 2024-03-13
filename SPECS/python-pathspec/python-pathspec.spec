@@ -20,7 +20,6 @@ BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 BuildRequires:  python3-devel
 %if 0%{?with_check}
-BuildRequires:  python3-iniconfig
 BuildRequires:  python3-pytest
 %endif
 BuildRequires:  python3-flit-core
@@ -59,7 +58,7 @@ is derived from Rsync's wildmatch. Git uses wildmatch for its gitignore files.
 
 
 %check
-# pip3 install iniconfig
+pip3 install iniconfig
 %pytest
 
 

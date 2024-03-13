@@ -38,12 +38,6 @@ BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pytest
 %endif
 
-Requires:  python3
-Requires:  python3-packaging
-Requires:  python3-pathspec
-Requires:  python3-pluggy
-Requires:  python3-trove-classifiers
-
 %global common_description %{expand:
 This is the extensible, standards compliant build backend used by Hatch.}
 

@@ -34,7 +34,6 @@ BuildRequires:  python3-trove-classifiers
 %if %{with tests}
 BuildRequires:  python3dist(pytest)
 BuildRequires:  git-core
-BuildRequires:  python3-iniconfig
 BuildRequires:  python3-setuptools_scm
 %endif
 
@@ -70,7 +69,7 @@ Summary:        %{summary}
 
 %check
 %if %{with tests}
-#pip3 install iniconfig
+pip3 install iniconfig
 %pytest
 %else
 %pyproject_check_import
