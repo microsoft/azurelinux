@@ -38,8 +38,24 @@ def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
             if result is True:
                 return True
 
-def check_folder(path):
+def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
+    current = Path(path)
+    if Path(os.path.join(path, f"{current.name}.spec")).is_file():
+        if Path(os.path.join(path, f"{current.name}.signatures.json")).is_file():
+            return path
+
+    parent = current.parent
+    if parent != current:
+        return find_spec_folder_with_signatures_json(f"{parent}")
+
+    return None
+
+def check_folder(folder):
     signatures_correct = True
+
+    # find YY (maybe ancestor of path) that has xx/YY/YY.spec
+    path = find_spec_folder_with_signatures_json(folder)
+
     for signature_path in Path(path).glob("*.signatures.json"):
         with open(signature_path, "r") as f:
             signatures_json = json.load(f)
