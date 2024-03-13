@@ -22,7 +22,7 @@ BuildArch:      noarch
 BuildRequires:  python3-devel
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
-#BuildRequires:  python3-iniconfig
+BuildRequires:  python3-iniconfig
 %endif
 
 BuildRequires:  pyproject-rpm-macros
@@ -66,7 +66,7 @@ Summary:        %{summary}
 
 
 %check
-pip install iniconfig
+#pip install iniconfig
 %pytest
 
 
