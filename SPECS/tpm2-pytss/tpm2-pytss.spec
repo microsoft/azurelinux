@@ -17,6 +17,7 @@ BuildRequires: python3-pip
 BuildRequires: python3-pkgconfig
 BuildRequires: python3-pycparser
 BuildRequires: python3-setuptools
+BuildRequires: python3-wheel
 BuildRequires: tpm2-tss-devel
 
 # packaging, asn1crypto, cryptography, and setuptools_scm are required in
@@ -51,6 +52,7 @@ This package primarily exposes the TPM 2.0 Enhanced System API.
 %if 0%{?with_check}
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitelib}
+pip3 install iniconfig
 %pytest
 %endif
 

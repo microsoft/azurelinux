@@ -9,6 +9,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
+Source1:        cryptography-%{version}-vendor.tar.gz
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
@@ -40,13 +41,51 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 %prep
 %autosetup -p1 -n cryptography-%{version}
 
+# Do vendor expansion here manually by
+# calling `tar x` and setting up 
+# .cargo/config to use it.
+tar fx %{SOURCE1}
+mkdir -p .cargo
+
+cat >.cargo/config << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
 %build
+export RUSTFLAGS="%build_rustflags"
+export OPENSSL_NO_VENDOR=1
 %pyproject_wheel
+find .
 
 %install
 %pyproject_install
 
 %check
+pip3 install iniconfig
+echo "bfjelds: before tests/aaatest.py"
+mkdir -p ./tests
+cat << EOF > ./tests/aaatest.py
+#!/usr/bin/python3 -u
+# SPDX-License-Identifier: BSD-2
+import itertools
+import unittest
+
+from cryptography import *
+
+class TypesTest(unittest.TestCase):
+    def test(self):
+        print("hello")
+
+EOF
+ls -l ./tests
+ls -l ./tests/aaatest.py
+cat ./tests/aaatest.py
+echo "bfjelds: after tests/aaatest.py"
+
 openssl req \
     -new \
     -newkey rsa:4096 \
