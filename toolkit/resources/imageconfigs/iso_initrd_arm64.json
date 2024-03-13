@@ -24,7 +24,7 @@
                 "../../out/tools/imager": "/installer/imager",
                 "../../out/tools/liveinstaller": "/installer/liveinstaller",
                 "additionalfiles/iso_initrd/init": "/init",
-                "additionalfiles/iso_initrd/installer/calamares-EULA.txt": "/etc/calamares/mariner-eula",
+                "additionalfiles/iso_initrd/installer/calamares-EULA.txt": "/etc/calamares/azl-eula",
                 "additionalfiles/iso_initrd/installer/terminal-EULA.txt": "/installer/EULA.txt",
                 "additionalfiles/iso_initrd/root/asoundrc": "/root/.asoundrc",
                 "additionalfiles/iso_initrd/root/runliveinstaller": "/root/runliveinstaller",
