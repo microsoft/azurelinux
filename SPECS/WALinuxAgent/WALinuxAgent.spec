@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.3.1.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{versi
 Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
+Patch0:         add_firewall_rules.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -38,7 +39,7 @@ VMs in the Windows Azure cloud. This package should be installed on Linux disk
 images that are built to run in the Windows Azure environment.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -n %{name}-%{version} -p1
 
 %pre -p /bin/sh
 
@@ -90,6 +91,9 @@ python3 setup.py check && python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jan 30 2024 Nan Liu <liunan@microsoft.com> - 2.3.1.1-4
+- Patch waagent.conf to add firewall rules to protect access to Azure host node
+
 * Tue Nov 10 2022 Nan Liu <liunan@microsoft.com> - 2.3.1.1-3
 - Add ephemeral-disk-warning.service
 
