@@ -1,4 +1,3 @@
-%bcond_without python3
 %define underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        Boost
 Name:           boost
@@ -67,19 +66,6 @@ Run-time support of boost program options library, which allows program
 developers to obtain (name, value) pairs from the user, via
 conventional methods such as command-line and configuration file.
 
-%if %{with python3}
-%package python3
-Summary: Run-time component of boost python library for Python 3
-Requires: python(abi) = %{python3_version}
- 
-%description python3
-The Boost Python Library is a framework for interfacing Python and
-C++. It allows you to quickly and seamlessly expose C++ classes,
-functions and objects to Python, and vice versa, using no special
-tools -- just your C++ compiler.  This package contains run-time
-support for the Boost Python Library compiled for Python 3.
-%endif
- 
 %prep
 %autosetup -n %{name}_%{underscore_version}
 
@@ -115,12 +101,6 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_program_options.so.%{sonamever}
 	
-%if %{with python3}
-%files python3
-%license LICENSE_1_0.txt
-%{_libdir}/libboost_python%{python3_version_nodots}.so.%{sonamever}
-%endif
-
 %files random
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_random.so.%{sonamever}
@@ -131,7 +111,7 @@ rm -rf %{buildroot}%{_libdir}/cmake
 
 %changelog
 * Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
-- Add filesystem, random, system, program-options, python3 packages 
+- Add filesystem, random, system, program-options packages 
 
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.83.0-1
 - Upgrade to version 1.83.0-1
