@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:          helm
-Version:       3.14.0
-Release:       2%{?dist}
+Version:       3.14.2
+Release:       1%{?dist}
 Summary:       The Kubernetes Package Manager
 Group:         Applications/Networking
 License:       Apache 2.0
@@ -55,6 +55,9 @@ install -m 755 ./helm %{buildroot}%{_bindir}
 go test -v ./cmd/helm
 
 %changelog
+* Thu Mar 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.2-1
+- Auto-upgrade to 3.14.2 - CVE-2024-26147
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.14.0-2
 - Bump release to rebuild with go 1.21.6
 
