@@ -59,7 +59,7 @@ Patch15:        remove-sloppy-m4-detection-from-bundled-autoconf.patch
 # https://bugzilla.mozilla.org/show_bug.cgi?id=1474486
 Patch16:        firefox-112.0-commasplit.patch
 
-#Patch17:        Replace-distutils.LooseVersion-with-looseversion.LooseVersion.patch
+Patch17:        Replace-distutils.LooseVersion-with-looseversion.LooseVersion.patch
 # This is ugly, I know, I know...
 Patch18:        Hacky-workaround-for-expected-string-or-bytes-like-object.patch
 
@@ -97,9 +97,7 @@ BuildRequires:  pkgconfig(libffi)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if !0%{?azl}
 BuildRequires:  python3-looseversion
-%endif
 BuildRequires:  python3-six
 BuildRequires:  readline-devel
 BuildRequires:  wget
@@ -130,12 +128,10 @@ rm third_party/python/six/six.py
 # Link the system six library (build tooling expects that)
 ln -s /usr/lib/python%{python3_version}/site-packages/six.py third_party/python/six/six.py
 
-%if !0%{?azl}
 # Set up looseversion
 mkdir third_party/python/looseversion
 ln -s /usr/lib/python%{python3_version}/site-packages/looseversion/__init__.py third_party/python/looseversion/looseversion.py
 echo "vendored:third_party/python/looseversion" >>  python/sites/mach.txt
-%endif
 
 # Copy out the LICENSE file
 cp LICENSE js/src/
