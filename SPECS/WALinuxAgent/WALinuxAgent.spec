@@ -11,7 +11,6 @@ Source0:        https://github.com/Azure/WALinuxAgent/archive/refs/tags/v%{versi
 Source1:        ephemeral-disk-warning.service
 Source2:        ephemeral-disk-warning.conf
 Source3:        ephemeral-disk-warning
-Source4:        50-waagent.preset
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -63,7 +62,6 @@ sed -i 's,/usr/bin/waagent,/usr/sbin/waagent,' %{buildroot}/lib/systemd/system/w
 install -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/ephemeral-disk-warning.service
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
 install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
-install -Dm 644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/50-waagent.preset
 
 %check
 python3 setup.py check && python3 setup.py test
@@ -86,7 +84,6 @@ python3 setup.py check && python3 setup.py test
 %attr(0755,root,root) %{_sbindir}/waagent
 %attr(0755,root,root) %{_sbindir}/waagent2.0
 %attr(0755,root,root) %{_sbindir}/ephemeral-disk-warning
-%{_libdir}/systemd/system-preset/50-waagent.preset
 %config %{_sysconfdir}/waagent.conf
 %config %{_sysconfdir}/ephemeral-disk-warning.conf
 %{_sysconfdir}/logrotate.d/waagent.logrotate
@@ -97,7 +94,6 @@ python3 setup.py check && python3 setup.py test
 
 %changelog
 * Wed Mar 13 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.9.0.4-2
-- Package preset file to enable waagent unit
 - Sed service file to refer to actual waagent location, /usr/sbin/waagent
 
 * Tue Feb 27 2024 Henry Li <lihl@microsoft.com> - 2.9.0.4-1
