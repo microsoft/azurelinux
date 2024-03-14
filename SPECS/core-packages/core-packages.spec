@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
-Version:        3.0
-Release:        2%{?dist}
+Version:        %{azl}.0
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,9 +62,8 @@ Requires:       findutils
 Requires:       grep
 Requires:       gzip
 Requires:       azurelinux-release
-Requires:       azurelinux-repos
-Requires:       azurelinux-repos-ms-non-oss
-Requires:       azurelinux-repos-ms-oss
+Requires:       azurelinux-repos-ms-non-oss-preview
+Requires:       azurelinux-repos-preview
 Requires:       ncurses-libs
 Requires:       openssl
 Requires:       readline
@@ -89,6 +88,12 @@ Requires:       zlib
 %files container
 
 %changelog
+* Wed Mar 13 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-3
+- Preview-only changes in the 'container' subpackage.
+- Removed dependencies: 'azurelinux-repos-ms-oss'.
+- Switched 'azurelinux-repos' to 'azurelinux-repos-preview'.
+- Switched 'azurelinux-repos-ms-non-oss' to 'azurelinux-repos-ms-non-oss-preview'.
+
 * Thu Feb 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-2
 - Updating naming for 3.0 version of Azure Linux.
 

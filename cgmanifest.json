@@ -1077,8 +1077,8 @@
         "type": "other",
         "other": {
           "name": "bind",
-          "version": "9.16.44",
-          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.16.44/bind-9.16.44.tar.xz"
+          "version": "9.19.21",
+          "downloadUrl": "https://ftp.isc.org/isc/bind9/9.19.21/bind-9.19.21.tar.xz"
         }
       }
     },
@@ -7150,6 +7150,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ig",
+          "version": "0.25.0",
+          "downloadUrl": "https://github.com/inspektor-gadget/inspektor-gadget/archive/refs/tags/v0.25.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "iio-sensor-proxy",
           "version": "3.0",
           "downloadUrl": "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/de965bcb444552d328255639b241ce73/iio-sensor-proxy-3.0.tar.xz"
@@ -13034,16 +13044,6 @@
           "name": "mksh",
           "version": "59c",
           "downloadUrl": "http://www.mirbsd.org/MirOS/dist/mir/mksh/mksh-R59c.tgz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "mlnx-ofa_kernel",
-          "version": "23.04",
-          "downloadUrl": "https://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-23.04-0.5.3.tgz"
         }
       }
     },
@@ -22492,9 +22492,19 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-hatchling",
-          "version": "1.21.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.21.1.tar.gz"
+            "name": "python-hatch-fancy-pypi-readme",
+            "version": "24.1.0",
+            "downloadUrl": "https://files.pythonhosted.org/packages/b4/c2/c9094283a07dd96c5a8f7a5f1910259d40d2e29223b95dd875a6ca13b58f/hatch_fancy_pypi_readme-24.1.0.tar.gz"
+        }
+        }
+      },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-hatch-vcs",
+          "version": "0.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatch_vcs/hatch_vcs-0.4.0.tar.gz"
         }
       }
     },
@@ -22743,8 +22753,8 @@
         "type": "other",
         "other": {
           "name": "python-jsonschema",
-          "version": "2.6.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-2.6.0.tar.gz"
+          "version": "4.21.1",
+          "downloadUrl": "https://pypi.python.org/packages/source/j/jsonschema/jsonschema-4.21.1.tar.gz"
         }
       }
     },
@@ -26093,16 +26103,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-fluent-plugin-td",
-          "version": "1.1.0",
-          "downloadUrl": "https://github.com/treasure-data/fluent-plugin-td/archive/refs/tags/v1.1.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rubygem-fluent-plugin-webhdfs",
           "version": "1.5.0",
           "downloadUrl": "https://github.com/fluent/fluent-plugin-webhdfs/archive/refs/tags/v1.5.0.tar.gz"
@@ -26696,36 +26696,6 @@
           "name": "rubygem-systemd-journal",
           "version": "1.4.2",
           "downloadUrl": "https://github.com/ledbettj/systemd-journal/archive/refs/tags/v1.4.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td",
-          "version": "0.17.1",
-          "downloadUrl": "https://github.com/treasure-data/td/archive/refs/tags/v0.17.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-client",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/treasure-data/td-client-ruby/archive/refs/tags/v2.0.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rubygem-td-logger",
-          "version": "0.3.27",
-          "downloadUrl": "https://github.com/treasure-data/td-logger-ruby/archive/refs/tags/v0.3.27.tar.gz"
         }
       }
     },

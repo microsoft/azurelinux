@@ -4,6 +4,8 @@
 
 set -e
 
+STD_OUT_REDIRECT=/dev/stdout
+
 switch_to_red_text() {
     printf "\e[31m"
 }
@@ -23,7 +25,7 @@ print_error() {
 help() {
 echo "
 Usage:
-sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y]
+sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y] [QUIET=y]
 
 Starts a docker container with the specified version of mariner.
 
@@ -40,6 +42,7 @@ Optional arguments:
     EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
     KEEP_CONTAINER: Set to 'y' to not cleanup container upon exit. default: n
+    QUIET:          Set to 'y' to suppress output. default: n
 
     * User can override Azure Linux make definitions. Some useful overrides could be
                     SPECS_DIR: build specs from another directory like SPECS-EXTENDED by providing SPECS_DIR=path/to/SPECS-EXTENDED. default: $REPO_PATH/SPECS
@@ -53,21 +56,21 @@ To see help, run 'sudo make containerized-rpmbuild-help'
 build_worker_chroot() {
     pushd $toolkit_root
     echo "Building worker chroot..."
-    make chroot-tools REBUILD_TOOLS=y > /dev/null
+    make chroot-tools REBUILD_TOOLS=y > ${STD_OUT_REDIRECT}
     popd
 }
 
 build_tools() {
     pushd $toolkit_root
     echo "Building required tools..."
-    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > /dev/null
+    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > ${STD_OUT_REDIRECT}
     popd
 }
 
 build_graph() {
     pushd $toolkit_root
     echo "Building dependency graph..."
-    make workplan > /dev/null
+    make workplan > ${STD_OUT_REDIRECT}
     popd
 }
 
@@ -92,6 +95,7 @@ while (( "$#")); do
     -ep ) extra_packages="$2"; shift 2;;
     -r ) enable_local_repo=true; shift ;;
     -k ) keep_container=""; shift ;;
+    -q ) STD_OUT_REDIRECT=/dev/null; shift ;;
     -h ) help; exit 1 ;;
     ? ) echo -e "ERROR: INVALID OPTION.\n\n"; help; exit 1 ;;
   esac
@@ -169,7 +173,7 @@ if [[ "${mode}" == "build" ]]; then
     pushd $toolkit_root
     echo "Populating Intermediate SRPMs..."
     if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" )  || ( ! -f "$TOOL_BINS_DIR/downloader" ) ]]; then build_tools; fi
-    make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
+    make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > ${STD_OUT_REDIRECT}
     popd
 fi
 

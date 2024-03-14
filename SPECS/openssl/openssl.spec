@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -99,8 +99,6 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
-Requires: ca-certificates >= 2008-5
-Recommends: openssl-pkcs11%{?_isa}
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -361,6 +359,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3
+- Remove dependencies for the libs sub-package to realign with azure linux 2.0
+
 * Thu Feb 29 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.4-2
 - Perl will be installed with openssl-perl sub-package and not needed as default runtime dependency.
 
