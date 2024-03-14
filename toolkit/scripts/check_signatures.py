@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 
 def getSignature(fileName) -> str:
@@ -48,26 +49,19 @@ def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
     return names
 
 def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
-    # Use this path if there are any spec files (XXX.spec) that have
-    # a matching signature file (XXX.signatures.json)
-    names = find_name_of_all_spec_and_signatures_json_pairs(path)
-    if len(names) > 0:
-        return path
-
-    # No spec/signatures.json combo found in this folder,
-    # check the parent folder (unless the parent folder IS
-    # THE SAME as this folder)
-    current = Path(path)
-    parent = current.parent
-    if parent != current:
-        return find_spec_folder_with_signatures_json(f"{parent}")
-
-    # If nothing is found, return None
+    # Assume that spec/signatures.json files are only found in
+    # SPECS/XX and SPECS-EXTENDED/XX.  Find an ancestor of path
+    # that adheres to this assuption.  Return None if not found.
+    regex = f".*SPECS(-EXTENDED)?{os.sep}[^{os.sep}]+"
+    matching_path = re.search(regex, path)
+    if matching_path is not None:
+        return matching_path.group(0)
     return None
 
 def check_folder(folder):
     signatures_correct = True
 
+    # get SPECS/XX ancestor of input
     # find YY (maybe ancestor of path) that has xx/YY/YY.spec
     path = find_spec_folder_with_signatures_json(folder)
     if path is None:
