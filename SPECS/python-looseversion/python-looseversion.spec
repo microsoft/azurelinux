@@ -38,6 +38,7 @@ BuildRequires:  python-rpm-macros
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-pip
 BuildRequires:  python3-trove-classifiers
 
