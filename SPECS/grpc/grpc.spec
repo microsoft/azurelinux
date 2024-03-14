@@ -58,6 +58,7 @@ Requires:       protobuf
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
+# !!!! temporarily disable python3-grpcio because of build issues with Cython 3
 # %package -n python3-grpcio
 # Summary:        Python language bindings for gRPC
 # Requires:       %{name} = %{version}-%{release}
@@ -66,7 +67,6 @@ The grpc-plugins package contains the grpc plugins.
 
 # %description -n python3-grpcio
 # Python language bindings for gRPC.
-
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -105,32 +105,32 @@ cmake ../.. -GNinja \
    -DgRPC_ZLIB_PROVIDER:STRING=package
 
 # limit parallel build to avoid resource shortage while building
-NB_CORE_TO_USE=$(($(nproc) / 1))
+NB_CORE_TO_USE=$(($(nproc) / 2))
 if [[ $NB_CORE_TO_USE -eq 0 ]]; then
   NB_CORE_TO_USE=1
 fi
 cmake --build . -j$NB_CORE_TO_USE
 
 popd
-#uncommenting below line causes the whole build to get stuck in aarch64 machine 
-#py3_build
 
-%install
-pushd cmake/build
-DESTDIR="%{buildroot}" cmake --install .
-popd
-
-#python
+# !!!! temporarily disable python3-grpcio because of build issues with Cython 3
+# # python build for grpcio 
 # export GRPC_PYTHON_BUILD_WITH_CYTHON=True
 # export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
 # export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
 # export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
 # export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 # export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-# #uncommenting below line causes the whole build to get stuck in aarch64 machine 
-# #py3_install
-#using macros causes build to get stuck forever
-# %{__python3} setup.py install -O1 --root %{buildroot}
+# %py3_build
+
+%install
+pushd cmake/build
+DESTDIR="%{buildroot}" cmake --install .
+popd
+
+# !!!! temporarily disable python3-grpcio because of build issues with Cython 3
+# # python install for grpcio
+# %py3_install
 
 %files
 %license LICENSE
@@ -149,6 +149,7 @@ popd
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
+# !!!! temporarily disable python3-grpcio because of build issues with Cython 3
 # %files -n python3-grpcio
 # %license LICENSE
 # %{python3_sitearch}/grpc
