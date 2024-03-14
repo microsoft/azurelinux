@@ -100,6 +100,9 @@ BuildRequires:  readline-devel
 BuildRequires:  wget
 BuildRequires:  zip
 
+Requires:       icu >= 72
+Requires:       python3
+
 %description
 SpiderMonkey is the code-name for Mozilla Firefox's C++ implementation of
 JavaScript. It is intended to be embedded in other applications
