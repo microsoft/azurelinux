@@ -43,8 +43,8 @@ between tools.
 
 rm distlib/*.exe
 
-%generate_buildrequires
-%pyproject_buildrequires
+# %generate_buildrequires
+# %pyproject_buildrequires
 
 %build
 %pyproject_wheel
