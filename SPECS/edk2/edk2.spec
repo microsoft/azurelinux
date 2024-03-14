@@ -131,10 +131,6 @@ Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
 Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 %endif
 
-Patch1000: CVE-2023-0465.patch
-Patch1001: CVE-2023-2650.patch
-Patch1002: improve-safety-of-DH.patch
-
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
 # verification with "ovmf-vars-generator".
@@ -329,12 +325,6 @@ git config am.keepcr true
 
 cp -a -- %{SOURCE1} .
 tar -C CryptoPkg/Library/OpensslLib -a -f %{SOURCE2} -x
-# Need to patch CVE-2023-0465 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1000}
-# Need to patch CVE-2023-2650 in the bundled openssl
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1001}
-# Apply patch "improve-safety-of-DH.patch"
-(cd CryptoPkg/Library/OpensslLib/openssl && patch -p1 ) < %{PATCH1002}
 
 # extract softfloat into place
 tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
