@@ -24,10 +24,7 @@ Patch1: libcgroup-0.37-chmod.patch
 Patch2: libcgroup-0.40.rc1-coverity.patch
 Patch3: libcgroup-0.40.rc1-fread.patch
 Patch4: libcgroup-0.40.rc1-templates-fix.patch
-Patch5: no-googletests.patch
-# Note: Commenting out the API fuzz cgroup_set_permissions which causes failure
-# but requires further investigation 
-#Patch6: remove-API_FUZZ_test.patch
+Patch5: fix-libcgroup-tests.patch
 
 %{?systemd_requires}
 
@@ -190,7 +187,7 @@ getent group cgred >/dev/null || groupadd -r cgred
 - Patch test Makefile to compile with C++14 since gtest requires at 
   least C++14
 - Skip 8 tests that are not applicable to work chroot testing
-- Skip cgroup_set_permissions test
+- Fix API_cgroup_set_permissions package test
 
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.0-2
 - Fix build by forcing C++ 14 standard
