@@ -25,10 +25,10 @@ TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
 
 # TODO Remove once PMC is available for 3.0
 if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
-    repo_file_src="/mariner_setup_dir/mariner-3_repo"
+    repo_file_src="/azl_setup_dir/azl-3_repo"
     repo_name=$(awk -F'[][]' '/^\[/{print $2}' "${repo_file_src}")
     TDNF_ARGS+=("--disablerepo=*" "--enablerepo=${repo_name}")
-    mv "${repo_file_src}" /etc/yum.repos.d/mariner-3.repo
+    mv "${repo_file_src}" /etc/yum.repos.d/azl-3.repo
 fi
 
 ## Create $SOURCES_DIR
@@ -66,8 +66,8 @@ build_pkg() {
 
 # Show help on useful commands
 show_help() {
-    echo -e "`cat /mariner_setup_dir/welcome.txt`"
-    cat /mariner_setup_dir/mounts.txt
+    echo -e "`cat /azl_setup_dir/welcome.txt`"
+    cat /azl_setup_dir/mounts.txt
     echo -e "* \n* \e[31mLocal repo information:\e[0m"
     if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
         echo -e "*\tLocal repo is enabled. Package dependencies will be installed from $RPMS_DIR, /repo and upstream server"
@@ -122,9 +122,9 @@ enable_local_repo() {
 # Update dependency graph using build tools
 update_specs_metadata() {
     # update specs.json
-    /mariner_setup_dir/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/mariner_setup_dir/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
+    /azl_setup_dir/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/azl_setup_dir/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
     # update graph.dot
-    /mariner_setup_dir/grapher --input=/mariner_setup_dir/specs.json --output=/mariner_setup_dir/graph.dot
+    /azl_setup_dir/grapher --input=/azl_setup_dir/specs.json --output=/azl_setup_dir/graph.dot
 }
 
 # Install package dependencies using depsearch tool
@@ -143,7 +143,7 @@ install_dependencies_depsearch() {
 get_pkg_dependency() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
-    /mariner_setup_dir/depsearch --input=/mariner_setup_dir/graph.dot  --packages=$PKG --reverse
+    /azl_setup_dir/depsearch --input=/azl_setup_dir/graph.dot  --packages=$PKG --reverse
 }
 
 # Install package dependencies listed as BuildRequires in spec
