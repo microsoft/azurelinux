@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -113,6 +113,9 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 %{_userpresetdir}/*.preset
 
 %changelog
+* Thu Mar 14 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-6
+- Enable waagent.service in 90-default.preset
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-5
 - Add 'Microsoft' to names in release files and welcome message
 - Restore full version number in release files
