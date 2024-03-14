@@ -25,6 +25,7 @@ Patch2: libcgroup-0.40.rc1-coverity.patch
 Patch3: libcgroup-0.40.rc1-fread.patch
 Patch4: libcgroup-0.40.rc1-templates-fix.patch
 Patch5: fix-libcgroup-tests.patch
+Patch6: test.patch
 
 %{?systemd_requires}
 
