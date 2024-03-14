@@ -20,6 +20,7 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 
 %package -n     python3-cryptography
 Summary:        python-cryptography
+BuildRequires:  cargo
 BuildRequires:  openssl-devel
 BuildRequires:  python3-cffi
 BuildRequires:  python3-devel
@@ -35,6 +36,15 @@ Requires:       python3-packaging
 Requires:       python3-pyasn1
 Requires:       python3-six
 
+%ifarch x86_64
+%define rust_def_target x86_64-unknown-linux-gnu
+%define cargo_pkg_feature_opts --no-default-features
+%endif
+%ifarch aarch64
+%define rust_def_target aarch64-unknown-linux-gnu
+%define cargo_pkg_feature_opts --no-default-features
+%endif
+
 %description -n python3-cryptography
 Cryptography is a Python library which exposes cryptographic recipes and primitives.
 
@@ -44,48 +54,34 @@ Cryptography is a Python library which exposes cryptographic recipes and primiti
 # Do vendor expansion here manually by
 # calling `tar x` and setting up 
 # .cargo/config to use it.
+pushd ./src/rust
 tar fx %{SOURCE1}
+rm ./Cargo.lock
 mkdir -p .cargo
 
-cat >.cargo/config << EOF
+cat > .cargo/config << EOF
 [source.crates-io]
 replace-with = "vendored-sources"
 
 [source.vendored-sources]
 directory = "vendor"
 EOF
+popd
 
 %build
-export RUSTFLAGS="%build_rustflags"
-export OPENSSL_NO_VENDOR=1
-%pyproject_wheel
+pushd src/rust
+export RUSTFLAGS="-C lto=n"
+cargo rustc --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} -v --features 'pyo3/extension-module pyo3/abi3-py311' -- --crate-type cdylib
 find .
+popd
+%pyproject_wheel
 
 %install
 %pyproject_install
+%pyproject_save_files cryptography
 
 %check
 pip3 install iniconfig
-echo "bfjelds: before tests/aaatest.py"
-mkdir -p ./tests
-cat << EOF > ./tests/aaatest.py
-#!/usr/bin/python3 -u
-# SPDX-License-Identifier: BSD-2
-import itertools
-import unittest
-
-from cryptography import *
-
-class TypesTest(unittest.TestCase):
-    def test(self):
-        print("hello")
-
-EOF
-ls -l ./tests
-ls -l ./tests/aaatest.py
-cat ./tests/aaatest.py
-echo "bfjelds: after tests/aaatest.py"
-
 openssl req \
     -new \
     -newkey rsa:4096 \
@@ -101,10 +97,8 @@ pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
 PYTHONPATH=%{buildroot}%{python3_sitearch} \
     %{__python3} -m pytest -v tests
 
-%files -n python3-cryptography
-%defattr(-,root,root,-)
+%files -n python3-cryptography -f %{pyproject_files}
 %license LICENSE
-%{python3_sitelib}/*
 
 %changelog
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 42.0.5-1
