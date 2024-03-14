@@ -19,15 +19,64 @@ DISTRO_MACRO="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-DIST_VERSION_MAC
 DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 
 SPECS_DIR="$REPO_ROOT/SPECS"
+rpm_package_macros_file_path=""
+
+# We do not want to use the host's default macros.
+# If we set MACROS_PACKAGE_NAME (e.g., "rpm-libs-4.18.1-4.azl3.x86_64.rpm") that file will be downloaded from PACKAGE_URL_LIST and
+# the macros file will be extracted from the package and used during spec parsing.
+# If unset, try and find the one listed in the toolchain manifests and use it instead.
+# If all else fails, use the built-in macros from the host. This is the fallback option if the above generate an error.
+arch="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-build_arch)"
+MACROS_PACKAGE_NAME=$(grep "rpm-libs" "$REPO_ROOT/toolkit/resources/manifests/package/toolchain_$arch.txt") || MACROS_PACKAGE_NAME=""
+
+if [[ -n $MACROS_PACKAGE_NAME ]]
+then
+    # Check if the MACROS_FILE_PATH is already defined, and the directory exists
+    if [[ -z $RPM_OPS_MACROS_FILE_PATH ]] || [[ ! -d $RPM_OPS_MACROS_FILE_PATH ]]
+    then
+        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely  owned by root
+        RPM_OPS_MACROS_FILE_PATH="$(mktemp -d)"
+        export RPM_OPS_MACROS_FILE_PATH
+    fi
+
+    source_url=( $(make -s -f $REPO_ROOT/toolkit/Makefile printvar-PACKAGE_URL_LIST) )
+    # We assume the 1st entry will contain the correct URL
+    source_url_full=${source_url[0]}/$MACROS_PACKAGE_NAME
+    # To try and disambiguate different versions of the macros files, hash the url.
+    url_hash=$(echo $source_url_full | sha256sum | awk '{print $1}')
+    temp_macros_file_path="$RPM_OPS_MACROS_FILE_PATH/$url_hash"
+
+    # Check if we have the file already extracted
+    if [[ ! -f $temp_macros_file_path ]]
+    then
+        echo "Downloading and extracting macros file from package $MACROS_PACKAGE_NAME to $temp_macros_file_path" >&2
+        # Extract the macros file from the package into the macros file path
+        curl -s "$source_url_full" | rpm2cpio - | cpio --quiet -i --to-stdout ./usr/lib/rpm/macros > "$temp_macros_file_path".tmp && \
+            mv "$temp_macros_file_path".tmp "$temp_macros_file_path" || \
+            temp_macros_file_path=""
+        if [[ -z $temp_macros_file_path ]]
+        then
+            echo "Failed to extract macros file from package $MACROS_PACKAGE_NAME", using built-in defaults >&2
+        fi
+
+    fi
+    rpm_package_macros_file_path="$temp_macros_file_path"
+fi
 
 # Azure Linux macro files used during spec parsing.
 MACROS=()
-for macro_file in "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+# If we have a package macros file, we will use it for parsing the spec files instead of the built-in macros
+if [[ -n $rpm_package_macros_file_path ]]
+then
+    # --macros is set to empty to clear the default macros, the first --load will load a replacement from $rpm_package_macros_file_path
+    MACROS+=("--macros=''")
+fi
+for macro_file in $rpm_package_macros_file_path "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
 
-function mariner_rpmspec {
+function azl_rpmspec {
     # Looking for spec path in the argument list to extract its directory.
     local sourcedir
 
@@ -42,9 +91,13 @@ function mariner_rpmspec {
 
     if [[ -z $sourcedir ]]
     then
-        echo "Must pass valid spec path to 'mariner_rpmspec'!" >&2
+        echo "Must pass valid spec path to 'azl_rpmspec'!" >&2
         return 1
     fi
 
     rpmspec "${MACROS[@]}" "${DEFINES[@]}" -D "_sourcedir $sourcedir" "$@"
+}
+
+function azl_rpm {
+    rpm "${MACROS[@]}" "${DEFINES[@]}" "$@"
 }
