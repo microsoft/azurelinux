@@ -121,7 +121,7 @@ popd
 # export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
 # export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
 # export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
-# %py3_build
+# py3_build
 
 %install
 pushd cmake/build
@@ -130,7 +130,7 @@ popd
 
 # !!!! temporarily disable python3-grpcio because of build issues with Cython 3
 # # python install for grpcio
-# %py3_install
+# py3_install
 
 %files
 %license LICENSE
