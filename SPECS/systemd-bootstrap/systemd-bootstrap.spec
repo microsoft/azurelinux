@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,7 @@ BuildRequires:  python3-jinja2
 BuildRequires:  util-linux-devel
 BuildRequires:  xz-devel
 Requires:       %{name}-rpm-macros = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 Requires:       glib
 Requires:       kmod
 Requires:       libcap
@@ -78,6 +79,12 @@ AutoReq:        no
 
 %description
 Systemd is an init replacement with better process control and security
+
+%package libs
+Summary:        systemd libraries
+
+%description libs
+Systemd libraries
 
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
@@ -245,7 +252,6 @@ fi
 /lib/security
 %{_libdir}/sysctl.d
 %{_libdir}/tmpfiles.d
-/lib/*.so*
 %{_libdir}/modprobe.d/systemd.conf
 %{_libdir}/sysusers.d/*
 %{_bindir}/*
@@ -260,6 +266,9 @@ fi
 %{_datadir}/systemd
 %{_datadir}/zsh/*
 %dir %{_localstatedir}/log/journal
+
+%files libs
+/lib/*.so*
 
 %files rpm-macros
 %{_libdir}/rpm
@@ -276,6 +285,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-17
+- Split libs into their own subpackage to align with full systemd.
+
 * Tue Feb 27 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-16
 - Take rpm-macros from the new systemd-255 package so they are interchangeable
 
@@ -298,7 +310,7 @@ fi
 * Wed Dec 14 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 250.3-10
 - Add patch for CVE-2022-45873
 
-* Wed Nov 29 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-9
+* Wed Nov 30 2022 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-9
 - Conditionally run systemctl preset-all only when first installing systemd, not on upgrades
 
 * Fri Nov 18 2022 Sam Meluch <sammeluch@microsoft.com> - 250.3-8
