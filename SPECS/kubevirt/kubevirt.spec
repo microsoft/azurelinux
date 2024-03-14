@@ -30,8 +30,7 @@ Source1:        disks-images-provider.yaml
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
-Patch2:         Hotplug_detach_grace_period.patch
+Patch1:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-3%{?dist}
