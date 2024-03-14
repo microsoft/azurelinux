@@ -4,7 +4,6 @@
 package rpm
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -53,11 +52,11 @@ const (
 	// NoCompatibleArchError specifies the error message when processing a SPEC written for a different architecture.
 	NoCompatibleArchError = "error: No compatible architectures found for build"
 
-	// MarinerModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
-	MarinerModuleLdflagsDefine = "distro_module_ldflags "
+	// Azure LinuxModuleLdflagsDefine specifies the variable used to enable linking ELF binaries with module_info.ld metadata.
+	AzureLinuxModuleLdflagsDefine = "distro_module_ldflags "
 
-	// MarinerCCacheDefine enables ccache in the Mariner build system
-	MarinerCCacheDefine = "ccache_enabled"
+	// Azure LinuxCCacheDefine enables ccache in the Azure Linux build system
+	AzureLinuxCCacheDefine = "ccache_enabled"
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
@@ -93,7 +92,7 @@ var (
 	installedRPMRegex = regexp.MustCompile(`^D: =+ \+{3} (\S+) (\S+)-linux.*$`)
 
 	// For most use-cases, the distro name abbreviation and major version are set by the exe package. However, if the
-	// module is used outside of the main Mariner build system, the caller can override these values with SetDistroMacros().
+	// module is used outside of the main Azure Linux build system, the caller can override these values with SetDistroMacros().
 	distNameAbreviation, distMajorVersion = loadLdDistroFlags()
 )
 
@@ -136,12 +135,12 @@ func GetBasePackageNameFromSpecFile(specPath string) (basePackageName string, er
 
 	baseName := filepath.Base(specPath)
 	if baseName == "" {
-		return "", errors.New(fmt.Sprintf("Cannot extract file name from specPath (%s).", specPath))
+		return "", fmt.Errorf("failed to extract file name from specPath (%s)", specPath)
 	}
 
 	fileExtension := filepath.Ext(baseName)
 	if fileExtension == "" {
-		return "", errors.New(fmt.Sprintf("Cannot extract file extension from file name (%s).", baseName))
+		return "", fmt.Errorf("failed to extract file extension from file name (%s)", baseName)
 	}
 
 	basePackageName = baseName[:len(baseName)-len(fileExtension)]
@@ -159,7 +158,7 @@ func SetMacroDir(newMacroDir string) (origenv []string, err error) {
 	}
 	exists, err := file.DirExists(newMacroDir)
 	if err != nil || exists == false {
-		err = fmt.Errorf("directory %s does not exist", newMacroDir)
+		err = fmt.Errorf("directory (%s) does not exist", newMacroDir)
 		return
 	}
 
@@ -175,14 +174,14 @@ func ExtractNameFromRPMPath(rpmFilePath string) (packageName string, err error) 
 
 	// If the path is invalid, return empty string. We consider any string that has at least 1 '-' characters valid.
 	if !strings.Contains(baseName, "-") {
-		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
 		return
 	}
 
 	rpmFileSplit := strings.Split(baseName, "-")
 	packageName = strings.Join(rpmFileSplit[:len(rpmFileSplit)-2], "-")
 	if packageName == "" {
-		err = fmt.Errorf("invalid RPM file path '%s', can't extract name", rpmFilePath)
+		err = fmt.Errorf("invalid RPM file path (%s), can't extract name", rpmFilePath)
 		return
 	}
 	return
@@ -377,7 +376,7 @@ func GenerateSRPMFromSPEC(specFile, topDir string, defines map[string]string) (e
 	args := formatCommandArgs(extraArgs, specFile, queryFormat, allDefines)
 	_, stderr, err := shell.Execute(rpmBuildProgram, args...)
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 	}
 
 	return
@@ -391,7 +390,7 @@ func InstallRPM(rpmFile string) (err error) {
 
 	_, stderr, err := shell.Execute(rpmProgram, installOption, rpmFile)
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 	}
 
 	return
@@ -405,7 +404,7 @@ func QueryRPMProvides(rpmFile string) (provides []string, err error) {
 	logger.Log.Debugf("Querying RPM provides (%s)", rpmFile)
 	stdout, stderr, err := shell.Execute(rpmProgram, queryProvidesOption, rpmFile)
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 		return
 	}
 
@@ -429,7 +428,7 @@ func ResolveCompetingPackages(rootDir string, rpmPaths ...string) (resolvedRPMs 
 	// Output of interest is printed to stderr.
 	_, stderr, err := shell.Execute(rpmProgram, args...)
 	if err != nil {
-		logger.Log.Warn(stderr)
+		err = fmt.Errorf("%v\n%w", stderr, err)
 		return
 	}
 
@@ -457,7 +456,7 @@ func SpecExclusiveArchIsCompatible(specfile, sourcedir, arch string, defines map
 	// Sanity check that this SPEC is meant to be built for the current machine architecture
 	queryOutput, err := QuerySPEC(specfile, sourcedir, exclusiveArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
-		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		err = fmt.Errorf("failed to query SPEC (%s):\n%w", specfile, err)
 		return
 	}
 
@@ -481,7 +480,7 @@ func SpecExcludeArchIsCompatible(specfile, sourcedir, arch string, defines map[s
 
 	queryOutput, err := QuerySPEC(specfile, sourcedir, excludeArchQuery, arch, defines, QueryHeaderArgument)
 	if err != nil {
-		logger.Log.Warnf("Failed to query SPEC (%s), error: %s", specfile, err)
+		err = fmt.Errorf("failed to query SPEC (%s):\n%w", specfile, err)
 		return
 	}
 

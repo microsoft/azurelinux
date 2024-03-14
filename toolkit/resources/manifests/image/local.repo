@@ -1,5 +1,5 @@
-[mariner-local-repo]
-name=Mariner Local Build Repo $releasever $basearch
+[azl-local-repo]
+name=Azure Linux Local Build Repo $releasever $basearch
 baseurl=file:///mnt/cdrom/RPMS
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY
 enabled=1

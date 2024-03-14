@@ -3,7 +3,7 @@
 Summary:        Policy analysis tools for SELinux
 Name:           setools
 Version:        4.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 # binaries are GPL and libraries are LGPL.  See COPYING.
 License:        GPLv2 AND LGPLv2+
 Vendor:         Microsoft Corporation
@@ -21,7 +21,6 @@ BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-BuildRequires:  qt5-qtbase-devel
 BuildRequires:  swig
 
 %description
@@ -99,6 +98,9 @@ rm -rf %{buildroot}%{_mandir}/{,ru/}man1/apol*
 %{python3_sitearch}/setools-*
 
 %changelog
+* Tue Mar 05 2024 Sam Meluch <sammeluch@microsoft.com> - 4.4.4-2
+- Remove unnecessary dependency on qt (runtime dep used by apol)
+
 * Tue Dec 12 2023 Aditya Dubey <adityadubey@microsoft.com> - 4.4.4-1
 - Update to 4.4.4 to fix Cython compliation issue
 

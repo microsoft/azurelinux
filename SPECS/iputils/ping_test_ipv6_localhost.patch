@@ -3,7 +3,7 @@ From: Rachel Menge <rachelmenge@microsoft.com>
 Date: Fri, 18 Feb 2022 12:13:21 -0800
 Subject: [PATCH] Mark ping6 for localhost as expected failure
 
-Mariner does not map 'localhost' for ipv6 addresses
+Azure Linux does not map 'localhost' for ipv6 addresses
 ---
  test/ping/meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

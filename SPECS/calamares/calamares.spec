@@ -1,13 +1,13 @@
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+%global py_byte_compile 1
 Summary:        Installer from a live CD/DVD/USB to disk
 # do not use QtWebEngine because it no longer works with QtWebEngine >= 5.11
 # (it now refuses to run as root unless "export QTWEBENGINE_DISABLE_SANDBOX=1")
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
-Version:        3.2.11
-Release:        40%{?dist}
+Version:        3.3.1
+Release:        4%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,20 +15,19 @@ URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
-Source1:        calamares-users-1.1.0.tar.gz
-Source2:        calamares-finished-1.1.0.tar.gz
-Source3:        calamares-welcome-1.1.1.tar.gz
-Source4:        calamares-partition-1.1.2.tar.gz
-Source5:        calamares-license-1.1.0.tar.gz
+Source1:        calamares-users-3.0.1.tar.gz
+Source2:        calamares-finished-3.0.1.tar.gz
+Source3:        calamares-welcome-3.0.1.tar.gz
+Source4:        calamares-partition-3.0.1.tar.gz
+Source5:        calamares-license-3.0.1.tar.gz
 # Source20..39 - configuration files
 Source20:       license.conf
 Source21:       settings.conf
 Source22:       show.qml
 Source23:       branding.desc
-Source24:       users.conf
 Source25:       stylesheet.qss
 # Source40..100 - Assets
-Source40:       mariner-logo.png
+Source40:       azl-logo.png
 # Run:
 # lupdate-qt5 show.qml -ts calamares-auto_fr.ts
 # then translate the template in linguist-qt5.
@@ -41,20 +40,18 @@ Source42:       calamares-auto_de.ts
 # lupdate-qt5 show.qml -ts calamares-auto_it.ts
 # then translate the template in linguist-qt5.
 Source43:       calamares-auto_it.ts
-Source52:       mariner-welcome.png
-Source53:       mariner-eula
+Source52:       azl-welcome.png
+Source53:       azl-eula
 # adjust some default settings (default shipped .conf files)
-Patch0:         calamares-3.2.11-default-settings.patch
-Patch1:         use-single-job-for-progress-bar-value.patch
-Patch2:         navigation-buttons-autodefault.patch
-Patch3:         round-to-full-disk-size.patch
+Patch0:         Azure-Linux-Calamares-Conf-Patch-3.3.1.patch
+#Patch3:         round-to-full-disk-size.patch
 # Due to a race condition, Calamares would crash intermittently when switching
 # partitioning method or encryption password. Patch4 fixes that bug.
 Patch4:         serialize-read-access.patch
 # Progress bar would expect a non-false return from a pooled thread, assuming
 # such result means a critical error. However, depending on timing
 # the process might return false since it already exited. Patch5 fixes that bug.
-Patch5:         install-progress-bar-fix.patch
+#Patch5:         install-progress-bar-fix.patch
 
 # Compilation tools
 BuildRequires:  cmake
@@ -62,13 +59,13 @@ BuildRequires:  extra-cmake-modules
 BuildRequires:  gcc
 # Other build-time tools
 BuildRequires:  gettext
-# KF5
-BuildRequires:  kf5-kconfig-devel
-BuildRequires:  kf5-kcoreaddons-devel
-BuildRequires:  kf5-ki18n-devel
-BuildRequires:  kf5-kwidgetsaddons-devel
+# KF 6
+BuildRequires:  kf-kconfig-devel
+BuildRequires:  kf-kcoreaddons-devel
+BuildRequires:  kf-ki18n-devel
+BuildRequires:  kf-kwidgetsaddons-devel
 # Macros
-BuildRequires:  kf5-rpm-macros
+BuildRequires:  kf-rpm-macros
 # KPMCORE
 BuildRequires:  kpmcore-devel >= 3.3
 BuildRequires:  libatasmart-devel
@@ -79,11 +76,13 @@ BuildRequires:  parted
 BuildRequires:  pkg-config
 # Python 3
 BuildRequires:  python3-devel >= 3.3
-# Qt 5
-BuildRequires:  qt5-linguist >= 5.10
-BuildRequires:  qt5-qtbase-devel >= 5.10
-BuildRequires:  qt5-qtdeclarative-devel >= 5.10
-BuildRequires:  qt5-qtsvg-devel >= 5.10
+# Qt 6
+BuildRequires:  qt-linguist >= 6.6.1
+BuildRequires:  qttools-devel >= 6.6.1
+BuildRequires:  qtbase-devel >= 6.6.1
+BuildRequires:  qtdeclarative-devel >= 6.6.1
+BuildRequires:  qtsvg-devel >= 6.6.1
+BuildRequires:  polkit-qt6-1-devel
 BuildRequires:  util-linux-devel
 BuildRequires:  yaml-cpp-devel >= 0.5.1
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -104,7 +103,7 @@ ExclusiveArch:  x86_64
 %description
 Calamares is a distribution-independent installer framework, designed to install
 from a live CD/DVD/USB environment to a hard disk. It includes a graphical
-installation program based on Qt 5. This package includes the Calamares
+installation program based on Qt 6. This package includes the Calamares
 framework and the required configuration files to produce a working replacement
 for Anaconda's liveinst.
 
@@ -136,101 +135,105 @@ rm -rf src/modules/{users,finished,welcome,partition,license}
 %setup -q -T -a 4 -D
 %setup -q -T -a 5 -D
 for module in users finished welcome partition license; do
-    mv "$module" src/modules/"$module"
+    mv "$module-%{version}" src/modules/"$module"
 done
 
 
 # Apply custom license config
 mv %{SOURCE20} src/modules/license/license.conf
-mv %{SOURCE24} src/modules/users/users.conf
 
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
-%patch 3 -p1
-%patch 4 -p1
-%patch 5 -p1
+%patch -P 0 -p1
+#%patch3 -p1
+%patch -P 4 -p1
+#%patch5 -p1
 
 %build
-mkdir -p %{_target_platform}
-pushd %{_target_platform}
-%cmake_kf5 -DBUILD_TESTING:BOOL=OFF -DWITH_PYTHONQT:BOOL=OFF -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" -DINSTALL_POLKIT:BOOL=OFF ..
-popd
+%cmake_kf \
+  -DBUILD_TESTING:BOOL=OFF \
+  -DWITH_PYTHONQT:BOOL=OFF \
+  -DCMAKE_BUILD_TYPE:STRING="RelWithDebInfo" \
+  -DINSTALL_POLKIT:BOOL=OFF \
+  -DWITH_QT6=ON \
+  -DWITH_QML=OFF
 
-make %{?_smp_mflags} -C %{_target_platform}
+%cmake_build
 
 %install
-make install/fast DESTDIR=%{buildroot} -C %{_target_platform}
-# create the auto branding directory
+%cmake_install
+# create the branding directory
+mkdir -p %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang
+lrelease-qt6 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_fr.qm
+lrelease-qt6 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_de.qm
+lrelease-qt6 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/AzureLinux/lang/calamares-auto_it.qm
 
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/mariner/lang
-lrelease-qt5 %{SOURCE41} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_fr.qm
-lrelease-qt5 %{SOURCE42} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_de.qm
-lrelease-qt5 %{SOURCE43} -qm %{buildroot}%{_datadir}/calamares/branding/mariner/lang/calamares-auto_it.qm
+install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-logo.png
+install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/show.qml
+install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/branding.desc
+install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
+install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
 
-# own the local settings directories
-mkdir -p %{buildroot}%{_sysconfdir}/calamares/modules
-mkdir -p %{buildroot}%{_sysconfdir}/calamares/branding
+mkdir -p %{buildroot}%{_sysconfdir}/calamares
 
-# delete dummypythonqt translations, we do not use PythonQt at this time
-rm -f %{buildroot}%{_datadir}/locale/*/LC_MESSAGES/calamares-dummypythonqt.mo
-%find_lang calamares-python
-
-# Mariner branding
-mkdir -p %{buildroot}%{_datadir}/calamares/branding/
-cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/calamares/branding/
-cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/modules/
+cp -r %{buildroot}%{_datadir}/calamares/branding/ %{buildroot}%{_sysconfdir}/calamares/
+cp -r %{buildroot}%{_datadir}/calamares/modules/ %{buildroot}%{_sysconfdir}/calamares/
 
 install -p -m 644 %{SOURCE21} %{buildroot}%{_sysconfdir}/calamares/settings.conf
-install -p -m 644 %{SOURCE40} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-logo.png
-install -p -m 644 %{SOURCE22} %{buildroot}%{_datadir}/calamares/branding/mariner/show.qml
-install -p -m 644 %{SOURCE23} %{buildroot}%{_datadir}/calamares/branding/mariner/branding.desc
-install -p -m 644 %{SOURCE25} %{buildroot}%{_datadir}/calamares/branding/mariner/stylesheet.qss
-install -p -m 644 %{SOURCE52} %{buildroot}%{_datadir}/calamares/branding/mariner/mariner-welcome.png
-
 
 # EULA
-install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/mariner-eula
+install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
+
+%find_lang calamares-python
 
 %post
 
 %files -f calamares-python.lang
-%license LICENSE
 %doc AUTHORS
 %{_bindir}/calamares
-%dir %{_datadir}/calamares/
-%{_datadir}/calamares/settings.conf
-%dir %{_datadir}/calamares/branding/
+%{_datadir}/applications/calamares.desktop
+%{_datadir}/calamares/branding/AzureLinux/azl-logo.png
+%{_datadir}/calamares/branding/AzureLinux/azl-welcome.png
+%{_datadir}/calamares/branding/AzureLinux/branding.desc
+%{_datadir}/calamares/branding/AzureLinux/lang/
+%{_datadir}/calamares/branding/AzureLinux/show.qml
+%{_datadir}/calamares/branding/AzureLinux/stylesheet.qss
 %{_datadir}/calamares/branding/default/
-%dir %{_datadir}/calamares/branding/mariner/
-%{_datadir}/calamares/branding/mariner/show.qml
-%{_datadir}/calamares/branding/mariner/lang/
-%{_datadir}/calamares/branding/mariner/mariner-logo.png
-%{_datadir}/calamares/branding/mariner/mariner-welcome.png
-%{_datadir}/calamares/branding/mariner/branding.desc
-%{_datadir}/calamares/branding/mariner/stylesheet.qss
 %{_datadir}/calamares/modules/
 %{_datadir}/calamares/qml/
-%{_datadir}/applications/calamares.desktop
+%{_datadir}/calamares/settings.conf
 %{_datadir}/icons/hicolor/scalable/apps/calamares.svg
 %{_mandir}/man8/calamares.8*
 %{_sysconfdir}/calamares/
+%{_sysconfdir}/calamares/azl-eula
 %{_sysconfdir}/calamares/settings.conf
-%{_sysconfdir}/calamares/mariner-eula
+%dir %{_datadir}/calamares/
+%dir %{_datadir}/calamares/branding/
+%dir %{_datadir}/calamares/branding/AzureLinux/
 
 %files libs
+%{_libdir}/calamares/
 %{_libdir}/libcalamares.so.*
 %{_libdir}/libcalamaresui.so.*
-%{_libdir}/calamares/
 
 %files devel
 %{_includedir}/libcalamares/
+%{_libdir}/cmake/Calamares/
 %{_libdir}/libcalamares.so
 %{_libdir}/libcalamaresui.so
-%{_libdir}/cmake/Calamares/
 
 %changelog
+* Tue Mar 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-4
+- update license.conf file path to use azl-eula
+
+* Fri Mar 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-3
+- Fix python macros for calamares
+
+* Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.1-2
+- Updated reference to distro in patch file from "Mariner" to "Azure Linux"
+
+* Tue Jan 16 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-1
+- Upgrade to version 3.3.1 for Azure Linux 3.0
+- Update patches to accomodate version 3.3.1
+
 * Fri Jan 27 2023 Mateusz Malisz <mamalisz@microsoft.com> - 3.2.11-40
 - Fix application crash when discoverin partitions due to a race condition with serialize-read-access.patch
 - Fix application crash when the Mariner installer process thread have already exited during progress bar installation view

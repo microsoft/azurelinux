@@ -25,6 +25,8 @@ import (
 )
 
 const (
+	DefaultVolumeId = "CDROM"
+
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
 	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
@@ -46,7 +48,7 @@ type IsoMaker struct {
 	initrdPath         string                  // Path to ISO's initrd file.
 	grubCfgPath        string                  // Path to ISO's grub.cfg file. If provided, overrides the grub.cfg from the resourcesDirPath location.
 	outputDirPath      string                  // Path to the output ISO directory.
-	releaseVersion     string                  // Current Mariner release version.
+	releaseVersion     string                  // Current Azure Linux release version.
 	resourcesDirPath   string                  // Path to the 'resources' directory.
 	additionalIsoFiles []safechroot.FileToCopy // Additional files to copy to the ISO media (absolute-source-path -> iso-root-relative-path).
 	imageNameBase      string                  // Base name of the ISO to generate (no path, and no file extension).
@@ -182,7 +184,7 @@ func (im *IsoMaker) buildIsoImage() error {
 
 	mkisofsArgs = append(mkisofsArgs,
 		// General mkisofs parameters.
-		"-R", "-l", "-D", "-o", isoImageFilePath)
+		"-R", "-l", "-D", "-o", isoImageFilePath, "-V", DefaultVolumeId)
 
 	if im.enableBiosBoot {
 		mkisofsArgs = append(mkisofsArgs,
@@ -466,7 +468,7 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 }
 
 // copyStaticIsoRootFiles copies architecture-independent files from the
-// Mariner repo directories.
+// Azure Linux repo directories.
 func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 
 	if im.resourcesDirPath == "" && im.grubCfgPath == "" {

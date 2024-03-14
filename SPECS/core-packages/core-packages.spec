@@ -1,6 +1,6 @@
 Summary:        Metapackage with core sets of packages
 Name:           core-packages
-Version:        3.0
+Version:        %{azl}.0
 Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation

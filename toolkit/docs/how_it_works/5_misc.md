@@ -152,7 +152,7 @@ When Make is running with `--dry-run` or `-n` it will add the short-form flag `-
 ## Distroless images
 
 ### RPM manifest file
-Mariner distroless container images do not contain an RPM database. In order for Secure Composition Analysis tools to detect the contents of a Mariner distroless container image, the file `/var/lib/rpmmanifest/container-manifest-2` contains the output of the following command:
+Azure Linux distroless container images do not contain an RPM database. In order for Secure Composition Analysis tools to detect the contents of an Azure Linux distroless container image, the file `/var/lib/rpmmanifest/container-manifest-2` contains the output of the following command:
 
 ```bash
 rpm --query --all --query-format "%{NAME}\t%{VERSION}-%{RELEASE}\t%{INSTALLTIME}\t%{BUILDTIME}\t%{VENDOR}\t%{EPOCH}\t%{SIZE}\t%{ARCH}\t%{EPOCHNUM}\t%{SOURCERPM}\n"

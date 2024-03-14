@@ -1,6 +1,6 @@
 Summary:        AzureLinux repo files, gpg keys
 Name:           azurelinux-repos
-Version:        3.0
+Version:        %{azl}.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -241,8 +241,8 @@ gpg --batch --yes --delete-keys 2BC94FFF7015A5F28F1537AD0CD9FED33135CE90
 - License verified.
 
 * Tue Jul 13 2021 Jon Slobodzian <joslobo@microsoft.com> - 2.0-1
-- Add microsoft and microsoft-preview repo configuration packages.  
-- These repos offer Mariner packages produced by partner teams within Microsoft on 
+- Add microsoft and microsoft-preview repo configuration packages.
+- These repos offer Mariner packages produced by partner teams within Microsoft on
 - behalf of the Mariner team but are released on an independent cadence from Mariner.
 - Version update for 2.0.  Formatting changes.
 

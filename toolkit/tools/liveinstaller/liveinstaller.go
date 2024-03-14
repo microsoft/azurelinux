@@ -142,7 +142,7 @@ func updateBootOrder(installDetails installationDetails) (err error) {
 		return
 	}
 
-	err = removeOldMarinerBootTargets()
+	err = removeOldAzureLinuxBootTargets()
 	if err != nil {
 		return
 	}
@@ -167,22 +167,22 @@ func runBootEntryCreationCommand(installDetails installationDetails) (err error)
 		"-d", bootDisk.TargetDisk.Value, // Specify which disk the boot file is on
 		"-p", fmt.Sprintf("%d", bootPartIdx+1), // Specify which partition the boot file is on
 		"-l", "'\\EFI\\BOOT\\bootx64.efi'", // Specify the path for where the boot file is located on the partition
-		"-L", "Mariner", // Specify what label you would like to give this boot entry
+		"-L", "Azure Linux", // Specify what label you would like to give this boot entry
 		"-v", // Be verbose
 	}
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return
 }
 
-func removeOldMarinerBootTargets() (err error) {
+func removeOldAzureLinuxBootTargets() (err error) {
 	const squashErrors = false
-	logger.Log.Info("Removing pre-existing 'Mariner' boot targets from efibootmgr")
+	logger.Log.Info("Removing pre-existing 'Azure Linux' boot targets from efibootmgr")
 	program := "efibootmgr" // Default behavior when piped or called without options is to print current boot order in a human-readable format
 	commandArgs := []string{
-		"|", "grep", "\"Mariner\"", // Filter boot order for Mariner boot targets
-		"|", "sed", "'s/* Mariner//g'", // Pruning for just the bootnum
+		"|", "grep", "\"Azure Linux\"", // Filter boot order for Azure Linux boot targets
+		"|", "sed", "'s/* Azure Linux//g'", // Pruning for just the bootnum
 		"|", "sed", "'s/Boot*//g'", // Pruning for just the bootnum
-		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B", // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with a Mariner label
+		"|", "xargs", "-t", "-i", "efibootmgr", "-b", "{}", "-B", // Calling efibootmgr --delete-bootnum (aka `-B`) on each pre-existing bootnum with an Azure Linux label
 	}
 	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 	return

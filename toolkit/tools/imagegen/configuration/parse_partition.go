@@ -11,8 +11,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 const (
@@ -47,7 +45,7 @@ var (
 func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpartitionSettings []PartitionSetting, err error) {
 	file, err := os.Open(partitionFile)
 	if err != nil {
-		logger.Log.Errorf("Failed to open file (%s)", partitionFile)
+		err = fmt.Errorf("failed to open file (%s)", partitionFile)
 		return
 	}
 	defer file.Close()
@@ -55,13 +53,13 @@ func ParseKickStartPartitionScheme(partitionFile string) (retdisks []Disk, retpa
 	// Check if the file is empty
 	_, err = file.Stat()
 	if err != nil {
-		logger.Log.Errorf("Empty partition file (%s)", partitionFile)
+		err = fmt.Errorf("empty partition file (%s)", partitionFile)
 		return
 	}
 
 	err = initializePrerequisitesForParser()
 	if err != nil {
-		logger.Log.Errorf("Error initialzing parameters of the parser (%s)", err)
+		err = fmt.Errorf("failed to initialize parameters of the parser:\n%w", err)
 		return
 	}
 
@@ -128,11 +126,11 @@ func processPartitionTableType() (err error) {
 		// whether the users prefer creation of GPT disk label or not. The value of "--gpt"
 		// is a bool where "True" indicates using GPT and "False" if not, which means using MBR.
 		// This config is set as a boot option within /proc/cmdline, which will be parsed by anaconda
-		// during installation process. Thus, Mariner will also pick the same design to reach compatibility
+		// during installation process. Thus, Azure Linux will also pick the same design to reach compatibility
 		// with kickstart scenario
 
 		// Please note that this code is only executed during kickstart installation, when "IsKickStartBoot" is set to true.
-		// Mariner installer currently does not allow direct specification of disk and partition layout within
+		// Azure Linux installer currently does not allow direct specification of disk and partition layout within
 		// the image config file for kickstart installation. So any disk/partition setting you make in the image config file
 		// will be overwritten if you enable kickstart installation mode.
 		isGPTPartitionTable, err := GetKernelCmdLineValue("--gpt")

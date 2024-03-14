@@ -15,7 +15,7 @@ or tomli/tomli-w.
 
 Name:           python-%{pypi_name}
 Version:        0.10.2
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        A deprecated Python Library for Tom's Obvious, Minimal Language
 
 License:        MIT
@@ -24,12 +24,12 @@ Source0:        %{pypi_source}
 
 BuildArch:      noarch
 
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 # python3 bootstrap: this is rebuilt before the final build of python3, which
 # adds the dependency on python3-rpm-generators, so we require it manually
 # Note that the package prefix is always python3-, even if we build for 3.X
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools

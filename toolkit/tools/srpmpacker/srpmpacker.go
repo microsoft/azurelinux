@@ -7,7 +7,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -165,7 +164,7 @@ func main() {
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
 	if *caCertFile != "" {
-		newCACert, err := ioutil.ReadFile(*caCertFile)
+		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
 			logger.Log.Panicf("Invalid CA certificate (%s), error: %s", *caCertFile, err)
 		}
@@ -273,7 +272,7 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 				return
 			}
 			if len(specFile) != 1 {
-				if strings.HasPrefix(specName, "msopenjdk-11") {
+				if strings.HasPrefix(specName, "msopenjdk-17") {
 					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
 					continue
 				} else {

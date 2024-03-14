@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -31,13 +32,16 @@ func shrinkFilesystems(imageLoopDevice string) error {
 			continue
 		}
 
+		partitionLoopDevice := diskPartitions[partitionNum].Path
+
 		// Check if the filesystem type is supported
 		fstype := diskPartitions[partitionNum].FileSystemType
 		if !supportedShrinkFsType(fstype) {
+			logger.Log.Infof("Shrinking partition (%s): unsupported filesystem type (%s)", partitionLoopDevice, fstype)
 			continue
 		}
 
-		partitionLoopDevice := diskPartitions[partitionNum].Path
+		logger.Log.Infof("Shrinking partition (%s)", partitionLoopDevice)
 
 		// Check the file system with e2fsck
 		err := shell.ExecuteLive(true /*squashErrors*/, "sudo", "e2fsck", "-fy", partitionLoopDevice)
@@ -52,9 +56,15 @@ func shrinkFilesystems(imageLoopDevice string) error {
 		}
 
 		// Find the new partition end value
-		end, err := getNewPartitionEndInSectors(stdout, matchStarts[partitionNum-1][1], imageLoopDevice)
+		end, err := getNewPartitionEndInSectors(stdout, stderr, matchStarts[partitionNum-1][1], imageLoopDevice)
 		if err != nil {
 			return fmt.Errorf("failed to calculate new partition end:\n%w", err)
+		}
+
+		if end == "" {
+			// Filesystem wasn't resized. So, there is no need to resize the partition.
+			logger.Log.Infof("Filesystem is already at its min size (%s)", partitionLoopDevice)
+			continue
 		}
 
 		// Resize the partition with parted resizepart
@@ -93,25 +103,35 @@ func getStartSectors(imageLoopDevice string, partitionCount int) (matchStarts []
 }
 
 // Get the filesystem size in sectors.
-func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) (filesystemSizeInSectors int, err error) {
+// Returns -1 if the resize was a no-op.
+func getFilesystemSizeInSectors(resize2fsStdout string, resize2fsStderr string, imageLoopDevice string,
+) (filesystemSizeInSectors int, err error) {
+	const resize2fsNopMessage = "Nothing to do!"
+	if strings.Contains(resize2fsStderr, resize2fsNopMessage) {
+		// Resize operation was a no-op.
+		return -1, nil
+	}
+
 	// Example resize2fs output first line: "Resizing the filesystem on /dev/loop44p2 to 21015 (4k) blocks."
 	re, err := regexp.Compile(`.*to (\d+) \((\d+)([a-zA-Z])\)`)
 	if err != nil {
 		return 0, fmt.Errorf("failed to compile regex:\n%w", err)
 	}
+
 	// Get the block count and block size
-	match := re.FindStringSubmatch(resize2fsOutput)
+	match := re.FindStringSubmatch(resize2fsStdout)
 	if match == nil {
-		return 0, fmt.Errorf("failed to parse output of resize2fs")
+		return 0, fmt.Errorf("failed to parse output of resize2fs:\nstdout:\n%s\nstderr:\n%s", resize2fsStdout,
+			resize2fsStderr)
 	}
 
 	blockCount, err := strconv.Atoi(match[1]) // Example: 21015
 	if err != nil {
-		return 0, fmt.Errorf("failed to get block count:\n%w", err)
+		return 0, fmt.Errorf("failed to parse block count (%s):\n%w", match[1], err)
 	}
 	multiplier, err := strconv.Atoi(match[2]) // Example: 4
 	if err != nil {
-		return 0, fmt.Errorf("failed to get multiplier for block size:\n%w", err)
+		return 0, fmt.Errorf("failed to parse multiplier for block size (%s):\n%w", match[2], err)
 	}
 	unit := match[3] // Example: 'k'
 
@@ -122,7 +142,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	case "k":
 		blockSize = multiplier * KiB
 	default:
-		return 0, fmt.Errorf("unrecognized unit %s", unit)
+		return 0, fmt.Errorf("unrecognized unit (%s)", unit)
 	}
 
 	filesystemSizeInBytes := blockCount * blockSize
@@ -130,7 +150,7 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 	// Get the sector size
 	logicalSectorSize, _, err := diskutils.GetSectorSize(imageLoopDevice)
 	if err != nil {
-		fmt.Errorf("failed to get sector size")
+		return 0, fmt.Errorf("failed to get sector size:\n%w", err)
 	}
 	sectorSizeInBytes := int(logicalSectorSize) // cast from uint64 to int
 
@@ -143,10 +163,18 @@ func getFilesystemSizeInSectors(resize2fsOutput string, imageLoopDevice string) 
 }
 
 // Get the new partition end in sectors.
-func getNewPartitionEndInSectors(resize2fsOutput string, startSector string, imageLoopDevice string) (endInSectors string, err error) {
-	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsOutput, imageLoopDevice)
+// Returns an empty string if the resize was a no-op.
+func getNewPartitionEndInSectors(resize2fsStdout string, resize2fsStderr string, startSector string,
+	imageLoopDevice string,
+) (endInSectors string, err error) {
+	filesystemSizeInSectors, err := getFilesystemSizeInSectors(resize2fsStdout, resize2fsStderr, imageLoopDevice)
 	if err != nil {
 		return "", fmt.Errorf("failed to get filesystem size:\n%w", err)
+	}
+
+	if filesystemSizeInSectors < 0 {
+		// Resize operation was a no-op.
+		return "", nil
 	}
 
 	// Convert start sector string to int
