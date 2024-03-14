@@ -69,8 +69,8 @@ Summary:        %{summary}
 %pyproject_save_files hatch_vcs
 
 
-%check
 %if 0%{?with_check}
+%check
 %if %{with tests}
 %pytest
 %else

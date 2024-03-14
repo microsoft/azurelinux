@@ -50,8 +50,8 @@ BuildRequires:  python3-devel
 %pyproject_save_files %{srcname}
 
 
-%check
 %if 0%{?with_check}
+%check
 %if %{with tests}
 %pytest
 %else
