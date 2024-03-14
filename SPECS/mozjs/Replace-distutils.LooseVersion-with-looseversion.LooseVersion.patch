@@ -1,0 +1,24 @@
+From 045b6698cd3da54d949ff228d601a6506ccf92bc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Tue, 11 Jul 2023 18:35:00 +0200
+Subject: [PATCH] Replace distutils.LooseVersion with looseversion.LooseVersion
+
+---
+ python/mozbuild/mozbuild/configure/util.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/mozbuild/mozbuild/configure/util.py b/python/mozbuild/mozbuild/configure/util.py
+index 06ac247..e2ce7d5 100644
+--- a/python/mozbuild/mozbuild/configure/util.py
++++ b/python/mozbuild/mozbuild/configure/util.py
+@@ -14,7 +14,7 @@ import six
+ import sys
+ from collections import deque
+ from contextlib import contextmanager
+-from distutils.version import LooseVersion
++from looseversion import LooseVersion
+
+
+ def getpreferredencoding():
+--
+2.41.0

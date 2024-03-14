@@ -1,0 +1,27 @@
+From 588c3558c2cf338b45eaed34e23275bfbd517ff6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Tue, 11 Jul 2023 20:28:11 +0200
+Subject: [PATCH] Hacky workaround for expected string or bytes-like object,
+ got '_Py2Int'
+
+---
+ python/mozbuild/mozbuild/shellutil.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/python/mozbuild/mozbuild/shellutil.py b/python/mozbuild/mozbuild/shellutil.py
+index c47b19f..4fe6c3a 100644
+--- a/python/mozbuild/mozbuild/shellutil.py
++++ b/python/mozbuild/mozbuild/shellutil.py
+@@ -186,6 +186,10 @@ def _quote(s):
+     if type(s) == int:
+         return "%d" % s
+
++    if type(s) != str:
++        # looseversion objects leak here, this is ugly, I know, but gets the job done, so...
++        return str(s.__int__())
++
+     # Empty strings need to be quoted to have any significance
+     if s and not SHELL_QUOTE_RE.search(s) and not s.startswith("~"):
+         return s
+--
+2.41.0

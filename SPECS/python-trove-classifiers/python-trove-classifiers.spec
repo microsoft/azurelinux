@@ -1,32 +1,36 @@
-# Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
 %undefine distro_module_ldflags
 
-%global pypi_name trove-classifiers
 Name:           python-trove-classifiers
-Version:        2024.2.23
-Release:        2%{?dist}
+Version:        2024.3.3
+Release:        1%{?dist}
 Summary:        Canonical source for classifiers on PyPI (pypi.org)
 
 License:        Apache-2.0
 URL:            https://github.com/pypa/trove-classifiers
-Source:         %{pypi_source trove-classifiers}
+Source:         https://github.com/pypa/trove-classifiers/archive/refs/tags/2024.3.3.tar.gz#/trove-classifiers-%{version}.tar.gz
 
-# [IMPORTANT] Update the patch for every new version
-Patch:          001_remove_claver_dependency.patch
+
+# Drop dependency on calver and use PEP 621 declarative metadata.
+# This patch is rebased version of upstream PR:
+# https://github.com/pypa/trove-classifiers/pull/126/commits/809156bb35852bcaa1c753e0165f1814f2bcedf6
+Patch: Move-to-PEP-621-declarative-metadata.patch
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+#BuildRequires:  python3-iniconfig
+%endif
+
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 BuildRequires:  python3-packaging
-BuildRequires:  python3-toml
 
 %global _description %{expand:
 Canonical source for classifiers on PyPI.
@@ -45,7 +49,7 @@ Summary:        %{summary}
 %prep
 %autosetup -p1 -n trove-classifiers-%{version}
 # Replace @@VERSION@@ with %%version
-#%writevars -f pyproject.toml version
+%writevars -f pyproject.toml version
 
 
 %generate_buildrequires
@@ -62,9 +66,8 @@ Summary:        %{summary}
 
 
 %check
-%if 0%{?with_check}
+pip install iniconfig
 %pytest
-%endif
 
 
 %files -n python3-trove-classifiers -f %{pyproject_files}
@@ -72,6 +75,11 @@ Summary:        %{summary}
 
 
 %changelog
+* Mon Mar 11 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 2024.3.3-1
+- Update to 2024.3.3
+- Drop dependency on calver and use PEP 621 declarative metadata as in original Fedora spec.
+- Re-enable tests
+
 * Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2024.2.23-2
 - Updating naming for 3.0 version of Azure Linux.
 
@@ -109,4 +117,3 @@ Fixes: rhbz#2187710
 
 * Tue Feb 21 2023 Tomáš Hrnčiar <thrnciar@redhat.com> - 2023.2.20-1
 Initial package
-

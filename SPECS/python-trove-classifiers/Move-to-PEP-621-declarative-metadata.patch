@@ -1,0 +1,94 @@
+From 49510fec2cddeb796ab4078be4577eee624833f0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Hrn=C4=8Diar?= <thrnciar@redhat.com>
+Date: Tue, 21 Feb 2023 18:22:42 +0100
+Subject: [PATCH] Move to PEP 621 declarative metadata
+
+---
+ pyproject.toml | 31 ++++++++++++++++++++++++++++++-
+ setup.py       | 33 ---------------------------------
+ 2 files changed, 30 insertions(+), 34 deletions(-)
+ delete mode 100644 setup.py
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 05374a2..1134247 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,7 +1,36 @@
+ [build-system]
+-requires = ["setuptools", "calver"]
++requires = ["setuptools >= 61.0"]
+ build-backend = "setuptools.build_meta"
+
++[project]
++name = "trove-classifiers"
++version = "@@VERSION@@"
++readme = "README.md"
++description = "Canonical source for classifiers on PyPI (pypi.org)."
++authors = [{name = "The PyPI Admins", email = "admin@pypi.org"}]
++classifiers = [
++    "Development Status :: 5 - Production/Stable",
++    "Intended Audience :: Developers",
++    "License :: OSI Approved :: Apache Software License",
++    "Programming Language :: Python :: 3",
++    "Typing :: Typed",
++]
++keywords = ["classifiers"]
++
++[project.urls]
++Homepage = "https://github.com/pypa/trove-classifiers"
++
++[tool.setuptools]
++package-dir = {"" = "src"}
++include-package-data = false
++
++[tool.setuptools.packages.find]
++where = ["src"]
++namespaces = false
++
++[tool.setuptools.package-data]
++"*" = ["py.typed"]
++
+ [tool.mypy]
+ strict = true
+ warn_unreachable = true
+diff --git a/setup.py b/setup.py
+deleted file mode 100644
+index 826eac7..0000000
+--- a/setup.py
++++ /dev/null
+@@ -1,33 +0,0 @@
+-from io import open
+-from os import path
+-
+-from setuptools import setup, find_packages
+-
+-here = path.abspath(path.dirname(__file__))
+-
+-# Get the long description from the README file
+-with open(path.join(here, "README.md"), encoding="utf-8") as f:
+-    long_description = f.read()
+-
+-setup(
+-    name="trove-classifiers",
+-    description="Canonical source for classifiers on PyPI (pypi.org).",
+-    long_description=long_description,
+-    long_description_content_type="text/markdown",
+-    url="https://github.com/pypa/trove-classifiers",
+-    author="The PyPI Admins",
+-    author_email="admin@pypi.org",
+-    classifiers=[
+-        "Development Status :: 5 - Production/Stable",
+-        "Intended Audience :: Developers",
+-        "License :: OSI Approved :: Apache Software License",
+-        "Programming Language :: Python :: 3",
+-        "Typing :: Typed",
+-    ],
+-    keywords="classifiers",
+-    package_dir={"": "src"},
+-    packages=find_packages(where="src"),
+-    package_data={"": ["py.typed"]},
+-    use_calver=True,
+-    setup_requires=["calver"],
+-)
+--
+2.40.1

@@ -1,0 +1,25 @@
+From 9be85b155c6df0454c5faef9e850f572c99e3615 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Franti=C5=A1ek=20Zatloukal?= <fzatlouk@redhat.com>
+Date: Wed, 15 Jul 2020 08:32:44 +0200
+Subject: [PATCH] Increase the test timeout for slower buildds
+
+Ported forward from Debian: https://bugs.debian.org/878284
+---
+ js/src/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/js/src/Makefile.in b/js/src/Makefile.in
+index 6daed72..16db2de 100644
+--- a/js/src/Makefile.in
++++ b/js/src/Makefile.in
+@@ -53,7 +53,7 @@ check:: check-js-msg
+
+ check-jstests:
+ 	$(wildcard $(RUN_TEST_PROGRAM)) $(PYTHON3) -u $(srcdir)/tests/jstests.py \
+-		--no-progress --format=automation --timeout 300 \
++		--no-progress --format=automation --timeout 600 \
+ 		$(JSTESTS_EXTRA_ARGS) \
+ 		$(DIST)/bin/js$(BIN_SUFFIX)
+
+--
+2.37.1
