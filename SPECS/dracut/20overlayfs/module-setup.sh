@@ -16,3 +16,6 @@ installkernel() {
 install() {
     inst_hook pre-pivot 10 "$moddir/overlayfs-mount.sh"
 }
+
+
+
