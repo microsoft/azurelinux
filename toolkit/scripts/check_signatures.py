@@ -48,7 +48,7 @@ def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
 
     return names
 
-def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
+def find_spec_folder_ancestor(path: str) -> Optional[str]:
     # Assume that spec/signatures.json files are only found in
     # SPECS/XX and SPECS-EXTENDED/XX.  Find an ancestor of path
     # that adheres to this assuption.  Return None if not found.
@@ -61,9 +61,8 @@ def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
 def check_folder(folder):
     signatures_correct = True
 
-    # get SPECS/XX ancestor of input
-    # find YY (maybe ancestor of path) that has xx/YY/YY.spec
-    path = find_spec_folder_with_signatures_json(folder)
+    # get SPECS/XX or SPECS-EXTENED/XX ancestor of input
+    path = find_spec_folder_ancestor(folder)
     if path is None:
         # no spec/signature files found in path or its ancestors
         return signatures_correct
