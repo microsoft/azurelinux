@@ -22502,6 +22502,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-hatchling",
+          "version": "1.21.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/h/hatchling/hatchling-1.21.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-hs-dbus-signature",
           "version": "0.06",
           "downloadUrl": "https://github.com/stratis-storage/hs-dbus-signature/archive/v0.06/hs-dbus-signature-0.06.tar.gz"
@@ -25032,29 +25042,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "qtbase",
-          "version": "6.6.1",
-          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "qt5-qtconnectivity",
           "version": "5.14.2",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.14/5.14.2/submodules/qtconnectivity-everywhere-src-5.14.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "qtdeclarative",
-          "version": "6.6.1",
-          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtdeclarative-everywhere-src-6.6.1.tar.xz"
         }
       }
     },
@@ -25075,6 +25065,26 @@
           "name": "qt5-qtserialport",
           "version": "5.15.9",
           "downloadUrl": "https://download.qt.io/official_releases/qt/5.15/5.15.9/submodules/qtserialport-everywhere-opensource-src-5.15.9.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "qtbase",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtbase-everywhere-src-6.6.1.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "qtdeclarative",
+          "version": "6.6.1",
+          "downloadUrl": "https://download.qt.io/archive/qt/6.6/6.6.1/submodules/qtdeclarative-everywhere-src-6.6.1.tar.xz"
         }
       }
     },
