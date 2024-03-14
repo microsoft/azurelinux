@@ -25,8 +25,10 @@ TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
 
 # TODO Remove once PMC is available for 3.0
 if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
-    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=mariner-3.0-daily-build")
-    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
+    repo_file_src="/mariner_setup_dir/mariner-3_repo"
+    repo_name=$(awk -F'[][]' '/^\[/{print $2}' "${repo_file_src}")
+    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=${repo_name}")
+    mv "${repo_file_src}" /etc/yum.repos.d/mariner-3.repo
 fi
 
 ## Create $SOURCES_DIR
