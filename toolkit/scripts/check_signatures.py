@@ -21,23 +21,17 @@ def getSignature(fileName) -> str:
             sha256sum.update(read_data)
     return sha256sum.hexdigest()
 
-def find_file_and_check(path, filename, expected_signature) -> Optional[bool]:
-    path_to_check = os.path.join(path, filename)
-    if Path(path_to_check).is_file():
-        actual_signature = getSignature(path_to_check)
-        if actual_signature == expected_signature:
-            return True
-        print(f"ERROR: detected a mismatched signature for {filename}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
-        return False
+def find_file(path, filename) -> Optional[str]:
+    return_value : Optional[str] = None
+    for matching_file in Path(path).glob(f"**/{filename}"):
+        if os.path.exists(matching_file):
+            if return_value is not None:
+                print(f"ERROR: detected multiple {filename}: [{matching_files}]")
+                return None
+            
+            return_value = matching_file
 
-    for content in os.listdir(path):
-        path_to_check = os.path.join(path, content)
-        if os.path.isdir(path_to_check):
-            result = find_file_and_check(path_to_check, filename, expected_signature)
-            if result is not None:
-                return result
-
-    return None
+    return return_value
 
 def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
     names: List[str] = []
@@ -50,6 +44,7 @@ def find_name_of_all_spec_and_signatures_json_pairs(path: str) -> List[str]:
                 # If there is a matching signature file (XXX.signatures.json),
                 # add it to list
                 names.append(name)
+
     return names
 
 def find_spec_folder_with_signatures_json(path: str) -> Optional[str]:
@@ -79,17 +74,20 @@ def check_folder(folder):
         # no spec/signature files found in path or its ancestors
         return signatures_correct
 
-    names = find_name_of_all_spec_and_signatures_json_pairs(path)
-    for name in names:
+    for name in find_name_of_all_spec_and_signatures_json_pairs(path):
         signature_path = os.path.join(path, f"{name}.signatures.json")
         with open(signature_path, "r") as f:
             signatures_json = json.load(f)
             for file_to_check, expected_signature in signatures_json["Signatures"].items():
-                result = find_file_and_check(path, file_to_check, expected_signature)
-                if result is None:
+                file_to_check_path = find_file(path, file_to_check)
+                if file_to_check_path is not None:
+                    actual_signature = getSignature(file_to_check_path)
+                    if actual_signature != expected_signature:
+                        print(f"ERROR: detected a mismatched signature for {file_to_check}, expected [{expected_signature}] does not equal actual [{actual_signature}]")
+                        signatures_correct = False
+                else:
                     print(f"{file_to_check} is not found in CBL-Mariner, build to verify signature")
-                elif result is False:
-                    signatures_correct = False
+
     return signatures_correct
 
 if __name__ == '__main__':
