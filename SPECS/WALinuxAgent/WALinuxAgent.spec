@@ -63,7 +63,7 @@ sed -i 's,/usr/bin/waagent,/usr/sbin/waagent,' %{buildroot}/lib/systemd/system/w
 install -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/ephemeral-disk-warning.service
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
 install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
-install -m 644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/50-waagent.preset
+install -Dm 644 %{SOURCE4} %{buildroot}%{_libdir}/systemd/system-preset/50-waagent.preset
 
 %check
 python3 setup.py check && python3 setup.py test
