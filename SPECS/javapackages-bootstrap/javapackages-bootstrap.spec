@@ -307,7 +307,7 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
 # leave ignore patch text file
-other_sources=$(echo %{sources} | cut -d' ' -f5-)
+other_sources=$(echo %{sources} | cut -d' ' -f4-)
 
 for source in ${other_sources}
 do
