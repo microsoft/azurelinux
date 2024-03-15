@@ -3,7 +3,6 @@ package imagecustomizerlib
 import (
 	"crypto/rand"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -76,10 +75,11 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
 
-			err = constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath, &partitionMetadataOutput)
+			partitionMetadata, err := constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath)
 			if err != nil {
 				return err
 			}
+			partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 		}
 	}
@@ -221,36 +221,19 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 	return randomBytes, nil
 }
 
-// Construct outputPartitionMetadata object.
-func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string, output *[]outputPartitionMetadata) (err error) {
-	diskPartitionJson, err := json.Marshal(&diskPartition)
-	if err != nil {
-		return fmt.Errorf("failed to marshal disk partition:\n%w", err)
-	}
+// Construct outputPartitionMetadata for given partition.
+func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string) (partitionMetadata outputPartitionMetadata, err error) {
+	partitionMetadata.Type = diskPartition.Type
+	partitionMetadata.PartitionNum = partitionNum
+	partitionMetadata.PartitionFilepath = partitionFilepath
+	partitionMetadata.PartLabel = diskPartition.PartLabel
+	partitionMetadata.FileSystemType = diskPartition.FileSystemType
+	partitionMetadata.PartitionTypeUuid = diskPartition.PartitionTypeUuid
+	partitionMetadata.Uuid = diskPartition.Uuid
+	partitionMetadata.PartUuid = diskPartition.PartUuid
+	partitionMetadata.Mountpoint = diskPartition.Mountpoint
 
-	// Construct a map of interesting partition information
-	interestingPartitionInfo := map[string]interface{}{}
-	err = json.Unmarshal([]byte(diskPartitionJson), &interestingPartitionInfo)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal disk partition json:\n%w", err)
-	}
-	interestingPartitionInfo["filepath"] = partitionFilepath
-	interestingPartitionInfo["partitionNum"] = partitionNum
-	delete(interestingPartitionInfo, "name") // Customer is not interested in loop device name
-	delete(interestingPartitionInfo, "path") // Customer is not interested in loop device path
-
-	// Append the interesting partition information to output
-	interestingPartitionInfoJson, err := json.Marshal(&interestingPartitionInfo)
-	if err != nil {
-		return fmt.Errorf("failed to marshal interesting partition info:\n%w", err)
-	}
-	var currentPartitionMetadata outputPartitionMetadata
-	err = json.Unmarshal([]byte(interestingPartitionInfoJson), &currentPartitionMetadata)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal interesting partition info json:\n%w", err)
-	}
-	*output = append(*output, currentPartitionMetadata)
-	return nil
+	return partitionMetadata, nil
 }
 
 // Write partition metadata as JSON to a file.
