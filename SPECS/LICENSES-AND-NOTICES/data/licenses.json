@@ -276,6 +276,7 @@
                 "glew",
                 "glm",
                 "glog",
+                "glslang",
                 "glusterfs",
                 "gnome-desktop-testing",
                 "gnome-doc-utils",
