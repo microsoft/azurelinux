@@ -2,7 +2,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        42.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,10 +10,6 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
 Source1:        cryptography-%{version}-vendor.tar.gz
-%if 0%{?with_check}
-BuildRequires:  python3-pip
-BuildRequires:  python3-pytest
-%endif
 
 %description
 Cryptography is a Python library which exposes cryptographic recipes and primitives.
@@ -28,6 +24,10 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+%endif
+
 Requires:       python3
 Requires:       python3-asn1crypto
 Requires:       python3-cffi
@@ -69,33 +69,19 @@ EOF
 popd
 
 %build
-%pyproject_wheel
 pushd src/rust
 export RUSTFLAGS="-C lto=n"
 cargo rustc --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} -v --features 'pyo3/extension-module pyo3/abi3-py311' -- --crate-type cdylib
 popd
-
-# pyproject_wheel doesn't seem capable of packing anything other than *.py, and
-# _rust.abi3.so is needed, so: 
-#     1. unpack the whl
-#     2. add the so
-#     3. repack the whl
-export WHL_LOCATION=$(find .. -name "cryptography-*.whl" | grep -v wheel-contents | head -n 1)
-export WHL_NAME=$(basename $WHL_LOCATION)
-mkdir ./wheel-contents
-wheel unpack $WHL_LOCATION --dest ./wheel-contents
-cp ./src/rust/target/%{rust_def_target}/release/libcryptography_rust.so ./wheel-contents/cryptography-%{version}/cryptography/hazmat/bindings/_rust.abi3.so
-pushd ./wheel-contents
-wheel pack cryptography-%{version}
-cp ./$WHL_NAME $WHL_LOCATION
-popd
+# Need to add _rust.abi3.so to MANIFEST.in so the whl will contain it
+cp ./src/rust/target/%{rust_def_target}/release/libcryptography_rust.so ./src/cryptography/hazmat/bindings/_rust.abi3.so
+echo 'recursive-include src/cryptography _rust.abi3.so' >> MANIFEST.in
 
 %install
 %pyproject_install
 %pyproject_save_files cryptography
 
 %check
-pip3 install iniconfig
 openssl req \
     -new \
     -newkey rsa:4096 \
@@ -107,7 +93,7 @@ openssl req \
     -out mariner.cert
 openssl rsa -in mariner.key -out mariner.pem
 mv mariner.pem %{_sysconfdir}/ssl/certs
-pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz
+pip3 install pretend pytest hypothesis iso8601 cryptography_vectors pytz iniconfig
 PYTHONPATH=%{buildroot}%{python3_sitearch} \
     %{__python3} -m pytest -v tests
 
