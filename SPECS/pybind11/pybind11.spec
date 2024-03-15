@@ -81,7 +81,7 @@ done
 %py3_build
 
 %check
-make -C python3 check %{?_smp_mflags}
+make -C tests check %{?_smp_mflags}
 
 %install
 %make_install -C python3
