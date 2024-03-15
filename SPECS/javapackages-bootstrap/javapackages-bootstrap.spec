@@ -31,7 +31,6 @@ Source0:        https://github.com/fedora-java/javapackages-bootstrap/releases/d
 # License breakdown
 Source1:        javapackages-bootstrap-PACKAGE-LICENSING
 Source2:        ignore.upstream.patch.txt
-Source3:        generate-bundled-provides.sh
 
 Source1001:     ant-1.10.14.tar.xz
 Source1002:     aopalliance-1.0.tar.xz
@@ -152,6 +151,8 @@ Source1116:     xmlunit-2.9.1.tar.xz
 Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xmvn-generator-1.2.1.tar.xz
 Source1120:     xz-java-1.9.tar.xz
+
+Patch0:       0001-Bind-to-OpenJDK-17-for-runtime.patch
 
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
@@ -315,6 +316,8 @@ do
   tar -xf "${source}"
 done
 
+%patch 0 -p1
+
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"
@@ -365,11 +368,15 @@ install -D -p -m 644 downstream/xmvn-generator/src/main/rpm/macros.xmvngen %{bui
 install -D -p -m 644 downstream/xmvn-generator/src/main/rpm/macros.xmvngenhook %{buildroot}%{_sysconfdir}/rpm/macros.jpbgenhook
 install -D -p -m 644 downstream/xmvn-generator/src/main/rpm/xmvngen.attr %{buildroot}%{_fileattrsdir}/jpbgen.attr
 
-# Use toolchains.xml provided by javapackages-tools
-ln -sf %{_datadir}/xmvn/conf/toolchains.xml %{buildroot}%{mavenHomePath}/conf/toolchains.xml
-
-install -d -m 755 %{buildroot}%{_rpmmacrodir}
-echo '%%jpb_env PATH=/usr/libexec/javapackages-bootstrap:$PATH' >%{buildroot}%{_rpmmacrodir}/macros.%{name}
+echo '
+%%__xmvngen_debug 1
+%%__xmvngen_libjvm %{javaHomePath}/lib/server/libjvm.so
+%%__xmvngen_classpath %{artifactsPath}/%{name}/xmvn-generator.jar:%{artifactsPath}/%{name}/asm.jar:%{artifactsPath}/%{name}/commons-compress.jar
+%%__xmvngen_provides_generators org.fedoraproject.xmvn.generator.jpms.JPMSGeneratorFactory
+%%__xmvngen_requires_generators %%{nil}
+%%__xmvngen_post_install_hooks org.fedoraproject.xmvn.generator.transformer.TransformerHookFactory
+%%jpb_env PATH=/usr/libexec/javapackages-bootstrap:$PATH
+' >%{buildroot}%{_rpmmacrodir}/macros.jpbgen
 
 # by default it sets JAVA_HOME to /usr/lib/jvm/java-11-openjdk
 sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{_datadir}/%{name}/bin/mvn
