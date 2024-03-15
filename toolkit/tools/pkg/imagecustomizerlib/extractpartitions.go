@@ -86,7 +86,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 	// Write partition metadata JSON to a file
 	jsonFilename := basename + "_partition_metadata.json"
-	err = writePartitionMetadataJson(outDir, jsonFilename, &output)
+	err = writePartitionMetadataJson(outDir, jsonFilename, &partitionMetadataOutput)
 	if err != nil {
 		return fmt.Errorf("failed to write partition metadata json:\n%w", err)
 	}
