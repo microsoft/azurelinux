@@ -69,12 +69,26 @@ EOF
 popd
 
 %build
+%pyproject_wheel
 pushd src/rust
 export RUSTFLAGS="-C lto=n"
 cargo rustc --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} -v --features 'pyo3/extension-module pyo3/abi3-py311' -- --crate-type cdylib
-find .
 popd
-%pyproject_wheel
+
+# pyproject_wheel doesn't seem capable of packing anything other than *.py, and
+# _rust.abi3.so is needed, so: 
+#     1. unpack the whl
+#     2. add the so
+#     3. repack the whl
+export WHL_LOCATION=$(find .. -name "cryptography-*.whl" | grep -v wheel-contents | head -n 1)
+export WHL_NAME=$(basename $WHL_LOCATION)
+mkdir ./wheel-contents
+wheel unpack $WHL_LOCATION --dest ./wheel-contents
+cp ./src/rust/target/%{rust_def_target}/release/libcryptography_rust.so ./wheel-contents/cryptography-%{version}/cryptography/hazmat/bindings/_rust.abi3.so
+pushd ./wheel-contents
+wheel pack cryptography-%{version}
+cp ./$WHL_NAME $WHL_LOCATION
+popd
 
 %install
 %pyproject_install
