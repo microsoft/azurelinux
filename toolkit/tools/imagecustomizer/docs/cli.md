@@ -40,7 +40,8 @@ iso image. For more details on this format, see: [Azure Linux Image Customizer I
 
 ## --output-split-partitions-format=FORMAT
 
-Format of partition files. If specified, disk partitions will be extracted as separate files and a json file with partition metadata will be produced.
+Format of partition files. If specified, disk partitions will be extracted as separate files and a 
+json file with partition metadata will be produced.
 
 Options: raw, raw-zst.
 

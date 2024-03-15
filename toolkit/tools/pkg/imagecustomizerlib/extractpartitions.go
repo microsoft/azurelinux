@@ -18,7 +18,7 @@ import (
 type outputPartitionMetadata struct {
 	Type              string `json:"type"`         // Example: part
 	PartitionNum      int    `json:"partitionnum"` // Example: 1
-	PartitionFilepath string `json:"filepath"`     // Example: out/image_1.raw
+	PartitionFilename string `json:"filename"`     // Example: image_1.raw.zst
 	PartLabel         string `json:"partlabel"`    // Example: boot
 	FileSystemType    string `json:"fstype"`       // Example: vfat
 	PartitionTypeUuid string `json:"parttype"`     // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
@@ -225,7 +225,7 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string) (partitionMetadata outputPartitionMetadata, err error) {
 	partitionMetadata.Type = diskPartition.Type
 	partitionMetadata.PartitionNum = partitionNum
-	partitionMetadata.PartitionFilepath = partitionFilepath
+	partitionMetadata.PartitionFilename = filepath.Base(partitionFilepath)
 	partitionMetadata.PartLabel = diskPartition.PartLabel
 	partitionMetadata.FileSystemType = diskPartition.FileSystemType
 	partitionMetadata.PartitionTypeUuid = diskPartition.PartitionTypeUuid
