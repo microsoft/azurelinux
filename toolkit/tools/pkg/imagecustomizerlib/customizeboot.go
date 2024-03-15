@@ -130,7 +130,7 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 		return "", "", fmt.Errorf("failed to find initrd command line")
 	}
 	if len(match) <= initPathRegexPathIndexEnd {
-		return "", "", fmt.Errorf("failed to find initrd command line path")
+		return "", "", fmt.Errorf("failed to find initrd command line's path arg")
 	}
 
 	start := match[initPathRegexPathStart]
