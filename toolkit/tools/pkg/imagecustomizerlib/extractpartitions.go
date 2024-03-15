@@ -48,6 +48,9 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 	// Create skippable frame metadata defined as a random 128-bit number
 	skippableFrameMetadata, err := createSkippableFrameMetadata()
+	if err != nil {
+		return err
+	}
 
 	// Extract partitions to files
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
