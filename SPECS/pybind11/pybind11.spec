@@ -81,7 +81,9 @@ done
 %py3_build
 
 %check
+pushd tests
 make check %{?_smp_mflags}
+popd
 
 %install
 %make_install -C python3
