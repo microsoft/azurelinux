@@ -26,6 +26,7 @@ Disks:
 
 SystemConfig:
   BootType: efi
+  ResetBootLoaderType: hard-reset
   PartitionSettings:
   - ID: esp
     MountPoint: /boot/efi

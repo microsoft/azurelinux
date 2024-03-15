@@ -4,8 +4,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 ### Operation ordering
 
-1. If partitions were specified in the config, customize the disk partitions and reset
-   the boot-loader.
+1. If partitions were specified in the config, customize the disk partitions.
 
 2. Override the `/etc/resolv.conf` file with the version from the host OS.
 
@@ -36,7 +35,12 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 10. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
 
-11. Apply kernel command-line args, if the partitions weren't customized.
+11. If [ResetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+    reset the boot-loader.
+
+    If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then
+    append the [ExtraCommandLine](#extracommandline-string) value to the existing
+    `grub.cfg` file.
 
 12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
 
@@ -48,7 +52,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 And if the output format is set to `iso`:
 
-12. Copy additional iso media files ([Iso](#iso-type)).
+16. Copy additional iso media files ([Iso](#iso-type)).
 
 ### /etc/resolv.conf
 
@@ -100,6 +104,7 @@ SystemConfig:
         - [Permissions](#permissions-string)
   - [SystemConfig](#systemconfig-type)
     - [BootType](#boottype-string)
+    - [ResetBootLoaderType](#resetbootloadertype-string)
     - [Hostname](#hostname-string)
     - [KernelCommandLine](#kernelcommandline-type)
       - [ExtraCommandLine](#extracommandline-string)
@@ -171,7 +176,8 @@ Contains the options for provisioning disks and their partitions.
 If the Disks field isn't specified, then the partitions of the base image aren't
 changed.
 
-If Disks is specified, then [SystemConfig.BootType](#boottype-boottype) must also be
+If Disks is specified, then both [SystemConfig.BootType](#boottype-string) and
+[SystemConfig.ResetBootLoaderType](#resetbootloadertype-string) must also be
 specified.
 
 While Disks is a list, only 1 disk is supported at the moment.
@@ -323,12 +329,11 @@ Options for configuring the kernel.
 
 Additional Linux kernel command line options to add to the image.
 
-If the partitions are customized, then the `grub.cfg` file will be reset to handle the
-new partition layout.
-So, any existing ExtraCommandLine value in the base image will be replaced.
+If [ResetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, then the
+`ExtraCommandLine` value will be appended to the new `grub.cfg` file.
 
-If the partitions are not customized, then the `ExtraCommandLine` value will be appended
-to the existing `grub.cfg` file.
+If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then the
+`ExtraCommandLine` value will be appended to the existing `grub.cfg` file.
 
 ### SELinux
 
@@ -660,6 +665,18 @@ Supported options:
 
   When this option is specified, the partition layout must contain a partition with the
   `esp` flag.
+
+### ResetBootLoaderType [string]
+
+Specifies that the boot-loader configuration should be reset and how it should be reset.
+
+Supported options:
+
+- `hard-reset`: Fully reset the boot-loader and its configuration.
+  This includes removing any customized kernel command-line arguments that were added to
+  base image.
+
+This field can only be specified if [Disks](#disks-disk) is also specified.
 
 ### Hostname [string]
 

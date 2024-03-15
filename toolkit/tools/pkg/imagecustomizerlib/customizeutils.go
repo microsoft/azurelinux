@@ -29,9 +29,11 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	imageConnection *ImageConnection, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
+
+	imageChroot := imageConnection.Chroot()
 
 	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
 	// tool as closely as possible.
@@ -84,13 +86,13 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
-		partitionsCustomized)
+	err = handleBootLoader(baseConfigPath, config, imageConnection)
 	if err != nil {
-		return fmt.Errorf("failed to add extra kernel command line: %w", err)
+		return err
 	}
 
-	err = handleSELinux(config.SystemConfig.KernelCommandLine.SELinux, partitionsCustomized, imageChroot)
+	err = handleSELinux(config.SystemConfig.KernelCommandLine.SELinux, config.SystemConfig.ResetBootLoaderType,
+		imageChroot)
 	if err != nil {
 		return err
 	}
@@ -404,7 +406,35 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 	return nil
 }
 
-func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized bool, imageChroot *safechroot.Chroot,
+func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
+) error {
+	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
+	if err != nil {
+		return err
+	}
+
+	switch config.SystemConfig.ResetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		// Hard-reset the grub config.
+		err := configureDiskBootLoader(imageConnection, config.SystemConfig.PartitionSettings,
+			config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, currentSelinuxMode)
+		if err != nil {
+			return fmt.Errorf("failed to configure bootloader:\n%w", err)
+		}
+
+	default:
+		// Append the kernel command-line args to the existing grub config.
+		err := addKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		if err != nil {
+			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+		}
+	}
+
+	return nil
+}
+
+func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
+	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
@@ -416,9 +446,12 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized 
 		}
 	}
 
-	// If the partitions were customized, then the grub.cfg file will have been recreated from scratch and therefore
-	// the SELinux args will already be correct and don't need to be updated.
-	if !partitionsCustomized {
+	switch ResetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		// The grub.cfg file has been recreated from scratch and therefore the SELinux args will already be correct and
+		// don't need to be updated.
+
+	default:
 		// Update the SELinux kernel command-line args.
 		err := updateSELinuxCommandLine(selinuxMode, imageChroot)
 		if err != nil {

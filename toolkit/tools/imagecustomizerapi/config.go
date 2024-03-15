@@ -48,9 +48,14 @@ func (c *Config) IsValid() (err error) {
 	hasDisks := c.Disks != nil
 	hasBootType := c.SystemConfig.BootType != BootTypeUnset
 	hasPartitionSettings := len(c.SystemConfig.PartitionSettings) > 0
+	hasResetBootLoader := c.SystemConfig.ResetBootLoaderType != ResetBootLoaderTypeDefault
 
 	if hasDisks != hasBootType {
 		return fmt.Errorf("SystemConfig.BootType and Disks must be specified together")
+	}
+
+	if hasDisks != hasResetBootLoader {
+		return fmt.Errorf("SystemConfig.ResetBootLoaderType and Disks must be specified together'")
 	}
 
 	if hasPartitionSettings && !hasDisks {

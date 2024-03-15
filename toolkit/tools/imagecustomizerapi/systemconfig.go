@@ -12,31 +12,37 @@ import (
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
 type SystemConfig struct {
-	BootType                BootType           `yaml:"BootType"`
-	Hostname                string             `yaml:"Hostname"`
-	UpdateBaseImagePackages bool               `yaml:"UpdateBaseImagePackages"`
-	PackageListsInstall     []string           `yaml:"PackageListsInstall"`
-	PackagesInstall         []string           `yaml:"PackagesInstall"`
-	PackageListsRemove      []string           `yaml:"PackageListsRemove"`
-	PackagesRemove          []string           `yaml:"PackagesRemove"`
-	PackageListsUpdate      []string           `yaml:"PackageListsUpdate"`
-	PackagesUpdate          []string           `yaml:"PackagesUpdate"`
-	KernelCommandLine       KernelCommandLine  `yaml:"KernelCommandLine"`
-	AdditionalFiles         AdditionalFilesMap `yaml:"AdditionalFiles"`
-	PartitionSettings       []PartitionSetting `yaml:"PartitionSettings"`
-	PostInstallScripts      []Script           `yaml:"PostInstallScripts"`
-	FinalizeImageScripts    []Script           `yaml:"FinalizeImageScripts"`
-	Users                   []User             `yaml:"Users"`
-	Services                Services           `yaml:"Services"`
-	Modules                 Modules            `yaml:"Modules"`
-	Verity                  *Verity            `yaml:"Verity"`
-	Overlays                *[]Overlay         `yaml:"Overlays"`
+	BootType                BootType            `yaml:"BootType"`
+	ResetBootLoaderType     ResetBootLoaderType `yaml:"ResetBootLoaderType"`
+	Hostname                string              `yaml:"Hostname"`
+	UpdateBaseImagePackages bool                `yaml:"UpdateBaseImagePackages"`
+	PackageListsInstall     []string            `yaml:"PackageListsInstall"`
+	PackagesInstall         []string            `yaml:"PackagesInstall"`
+	PackageListsRemove      []string            `yaml:"PackageListsRemove"`
+	PackagesRemove          []string            `yaml:"PackagesRemove"`
+	PackageListsUpdate      []string            `yaml:"PackageListsUpdate"`
+	PackagesUpdate          []string            `yaml:"PackagesUpdate"`
+	KernelCommandLine       KernelCommandLine   `yaml:"KernelCommandLine"`
+	AdditionalFiles         AdditionalFilesMap  `yaml:"AdditionalFiles"`
+	PartitionSettings       []PartitionSetting  `yaml:"PartitionSettings"`
+	PostInstallScripts      []Script            `yaml:"PostInstallScripts"`
+	FinalizeImageScripts    []Script            `yaml:"FinalizeImageScripts"`
+	Users                   []User              `yaml:"Users"`
+	Services                Services            `yaml:"Services"`
+	Modules                 Modules             `yaml:"Modules"`
+	Verity                  *Verity             `yaml:"Verity"`
+	Overlays                *[]Overlay          `yaml:"Overlays"`
 }
 
 func (s *SystemConfig) IsValid() error {
 	var err error
 
 	err = s.BootType.IsValid()
+	if err != nil {
+		return err
+	}
+
+	err = s.ResetBootLoaderType.IsValid()
 	if err != nil {
 		return err
 	}

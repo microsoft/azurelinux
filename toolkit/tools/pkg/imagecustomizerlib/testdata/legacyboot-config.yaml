@@ -15,8 +15,12 @@ Disks:
 
 SystemConfig:
   BootType: legacy
+  ResetBootLoaderType: hard-reset
   PartitionSettings:
   - ID: boot
 
   - ID: rootfs
     MountPoint: /
+    
+  PackagesInstall:
+  - grub2
