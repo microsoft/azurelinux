@@ -1,0 +1,31 @@
+Disks:
+- PartitionTableType: gpt
+  MaxSize: 4096
+  Partitions:
+  - ID: efi
+    Flags:
+    - esp
+    - boot
+    Start: 1
+    End: 65
+    FsType: fat32
+
+  - ID: rootfs
+    Start: 65
+    FsType: ext4
+
+SystemConfig:
+  BootType: efi
+  PartitionSettings:
+  - ID: efi
+    MountPoint: /boot/efi
+    MountOptions: umask=0077
+
+  - ID: rootfs
+    MountPoint: /
+
+  PackagesRemove:
+  - kernel
+
+  PackagesInstall:
+  - kernel-mshv
