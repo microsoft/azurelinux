@@ -16,7 +16,6 @@ import (
 )
 
 type outputPartitionMetadata struct {
-	Type              string `json:"type"`         // Example: part
 	PartitionNum      int    `json:"partitionnum"` // Example: 1
 	PartitionFilename string `json:"filename"`     // Example: image_1.raw.zst
 	PartLabel         string `json:"partlabel"`    // Example: boot
@@ -223,7 +222,6 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 
 // Construct outputPartitionMetadata for given partition.
 func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string) (partitionMetadata outputPartitionMetadata, err error) {
-	partitionMetadata.Type = diskPartition.Type
 	partitionMetadata.PartitionNum = partitionNum
 	partitionMetadata.PartitionFilename = filepath.Base(partitionFilepath)
 	partitionMetadata.PartLabel = diskPartition.PartLabel

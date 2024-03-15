@@ -4,9 +4,6 @@ The partition metadata JSON file contains metadata describing the extracted part
 of an image file. Each partition is represented as an object with the following
 attributes:
 
-type (string):
-Indicates the type of the object. In this context, it is always set to "part".
-
 partitionnum (integer):
 Specifies the partition number.
 Example: 1 
