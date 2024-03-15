@@ -1,19 +1,20 @@
 Summary:        Mesa libGLU library
 Name:           mesa-libGLU
-Version:        9.0.1
-Release:        4%{?dist}
+Version:        9.0.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://mesa3d.org/
-Source0:        https://mesa.freedesktop.org/archive/glu/glu-%{version}.tar.xz
+Source0:        https://gitlab.freedesktop.org/mesa/glu/-/archive/glu-9.0.3/glu-glu-9.0.3.tar.gz#/mesa-libGLU-%{version}.tar.gz
 Source1:        LICENSE.PTR
 Source2:        make-git-snapshot.sh
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
+
+BuildRequires:  gcc-c++
+BuildRequires:  libglvnd-devel
 BuildRequires:  mesa-libGL-devel
-Provides:       libGLU = %{version}-%{release}
+BuildRequires:  meson
+Provides: libGLU
 
 %description
 Mesa implementation of the standard GLU OpenGL utility API.
@@ -21,26 +22,23 @@ Mesa implementation of the standard GLU OpenGL utility API.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Provides:       libGLU-devel = %{version}-%{release}
+Provides:	libGLU-devel
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%setup -q -n glu-%{version}
+%autosetup -p1 -n glu-glu-%{version}
 cp %{SOURCE1} .
 
 %build
-autoreconf -v -i -f
-%configure --disable-static
-%make_build
-make %{?_smp_mflags}
+%meson -Dgl_provider=glvnd
+%meson_build
 
 %install
-%make_install
-find %{buildroot} -type f -name "*.la" -delete -print
-rm -rf %{buildroot}%{_mandir}/man3/gl[A-Z]*
+%meson_install
+find $RPM_BUILD_ROOT -name '*.a' -delete
 
 %ldconfig_scriptlets
 
@@ -55,6 +53,9 @@ rm -rf %{buildroot}%{_mandir}/man3/gl[A-Z]*
 %{_libdir}/pkgconfig/glu.pc
 
 %changelog
+* Thu Feb 29 2024 Vince Perri <viperri@microsoft.com> - 9.0.3-1
+- Upgrade to 9.0.3.
+
 * Wed Jul 21 2021 Vinicius Jarina <vinja@microsoft.com> - 9.0.1-4
 - Initial CBL-Mariner import from Fedora 33 (license: MIT).
 - Added a "LICENSE.PTR" source clarifying the project's license.

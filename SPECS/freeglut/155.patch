@@ -1,0 +1,49 @@
+From a3810f4e9540286e2d4b8cc97c82ec484de45b9e Mon Sep 17 00:00:00 2001
+From: Sebastian Rasmussen <sebras@gmail.com>
+Date: Mon, 12 Feb 2024 14:46:22 +0800
+Subject: [PATCH] Plug memory leak that happens upon error.
+
+If fgStructure.CurrentMenu is set when glutAddMenuEntry() or
+glutAddSubMenu() is called the allocated menuEntry variable will
+leak. This commit postpones allocating menuEntry until after the
+error checks, thereby plugging the memory leak.
+
+This fixes CVE-2024-24258 and CVE-2024-24259.
+---
+ src/fg_menu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/fg_menu.c b/src/fg_menu.c
+index 53112dc21..0da88901d 100644
+--- a/src/fg_menu.c
++++ b/src/fg_menu.c
+@@ -864,12 +864,12 @@ void FGAPIENTRY glutAddMenuEntry( const char* label, int value )
+ {
+     SFG_MenuEntry* menuEntry;
+     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddMenuEntry" );
+-    menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
+ 
+     freeglut_return_if_fail( fgStructure.CurrentMenu );
+     if (fgState.ActiveMenus)
+         fgError("Menu manipulation not allowed while menus in use.");
+ 
++    menuEntry = (SFG_MenuEntry *)calloc( sizeof(SFG_MenuEntry), 1 );
+     menuEntry->Text = strdup( label );
+     menuEntry->ID   = value;
+ 
+@@ -888,7 +888,6 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
+     SFG_Menu *subMenu;
+ 
+     FREEGLUT_EXIT_IF_NOT_INITIALISED ( "glutAddSubMenu" );
+-    menuEntry = ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
+     subMenu = fgMenuByID( subMenuID );
+ 
+     freeglut_return_if_fail( fgStructure.CurrentMenu );
+@@ -897,6 +896,7 @@ void FGAPIENTRY glutAddSubMenu( const char *label, int subMenuID )
+ 
+     freeglut_return_if_fail( subMenu );
+ 
++    menuEntry = ( SFG_MenuEntry * )calloc( sizeof( SFG_MenuEntry ), 1 );
+     menuEntry->Text    = strdup( label );
+     menuEntry->SubMenu = subMenu;
+     menuEntry->ID      = -1;
