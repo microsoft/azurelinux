@@ -1,0 +1,28 @@
+diff -uNr pybind11-2.10.1.bak/pybind11/commands.py pybind11-2.10.1/pybind11/commands.py
+--- pybind11-2.10.1.bak/pybind11/commands.py	2022-11-07 15:25:26.651515082 -0600
++++ pybind11-2.10.1/pybind11/commands.py	2022-11-07 15:27:01.574703289 -0600
+@@ -8,22 +8,13 @@
+     Return the path to the pybind11 include directory. The historical "user"
+     argument is unused, and may be removed.
+     """
+-    installed_path = os.path.join(DIR, "include")
+-    source_path = os.path.join(os.path.dirname(DIR), "include")
+-    return installed_path if os.path.exists(installed_path) else source_path
+-
++    return '/usr/include/pybind11'
+ 
+ def get_cmake_dir() -> str:
+     """
+     Return the path to the pybind11 CMake module directory.
+     """
+-    cmake_installed_path = os.path.join(DIR, "share", "cmake", "pybind11")
+-    if os.path.exists(cmake_installed_path):
+-        return cmake_installed_path
+-
+-    msg = "pybind11 not installed, installation required to access the CMake files"
+-    raise ImportError(msg)
+-
++    return '/usr/share/cmake/pybind11'
+ 
+ def get_pkgconfig_dir() -> str:
+     """

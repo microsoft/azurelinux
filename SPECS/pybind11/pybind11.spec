@@ -7,7 +7,7 @@ Distribution:   Azure Linux
 %global debug_package %{nil}
 
 Name:    pybind11
-Version: 2.6.2
+Version: 2.11.1
 Release: 3%{?dist}
 Summary: Seamless operability between C++11 and Python
 License: BSD
@@ -15,7 +15,7 @@ URL:	 https://github.com/pybind/pybind11
 Source0: https://github.com/pybind/pybind11/archive/v%{version}/%{name}-%{version}.tar.gz
 
 # Patch out header path
-Patch1:  pybind11-2.6.1-hpath.patch
+Patch1:  pybind11-2.10.11-hpath.patch
 
 BuildRequires: make
 
@@ -94,12 +94,17 @@ PYBIND11_USE_CMAKE=true %py3_install "--install-purelib" "%{python3_sitearch}"
 %{_includedir}/pybind11/
 %{_datadir}/cmake/pybind11/
 %{_bindir}/pybind11-config
+%{_datadir}/pkgconfig/%{name}.pc
+ 
 
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}/
 %{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Thu Aug 31 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.11.1-1
+- Update to 2.11.1 using Fedora 40 (license: MIT)
+
 * Thu Aug 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.6.2-3
 - Disabling missing test dependency.
 - License verified.

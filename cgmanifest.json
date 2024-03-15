@@ -21443,8 +21443,8 @@
         "type": "other",
         "other": {
           "name": "pybind11",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.6.2/pybind11-2.6.2.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.11.1/pybind11-2.11.1.tar.gz"
         }
       }
     },
@@ -23042,6 +23042,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ml-dtypes",
+          "version": "0.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/ml_dtypes/ml_dtypes-0.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mock",
           "version": "5.1.0",
           "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-5.1.0.tar.gz"
@@ -24425,16 +24435,6 @@
           "name": "python-tensorboard-plugin-wit",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/PAIR-code/what-if-tool/archive/refs/tags/v1.8.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-tensorflow-estimator",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/estimator/archive/refs/tags/v2.11.0.tar.gz"
         }
       }
     },
@@ -28326,8 +28326,8 @@
         "type": "other",
         "other": {
           "name": "tensorflow",
-          "version": "2.11.1",
-          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
+          "version": "2.16.1",
+          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.16.1.tar.gz"
         }
       }
     },
