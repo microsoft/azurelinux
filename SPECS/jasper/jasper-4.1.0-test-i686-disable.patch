@@ -1,0 +1,131 @@
+diff -urNp a/src/app/CMakeLists.txt b/src/app/CMakeLists.txt
+--- a/src/app/CMakeLists.txt	2024-02-13 13:35:43.450061461 +0100
++++ b/src/app/CMakeLists.txt	2024-02-14 07:44:16.606095637 +0100
+@@ -115,9 +115,6 @@ if(BASH_PROGRAM AND JAS_HAVE_ALL_NATIVE_
+ 	add_test(run_test_2
+ 	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+ 	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_2" -v)
+-	add_test(run_test_3
+-	  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+-	  "${CMAKE_CURRENT_SOURCE_DIR}/../../test/bin/run_test_3" -v)
+ 	if(JAS_ENABLE_CONFORMANCE_TESTS)
+ 		add_test(run_conformance_tests
+ 		  "${BASH_PROGRAM}" "${CMAKE_CURRENT_BINARY_DIR}/../../test/bin/wrapper"
+diff -urNp a/test/bin/run_test_3 b/test/bin/run_test_3
+--- a/test/bin/run_test_3	2024-02-13 13:35:43.463061601 +0100
++++ b/test/bin/run_test_3	1970-01-01 01:00:00.000000000 +0100
+@@ -1,114 +0,0 @@
+-#! /usr/bin/env bash
+-# Copyright (c) 2016 Michael David Adams
+-################################################################################
+-
+-################################################################################
+-
+-if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+-	echo "This test requires Bash 4 or greater."
+-	echo "This test is being skipped."
+-	exit 0
+-fi
+-
+-cmd_dir=$(dirname "$0") || exit 1
+-source "$cmd_dir"/base_utilities || exit 1
+-source "$cmd_dir"/test_utilities || exit 1
+-top_dir="$cmd_dir/../.."
+-sysinfo_program="$top_dir/build/sysinfo"
+-
+-debug_level="${JAS_DEBUG_LEVEL:-0}"
+-if [ "$debug_level" -ge 1 ]; then
+-	set -xv
+-fi
+-
+-################################################################################
+-
+-set_source_and_build_dirs || panic "cannot set source and build directories"
+-
+-################################################################################
+-
+-#abs_source_dir="$1"
+-#abs_build_dir="$2"
+-
+-#export JAS_ABS_TOP_BUILDDIR="$abs_build_dir"
+-#export JAS_TOP_BUILDDIR="$abs_build_dir"
+-#export JAS_ABS_TOP_SRCDIR="$abs_source_dir"
+-#export JAS_TOP_SRCDIR="$abs_source_dir"
+-
+-#$CMDDIR/rundectests jasper || exit 1
+-
+-oj_compress=$(type -P opj2_compress) || oj_compress=""
+-oj_decompress=$(type -P opj2_decompress) || oj_decompress=""
+-
+-run_test="$cmd_dir/run_codec_test"
+-
+-codec_selectors=()
+-codec_selectors+=(jasper_jasper)
+-if [ -n "$oj_decompress" ]; then
+-	codec_selectors+=(jasper_oj)
+-fi
+-#codec_selectors+=(jasper_jj2k)
+-#codec_selectors+=(jj2k_jasper)
+-#codec_selectors+=(kakadu_jasper)
+-#codec_selectors+=(jasper_kakadu)
+-###codec_selectors+=(jasper_vm)
+-###codec_selectors+=(vm_jasper)
+-
+-exclude_tests=()
+-
+-os="$("$sysinfo_program" -o)" || \
+-  panic "cannot get OS information"
+-echo "OS: $os"
+-
+-if [ "$os" = windows ]; then
+-	eecho "WARNING: some tests disabled"
+-	exclude_tests+=(sgn_1)
+-fi
+-
+-base_opts=()
+-for test in "${exclude_tests[@]}"; do
+-	base_opts+=(-X "$test")
+-done
+-
+-echo "STARTING AT `date`"
+-
+-num_errors=0
+-failed_tests=()
+-
+-for codec_selector in "${codec_selectors[@]}"; do
+-	enc=$(echo "$codec_selector" | awk -v FS=_ '{print $1}' -)
+-	dec=$(echo "$codec_selector" | awk -v FS=_ '{print $2}' -)
+-	echo "############################################################"
+-	echo "START OF TESTS FOR ENCODER=$enc DECODER=$dec"
+-	echo "############################################################"
+-	opts=()
+-	opts+=(-v)
+-	opts+=(-e "$enc")
+-	opts+=(-d "$dec")
+-	opts+=(-E ignore)
+-	opts+=("${base_opts[@]}")
+-	#opts+=(-B)
+-	opts+=("$@")
+-	"$run_test" "${opts[@]}"
+-	status=$?
+-	if [ $status -ne 0 ]; then
+-		num_errors=$((num_errors + 1))
+-		failed_tests+=($codec_selector)
+-		#panic "running tests failed"
+-	fi
+-	echo "############################################################"
+-	echo "END OF TESTS"
+-	echo "############################################################"
+-done
+-
+-echo "ENDING AT `date`"
+-
+-echo "############################################################"
+-echo "TEST SUMMARY"
+-echo "Number of codec selectors: ${#codec_selectors[@]}"
+-echo "Number of errors: $num_errors"
+-if [ "$num_errors" -gt 0 ]; then
+-	echo "STATUS: FAILED"
+-	exit 1
+-fi
+-echo "STATUS: PASSED"
