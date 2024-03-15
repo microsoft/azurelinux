@@ -3,6 +3,7 @@ package imagecustomizerlib
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -15,6 +16,18 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
+type outputPartitionMetadata struct {
+	Type              string `json:"type"`         // Example: part
+	PartitionNum      int    `json:"partitionnum"` // Example: 1
+	PartitionFilepath string `json:"filepath"`     // Example: out/image_1.raw
+	PartLabel         string `json:"partlabel"`    // Example: boot
+	FileSystemType    string `json:"fstype"`       // Example: vfat
+	PartitionTypeUuid string `json:"parttype"`     // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+	Uuid              string `json:"uuid"`         // Example: 4BD9-3A78
+	PartUuid          string `json:"partuuid"`     // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
+	Mountpoint        string `json:"mountpoint"`   // Example: /mnt/os/boot
+}
+
 const (
 	SkippableFrameMagicNumber uint32 = 0x184D2A50
 	SkippableFramePayloadSize uint32 = 16
@@ -24,23 +37,19 @@ const (
 // Extract all partitions of connected image into separate files with specified format.
 func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
 
-	// Get partition info.
+	// Get partition info
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
 	if err != nil {
 		return err
 	}
 
-	// Write partition metadata JSON to a file.
-	jsonFilename := basename + "_partition_metadata.json"
-	err = writePartitionMetadataJson(diskPartitions, outDir, jsonFilename)
-	if err != nil {
-		return err
-	}
+	// Stores the output partition metadata that will be written to JSON file
+	var output []outputPartitionMetadata
 
-	// Create skippable frame metadata defined as a random 128-Bit number
+	// Create skippable frame metadata defined as a random 128-bit number
 	skippableFrameMetadata, err := createSkippableFrameMetadata()
 
-	// Extract partitions to files.
+	// Extract partitions to files
 	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
 		if diskPartitions[partitionNum].Type == "part" {
 			partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
@@ -54,7 +63,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 			switch partitionFormat {
 			case "raw":
-				// Do nothing for "raw" case.
+				// Do nothing for "raw" case
 			case "raw-zst":
 				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
 				if err != nil {
@@ -63,13 +72,25 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 			default:
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
+
+			err = constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath, &output)
+			if err != nil {
+				return err
+			}
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
 		}
+	}
+
+	// Write partition metadata JSON to a file
+	jsonFilename := basename + "_partition_metadata.json"
+	err = writePartitionMetadataJson(outDir, jsonFilename, &output)
+	if err != nil {
+		return fmt.Errorf("failed to write partition metadata json:\n%w", err)
 	}
 	return nil
 }
 
-// Extract raw-zst partition
+// Extract raw-zst partition.
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionFilename string, outDir string) (partitionFilepath string, err error) {
 	// Define file path for temporary partition
 	tempPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
@@ -197,11 +218,46 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 	return randomBytes, nil
 }
 
+// Construct outputPartitionMetadata object.
+func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string, output *[]outputPartitionMetadata) (err error) {
+	diskPartitionJson, err := json.Marshal(&diskPartition)
+	if err != nil {
+		return fmt.Errorf("failed to marshal disk partition:\n%w", err)
+	}
+
+	// Construct a map of interesting partition information
+	interestingPartitionInfo := map[string]interface{}{}
+	err = json.Unmarshal([]byte(diskPartitionJson), &interestingPartitionInfo)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal disk partition json:\n%w", err)
+	}
+	interestingPartitionInfo["filepath"] = partitionFilepath
+	interestingPartitionInfo["partitionNum"] = partitionNum
+	delete(interestingPartitionInfo, "name") // Customer is not interested in loop device name
+	delete(interestingPartitionInfo, "path") // Customer is not interested in loop device path
+
+	// Append the interesting partition information to output
+	interestingPartitionInfoJson, err := json.Marshal(&interestingPartitionInfo)
+	if err != nil {
+		return fmt.Errorf("failed to marshal interesting partition info:\n%w", err)
+	}
+	var currentPartitionMetadata outputPartitionMetadata
+	err = json.Unmarshal([]byte(interestingPartitionInfoJson), &currentPartitionMetadata)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal interesting partition info json:\n%w", err)
+	}
+	*output = append(*output, currentPartitionMetadata)
+	return nil
+}
+
 // Write partition metadata as JSON to a file.
-func writePartitionMetadataJson(diskPartition []diskutils.PartitionInfo, outDir string, name string) (err error) {
-	// Write the JSON string to file
+func writePartitionMetadataJson(outDir string, name string, output *[]outputPartitionMetadata) (err error) {
 	fullPath := filepath.Join(outDir, name)
-	jsonutils.WriteJSONFile(fullPath, &diskPartition)
+
+	err = jsonutils.WriteJSONFile(fullPath, output)
+	if err != nil {
+		return err
+	}
 
 	logger.Log.Infof("Partition metadata file created: %s", fullPath)
 	return nil
