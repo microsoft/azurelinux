@@ -155,11 +155,11 @@ repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 # Generate text based on mode (Use figlet to generate splash text once available on Azure Linux)
 if [[ "${mode}" == "build" ]]; then
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
-    echo -e "\033[31m --------------------------------- AZURE LINUX BUILDER ! -------------------------------- \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m --------------------------------- AZURE LINUX BUILDER ! ---------------------------------\033[0m" >> ${tmp_dir}/splash.txt
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 else
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
-    echo -e "\033[31m --------------------------------- AZURE LINUX TESTER ! --------------------------------- \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m --------------------------------- AZURE LINUX TESTER ! ----------------------------------\033[0m" >> ${tmp_dir}/splash.txt
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 fi
 
@@ -246,7 +246,7 @@ if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base imag
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
-    container_img="azl/containerized-rpmbuild:${version}"
+    container_img="mcr.microsoft.com/azurelinux/containerized-rpmbuild:${version}"
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
@@ -266,7 +266,7 @@ fi
 
 # ================== Launch Container ==================
 echo "Checking if build env is up-to-date..."
-docker_image_tag="azl/${USER}-containerized-rpmbuild:${version}"
+docker_image_tag="mcr.microsoft.com/azurelinux/${USER}-containerized-rpmbuild:${version}"
 docker build -q \
                 -f "${dockerfile}" \
                 -t "${docker_image_tag}" \
