@@ -69,7 +69,7 @@ Python language bindings for gRPC.
 %prep
 %setup -q -n %{name}-%{version}
 %setup -T -D -a 1
-%patch0 -p1
+%patch 0 -p1
 
 # remove third party code taken from installed packages (build requires)
 rm -r %{_builddir}/%{name}-%{version}/third_party/abseil-cpp
