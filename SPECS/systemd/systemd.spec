@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        7%{?dist}
+Release:        8%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -344,6 +344,7 @@ Obsoletes:      systemd-compat-libs < 230
 Obsoletes:      nss-myhostname < 0.4
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
+Obsoletes:      systemd-bootstrap-libs <= %{version}-%{release}
 
 %description libs
 Libraries for systemd and udev.
@@ -1186,6 +1187,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-8
+- Obsolete the new systemd-bootstrap-libs subpacakge.
+
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 255-7
 - remove use of %%azure (or %%azl) macro
 
