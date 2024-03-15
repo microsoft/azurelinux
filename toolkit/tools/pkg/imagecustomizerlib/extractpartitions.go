@@ -44,7 +44,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	}
 
 	// Stores the output partition metadata that will be written to JSON file
-	var output []outputPartitionMetadata
+	var partitionMetadataOutput []outputPartitionMetadata
 
 	// Create skippable frame metadata defined as a random 128-bit number
 	skippableFrameMetadata, err := createSkippableFrameMetadata()
@@ -73,7 +73,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 			}
 
-			err = constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath, &output)
+			err = constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath, &partitionMetadataOutput)
 			if err != nil {
 				return err
 			}
