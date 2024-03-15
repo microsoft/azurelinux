@@ -11,8 +11,8 @@ import (
 
 // ParsePackageList will parse a string of packages.
 // Duplicate entries in the string will be removed.
-// If no/empty string is given, nil will be returned.
-// A map of [package name] -> [true] will be returned.
+// If empty string is given, nil will be returned.
+// Else, a map of [package name] -> [true] will be returned.
 func ParsePackageList(packages string) (packageMap map[string]bool, err error) {
 	timestamp.StartEvent("parse list", nil)
 	defer timestamp.StopEvent(nil)
