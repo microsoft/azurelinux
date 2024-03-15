@@ -1,7 +1,7 @@
-diff -uNr pybind11-2.10.1.bak/pybind11/commands.py pybind11-2.11.1/pybind11/commands.py
---- pybind11-2.11.1.bak/pybind11/commands.py	2022-11-07 15:25:26.651515082 -0600
-+++ pybind11-2.11.1/pybind11/commands.py	2022-11-07 15:27:01.574703289 -0600
-@@ -8,22 +8,13 @@
+diff -urN pybind11-2.11.1/pybind11/commands.py pybind11-2.11.1/pybind11/commands.py
+--- pybind11-2.11.1/pybind11/commands.py	2024-03-18 12:25:44.994329051 -0700
++++ pybind11-2.11.1/pybind11/commands.py	2024-03-18 12:27:05.558472628 -0700
+@@ -8,21 +8,13 @@
      Return the path to the pybind11 include directory. The historical "user"
      argument is unused, and may be removed.
      """
@@ -21,8 +21,7 @@ diff -uNr pybind11-2.10.1.bak/pybind11/commands.py pybind11-2.11.1/pybind11/comm
 -
 -    msg = "pybind11 not installed, installation required to access the CMake files"
 -    raise ImportError(msg)
--
 +    return '/usr/share/cmake/pybind11'
  
+ 
  def get_pkgconfig_dir() -> str:
-     """
