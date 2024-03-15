@@ -77,7 +77,7 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 
 			partitionMetadata, err := constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to construct partition metadata:\n%w", err)
 			}
 			partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
 			logger.Log.Infof("Partition file created: %s", partitionFilepath)
