@@ -1,6 +1,6 @@
-diff -uNr pybind11-2.10.1.bak/pybind11/commands.py pybind11-2.10.1/pybind11/commands.py
---- pybind11-2.10.1.bak/pybind11/commands.py	2022-11-07 15:25:26.651515082 -0600
-+++ pybind11-2.10.1/pybind11/commands.py	2022-11-07 15:27:01.574703289 -0600
+diff -uNr pybind11-2.10.1.bak/pybind11/commands.py pybind11-2.11.1/pybind11/commands.py
+--- pybind11-2.11.1.bak/pybind11/commands.py	2022-11-07 15:25:26.651515082 -0600
++++ pybind11-2.11.1/pybind11/commands.py	2022-11-07 15:27:01.574703289 -0600
 @@ -8,22 +8,13 @@
      Return the path to the pybind11 include directory. The historical "user"
      argument is unused, and may be removed.
