@@ -574,6 +574,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 // files can be used by custom initrd/LiveOS images that will look for them
 // on the iso media.
 func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
+	logger.Log.Debugf("Copying ISO additional files")
 	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles...)
 }
 
