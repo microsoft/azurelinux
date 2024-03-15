@@ -28,6 +28,7 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-pytest
 %endif
 
+Requires:       openssl-libs
 Requires:       python3
 Requires:       python3-asn1crypto
 Requires:       python3-cffi
@@ -76,6 +77,7 @@ popd
 # Need to add _rust.abi3.so to MANIFEST.in so the whl will contain it
 cp ./src/rust/target/%{rust_def_target}/release/libcryptography_rust.so ./src/cryptography/hazmat/bindings/_rust.abi3.so
 echo 'recursive-include src/cryptography _rust.abi3.so' >> MANIFEST.in
+%pyproject_wheel
 
 %install
 %pyproject_install
