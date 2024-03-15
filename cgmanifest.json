@@ -20723,8 +20723,8 @@
         "type": "other",
         "other": {
           "name": "pesign",
-          "version": "0.112",
-          "downloadUrl": "https://github.com/vathpela/pesign/releases/download/0.112/pesign-0.112.tar.bz2"
+          "version": "116",
+          "downloadUrl": "https://github.com/rhboot/pesign/releases/download/116/pesign-116.tar.bz2"
         }
       }
     },
@@ -27415,9 +27415,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "shim-unsigned-aarch64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "name": "shim-unsigned-aa64",
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },
@@ -27426,8 +27426,8 @@
         "type": "other",
         "other": {
           "name": "shim-unsigned-x64",
-          "version": "15.4",
-          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.4/shim-15.4.tar.bz2"
+          "version": "15.8",
+          "downloadUrl": "https://github.com/rhboot/shim/releases/download/15.8/shim-15.8.tar.bz2"
         }
       }
     },

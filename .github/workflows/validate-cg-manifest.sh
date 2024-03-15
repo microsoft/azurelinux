@@ -48,6 +48,9 @@ ignore_no_source_tarball=" \
   pyproject-rpm-macros \
   python-rpm-generators \
   qt-rpm-macros \
+  shim \
+  shim-aa64 \
+  shim-x64 \
   sgx-backwards-compatability \
   verity-read-only-root \
   web-assets \

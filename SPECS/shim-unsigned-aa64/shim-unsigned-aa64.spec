@@ -9,8 +9,6 @@
 %global zdpd 0%{dotpre}.
 %endif
 
-%bcond altarch 0
-
 %if 0%{?azl}
 %global efidir azurelinux
 %else
@@ -18,21 +16,13 @@
 %endif
 %global shimrootdir %{_datadir}/shim/
 %global shimversiondir %{shimrootdir}/%{version}-%{release}
-%global efiarch x64
+%global efiarch aa64
 %global shimdir %{shimversiondir}/%{efiarch}
-%if %{with altarch}
-%global efialtarch ia32
-%global shimaltdir %{shimversiondir}/%{efialtarch}
-%endif
 
 %global debug_package %{nil}
 %global __debug_package 1
 %global _binaries_in_noarch_packages_terminate_build 0
-%if %{with altarch}
-%global __debug_install_post %{SOURCE100} %{efiarch} %{efialtarch}
-%else
 %global __debug_install_post %{SOURCE100} %{efiarch}
-%endif
 %undefine _debuginfo_subpackages
 
 # currently here's what's in our dbx: nothing
@@ -42,13 +32,13 @@ Name:		shim-unsigned-%{efiarch}
 Version:	15.8
 Release:	3%{?dist}
 Summary:	First-stage UEFI bootloader
-ExclusiveArch:	x86_64
+ExclusiveArch:	aarch64
 License:	BSD
 Vendor:		Microsoft Corporation
 Distribution:	Azure Linux
 URL:		https://github.com/rhboot/shim
 Source0:	https://github.com/rhboot/shim/releases/download/%{version}%{?dashpre}/shim-%{version}%{?dotpre}.tar.bz2
-Source1:	cbl-mariner-ca-20211013.der
+Source1:	azurelinux-ca-20211013.der
 %if 0%{?dbxfile}
 Source2:	%{dbxfile}
 %endif
@@ -83,15 +73,6 @@ use this package or when debugging this package.
 %description
 %desc
 
-%if %{with altarch}
-%package -n shim-unsigned-%{efialtarch}
-Summary:	First-stage UEFI bootloader (unsigned data)
-Provides:	bundled(openssl) = %{openssl_vre}
-
-%description -n shim-unsigned-%{efialtarch}
-%desc
-%endif
-
 %package debuginfo
 Summary:	Debug information for shim-unsigned-%{efiarch}
 AutoReqProv:	0
@@ -99,16 +80,6 @@ BuildArch:	noarch
 
 %description debuginfo
 %debug_desc
-
-%if %{with altarch}
-%package -n shim-unsigned-%{efialtarch}-debuginfo
-Summary:	Debug information for shim-unsigned-%{efialtarch}
-AutoReqProv:	0
-BuildArch:	noarch
-
-%description -n shim-unsigned-%{efialtarch}-debuginfo
-%debug_desc
-%endif
 
 %package debugsource
 Summary:	Debug Source for shim-unsigned
@@ -123,23 +94,20 @@ BuildArch:	noarch
 git config --unset user.email
 git config --unset user.name
 mkdir build-%{efiarch}
-%if %{with altarch}
-mkdir build-%{efialtarch}
-%endif
 cp %{SOURCE3} data/
 
 %build
-COMMITID=$(cat commit)
-MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
+COMMIT_ID=5914984a1ffeab841f482c791426d7ca9935a5e6
+MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMIT_ID=${COMMIT_ID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim RELEASE=%{release} "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
-MAKEFLAGS+="%{_smp_mflags}"
+MAKEFLAGS+=" %{_smp_mflags} "
 if [ -f "%{SOURCE1}" ]; then
-	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1}"
+	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1} "
 fi
 %if 0%{?dbxfile}
 if [ -f "%{SOURCE2}" ]; then
-	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2}"
+	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2} "
 fi
 %endif
 
@@ -149,26 +117,17 @@ make ${MAKEFLAGS} \
 	all
 cd ..
 
-%if %{with altarch}
-cd build-%{efialtarch}
-setarch linux32 -B make ${MAKEFLAGS} \
-	ARCH=%{efialtarch} \
-	DEFAULT_LOADER='\\\\grub%{efialtarch}.efi' \
-	all
-cd ..
-%endif
-
 %install
-COMMITID=$(cat commit)
-MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMITID=${COMMITID} "
+COMMIT_ID=5914984a1ffeab841f482c791426d7ca9935a5e6
+MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMIT_ID=${COMMIT_ID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim RELEASE=%{release} "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
 if [ -f "%{SOURCE1}" ]; then
-	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1}"
+	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1} "
 fi
 %if 0%{?dbxfile}
 if [ -f "%{SOURCE2}" ]; then
-	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2}"
+	MAKEFLAGS="$MAKEFLAGS VENDOR_DBX_FILE=%{SOURCE2} "
 fi
 %endif
 
@@ -180,17 +139,6 @@ make ${MAKEFLAGS} \
 install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimdir}/"
 cd ..
 
-%if %{with altarch}
-cd build-%{efialtarch}
-setarch linux32 make ${MAKEFLAGS} \
-	ARCH=%{efialtarch} \
-	DEFAULT_LOADER='\\\\grub%{efialtarch}.efi' \
-	DESTDIR=${RPM_BUILD_ROOT} \
-	install-as-data install-debuginfo install-debugsource
-install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimaltdir}/"
-cd ..
-%endif
-
 %files
 %license COPYRIGHT
 %dir %{shimrootdir}
@@ -200,65 +148,35 @@ cd ..
 %{shimdir}/*.hash
 %{shimdir}/*.CSV
 
-%if %{with altarch}
-%files -n shim-unsigned-%{efialtarch}
-%license COPYRIGHT
-%dir %{shimrootdir}
-%dir %{shimversiondir}
-%dir %{shimaltdir}
-%{shimaltdir}/*.efi
-%{shimaltdir}/*.hash
-%{shimaltdir}/*.CSV
-%endif
-
 %files debuginfo -f build-%{efiarch}/debugfiles.list
-
-%if %{with altarch}
-%files -n shim-unsigned-%{efialtarch}-debuginfo -f build-%{efialtarch}/debugfiles.list
-%endif
 
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
-* Thu Feb 08 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-3
+* Tue Mar 12 2024 Dan Streetman <ddstreet@microsoft.com> - 15.8-3
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - license verified
 
-* Tue Jun 07 2022 Peter Jones <pjones@redhat.com> - 15.6-1
+* Thu Mar 07 2024 Peter Jones <pjones@redhat.com> - 15.8-2
+- Update to shim-15.8
+  Resolves: CVE-2023-40546
+  Resolves: CVE-2023-40547
+  Resolves: CVE-2023-40548
+  Resolves: CVE-2023-40549
+  Resolves: CVE-2023-40550
+  Resolves: CVE-2023-40551
+  Resolves: rhbz#2113005
+  Resolves: rhbz#2189197
+  Resolves: rhbz#2238884
+  Resolves: rhbz#2259264
+
+* Thu Jul 07 2022 Robbie Harwood <rharwood@redhat.com> - 15.6-2
+- Add pjones's aarch64 relocation fix
+- Resolves: #2101248
+
+* Wed Jun 15 2022 Peter Jones <pjones@redhat.com> - 15.6-1
 - Update to shim-15.6
   Resolves: CVE-2022-28737
-
-* Thu Mar 10 2022 Peter Jones <pjones@redhat.com> - 15.5-1
-- Update to shim 15.5
-  - lots of minor fixes
-
-* Tue Mar 30 2021 Peter Jones <pjones@redhat.com> - 15.4-1
-- Update to shim 15.4
-  - Support for revocations via the ".sbat" section and SBAT EFI variable
-  - A new unit test framework and a bunch of unit tests
-  - No external gnu-efi dependency
-  - Better CI
-  Resolves: CVE-2020-14372
-  Resolves: CVE-2020-25632
-  Resolves: CVE-2020-25647
-  Resolves: CVE-2020-27749
-  Resolves: CVE-2020-27779
-  Resolves: CVE-2021-20225
-  Resolves: CVE-2021-20233
-
-* Wed Mar 24 2021 Peter Jones <pjones@redhat.com> - 15.3-0~1
-- Update to shim 15.3
-  - Support for revocations via the ".sbat" section and SBAT EFI variable
-  - A new unit test framework and a bunch of unit tests
-  - No external gnu-efi dependency
-  - Better CI
-  Resolves: CVE-2020-14372
-  Resolves: CVE-2020-25632
-  Resolves: CVE-2020-25647
-  Resolves: CVE-2020-27749
-  Resolves: CVE-2020-27779
-  Resolves: CVE-2021-20225
-  Resolves: CVE-2021-20233
 
 * Thu Apr 05 2018 Peter Jones <pjones@redhat.com> - 15-1
 - Update to shim 15
@@ -274,10 +192,24 @@ cd ..
 - coverity and scan-build checker make targets
 - misc cleanups
 
-* Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 13-0.2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+* Tue Sep 19 2017 Peter Jones <pjones@redhat.com> - 13-3
+- Actually update to the *real* 13 final.
+  Related: rhbz#1489604
 
-* Fri Aug 18 2017 Peter Jones <pjones@redhat.com> - 13-0.1
-- Make a new shim-unsigned-x64 package like the shim-unsigned-aarch64 one.
-- This will (eventually) supersede what's in the "shim" package so we can
-  make "shim" hold the signed one, which will confuse fewer people.
+* Thu Aug 31 2017 Peter Jones <pjones@redhat.com> - 13-2
+- Actually update to 13 final.
+
+* Mon Aug 21 2017 Peter Jones <pjones@redhat.com> - 13-0.1
+- Update to shim-13 test release.
+
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Thu May 12 2016 Peter Jones <pjones@redhat.com> - - 0.9-1
+- Initial split up of -aarch64
