@@ -12,14 +12,15 @@ INCREMENTAL_TOOLCHAIN=$4
 ARCHIVE_TOOL=$5
 
 # Grab an identity for the raw toolchain components so we can avoid rebuilding it if it hasn't changed
-files_to_watch=( "./create_toolchain_in_container.sh" \
-                    "./container/toolchain-sha256sums" \
+files_to_watch=(    "./create_toolchain_in_container.sh" \
                     "./container/Dockerfile" \
                     "./container/mount_chroot_start_build.sh" \
                     "./container/sanity_check.sh" \
                     "./container/toolchain_build_in_chroot.sh" \
                     "./container/toolchain_build_temp_tools.sh" \
                     "./container/toolchain_initial_chroot_setup.sh" \
+                    "./container/toolchain-remote-wget-list" \
+                    "./container/toolchain-sha256sums" \
                     "./container/unmount_chroot.sh" \
                     "./container/version-check-container.sh" )
 sha_component_tag=$(sha256sum "${files_to_watch[@]}" | sha256sum | cut -d' ' -f1 )
