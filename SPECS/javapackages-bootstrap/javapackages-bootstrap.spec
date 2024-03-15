@@ -157,6 +157,7 @@ BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-generators
 BuildRequires:  java-devel
 BuildRequires:  rpm-devel
+BuildRequires:  javapackages-extra
 
 Requires:       bash
 Requires:       coreutils
