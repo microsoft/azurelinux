@@ -152,6 +152,8 @@ Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xmvn-generator-1.2.1.tar.xz
 Source1120:     xz-java-1.9.tar.xz
 
+Patch01:      0002-Rebase-xmvn-to-current-trunk.patch
+
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
 Provides:     bundled(apache-pom) = 30
@@ -313,7 +315,7 @@ for source in ${other_sources}
 do
   tar -xf "${source}"
 done
-
+%patch 0 -p1
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"

@@ -1,0 +1,1093 @@
+From 176c6273f7d725bdb2178be7dabaeab2db9f9e33 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Wed, 26 Oct 2022 09:53:13 +0200
+Subject: [PATCH] Rebase xmvn to current trunk
+
+---
+ patches/xmvn/0001-Port-to-current-trunk.patch | 1075 +++++++++++++++++
+ 1 file changed, 1075 insertions(+)
+ create mode 100644 patches/xmvn/0001-Port-to-current-trunk.patch
+
+diff --git a/patches/xmvn/0001-Port-to-current-trunk.patch b/patches/xmvn/0001-Port-to-current-trunk.patch
+new file mode 100644
+index 0000000..5e0e1ac
+--- /dev/null
++++ b/patches/xmvn/0001-Port-to-current-trunk.patch
+@@ -0,0 +1,1075 @@
++diff --git a/.github/workflows/Dockerfile b/.github/workflows/Dockerfile
++index 6eaf6875..154e10d9 100644
++--- a/.github/workflows/Dockerfile
+++++ b/.github/workflows/Dockerfile
++@@ -14,5 +14,5 @@
++ # limitations under the License.
++ #
++ 
++-FROM registry.access.redhat.com/ubi8
++-RUN dnf -y module enable maven:3.6 && dnf -y update && dnf -y install git-core maven-openjdk11
+++FROM registry.access.redhat.com/ubi9
+++RUN dnf -y update && dnf -y install git-core maven-openjdk8
++diff --git a/.github/workflows/maven.yml b/.github/workflows/maven.yml
++index 0dc14a3f..775c25c6 100644
++--- a/.github/workflows/maven.yml
+++++ b/.github/workflows/maven.yml
++@@ -27,8 +27,8 @@ jobs:
++     container: quay.io/mizdebsk/maven:latest
++     steps:
++       - name: Checkout git repository
++-        uses: actions/checkout@v2
+++        uses: actions/checkout@v3
++       - name: Run build
++-        run: mvn -B -Dgpg.skip -Prun-its verify
+++        run: mvn -V -B -Dgpg.skip -Pquality,run-its,release verify
++       - name: Upload coverage report to Codecov
++-        uses: codecov/codecov-action@v2.0.2
+++        uses: codecov/codecov-action@v3.1.0
++diff --git a/aux/license-header.txt b/aux/license-header.txt
++index 78ec7dee..9212e864 100644
++--- a/aux/license-header.txt
+++++ b/aux/license-header.txt
++@@ -1,5 +1,5 @@
++ ^/\*-$
++-^ \* Copyright \(c\) (20(1[2-9]|2[0-0])-)?2021 Red Hat, Inc\.$
+++^ \* Copyright \(c\) (20(1[2-9]|2[0-1])-)?202[1-2] Red Hat, Inc\.$
++ ^ \*$
++ ^ \* Licensed under the Apache License, Version 2\.0 \(the "License"\);$
++ ^ \* you may not use this file except in compliance with the License\.$
++diff --git a/xmvn-api/.classpath b/xmvn-api/.classpath
++index 6c61e620..12aa8aee 100644
++--- a/xmvn-api/.classpath
+++++ b/xmvn-api/.classpath
++@@ -13,7 +13,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-api/.settings/org.eclipse.jdt.core.prefs b/xmvn-api/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-api/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-api/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-api/pom.xml b/xmvn-api/pom.xml
++index 74b961d8..247eaad7 100644
++--- a/xmvn-api/pom.xml
+++++ b/xmvn-api/pom.xml
++@@ -38,7 +38,7 @@
++         <artifactId>modello-maven-plugin</artifactId>
++         <configuration>
++           <version>3.2.0</version>
++-          <useJava5>true</useJava5>
+++          <javaSource>8</javaSource>
++           <domAsXpp3>false</domAsXpp3>
++           <models>
++             <model>src/main/mdo/config.mdo</model>
++diff --git a/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DependencyDescriptor.java b/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DependencyDescriptor.java
++index 9918affe..1af7d2fb 100644
++--- a/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DependencyDescriptor.java
+++++ b/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DependencyDescriptor.java
++@@ -15,6 +15,7 @@
++  */
++ package org.fedoraproject.xmvn.deployer;
++ 
+++import java.util.Collections;
++ import java.util.List;
++ 
++ import org.fedoraproject.xmvn.artifact.Artifact;
++@@ -34,7 +35,7 @@ public class DependencyDescriptor
++     {
++         this.dependencyArtifact = dependencyArtifact;
++         this.optional = optional;
++-        this.exclusions = List.copyOf( exclusions );
+++        this.exclusions = Collections.unmodifiableList( exclusions );
++     }
++ 
++     public Artifact getDependencyArtifact()
++diff --git a/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DeploymentRequest.java b/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DeploymentRequest.java
++index 6c67d2c7..16e48471 100644
++--- a/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DeploymentRequest.java
+++++ b/xmvn-api/src/main/java/org/fedoraproject/xmvn/deployer/DeploymentRequest.java
++@@ -19,6 +19,7 @@ import java.nio.file.Path;
++ import java.nio.file.Paths;
++ import java.util.ArrayList;
++ import java.util.Arrays;
+++import java.util.Collections;
++ import java.util.Iterator;
++ import java.util.LinkedHashMap;
++ import java.util.List;
++@@ -53,7 +54,7 @@ public class DeploymentRequest
++ 
++     public List<DependencyDescriptor> getDependencies()
++     {
++-        return List.copyOf( dependencies );
+++        return Collections.unmodifiableList( dependencies );
++     }
++ 
++     public void addDependency( Artifact dependencyArtifact, Artifact... exclusions )
++@@ -85,7 +86,7 @@ public class DeploymentRequest
++ 
++     public Map<String, String> getProperties()
++     {
++-        return Map.copyOf( properties );
+++        return Collections.unmodifiableMap( properties );
++     }
++ 
++     public String getProperty( String key )
++diff --git a/xmvn-connector/.classpath b/xmvn-connector/.classpath
++index 97c81cef..4f8e155a 100644
++--- a/xmvn-connector/.classpath
+++++ b/xmvn-connector/.classpath
++@@ -13,7 +13,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-connector/.settings/org.eclipse.jdt.core.prefs b/xmvn-connector/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-connector/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-connector/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnModelValidator.java b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnModelValidator.java
++index a3fe4712..d340b91f 100644
++--- a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnModelValidator.java
+++++ b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnModelValidator.java
++@@ -27,6 +27,7 @@ import org.apache.maven.model.Model;
++ import org.apache.maven.model.Plugin;
++ import org.apache.maven.model.building.ModelBuildingRequest;
++ import org.apache.maven.model.building.ModelProblemCollector;
+++import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
++ import org.apache.maven.model.validation.DefaultModelValidator;
++ import org.apache.maven.model.validation.ModelValidator;
++ import org.codehaus.plexus.component.annotations.Component;
++@@ -52,6 +53,11 @@ public class XMvnModelValidator
++     @Requirement
++     private Configurator configurator;
++ 
+++    public XMvnModelValidator()
+++    {
+++        super( new DefaultModelVersionProcessor() );
+++    }
+++
++     @Override
++     public void validateEffectiveModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
++     {
++diff --git a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnMojoExecutionListener.java b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnMojoExecutionListener.java
++index dc312edf..812ecd83 100644
++--- a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnMojoExecutionListener.java
+++++ b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnMojoExecutionListener.java
++@@ -25,6 +25,7 @@ import java.nio.file.Files;
++ import java.nio.file.Path;
++ import java.nio.file.Paths;
++ import java.util.ArrayList;
+++import java.util.Collections;
++ import java.util.List;
++ import java.util.Properties;
++ 
++@@ -276,7 +277,7 @@ public class XMvnMojoExecutionListener
++         }
++         else if ( XMVN_BUILDDEP.equals( execution ) )
++         {
++-            trySetBeanProperty( mojo, "resolutions", List.copyOf( resolutions ) );
+++            trySetBeanProperty( mojo, "resolutions", Collections.unmodifiableList( new ArrayList<>( resolutions ) ) );
++         }
++     }
++ 
++diff --git a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnToolchainManager.java b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnToolchainManager.java
++index 53f1020d..1fb59cb3 100644
++--- a/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnToolchainManager.java
+++++ b/xmvn-connector/src/main/java/org/fedoraproject/xmvn/connector/maven/XMvnToolchainManager.java
++@@ -22,6 +22,7 @@ import org.apache.maven.execution.MavenSession;
++ import org.apache.maven.project.MavenProject;
++ import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
++ import org.apache.maven.toolchain.MisconfiguredToolchainException;
+++import org.apache.maven.toolchain.ToolchainPrivate;
++ import org.codehaus.plexus.component.annotations.Component;
++ 
++ /**
++@@ -38,11 +39,11 @@ public class XMvnToolchainManager
++ 
++         try
++         {
++-            for ( var toolchain : getToolchainsForType( "jdk", session ) )
+++            for ( ToolchainPrivate toolchain : getToolchainsForType( "jdk", session ) )
++             {
++                 if ( toolchain.matchesRequirements( Collections.singletonMap( "xmvn", "xmvn" ) ) )
++                 {
++-                    for ( var project : session.getAllProjects() )
+++                    for ( MavenProject project : session.getAllProjects() )
++                     {
++                         session.setCurrentProject( project );
++                         storeToolchainToBuildContext( toolchain, session );
++diff --git a/xmvn-core/.classpath b/xmvn-core/.classpath
++index 0fb79cfe..002ad570 100644
++--- a/xmvn-core/.classpath
+++++ b/xmvn-core/.classpath
++@@ -24,7 +24,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-core/.settings/org.eclipse.jdt.core.prefs b/xmvn-core/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-core/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-core/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-core/src/test/java/org/fedoraproject/xmvn/deployer/BasicDeployerTest.java b/xmvn-core/src/test/java/org/fedoraproject/xmvn/deployer/BasicDeployerTest.java
++index f79e5b64..0028f4f1 100644
++--- a/xmvn-core/src/test/java/org/fedoraproject/xmvn/deployer/BasicDeployerTest.java
+++++ b/xmvn-core/src/test/java/org/fedoraproject/xmvn/deployer/BasicDeployerTest.java
++@@ -28,6 +28,7 @@ import java.nio.file.Paths;
++ import java.nio.file.attribute.PosixFilePermission;
++ import java.util.Arrays;
++ import java.util.Collections;
+++import java.util.regex.Matcher;
++ import java.util.regex.Pattern;
++ 
++ import org.junit.jupiter.api.Test;
++@@ -149,7 +150,7 @@ public class BasicDeployerTest
++         {
++             return Files.lines( Paths.get( "/proc/self/status" ) ).map( s ->
++             {
++-                var matcher = PROCESS_UID_PATTERN.matcher( s );
+++                Matcher matcher = PROCESS_UID_PATTERN.matcher( s );
++ 
++                 if ( matcher.matches() )
++                 {
++diff --git a/xmvn-it/.classpath b/xmvn-it/.classpath
++index 2fcc9100..8131be0e 100644
++--- a/xmvn-it/.classpath
+++++ b/xmvn-it/.classpath
++@@ -19,7 +19,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-it/.settings/org.eclipse.jdt.core.prefs b/xmvn-it/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-it/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-it/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/AbstractIntegrationTest.java b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/AbstractIntegrationTest.java
++index f8a4e01a..c2e2d74e 100644
++--- a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/AbstractIntegrationTest.java
+++++ b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/AbstractIntegrationTest.java
++@@ -167,6 +167,11 @@ public abstract class AbstractIntegrationTest
++         return Files.lines( baseDir.resolve( STDERR ) );
++     }
++ 
+++    public static int getJavaVersion()
+++    {
+++        return Integer.parseInt( System.getProperty( "java.version" ).replaceAll( "\\..*", "" ) );
+++    }
+++
++     /**
++      * @author Mikolaj Izdebski
++      */
++diff --git a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/ArchiveLayoutIntegrationTest.java b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/ArchiveLayoutIntegrationTest.java
++index db7f59cb..dd8edf02 100644
++--- a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/ArchiveLayoutIntegrationTest.java
+++++ b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/ArchiveLayoutIntegrationTest.java
++@@ -190,7 +190,10 @@ public class ArchiveLayoutIntegrationTest
++         expect( 1, 1, "lib/" );
++         expect( 30, 60, "lib/[^/]*\\.jar" );
++         expect( 15, 30, "lib/[^/]*\\.license" );
++-        expect( 10, 100, "lib/jansi-native/.*" );
+++
+++        expect( 1, 1, "lib/jansi-native/" );
+++        expect( 1, 1, "lib/jansi-native/README\\.txt" );
+++        expect( 3, 9, "lib/jansi-native/Windows/.*" );
++ 
++         expect( 1, 1, "lib/ext/" );
++         expect( 1, 1, "lib/ext/README\\.txt" );
++diff --git a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocJPMSIntegrationTest.java b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocJPMSIntegrationTest.java
++index 2c28702a..78d6e394 100644
++--- a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocJPMSIntegrationTest.java
+++++ b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocJPMSIntegrationTest.java
++@@ -16,6 +16,7 @@
++ package org.fedoraproject.xmvn.it.maven.mojo.javadoc;
++ 
++ import static org.junit.jupiter.api.Assertions.assertTrue;
+++import static org.junit.jupiter.api.Assumptions.assumeTrue;
++ 
++ import java.nio.file.Files;
++ import java.nio.file.Paths;
++@@ -36,6 +37,7 @@ public class JavadocJPMSIntegrationTest
++     public void testJavadocJPMS()
++         throws Exception
++     {
+++        assumeTrue( getJavaVersion() >= 9 );
++         performTest( "verify", "org.fedoraproject.xmvn:xmvn-mojo:javadoc" );
++ 
++         assertTrue( Files.isDirectory( Paths.get( "target/xmvn-apidocs" ) ) );
++diff --git a/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocToolchainsIntegrationTest.java b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocToolchainsIntegrationTest.java
++new file mode 100644
++index 00000000..c552652d
++--- /dev/null
+++++ b/xmvn-it/src/test/java/org/fedoraproject/xmvn/it/maven/mojo/javadoc/JavadocToolchainsIntegrationTest.java
++@@ -0,0 +1,39 @@
+++/*-
+++ * Copyright (c) 2021 Red Hat, Inc.
+++ *
+++ * Licensed under the Apache License, Version 2.0 (the "License");
+++ * you may not use this file except in compliance with the License.
+++ * You may obtain a copy of the License at
+++ *
+++ *     http://www.apache.org/licenses/LICENSE-2.0
+++ *
+++ * Unless required by applicable law or agreed to in writing, software
+++ * distributed under the License is distributed on an "AS IS" BASIS,
+++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+++ * See the License for the specific language governing permissions and
+++ * limitations under the License.
+++ */
+++package org.fedoraproject.xmvn.it.maven.mojo.javadoc;
+++
+++import static org.junit.jupiter.api.Assertions.assertTrue;
+++
+++import org.junit.jupiter.api.Test;
+++
+++import org.fedoraproject.xmvn.it.maven.mojo.AbstractMojoIntegrationTest;
+++
+++/**
+++ * Integration tests for javadoc MOJO.
+++ * 
+++ * @author Mikolaj Izdebski
+++ */
+++public class JavadocToolchainsIntegrationTest
+++    extends AbstractMojoIntegrationTest
+++{
+++    @Test
+++    public void testJavadocToolchains()
+++        throws Exception
+++    {
+++        performTest( "org.fedoraproject.xmvn:xmvn-mojo:javadoc" );
+++        assertTrue( getStdout().anyMatch( s -> s.equals( "[INFO] Toolchain in xmvn-mojo: JDK[/tmp]" ) ) );
+++    }
+++}
++diff --git a/xmvn-it/src/test/resources/testBuilddepPackaging/child/pom.xml b/xmvn-it/src/test/resources/testBuilddepPackaging/child/pom.xml
++index 49027aa8..66351388 100644
++--- a/xmvn-it/src/test/resources/testBuilddepPackaging/child/pom.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepPackaging/child/pom.xml
++@@ -13,7 +13,7 @@
++     <dependency>
++       <groupId>junit</groupId>
++       <artifactId>junit</artifactId>
++-      <version>4.12</version>
+++      <version>4.13.1</version>
++     </dependency>
++   </dependencies>
++   <build>
++diff --git a/xmvn-it/src/test/resources/testBuilddepPackagingExternal/parent/pom.xml b/xmvn-it/src/test/resources/testBuilddepPackagingExternal/parent/pom.xml
++index 588a6c6b..c59dc398 100644
++--- a/xmvn-it/src/test/resources/testBuilddepPackagingExternal/parent/pom.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepPackagingExternal/parent/pom.xml
++@@ -9,7 +9,7 @@
++     <dependency>
++       <groupId>junit</groupId>
++       <artifactId>junit</artifactId>
++-      <version>4.12</version>
+++      <version>4.13.1</version>
++     </dependency>
++   </dependencies>
++   <build>
++diff --git a/xmvn-it/src/test/resources/testBuilddepProfileActivation/pom.xml b/xmvn-it/src/test/resources/testBuilddepProfileActivation/pom.xml
++index 361b404a..fe2a495b 100644
++--- a/xmvn-it/src/test/resources/testBuilddepProfileActivation/pom.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepProfileActivation/pom.xml
++@@ -19,7 +19,7 @@
++         <dependency>
++           <groupId>junit</groupId>
++           <artifactId>junit</artifactId>
++-          <version>4.12</version>
+++          <version>4.13.1</version>
++         </dependency>
++       </dependencies>
++       <build>
++diff --git a/xmvn-it/src/test/resources/testBuilddepProfiles/pom.xml b/xmvn-it/src/test/resources/testBuilddepProfiles/pom.xml
++index f009b33f..95c06ed4 100644
++--- a/xmvn-it/src/test/resources/testBuilddepProfiles/pom.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepProfiles/pom.xml
++@@ -13,7 +13,7 @@
++         <dependency>
++           <groupId>junit</groupId>
++           <artifactId>junit</artifactId>
++-          <version>4.12</version>
+++          <version>4.13.1</version>
++         </dependency>
++       </dependencies>
++       <build>
++diff --git a/xmvn-it/src/test/resources/testBuilddepTychoPomless/.mvn/extensions.xml b/xmvn-it/src/test/resources/testBuilddepTychoPomless/.mvn/extensions.xml
++index 4632f0fa..10e3eba4 100644
++--- a/xmvn-it/src/test/resources/testBuilddepTychoPomless/.mvn/extensions.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepTychoPomless/.mvn/extensions.xml
++@@ -3,6 +3,6 @@
++   <extension>
++     <groupId>org.eclipse.tycho.extras</groupId>
++     <artifactId>tycho-pomless</artifactId>
++-    <version>2.3.0</version>
+++    <version>1.7.0</version>
++   </extension>
++ </extensions>
++diff --git a/xmvn-it/src/test/resources/testBuilddepTychoPomless/pom.xml b/xmvn-it/src/test/resources/testBuilddepTychoPomless/pom.xml
++index 66ce6ab5..d7a58b1b 100644
++--- a/xmvn-it/src/test/resources/testBuilddepTychoPomless/pom.xml
+++++ b/xmvn-it/src/test/resources/testBuilddepTychoPomless/pom.xml
++@@ -13,7 +13,7 @@
++       <plugin>
++ 	<groupId>org.eclipse.tycho</groupId>
++ 	<artifactId>tycho-maven-plugin</artifactId>
++-	<version>2.3.0</version>
+++	<version>1.7.0</version>
++ 	<extensions>true</extensions>
++       </plugin>
++     </plugins>
++diff --git a/xmvn-it/src/test/resources/testJavadoc/pom.xml b/xmvn-it/src/test/resources/testJavadoc/pom.xml
++index 241bee4d..7e8703d9 100644
++--- a/xmvn-it/src/test/resources/testJavadoc/pom.xml
+++++ b/xmvn-it/src/test/resources/testJavadoc/pom.xml
++@@ -18,7 +18,7 @@
++     <dependency>
++       <groupId>org.apache.commons</groupId>
++       <artifactId>commons-compress</artifactId>
++-      <version>1.20</version>
+++      <version>1.21</version>
++     </dependency>
++     <dependency>
++       <groupId>org.apache.maven</groupId>
++diff --git a/xmvn-it/src/test/resources/testJavadocJPMS/pom.xml b/xmvn-it/src/test/resources/testJavadocJPMS/pom.xml
++index 6bb860ef..5b4afac5 100644
++--- a/xmvn-it/src/test/resources/testJavadocJPMS/pom.xml
+++++ b/xmvn-it/src/test/resources/testJavadocJPMS/pom.xml
++@@ -16,7 +16,7 @@
++         <artifactId>maven-compiler-plugin</artifactId>
++         <version>3.8.1</version>
++         <configuration>
++-          <release>11</release>
+++          <release>9</release>
++         </configuration>
++       </plugin>
++     </plugins>
++diff --git a/xmvn-it/src/test/resources/testJavadocToolchains/.xmvn/configuration.xml b/xmvn-it/src/test/resources/testJavadocToolchains/.xmvn/configuration.xml
++new file mode 100644
++index 00000000..06f5b389
++--- /dev/null
+++++ b/xmvn-it/src/test/resources/testJavadocToolchains/.xmvn/configuration.xml
++@@ -0,0 +1,7 @@
+++<configuration>
+++  <resolverSettings>
+++    <metadataRepositories>
+++      <repository>metadata.xml</repository>
+++    </metadataRepositories>
+++  </resolverSettings>
+++</configuration>
++diff --git a/xmvn-it/src/test/resources/testJavadocToolchains/pom.xml b/xmvn-it/src/test/resources/testJavadocToolchains/pom.xml
++new file mode 100644
++index 00000000..5296a0fe
++--- /dev/null
+++++ b/xmvn-it/src/test/resources/testJavadocToolchains/pom.xml
++@@ -0,0 +1,6 @@
+++<project>
+++  <modelVersion>4.0.0</modelVersion>
+++  <groupId>xmvn.its</groupId>
+++  <artifactId>javadoc-toolchains-test</artifactId>
+++  <version>0.0.0-SNAPSHOT</version>
+++</project>
++diff --git a/xmvn-it/src/test/resources/testJavadocToolchains/src/main/java/somepkg/SomeClass.java b/xmvn-it/src/test/resources/testJavadocToolchains/src/main/java/somepkg/SomeClass.java
++new file mode 100644
++index 00000000..087d2158
++--- /dev/null
+++++ b/xmvn-it/src/test/resources/testJavadocToolchains/src/main/java/somepkg/SomeClass.java
++@@ -0,0 +1,24 @@
+++/*-
+++ * Copyright (c) 2016-2021 Red Hat, Inc.
+++ *
+++ * Licensed under the Apache License, Version 2.0 (the "License");
+++ * you may not use this file except in compliance with the License.
+++ * You may obtain a copy of the License at
+++ *
+++ *     http://www.apache.org/licenses/LICENSE-2.0
+++ *
+++ * Unless required by applicable law or agreed to in writing, software
+++ * distributed under the License is distributed on an "AS IS" BASIS,
+++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+++ * See the License for the specific language governing permissions and
+++ * limitations under the License.
+++ */
+++package somepkg;
+++
+++/**
+++ * @author Mikolaj Izdebski
+++ */
+++public class SomeClass
+++{
+++
+++}
++diff --git a/xmvn-it/src/test/resources/testJavadocToolchains/toolchains.xml b/xmvn-it/src/test/resources/testJavadocToolchains/toolchains.xml
++new file mode 100644
++index 00000000..9e92c646
++--- /dev/null
+++++ b/xmvn-it/src/test/resources/testJavadocToolchains/toolchains.xml
++@@ -0,0 +1,11 @@
+++<toolchains>
+++  <toolchain>
+++    <type>jdk</type>
+++    <provides>
+++      <xmvn>xmvn</xmvn>
+++    </provides>
+++    <configuration>
+++      <jdkHome>/tmp</jdkHome>
+++    </configuration>
+++  </toolchain>
+++</toolchains>
++diff --git a/xmvn-mojo/.classpath b/xmvn-mojo/.classpath
++index 4d004b9e..1a0c5608 100644
++--- a/xmvn-mojo/.classpath
+++++ b/xmvn-mojo/.classpath
++@@ -18,7 +18,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-mojo/.settings/org.eclipse.jdt.core.prefs b/xmvn-mojo/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-mojo/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-mojo/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/BuildDependencyVisitor.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/BuildDependencyVisitor.java
++index e77ca530..75cc4922 100644
++--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/BuildDependencyVisitor.java
+++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/BuildDependencyVisitor.java
++@@ -16,6 +16,7 @@
++ package org.fedoraproject.xmvn.mojo;
++ 
++ import java.util.Arrays;
+++import java.util.Collections;
++ import java.util.LinkedHashSet;
++ import java.util.List;
++ import java.util.Set;
++@@ -53,7 +54,7 @@ class BuildDependencyVisitor
++ 
++     public Set<Artifact> getArtifacts()
++     {
++-        return Set.copyOf( artifacts );
+++        return Collections.unmodifiableSet( artifacts );
++     }
++ 
++     private boolean isExternal( InputLocation location )
++diff --git a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/JavadocMojo.java b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/JavadocMojo.java
++index b2cd41fd..20b0154a 100644
++--- a/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/JavadocMojo.java
+++++ b/xmvn-mojo/src/main/java/org/fedoraproject/xmvn/mojo/JavadocMojo.java
++@@ -45,6 +45,8 @@ import org.apache.maven.project.DependencyResolutionRequest;
++ import org.apache.maven.project.DependencyResolutionResult;
++ import org.apache.maven.project.MavenProject;
++ import org.apache.maven.project.ProjectDependenciesResolver;
+++import org.apache.maven.toolchain.Toolchain;
+++import org.apache.maven.toolchain.ToolchainManager;
++ import org.codehaus.plexus.logging.Logger;
++ import org.codehaus.plexus.util.StringUtils;
++ import org.eclipse.aether.util.filter.AndDependencyFilter;
++@@ -67,7 +69,10 @@ public class JavadocMojo
++     private ProjectDependenciesResolver resolver;
++ 
++     @Component
++-    private Configurator confugurator;
+++    private Configurator configurator;
+++
+++    @Component
+++    private ToolchainManager toolchainManager;
++ 
++     @Parameter( defaultValue = "${session}", readonly = true )
++     private MavenSession session;
++@@ -84,9 +89,12 @@ public class JavadocMojo
++     @Parameter( defaultValue = "${project.build.directory}", required = true )
++     private File buildDirectory;
++ 
++-    @Parameter( property = "source" )
+++    @Parameter( property = "source", defaultValue = "${maven.compiler.source}" )
++     private String source;
++ 
+++    @Parameter( defaultValue = "${maven.compiler.release}" )
+++    private String release;
+++
++     private static String quoted( Object obj )
++     {
++         String arg = obj.toString();
++@@ -161,12 +169,21 @@ public class JavadocMojo
++     public void execute()
++         throws MojoExecutionException, MojoFailureException
++     {
+++        String javadocTool = null;
+++        Toolchain tc = toolchainManager.getToolchainFromBuildContext( "jdk", session );
+++        if ( tc != null )
+++        {
+++            logger.info( "Toolchain in xmvn-mojo: " + tc );
+++            javadocTool = tc.findTool( "javadoc" );
+++        }
++         Path javadocExecutable;
++-        if ( System.getenv().containsKey( "JAVA_HOME" ) )
+++        if ( javadocTool != null && !javadocTool.isEmpty() )
++         {
++-            javadocExecutable = Paths.get( System.getenv( "JAVA_HOME" ) ) //
++-                                     .resolve( "bin" ) //
++-                                     .resolve( "javadoc" );
+++            javadocExecutable = Paths.get( javadocTool );
+++        }
+++        else if ( System.getenv().containsKey( "JAVA_HOME" ) )
+++        {
+++            javadocExecutable = Paths.get( System.getenv( "JAVA_HOME" ) ).resolve( "bin" ).resolve( "javadoc" );
++         }
++         else
++         {
++@@ -222,8 +239,38 @@ public class JavadocMojo
++             List<Path> reactorClassPath = new ArrayList<>();
++             List<Path> fullClassPath = new ArrayList<>();
++             populateClasspath( reactorClassPath, fullClassPath );
+++            boolean isModular = !findFiles( reactorClassPath, "module-info\\.class" ).isEmpty();
++ 
++-            if ( findFiles( reactorClassPath, "module-info\\.class" ).isEmpty() )
+++            String sourceLevel = null;
+++            if ( release != null )
+++            {
+++                opts.add( "--release" );
+++                opts.add( quoted( release ) );
+++                sourceLevel = release;
+++            }
+++            else if ( source != null )
+++            {
+++                opts.add( "-source" );
+++                opts.add( quoted( source ) );
+++                sourceLevel = source;
+++            }
+++
+++            boolean skipModuleInfo = !isModular;
+++            if ( sourceLevel != null )
+++            {
+++                try
+++                {
+++                    float f = Float.parseFloat( sourceLevel );
+++                    if ( f < 9 )
+++                        skipModuleInfo = true;
+++                }
+++                catch ( Exception e )
+++                {
+++                    // pass, we assume that we use modular Java
+++                }
+++            }
+++
+++            if ( !isModular || skipModuleInfo )
++             {
++                 opts.add( "-classpath" );
++             }
++@@ -244,15 +291,11 @@ public class JavadocMojo
++             opts.add( quoted( docencoding ) );
++             opts.add( "-doctitle" );
++             opts.add( quoted( "Javadoc for package XXX" ) );
++-            if ( source != null )
++-            {
++-                opts.add( "-source" );
++-                opts.add( quoted( source ) );
++-            }
++ 
++             for ( Path file : sourceFiles )
++             {
++-                opts.add( quoted( file ) );
+++                if ( !skipModuleInfo || !file.endsWith( "module-info.java" ) )
+++                    opts.add( quoted( file ) );
++             }
++ 
++             Files.write( outputDir.resolve( "args" ), opts, StandardOpenOption.CREATE );
++diff --git a/xmvn-parent/pom.xml b/xmvn-parent/pom.xml
++index 2dafffbe..030923f9 100644
++--- a/xmvn-parent/pom.xml
+++++ b/xmvn-parent/pom.xml
++@@ -77,47 +77,47 @@
++   <properties>
++     <project.build.sourceEncoding>US-ASCII</project.build.sourceEncoding>
++ 
++-    <asmVersion>9.2</asmVersion>
++-    <jcommanderVersion>1.81</jcommanderVersion>
++-    <mavenInvokerVersion>3.1.0</mavenInvokerVersion>
++-    <mavenResolverVersion>1.7.1</mavenResolverVersion>
++-    <mavenVersion>3.8.1</mavenVersion>
+++    <asmVersion>9.3</asmVersion>
+++    <jcommanderVersion>1.82</jcommanderVersion>
+++    <mavenInvokerVersion>3.2.0</mavenInvokerVersion>
+++    <mavenResolverVersion>1.8.1</mavenResolverVersion>
+++    <mavenVersion>3.8.6</mavenVersion>
++     <plexusClassworldsVersion>2.6.0</plexusClassworldsVersion>
++-    <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
++-    <pluginToolsVersion>3.6.1</pluginToolsVersion>
++-    <slf4jVersion>2.0.0-alpha2</slf4jVersion>
+++    <plexusUtilsVersion>3.4.2</plexusUtilsVersion>
+++    <pluginToolsVersion>3.6.4</pluginToolsVersion>
+++    <slf4jVersion>2.0.0-alpha7</slf4jVersion>
++     <commonsCompressVersion>1.21</commonsCompressVersion>
++ 
++     <!-- Build dependencies -->
++     <apivizVersion>1.3.2.GA</apivizVersion>
++     <assemblyPluginVersion>3.3.0</assemblyPluginVersion>
++-    <buildHelperPluginVersion>3.2.0</buildHelperPluginVersion>
++-    <checkstyleVersion>8.44</checkstyleVersion>
+++    <buildHelperPluginVersion>3.3.0</buildHelperPluginVersion>
+++    <checkstyleVersion>9.3</checkstyleVersion>
++     <checkstylePluginVersion>3.1.2</checkstylePluginVersion>
++-    <cleanPluginVersion>3.1.0</cleanPluginVersion>
++-    <compilerPluginVersion>3.8.1</compilerPluginVersion>
++-    <dependencyPluginVersion>3.2.0</dependencyPluginVersion>
++-    <deployPluginVersion>3.0.0-M1</deployPluginVersion>
+++    <cleanPluginVersion>3.2.0</cleanPluginVersion>
+++    <compilerPluginVersion>3.10.1</compilerPluginVersion>
+++    <dependencyPluginVersion>3.3.0</dependencyPluginVersion>
+++    <deployPluginVersion>3.0.0-M2</deployPluginVersion>
++     <easymockVersion>4.3</easymockVersion>
++     <gpgPluginVersion>3.0.1</gpgPluginVersion>
++     <installPluginVersion>3.0.0-M1</installPluginVersion>
++-    <jacocoVersion>0.8.7</jacocoVersion>
++-    <jarPluginVersion>3.2.0</jarPluginVersion>
++-    <javadocPluginVersion>3.3.0</javadocPluginVersion>
++-    <junitVersion>5.7.2</junitVersion>
+++    <jacocoVersion>0.8.8</jacocoVersion>
+++    <jarPluginVersion>3.2.2</jarPluginVersion>
+++    <javadocPluginVersion>3.4.0</javadocPluginVersion>
+++    <junitVersion>5.8.2</junitVersion>
++     <jxrPluginVersion>2.3</jxrPluginVersion>
++     <mavenWagonVersion>1.0</mavenWagonVersion>
++-    <modelloVersion>1.11</modelloVersion>
++-    <nexusStagingPluginVersion>1.6.8</nexusStagingPluginVersion>
+++    <modelloVersion>2.0.0</modelloVersion>
+++    <nexusStagingPluginVersion>1.6.13</nexusStagingPluginVersion>
++     <pmdPluginVersion>3.0.1</pmdPluginVersion>
++     <projectInfoReportsPluginVersion>3.0.0</projectInfoReportsPluginVersion>
++-    <plexusVersion>2.1.0</plexusVersion>
++-    <ratPluginVersion>0.13</ratPluginVersion>
+++    <plexusVersion>2.1.1</plexusVersion>
+++    <ratPluginVersion>0.14</ratPluginVersion>
++     <resourcesPluginVersion>3.2.0</resourcesPluginVersion>
++-    <sitePluginVersion>3.9.1</sitePluginVersion>
+++    <sitePluginVersion>3.12.0</sitePluginVersion>
++     <sourcePluginVersion>3.2.1</sourcePluginVersion>
++-    <surefireVersion>3.0.0-M5</surefireVersion>
++-    <xmlunitVersion>2.8.2</xmlunitVersion>
+++    <surefireVersion>3.0.0-M7</surefireVersion>
+++    <xmlunitVersion>2.9.0</xmlunitVersion>
++ 
++   </properties>
++   <dependencyManagement>
++@@ -298,7 +298,8 @@
++           <artifactId>maven-compiler-plugin</artifactId>
++           <version>${compilerPluginVersion}</version>
++           <configuration>
++-            <release>11</release>
+++            <source>1.8</source>
+++            <target>1.8</target>
++           </configuration>
++         </plugin>
++         <plugin>
++@@ -469,12 +470,6 @@
++     </profile>
++     <profile>
++       <id>release</id>
++-      <activation>
++-        <property>
++-          <name>env.CI</name>
++-          <value>true</value>
++-        </property>
++-      </activation>
++       <build>
++         <plugins>
++           <plugin>
++@@ -564,5 +559,27 @@
++         </plugins>
++       </build>
++     </profile>
+++    <profile>
+++      <id>jdk9+</id>
+++      <activation>
+++        <jdk>[9,)</jdk>
+++      </activation>
+++      <build>
+++        <plugins>
+++          <plugin>
+++            <artifactId>maven-compiler-plugin</artifactId>
+++            <configuration>
+++              <release>8</release>
+++            </configuration>
+++          </plugin>
+++          <plugin>
+++            <artifactId>maven-surefire-plugin</artifactId>
+++            <configuration>
+++              <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+++            </configuration>
+++          </plugin>
+++        </plugins>
+++      </build>
+++    </profile>
++   </profiles>
++ </project>
++diff --git a/xmvn-tools/xmvn-install/.classpath b/xmvn-tools/xmvn-install/.classpath
++index 0fb79cfe..002ad570 100644
++--- a/xmvn-tools/xmvn-install/.classpath
+++++ b/xmvn-tools/xmvn-install/.classpath
++@@ -24,7 +24,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-tools/xmvn-install/.settings/org.eclipse.jdt.core.prefs b/xmvn-tools/xmvn-install/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-tools/xmvn-install/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-tools/xmvn-install/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/JarUtilsTest.java b/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/JarUtilsTest.java
++index 8866752d..d2ef084e 100644
++--- a/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/JarUtilsTest.java
+++++ b/xmvn-tools/xmvn-install/src/test/java/org/fedoraproject/xmvn/tools/install/JarUtilsTest.java
++@@ -411,8 +411,8 @@ public class JarUtilsTest
++ 
++         byte[] content = Files.readAllBytes( testJar );
++ 
++-        var previousSecurity = System.getSecurityManager();
++-        var fobiddingSecurity = new ForbiddingSecurityManager( testJar.toString() );
+++        SecurityManager previousSecurity = System.getSecurityManager();
+++        SecurityManager fobiddingSecurity = new ForbiddingSecurityManager( testJar.toString() );
++ 
++         System.setSecurityManager( fobiddingSecurity );
++ 
++@@ -430,7 +430,7 @@ public class JarUtilsTest
++                                "Content of the backup file is different from the content of the original file" );
++ 
++             System.setSecurityManager( previousSecurity );
++-            try ( var os = new FileOutputStream( testJar.toFile(), true ) )
+++            try ( FileOutputStream os = new FileOutputStream( testJar.toFile(), true ) )
++             {
++                 /// Append garbage to the original file to check if the content of the backup will be retained
++                 os.write( 0 );
++diff --git a/xmvn-tools/xmvn-resolve/.classpath b/xmvn-tools/xmvn-resolve/.classpath
++index 97c81cef..4f8e155a 100644
++--- a/xmvn-tools/xmvn-resolve/.classpath
+++++ b/xmvn-tools/xmvn-resolve/.classpath
++@@ -13,7 +13,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-tools/xmvn-resolve/.settings/org.eclipse.jdt.core.prefs b/xmvn-tools/xmvn-resolve/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-tools/xmvn-resolve/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-tools/xmvn-resolve/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
++diff --git a/xmvn-tools/xmvn-subst/.classpath b/xmvn-tools/xmvn-subst/.classpath
++index 4559ca0b..5e8a55fe 100644
++--- a/xmvn-tools/xmvn-subst/.classpath
+++++ b/xmvn-tools/xmvn-subst/.classpath
++@@ -13,7 +13,7 @@
++ 			<attribute name="test" value="true"/>
++ 		</attributes>
++ 	</classpathentry>
++-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
++ 		<attributes>
++ 			<attribute name="maven.pomderived" value="true"/>
++ 		</attributes>
++diff --git a/xmvn-tools/xmvn-subst/.settings/org.eclipse.jdt.core.prefs b/xmvn-tools/xmvn-subst/.settings/org.eclipse.jdt.core.prefs
++index 2d67d3f3..2f39a66b 100644
++--- a/xmvn-tools/xmvn-subst/.settings/org.eclipse.jdt.core.prefs
+++++ b/xmvn-tools/xmvn-subst/.settings/org.eclipse.jdt.core.prefs
++@@ -8,8 +8,8 @@ org.eclipse.jdt.core.compiler.annotation.nonnullbydefault.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullable=org.eclipse.jdt.annotation.Nullable
++ org.eclipse.jdt.core.compiler.annotation.nullable.secondary=
++ org.eclipse.jdt.core.compiler.annotation.nullanalysis=disabled
++-org.eclipse.jdt.core.compiler.codegen.targetPlatform=11
++-org.eclipse.jdt.core.compiler.compliance=11
+++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+++org.eclipse.jdt.core.compiler.compliance=1.8
++ org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
++ org.eclipse.jdt.core.compiler.problem.autoboxing=ignore
++ org.eclipse.jdt.core.compiler.problem.comparingIdentical=warning
++@@ -97,8 +97,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
++ org.eclipse.jdt.core.compiler.problem.unusedTypeParameter=warning
++ org.eclipse.jdt.core.compiler.problem.unusedWarningToken=warning
++ org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
++-org.eclipse.jdt.core.compiler.release=enabled
++-org.eclipse.jdt.core.compiler.source=11
+++org.eclipse.jdt.core.compiler.release=disabled
+++org.eclipse.jdt.core.compiler.source=1.8
++ org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns=false
++ org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines=2147483647
++ org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
+-- 
+2.37.3
