@@ -71,7 +71,7 @@ popd
 
 %build
 pushd src/rust
-export RUSTFLAGS="-C lto=n"
+export RUSTFLAGS='-C lto=n'
 cargo rustc --release --target=%{rust_def_target} %{cargo_pkg_feature_opts} -v --features 'pyo3/extension-module pyo3/abi3-py311' -- --crate-type cdylib
 popd
 # Need to add _rust.abi3.so to MANIFEST.in so the whl will contain it

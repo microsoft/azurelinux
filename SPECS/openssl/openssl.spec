@@ -163,35 +163,30 @@ export HASHBANGPERL=/usr/bin/perl
     no-capieng \
     enable-cast \
     enable-cms \
-    no-comp \
     enable-ct \
     enable-deprecated \
     enable-des \
     enable-dh \
     enable-dsa \
     no-dtls1 \
-    no-ec2m \
     enable-ec_nistp_64_gcc_128 \
     enable-ecdh \
     enable-ecdsa \
     no-gost \
-    no-idea \
     no-mdc2 \
     no-md2 \
     enable-md4 \
     enable-rc2 \
     enable-rc4 \
     enable-rc5 \
-    no-rfc3779 \
     enable-rmd160 \
     no-sctp \
-    no-seed \
     no-siphash \
     no-sm2 \
-    no-sm3 \
-    no-sm4 \
     no-ssl \
     no-ssl3 \
+    enable-ssl3-method \
+    enable-seed \
     no-weak-ssl-ciphers \
     no-whirlpool \
     no-zlib \
