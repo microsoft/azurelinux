@@ -34,6 +34,7 @@ API documentation for %{name}.
 sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar junit || find-jar javapackages-bootstrap/junit)"|' src/test/java/org/apache/maven/plugin/compiler/CompilerMojoTestCase.java
 
 %build
+echo $JAVA_HOME
 %{mvn_build}
 
 %install
