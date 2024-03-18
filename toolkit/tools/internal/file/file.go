@@ -89,6 +89,66 @@ func Copy(src, dst string) (err error) {
 	return NewFileCopyBuilder(src, dst).Run()
 }
 
+// CopyDir copies a file from src to dst, creating directories for the destination if needed.
+// dst is assumed to be a directory and not a file. Will preserve permissions.
+func CopyDir(src, dst string) (err error) {
+	isDstExist, err := PathExists(dst)
+	if err != nil {
+		return err
+	}
+	if isDstExist {
+		isDstDir, err := IsDir(dst)
+		if err != nil {
+			return err
+		}
+		if isDstDir {
+			logger.Log.Infof("destination (%s) already exists and is a directory", dst)
+		}
+	}
+
+	if !isDstExist {
+		// Get src dir info
+		fileInfo, err := os.Stat(src)
+		if err != nil {
+			return fmt.Errorf("error getting file info: %w", err)
+		}
+		permissions := fileInfo.Mode().Perm()
+
+		// Create dst dir
+		err = os.MkdirAll(dst, permissions)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	// Open the source directory
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	// Iterate over the entries in the source directory
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			// If it's a directory, recursively copy it
+			if err := CopyDir(srcPath, dstPath); err != nil {
+				return err
+			}
+		} else {
+			// If it's a file, copy it
+			if err := Copy(srcPath, dstPath); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 // Read reads a string from the file src.
 func Read(src string) (data string, err error) {
 	logger.Log.Debugf("Reading from (%s)", src)
