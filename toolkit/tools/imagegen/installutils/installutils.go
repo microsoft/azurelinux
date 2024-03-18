@@ -78,6 +78,9 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
+
+	// Configuration files related to boot behavior. Users should be able to read these files, and root should have RW access.
+	bootUsrConfigFileMode = 0644
 )
 
 // PackageList represents the list of packages to install into an image
@@ -1166,7 +1169,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	installGrubDefFile := filepath.Join(installRoot, targetFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetFile, installGrubDefFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootUsrConfigFileMode)
 	if err != nil {
 		return
 	}
