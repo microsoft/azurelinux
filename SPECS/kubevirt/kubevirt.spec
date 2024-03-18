@@ -35,12 +35,13 @@ Source100:      %{name}-rpmlintrc
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
 Patch1:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
-BuildRequires:  glibc-devel-static
+BuildRequires:  glibc-devel
+BuildRequires:  glibc-static >= 2.38-3%{?dist}
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  golang(API) >= 1.21
+BuildRequires:  golang >= 1.21
 BuildRequires:  pkgconfig(libvirt)
 ExclusiveArch:  x86_64 aarch64
 
@@ -384,6 +385,7 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
 %changelog
 * Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
 - Bump package version to 1.2.0 from 0.59.0
+- Referenced kubevirt.spec from https://code.opensuse.org/package/kubevirt/blob/master/f/kubevirt.spec
 
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 0.59.0-14
 - update to build dep latest glibc-static version
