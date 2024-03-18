@@ -21,20 +21,21 @@ DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 SPECS_DIR="$REPO_ROOT/SPECS"
 rpm_package_macros_file_path=""
 
-# We do not want to use the host's default macros.
-# If we set MACROS_PACKAGE_NAME (e.g., "rpm-libs-4.18.1-4.azl3.x86_64.rpm") that file will be downloaded from PACKAGE_URL_LIST and
-# the macros file will be extracted from the package and used during spec parsing.
-# If unset, try and find the one listed in the toolchain manifests and use it instead.
-# If all else fails, use the built-in macros from the host. This is the fallback option if the above generate an error.
+# We do not want to use the host's default macros. Scan the toolchain manifest for rpm-libs and use it instead.
+# If this fails use the built-in macros from the host. This is the fallback option if the above generate an error.
 arch="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-build_arch)"
-MACROS_PACKAGE_NAME=$(grep "rpm-libs" "$REPO_ROOT/toolkit/resources/manifests/package/toolchain_$arch.txt") || MACROS_PACKAGE_NAME=""
+if [[ -f "$REPO_ROOT/toolkit/resources/manifests/package/toolchain_$arch.txt" ]]
+then
+    MACROS_PACKAGE_NAME=$(grep "rpm-libs" "$REPO_ROOT/toolkit/resources/manifests/package/toolchain_$arch.txt") || MACROS_PACKAGE_NAME=""
+fi
 
 if [[ -n $MACROS_PACKAGE_NAME ]]
 then
     # Check if the MACROS_FILE_PATH is already defined, and the directory exists
     if [[ -z $RPM_OPS_MACROS_FILE_PATH ]] || [[ ! -d $RPM_OPS_MACROS_FILE_PATH ]]
     then
-        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely  owned by root
+        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely  owned by root, but we also
+        # want to re-use the same macro files if possible to avoid downloads.
         RPM_OPS_MACROS_FILE_PATH="$(mktemp -d)"
         export RPM_OPS_MACROS_FILE_PATH
     fi
@@ -49,8 +50,9 @@ then
     # Check if we have the file already extracted
     if [[ ! -f $temp_macros_file_path ]]
     then
-        echo "Downloading and extracting macros file from package $MACROS_PACKAGE_NAME to $temp_macros_file_path" >&2
-        # Extract the macros file from the package into the macros file path
+        echo "Downloading and extracting macros file from package '$source_url_full' to '$temp_macros_file_path'" >&2
+        # Extract the macros file from the package into the macros file path.
+        # Use a temporary file to avoid partial writes if the download/extract fails.
         curl -s "$source_url_full" | rpm2cpio - | cpio --quiet -i --to-stdout ./usr/lib/rpm/macros > "$temp_macros_file_path".tmp && \
             mv "$temp_macros_file_path".tmp "$temp_macros_file_path" || \
             temp_macros_file_path=""
