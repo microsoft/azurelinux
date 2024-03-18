@@ -37,11 +37,11 @@ Patch1:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
-BuildRequires:  golang >= 1.21
 BuildRequires:  pkgconfig(libvirt)
 ExclusiveArch:  x86_64 aarch64
 
@@ -408,7 +408,7 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-7
 - Bump release to rebuild with go 1.19.12
 
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-5
