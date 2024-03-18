@@ -86,7 +86,7 @@ cp "$REPO_ROOT/SPECS/cmake/macros.cmake" "$cmake_macros_file_path"
 sed -i -e "s|@@CMAKE_VERSION@@|$cmake_spec_version|" -e "s|@@CMAKE_MAJOR_VERSION@@|$cmake_spec_major_version|" "$cmake_macros_file_path"
 
 # Add all macro files we know about to the list of macros to load, except cmake where we need to use the custom one.
-for macro_file in $rpm_package_macros_file_path $cmake_macros_file_path $(find ../SPECS/ -name 'macros.*' ! -name 'macros.cmake')
+for macro_file in $rpm_package_macros_file_path $cmake_macros_file_path $(find $REPO_ROOT/SPECS/ -name 'macros.*' ! -name 'macros.cmake')
 do
   MACROS+=("--load=$macro_file")
 done
