@@ -169,11 +169,11 @@ do
   # Removing trailing comments from "Source" tags.
   sed -Ei "s/^(\s*Source[0-9]*:.*)#.*/\1/" "$spec"
 
-  name=$(mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" 2>/dev/null)
+  name=$(azl_rpmspec --srpm --qf "%{NAME}" -q "$spec" 2>/dev/null)
   if [[ -z $name ]]
   then
     echo "Failed to get name from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    mariner_rpmspec --srpm --qf "%{NAME}" -q "$spec" &>> bad_registrations.txt
+    azl_rpmspec --srpm --qf "%{NAME}" -q "$spec" &>> bad_registrations.txt
     continue
   fi
 
@@ -184,15 +184,15 @@ do
     continue
   fi
 
-  version=$(mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" 2>/dev/null )
+  version=$(azl_rpmspec --srpm --qf "%{VERSION}" -q "$spec" 2>/dev/null )
   if [[ -z $version ]]
   then
     echo "Failed to get version from '$original_spec'. Please update the spec or the macros from the 'defines' variable in this script. Error:" >> bad_registrations.txt
-    mariner_rpmspec --srpm --qf "%{VERSION}" -q "$spec" &>> bad_registrations.txt
+    azl_rpmspec --srpm --qf "%{VERSION}" -q "$spec" &>> bad_registrations.txt
     continue
   fi
 
-  parsed_spec="$(mariner_rpmspec --parse "$spec" 2>/dev/null)"
+  parsed_spec="$(azl_rpmspec --parse "$spec" 2>/dev/null)"
 
   # Reading the source0 file/URL.
   source0=$(echo "$parsed_spec" | grep -P "^\s*Source0?:" | cut -d: -f2- | xargs)
