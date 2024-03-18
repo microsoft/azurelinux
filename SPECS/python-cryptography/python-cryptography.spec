@@ -26,6 +26,8 @@ BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-benchmark
+BuildRequires:  python-certifi
 %endif
 
 Requires:       openssl-libs
