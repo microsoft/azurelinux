@@ -63,7 +63,7 @@ Tools for TCG TPM2 PKCSv11 Software Stack
 echo "bfjelds: one"
 %configure --enable-unit --verbose
 echo "bfjelds: two"
-%make_build PACKAGE_VERSION=%{version} --verbose
+%make_build PACKAGE_VERSION=%{version}
 echo "bfjelds: three"
 
 cd tools

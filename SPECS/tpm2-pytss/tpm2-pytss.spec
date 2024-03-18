@@ -1,6 +1,6 @@
 Name:       tpm2-pytss
-Version:    1.2.0
-Release:    3%{?dist}
+Version:    2.2.1
+Release:    1%{?dist}
 Summary:    Python bindings for tpm2-tss
 License:    BSD
 URL:        https://github.com/tpm2-software/tpm2-pytss
@@ -31,10 +31,13 @@ BuildRequires: python3-setuptools_scm
 BuildRequires: python3-pytest
 BuildRequires: python3-cffi
 BuildRequires: python3-PyYAML
+BuildRequires: swtpm-tools
 %endif
 
 Requires: python3
 Requires: tpm2-tss
+
+Provides: python3-%{name} = %{version}-%{release}
 
 %description
 TPM2 TSS Python bindings for Enhanced System API (ESYS).
@@ -44,20 +47,29 @@ This package primarily exposes the TPM 2.0 Enhanced System API.
 %autosetup -p1 -Sgit
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %if 0%{?with_check}
 %check
 export PYTHONPATH=%{buildroot}%{python3_sitelib}
 pip3 install iniconfig
+if [ ! -f /dev/tpm0 ];then
+   mkdir /tmp/swtpm
+   swtpm_setup --tpm-state /tmp/swtpm --tpm2
+   swtpm socket --server type=unixio,path=/tmp/swtpm/socket --ctrl type=unixio,path=/tmp/swtpm/socket.ctrl --tpmstate dir=/tmp/swtpm --flags startup-clear --tpm2 --daemon
+   export TPM2TOOLS_TCTI=swtpm:path=/tmp/swtpm/socket
+   %{buildroot}/%{_bindir}/tpm2_startup -c
+   %{buildroot}/%{_bindir}/tpm2_pcrread
+fi
 %pytest
 %endif
 
-%files
-%defattr(-,root,root)
+%files -n tpm2-pytss
+%defattr(-,root,root,-)
+%license LICENSE
 %{python3_sitelib}/*
 
 %changelog
