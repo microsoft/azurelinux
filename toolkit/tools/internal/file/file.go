@@ -89,7 +89,7 @@ func Copy(src, dst string) (err error) {
 	return NewFileCopyBuilder(src, dst).Run()
 }
 
-// CopyDir copies a file from src to dst, creating directories for the destination if needed.
+// CopyDir copies src directory to dst, creating directories for the destination if needed.
 // dst is assumed to be a directory and not a file. Will preserve permissions.
 func CopyDir(src, dst string) (err error) {
 	isDstExist, err := PathExists(dst)
