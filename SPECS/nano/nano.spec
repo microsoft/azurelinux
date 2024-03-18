@@ -12,6 +12,7 @@ BuildRequires:  ncurses-devel
 Requires:       ncurses
 
 # TEST UPDATE TO TRIGGER CGMANFIEST PR GATE
+%bcond test 0
 
 %description
 The Nano package contains a small, simple text editor
