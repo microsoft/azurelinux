@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -77,7 +77,7 @@ The glib2-doc package includes documentation for the GLib library.
 %install
 %meson_install
 
-mv %{buildroot}%{_bindir}/gio-querymodules %{buildroot}%{_bindir}/gio-querymodules-%{__isa_bits}
+ln -s gio-querymodules %{buildroot}%{_bindir}/gio-querymodules-%{__isa_bits}
 
 # Manually create this directory. The build procedure of glib requires setting -Dfam=true to 
 # produce this directory, but this config will introduce new BR that introduces build cycles that 
@@ -123,6 +123,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Fri Mar 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.78.1-2
+- Adding link for gio-querymodules.
+
 * Mon Nov 27 2023 Andrew Phelps <anphel@microsoft.com> - 2.78.1-1
 - Upgrade to version 2.78.1
 
