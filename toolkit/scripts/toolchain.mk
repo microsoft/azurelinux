@@ -62,7 +62,7 @@ toolchain_spec_list: $(toolchain_spec_list)
 
 clean: clean-toolchain
 
-clean-toolchain:
+clean-toolchain: clean-toolchain-rpms
 	$(SCRIPTS_DIR)/safeunmount.sh "$(toolchain_build_dir)"
 	rm -rf $(toolchain_build_dir)
 	rm -rf $(toolchain_local_temp)
@@ -86,8 +86,8 @@ clean-toolchain-containers:
 	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
 
 clean-toolchain-rpms:
-	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
-	for f in $(toolchain_rpms_noarch); do rm -vf $(RPMS_DIR)/noarch/$$f; done
+	@for f in $(toolchain_out_rpms); do rm -vf $$f; done
+	rm -rvf $(TOOLCHAIN_RPMS_DIR)
 
 copy-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
