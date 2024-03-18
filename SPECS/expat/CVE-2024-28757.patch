@@ -1,0 +1,53 @@
+From 1d50b80cf31de87750103656f6eb693746854aa8 Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Mon, 4 Mar 2024 23:49:06 +0100
+Subject: [PATCH] lib/xmlparse.c: Detect billion laughs attack with isolated
+ external parser
+
+When parsing DTD content with code like ..
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  XML_Parser ext_parser = XML_ExternalEntityParserCreate(parser, NULL, NULL);
+  enum XML_Status status = XML_Parse(ext_parser, doc, (int)strlen(doc), XML_TRUE);
+
+.. there are 0 bytes accounted as direct input and all input from `doc` accounted
+as indirect input.  Now function accountingGetCurrentAmplification cannot calculate
+the current amplification ratio as "(direct + indirect) / direct", and it did refuse
+to divide by 0 as one would expect, but it returned 1.0 for this case to indicate
+no amplification over direct input.  As a result, billion laughs attacks from
+DTD-only input were not detected with this isolated way of using an external parser.
+
+The new approach is to assume direct input of length not 0 but 22 -- derived from
+ghost input "<!ENTITY a SYSTEM 'b'>", the shortest possible way to include an external
+DTD --, and do the usual "(direct + indirect) / direct" math with "direct := 22".
+
+GitHub issue #839 has more details on this issue and its origin in ClusterFuzz
+finding 66812.
+---
+ expat/lib/xmlparse.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/expat/lib/xmlparse.c b/expat/lib/xmlparse.c
+index b884d82b5..d44baa68d 100644
+--- a/expat/lib/xmlparse.c
++++ b/expat/lib/xmlparse.c
+@@ -7787,6 +7787,8 @@ copyString(const XML_Char *s, const XML_Memory_Handling_Suite *memsuite) {
+ 
+ static float
+ accountingGetCurrentAmplification(XML_Parser rootParser) {
++  //                                          1.........1.........12 => 22
++  const size_t lenOfShortestInclude = sizeof("<!ENTITY a SYSTEM 'b'>") - 1;
+   const XmlBigCount countBytesOutput
+       = rootParser->m_accounting.countBytesDirect
+         + rootParser->m_accounting.countBytesIndirect;
+@@ -7794,7 +7796,9 @@ accountingGetCurrentAmplification(XML_Parser rootParser) {
+       = rootParser->m_accounting.countBytesDirect
+             ? (countBytesOutput
+                / (float)(rootParser->m_accounting.countBytesDirect))
+-            : 1.0f;
++            : ((lenOfShortestInclude
++                + rootParser->m_accounting.countBytesIndirect)
++               / (float)lenOfShortestInclude);
+   assert(! rootParser->m_parentParser);
+   return amplificationFactor;
+ }
