@@ -60,11 +60,8 @@ Tools for TCG TPM2 PKCSv11 Software Stack
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-echo "bfjelds: one"
 %configure --enable-unit --verbose
-echo "bfjelds: two"
 %make_build PACKAGE_VERSION=%{version}
-echo "bfjelds: three"
 
 cd tools
 %py3_build
