@@ -81,7 +81,7 @@ func (c *Config) IsValid() (err error) {
 			})
 		})
 		if !hasBiosBoot {
-			return fmt.Errorf("'bios_grub' partition must be provided for 'legacy' boot type")
+			return fmt.Errorf("'bios-grub' partition must be provided for 'legacy' boot type")
 		}
 	}
 

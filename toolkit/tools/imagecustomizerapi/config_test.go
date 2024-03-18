@@ -54,7 +54,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 					FsType: "fat32",
 					Start:  1,
 					Flags: []PartitionFlag{
-						"bios_grub",
+						"bios-grub",
 					},
 				},
 			},
@@ -221,7 +221,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "bios_grub")
+	assert.ErrorContains(t, err, "bios-grub")
 	assert.ErrorContains(t, err, "legacy")
 }
 

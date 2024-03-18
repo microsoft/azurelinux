@@ -195,7 +195,7 @@ func TestPartitionIsValidBadBiosBootFsType(t *testing.T) {
 		FsType: "ext4",
 		Start:  1,
 		End:    nil,
-		Flags:  []PartitionFlag{"bios_grub"},
+		Flags:  []PartitionFlag{"bios-grub"},
 	}
 
 	err := partition.IsValid()
@@ -210,7 +210,7 @@ func TestPartitionIsValidBadBiosBootStart(t *testing.T) {
 		FsType: "ext4",
 		Start:  2,
 		End:    nil,
-		Flags:  []PartitionFlag{"bios_grub"},
+		Flags:  []PartitionFlag{"bios-grub"},
 	}
 
 	err := partition.IsValid()
