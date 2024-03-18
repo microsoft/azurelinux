@@ -352,7 +352,7 @@ install -m644 %{SOURCE9} \
 
 %changelog
 * Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.1.4-5
-- Support required for python-cryptography
+- Modify configure flags to provide what python-cryptography needs.
 
 * Thu Mar 13 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
 - Remove runtime dependency on coreutils
