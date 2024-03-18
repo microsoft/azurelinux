@@ -17,7 +17,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot, imageConnection *ImageConnection) error {
+func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	if verity == nil {
@@ -32,7 +32,7 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 		return err
 	}
 
-	err = updateFstab(buildDir, imageChroot, imageConnection)
+	err = updateFstab(buildDir, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -96,42 +96,29 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	return nil
 }
 
-func updateFstab(buildDir string, imageChroot *safechroot.Chroot, imageConnection *ImageConnection) error {
+func updateFstab(buildDir string, imageChroot *safechroot.Chroot) error {
 	var err error
 
-	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
-	if err != nil {
-		return err
-	}
-
-	rootfsPartition, err := findRootfsPartition(buildDir, diskPartitions)
-	if err != nil {
-		return err
-	}
-
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
-	lines, err := file.ReadLines(fstabFile)
+	fstabEntries, err := diskutils.ReadFstabFile(fstabFile)
 	if err != nil {
 		return fmt.Errorf("failed to read fstab file: %v", err)
 	}
 
-	var updatedLines []string
-	fstabLineRegex := regexp.MustCompile(`^PARTUUID=` + rootfsPartition.PartUuid + ` .*`)
-	for _, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if fstabLineRegex.MatchString(trimmedLine) {
+	var updatedEntries []diskutils.FstabEntry
+	for _, entry := range fstabEntries {
+		if entry.Target == "/" {
 			// Replace existing root partition line with the Verity target.
-			updatedLine := fmt.Sprintf("/dev/mapper/root / ext4 ro,defaults 0 1")
-			updatedLines = append(updatedLines, updatedLine)
-		} else {
-			// Add other lines unchanged
-			updatedLines = append(updatedLines, line)
+			entry.Source = "/dev/mapper/root"
+			entry.Options = "ro," + entry.Options
 		}
+		updatedEntries = append(updatedEntries, entry)
 	}
 
-	err = file.WriteLines(updatedLines, fstabFile)
+	// Write the updated fstab entries back to the fstab file
+	err = diskutils.WriteFstabFile(updatedEntries, fstabFile)
 	if err != nil {
-		return fmt.Errorf("failed to write updated fstabFile: %v", err)
+		return err
 	}
 
 	return nil

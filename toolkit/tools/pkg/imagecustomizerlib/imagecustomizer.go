@@ -377,7 +377,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 
 	// Do the actual customizations.
 	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources,
-		useBaseImageRpmRepos, partitionsCustomized, imageConnection)
+		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}

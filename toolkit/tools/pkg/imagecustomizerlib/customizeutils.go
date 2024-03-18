@@ -29,7 +29,7 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageConnection *ImageConnection, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
 
@@ -112,7 +112,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableVerityPartition(buildDir, config.SystemConfig.Verity, imageChroot, imageConnection)
+	err = enableVerityPartition(buildDir, config.SystemConfig.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
