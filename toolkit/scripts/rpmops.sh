@@ -21,6 +21,15 @@ DEFINES=(-D "with_check 1" -D "dist $DIST_TAG" -D "$DISTRO_MACRO")
 SPECS_DIR="$REPO_ROOT/SPECS"
 rpm_package_macros_file_path=""
 
+# Check if the MACROS_FILE_PATH is already defined, and the directory exists
+if [[ -z "$RPM_OPS_MACROS_DIRECTORY" ]] || [[ ! -d "$RPM_OPS_MACROS_DIRECTORY" ]]
+then
+    # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely owned by root, but we also
+    # want to re-use the same macro files if possible to avoid downloads and handle multiple concurrent versions.
+    RPM_OPS_MACROS_DIRECTORY="$(mktemp -d)"
+    export RPM_OPS_MACROS_DIRECTORY
+fi
+
 # We do not want to use the host's default macros. Scan the toolchain manifest for rpm-libs and use it instead.
 # If this fails use the built-in macros from the host. This is the fallback option if the above generate an error.
 # Note: There is a limitation. In the event that the rpm-libs package itself is updated, the macros file will still
@@ -33,21 +42,12 @@ fi
 
 if [[ -n $MACROS_PACKAGE_NAME ]]
 then
-    # Check if the MACROS_FILE_PATH is already defined, and the directory exists
-    if [[ -z "$RPM_OPS_MACROS_FILE_PATH" ]] || [[ ! -d "$RPM_OPS_MACROS_FILE_PATH" ]]
-    then
-        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely owned by root, but we also
-        # want to re-use the same macro files if possible to avoid downloads and handle multiple concurrent versions.
-        RPM_OPS_MACROS_FILE_PATH="$(mktemp -d)"
-        export RPM_OPS_MACROS_FILE_PATH
-    fi
-
     source_url=( $(make -s -f $REPO_ROOT/toolkit/Makefile printvar-PACKAGE_URL_LIST) )
     # We assume the 1st entry will contain the correct URL
     source_url_full=${source_url[0]}/$MACROS_PACKAGE_NAME
     # To try and disambiguate different versions of the macros files, hash the url.
     url_hash=$(echo $source_url_full | sha256sum | awk '{print $1}')
-    temp_macros_file_path="$RPM_OPS_MACROS_FILE_PATH/$url_hash"
+    temp_macros_file_path="$RPM_OPS_MACROS_DIRECTORY/$url_hash"
 
     # Check if we have the file already extracted
     if [[ ! -f "$temp_macros_file_path" ]]
@@ -75,7 +75,18 @@ then
     # --macros is set to empty to clear the default macros, the first --load will load a replacement from $rpm_package_macros_file_path
     MACROS+=("--macros=''")
 fi
-for macro_file in $rpm_package_macros_file_path "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+
+# The CMAKE macro is problematic, it needs to be adjusted based on the CMAKE_MAJOR_VERSION variable.
+# This is based on %version from the specfile, so grab that.
+cmake_spec_version=$(rpmspec --query --qf "%{version}" $REPO_ROOT/SPECS/cmake/cmake.spec)
+# Major version is defined via %global major_version #, can't use rpmspec to read that...
+cmake_spec_major_version=$(grep -E '^%global major_version' $REPO_ROOT/SPECS/cmake/cmake.spec | awk '{print $3}')
+cmake_macros_file_path="$RPM_OPS_MACROS_DIRECTORY/macros.cmake$cmake_spec_version"
+cp "$REPO_ROOT/SPECS/cmake/macros.cmake" "$cmake_macros_file_path"
+sed -i -e "s|@@CMAKE_VERSION@@|$cmake_spec_version|" -e "s|@@CMAKE_MAJOR_VERSION@@|$cmake_spec_major_version|" "$cmake_macros_file_path"
+
+# Add all macro files we know about to the list of macros to load, except cmake where we need to use the custom one.
+for macro_file in $rpm_package_macros_file_path $cmake_macros_file_path $(find ../SPECS/ -name 'macros.*' ! -name 'macros.cmake')
 do
   MACROS+=("--load=$macro_file")
 done
