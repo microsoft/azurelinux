@@ -229,13 +229,13 @@ func fstabEntriesToMountPoints(fstabEntries []diskutils.FstabEntry, diskPartitio
 		if fstabEntry.Target == "/" {
 			mountPoint = safechroot.NewPreDefaultsMountPoint(
 				source, fstabEntry.Target, fstabEntry.FsType,
-				uintptr(fstabEntry.Options), fstabEntry.FsOptions)
+				uintptr(fstabEntry.VfsOptions), fstabEntry.FsOptions)
 
 			foundRoot = true
 		} else {
 			mountPoint = safechroot.NewMountPoint(
 				source, fstabEntry.Target, fstabEntry.FsType,
-				uintptr(fstabEntry.Options), fstabEntry.FsOptions)
+				uintptr(fstabEntry.VfsOptions), fstabEntry.FsOptions)
 		}
 
 		mountPoints = append(mountPoints, mountPoint)
