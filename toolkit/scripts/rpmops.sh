@@ -23,6 +23,8 @@ rpm_package_macros_file_path=""
 
 # We do not want to use the host's default macros. Scan the toolchain manifest for rpm-libs and use it instead.
 # If this fails use the built-in macros from the host. This is the fallback option if the above generate an error.
+# Note: There is a limitation. In the event that the rpm-libs package itself is updated, the macros file will still
+# be the old one.
 arch="$(make -s -f $REPO_ROOT/toolkit/Makefile printvar-build_arch)"
 if [[ -f "$REPO_ROOT/toolkit/resources/manifests/package/toolchain_$arch.txt" ]]
 then
@@ -32,10 +34,10 @@ fi
 if [[ -n $MACROS_PACKAGE_NAME ]]
 then
     # Check if the MACROS_FILE_PATH is already defined, and the directory exists
-    if [[ -z $RPM_OPS_MACROS_FILE_PATH ]] || [[ ! -d $RPM_OPS_MACROS_FILE_PATH ]]
+    if [[ -z "$RPM_OPS_MACROS_FILE_PATH" ]] || [[ ! -d "$RPM_OPS_MACROS_FILE_PATH" ]]
     then
-        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely  owned by root, but we also
-        # want to re-use the same macro files if possible to avoid downloads.
+        # Create a temporary directory to store the macros file, we don't want to use ./build since that is likely owned by root, but we also
+        # want to re-use the same macro files if possible to avoid downloads and handle multiple concurrent versions.
         RPM_OPS_MACROS_FILE_PATH="$(mktemp -d)"
         export RPM_OPS_MACROS_FILE_PATH
     fi
@@ -48,7 +50,7 @@ then
     temp_macros_file_path="$RPM_OPS_MACROS_FILE_PATH/$url_hash"
 
     # Check if we have the file already extracted
-    if [[ ! -f $temp_macros_file_path ]]
+    if [[ ! -f "$temp_macros_file_path" ]]
     then
         echo "Downloading and extracting macros file from package '$source_url_full' to '$temp_macros_file_path'" >&2
         # Extract the macros file from the package into the macros file path.
@@ -56,9 +58,9 @@ then
         curl -s "$source_url_full" | rpm2cpio - | cpio --quiet -i --to-stdout ./usr/lib/rpm/macros > "$temp_macros_file_path".tmp && \
             mv "$temp_macros_file_path".tmp "$temp_macros_file_path" || \
             temp_macros_file_path=""
-        if [[ -z $temp_macros_file_path ]]
+        if [[ -z "$temp_macros_file_path" ]]
         then
-            echo "Failed to extract macros file from package $MACROS_PACKAGE_NAME", using built-in defaults >&2
+            echo "Warning: Failed to extract macros file from package $MACROS_PACKAGE_NAME", using built-in defaults >&2
         fi
 
     fi
