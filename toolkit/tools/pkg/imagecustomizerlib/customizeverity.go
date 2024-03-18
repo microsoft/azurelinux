@@ -32,7 +32,7 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 		return err
 	}
 
-	err = updateFstab(buildDir, imageChroot)
+	err = updateFstabForVerity(buildDir, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	return nil
 }
 
-func updateFstab(buildDir string, imageChroot *safechroot.Chroot) error {
+func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
