@@ -76,7 +76,8 @@ Release: 0%{?dist}
 # ./lib/py/compat/win32/stdint.h is 2-clause BSD
 # ./compiler/cpp/src/md5.[ch] are zlib
 License: Apache-2.0 AND BSD-3-Clause AND Zlib
-
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
 URL:     https://thrift.apache.org/
  
 Source0: https://archive.apache.org/dist/%{name}/%{version}/%{name}-%{version}.tar.gz
