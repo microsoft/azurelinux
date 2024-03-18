@@ -1,0 +1,48 @@
+# Three things important for creating the cache
+# i) Bazel version should match .bazelversion file  
+# ii) The Working directory should match the directory where this cache will be used. 
+# for example: In AZL3.0 tensorflow is built in "/usr/src/azl/BUILD/tensorflow-$version".
+# iii) Vendoring will be available in 7.1.0 bazel. Probably this way of caching can be removed
+
+FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
+
+ARG TF_VERSION
+
+WORKDIR /root/
+#bazel version must match with the .bazelversion
+RUN tdnf -y install build-essential tar bazel python3-devel python3-numpy python3-pip python3-packaging python3-wheel python3-requests libstdc++-devel wget ca-certificates
+
+# Create Working Directory
+RUN wget https://github.com/tensorflow/tensorflow/archive/refs/tags/v$TF_VERSION.tar.gz
+RUN mkdir -p /usr/src/azl/BUILD
+RUN tar -xvf v$TF_VERSION.tar.gz -C /usr/src/azl/BUILD
+WORKDIR /usr/src/azl/BUILD/tensorflow-$TF_VERSION
+RUN rm .bazelversion
+
+# create cache using fetch
+# this doesn't download all the dependencies.
+RUN bazel --output_user_root=`pwd`/../tf_tmp fetch  //tensorflow/tools/pip_package:build_pip_package
+
+# some of the tertiary dependencies needs build command to download.
+# As compiling start we exit the command. This indicates all the dependencies has been downloaded
+# should take 5-10 mins 
+RUN bazel --output_user_root=`pwd`/../tf_tmp build //tensorflow/tools/pip_package:build_pip_package > /tmp/bazel_output.log 2>&1 & \
+    pid=$! && \
+    while true; do \
+        if grep -q "Compiling" /tmp/bazel_output.log; then \
+            echo "Compiling detected, exiting..." && \
+            kill $pid && \
+            exit 0; \
+        fi; \
+        sleep 1; \
+    done
+
+# bazel puts cache in the md5 hash of the working directory
+# cache will be present at output_user_root/$MD5_HASH/external ie /usr/src/azl/BUILD/tf_tmp/$MD5_HASH/external
+RUN MD5_HASH=$(echo -n $PWD | md5sum | awk '{print $1}') && \
+    mkdir -p /usr/src/azl/BUILD/tf_tmp/$MD5_HASH && \
+    cd /usr/src/azl/BUILD/tf_tmp/$MD5_HASH && \
+    tar -czvf tensorflow-$TF_VERSION-cache.tar.gz -C /usr/src/azl/BUILD/tf_tmp/$MD5_HASH/external . && \
+    cp tensorflow-$TF_VERSION-cache.tar.gz /root/
+
+CMD ["bash"]
