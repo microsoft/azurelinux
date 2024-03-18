@@ -103,6 +103,9 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %license LICENSE
 
 %changelog
+* Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 42.0.5-2
+- Build rust backings
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 42.0.5-1
 - Upgrade to version 42.0.5
 - Switch to pytest
