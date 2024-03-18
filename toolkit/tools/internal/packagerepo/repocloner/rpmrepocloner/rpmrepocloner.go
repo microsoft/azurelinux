@@ -11,28 +11,28 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 )
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
 const (
-	RepoFlagMarinerDefaults = uint64(1) << iota // External default Mariner repos pre-installed in the chroot.
+	RepoFlagDistroDefaults  = uint64(1) << iota // External default Azure Linux repos pre-installed in the chroot.
 	RepoFlagDownloadedCache                     // Local repo with the cached packages downloaded from upstream.
 	RepoFlagLocalBuilds                         // Local repo with the packages built from local spec files.
-	RepoFlagPreview                             // Separate flag to control the use of the Mariner preview packages repository.
+	RepoFlagPreview                             // Separate flag to control the use of the Azure Linux preview packages repository.
 	RepoFlagToolchain                           // Local repo with the toolchain packages.
 	RepoFlagUpstream                            // Separate flag to control the use of all upstream packages repositories.
 
 	// A compound flag enabling all supported repositories.
-	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagMarinerDefaults | RepoFlagUpstream
+	RepoFlagAll = RepoFlagToolchain | RepoFlagLocalBuilds | RepoFlagDownloadedCache | RepoFlagPreview | RepoFlagDistroDefaults | RepoFlagUpstream
 )
 
 const (
@@ -52,13 +52,13 @@ const (
 
 // RpmRepoCloner represents an RPM repository cloner.
 type RpmRepoCloner struct {
-	chroot                *safechroot.Chroot
-	chrootCloneDir        string
-	defaultMarinerRepoIDs []string
-	mountedCloneDir       string
-	repoIDCache           string
-	reposArgsList         [][]string
-	reposFlags            uint64
+	chroot                   *safechroot.Chroot
+	chrootCloneDir           string
+	defaultAzureLinuxRepoIDs []string
+	mountedCloneDir          string
+	repoIDCache              string
+	reposArgsList            [][]string
+	reposFlags               uint64
 }
 
 // ConstructCloner constructs a new RpmRepoCloner.
@@ -84,7 +84,7 @@ func ConstructCloner(destinationDir, tmpDir, workerTar, existingRpmsDir, toolcha
 	tlsKey, tlsCert = strings.TrimSpace(tlsKey), strings.TrimSpace(tlsCert)
 	err = r.addNetworkFiles(tlsCert, tlsKey)
 	if err != nil {
-		err = fmt.Errorf("failed to customize RPM repo cloner. Error:\n%w", err)
+		err = fmt.Errorf("failed to customize RPM repo cloner:\n%w", err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// Ensure that if initialization fails, the chroot is closed
 	defer func() {
 		if err != nil {
-			logger.Log.Warnf("Failed to initialize cloner. Error: %s", err)
+			logger.Log.Warnf("Failed to initialize cloner:\n%v", err)
 			if r.chroot != nil {
 				closeErr := r.chroot.Close(leaveChrootFilesOnDisk)
 				if closeErr != nil {
@@ -134,7 +134,7 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// Create the directory to download into
 	err = os.MkdirAll(destinationDir, os.ModePerm)
 	if err != nil {
-		logger.Log.Warnf("Could not create download directory (%s)", destinationDir)
+		err = fmt.Errorf("failed to create download directory (%s):\n%w", destinationDir, err)
 		return
 	}
 
@@ -176,11 +176,10 @@ func (r *RpmRepoCloner) initialize(destinationDir, tmpDir, workerTar, existingRp
 	// We make sure it's present during all builds to avoid noisy TDNF error messages in the logs.
 	reposToInitialize := []string{chrootLocalRpmsDir, chrootCloneDirRegular, chrootCloneDirContainer, chrootLocalToolchainDir}
 	for _, repoToInitialize := range reposToInitialize {
-		logger.Log.Debugf("Initializing the '%s' repository.", repoToInitialize)
+		logger.Log.Debugf("Initializing the (%s) repository", repoToInitialize)
 		err = r.initializeMountedChrootRepo(repoToInitialize)
 		if err != nil {
-			logger.Log.Errorf("Failed while trying to initialize the '%s' repository.", repoToInitialize)
-			return
+			return fmt.Errorf("failed to initialize repository (%s):\n%w", repoToInitialize, err)
 		}
 	}
 
@@ -245,16 +244,14 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 	// Create the directory for the repo file in case there wasn't already one there
 	err = os.MkdirAll(filepath.Dir(fullRepoFilePath), os.ModePerm)
 	if err != nil {
-		logger.Log.Warnf("Could not create directory for chroot repo file (%s)", fullRepoFilePath)
-		return
+		return fmt.Errorf("failed to create directory for chroot repo file (%s):\n%w", fullRepoFilePath, err)
 	}
 
 	// Get a list of the existing repofiles that are part of the chroot, if any
 	// We need to capture this list before we add 'allrepos.repo'.
 	existingRepoFiles, err := filepath.Glob(filepath.Join(fullRepoDirPath, "*"))
 	if err != nil {
-		logger.Log.Warnf("Could not list existing repo files (%s)", fullRepoDirPath)
-		return
+		return fmt.Errorf("failed to list existing repo files (%s):\n%w", fullRepoDirPath, err)
 	}
 
 	dstFile, err := os.OpenFile(fullRepoFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
@@ -274,13 +271,13 @@ func (r *RpmRepoCloner) initializeRepoDefinitions(repoDefinitions []string) (err
 
 	// Add each previously existing repofile to the end of the new file, then delete the original.
 	// We want to try our custom mounted repos before reaching out to the upstream servers.
-	// By default, chroot ships with PMC repositories specified in mariner-repos rpm.
+	// By default, chroot ships with PMC repositories specified in azurelinux-repos rpm.
 	for _, originalRepoFilePath := range existingRepoFiles {
 		repoIDs, err := readRepoIDs(originalRepoFilePath)
 		if err != nil {
 			return err
 		}
-		r.defaultMarinerRepoIDs = append(r.defaultMarinerRepoIDs, repoIDs...)
+		r.defaultAzureLinuxRepoIDs = append(r.defaultAzureLinuxRepoIDs, repoIDs...)
 
 		err = appendRepoFile(originalRepoFilePath, dstFile)
 		if err != nil {
@@ -317,13 +314,11 @@ func (r *RpmRepoCloner) initializeMountedChrootRepo(repoDir string) (err error) 
 	return r.chroot.Run(func() (err error) {
 		err = os.MkdirAll(repoDir, os.ModePerm)
 		if err != nil {
-			logger.Log.Errorf("Failed to create repo directory '%s'.", repoDir)
-			return
+			return fmt.Errorf("failed to create repo directory (%s):\n%w", repoDir, err)
 		}
 		err = rpmrepomanager.CreateRepo(repoDir)
 		if err != nil {
-			logger.Log.Errorf("Failed to create an RPM repository under '%s'.", repoDir)
-			return
+			return fmt.Errorf("failed to create an RPM repository under (%s):\n%w", repoDir, err)
 		}
 
 		return r.refreshPackagesCache()
@@ -520,6 +515,9 @@ func (r *RpmRepoCloner) ConvertDownloadedPackagesIntoRepo() (err error) {
 		// Docker based build doesn't use overlay so cache repo
 		// must be explicitly initialized
 		err = r.initializeMountedChrootRepo(chrootCloneDirContainer)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -734,16 +732,16 @@ func (r *RpmRepoCloner) SetEnabledRepos(reposFlags uint64) {
 		previousReposList = append(previousReposList, fmt.Sprintf("--disablerepo=%s", repoIDPreview))
 	}
 
-	if RepoFlagMarinerDefaults&reposFlags == 0 {
-		previousReposList = append(previousReposList, r.disabledDefaultMarinerReposArgs()...)
+	if RepoFlagDistroDefaults&reposFlags == 0 {
+		previousReposList = append(previousReposList, r.disabledDefaultAzureLinuxReposArgs()...)
 	}
 
 	r.reposArgsList = append(r.reposArgsList, previousReposList)
 }
 
-func (r *RpmRepoCloner) disabledDefaultMarinerReposArgs() (args []string) {
-	args = make([]string, len(r.defaultMarinerRepoIDs))
-	for i, repoID := range r.defaultMarinerRepoIDs {
+func (r *RpmRepoCloner) disabledDefaultAzureLinuxReposArgs() (args []string) {
+	args = make([]string, len(r.defaultAzureLinuxRepoIDs))
+	for i, repoID := range r.defaultAzureLinuxRepoIDs {
 		args[i] = fmt.Sprintf("--disablerepo=%s", repoID)
 	}
 
@@ -764,7 +762,8 @@ func (r *RpmRepoCloner) refreshPackagesCache() (err error) {
 
 	stdout, stderr, err := shell.Execute("tdnf", args...)
 	if err != nil {
-		logger.Log.Errorf("Failed to run 'tdnf makecache'. Stdout:\n%s\nStderr:\n%s\nError: %s.", stdout, stderr, err)
+		logger.Log.Errorf("Failed to run 'tdnf makecache'\nstdout:\n%v", stdout)
+		return fmt.Errorf("failed to run 'tdnf makecache':\n%v\n%w", stderr, err)
 	}
 
 	return

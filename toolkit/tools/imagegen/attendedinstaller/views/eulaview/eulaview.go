@@ -5,15 +5,15 @@ package eulaview
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 )
 
 // Resource constants.
@@ -120,7 +120,7 @@ func populateEULA(eulaFile string, text *tview.TextView) (err error) {
 	}
 	defer file.Close()
 
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		return
 	}

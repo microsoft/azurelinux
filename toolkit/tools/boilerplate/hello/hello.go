@@ -3,7 +3,7 @@
 
 package hello
 
-import "github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+import "github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 
 // World is a sample public (starts with a capital letter, must be commented) function.
 func World() string {

@@ -14,7 +14,7 @@ BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  cmake
 BuildRequires:  abseil-cpp-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
 BuildRequires:  gbenchmark-devel
@@ -52,7 +52,7 @@ you will need to install %{name}-devel.
   -DOVERRIDE_INSTALL_PREFIX=/usr \
   -DCMAKE_COLOR_MAKEFILE:BOOL=OFF \
   -DINSTALL_LIBDIR:PATH=%{_libdir} \
-%if %{with_check}
+%if 0%{?with_check}
   -DRE2_BUILD_TESTING:BOOL=ON \
 %endif
   "-GUnix Makefiles"

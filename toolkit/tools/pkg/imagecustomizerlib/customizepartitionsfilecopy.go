@@ -6,10 +6,10 @@ package imagecustomizerlib
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -21,11 +21,6 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 	defer existingImageConnection.Close()
 
-	currentSELinuxMode, err := getCurrentSELinuxMode(existingImageConnection.Chroot())
-	if err != nil {
-		return err
-	}
-
 	diskConfig := (*config.Disks)[0]
 
 	installOSFunc := func(imageChroot *safechroot.Chroot) error {
@@ -33,8 +28,7 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 
 	err = createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
-		config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, buildDir, "newimageroot",
-		currentSELinuxMode, installOSFunc)
+		buildDir, "newimageroot", installOSFunc)
 	if err != nil {
 		return err
 	}

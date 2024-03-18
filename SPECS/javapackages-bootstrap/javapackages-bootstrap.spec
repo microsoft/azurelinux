@@ -249,13 +249,13 @@ Provides:       bundled(xmvn) = 4.0.0~SNAPSHOT
 Provides:       bundled(xz-java) = 1.8
 
 BuildRequires:  byaccj
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-generators
 BuildRequires:  java-devel
 
 Requires:       bash
 Requires:       coreutils
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       procps-ng
 
 %description
@@ -288,13 +288,13 @@ do
   tar -xf "${source}"
 done
 
-%patch0 -p1
+%patch 0 -p1
 pushd "downstream/commons-compress"
-%patch1 -p1 
+%patch 1 -p1 
 popd
 
 pushd "downstream/plexus-archiver"
-%patch2 -p1 
+%patch 2 -p1 
 popd
 
 for patch_path in patches/*/*

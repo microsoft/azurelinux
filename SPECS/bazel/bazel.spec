@@ -3,7 +3,7 @@
 %define __os_install_post %{_libdir}/rpm/brp-compress %{nil}
 Summary:        Correct, reproducible, and fast builds for everyone.
 Name:           bazel
-Version:        7.0.2
+Version:        6.5.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -12,15 +12,18 @@ URL:            https://bazel.io/
 # do not use the github tar.gz use the ...-dist.zip instead
 Source0:        https://github.com/bazelbuild/%{name}/releases/download/%{version}/%{name}-%{version}-dist.zip
 Patch0:         fix-bazel-version-check.patch
+Patch1:         0001-JDK17.patch
 BuildRequires:  build-essential
 BuildRequires:  libstdc++
 BuildRequires:  libstdc++-devel
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  python3
 BuildRequires:  unzip
 BuildRequires:  zip
 BuildRequires:  perl-Digest-SHA
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
+
+
 
 %description
 A fast, scalable, multi-language and extensible build system.
@@ -29,9 +32,10 @@ A fast, scalable, multi-language and extensible build system.
 %autosetup -p1 -c -n %{name}-%{version}
 
 %build
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 ln -s %{_bindir}/python3 %{_bindir}/python
 
-EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk --remote_download_minimal" ./compile.sh
+EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk --tool_java_runtime_version=local_jdk --remote_download_minimal" ./compile.sh 
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
@@ -44,8 +48,9 @@ cp ./scripts/packages/bazel.sh %{buildroot}/%{_bindir}/bazel
 %attr(0755,root,root) %{_bindir}/bazel-real
 
 %changelog
-* Fri Jan 26 2024 Riken Maharjan <rmaharjan@microsoft.com> - 7.0.2-1
-- Upgrade to 7.0.2
+* Tue Mar 05 2024 Riken Maharjan <rmaharjan@microsoft.com> - 6.5.0-1
+- Upgrade to 6.5.0
+- Added msopenjdk-17 patch
 
 * Fri Dec 09 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.3.2-1
 - Auto-upgrade to 5.3.2 - CVE-2022-3474

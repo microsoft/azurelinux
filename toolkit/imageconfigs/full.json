@@ -1,8 +1,9 @@
 {
     "SystemConfigs": [
         {
-            "Name": "CBL-Mariner Full",
+            "Name": "Azure Linux Full",
             "PackageLists": [
+                "packagelists/grub2-mkconfig.json",
                 "packagelists/developer-packages.json",
                 "packagelists/virtualization-host-packages.json",
                 "packagelists/core-packages-image.json",
@@ -20,8 +21,9 @@
             }
         },
         {
-            "Name": "CBL-Mariner Core",
+            "Name": "Azure Linux Core",
             "PackageLists": [
+                "packagelists/grub2-mkconfig.json",
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image.json"
             ],

@@ -1,7 +1,7 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
 Version:        2.2.0
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,7 @@ BuildRequires:  python3-docutils
 BuildRequires:  python3-lockfile
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python3-pip
@@ -36,7 +36,6 @@ use the instance as a context manager to enter a daemon state.
 
 %prep
 %autosetup
-sed -i 's/distclass=version.ChangelogAwareDistribution,/ /g' setup.py
 
 %build
 %py3_build
@@ -53,6 +52,9 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 2.2.0-7
+- Remove change to ChangelogAwareDistribution in setup.py
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 2.2.0-6
 - Replace easy_install usage with pip in %%check sections
 

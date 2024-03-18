@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 Summary: A mouse server for the Linux console
 Name: gpm
 Version: 1.20.7
-Release: 23%{?dist}
+Release: 24%{?dist}
 License: GPLv2
 URL: http://www.nico.schottelius.org/software/gpm/
 #URL2 : http://freecode.com/projects/gpm
@@ -17,7 +17,7 @@ URL: http://www.nico.schottelius.org/software/gpm/
 # 4.] rm -rf %{name}-%{version}/doc/specs
 # 5.] tar cJf %{name}-%{version}.tar.xz %{name}-%{version}
 
-Source: %{_mariner_sources_url}/%{name}-%{version}.tar.xz
+Source: %{_distro_sources_url}/%{name}-%{version}.tar.xz
 Source1: gpm.service
 Patch0: https://github.com/telmich/gpm/compare/1.20.7...4a938233fbe6de7af05aabc74891b68d4bae40f8.diff
 # https://github.com/telmich/gpm/pull/37/
@@ -78,13 +78,13 @@ mouse support to text-based Linux applications.
 %prep
 %setup -q
 
-%patch0 -p1 -b .master
-%patch3 -p1 -b .gcc10
-%patch1 -p1 -b .multilib
-%patch2 -p1 -b .lib-silent
-%patch4 -p1 -b .close-fds
-%patch5 -p1 -b .weak-wgetch
-%patch7 -p1
+%patch 0 -p1 -b .master
+%patch 3 -p1 -b .gcc10
+%patch 1 -p1 -b .multilib
+%patch 2 -p1 -b .lib-silent
+%patch 4 -p1 -b .close-fds
+%patch 5 -p1 -b .weak-wgetch
+%patch 7 -p1
 # not sure if this is really needed
 #patch8 -p1
 
@@ -160,6 +160,9 @@ rm -rf %{buildroot}%{_mandir}
 %{_libdir}/libgpm.a
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-24
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20.7-23
 - Updating source URLs.
 - License verified.

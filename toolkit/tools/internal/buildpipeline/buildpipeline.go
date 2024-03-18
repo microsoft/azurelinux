@@ -10,8 +10,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 
 	"golang.org/x/sys/unix"
 )
@@ -24,11 +24,12 @@ const (
 
 // IsRegularBuild indicates if it is a regular build (without using docker)
 func IsRegularBuild() bool {
-	// some specific build pipeline builds Mariner from a Docker container and
+	// some specific build pipeline builds Azure Linux from a Docker container and
 	// consequently have special requirements with regards to chroot
 	// check if .dockerenv file exist to disambiguate build pipeline
-	exists, _ := file.PathExists("/.dockerenv")
-	return !exists
+	dockerEnvExists, _ := file.PathExists("/.dockerenv")
+	ignoreDockerEnvExists, _ := file.PathExists("/.mariner-toolkit-ignore-dockerenv")
+	return ignoreDockerEnvExists || !dockerEnvExists
 }
 
 // GetChrootDir returns the chroot folder

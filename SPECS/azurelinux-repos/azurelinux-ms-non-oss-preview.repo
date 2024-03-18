@@ -1,0 +1,9 @@
+[azurelinux-official-ms-non-oss-preview]
+name=Azure Linux Official Extras Preview $releasever $basearch
+baseurl=https://packages.microsoft.com/azurelinux/$releasever/preview/extras/$basearch
+gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
+gpgcheck=1
+repo_gpgcheck=1
+enabled=1
+skip_if_unavailable=True
+sslverify=1

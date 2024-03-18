@@ -2,8 +2,8 @@
 
 Summary:        Python WBEM client interface and related utilities
 Name:           python-%{pkgname}
-Version:        1.0.1
-Release:        6%{?dist}
+Version:        1.6.2
+Release:        1%{?dist}
 License:        LGPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,14 +33,15 @@ BuildRequires:  python3-pbr
 BuildRequires:  python3-pip
 BuildRequires:  python3-ply
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 Requires:       python3
 Requires:       python3-PyYAML
 Requires:       python3-nocasedict
+Requires:       python3-nocaselist
 Requires:       python3-ply
 Requires:       python3-requests
 Requires:       python3-xml
 Requires:       python3-yamlloader
-AutoReqProv:    no
 Provides:       python3dist(pywbem) = %{version}-%{release}
 Provides:       python3.7dist(pyweb) = %{version}-%{release}
 BuildArch:      noarch
@@ -73,6 +74,9 @@ rm -rf %{buildroot}%{_bindir}/*.bat
 %doc README.rst
 
 %changelog
+* Wed Feb 21 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.6.2-1
+- Upgrade to 1.6.2
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.1-6
 - License verified.
 

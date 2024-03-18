@@ -12,6 +12,8 @@ Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_ver
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
 
+%global sonamever %{version}
+
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
 linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions and unit testing.
@@ -33,6 +35,36 @@ Requires:       %{name} = %{version}-%{release}
 
 %description    static
 The boost-static package contains boost static libraries.
+
+%package filesystem
+Summary: Run-time component of boost filesystem library
+Requires: %{name}-system%{?_isa} = %{version}-%{release}
+ 
+%description filesystem
+Run-time support for the Boost Filesystem Library, which provides
+portable facilities to query and manipulate paths, files, and
+directories.
+
+%package random
+Summary: Run-time component of boost random library
+ 
+%description random
+Run-time support for boost random library.
+
+%package system
+Summary: Run-time component of boost system support library
+ 
+%description system
+Run-time component of Boost operating system support library, including
+the diagnostics support that is part of the C++11 standard library.
+
+%package program-options
+Summary:  Run-time component of boost program_options library
+ 
+%description program-options
+Run-time support of boost program options library, which allows program
+developers to obtain (name, value) pairs from the user, via
+conventional methods such as command-line and configuration file.
 
 %prep
 %autosetup -n %{name}_%{underscore_version}
@@ -61,7 +93,26 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %defattr(-,root,root)
 %{_libdir}/libboost_*.a
 
+%files filesystem
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_filesystem.so.%{sonamever}
+
+%files program-options
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_program_options.so.%{sonamever}
+	
+%files random
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_random.so.%{sonamever}
+
+%files system
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_system.so.%{sonamever}
+
 %changelog
+* Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
+- Add filesystem, random, system, program-options packages 
+
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.83.0-1
 - Upgrade to version 1.83.0-1
 

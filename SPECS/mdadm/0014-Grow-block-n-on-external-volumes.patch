@@ -1,0 +1,41 @@
+From 20e114e334ed6ed3280c37a9a08fb95578393d1a Mon Sep 17 00:00:00 2001
+From: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Date: Thu, 19 May 2022 09:16:08 +0200
+Subject: [PATCH 14/83] Grow: block -n on external volumes.
+
+Performing --raid-devices on external metadata volume should be blocked
+as it causes unwanted behaviour.
+
+Eg. Performing
+mdadm -G /dev/md/volume -l10 -n4
+on r0_d2 inside 4 disk container, returns
+mdadm: Need 2 spares to avoid degraded array, only have 0.
+
+Signed-off-by: Mateusz Kusiak <mateusz.kusiak@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Grow.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Grow.c b/Grow.c
+index 8a242b0f..f6efbc48 100644
+--- a/Grow.c
++++ b/Grow.c
+@@ -1892,6 +1892,14 @@ int Grow_reshape(char *devname, int fd,
+ 
+ 		if (retval) {
+ 			pr_err("Cannot read superblock for %s\n", devname);
++			close(cfd);
++			free(subarray);
++			return 1;
++		}
++
++		if (s->raiddisks && subarray) {
++			pr_err("--raid-devices operation can be performed on a container only\n");
++			close(cfd);
+ 			free(subarray);
+ 			return 1;
+ 		}
+-- 
+2.38.1
+

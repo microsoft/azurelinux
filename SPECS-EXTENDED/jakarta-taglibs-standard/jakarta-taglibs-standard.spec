@@ -21,14 +21,14 @@ Distribution:   Azure Linux
 %define short_name      taglibs-standard
 Name:           jakarta-taglibs-standard
 Version:        1.1.1
-Release:        260%{?dist}
+Release:        261%{?dist}
 Summary:        Open Source Implementation of the JSP Standard Tag Library
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 Url:            http://tomcat.apache.org/taglibs/
 # Need to switch to upstream's source tarball:
 # https://archive.apache.org/dist/jakarta/taglibs/standard/source/jakarta-taglibs-standard-1.1.1-src.tar.gz
-Source0:        %{_mariner_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2
+Source0:        %{_distro_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2
 Patch0:         %{name}-%{version}-build.patch
 Patch1:         %{name}-java6-compatibility.patch
 Patch2:         %{name}-%{version}-remove-enums.patch
@@ -58,11 +58,11 @@ This package contains the javadoc documentation for Jakarta Taglibs.
 
 %prep
 %setup -q -n %{name}-%{version}-src
-%patch0
-%patch1 -b .sav1
-%patch2 -b .sav2
-%patch3 -p1
-%patch4 -p1
+%patch 0
+%patch 1 -b .sav1
+%patch 2 -b .sav2
+%patch 3 -p1
+%patch 4 -p1
 
 cat > build.properties <<EOBP
 build.dir=build
@@ -102,6 +102,9 @@ cp -pr standard/dist/standard/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %doc %{_javadocdir}/%{name}
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-261
+- Updating naming for 3.0 version of Azure Linux.
+
 * Mon Apr 25 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.1-260
 - Updating source URLs.
 - License verified.

@@ -1,15 +1,20 @@
 Summary:        NVM-Express user space tooling for Linux
 Name:           nvme-cli
-Version:        1.16
-Release:        2%{?dist}
+Version:        2.8
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/linux-nvme/nvme-cli
-Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/linux-nvme/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz	
+BuildRequires:  asciidoc
 BuildRequires:  gcc
-BuildRequires:  make
+BuildRequires:  json-c-devel
+BuildRequires:  libnvme-devel
+BuildRequires:	meson
+BuildRequires:  xmlto
+
 Requires(post): systemd
 Requires(post): systemd-udev
 Requires(post): util-linux
@@ -18,13 +23,14 @@ Requires(post): util-linux
 NVM-Express user space tooling for Linux
 
 %prep
-%setup -q
+%autosetup -p1 -n %{name}-%{version}
 
 %build
-make CFLAGS="%{build_cflags} -std=gnu99 -I."
+%meson -Dudevrulesdir=%{_sysconfdir}/udev/rules.d -Dsystemddir=%{_libdir}/systemd/system -Dpdc-enabled=true
+%meson_build
 
 %install
-make install PREFIX=%{_prefix} DESTDIR=%{buildroot}
+%meson_install
 
 %files
 %defattr(-,root,root)
@@ -32,18 +38,17 @@ make install PREFIX=%{_prefix} DESTDIR=%{buildroot}
 %{_sbindir}/nvme
 %{_datadir}/bash-completion/completions/nvme
 %{_datadir}/zsh/site-functions/_nvme
-%{_mandir}/man1/nvme*.1*
 %dir %{_sysconfdir}/nvme
-%{_sysconfdir}/nvme/hostnqn
-%{_sysconfdir}/nvme/hostid
 %{_sysconfdir}/nvme/discovery.conf
+%{_sysconfdir}/udev/rules.d/65-persistent-net-nbft.rules
 %{_sysconfdir}/udev/rules.d/70-nvmf-autoconnect.rules
-%{_sysconfdir}/udev/rules.d/71-nvmf-iopolicy-netapp.rules
+%{_sysconfdir}/udev/rules.d/71-nvmf-netapp.rules
 %{_libdir}/dracut/dracut.conf.d/*
 %{_libdir}/systemd/system/nvmf-connect@.service
 %{_libdir}/systemd/system/nvmefc-boot-connections.service
 %{_libdir}/systemd/system/nvmf-connect.target
 %{_libdir}/systemd/system/nvmf-autoconnect.service
+%{_libdir}/systemd/system/nvmf-connect-nbft.service
 
 %post
 if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
@@ -60,6 +65,9 @@ if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
 fi
 
 %changelog
+* Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8-1
+- Auto-upgrade to 2.8
+
 * Fri Mar 25 2022 Andrew Phelps <anphel@microsoft.com> - 1.16-2
 - Remove check tests which fail to run properly on daily build machines
 - Update spec with changes based on upstream github project's nvme.spec.in

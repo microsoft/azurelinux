@@ -6,7 +6,7 @@ package speakuputils
 import (
 	"github.com/bendahl/uinput"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // Constants for start/stop speakup functions
@@ -18,7 +18,7 @@ const (
 
 // CreateVirtualKeyboard creates and returns a virtual keyboard from the uinput package
 func CreateVirtualKeyboard() (keyboard uinput.Keyboard, err error) {
-	keyboard, err = uinput.CreateKeyboard("/dev/uinput", []byte("MarinerVirtualKeyboard"))
+	keyboard, err = uinput.CreateKeyboard("/dev/uinput", []byte("isoVirtualKeyboard"))
 	return
 }
 

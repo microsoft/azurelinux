@@ -52,7 +52,7 @@ Ideally as much of `/etc` as possible should be left read-only to avoid miss-con
 Verity supports error correction which will return the original data even if the underlying blocks have been modified (it does not restore the underlying data stored on disk however). FEC incurs some overhead but the hash tree, which is a sunk cost, makes it much more effective than normal Reed-Solomon codes. For a 2GiB disk, FEC with 2 roots (i.e. 2 bytes of error correction codes per 255 bytes of real data) can correct ~16MiB of errors with ~16MiB of overhead. See [veritydisk.go](../../tools/imagegen/configuration/veritydisk.go) for calculation details.
 
 ### Hash Tree and FEC Overhead
-The extra data required for verity needs to be stored outside the measured partition. In the case of Mariner it is stored in the initramfs. Assuming the Merkle tree is a full m-ary tree with m=128 (128 branches per node, from `4k/sizeof(sha256)`), the size of the Merkle tree is:
+The extra data required for verity needs to be stored outside the measured partition. In the case of Azure Linux it is stored in the initramfs. Assuming the Merkle tree is a full m-ary tree with m=128 (128 branches per node, from `4k/sizeof(sha256)`), the size of the Merkle tree is:
 ```
 blockSize = 4k
 m = blockSize / sizeof(sha256)
@@ -108,4 +108,4 @@ Once the writable mount is created it is possible to write data back to the unde
 If enough blocks are corrupted the system will eventually be unable to recover them with FEC and the error handling behavior will trigger. The default behavior is to simply return an IO error, but other options are available by setting the `"VerityErrorBehavior"` key in the configuration file.
 
 ## ISO Installers
-If a configuration used to create an ISO has a read-only root configured, the ISO installer will honor that configuration. (See `full.json`'s `"CBL-Mariner Core Read-Only"` entry).
+If a configuration used to create an ISO has a read-only root configured, the ISO installer will honor that configuration. (See `full.json`'s `"Azure Linux Core Read-Only"` entry).

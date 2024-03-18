@@ -51,7 +51,7 @@ jobs:
           path: 'main-checkout'
 
       # Our linter is based on the spec-cleaner tool from the folks at openSUSE
-      # We apply a patch to modify it for CBL-Mariner's needs
+      # We apply a patch to modify it for Azure Linux's needs
       - name: spec-cleaner checkout
         uses: actions/checkout@v4
         with:
@@ -59,7 +59,7 @@ jobs:
           ref: 'spec-cleaner-1.2.0'
           path: 'spec-cleaner'
 
-      # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
+      # For consistency, we use the same major/minor version of Python that Azure Linux ships
       - name: Setup Python 3.7
         uses: actions/setup-python@v4
         with:
@@ -67,10 +67,10 @@ jobs:
 
       # We take our version of the linting tool from the master branch to ensure rules
       # are consistent across all branches
-      - name: Patch spec-cleaner with Mariner-specific lints
+      - name: Patch spec-cleaner with Azure Linux-specific lints
         run: |
           pushd spec-cleaner
-          git apply ../main-checkout/.github/workflows/mariner-spec-cleaner.patch
+          git apply ../main-checkout/.github/workflows/azurelinux-spec-cleaner.patch
           popd
 
       - name: Install patched spec-cleaner

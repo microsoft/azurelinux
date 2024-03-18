@@ -1,7 +1,7 @@
 Summary:        The package automatically configure source code
 Name:           autoconf
-Version:        2.71
-Release:        3%{?dist}
+Version:        2.72
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,7 @@ BuildRequires:  perl
 # Still an open issue as of 15th of March 2022: https://savannah.gnu.org/support/?110503.
 Requires:       gtk-doc
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(File::Find)
 %endif
 Requires:       m4
@@ -49,6 +49,9 @@ make -k check %{?_smp_mflags}
 %{_datarootdir}/autoconf/*
 
 %changelog
+* Tue Feb 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.72-1
+- Auto-upgrade to 2.72 - Azure Linux 3.0 Upgrades
+
 * Thu Mar 17 2022 Muhammad Falak <mwani@microsoft.com> - 2.71-3
 - Drop TESTSUITEFLAGS and run all tests cases
 - Add an explicit BR on `perl(File::Find)` to enable ptest

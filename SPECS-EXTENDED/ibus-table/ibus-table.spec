@@ -20,7 +20,7 @@ BuildRequires:  python3-devel
 
 # Test dependencies break the package build.
 # Disabling until fixed.
-# %if %{with_check}
+# %if 0%{?with_check}
 # BuildRequires:  libappstream-glib
 # BuildRequires:  desktop-file-utils
 # BuildRequires:  python3-mock

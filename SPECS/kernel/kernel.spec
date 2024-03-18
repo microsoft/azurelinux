@@ -28,8 +28,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.12.1
-Release:        2%{?dist}
+Version:        6.6.14.1
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,7 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
+Source7:        10_kernel.cfg
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -74,6 +75,7 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+%{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
 #  1. Extract the linux sources into a folder
@@ -246,23 +248,12 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
-# GRUB Environment Block
-mariner_cmdline=init=/lib/systemd/systemd ro no-vmw-sta crashkernel=256M
-mariner_linux=vmlinuz-%{uname_r}
-mariner_initrd=initrd.img-%{uname_r}
-EOF
-chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
+# Add kernel boot configurations to /etc/default/grub.d
+install -Dm 755 %{SOURCE7} %{buildroot}%{_sysconfdir}/default/grub.d/10_kernel.cfg
 
 # hmac sign the kernel for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
-
-# Register myself to initramfs
-mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
-EOF
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -315,22 +306,13 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
+rm -rf /boot/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %preun tools
 %systemd_preun cpupower.service
 
 %postun
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
 %grub2_postun
 
 %postun tools
@@ -338,7 +320,6 @@ fi
 
 %post
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %grub2_post
 
 %post drivers-accessibility
@@ -361,8 +342,7 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) /boot/linux-%{uname_r}.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
+%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -429,6 +409,27 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
+- Remove /var/lib/initramfs/kernel files.
+
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
+- Call dracut instead of mkinitrd
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
+* Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Remove legacy /boot/mariner.cfg
+- Introduce /etc/default/grub.d/10_kernel.cfg
+
+* Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
+- Auto-upgrade to 6.6.14.1
+- Enable support for latency based cgroup IO protection
+- Enable ZRAM module
+- Enable Broadcom MPI3 Storage Controller Device Driver module
+
+* Thu Feb 01 2024 Vince Perri <viperri@microsoft.com> - 6.6.12.1-3
+- Config changes to converge kernel-hci config with kernel
+- Remove no-vmw-sta kernel argument inherited from Photon OS
+
 * Sat Jan 27 11:07:05 EST 2024 Dan Streetman <ddstreet@ieee.org> - 6.6.12.1-2
 - use "bootstrap" systemd macros
 

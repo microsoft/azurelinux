@@ -24,7 +24,7 @@ for detailed workload specification.
 
 %prep
 %setup -q
-%patch0 -p1 -b .dofile
+%patch 0 -p1 -b .dofile
 cp -p %{SOURCE1} .
 cp -p %{SOURCE2} .
 

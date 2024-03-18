@@ -3,13 +3,13 @@
 Summary:        Test framework project
 Name:           maven-surefire
 Version:        3.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND CPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
-Source0:        %{_mariner_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source2:        cpl-v10.html
 Patch1:         0001-Port-to-TestNG-6.11.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch
@@ -80,9 +80,9 @@ Javadoc for %{name}.
 %setup -q -n surefire-%{upstream_version}-M4
 cp -p %{SOURCE2} .
 
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
 
 # Disable strict doclint
 sed -i /-Xdoclint:all/d pom.xml
@@ -147,6 +147,9 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

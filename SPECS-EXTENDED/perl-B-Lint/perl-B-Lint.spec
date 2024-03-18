@@ -46,7 +46,7 @@ for C programs.
 
 %prep
 %setup -q -n B-Lint-%{version}
-%patch0 -p1
+%patch 0 -p1
 # Install into architecture-agnostic path, CPAN RT#83049
 sed -i '/PM *=>/,/}/d' Makefile.PL
 

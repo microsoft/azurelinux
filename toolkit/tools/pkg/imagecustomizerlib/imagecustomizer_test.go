@@ -11,11 +11,11 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -274,7 +274,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return "", fmt.Errorf("failed to make build directory (%s):\n%w", buildDir, err)
 	}
 
-	// Use a prototypical Mariner image partition config.
+	// Use a prototypical Azure Linux image partition config.
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
 		MaxSize:            4096,
@@ -318,7 +318,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	err = createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
+	err = createNewImageWithBootLoader(rawDisk, diskConfig, partitionSettings, "efi",
 		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxDisabled,
 		installOS)
 	if err != nil {

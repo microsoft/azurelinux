@@ -6,8 +6,8 @@ package imagecustomizerlib
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 )
 
 func bootTypeToImager(bootType imagecustomizerapi.BootType) (string, error) {
@@ -171,7 +171,7 @@ func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelComman
 	}
 
 	imagerKernelCommandLine := configuration.KernelCommandLine{
-		ExtraCommandLine: kernelCommandLine.ExtraCommandLine,
+		ExtraCommandLine: string(kernelCommandLine.ExtraCommandLine),
 		SELinux:          imagerSELinux,
 		SELinuxPolicy:    "",
 	}

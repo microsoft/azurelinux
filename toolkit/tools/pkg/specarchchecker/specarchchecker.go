@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	simpletoolchroot "github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/simpletoolchroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	simpletoolchroot "github.com/microsoft/azurelinux/toolkit/tools/pkg/simpletoolchroot"
 )
 
 type ArchChecker struct {
@@ -73,7 +73,7 @@ func (a *ArchChecker) buildAllSpecsListFromNames(specNames []string) (specPaths 
 }
 
 func (a *ArchChecker) filterListInChroot(specFileNames []string, distTag string, testOnly bool) (filteredSpecNames []string, err error) {
-	defines := rpm.DefaultDefinesWithDist(testOnly, distTag)
+	defines := rpm.DefaultDistroDefines(testOnly, distTag)
 	specPaths, err := a.buildAllSpecsListFromNames(specFileNames)
 	if err != nil {
 		err = fmt.Errorf("failed to translate names to specs inside (%s). Error:\n%w", a.simpleToolChroot.ChrootRelativeSpecDir(), err)
@@ -115,7 +115,7 @@ func filterOutSpecsWithoutTests(specPaths []string, distTag string) (filteredSpe
 		return nil, err
 	}
 
-	defines := rpm.DefaultDefinesWithDist(runChecks, distTag)
+	defines := rpm.DefaultDistroDefines(runChecks, distTag)
 	for _, specPath := range specPaths {
 		hasCheckSection, err := rpm.SpecHasCheckSection(specPath, filepath.Dir(specPath), buildArch, defines)
 		if err != nil {

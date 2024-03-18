@@ -12,8 +12,8 @@ Notable features and goals:\
 %global srcname pytest-benchmark
 Summary:        A py.test fixture for benchmarking code
 Name:           python-%{srcname}
-Version:        3.4.1
-Release:        2%{?dist}
+Version:        4.0.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,7 +24,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -81,6 +81,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/pytest_benchmark-%{version}-py*.egg-info
 
 %changelog
+* Tue Feb 13 2024 Suresh Thelkar <sthelkar@microsoft.com> - 4.0.0-1
+- Upgrade to version 4.0.0
+
 * Thu Oct 27 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.4.1-2
 - Froze 'pytest' version to 7.1.2 to stabilize tests.
 - Disabled test broken upsteam.

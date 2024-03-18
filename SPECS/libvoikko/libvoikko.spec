@@ -103,8 +103,8 @@ install -pm 0644 python/libvoikko.py %{buildroot}%{python3_sitelib}/
 %{_libdir}/pkgconfig/libvoikko.pc
 
 %files -n python3-libvoikko
-%{python3_sitelib}/%{name}.py*
 %{python3_sitelib}/__pycache__/*
+%{python3_sitelib}/%{name}.py*
 
 %changelog
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.3-1

@@ -26,6 +26,7 @@ Disks:
 
 SystemConfig:
   BootType: efi
+  ResetBootLoaderType: hard-reset
   PartitionSettings:
   - ID: esp
     MountPoint: /boot/efi
@@ -42,3 +43,4 @@ SystemConfig:
 
   KernelCommandLine:
     ExtraCommandLine: console=tty0 console=ttyS0
+    SELinux: disabled

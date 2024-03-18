@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Helper script to generate maven build caches.
-## CBL-MARINER builds do not have access to internet when building rpms.
+## Azure Linux builds do not have access to internet when building rpms.
 ## Generating build cache as tarballs to be used when buidling offline.
 set -e
 
@@ -71,8 +71,8 @@ function installUtils {
 	echo "Installing pre-built PMC 1.0 maven rpm to provide maven binary needed to build maven itself."
 	rpm -i --nodeps maven.rpm
 	mvn -v
-	echo "Installing msopenjdk-11."
-	tdnf install -y msopenjdk-11 | dieIfError
+	echo "Installing msopenjdk-17."
+	tdnf install -y msopenjdk-17 | dieIfError
 }
 
 function buildMaven {
@@ -82,8 +82,8 @@ function buildMaven {
 	tar -xf mavensrc.tar.gz
 	cd apache-maven-$VERSION
 
-	export JAVA_HOME="/usr/lib/jvm/msopenjdk-11"
-	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-11/lib/jli"
+	export JAVA_HOME="/usr/lib/jvm/msopenjdk-17"
+	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-17/lib"
 	sed -i 's/www.opensource/opensource/g' DEPENDENCIES
 	mvn -DskipTests clean package
 	popd

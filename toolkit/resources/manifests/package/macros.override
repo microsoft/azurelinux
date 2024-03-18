@@ -1,6 +1,6 @@
 # This file is for rpm macro overrides that modify the behavior of the build.
 # It gets copied into /usr/lib/rpm/macros.d in toolchain and main package builds.
-# It can be used to configure the scriptlets in macros.check in mariner-rpm-macros.
+# It can be used to configure the scriptlets in macros.check in azurelinux-rpm-macros.
 
 # IMPORTANT: Hyphens (-) must be replaced with underscores (_) in spec names for these
 # macro definitions as hyphens are illegal characters for macro names.
