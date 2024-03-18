@@ -73,6 +73,9 @@ fi
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 2.2.1-1
+- Update to handle new version of python-cryptography
+
 * Mon Jan 22 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.2.0-3
 - Initial CBL-Mariner import from Photon (license: Apache2).
 - Verified license.
