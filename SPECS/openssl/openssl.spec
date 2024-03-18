@@ -86,6 +86,8 @@ BuildRequires: sed
 
 %if 0%{?with_check}
 BuildRequires: perl(Test::More)
+BuildRequires: perl-Test-Harness
+BuildRequires: perl-Math-BigInt
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -187,6 +189,7 @@ export HASHBANGPERL=/usr/bin/perl
     no-ssl3 \
     enable-ssl3-method \
     enable-seed \
+    enable-ec2m \
     no-weak-ssl-ciphers \
     no-whirlpool \
     no-zlib \
