@@ -9,24 +9,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSystemConfigValidEmpty(t *testing.T) {
-	testValidYamlValue[*SystemConfig](t, "{ }", &SystemConfig{})
+func TestOSValidEmpty(t *testing.T) {
+	testValidYamlValue[*OS](t, "{ }", &OS{})
 }
 
-func TestSystemConfigValidHostname(t *testing.T) {
-	testValidYamlValue[*SystemConfig](t, "{ \"hostname\": \"validhostname\" }", &SystemConfig{Hostname: "validhostname"})
+func TestOSValidHostname(t *testing.T) {
+	testValidYamlValue[*OS](t, "{ \"hostname\": \"validhostname\" }", &OS{Hostname: "validhostname"})
 }
 
-func TestSystemConfigInvalidHostname(t *testing.T) {
-	testInvalidYamlValue[*SystemConfig](t, "{ \"hostname\": \"invalid_hostname\" }")
+func TestOSInvalidHostname(t *testing.T) {
+	testInvalidYamlValue[*OS](t, "{ \"hostname\": \"invalid_hostname\" }")
 }
 
-func TestSystemConfigInvalidAdditionalFiles(t *testing.T) {
-	testInvalidYamlValue[*SystemConfig](t, "{ \"additionalFiles\": { \"a.txt\": [] } }")
+func TestOSInvalidAdditionalFiles(t *testing.T) {
+	testInvalidYamlValue[*OS](t, "{ \"additionalFiles\": { \"a.txt\": [] } }")
 }
 
-func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
-	value := SystemConfig{
+func TestOSIsValidDuplicatePartitionID(t *testing.T) {
+	value := OS{
 		PartitionSettings: []PartitionSetting{
 			{
 				ID: "a",
@@ -42,8 +42,8 @@ func TestSystemConfigIsValidDuplicatePartitionID(t *testing.T) {
 	assert.ErrorContains(t, err, "duplicate partitionSettings ID")
 }
 
-func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
-	invalidVerity := SystemConfig{
+func TestOSIsValidVerityInValidPartUuid(t *testing.T) {
+	invalidVerity := OS{
 		Verity: &Verity{
 			DataPartition: IdentifiedPartition{
 				IdType: "part-uuid",
@@ -61,7 +61,7 @@ func TestSystemConfigIsValidVerityInValidPartUuid(t *testing.T) {
 	assert.ErrorContains(t, err, "invalid id format")
 }
 
-func TestSystemConfigIsValidOverlayInvalidLowerDir(t *testing.T) {
+func TestOSIsValidOverlayInvalidLowerDir(t *testing.T) {
 	overlayWithInvalidLowerDir := Overlay{
 		LowerDir: "",
 		UpperDir: "/upper",

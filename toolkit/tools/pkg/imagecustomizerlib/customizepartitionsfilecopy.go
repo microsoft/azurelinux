@@ -27,7 +27,7 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 		return copyFilesIntoNewDisk(existingImageConnection.Chroot(), imageChroot)
 	}
 
-	err = createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
+	err = createNewImage(newBuildImageFile, diskConfig, config.OS.PartitionSettings,
 		buildDir, "newimageroot", installOSFunc)
 	if err != nil {
 		return err

@@ -14,7 +14,7 @@ disks:
     start: 65
     fsType: ext4
 
-systemConfig:
+os:
   bootType: efi
   resetBootLoaderType: hard-reset
   partitionSettings:
