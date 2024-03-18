@@ -111,7 +111,7 @@ BuildRequires: libevent-devel
 BuildRequires: libstdc++-devel
 BuildRequires: libtool
 BuildRequires: openssl-devel
-BuildRequires: qt5-qtbase-devel
+#BuildRequires: qt5-qtbase-devel
 BuildRequires: zlib-devel
  
 %if 0%{?want_golang} > 0
