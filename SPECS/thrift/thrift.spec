@@ -111,7 +111,6 @@ BuildRequires: libevent-devel
 BuildRequires: libstdc++-devel
 BuildRequires: libtool
 BuildRequires: openssl-devel
-BuildRequires: qt5-qtbase-devel >=  5.12
 BuildRequires: zlib-devel
  
 %if 0%{?want_golang} > 0
@@ -135,20 +134,6 @@ Requires: boost-devel
 %description devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
- 
-%package        qt
-Summary:        Qt support for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
- 
-%description    qt
-The %{name}-qt package contains Qt bindings for %{name}.
- 
-%package        glib
-Summary:        GLib support for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
- 
-%description    glib
-The %{name}-qt package contains GLib bindings for %{name}.
  
 %package -n python3-%{name}
 Summary: Python 3 support for %{name}
@@ -289,10 +274,7 @@ find . -name \*.cpp -or -name \*.cc -or -name \*.h | xargs -r chmod 644
 cp -p %{SOURCE2} bootstrap.sh
  
 # work around linking issues
-echo 'libthrift_c_glib_la_LIBADD = $(GLIB_LIBS) $(GOBJECT_LIBS) -L../cpp/.libs ' >> lib/c_glib/Makefile.am
-echo 'libthriftqt5_la_LIBADD = $(QT_LIBS) -lthrift -L.libs' >> lib/cpp/Makefile.am
 echo 'libthriftz_la_LIBADD = $(ZLIB_LIBS) -lthrift -L.libs' >> lib/cpp/Makefile.am
-echo 'EXTRA_libthriftqt5_la_DEPENDENCIES = libthrift.la' >> lib/cpp/Makefile.am
 echo 'EXTRA_libthriftz_la_DEPENDENCIES = libthrift.la' >> lib/cpp/Makefile.am
  
 # fix broken upstream check for ant version; we enforce this with BuildRequires, so no need to check here
@@ -308,8 +290,6 @@ export PERL_PREFIX=%{_prefix}
 export PHP_PREFIX=%{php_extdir}
 export JAVA_PREFIX=%{_javadir}
 export RUBY_PREFIX=%{_prefix}
-export GLIB_LIBS=$(pkg-config --libs glib-2.0)
-export GLIB_CFLAGS=$(pkg-config --cflags glib-2.0)
 export GOBJECT_LIBS=$(pkg-config --libs gobject-2.0)
 export GOBJECT_CFLAGS=$(pkg-config --cflags gobject-2.0)
  
@@ -382,15 +362,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %{_libdir}/libthrift-%{version}.so
 %{_libdir}/libthriftz-%{version}.so
 %{_libdir}/libthriftnb-%{version}.so
- 
-%files glib
-%{_libdir}/libthrift_c_glib.so
-%{_libdir}/libthrift_c_glib.so.*
- 
-%files qt
-%{_libdir}/libthriftqt5.so
-%{_libdir}/libthriftqt5-%{version}.so
- 
+  
 %files devel
 %{_includedir}/thrift
 %{_libdir}/*.so
@@ -398,7 +370,6 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %{_libdir}/*.so.0.0.0
 %exclude %{_libdir}/lib*-%{version}.so
 %{_libdir}/pkgconfig/thrift-z.pc
-%{_libdir}/pkgconfig/thrift-qt5.pc
 %{_libdir}/pkgconfig/thrift-nb.pc
 %{_libdir}/pkgconfig/thrift.pc
 %{_libdir}/pkgconfig/thrift_c_glib.pc
