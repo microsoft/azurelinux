@@ -12,6 +12,9 @@ Source0:        https://downloads.sourceforge.net/boost/%{name}_%{underscore_ver
 BuildRequires:  bzip2-devel
 BuildRequires:  libbacktrace-static
 
+	
+%global sonamever %{version}
+
 %description
 Boost provides a set of free peer-reviewed portable C++ source libraries. It includes libraries for
 linear algebra, pseudorandom number generation, multithreading, image processing, regular expressions and unit testing.
@@ -26,6 +29,33 @@ Provides:       %{name}-signals = %{version}-%{release}
 The boost-devel package contains libraries, header files and documentation
 for developing applications that use boost.
 
+ 
+%package filesystem
+Summary: Run-time component of boost filesystem library
+Requires: %{name}-system%{?_isa} = %{version}-%{release}
+ 
+%description filesystem
+ 
+Run-time support for the Boost Filesystem Library, which provides
+portable facilities to query and manipulate paths, files, and
+directories.
+
+%package random
+Summary: Run-time component of boost random library
+ 
+%description random
+ 
+Run-time support for boost random library.
+
+ 
+%package system
+Summary: Run-time component of boost system support library
+ 
+%description system
+ 
+Run-time component of Boost operating system support library, including
+the diagnostics support that is part of the C++11 standard library.
+
 %package        static
 Summary:        boost static libraries
 Group:          Development/Libraries
@@ -33,6 +63,8 @@ Requires:       %{name} = %{version}-%{release}
 
 %description    static
 The boost-static package contains boost static libraries.
+
+
 
 %prep
 %autosetup -n %{name}_%{underscore_version}
@@ -56,10 +88,25 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %defattr(-,root,root)
 %{_includedir}/boost/*
 %{_libdir}/libboost_*.so
+%{_libdir}/libboost_filesystem.so
+%{_libdir}/libboost_random.so
+	
+%files filesystem
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_filesystem.so.%{sonamever}
+
+%files random
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_random.so.%{sonamever}
 
 %files static
 %defattr(-,root,root)
 %{_libdir}/libboost_*.a
+
+
+%files system
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_system.so.%{sonamever}
 
 %changelog
 * Tue Nov 14 2023 Andrew Phelps <anphel@microsoft.com> - 1.83.0-1

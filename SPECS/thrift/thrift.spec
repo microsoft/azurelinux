@@ -169,10 +169,10 @@ The python3-%{name} package contains Python bindings for %{name}.
 %package -n perl-%{name}
 Summary: Perl support for %{name}
 Provides: perl(Thrift) = %{version}-%{release}
-BuildRequires: perl(Bit::Vector)
-BuildRequires: perl(ExtUtils::MakeMaker)
+BuildRequires: perl-Bit-Vector
+BuildRequires: perl-ExtUtils-MakeMaker
 BuildRequires: perl-generators
-Requires: perl(Bit::Vector)
+Requires: perl-Bit-Vector
 Requires: perl(Encode)
 Requires: perl(HTTP::Request)
 Requires: perl(IO::Select)

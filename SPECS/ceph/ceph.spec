@@ -4,7 +4,7 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        18.2.0
+Version:        18.2.1
 Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
@@ -99,6 +99,7 @@ BuildRequires:	python%{python3_pkgversion}
 BuildRequires:	python%{python3_pkgversion}-devel
 BuildRequires:	python%{python3_pkgversion}-setuptools
 BuildRequires:	python%{python3_pkgversion}-Cython
+BuildRequires:  python%{python3_pkgversion}-yaml
 BuildRequires:	snappy-devel
 BuildRequires:	sqlite-devel
 BuildRequires:	sudo
@@ -111,6 +112,7 @@ BuildRequires:	xmlstarlet
 BuildRequires:	nasm
 BuildRequires:	lua-devel
 BuildRequires:  lmdb-devel
+BuildRequires:  thrift-devel >= 0.13.0
 
 #extra dependencies from 16.2.0 todo remove 
 
@@ -224,7 +226,7 @@ BuildRequires:  xmlsec1-openssl
 BuildRequires:  xmlsec1-openssl-devel
 BuildRequires:	python%{python3_pkgversion}-asyncssh
 BuildRequires:	python%{python3_pkgversion}-natsort
-BuildRequires:  thrift-devel >= 0.13.0
+
 
 %ifarch x86_64
 BuildRequires:  xmlsec1-nss
@@ -982,8 +984,12 @@ env | sort
 
 mkdir build
 cd build
+
 CMAKE=cmake
 ${CMAKE} .. \
+    -DBOOST_J=4 \
+    -Dthrift_HOME=/usr/include \
+    -DSYSTEM_BOOST=
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
     -DCMAKE_INSTALL_LIBEXECDIR=%{_libexecdir} \
@@ -996,6 +1002,7 @@ ${CMAKE} .. \
     -DWITH_MANPAGE=ON \
     -DWITH_PYTHON3=%{python3_version} \
     -DWITH_MGR_DASHBOARD_FRONTEND=OFF \
+    --debug-find \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -1062,11 +1069,8 @@ ${CMAKE} .. \
 %if 0%{without jaeger}
     -DWITH_JAEGER:BOOL=OFF \
 %endif
-%if 0%{?suse_version}
-    -DBOOST_J:STRING=%{jobs} \
-%else
-    -DBOOST_J:STRING=%{_smp_build_ncpus} \
-%endif
+
+
 %if 0%{?rhel}
     -DWITH_FMT_HEADER_ONLY:BOOL=ON \
 %endif
@@ -1082,16 +1086,7 @@ ${CMAKE} .. \
     -DWITH_SEASTAR:BOOL=ON \
     -DWITH_JAEGER:BOOL=OFF \
 %endif
-    -DWITH_GRAFANA:BOOL=ON \
-%if 0%{with cephadm_bundling}
-%if 0%{with cephadm_pip_deps}
-    -DCEPHADM_BUNDLED_DEPENDENCIES=pip
-%else
-    -DCEPHADM_BUNDLED_DEPENDENCIES=rpm
-%endif
-%else
-    -DCEPHADM_BUNDLED_DEPENDENCIES=none
-%endif
+
 
 %if %{with cmake_verbose_logging}
 cat ./CMakeFiles/CMakeOutput.log
