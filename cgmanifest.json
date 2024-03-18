@@ -24002,6 +24002,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-rich",
+          "version": "13.7.1",
+          "downloadUrl": "https://github.com/Textualize/rich/archive/v13.7.1/rich-v13.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-routes",
           "version": "2.5.1",
           "downloadUrl": "https://pypi.io/packages/source/R/Routes/Routes-2.5.1.tar.gz"
