@@ -11,6 +11,8 @@ Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 
+# TEST UPDATE TO TRIGGER CGMANFIEST PR GATE
+
 %description
 The Nano package contains a small, simple text editor
 
