@@ -91,8 +91,8 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "BootType")
-	assert.ErrorContains(t, err, "Disks")
+	assert.ErrorContains(t, err, "bootType")
+	assert.ErrorContains(t, err, "disks")
 }
 
 func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
@@ -116,8 +116,8 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "ResetBootLoaderType")
-	assert.ErrorContains(t, err, "Disks")
+	assert.ErrorContains(t, err, "resetBootLoaderType")
+	assert.ErrorContains(t, err, "disks")
 }
 
 func TestConfigIsValidMultipleDisks(t *testing.T) {
@@ -182,7 +182,7 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestConfigIsValidMissingEsp(t *testing.T) {
@@ -257,7 +257,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MountPoint")
+	assert.ErrorContains(t, err, "mountPoint")
 	assert.ErrorContains(t, err, "absolute path")
 }
 
@@ -294,7 +294,7 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 	err := config.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "ID")
+	assert.ErrorContains(t, err, "id")
 }
 
 func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
@@ -311,9 +311,9 @@ func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
 	}
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "Disks")
-	assert.ErrorContains(t, err, "BootType")
-	assert.ErrorContains(t, err, "PartitionSettings")
+	assert.ErrorContains(t, err, "disks")
+	assert.ErrorContains(t, err, "bootType")
+	assert.ErrorContains(t, err, "partitionSettings")
 }
 
 func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
@@ -329,7 +329,7 @@ func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
 	}
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "SystemConfig.BootType and Disks must be specified together")
+	assert.ErrorContains(t, err, "systemConfig.bootType and disks must be specified together")
 }
 
 func TestConfigIsValidKernelCLI(t *testing.T) {

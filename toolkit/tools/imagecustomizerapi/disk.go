@@ -13,13 +13,13 @@ import (
 
 type Disk struct {
 	// The type of partition table to use (e.g. mbr, gpt)
-	PartitionTableType PartitionTableType `yaml:"PartitionTableType"`
+	PartitionTableType PartitionTableType `yaml:"partitionTableType"`
 
 	// The virtual size of the disk.
-	MaxSize uint64 `yaml:"MaxSize"`
+	MaxSize uint64 `yaml:"maxSize"`
 
 	// The partitions to allocate on the disk.
-	Partitions []Partition `yaml:"Partitions"`
+	Partitions []Partition `yaml:"partitions"`
 }
 
 func (d *Disk) IsValid() error {
@@ -29,7 +29,7 @@ func (d *Disk) IsValid() error {
 	}
 
 	if d.MaxSize <= 0 {
-		return fmt.Errorf("a disk's MaxSize value (%d) must be a positive non-zero number", d.MaxSize)
+		return fmt.Errorf("a disk's maxSize value (%d) must be a positive non-zero number", d.MaxSize)
 	}
 
 	partitionIDSet := make(map[string]bool)
@@ -40,7 +40,7 @@ func (d *Disk) IsValid() error {
 		}
 
 		if _, existingName := partitionIDSet[partition.ID]; existingName {
-			return fmt.Errorf("duplicate partition ID used (%s) at index %d", partition.ID, i)
+			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.ID, i)
 		}
 
 		partitionIDSet[partition.ID] = false // dummy value
@@ -70,7 +70,7 @@ func (d *Disk) IsValid() error {
 
 		aEnd, aHasEnd := a.GetEnd()
 		if !aHasEnd {
-			return fmt.Errorf("partition (%s) is not last partition but ommitted End value", a.ID)
+			return fmt.Errorf("partition (%s) is not last partition but ommitted end value", a.ID)
 		}
 		if aEnd > b.Start {
 			bEnd, bHasEnd := b.GetEnd()
@@ -103,7 +103,7 @@ func (d *Disk) IsValid() error {
 		}
 
 		if requiredSize > d.MaxSize {
-			return fmt.Errorf("disk's partitions need %d MiB but MaxSize is only %d MiB", requiredSize, d.MaxSize)
+			return fmt.Errorf("disk's partitions need %d MiB but maxSize is only %d MiB", requiredSize, d.MaxSize)
 		}
 	}
 

@@ -27,6 +27,6 @@ func (s SELinux) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid SELinux value (%v)", s)
+		return fmt.Errorf("invalid selinux value (%v)", s)
 	}
 }

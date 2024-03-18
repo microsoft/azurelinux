@@ -86,8 +86,8 @@ func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "End")
-	assert.ErrorContains(t, err, "Size")
+	assert.ErrorContains(t, err, "end")
+	assert.ErrorContains(t, err, "size")
 }
 
 func TestPartitionIsValidGoodName(t *testing.T) {
@@ -157,7 +157,7 @@ func TestPartitionIsValidBadFlag(t *testing.T) {
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "PartitionFlag")
+	assert.ErrorContains(t, err, "partitionFlag")
 }
 
 func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
@@ -171,7 +171,7 @@ func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "FileSystemType")
+	assert.ErrorContains(t, err, "fileSystemType")
 }
 
 func TestPartitionIsValidBadEspFsType(t *testing.T) {

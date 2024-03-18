@@ -13,10 +13,10 @@ const (
 	MountIdentifierTypeUuid MountIdentifierType = "uuid"
 
 	// MountIdentifierTypePartUuid mounts this partition via the GPT/MBR PARTUUID
-	MountIdentifierTypePartUuid MountIdentifierType = "partuuid"
+	MountIdentifierTypePartUuid MountIdentifierType = "part-uuid"
 
 	// MountIdentifierTypePartLabel mounts this partition via the GPT PARTLABEL
-	MountIdentifierTypePartLabel MountIdentifierType = "partlabel"
+	MountIdentifierTypePartLabel MountIdentifierType = "part-label"
 
 	// MountIdentifierTypeDefault uses the default type, which is PARTUUID.
 	MountIdentifierTypeDefault MountIdentifierType = ""
@@ -29,6 +29,6 @@ func (m MountIdentifierType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid MountIdentifierType value (%v)", m)
+		return fmt.Errorf("invalid mountIdentifierType value (%v)", m)
 	}
 }
