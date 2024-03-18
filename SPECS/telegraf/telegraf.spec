@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.28.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -12,6 +12,7 @@ Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2023-48795.patch
 Patch1:         CVE-2024-28110.patch
+Patch2:         CVE-2024-27304.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
@@ -82,6 +83,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Mar 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28.5-5
+- Patching CVE-2024-27304 in vendor/github.com/jackc/pgproto3.
+
 * Wed Mar 13 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.28.5-4
 - Address CVE-2024-28110 by patching vendored github.com/cloudevents
 
