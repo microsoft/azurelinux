@@ -50,9 +50,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 15. Enable dm-verity root protection.
 
-And if the output format is set to `iso`:
-
-16. Copy additional iso media files ([Iso](#iso-type)).
+16. if the output format is set to `iso`, copy additional iso media files
+([Iso](#iso-type)).
 
 ### /etc/resolv.conf
 
@@ -150,8 +149,8 @@ SystemConfig:
         - [SecondaryGroups](#secondarygroups-string)
         - [StartupCommand](#startupcommand-string)
     - [Services](#services-type)
-      -  [Enable](#enable-string)
-      -  [Disable](#disable-string)
+      - [Enable](#enable-string)
+      - [Disable](#disable-string)
     - [Modules](#modules-type)
       - [Load](#load-module)
         - [Module type](#module-type)
@@ -202,6 +201,7 @@ Disks:
 
 SystemConfig:
   BootType: efi
+  ResetBootLoaderType: hard-reset
   PartitionSettings:
   - ID: esp
     MountPoint: /boot/efi
