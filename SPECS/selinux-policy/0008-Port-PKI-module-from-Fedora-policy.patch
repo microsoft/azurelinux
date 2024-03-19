@@ -1,7 +1,7 @@
-From 2ddad2bc51816f719a65176c4ebe0b04f56ef8d0 Mon Sep 17 00:00:00 2001
+From bde9b82b3d8fdb20d373208ba91650d7ee0ee039 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Thu, 16 Feb 2023 15:25:40 +0000
-Subject: [PATCH 32/35] Port PKI module from Fedora policy.
+Subject: [PATCH 08/14] Port PKI module from Fedora policy.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
@@ -16,13 +16,11 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  create mode 100644 policy/modules/services/pki.if
  create mode 100644 policy/modules/services/pki.te
 
-MSFT_TAG: pending
-
 diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
-index b465af7de..dcedc5653 100644
+index 699ff7f7d..06e01544d 100644
 --- a/policy/modules/kernel/corenetwork.te.in
 +++ b/policy/modules/kernel/corenetwork.te.in
-@@ -227,6 +227,12 @@ network_port(pegasus_http, tcp,5988,s0)
+@@ -228,6 +228,12 @@ network_port(pegasus_http, tcp,5988,s0)
  network_port(pegasus_https, tcp,5989,s0)
  network_port(pgpkeyserver, udp, 11371,s0, tcp,11371,s0)
  network_port(pingd, tcp,9125,s0)
@@ -943,5 +941,5 @@ index 59dd6e0d6..a772ac7b7 100644
  #
  # tomcat domain local policy
 -- 
-2.34.1
+2.43.2
 

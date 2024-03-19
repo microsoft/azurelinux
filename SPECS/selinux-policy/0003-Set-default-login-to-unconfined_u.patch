@@ -1,13 +1,11 @@
-From c60f9651ef327b26a8b26d7a80b81c4f8c0315c5 Mon Sep 17 00:00:00 2001
+From 693de1d981c808f3dc639248f4cd26ce335c16e7 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Sep 2021 20:30:29 +0000
-Subject: [PATCH 03/35] Set default login to unconfined_u.
+Subject: [PATCH 03/14] Set default login to unconfined_u.
 
 ---
  config/appconfig-mcs/seusers | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
-
-MSFT_TAG: not upstreamable.
 
 diff --git a/config/appconfig-mcs/seusers b/config/appconfig-mcs/seusers
 index ce614b41b..5fbab95af 100644
@@ -19,5 +17,5 @@ index ce614b41b..5fbab95af 100644
 +root:unconfined_u:s0-mcs_systemhigh
 +__default__:unconfined_u:s0-mcs_systemhigh
 -- 
-2.34.1
+2.43.2
 

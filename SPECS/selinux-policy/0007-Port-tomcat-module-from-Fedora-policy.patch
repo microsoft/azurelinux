@@ -1,7 +1,7 @@
-From a2c9ccfe96c05e2446d16f8460a02ac51a11abae Mon Sep 17 00:00:00 2001
+From 96118b7e35198b23fae8ddece5aa7a078b6351e0 Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Thu, 16 Feb 2023 15:23:48 +0000
-Subject: [PATCH 31/35] Port tomcat module from Fedora policy.
+Subject: [PATCH 07/14] Port tomcat module from Fedora policy.
 
 Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 ---
@@ -14,10 +14,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  create mode 100644 policy/modules/services/tomcat.if
  create mode 100644 policy/modules/services/tomcat.te
 
-MSFT_TAG: pending
-
 diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
-index 2bc259678..b465af7de 100644
+index 71096934f..699ff7f7d 100644
 --- a/policy/modules/kernel/corenetwork.te.in
 +++ b/policy/modules/kernel/corenetwork.te.in
 @@ -105,6 +105,7 @@ network_port(armtechdaemon, tcp,9292,s0, udp,9292,s0)
@@ -44,7 +42,7 @@ index 2bc259678..b465af7de 100644
  network_port(kerberos, tcp,88,s0, udp,88,s0, tcp,750,s0, udp,750,s0)
  network_port(kerberos_admin, tcp,464,s0, udp,464,s0, tcp,749,s0)
  network_port(kerberos_master, tcp,4444,s0, udp,4444,s0)
-@@ -191,6 +194,7 @@ network_port(memcache, tcp,11211,s0, udp,11211,s0)
+@@ -192,6 +195,7 @@ network_port(memcache, tcp,11211,s0, udp,11211,s0)
  network_port(milter) # no defined portcon
  network_port(mmcc, tcp,5050,s0, udp,5050,s0)
  network_port(mon, tcp,2583,s0, udp,2583,s0)
@@ -617,5 +615,5 @@ index 000000000..59dd6e0d6
 +	tomcat_search_lib(tomcat_domain)
 +')
 -- 
-2.34.1
+2.43.2
 
