@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        6.6.14.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -136,7 +136,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -146,6 +145,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
+- remove unnecessary 10_kernel.cfg grub config file
+
 * Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-4
 - Remove /var/lib/initramfs/kernel files.
 
