@@ -12,6 +12,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python3-pip
+BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  python3-wheel
