@@ -8,11 +8,11 @@ disks:
     - boot
     start: 1
     end: 65
-    fsType: fat32
+    fileSystemType: fat32
 
   - id: rootfs
     start: 65
-    fsType: ext4
+    fileSystemType: ext4
 
 os:
   bootType: efi

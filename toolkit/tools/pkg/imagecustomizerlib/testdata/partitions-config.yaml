@@ -8,21 +8,21 @@ disks:
     - boot
     start: 1
     end: 9
-    fsType: fat32
+    fileSystemType: fat32
 
   - id: boot
     start: 9
     end: 108
-    fsType: ext4
+    fileSystemType: ext4
 
   - id: rootfs
     start: 108
     end: 2048
-    fsType: xfs
+    fileSystemType: xfs
 
   - id: var
     start: 2048
-    fsType: xfs
+    fileSystemType: xfs
 
 os:
   bootType: efi

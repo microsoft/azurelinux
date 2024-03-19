@@ -12,9 +12,9 @@ import (
 
 func TestPartitionIsValidExpanding(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
 	}
 
 	err := partition.IsValid()
@@ -23,10 +23,10 @@ func TestPartitionIsValidExpanding(t *testing.T) {
 
 func TestPartitionIsValidFixedSize(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    ptrutils.PtrTo(uint64(1)),
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            ptrutils.PtrTo(uint64(1)),
 	}
 
 	err := partition.IsValid()
@@ -35,10 +35,10 @@ func TestPartitionIsValidFixedSize(t *testing.T) {
 
 func TestPartitionIsValidZeroSize(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    ptrutils.PtrTo(uint64(0)),
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            ptrutils.PtrTo(uint64(0)),
 	}
 
 	err := partition.IsValid()
@@ -49,10 +49,10 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 
 func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		Size:   ptrutils.PtrTo(uint64(0)),
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		Size:           ptrutils.PtrTo(uint64(0)),
 	}
 
 	err := partition.IsValid()
@@ -63,10 +63,10 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  2,
-		End:    ptrutils.PtrTo(uint64(1)),
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          2,
+		End:            ptrutils.PtrTo(uint64(1)),
 	}
 
 	err := partition.IsValid()
@@ -77,11 +77,11 @@ func TestPartitionIsValidNegativeSize(t *testing.T) {
 
 func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  2,
-		End:    ptrutils.PtrTo(uint64(3)),
-		Size:   ptrutils.PtrTo(uint64(1)),
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          2,
+		End:            ptrutils.PtrTo(uint64(3)),
+		Size:           ptrutils.PtrTo(uint64(1)),
 	}
 
 	err := partition.IsValid()
@@ -92,11 +92,11 @@ func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 
 func TestPartitionIsValidGoodName(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    nil,
-		Name:   "a",
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            nil,
+		Label:          "a",
 	}
 
 	err := partition.IsValid()
@@ -105,11 +105,11 @@ func TestPartitionIsValidGoodName(t *testing.T) {
 
 func TestPartitionIsValidNameTooLong(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    nil,
-		Name:   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            nil,
+		Label:          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 	}
 
 	err := partition.IsValid()
@@ -120,11 +120,11 @@ func TestPartitionIsValidNameTooLong(t *testing.T) {
 
 func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    nil,
-		Name:   "❤️",
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            nil,
+		Label:          "❤️",
 	}
 
 	err := partition.IsValid()
@@ -135,11 +135,11 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 
 func TestPartitionIsValidGoodFlag(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "fat32",
-		Start:  0,
-		End:    nil,
-		Flags:  []PartitionFlag{"esp"},
+		ID:             "a",
+		FileSystemType: "fat32",
+		Start:          0,
+		End:            nil,
+		Flags:          []PartitionFlag{"esp"},
 	}
 
 	err := partition.IsValid()
@@ -148,11 +148,11 @@ func TestPartitionIsValidGoodFlag(t *testing.T) {
 
 func TestPartitionIsValidBadFlag(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    nil,
-		Flags:  []PartitionFlag{"a"},
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            nil,
+		Flags:          []PartitionFlag{"a"},
 	}
 
 	err := partition.IsValid()
@@ -162,11 +162,11 @@ func TestPartitionIsValidBadFlag(t *testing.T) {
 
 func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ntfs",
-		Start:  0,
-		End:    nil,
-		Flags:  []PartitionFlag{"a"},
+		ID:             "a",
+		FileSystemType: "ntfs",
+		Start:          0,
+		End:            nil,
+		Flags:          []PartitionFlag{"a"},
 	}
 
 	err := partition.IsValid()
@@ -176,11 +176,11 @@ func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 
 func TestPartitionIsValidBadEspFsType(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  0,
-		End:    nil,
-		Flags:  []PartitionFlag{"esp"},
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          0,
+		End:            nil,
+		Flags:          []PartitionFlag{"esp"},
 	}
 
 	err := partition.IsValid()
@@ -191,11 +191,11 @@ func TestPartitionIsValidBadEspFsType(t *testing.T) {
 
 func TestPartitionIsValidBadBiosBootFsType(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  1,
-		End:    nil,
-		Flags:  []PartitionFlag{"bios-grub"},
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          1,
+		End:            nil,
+		Flags:          []PartitionFlag{"bios-grub"},
 	}
 
 	err := partition.IsValid()
@@ -206,11 +206,11 @@ func TestPartitionIsValidBadBiosBootFsType(t *testing.T) {
 
 func TestPartitionIsValidBadBiosBootStart(t *testing.T) {
 	partition := Partition{
-		ID:     "a",
-		FsType: "ext4",
-		Start:  2,
-		End:    nil,
-		Flags:  []PartitionFlag{"bios-grub"},
+		ID:             "a",
+		FileSystemType: "ext4",
+		Start:          2,
+		End:            nil,
+		Flags:          []PartitionFlag{"bios-grub"},
 	}
 
 	err := partition.IsValid()

@@ -82,7 +82,7 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi.Disk,
 	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
 	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
-	currentSELinuxMode imagecustomizerapi.SELinux, installOS installOSFunc,
+	currentSELinuxMode imagecustomizerapi.SELinuxMode, installOS installOSFunc,
 ) error {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
@@ -149,7 +149,7 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 
 func configureDiskBootLoader(imageConnection *ImageConnection, partitionSettings []imagecustomizerapi.PartitionSetting,
 	bootType imagecustomizerapi.BootType, kernelCommandLine imagecustomizerapi.KernelCommandLine,
-	currentSELinuxMode imagecustomizerapi.SELinux,
+	currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) error {
 	imagerBootType, err := bootTypeToImager(bootType)
 	if err != nil {
