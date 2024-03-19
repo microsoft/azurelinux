@@ -17,6 +17,7 @@ BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-attrs
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
+BuildRequires:  python3-poetry
 BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
  
