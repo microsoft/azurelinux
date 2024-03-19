@@ -90,4 +90,6 @@
 # Image Customizer
 /toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
 /toolkit/tools/imagecustomizerapi/ @microsoft/cbl-mariner-imagecustomizer
+/toolkit/tools/osmodifier @microsoft/cbl-mariner-imagecustomizer
 /toolkit/tools/pkg/imagecustomizerlib/ @microsoft/cbl-mariner-imagecustomizer
+/toolkit/tools/pkg/osmodifierlib @microsoft/cbl-mariner-imagecustomizer
