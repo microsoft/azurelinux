@@ -163,9 +163,10 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 }
 
 func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelCommandLine,
+	selinuxConfig imagecustomizerapi.SELinux,
 	currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) (configuration.KernelCommandLine, error) {
-	imagerSELinuxMode, err := selinuxModeMaybeDefaultToImager(kernelCommandLine.SELinuxMode, currentSELinuxMode)
+	imagerSELinuxMode, err := selinuxModeMaybeDefaultToImager(selinuxConfig.Mode, currentSELinuxMode)
 	if err != nil {
 		return configuration.KernelCommandLine{}, err
 	}
