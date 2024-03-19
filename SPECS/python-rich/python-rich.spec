@@ -9,7 +9,7 @@ URL:            https://github.com/Textualize/rich
 Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
  
 # Fix tests with Python 3.13 - submitted upstream
-Patch0:         python-rich-tests-python-3.13.patch
+Patch0:         fix-tests-python-3.13.patch
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pytest
@@ -23,19 +23,19 @@ The Rich API makes it easy to add color and style to terminal output. Rich can
 also render pretty tables, progress bars, markdown, syntax highlighted source
 code, tracebacks, and more — out of the box.
  
-%package -n     python3-%{pypi_name}
+%package -n     python3-rich
 Summary:        %{summary}
 # This was previously misnamed, remove the obsolete in Fedora 38, EPEL 10
-Obsoletes:      python-%{pypi_name} < 10.16.1-2
+Obsoletes:      python-rich < 10.16.1-2
  
-%description -n python3-%{pypi_name}
+%description -n python3-rich
 Rich is a Python library for rich text and beautiful formatting in the terminal.
 The Rich API makes it easy to add color and style to terminal output. Rich can
 also render pretty tables, progress bars, markdown, syntax highlighted source
 code, tracebacks, and more — out of the box.
  
 %prep
-%autosetup -p1 -n %{pypi_name}-%{version}
+%autosetup -p1 -n rich-%{version}
  
 %generate_buildrequires
 %pyproject_buildrequires -r
@@ -51,7 +51,7 @@ code, tracebacks, and more — out of the box.
 %pyproject_check_import
 %pytest -vv
  
-%files -n python3-%{pypi_name} -f %{pyproject_files}
+%files -n python3-rich -f %{pyproject_files}
 %license LICENSE
 %doc README.md
  
