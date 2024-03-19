@@ -12,26 +12,20 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	BootType                BootType            `yaml:"bootType"`
-	ResetBootLoaderType     ResetBootLoaderType `yaml:"resetBootLoaderType"`
-	Hostname                string              `yaml:"hostname"`
-	UpdateBaseImagePackages bool                `yaml:"updateBaseImagePackages"`
-	PackageListsInstall     []string            `yaml:"packageListsInstall"`
-	PackagesInstall         []string            `yaml:"packagesInstall"`
-	PackageListsRemove      []string            `yaml:"packageListsRemove"`
-	PackagesRemove          []string            `yaml:"packagesRemove"`
-	PackageListsUpdate      []string            `yaml:"packageListsUpdate"`
-	PackagesUpdate          []string            `yaml:"packagesUpdate"`
-	KernelCommandLine       KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles         AdditionalFilesMap  `yaml:"additionalFiles"`
-	PartitionSettings       []PartitionSetting  `yaml:"partitionSettings"`
-	PostInstallScripts      []Script            `yaml:"postInstallScripts"`
-	FinalizeImageScripts    []Script            `yaml:"finalizeImageScripts"`
-	Users                   []User              `yaml:"users"`
-	Services                Services            `yaml:"services"`
-	Modules                 Modules             `yaml:"modules"`
-	Verity                  *Verity             `yaml:"verity"`
-	Overlays                *[]Overlay          `yaml:"overlays"`
+	BootType             BootType            `yaml:"bootType"`
+	ResetBootLoaderType  ResetBootLoaderType `yaml:"resetBootLoaderType"`
+	Hostname             string              `yaml:"hostname"`
+	Packages             Packages            `yaml:"packages"`
+	KernelCommandLine    KernelCommandLine   `yaml:"kernelCommandLine"`
+	AdditionalFiles      AdditionalFilesMap  `yaml:"additionalFiles"`
+	PartitionSettings    []PartitionSetting  `yaml:"partitionSettings"`
+	PostInstallScripts   []Script            `yaml:"postInstallScripts"`
+	FinalizeImageScripts []Script            `yaml:"finalizeImageScripts"`
+	Users                []User              `yaml:"users"`
+	Services             Services            `yaml:"services"`
+	Modules              Modules             `yaml:"modules"`
+	Verity               *Verity             `yaml:"verity"`
+	Overlays             *[]Overlay          `yaml:"overlays"`
 }
 
 func (s *OS) IsValid() error {
