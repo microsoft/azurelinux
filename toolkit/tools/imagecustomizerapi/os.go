@@ -16,6 +16,7 @@ type OS struct {
 	ResetBootLoaderType  ResetBootLoaderType `yaml:"resetBootLoaderType"`
 	Hostname             string              `yaml:"hostname"`
 	Packages             Packages            `yaml:"packages"`
+	SELinux              SELinux             `yaml:"selinux"`
 	KernelCommandLine    KernelCommandLine   `yaml:"kernelCommandLine"`
 	AdditionalFiles      AdditionalFilesMap  `yaml:"additionalFiles"`
 	PartitionSettings    []PartitionSetting  `yaml:"partitionSettings"`
@@ -47,14 +48,19 @@ func (s *OS) IsValid() error {
 		}
 	}
 
+	err = s.SELinux.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid selinux:\n%w", err)
+	}
+
 	err = s.KernelCommandLine.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid KernelCommandLine: %w", err)
+		return fmt.Errorf("invalid kernelCommandLine: %w", err)
 	}
 
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid AdditionalFiles: %w", err)
+		return fmt.Errorf("invalid additionalFiles: %w", err)
 	}
 
 	partitionIDSet := make(map[string]bool)
