@@ -111,6 +111,7 @@ BuildRequires: libevent-devel
 BuildRequires: libstdc++-devel
 BuildRequires: libtool
 BuildRequires: openssl-devel
+BuildRequires: openssl-libs
 BuildRequires: zlib-devel
  
 %if 0%{?want_golang} > 0
