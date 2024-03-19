@@ -294,8 +294,6 @@ export RUBY_PREFIX=%{_prefix}
 export GOBJECT_LIBS=$(pkg-config --libs gobject-2.0)
 export GOBJECT_CFLAGS=$(pkg-config --cflags gobject-2.0)
 
-export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
-
 find %{_builddir} -name rebar -exec rm -f '{}' \;
 find . -name Makefile\* -exec sed -i -e 's/[.][/]rebar/rebar/g' {} \;
  
@@ -408,5 +406,5 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
-* Thu Mar 14 2024 Himaja Kesari <himajakesari@microsoft.com>
+* Tue Mar 19 2024 Himaja Kesari <himajakesari@microsoft.com>
 - Initial import from fedora for Azure Linux
