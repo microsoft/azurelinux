@@ -21,6 +21,6 @@ func (t FileSystemType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid FileSystemType value (%s)", t)
+		return fmt.Errorf("invalid fileSystemType value (%s)", t)
 	}
 }

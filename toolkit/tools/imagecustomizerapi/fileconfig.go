@@ -18,10 +18,10 @@ type FileConfigList []FileConfig
 // FileConfig specifies options for how a file is copied in the target OS.
 type FileConfig struct {
 	// The file path in the target OS that the file will be copied to.
-	Path string `yaml:"Path"`
+	Path string `yaml:"path"`
 
 	// The file permissions to set on the file.
-	Permissions *FilePermissions `yaml:"Permissions"`
+	Permissions *FilePermissions `yaml:"permissions"`
 }
 
 var (
@@ -39,7 +39,7 @@ func (l *FileConfigList) IsValid() (err error) {
 	for i, fileConfig := range *l {
 		err = fileConfig.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid FileConfig at index %d:\n%w", i, err)
+			return fmt.Errorf("invalid fileConfig at index %d:\n%w", i, err)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (l *FileConfigList) UnmarshalYAML(value *yaml.Node) error {
 	type IntermediateTypeFileConfigList FileConfigList
 	err = value.Decode((*IntermediateTypeFileConfigList)(l))
 	if err != nil {
-		return fmt.Errorf("failed to parse FileConfigList:\n%w", err)
+		return fmt.Errorf("failed to parse fileConfigList:\n%w", err)
 	}
 
 	return nil
@@ -70,14 +70,14 @@ func (l *FileConfigList) UnmarshalYAML(value *yaml.Node) error {
 func (f *FileConfig) IsValid() (err error) {
 	// Path
 	if f.Path == "" {
-		return fmt.Errorf("invalid Path value: empty string")
+		return fmt.Errorf("invalid path value: empty string")
 	}
 
 	// Permissions
 	if f.Permissions != nil {
 		err = f.Permissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid Permissions value:\n%w", err)
+			return fmt.Errorf("invalid permissions value:\n%w", err)
 		}
 	}
 
@@ -102,7 +102,7 @@ func (f *FileConfig) UnmarshalYAML(value *yaml.Node) error {
 	type IntermediateTypeFileConfig FileConfig
 	err = value.Decode((*IntermediateTypeFileConfig)(f))
 	if err != nil {
-		return fmt.Errorf("failed to parse FileConfig:\n%w", err)
+		return fmt.Errorf("failed to parse fileConfig:\n%w", err)
 	}
 
 	return nil

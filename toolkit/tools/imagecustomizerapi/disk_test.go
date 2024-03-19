@@ -97,7 +97,7 @@ func TestDiskIsValidInvalidTableType(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "PartitionTableType")
+	assert.ErrorContains(t, err, "partitionTableType")
 }
 
 func TestDiskIsValidInvalidPartition(t *testing.T) {
@@ -213,7 +213,7 @@ func TestDiskIsValidTooSmall(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidTooSmallExpanding(t *testing.T) {
@@ -237,7 +237,7 @@ func TestDiskIsValidTooSmallExpanding(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidZeroSize(t *testing.T) {
@@ -249,7 +249,7 @@ func TestDiskIsValidZeroSize(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidMissingEspFlag(t *testing.T) {
@@ -319,5 +319,5 @@ func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate partition ID")
+	assert.ErrorContains(t, err, "duplicate partition id")
 }

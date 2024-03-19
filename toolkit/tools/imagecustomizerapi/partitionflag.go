@@ -21,7 +21,7 @@ const (
 	// This partition must start at block 1.
 	//
 	// See, https://en.wikipedia.org/wiki/BIOS_boot_partition
-	PartitionFlagBiosGrub PartitionFlag = "bios_grub"
+	PartitionFlagBiosGrub PartitionFlag = "bios-grub"
 
 	// PartitionFlagBoot indicates this is a boot partition.
 	//
@@ -36,6 +36,6 @@ func (p PartitionFlag) IsValid() (err error) {
 		return nil
 
 	default:
-		return fmt.Errorf("unknown PartitionFlag value (%s)", p)
+		return fmt.Errorf("unknown partitionFlag value (%s)", p)
 	}
 }

@@ -22,6 +22,6 @@ func (t BootType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid BootType value (%v)", t)
+		return fmt.Errorf("invalid bootType value (%v)", t)
 	}
 }

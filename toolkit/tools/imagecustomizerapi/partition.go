@@ -12,25 +12,25 @@ import (
 
 type Partition struct {
 	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
-	ID string `yaml:"ID"`
+	ID string `yaml:"id"`
 	// FsType is the type of file system to use on the partition.
-	FsType FileSystemType `yaml:"FsType"`
+	FsType FileSystemType `yaml:"fsType"`
 	// Name is the label to assign to the partition.
-	Name string `yaml:"Name"`
+	Name string `yaml:"name"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"Start"`
+	Start uint64 `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"End"`
+	End *uint64 `yaml:"end"`
 	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"Size"`
+	Size *uint64 `yaml:"size"`
 	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"Flags"`
+	Flags []PartitionFlag `yaml:"flags"`
 }
 
 func (p *Partition) IsValid() error {
 	err := p.FsType.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid partition (%s) FsType value:\n%w", p.ID, err)
+		return fmt.Errorf("invalid partition (%s) fsType value:\n%w", p.ID, err)
 	}
 
 	err = isGPTNameValid(p.Name)
@@ -39,7 +39,7 @@ func (p *Partition) IsValid() error {
 	}
 
 	if p.End != nil && p.Size != nil {
-		return fmt.Errorf("cannot specify both End and Size on partition (%s)", p.ID)
+		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.ID)
 	}
 
 	if (p.End != nil && p.Start >= *p.End) || (p.Size != nil && *p.Size <= 0) {

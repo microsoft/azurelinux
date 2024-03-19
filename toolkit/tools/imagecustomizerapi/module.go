@@ -8,7 +8,7 @@ import (
 )
 
 type Module struct {
-	Name string `yaml:"Name"`
+	Name string `yaml:"name"`
 }
 
 func (m *Module) IsValid() error {
@@ -20,20 +20,20 @@ func (m *Module) IsValid() error {
 }
 
 type Modules struct {
-	Load    []Module `yaml:"Load"`
-	Disable []Module `yaml:"Disable"`
+	Load    []Module `yaml:"load"`
+	Disable []Module `yaml:"disable"`
 }
 
 func (m *Modules) IsValid() error {
 	for i, module := range m.Load {
 		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Load at index %d: %w", module.Name, i, err)
+			return fmt.Errorf("invalid module '%s' in modules.load at index %d: %w", module.Name, i, err)
 		}
 	}
 
 	for i, module := range m.Disable {
 		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Disable at index %d: %w", module.Name, i, err)
+			return fmt.Errorf("invalid module '%s' in modules.disable at index %d: %w", module.Name, i, err)
 		}
 	}
 

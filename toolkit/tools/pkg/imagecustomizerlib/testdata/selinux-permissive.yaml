@@ -1,8 +1,8 @@
-SystemConfig:
-  KernelCommandLine:
-    SELinux: permissive
+systemConfig:
+  kernelCommandLine:
+    selinux: permissive
 
-  PackagesInstall:
+  packagesInstall:
   - selinux-policy
   - selinux-policy-modules
   - setools-console

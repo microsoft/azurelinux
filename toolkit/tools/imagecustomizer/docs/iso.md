@@ -64,18 +64,18 @@ cloud-init data files).
 If cloud-init data is to be placed directly within the iso file system:
 
 ```yaml
-Iso:
-  AdditionalFiles:
+iso:
+  additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data
-  KernelCommandLine:
+  kernelCommandLine:
     ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
-    PrimaryGroup: sudo
+systemConfig:
+  users:
+  - name: test
+    password: testpassword
+    primaryGroup: sudo
 ```
 
 #### Example 2
@@ -83,15 +83,15 @@ SystemConfig:
 If cloud-init data is to be placed within the LiveOS root file system:
 
 ```yaml
-Iso:
-  KernelCommandLine:
-    ExtraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
-    PrimaryGroup: sudo
-  AdditionalFiles:
+iso:
+  kernelCommandLine:
+    extraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
+systemConfig:
+  users:
+  - name: test
+    password: testpassword
+    primaryGroup: sudo
+  additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data

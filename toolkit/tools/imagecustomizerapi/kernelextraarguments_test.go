@@ -50,8 +50,8 @@ func TestKernelExtraArgumentsIsValid(t *testing.T) {
 		backslash.
 	*/
 
-	missingClosingDoubleQuotes := "invalid double-quoted string. Missing closing double-quotes."
-	missingClosingSingleQuote := "invalid single-quoted string. Missing closing single-quote."
+	missingClosingDoubleQuotes := "invalid double-quoted string: missing closing double-quotes"
+	missingClosingSingleQuote := "invalid single-quoted string: missing closing single-quote"
 
 	configsToTest := map[KernelExtraArguments]*string{
 		// very simple cases (no quoting)

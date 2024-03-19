@@ -1,14 +1,14 @@
-SystemConfig:
-  UpdateBaseImagePackages: true
+systemConfig:
+  updateBaseImagePackages: true
 
-  PackagesRemove:
+  packagesRemove:
   - which
 
-  PackagesInstall:
+  packagesInstall:
   - setools-console
 
-  PackageListsInstall:
+  packageListsInstall:
   - lists/dracut-fips.yaml
 
-  PackagesUpdate:
+  packagesUpdate:
   - setools-console
