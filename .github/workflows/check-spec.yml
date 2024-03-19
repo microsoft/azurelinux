@@ -51,7 +51,7 @@ jobs:
 
       - name: Get toolchain spec list
         run: |
-          make -C toolkit toolchain_spec_list
+          toolchain_spec_list=$(make --no-print-directory -sC toolkit printvar-toolchain_spec_list)
 
       - name: Main branch checkout
         uses: actions/checkout@v4
@@ -61,4 +61,4 @@ jobs:
 
       - name: Verify .spec files
         if: ${{ env.updated-specs != '' }}
-        run: python3 toolkit/scripts/check_spec_guidelines.py build/toolchain/toolchain_specs.txt ${{ env.updated-specs }}
+        run: python3 toolkit/scripts/check_spec_guidelines.py toolchain_spec_list ${{ env.updated-specs }}

@@ -25,7 +25,6 @@ func ParsePackageList(packages string) (packageMap map[string]bool, err error) {
 	packageList := strings.Fields(packages)
 
 	for _, pkg := range packageList {
-		pkg = strings.TrimSpace(pkg)
 		packageMap[pkg] = true
 	}
 

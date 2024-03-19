@@ -16,8 +16,6 @@ SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
-
 # Configure the list of packages we want to process into SRPMs
 # Strip any whitespace from user input and reasign using override so we can compare it with the empty string
 override SRPM_PACK_LIST := $(strip $(SRPM_PACK_LIST))
@@ -105,7 +103,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
 	touch $@
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_files) $(go-srpmpacker)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
