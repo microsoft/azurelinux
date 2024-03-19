@@ -328,17 +328,17 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, rpmsSources []string,
 	useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
+	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.Packages.RemoveLists, config.Packages.Remove)
 	if err != nil {
 		return err
 	}
 
-	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
+	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.Packages.InstallLists, config.Packages.Install)
 	if err != nil {
 		return err
 	}
 
-	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
+	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.Packages.UpdateLists, config.Packages.Update)
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,8 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 	hasRpmSources := len(rpmsSources) > 0 || useBaseImageRpmRepos
 
 	if !hasRpmSources {
-		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
+		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 ||
+			config.Packages.UpdateExistingPackages
 
 		if needRpmsSources {
 			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
@@ -355,13 +356,13 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 		}
 	}
 
-	config.PackagesRemove = allPackagesRemove
-	config.PackagesInstall = allPackagesInstall
-	config.PackagesUpdate = allPackagesUpdate
+	config.Packages.Remove = allPackagesRemove
+	config.Packages.Install = allPackagesInstall
+	config.Packages.Update = allPackagesUpdate
 
-	config.PackageListsRemove = nil
-	config.PackageListsInstall = nil
-	config.PackageListsUpdate = nil
+	config.Packages.RemoveLists = nil
+	config.Packages.InstallLists = nil
+	config.Packages.UpdateLists = nil
 
 	return nil
 }

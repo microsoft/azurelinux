@@ -2,8 +2,9 @@ os:
   kernelCommandLine:
     selinuxMode: force-enforcing
 
-  packagesInstall:
-  - selinux-policy
-  - selinux-policy-modules
-  - setools-console
-  - policycoreutils-python-utils
+  packages:
+    install:
+    - selinux-policy
+    - selinux-policy-modules
+    - setools-console
+    - policycoreutils-python-utils

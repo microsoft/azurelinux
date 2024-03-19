@@ -22,5 +22,6 @@ os:
   - id: rootfs
     mountPoint: /
     
-  packagesInstall:
-  - grub2
+  packages:
+    install:
+    - grub2
