@@ -10,16 +10,16 @@ import (
 )
 
 type Config struct {
-	Disks        *[]Disk      `yaml:"Disks"`
-	Iso          *Iso         `yaml:"Iso"`
-	SystemConfig SystemConfig `yaml:"SystemConfig"`
+	Disks        *[]Disk      `yaml:"disks"`
+	Iso          *Iso         `yaml:"iso"`
+	SystemConfig SystemConfig `yaml:"systemConfig"`
 }
 
 func (c *Config) IsValid() (err error) {
 	if c.Disks != nil {
 		disks := *c.Disks
 		if len(disks) < 1 {
-			return fmt.Errorf("at least 1 disk must be specified (or the Disks field should be ommited)")
+			return fmt.Errorf("at least 1 disk must be specified (or the disks field should be ommited)")
 		}
 		if len(disks) > 1 {
 			return fmt.Errorf("multiple disks is not currently supported")
@@ -51,15 +51,15 @@ func (c *Config) IsValid() (err error) {
 	hasResetBootLoader := c.SystemConfig.ResetBootLoaderType != ResetBootLoaderTypeDefault
 
 	if hasDisks != hasBootType {
-		return fmt.Errorf("SystemConfig.BootType and Disks must be specified together")
+		return fmt.Errorf("systemConfig.bootType and disks must be specified together")
 	}
 
 	if hasDisks != hasResetBootLoader {
-		return fmt.Errorf("SystemConfig.ResetBootLoaderType and Disks must be specified together'")
+		return fmt.Errorf("systemConfig.resetBootLoaderType and disks must be specified together'")
 	}
 
 	if hasPartitionSettings && !hasDisks {
-		return fmt.Errorf("the Disks and SystemConfig.BootType values must also be specified if SystemConfig.PartitionSettings is specified")
+		return fmt.Errorf("the disks and systemConfig.bootType values must also be specified if systemConfig.partitionSettings is specified")
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.
@@ -81,7 +81,7 @@ func (c *Config) IsValid() (err error) {
 			})
 		})
 		if !hasBiosBoot {
-			return fmt.Errorf("'bios_grub' partition must be provided for 'legacy' boot type")
+			return fmt.Errorf("'bios-grub' partition must be provided for 'legacy' boot type")
 		}
 	}
 
@@ -93,7 +93,7 @@ func (c *Config) IsValid() (err error) {
 			})
 		})
 		if !diskExists {
-			return fmt.Errorf("invalid PartitionSetting at index %d:\nno partition with matching ID (%s)", i,
+			return fmt.Errorf("invalid partitionSetting at index %d:\nno partition with matching ID (%s)", i,
 				partitionSetting.ID)
 		}
 	}

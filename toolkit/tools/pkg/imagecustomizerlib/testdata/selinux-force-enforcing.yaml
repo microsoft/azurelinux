@@ -1,8 +1,8 @@
-SystemConfig:
-  KernelCommandLine:
-    SELinux: force-enforcing
+systemConfig:
+  kernelCommandLine:
+    selinux: force-enforcing
 
-  PackagesInstall:
+  packagesInstall:
   - selinux-policy
   - selinux-policy-modules
   - setools-console
