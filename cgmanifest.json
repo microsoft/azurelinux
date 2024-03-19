@@ -28347,7 +28347,7 @@
         "other": {
           "name": "thrift",
           "version": "0.15.0",
-          "downloadUrl": " https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
         }
       }
     },
