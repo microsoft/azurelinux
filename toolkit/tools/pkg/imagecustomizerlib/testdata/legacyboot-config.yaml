@@ -7,11 +7,11 @@ disks:
     - bios-grub
     start: 1
     size: 8
-    fsType: fat32
+    fileSystemType: fat32
 
   - id: rootfs
     start: 9
-    fsType: ext4
+    fileSystemType: ext4
 
 os:
   bootType: legacy

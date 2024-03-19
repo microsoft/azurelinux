@@ -90,8 +90,8 @@ os:
       - [partitions](#partitions-partition)
         - [partition type](#partition-type)
           - [id](#id-string)
-          - [fsType](#fstype-string)
-          - [name](#partition-name)
+          - [fileSystemType](#filesystemtype-string)
+          - [label](#partition-label)
           - [start](#start-uint64)
           - [end](#end-uint64)
           - [size](#size-uint64)
@@ -125,7 +125,7 @@ os:
     - [partitionSettings](#partitionsettings-partitionsetting)
       - [partitionSetting type](#partitionsetting-type)
         - [id](#id-string)
-        - [mountIdentifier](#mountidentifier-string)
+        - [mountIdentifierType](#mountidentifiertype-string)
         - [mountOptions](#mountoptions-string)
         - [mountPoint](#mountpoint-string)
     - [postInstallScripts](#postinstallscripts-script)
@@ -144,7 +144,7 @@ os:
         - [password](#password-string)
         - [passwordPath](#passwordpath-string)
         - [passwordExpiresDays](#passwordexpiresdays-int)
-        - [sshPubKeyPaths](#sshpubkeypaths-string)
+        - [sshPublicKeyPaths](#sshpublickeypaths-string)
         - [primaryGroup](#primarygroup-string)
         - [secondaryGroups](#secondarygroups-string)
         - [startupCommand](#startupcommand-string)
@@ -193,11 +193,11 @@ disks:
     - boot
     start: 1
     end: 9
-    fsType: fat32
+    fileSystemType: fat32
 
   - id: rootfs
     start: 9
-    fsType: ext4
+    fileSystemType: ext4
 
 os:
   bootType: efi
@@ -211,7 +211,7 @@ os:
     mountPoint: /
 ```
 
-### os [[os](#systemconfig-type)]
+### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
 
@@ -335,7 +335,7 @@ If [resetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, 
 If [resetBootLoaderType](#resetbootloadertype-string) is not set, then the
 `extraCommandLine` value will be appended to the existing `grub.cfg` file.
 
-### selinux
+### selinuxMode
 
 Specifies the mode to set SELinux to.
 
@@ -381,7 +381,7 @@ Example:
 ```yaml
 os:
   kernelCommandLine:
-    selinux: enforcing
+    selinuxMode: enforcing
 
   packagesInstall:
   # Required packages for SELinux.
@@ -472,7 +472,7 @@ The ID of the partition.
 This is used to correlate Partition objects with [partitionSetting](#partitionsetting-type)
 objects.
 
-### fsType [string]
+### fileSystemType [string]
 
 Required.
 
@@ -484,9 +484,9 @@ Supported options:
 - `fat32`
 - `xfs`
 
-<div id="partition-name"></div>
+<div id="partition-label"></div>
 
-### name [string]
+### label [string]
 
 The label to assign to the partition.
 
@@ -518,7 +518,7 @@ Specifies options for the partition.
 Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
-  The partition must have a `fsType` of `fat32`.
+  The partition must have a `fileSystemType` of `fat32`.
 
   When specified on a GPT formatted disk, the `boot` flag must also be added.
 
@@ -550,7 +550,7 @@ The ID of the partition.
 This is used correlate [partition](#partition-type) objects with PartitionSetting
 objects.
 
-### mountIdentifier [string]
+### mountIdentifierType [string]
 
 Default: `part-uuid`
 
@@ -1002,7 +1002,7 @@ os:
     passwordExpiresDays: 120
 ```
 
-### sshPubKeyPaths [string[]]
+### sshPublicKeyPaths [string[]]
 
 File paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
@@ -1013,7 +1013,7 @@ Example:
 os:
   users:
   - name: test
-    sshPubKeyPaths:
+    sshPublicKeyPaths:
     - id_ed25519.pub
 ```
 

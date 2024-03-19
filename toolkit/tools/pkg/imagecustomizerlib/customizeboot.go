@@ -278,7 +278,7 @@ func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArg
 // Updates the kernel command-line args with the new SELinux mode.
 //
 // See, installutils.setGrubCfgSELinux()
-func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinux, imageChroot *safechroot.Chroot) error {
+func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Updating SELinux kernel command-line args")
 
 	grub2Config, err := readGrub2ConfigFile(imageChroot)
@@ -300,7 +300,7 @@ func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinux, imageChroo
 	return nil
 }
 
-func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinux) (string, error) {
+func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
 	// Remove all the existing SELinux args.
 	grub2Config, securityIndex, err := tryRemoveKernelCommandLineArgumentValue(grub2Config, "security")
 	if err != nil {
@@ -317,7 +317,7 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 		return "", err
 	}
 
-	if selinuxMode == imagecustomizerapi.SELinuxDisabled {
+	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
 		// Don't need to insert any new args.
 		return grub2Config, nil
 	}
@@ -348,10 +348,10 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 
 	newSELinuxArgs := ""
 	switch selinuxMode {
-	case imagecustomizerapi.SELinuxForceEnforcing:
+	case imagecustomizerapi.SELinuxModeForceEnforcing:
 		newSELinuxArgs = installutils.CmdlineSELinuxForceEnforcing
 
-	case imagecustomizerapi.SELinuxPermissive, imagecustomizerapi.SELinuxEnforcing:
+	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
 		newSELinuxArgs = installutils.CmdlineSELinuxSettings
 
 	default:
@@ -363,61 +363,61 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 	return grub2Config, nil
 }
 
-func getCurrentSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinux, error) {
+func getCurrentSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
 	logger.Log.Debugf("Get existing SELinux mode")
 
 	grub2Config, err := readGrub2ConfigFile(imageChroot)
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	// Try to find any existing SELinux args.
 	_, _, securityValue, err := findKernelCommandLineArgumentArg(grub2Config, "security")
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	_, _, selinuxValue, err := findKernelCommandLineArgumentArg(grub2Config, "selinux")
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	_, _, enforcingValue, err := findKernelCommandLineArgumentArg(grub2Config, "enforcing")
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	// Check if SELinux is disabled.
 	if securityValue != "selinux" || selinuxValue != "1" {
-		return imagecustomizerapi.SELinuxDisabled, nil
+		return imagecustomizerapi.SELinuxModeDisabled, nil
 	}
 
 	// Check if SELinux is in forced enforcing mode.
 	if enforcingValue == "1" {
-		return imagecustomizerapi.SELinuxForceEnforcing, nil
+		return imagecustomizerapi.SELinuxModeForceEnforcing, nil
 	}
 
 	selinuxMode, err := getSELinuxModeFromConfigFile(imageChroot)
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, err
+		return imagecustomizerapi.SELinuxModeDefault, err
 	}
 
 	return selinuxMode, nil
 }
 
-func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinux, error) {
+func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
 	selinuxConfigFilePath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 
 	// Read the SELinux config file.
 	selinuxConfig, err := file.Read(selinuxConfigFilePath)
 	if err != nil {
-		return imagecustomizerapi.SELinuxDefault, fmt.Errorf("failed to read SELinux config file (%s):\n%w",
+		return imagecustomizerapi.SELinuxModeDefault, fmt.Errorf("failed to read SELinux config file (%s):\n%w",
 			installutils.SELinuxConfigFile, err)
 	}
 
 	match := selinuxConfigModeRegex.FindStringSubmatch(selinuxConfig)
 	if match == nil {
-		return imagecustomizerapi.SELinuxDefault, fmt.Errorf("failed to find SELinux mode in (%s) file",
+		return imagecustomizerapi.SELinuxModeDefault, fmt.Errorf("failed to find SELinux mode in (%s) file",
 			installutils.SELinuxConfigFile)
 	}
 
@@ -425,16 +425,16 @@ func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomiz
 
 	switch selinuxConfigMode {
 	case installutils.SELinuxConfigEnforcing:
-		return imagecustomizerapi.SELinuxEnforcing, nil
+		return imagecustomizerapi.SELinuxModeEnforcing, nil
 
 	case installutils.SELinuxConfigPermissive:
-		return imagecustomizerapi.SELinuxPermissive, nil
+		return imagecustomizerapi.SELinuxModePermissive, nil
 
 	case installutils.SELinuxConfigDisabled:
-		return imagecustomizerapi.SELinuxDisabled, nil
+		return imagecustomizerapi.SELinuxModeDisabled, nil
 
 	default:
-		return imagecustomizerapi.SELinuxDefault, fmt.Errorf("unknown SELinux mode (%s) found in (%s) file",
+		return imagecustomizerapi.SELinuxModeDefault, fmt.Errorf("unknown SELinux mode (%s) found in (%s) file",
 			selinuxConfigMode, installutils.SELinuxConfigFile)
 	}
 }

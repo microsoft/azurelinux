@@ -13,10 +13,10 @@ import (
 type Partition struct {
 	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
 	ID string `yaml:"id"`
-	// FsType is the type of file system to use on the partition.
-	FsType FileSystemType `yaml:"fsType"`
+	// FileSystemType is the type of file system to use on the partition.
+	FileSystemType FileSystemType `yaml:"fileSystemType"`
 	// Name is the label to assign to the partition.
-	Name string `yaml:"name"`
+	Label string `yaml:"label"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
 	Start uint64 `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
@@ -28,12 +28,12 @@ type Partition struct {
 }
 
 func (p *Partition) IsValid() error {
-	err := p.FsType.IsValid()
+	err := p.FileSystemType.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid partition (%s) fsType value:\n%w", p.ID, err)
+		return fmt.Errorf("invalid partition (%s) fileSystemType value:\n%w", p.ID, err)
 	}
 
-	err = isGPTNameValid(p.Name)
+	err = isGPTNameValid(p.Label)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func (p *Partition) IsValid() error {
 
 	isESP := sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
 	if isESP {
-		if p.FsType != FileSystemTypeFat32 {
+		if p.FileSystemType != FileSystemTypeFat32 {
 			return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
 		}
 	}
@@ -66,7 +66,7 @@ func (p *Partition) IsValid() error {
 			return fmt.Errorf("BIOS boot partition must start at block 1")
 		}
 
-		if p.FsType != FileSystemTypeFat32 {
+		if p.FileSystemType != FileSystemTypeFat32 {
 			return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
 		}
 	}

@@ -5,24 +5,25 @@ import (
 )
 
 // SELinux sets the SELinux mode
-type SELinux string
+type SELinuxMode string
 
 const (
 	// SELinuxDefault keeps the base image's existing SELinux mode.
-	SELinuxDefault SELinux = ""
+	SELinuxModeDefault SELinuxMode = ""
 	// SELinuxDisabled disables SELinux
-	SELinuxDisabled SELinux = "disabled"
+	SELinuxModeDisabled SELinuxMode = "disabled"
 	// SELinuxEnforcing sets SELinux to enforcing
-	SELinuxEnforcing SELinux = "enforcing"
+	SELinuxModeEnforcing SELinuxMode = "enforcing"
 	// SELinuxPermissive sets SELinux to permissive
-	SELinuxPermissive SELinux = "permissive"
+	SELinuxModePermissive SELinuxMode = "permissive"
 	// SELinuxForceEnforcing both sets SELinux to enforcing, and forces it via the kernel command line
-	SELinuxForceEnforcing SELinux = "force-enforcing"
+	SELinuxModeForceEnforcing SELinuxMode = "force-enforcing"
 )
 
-func (s SELinux) IsValid() error {
+func (s SELinuxMode) IsValid() error {
 	switch s {
-	case SELinuxDefault, SELinuxDisabled, SELinuxEnforcing, SELinuxPermissive, SELinuxForceEnforcing:
+	case SELinuxModeDefault, SELinuxModeDisabled, SELinuxModeEnforcing, SELinuxModePermissive,
+		SELinuxModeForceEnforcing:
 		// All good.
 		return nil
 
