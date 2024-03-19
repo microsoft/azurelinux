@@ -1,6 +1,6 @@
 os:
   kernelCommandLine:
-    selinux: enforcing
+    selinuxMode: enforcing
 
   packagesInstall:
   - selinux-policy

@@ -91,7 +91,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = handleSELinux(config.OS.KernelCommandLine.SELinux, config.OS.ResetBootLoaderType,
+	err = handleSELinux(config.OS.KernelCommandLine.SELinuxMode, config.OS.ResetBootLoaderType,
 		imageChroot)
 	if err != nil {
 		return err
@@ -311,11 +311,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	// Set user's SSH keys.
-	for i, _ := range user.SSHPubKeyPaths {
-		user.SSHPubKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPubKeyPaths[i])
+	for i, _ := range user.SSHPublicKeyPaths {
+		user.SSHPublicKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPublicKeyPaths[i])
 	}
 
-	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPublicKeyPaths, user.SSHPublicKeys)
 	if err != nil {
 		return err
 	}
@@ -433,13 +433,13 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	return nil
 }
 
-func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
+func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, ResetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
 	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
 	// Resolve the default SELinux mode.
-	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
 		if err != nil {
 			return err
@@ -459,7 +459,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType i
 		}
 	}
 
-	if selinuxMode != imagecustomizerapi.SELinuxDisabled {
+	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
 		err = updateSELinuxMode(selinuxMode, imageChroot)
 		if err != nil {
 			return err
@@ -469,7 +469,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType i
 	return nil
 }
 
-func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinux, imageChroot *safechroot.Chroot) error {
+func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err

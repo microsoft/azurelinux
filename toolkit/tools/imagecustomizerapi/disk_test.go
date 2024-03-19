@@ -16,9 +16,9 @@ func TestDiskIsValid(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 		},
 	}
@@ -33,10 +33,10 @@ func TestDiskIsValidWithEnd(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 		},
 	}
@@ -51,10 +51,10 @@ func TestDiskIsValidWithSize(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				Size:   ptrutils.PtrTo(uint64(1)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				Size:           ptrutils.PtrTo(uint64(1)),
 			},
 		},
 	}
@@ -69,9 +69,9 @@ func TestDiskIsValidStartAt0(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  0,
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          0,
 			},
 		},
 	}
@@ -88,9 +88,9 @@ func TestDiskIsValidInvalidTableType(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 		},
 	}
@@ -106,10 +106,10 @@ func TestDiskIsValidInvalidPartition(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  2,
-				End:    ptrutils.PtrTo(uint64(0)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          2,
+				End:            ptrutils.PtrTo(uint64(0)),
 			},
 		},
 	}
@@ -125,14 +125,14 @@ func TestDiskIsValidTwoExpanding(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
+				ID:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}
@@ -148,16 +148,16 @@ func TestDiskIsValidOverlaps(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
-				End:    ptrutils.PtrTo(uint64(4)),
+				ID:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
+				End:            ptrutils.PtrTo(uint64(4)),
 			},
 		},
 	}
@@ -173,15 +173,15 @@ func TestDiskIsValidOverlapsExpanding(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
+				ID:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}
@@ -197,16 +197,16 @@ func TestDiskIsValidTooSmall(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  3,
-				End:    ptrutils.PtrTo(uint64(4)),
+				ID:             "b",
+				FileSystemType: "ext4",
+				Start:          3,
+				End:            ptrutils.PtrTo(uint64(4)),
 			},
 		},
 	}
@@ -222,15 +222,15 @@ func TestDiskIsValidTooSmallExpanding(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  3,
+				ID:             "b",
+				FileSystemType: "ext4",
+				Start:          3,
 			},
 		},
 	}
@@ -258,9 +258,9 @@ func TestDiskIsValidMissingEspFlag(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "fat32",
-				Start:  1,
+				ID:             "a",
+				FileSystemType: "fat32",
+				Start:          1,
 				Flags: []PartitionFlag{
 					"boot",
 				},
@@ -281,9 +281,9 @@ func TestDiskIsValidMissingBootFlag(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "fat32",
-				Start:  1,
+				ID:             "a",
+				FileSystemType: "fat32",
+				Start:          1,
 				Flags: []PartitionFlag{
 					"esp",
 				},
@@ -304,15 +304,15 @@ func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  2,
+				ID:             "a",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}

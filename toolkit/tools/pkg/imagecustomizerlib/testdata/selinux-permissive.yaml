@@ -1,6 +1,6 @@
 os:
   kernelCommandLine:
-    selinux: permissive
+    selinuxMode: permissive
 
   packagesInstall:
   - selinux-policy
