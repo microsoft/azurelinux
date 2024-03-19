@@ -207,19 +207,6 @@ mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
 install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
 
-# Install release manifests
-mkdir -p %{buildroot}%{_datadir}/kube-virt/manifests/release
-install -m 0644 _out/manifests/release/kubevirt-operator.yaml %{buildroot}%{_datadir}/kube-virt/manifests/release/
-install -m 0644 _out/manifests/release/kubevirt-cr.yaml %{buildroot}%{_datadir}/kube-virt/manifests/release/
-
-# Install manifests for testing
-mkdir -p %{buildroot}%{_datadir}/kube-virt/manifests/testing
-install -m 0644 _out/manifests/testing/* %{buildroot}%{_datadir}/kube-virt/manifests/testing/
-# The generated disks-images-provider.yaml refers to nonexistent container
-# images. Overwrite it with the upstream version for testing.
-install -m 0644 %{S:3} %{buildroot}/%{_datadir}/kube-virt/manifests/testing/
-install -m 0644 tests/default-config.json %{buildroot}%{_datadir}/kube-virt/manifests/testing/
-
 %files virtctl
 %license LICENSE
 %doc README.md
