@@ -11,6 +11,12 @@ URL:            https://pypi.python.org/pypi/cryptography
 Source0:        https://pypi.io/packages/source/c/cryptography/cryptography-%{version}.tar.gz
 Source1:        cryptography-%{version}-vendor.tar.gz
 
+# azl: The openssl package does not build some of the bits that
+# python-cryptography expects.  This patch removes code that fails
+# due to their absence.
+Patch0:         0001-remove-openssl-cipher-Cipher-chacha20_poly1305.patch
+Patch1:         0002-remove-poly1305-tests.patch
+
 %description
 Cryptography is a Python library which exposes cryptographic recipes and primitives.
 

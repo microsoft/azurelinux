@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 5%{?dist}
+Release: 4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -86,8 +86,6 @@ BuildRequires: sed
 
 %if 0%{?with_check}
 BuildRequires: perl(Test::More)
-BuildRequires: perl-Test-Harness
-BuildRequires: perl-Math-BigInt
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
@@ -164,32 +162,38 @@ export HASHBANGPERL=/usr/bin/perl
     enable-camellia \
     no-capieng \
     enable-cast \
+    no-chacha \
     enable-cms \
+    no-comp \
     enable-ct \
     enable-deprecated \
     enable-des \
     enable-dh \
     enable-dsa \
     no-dtls1 \
+    no-ec2m \
     enable-ec_nistp_64_gcc_128 \
     enable-ecdh \
     enable-ecdsa \
     no-gost \
+    no-idea \
     no-mdc2 \
     no-md2 \
     enable-md4 \
+    no-poly1305 \
     enable-rc2 \
     enable-rc4 \
     enable-rc5 \
+    no-rfc3779 \
     enable-rmd160 \
     no-sctp \
+    no-seed \
     no-siphash \
     no-sm2 \
+    no-sm3 \
+    no-sm4 \
     no-ssl \
     no-ssl3 \
-    enable-ssl3-method \
-    enable-seed \
-    enable-ec2m \
     no-weak-ssl-ciphers \
     no-whirlpool \
     no-zlib \
@@ -354,9 +358,6 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
-* Mon Mar 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 3.1.4-5
-- Modify configure flags to provide what python-cryptography needs.
-
 * Thu Mar 13 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
 - Remove runtime dependency on coreutils
 

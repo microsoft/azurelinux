@@ -10,6 +10,10 @@ Distribution:   Azure Linux
 
 Source0: https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+# azl: The openssl package does not build some of the bits that
+# tpm2-pytss expects.  This patch removes tests that fail due to
+# their absence.
+Patch0:  0001-remove-tests-for-unsupported-openssl.patch
 
 BuildRequires: git
 BuildRequires: python3-devel
