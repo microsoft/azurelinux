@@ -26,10 +26,7 @@ Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        kubevirt_containers_meta
-Source2:        kubevirt_containers_meta.service
-Source3:        disks-images-provider.yaml
-Source100:      %{name}-rpmlintrc
+# The containers_meta packages and associated files are not required for the Mariner build
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
@@ -139,79 +136,10 @@ Group:          System/Packages
 %description    tests
 The package provides Kubevirt end-to-end tests.
 
-%package -n     obs-service-kubevirt_containers_meta
-Summary:        Kubevirt containers meta information (build service)
-Group:          System/Packages
-
-%description -n obs-service-kubevirt_containers_meta
-The package provides meta information that is used during the build of
-the Kubevirt container images.
-
 %prep
 %autosetup -p1
 
 %build
-# Hackery to determine which registry path to use in kubevirt-operator.yaml
-# when building the manifests
-#
-# The 'kubevirt_registry_path' macro can be used to define an explicit path in
-# the project config, e.g.
-#
-# Macros:
-# %kubevirt_registry_path registry.opensuse.org/Virtualization/container
-# :Macros
-#
-# 'kubevirt_registry_path' can also be defined when building locally, e.g.
-#
-# osc build --define='kubevirt_registry_path registry.opensuse.org/foo/bar/baz' ...
-#
-# If 'kubevirt_registry_path' is not specified, the standard publish location
-# for SLE and openSUSE-based containers is used.
-#
-distro='%{?sle_version}:%{?is_opensuse}%{!?is_opensuse:0}'
-case "${distro}" in
-150500:0)
-    tagprefix=suse/sles/15.5
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-    ;;
-150600:0)
-    tagprefix=suse/sles/15.6
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-    ;;
-*:1)
-    tagprefix=kubevirt
-    labelprefix=org.opensuse.kubevirt
-    registry=registry.opensuse.org
-    ;;
-*)
-%if 0%{?suse_version} == 1600
-    tagprefix=alp/kubevirt
-    labelprefix=com.suse.kubevirt
-    registry=registry.suse.com
-%else
-    echo "Unsupported distro: ${distro}" >&2
-    exit 1
-%endif
-    ;;
-esac
-
-%if "%{?kubevirt_registry_path}" == ""
-    reg_path="${registry}/${tagprefix}"
-%else
-    reg_path='%{kubevirt_registry_path}'
-%endif
-
-sed -i"" \
-    -e "s#_TAGPREFIX_#${tagprefix}#g" \
-    -e "s#_LABELPREFIX_#${labelprefix}#g" \
-    -e "s#_REGISTRY_#${registry}#g" \
-    -e "s#_PKG_VERSION_#%{version}#g" \
-    -e "s#_PKG_RELEASE_#%{release}#g" \
-    -e "s#_DISTRO_#${distro}#g" \
-    %{S:1}
-
 mkdir -p go/src/kubevirt.io go/pkg
 ln -s ../../../ go/src/kubevirt.io/kubevirt
 export GOPATH=${PWD}/go
@@ -292,11 +220,6 @@ install -m 0644 _out/manifests/testing/* %{buildroot}%{_datadir}/kube-virt/manif
 install -m 0644 %{S:3} %{buildroot}/%{_datadir}/kube-virt/manifests/testing/
 install -m 0644 tests/default-config.json %{buildroot}%{_datadir}/kube-virt/manifests/testing/
 
-# Install kubevirt_containers_meta build service
-mkdir -p %{buildroot}%{_prefix}/lib/obs/service
-install -m 0755 %{S:1} %{buildroot}%{_prefix}/lib/obs/service
-install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
-
 %files virtctl
 %license LICENSE
 %doc README.md
@@ -375,12 +298,6 @@ install -m 0644 %{S:2} %{buildroot}%{_prefix}/lib/obs/service
 %dir %{_datadir}/kube-virt/manifests
 %{_bindir}/virt-tests
 %{_datadir}/kube-virt/manifests/testing
-
-%files -n obs-service-kubevirt_containers_meta
-%license LICENSE
-%doc README.md
-%dir %{_prefix}/lib/obs
-%{_prefix}/lib/obs/service
 
 %changelog
 * Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1

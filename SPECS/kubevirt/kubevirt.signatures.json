@@ -1,9 +1,5 @@
 {
   "Signatures": {
-    "disks-images-provider.yaml": "c0b58839b33c93e3d111274edf4fe1b6736c2ebe3e8a4b581b9ae298fe29ea6d",
-    "kubevirt-1.2.0.tar.gz": "da63ee052939a68e54dca37084234ebd7a86233f2087bc13cb7d63fc24d356e3",
-    "kubevirt-rpmlintrc": "16311e9a9550813799516f1871376d95151c8fd4abf4e5a5a568f91fa7c9e10a",
-    "kubevirt_containers_meta": "a7899c8992be6387148a3f3f5d0bc0464d3259a9272602e5efbc42c09a604295",
-    "kubevirt_containers_meta.service": "a38783b77ebea6546a0c94e7ca5deb5f1a4d890633d754f11f12a85aad27de4e"
+    "kubevirt-1.2.0.tar.gz": "da63ee052939a68e54dca37084234ebd7a86233f2087bc13cb7d63fc24d356e3"
   }
 }

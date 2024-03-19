@@ -1,5 +1,0 @@
-<service name="kubevirt_containers_meta">
-    <summary>Containers meta information for Kubevirt (build service)</summary>
-    <description>Provides meta information that is used during the build of
-the Kubevirt container images.</description>
-</service>
