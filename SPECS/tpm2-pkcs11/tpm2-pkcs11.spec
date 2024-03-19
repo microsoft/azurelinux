@@ -60,7 +60,10 @@ Tools for TCG TPM2 PKCSv11 Software Stack
 %autosetup -p1 -n %{name}-%{version}
 
 %build
-%configure --enable-unit --verbose
+
+%configure \
+    --enable-unit
+
 %make_build PACKAGE_VERSION=%{version}
 
 cd tools
