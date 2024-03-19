@@ -293,7 +293,9 @@ export JAVA_PREFIX=%{_javadir}
 export RUBY_PREFIX=%{_prefix}
 export GOBJECT_LIBS=$(pkg-config --libs gobject-2.0)
 export GOBJECT_CFLAGS=$(pkg-config --cflags gobject-2.0)
- 
+
+export LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH
+
 find %{_builddir} -name rebar -exec rm -f '{}' \;
 find . -name Makefile\* -exec sed -i -e 's/[.][/]rebar/rebar/g' {} \;
  
