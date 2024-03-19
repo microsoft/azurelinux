@@ -805,8 +805,8 @@
         "type": "other",
         "other": {
           "name": "autofs",
-          "version": "5.1.8",
-          "downloadUrl": "https://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.8.tar.xz"
+          "version": "5.1.9",
+          "downloadUrl": "https://www.kernel.org/pub/linux/daemons/autofs/v5/autofs-5.1.9.tar.xz"
         }
       }
     },
