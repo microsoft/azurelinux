@@ -10,9 +10,9 @@ import (
 )
 
 type Config struct {
-	Disks        *[]Disk      `yaml:"disks"`
-	Iso          *Iso         `yaml:"iso"`
-	SystemConfig SystemConfig `yaml:"systemConfig"`
+	Disks *[]Disk `yaml:"disks"`
+	Iso   *Iso    `yaml:"iso"`
+	OS    OS      `yaml:"os"`
 }
 
 func (c *Config) IsValid() (err error) {
@@ -40,30 +40,30 @@ func (c *Config) IsValid() (err error) {
 		}
 	}
 
-	err = c.SystemConfig.IsValid()
+	err = c.OS.IsValid()
 	if err != nil {
 		return err
 	}
 
 	hasDisks := c.Disks != nil
-	hasBootType := c.SystemConfig.BootType != BootTypeUnset
-	hasPartitionSettings := len(c.SystemConfig.PartitionSettings) > 0
-	hasResetBootLoader := c.SystemConfig.ResetBootLoaderType != ResetBootLoaderTypeDefault
+	hasBootType := c.OS.BootType != BootTypeUnset
+	hasPartitionSettings := len(c.OS.PartitionSettings) > 0
+	hasResetBootLoader := c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
 
 	if hasDisks != hasBootType {
-		return fmt.Errorf("systemConfig.bootType and disks must be specified together")
+		return fmt.Errorf("os.bootType and disks must be specified together")
 	}
 
 	if hasDisks != hasResetBootLoader {
-		return fmt.Errorf("systemConfig.resetBootLoaderType and disks must be specified together'")
+		return fmt.Errorf("os.resetBootLoaderType and disks must be specified together'")
 	}
 
 	if hasPartitionSettings && !hasDisks {
-		return fmt.Errorf("the disks and systemConfig.bootType values must also be specified if systemConfig.partitionSettings is specified")
+		return fmt.Errorf("the disks and os.bootType values must also be specified if os.partitionSettings is specified")
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.
-	switch c.SystemConfig.BootType {
+	switch c.OS.BootType {
 	case BootTypeEfi:
 		hasEsp := sliceutils.ContainsFunc(*c.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
@@ -86,7 +86,7 @@ func (c *Config) IsValid() (err error) {
 	}
 
 	// Ensure all the partition settings object have an equivalent partition object.
-	for i, partitionSetting := range c.SystemConfig.PartitionSettings {
+	for i, partitionSetting := range c.OS.PartitionSettings {
 		diskExists := sliceutils.ContainsFunc(*c.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
 				return partition.ID == partitionSetting.ID

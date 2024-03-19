@@ -13,7 +13,7 @@ disks:
     start: 9
     fsType: ext4
 
-systemConfig:
+os:
   bootType: legacy
   resetBootLoaderType: hard-reset
   partitionSettings:

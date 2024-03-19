@@ -26,7 +26,7 @@ func TestConfigIsValid(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "efi",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -59,7 +59,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "legacy",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -83,7 +83,7 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname:            "test",
 			ResetBootLoaderType: "hard-reset",
 		},
@@ -108,7 +108,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test",
 			BootType: "efi",
 		},
@@ -132,7 +132,7 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 				MaxSize:            1,
 			},
 		},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "legacy",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -147,7 +147,7 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 func TestConfigIsValidZeroDisks(t *testing.T) {
 	config := &Config{
 		Disks: &[]Disk{},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test",
 		},
 	}
@@ -159,7 +159,7 @@ func TestConfigIsValidZeroDisks(t *testing.T) {
 
 func TestConfigIsValidBadHostname(t *testing.T) {
 	config := &Config{
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test_",
 		},
 	}
@@ -175,7 +175,7 @@ func TestConfigIsValidBadDisk(t *testing.T) {
 			PartitionTableType: PartitionTableTypeGpt,
 			MaxSize:            0,
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test",
 		},
 	}
@@ -192,7 +192,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 			MaxSize:            2,
 			Partitions:         []Partition{},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "efi",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -212,7 +212,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 			MaxSize:            2,
 			Partitions:         []Partition{},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "legacy",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -242,7 +242,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "efi",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -278,7 +278,7 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "efi",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",
@@ -299,7 +299,7 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 
 func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
 	config := &Config{
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test",
 			PartitionSettings: []PartitionSetting{
 				{
@@ -318,7 +318,7 @@ func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
 
 func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
 	config := &Config{
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname:            "test",
 			BootType:            BootTypeEfi,
 			ResetBootLoaderType: "hard-reset",
@@ -329,7 +329,7 @@ func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
 	}
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "systemConfig.bootType and disks must be specified together")
+	assert.ErrorContains(t, err, "os.bootType and disks must be specified together")
 }
 
 func TestConfigIsValidKernelCLI(t *testing.T) {
@@ -349,7 +349,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				},
 			},
 		}},
-		SystemConfig: SystemConfig{
+		OS: OS{
 			BootType:            "efi",
 			ResetBootLoaderType: "hard-reset",
 			Hostname:            "test",

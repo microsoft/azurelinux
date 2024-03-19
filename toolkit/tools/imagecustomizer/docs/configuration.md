@@ -72,7 +72,7 @@ new package with [packagesInstall](#packagesinstall-string).
 Example:
 
 ```yaml
-systemConfig:
+os:
   packagesRemove:
   - kernel
 
@@ -101,7 +101,7 @@ systemConfig:
       - [fileConfig type](#fileconfig-type)
         - [path](#path-string)
         - [permissions](#permissions-string)
-  - [systemConfig type](#systemconfig-type)
+  - [os type](#os-type)
     - [bootType](#boottype-string)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
@@ -175,8 +175,8 @@ Contains the options for provisioning disks and their partitions.
 If the Disks field isn't specified, then the partitions of the base image aren't
 changed.
 
-If Disks is specified, then both [systemConfig.bootType](#boottype-string) and
-[systemConfig.resetBootLoaderType](#resetbootloadertype-string) must also be
+If Disks is specified, then both [os.bootType](#boottype-string) and
+[os.resetBootLoaderType](#resetbootloadertype-string) must also be
 specified.
 
 While Disks is a list, only 1 disk is supported at the moment.
@@ -199,7 +199,7 @@ disks:
     start: 9
     fsType: ext4
 
-systemConfig:
+os:
   bootType: efi
   resetBootLoaderType: hard-reset
   partitionSettings:
@@ -211,14 +211,14 @@ systemConfig:
     mountPoint: /
 ```
 
-### systemConfig [[systemConfig](#systemconfig-type)]
+### os [[os](#systemconfig-type)]
 
 Contains the configuration options for the OS.
 
 Example:
 
 ```yaml
-systemConfig:
+os:
   hostname: example-image
 ```
 
@@ -274,7 +274,7 @@ Specifies the configuration for dm-verity root integrity verification.
 Example:
 
 ```yaml
-systemConfig:
+os:
   verity:
     dataPartition:
       idType: part-uuid
@@ -297,7 +297,7 @@ The absolute path of the destination file.
 Example:
 
 ```yaml
-systemConfig:
+os:
   additionalFiles:
     files/a.txt:
     - path: /a.txt
@@ -314,7 +314,7 @@ Supported formats:
 Example:
 
 ```yaml
-systemConfig:
+os:
   additionalFiles:
     files/a.txt:
     - path: /a.txt
@@ -379,7 +379,7 @@ called automatically after the `postInstallScripts` are run.
 Example:
 
 ```yaml
-systemConfig:
+os:
   kernelCommandLine:
     selinux: enforcing
 
@@ -404,7 +404,7 @@ Options for configuring a kernel module.
 Name of the module.
 
 ```yaml
-systemConfig:
+os:
   modules:
     load:
     - name: br_netfilter
@@ -421,7 +421,7 @@ Sets kernel modules to be loaded automatically on boot.
 Implemented by adding an entry to `/etc/modules-load.d/`.
 
 ```yaml
-SystemConfig:
+OS:
   Modules:
     Load:
     - Name: br_netfilter
@@ -434,7 +434,7 @@ Disable kernel modules from being loaded.
 Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
 
 ```yaml
-systemConfig:
+os:
   modules:
     disable:
     - name: mousedev
@@ -596,7 +596,7 @@ in.
 Example:
 
 ```yaml
-systemConfig:
+os:
   postInstallScripts:
   - path: scripts/a.sh
 ```
@@ -608,7 +608,7 @@ Additional arguments to pass to the script.
 Example:
 
 ```yaml
-systemConfig:
+os:
   postInstallScripts:
   - path: scripts/a.sh
     args: abc
@@ -626,7 +626,7 @@ That is, services that will be set to automatically run on OS boot.
 Example:
 
 ```yaml
-systemConfig:
+os:
   services:
     enable:
     - sshd
@@ -640,13 +640,13 @@ That is, services that will be set to not automatically run on OS boot.
 Example:
 
 ```yaml
-systemConfig:
+os:
   services:
     disable:
     - sshd
 ```
 
-## systemConfig type
+## os type
 
 Contains the configuration options for the OS.
 
@@ -687,7 +687,7 @@ Implemented by writing to the `/etc/hostname` file.
 Example:
 
 ```yaml
-systemConfig:
+os:
   hostname: example-image
 ```
 
@@ -705,7 +705,7 @@ Implemented by calling: `tdnf update`
 Example:
 
 ```yaml
-systemConfig:
+os:
   updateBaseImagePackages: true
 ```
 
@@ -719,7 +719,7 @@ The other YAML file schema is specified by [packageList](#packagelist-type).
 Example:
 
 ```yaml
-systemConfig:
+os:
   packageListsRemove:
   - lists/ssh.yaml
 ```
@@ -733,7 +733,7 @@ Implemented by calling: `tdnf install`.
 Example:
 
 ```yaml
-systemConfig:
+os:
   packagesInstall:
   - openssh-server
 ```
@@ -748,7 +748,7 @@ The other YAML file schema is specified by [packageList](#packagelist-type).
 Example:
 
 ```yaml
-systemConfig:
+os:
   packageListsRemove:
   - lists/ssh.yaml
 ```
@@ -762,7 +762,7 @@ Implemented by calling: `tdnf remove`
 Example:
 
 ```yaml
-systemConfig:
+os:
   packagesRemove:
   - openssh-server
 ```
@@ -777,7 +777,7 @@ The other YAML file schema is specified by [packageList](#packagelist-type).
 Example:
 
 ```yaml
-systemConfig:
+os:
   packageListsUpdate:
   - lists/ssh.yaml
 ```
@@ -791,7 +791,7 @@ Implemented by calling: `tdnf update`
 Example:
 
 ```yaml
-systemConfig:
+os:
   packagesUpdate:
   - openssh-server
 ```
@@ -811,7 +811,7 @@ The destination files value can be one of:
 Example:
 
 ```yaml
-systemConfig:
+os:
   additionalFiles:
     # Single destination.
     files/a.txt: /a.txt
@@ -844,7 +844,7 @@ that contains the config file.
 Example:
 
 ```yaml
-systemConfig:
+os:
   postInstallScripts:
   - path: scripts/a.sh
 ```
@@ -861,7 +861,7 @@ that contains the config file.
 Example:
 
 ```yaml
-systemConfig:
+os:
   finalizeImageScripts:
   - path: scripts/a.sh
 ```
@@ -873,7 +873,7 @@ Used to add and/or update user accounts.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
 ```
@@ -883,7 +883,7 @@ systemConfig:
 Options for configuring systemd services.
 
 ```yaml
-systemConfig:
+os:
   services:
     enable:
     - sshd
@@ -908,7 +908,7 @@ The name of the user.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
 ```
@@ -923,7 +923,7 @@ Valid range: 0-60000
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     uid: 1000
@@ -940,7 +940,7 @@ When set to true, specifies that the password provided by either `password` or
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     # Generated by:
@@ -965,7 +965,7 @@ Use of this property is strongly discouraged, except when debugging.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     password: testpassword
@@ -979,7 +979,7 @@ The password is read from the file path specified.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     passwordPath: test-password.txt
@@ -994,7 +994,7 @@ Valid range: 0-99999. Set to -1 to remove expiry.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     passwordPath: test-password.txt
@@ -1010,7 +1010,7 @@ These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     sshPubKeyPaths:
@@ -1024,7 +1024,7 @@ The primary group of the user.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     primaryGroup: testgroup
@@ -1037,7 +1037,7 @@ Additional groups to assign to the user.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     secondaryGroups:
@@ -1051,7 +1051,7 @@ The command run when the user logs in.
 Example:
 
 ```yaml
-systemConfig:
+os:
   users:
   - name: test
     startupCommand: /sbin/nologin

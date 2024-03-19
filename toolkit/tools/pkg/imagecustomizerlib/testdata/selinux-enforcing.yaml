@@ -1,4 +1,4 @@
-systemConfig:
+os:
   kernelCommandLine:
     selinux: enforcing
 

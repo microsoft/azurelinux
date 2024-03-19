@@ -71,7 +71,7 @@ iso:
     cloud-init-data/meta-data: /cloud-init-data/meta-data
   kernelCommandLine:
     ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
-systemConfig:
+os:
   users:
   - name: test
     password: testpassword
@@ -86,7 +86,7 @@ If cloud-init data is to be placed within the LiveOS root file system:
 iso:
   kernelCommandLine:
     extraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
-systemConfig:
+os:
   users:
   - name: test
     password: testpassword

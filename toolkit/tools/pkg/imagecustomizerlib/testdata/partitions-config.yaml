@@ -24,7 +24,7 @@ disks:
     start: 2048
     fsType: xfs
 
-systemConfig:
+os:
   bootType: efi
   resetBootLoaderType: hard-reset
   partitionSettings:

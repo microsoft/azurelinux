@@ -10,8 +10,8 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
-// SystemConfig defines how each system present on the image is supposed to be configured.
-type SystemConfig struct {
+// OS defines how each system present on the image is supposed to be configured.
+type OS struct {
 	BootType                BootType            `yaml:"bootType"`
 	ResetBootLoaderType     ResetBootLoaderType `yaml:"resetBootLoaderType"`
 	Hostname                string              `yaml:"hostname"`
@@ -34,7 +34,7 @@ type SystemConfig struct {
 	Overlays                *[]Overlay          `yaml:"overlays"`
 }
 
-func (s *SystemConfig) IsValid() error {
+func (s *OS) IsValid() error {
 	var err error
 
 	err = s.BootType.IsValid()
