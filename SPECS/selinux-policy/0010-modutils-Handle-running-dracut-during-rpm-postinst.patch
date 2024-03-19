@@ -1,7 +1,7 @@
-From 7a0b98db32746f8d8899ece9aa5c8779605e85dd Mon Sep 17 00:00:00 2001
+From ef42790dfa6d71cab77626c2650ec2714cefa5ce Mon Sep 17 00:00:00 2001
 From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
 Date: Wed, 1 Mar 2023 20:53:21 +0000
-Subject: [PATCH 35/35] modutils: Handle running dracut during rpm postinst.
+Subject: [PATCH 10/14] modutils: Handle running dracut during rpm postinst.
 
 Dracut runs depmod.
 
@@ -12,10 +12,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/system/modutils.te |  7 ++++
  3 files changed, 83 insertions(+)
 
-MSFT_TAG: not upstreamable
-
 diff --git a/policy/modules/admin/rpm.if b/policy/modules/admin/rpm.if
-index 2b5e0768e..ce62d846f 100644
+index 54dcbdb71..b20c3cd3d 100644
 --- a/policy/modules/admin/rpm.if
 +++ b/policy/modules/admin/rpm.if
 @@ -338,6 +338,63 @@ interface(`rpm_manage_script_tmp_files',`
@@ -81,12 +79,12 @@ index 2b5e0768e..ce62d846f 100644
 +
  #####################################
  ## <summary>
- ##	Append rpm temporary files.
+ ##	Read rpm temporary files.
 diff --git a/policy/modules/kernel/files.if b/policy/modules/kernel/files.if
-index f7217b226..b95270960 100644
+index 472b5bb38..3b82afba8 100644
 --- a/policy/modules/kernel/files.if
 +++ b/policy/modules/kernel/files.if
-@@ -2557,6 +2557,25 @@ interface(`files_boot_filetrans',`
+@@ -2569,6 +2569,25 @@ interface(`files_boot_filetrans',`
  	filetrans_pattern($1, boot_t, $2, $3, $4)
  ')
  
@@ -113,10 +111,10 @@ index f7217b226..b95270960 100644
  ## <summary>
  ##	read files in the /boot directory.
 diff --git a/policy/modules/system/modutils.te b/policy/modules/system/modutils.te
-index 3da4d5354..fb388ce98 100644
+index 12c4dc466..c2adfd44c 100644
 --- a/policy/modules/system/modutils.te
 +++ b/policy/modules/system/modutils.te
-@@ -173,6 +173,13 @@ optional_policy(`
+@@ -174,6 +174,13 @@ optional_policy(`
  
  optional_policy(`
  	rpm_rw_pipes(kmod_t)
@@ -131,5 +129,5 @@ index 3da4d5354..fb388ce98 100644
  
  optional_policy(`
 -- 
-2.34.1
+2.43.2
 
