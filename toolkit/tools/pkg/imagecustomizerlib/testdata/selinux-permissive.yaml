@@ -1,6 +1,6 @@
 os:
-  kernelCommandLine:
-    selinuxMode: permissive
+  selinux:
+    mode: permissive
 
   packages:
     install:

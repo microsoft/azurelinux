@@ -91,7 +91,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = handleSELinux(config.OS.KernelCommandLine.SELinuxMode, config.OS.ResetBootLoaderType,
+	err = handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
 		imageChroot)
 	if err != nil {
 		return err
@@ -417,7 +417,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// Hard-reset the grub config.
 		err := configureDiskBootLoader(imageConnection, config.OS.PartitionSettings,
-			config.OS.BootType, config.OS.KernelCommandLine, currentSelinuxMode)
+			config.OS.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
 		if err != nil {
 			return fmt.Errorf("failed to configure bootloader:\n%w", err)
 		}
