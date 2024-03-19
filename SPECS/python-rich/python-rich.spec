@@ -7,15 +7,18 @@ Distribution:   Azure Linux
 License:        MIT
 URL:            https://github.com/Textualize/rich
 Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
+
+BuildArch:      noarch
  
 # Fix tests with Python 3.13 - submitted upstream
 Patch0:         fix-tests-python-3.13.patch
-BuildRequires:  python3-devel
+
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-attrs
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-attrs
-BuildArch:      noarch
  
 %description
 Rich is a Python library for rich text and beautiful formatting in the terminal.
