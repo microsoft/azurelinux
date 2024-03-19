@@ -20,7 +20,8 @@
                 "default": "kernel"
             },
             "AdditionalFiles": {
-                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network"
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network",
+                "../resources/imageconfigs/additionalfiles/iso_initrd/10-console-messages.conf": "/etc/sysctl.d/10-console-messages.conf"
             }
         },
         {
@@ -34,7 +35,8 @@
                 "default": "kernel"
             },
             "AdditionalFiles": {
-                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network"
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network",
+                "../resources/imageconfigs/additionalfiles/iso_initrd/10-console-messages.conf": "/etc/sysctl.d/10-console-messages.conf"
             }
         }
     ]
