@@ -18,6 +18,9 @@
             },
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "AdditionalFiles": {
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network"
             }
         },
         {
@@ -29,6 +32,9 @@
             ],
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "AdditionalFiles": {
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network"
             }
         }
     ]
