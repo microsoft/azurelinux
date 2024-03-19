@@ -2,8 +2,8 @@
 %global modname pexpect
 Summary:        Unicode-aware Pure Python Expect-like module
 Name:           python-%{modname}
-Version:        4.8.0
-Release:        11%{?dist}
+Version:        4.9.0
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -89,6 +89,9 @@ TRAVIS=true python3 -m pytest -v -k "not spawn_uses_env"
 %{python3_sitelib}/%{modname}-*.egg-info
 
 %changelog
+* Wed Feb 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.0-1
+- Auto-upgrade to 4.9.0 - AzL 3.0 upgrade
+
 * Tue Aug 09 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.8.0-11
 - Disabling flaky "spawn_uses_env" test.
 
