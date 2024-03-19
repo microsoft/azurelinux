@@ -1,4 +1,4 @@
-systemConfig:
+os:
   modules:
     load:
     - name: br_netfilter

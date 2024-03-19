@@ -1,4 +1,4 @@
-systemConfig:
+os:
   postInstallScripts:
   - path: scripts/postinstallscript.sh
 

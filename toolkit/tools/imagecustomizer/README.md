@@ -36,7 +36,7 @@ Disadvantages:
    For example:
 
     ```yaml
-    systemConfig:
+    os:
       packagesInstall:
       - dnf
     ```
