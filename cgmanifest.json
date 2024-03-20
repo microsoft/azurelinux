@@ -14363,8 +14363,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.10",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.10.tar.gz"
+          "version": "0.8.17",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.17.tar.gz"
         }
       }
     },
