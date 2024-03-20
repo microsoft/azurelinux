@@ -148,7 +148,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 * Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
 - remove unnecessary 10_kernel.cfg grub config file
 
-* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-4
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
 - Remove /var/lib/initramfs/kernel files.
 
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
