@@ -5,37 +5,71 @@ package imagecustomizerapi
 
 import (
 	"fmt"
+	"strings"
+)
+
+type ModuleOptions map[string]string
+type LoadMode string
+
+const (
+	LoadModeAlways   	LoadMode = "always"
+	LoadModeAuto		LoadMode = "auto"
+	LoadModeDisable 	LoadMode = "disable"
+	LoadModeInherit	    LoadMode = "inherit"
 )
 
 type Module struct {
-	Name string `yaml:"name"`
+	Name     string            `yaml:"name"`
+	LoadMode LoadMode          `yaml:"loadMode"`
+	Options  map[string]string `yaml:"options"`
 }
 
 func (m *Module) IsValid() error {
-	if m.Name == "" {
-		return fmt.Errorf("name of module may not be empty")
+	if err := validateModuleName(m.Name); err != nil {
+		return err
 	}
 
+	if err := validateModuleLoadMode(m.LoadMode); err != nil {
+		return err
+	}
+
+	if len(m.Options) > 0 {
+		for optionKey, optionValue := range m.Options {
+			if optionKey == "" {
+				return fmt.Errorf("option key cannot be empty for module %s", m.Name)
+			}
+			if optionValue == "" {
+				return fmt.Errorf("option value cannot be empty for module %s", m.Name)
+			}
+
+			if strings.ContainsAny(optionKey, " \n") {
+				return fmt.Errorf("option key cannot contain spaces or newline characters for module %s", m.Name)
+			}
+			if strings.ContainsAny(optionValue, " \n") {
+				return fmt.Errorf("option value cannot contain spaces or newline characters for module %s", m.Name)
+			}
+		}
+	}
 	return nil
 }
 
-type Modules struct {
-	Load    []Module `yaml:"load"`
-	Disable []Module `yaml:"disable"`
+func validateModuleName(moduleName string) error {
+	if moduleName == "" {
+		return fmt.Errorf("module name cannot be empty")
+	}
+	if strings.ContainsAny(moduleName, " \n") {
+		return fmt.Errorf("module name cannot contain spaces or newline characters")
+	}
+	return nil
 }
 
-func (m *Modules) IsValid() error {
-	for i, module := range m.Load {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in modules.load at index %d: %w", module.Name, i, err)
-		}
-	}
+func validateModuleLoadMode(loadmode LoadMode) error {
+	switch loadmode {
+	case LoadModeAuto, LoadModeDisable, LoadModeAlways, LoadModeInherit:
+		// All good.
+		return nil
 
-	for i, module := range m.Disable {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in modules.disable at index %d: %w", module.Name, i, err)
-		}
+	default:
+		return fmt.Errorf("invalid module load mode value (%v), it can only be 'always', 'auto', 'disable', or 'inherit'", loadmode)
 	}
-
-	return nil
 }

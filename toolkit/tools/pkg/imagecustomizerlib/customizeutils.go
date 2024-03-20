@@ -359,33 +359,6 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
-	var err error
-
-	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-		err = file.Write(module.Name, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module load configuration: %w", err)
-		}
-	}
-
-	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
-		data := fmt.Sprintf("blacklist %s\n", module.Name)
-		err = file.Write(data, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module disable configuration: %w", err)
-		}
-	}
-
-	return nil
-}
-
 func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
 	var err error
 

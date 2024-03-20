@@ -29,7 +29,7 @@ type OS struct {
 	FinalizeImageScripts    []Script            `yaml:"finalizeImageScripts"`
 	Users                   []User              `yaml:"users"`
 	Services                Services            `yaml:"services"`
-	Modules                 Modules             `yaml:"modules"`
+	Modules                 []Module            `yaml:"modules"`
 	Verity                  *Verity             `yaml:"verity"`
 	Overlays                *[]Overlay          `yaml:"overlays"`
 }
@@ -102,8 +102,11 @@ func (s *OS) IsValid() error {
 		return err
 	}
 
-	if err := s.Modules.IsValid(); err != nil {
-		return err
+	for i, module := range s.Modules {
+		err = module.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Modules item at index %d: %w", i, err)
+		}
 	}
 
 	if s.Verity != nil {
