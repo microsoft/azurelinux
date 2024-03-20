@@ -152,8 +152,6 @@ Source1118:     xmvn-jpb-4.2.0.tar.xz
 Source1119:     xmvn-generator-1.2.1.tar.xz
 Source1120:     xz-java-1.9.tar.xz
 
-Patch0:      0002-Rebase-xmvn-to-current-trunk.patch
-
 Provides:     bundled(ant) = 1.10.14
 Provides:     bundled(aopalliance) = 1.0
 Provides:     bundled(apache-pom) = 30
@@ -315,7 +313,7 @@ for source in ${other_sources}
 do
   tar -xf "${source}"
 done
-%patch 0 -p1
+
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"
@@ -345,7 +343,7 @@ echo $JAVA_HOME
 %install
 export JAVA_HOME=$(find /usr/lib/jvm -name "*openjdk*")
 ./mbi.sh dist \
-  -javaCmdPath=%{JAVA_HOME}/bin/java \
+  -javaCmdPath=%{java_home}/bin/java \
   -basePackageName=%{name} \
   -installRoot=%{buildroot} \
   -mavenHomePath=%{mavenHomePath} \
@@ -368,7 +366,7 @@ install -D -p -m 644 downstream/xmvn-generator/src/main/rpm/xmvngen.attr %{build
 
 echo '
 %%__xmvngen_debug 1
-%%__xmvngen_libjvm %{javaHomePath}/lib/server/libjvm.so
+%%__xmvngen_libjvm %{java_home}/lib/server/libjvm.so
 %%__xmvngen_classpath %{artifactsPath}/%{name}/xmvn-generator.jar:%{artifactsPath}/%{name}/asm.jar:%{artifactsPath}/%{name}/commons-compress.jar
 %%__xmvngen_provides_generators org.fedoraproject.xmvn.generator.jpms.JPMSGeneratorFactory
 %%__xmvngen_requires_generators %%{nil}
@@ -376,9 +374,9 @@ echo '
 %%jpb_env PATH=/usr/libexec/javapackages-bootstrap:$PATH
 ' >%{buildroot}%{_rpmmacrodir}/macros.jpbgen
 
-# by default it sets JAVA_HOME to /usr/lib/jvm/java-11-openjdk
-sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{_datadir}/%{name}/bin/mvn
-sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPath}/xmvn-install
+# by default it sets JAVA_HOME to /usr/lib/jvm/java-17
+sed -i 's|/usr/lib/jvm/java-17|%{java_home}|' %{buildroot}%{_datadir}/%{name}/bin/mvn
+sed -i 's|/usr/lib/jvm/java-17|%{java_home}|' %{buildroot}%{launchersPath}/xmvn-install
 
 sed -i s/xmvn-generator/%{name}-generator/ %{buildroot}%{_sysconfdir}/rpm/macros.jpbgenhook
 sed -i s/xmvn-generator/%{name}-generator/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
@@ -402,9 +400,8 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.0-1
-- Auto-upgrade to 1.14.0 - azl 3.0
-- Changes from Fedora 39 (license: MIT).
+* Wed Mar 20 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.14.0-1
+- upgrade to 1.14.0
 
 * Fri Aug 11 2023 Saul Paredes <saulparedes@microsoft.com> - 1.5.0-4
 - Patch plexus-archiver to fix CVE-2023-37460
