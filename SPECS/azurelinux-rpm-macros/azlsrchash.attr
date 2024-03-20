@@ -1,0 +1,3 @@
+# RPM macros for encoding a sha256 source hash into rpms.
+%__azlsrchash_provides() %{?azlsrchash:azlsrchash(%{azlsrchash})}
+%__azlsrchash_path .*

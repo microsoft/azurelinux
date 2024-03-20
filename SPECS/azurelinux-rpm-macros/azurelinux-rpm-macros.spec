@@ -7,7 +7,7 @@
 Summary:        Azure Linux specific rpm macro files
 Name:           azurelinux-rpm-macros
 Version:        3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,6 +48,7 @@ Source29:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/
 Source30:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-fix-pyc-reproducibility
 Source31:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/brp-python-hardlink
 Source32:       https://src.fedoraproject.org/rpms/python-rpm-macros/blob/f40/f/import_all_modules.py
+Source33:       azlsrchash.attr
 ###
 Provides:       redhat-rpm-config
 Provides:       openblas-srpm-macros
@@ -98,6 +99,7 @@ install -p -m 755 -t %{buildroot}%{rcdir} verify-package-notes.sh
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 install -p -m 644 -t %{buildroot}%{_rpmconfigdir}/macros.d macros.*
 mkdir -p %{buildroot}%{_fileattrsdir}
+install -p -m 644 -t %{buildroot}%{_fileattrsdir} *.attr
 
 mkdir -p %{buildroot}%{rcluadir}/{rpm,srpm}
 install -p -m 644 -t %{buildroot}%{rcluadir} common.lua
@@ -141,6 +143,9 @@ install -p -m 644 -t %{buildroot}%{rcluadir}/srpm python.lua
 %{_rpmconfigdir}/macros.d/macros.check
 
 %changelog
+* Tue Mar 19 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.0-3
+- Add azlsrchash file attrs
+
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-2
 - Update all python-related scripts from Fedora 40 version of python-rpm-macros
 - Sort python-related sources together
