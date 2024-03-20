@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -118,6 +118,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Mar 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 18.18.2-5
+- Patch CVE-2024-22025
+
 * Tue Feb 27 2024 Suresh Thelkar <sthelkar@ieee.org> - 18.18.2-4
 - Patch CVE-2024-24806
 
