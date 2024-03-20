@@ -35,7 +35,7 @@ func checkFileSystems(rawImageFile string) error {
 }
 
 func checkFileSystemsHelper(diskDevice string) error {
-	// Get partition info
+	// Get partitions info
 	diskPartitions, err := diskutils.GetDiskPartitions(diskDevice)
 	if err != nil {
 		return err
@@ -46,12 +46,27 @@ func checkFileSystemsHelper(diskDevice string) error {
 			continue
 		}
 
-		// Check the file system.
-		// Note: If file systems errors are found and corrected, `fsck -a` will return an exit code of 1, which is
-		// currently still treated as a failure.
-		err := shell.ExecuteLive(true /*squashErrors*/, "fsck", "-a", diskPartition.Path)
-		if err != nil {
-			return fmt.Errorf("failed to check (%s) with fsck:\n%w", diskPartition.Path, err)
+		// Check the file system for corruption.
+		switch diskPartition.FileSystemType {
+		case "ext2", "ext3", "ext4":
+			// Add -f flag to force check to run even if the journal is marked as clean.
+			err := shell.ExecuteLive(true /*squashErrors*/, "e2fsck", "-fn", diskPartition.Path)
+			if err != nil {
+				return fmt.Errorf("failed to check (%s) with e2fsck:\n%w", diskPartition.Path, err)
+			}
+
+		case "xfs":
+			// The fsck.xfs tool doesn't do anything. So, call xfs_repair instead.
+			err := shell.ExecuteLive(true /*squashErrors*/, "xfs_repair", "-n", diskPartition.Path)
+			if err != nil {
+				return fmt.Errorf("failed to check (%s) with xfs_repair:\n%w", diskPartition.Path, err)
+			}
+
+		default:
+			err := shell.ExecuteLive(true /*squashErrors*/, "fsck", "-n", diskPartition.Path)
+			if err != nil {
+				return fmt.Errorf("failed to check (%s) with fsck:\n%w", diskPartition.Path, err)
+			}
 		}
 	}
 
