@@ -76,17 +76,8 @@ then
     MACROS+=("--macros=''")
 fi
 
-# The CMAKE macro is problematic, it needs to be adjusted based on the CMAKE_MAJOR_VERSION variable.
-# This is based on %version from the specfile, so grab that.
-cmake_spec_version=$(rpmspec --query --qf "%{version}" $REPO_ROOT/SPECS/cmake/cmake.spec)
-# Major version is defined via %global major_version #, can't use rpmspec to read that...
-cmake_spec_major_version=$(grep -E '^%global major_version' $REPO_ROOT/SPECS/cmake/cmake.spec | awk '{print $3}')
-cmake_macros_file_path="$RPM_OPS_MACROS_DIRECTORY/macros.cmake$cmake_spec_version"
-cp "$REPO_ROOT/SPECS/cmake/macros.cmake" "$cmake_macros_file_path"
-sed -i -e "s|@@CMAKE_VERSION@@|$cmake_spec_version|" -e "s|@@CMAKE_MAJOR_VERSION@@|$cmake_spec_major_version|" "$cmake_macros_file_path"
-
 # Add all macro files we know about to the list of macros to load, except cmake where we need to use the custom one.
-for macro_file in $rpm_package_macros_file_path $cmake_macros_file_path "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+for macro_file in $rpm_package_macros_file_path "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
