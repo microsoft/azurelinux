@@ -2244,7 +2244,6 @@
                 "networkd-dispatcher",
                 "nlohmann-json",
                 "nmap",
-                "nmi",
                 "node-problem-detector",
                 "ntopng",
                 "opentelemetry-cpp",
