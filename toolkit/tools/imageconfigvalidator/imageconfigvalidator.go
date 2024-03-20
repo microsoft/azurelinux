@@ -118,7 +118,7 @@ func validatePackages(config configuration.Config) (err error) {
 		verityDebugPkgName = "verity-read-only-root-debug-tools"
 		dracutFipsPkgName  = "dracut-fips"
 		fipsKernelCmdLine  = "fips=1"
-		grub2PkgName       = "grub2"
+		grub2PkgName       = "grub2-mkconfig"
 	)
 
 	for _, systemConfig := range config.SystemConfigs {

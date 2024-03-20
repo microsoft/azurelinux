@@ -6,7 +6,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -152,6 +152,7 @@ Unsigned GRUB UEFI image
 %package efi-binary
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
+Requires:       %{name}-mkconfig
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -166,6 +167,7 @@ GRUB UEFI bootloader binaries
 %package efi-binary-noprefix
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
+Requires:       %{name}-mkconfig
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
@@ -185,6 +187,13 @@ Group:          System Environment/Base
 %description configuration
 Directory for package-specific boot configurations
 to be persistently stored on AzureLinux
+
+%package mkconfig
+Summary:        Minimal set of utilities to configure a grub-based system
+Group:          System Environment/Base
+
+%description mkconfig
+Minimal set of utilities to configure a grub-based system
 
 %prep
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
@@ -339,6 +348,22 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %{_sysconfdir}/sysconfig/grub
 %attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
 %ghost %config(noreplace) /boot/%{name}/grub.cfg
+%exclude %{_datarootdir}/grub/grub-mkconfig_lib
+%exclude /sbin/grub2-probe
+%exclude /sbin/grub2-mkconfig
+%exclude %{_bindir}/grub2-editenv
+%exclude %{_bindir}/grub2-script-check
+%exclude %{_bindir}/grub2-file
+%exclude %{_bindir}/grub2-mkrelpath
+
+%files mkconfig
+%{_datarootdir}/grub/grub-mkconfig_lib
+/sbin/grub2-probe
+/sbin/grub2-mkconfig
+%{_bindir}/grub2-editenv
+%{_bindir}/grub2-script-check
+%{_bindir}/grub2-file
+%{_bindir}/grub2-mkrelpath
 
 %ifarch x86_64
 %files pc
@@ -388,7 +413,10 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
-* Wed Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
+* Tue Mar 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-17
+- Introduce grub2-mkconfig subpackage
+
+* Wed Mar 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
 - Updated sbat.csv.in to reflect new distro name.
 
 * Tue Mar 05 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-15

@@ -2,7 +2,7 @@
     "packages": [
         "shim-unsigned",
         "grub2-efi-binary",
-        "grub2",
+        "grub2-mkconfig",
         "ca-certificates",
         "cronie-anacron",
         "logrotate",
