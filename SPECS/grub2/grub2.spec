@@ -5,8 +5,8 @@
 %global gnulibversion 9f48fb992a3d7e96610c4ce8be969cff2d61a01b
 Summary:        GRand Unified Bootloader
 Name:           grub2
-Version:        2.12
-Release:        1%{?dist}
+Version:        2.06
+Release:        12%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,7 +16,7 @@ Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{versi
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 Source3:        macros.grub2
-Patch0001:      revert-cflags-for-mkimage.patch
+#Patch0001:      revert-cflags-for-mkimage.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3
