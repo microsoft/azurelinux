@@ -1,6 +1,6 @@
 Name:           python-rich
 Version:        13.7.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Render rich text and beautiful formatting in the terminal
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ URL:            https://github.com/Textualize/rich
 Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
 
 BuildArch:      noarch
- 
+
 # Fix tests with Python 3.13 - submitted upstream
 Patch0:         fix-tests-python-3.13.patch
 
@@ -20,48 +20,49 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-poetry
 BuildRequires:  python3-pytest
 BuildRequires:  python3-setuptools
- 
+
 %description
 Rich is a Python library for rich text and beautiful formatting in the terminal.
 The Rich API makes it easy to add color and style to terminal output. Rich can
 also render pretty tables, progress bars, markdown, syntax highlighted source
 code, tracebacks, and more — out of the box.
- 
+
 %package -n     python3-rich
 Summary:        %{summary}
 # This was previously misnamed, remove the obsolete in Fedora 38, EPEL 10
 Obsoletes:      python-rich < 10.16.1-2
- 
+
 %description -n python3-rich
 Rich is a Python library for rich text and beautiful formatting in the terminal.
 The Rich API makes it easy to add color and style to terminal output. Rich can
 also render pretty tables, progress bars, markdown, syntax highlighted source
 code, tracebacks, and more — out of the box.
- 
+
 %prep
 %autosetup -p1 -n rich-%{version}
- 
+
 %generate_buildrequires
 %pyproject_buildrequires -r
- 
+
 %build
 %pyproject_wheel
 %install
 %pyproject_install
 %pyproject_save_files rich
- 
+
 %check
 # add below to make sure initial build will catch runtime import errors
 %pyproject_check_import
 %pytest -vv
- 
+
 %files -n python3-rich -f %{pyproject_files}
 %license LICENSE
 %doc README.md
- 
+
 %changelog
 * Mon Mar 18 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 13.7.1
-- Initial CBL-Mariner import from Fedora 41 (license: MIT).  License verified.
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified.
 
 * Thu Mar 14 2024 Parag Nemade <pnemade@fedoraproject.org> - 13.7.1-1
 - local build
