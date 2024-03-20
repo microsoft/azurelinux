@@ -66,7 +66,7 @@
 Summary: Software framework for cross-language services development
 Name:    thrift
 Version: 0.15.0
-Release: 1%{?dist}
+Release: 5%{?dist}
 
 # Parts of the source are used under the BSD and zlib licenses, but
 # these are OK for inclusion in an Apache 2.0-licensed whole:
@@ -93,8 +93,8 @@ Patch1: configure-java-prefix.patch
 # subpackages, to facilitate enabling or disabling individual language
 # bindings in the future
 
-BuildRequires:  pkgconfig(libcrypto)
-BuildRequires:python3-six
+BuildRequires: pkgconfig(libcrypto)
+BuildRequires: python3-six
 %if 0%{?want_java} > 0
 BuildRequires: ant >= 1.7
 %endif
@@ -406,7 +406,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
-* Tue Mar 19 2024 Himaja Kesari <himajakesari@microsoft.com>
+* Tue Mar 19 2024 Himaja Kesari <himajakesari@microsoft.com> - 0.15.0-5
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
 
