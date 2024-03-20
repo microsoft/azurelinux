@@ -25,23 +25,6 @@ func TestOSInvalidAdditionalFiles(t *testing.T) {
 	testInvalidYamlValue[*OS](t, "{ \"additionalFiles\": { \"a.txt\": [] } }")
 }
 
-func TestOSIsValidDuplicatePartitionID(t *testing.T) {
-	value := OS{
-		PartitionSettings: []PartitionSetting{
-			{
-				ID: "a",
-			},
-			{
-				ID: "a",
-			},
-		},
-	}
-
-	err := value.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate partitionSettings ID")
-}
-
 func TestOSIsValidVerityInValidPartUuid(t *testing.T) {
 	invalidVerity := OS{
 		Verity: &Verity{

@@ -226,7 +226,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 }
 
 func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Disks != nil
+	return config.Storage != nil
 }
 
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {

@@ -1,22 +1,22 @@
-disks:
-- partitionTableType: gpt
-  maxSize: 4096
-  partitions:
-  - id: efi
-    flags:
-    - esp
-    - boot
-    start: 1
-    end: 65
-    fileSystemType: fat32
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096
+    partitions:
+    - id: efi
+      flags:
+      - esp
+      - boot
+      start: 1
+      end: 65
+      fileSystemType: fat32
 
-  - id: rootfs
-    start: 65
-    fileSystemType: ext4
+    - id: rootfs
+      start: 65
+      fileSystemType: ext4
 
-os:
   bootType: efi
-  resetBootLoaderType: hard-reset
+
   partitionSettings:
   - id: efi
     mountPoint: /boot/efi
@@ -24,6 +24,9 @@ os:
 
   - id: rootfs
     mountPoint: /
+
+os:
+  resetBootLoaderType: hard-reset
 
   packages:
     remove:
