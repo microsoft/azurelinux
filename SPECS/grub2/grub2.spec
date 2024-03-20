@@ -93,6 +93,7 @@ Requires:       device-mapper
 Requires:       systemd-udev
 Requires:       xz
 Requires:       %{name}-configuration = %{version}-%{release}
+Requires:       %{name}-mkconfig = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
