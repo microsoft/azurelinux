@@ -1,9 +1,9 @@
 #!/bin/sh
-if [ "q$1" == "q" ]; then
+if [ "q$1" = "q" ]; then
 	echo "Usage: $0 <kernel version> <distro version>"
 	exit 1
 fi
-if [ "q$2" == "q" ]; then
+if [ "q$2" = "q" ]; then
 	echo "Usage: $0 <kernel version> <distro version>"
 	exit 1
 fi

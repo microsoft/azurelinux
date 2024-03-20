@@ -1,5 +1,4 @@
 %define _legacy_common_support 1
-%define mariner_version 3
 
 Name:		   usbip
 Summary:	   USB/IP user-space
@@ -9,7 +8,7 @@ License:	   GPLv2+
 Vendor:            Microsoft Corporation
 Distribution:   Azure Linux
 Group:             System/Kernel
-# https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz
+# https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%%{azl}/%%{version}.tar.gz
 # In the interests of keeping the source rpm from being ridiculously large,
 # download the Linux kernel from above and run `extract_usbip.sh <version> <mariner_version>`
 # in the SOURCE directory.
