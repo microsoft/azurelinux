@@ -12,16 +12,15 @@ type BootType string
 const (
 	BootTypeEfi    BootType = "efi"
 	BootTypeLegacy BootType = "legacy"
-	BootTypeUnset  BootType = ""
 )
 
 func (t BootType) IsValid() error {
 	switch t {
-	case BootTypeEfi, BootTypeLegacy, BootTypeUnset:
+	case BootTypeEfi, BootTypeLegacy:
 		// All good.
 		return nil
 
 	default:
-		return fmt.Errorf("invalid BootType value (%v)", t)
+		return fmt.Errorf("invalid bootType value (%v)", t)
 	}
 }

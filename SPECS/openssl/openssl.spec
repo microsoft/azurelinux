@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -89,7 +89,6 @@ BuildRequires: perl(Test::More)
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: coreutils
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -359,6 +358,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Mar 13 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
+- Remove runtime dependency on coreutils
+
 * Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3
 - Remove dependencies for the libs sub-package to realign with azure linux 2.0
 

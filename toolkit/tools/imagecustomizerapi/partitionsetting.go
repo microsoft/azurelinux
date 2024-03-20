@@ -10,21 +10,21 @@ import (
 
 // PartitionSetting holds the mounting information for each partition.
 type PartitionSetting struct {
-	ID              string              `yaml:"ID"`
-	MountIdentifier MountIdentifierType `yaml:"MountIdentifier"`
-	MountOptions    string              `yaml:"MountOptions"`
-	MountPoint      string              `yaml:"MountPoint"`
+	ID                  string              `yaml:"id"`
+	MountIdentifierType MountIdentifierType `yaml:"mountIdentifierType"`
+	MountOptions        string              `yaml:"mountOptions"`
+	MountPoint          string              `yaml:"mountPoint"`
 }
 
 // IsValid returns an error if the PartitionSetting is not valid
 func (p *PartitionSetting) IsValid() error {
-	err := p.MountIdentifier.IsValid()
+	err := p.MountIdentifierType.IsValid()
 	if err != nil {
 		return err
 	}
 
 	if p.MountPoint != "" && !path.IsAbs(p.MountPoint) {
-		return fmt.Errorf("MountPoint (%s) must be an absolute path", p.MountPoint)
+		return fmt.Errorf("mountPoint (%s) must be an absolute path", p.MountPoint)
 	}
 
 	return nil

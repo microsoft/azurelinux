@@ -11,30 +11,33 @@ import (
 
 func TestConfigIsValid(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "esp",
-					FsType: "fat32",
-					Start:  1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "esp",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"esp",
+							"boot",
+						},
 					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
 			BootType: "efi",
-			Hostname: "test",
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:         "esp",
 					MountPoint: "/boot/efi",
 				},
 			},
+		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 		},
 	}
 
@@ -44,23 +47,26 @@ func TestConfigIsValid(t *testing.T) {
 
 func TestConfigIsValidLegacy(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "boot",
-					FsType: "fat32",
-					Start:  1,
-					Flags: []PartitionFlag{
-						"bios_grub",
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "boot",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"bios-grub",
+						},
 					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
 			BootType: "legacy",
-			Hostname: "test",
+		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 		},
 	}
 
@@ -70,42 +76,78 @@ func TestConfigIsValidLegacy(t *testing.T) {
 
 func TestConfigIsValidNoBootType(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "a",
-					FsType: "ext4",
-					Start:  1,
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "a",
+						FileSystemType: "ext4",
+						Start:          1,
+					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
+		},
+		OS: OS{
+			Hostname:            "test",
+			ResetBootLoaderType: "hard-reset",
+		},
+	}
+
+	err := config.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "bootType")
+}
+
+func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
+	config := &Config{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "esp",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"esp",
+							"boot",
+						},
+					},
+				},
+			}},
+			BootType: "efi",
+		},
+		OS: OS{
 			Hostname: "test",
 		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "BootType")
-	assert.ErrorContains(t, err, "Disks")
+	assert.ErrorContains(t, err, "os.resetBootLoaderType and storage must be specified together")
 }
 
 func TestConfigIsValidMultipleDisks(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{
-			{
-				PartitionTableType: "gpt",
-				MaxSize:            1,
+		Storage: &Storage{
+			Disks: []Disk{
+				{
+					PartitionTableType: "gpt",
+					MaxSize:            1,
+				},
+				{
+					PartitionTableType: "gpt",
+					MaxSize:            1,
+				},
 			},
-			{
-				PartitionTableType: "gpt",
-				MaxSize:            1,
-			},
+			BootType: "legacy",
 		},
-		SystemConfig: SystemConfig{
-			Hostname: "test",
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 		},
 	}
 
@@ -116,20 +158,23 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 
 func TestConfigIsValidZeroDisks(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{},
-		SystemConfig: SystemConfig{
+		Storage: &Storage{
+			BootType: BootTypeEfi,
+			Disks:    []Disk{},
+		},
+		OS: OS{
 			Hostname: "test",
 		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "1 disk")
+	assert.ErrorContains(t, err, "at least 1 disk must be specified")
 }
 
 func TestConfigIsValidBadHostname(t *testing.T) {
 	config := &Config{
-		SystemConfig: SystemConfig{
+		OS: OS{
 			Hostname: "test_",
 		},
 	}
@@ -141,30 +186,36 @@ func TestConfigIsValidBadHostname(t *testing.T) {
 
 func TestConfigIsValidBadDisk(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            0,
-		}},
-		SystemConfig: SystemConfig{
+		Storage: &Storage{
+			BootType: BootTypeEfi,
+			Disks: []Disk{{
+				PartitionTableType: PartitionTableTypeGpt,
+				MaxSize:            0,
+			}},
+		},
+		OS: OS{
 			Hostname: "test",
 		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestConfigIsValidMissingEsp(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions:         []Partition{},
-		}},
-		SystemConfig: SystemConfig{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions:         []Partition{},
+			}},
 			BootType: "efi",
-			Hostname: "test",
+		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 		},
 	}
 
@@ -176,43 +227,45 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 
 func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions:         []Partition{},
-		}},
-		SystemConfig: SystemConfig{
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions:         []Partition{},
+			}},
 			BootType: "legacy",
-			Hostname: "test",
+		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "bios_grub")
+	assert.ErrorContains(t, err, "bios-grub")
 	assert.ErrorContains(t, err, "legacy")
 }
 
 func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "esp",
-					FsType: "fat32",
-					Start:  1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "esp",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"esp",
+							"boot",
+						},
 					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
 			BootType: "efi",
-			Hostname: "test",
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:         "esp",
@@ -220,34 +273,37 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				},
 			},
 		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
+		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MountPoint")
+	assert.ErrorContains(t, err, "mountPoint")
 	assert.ErrorContains(t, err, "absolute path")
 }
 
 func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "esp",
-					FsType: "fat32",
-					Start:  1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "esp",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"esp",
+							"boot",
+						},
 					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
 			BootType: "efi",
-			Hostname: "test",
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:         "boot",
@@ -255,74 +311,47 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 				},
 			},
 		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
+		},
 	}
 
 	err := config.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "ID")
-}
-
-func TestConfigIsValidPartitionSettingsMissingDisks(t *testing.T) {
-	config := &Config{
-		SystemConfig: SystemConfig{
-			Hostname: "test",
-			PartitionSettings: []PartitionSetting{
-				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
-				},
-			},
-		},
-	}
-	err := config.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "Disks")
-	assert.ErrorContains(t, err, "BootType")
-	assert.ErrorContains(t, err, "PartitionSettings")
-}
-
-func TestConfigIsValidBootTypeMissingDisks(t *testing.T) {
-	config := &Config{
-		SystemConfig: SystemConfig{
-			Hostname: "test",
-			BootType: BootTypeEfi,
-			KernelCommandLine: KernelCommandLine{
-				ExtraCommandLine: "console=ttyS0",
-			},
-		},
-	}
-	err := config.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "SystemConfig.BootType and Disks must be specified together")
+	assert.ErrorContains(t, err, "id")
 }
 
 func TestConfigIsValidKernelCLI(t *testing.T) {
 	config := &Config{
-		Disks: &[]Disk{{
-			PartitionTableType: "gpt",
-			MaxSize:            2,
-			Partitions: []Partition{
-				{
-					ID:     "esp",
-					FsType: "fat32",
-					Start:  1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
+		Storage: &Storage{
+			Disks: []Disk{{
+				PartitionTableType: "gpt",
+				MaxSize:            2,
+				Partitions: []Partition{
+					{
+						ID:             "esp",
+						FileSystemType: "fat32",
+						Start:          1,
+						Flags: []PartitionFlag{
+							"esp",
+							"boot",
+						},
 					},
 				},
-			},
-		}},
-		SystemConfig: SystemConfig{
+			}},
 			BootType: "efi",
-			Hostname: "test",
 			PartitionSettings: []PartitionSetting{
 				{
 					ID:         "esp",
 					MountPoint: "/boot/efi",
 				},
 			},
+		},
+		OS: OS{
+			ResetBootLoaderType: "hard-reset",
+			Hostname:            "test",
 			KernelCommandLine: KernelCommandLine{
 				ExtraCommandLine: "console=ttyS0",
 			},

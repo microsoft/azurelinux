@@ -503,11 +503,11 @@ If that is not desired all remote sources can be disabled by clearing the follow
 
 #### `CLEAN_TOOLCHAIN_CONTAINERS=...`
 
-##### `CLEAN_TOOLCHAIN_CONTAINERS=n`
+##### `CLEAN_TOOLCHAIN_CONTAINERS=`**`n`** *(default)*`
 
-> Leave the raw toolchain containers in docker when running `make clean`. If they match the configuration of the current build they will be re-used.
+> Leave the raw toolchain containers in docker when running `make clean`. If they match the configuration of the current build they will be re-used. Run `clean-toolchain-containers` to clean them manually.
 
-##### `CLEAN_TOOLCHAIN_CONTAINERS=`**`y`** *(default)*
+##### `CLEAN_TOOLCHAIN_CONTAINERS=y`
 
 > Delete all `marinertoolchain*` containers and images associated with this working directory when running `make clean`.
 
