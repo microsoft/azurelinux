@@ -19,6 +19,7 @@ Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2024-24806.patch
+Patch3:         CVE-2024-22025.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
