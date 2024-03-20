@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "cert-manager-1.11.2-govendor.tar.gz": "19fd0c6c70b04906a0bfccb0e900ab018cae2f677519523e927b39a724540b75",
-  "cert-manager-1.11.2.tar.gz": "43755f8b58824de92a3f0b48820068c63599c7a75f1e6a0d994fc0e0a04f808b"
+  "cert-manager-1.14.4-govendor.tar.gz": "1f1f026f491da1c82a8a085cbec68bc32ec37a908fa9a6e7e899df128b6f9eee",
+  "cert-manager-1.14.4.tar.gz": "f9b68c18840d7590e3c0691d9827b63ede30cbdcd21604312034f32d23bf1a3e"
  }
 }
