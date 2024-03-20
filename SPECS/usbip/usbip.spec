@@ -10,7 +10,7 @@ Distribution:   Azure Linux
 Group:             System/Kernel
 # https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%%{azl}/%%{version}.tar.gz
 # In the interests of keeping the source rpm from being ridiculously large,
-# download the Linux kernel from above and run `extract_usbip.sh <version> <mariner_version>`
+# download the Linux kernel from above and run `extract_usbip.sh <version> <azure_linux_version>`
 # in the SOURCE directory.
 URL:		   https://github.com/microsoft/CBL-Mariner-Linux-Kernel
 # The kernel modules require working USB and there's no USB for s390x
