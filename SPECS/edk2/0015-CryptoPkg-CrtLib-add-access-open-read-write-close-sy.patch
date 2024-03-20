@@ -1,0 +1,138 @@
+From c3ea169e825a03c54c846ca3edf256a9ad045b81 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 28 Aug 2023 13:27:09 +0200
+Subject: [PATCH 15/17] CryptoPkg/CrtLib: add access/open/read/write/close
+ syscalls
+
+needed by rhel downstream openssl patches
+---
+ CryptoPkg/Library/Include/CrtLibSupport.h     | 41 +++++++++++++++++
+ .../Library/BaseCryptLib/SysCall/CrtWrapper.c | 46 +++++++++++++++++++
+ 2 files changed, 87 insertions(+)
+
+diff --git a/CryptoPkg/Library/Include/CrtLibSupport.h b/CryptoPkg/Library/Include/CrtLibSupport.h
+index f36fe08f0c61..7d98496af80b 100644
+--- a/CryptoPkg/Library/Include/CrtLibSupport.h
++++ b/CryptoPkg/Library/Include/CrtLibSupport.h
+@@ -78,6 +78,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
+ //
+ // Definitions for global constants used by CRT library routines
+ //
++#define EINTR         4
+ #define EINVAL        22              /* Invalid argument */
+ #define EAFNOSUPPORT  47              /* Address family not supported by protocol family */
+ #define INT_MAX       0x7FFFFFFF      /* Maximum (signed) int value */
+@@ -102,6 +103,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
+ #define NS_INADDRSZ   4   /*%< IPv4 T_A */
+ #define NS_IN6ADDRSZ  16  /*%< IPv6 T_AAAA */
+ 
++#define O_RDONLY        00000000
++#define O_WRONLY        00000001
++#define O_RDWR          00000002
++
++#define R_OK  4
++#define W_OK  2
++#define X_OK  1
++#define F_OK  0
++
+ //
+ // Basic types mapping
+ //
+@@ -324,6 +334,37 @@ fprintf     (
+   ...
+   );
+ 
++int
++access(
++  const char*,
++  int
++  );
++
++int
++open (
++  const char *,
++  int
++  );
++
++ssize_t
++read (
++  int,
++  void*,
++  size_t
++  );
++
++ssize_t
++write (
++  int,
++  const void*,
++  size_t
++  );
++
++int
++close (
++  int
++  );
++
+ time_t
+ time        (
+   time_t *
+diff --git a/CryptoPkg/Library/BaseCryptLib/SysCall/CrtWrapper.c b/CryptoPkg/Library/BaseCryptLib/SysCall/CrtWrapper.c
+index 37cdecc9bd1d..dfdb63553667 100644
+--- a/CryptoPkg/Library/BaseCryptLib/SysCall/CrtWrapper.c
++++ b/CryptoPkg/Library/BaseCryptLib/SysCall/CrtWrapper.c
+@@ -550,6 +550,52 @@ fread (
+   return 0;
+ }
+ 
++int
++access(
++  const char*,
++  int
++  )
++{
++  return -1;
++}
++
++int
++open (
++  const char *,
++  int
++  )
++{
++  return -1;
++}
++
++ssize_t
++read (
++  int,
++  void*,
++  size_t
++  )
++{
++  return -1;
++}
++
++ssize_t
++write (
++  int,
++  const void*,
++  size_t
++  )
++{
++  return -1;
++}
++
++int
++close (
++  int
++  )
++{
++  return -1;
++}
++
+ uid_t
+ getuid (
+   void
+-- 
+2.43.1
+
