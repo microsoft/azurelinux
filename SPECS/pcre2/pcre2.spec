@@ -236,7 +236,7 @@ make check -j1
 %{_libdir}/*.a
 
 %changelog
-* Fri Mar 20 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 10.42-2
+* Wed Mar 20 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 10.42-2
 - Removed pcre2-doc subpackage as runtime requirement for the main package and tools subpackage.
 
 * Mon Jul 31 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 10.42-1
