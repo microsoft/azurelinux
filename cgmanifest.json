@@ -28946,8 +28946,8 @@
         "type": "other",
         "other": {
           "name": "usbip",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-6.6.14.1.tar.xz"
         }
       }
     },
