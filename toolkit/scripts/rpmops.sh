@@ -76,7 +76,7 @@ then
     MACROS+=("--macros=''")
 fi
 
-# Add all macro files we know about to the list of macros to load, except cmake where we need to use the custom one.
+# Add all macro files we would have in the chroot.
 for macro_file in $rpm_package_macros_file_path "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
