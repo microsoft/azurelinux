@@ -1,6 +1,6 @@
 [azurelinux-official-ms-non-oss]
-name=Azure Linux Official Extras $releasever $basearch
-baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/extras/$basearch
+name=Azure Linux Official Microsoft Non-Open-Source $releasever $basearch
+baseurl=https://packages.microsoft.com/azurelinux/$releasever/prod/ms-non-oss/$basearch
 gpgkey=file:///etc/pki/rpm-gpg/MICROSOFT-RPM-GPG-KEY file:///etc/pki/rpm-gpg/MICROSOFT-METADATA-GPG-KEY
 gpgcheck=1
 repo_gpgcheck=1
