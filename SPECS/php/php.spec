@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.22
-Release:        2%{?dist}
+Version:        8.3.4
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1515,6 +1515,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Wed Mar 20 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 8.3.4-1
+- Auto-upgrade to 8.3.4 - Azure Linux 3.0 - package upgrades
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
