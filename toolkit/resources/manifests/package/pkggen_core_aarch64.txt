@@ -50,9 +50,9 @@ bzip2-devel-1.0.8-1.azl3.aarch64.rpm
 bzip2-libs-1.0.8-1.azl3.aarch64.rpm
 sed-4.9-1.azl3.aarch64.rpm
 sed-lang-4.9-1.azl3.aarch64.rpm
-procps-ng-4.0.4-1.azl3.aarch64.rpm
-procps-ng-devel-4.0.4-1.azl3.aarch64.rpm
-procps-ng-lang-4.0.4-1.azl3.aarch64.rpm
+procps-ng-4.0.4-2.azl3.aarch64.rpm
+procps-ng-devel-4.0.4-2.azl3.aarch64.rpm
+procps-ng-lang-4.0.4-2.azl3.aarch64.rpm
 m4-1.4.19-2.azl3.aarch64.rpm
 grep-3.11-2.azl3.aarch64.rpm
 grep-lang-3.11-2.azl3.aarch64.rpm
