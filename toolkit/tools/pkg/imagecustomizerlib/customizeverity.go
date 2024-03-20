@@ -213,8 +213,12 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
 func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
 	switch idType {
-	case imagecustomizerapi.IdTypePartLabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartUuid:
-		return fmt.Sprintf("%s=%s", strings.ToUpper(string(idType)), id), nil
+	case imagecustomizerapi.IdTypePartLabel:
+		return fmt.Sprintf("%s=%s", "PARTLABEL", id), nil
+	case imagecustomizerapi.IdTypeUuid:
+		return fmt.Sprintf("%s=%s", "UUID", id), nil
+	case imagecustomizerapi.IdTypePartUuid:
+		return fmt.Sprintf("%s=%s", "PARTUUID", id), nil
 	default:
 		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
 	}
