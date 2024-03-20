@@ -146,7 +146,6 @@ sed -r -i 's/(oldest-supported-)(numpy)/\2/' python/pyproject.toml
  
 
 %build
-cd /usr/src/mariner/BUILD/apache-arrow-15.0.0 
 pushd cpp
 %cmake \
   -DARROW_FLIGHT:BOOL=ON \
@@ -176,8 +175,6 @@ export VERBOSE=1
 export GCC_COLORS=
 %cmake_build
 popd
- 
-export LD_LIBRARY_PATH=/usr/src/mariner/BUILD/apache-arrow-15.0.0/cpp/build/relwithdebinfo/:$LD_LIBRARY_PATH
 rm -rf /tmp/usr
  
 #--------------------------------------------------------------------
