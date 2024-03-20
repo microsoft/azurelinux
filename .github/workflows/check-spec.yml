@@ -61,4 +61,4 @@ jobs:
 
       - name: Verify .spec files
         if: ${{ env.updated-specs != '' }}
-        run: python3 toolkit/scripts/check_spec_guidelines.py --toolchain_specs  ${{ env.toolchain-spec-list }} --specs ${{ env.updated-specs }}
+        run: python3 toolkit/scripts/check_spec_guidelines.py --toolchain_specs  "${{ env.toolchain-spec-list }}" --specs ${{ env.updated-specs }}
