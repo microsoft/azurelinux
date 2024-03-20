@@ -55,11 +55,11 @@ rm distlib/*.exe
 %pyproject_save_files %{srcname}
 
 # package is building, but tests hang, so skipping for now
-# %if %{with_check}
-# %check
-# export PYTHONHASHSEED=0
-# export SKIP_ONLINE=1
-# pip3 install exceptiongroup iniconfig tomli
+%if %{with_check}
+%check
+export PYTHONHASHSEED=0
+export SKIP_ONLINE=1
+pip3 install exceptiongroup iniconfig tomli
 
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
@@ -68,8 +68,8 @@ rm distlib/*.exe
 # test_is_writable assumes we're not the root user
 # and does not like that we have write access to /etc
 
-# %pytest -k "not test_is_writable and not test_sequencer_basic"
-# %endif
+%pytest -k "not test_is_writable and not test_sequencer_basic"
+%endif
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
