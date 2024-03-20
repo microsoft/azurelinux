@@ -13,7 +13,7 @@ Source1:        etcd.service
 # In order to regenerate this tarball, download the source tarball and run:
 #   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang >= 1.21
+BuildRequires:  golang >= 1.20.13
 
 %description
 A highly-available key value store for shared configuration and service discovery.
