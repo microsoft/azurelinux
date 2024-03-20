@@ -39,8 +39,7 @@ version_release_matching_groups = [
 version_matching_groups = [
     frozenset([
         "SPECS/hyperv-daemons/hyperv-daemons.spec",
-        "SPECS/kernel/kernel.spec",
-        "SPECS/usbip/usbip.spec"
+        "SPECS/kernel/kernel.spec"
     ]),
     frozenset([
         "SPECS/python-flit/python-flit.spec",
