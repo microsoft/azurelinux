@@ -1,27 +1,30 @@
-disks:
-- partitionTableType: gpt
-  maxSize: 4096
-  partitions:
-  - id: boot
-    flags:
-    - bios-grub
-    start: 1
-    size: 8
-    fileSystemType: fat32
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096
+    partitions:
+    - id: boot
+      flags:
+      - bios-grub
+      start: 1
+      size: 8
+      fileSystemType: fat32
 
-  - id: rootfs
-    start: 9
-    fileSystemType: ext4
+    - id: rootfs
+      start: 9
+      fileSystemType: ext4
 
-os:
   bootType: legacy
-  resetBootLoaderType: hard-reset
+
   partitionSettings:
   - id: boot
 
   - id: rootfs
     mountPoint: /
-    
+
+os:
+  resetBootLoaderType: hard-reset
+
   packages:
     install:
     - grub2
