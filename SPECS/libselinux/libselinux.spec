@@ -1,7 +1,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        3.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,7 +79,7 @@ make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{
 
 mkdir -p %{buildroot}%{_libdir}/tmpfiles.d
 mkdir -p %{buildroot}%{_localstatedir}/run/setrans
-echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libselinux.conf
+echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libselinux.conf
 
 %ldconfig_scriptlets
 
@@ -110,6 +110,10 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 3.6-2
+- fix tmpfiles.d conf to avoid "Line references path below legacy directory
+  /var/run/" warnings
+
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
 - Upgrade to version 3.6
 - Build against pcre2

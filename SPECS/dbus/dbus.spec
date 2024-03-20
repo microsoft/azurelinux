@@ -2,7 +2,7 @@
 Summary:        DBus for systemd
 Name:           dbus
 Version:        1.15.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,7 @@ autoreconf -i
     --docdir=%{_versioneddocdir}  \
     --enable-libaudit=yes \
     --enable-selinux=yes \
+    --runstatedir=/run \
     --with-console-auth-dir=/run/console
 
 make %{?_smp_mflags}
@@ -91,6 +92,10 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 1.15.8-2
+- specify runstatedir to avoid "Line references path below legacy
+  directory /var/run/" warnings
+
 * Thu Jan 04 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.15.8-1
 - Upgrade to 1.15.8
 

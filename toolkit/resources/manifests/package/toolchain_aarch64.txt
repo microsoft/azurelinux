@@ -206,11 +206,11 @@ libpipeline-debuginfo-1.5.7-1.azl3.aarch64.rpm
 libpipeline-devel-1.5.7-1.azl3.aarch64.rpm
 libpkgconf-2.0.2-1.azl3.aarch64.rpm
 libpkgconf-devel-2.0.2-1.azl3.aarch64.rpm
-libselinux-3.6-1.azl3.aarch64.rpm
-libselinux-debuginfo-3.6-1.azl3.aarch64.rpm
-libselinux-devel-3.6-1.azl3.aarch64.rpm
-libselinux-python3-3.6-1.azl3.aarch64.rpm
-libselinux-utils-3.6-1.azl3.aarch64.rpm
+libselinux-3.6-2.azl3.aarch64.rpm
+libselinux-debuginfo-3.6-2.azl3.aarch64.rpm
+libselinux-devel-3.6-2.azl3.aarch64.rpm
+libselinux-python3-3.6-2.azl3.aarch64.rpm
+libselinux-utils-3.6-2.azl3.aarch64.rpm
 libsepol-3.6-1.azl3.aarch64.rpm
 libsepol-debuginfo-3.6-1.azl3.aarch64.rpm
 libsepol-devel-3.6-1.azl3.aarch64.rpm
