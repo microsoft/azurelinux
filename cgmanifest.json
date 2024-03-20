@@ -12771,8 +12771,8 @@
         "type": "other",
         "other": {
           "name": "maven-resolver",
-          "version": "1.7.3",
-          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.7.3-source-release.zip"
+          "version": "1.9.15",
+          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.9.15-source-release.zip"
         }
       }
     },
