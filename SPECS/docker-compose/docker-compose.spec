@@ -1,8 +1,8 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.24.6
-Release:        1%{?dist}
-License:        MIT
+Release:        2%{?dist}
+License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Tools/Container
@@ -44,6 +44,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Wed Mar 20 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.24.6-2
+- Correct license to ASL 2.0
+
 * Mon Feb 26 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.24.6-1
 - Rename spec from moby-compose to docker-compose
 - Bump version to 2.24.6
