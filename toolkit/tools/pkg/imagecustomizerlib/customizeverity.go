@@ -214,7 +214,7 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
 	switch idType {
 	case imagecustomizerapi.IdTypePartLabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartUuid:
-		return fmt.Sprintf("%s=%s", strings.ToUpper(string(idType)), id), nil
+		return fmt.Sprintf("%s=%s", strings.ToUpper(strings.ReplaceAll(string(idType), "-", "")), id), nil
 	default:
 		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
 	}
