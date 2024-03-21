@@ -17,5 +17,5 @@ func TestIdTypeIsValid(t *testing.T) {
 func TestIdTypeIsValidBadValue(t *testing.T) {
 	err := IdType("bad").IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid IdType value")
+	assert.ErrorContains(t, err, "invalid idType value")
 }

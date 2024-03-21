@@ -10,49 +10,48 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 3. Update packages:
 
-   1. Remove packages ([PackageListsRemove](#packagelistsremove-string),
-   [PackagesRemove](#packagesremove-string))
+   1. Remove packages ([removeLists](#removelists-string),
+   [remove](#remove-string))
 
-   2. Update base image packages ([UpdateBaseImagePackages](#updatebaseimagepackages-bool)).
+   2. Update base image packages ([updateExistingPackages](#updateexistingpackages-bool)).
 
-   3. Install packages ([PackageListsInstall](#packagelistsinstall-string),
-   [PackagesInstall](#packagesinstall-string))
+   3. Install packages ([installLists](#installlists-string),
+   [install](#install-string))
 
-   4. Update packages ([PackageListsUpdate](#packagelistsupdate-string),
-   [PackagesUpdate](#packagesupdate-string))
+   4. Update packages ([updateLists](#removelists-string),
+   [update](#update-string))
 
-4. Update hostname. ([Hostname](#hostname-string))
+4. Update hostname. ([hostname](#hostname-string))
 
-5. Copy additional files. ([AdditionalFiles](#additionalfiles-mapstring-fileconfig))
+5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
 
-6. Add/update users. ([Users](#users-user))
+6. Add/update users. ([users](#users-user))
 
-7. Enable/disable services. ([Services](#services-type))
+7. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([Modules](#modules-type))
+8. Configure kernel modules. ([modules](#modules-type))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
-10. Run post-install scripts. ([PostInstallScripts](#postinstallscripts-script))
+10. Run post-install scripts. ([postInstallScripts](#postinstallscripts-script))
 
-11. If [ResetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
-    If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then
-    append the [ExtraCommandLine](#extracommandline-string) value to the existing
+    If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
+    append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
 12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
 
-13. Run finalize image scripts. ([FinalizeImageScripts](#finalizeimagescripts-script))
+13. Run finalize image scripts. ([finalizeImageScripts](#finalizeimagescripts-script))
 
 14. Delete `/etc/resolv.conf` file.
 
 15. Enable dm-verity root protection.
 
-And if the output format is set to `iso`:
-
-16. Copy additional iso media files ([Iso](#iso-type)).
+16. if the output format is set to `iso`, copy additional iso media files.
+([iso](#iso-type))
 
 ### /etc/resolv.conf
 
@@ -67,166 +66,168 @@ restored to its original contents.
 ### Replacing packages
 
 If you wish to replace a package with conflicting package, then you can remove the
-existing package using [PackagesRemove](#packagesremove-string) and then install the
-new package with [PackagesInstall](#packagesinstall-string).
+existing package using [remove](#remove-string) and then install the
+new package with [install](#install-string).
 
 Example:
 
 ```yaml
-SystemConfig:
-  PackagesRemove:
-  - kernel
+os:
+  packages:
+    remove:
+    - kernel
 
-  PackagesInstall:
-  - kernel-uvm
+    install:
+    - kernel-uvm
 ```
 
 ## Schema Overview
 
-- [Config type](#config-type)
-  - [Disks](#disks-disk)
-    - [Disk type](#disk-type)
-      - [PartitionTableType](#partitiontabletype-string)
-      - [MaxSize](#maxsize-uint64)
-      - [Partitions](#partitions-partition)
-        - [Partition type](#partition-type)
-          - [ID](#id-string)
-          - [FsType](#fstype-string)
-          - [Name](#partition-name)
-          - [Start](#start-uint64)
-          - [End](#end-uint64)
-          - [Size](#size-uint64)
-          - [Flag](#flags-string)
-  - [Iso](#iso-type)
-    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [FileConfig type](#fileconfig-type)
-        - [Path](#path-string)
-        - [Permissions](#permissions-string)
-  - [SystemConfig](#systemconfig-type)
-    - [BootType](#boottype-string)
-    - [ResetBootLoaderType](#resetbootloadertype-string)
-    - [Hostname](#hostname-string)
-    - [KernelCommandLine](#kernelcommandline-type)
-      - [ExtraCommandLine](#extracommandline-string)
-    - [UpdateBaseImagePackages](#updatebaseimagepackages-bool)
-    - [PackageListsInstall](#packagelistsinstall-string)
-      - [PackageList type](#packagelist-type)
-        - [Packages](#packages-string)
-    - [PackagesInstall](#packagesinstall-string)
-    - [PackageListsRemove](#packagelistsremove-string)
-      - [PackageList type](#packagelist-type)
-        - [Packages](#packages-string)
-    - [PackagesRemove](#packagesremove-string)
-    - [PackageListsUpdate](#packagelistsupdate-string)
-    - [PackagesUpdate](#packagesupdate-string)
-    - [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [FileConfig type](#fileconfig-type)
-        - [Path](#path-string)
-        - [Permissions](#permissions-string)
-    - [PartitionSettings](#partitionsettings-partitionsetting)
-      - [PartitionSetting type](#partitionsetting-type)
-        - [ID](#id-string)
-        - [MountIdentifier](#mountidentifier-string)
-        - [MountOptions](#mountoptions-string)
-        - [MountPoint](#mountpoint-string)
-    - [PostInstallScripts](#postinstallscripts-script)
-      - [Script type](#script-type)
-        - [Path](#path-string)
-        - [Args](#args-string)
-    - [FinalizeImageScripts](#finalizeimagescripts-script)
-      - [Script type](#script-type)
-        - [Path](#path-string)
-        - [Args](#args-string)
-    - [Users](#users-user)
-      - [User type](#user-type)
-        - [Name](#user-name)
-        - [UID](#uid-int)
-        - [PasswordHashed](#passwordhashed-bool)
-        - [Password](#password-string)
-        - [PasswordPath](#passwordpath-string)
-        - [PasswordExpiresDays](#passwordexpiresdays-int)
-        - [SSHPubKeyPaths](#sshpubkeypaths-string)
-        - [PrimaryGroup](#primarygroup-string)
-        - [SecondaryGroups](#secondarygroups-string)
-        - [StartupCommand](#startupcommand-string)
-    - [Services](#services-type)
-      -  [Enable](#enable-string)
-      -  [Disable](#disable-string)
-    - [Modules](#modules-type)
-      - [Load](#load-module)
-        - [Module type](#module-type)
-          - [Name](#module-name)
-      - [Disable](#disable-module)
-        - [Module type](#module-type)
-          - [Name](#module-name)
-    - [Verity type](#verity-type)
+- [config type](#config-type)
+  - [disks](#disks-disk)
+    - [disk type](#disk-type)
+      - [partitionTableType](#partitiontabletype-string)
+      - [maxSize](#maxsize-uint64)
+      - [partitions](#partitions-partition)
+        - [partition type](#partition-type)
+          - [id](#id-string)
+          - [fileSystemType](#filesystemtype-string)
+          - [label](#partition-label)
+          - [start](#start-uint64)
+          - [end](#end-uint64)
+          - [size](#size-uint64)
+          - [flag](#flags-string)
+  - [iso](#iso-type)
+    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
+      - [fileConfig type](#fileconfig-type)
+        - [path](#path-string)
+        - [permissions](#permissions-string)
+  - [os type](#os-type)
+    - [bootType](#boottype-string)
+    - [resetBootLoaderType](#resetbootloadertype-string)
+    - [hostname](#hostname-string)
+    - [kernelCommandLine](#kernelcommandline-type)
+      - [extraCommandLine](#extracommandline-string)
+    - [updateBaseImagePackages](#updatebaseimagepackages-bool)
+    - [packageListsInstall](#packagelistsinstall-string)
+      - [packageList type](#packagelist-type)
+        - [packages](#packages-string)
+    - [packagesInstall](#packagesinstall-string)
+    - [packageListsRemove](#packagelistsremove-string)
+      - [packageList type](#packagelist-type)
+        - [packages](#packages-string)
+    - [packagesRemove](#packagesremove-string)
+    - [packageListsUpdate](#packagelistsupdate-string)
+    - [packagesUpdate](#packagesupdate-string)
+    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
+      - [fileConfig type](#fileconfig-type)
+        - [path](#path-string)
+        - [permissions](#permissions-string)
+    - [partitionSettings](#partitionsettings-partitionsetting)
+      - [partitionSetting type](#partitionsetting-type)
+        - [id](#id-string)
+        - [mountIdentifierType](#mountidentifiertype-string)
+        - [mountOptions](#mountoptions-string)
+        - [mountPoint](#mountpoint-string)
+    - [postInstallScripts](#postinstallscripts-script)
+      - [script type](#script-type)
+        - [path](#path-string)
+        - [args](#args-string)
+    - [finalizeImageScripts](#finalizeimagescripts-script)
+      - [script type](#script-type)
+        - [path](#path-string)
+        - [args](#args-string)
+    - [users](#users-user)
+      - [user type](#user-type)
+        - [name](#user-name)
+        - [uid](#uid-int)
+        - [passwordHashed](#passwordhashed-bool)
+        - [password](#password-string)
+        - [passwordPath](#passwordpath-string)
+        - [passwordExpiresDays](#passwordexpiresdays-int)
+        - [sshPublicKeyPaths](#sshpublickeypaths-string)
+        - [primaryGroup](#primarygroup-string)
+        - [secondaryGroups](#secondarygroups-string)
+        - [startupCommand](#startupcommand-string)
+    - [services](#services-type)
+      - [enable](#enable-string)
+      - [disable](#disable-string)
+    - [modules](#modules-type)
+      - [load](#load-module)
+        - [module type](#module-type)
+          - [name](#module-name)
+      - [disable](#disable-module)
+        - [module type](#module-type)
+          - [name](#module-name)
+    - [verity type](#verity-type)
 
 ## Top-level
 
-The top level type for the YAML file is the [Config](#config-type) type.
+The top level type for the YAML file is the [config](#config-type) type.
 
-## Config type
+## config type
 
 The top-level type of the configuration.
 
-### Disks [[Disk](#disk-type)[]]
+### disks [[disk](#disk-type)[]]
 
 Contains the options for provisioning disks and their partitions.
 
 If the Disks field isn't specified, then the partitions of the base image aren't
 changed.
 
-If Disks is specified, then both [SystemConfig.BootType](#boottype-string) and
-[SystemConfig.ResetBootLoaderType](#resetbootloadertype-string) must also be
+If Disks is specified, then both [os.bootType](#boottype-string) and
+[os.resetBootLoaderType](#resetbootloadertype-string) must also be
 specified.
 
 While Disks is a list, only 1 disk is supported at the moment.
 Support for multiple disks may (or may not) be added in the future.
 
 ```yaml
-Disks:
-- PartitionTableType: gpt
-  MaxSize: 4096
-  Partitions:
-  - ID: esp
-    Flags:
+disks:
+- partitionTableType: gpt
+  maxSize: 4096
+  partitions:
+  - id: esp
+    flags:
     - esp
     - boot
-    Start: 1
-    End: 9
-    FsType: fat32
+    start: 1
+    end: 9
+    fileSystemType: fat32
 
-  - ID: rootfs
-    Start: 9
-    FsType: ext4
+  - id: rootfs
+    start: 9
+    fileSystemType: ext4
 
-SystemConfig:
-  BootType: efi
-  PartitionSettings:
-  - ID: esp
-    MountPoint: /boot/efi
-    MountOptions: umask=0077
+os:
+  bootType: efi
+  resetBootLoaderType: hard-reset
+  partitionSettings:
+  - id: esp
+    mountPoint: /boot/efi
+    mountOptions: umask=0077
 
-  - ID: rootfs
-    MountPoint: /
+  - id: rootfs
+    mountPoint: /
 ```
 
-### SystemConfig [[SystemConfig](#systemconfig-type)]
+### os [[os](#os-type)]
 
 Contains the configuration options for the OS.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Hostname: example-image
+os:
+  hostname: example-image
 ```
 
-## Disk type
+## disk type
 
 Specifies the properties of a disk, including its partitions.
 
-### PartitionTableType [string]
+### partitionTableType [string]
 
 Specifies how the partition tables are laid out.
 
@@ -234,76 +235,76 @@ Supported options:
 
 - `gpt`: Use the GUID Partition Table (GPT) format.
 
-### MaxSize [uint64]
+### maxSize [uint64]
 
 The size of the disk, specified in mebibytes (MiB).
 
-### Partitions [[Partition](#partition-type)[]]
+### partitions [[partition](#partition-type)[]]
 
 The partitions to provision on the disk.
 
-## Iso type
+## iso type
 
 Specifies the configuration for the generated ISO media.
 
-### KernelExtraCommandLine [string]
+### kernelExtraCommandLine [string]
 
-- See [ExtraCommandLine](#extracommandline-string).
+- See [extraCommandLine](#extracommandline-string).
 
-### AdditionalFiles
+### additionalFiles
 
-- See [AdditionalFiles](#additionalfiles-mapstring-fileconfig).
+- See [additionalFiles](#additionalfiles-mapstring-fileconfig).
 
-## Verity type
+## verity type
 
 Specifies the configuration for dm-verity root integrity verification.
 
-- DataPartition: A partition configured with dm-verity, which verifies integrity
+- `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
 
-  - IdType: Specifies the type of id for the partition. The options are
-    `PartLabel` (partition label), `Uuid` (filesystem UUID), and `PartUuid`
+  - `idType`: Specifies the type of id for the partition. The options are
+    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
     (partition UUID).
 
-  - Id: The unique identifier value of the partition, corresponding to the
+  - `id`: The unique identifier value of the partition, corresponding to the
     specified IdType.
 
-- HashPartition: A partition used exclusively for storing a calculated hash
+- `hashPartition`: A partition used exclusively for storing a calculated hash
   tree.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Verity:
-    DataPartition:
-      IdType: PartUuid
-      Id: 00000000-0000-0000-0000-000000000000
-    HashPartition:
-      IdType: PartLabel
+os:
+  verity:
+    dataPartition:
+      idType: part-uuid
+      id: 00000000-0000-0000-0000-000000000000
+    hashPartition:
+      idType: part-label
       Id: hash_partition
 ```
 
-## FileConfig type
+## fileConfig type
 
 Specifies options for placing a file in the OS.
 
-Type is used by: [AdditionalFiles](#additionalfiles-mapstring-fileconfig)
+Type is used by: [additionalFiles](#additionalfiles-mapstring-fileconfig)
 
-### Path [string]
+### path [string]
 
 The absolute path of the destination file.
 
 Example:
 
 ```yaml
-SystemConfig:
-  AdditionalFiles:
+os:
+  additionalFiles:
     files/a.txt:
-    - Path: /a.txt
+    - path: /a.txt
 ```
 
-### Permissions [string]
+### permissions [string]
 
 The permissions to set on the destination file.
 
@@ -314,28 +315,28 @@ Supported formats:
 Example:
 
 ```yaml
-SystemConfig:
-  AdditionalFiles:
+os:
+  additionalFiles:
     files/a.txt:
-    - Path: /a.txt
-      Permissions: "664"
+    - path: /a.txt
+      permissions: "664"
 ```
 
-## KernelCommandLine type
+## kernelCommandLine type
 
 Options for configuring the kernel.
 
-### ExtraCommandLine [string]
+### extraCommandLine [string]
 
 Additional Linux kernel command line options to add to the image.
 
-If [ResetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, then the
-`ExtraCommandLine` value will be appended to the new `grub.cfg` file.
+If [resetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, then the
+`extraCommandLine` value will be appended to the new `grub.cfg` file.
 
-If [ResetBootLoaderType](#resetbootloadertype-string) is not set, then the
-`ExtraCommandLine` value will be appended to the existing `grub.cfg` file.
+If [resetBootLoaderType](#resetbootloadertype-string) is not set, then the
+`extraCommandLine` value will be appended to the existing `grub.cfg` file.
 
-### SELinux
+### selinuxMode
 
 Specifies the mode to set SELinux to.
 
@@ -372,18 +373,18 @@ the image.
 
 Note: If you wish to apply additional SELinux policies on top of the base SELinux
 policy, then it is recommended to apply these new policies using
-([PostInstallScripts](#postinstallscripts-script)).
+([postInstallScripts](#postinstallscripts-script)).
 After applying the policies, you do not need to call `setfiles` manually since it will
-called automatically after the `PostInstallScripts` are run.
+called automatically after the `postInstallScripts` are run.
 
 Example:
 
 ```yaml
-SystemConfig:
-  KernelCommandLine:
-    SELinux: enforcing
+os:
+  kernelCommandLine:
+    selinuxMode: enforcing
 
-  PackagesInstall:
+  packagesInstall:
   # Required packages for SELinux.
   - selinux-policy
   - selinux-policy-modules
@@ -393,86 +394,195 @@ SystemConfig:
   - policycoreutils-python-utils
 ```
 
-## Module type
+## module type
 
 Options for configuring a kernel module.
 
 <div id="module-name"></div>
 
-### Name
+### name
 
 Name of the module.
 
 ```yaml
-SystemConfig:
-  Modules:
-    Load:
-    - Name: br_netfilter
+os:
+  modules:
+    load:
+    - name: br_netfilter
 ```
 
-## Modules type
+## modules type
 
 Options for configuring kernel modules.
 
-### Load [[Module](#module-type)[]]
+### load [[module](#module-type)[]]
 
 Sets kernel modules to be loaded automatically on boot.
 
 Implemented by adding an entry to `/etc/modules-load.d/`.
 
 ```yaml
-SystemConfig:
+OS:
   Modules:
     Load:
     - Name: br_netfilter
 ```
 
-### Disable [[Module](#module-type)[]]
+### disable [[module](#module-type)[]]
 
 Disable kernel modules from being loaded.
 
 Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
 
 ```yaml
-SystemConfig:
-  Modules:
-    Disable:
-    - Name: mousedev
+os:
+  modules:
+    disable:
+    - name: mousedev
 ```
 
-## PackageList type
+## packageList type
 
 Used to split off lists of packages into a separate file.
 This is useful for sharing list of packages between different configuration files.
 
 This type is used by:
 
-- [PackageListsInstall](#packagelistsinstall-string)
-- [PackageListsRemove](#packagelistsremove-string)
-- [PackageListsUpdate](#packagelistsupdate-string)
+- [installLists](#installlists-string)
+- [removeLists](#removelists-string)
+- [updateLists](#updatelists-string)
 
-### Packages [string[]]
+### packages [string[]]
 
 Specifies a list of packages.
 
 Example:
 
 ```yaml
-Packages:
+packages:
 - openssh-server
 ```
 
-## Partition type
+## packages type
 
-### ID [string]
+### updateExistingPackages [bool]
+
+Updates the packages that exist in the base image.
+
+Implemented by calling: `tdnf update`
+
+Example:
+
+```yaml
+os:
+  packages:
+    updateExistingPackages: true
+```
+
+### installLists [string[]]
+
+Same as [install](#install-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    installLists:
+    - lists/ssh.yaml
+```
+
+### install [string[]]
+
+Installs packages onto the image.
+
+Implemented by calling: `tdnf install`.
+
+Example:
+
+```yaml
+os:
+  packages:
+    install:
+    - openssh-server
+```
+
+### removeLists [string[]]
+
+Same as [remove](#remove-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    removeLists:
+    - lists/ssh.yaml
+```
+
+### remove [string[]]
+
+Removes packages from the image.
+
+Implemented by calling: `tdnf remove`
+
+Example:
+
+```yaml
+os:
+  packages:
+    remove:
+    - openssh-server
+```
+
+### updateLists [string[]]
+
+Same as [update](#update-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    updateLists:
+    - lists/ssh.yaml
+```
+
+### update [string[]]
+
+Updates packages on the system.
+
+Implemented by calling: `tdnf update`
+
+Example:
+
+```yaml
+os:
+  packages:
+    update:
+    - openssh-server
+```
+
+## partition type
+
+### id [string]
 
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [PartitionSetting](#partitionsetting-type)
+This is used to correlate Partition objects with [partitionSetting](#partitionsetting-type)
 objects.
 
-### FsType [string]
+### fileSystemType [string]
 
 Required.
 
@@ -484,19 +594,19 @@ Supported options:
 - `fat32`
 - `xfs`
 
-<div id="partition-name"></div>
+<div id="partition-label"></div>
 
-### Name [string]
+### label [string]
 
 The label to assign to the partition.
 
-### Start [uint64]
+### start [uint64]
 
 Required.
 
 The start location (inclusive) of the partition, specified in MiBs.
 
-### End [uint64]
+### end [uint64]
 
 The end location (exclusive) of the partition, specified in MiBs.
 
@@ -505,24 +615,24 @@ The End and Size fields cannot be specified at the same time.
 Either the Size or End field is required for all partitions except for the last
 partition.
 When both the Size and End fields are omitted, the last partition will fill the
-remainder of the disk (based on the disk's [MaxSize](#maxsize-uint64) field).
+remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
-### Size [uint64]
+### size [uint64]
 
 The size of the partition, specified in MiBs.
 
-### Flags [string[]]
+### flags [string[]]
 
 Specifies options for the partition.
 
 Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
-  The partition must have a `FsType` of `fat32`.
+  The partition must have a `fileSystemType` of `fat32`.
 
   When specified on a GPT formatted disk, the `boot` flag must also be added.
 
-- `bios_grub`: Specifies this partition is the BIOS boot partition.
+- `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
 
   This partition must start at block 1.
@@ -538,21 +648,21 @@ Supported options:
 These options mirror those in
 [parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
 
-## PartitionSetting type
+## partitionSetting type
 
 Specifies the mount options for a partition.
 
-### ID [string]
+### id [string]
 
 Required.
 
 The ID of the partition.
-This is used correlate [Partition](#partition-type) objects with PartitionSetting
+This is used correlate [partition](#partition-type) objects with PartitionSetting
 objects.
 
-### MountIdentifier [string]
+### mountIdentifierType [string]
 
-Default: `partuuid`
+Default: `part-uuid`
 
 The partition ID type that should be used to recognize the partition on the disk.
 
@@ -560,11 +670,11 @@ Supported options:
 
 - `uuid`: The filesystem's partition UUID.
 
-- `partuuid`: The partition UUID specified in the partition table.
+- `part-uuid`: The partition UUID specified in the partition table.
 
-- `partlabel`: The partition label specified in the partition table.
+- `part-label`: The partition label specified in the partition table.
 
-### MountOptions [string]
+### mountOptions [string]
 
 The additional options used when mounting the file system.
 
@@ -572,7 +682,7 @@ These options are in the same format as [mount](https://linux.die.net/man/8/moun
 `-o` option (or the `fs_mntops` field of the
 [fstab](https://man7.org/linux/man-pages/man5/fstab.5.html) file).
 
-### MountPoint [string]
+### mountPoint [string]
 
 Required.
 
@@ -582,11 +692,11 @@ The mounts will be sorted to ensure that parent directories are mounted before c
 directories.
 For example, `/boot` will be mounted before `/boot/efi`.
 
-## Script type
+## script type
 
 Points to a script file (typically a Bash script) to be run during customization.
 
-### Path [string]
+### path [string]
 
 The path of the script.
 
@@ -596,29 +706,29 @@ in.
 Example:
 
 ```yaml
-SystemConfig:
-  PostInstallScripts:
-  - Path: scripts/a.sh
+os:
+  postInstallScripts:
+  - path: scripts/a.sh
 ```
 
-### Args [string]
+### args [string]
 
 Additional arguments to pass to the script.
 
 Example:
 
 ```yaml
-SystemConfig:
-  PostInstallScripts:
-  - Path: scripts/a.sh
-    Args: abc
+os:
+  postInstallScripts:
+  - path: scripts/a.sh
+    args: abc
 ```
 
-## Services type
+## services type
 
 Options for configuring systemd services.
 
-### Enable [string[]]
+### enable [string[]]
 
 A list of services to enable.
 That is, services that will be set to automatically run on OS boot.
@@ -626,13 +736,13 @@ That is, services that will be set to automatically run on OS boot.
 Example:
 
 ```yaml
-SystemConfig:
-  Services:
-    Enable:
+os:
+  services:
+    enable:
     - sshd
 ```
 
-### Disable [string[]]
+### disable [string[]]
 
 A list of services to disable.
 That is, services that will be set to not automatically run on OS boot.
@@ -640,17 +750,17 @@ That is, services that will be set to not automatically run on OS boot.
 Example:
 
 ```yaml
-SystemConfig:
-  Services:
-    Disable:
+os:
+  services:
+    disable:
     - sshd
 ```
 
-## SystemConfig type
+## os type
 
 Contains the configuration options for the OS.
 
-### BootType [string]
+### bootType [string]
 
 Specifies the boot system that the image supports.
 
@@ -659,14 +769,14 @@ Supported options:
 - `legacy`: Support booting from BIOS firmware.
 
   When this option is specified, the partition layout must contain a partition with the
-  `bios_grub` flag.
+  `bios-grub` flag.
 
 - `efi`: Support booting from UEFI firmware.
 
   When this option is specified, the partition layout must contain a partition with the
   `esp` flag.
 
-### ResetBootLoaderType [string]
+### resetBootLoaderType [string]
 
 Specifies that the boot-loader configuration should be reset and how it should be reset.
 
@@ -678,7 +788,7 @@ Supported options:
 
 This field can only be specified if [Disks](#disks-disk) is also specified.
 
-### Hostname [string]
+### hostname [string]
 
 Specifies the hostname for the OS.
 
@@ -687,116 +797,20 @@ Implemented by writing to the `/etc/hostname` file.
 Example:
 
 ```yaml
-SystemConfig:
-  Hostname: example-image
+os:
+  hostname: example-image
 ```
 
-### KernelCommandLine [[KernelCommandLine](#kernelcommandline-type)]
+### kernelCommandLine [[kernelCommandLine](#kernelcommandline-type)]
 
 Specifies extra kernel command line options, as well as other configuration values
 relating to the kernel.
 
-### UpdateBaseImagePackages [bool]
+### packages [packages](#packages-type)
 
-Updates the packages that exist in the base image.
+Remove, update, and install packages on the system.
 
-Implemented by calling: `tdnf update`
-
-Example:
-
-```yaml
-SystemConfig:
-  UpdateBaseImagePackages: true
-```
-
-### PackageListsInstall [string[]]
-
-Same as [PackagesInstall](#packagesinstall-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [PackageList](#packagelist-type).
-
-Example:
-
-```yaml
-SystemConfig:
-  PackageListsRemove:
-  - lists/ssh.yaml
-```
-
-### PackagesInstall [string[]]
-
-Installs packages onto the image.
-
-Implemented by calling: `tdnf install`.
-
-Example:
-
-```yaml
-SystemConfig:
-  PackagesInstall:
-  - openssh-server
-```
-
-### PackageListsRemove [string[]]
-
-Same as [PackagesRemove](#packagesremove-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [PackageList](#packagelist-type).
-
-Example:
-
-```yaml
-SystemConfig:
-  PackageListsRemove:
-  - lists/ssh.yaml
-```
-
-### PackagesRemove [string[]]
-
-Removes packages from the image.
-
-Implemented by calling: `tdnf remove`
-
-Example:
-
-```yaml
-SystemConfig:
-  PackagesRemove:
-  - openssh-server
-```
-
-### PackageListsUpdate [string[]]
-
-Same as [PackagesUpdate](#packagesupdate-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [PackageList](#packagelist-type).
-
-Example:
-
-```yaml
-SystemConfig:
-  PackageListsUpdate:
-  - lists/ssh.yaml
-```
-
-### PackagesUpdate [string[]]
-
-Updates packages on the system.
-
-Implemented by calling: `tdnf update`
-
-Example:
-
-```yaml
-SystemConfig:
-  PackagesUpdate:
-  - openssh-server
-```
-
-### AdditionalFiles [Map\<string, [FileConfig](#fileconfig-type)[]>]
+### additionalFiles [map\<string, [fileConfig](#fileconfig-type)[]>]
 
 Copy files into the OS image.
 
@@ -805,34 +819,34 @@ This property is a dictionary of source file paths to destination files.
 The destination files value can be one of:
 
 - The absolute path of a destination file.
-- A [FileConfig](#fileconfig-type) object.
-- A list containing a mixture of paths and [FileConfig](#fileconfig-type) objects.
+- A [fileConfig](#fileconfig-type) object.
+- A list containing a mixture of paths and [fileConfig](#fileconfig-type) objects.
 
 Example:
 
 ```yaml
-SystemConfig:
-  AdditionalFiles:
+os:
+  additionalFiles:
     # Single destination.
     files/a.txt: /a.txt
 
     # Single destinations with options.
     files/b.txt:
-      Path: /b.txt
-      Permissions: "664"
+      path: /b.txt
+      permissions: "664"
 
     # Multiple destinations.
     files/c.txt:
     - /c1.txt
-    - Path: /c2.txt
-      Permissions: "664"
+    - path: /c2.txt
+      permissions: "664"
 ```
 
-### PartitionSettings [[PartitionSetting](#partitionsetting-type)[]]
+### partitionSettings [[partitionSetting](#partitionsetting-type)[]]
 
 Specifies the mount options of the partitions.
 
-### PostInstallScripts [[Script](#script-type)[]]
+### postInstallScripts [[script](#script-type)[]]
 
 Scripts to run against the image after the packages have been added and removed.
 
@@ -844,12 +858,12 @@ that contains the config file.
 Example:
 
 ```yaml
-SystemConfig:
-  PostInstallScripts:
-  - Path: scripts/a.sh
+os:
+  postInstallScripts:
+  - path: scripts/a.sh
 ```
 
-### FinalizeImageScripts [[Script](#script-type)[]]
+### finalizeImageScripts [[script](#script-type)[]]
 
 Scripts to run against the image just before the image is finalized.
 
@@ -861,45 +875,45 @@ that contains the config file.
 Example:
 
 ```yaml
-SystemConfig:
-  FinalizeImageScripts:
-  - Path: scripts/a.sh
+os:
+  finalizeImageScripts:
+  - path: scripts/a.sh
 ```
 
-### Users [[User](#user-type)]
+### users [[user](#user-type)]
 
 Used to add and/or update user accounts.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
+os:
+  users:
+  - name: test
 ```
 
-### Services [[Services](#services-type)]
+### services [[services](#services-type)]
 
 Options for configuring systemd services.
 
 ```yaml
-SystemConfig:
-  Services:
-    Enable:
+os:
+  services:
+    enable:
     - sshd
 ```
 
-### Modules [[Modules](#modules-type)]
+### modules [[modules](#modules-type)]
 
 Options for configuration kernel modules.
 
-## User type
+## user type
 
 Options for configuring a user account.
 
 <div id="user-name"></div>
 
-### Name [string]
+### name [string]
 
 Required.
 
@@ -908,12 +922,12 @@ The name of the user.
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
+os:
+  users:
+  - name: test
 ```
 
-### UID [int]
+### uid [int]
 
 The ID to use for the user.
 This value is not used if the user already exists.
@@ -923,32 +937,32 @@ Valid range: 0-60000
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    UID: 1000
+os:
+  users:
+  - name: test
+    uid: 1000
 ```
 
-### PasswordHashed [bool]
+### passwordHashed [bool]
 
 Default: `false`.
 
-When set to true, specifies that the password provided by either `Password` or
-`PasswordPath` has already been hashed and may be copied directly into the
+When set to true, specifies that the password provided by either `password` or
+`passwordPath` has already been hashed and may be copied directly into the
 `/etc/shadow` file.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
+os:
+  users:
+  - name: test
     # Generated by:
     #   PASSWORD="password"
     #   SALT=$(tr -dc "A-Za-z0-9" < /dev/urandom 2> /dev/null | head -c 12)
     #   openssl passwd -6 -salt "$SALT" "$PASSWORD"
-    Password: "$6$XH9YwqAMPohT$YQ0fqon.KOXz9AfjP5LE6VHifnNcsIgxmeX/iM5VF1GpFJTOpnTY.UGVRA.Xb8gYdVFqkYnnpJwlaIU1LhNHB/"
-    PasswordHashed: true
+    password: "$6$XH9YwqAMPohT$YQ0fqon.KOXz9AfjP5LE6VHifnNcsIgxmeX/iM5VF1GpFJTOpnTY.UGVRA.Xb8gYdVFqkYnnpJwlaIU1LhNHB/"
+    passwordHashed: true
 ```
 
 Note: Modern GPUs have gotten incredibly good at brute forcing hashed passwords.
@@ -956,7 +970,7 @@ While hashing passwords is still considered best practice, unless the password i
 incredibly strong (32+ randomly generated characters), then it is recommended
 that you treat a hashed password with the same care as a plain-text password.
 
-### Password [string]
+### password [string]
 
 Sets the user's password.
 
@@ -965,13 +979,13 @@ Use of this property is strongly discouraged, except when debugging.
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
+os:
+  users:
+  - name: test
+    password: testpassword
 ```
 
-### PasswordPath [string]
+### passwordPath [string]
 
 Sets the user's password.
 The password is read from the file path specified.
@@ -979,10 +993,10 @@ The password is read from the file path specified.
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    PasswordPath: test-password.txt
+os:
+  users:
+  - name: test
+    passwordPath: test-password.txt
 ```
 
 ### PasswordExpiresDays [int]
@@ -994,15 +1008,15 @@ Valid range: 0-99999. Set to -1 to remove expiry.
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    PasswordPath: test-password.txt
-    PasswordHashed: true
-    PasswordExpiresDays: 120
+os:
+  users:
+  - name: test
+    passwordPath: test-password.txt
+    passwordHashed: true
+    passwordExpiresDays: 120
 ```
 
-### SSHPubKeyPaths [string[]]
+### sshPublicKeyPaths [string[]]
 
 File paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
@@ -1010,49 +1024,49 @@ These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    SSHPubKeyPaths:
+os:
+  users:
+  - name: test
+    sshPublicKeyPaths:
     - id_ed25519.pub
 ```
 
-### PrimaryGroup [string]
+### primaryGroup [string]
 
 The primary group of the user.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    PrimaryGroup: testgroup
+os:
+  users:
+  - name: test
+    primaryGroup: testgroup
 ```
 
-### SecondaryGroups [string[]]
+### secondaryGroups [string[]]
 
 Additional groups to assign to the user.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    SecondaryGroups:
+os:
+  users:
+  - name: test
+    secondaryGroups:
     - sudo
 ```
 
-### StartupCommand [string]
+### startupCommand [string]
 
 The command run when the user logs in.
 
 Example:
 
 ```yaml
-SystemConfig:
-  Users:
-  - Name: test
-    StartupCommand: /sbin/nologin
+os:
+  users:
+  - name: test
+    startupCommand: /sbin/nologin
 ```

@@ -26,8 +26,6 @@
 #   root with the writable overlay, allowing system modifications without
 #   altering the base system.
 
-set -ex
-
 parse_kernel_cmdline_args() {
     # Ensure that the 'dracut-lib' is present and loaded.
     type getarg >/dev/null 2>&1 || . /lib/dracut-lib.sh

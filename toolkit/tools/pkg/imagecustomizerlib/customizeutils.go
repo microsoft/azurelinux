@@ -45,33 +45,33 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources,
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.OS, imageChroot, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
-	err = updateHostname(config.SystemConfig.Hostname, imageChroot)
+	err = updateHostname(config.OS.Hostname, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalFiles(baseConfigPath, config.SystemConfig.AdditionalFiles, imageChroot)
+	err = copyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
+	err = AddOrUpdateUsers(config.OS.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = enableOrDisableServices(config.SystemConfig.Services, imageChroot)
+	err = enableOrDisableServices(config.OS.Services, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
+	err = loadOrDisableModules(config.OS.Modules, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.SystemConfig.PostInstallScripts, imageChroot)
+	err = runScripts(baseConfigPath, config.OS.PostInstallScripts, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -91,13 +91,13 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = handleSELinux(config.SystemConfig.KernelCommandLine.SELinux, config.SystemConfig.ResetBootLoaderType,
+	err = handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
 		imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
+	err = runScripts(baseConfigPath, config.OS.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -107,12 +107,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableOverlays(config.SystemConfig.Overlays, imageChroot)
+	err = enableOverlays(config.OS.Overlays, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
+	err = enableVerityPartition(buildDir, config.OS.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -311,11 +311,11 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	// Set user's SSH keys.
-	for i, _ := range user.SSHPubKeyPaths {
-		user.SSHPubKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPubKeyPaths[i])
+	for i, _ := range user.SSHPublicKeyPaths {
+		user.SSHPublicKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPublicKeyPaths[i])
 	}
 
-	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPublicKeyPaths, user.SSHPublicKeys)
 	if err != nil {
 		return err
 	}
@@ -413,18 +413,18 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 		return err
 	}
 
-	switch config.SystemConfig.ResetBootLoaderType {
+	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.SystemConfig.PartitionSettings,
-			config.SystemConfig.BootType, config.SystemConfig.KernelCommandLine, currentSelinuxMode)
+		err := configureDiskBootLoader(imageConnection, config.Storage.PartitionSettings,
+			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
 		if err != nil {
 			return fmt.Errorf("failed to configure bootloader:\n%w", err)
 		}
 
 	default:
 		// Append the kernel command-line args to the existing grub config.
-		err := addKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
 		if err != nil {
 			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
 		}
@@ -433,20 +433,20 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	return nil
 }
 
-func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
+func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
 	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
 	// Resolve the default SELinux mode.
-	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
 		if err != nil {
 			return err
 		}
 	}
 
-	switch ResetBootLoaderType {
+	switch resetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// The grub.cfg file has been recreated from scratch and therefore the SELinux args will already be correct and
 		// don't need to be updated.
@@ -459,7 +459,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType i
 		}
 	}
 
-	if selinuxMode != imagecustomizerapi.SELinuxDisabled {
+	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
 		err = updateSELinuxMode(selinuxMode, imageChroot)
 		if err != nil {
 			return err
@@ -469,7 +469,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, ResetBootLoaderType i
 	return nil
 }
 
-func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinux, imageChroot *safechroot.Chroot) error {
+func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err

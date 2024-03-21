@@ -81,8 +81,8 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 
 func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi.Disk,
 	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
-	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
-	currentSELinuxMode imagecustomizerapi.SELinux, installOS installOSFunc,
+	selinuxConfig imagecustomizerapi.SELinux, kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string,
+	chrootDirName string, currentSELinuxMode imagecustomizerapi.SELinuxMode, installOS installOSFunc,
 ) error {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
@@ -93,7 +93,8 @@ func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi
 		return fmt.Errorf("failed to create new image:\n%w", err)
 	}
 
-	err = configureDiskBootLoader(imageConnection, partitionSettings, bootType, kernelCommandLine, currentSELinuxMode)
+	err = configureDiskBootLoader(imageConnection, partitionSettings, bootType, selinuxConfig, kernelCommandLine,
+		currentSELinuxMode)
 	if err != nil {
 		return fmt.Errorf("failed to add bootloader to new image:\n%w", err)
 	}
@@ -148,15 +149,15 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 }
 
 func configureDiskBootLoader(imageConnection *ImageConnection, partitionSettings []imagecustomizerapi.PartitionSetting,
-	bootType imagecustomizerapi.BootType, kernelCommandLine imagecustomizerapi.KernelCommandLine,
-	currentSELinuxMode imagecustomizerapi.SELinux,
+	bootType imagecustomizerapi.BootType, selinuxConfig imagecustomizerapi.SELinux,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) error {
 	imagerBootType, err := bootTypeToImager(bootType)
 	if err != nil {
 		return err
 	}
 
-	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine, currentSELinuxMode)
+	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine, selinuxConfig, currentSELinuxMode)
 	if err != nil {
 		return err
 	}

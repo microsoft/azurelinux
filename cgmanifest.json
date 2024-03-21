@@ -874,6 +874,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "azure-nvme-utils",
+          "version": "0.1.1",
+          "downloadUrl": "https://github.com/Azure/azure-nvme-utils/archive/refs/tags/v0.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "azure-storage-cpp",
           "version": "7.5.0",
           "downloadUrl": "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
@@ -2558,8 +2568,8 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.3",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.3/dhcp-4.4.3.tar.gz"
+          "version": "4.4.3.P1",
+          "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz"
         }
       }
     },
@@ -14051,16 +14061,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nmi",
-          "version": "1.8.7",
-          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.7.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "node-problem-detector",
           "version": "0.8.15",
           "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.15.tar.gz"
@@ -21453,8 +21453,8 @@
         "type": "other",
         "other": {
           "name": "pybind11",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.6.2/pybind11-2.6.2.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.11.1/pybind11-2.11.1.tar.gz"
         }
       }
     },
@@ -23052,6 +23052,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ml-dtypes",
+          "version": "0.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/ml_dtypes/ml_dtypes-0.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mock",
           "version": "5.1.0",
           "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-5.1.0.tar.gz"
@@ -24435,16 +24445,6 @@
           "name": "python-tensorboard-plugin-wit",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/PAIR-code/what-if-tool/archive/refs/tags/v1.8.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-tensorflow-estimator",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/estimator/archive/refs/tags/v2.11.0.tar.gz"
         }
       }
     },
@@ -27234,8 +27234,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20221101",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20221101/refpolicy-2.20221101.tar.bz2"
+          "version": "2.20240226",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20240226/refpolicy-2.20240226.tar.bz2"
         }
       }
     },
@@ -28336,8 +28336,8 @@
         "type": "other",
         "other": {
           "name": "tensorflow",
-          "version": "2.11.1",
-          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
+          "version": "2.16.1",
+          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.16.1.tar.gz"
         }
       }
     },
@@ -28348,6 +28348,16 @@
           "name": "texinfo",
           "version": "7.0.3",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "thrift",
+          "version": "0.15.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
         }
       }
     },
@@ -28936,8 +28946,8 @@
         "type": "other",
         "other": {
           "name": "usbip",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-6.6.14.1.tar.xz"
         }
       }
     },

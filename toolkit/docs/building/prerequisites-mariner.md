@@ -32,7 +32,8 @@ sudo tdnf -y install \
     sudo \
     tar \
     wget \
-    xfsprogs
+    xfsprogs \
+    zstd
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service
