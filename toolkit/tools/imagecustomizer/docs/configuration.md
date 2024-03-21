@@ -10,16 +10,16 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 3. Update packages:
 
-   1. Remove packages ([packageListsRemove](#packagelistsremove-string),
-   [packagesRemove](#packagesremove-string))
+   1. Remove packages ([removeLists](#removelists-string),
+   [remove](#remove-string))
 
-   2. Update base image packages ([updateBaseImagePackages](#updatebaseimagepackages-bool)).
+   2. Update base image packages ([updateExistingPackages](#updateexistingpackages-bool)).
 
-   3. Install packages ([packageListsInstall](#packagelistsinstall-string),
-   [packagesInstall](#packagesinstall-string))
+   3. Install packages ([installLists](#installlists-string),
+   [install](#install-string))
 
-   4. Update packages ([packageListsUpdate](#packagelistsupdate-string),
-   [packagesUpdate](#packagesupdate-string))
+   4. Update packages ([updateLists](#removelists-string),
+   [update](#update-string))
 
 4. Update hostname. ([hostname](#hostname-string))
 
@@ -66,18 +66,19 @@ restored to its original contents.
 ### Replacing packages
 
 If you wish to replace a package with conflicting package, then you can remove the
-existing package using [packagesRemove](#packagesremove-string) and then install the
-new package with [packagesInstall](#packagesinstall-string).
+existing package using [remove](#remove-string) and then install the
+new package with [install](#install-string).
 
 Example:
 
 ```yaml
 os:
-  packagesRemove:
-  - kernel
+  packages:
+    remove:
+    - kernel
 
-  packagesInstall:
-  - kernel-uvm
+    install:
+    - kernel-uvm
 ```
 
 ## Schema Overview
@@ -451,9 +452,9 @@ This is useful for sharing list of packages between different configuration file
 
 This type is used by:
 
-- [packageListsInstall](#packagelistsinstall-string)
-- [packageListsRemove](#packagelistsremove-string)
-- [packageListsUpdate](#packagelistsupdate-string)
+- [installLists](#installlists-string)
+- [removeLists](#removelists-string)
+- [updateLists](#updatelists-string)
 
 ### packages [string[]]
 
@@ -464,6 +465,115 @@ Example:
 ```yaml
 packages:
 - openssh-server
+```
+
+## packages type
+
+### updateExistingPackages [bool]
+
+Updates the packages that exist in the base image.
+
+Implemented by calling: `tdnf update`
+
+Example:
+
+```yaml
+os:
+  packages:
+    updateExistingPackages: true
+```
+
+### installLists [string[]]
+
+Same as [install](#install-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    installLists:
+    - lists/ssh.yaml
+```
+
+### install [string[]]
+
+Installs packages onto the image.
+
+Implemented by calling: `tdnf install`.
+
+Example:
+
+```yaml
+os:
+  packages:
+    install:
+    - openssh-server
+```
+
+### removeLists [string[]]
+
+Same as [remove](#remove-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    removeLists:
+    - lists/ssh.yaml
+```
+
+### remove [string[]]
+
+Removes packages from the image.
+
+Implemented by calling: `tdnf remove`
+
+Example:
+
+```yaml
+os:
+  packages:
+    remove:
+    - openssh-server
+```
+
+### updateLists [string[]]
+
+Same as [update](#update-string) but the packages are specified in a
+separate YAML (or JSON) file.
+
+The other YAML file schema is specified by [packageList](#packagelist-type).
+
+Example:
+
+```yaml
+os:
+  packages:
+    updateLists:
+    - lists/ssh.yaml
+```
+
+### update [string[]]
+
+Updates packages on the system.
+
+Implemented by calling: `tdnf update`
+
+Example:
+
+```yaml
+os:
+  packages:
+    update:
+    - openssh-server
 ```
 
 ## partition type
@@ -700,105 +810,9 @@ os:
 Specifies extra kernel command line options, as well as other configuration values
 relating to the kernel.
 
-### updateBaseImagePackages [bool]
+### packages [packages](#packages-type)
 
-Updates the packages that exist in the base image.
-
-Implemented by calling: `tdnf update`
-
-Example:
-
-```yaml
-os:
-  updateBaseImagePackages: true
-```
-
-### packageListsInstall [string[]]
-
-Same as [packagesInstall](#packagesinstall-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [packageList](#packagelist-type).
-
-Example:
-
-```yaml
-os:
-  packageListsRemove:
-  - lists/ssh.yaml
-```
-
-### packagesInstall [string[]]
-
-Installs packages onto the image.
-
-Implemented by calling: `tdnf install`.
-
-Example:
-
-```yaml
-os:
-  packagesInstall:
-  - openssh-server
-```
-
-### packageListsRemove [string[]]
-
-Same as [packagesRemove](#packagesremove-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [packageList](#packagelist-type).
-
-Example:
-
-```yaml
-os:
-  packageListsRemove:
-  - lists/ssh.yaml
-```
-
-### packagesRemove [string[]]
-
-Removes packages from the image.
-
-Implemented by calling: `tdnf remove`
-
-Example:
-
-```yaml
-os:
-  packagesRemove:
-  - openssh-server
-```
-
-### packageListsUpdate [string[]]
-
-Same as [packagesUpdate](#packagesupdate-string) but the packages are specified in a
-separate YAML (or JSON) file.
-
-The other YAML file schema is specified by [packageList](#packagelist-type).
-
-Example:
-
-```yaml
-os:
-  packageListsUpdate:
-  - lists/ssh.yaml
-```
-
-### packagesUpdate [string[]]
-
-Updates packages on the system.
-
-Implemented by calling: `tdnf update`
-
-Example:
-
-```yaml
-os:
-  packagesUpdate:
-  - openssh-server
-```
+Remove, update, and install packages on the system.
 
 ### additionalFiles [map\<string, [fileConfig](#fileconfig-type)[]>]
 

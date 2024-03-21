@@ -318,7 +318,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	err = createNewImageWithBootLoader(rawDisk, diskConfig, partitionSettings, "efi",
+	err = createNewImageWithBootLoader(rawDisk, diskConfig, partitionSettings, "efi", imagecustomizerapi.SELinux{},
 		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxModeDisabled,
 		installOS)
 	if err != nil {

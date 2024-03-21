@@ -91,7 +91,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = handleSELinux(config.OS.KernelCommandLine.SELinuxMode, config.OS.ResetBootLoaderType,
+	err = handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
 		imageChroot)
 	if err != nil {
 		return err
@@ -389,8 +389,8 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.OS.PartitionSettings,
-			config.OS.BootType, config.OS.KernelCommandLine, currentSelinuxMode)
+		err := configureDiskBootLoader(imageConnection, config.Storage.PartitionSettings,
+			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
 		if err != nil {
 			return fmt.Errorf("failed to configure bootloader:\n%w", err)
 		}
@@ -406,7 +406,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	return nil
 }
 
-func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, ResetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
+func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
 	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
@@ -419,7 +419,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, ResetBootLoaderTy
 		}
 	}
 
-	switch ResetBootLoaderType {
+	switch resetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// The grub.cfg file has been recreated from scratch and therefore the SELinux args will already be correct and
 		// don't need to be updated.

@@ -1,9 +1,10 @@
 os:
-  kernelCommandLine:
-    selinuxMode: permissive
+  selinux:
+    mode: permissive
 
-  packagesInstall:
-  - selinux-policy
-  - selinux-policy-modules
-  - setools-console
-  - policycoreutils-python-utils
+  packages:
+    install:
+    - selinux-policy
+    - selinux-policy-modules
+    - setools-console
+    - policycoreutils-python-utils

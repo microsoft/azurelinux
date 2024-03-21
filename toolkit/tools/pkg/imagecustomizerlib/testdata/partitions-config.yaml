@@ -1,32 +1,32 @@
-disks:
-- partitionTableType: gpt
-  maxSize: 4096
-  partitions:
-  - id: esp
-    flags:
-    - esp
-    - boot
-    start: 1
-    end: 9
-    fileSystemType: fat32
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096
+    partitions:
+    - id: esp
+      flags:
+      - esp
+      - boot
+      start: 1
+      end: 9
+      fileSystemType: fat32
 
-  - id: boot
-    start: 9
-    end: 108
-    fileSystemType: ext4
+    - id: boot
+      start: 9
+      end: 108
+      fileSystemType: ext4
 
-  - id: rootfs
-    start: 108
-    end: 2048
-    fileSystemType: xfs
+    - id: rootfs
+      start: 108
+      end: 2048
+      fileSystemType: xfs
 
-  - id: var
-    start: 2048
-    fileSystemType: xfs
+    - id: var
+      start: 2048
+      fileSystemType: xfs
 
-os:
   bootType: efi
-  resetBootLoaderType: hard-reset
+
   partitionSettings:
   - id: esp
     mountPoint: /boot/efi
@@ -41,6 +41,8 @@ os:
   - id: var
     mountPoint: /var
 
+os:
+  resetBootLoaderType: hard-reset
+
   kernelCommandLine:
     extraCommandLine: console=tty0 console=ttyS0
-    selinux: disabled

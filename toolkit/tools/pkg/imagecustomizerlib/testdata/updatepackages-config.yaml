@@ -1,14 +1,15 @@
 os:
-  updateBaseImagePackages: true
+  packages:
+    updateExistingPackages: true
 
-  packagesRemove:
-  - which
+    remove:
+    - which
 
-  packagesInstall:
-  - setools-console
+    install:
+    - setools-console
 
-  packageListsInstall:
-  - lists/dracut-fips.yaml
+    installLists:
+    - lists/dracut-fips.yaml
 
-  packagesUpdate:
-  - setools-console
+    update:
+    - setools-console

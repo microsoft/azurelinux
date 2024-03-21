@@ -12,36 +12,23 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	BootType                BootType            `yaml:"bootType"`
-	ResetBootLoaderType     ResetBootLoaderType `yaml:"resetBootLoaderType"`
-	Hostname                string              `yaml:"hostname"`
-	UpdateBaseImagePackages bool                `yaml:"updateBaseImagePackages"`
-	PackageListsInstall     []string            `yaml:"packageListsInstall"`
-	PackagesInstall         []string            `yaml:"packagesInstall"`
-	PackageListsRemove      []string            `yaml:"packageListsRemove"`
-	PackagesRemove          []string            `yaml:"packagesRemove"`
-	PackageListsUpdate      []string            `yaml:"packageListsUpdate"`
-	PackagesUpdate          []string            `yaml:"packagesUpdate"`
-	KernelCommandLine       KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles         AdditionalFilesMap  `yaml:"additionalFiles"`
-	PartitionSettings       []PartitionSetting  `yaml:"partitionSettings"`
-	PostInstallScripts      []Script            `yaml:"postInstallScripts"`
-	FinalizeImageScripts    []Script            `yaml:"finalizeImageScripts"`
-	Users                   []User              `yaml:"users"`
-	Services                Services            `yaml:"services"`
-	Modules                 []Module            `yaml:"modules"`
-	Verity                  *Verity             `yaml:"verity"`
-	Overlays                *[]Overlay          `yaml:"overlays"`
+	ResetBootLoaderType  ResetBootLoaderType `yaml:"resetBootLoaderType"`
+	Hostname             string              `yaml:"hostname"`
+	Packages             Packages            `yaml:"packages"`
+	SELinux              SELinux             `yaml:"selinux"`
+	KernelCommandLine    KernelCommandLine   `yaml:"kernelCommandLine"`
+	AdditionalFiles      AdditionalFilesMap  `yaml:"additionalFiles"`
+	PostInstallScripts   []Script            `yaml:"postInstallScripts"`
+	FinalizeImageScripts []Script            `yaml:"finalizeImageScripts"`
+	Users                []User              `yaml:"users"`
+	Services             Services            `yaml:"services"`
+	Modules              []Module            `yaml:"modules"`
+	Verity               *Verity             `yaml:"verity"`
+	Overlays             *[]Overlay          `yaml:"overlays"`
 }
 
 func (s *OS) IsValid() error {
 	var err error
-
-	err = s.BootType.IsValid()
-	if err != nil {
-		return err
-	}
-
 	err = s.ResetBootLoaderType.IsValid()
 	if err != nil {
 		return err
@@ -53,28 +40,19 @@ func (s *OS) IsValid() error {
 		}
 	}
 
+	err = s.SELinux.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid selinux:\n%w", err)
+	}
+
 	err = s.KernelCommandLine.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid KernelCommandLine: %w", err)
+		return fmt.Errorf("invalid kernelCommandLine: %w", err)
 	}
 
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid AdditionalFiles: %w", err)
-	}
-
-	partitionIDSet := make(map[string]bool)
-	for i, partition := range s.PartitionSettings {
-		err = partition.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid partitionSettings item at index %d: %w", i, err)
-		}
-
-		if _, existingName := partitionIDSet[partition.ID]; existingName {
-			return fmt.Errorf("duplicate partitionSettings ID used (%s) at index %d", partition.ID, i)
-		}
-
-		partitionIDSet[partition.ID] = false // dummy value
+		return fmt.Errorf("invalid additionalFiles: %w", err)
 	}
 
 	for i, script := range s.PostInstallScripts {
