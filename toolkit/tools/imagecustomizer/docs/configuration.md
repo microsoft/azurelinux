@@ -48,9 +48,11 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 14. Delete `/etc/resolv.conf` file.
 
-15. Enable dm-verity root protection.
+15. Enable overlay filesystem. ([overlay](#overlay-type))
 
-16. if the output format is set to `iso`, copy additional iso media files.
+16. Enable dm-verity root protection. ([verity](#verity-type))
+
+17. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -164,6 +166,7 @@ os:
       - [disable](#disable-module)
         - [module type](#module-type)
           - [name](#module-name)
+    - [overlay type](#overlay-type)
     - [verity type](#verity-type)
 
 ## Top-level
@@ -258,9 +261,63 @@ Specifies the configuration for the generated ISO media.
 
 - See [additionalFiles](#additionalfiles-mapstring-fileconfig).
 
+## overlay type
+
+Specifies the configuration for overlay filesystem.
+
+- `lowerDir`: This directory acts as the read-only layer in the overlay
+  filesystem. It contains the base files and directories which will be overlaid
+  by the upperDir. Changes to the overlay filesystem do not affect the contents
+  of lowerDir.
+
+- `upperDir`: This directory is the writable layer of the overlay filesystem.
+  Any modifications, such as file additions, deletions, or changes, are made in
+  the upperDir. These changes are what make the overlay filesystem appear
+  different from the lowerDir alone.
+
+- `workDir`: This is a required directory used for preparing files before they
+  are merged into the upperDir. It needs to be on the same filesystem as the
+  upperDir and is used for temporary storage by the overlay filesystem to ensure
+  atomic operations. The workDir is not directly accessible to users.
+
+- `partition`: Optional field: If configured, a partition will be attached to
+  the current targeted overlay, making it persistent and ensuring that changes
+  are retained. If not configured, the overlay will be volatile.
+
+  - `idType`: Specifies the type of id for the partition. The options are
+    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
+    (partition UUID).
+
+  - `id`: The unique identifier value of the partition, corresponding to the
+    specified IdType.
+
+Example:
+
+```yaml
+os:
+  overlays:
+    - lowerDir: /etc
+      upperDir: /upper_etc
+      workDir: /work_etc
+      partition:
+        idType: part-label
+        Id: partition-etc
+    - lowerDir: /var/lib
+      upperDir: /upper_var_lib
+      workDir: /work_var_lib
+    - lowerDir: /var/log
+      upperDir: /upper_var_log
+      workDir: /work_var_log
+```
+
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification.
+Specifies the configuration for dm-verity root integrity verification. Please
+execute `sudo modprobe nbd` before building the image with verity enablement.
+
+Please enable overlays for the `/var/lib` and `/var/log` directories, along with
+verity enablement, to ensure proper functioning of services. For an example,
+please refer to the [overlay type](#overlay-type) section.
 
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
