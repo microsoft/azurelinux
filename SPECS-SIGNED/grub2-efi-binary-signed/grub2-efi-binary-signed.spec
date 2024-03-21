@@ -41,7 +41,7 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
-Requires:       %{name}-mkconfig
+Requires:       grub2-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -57,7 +57,7 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary-noprefix
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
-Requires:       %{name}-mkconfig
+Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is

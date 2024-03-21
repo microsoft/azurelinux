@@ -92,8 +92,7 @@ BuildRequires:  xz-devel
 Requires:       device-mapper
 Requires:       systemd-udev
 Requires:       xz
-Requires:       %{name}-configuration = %{version}-%{release}
-Requires:       %{name}-mkconfig = %{version}-%{release}
+Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -102,7 +101,6 @@ Provides:       %{name}-common = %{version}-%{release}
 Provides:       %{name}-tools = %{version}-%{release}
 Provides:       %{name}-tools-efi = %{version}-%{release}
 Provides:       %{name}-tools-extra = %{version}-%{release}
-Provides:       %{name}-tools-minimal = %{version}-%{release}
 
 %description
 The GRUB package contains the GRand Unified Bootloader.
@@ -153,7 +151,7 @@ Unsigned GRUB UEFI image
 %package efi-binary
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
-Requires:       %{name}-mkconfig
+Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -168,7 +166,7 @@ GRUB UEFI bootloader binaries
 %package efi-binary-noprefix
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
-Requires:       %{name}-mkconfig
+Requires:       %{name}-tools-minimal = %{version}-%{release}
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
@@ -189,11 +187,12 @@ Group:          System Environment/Base
 Directory for package-specific boot configurations
 to be persistently stored on AzureLinux
 
-%package mkconfig
+%package tools-minimal
 Summary:        Minimal set of utilities to configure a grub-based system
 Group:          System Environment/Base
+Requires:       %{name}-configuration
 
-%description mkconfig
+%description tools-minimal
 Minimal set of utilities to configure a grub-based system
 
 %prep
@@ -343,21 +342,28 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %license COPYING
 %dir /boot/%{name}
 %config() %{_sysconfdir}/bash_completion.d/grub
-/sbin/*
-%{_bindir}/*
-%{_datarootdir}/grub/*
 %{_sysconfdir}/sysconfig/grub
-%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
-%ghost %config(noreplace) /boot/%{name}/grub.cfg
-%exclude %{_datarootdir}/grub/grub-mkconfig_lib
-%exclude /sbin/grub2-probe
-%exclude /sbin/grub2-mkconfig
-%exclude %{_bindir}/grub2-editenv
-%exclude %{_bindir}/grub2-script-check
-%exclude %{_bindir}/grub2-file
-%exclude %{_bindir}/grub2-mkrelpath
+/sbin/grub2-bios-setup
+/sbin/grub2-install
+/sbin/grub2-macbless
+/sbin/grub2-ofpathname
+/sbin/grub2-reboot
+/sbin/grub2-set-default
+/sbin/grub2-sparc64-setup
+%{_bindir}/grub2-fstest
+%{_bindir}/grub2-glue-efi
+%{_bindir}/grub2-kbdcomp
+%{_bindir}/grub2-menulst2cfg
+%{_bindir}/grub2-mkimage
+%{_bindir}/grub2-mklayout
+%{_bindir}/grub2-mknetdir
+%{_bindir}/grub2-mkpasswd-pbkdf2
+%{_bindir}/grub2-mkrescue
+%{_bindir}/grub2-mkstandalone
+%{_bindir}/grub2-render-label
+%{_bindir}/grub2-syslinux2cfg
 
-%files mkconfig
+%files tools-minimal
 %{_datarootdir}/grub/grub-mkconfig_lib
 /sbin/grub2-probe
 /sbin/grub2-mkconfig
@@ -405,6 +411,8 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %dir %{_sysconfdir}/grub.d
 %dir %{_sysconfdir}/default/grub.d
 %{_sysconfdir}/grub.d/README
+%attr(0644,root,root) %ghost %config(noreplace) %{_sysconfdir}/default/grub
+%ghost %config(noreplace) /boot/%{name}/grub.cfg
 %config() %{_sysconfdir}/grub.d/00_header
 %config() %{_sysconfdir}/grub.d/10_linux
 %config() %{_sysconfdir}/grub.d/20_linux_xen
@@ -415,7 +423,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %changelog
 * Tue Mar 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-17
-- Introduce grub2-mkconfig subpackage
+- Introduce grub2-tools-minimal subpackage
 
 * Wed Mar 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
 - Updated sbat.csv.in to reflect new distro name.
