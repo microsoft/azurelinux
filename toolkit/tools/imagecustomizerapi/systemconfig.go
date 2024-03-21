@@ -108,30 +108,5 @@ func (s *SystemConfig) IsValid() error {
 		}
 	}
 
-	if s.Overlays != nil {
-		upperDirs := make(map[string]bool)
-		workDirs := make(map[string]bool)
-
-		for i, overlay := range *s.Overlays {
-			// Validate the overlay itself
-			err := overlay.IsValid()
-			if err != nil {
-				return fmt.Errorf("invalid Overlay (LowerDir: '%s') at index %d: %w", overlay.LowerDir, i, err)
-			}
-
-			// Check for unique UpperDir
-			if _, exists := upperDirs[overlay.UpperDir]; exists {
-				return fmt.Errorf("duplicate UpperDir '%s' found in Overlay (LowerDir: '%s') at index %d", overlay.UpperDir, overlay.LowerDir, i)
-			}
-			upperDirs[overlay.UpperDir] = true
-
-			// Check for unique WorkDir
-			if _, exists := workDirs[overlay.WorkDir]; exists {
-				return fmt.Errorf("duplicate WorkDir '%s' found in Overlay (LowerDir: '%s') at index %d", overlay.WorkDir, overlay.LowerDir, i)
-			}
-			workDirs[overlay.WorkDir] = true
-		}
-	}
-
 	return nil
 }
