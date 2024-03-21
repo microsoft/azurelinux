@@ -190,7 +190,7 @@ to be persistently stored on AzureLinux
 %package tools-minimal
 Summary:        Minimal set of utilities to configure a grub-based system
 Group:          System Environment/Base
-Requires:       %{name}-configuration
+Requires:       %{name}-configuration = %{version}-%{release}
 
 %description tools-minimal
 Minimal set of utilities to configure a grub-based system
