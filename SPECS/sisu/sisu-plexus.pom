@@ -28,8 +28,7 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<classifier>no_aop</classifier>
-			<version>4.0</version>
+			<version>5.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

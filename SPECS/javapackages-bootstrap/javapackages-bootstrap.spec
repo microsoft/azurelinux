@@ -19,7 +19,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -400,8 +400,9 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
-* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.0-1
-- Auto-upgrade to 1.14.0 - azl 3.0
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.14.0-2
+- Change JAVA_HOME for xmvn to be msopenjdk location.
+- Upgrade to 1.14.0 - azl 3.0
 - Changes from Fedora 39 (license: MIT).
 
 * Fri Aug 11 2023 Saul Paredes <saulparedes@microsoft.com> - 1.5.0-4
