@@ -4,6 +4,7 @@
 package imagecustomizerlib
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
@@ -41,10 +42,20 @@ func checkFileSystemsHelper(diskDevice string) error {
 		return err
 	}
 
+	errs := []error(nil)
 	for _, diskPartition := range diskPartitions {
 		if diskPartition.Type != "part" {
+			// Skip the disk entry.
 			continue
 		}
+
+		if diskPartition.FileSystemType == "" {
+			// Skip partitions that don't have a known file system type (e.g. the BIOS boot partition).
+			logger.Log.Debugf("Skipping file system check (%s)", diskPartition.Path)
+			continue
+		}
+
+		logger.Log.Debugf("Check file system (%s) at (%s)", diskPartition.FileSystemType, diskPartition.Path)
 
 		// Check the file system for corruption.
 		switch diskPartition.FileSystemType {
@@ -52,22 +63,29 @@ func checkFileSystemsHelper(diskDevice string) error {
 			// Add -f flag to force check to run even if the journal is marked as clean.
 			err := shell.ExecuteLive(true /*squashErrors*/, "e2fsck", "-fn", diskPartition.Path)
 			if err != nil {
-				return fmt.Errorf("failed to check (%s) with e2fsck:\n%w", diskPartition.Path, err)
+				err = fmt.Errorf("failed to check (%s) with e2fsck:\n%w", diskPartition.Path, err)
+				errs = append(errs, err)
 			}
 
 		case "xfs":
 			// The fsck.xfs tool doesn't do anything. So, call xfs_repair instead.
 			err := shell.ExecuteLive(true /*squashErrors*/, "xfs_repair", "-n", diskPartition.Path)
 			if err != nil {
-				return fmt.Errorf("failed to check (%s) with xfs_repair:\n%w", diskPartition.Path, err)
+				err = fmt.Errorf("failed to check (%s) with xfs_repair:\n%w", diskPartition.Path, err)
+				errs = append(errs, err)
 			}
 
 		default:
 			err := shell.ExecuteLive(true /*squashErrors*/, "fsck", "-n", diskPartition.Path)
 			if err != nil {
-				return fmt.Errorf("failed to check (%s) with fsck:\n%w", diskPartition.Path, err)
+				err = fmt.Errorf("failed to check (%s) with fsck:\n%w", diskPartition.Path, err)
+				errs = append(errs, err)
 			}
 		}
+	}
+
+	if len(errs) > 0 {
+		return errors.Join(errs...)
 	}
 
 	return nil
