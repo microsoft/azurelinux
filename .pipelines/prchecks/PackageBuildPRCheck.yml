@@ -55,8 +55,7 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
-                  ob_artifactSuffix: _$(System.JobAttempt)
+                  ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                 steps:
                   - template: .pipelines/templates/RawToolchainDownload.yml@self
@@ -79,7 +78,7 @@ extends:
                   # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: $(ob_artifactBaseName)
+                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish toolchain artifacts"
@@ -93,8 +92,7 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                 variables:
-                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
-                  ob_artifactSuffix: _$(System.JobAttempt)
+                  ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                 steps:
@@ -113,7 +111,7 @@ extends:
 
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                      artifact: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish packages build artifacts"
