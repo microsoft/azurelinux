@@ -280,17 +280,15 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		MaxSize:            4096,
 		Partitions: []imagecustomizerapi.Partition{
 			{
-				Id:             "boot",
-				Flags:          []imagecustomizerapi.PartitionFlag{"esp", "boot"},
-				Start:          1,
-				End:            ptrutils.PtrTo(uint64(9)),
-				FileSystemType: "fat32",
+				Id:    "boot",
+				Flags: []imagecustomizerapi.PartitionFlag{"esp", "boot"},
+				Start: 1,
+				End:   ptrutils.PtrTo(uint64(9)),
 			},
 			{
-				Id:             "rootfs",
-				Start:          9,
-				End:            nil,
-				FileSystemType: "ext4",
+				Id:    "rootfs",
+				Start: 9,
+				End:   nil,
 			},
 		},
 	}
@@ -298,6 +296,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	fileSystems := []imagecustomizerapi.FileSystem{
 		{
 			DeviceId: "boot",
+			Type:     "fat32",
 			MountPoint: &imagecustomizerapi.MountPoint{
 				Path:    "/boot/efi",
 				Options: "umask=0077",
@@ -305,6 +304,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		},
 		{
 			DeviceId: "rootfs",
+			Type:     "ext4",
 			MountPoint: &imagecustomizerapi.MountPoint{
 				Path: "/",
 			},

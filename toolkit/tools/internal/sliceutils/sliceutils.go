@@ -119,3 +119,14 @@ func ContainsFunc[K any](inputSlice []K, fn func(K) bool) bool {
 	}
 	return false
 }
+
+func FindValueFunc[K any](inputSlice []K, fn func(K) bool) (K, bool) {
+	for _, item := range inputSlice {
+		if fn(item) {
+			return item, true
+		}
+	}
+
+	var value K
+	return value, false
+}
