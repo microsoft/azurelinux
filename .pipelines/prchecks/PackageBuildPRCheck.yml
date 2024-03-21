@@ -72,6 +72,10 @@ extends:
                   # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
                   - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
 
+                  - script: echo "##vso[task.setvariable variable=toolchainArtifactName]$(ob_artifactBaseName)"
+                    name: "ToolchainArtifactName"
+                    displayName: "Set variable for published artifact name"
+
                   # 1. Automatic publishing won't work if 'isCustom: true' is set on the pool. We cannot do 'isCustom: false' because
                   #    then OneBranch attempts to perform additional actions (adding build tags for instance), which require additional permissions
                   #    that the PR check pipeline does not have.
@@ -95,10 +99,11 @@ extends:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}_$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
+                  toolchainArtifactName: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['ToolchainArtifactName.toolchainArtifactName'] ]
                 steps:
                   - template: .pipelines/templates/PackageBuild.yml@self
                     parameters:
-                      customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      customToolchainArtifactName: $(toolchainArtifactName)
                       isCheckBuild: true
                       isQuickRebuildPackages: true
                       isUseCCache: true
