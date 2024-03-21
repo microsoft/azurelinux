@@ -57,7 +57,7 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary-noprefix
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
-Requires:       %{name}-tools-minimal = %{version}-%{release}
+Requires:       grub2-tools-minimal = %{version}-%{release}
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
