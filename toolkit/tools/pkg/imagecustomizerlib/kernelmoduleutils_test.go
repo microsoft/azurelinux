@@ -193,7 +193,7 @@ func TestUpdateModulesOptions(t *testing.T) {
 	_, err = aggregateModuleOptions([]string{}, moduleOptionsFilePath, "module1", "option2", "new_value2")
 	assert.NoError(t, err)
 
-	_, err = aggregateModuleOptions([]string{}, moduleOptionsFilePath, "module3", "option3", "new_value3")
+	_, err = aggregateModuleOptions([]string{}, moduleOptionsFilePath, "module2", "option3", "new_value3")
 	assert.NoError(t, err)
 
 	expectedLines = []string{
