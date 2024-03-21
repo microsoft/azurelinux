@@ -72,7 +72,7 @@ extends:
                   # and make it available to the next stage via an output variable: 'CalculateToolchainPackageRetestList.toolchainPackageRetestList'
                   - template: .pipelines/templates/ToolchainCalculatePackageRetests.yml@self
 
-                  - script: echo "##vso[task.setvariable variable=toolchainArtifactName]$(ob_artifactBaseName)"
+                  - script: echo "##vso[task.setvariable variable=toolchainArtifactName;isOutput=true]$(ob_artifactBaseName)"
                     name: "ToolchainArtifactName"
                     displayName: "Set variable for published artifact name"
 
