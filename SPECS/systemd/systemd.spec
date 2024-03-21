@@ -130,7 +130,8 @@ Patch0490:      use-bfq-scheduler.patch
 Patch0491:      fedora-use-system-auth-in-pam-systemd-user.patch
 
 # Patches for Azure Linux
-Patch0900: do-not-test-openssl-sm3.patch
+Patch0900:      do-not-test-openssl-sm3.patch
+Patch0901:      networkd-default-use-domains.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
