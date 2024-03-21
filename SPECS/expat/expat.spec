@@ -1,7 +1,7 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.5.0
+Version:        2.6.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -65,6 +65,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Thu Mar 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.6.2-1
+- Auto-upgrade to 2.6.2 - CVE-2024-28757
+
 * Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.0-1
 - Upgrade to 2.5.0
 
