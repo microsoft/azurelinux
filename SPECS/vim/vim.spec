@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2190
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,8 +46,11 @@ cat > %{buildroot}%{_sysconfdir}/vimrc << "EOF"
 
 set shell=/bin/bash
 set nocompatible
+set ai
 set backspace=2
 set ruler
+set hlsearch
+set belloff=all
 syntax on
 set tags=./tags;/
 color desert
@@ -58,7 +61,6 @@ endif
 nmap <F2> :w<CR>
 imap <F2> <Esc>:w<CR>
 nmap <F10> :q!<CR>
-nmap <Esc><Esc> :q<CR>
 " Use 4 space characters instead of tab for python files
 au BufEnter,BufNew *.py set tabstop=4 shiftwidth=4 expandtab
 " Move the swap file location to protect against CVE-2017-1000382
@@ -67,6 +69,9 @@ if ! isdirectory("~/.vim/swap/")
         call system('install -d -m 700 ~/.vim/swap')
 endif
 set directory=~/.vim/swap/
+
+command! W execute 'w !sudo tee % > /dev/null' <bar> edit!
+
 " End %{_sysconfdir}/vimrc
 EOF
 
@@ -197,6 +202,9 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
+* Thu Mar 21 2024 Andy Zaugg <azaugg@linkedin.com> - 9.0.2190-2
+- Tweek vimrc, remove double escape quit, remove vim bell, add ai and hlsearch and add :W for sudo write
+
 * Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 9.0.2190-1
 - Upgrade version to 9.0.2190
 
