@@ -1,0 +1,123 @@
+diff -urpN systemd-stable-255/src/network/networkd.conf b/src/network/networkd.conf
+--- systemd-stable-255/src/network/networkd.conf	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd.conf	2024-03-21 15:59:11.448545680 -0400
+@@ -27,7 +27,9 @@
+ [DHCPv4]
+ #DUIDType=vendor
+ #DUIDRawData=
++#DefaultUseDomains=no
+ 
+ [DHCPv6]
+ #DUIDType=vendor
+ #DUIDRawData=
++#DefaultUseDomains=no
+diff -urpN systemd-stable-255/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
+--- systemd-stable-255/src/network/networkd-dhcp-common.c	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-dhcp-common.c	2024-03-21 15:56:40.864623341 -0400
+@@ -633,6 +633,36 @@ int config_parse_dhcp_use_domains(
+         return 0;
+ }
+ 
++int config_parse_default_dhcp_use_domains(
++                const char* unit,
++                const char *filename,
++                unsigned line,
++                const char *section,
++                unsigned section_line,
++                const char *lvalue,
++                int ltype,
++                const char *rvalue,
++                void *data,
++                void *userdata) {
++
++        DHCPUseDomains *use_domains = ASSERT_PTR(data);
++
++        assert(filename);
++        assert(lvalue);
++        assert(rvalue);
++
++        DHCPUseDomains d = dhcp_use_domains_from_string(rvalue);
++        if (d < 0) {
++                log_syntax(unit, LOG_WARNING, filename, line, d,
++                           "Failed to parse %s=%s, ignoring assignment: %m", lvalue, rvalue);
++                return 0;
++        }
++
++        *use_domains = d;
++
++        return 0;
++}
++
+ int config_parse_dhcp_use_ntp(
+                 const char* unit,
+                 const char *filename,
+diff -urpN systemd-stable-255/src/network/networkd-dhcp-common.h b/src/network/networkd-dhcp-common.h
+--- systemd-stable-255/src/network/networkd-dhcp-common.h	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-dhcp-common.h	2024-03-21 15:56:40.872623336 -0400
+@@ -99,6 +99,7 @@ CONFIG_PARSER_PROTOTYPE(config_parse_ipv
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_send_hostname);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_dns);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_domains);
++CONFIG_PARSER_PROTOTYPE(config_parse_default_dhcp_use_domains);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_ntp);
+ CONFIG_PARSER_PROTOTYPE(config_parse_iaid);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_or_ra_route_table);
+diff -urpN systemd-stable-255/src/network/networkd-gperf.gperf b/src/network/networkd-gperf.gperf
+--- systemd-stable-255/src/network/networkd-gperf.gperf	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-gperf.gperf	2024-03-21 15:56:40.872623336 -0400
+@@ -27,8 +27,10 @@ Network.ManageForeignRoutingPolicyRules,
+ Network.ManageForeignRoutes,             config_parse_bool,                      0,          offsetof(Manager, manage_foreign_routes)
+ Network.RouteTable,                      config_parse_route_table_names,         0,          0
+ Network.IPv6PrivacyExtensions,           config_parse_ipv6_privacy_extensions,   0,          offsetof(Manager, ipv6_privacy_extensions)
++DHCPv4.DefaultUseDomains,                config_parse_default_dhcp_use_domains,  0,          offsetof(Manager, dhcp_use_domains)
+ DHCPv4.DUIDType,                         config_parse_duid_type,                 0,          offsetof(Manager, dhcp_duid)
+ DHCPv4.DUIDRawData,                      config_parse_duid_rawdata,              0,          offsetof(Manager, dhcp_duid)
++DHCPv6.DefaultUseDomains,                config_parse_default_dhcp_use_domains,  0,          offsetof(Manager, dhcp6_use_domains)
+ DHCPv6.DUIDType,                         config_parse_duid_type,                 0,          offsetof(Manager, dhcp6_duid)
+ DHCPv6.DUIDRawData,                      config_parse_duid_rawdata,              0,          offsetof(Manager, dhcp6_duid)
+ /* Deprecated */
+diff -urpN systemd-stable-255/src/network/networkd-manager.c b/src/network/networkd-manager.c
+--- systemd-stable-255/src/network/networkd-manager.c	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-manager.c	2024-03-21 15:56:40.872623336 -0400
+@@ -592,7 +592,9 @@ int manager_new(Manager **ret, bool test
+                 .manage_foreign_routes = true,
+                 .manage_foreign_rules = true,
+                 .ethtool_fd = -EBADF,
++                .dhcp_use_domains = DHCP_USE_DOMAINS_NO,
+                 .dhcp_duid.type = DUID_TYPE_EN,
++                .dhcp6_use_domains = DHCP_USE_DOMAINS_NO,
+                 .dhcp6_duid.type = DUID_TYPE_EN,
+                 .duid_product_uuid.type = DUID_TYPE_UUID,
+         };
+diff -urpN systemd-stable-255/src/network/networkd-manager.h b/src/network/networkd-manager.h
+--- systemd-stable-255/src/network/networkd-manager.h	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-manager.h	2024-03-21 15:56:40.872623336 -0400
+@@ -59,6 +59,9 @@ struct Manager {
+         OrderedSet *address_pools;
+         Set *dhcp_pd_subnet_ids;
+ 
++        DHCPUseDomains dhcp_use_domains;
++        DHCPUseDomains dhcp6_use_domains;
++
+         DUID dhcp_duid;
+         DUID dhcp6_duid;
+         DUID duid_product_uuid;
+diff -urpN systemd-stable-255/src/network/networkd-network.c b/src/network/networkd-network.c
+--- systemd-stable-255/src/network/networkd-network.c	2023-12-06 15:32:40.000000000 -0500
++++ b/src/network/networkd-network.c	2024-03-21 15:56:40.872623336 -0400
+@@ -390,6 +390,7 @@ int network_load_one(Manager *manager, O
+                 .dhcp_use_captive_portal = true,
+                 .dhcp_use_dns = true,
+                 .dhcp_routes_to_dns = true,
++                .dhcp_use_domains = manager->dhcp_use_domains,
+                 .dhcp_use_hostname = true,
+                 .dhcp_use_routes = true,
+                 .dhcp_use_gateway = -1,
+@@ -406,6 +407,7 @@ int network_load_one(Manager *manager, O
+                 .dhcp6_use_address = true,
+                 .dhcp6_use_pd_prefix = true,
+                 .dhcp6_use_dns = true,
++                .dhcp6_use_domains = manager->dhcp6_use_domains,
+                 .dhcp6_use_hostname = true,
+                 .dhcp6_use_ntp = true,
+                 .dhcp6_use_captive_portal = true,
