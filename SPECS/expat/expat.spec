@@ -67,7 +67,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 
 %changelog
 * Thu Mar 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
-- Upgrading to 2.6.2 to fix CVE-2023-52425
+- Upgrading to 2.6.2 to fix CVE-2023-52425 and CVE-2023-28757
 
 * Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.0-1
 - Upgrade to 2.5.0
