@@ -12,7 +12,7 @@ import (
 
 func TestPartitionIsValidExpanding(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 	}
@@ -23,7 +23,7 @@ func TestPartitionIsValidExpanding(t *testing.T) {
 
 func TestPartitionIsValidFixedSize(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            ptrutils.PtrTo(uint64(1)),
@@ -35,7 +35,7 @@ func TestPartitionIsValidFixedSize(t *testing.T) {
 
 func TestPartitionIsValidZeroSize(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            ptrutils.PtrTo(uint64(0)),
@@ -49,7 +49,7 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 
 func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		Size:           ptrutils.PtrTo(uint64(0)),
@@ -63,7 +63,7 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          2,
 		End:            ptrutils.PtrTo(uint64(1)),
@@ -77,7 +77,7 @@ func TestPartitionIsValidNegativeSize(t *testing.T) {
 
 func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          2,
 		End:            ptrutils.PtrTo(uint64(3)),
@@ -92,7 +92,7 @@ func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 
 func TestPartitionIsValidGoodName(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            nil,
@@ -105,7 +105,7 @@ func TestPartitionIsValidGoodName(t *testing.T) {
 
 func TestPartitionIsValidNameTooLong(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            nil,
@@ -120,7 +120,7 @@ func TestPartitionIsValidNameTooLong(t *testing.T) {
 
 func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            nil,
@@ -135,7 +135,7 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 
 func TestPartitionIsValidGoodFlag(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "fat32",
 		Start:          0,
 		End:            nil,
@@ -148,7 +148,7 @@ func TestPartitionIsValidGoodFlag(t *testing.T) {
 
 func TestPartitionIsValidBadFlag(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            nil,
@@ -162,7 +162,7 @@ func TestPartitionIsValidBadFlag(t *testing.T) {
 
 func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ntfs",
 		Start:          0,
 		End:            nil,
@@ -176,7 +176,7 @@ func TestPartitionIsValidUnsupportedFileSystem(t *testing.T) {
 
 func TestPartitionIsValidBadEspFsType(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          0,
 		End:            nil,
@@ -191,7 +191,7 @@ func TestPartitionIsValidBadEspFsType(t *testing.T) {
 
 func TestPartitionIsValidBadBiosBootFsType(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          1,
 		End:            nil,
@@ -206,7 +206,7 @@ func TestPartitionIsValidBadBiosBootFsType(t *testing.T) {
 
 func TestPartitionIsValidBadBiosBootStart(t *testing.T) {
 	partition := Partition{
-		ID:             "a",
+		Id:             "a",
 		FileSystemType: "ext4",
 		Start:          2,
 		End:            nil,

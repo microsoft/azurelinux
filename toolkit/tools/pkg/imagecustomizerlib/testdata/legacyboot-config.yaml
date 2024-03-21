@@ -16,11 +16,12 @@ storage:
 
   bootType: legacy
 
-  partitionSettings:
-  - id: boot
+  fileSystems:
+  - deviceId: boot
 
-  - id: rootfs
-    mountPoint: /
+  - deviceId: rootfs
+    mountPoint:
+      path: /
 
 os:
   resetBootLoaderType: hard-reset

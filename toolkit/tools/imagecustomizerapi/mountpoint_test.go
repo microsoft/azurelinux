@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPartitionIsValidInvalidMountIdentifier(t *testing.T) {
-	partition := PartitionSetting{
-		ID:                  "a",
-		MountIdentifierType: "bad",
+func TestMountPointIsValidInvalidIdType(t *testing.T) {
+	mountPoint := MountPoint{
+		IdType: "bad",
+		Path:   "/",
 	}
 
-	err := partition.IsValid()
+	err := mountPoint.IsValid()
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "invalid")
-	assert.ErrorContains(t, err, "mountIdentifierType")
+	assert.ErrorContains(t, err, "idType")
 }

@@ -84,58 +84,63 @@ os:
 ## Schema Overview
 
 - [config type](#config-type)
-  - [disks](#disks-disk)
-    - [disk type](#disk-type)
-      - [partitionTableType](#partitiontabletype-string)
-      - [maxSize](#maxsize-uint64)
-      - [partitions](#partitions-partition)
-        - [partition type](#partition-type)
-          - [id](#id-string)
-          - [fileSystemType](#filesystemtype-string)
-          - [label](#partition-label)
-          - [start](#start-uint64)
-          - [end](#end-uint64)
-          - [size](#size-uint64)
-          - [flag](#flags-string)
+  - [storage](#storage-storage)
+    - [bootType](#boottype-string)
+    - [disks](#disks-disk)
+      - [disk type](#disk-type)
+        - [partitionTableType](#partitiontabletype-string)
+        - [maxSize](#maxsize-uint64)
+        - [partitions](#partitions-partition)
+          - [partition type](#partition-type)
+            - [id](#id-string)
+            - [fileSystemType](#filesystemtype-string)
+            - [label](#label-string)
+            - [start](#start-uint64)
+            - [end](#end-uint64)
+            - [size](#size-uint64)
+            - [flag](#flags-string)
+    - [fileSystems](#filesystems-filesystem)
+      - [fileSystem type](#filesystem-type)
+        - [deviceId](#deviceid-string)
+        - [mountPoint](#mountpoint-mountpoint)
+          - [mountPoint type](#mountpoint-type)
+            - [idType](#idtype-string)
+            - [options](#options-string)
+            - [path](#mountpoint-path)
   - [iso](#iso-type)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
-        - [path](#path-string)
+        - [path](#fileconfig-path)
         - [permissions](#permissions-string)
   - [os type](#os-type)
-    - [bootType](#boottype-string)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
     - [kernelCommandLine](#kernelcommandline-type)
       - [extraCommandLine](#extracommandline-string)
-    - [updateBaseImagePackages](#updatebaseimagepackages-bool)
-    - [packageListsInstall](#packagelistsinstall-string)
-      - [packageList type](#packagelist-type)
-        - [packages](#packages-string)
-    - [packagesInstall](#packagesinstall-string)
-    - [packageListsRemove](#packagelistsremove-string)
-      - [packageList type](#packagelist-type)
-        - [packages](#packages-string)
-    - [packagesRemove](#packagesremove-string)
-    - [packageListsUpdate](#packagelistsupdate-string)
-    - [packagesUpdate](#packagesupdate-string)
+    - [packages](#packages-packages)
+      - [packages type](#packages-type)
+        - [updateExistingPackages](#updateexistingpackages-bool)
+        - [installLists](#installlists-string)
+          - [packageList type](#packagelist-type)
+            - [packages](#packages-string)
+        - [install](#install-string)
+        - [removeLists](#removelists-string)
+          - [packageList type](#packagelist-type)
+            - [packages](#packages-string)
+        - [remove](#remove-string)
+        - [updateLists](#updatelists-string)
+        - [update](#update-string)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
-        - [path](#path-string)
+        - [path](#fileconfig-path)
         - [permissions](#permissions-string)
-    - [partitionSettings](#partitionsettings-partitionsetting)
-      - [partitionSetting type](#partitionsetting-type)
-        - [id](#id-string)
-        - [mountIdentifierType](#mountidentifiertype-string)
-        - [mountOptions](#mountoptions-string)
-        - [mountPoint](#mountpoint-string)
     - [postInstallScripts](#postinstallscripts-script)
       - [script type](#script-type)
-        - [path](#path-string)
+        - [path](#script-path)
         - [args](#args-string)
     - [finalizeImageScripts](#finalizeimagescripts-script)
       - [script type](#script-type)
-        - [path](#path-string)
+        - [path](#script-path)
         - [args](#args-string)
     - [users](#users-user)
       - [user type](#user-type)
@@ -169,47 +174,45 @@ The top level type for the YAML file is the [config](#config-type) type.
 
 The top-level type of the configuration.
 
-### disks [[disk](#disk-type)[]]
+### storage [[storage](#storage-type)]
 
-Contains the options for provisioning disks and their partitions.
-
-If the Disks field isn't specified, then the partitions of the base image aren't
-changed.
-
-If Disks is specified, then both [os.bootType](#boottype-string) and
-[os.resetBootLoaderType](#resetbootloadertype-string) must also be
-specified.
+Contains the options for provisioning disks, partitions, and file systems.
 
 While Disks is a list, only 1 disk is supported at the moment.
 Support for multiple disks may (or may not) be added in the future.
 
 ```yaml
-disks:
-- partitionTableType: gpt
-  maxSize: 4096
-  partitions:
-  - id: esp
-    flags:
-    - esp
-    - boot
-    start: 1
-    end: 9
-    fileSystemType: fat32
+storage:
+  bootType: efi
 
-  - id: rootfs
-    start: 9
-    fileSystemType: ext4
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096
+    partitions:
+    - id: esp
+      flags:
+      - esp
+      - boot
+      start: 1
+      end: 9
+      fileSystemType: fat32
+
+    - id: rootfs
+      start: 9
+      fileSystemType: ext4
+      
+  fileSystems:
+  - deviceId: esp
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    mountPoint:
+      path: /
 
 os:
-  bootType: efi
   resetBootLoaderType: hard-reset
-  partitionSettings:
-  - id: esp
-    mountPoint: /boot/efi
-    mountOptions: umask=0077
-
-  - id: rootfs
-    mountPoint: /
 ```
 
 ### os [[os](#os-type)]
@@ -291,6 +294,8 @@ Specifies options for placing a file in the OS.
 
 Type is used by: [additionalFiles](#additionalfiles-mapstring-fileconfig)
 
+<div id="fileconfig-path"></div>
+
 ### path [string]
 
 The absolute path of the destination file.
@@ -321,6 +326,21 @@ os:
     - path: /a.txt
       permissions: "664"
 ```
+
+## fileSystem type
+
+Specifies the mount options for a partition.
+
+### deviceId [string]
+
+Required.
+
+The ID of the partition.
+This is used correlate [partition](#partition-type) objects with fileSystem objects.
+
+### mountPoint [[mountPoint](#mountpoint-type)]
+
+Optional settings for where and how to mount the filesystem.
 
 ## kernelCommandLine type
 
@@ -579,7 +599,7 @@ os:
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [partitionSetting](#partitionsetting-type)
+This is used to correlate Partition objects with [fileSystem](#filesystem-type)
 objects.
 
 ### fileSystemType [string]
@@ -593,8 +613,6 @@ Supported options:
 - `ext4`
 - `fat32`
 - `xfs`
-
-<div id="partition-label"></div>
 
 ### label [string]
 
@@ -648,19 +666,9 @@ Supported options:
 These options mirror those in
 [parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
 
-## partitionSetting type
+## mountPoint type
 
-Specifies the mount options for a partition.
-
-### id [string]
-
-Required.
-
-The ID of the partition.
-This is used correlate [partition](#partition-type) objects with PartitionSetting
-objects.
-
-### mountIdentifierType [string]
+### idType [string]
 
 Default: `part-uuid`
 
@@ -674,7 +682,7 @@ Supported options:
 
 - `part-label`: The partition label specified in the partition table.
 
-### mountOptions [string]
+### options [string]
 
 The additional options used when mounting the file system.
 
@@ -682,7 +690,9 @@ These options are in the same format as [mount](https://linux.die.net/man/8/moun
 `-o` option (or the `fs_mntops` field of the
 [fstab](https://man7.org/linux/man-pages/man5/fstab.5.html) file).
 
-### mountPoint [string]
+<div id="mountpoint-path"></div>
+
+### path [string]
 
 Required.
 
@@ -695,6 +705,8 @@ For example, `/boot` will be mounted before `/boot/efi`.
 ## script type
 
 Points to a script file (typically a Bash script) to be run during customization.
+
+<div id="script-path"></div>
 
 ### path [string]
 
@@ -759,22 +771,6 @@ os:
 ## os type
 
 Contains the configuration options for the OS.
-
-### bootType [string]
-
-Specifies the boot system that the image supports.
-
-Supported options:
-
-- `legacy`: Support booting from BIOS firmware.
-
-  When this option is specified, the partition layout must contain a partition with the
-  `bios-grub` flag.
-
-- `efi`: Support booting from UEFI firmware.
-
-  When this option is specified, the partition layout must contain a partition with the
-  `esp` flag.
 
 ### resetBootLoaderType [string]
 
@@ -841,10 +837,6 @@ os:
     - path: /c2.txt
       permissions: "664"
 ```
-
-### partitionSettings [[partitionSetting](#partitionsetting-type)[]]
-
-Specifies the mount options of the partitions.
 
 ### postInstallScripts [[script](#script-type)[]]
 
@@ -1070,3 +1062,29 @@ os:
   - name: test
     startupCommand: /sbin/nologin
 ```
+
+## storage type
+
+### bootType [string]
+
+Specifies the boot system that the image supports.
+
+Supported options:
+
+- `legacy`: Support booting from BIOS firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `bios-grub` flag.
+
+- `efi`: Support booting from UEFI firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `esp` flag.
+
+### disks [[disk](#disk-type)[]]
+
+Contains the options for provisioning disks and their partitions.
+
+### fileSystems [[fileSystem](#filesystem-type)[]]
+
+Specifies the mount options of the partitions.

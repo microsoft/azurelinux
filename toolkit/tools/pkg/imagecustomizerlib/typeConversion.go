@@ -76,7 +76,7 @@ func partitionToImager(partition imagecustomizerapi.Partition) (configuration.Pa
 	}
 
 	imagerPartition := configuration.Partition{
-		ID:     partition.ID,
+		ID:     partition.Id,
 		FsType: string(partition.FileSystemType),
 		Name:   partition.Label,
 		Start:  partition.Start,
@@ -116,11 +116,11 @@ func partitionFlagToImager(flag imagecustomizerapi.PartitionFlag) (configuration
 	}
 }
 
-func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionSetting,
+func partitionSettingsToImager(fileSystems []imagecustomizerapi.FileSystem,
 ) ([]configuration.PartitionSetting, error) {
 	imagerPartitionSettings := []configuration.PartitionSetting(nil)
-	for _, partitionSetting := range partitionSettings {
-		imagerPartitionSetting, err := partitionSettingToImager(partitionSetting)
+	for _, fileSystem := range fileSystems {
+		imagerPartitionSetting, err := partitionSettingToImager(fileSystem)
 		if err != nil {
 			return nil, err
 		}
@@ -129,18 +129,27 @@ func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionS
 	return imagerPartitionSettings, nil
 }
 
-func partitionSettingToImager(partitionSettings imagecustomizerapi.PartitionSetting,
+func partitionSettingToImager(fileSystem imagecustomizerapi.FileSystem,
 ) (configuration.PartitionSetting, error) {
-	imagerMountIdentifierType, err := mountIdentifierTypeToImager(partitionSettings.MountIdentifierType)
+	mountIdType := imagecustomizerapi.MountIdentifierTypeDefault
+	mountOptions := ""
+	mountPath := ""
+	if fileSystem.MountPoint != nil {
+		mountIdType = fileSystem.MountPoint.IdType
+		mountOptions = fileSystem.MountPoint.Options
+		mountPath = fileSystem.MountPoint.Path
+	}
+
+	imagerMountIdentifierType, err := mountIdentifierTypeToImager(mountIdType)
 	if err != nil {
 		return configuration.PartitionSetting{}, err
 	}
 
 	imagerPartitionSetting := configuration.PartitionSetting{
-		ID:              partitionSettings.ID,
+		ID:              fileSystem.DeviceId,
 		MountIdentifier: imagerMountIdentifierType,
-		MountOptions:    partitionSettings.MountOptions,
-		MountPoint:      partitionSettings.MountPoint,
+		MountOptions:    mountOptions,
+		MountPoint:      mountPath,
 	}
 	return imagerPartitionSetting, nil
 }

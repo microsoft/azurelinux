@@ -17,7 +17,7 @@ func TestConfigIsValid(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
+						Id:             "esp",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -28,10 +28,12 @@ func TestConfigIsValid(t *testing.T) {
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
+					DeviceId: "esp",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
 				},
 			},
 		},
@@ -53,7 +55,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "boot",
+						Id:             "boot",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -82,7 +84,7 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "a",
+						Id:             "a",
 						FileSystemType: "ext4",
 						Start:          1,
 					},
@@ -108,7 +110,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
+						Id:             "esp",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -255,7 +257,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
+						Id:             "esp",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -266,10 +268,12 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "boot/efi",
+					DeviceId: "esp",
+					MountPoint: &MountPoint{
+						Path: "boot/efi",
+					},
 				},
 			},
 		},
@@ -293,7 +297,7 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
+						Id:             "esp",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -304,10 +308,12 @@ func TestConfigIsValidInvalidPartitionId(t *testing.T) {
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "boot",
-					MountPoint: "/boot/efi",
+					DeviceId: "boot",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
 				},
 			},
 		},
@@ -331,7 +337,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
+						Id:             "esp",
 						FileSystemType: "fat32",
 						Start:          1,
 						Flags: []PartitionFlag{
@@ -342,10 +348,12 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
+					DeviceId: "esp",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
 				},
 			},
 		},
