@@ -101,6 +101,7 @@ extends:
                       customToolchainArtifactName: $(toolchainArtifactNameBase)_${{ configuration.name }}
                       isCheckBuild: true
                       isQuickRebuildPackages: true
+                      isUseCCache: true
                       outputArtifactsFolder: $(ob_outputDirectory)
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
