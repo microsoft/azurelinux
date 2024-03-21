@@ -1,6 +1,6 @@
 Name:           jurand
 Version:        1.3.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for manipulating Java symbols
 License:        Apache-2.0
 URL:            https://github.com/fedora-java/jurand
@@ -44,6 +44,9 @@ make test
 %doc README.adoc
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.3.2-4
+- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+
 * Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
