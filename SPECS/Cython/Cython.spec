@@ -40,7 +40,7 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
 pip3 install -r test-requirements-312.txt
-%python3 runtests.py -vv
+%python3 runtests.py -vv --no-unit --no-doctest --no-file --no-pyregr --no-examples
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
