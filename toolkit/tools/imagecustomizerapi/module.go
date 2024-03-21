@@ -65,11 +65,11 @@ func validateModuleName(moduleName string) error {
 
 func validateModuleLoadMode(loadmode LoadMode) error {
 	switch loadmode {
-	case LoadModeAuto, LoadModeDisable, LoadModeAlways, LoadModeInherit:
+	case LoadModeAuto, LoadModeDisable, LoadModeAlways, LoadModeInherit, "":
 		// All good.
 		return nil
 
 	default:
-		return fmt.Errorf("invalid module load mode value (%v), it can only be 'always', 'auto', 'disable', or 'inherit'", loadmode)
+		return fmt.Errorf("invalid module load mode value (%v), it can only be 'always', 'auto', 'disable','inherit' or ''", loadmode)
 	}
 }

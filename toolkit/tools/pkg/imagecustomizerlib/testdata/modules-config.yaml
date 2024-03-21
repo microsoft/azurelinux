@@ -13,10 +13,9 @@ os:
       loadMode: always
 
     - name: e1000e
-      loadMode: auto
+      loadMode: inherit
       options:
         InterruptThrottleRate: 3000,3000,3000
 
     - name: mousedev
       loadMode: disable
-

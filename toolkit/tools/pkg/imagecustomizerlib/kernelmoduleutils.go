@@ -29,11 +29,18 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, imageChroot *safe
 	var modulesToLoad []string
 	var modulesToDisable []string
 	var moduleOptionsUpdates map[string]map[string]string = make(map[string]map[string]string)
+	moduleMap := make(map[string]int)
 	moduleDisableFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/modules-disabled.conf")
 	moduleLoadFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/modules-load.conf")
 	moduleOptionsFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/module-options.conf")
 
 	for i, module := range modules {
+		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
+		if _, exists := moduleMap[module.Name]; exists {
+			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
+		}
+		moduleMap[module.Name] = i
+
 		switch module.LoadMode {
 		case imagecustomizerapi.LoadModeAlways:
 			// If a module is disabled, remove it. Add the module to modules-load.d/. Write options if provided.
@@ -85,8 +92,6 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, imageChroot *safe
 					moduleOptionsUpdates[module.Name] = module.Options
 				}
 			}
-		default:
-			return fmt.Errorf("invalid idType value (%v)", i)
 		}
 	}
 
@@ -103,29 +108,9 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, imageChroot *safe
 	}
 
 	// Batch process module options
-	aggregatedOptions := []string{}
-	if len(moduleOptionsUpdates) > 0 {
-		for moduleName, options := range moduleOptionsUpdates {
-			for key, value := range options {
-				logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
-				aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
-				if err != nil {
-					return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
-				}
-			}
-		}
-
-		file, err := os.OpenFile(moduleOptionsFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-		if err != nil {
-			return fmt.Errorf("failed to open %s: %w", moduleOptionsFilePath, err)
-		}
-		defer file.Close()
-
-		content := strings.Join(aggregatedOptions, "\n") + "\n"
-		// Append the content to the file.
-		if _, err := file.WriteString(content); err != nil {
-			return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
-		}
+	err = updateModulesOptions(moduleOptionsUpdates, moduleOptionsFilePath)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -240,6 +225,36 @@ func removeModuleFromDisableList(moduleName, moduleDisableFilePath string) error
 	}
 
 	return nil
+}
+
+func updateModulesOptions(moduleOptionsUpdates map[string]map[string]string, moduleOptionsFilePath string) error {
+    aggregatedOptions := []string{}
+    var err error
+
+    if len(moduleOptionsUpdates) > 0 {
+        for moduleName, options := range moduleOptionsUpdates {
+            for key, value := range options {
+                logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
+                aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
+                if err != nil {
+                    return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
+                }
+            }
+        }
+
+        file, err := os.OpenFile(moduleOptionsFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+        if err != nil {
+            return fmt.Errorf("failed to open %s: %w", moduleOptionsFilePath, err)
+        }
+        defer file.Close()
+
+        content := strings.Join(aggregatedOptions, "\n") + "\n"
+        if _, err = file.WriteString(content); err != nil {
+            return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
+        }
+    }
+
+    return nil
 }
 
 func aggregateModuleOptions(aggregatedOptions []string, moduleOptionsFilePath string, moduleName string, optionKey string, optionValue string) ([]string, error) {
