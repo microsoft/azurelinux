@@ -3,6 +3,8 @@ Version:        1.3.2
 Release:        4%{?dist}
 Summary:        A tool for manipulating Java symbols
 License:        Apache-2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://github.com/fedora-java/jurand
 
 Source0:        https://github.com/fedora-java/jurand/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz

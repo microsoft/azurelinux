@@ -5,7 +5,7 @@ Version:        3.11.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-compiler-plugin
 Source0:        https://archive.apache.org/dist/maven/plugins/%{name}-%{version}-source-release.zip
 BuildRequires:  javapackages-bootstrap
