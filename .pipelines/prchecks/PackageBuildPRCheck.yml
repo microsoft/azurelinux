@@ -56,6 +56,7 @@ extends:
                   name: ${{ configuration.agentPool }}
                 variables:
                   ob_artifactBaseName: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                  ob_artifactSuffix: _$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                 steps:
                   - template: .pipelines/templates/RawToolchainDownload.yml@self
@@ -93,6 +94,7 @@ extends:
                   name: ${{ configuration.agentPool }}
                 variables:
                   ob_artifactBaseName: ${{ variables.rpmsArtifactNameBase }}_${{ configuration.name }}
+                  ob_artifactSuffix: _$(System.JobAttempt)
                   ob_outputDirectory: $(Build.ArtifactStagingDirectory)
                   testListFromToolchain: $[ stageDependencies.Toolchain_${{ configuration.name }}.Build.outputs['CalculateToolchainPackageRetestList.toolchainPackageRetestList'] ]
                 steps:
