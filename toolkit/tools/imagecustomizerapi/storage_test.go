@@ -16,7 +16,7 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 			MaxSize:            2,
 			Partitions: []Partition{
 				{
-					ID:             "esp",
+					Id:             "esp",
 					FileSystemType: "fat32",
 					Start:          1,
 					Flags: []PartitionFlag{
@@ -27,19 +27,23 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 			},
 		}},
 		BootType: "efi",
-		PartitionSettings: []PartitionSetting{
+		FileSystems: []FileSystem{
 			{
-				ID:         "esp",
-				MountPoint: "/boot/efi",
+				DeviceId: "esp",
+				MountPoint: &MountPoint{
+					Path: "/boot/efi",
+				},
 			},
 			{
-				ID:         "esp",
-				MountPoint: "/",
+				DeviceId: "esp",
+				MountPoint: &MountPoint{
+					Path: "/",
+				},
 			},
 		},
 	}
 
 	err := value.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate partitionSettings ID")
+	assert.ErrorContains(t, err, "duplicate fileSystem deviceId used")
 }

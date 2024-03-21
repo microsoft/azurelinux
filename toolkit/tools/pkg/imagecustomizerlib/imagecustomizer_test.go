@@ -280,14 +280,14 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		MaxSize:            4096,
 		Partitions: []imagecustomizerapi.Partition{
 			{
-				ID:             "boot",
+				Id:             "boot",
 				Flags:          []imagecustomizerapi.PartitionFlag{"esp", "boot"},
 				Start:          1,
 				End:            ptrutils.PtrTo(uint64(9)),
 				FileSystemType: "fat32",
 			},
 			{
-				ID:             "rootfs",
+				Id:             "rootfs",
 				Start:          9,
 				End:            nil,
 				FileSystemType: "ext4",
@@ -295,17 +295,19 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		},
 	}
 
-	partitionSettings := []imagecustomizerapi.PartitionSetting{
+	fileSystems := []imagecustomizerapi.FileSystem{
 		{
-			ID:                  "boot",
-			MountPoint:          "/boot/efi",
-			MountOptions:        "umask=0077",
-			MountIdentifierType: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "boot",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path:    "/boot/efi",
+				Options: "umask=0077",
+			},
 		},
 		{
-			ID:                  "rootfs",
-			MountPoint:          "/",
-			MountIdentifierType: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "rootfs",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path: "/",
+			},
 		},
 	}
 
@@ -318,7 +320,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	err = createNewImageWithBootLoader(rawDisk, diskConfig, partitionSettings, "efi", imagecustomizerapi.SELinux{},
+	err = createNewImageWithBootLoader(rawDisk, diskConfig, fileSystems, "efi", imagecustomizerapi.SELinux{},
 		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxModeDisabled,
 		installOS)
 	if err != nil {

@@ -27,19 +27,23 @@ storage:
 
   bootType: efi
 
-  partitionSettings:
-  - id: esp
-    mountPoint: /boot/efi
-    mountOptions: umask=0077
+  fileSystems:
+  - deviceId: esp
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
 
-  - id: boot
-    mountPoint: /boot
+  - deviceId: boot
+    mountPoint:
+      path: /boot
 
-  - id: rootfs
-    mountPoint: /
+  - deviceId: rootfs
+    mountPoint:
+      path: /
 
-  - id: var
-    mountPoint: /var
+  - deviceId: var
+    mountPoint:
+      path: /var
 
 os:
   resetBootLoaderType: hard-reset
