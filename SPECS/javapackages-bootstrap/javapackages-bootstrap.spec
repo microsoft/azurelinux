@@ -374,7 +374,7 @@ echo '
 %%jpb_env PATH=/usr/libexec/javapackages-bootstrap:$PATH
 ' >%{buildroot}%{_rpmmacrodir}/macros.jpbgen
 
-# by default it sets JAVA_HOME to /usr/lib/jvm/java-17
+# by default it sets JAVA_HOME to /usr/lib/jvm/java-11-openjdk
 sed -i 's|/usr/lib/jvm/java-17|%{java_home}|' %{buildroot}%{_datadir}/%{name}/bin/mvn
 sed -i 's|/usr/lib/jvm/java-17|%{java_home}|' %{buildroot}%{launchersPath}/xmvn-install
 
@@ -400,8 +400,9 @@ sed -i s/_xmvngen_/_jpbgen_/ %{buildroot}%{_fileattrsdir}/jpbgen.attr
 %doc AUTHORS
 
 %changelog
-* Wed Mar 20 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.14.0-1
-- upgrade to 1.14.0
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.0-1
+- Auto-upgrade to 1.14.0 - azl 3.0
+- Changes from Fedora 39 (license: MIT).
 
 * Fri Aug 11 2023 Saul Paredes <saulparedes@microsoft.com> - 1.5.0-4
 - Patch plexus-archiver to fix CVE-2023-37460
