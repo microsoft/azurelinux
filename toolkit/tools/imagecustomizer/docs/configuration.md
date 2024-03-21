@@ -29,7 +29,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 7. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([modules](#modules-type))
+8. Configure kernel modules. ([modules](#modules-module))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
@@ -151,13 +151,11 @@ os:
     - [services](#services-type)
       - [enable](#enable-string)
       - [disable](#disable-string)
-    - [modules](#modules-type)
-      - [load](#load-module)
-        - [module type](#module-type)
-          - [name](#module-name)
-      - [disable](#disable-module)
-        - [module type](#module-type)
-          - [name](#module-name)
+    - [modules](#modules-module)
+      - [module type](#module-type)
+        - [name](#module-name)
+        - [loadMode](#loadMode-string)
+        - [options](#options-mapstring-string)
     - [verity type](#verity-type)
 
 ## Top-level
@@ -399,45 +397,51 @@ Options for configuring a kernel module.
 
 <div id="module-name"></div>
 
-### name
+### name [string]
 
 Name of the module.
 
 ```yaml
 os:
   modules:
-    load:
     - name: br_netfilter
 ```
 
-## modules type
+### loadMode [string]
 
-Options for configuring kernel modules.
+The loadMode setting for kernel modules dictates how and when these modules are loaded or disabled in the system.
 
-### load [[module](#module-type)[]]
+Supported loadmodes:
 
-Sets kernel modules to be loaded automatically on boot.
+- `always`: Set kernel modules to be loaded automatically at boot time.
+  - If the module is blacklisted in the base image, remove the blacklist entry.
+  - Add the module to `/etc/modules-load.d/modules-load.conf`.
+  - Write the options, if provided.
 
-Implemented by adding an entry to `/etc/modules-load.d/`.
+- `auto`: Used for modules that are automatically loaded by the kernel as needed, without explicit configuration to load them at boot.
+  - If the module is blacklisted in the base image, remove the blacklist entry to allow it to be loaded automatically.
+  - Write the provided options to `/etc/modprobe.d/module-options.conf`, but do not add the module to /etc/modules-load.d/, as it should be loaded automatically by the kernel when necessary.
 
-```yaml
-OS:
-  Modules:
-    Load:
-    - Name: br_netfilter
-```
+- `disable`: Configures kernel modules to be explicitly disabled, preventing them from loading automatically.
+  - If the module is not already blacklisted in the base image, a blacklist entry will be added to `/etc/modprobe.d/blacklist.conf` to ensure the module is disabled.
 
-### disable [[module](#module-type)[]]
+- `inherit`: Configures kernel modules to inherit the loading behavior set in the base image. Only applying new options where they are explicitly provided and applicable.
+  - If the module is not blacklisted, and options are provided, these options will be written to `/etc/modprobe.d/module-options.conf`.
 
-Disable kernel modules from being loaded.
+If loadMode is not set, it will be default to `inherit`.
 
-Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
+### options [map\<string, string>]
+
+Kernel options for modules can specify how these modules interact with the system, and adjust performance or security settings specific to each module.
 
 ```yaml
 os:
   modules:
-    disable:
-    - name: mousedev
+    - name: vfio
+      loadMode: always
+      options:
+        enable_unsafe_noiommu_mode: "Y"
+        disable_vga: "Y"
 ```
 
 ## packageList type
@@ -878,6 +882,19 @@ os:
   - name: test
 ```
 
+### modules [[module](#module-type)]
+
+Used to configure kernel modules.
+
+Example:
+
+```yaml
+os:
+  modules:
+    - name: vfio
+```
+
+
 ### services [[services](#services-type)]
 
 Options for configuring systemd services.
@@ -888,10 +905,6 @@ os:
     enable:
     - sshd
 ```
-
-### modules [[modules](#modules-type)]
-
-Options for configuration kernel modules.
 
 ## user type
 
