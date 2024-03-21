@@ -190,7 +190,13 @@ func removeOldAzureLinuxBootTargets() (err error) {
 
 func ejectDisk() (err error) {
 	logger.Log.Info("Ejecting CD-ROM.")
-	_, _, err = shell.Execute("eject", "--cdrom")
+	const squashErrors = false
+	program := "eject"
+	commandArgs := []string{
+		"--cdrom",
+		"--force",
+	}
+	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 
 	if err != nil {
 		// If there was an error ejecting the CD-ROM, assume this is a USB installation and prompt the user
