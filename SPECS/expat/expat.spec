@@ -53,6 +53,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %defattr(-,root,root)
 %doc AUTHORS Changes
 %{_bindir}/*
+%exclude %{_mandir}/man1/xmlwf.1.gz
 
 %files devel
 %{_includedir}/*
