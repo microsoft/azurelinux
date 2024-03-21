@@ -79,7 +79,7 @@ extends:
                   # 2. The value for 'artifact' must equal $(ob_artifactBaseName), as this is the only value OneBranch accepts.
                   - task: PublishPipelineArtifact@1
                     inputs:
-                      artifact: $(toolchainArtifactNameBase)_${{ configuration.name }}
+                      artifact: $(ob_artifactBaseName)
                       targetPath: $(ob_outputDirectory)
                     condition: always()
                     displayName: "Publish toolchain artifacts"
