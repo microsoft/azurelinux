@@ -190,9 +190,9 @@ autoreconf -i
     --enable-fuse \
     --disable-golang \
     --disable-rust \
-    --enable-ublk
+    %{!?azl:--enable-ublk}
 
-make %{?_smp_mflags}
+%make_build
 
 
 %install
@@ -247,7 +247,7 @@ skip_test fuse/test-*.sh
 make -C tests connect-tcp6 ||:
 skip_test tests/connect-tcp6
 
-make %{?_smp_mflags} check || {
+%make_build check || {
     for f in $(find -name test-suite.log); do
         echo
         echo "==== $f ===="
