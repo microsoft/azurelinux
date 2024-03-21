@@ -1,4 +1,3 @@
-
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
@@ -10,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -149,32 +148,32 @@ func ensureModulesLoaded(moduleNames []string, moduleLoadFilePath string) error 
 
 func ensureModulesDisabled(moduleNames []string, moduleDisableFilePath string) error {
 	content, err := os.ReadFile(moduleDisableFilePath)
-    if err != nil && !os.IsNotExist(err) {
-        return fmt.Errorf("failed to read disable configuration: %w", err)
-    }
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to read disable configuration: %w", err)
+	}
 
-    contentString := string(content)
-    updatedContent := contentString
-    needUpdate := false
+	contentString := string(content)
+	updatedContent := contentString
+	needUpdate := false
 
-    for _, moduleName := range moduleNames {
-        blacklistEntry := "blacklist " + moduleName
-        if !strings.Contains(contentString, blacklistEntry+"\n") {
-            // Append the module to be disabled if it's not already in the file
-            updatedContent += blacklistEntry + "\n"
-            needUpdate = true
-            logger.Log.Infof("Disabling module %s", moduleName)
-        }
-    }
+	for _, moduleName := range moduleNames {
+		blacklistEntry := "blacklist " + moduleName
+		if !strings.Contains(contentString, blacklistEntry+"\n") {
+			// Append the module to be disabled if it's not already in the file
+			updatedContent += blacklistEntry + "\n"
+			needUpdate = true
+			logger.Log.Infof("Disabling module %s", moduleName)
+		}
+	}
 
-    if needUpdate {
-        err = os.WriteFile(moduleDisableFilePath, []byte(updatedContent), 0644)
-        if err != nil {
-            return fmt.Errorf("failed to update disable configuration: %w", err)
-        }
-    }
+	if needUpdate {
+		err = os.WriteFile(moduleDisableFilePath, []byte(updatedContent), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to update disable configuration: %w", err)
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func isModuleDisabled(moduleName, moduleDisableFilePath string) (bool, error) {
@@ -228,33 +227,33 @@ func removeModuleFromDisableList(moduleName, moduleDisableFilePath string) error
 }
 
 func updateModulesOptions(moduleOptionsUpdates map[string]map[string]string, moduleOptionsFilePath string) error {
-    aggregatedOptions := []string{}
-    var err error
+	aggregatedOptions := []string{}
+	var err error
 
-    if len(moduleOptionsUpdates) > 0 {
-        for moduleName, options := range moduleOptionsUpdates {
-            for key, value := range options {
-                logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
-                aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
-                if err != nil {
-                    return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
-                }
-            }
-        }
+	if len(moduleOptionsUpdates) > 0 {
+		for moduleName, options := range moduleOptionsUpdates {
+			for key, value := range options {
+				logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
+				aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
+				if err != nil {
+					return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
+				}
+			}
+		}
 
-        file, err := os.OpenFile(moduleOptionsFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-        if err != nil {
-            return fmt.Errorf("failed to open %s: %w", moduleOptionsFilePath, err)
-        }
-        defer file.Close()
+		file, err := os.OpenFile(moduleOptionsFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to open %s: %w", moduleOptionsFilePath, err)
+		}
+		defer file.Close()
 
-        content := strings.Join(aggregatedOptions, "\n") + "\n"
-        if _, err = file.WriteString(content); err != nil {
-            return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
-        }
-    }
+		content := strings.Join(aggregatedOptions, "\n") + "\n"
+		if _, err = file.WriteString(content); err != nil {
+			return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func aggregateModuleOptions(aggregatedOptions []string, moduleOptionsFilePath string, moduleName string, optionKey string, optionValue string) ([]string, error) {

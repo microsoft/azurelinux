@@ -12,10 +12,10 @@ type ModuleOptions map[string]string
 type LoadMode string
 
 const (
-	LoadModeAlways   	LoadMode = "always"
-	LoadModeAuto		LoadMode = "auto"
-	LoadModeDisable 	LoadMode = "disable"
-	LoadModeInherit	    LoadMode = "inherit"
+	LoadModeAlways  LoadMode = "always"
+	LoadModeAuto    LoadMode = "auto"
+	LoadModeDisable LoadMode = "disable"
+	LoadModeInherit LoadMode = "inherit"
 )
 
 type Module struct {
