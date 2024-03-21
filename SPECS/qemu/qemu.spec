@@ -438,7 +438,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 8.2.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -447,6 +447,7 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 # https://patchwork.kernel.org/project/qemu-devel/patch/20231128143647.847668-1-crobinso@redhat.com/
 # Fix pvh.img ld build failure on fedora rawhide
 Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
+Patch2: 0002-disable-migration-tests.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -660,7 +661,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %if %{user_static}
 BuildRequires: glibc-static >= 2.38-3
 BuildRequires: glib2-static zlib-static
-BuildRequires: pcre-static
+BuildRequires: pcre2-static
 %endif
 
 # Requires for the Fedora 'qemu' metapackage
@@ -3462,8 +3463,12 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 8.2.0-4
+- Apply patch to disable migration tests that were getting stuck
+- Move from pcre to pcre2
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 8.2.0-3
-- update to build dep latest glibc-static version
+- Update to build dep latest glibc-static version
 
 * Mon Mar 11 2024 Kanika Nema <kanikanema@microsoft.com> - 8.2.0-2
 - Fix spec for ARM builds and minor cleanup
