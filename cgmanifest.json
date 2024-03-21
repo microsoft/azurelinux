@@ -28536,8 +28536,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-pytss",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/1.2.0.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/2.2.1.tar.gz"
         }
       }
     },
