@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format - C implementation
 Name:           protobuf-c
 Version:        1.5.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,6 +62,9 @@ find %{buildroot} -type f -name "libprotobuf-c.a" -delete -print
 %{_libdir}/libprotobuf-c.so
 
 %changelog
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.5.0-4
+- Bumping release to rebuild with latest 'abseil-cpp'.
+
 * Wed Mar 06 2024 Lanze Liu <lanzeliu@microsoft.com> - 1.5.0-3
 - Remove protobuf-c static sub-package
 

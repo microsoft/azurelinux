@@ -1,7 +1,7 @@
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -153,6 +153,9 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.62.0-2
+- Bump release to rebuild with latest 'abseil-cpp'.
+
 * Thu Mar 07 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.62.0-1
 - Upgrade to 1.62.0
 - Import 'grpcio-cython3.patch' from OpenSUSE

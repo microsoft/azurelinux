@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20230802.1",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz"
+          "version": "20240116.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.0.tar.gz"
         }
       }
     },
@@ -15213,8 +15213,8 @@
         "type": "other",
         "other": {
           "name": "opentelemetry-cpp",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
         }
       }
     },
