@@ -227,14 +227,14 @@ func removeModuleFromDisableList(moduleName, moduleDisableFilePath string) error
 }
 
 func updateModulesOptions(moduleOptionsUpdates map[string]map[string]string, moduleOptionsFilePath string) error {
-	aggregatedOptions := []string{}
+	optionsToAppend := []string{}
 	var err error
 
 	if len(moduleOptionsUpdates) > 0 {
 		for moduleName, options := range moduleOptionsUpdates {
 			for key, value := range options {
 				logger.Log.Infof("Writing module options %s=%s for module %s", key, value, moduleName)
-				aggregatedOptions, err = aggregateModuleOptions(aggregatedOptions, moduleOptionsFilePath, moduleName, key, value)
+				optionsToAppend, err = aggregateModuleOptions(optionsToAppend, moduleOptionsFilePath, moduleName, key, value)
 				if err != nil {
 					return fmt.Errorf("failed to append module option for module %s: %w", moduleName, err)
 				}
@@ -247,7 +247,7 @@ func updateModulesOptions(moduleOptionsUpdates map[string]map[string]string, mod
 		}
 		defer file.Close()
 
-		content := strings.Join(aggregatedOptions, "\n") + "\n"
+		content := strings.Join(optionsToAppend, "\n") + "\n"
 		if _, err = file.WriteString(content); err != nil {
 			return fmt.Errorf("failed to write module options to %s: %w", moduleOptionsFilePath, err)
 		}

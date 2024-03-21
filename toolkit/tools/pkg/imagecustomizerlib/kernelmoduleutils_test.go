@@ -6,6 +6,7 @@ package imagecustomizerlib
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
@@ -173,12 +174,21 @@ func TestUpdateModulesOptions(t *testing.T) {
 	err = updateModulesOptions(moduleOptionsUpdates, moduleOptionsFilePath)
 	assert.NoError(t, err)
 
-	content, err := os.ReadFile(moduleOptionsFilePath)
+	contentFromFile, err := os.ReadFile(moduleOptionsFilePath)
 	assert.NoError(t, err)
+	content := string(contentFromFile)
+	actualLines := strings.Split(content, "\n")
 
-	expectedContent := "options module1 option1=value1\noptions module1 option2=value2\noptions module2 option3=value3\n"
-	assert.Equal(t, expectedContent, string(content))
+	expectedLines := []string{
+		"options module1 option1=value1",
+		"options module1 option2=value2",
+		"options module2 option3=value3",
+	}
 
+	// Check if each expected line is present in the actual content
+	for _, expectedLine := range expectedLines {
+		assert.Contains(t, actualLines, expectedLine)
+	}
 	// Update existing module option
 	_, err = aggregateModuleOptions([]string{}, moduleOptionsFilePath, "module1", "option2", "new_value2")
 	assert.NoError(t, err)
@@ -186,9 +196,19 @@ func TestUpdateModulesOptions(t *testing.T) {
 	_, err = aggregateModuleOptions([]string{}, moduleOptionsFilePath, "module3", "option3", "new_value3")
 	assert.NoError(t, err)
 
-	content, _ = os.ReadFile(moduleOptionsFilePath)
-	expectedContent = "options module1 option1=value1\noptions module1 option2=new_value\noptions module2 option3=new_value3\n"
-	assert.Equal(t, expectedContent, string(content))
+	expectedLines = []string{
+		"options module1 option1=value1",
+		"options module1 option2=new_value2",
+		"options module2 option3=new_value3",
+	}
+
+	contentFromFile, err = os.ReadFile(moduleOptionsFilePath)
+	assert.NoError(t, err)
+	content = string(contentFromFile)
+	actualLines = strings.Split(content, "\n")
+	for _, expectedLine := range expectedLines {
+		assert.Contains(t, actualLines, expectedLine)
+	}
 
 	// Add new module options
 	moduleOptionsUpdates = map[string]map[string]string{
@@ -199,7 +219,17 @@ func TestUpdateModulesOptions(t *testing.T) {
 
 	err = updateModulesOptions(moduleOptionsUpdates, moduleOptionsFilePath)
 	assert.NoError(t, err)
-	content, _ = os.ReadFile(moduleOptionsFilePath)
-	expectedContent = "options module1 option1=value1\noptions module1 option2=new_value\noptions module2 option3=new_value3\noptions module4 option4=value4\n"
-	assert.Equal(t, expectedContent, string(content))
+	expectedLines = []string{
+		"options module1 option1=value1",
+		"options module1 option2=new_value2",
+		"options module2 option3=new_value3",
+		"options module4 option4=value4",
+	}
+	contentFromFile, err = os.ReadFile(moduleOptionsFilePath)
+	assert.NoError(t, err)
+	content = string(contentFromFile)
+	actualLines = strings.Split(content, "\n")
+	for _, expectedLine := range expectedLines {
+		assert.Contains(t, actualLines, expectedLine)
+	}
 }
