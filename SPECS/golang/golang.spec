@@ -1,8 +1,8 @@
 %global bootstrap_compiler_version 1.19.12-1
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_revision  1
-%global ms_go_buildid   20240111.3
+%global ms_go_revision  2
+%global ms_go_buildid   20240320.5
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,8 +15,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.21.6
-Release:        2%{?dist}
+Version:        1.21.8
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,6 +144,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Mar 21 2024 Davis Goodin <dagood@microsoft.com> - 1.21.8-1
+- Bump version to 1.21.8-1, build version to 1.21.8-2
+
 * Thu Feb 22 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.6-2
 - Include go.env file in GOROOT
 
