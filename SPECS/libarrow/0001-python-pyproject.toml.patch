@@ -1,0 +1,23 @@
+--- arrow-apache-arrow-14.0.0/python/pyproject.toml.orig	2023-10-20 10:33:42.108813402 -0400
++++ arrow-apache-arrow-14.0.0/python/pyproject.toml	2023-10-20 10:34:04.643427658 -0400
+@@ -19,7 +19,7 @@
+ requires = [
+     "cython >= 0.29.31",
+     "oldest-supported-numpy>=0.14",
+-    "setuptools_scm < 8.0.0",
++    "setuptools_scm >= 8.0.4",
+     "setuptools >= 40.1.0",
+     "wheel"
+ ]
+--- arrow-apache-arrow-14.0.0/python/setup.py.orig	2023-10-20 10:43:16.118987563 -0400
++++ arrow-apache-arrow-14.0.0/python/setup.py	2023-10-20 10:43:47.157456249 -0400
+@@ -492,7 +492,7 @@
+                                  'pyarrow/_generated_version.py'),
+         'version_scheme': guess_next_dev_version
+     },
+-    setup_requires=['setuptools_scm < 8.0.0', 'cython >= 0.29.31'] + setup_requires,
++    setup_requires=['setuptools_scm >= 8.0.4', 'cython >= 0.29.31'] + setup_requires,
+     install_requires=install_requires,
+     tests_require=['pytest', 'pandas', 'hypothesis'],
+     python_requires='>=3.8',
+
