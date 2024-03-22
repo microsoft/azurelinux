@@ -16,9 +16,9 @@ func TestDiskIsValid(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 		},
 	}
@@ -33,10 +33,10 @@ func TestDiskIsValidWithEnd(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 		},
 	}
@@ -51,10 +51,10 @@ func TestDiskIsValidWithSize(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				Size:   ptrutils.PtrTo(uint64(1)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				Size:           ptrutils.PtrTo(uint64(1)),
 			},
 		},
 	}
@@ -69,9 +69,9 @@ func TestDiskIsValidStartAt0(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  0,
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          0,
 			},
 		},
 	}
@@ -88,16 +88,16 @@ func TestDiskIsValidInvalidTableType(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 		},
 	}
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "PartitionTableType")
+	assert.ErrorContains(t, err, "partitionTableType")
 }
 
 func TestDiskIsValidInvalidPartition(t *testing.T) {
@@ -106,10 +106,10 @@ func TestDiskIsValidInvalidPartition(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  2,
-				End:    ptrutils.PtrTo(uint64(0)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          2,
+				End:            ptrutils.PtrTo(uint64(0)),
 			},
 		},
 	}
@@ -125,14 +125,14 @@ func TestDiskIsValidTwoExpanding(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
+				Id:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}
@@ -148,16 +148,16 @@ func TestDiskIsValidOverlaps(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
-				End:    ptrutils.PtrTo(uint64(4)),
+				Id:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
+				End:            ptrutils.PtrTo(uint64(4)),
 			},
 		},
 	}
@@ -173,15 +173,15 @@ func TestDiskIsValidOverlapsExpanding(t *testing.T) {
 		MaxSize:            4,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  2,
+				Id:             "b",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}
@@ -197,23 +197,23 @@ func TestDiskIsValidTooSmall(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  3,
-				End:    ptrutils.PtrTo(uint64(4)),
+				Id:             "b",
+				FileSystemType: "ext4",
+				Start:          3,
+				End:            ptrutils.PtrTo(uint64(4)),
 			},
 		},
 	}
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidTooSmallExpanding(t *testing.T) {
@@ -222,22 +222,22 @@ func TestDiskIsValidTooSmallExpanding(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(3)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(3)),
 			},
 			{
-				ID:     "b",
-				FsType: "ext4",
-				Start:  3,
+				Id:             "b",
+				FileSystemType: "ext4",
+				Start:          3,
 			},
 		},
 	}
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidZeroSize(t *testing.T) {
@@ -249,7 +249,7 @@ func TestDiskIsValidZeroSize(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "MaxSize")
+	assert.ErrorContains(t, err, "maxSize")
 }
 
 func TestDiskIsValidMissingEspFlag(t *testing.T) {
@@ -258,9 +258,9 @@ func TestDiskIsValidMissingEspFlag(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "fat32",
-				Start:  1,
+				Id:             "a",
+				FileSystemType: "fat32",
+				Start:          1,
 				Flags: []PartitionFlag{
 					"boot",
 				},
@@ -281,9 +281,9 @@ func TestDiskIsValidMissingBootFlag(t *testing.T) {
 		MaxSize:            3,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "fat32",
-				Start:  1,
+				Id:             "a",
+				FileSystemType: "fat32",
+				Start:          1,
 				Flags: []PartitionFlag{
 					"esp",
 				},
@@ -304,20 +304,20 @@ func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
 		MaxSize:            2,
 		Partitions: []Partition{
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(2)),
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(2)),
 			},
 			{
-				ID:     "a",
-				FsType: "ext4",
-				Start:  2,
+				Id:             "a",
+				FileSystemType: "ext4",
+				Start:          2,
 			},
 		},
 	}
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "duplicate partition ID")
+	assert.ErrorContains(t, err, "duplicate partition id")
 }

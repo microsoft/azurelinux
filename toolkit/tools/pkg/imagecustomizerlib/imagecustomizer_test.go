@@ -134,7 +134,7 @@ func reconnectToFakeEfiImage(buildDir string, imageFilePath string) (*ImageConne
 
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/a.txt": {{Path: "/a.txt"}},
 			},
@@ -144,7 +144,7 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/missing_a.txt": {{Path: "/a.txt"}},
 			},
@@ -154,7 +154,7 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files": {{Path: "/a.txt"}},
 			},
@@ -164,7 +164,7 @@ func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 
 func TestValidateConfigScript(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			PostInstallScripts: []imagecustomizerapi.Script{
 				{
 					Path: "scripts/postinstallscript.sh",
@@ -181,7 +181,7 @@ func TestValidateConfigScript(t *testing.T) {
 
 func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			PostInstallScripts: []imagecustomizerapi.Script{
 				{
 					Path: "../a.sh",
@@ -193,7 +193,7 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 
 func TestValidateConfigScriptNonExecutable(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			FinalizeImageScripts: []imagecustomizerapi.Script{
 				{
 					Path: "files/a.txt",
@@ -229,7 +229,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 
 	// Customize image.
 	config := &imagecustomizerapi.Config{
-		SystemConfig: imagecustomizerapi.SystemConfig{
+		OS: imagecustomizerapi.OS{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
 				ExtraCommandLine: "console=tty0 console=ttyS0",
 			},
@@ -280,32 +280,34 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		MaxSize:            4096,
 		Partitions: []imagecustomizerapi.Partition{
 			{
-				ID:     "boot",
-				Flags:  []imagecustomizerapi.PartitionFlag{"esp", "boot"},
-				Start:  1,
-				End:    ptrutils.PtrTo(uint64(9)),
-				FsType: "fat32",
+				Id:             "boot",
+				Flags:          []imagecustomizerapi.PartitionFlag{"esp", "boot"},
+				Start:          1,
+				End:            ptrutils.PtrTo(uint64(9)),
+				FileSystemType: "fat32",
 			},
 			{
-				ID:     "rootfs",
-				Start:  9,
-				End:    nil,
-				FsType: "ext4",
+				Id:             "rootfs",
+				Start:          9,
+				End:            nil,
+				FileSystemType: "ext4",
 			},
 		},
 	}
 
-	partitionSettings := []imagecustomizerapi.PartitionSetting{
+	fileSystems := []imagecustomizerapi.FileSystem{
 		{
-			ID:              "boot",
-			MountPoint:      "/boot/efi",
-			MountOptions:    "umask=0077",
-			MountIdentifier: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "boot",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path:    "/boot/efi",
+				Options: "umask=0077",
+			},
 		},
 		{
-			ID:              "rootfs",
-			MountPoint:      "/",
-			MountIdentifier: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "rootfs",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path: "/",
+			},
 		},
 	}
 
@@ -318,8 +320,8 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	err = createNewImage(rawDisk, diskConfig, partitionSettings, "efi",
-		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxDisabled,
+	err = createNewImageWithBootLoader(rawDisk, diskConfig, fileSystems, "efi", imagecustomizerapi.SELinux{},
+		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxModeDisabled,
 		installOS)
 	if err != nil {
 		return "", err

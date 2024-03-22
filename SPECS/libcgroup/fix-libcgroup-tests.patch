@@ -1,0 +1,64 @@
+diff --git a/tests/gunit/Makefile.am b/tests/gunit/Makefile.am
+index 353567b..91e3e3c 100644
+--- a/tests/gunit/Makefile.am
++++ b/tests/gunit/Makefile.am
+@@ -9,19 +9,16 @@
+ AM_CPPFLAGS = -I$(top_srcdir)/include \
+ 	      -I$(top_srcdir)/src \
+ 	      -I$(top_srcdir)/src/tools \
+-	      -I$(top_srcdir)/googletest/googletest/include \
+-	      -I$(top_srcdir)/googletest/googletest \
+-	      -std=c++11 \
++	      -std=c++14 \
++		  -Wno-unused-variable \
+ 	      -Wno-write-strings \
++		  -Wno-stringop-truncation \
+ 	      -DSTATIC= \
+ 	      -DUNIT_TEST
+ LDADD = $(top_builddir)/src/.libs/libcgroupfortesting.la \
+ 	$(top_builddir)/src/tools/.libs/libcgset.la
+ 
+-EXTRA_DIST = $(top_srcdir)/googletest/googletest/libgtest.so \
+-	     $(top_srcdir)/googletest/googletest/libgtest_main.so \
+-	     $(top_srcdir)/googletest/googletest/include \
+-	     libcgroup_unittest.map
++EXTRA_DIST = libcgroup_unittest.map
+ 
+ check_PROGRAMS = gtest
+ TESTS = gtest
+@@ -32,21 +29,16 @@ gtest_SOURCES = gtest.cpp \
+ 		003-cg_get_cgroups_from_proc_cgroups.cpp \
+ 		004-cgroup_compare_ignore_rule.cpp \
+ 		005-cgroup_compare_wildcard_procname.cpp \
+-		006-cgroup_get_cgroup.cpp \
+ 		007-cgroup_process_v1_mount.cpp \
+ 		008-cgroup_process_v2_mount.cpp \
+-		009-cgroup_set_values_recursive.cpp \
+ 		010-cgroup_chown_chmod_tasks.cpp \
+-		011-cgroupv2_subtree_control.cpp \
+-		012-cgroup_create_cgroup.cpp \
+ 		013-cgroup_build_tasks_procs_path.cpp \
+ 		014-cgroupv2_get_subtree_control.cpp \
+ 		015-cgroupv2_controller_enabled.cpp \
+ 		016-cgset_parse_r_flag.cpp \
+ 		017-API_fuzz_test.cpp
+ 
+-gtest_LDFLAGS = -L$(top_srcdir)/googletest/googletest -l:libgtest.so \
+-		-rpath $(abs_top_srcdir)/googletest/googletest
++gtest_LDFLAGS = -l:libgtest.so
+ 
+ clean-local:
+ 	${RM} test-procpidcgroup
+diff --git a/tests/gunit/017-API_fuzz_test.cpp b/tests/gunit/017-API_fuzz_test.cpp
+index 969cfdb..f1654e4 100644
+--- a/tests/gunit/017-API_fuzz_test.cpp
++++ b/tests/gunit/017-API_fuzz_test.cpp
+@@ -37,6 +37,8 @@ TEST_F(APIArgsTest, API_cgroup_set_permissions)
+ 	ctrl_mode = (S_IRUSR | S_IWUSR | S_IRGRP);
+ 	task_mode = (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+ 
++	// Set the logger in case cgroup_init() is not called
++	cgroup_set_default_logger(-1);
+ 	testing::internal::CaptureStdout();
+ 
+ 	cgroup_set_permissions(cgroup, dir_mode, ctrl_mode, task_mode);

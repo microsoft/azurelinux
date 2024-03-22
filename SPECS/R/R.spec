@@ -15,7 +15,7 @@ BuildRequires:  curl-devel
 BuildRequires:  gfortran
 BuildRequires:  glibc-iconv
 BuildRequires:  make
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  pcre
 BuildRequires:  pcre2
 BuildRequires:  pcre2-devel

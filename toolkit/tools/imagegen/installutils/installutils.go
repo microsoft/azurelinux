@@ -78,6 +78,9 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
+
+	// Configuration files related to boot behavior. Users should be able to read these files, and root should have RW access.
+	bootUsrConfigFileMode = 0644
 )
 
 // PackageList represents the list of packages to install into an image
@@ -1166,7 +1169,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	installGrubDefFile := filepath.Join(installRoot, targetFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetFile, installGrubDefFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootUsrConfigFileMode)
 	if err != nil {
 		return
 	}
@@ -1766,6 +1769,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
 	targetRootPath := "/mnt/_bindmountroot"
+	targetRootFullPath := filepath.Join(installChroot.RootDir(), targetRootPath)
 
 	for _, mountToLabel := range listOfMountsToLabel {
 		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
@@ -1819,7 +1823,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 		// Cleanup the temporary directory.
 		// Note: This is intentionally done within the for loop to ensure the directory is always empty for the next
 		// mount. For example, if a parent directory mount is processed after a nested child directory mount.
-		err = os.RemoveAll(targetRootPath)
+		err = os.RemoveAll(targetRootFullPath)
 		if err != nil {
 			return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
 		}

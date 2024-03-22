@@ -1,0 +1,11 @@
+diff -urN a/scripts/bootstrap/compile.sh b/scripts/bootstrap/compile.sh
+--- a/scripts/bootstrap/compile.sh	1980-01-01 00:00:00.000000000 -0800
++++ b/scripts/bootstrap/compile.sh	2024-03-11 15:10:12.241266121 -0700
+@@ -447,6 +447,7 @@
+       -XX:+HeapDumpOnOutOfMemoryError -Xverify:none -Dfile.encoding=ISO-8859-1 \
+       -XX:HeapDumpPath=${OUTPUT_DIR} \
+       -Djava.util.logging.config.file=${OUTPUT_DIR}/javalog.properties \
++      --add-opens java.base/java.lang=ALL-UNNAMED \
+       ${JNI_FLAGS} \
+       -jar ${ARCHIVE_DIR}/libblaze.jar \
+       --batch \

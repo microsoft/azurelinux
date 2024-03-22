@@ -8,13 +8,13 @@ import (
 )
 
 type Script struct {
-	Path string `yaml:"Path"`
-	Args string `yaml:"Args"`
+	Path string `yaml:"path"`
+	Args string `yaml:"args"`
 }
 
 func (s *Script) IsValid() error {
 	if s.Path == "" {
-		return fmt.Errorf("value of Path may not be empty")
+		return fmt.Errorf("value of path may not be empty")
 	}
 
 	return nil

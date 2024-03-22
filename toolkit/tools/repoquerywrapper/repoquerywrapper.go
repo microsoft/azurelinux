@@ -4,7 +4,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -92,7 +91,7 @@ func main() {
 }
 
 func readFileLines(fileName string) (lines []string, err error) {
-	content, err := ioutil.ReadFile(fileName)
+	content, err := os.ReadFile(fileName)
 	if err != nil {
 		logger.Log.Errorf("Error reading file: %v", err)
 		return nil, err
@@ -103,7 +102,7 @@ func readFileLines(fileName string) (lines []string, err error) {
 
 func writeFileLines(lines []string, fileName string) (err error) {
 	content := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(fileName, []byte(content), 0644)
+	err = os.WriteFile(fileName, []byte(content), 0644)
 	if err != nil {
 		logger.Log.Errorf("Error writing file: %v", err)
 		return err
