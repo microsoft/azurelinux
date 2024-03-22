@@ -134,9 +134,9 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
 
-mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 
 touch %{buildroot}%{_var}/opt/%{name}/log/%{name}.log
 ln -srv %{buildroot}%{_var}/opt/%{name}/log/%{name}.log %{buildroot}%{_var}/log/
@@ -156,7 +156,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
-%exclude %{_libdir}/dracut/modules.d/20overlayfs/*
+%exclude %{dracutlibdir}/modules.d/20overlayfs
 %{_libdir}/%{name}/%{name}-init.sh
 %{_datadir}/pkgconfig/%{name}.pc
 %{dracutlibdir}/%{name}-functions.sh
@@ -207,8 +207,8 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %defattr(-,root,root,0755)
 
 %files overlayfs
-%dir %{_libdir}/dracut/modules.d/20overlayfs
-%{_libdir}/dracut/modules.d/20overlayfs/*
+%dir %{dracutlibdir}/modules.d/20overlayfs
+%{dracutlibdir}/modules.d/20overlayfs/*
 
 %{_bindir}/%{name}-catimages
 %dir /boot/%{name}
