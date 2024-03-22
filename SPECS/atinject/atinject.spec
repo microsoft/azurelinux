@@ -114,7 +114,7 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1-6
+* Fri Mar 22 2024 Jon Slobodzian <joslobo@microsoft.com> - 1-6
 - Updated to build with Java 7.  Modified version
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-5
