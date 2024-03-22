@@ -274,6 +274,7 @@ Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
 Obsoletes:      systemd-bootstrap <= %{version}-%{release}
+Provides:       systemd-bootstrap = %{version}-%{release}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -347,6 +348,7 @@ Obsoletes:      nss-myhostname < 0.4
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
 Obsoletes:      systemd-bootstrap-libs <= %{version}-%{release}
+Provides:       systemd-bootstrap-libs = %{version}-%{release}
 
 %description libs
 Libraries for systemd and udev.
@@ -362,6 +364,7 @@ Systemd PAM module registers the session with systemd-logind.
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
 Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}
+Provides:       systemd-bootstrap-rpm-macros = %{version}-%{release}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -381,6 +384,7 @@ Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
 Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}
+Provides:       systemd-bootstrap-devel = %{version}-%{release}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
