@@ -1,7 +1,8 @@
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
 %global _python_bytecompile_extra 1
-
+ %define _unpackaged_files_terminate_build 0 
+ 
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        18.2.1
@@ -11,6 +12,9 @@ URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
+Patch0: 0034-src-pybind-rbd-rbd.pyx.patch
+Patch1: 0032-cmake-modules-BuildBoost.cmake.patch
+
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
 # at the top-level directory of this distribution and at
@@ -74,7 +78,9 @@ Requires:       ceph-mgr = %{version}-%{release}
 Requires:       ceph-mon = %{version}-%{release}
 Requires(post):	binutils
 Requires:       systemd
-
+	
+BuildRequires:	pkgconfig(libudev)
+BuildRequires:	pkgconfig(udev)
 BuildRequires: lmdb-devel >= 0.9.16
 BuildRequires:	libaio-devel
 BuildRequires:	libblkid-devel >= 2.17
@@ -83,7 +89,7 @@ BuildRequires:  cryptsetup-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	libcap-devel
 BuildRequires:	libcap-ng-devel
-BuildRequires:	fmt-devel >= 6.2.1
+#BuildRequires:	fmt-devel >= 6.2.1
 BuildRequires:	pkg-config
 BuildRequires:	libnl3-devel
 BuildRequires:	liboath-devel
@@ -99,7 +105,6 @@ BuildRequires:	python%{python3_pkgversion}
 BuildRequires:	python%{python3_pkgversion}-devel
 BuildRequires:	python%{python3_pkgversion}-setuptools
 BuildRequires:	python%{python3_pkgversion}-Cython
-BuildRequires:  python%{python3_pkgversion}-yaml
 BuildRequires:	snappy-devel
 BuildRequires:	sqlite-devel
 BuildRequires:	sudo
@@ -112,7 +117,6 @@ BuildRequires:	xmlstarlet
 BuildRequires:	nasm
 BuildRequires:	lua-devel
 BuildRequires:  lmdb-devel
-BuildRequires:  thrift-devel >= 0.13.0
 
 #extra dependencies from 16.2.0 todo remove 
 
@@ -141,13 +145,13 @@ BuildRequires:  nss-devel
 BuildRequires:  parted
 BuildRequires:  pkg-config
 
-BuildRequires:  python%{python3_pkgversion}-prettytable
-BuildRequires:  python%{python3_pkgversion}-sphinx
-BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
-BuildRequires:  python%{python3_pkgversion}-xml
+BuildRequires:  python3-prettytable
+#BuildRequires:  python3-sphinx >= 7
+#BuildRequires:  python3-sphinxcontrib-websupport
+BuildRequires:  python3-xml
 BuildRequires:  util-linux
-BuildRequires:  systemd
-BuildRequires:  systemd-devel
+#BuildRequires:  systemd-bootstrap
+#BuildRequires:  systemd-bootstrap-devel
 
 
 BuildRequires:  xmlstarlet
@@ -226,7 +230,7 @@ BuildRequires:  xmlsec1-openssl
 BuildRequires:  xmlsec1-openssl-devel
 BuildRequires:	python%{python3_pkgversion}-asyncssh
 BuildRequires:	python%{python3_pkgversion}-natsort
-
+BuildRequires:  thrift-devel >= 0.13.0
 
 %ifarch x86_64
 BuildRequires:  xmlsec1-nss
@@ -269,7 +273,7 @@ BuildRequires:  qatzip-devel
 BuildRequires:  gcc-toolset-9-gcc-c++ >= 9.2.1-2.3
 BuildRequires:  c-ares-devel
 BuildRequires:  cryptopp-devel
-BuildRequires:  fmt-devel
+#BuildRequires:  fmt-devel
 BuildRequires:  gcc-toolset-9-annobin
 BuildRequires:  gcc-toolset-9-libasan-devel
 BuildRequires:  gcc-toolset-9-libatomic-devel
@@ -781,15 +785,7 @@ descriptions, and submitting the command to the appropriate daemon.
 
 %package -n python%{python3_pkgversion}-ceph-common
 Summary:	Python 3 utility libraries for Ceph
-%if 0%{?fedora} || 0%{?rhel} >= 8 || 0%{?openEuler}
-Requires:       python%{python3_pkgversion}-pyyaml
-%endif
-%if 0%{?suse_version}
 Requires:       python%{python3_pkgversion}-PyYAML
-%endif
-%if 0%{?suse_version}
-Group:		Development/Libraries/Python
-%endif
 %{?python_provide:%python_provide python%{python3_pkgversion}-ceph-common}
 %description -n python%{python3_pkgversion}-ceph-common
 This package contains data structures, classes and functions used by Ceph.
@@ -920,12 +916,6 @@ This package provides a Ceph hardware monitoring agent.
 %autosetup -p1 
 
 
-# Despite disabling diskprediction, some unpackaged files stick around
-# Delete directories to prevent these files from being built/installed later
-cd %{_topdir}/BUILD/%{name}-%{version}
-rm -rf ./src/pybind/mgr/diskprediction_local
-rm -rf ./src/pybind/mgr/diskprediction_cloud
-
 
 %build
 # LTO can be enabled as soon as the following GCC bug is fixed:
@@ -984,12 +974,8 @@ env | sort
 
 mkdir build
 cd build
-
 CMAKE=cmake
 ${CMAKE} .. \
-    -DBOOST_J=4 \
-    -Dthrift_HOME=/usr/include \
-    -DSYSTEM_BOOST=
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
     -DCMAKE_INSTALL_LIBEXECDIR=%{_libexecdir} \
@@ -1002,7 +988,11 @@ ${CMAKE} .. \
     -DWITH_MANPAGE=ON \
     -DWITH_PYTHON3=%{python3_version} \
     -DWITH_MGR_DASHBOARD_FRONTEND=OFF \
-    --debug-find \
+    -DWITH_SYSTEM_ARROW=ON \
+    -DBOOST_J=4 \
+    -DWITH_FMT_HEADER_ONLY=ON \
+    -Dthrift_HOME=/usr/include \
+    -DSYSTEM_BOOST=OFF \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -1069,11 +1059,6 @@ ${CMAKE} .. \
 %if 0%{without jaeger}
     -DWITH_JAEGER:BOOL=OFF \
 %endif
-
-
-%if 0%{?rhel}
-    -DWITH_FMT_HEADER_ONLY:BOOL=ON \
-%endif
 %if 0%{with system_arrow}
     -DWITH_SYSTEM_ARROW:BOOL=ON \
     -DWITH_SYSTEM_UTF8PROC:BOOL=ON \
@@ -1086,7 +1071,7 @@ ${CMAKE} .. \
     -DWITH_SEASTAR:BOOL=ON \
     -DWITH_JAEGER:BOOL=OFF \
 %endif
-
+    -DWITH_GRAFANA:BOOL=ON \
 
 %if %{with cmake_verbose_logging}
 cat ./CMakeFiles/CMakeOutput.log
@@ -1126,7 +1111,6 @@ chmod 0644 %{buildroot}%{_docdir}/ceph/sample.ceph.conf
 install -m 0644 -D COPYING %{buildroot}%{_docdir}/ceph/COPYING
 install -m 0644 -D etc/sysctl/90-ceph-osd.conf %{buildroot}%{_sysctldir}/90-ceph-osd.conf
 
-install -m 0755 src/cephadm/cephadm %{buildroot}%{_sbindir}/cephadm
 mkdir -p %{buildroot}%{_sharedstatedir}/cephadm
 chmod 0700 %{buildroot}%{_sharedstatedir}/cephadm
 mkdir -p %{buildroot}%{_sharedstatedir}/cephadm/.ssh
@@ -1199,7 +1183,6 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %dir %{python3_sitelib}/ceph_volume
 %{python3_sitelib}/ceph_volume/*
 %{python3_sitelib}/ceph_volume-*
-%{_mandir}/man8/ceph-deploy.8*
 %{_mandir}/man8/ceph-create-keys.8*
 %{_mandir}/man8/ceph-run.8*
 %{_mandir}/man8/crushtool.8*
@@ -1302,7 +1285,6 @@ exit 0
 %{_mandir}/man8/rbd-replay-many.8*
 %{_mandir}/man8/rbd-replay-prep.8*
 %{_mandir}/man8/rgw-orphan-list.8*
-%{_mandir}/man8/rgw-restore-bucket-index.8*
 %dir %{_datadir}/ceph/
 %{_datadir}/ceph/known_hosts_drop.ceph.com
 %{_datadir}/ceph/id_rsa_drop.ceph.com
@@ -1576,8 +1558,7 @@ fi
 %files -n rbd-nbd
 %{_bindir}/rbd-nbd
 %{_mandir}/man8/rbd-nbd.8*
-%dir %{_libexecdir}/rbd-nbd
-%{_libexecdir}/rbd-nbd/rbd-nbd_quiesce
+
 
 %files radosgw
 %{_bindir}/ceph-diff-sorted
@@ -1847,9 +1828,7 @@ fi
 
 %files -n python%{python3_pkgversion}-ceph-argparse
 %{python3_sitelib}/ceph_argparse.py
-%{python3_sitelib}/__pycache__/ceph_argparse.cpython*.py*
 %{python3_sitelib}/ceph_daemon.py
-%{python3_sitelib}/__pycache__/ceph_daemon.cpython*.py*
 
 %files -n python%{python3_pkgversion}-ceph-common
 %{python3_sitelib}/ceph
@@ -2038,15 +2017,6 @@ exit 0
 %attr(0755,root,root) %dir %{_sysconfdir}/prometheus/ceph
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
-%files mib
-%attr(0755,root,root) %dir %{_datadir}/snmp
-%{_datadir}/snmp/mibs
-
-%files node-proxy
-%{_sbindir}/ceph-node-proxy
-%dir %{python3_sitelib}/ceph_node_proxy
-%{python3_sitelib}/ceph_node_proxy/*
-%{python3_sitelib}/ceph_node_proxy-*
 
 
 %changelog
