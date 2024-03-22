@@ -9,7 +9,7 @@ ARG AZL_VERSION=3.0
 
 ARG RPMS
 ARG LOCAL_REPO_FILE="local.repo"
-ARG LOCAL_REPO_PATH="/localrepo" 
+ARG LOCAL_REPO_PATH="/localrepo"
 
 COPY ${RPMS} /WORKDIR/RPMS
 COPY ${LOCAL_REPO_FILE} /WORKDIR/REPO/local.repo
@@ -22,16 +22,16 @@ RUN if [ "${RPMS}" ]; then \
     tdnf install -y --releasever=$AZL_VERSION createrepo; \
     cp -r /WORKDIR/RPMS ${LOCAL_REPO_PATH}; \
     cp /WORKDIR/REPO/local.repo /etc/yum.repos.d/local.repo; \
-    createrepo --database ${LOCAL_REPO_PATH} --workers 10; \
+    createrepo --compatibility --database ${LOCAL_REPO_PATH} --workers 10; \
     tdnf makecache; \
     tdnf autoremove -y createrepo; \
 fi
 
-# Install busybox, glibc, and their dependencies into a staging location.
+# Install azurelinux-release, busybox, glibc, and their dependencies into a staging location.
 # Staging directory is copied into the final scratch image.
 RUN mkdir /staging \
     && tdnf install -y --releasever=$AZL_VERSION --installroot /staging \
-    busybox glibc \
+    azurelinux-release busybox glibc \
     && tdnf clean all \
     && pushd /staging \
     && rm -rf boot media mnt opt run \
