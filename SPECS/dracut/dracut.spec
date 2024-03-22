@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        055
-Release:        7%{?dist}
+Release:        8%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -155,6 +155,7 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
+%exclude %{_libdir}/dracut/modules.d/20overlayfs/*
 %{_libdir}/dracut/dracut-init.sh
 %{_libdir}/dracut/dracut-util
 %{_datadir}/pkgconfig/dracut.pc
@@ -210,6 +211,9 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{_sharedstatedir}/dracut/overlay
 
 %changelog
+* Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-8
+- Exclude overlayfs module from main dracut package
+
 * Mon Jan 29 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-7
 - Add overlayfs sub-package.
 
