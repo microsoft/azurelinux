@@ -1773,6 +1773,7 @@
                 "python-responses",
                 "python-retrying",
                 "python-rfc3986",
+                "python-rich",
                 "python-rpm-generators",
                 "python-rpmfluff",
                 "python-rtslib",

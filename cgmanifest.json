@@ -21053,8 +21053,8 @@
         "type": "other",
         "other": {
           "name": "poetry",
-          "version": "1.0.10",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/poetry/poetry-1.0.10.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://github.com/python-poetry/poetry/archive/1.8.2/poetry-1.8.2.tar.gz"
         }
       }
     },
@@ -23995,6 +23995,16 @@
           "name": "python-rfc3986",
           "version": "1.2.0",
           "downloadUrl": "https://pypi.python.org/packages/source/r/rfc3986/rfc3986-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rich",
+          "version": "13.7.1",
+          "downloadUrl": "https://github.com/Textualize/rich/archive/v13.7.1/rich-13.7.1.tar.gz"
         }
       }
     },

@@ -1,75 +1,96 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global pypi_name poetry
 
 %global common_description %{expand:
 Poetry helps you declare, manage and install dependencies of Python
 projects, ensuring you have the right stack everywhere.}
 
-Name:           %{pypi_name}
+Name:           poetry
 Summary:        Python dependency management and packaging made easy
-Version:        1.0.10
-Release:        2%{?dist}
+Version:        1.8.2
+Release:        1%{?dist}
 License:        MIT
 
-URL:            https://poetry.eustace.io/
-Source0:        %{pypi_source}
+URL:            https://python-poetry.org/
+Source0:        https://github.com/python-poetry/poetry/archive/%{version}/poetry-%{version}.tar.gz
 
 # relax some too-strict dependencies that are specified in setup.py:
 # - importlib-metadata (either removed or too old in fedora)
 # - keyring (too new in fedora, but should be compatible)
 # - pyrsistent (too new in fedora, but should be compatible)
 # - requests-toolbelt (too new in fedora, but should be compatible)
-Patch0:         00-setup-requirements-fixes.patch
+# Patch0:         00-setup-requirements-fixes.patch
 
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3dist(setuptools)
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  gcc
+BuildRequires:  git-core
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pytest-mock
+BuildRequires:  python3-pytest-xdist
 
-Requires:       python3-%{pypi_name} = %{version}-%{release}
+Requires:       python3-poetry = %{version}-%{release}
 
 %description %{common_description}
 
-
-%package -n     python3-%{pypi_name}
+%package -n     python3-poetry
 Summary:        %{summary}
 
-# this is an optional dependency of CacheControl, but it's required by poetry
-Requires:       python3dist(lockfile)
+%{?python_provide:%python_provide python3-poetry}
 
-%{?python_provide:%python_provide python3-%{pypi_name}}
-
-%description -n python3-%{pypi_name} %{common_description}
-
+%description -n python3-poetry %{common_description}
 
 %prep
 %autosetup -p1
 
-
 %build
-%py3_build
-
+%pyproject_wheel
+	
+%generate_buildrequires
+%pyproject_buildrequires %{?with_bootstrap: -R}
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files poetry
 
+export PYTHONPATH=%{buildroot}%{python3_sitelib}
+for i in bash,bash-completion/completions,poetry fish,fish/vendor_completions.d,poetry.fish zsh,zsh/site-functions,_poetry; do IFS=","
+    set -- $i
+    mkdir -p %{buildroot}%{_datadir}/$2
+    # poetry leaves references to the buildroot in the completion files -> remove them
+    %{buildroot}%{_bindir}/poetry completions $1 | sed 's|%{buildroot}||g' > %{buildroot}%{_datadir}/$2/$3
+done
+
+%if %{without bootstrap}
+%check
+%pytest -m "not network"
+%endif
 
 %files
-%license LICENSE
-%doc README.md
-
 %{_bindir}/poetry
+# The directories with shell completions are co-owned
+%{_datadir}/bash-completion/
+%{_datadir}/fish/
+%{_datadir}/zsh/
 
-%files -n python3-%{pypi_name}
+%files -n python3-poetry -f %{pyproject_files}
 %license LICENSE
 %doc README.md
 
-%{python3_sitelib}/%{pypi_name}/
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
-
+# this is co-owned by poetry-core but we require poetry-core, so we get rid of it
+# the file and its pycache might not be bit by bit identical
+%exclude %dir %{python3_sitelib}/poetry
+%pycached %exclude %{python3_sitelib}/poetry/__init__.py
 
 %changelog
+* Wed Mar 20 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 1.8.2-1
+- Promoted to SPECS.
+- Upgraded version from 1.0.10 to 1.8.2.
+- License verified.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.10-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
