@@ -1,21 +1,21 @@
 os:
   modules:
-    - name: vfio
-      loadMode: always
-      options:
-        enable_unsafe_noiommu_mode: "Y"
-        disable_vga: "Y"
+  - name: vfio
+    loadMode: always
+    options:
+      enable_unsafe_noiommu_mode: Y
+      disable_vga: Y
 
-    - name: br_netfilter
-      loadMode: auto
+  - name: br_netfilter
+    loadMode: auto
 
-    - name: mlx5_ib
-      loadMode: always
+  - name: mlx5_ib
+    loadMode: always
 
-    - name: e1000e
-      loadMode: inherit
-      options:
-        InterruptThrottleRate: 3000,3000,3000
+  - name: e1000e
+    loadMode: inherit
+    options:
+      InterruptThrottleRate: 3000,3000,3000
 
-    - name: mousedev
-      loadMode: disable
+  - name: mousedev
+    loadMode: disable

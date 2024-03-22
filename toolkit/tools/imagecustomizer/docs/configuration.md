@@ -410,7 +410,8 @@ os:
 
 ### loadMode [string]
 
-The loadMode setting for kernel modules dictates how and when these modules are loaded or disabled in the system.
+The loadMode setting for kernel modules dictates how and when these modules 
+are loaded or disabled in the system.
 
 Supported loadmodes:
 
@@ -419,21 +420,31 @@ Supported loadmodes:
   - Add the module to `/etc/modules-load.d/modules-load.conf`.
   - Write the options, if provided.
 
-- `auto`: Used for modules that are automatically loaded by the kernel as needed, without explicit configuration to load them at boot.
-  - If the module is blacklisted in the base image, remove the blacklist entry to allow it to be loaded automatically.
-  - Write the provided options to `/etc/modprobe.d/module-options.conf`, but do not add the module to /etc/modules-load.d/, as it should be loaded automatically by the kernel when necessary.
+- `auto`: Used for modules that are automatically loaded by the kernel as needed,
+    without explicit configuration to load them at boot.
+  - If the module is disabled in the base image, remove the blacklist entry to
+    allow it to be loaded automatically.
+  - Write the provided options to `/etc/modprobe.d/module-options.conf`, but do not
+    add the module to `/etc/modules-load.d/modules-load.conf`, as it should be loaded automatically by
+    the kernel when necessary.
 
-- `disable`: Configures kernel modules to be explicitly disabled, preventing them from loading automatically.
-  - If the module is not already blacklisted in the base image, a blacklist entry will be added to `/etc/modprobe.d/blacklist.conf` to ensure the module is disabled.
+- `disable`: Configures kernel modules to be explicitly disabled, preventing them from
+  loading automatically.
+  - If the module is not already disabled in the base image, a blacklist entry will
+    be added to `/etc/modprobe.d/blacklist.conf` to ensure the module is disabled.
 
-- `inherit`: Configures kernel modules to inherit the loading behavior set in the base image. Only applying new options where they are explicitly provided and applicable.
-  - If the module is not blacklisted, and options are provided, these options will be written to `/etc/modprobe.d/module-options.conf`.
+- `inherit`: Configures kernel modules to inherit the loading behavior set in the base
+  image. Only applying new options where they are explicitly provided and applicable.
+  - If the module is not disabled, and options are provided, these options will be
+    written to `/etc/modprobe.d/module-options.conf`.
 
-If loadMode is not set, it will be default to `inherit`.
+-  empty string or not set, it will default to `inherit`.
+
 
 ### options [map\<string, string>]
 
-Kernel options for modules can specify how these modules interact with the system, and adjust performance or security settings specific to each module.
+Kernel options for modules can specify how these modules interact with the system, 
+and adjust performance or security settings specific to each module.
 
 ```yaml
 os:
@@ -896,7 +907,7 @@ os:
   - name: test
 ```
 
-### modules [[module](#module-type)]
+### modules [[module](#module-type)[]]
 
 Used to configure kernel modules.
 

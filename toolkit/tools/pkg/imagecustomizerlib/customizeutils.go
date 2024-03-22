@@ -71,7 +71,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = loadOrDisableModules(config.OS.Modules, imageChroot)
+	err = loadOrDisableModules(config.OS.Modules, imageChroot.RootDir())
 	if err != nil {
 		return err
 	}

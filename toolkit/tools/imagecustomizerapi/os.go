@@ -80,10 +80,16 @@ func (s *OS) IsValid() error {
 		return err
 	}
 
+	moduleMap := make(map[string]int)
 	for i, module := range s.Modules {
+		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
+		if _, exists := moduleMap[module.Name]; exists {
+			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
+		}
+		moduleMap[module.Name] = i
 		err = module.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid Modules item at index %d: %w", i, err)
+			return fmt.Errorf("invalid Modules item at index %d:\n%w", i, err)
 		}
 	}
 
