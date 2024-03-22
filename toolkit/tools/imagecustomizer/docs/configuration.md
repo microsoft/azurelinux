@@ -482,7 +482,7 @@ Name of the module.
 ```yaml
 os:
   modules:
-    - name: br_netfilter
+  - name: br_netfilter
 ```
 
 ### loadMode [string]
@@ -526,11 +526,11 @@ and adjust performance or security settings specific to each module.
 ```yaml
 os:
   modules:
-    - name: vfio
-      loadMode: always
-      options:
-        enable_unsafe_noiommu_mode: Y
-        disable_vga: Y
+  - name: vfio
+    loadMode: always
+    options:
+      enable_unsafe_noiommu_mode: Y
+      disable_vga: Y
 ```
 
 ## packageList type
