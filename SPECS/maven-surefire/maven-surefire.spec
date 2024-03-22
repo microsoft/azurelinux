@@ -2,8 +2,8 @@
 %bcond_without bootstrap
 Summary:        Test framework project
 Name:           maven-surefire
-Version:        3.0.0
-Release:        2%{?dist}
+Version:        3.2.2
+Release:        1%{?dist}
 License:        ASL 2.0 AND CPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,9 +11,8 @@ URL:            https://maven.apache.org/surefire/
 # ./generate-tarball.sh
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source2:        cpl-v10.html
-Patch1:         0001-Port-to-TestNG-6.11.patch
+Patch1:         0001-Port-to-TestNG-7.4.0.patch
 Patch2:         0002-Disable-JUnit-4.8-test-grouping.patch
-Patch3:         0003-Port-to-maven-shared-utils-3.3.3.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 # PpidChecker relies on /usr/bin/ps to check process uptime
@@ -77,12 +76,11 @@ Summary:        Javadoc for %{name}
 Javadoc for %{name}.
 
 %prep
-%setup -q -n surefire-%{upstream_version}-M4
+%setup -q -n surefire-%{upstream_version}
 cp -p %{SOURCE2} .
 
 %patch 1 -p1
 %patch 2 -p1
-%patch 3 -p1
 
 # Disable strict doclint
 sed -i /-Xdoclint:all/d pom.xml
@@ -91,8 +89,6 @@ sed -i /-Xdoclint:all/d pom.xml
 %pom_disable_module surefire-report-parser
 %pom_disable_module surefire-shadefire
 
-%pom_remove_dep :maven-toolchain maven-surefire-common
-
 %pom_disable_module surefire-grouper
 %pom_remove_dep :surefire-grouper surefire-providers/common-junit48
 %pom_remove_dep :surefire-grouper surefire-providers/surefire-testng-utils
@@ -100,22 +96,24 @@ rm surefire-providers/common-junit48/src/main/java/org/apache/maven/surefire/com
 rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/surefire/testng/utils/GroupMatcherMethodSelector.java
 
 %pom_remove_dep -r org.apache.maven.surefire:surefire-shadefire
-
+%pom_remove_dep -r org.junit:junit-bom
 # Help plugin is needed only to evaluate effective Maven settings.
 # For building RPM package default settings will suffice.
-%pom_remove_plugin :maven-help-plugin surefire-its
-
+%pom_remove_plugin :maven-help-plugin surefire-its 
 # QA plugin useful only for upstream
 %pom_remove_plugin -r :jacoco-maven-plugin
 # Not wanted
 %pom_remove_plugin -r :maven-shade-plugin
-# Not in Fedora
+
+%pom_remove_plugin -r :maven-checkstyle-plugin
+	
+find -name *.java -exec sed -i -e s/org.apache.maven.surefire.shared.utils/org.apache.maven.shared.utils/ -e s/org.apache.maven.surefire.shared.io/org.apache.commons.io/ -e s/org.apache.maven.surefire.shared.lang3/org.apache.commons.lang3/ -e s/org.apache.maven.surefire.shared.compress/org.apache.commons.compress/ {} \;
+ 
 %pom_remove_plugin -r :animal-sniffer-maven-plugin
 # Complains
 %pom_remove_plugin -r :apache-rat-plugin
-%pom_remove_plugin -r :maven-enforcer-plugin
 # We don't need site-source
-%pom_remove_plugin :maven-assembly-plugin maven-surefire-plugin
+%pom_remove_plugin :maven-assembly-plugin maven-surefire-plugin 
 %pom_remove_dep -r ::::site-source
 
 %build
@@ -124,7 +122,7 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %{mvn_package} ":*{junit,testng,failsafe-plugin}*"  @1
 %{mvn_package} ":*tests*" __noinstall
 # tests turned off because they need jmock
-%{mvn_build} -f -- -DcommonsIoVersion=2.8.0 -DcommonsLang3Version=3.11
+%{mvn_build} -f
 
 %install
 %{mvn_install}
@@ -147,6 +145,9 @@ rm surefire-providers/surefire-testng-utils/src/main/java/org/apache/maven/suref
 %license LICENSE NOTICE cpl-v10.html
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.2.2-1
+- update to 3.2.2 for azl3.0 using Fedora 40 (License: MIT)
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-2
 - Updating naming for 3.0 version of Azure Linux.
 
