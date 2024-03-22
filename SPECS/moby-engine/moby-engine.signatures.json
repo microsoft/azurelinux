@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "daemon.json": "532f2e930400baed129ed953b9ba0d5158fc443aecbff6f6513f58565696db5c",
   "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
   "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
   "moby-engine-25.0.3.tar.gz": "4cdb516f5d6f5caf8b3bcf93c2962277ba727cfd2d1620176a3bb0cf153b3590"
