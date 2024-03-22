@@ -139,6 +139,12 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
+	// Check file systems for corruption.
+	err = checkFileSystems(rawImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to check filesystems:\n%w", err)
+	}
+
 	// Shrink the filesystems.
 	if enableShrinkFilesystems {
 		err = shrinkFilesystemsHelper(rawImageFile)

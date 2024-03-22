@@ -389,7 +389,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.Storage.PartitionSettings,
+		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
 			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
 		if err != nil {
 			return fmt.Errorf("failed to configure bootloader:\n%w", err)
