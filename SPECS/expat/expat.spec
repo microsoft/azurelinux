@@ -42,6 +42,7 @@ This package contains minimal set of shared expat libraries.
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_docdir}/%{name}
+rm %{_mandir}/man1/xmlwf.1.gz
 %{_fixperms} %{buildroot}/*
 
 %check
@@ -53,7 +54,6 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %defattr(-,root,root)
 %doc AUTHORS Changes
 %{_bindir}/*
-%exclude %{_mandir}/man1/xmlwf.1.gz
 
 %files devel
 %{_includedir}/*
