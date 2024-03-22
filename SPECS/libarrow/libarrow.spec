@@ -148,6 +148,9 @@ sed -r -i 's/(oldest-supported-)(numpy)/\2/' python/pyproject.toml
 %build
 pushd cpp
 %cmake \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DARROW_ZSTD_USE_SHARED=OFF \
+  -DARROW_PROTOBUF_USE_SHARED=OFF \
   -DARROW_WITH_PROTOBUF=OFF \
   -DARROW_FLIGHT:BOOL=ON \
   -DARROW_ORC=ON \
