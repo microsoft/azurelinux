@@ -11,7 +11,7 @@
 %bcond_without have_re2
 %bcond_without have_utf8proc
  
-Name:		libarrow
+Name:	libarrow
 Version:	15.0.0
 Release:	4%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
@@ -19,7 +19,7 @@ License:	Apache-2.0
 URL:		https://arrow.apache.org/
 Requires:	%{name}-doc = %{version}-%{release}
 Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
-Patch0001:	0001-python-pyproject.toml.patch
+Patch0001: 0001-python-pyproject.toml.patch
  
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
@@ -243,7 +243,7 @@ popd
 %{_libdir}/pkgconfig/parquet*.pc
  
 %changelog
-* Wed Mar 20 2024 Himaja Kesari <himajakesari@microsoft.com> - 15.0.0-4
+* Fri Mar 22 2024 Himaja Kesari <himajakesari@microsoft.com> - 15.0.0-4
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
 
