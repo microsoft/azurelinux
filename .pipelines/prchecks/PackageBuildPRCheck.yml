@@ -134,7 +134,7 @@ extends:
                   isCustom: true
                   name: ${{ configuration.agentPool }}
                   variables:
-                    rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.Build.outputs['RPMsArtifactName.rpmsArtifactName'] ]
+                    rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
                 steps:
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
