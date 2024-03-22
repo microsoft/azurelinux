@@ -113,6 +113,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_libdir}/libmemcached.so.11*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
+%{_libdir}/libp9y.a
 
 %files devel
 %doc example
