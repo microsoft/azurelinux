@@ -14,8 +14,12 @@ BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  unzip
 
+%if 0%{?with_check}
+BuildRequires:  clang-tools-extra
+%endif
+
 %description
-erlang programming language
+Erlang is a programming language and runtime system for building massively scalable soft real-time systems with requirements on high availability.
 
 %prep
 %autosetup -n otp-OTP-%{version}
@@ -26,8 +30,11 @@ export ERL_TOP=`pwd`
 %make_build
 
 %install
-
 %make_install
+
+%check
+export ERL_TOP=`pwd`
+./otp_build check --no-docs
 
 %post
 
