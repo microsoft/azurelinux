@@ -25,6 +25,6 @@ jobs:
           pushd toolkit
           ./scripts/setuplkgtoolchain.sh
           BUILD_ID=$(wget -qO - https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json | jq -r ".dailybuildid" | tr '\.' '-')
-          make graph REBUILD_TOOLS=y DAILY_BUILD_ID=${BUILD_ID}
+          sudo make -j$(nproc) graph REBUILD_TOOLS=y DAILY_BUILD_ID=${BUILD_ID}
           popd
         if: always()
