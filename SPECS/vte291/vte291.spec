@@ -14,7 +14,8 @@
 %bcond docs 0
 %else
 %bcond docs 1
-%fi
+%endif
+
 Name:           vte291
 Version:        0.74.2
 Release:        5%{?dist}
