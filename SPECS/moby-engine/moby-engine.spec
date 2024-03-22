@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -13,6 +13,7 @@ Distribution: Azure Linux
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1: docker.service
 Source2: docker.socket
+Source3: daemon.json
 
 %{?systemd_requires}
 
@@ -79,12 +80,18 @@ DOCKER_GITCOMMIT=${GIT_COMMIT:0:7} DOCKER_BUILDTAGS='seccomp' hack/make.sh dynbi
 mkdir -p %{buildroot}%{_bindir}
 install -p -m 755 ./bundles/dynbinary-daemon/dockerd %{buildroot}%{_bindir}/dockerd
 
+mkdir -p %{buildroot}%{_libexecdir}
+install -p -m 755 ./bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_libexecdir}/docker-proxy
+
 mkdir -p %{buildroot}%{_sysconfdir}/udev/rules.d
 install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_sysconfdir}/udev/rules.d/80-docker.rules
 
 mkdir -p %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
+
+mkdir -p -m 755 %{buildroot}%{_sysconfdir}/docker
+install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/docker/daemon.json
 
 %post
 if ! grep -q "^docker:" /etc/group; then
@@ -99,11 +106,18 @@ fi
 
 %files
 %license LICENSE NOTICE
-%{_bindir}/*
+%{_bindir}/dockerd
+%{_libexecdir}/docker-proxy
+%dir %{_sysconfdir}/docker
+%config(noreplace) %{_sysconfdir}/docker/daemon.json
 %{_sysconfdir}/*
 %{_unitdir}/*
 
 %changelog
+* Thu Mar 21 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-2
+- Add the in-tree version of docker proxy built from cmd/docker-proxy into /usr/libexec
+- Set userland-proxy-path explicitly by introducing /etc/docker/daemon.json
+
 * Mon Feb 26 2024 Henry Beberman <henry.beberman@microsoft.com> - 25.0.3-1
 - Upgrade to version 25.0.3 and clean up spec
 - Remove docker-proxy as it's no longer used (2050e085f95bb796e9ff3a325b9985e319c193cf)
