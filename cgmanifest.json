@@ -8020,6 +8020,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jurand",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/fedora-java/jurand/archive/refs/tags/1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jx",
           "version": "3.2.236",
           "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
