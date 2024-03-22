@@ -1,0 +1,34 @@
+From b88042cfb32866a00d39b678bb224eb55ecf53c1 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Tue, 22 Jun 2021 22:10:17 +0200
+Subject: [PATCH] Preserve any existing PYTHONPATH in tests
+ 
+---
+ tests/conftest.py | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+ 
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 4ad1ff23..7200d286 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -118,9 +118,15 @@ def dev_server(xprocess, request, tmp_path):
+         class Starter(ProcessStarter):
+             args = [sys.executable, run_path, name, json.dumps(kwargs)]
+             # Extend the existing env, otherwise Windows and CI fails.
+-            # Modules will be imported from tmp_path for the reloader.
++            # Modules will be imported from tmp_path for the reloader
++            # but any existing PYTHONPATH is preserved.
+             # Unbuffered output so the logs update immediately.
+-            env = {**os.environ, "PYTHONPATH": str(tmp_path), "PYTHONUNBUFFERED": "1"}
++            original_python_path = os.getenv("PYTHONPATH")
++            if original_python_path:
++                new_python_path = os.pathsep.join((original_python_path, str(tmp_path)))
++            else:
++                new_python_path = str(tmp_path)
++            env = {**os.environ, "PYTHONPATH": new_python_path, "PYTHONUNBUFFERED": "1"}
+ 
+             @cached_property
+             def pattern(self):
+-- 
+2.31.1
+ 
