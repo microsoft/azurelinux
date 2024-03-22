@@ -227,7 +227,6 @@ popd
 %{_libdir}/pkgconfig/arrow-csv.pc
 %{_libdir}/pkgconfig/arrow-filesystem.pc
 %{_libdir}/pkgconfig/arrow-json.pc
-%{_libdir}/pkgconfig/arrow-orc.pc
 %{_libdir}/pkgconfig/arrow.pc
 %{_datadir}/arrow/gdb/gdb_arrow.py
 #%{_datadir}/gdb/auto-load/usr/lib64/libarrow.so.*-gdb.py
