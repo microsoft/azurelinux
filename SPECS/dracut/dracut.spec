@@ -129,9 +129,9 @@ install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 
-mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 
 # create compat symlink
 mkdir -p %{buildroot}%{_sbindir}
@@ -155,7 +155,7 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
-%exclude %{_libdir}/dracut/modules.d/20overlayfs/*
+%exclude %{dracutlibdir}/modules.d/20overlayfs/*
 %{_libdir}/dracut/dracut-init.sh
 %{_libdir}/dracut/dracut-util
 %{_datadir}/pkgconfig/dracut.pc
@@ -202,8 +202,8 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 %defattr(-,root,root,0755)
 
 %files overlayfs
-%dir %{_libdir}/dracut/modules.d/20overlayfs
-%{_libdir}/dracut/modules.d/20overlayfs/*
+%dir %{dracutlibdir}/modules.d/20overlayfs
+%{dracutlibdir}/modules.d/20overlayfs/*
 
 %{_bindir}/dracut-catimages
 %dir /boot/dracut
