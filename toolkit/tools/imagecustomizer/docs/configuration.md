@@ -529,8 +529,8 @@ os:
     - name: vfio
       loadMode: always
       options:
-        enable_unsafe_noiommu_mode: "Y"
-        disable_vga: "Y"
+        enable_unsafe_noiommu_mode: Y
+        disable_vga: Y
 ```
 
 ## packageList type

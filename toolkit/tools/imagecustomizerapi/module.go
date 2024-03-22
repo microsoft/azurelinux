@@ -8,8 +8,6 @@ import (
 	"strings"
 )
 
-type ModuleOptions map[string]string
-
 type Module struct {
 	Name     string            `yaml:"name"`
 	LoadMode ModuleLoadMode    `yaml:"loadMode"`
