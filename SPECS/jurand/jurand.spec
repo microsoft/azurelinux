@@ -44,6 +44,7 @@ make test
 %changelog
 * Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.3.2-4
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- License verified
 
 * Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
