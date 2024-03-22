@@ -18,6 +18,9 @@ Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
 Requires:	%{name}-doc = %{version}-%{release}
+Group:          Development/Libraries
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Source0:	https://dist.apache.org/repos/dist/release/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
 Patch0001: 0001-python-pyproject.toml.patch
  
@@ -247,6 +250,12 @@ popd
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
 
+* Sat Feb 24 2024 Paul Wouters <paul.wouters@aiven.io> - 15.0.0-3
+- Rebuilt for libre2.so.11 bump
+ 
+* Sun Feb 04 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 15.0.0-2
+- Rebuilt for abseil-cpp-20240116.0
+ 
 * Thu Jan 25 2024  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 15.0.0-1
 - Arrow 15.0.0 GA
  
