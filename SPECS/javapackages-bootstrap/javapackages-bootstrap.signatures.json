@@ -2,6 +2,7 @@
     "Signatures": {
         "javapackages-bootstrap-1.5.0.tar.xz": "37518e10d629f6d7115bd78bed85977c7294f871c2438a57f7857f2c0e065c7c",
         "javapackages-bootstrap-PACKAGE-LICENSING": "3f440662012f41be31be13fb764c1f6a21d51f2efdcabf85ed35e9eb8c3b5714",
+        "guava.xml":"4fba5a37ddeabeb21925f2bf71182380734c89ee0000895df59fb32ff8e8669c",
         "ignore.upstream.patch.txt": "441bb5697fc5fb4089b1d43479dd443a8ce4405bec4d6b92c4152d4320ad3a80",
         "apache-pom.tar.xz": "cedc788ca41b99d04a6b058b1689e6eda8f33b9afd642e526a0998d7741f7614",
         "ant.tar.xz": "230ad9d99c5adfffd14abc3e094e8b7331cef0c061282ce0f13245a02458b604",
