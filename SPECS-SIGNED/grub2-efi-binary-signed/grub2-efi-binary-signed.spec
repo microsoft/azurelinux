@@ -12,7 +12,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,7 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
+Requires:       grub2-tools-minimal = %{version}-%{release}
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -56,6 +57,7 @@ specifically created for installing on %{buildarch} systems
 %package -n     grub2-efi-binary-noprefix
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
+Requires:       grub2-tools-minimal = %{version}-%{release}
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
@@ -77,6 +79,9 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Wed Mar 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-17
+- Bump release number to match grub release number
+
 * Wed Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.06-16
 - Bumping release version to match with `grub2` release version
 
