@@ -39,11 +39,11 @@ func (d *Disk) IsValid() error {
 			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
 		}
 
-		if _, existingName := partitionIDSet[partition.ID]; existingName {
-			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.ID, i)
+		if _, existingName := partitionIDSet[partition.Id]; existingName {
+			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.Id, i)
 		}
 
-		partitionIDSet[partition.ID] = false // dummy value
+		partitionIDSet[partition.Id] = false // dummy value
 
 		if d.PartitionTableType == PartitionTableTypeGpt {
 			isESP := sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
@@ -70,7 +70,7 @@ func (d *Disk) IsValid() error {
 
 		aEnd, aHasEnd := a.GetEnd()
 		if !aHasEnd {
-			return fmt.Errorf("partition (%s) is not last partition but ommitted end value", a.ID)
+			return fmt.Errorf("partition (%s) is not last partition but ommitted end value", a.Id)
 		}
 		if aEnd > b.Start {
 			bEnd, bHasEnd := b.GetEnd()
@@ -79,7 +79,7 @@ func (d *Disk) IsValid() error {
 				bEndStr = strconv.FormatUint(bEnd, 10)
 			}
 			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
-				a.ID, a.Start, aEnd, b.ID, b.Start, bEndStr)
+				a.Id, a.Start, aEnd, b.Id, b.Start, bEndStr)
 		}
 	}
 
@@ -87,7 +87,7 @@ func (d *Disk) IsValid() error {
 		// Make sure the first block isn't used.
 		firstPartition := sortedPartitions[0]
 		if firstPartition.Start == 0 {
-			return fmt.Errorf("block 0 must be reserved for the MBR header (%s)", firstPartition.ID)
+			return fmt.Errorf("block 0 must be reserved for the MBR header (%s)", firstPartition.Id)
 		}
 
 		// Check that the disk is big enough for the partition layout.

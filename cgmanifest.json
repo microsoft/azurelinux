@@ -3318,8 +3318,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "25.2",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.2/otp-OTP-25.2.tar.gz"
+          "version": "26.2.3",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.3/otp-OTP-26.2.3.tar.gz"
         }
       }
     },
@@ -4630,8 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz"
+          "version": "1.21.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.8-2/go.20240320.5.src.tar.gz"
         }
       }
     },
@@ -8643,6 +8643,16 @@
           "name": "libarchive",
           "version": "3.7.1",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libarrow",
+          "version": "15.0.0",
+          "downloadUrl": "https://dist.apache.org/repos/dist/release/arrow/arrow-15.0.0/apache-arrow-15.0.0.tar.gz"
         }
       }
     },
@@ -24123,8 +24133,8 @@
         "type": "other",
         "other": {
           "name": "python-setuptools_scm",
-          "version": "6.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-6.4.2.tar.gz"
+          "version": "8.0.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/af/54/0a75c590c1aa1908c1036de783c0b7136d8fe4beb8ce4c52e4d92b9e9ca7/setuptools-scm-8.0.3.tar.gz"
         }
       }
     },
@@ -28546,8 +28556,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-pytss",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/1.2.0.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/2.2.1.tar.gz"
         }
       }
     },

@@ -577,6 +577,7 @@
                 "libaec",
                 "libao",
                 "libappstream-glib",
+                "libarrow",
                 "libart_lgpl",
                 "libasyncns",
                 "libatasmart",
