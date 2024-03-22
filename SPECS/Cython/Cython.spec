@@ -41,7 +41,8 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
 pip3 install -r test-requirements-312.txt
-%python3 runtests.py -vv --no-doctest --no-file --no-pyregr --no-examples
+# Skip the file based tests, since they typically take over 5 hours to run.
+%python3 runtests.py -vv --no-file
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
@@ -58,7 +59,7 @@ pip3 install -r test-requirements-312.txt
 %changelog
 * Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
 - Switch to test-requirements-312.txt
-- Only run unit tests
+- Skip long-running file based tests
 - Add patch to fix TestPyCache test
 
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 3.0.5-1
