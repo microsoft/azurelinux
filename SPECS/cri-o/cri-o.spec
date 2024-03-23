@@ -26,7 +26,7 @@ Summary:        OCI-based implementation of Kubernetes Container Runtime Interfa
 # Define macros for further referenced sources
 Name:           cri-o
 Version:        1.28.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,7 +60,6 @@ BuildRequires:  glibc-devel
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  gpgme-devel
-BuildRequires:  libapparmor-devel
 BuildRequires:  libassuan-devel
 BuildRequires:  libseccomp-devel
 BuildRequires:  sed
@@ -203,6 +202,9 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Mon Mar 11 2024 Andrew Phelps <anphel@microsoft.com> - 1.28.0-2
+- Remove BR on libapparmor-devel
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.0-1
 - Auto-upgrade to 1.28.0 - Azure Linux 3.0 - package upgrades
 
