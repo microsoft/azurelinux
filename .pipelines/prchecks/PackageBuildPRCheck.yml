@@ -133,8 +133,8 @@ extends:
                   type: linux
                   isCustom: true
                   name: ${{ configuration.agentPool }}
-                  variables:
-                    rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
+                variables:
+                  rpmsArtifactName: $[ stageDependencies.RPMs_${{ configuration.name }}.BuildAndTest.outputs['RPMsArtifactName.rpmsArtifactName'] ]
                 steps:
                   - template: .pipelines/templatesWithCheckout/SodiffCheck.yml@self
                     parameters:
