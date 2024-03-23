@@ -26354,8 +26354,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-multipart-post",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/socketry/multipart-post/archive/refs/tags/v2.1.1.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/socketry/multipart-post/archive/refs/tags/v2.3.0.tar.gz"
         }
       }
     },

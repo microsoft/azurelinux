@@ -2,8 +2,8 @@
 %global gem_name multipart-post
 Summary:        Adds multipart POST capability to net/http
 Name:           rubygem-%{gem_name}
-Version:        2.1.1
-Release:        2%{?dist}
+Version:        2.3.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Mar 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.3.0-1
+- Auto-upgrade to 2.3.0 - none
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.1.1-2
 - Build from .tar.gz source.
 
