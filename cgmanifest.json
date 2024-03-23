@@ -13972,8 +13972,8 @@
         "type": "other",
         "other": {
           "name": "nginx",
-          "version": "1.25.2",
-          "downloadUrl": "https://nginx.org/download/nginx-1.25.2.tar.gz"
+          "version": "1.25.4",
+          "downloadUrl": "https://nginx.org/download/nginx-1.25.4.tar.gz"
         }
       }
     },
@@ -15215,16 +15215,6 @@
           "name": "opentelemetry-cpp",
           "version": "1.14.2",
           "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "opentelemetry-cpp-contrib",
-          "version": "37e4466d882cbddff6f607a20fe327060de76166",
-          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/37e4466d882cbddff6f607a20fe327060de76166.tar.gz"
         }
       }
     },
