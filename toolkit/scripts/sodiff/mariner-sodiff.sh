@@ -2,11 +2,36 @@
 
 # Required binaries:
 # rpm and dnf
+sodiff_script_error=false
+while getopts "r:f:v:o:e:" opt; do
+    case $opt in
+        r) rpms_folder="$OPTARG";;
+        f) repo_file_path="$OPTARG";;
+        v) mariner_version="$OPTARG";;
+        o) sodiff_out_dir="$OPTARG";;
+        e) sodiff_script_error="$OPTARG";;
+    esac
+done
 
-rpms_folder="$1"
-repo_file_path="$2"
-mariner_version="$3"
-sodiff_out_dir="$4"
+if [[ -z "$rpms_folder" ]]; then
+    echo "INVALID ARGUMENT: RPMS_FOLDER is empty"
+    exit 1
+fi
+
+if [[ -z "$repo_file_path" ]]; then
+    echo "INVALID ARGUMENT: REPO_FILE_PATH is empty"
+    exit 1
+fi
+
+if [[ -z "$mariner_version" ]]; then
+    echo "INVALID ARGUMENT: MARINER_VERSION is empty"
+    exit 1
+fi
+
+if [[ -z "$sodiff_out_dir" ]]; then
+    echo "INVALID ARGUMENT: SODIFF_OUT_DIR is empty"
+    exit 1
+fi
 sodiff_log_file="${sodiff_out_dir}/sodiff.log"
 
 # Setup output dir
@@ -18,7 +43,7 @@ common_options="-c $repo_file_path --releasever $mariner_version"
 
 DNF_COMMAND=dnf
 # Cache RPM metadata
->/dev/null dnf $common_options -y makecache
+>/dev/null $DNF_COMMAND $common_options -y makecache
 
 # Get packages from stdin
 pkgs=`cat`
@@ -58,7 +83,9 @@ done
 # Obtain a list of unique packages to be updated
 2>/dev/null cat "$sodiff_out_dir"/require* | sort -u > "$sodiff_out_dir"/sodiff-intermediate-summary.txt
 
-rm "$sodiff_out_dir"/require*
+if [ ls "$sodiff_out_dir"/require* 1> /dev/null 2>&1 ]; then
+    rm "$sodiff_out_dir"/require*
+fi
 touch "$sodiff_out_dir"/sodiff-summary.txt
 
 # Remove packages that have been dash-rolled already.
@@ -86,6 +113,9 @@ echo "######################"
 if [[ $pkgsFound -gt 0 ]]; then
     echo "The Following Packages Are in Need of an Update:"
     cat "$sodiff_out_dir"/sodiff-summary.txt
+    if [[ "$sodiff_script_error" -eq "true" ]]; then
+        exit 1
+    fi 
 else
     echo "No Packages with Conflicting .so Files Found."
 fi
