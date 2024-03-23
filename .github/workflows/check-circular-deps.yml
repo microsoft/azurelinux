@@ -1,0 +1,31 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Circular dependency check
+
+on:
+  push:
+    branches: [3.0*]
+  pull_request:
+    branches: [3.0*]
+
+jobs:
+  spec-check:
+    name: Circular dependency check
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the branch of our repo that triggered this action
+      - name: Workflow trigger checkout
+        uses: actions/checkout@v4
+
+      - name: Check for circular dependencies
+        run: |
+          echo "Checking for circular dependency loops..."
+          # Call this script to sync the toolchain manifests with the LKG daily build.
+          ./toolkit/scripts/setuplkgtoolchain.sh
+          # Determine the LKG daily build ID.
+          LKG_BUILD_ID=$(wget -qO - https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json | jq -r ".dailybuildid" | tr '\.' '-')
+          # Setup the toolchain using the LKG daily build, and then make the full package graph.
+          # This will fail if any circular dependency loops are detected in the core SPECs.
+          sudo make -C toolkit -j$(nproc) graph REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
