@@ -2,8 +2,8 @@
 %global gem_name public_suffix
 Summary:        Domain name parser for Ruby based on the Public Suffix List
 Name:           rubygem-%{gem_name}
-Version:        4.0.6
-Release:        2%{?dist}
+Version:        5.0.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Mar 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.0.3-1
+- Auto-upgrade to 5.0.3 - azl3.0
+
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 4.0.6-2
 - Build from .tar.gz source.
 
