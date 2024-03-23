@@ -2,8 +2,8 @@
 %global gem_name parallel
 Summary:        Run any kind of code in parallel processes
 Name:           rubygem-parallel
-Version:        1.20.1
-Release:        2%{?dist}
+Version:        1.23.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sat Mar 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.0-1
+- Auto-upgrade to 1.23.0 - none
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.20.1-2
 - Build from .tar.gz source.
 

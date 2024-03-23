@@ -26424,8 +26424,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-parallel",
-          "version": "1.20.1",
-          "downloadUrl": "https://github.com/grosser/parallel/archive/refs/tags/v1.20.1.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://github.com/grosser/parallel/archive/refs/tags/v1.23.0.tar.gz"
         }
       }
     },
