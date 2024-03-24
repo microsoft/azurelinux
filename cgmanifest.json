@@ -675,7 +675,7 @@
         "type": "other",
         "other": {
           "name": "atinject",
-          "version": "1+20100611git1f74ea7",
+          "version": "1",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/atinject-1.tar.xz"
         }
       }

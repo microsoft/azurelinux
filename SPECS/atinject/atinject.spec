@@ -18,8 +18,8 @@
 %global git_version 20100611git1f74ea7
 Summary:        Dependency injection specification for Java (JSR-330)
 Name:           atinject
-Version:        %{base_version}+%{git_version}
-Release:        5%{?dist}
+Version:        %{base_version}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,8 +75,8 @@ sed -i -e 's/pom\.groupId/project.groupId/' tck-pom.xml
 set -e
 alias rm=:
 alias xargs=:
-alias javadoc='javadoc -source 6 -notimestamp -Xdoclint:none'
-alias javac='javac -source 6 -target 6'
+alias javadoc='javadoc -source 7 -notimestamp -Xdoclint:none'
+alias javac='javac -source 7 -target 7'
 . ./build.sh
 
 # Inject OSGi manifests required by Eclipse.
@@ -114,6 +114,9 @@ cp -pr  build/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Mar 22 2024 Jon Slobodzian <joslobo@microsoft.com> - 1-6
+- Updated to build with Java 7.  Modified version
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1+20100611git1f74ea7-5
 - Updating naming for 3.0 version of Azure Linux.
 
