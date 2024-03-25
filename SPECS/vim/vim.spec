@@ -15,8 +15,6 @@ Requires(post): sed
 Provides:       vi = %{version}-%{release}
 Provides:       %{name}-minimal = %{version}-%{release}
 
-# TEST
-
 %description
 The Vim package contains a powerful text editor.
 
@@ -303,8 +301,8 @@ fi
 - Update to version 8.2.5064 to fix CVEs: 2022-1851, 2022-1886, and 2022-1898.
 
 * Fri May 27 2022 Max Brodeur-Urbas <maxbr@microsoft.com> - 8.2.4979-1
-- Update version to 8.2.4979 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629,
-  CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620,
+- Update version to 8.2.4979 to fix CVE-2022-1619, CVE-2022-1621, CVE-2022-1629, 
+  CVE-2022-1616, CVE-2022-1733, CVE-2022-1735, CVE-2022-1769, CVE-2022-1620, 
   CVE-2022-1674, CVE-2022-1771, CVE-2022-1785, CVE-2022-1796.
 
 * Fri May 20 2022 Chris Co <chrco@microsoft.com> - 8.2.4925-1
