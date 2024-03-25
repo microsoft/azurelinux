@@ -68,6 +68,7 @@ install -vdm755 %{buildroot}%{_libdir}
 make %{?_smp_mflags} check
 
 %files
+%defattr(-,root,root)
 %attr(4750,root,messagebus) %{_libexecdir}/dbus-daemon-launch-helper
 %license COPYING
 %{_bindir}/*
@@ -82,6 +83,7 @@ make %{?_smp_mflags} check
 #%%{_sharedstatedir}/*
 
 %files devel
+%defattr(-,root,root)
 %{_datadir}/xml/dbus-1
 %{_includedir}/*
 %{_libdir}/*.a

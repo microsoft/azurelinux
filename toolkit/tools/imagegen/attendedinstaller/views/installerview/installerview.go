@@ -63,7 +63,6 @@ func New(calamaresInstallFunc func()) *InstallerView {
 	if err != nil {
 		logger.Log.Debugf("Calamares not found, defaulting to terminal based installer")
 	} else {
-		//logger.Log.Debugf("Calamares found, but the gui installer is temporarily disabled until stabilized")
 		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
 
 		logger.Log.Debugf("Running chgrp for dbus-daemon-launch-helper")
