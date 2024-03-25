@@ -95,7 +95,6 @@ os:
         - [partitions](#partitions-partition)
           - [partition type](#partition-type)
             - [id](#id-string)
-            - [fileSystemType](#filesystemtype-string)
             - [label](#label-string)
             - [start](#start-uint64)
             - [end](#end-uint64)
@@ -104,6 +103,7 @@ os:
     - [fileSystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
+        - [type](#type-string)
         - [mountPoint](#mountpoint-mountpoint)
           - [mountPoint type](#mountpoint-type)
             - [idType](#idtype-string)
@@ -198,19 +198,19 @@ storage:
       - boot
       start: 1
       end: 9
-      fileSystemType: fat32
 
     - id: rootfs
       start: 9
-      fileSystemType: ext4
       
   fileSystems:
   - deviceId: esp
+    type: fat32
     mountPoint:
       path: /boot/efi
       options: umask=0077
 
   - deviceId: rootfs
+    type: ext4
     mountPoint:
       path: /
 
@@ -394,6 +394,18 @@ Required.
 
 The ID of the partition.
 This is used correlate [partition](#partition-type) objects with fileSystem objects.
+
+### type [string]
+
+Required.
+
+The filesystem type of the partition.
+
+Supported options:
+
+- `ext4`
+- `fat32`
+- `xfs`
 
 ### mountPoint [[mountPoint](#mountpoint-type)]
 
@@ -658,18 +670,6 @@ Required.
 The ID of the partition.
 This is used to correlate Partition objects with [fileSystem](#filesystem-type)
 objects.
-
-### fileSystemType [string]
-
-Required.
-
-The filesystem type of the partition.
-
-Supported options:
-
-- `ext4`
-- `fat32`
-- `xfs`
 
 ### label [string]
 

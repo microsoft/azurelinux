@@ -37,18 +37,37 @@ func (s *Storage) IsValid() error {
 		}
 	}
 
-	fileSystemIDSet := make(map[string]bool)
+	fileSystemSet := make(map[string]FileSystem)
 	for i, fileSystem := range s.FileSystems {
 		err = fileSystem.IsValid()
 		if err != nil {
 			return fmt.Errorf("invalid fileSystems item at index %d: %w", i, err)
 		}
 
-		if _, existingName := fileSystemIDSet[fileSystem.DeviceId]; existingName {
+		if _, existingName := fileSystemSet[fileSystem.DeviceId]; existingName {
 			return fmt.Errorf("duplicate fileSystem deviceId used (%s) at index %d", fileSystem.DeviceId, i)
 		}
 
-		fileSystemIDSet[fileSystem.DeviceId] = false // dummy value
+		fileSystemSet[fileSystem.DeviceId] = fileSystem
+	}
+
+	// Ensure special partitions have the correct filesystem type.
+	for _, disk := range s.Disks {
+		for _, partition := range disk.Partitions {
+			fileSystem, hasFileSystem := fileSystemSet[partition.Id]
+
+			if partition.IsESP() {
+				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
+				}
+			}
+
+			if partition.IsBiosBoot() {
+				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
+				}
+			}
+		}
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.
@@ -56,7 +75,7 @@ func (s *Storage) IsValid() error {
 	case BootTypeEfi:
 		hasEsp := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
+				return partition.IsESP()
 			})
 		})
 		if !hasEsp {
@@ -66,7 +85,7 @@ func (s *Storage) IsValid() error {
 	case BootTypeLegacy:
 		hasBiosBoot := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return sliceutils.ContainsValue(partition.Flags, PartitionFlagBiosGrub)
+				return partition.IsBiosBoot()
 			})
 		})
 		if !hasBiosBoot {
@@ -74,7 +93,7 @@ func (s *Storage) IsValid() error {
 		}
 	}
 
-	// Ensure all the partition settings object have an equivalent partition object.
+	// Ensure all the filesystems objects have an equivalent partition object.
 	for i, fileSystem := range s.FileSystems {
 		diskExists := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
