@@ -63,8 +63,22 @@ func New(calamaresInstallFunc func()) *InstallerView {
 	if err != nil {
 		logger.Log.Debugf("Calamares not found, defaulting to terminal based installer")
 	} else {
-		logger.Log.Debugf("Calamares found, but the gui installer is temporarily disabled until stabilized")
-		// iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
+		//logger.Log.Debugf("Calamares found, but the gui installer is temporarily disabled until stabilized")
+		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
+
+		logger.Log.Debugf("Running chgrp for dbus-daemon-launch-helper")
+		cmd := exec.Command("chgrp", "messagebus", "/usr/libexec/dbus-daemon-launch-helper")
+		err = cmd.Run()
+		if err != nil {
+			logger.Log.Debugf("Error while running chgrp for dbus-daemon-launch-helper")
+		}
+		logger.Log.Debugf("Running chmod for dbus-daemon-launch-helper")
+		cmd = exec.Command("chmod", "4750", "/usr/libexec/dbus-daemon-launch-helper")
+		err = cmd.Run()
+		if err != nil {
+			logger.Log.Debugf("Error while running chmod for dbus-daemon-launch-helper")
+		}
+
 	}
 
 	iv.needsToPrompt = (len(iv.installerOptions) != 1)
