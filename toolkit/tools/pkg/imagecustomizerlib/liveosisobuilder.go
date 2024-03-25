@@ -240,14 +240,9 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "security", "")
+	inputContentString, err = updateSELinuxCommandLineHelper(inputContentString, imagecustomizerapi.SELinuxModeDisabled)
 	if err != nil {
-		return fmt.Errorf("failed to update the security kernel argument in the iso grub.cfg:\n%w", err)
-	}
-
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "selinux", "0")
-	if err != nil {
-		return fmt.Errorf("failed to update the selinux kernel argument in the iso grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
@@ -326,7 +321,9 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 			copiedByIsoMaker = true
 		}
 
-		err = file.Copy(sourcePath, targetPath)
+		err = file.NewFileCopyBuilder(sourcePath, targetPath).
+			SetNoDereference().
+			Run()
 		if err != nil {
 			return err
 		}
@@ -360,18 +357,36 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 //   - the following is populated:
 //     b.artifacts.kernelVersion
 func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
-	kernelParentPath := filepath.Join(writeableRootfsDir, "/usr/lib/modules")
-	kernelPaths, err := os.ReadDir(kernelParentPath)
+	const kernelModulesDir = "/usr/lib/modules"
+
+	kernelParentPath := filepath.Join(writeableRootfsDir, kernelModulesDir)
+	kernelDirs, err := os.ReadDir(kernelParentPath)
 	if err != nil {
 		return fmt.Errorf("failed to enumerate kernels under (%s):\n%w", kernelParentPath, err)
 	}
-	if len(kernelPaths) == 0 {
-		return fmt.Errorf("did not find any kernels installed under (%s).", kernelParentPath)
+
+	// Filter out directories that are empty.
+	// Some versions of Azure Linux 2.0 don't cleanup properly when the kernel package is uninstalled.
+	filteredKernelDirs := []fs.DirEntry(nil)
+	for _, kernelDir := range kernelDirs {
+		kernelPath := filepath.Join(kernelParentPath, kernelDir.Name())
+		empty, err := file.IsDirEmpty(kernelPath)
+		if err != nil {
+			return err
+		}
+
+		if !empty {
+			filteredKernelDirs = append(filteredKernelDirs, kernelDir)
+		}
 	}
-	if len(kernelPaths) > 1 {
-		return fmt.Errorf("unsupported scenario. found more than one kernel under (%s).", kernelParentPath)
+
+	if len(filteredKernelDirs) == 0 {
+		return fmt.Errorf("did not find any kernels installed under (%s)", kernelModulesDir)
 	}
-	b.artifacts.kernelVersion = kernelPaths[0].Name()
+	if len(filteredKernelDirs) > 1 {
+		return fmt.Errorf("unsupported scenario: found more than one kernel under (%s)", kernelModulesDir)
+	}
+	b.artifacts.kernelVersion = filteredKernelDirs[0].Name()
 	logger.Log.Debugf("Found installed kernel version (%s)", b.artifacts.kernelVersion)
 	return nil
 }
@@ -634,8 +649,9 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	// Add /boot/* files
 	for sourceFile, targetFile := range b.artifacts.bootDirFiles {
 		fileToCopy := safechroot.FileToCopy{
-			Src:  sourceFile,
-			Dest: targetFile,
+			Src:           sourceFile,
+			Dest:          targetFile,
+			NoDereference: true,
 		}
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}

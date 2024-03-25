@@ -675,7 +675,7 @@
         "type": "other",
         "other": {
           "name": "atinject",
-          "version": "1+20100611git1f74ea7",
+          "version": "1",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/atinject-1.tar.xz"
         }
       }
@@ -867,6 +867,16 @@
           "name": "azure-iotedge",
           "version": "1.1.8",
           "downloadUrl": "https://github.com/Azure/iotedge/archive/1.1.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "azure-nvme-utils",
+          "version": "0.1.1",
+          "downloadUrl": "https://github.com/Azure/azure-nvme-utils/archive/refs/tags/v0.1.1.tar.gz"
         }
       }
     },
@@ -2558,8 +2568,8 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.3",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.3/dhcp-4.4.3.tar.gz"
+          "version": "4.4.3.P1",
+          "downloadUrl": "https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz"
         }
       }
     },
@@ -3308,8 +3318,8 @@
         "type": "other",
         "other": {
           "name": "erlang",
-          "version": "25.2",
-          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-25.2/otp-OTP-25.2.tar.gz"
+          "version": "26.2.3",
+          "downloadUrl": "https://github.com/erlang/otp/archive/OTP-26.2.3/otp-OTP-26.2.3.tar.gz"
         }
       }
     },
@@ -3820,8 +3830,8 @@
         "type": "other",
         "other": {
           "name": "freeglut",
-          "version": "3.2.1",
-          "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.2.1.tar.gz"
+          "version": "3.4.0",
+          "downloadUrl": "https://downloads.sourceforge.net/freeglut/freeglut-3.4.0.tar.gz"
         }
       }
     },
@@ -4409,6 +4419,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "glslang",
+          "version": "14.0.0",
+          "downloadUrl": "https://github.com/KhronosGroup/glslang/archive/vulkan-sdk-1.3.275.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "glusterfs",
           "version": "11.1",
           "downloadUrl": "https://download.gluster.org/pub/gluster/glusterfs/11/11.1/glusterfs-11.1.tar.gz"
@@ -4610,8 +4630,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz"
+          "version": "1.21.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.8-2/go.20240320.5.src.tar.gz"
         }
       }
     },
@@ -4850,8 +4870,8 @@
         "type": "other",
         "other": {
           "name": "grpc",
-          "version": "1.42.0",
-          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.42.0/grpc-1.42.0.tar.gz"
+          "version": "1.62.0",
+          "downloadUrl": "https://github.com/grpc/grpc/archive/v1.62.0/grpc-1.62.0.tar.gz"
         }
       }
     },
@@ -7661,8 +7681,8 @@
         "type": "other",
         "other": {
           "name": "jasper",
-          "version": "2.0.32",
-          "downloadUrl": "https://github.com/jasper-software/jasper/archive/version-2.0.32.tar.gz"
+          "version": "4.2.1",
+          "downloadUrl": "https://github.com/jasper-software/jasper/archive/refs/tags/version-4.2.1.tar.gz"
         }
       }
     },
@@ -7711,8 +7731,8 @@
         "type": "other",
         "other": {
           "name": "javapackages-bootstrap",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.5.0/javapackages-bootstrap-1.5.0.tar.xz"
+          "version": "1.14.0",
+          "downloadUrl": "https://github.com/fedora-java/javapackages-bootstrap/releases/download/1.14.0/javapackages-bootstrap-1.14.0.tar.xz"
         }
       }
     },
@@ -8013,6 +8033,16 @@
           "name": "junitperf",
           "version": "1.9.1",
           "downloadUrl": "https://github.com/clarkware/junitperf/archive/refs/tags/1.9.1.zip"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "jurand",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/fedora-java/jurand/archive/refs/tags/1.3.2.tar.gz"
         }
       }
     },
@@ -8613,6 +8643,16 @@
           "name": "libarchive",
           "version": "3.7.1",
           "downloadUrl": "https://github.com/libarchive/libarchive/releases/download/v3.7.1/libarchive-3.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libarrow",
+          "version": "15.0.0",
+          "downloadUrl": "https://dist.apache.org/repos/dist/release/arrow/arrow-15.0.0/apache-arrow-15.0.0.tar.gz"
         }
       }
     },
@@ -9421,8 +9461,8 @@
         "type": "other",
         "other": {
           "name": "libglvnd",
-          "version": "1.3.2",
-          "downloadUrl": "https://github.com/NVIDIA/libglvnd/archive/v1.3.2/libglvnd-1.3.2.tar.gz"
+          "version": "1.7.0",
+          "downloadUrl": "https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v1.7.0/libglvnd-1.7.0.tar.gz"
         }
       }
     },
@@ -12711,8 +12751,8 @@
         "type": "other",
         "other": {
           "name": "maven-compiler-plugin",
-          "version": "3.8.1",
-          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.8.1-source-release.zip"
+          "version": "3.11.0",
+          "downloadUrl": "https://archive.apache.org/dist/maven/plugins/maven-compiler-plugin-3.11.0-source-release.zip"
         }
       }
     },
@@ -12721,8 +12761,8 @@
         "type": "other",
         "other": {
           "name": "maven-jar-plugin",
-          "version": "3.2.2",
-          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.2.2/maven-jar-plugin-3.2.2-source-release.zip"
+          "version": "3.3.0",
+          "downloadUrl": "https://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/3.3.0/maven-jar-plugin-3.3.0-source-release.zip"
         }
       }
     },
@@ -12751,8 +12791,8 @@
         "type": "other",
         "other": {
           "name": "maven-resolver",
-          "version": "1.7.3",
-          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.7.3-source-release.zip"
+          "version": "1.9.15",
+          "downloadUrl": "https://archive.apache.org/dist/maven/resolver/maven-resolver-1.9.15-source-release.zip"
         }
       }
     },
@@ -12771,8 +12811,8 @@
         "type": "other",
         "other": {
           "name": "maven-surefire",
-          "version": "3.0.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-surefire-3.0.0.tar.gz"
+          "version": "3.2.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-surefire-3.2.2.tar.gz"
         }
       }
     },
@@ -12931,8 +12971,8 @@
         "type": "other",
         "other": {
           "name": "mesa",
-          "version": "21.0.0",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/mesa-21.0.0.tar.xz"
+          "version": "24.0.1",
+          "downloadUrl": "https://archive.mesa3d.org/mesa-24.0.1.tar.xz"
         }
       }
     },
@@ -12941,8 +12981,8 @@
         "type": "other",
         "other": {
           "name": "mesa-libGLU",
-          "version": "9.0.1",
-          "downloadUrl": "https://mesa.freedesktop.org/archive/glu/glu-9.0.1.tar.xz"
+          "version": "9.0.3",
+          "downloadUrl": "https://gitlab.freedesktop.org/mesa/glu/-/archive/glu-9.0.3/glu-glu-9.0.3.tar.gz"
         }
       }
     },
@@ -14024,16 +14064,6 @@
           "name": "nmap",
           "version": "7.94",
           "downloadUrl": "https://nmap.org/dist/nmap-7.94.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nmi",
-          "version": "1.8.7",
-          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.7.tar.gz"
         }
       }
     },
@@ -21433,8 +21463,8 @@
         "type": "other",
         "other": {
           "name": "pybind11",
-          "version": "2.6.2",
-          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.6.2/pybind11-2.6.2.tar.gz"
+          "version": "2.11.1",
+          "downloadUrl": "https://github.com/pybind/pybind11/archive/v2.11.1/pybind11-2.11.1.tar.gz"
         }
       }
     },
@@ -23032,6 +23062,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-ml-dtypes",
+          "version": "0.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/ml_dtypes/ml_dtypes-0.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mock",
           "version": "5.1.0",
           "downloadUrl": "https://pypi.python.org/packages/source/m/mock/mock-5.1.0.tar.gz"
@@ -24093,8 +24133,8 @@
         "type": "other",
         "other": {
           "name": "python-setuptools_scm",
-          "version": "6.4.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/s/setuptools_scm/setuptools_scm-6.4.2.tar.gz"
+          "version": "8.0.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/af/54/0a75c590c1aa1908c1036de783c0b7136d8fe4beb8ce4c52e4d92b9e9ca7/setuptools-scm-8.0.3.tar.gz"
         }
       }
     },
@@ -24415,16 +24455,6 @@
           "name": "python-tensorboard-plugin-wit",
           "version": "1.8.1",
           "downloadUrl": "https://github.com/PAIR-code/what-if-tool/archive/refs/tags/v1.8.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-tensorflow-estimator",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/estimator/archive/refs/tags/v2.11.0.tar.gz"
         }
       }
     },
@@ -27214,8 +27244,8 @@
         "type": "other",
         "other": {
           "name": "selinux-policy",
-          "version": "2.20221101",
-          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20221101/refpolicy-2.20221101.tar.bz2"
+          "version": "2.20240226",
+          "downloadUrl": "https://github.com/SELinuxProject/refpolicy/releases/download/RELEASE_2_20240226/refpolicy-2.20240226.tar.bz2"
         }
       }
     },
@@ -27727,7 +27757,7 @@
         "other": {
           "name": "spirv-headers",
           "version": "1.5.5",
-          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers/archive/b42ba6d92faf6b4938e6f22ddd186dbdacc98d78/spirv-headers-b42ba6d92faf6b4938e6f22ddd186dbdacc98d78.tar.gz"
+          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Headers//archive/refs/tags/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -27736,8 +27766,8 @@
         "type": "other",
         "other": {
           "name": "spirv-tools",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v2022.1.tar.gz"
+          "version": "2023.2",
+          "downloadUrl": "https://github.com/KhronosGroup/SPIRV-Tools/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -28316,8 +28346,8 @@
         "type": "other",
         "other": {
           "name": "tensorflow",
-          "version": "2.11.1",
-          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.1.tar.gz"
+          "version": "2.16.1",
+          "downloadUrl": "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.16.1.tar.gz"
         }
       }
     },
@@ -28328,6 +28358,16 @@
           "name": "texinfo",
           "version": "7.0.3",
           "downloadUrl": "http://ftp.gnu.org/gnu/texinfo/texinfo-7.0.3.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "thrift",
+          "version": "0.15.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
         }
       }
     },
@@ -28516,8 +28556,8 @@
         "type": "other",
         "other": {
           "name": "tpm2-pytss",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/1.2.0.tar.gz"
+          "version": "2.2.1",
+          "downloadUrl": "https://github.com/tpm2-software/tpm2-pytss/archive/refs/tags/2.2.1.tar.gz"
         }
       }
     },
@@ -28916,8 +28956,8 @@
         "type": "other",
         "other": {
           "name": "usbip",
-          "version": "5.15.34.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-5.15.34.1.tar.xz"
+          "version": "6.6.14.1",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/usbip-6.6.14.1.tar.xz"
         }
       }
     },

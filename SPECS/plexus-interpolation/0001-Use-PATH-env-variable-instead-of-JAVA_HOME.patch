@@ -1,0 +1,38 @@
+From d6623bd636d7f07aa8c73234375bdd11ccd6ee95 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Wed, 25 Mar 2020 06:58:13 +0100
+Subject: [PATCH] Use PATH env variable instead of JAVA_HOME
+
+---
+ .../plexus/interpolation/EnvarBasedValueSourceTest.java         | 2 +-
+ .../plexus/interpolation/fixed/EnvarBasedValueSourceTest.java   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/test/java/org/codehaus/plexus/interpolation/EnvarBasedValueSourceTest.java b/src/test/java/org/codehaus/plexus/interpolation/EnvarBasedValueSourceTest.java
+index bc88e8b..6fc4c13 100644
+--- a/src/test/java/org/codehaus/plexus/interpolation/EnvarBasedValueSourceTest.java
++++ b/src/test/java/org/codehaus/plexus/interpolation/EnvarBasedValueSourceTest.java
+@@ -87,7 +87,7 @@ public class EnvarBasedValueSourceTest
+ 
+         EnvarBasedValueSource source = new EnvarBasedValueSource();
+ 
+-        String realEnvVar = "JAVA_HOME";
++        String realEnvVar = "PATH";
+ 
+         String realValue = System.getenv().get( realEnvVar );
+         assertNotNull( "Can't run this test until " + realEnvVar + " env variable is set", realValue );
+diff --git a/src/test/java/org/codehaus/plexus/interpolation/fixed/EnvarBasedValueSourceTest.java b/src/test/java/org/codehaus/plexus/interpolation/fixed/EnvarBasedValueSourceTest.java
+index beaf014..94899d7 100644
+--- a/src/test/java/org/codehaus/plexus/interpolation/fixed/EnvarBasedValueSourceTest.java
++++ b/src/test/java/org/codehaus/plexus/interpolation/fixed/EnvarBasedValueSourceTest.java
+@@ -87,7 +87,7 @@ public class EnvarBasedValueSourceTest
+ 
+         EnvarBasedValueSource source = new EnvarBasedValueSource();
+ 
+-        String realEnvVar = "JAVA_HOME";
++        String realEnvVar = "PATH";
+ 
+         String realValue = System.getenv().get( realEnvVar );
+         assertNotNull( "Can't run this test until " + realEnvVar + " env variable is set", realValue );
+-- 
+2.21.0
