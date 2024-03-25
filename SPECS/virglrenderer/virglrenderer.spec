@@ -10,12 +10,13 @@ Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
+BuildRequires:  libva-devel
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
 BuildRequires:  python3
-BuildRequires:  xorg-x11-util-macros
 BuildRequires:  vulkan-loader-devel
+BuildRequires:  xorg-x11-util-macros
 
 %description
 The virgil3d rendering library is a library used by
