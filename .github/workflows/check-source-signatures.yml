@@ -42,7 +42,7 @@ jobs:
           echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
           echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
 
-      - name: Check for invalid signatures
+      - name: Check for invalid source signatures
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
           changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u)
@@ -53,7 +53,7 @@ jobs:
           else
             echo "Packages modified in this PR:"
             echo "${changed_pkgs}"
-            echo "${changed_pkgs_extended}
+            echo "${changed_pkgs_extended}"
           fi
 
           echo "Checking for invalid signatures..."
