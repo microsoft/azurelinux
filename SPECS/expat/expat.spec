@@ -54,6 +54,7 @@ ls -l %{buildroot}/
 %files
 %defattr(-,root,root)
 %doc AUTHORS Changes
+%{_mandir}/man1/xmlwf.1.gz
 %{_bindir}/*
 
 %files devel
