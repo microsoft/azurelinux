@@ -35,7 +35,7 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %changelog
 * Sat Mar 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.3.0-1
-- Upgrade to 2.3.0 - none
+- Upgrade to 2.3.0
 
 * Wed Jun 22 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.1.1-2
 - Build from .tar.gz source.
