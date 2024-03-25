@@ -7,7 +7,7 @@
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
 Version:        4.2.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -270,7 +270,7 @@ end
 %license LICENSE NOTICE
 
 %changelog
-* Mon Mar 25 2024 Nan Liu<liunan@microsoft.com> - 4.2.0-1
+* Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 4.2.0-3
 - Workaround build issue with OpenJDK 17, upgrade to 4.2.0
 
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-2
