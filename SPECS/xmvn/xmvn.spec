@@ -153,7 +153,7 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
-# Workaround easymock incompatibility with Java 17that should be fixed            
+# Workaround easymock incompatibility with Java 17 that should be fixed            
 # in easymock 4.4: https://github.com/easymock/easymock/issues/274            
 %pom_add_plugin :maven-surefire-plugin xmvn-connector "<configuration>
     <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
@@ -271,7 +271,7 @@ end
 
 %changelog
 * Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 4.2.0-3
-- Workaround build issue with OpenJDK 17, upgrade to 4.2.0
+- Imported workaround for OpenJDK 17 from Fedora 40, upgrade to 4.2.0
 
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-2
 - Rebuilt with msopenjdk-17 
