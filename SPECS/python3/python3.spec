@@ -11,8 +11,8 @@
 
 Summary:        A high-level scripting language
 Name:           python3
-Version:        3.9.14
-Release:        8%{?dist}
+Version:        3.9.19
+Release:        1%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,13 +20,8 @@ Group:          System Environment/Programming
 URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
-Patch1:         CVE-2015-20107.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
 Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
-Patch3:         CVE-2022-37454.patch
-Patch4:         CVE-2022-45061.patch
-Patch5:         CVE-2022-42919.patch
-Patch6:         CVE-2023-24329.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 
@@ -323,6 +318,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Fri Mar 22 2024 Binu Philip <bphilip@microsoft.com> - 3.9.19-1
+- Upgrade to python 3.9.19 for CVE-2023-6597 and other security fixes
+
 * Wed Oct 11 2023 Amrita Kohli <amritakohli@microsoft.com> - 3.9.14-8
 - Patch for CVE-2023-24329
 
