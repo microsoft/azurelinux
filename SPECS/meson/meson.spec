@@ -1,7 +1,7 @@
 Summary:        Extremely fast and user friendly build system
 Name:           meson
 Version:        1.3.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -55,7 +55,9 @@ export MESON_PRINT_TEST_OUTPUT=1
 # Skip linuxliketests because they use 'test cases/common/13 pch' (removed above)
 sed -i '/def test_pch_with_address_sanitizer/i \    @unittest.skip("Not supported in Azure Linux.")' unittests/linuxliketests.py
 # Do not remove, because these tests are called from menson/run_unittests.py and we don't want to remove them
-python3 ./run_tests.py
+# Since the full test suite can take over an hour to run in pipelines, only run the unit tests by default.
+# python3 ./run_tests.py
+python3 ./run_unittests.py
 
 %files
 %license COPYING
@@ -67,6 +69,9 @@ python3 ./run_tests.py
 %{_datadir}/polkit-1/actions/com.mesonbuild.install.policy
 
 %changelog
+* Mon Mar 25 2024 Andrew Phelps <anphel@microsoft.com> - 1.3.1-2
+- Limit check section to unit tests
+
 * Thu Feb 29 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
 - Update version to 1.3.1
 - Remove flaky and unsupported tests
