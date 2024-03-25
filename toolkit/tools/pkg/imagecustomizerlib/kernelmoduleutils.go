@@ -25,7 +25,7 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) e
 
 	for i, module := range modules {
 		switch module.LoadMode {
-		case imagecustomizerapi.LoadModeAlways:
+		case imagecustomizerapi.ModuleLoadModeAlways:
 			// If a module is disabled, remove it. Add the module to modules-load.d/. Write options if provided.
 			err = removeModuleFromDisableList(module.Name, moduleDisableFilePath)
 			if err != nil {
@@ -37,7 +37,7 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) e
 				moduleOptionsUpdates[module.Name] = module.Options
 			}
 
-		case imagecustomizerapi.LoadModeAuto:
+		case imagecustomizerapi.ModuleLoadModeAuto:
 			// If a module is disabled, enable it. Write options if provided
 			err = removeModuleFromDisableList(module.Name, moduleDisableFilePath)
 			if err != nil {
@@ -48,7 +48,7 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) e
 				moduleOptionsUpdates[module.Name] = module.Options
 			}
 
-		case imagecustomizerapi.LoadModeDisable:
+		case imagecustomizerapi.ModuleLoadModeDisable:
 			// Disable a module, throw error if options are provided
 			if len(module.Options) > 0 {
 				return fmt.Errorf("cannot add options for disabled module (%s) at index %d:\nspecify auto or always as loadMode to override setting in base image", module.Name, i)
@@ -56,13 +56,12 @@ func loadOrDisableModules(modules []imagecustomizerapi.Module, rootDir string) e
 
 			modulesToDisable = append(modulesToDisable, module.Name)
 
-		case imagecustomizerapi.LoadModeInherit, imagecustomizerapi.LoadModeDefault:
+		case imagecustomizerapi.ModuleLoadModeInherit, imagecustomizerapi.ModuleLoadModeDefault:
 			// inherits the behavior of the base image, modify the options without changing the loading state
 			if len(module.Options) > 0 {
 				disabled, err := isModuleDisabled(module.Name, moduleDisableFilePath)
 				if err != nil {
-					logger.Log.Infof("failed to check if (%s) is disabled", module)
-					return err
+					return fmt.Errorf("failed to check if (%s) is disabled", module)
 				}
 
 				if disabled {

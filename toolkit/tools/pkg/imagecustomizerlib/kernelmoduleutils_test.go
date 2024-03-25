@@ -18,16 +18,16 @@ func TestLoadOrDisableModules(t *testing.T) {
 	modules := []imagecustomizerapi.Module{
 		{
 			Name:     "module1",
-			LoadMode: imagecustomizerapi.LoadModeAlways,
+			LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
 			Options:  map[string]string{"option1": "value1"},
 		},
 		{
 			Name:     "module2",
-			LoadMode: imagecustomizerapi.LoadModeDisable,
+			LoadMode: imagecustomizerapi.ModuleLoadModeDisable,
 		},
 		{
 			Name:     "module3",
-			LoadMode: imagecustomizerapi.LoadModeAuto,
+			LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
 			Options:  map[string]string{"option3_1": "value3_1", "option3_2": "value3_2"},
 		},
 	}
@@ -74,7 +74,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 	modules = []imagecustomizerapi.Module{
 		{
 			Name:     "module2",
-			LoadMode: imagecustomizerapi.LoadModeAuto,
+			LoadMode: imagecustomizerapi.ModuleLoadModeAuto,
 			Options:  map[string]string{"option2": "value2"},
 		},
 		{
@@ -98,7 +98,7 @@ func TestLoadOrDisableModules(t *testing.T) {
 	modules = []imagecustomizerapi.Module{
 		{
 			Name:     "module1",
-			LoadMode: imagecustomizerapi.LoadModeAlways,
+			LoadMode: imagecustomizerapi.ModuleLoadModeAlways,
 			Options:  map[string]string{"option1": "value1"},
 		},
 	}
