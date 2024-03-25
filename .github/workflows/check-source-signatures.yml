@@ -101,7 +101,8 @@ jobs:
             echo "Check the logs above for details on the mismatches files and their expected hashes."
             if [ $core_err -ne 0 ]; then
               echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}'"
-            elif [ $extended_err -ne 0 ]; then
+            fi
+            if [ $extended_err -ne 0 ]; then
               echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs_extended }} SPECS_DIR=../SPECS-EXTENDED'"
             fi
             printf "\n\n******************************"
