@@ -26354,8 +26354,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-multipart-post",
-          "version": "2.1.1",
-          "downloadUrl": "https://github.com/socketry/multipart-post/archive/refs/tags/v2.1.1.tar.gz"
+          "version": "2.3.0",
+          "downloadUrl": "https://github.com/socketry/multipart-post/archive/refs/tags/v2.3.0.tar.gz"
         }
       }
     },
@@ -26424,8 +26424,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-parallel",
-          "version": "1.20.1",
-          "downloadUrl": "https://github.com/grosser/parallel/archive/refs/tags/v1.20.1.tar.gz"
+          "version": "1.23.0",
+          "downloadUrl": "https://github.com/grosser/parallel/archive/refs/tags/v1.23.0.tar.gz"
         }
       }
     },
@@ -26504,8 +26504,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-public_suffix",
-          "version": "4.0.6",
-          "downloadUrl": "https://github.com/weppos/publicsuffix-ruby/archive/refs/tags/v4.0.6.tar.gz"
+          "version": "5.0.3",
+          "downloadUrl": "https://github.com/weppos/publicsuffix-ruby/archive/refs/tags/v5.0.3.tar.gz"
         }
       }
     },
@@ -26554,8 +26554,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rdiscount",
-          "version": "2.2.0.2",
-          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.0.2.tar.gz"
+          "version": "2.2.7.1",
+          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.7.1.tar.gz"
         }
       }
     },

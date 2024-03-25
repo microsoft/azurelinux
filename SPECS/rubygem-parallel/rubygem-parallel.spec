@@ -2,15 +2,14 @@
 %global gem_name parallel
 Summary:        Run any kind of code in parallel processes
 Name:           rubygem-parallel
-Version:        1.20.1
-Release:        2%{?dist}
+Version:        1.23.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/grosser/parallel
 Source0:        https://github.com/grosser/parallel/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
-Patch0:         fix-file_list.patch
 BuildRequires:  git
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}
@@ -30,10 +29,13 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/MIT-LICENSE.txt
+%license MIT-LICENSE.txt
 %{gemdir}
 
 %changelog
+* Sat Mar 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.23.0-1
+- Upgrade to 1.23.0
+
 * Fri Apr 01 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.20.1-2
 - Build from .tar.gz source.
 
