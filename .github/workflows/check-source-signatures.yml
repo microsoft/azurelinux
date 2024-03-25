@@ -79,19 +79,23 @@ jobs:
           # Core SPECs
           if [ -n "${{ env.changed_pkgs }}" ]; then
             # We want to ignore errors here, as we want to check all the packages that have been modified. Capture the error code and check it later.
-            set +ex
+            set +e
+            set -x
             sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}"
             core_err=$?
-            set -ex
+            set +x
+            set -e
           fi
 
           # Extended SPECs
           if [ -n "${{ env.changed_pkgs_extended }}" ]; then
             # We want to ignore errors here, as we want to check all the packages that have been modified. Capture the error code and check it later.
-            set +ex
+            set +e
+            set -x
             sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs_extended }}" SPECS_DIR=../SPECS-EXTENDED
             extended_err=$?
-            set -ex
+            set +x
+            set -e
           fi
 
           # Print results
