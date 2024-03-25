@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,6 +28,7 @@ Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
+Requires:       libgcc
 Requires:       mariner-release
 Requires:       openssl
 Requires:       openssl-libs
@@ -55,6 +56,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Mon Mar 25 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-4
+- Explicitly add libgcc as a runtime dependency for distroless-base
+
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
 - Add tzdata to minimal
