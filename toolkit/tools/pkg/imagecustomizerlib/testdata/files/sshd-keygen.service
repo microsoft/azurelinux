@@ -1,0 +1,14 @@
+[Unit]
+Description=Generate sshd host keys
+ConditionPathExists=|!/var/etc/ssh/ssh_host_rsa_key
+ConditionPathExists=|!/var/etc/ssh/ssh_host_ecdsa_key
+ConditionPathExists=|!/var/etc/ssh/ssh_host_ed25519_key
+Before=sshd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ssh-keygen -A -f /var
+
+[Install]
+WantedBy=multi-user.target
