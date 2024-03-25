@@ -10,10 +10,10 @@ Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
-BuildRequires:  libva-devel
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
+BuildRequires:  pkgconfig(libva)
 BuildRequires:  python3
 BuildRequires:  vulkan-loader-devel
 BuildRequires:  xorg-x11-util-macros
