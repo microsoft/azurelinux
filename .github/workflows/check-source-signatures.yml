@@ -45,8 +45,8 @@ jobs:
       - name: Check for invalid source signatures
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
-          changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u)
-          changed_pkgs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u)
+          changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
+          changed_pkgs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
           if [ -z "${changed_pkgs}${changed_pkgs_extended}" ]; then
             echo "No package changes detected."
             exit 0
