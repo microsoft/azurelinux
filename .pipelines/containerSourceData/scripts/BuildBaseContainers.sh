@@ -23,7 +23,6 @@ set -e
 #   │   ├── base
 #   │   │   ├── Dockerfile-Base-Template
 #   │   │   ├── Dockerfile-Base-Nonroot-Template
-#   │   |   ├── Dockerfile-Busybox-Template
 #   │   │   ├── Dockerfile-Distroless-Template
 #   │   │   ├── Dockerfile-Distroless-Nonroot-Template
 #   │   container_tarballs
@@ -165,7 +164,6 @@ function initialization {
     # Image types
     BASE="base"
     DISTROLESS="distroless"
-    BUSYBOX="busybox"
     MARINARA="marinara"
 
     base_tarball_file_name=$(basename "$BASE_TARBALL")      # core-3.0.20240101.tar.gz
@@ -193,7 +191,6 @@ function initialization {
     DISTROLESS_DEBUG_NONROOT_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$NONROOT_IMAGE_TAG"
     DISTROLESS_DEBUG_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$IMAGE_TAG"
 
-    BUSYBOX_IMAGE_NAME="$ACR_NAME_FULL/busybox:$IMAGE_TAG"
     MARINARA_IMAGE_NAME="$ACR_NAME_FULL/marinara:$IMAGE_TAG"
 
     echo "BASE_IMAGE_NAME                       -> $BASE_IMAGE_NAME"
@@ -204,7 +201,6 @@ function initialization {
     echo "DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME -> $DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME"
     echo "DISTROLESS_DEBUG_IMAGE_NAME           -> $DISTROLESS_DEBUG_IMAGE_NAME"
     echo "DISTROLESS_DEBUG_NONROOT_IMAGE_NAME   -> $DISTROLESS_DEBUG_NONROOT_IMAGE_NAME"
-    echo "BUSYBOX_IMAGE_NAME                    -> $BUSYBOX_IMAGE_NAME"
     echo "MARINARA_IMAGE_NAME                   -> $MARINARA_IMAGE_NAME"
 }
 
@@ -329,8 +325,6 @@ function build_images {
     docker_build_custom $DISTROLESS "$DISTROLESS_BASE_NONROOT_IMAGE_NAME" "$DISTROLESS_BASE_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
     docker_build_custom $DISTROLESS "$DISTROLESS_MINIMAL_NONROOT_IMAGE_NAME" "$DISTROLESS_MINIMAL_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
     docker_build_custom $DISTROLESS "$DISTROLESS_DEBUG_NONROOT_IMAGE_NAME" "$DISTROLESS_DEBUG_IMAGE_NAME" "Dockerfile-Distroless-Nonroot-Template"
-
-    docker_build_custom $BUSYBOX "$BUSYBOX_IMAGE_NAME" "" "Dockerfile-Busybox-Template"
 
     docker_build_marinara
 }
