@@ -48,8 +48,8 @@ jobs:
           changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
           changed_pkgs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
           echo "Packages modified in this PR:"
-          echo "${changed_pkgs}
-          echo "${changed_pkgs_extended}"
+          echo "    ${changed_pkgs}"
+          echo "    ${changed_pkgs_extended}"
           echo "changed_pkgs=${changed_pkgs}" >> $GITHUB_ENV
           echo "changed_pkgs_extended=${changed_pkgs_extended}" >> $GITHUB_ENV
 
