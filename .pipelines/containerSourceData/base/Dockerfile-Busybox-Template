@@ -27,7 +27,7 @@ RUN if [ "${RPMS}" ]; then \
     tdnf autoremove -y createrepo; \
 fi
 
-# Install busybox, glibc, and their dependencies into a staging location.
+# Install azurelinux-release, busybox, glibc, and their dependencies into a staging location.
 # Staging directory is copied into the final scratch image.
 RUN mkdir /staging \
     && tdnf install -y --releasever=$AZL_VERSION --installroot /staging \
