@@ -42,7 +42,8 @@ This package contains minimal set of shared expat libraries.
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_docdir}/%{name}
-rm %{buildroot}%{_mandir}/man1/xmlwf.1.gz
+echo "Listing files in the install directory:"
+ls -l %{buildroot}/
 %{_fixperms} %{buildroot}/*
 
 %check
