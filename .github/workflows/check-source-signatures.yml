@@ -50,19 +50,28 @@ jobs:
           if [ -z "${changed_pkgs}${changed_pkgs_extended}" ]; then
             echo "No package changes detected."
             exit 0
+          else
+            echo "Packages modified in this PR:"
+            echo "${changed_pkgs}"
+            echo "${changed_pkgs_extended}
           fi
+
           echo "Checking for invalid signatures..."
           # Call this script to sync the toolchain manifests with the LKG daily build.
           ./toolkit/scripts/setuplkgtoolchain.sh
           # Determine the LKG daily build ID.
           LKG_BUILD_ID=$(wget -qO - https://mariner3dailydevrepo.blob.core.windows.net/lkg/lkg-3.0-dev.json | jq -r ".dailybuildid" | tr '\.' '-')
 
+          # Core SPECs
           if [ -n "${changed_pkgs}" ]; then
+            echo "Running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID} SRPM_PACK_LIST='${changed_pkgs}'"
             sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID} SRPM_PACK_LIST="${changed_pkgs}"
             core_err=$?
           fi
 
+          # Extended SPECs
           if [ -n "${changed_pkgs_extended}" ]; then
+            echo "Running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID} SRPM_PACK_LIST='${changed_pkgs_extended} SPECS_DIR=SPECS-EXTENDED'"
             sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID} SRPM_PACK_LIST="${changed_pkgs_extended} SPECS_DIR=SPECS-EXTENDED"
             extended_err=$?
           fi
