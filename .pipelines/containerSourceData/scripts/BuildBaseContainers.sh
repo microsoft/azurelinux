@@ -236,7 +236,8 @@ function docker_build {
         --build-arg EULA="$EULA_FILE_NAME" \
         --build-arg BASE_IMAGE="$temp_image" \
         -t "$image_full_name" \
-        --no-cache
+        --no-cache \
+        --progress=plain
 
     docker rmi "$temp_image"
     popd > /dev/null
@@ -264,7 +265,8 @@ function docker_build_custom {
         --build-arg LOCAL_REPO_FILE="$LOCAL_REPO_FILE" \
         -t "$image_full_name" \
         -f "$CONTAINER_SRC_DIR/base/$dockerfile" \
-        --no-cache
+        --no-cache \
+        --progress=plain
 
     popd > /dev/null
 
