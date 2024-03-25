@@ -31,7 +31,7 @@ fi
 # Staging directory is copied into the final scratch image.
 RUN mkdir /staging \
     && tdnf install -y --releasever=$AZL_VERSION --installroot /staging \
-    busybox glibc \
+    azurelinux-release busybox glibc \
     && tdnf clean all \
     && pushd /staging \
     && rm -rf boot media mnt opt run \
