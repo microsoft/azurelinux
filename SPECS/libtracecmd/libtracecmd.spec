@@ -1,6 +1,6 @@
 Name: libtracecmd
 Version: 1.5.1
-Release: 3%{?dist}
+Release: 1%{?dist}
 License: LGPL-2.1-only AND LGPL-2.1-or-later AND GPL-2.0-only AND GPL-2.0-or-later
 Summary: A library for reading tracing instances stored in a trace file
 
@@ -69,55 +69,6 @@ chrpath --delete %{buildroot}/%{_libdir}/libtracecmd.so*
 %{_includedir}/trace-cmd
 
 %changelog
-* Thu Feb 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.5.1-3
-- Initial CBL-Mariner import from Fedora 40 (license: MIT)
+* Thu Feb 15 2024 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.5.1-1
+- Initial Azure Linux import from Fedora 40 (license: MIT)
 - License Verified
-
-* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Tue Jan 23 2024 Zamir SUN <sztsian@gmail.com> - 1.5.1-1
-- Update to 1.5.1
-
-* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Mon Jun 05 2023 Zamir SUN <sztsian@gmail.com> - 1.3.1-2
-- SPDX migration
-
-* Tue Apr 18 2023 Zamir SUN <sztsian@gmail.com> - 1.3.1-1
-- Update to 1.3.1
-
-* Fri Mar 31 2023 Jerome Marchand <jmarchan@redhat.com> - 1.2.0-3
-- Fix build: RHBZ#2171769
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Tue Oct 11 2022 Zamir SUN <sztsian@gmail.com> - 1.2.0-1
-- Update to 1.2.0
-
-* Thu Sep 8 2022 Zamir SUN <sztsian@gmail.com> - 1.1.3-4
-- Add zstd support
-- Fixes: RHBZ#2121037
-
-* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Fri Apr 15 2022 Zamir SUN <sztsian@gmail.com> - 1.1.3-2
-- Rebuild with newer libtraceevent
-
-* Wed Apr 13 2022 Zamir SUN <sztsian@gmail.com> - 1.1.3-1
-- Update to 1.1.3
-
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Mon Apr 19 2021 Zamir SUN <sztsian@gmail.com> - 1.1.0-1
-- Initial libtracecmd 1.1.0
