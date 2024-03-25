@@ -1,4 +1,4 @@
-# Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
+# Move the SSH host keys off the read-only /etc directory, so that sshd can run.
 SSH_VAR_DIR="/var/etc/ssh/"
 mkdir -p "$SSH_VAR_DIR"
 
