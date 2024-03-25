@@ -19,6 +19,29 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
 
+      # For consistency, we use the same major/minor version of Python that CBL-Mariner ships
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Get Python dependencies
+        run: python3 -m pip install -r toolkit/scripts/requirements.txt
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          echo "base_sha=$(git rev-parse origin/${{ github.base_ref }})" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.base_ref }}"
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git fetch origin ${{ github.event.before }}
+          echo "base_sha=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "Merging ${{ github.sha }} into ${{ github.event.before }}"
+
       - name: Check for invalid signatures
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
