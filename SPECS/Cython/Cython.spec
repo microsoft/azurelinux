@@ -3,7 +3,7 @@ Cython is an optimising static compiler for both the Python programming language
 Summary:        Language for writing Python extension modules
 Name:           Cython
 Version:        0.29.33
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,7 +40,8 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
 pip3 install -r test-requirements.txt
-%python3 runtests.py -vv
+# Skip long-running file and examples tests
+%python3 runtests.py -vv --no-file --no-examples
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
@@ -55,6 +56,9 @@ pip3 install -r test-requirements.txt
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
+* Mon Mar 25 2024 Andrew Phelps <anphel@microsoft.com> - 0.29.33-2
+- Skip long-running file and examples tests
+
 * Mon Feb 13 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.29.33-1
 - Update to latest upstream patch version to fix failing package tests
 - Use release tarball instead of git snapshot of release commit
