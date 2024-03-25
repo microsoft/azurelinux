@@ -1,0 +1,28 @@
+From 9ad648064b59f903781eb568cbad532bb9f09564 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 10:05:11 -0400
+Subject: [PATCH 22/24] irqbalance: Dontaudit net_admin.
+
+Does not seem to have negative effects.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/services/irqbalance.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/irqbalance.te b/policy/modules/services/irqbalance.te
+index 0a6f4c9bc..609d9ef50 100644
+--- a/policy/modules/services/irqbalance.te
++++ b/policy/modules/services/irqbalance.te
+@@ -24,7 +24,7 @@ init_unit_file(irqbalance_unit_t)
+ #
+ 
+ allow irqbalance_t self:capability { setpcap };
+-dontaudit irqbalance_t self:capability sys_tty_config;
++dontaudit irqbalance_t self:capability { net_admin sys_tty_config };
+ allow irqbalance_t self:process { getcap getsched setcap signal_perms };
+ allow irqbalance_t self:udp_socket create_socket_perms;
+ allow irqbalance_t self:unix_stream_socket create_stream_socket_perms;
+-- 
+2.44.0
+
