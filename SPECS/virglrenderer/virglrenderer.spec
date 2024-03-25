@@ -15,6 +15,7 @@ BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
 BuildRequires:  python3
 BuildRequires:  xorg-x11-util-macros
+BuildRequires:  vulkan-loader-devel
 
 %description
 The virgil3d rendering library is a library used by
@@ -66,7 +67,7 @@ driver to test virgl rendering without GL.
 
 %changelog
 * Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 1.0.1-1
-- Upgrade to 1.0.1 in Azure Linux 3.0
+- Upgrade to 1.0.1 in Azure Linux 3.0 using Fedora 40
 
 * Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
 - Apply CVE-2022-0175 patch from upstream.
