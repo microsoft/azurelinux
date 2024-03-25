@@ -55,37 +55,64 @@ func checkFileSystemsHelper(diskDevice string) error {
 			continue
 		}
 
-		logger.Log.Debugf("Check file system (%s) at (%s)", diskPartition.FileSystemType, diskPartition.Path)
-
-		// Check the file system for corruption.
-		switch diskPartition.FileSystemType {
-		case "ext2", "ext3", "ext4":
-			// Add -f flag to force check to run even if the journal is marked as clean.
-			err := shell.ExecuteLive(true /*squashErrors*/, "e2fsck", "-fn", diskPartition.Path)
-			if err != nil {
-				err = fmt.Errorf("failed to check (%s) with e2fsck:\n%w", diskPartition.Path, err)
-				errs = append(errs, err)
-			}
-
-		case "xfs":
-			// The fsck.xfs tool doesn't do anything. So, call xfs_repair instead.
-			err := shell.ExecuteLive(true /*squashErrors*/, "xfs_repair", "-n", diskPartition.Path)
-			if err != nil {
-				err = fmt.Errorf("failed to check (%s) with xfs_repair:\n%w", diskPartition.Path, err)
-				errs = append(errs, err)
-			}
-
-		default:
-			err := shell.ExecuteLive(true /*squashErrors*/, "fsck", "-n", diskPartition.Path)
-			if err != nil {
-				err = fmt.Errorf("failed to check (%s) with fsck:\n%w", diskPartition.Path, err)
-				errs = append(errs, err)
-			}
+		err = checkFileSystem(diskPartition.FileSystemType, diskPartition.Path)
+		if err != nil {
+			errs = append(errs, err)
 		}
 	}
 
 	if len(errs) > 0 {
 		return errors.Join(errs...)
+	}
+
+	return nil
+}
+
+func checkFileSystemFile(fileSystemType string, path string) error {
+	loopback, err := safeloopback.NewLoopback(path)
+	if err != nil {
+		return err
+	}
+	defer loopback.Close()
+
+	err = checkFileSystem(fileSystemType, loopback.DevicePath())
+	if err != nil {
+		return err
+	}
+
+	err = loopback.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkFileSystem(fileSystemType string, path string) error {
+	logger.Log.Debugf("Check file system (%s) at (%s)", fileSystemType, path)
+
+	// Check the file system for corruption.
+	switch fileSystemType {
+	case "ext2", "ext3", "ext4":
+		// Add -f flag to force check to run even if the journal is marked as clean.
+		err := shell.ExecuteLive(true /*squashErrors*/, "e2fsck", "-fn", path)
+		if err != nil {
+			return fmt.Errorf("failed to check (%s) with e2fsck:\n%w", path, err)
+
+		}
+
+	case "xfs":
+		// The fsck.xfs tool doesn't do anything. So, call xfs_repair instead.
+		err := shell.ExecuteLive(true /*squashErrors*/, "xfs_repair", "-n", path)
+		if err != nil {
+			return fmt.Errorf("failed to check (%s) with xfs_repair:\n%w", path, err)
+		}
+
+	default:
+		err := shell.ExecuteLive(true /*squashErrors*/, "fsck", "-n", path)
+		if err != nil {
+			return fmt.Errorf("failed to check (%s) with fsck:\n%w", path, err)
+		}
 	}
 
 	return nil
