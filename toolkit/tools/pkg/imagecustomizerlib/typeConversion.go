@@ -6,8 +6,8 @@ package imagecustomizerlib
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 )
 
 func bootTypeToImager(bootType imagecustomizerapi.BootType) (string, error) {
@@ -76,9 +76,9 @@ func partitionToImager(partition imagecustomizerapi.Partition) (configuration.Pa
 	}
 
 	imagerPartition := configuration.Partition{
-		ID:     partition.ID,
-		FsType: string(partition.FsType),
-		Name:   partition.Name,
+		ID:     partition.Id,
+		FsType: string(partition.FileSystemType),
+		Name:   partition.Label,
 		Start:  partition.Start,
 		End:    imagerEnd,
 		Flags:  imagerFlags,
@@ -116,11 +116,11 @@ func partitionFlagToImager(flag imagecustomizerapi.PartitionFlag) (configuration
 	}
 }
 
-func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionSetting,
+func partitionSettingsToImager(fileSystems []imagecustomizerapi.FileSystem,
 ) ([]configuration.PartitionSetting, error) {
 	imagerPartitionSettings := []configuration.PartitionSetting(nil)
-	for _, partitionSetting := range partitionSettings {
-		imagerPartitionSetting, err := partitionSettingToImager(partitionSetting)
+	for _, fileSystem := range fileSystems {
+		imagerPartitionSetting, err := partitionSettingToImager(fileSystem)
 		if err != nil {
 			return nil, err
 		}
@@ -129,18 +129,27 @@ func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionS
 	return imagerPartitionSettings, nil
 }
 
-func partitionSettingToImager(partitionSettings imagecustomizerapi.PartitionSetting,
+func partitionSettingToImager(fileSystem imagecustomizerapi.FileSystem,
 ) (configuration.PartitionSetting, error) {
-	imagerMountIdentifierType, err := mountIdentifierTypeToImager(partitionSettings.MountIdentifier)
+	mountIdType := imagecustomizerapi.MountIdentifierTypeDefault
+	mountOptions := ""
+	mountPath := ""
+	if fileSystem.MountPoint != nil {
+		mountIdType = fileSystem.MountPoint.IdType
+		mountOptions = fileSystem.MountPoint.Options
+		mountPath = fileSystem.MountPoint.Path
+	}
+
+	imagerMountIdentifierType, err := mountIdentifierTypeToImager(mountIdType)
 	if err != nil {
 		return configuration.PartitionSetting{}, err
 	}
 
 	imagerPartitionSetting := configuration.PartitionSetting{
-		ID:              partitionSettings.ID,
+		ID:              fileSystem.DeviceId,
 		MountIdentifier: imagerMountIdentifierType,
-		MountOptions:    partitionSettings.MountOptions,
-		MountPoint:      partitionSettings.MountPoint,
+		MountOptions:    mountOptions,
+		MountPoint:      mountPath,
 	}
 	return imagerPartitionSetting, nil
 }
@@ -163,46 +172,47 @@ func mountIdentifierTypeToImager(mountIdentifierType imagecustomizerapi.MountIde
 }
 
 func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelCommandLine,
-	currentSELinuxMode imagecustomizerapi.SELinux,
+	selinuxConfig imagecustomizerapi.SELinux,
+	currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) (configuration.KernelCommandLine, error) {
-	imagerSELinux, err := selinuxModeMaybeDefaultToImager(kernelCommandLine.SELinux, currentSELinuxMode)
+	imagerSELinuxMode, err := selinuxModeMaybeDefaultToImager(selinuxConfig.Mode, currentSELinuxMode)
 	if err != nil {
 		return configuration.KernelCommandLine{}, err
 	}
 
 	imagerKernelCommandLine := configuration.KernelCommandLine{
-		ExtraCommandLine: kernelCommandLine.ExtraCommandLine,
-		SELinux:          imagerSELinux,
+		ExtraCommandLine: string(kernelCommandLine.ExtraCommandLine),
+		SELinux:          imagerSELinuxMode,
 		SELinuxPolicy:    "",
 	}
 	return imagerKernelCommandLine, nil
 }
 
-func selinuxModeMaybeDefaultToImager(selinuxMode imagecustomizerapi.SELinux,
-	currentSELinuxMode imagecustomizerapi.SELinux,
+func selinuxModeMaybeDefaultToImager(selinuxMode imagecustomizerapi.SELinuxMode,
+	currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) (configuration.SELinux, error) {
-	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode = currentSELinuxMode
 	}
 
 	return selinuxModeToImager(selinuxMode)
 }
 
-func selinuxModeToImager(selinuxMode imagecustomizerapi.SELinux) (configuration.SELinux, error) {
+func selinuxModeToImager(selinuxMode imagecustomizerapi.SELinuxMode) (configuration.SELinux, error) {
 	switch selinuxMode {
-	case imagecustomizerapi.SELinuxDisabled:
+	case imagecustomizerapi.SELinuxModeDisabled:
 		return configuration.SELinuxOff, nil
 
-	case imagecustomizerapi.SELinuxEnforcing:
+	case imagecustomizerapi.SELinuxModeEnforcing:
 		return configuration.SELinuxEnforcing, nil
 
-	case imagecustomizerapi.SELinuxPermissive:
+	case imagecustomizerapi.SELinuxModePermissive:
 		return configuration.SELinuxPermissive, nil
 
-	case imagecustomizerapi.SELinuxForceEnforcing:
+	case imagecustomizerapi.SELinuxModeForceEnforcing:
 		return configuration.SELinuxForceEnforcing, nil
 
 	default:
-		return "", fmt.Errorf("unknown SELinux value (%s)", selinuxMode)
+		return "", fmt.Errorf("unknown SELinuxMode value (%s)", selinuxMode)
 	}
 }

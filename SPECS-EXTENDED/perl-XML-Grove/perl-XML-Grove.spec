@@ -43,8 +43,8 @@ the objects using normal Perl syntax.
 
 %prep
 %setup -q -n XML-Grove-%{cpan_version}
-%patch1 -p1 -b .test
-%patch2 -p1
+%patch 1 -p1 -b .test
+%patch 2 -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1

@@ -6,26 +6,26 @@ package attendedinstaller
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/speakuputils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/confirmview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/diskview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/encryptview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/eulaview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/finishview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/hostnameview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/installationview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/installerview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/progressview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/views/userview"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/speakuputils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/confirmview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/diskview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/encryptview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/eulaview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/finishview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/hostnameview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/installationview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/installerview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/progressview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/views/userview"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 
 	"github.com/bendahl/uinput"
 	"github.com/gdamore/tcell"
@@ -125,7 +125,7 @@ func (ai *AttendedInstaller) Run() (config configuration.Config, installationQui
 	// with the TUI (terminal UI) and result in undefined behavior.
 	// The log hooks that enable file logging will remain intact and still record
 	// logs.
-	originalStderrWriter := logger.ReplaceStderrWriter(ioutil.Discard)
+	originalStderrWriter := logger.ReplaceStderrWriter(io.Discard)
 	defer func() {
 		logger.ReplaceStderrWriter(originalStderrWriter)
 	}()

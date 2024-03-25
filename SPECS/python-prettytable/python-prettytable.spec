@@ -1,17 +1,21 @@
 Summary:        Library for displaying tabular data in a visually appealing ASCII format
 Name:           python-prettytable
-Version:        3.2.0
-Release:        2%{?dist}
+Version:        3.10.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/jazzband/prettytable
 Source0:        https://pypi.io/packages/source/p/prettytable/prettytable-%{version}.tar.gz
+Patch0:         0001-replace-to-flit.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-%if %{with_check}
+BuildRequires:  python3-wheel
+BuildRequires:  python3-flit
+BuildRequires:  python3-flit-core >= 3.8.0
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 BuildRequires:  python3-wcwidth
 %endif
@@ -34,15 +38,18 @@ selection of which columns are to be printed, independent alignment of columns
 specifying a row range.
 
 %prep
-%autosetup -n prettytable-%{version}
+%autosetup -p1 -n prettytable-%{version}
+
+%generate_buildrequires
+%pyproject_buildrequires -t
 
 %build
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%py3_build
+%pyproject_wheel
 
 %install
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%py3_install
+%pyproject_install
 
 %check
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
@@ -51,10 +58,14 @@ tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-prettytable
 %defattr(-,root,root,-)
-%license COPYING
+%license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Fri Feb 23 2024 Aditya Dubey <adityadubey@microsoft.com> - 3.10.0-1
+- Updated spec to build version 3.10.0 for Mariner 3.0
+- Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Mariner)
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 3.2.0-2
 - Update version of tox used for package tests
 
@@ -85,7 +96,7 @@ tox -e py%{python3_version_nodots} --sitepackages
 * Tue May 16 2017 Kumar Kaushik <kaushikk@vmware.com> - 0.7.2-4
 - Adding python3 support.
 
-* Mon Oct 04 2016 ChangLee <changlee@vmware.com> - 0.7.2-3
+* Tue Oct 04 2016 ChangLee <changlee@vmware.com> - 0.7.2-3
 - Modified %check
 
 * Tue May 24 2016 Priyesh Padmavilasom <ppadmavilasom@vmware.com> - 0.7.2-2

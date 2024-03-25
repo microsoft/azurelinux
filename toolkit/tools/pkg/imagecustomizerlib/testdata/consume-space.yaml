@@ -1,0 +1,3 @@
+os:
+  finalizeImageScripts:
+  - path: scripts/consume-space.sh

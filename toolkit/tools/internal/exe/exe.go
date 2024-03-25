@@ -8,12 +8,18 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 // ToolkitVersion specifies the version of the toolkit and the reported version of all tools in it.
 var ToolkitVersion = ""
+
+// DistroNameAbbreviation is the short form of the distro used for conditional tests (i.e. 'azl')
+var DistroNameAbbreviation = "default_dist"
+
+// DistroMajorVersion is the major version of the distro used for conditional tests (i.e. 3)
+var DistroMajorVersion = "1"
 
 // InputFlag registers an input flag for k with documentation doc and returns the passed value
 func InputFlag(k *kingpin.Application, doc string) *string {
@@ -53,16 +59,10 @@ func PlaceHolderize(thing []string) string {
 	return fmt.Sprintf("(%s)", strings.Join(thing, "|"))
 }
 
-// ParseListArgument takes a user provided string list that is space seperated
-// and returns a slice of the split and trimmed elements.
-func ParseListArgument(input string) (results []string) {
-	const delimiter = " "
-
-	trimmedInput := strings.TrimSpace(input)
-	if trimmedInput != "" {
-		results = strings.Split(trimmedInput, delimiter)
-	}
-	return
+// ParseListArgument takes a user provided string list that is white-space seperated
+// and returns a slice of the split elements, removing any empty elements and extra whitespace.
+func ParseListArgument(input string) []string {
+	return strings.Fields(input)
 }
 
 type ProfileFlags struct {

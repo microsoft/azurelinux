@@ -19,7 +19,7 @@
 
 Name:           xml-commons-resolver
 Version:        1.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Resolver subproject of xml-commons
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -68,8 +68,8 @@ Javadoc for %{name}.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
+%patch 0 -p1
+%patch 1 -p1
 
 cp %{SOURCE1} pom.xml
 
@@ -81,7 +81,7 @@ sed -i 's/\r//' KEYS LICENSE.resolver.txt NOTICE-resolver.txt
 %pom_remove_parent .
 
 %build
-%{ant} -f resolver.xml -Dant.build.javac.source=6 -Dant.build.javac.target=6 jar javadocs
+%{ant} -f resolver.xml -Dant.build.javac.source=8 -Dant.build.javac.target=8 jar javadocs
 
 %install
 # jar
@@ -134,6 +134,9 @@ install -m 0644 %{SOURCE5} %{buildroot}%{resolverdir}/CatalogManager.properties
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.2-6
+- build with msopenjdk-17
+
 * Mon Mar 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.2-5
 - Move to SPECS
 - License verified

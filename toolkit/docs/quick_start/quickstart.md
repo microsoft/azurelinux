@@ -1,6 +1,6 @@
 # Quick Start Guide
   - [Install Prerequisites](#install-prerequisites)
-  - [Clone CBL-Mariner](#clone-cbl-mariner)
+  - [Clone Azure Linux](#clone-azure-linux)
   - [Build and Boot an Image](#build-and-boot-an-image)
     - [VHDX and VHD Images](#vhdx-and-vhd-images)
     - [ISO Image](#iso-image)
@@ -8,13 +8,13 @@
 ## **Install Prerequisites**
 Install prerequisites [here](../building/prerequisites.md).
 
-## **Clone CBL-Mariner**
-From a bash terminal window, clone the CBL-Mariner Repository and check-out a stable build.
+## **Clone Azure Linux**
+From a bash terminal window, clone the Azure Linux Repository and check-out a stable build.
 
 ```bash
-# Clone the CBL-Mariner repo
-git clone https://github.com/microsoft/CBL-Mariner.git
-cd CBL-Mariner
+# Clone the Azure Linux repo
+git clone https://github.com/microsoft/azurelinux.git
+cd azurelinux
 
 # Sync to the latest stable build
 git checkout 2.0-stable
@@ -25,7 +25,7 @@ git checkout 2.0-stable
 
 ### **VHDX and VHD images**
 
-The following builds a bootable, VHDX or VHD CBL-Mariner image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/2.0/prod/.
+The following builds a bootable, VHDX or VHD Azure Linux image from precompiled RPMs in the Azure Linux package repository at https://packages.microsoft.com/azurelinux/3.0/prod/.
 
 No user account is provisioned by default.  To sign-in to these images, the sample meta-user-data.iso image must also be built and installed in your VM's CD drive.  The cloud-init service will detect the iso and provision a user account and password.
 
@@ -87,11 +87,11 @@ choose DVD Drive and press Add.
 
 1. Right click your VM and select _Connect..._.
 1. Select _Start_.
-1. Wait for CBL-Mariner to boot to the login prompt, then sign in with the username and password you provisioned in the meta-user-data.iso above.
+1. Wait for Azure Linux to boot to the login prompt, then sign in with the username and password you provisioned in the meta-user-data.iso above.
 
 ### ISO Image
 
-The following builds a bootable ISO image from precompiled RPMs in the CBL-Mariner package repository at https://packages.microsoft.com/cbl-mariner/2.0/prod/.
+The following builds a bootable ISO image from precompiled RPMs in the Azure Linux package repository at https://packages.microsoft.com/azurelinux/3.0/prod/.
 
 ```bash
 # Switch to the toolkit folder
@@ -112,7 +112,7 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Change Memory size if desired, then press _Next >_.
 1. Select a virtual switch, then press _Next >_.
 1. Select _Create a virtual hard disk_, choose a location for your VHD(X) and set your desired disk Size.  Then press _Next >_.
-1. Select _Install an operating system from a bootable image file_ and browse to your CBL-Mariner ISO.
+1. Select _Install an operating system from a bootable image file_ and browse to your Azure Linux ISO.
 1. Press _Finish_.
 
 **[Gen2/VHDX Only] Fix Boot Options**
@@ -128,4 +128,4 @@ Copy your binary image(s) to your VM Host Machine using your preferred technique
 1. Select _Start_.
 1. Follow the Installer Prompts to Install your image
 1. When installation completes, select restart to reboot the machine. The installation ISO will be automatically ejected.
-1. When prompted sign in to your CBL-Mariner using the user name and password provisioned through the Installer.
+1. When prompted sign in to your Azure Linux using the user name and password provisioned through the Installer.

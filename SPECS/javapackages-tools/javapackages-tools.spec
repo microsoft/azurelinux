@@ -8,8 +8,8 @@
 %global rpmmacrodir %{_rpmconfigdir}/macros.d
 Summary:        Macros and scripts for Java packaging support
 Name:           javapackages-tools
-Version:        6.0.0
-Release:        2%{?dist}
+Version:        6.1.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,7 @@ Patch1:         remove-headless-from-java-requires.patch
 Patch2:         undeprecate_add_maven_depmap.patch
 BuildRequires:  asciidoc
 BuildRequires:  coreutils
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  make
 BuildRequires:  python3-devel
 BuildRequires:  python3-lxml
@@ -30,13 +30,14 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
 BuildRequires:  which
 BuildRequires:  xmlto
-%if %{with_check}
+BuildRequires:  lua
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 Requires:       coreutils
 Requires:       findutils
 # default JRE
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       javapackages-filesystem = %{version}-%{release}
 Requires:       which
 Provides:       jpackage-utils = %{version}-%{release}
@@ -95,7 +96,7 @@ packaging in Linux distributions
 %package -n javapackages-local-bootstrap
 Summary:        Non-essential macros and scripts for Java packaging support
 Requires:       %{name} = %{version}-%{release}
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       python3
 Requires:       python3-javapackages = %{version}-%{release}
 
@@ -111,6 +112,15 @@ Requires:       %{python_interpreter}
  
 %description -n javapackages-generators
 RPM dependency generators to support Java packaging.
+
+%package -n javapackages-extra
+Summary:        Rarely-used macros and scripts for Java packaging support
+Requires:       javapackages-generators = %{version}-%{release}
+Requires:       lua
+
+%description -n javapackages-extra
+This package provides rarely-used and obsolete macros and scripts to
+support Java packaging.
 
 %prep
 %autosetup -p1 -n javapackages-%{version}
@@ -143,7 +153,9 @@ pip3 install -r test-requirements.txt
 
 %files -n javapackages-generators -f files-generators
 
-%files -n javapackages-local-bootstrap -f files-local
+%files -n javapackages-local-bootstrap -f files-common
+
+%files -n javapackages-extra -f files-extra
 
 %files -n ivy-local-bootstrap -f files-ivy
 
@@ -153,6 +165,10 @@ pip3 install -r test-requirements.txt
 %license LICENSE
 
 %changelog
+* Thu Feb 15 2024 Mitch Zhu <mitchzhu@microsoft.com> - 6.1.0-1
+- Update to upstream version 6.1.0
+- Add javapackages-extra
+
 * Fri Mar 31 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 6.0.0-2
 - Added maven-local subpackage
 

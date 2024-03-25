@@ -41,7 +41,7 @@ of files.
 
 # Test suite needs patching if we have Test::More < 0.88
 %if %{old_test_more}
-%patch0
+%patch 0
 %endif
 
 %build

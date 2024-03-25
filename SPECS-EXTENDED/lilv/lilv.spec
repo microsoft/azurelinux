@@ -27,7 +27,7 @@ BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_lv2_theme
 %endif
 Requires:       lv2 >= 1.18.0
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  lcov
 %endif
 

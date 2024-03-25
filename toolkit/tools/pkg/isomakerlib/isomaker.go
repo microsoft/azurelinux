@@ -15,20 +15,23 @@ import (
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/installutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
+	DefaultVolumeId = "CDROM"
+
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
 	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
 	defaultImageNameBase            = "azure-linux"
+	defaultOSFilesPath              = "isolinux"
 )
 
 // IsoMaker builds ISO images and populates them with packages and files required by the installer.
@@ -45,11 +48,12 @@ type IsoMaker struct {
 	initrdPath         string                  // Path to ISO's initrd file.
 	grubCfgPath        string                  // Path to ISO's grub.cfg file. If provided, overrides the grub.cfg from the resourcesDirPath location.
 	outputDirPath      string                  // Path to the output ISO directory.
-	releaseVersion     string                  // Current Mariner release version.
+	releaseVersion     string                  // Current Azure Linux release version.
 	resourcesDirPath   string                  // Path to the 'resources' directory.
 	additionalIsoFiles []safechroot.FileToCopy // Additional files to copy to the ISO media (absolute-source-path -> iso-root-relative-path).
 	imageNameBase      string                  // Base name of the ISO to generate (no path, and no file extension).
 	imageNameTag       string                  // Optional user-supplied tag appended to the generated ISO's name.
+	osFilesPath        string
 
 	isoMakerCleanUpTasks []func() error // List of clean-up tasks to perform at the end of the ISO generation process.
 }
@@ -85,15 +89,20 @@ func NewIsoMaker(unattendedInstall bool, baseDirPath, buildDirPath, releaseVersi
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
+		osFilesPath:        defaultOSFilesPath,
 	}
 
 	return isoMaker, nil
 }
 
-func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, additionalIsoFiles []safechroot.FileToCopy, config configuration.Config, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
+func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool, baseDirPath, buildDirPath, releaseVersion, resourcesDirPath string, additionalIsoFiles []safechroot.FileToCopy, config configuration.Config, osFilesPath, initrdPath, grubCfgPath, isoRepoDirPath, outputDir, imageNameBase, imageNameTag string) (isoMaker *IsoMaker, err error) {
 
 	if imageNameBase == "" {
 		imageNameBase = defaultImageNameBase
+	}
+
+	if osFilesPath == "" {
+		osFilesPath = defaultOSFilesPath
 	}
 
 	err = verifyConfig(config, unattendedInstall)
@@ -117,6 +126,7 @@ func NewIsoMakerWithConfig(unattendedInstall, enableBiosBoot, enableRpmRepo bool
 		outputDirPath:      outputDir,
 		imageNameBase:      imageNameBase,
 		imageNameTag:       imageNameTag,
+		osFilesPath:        osFilesPath,
 	}
 
 	return isoMaker, nil
@@ -174,12 +184,12 @@ func (im *IsoMaker) buildIsoImage() error {
 
 	mkisofsArgs = append(mkisofsArgs,
 		// General mkisofs parameters.
-		"-R", "-l", "-D", "-o", isoImageFilePath)
+		"-R", "-l", "-D", "-o", isoImageFilePath, "-V", DefaultVolumeId)
 
 	if im.enableBiosBoot {
 		mkisofsArgs = append(mkisofsArgs,
 			// BIOS bootloader, params suggested by https://wiki.syslinux.org/wiki/index.php?title=ISOLINUX.
-			"-b", "isolinux/isolinux.bin", "-c", "isolinux/boot.cat", "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table")
+			"-b", filepath.Join(im.osFilesPath, "isolinux.bin"), "-c", filepath.Join(im.osFilesPath, "boot.cat"), "-no-emul-boot", "-boot-load-size", "4", "-boot-info-table")
 	}
 
 	mkisofsArgs = append(mkisofsArgs,
@@ -214,7 +224,7 @@ func (im *IsoMaker) prepareIsoBootLoaderFilesAndFolders() (err error) {
 
 // copyInitrd copies a pre-built initrd into the isolinux folder.
 func (im *IsoMaker) copyInitrd() error {
-	initrdDestinationPath := filepath.Join(im.buildDirPath, "isolinux/initrd.img")
+	initrdDestinationPath := filepath.Join(im.buildDirPath, im.osFilesPath, "initrd.img")
 
 	logger.Log.Debugf("Copying initrd from '%s'.", im.initrdPath)
 
@@ -370,7 +380,7 @@ func (im *IsoMaker) applyRufusWorkaround(bootBootloaderFile, grubBootloaderFile 
 func (im *IsoMaker) createVmlinuzImage() error {
 	const bootKernelFile = "boot/vmlinuz"
 
-	vmlinuzFilePath := filepath.Join(im.buildDirPath, "isolinux/vmlinuz")
+	vmlinuzFilePath := filepath.Join(im.buildDirPath, im.osFilesPath, "vmlinuz")
 
 	// In order to select the correct kernel for isolinux, open the initrd archive
 	// and extract the vmlinuz file in it. An initrd is a gzip of a cpio archive.
@@ -458,7 +468,7 @@ func (im *IsoMaker) prepareWorkDirectory() (err error) {
 }
 
 // copyStaticIsoRootFiles copies architecture-independent files from the
-// Mariner repo directories.
+// Azure Linux repo directories.
 func (im *IsoMaker) copyStaticIsoRootFiles() (err error) {
 
 	if im.resourcesDirPath == "" && im.grubCfgPath == "" {
@@ -564,6 +574,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 // files can be used by custom initrd/LiveOS images that will look for them
 // on the iso media.
 func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
+	logger.Log.Debugf("Copying ISO additional files")
 	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles...)
 }
 

@@ -34,10 +34,10 @@ Source1:        ant.conf
 Source10:       ant-bootstrap.pom.in
 Patch0:         apache-ant-no-test-jar.patch
 Patch1:         apache-ant-bootstrap.patch
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 Requires:       which
 Provides:       ant-nodeps = %{version}-%{release}
 Provides:       ant-trax = %{version}-%{release}
@@ -98,9 +98,9 @@ find -name build.xml -o -name pom.xml | xargs sed -i -e s/-SNAPSHOT//
 find -name \*.jar -print -delete
 
 # When bootstrapping, we don't have junit
-%patch0 -p1
+%patch 0 -p1
 # Explicitly set sourcepath when compiling bootstrap
-%patch1 -p1
+%patch 1 -p1
 
 # clean jar files
 find . -name "*.jar" -print -delete

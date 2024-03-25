@@ -65,7 +65,7 @@ function installNodeModules {
 	echo "Installing node modules."
 	sudo tdnf install -y nodejs
 	npm config set cache "$homeCacheDir/.npm" --global
-	# Default node/npm versions in Mariner fails to build dependency node module versions due to known
+	# Default node/npm versions in Azure Linux fails to build dependency node module versions due to known
 	# incompatibilities.
 	# Backward compatible with node@v14.18.0
 	# When installing modules via npm to default prefix='/usr/local' in mariner, the permissions for 'others'
@@ -93,8 +93,8 @@ function buildReaperSources {
 	wget $SOURCE_URL -O reaper.tar.gz
 	tar -xf reaper.tar.gz
 	cd cassandra-reaper-${VERSION}
-	export JAVA_HOME="/usr/lib/jvm/msopenjdk-11"
-	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-11/lib/jli"
+	export JAVA_HOME="/usr/lib/jvm/msopenjdk-17"
+	export LD_LIBRARY_PATH="/usr/lib/jvm/msopenjdk-17/lib"
 	echo "Building reaper in online mode."
 	mvn -DskipTests package
 	popd
@@ -143,8 +143,8 @@ echo "Generate cassandra reaper build caches..."
 
 checkInternet
 
-echo "Installing msopenjdk-11."
-sudo tdnf install -y msopenjdk-11
+echo "Installing msopenjdk-17."
+sudo tdnf install -y msopenjdk-17
 
 echo "Installing maven modules."
 sudo tdnf install -y maven

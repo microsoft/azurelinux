@@ -18,10 +18,6 @@ version_release_matching_groups = [
         "SPECS/kernel-headers/kernel-headers.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/kernel-hci-signed/kernel-hci-signed.spec",
-        "SPECS/kernel-hci/kernel-hci.spec"
-    ]),
-    frozenset([
         "SPECS-SIGNED/grub2-efi-binary-signed/grub2-efi-binary-signed.spec",
         "SPECS/grub2/grub2.spec"
     ]),
@@ -62,6 +58,14 @@ version_matching_groups = [
     ])
 ]
 
+sdkver_matching_groups = [
+    frozenset([
+        "SPECS/glslang/glslang.spec",
+        "SPECS/spirv-tools/spirv-tools.spec",
+        "SPECS/spirv-headers/spirv-headers.spec"
+    ])
+]
+
 
 def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) -> Set[FrozenSet]:
     """Returns spec sets which violate matching rules for given tags. """
@@ -81,6 +85,10 @@ def check_spec_tags(base_path: str, tags: List[str], groups: List[FrozenSet]) ->
     return err_groups
 
 
+def check_sdkver_match_groups(base_path: str) -> Set[FrozenSet]:
+    return check_spec_tags(base_path, ['sdkver'], sdkver_matching_groups)
+
+
 def check_version_release_match_groups(base_path: str) -> Set[FrozenSet]:
     return check_spec_tags(base_path, ['epoch', 'version', 'release'], version_release_matching_groups)
 
@@ -93,10 +101,11 @@ def check_matches(base_path: str):
     version_match_errors = check_version_match_groups(base_path)
     version_release_match_errors = check_version_release_match_groups(
         base_path)
+    sdkver_match_errors = check_sdkver_match_groups(base_path)
 
     printer = pprint.PrettyPrinter()
 
-    if len(version_match_errors) or len(version_release_match_errors):
+    if len(version_match_errors) or len(version_release_match_errors) or len(sdkver_match_errors):
         print('The current repository state violates a spec entanglement rule!')
 
         if len(version_match_errors):
@@ -110,12 +119,19 @@ def check_matches(base_path: str):
                 '\nPlease update the following sets of specs to have the same "Epoch", "Version", and "Release" tags:')
             for e in version_release_match_errors:
                 printer.pprint(e)
+
+        if len(sdkver_match_errors):
+            print(
+                '\nPlease update the following sets of specs to have the same "sdkver" global variables:')
+            for e in sdkver_match_errors:
+                printer.pprint(e)
+
         sys.exit(1)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'repo_root', help='path to the root of the CBL-Mariner repository')
+        'repo_root', help='path to the root of the Azure Linux repository')
     args = parser.parse_args()
     check_matches(args.repo_root)

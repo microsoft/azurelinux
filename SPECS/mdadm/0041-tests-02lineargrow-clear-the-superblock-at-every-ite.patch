@@ -1,0 +1,31 @@
+From a2c832465fc75202e244327b2081231dfa974617 Mon Sep 17 00:00:00 2001
+From: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Date: Wed, 22 Jun 2022 14:25:16 -0600
+Subject: [PATCH 41/83] tests/02lineargrow: clear the superblock at every
+ iteration
+
+This fixes 02lineargrow test as prior metadata causes --add operation
+to misbehave.
+
+Signed-off-by: Sudhakar Panneerselvam <sudhakar.panneerselvam@oracle.com>
+Signed-off-by: Himanshu Madhani <himanshu.madhani@oracle.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ tests/02lineargrow | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/02lineargrow b/tests/02lineargrow
+index e05c219d..595bf9f2 100644
+--- a/tests/02lineargrow
++++ b/tests/02lineargrow
+@@ -20,4 +20,6 @@ do
+   testdev $md0 3 $sz 1
+ 
+   mdadm -S $md0
++  mdadm --zero /dev/loop2
++  mdadm --zero /dev/loop3
+ done
+-- 
+2.38.1
+

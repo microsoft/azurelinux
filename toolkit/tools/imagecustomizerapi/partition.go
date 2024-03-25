@@ -7,43 +7,43 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Partition struct {
 	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
-	ID string `yaml:"ID"`
-	// FsType is the type of file system to use on the partition.
-	FsType FileSystemType `yaml:"FsType"`
+	Id string `yaml:"id"`
+	// FileSystemType is the type of file system to use on the partition.
+	FileSystemType FileSystemType `yaml:"fileSystemType"`
 	// Name is the label to assign to the partition.
-	Name string `yaml:"Name"`
+	Label string `yaml:"label"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"Start"`
+	Start uint64 `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"End"`
+	End *uint64 `yaml:"end"`
 	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"Size"`
+	Size *uint64 `yaml:"size"`
 	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"Flags"`
+	Flags []PartitionFlag `yaml:"flags"`
 }
 
 func (p *Partition) IsValid() error {
-	err := p.FsType.IsValid()
+	err := p.FileSystemType.IsValid()
 	if err != nil {
-		return fmt.Errorf("invalid partition (%s) FsType value:\n%w", p.ID, err)
+		return fmt.Errorf("invalid partition (%s) fileSystemType value:\n%w", p.Id, err)
 	}
 
-	err = isGPTNameValid(p.Name)
+	err = isGPTNameValid(p.Label)
 	if err != nil {
 		return err
 	}
 
 	if p.End != nil && p.Size != nil {
-		return fmt.Errorf("cannot specify both End and Size on partition (%s)", p.ID)
+		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.Id)
 	}
 
 	if (p.End != nil && p.Start >= *p.End) || (p.Size != nil && *p.Size <= 0) {
-		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.ID)
+		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
 	for _, f := range p.Flags {
@@ -55,7 +55,7 @@ func (p *Partition) IsValid() error {
 
 	isESP := sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
 	if isESP {
-		if p.FsType != FileSystemTypeFat32 {
+		if p.FileSystemType != FileSystemTypeFat32 {
 			return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
 		}
 	}
@@ -66,7 +66,7 @@ func (p *Partition) IsValid() error {
 			return fmt.Errorf("BIOS boot partition must start at block 1")
 		}
 
-		if p.FsType != FileSystemTypeFat32 {
+		if p.FileSystemType != FileSystemTypeFat32 {
 			return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
 		}
 	}

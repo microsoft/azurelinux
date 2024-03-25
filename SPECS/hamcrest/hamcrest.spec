@@ -14,47 +14,28 @@
 
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
-
-%bcond_with jmock
-%bcond_with easymock
+	
+%global upstream_version %(echo %{version} | tr '~' '-')
+%global debug_package %{nil}
 
 Summary:        Library of matchers for building test expressions
 Name:           hamcrest
-Version:        1.3
-Release:        16%{?dist}
+Version:        2.2
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/hamcrest/JavaHamcrest
-Source0:        https://github.com/hamcrest/JavaHamcrest/archive/hamcrest-java-%{version}.tar.gz
-Source1:        hamcrest-core-MANIFEST.MF
-Source2:        hamcrest-library-MANIFEST.MF
-Source3:        hamcrest-integration-MANIFEST.MF
-Source4:        hamcrest-generator-MANIFEST.MF
-Patch0:         %{name}-%{version}-build.patch
-Patch1:         %{name}-%{version}-no-jarjar.patch
-Patch3:         %{name}-%{version}-javadoc.patch
-Patch4:         %{name}-%{version}-qdox-2.0.patch
-Patch5:         %{name}-%{version}-fork-javac.patch
-Patch6:         %{name}-%{version}-javadoc9.patch
-Patch7:         %{name}-%{version}-javadoc10.patch
-Patch8:         %{name}-%{version}-random-build-crash.patch
-BuildRequires:  ant
-BuildRequires:  fdupes
+Source0:        https://github.com/hamcrest/JavaHamcrest/archive/v%{upstream_version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        https://repo1.maven.org/maven2/org/hamcrest/hamcrest/%{upstream_version}/hamcrest-%{upstream_version}.pom
+Patch0:         0001-Fix-build-with-OpenJDK-11.patch
+
+BuildRequires:  java-devel >= 1.8
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  qdox >= 2.0
-Requires:       %{name}-core = %{version}-%{release}
-Requires:       qdox >= 2.0
-BuildArch:      noarch
-%if %{with jmock}
-BuildRequires:  jmock
-Requires:       jmock
-%endif
-%if %{with easymock}
-BuildRequires:  easymock
-Requires:       easymock
-%endif
+BuildRequires:  maven
+Provides:       mvn(org.hamcrest:hamcrest-core) 
 
 %description
 Provides a library of matcher objects (also known as constraints or
@@ -62,132 +43,73 @@ predicates) allowing 'match' rules to be defined declaratively, to be
 used in other frameworks. Typical scenarios include testing frameworks,
 mocking libraries and UI validation rules.
 
-%package core
-Summary:        Core API of hamcrest matcher framework.
-Group:          Development/Libraries/Java
-Provides:       mvn(org.hamcrest:hamcrest-core) = %{version}-%{release}
-
-%description core
-The core API of hamcrest matcher framework to be used by third-party framework providers.
-This includes the a foundation set of matcher implementations for common operations.
-
 %package javadoc
 Summary:        Javadoc for %{name}
-Group:          Documentation/HTML
-
+ 
 %description javadoc
 Javadoc for %{name}.
-
-%package demo
-Summary:        Demo files for %{name}
-Group:          Development/Libraries/Java
-Requires:       %{name} = %{version}-%{release}
-Requires:       junit
-
-%description demo
-Demo files for %{name}.
-
+ 
 %prep
-%setup -q -n JavaHamcrest-%{name}-java-%{version}
-
-find . -type f -name "*.jar" | xargs -t rm
-ln -sf $(build-classpath qdox) lib/generator/
-%if %{with jmock}
-ln -sf $(build-classpath jmock) lib/integration/
-%else
-rm -fr hamcrest-integration/src/main/java/org/hamcrest/integration/JMock1Adapter.java
-rm -fr hamcrest-integration/src/main/java/org/hamcrest/JMock1Matchers.java
-rm -fr hamcrest-unit-test/src/main/java/org/hamcrest/integration/JMock1AdapterTest.java
-%endif
-%if %{with easymock}
-ln -sf $(build-classpath easymock3) lib/integration/
-%else
-rm -fr hamcrest-integration/src/main/java/org/hamcrest/integration/EasyMock2Adapter.java
-rm -fr hamcrest-integration/src/main/java/org/hamcrest/EasyMock2Matchers.java
-%endif
-
-%patch0 -p1
-%patch1 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
+%setup -q -n JavaHamcrest-%{upstream_version}
+%patch 0 -p1
 
 sed -i 's/\r//' LICENSE.txt
-
+ 
+pushd hamcrest
+cp -p %{SOURCE1} pom.xml
+%pom_add_dep junit:junit::test
+%pom_xpath_inject pom:project '
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>any</version>
+      <configuration>
+        <source>1.8</source>
+        <target>1.8</target>
+      </configuration>
+    </plugin>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>any</version>
+      <configuration>
+        <archive>
+          <manifestEntries>
+            <Automatic-Module-Name>org.hamcrest</Automatic-Module-Name>
+          </manifestEntries>
+        </archive>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>'
+ 
+%mvn_alias org.hamcrest:hamcrest org.hamcrest:hamcrest-all
+%mvn_alias org.hamcrest:hamcrest org.hamcrest:hamcrest-core
+%mvn_alias org.hamcrest:hamcrest org.hamcrest:hamcrest-library
+ 
 %build
-export CLASSPATH=$(build-classpath qdox)
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 -Dversion=%{version} -Dbuild.sysclasspath=last clean core generator library bigjar javadoc
-
-# inject OSGi manifests
-jar ufm build/%{name}-core-%{version}.jar %{SOURCE1}
-jar ufm build/%{name}-library-%{version}.jar %{SOURCE2}
-jar ufm build/%{name}-integration-%{version}.jar %{SOURCE3}
-jar ufm build/%{name}-generator-%{version}.jar %{SOURCE4}
-
+pushd hamcrest
+%mvn_build -f
+popd
+ 
 %install
-sed -i 's/@VERSION@/%{version}/g' pom/*.pom
-
-# jars
-install -d -m 755 %{buildroot}%{_javadir}/%{name}
-install -d -m 755 %{buildroot}%{_mavenpomdir}/%{name}
-
-rm -f pom/%{name}-parent.pom
-for i in pom/%{name}*.pom; do
-  %pom_remove_parent ${i}
-  %pom_xpath_inject "pom:project" "
-  <groupId>org.hamcrest</groupId>
-  <version>%{version}</version>" ${i}
-done
-
-install -m 644 build/%{name}-core-%{version}.jar %{buildroot}%{_javadir}/%{name}/core.jar
-install -m 644 pom/%{name}-core.pom %{buildroot}%{_mavenpomdir}/%{name}/core.pom
-%add_maven_depmap %{name}/core.pom %{name}/core.jar -f core
-
-install -m 644 build/%{name}-all-%{version}.jar %{buildroot}%{_javadir}/%{name}/all.jar
-install -m 644 pom/%{name}-all.pom %{buildroot}%{_mavenpomdir}/%{name}/all.pom
-%add_maven_depmap %{name}/all.pom %{name}/all.jar
-
-install -m 644 build/%{name}-generator-%{version}.jar %{buildroot}%{_javadir}/%{name}/generator.jar
-install -m 644 pom/%{name}-generator.pom %{buildroot}%{_mavenpomdir}/%{name}/generator.pom
-%add_maven_depmap %{name}/generator.pom %{name}/generator.jar
-
-install -m 644 build/%{name}-integration-%{version}.jar %{buildroot}%{_javadir}/%{name}/integration.jar
-install -m 644 pom/%{name}-integration.pom %{buildroot}%{_mavenpomdir}/%{name}/integration.pom
-%add_maven_depmap %{name}/integration.pom %{name}/integration.jar
-
-install -m 644 build/%{name}-library-%{version}.jar %{buildroot}%{_javadir}/%{name}/library.jar
-install -m 644 pom/%{name}-library.pom %{buildroot}%{_mavenpomdir}/%{name}/library.pom
-%add_maven_depmap %{name}/library.pom %{name}/library.jar
-
-# javadoc
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr build/temp/hamcrest-all-%{version}-javadoc.jar.contents/* %{buildroot}%{_javadocdir}/%{name}
-%fdupes -s %{buildroot}%{_javadocdir}
-
-# demo
-install -d -m 755 %{buildroot}%{_datadir}/%{name}
-cp -pr %{name}-examples %{buildroot}%{_datadir}/%{name}/
-
-%files -f .mfiles
-%defattr(0644,root,root,0755)
+pushd hamcrest
+%mvn_install
+popd
+ 
+%files -f hamcrest/.mfiles
+%doc README.md
 %license LICENSE.txt
-
-%files core -f .mfiles-core
-%defattr(0644,root,root,0755)
+ 
+%files javadoc -f hamcrest/.mfiles-javadoc
 %license LICENSE.txt
-
-%files javadoc
-%defattr(0644,root,root,0755)
-%{_javadocdir}/%{name}
-
-%files demo
-%defattr(0644,root,root,0755)
-%{_datadir}/%{name}
 
 %changelog
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.2-1
+- upgrade to 2.2 - none
+
 * Mon Apr 3 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.3-16
 - Added provides for maven artifacts for core subpackage
 

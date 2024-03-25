@@ -10,13 +10,13 @@ import (
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/speakuputils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/speakuputils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uiutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 // UI constants.
@@ -63,7 +63,8 @@ func New(calamaresInstallFunc func()) *InstallerView {
 	if err != nil {
 		logger.Log.Debugf("Calamares not found, defaulting to terminal based installer")
 	} else {
-		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
+		logger.Log.Debugf("Calamares found, but the gui installer is temporarily disabled until stabilized")
+		// iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
 	}
 
 	iv.needsToPrompt = (len(iv.installerOptions) != 1)

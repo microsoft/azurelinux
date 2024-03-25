@@ -3,8 +3,8 @@
 
 Summary:        C++ interface to the glib
 Name:           glibmm
-Version:        2.70.0
-Release:        2%{?dist}
+Version:        2.78.1
+Release:        1%{?dist}
 License:        LGPLv2+
 URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
@@ -24,7 +24,7 @@ BuildRequires:  mm-common
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  glib-networking
 %endif
 
@@ -94,6 +94,9 @@ export GIO_EXTRA_MODULES=/usr/lib/gio/modules
 %doc %{_docdir}/glibmm-%{apiver}/
 
 %changelog
+* Mon Feb 12 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-1
+- Version upgrade to 2.78.1
+
 * Mon Feb 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 2.70.0-2
 - Fix %check section
 

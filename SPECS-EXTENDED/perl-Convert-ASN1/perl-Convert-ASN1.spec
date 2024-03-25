@@ -77,9 +77,9 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n Convert-ASN1-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 chmod +x t/*.t
 
 %build

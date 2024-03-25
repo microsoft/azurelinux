@@ -18,7 +18,7 @@
 Summary:        Correctness annotations for Java code
 Name:           jsr-305
 Version:        0.1+%{svn_date}
-Release:        7%{?dist}
+Release:        8%{?dist}
 # The majority of code is BSD-licensed, but some Java sources
 # are licensed under CC-BY license, see: $ grep -r Creative .
 License:        BSD AND CC-BY
@@ -32,7 +32,7 @@ URL:            https://code.google.com/archive/p/jsr-305
 #   svn export -r %{svn_revision} http://%{name}.googlecode.com/svn/trunk %{name}
 #   tar -czvf %{name}-%{svn_date}svn.tgz %{name}
 # Source0:      https://storage.googleapis.com/google-code-archive-source/v2/code.google.com/jsr-305/source-archive.zip
-Source0:        %{_mariner_sources_url}/jsr-305-%{svn_date}svn.tgz
+Source0:        %{_distro_sources_url}/jsr-305-%{svn_date}svn.tgz
 Source1:        jsr-305-ri-build.xml
 # File containing URL to CC-BY license text
 Source2:        NOTICE-CC-BY.txt
@@ -72,7 +72,7 @@ done
 export OPT_JAR_LIST=:
 export CLASSPATH=
 pushd ri
-%{ant} -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+%{ant} -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
        -Dversion=%{version} -Djava.javadoc=%{_javadocdir}/java
 popd
 
@@ -101,6 +101,13 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.1+20130910-8
+- build with msopenjdk-17 
+
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1+20130910-8
+- Updating naming for 3.0 version of Azure Linux.
+
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.1+20130910-7
 - Fixing maven provides
 

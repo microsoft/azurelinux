@@ -4,15 +4,14 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/profile"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repoutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/pkg/profile"
 	"github.com/sirupsen/logrus"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -92,7 +91,7 @@ func main() {
 }
 
 func readFileLines(fileName string) (lines []string, err error) {
-	content, err := ioutil.ReadFile(fileName)
+	content, err := os.ReadFile(fileName)
 	if err != nil {
 		logger.Log.Errorf("Error reading file: %v", err)
 		return nil, err
@@ -103,7 +102,7 @@ func readFileLines(fileName string) (lines []string, err error) {
 
 func writeFileLines(lines []string, fileName string) (err error) {
 	content := strings.Join(lines, "\n")
-	err = ioutil.WriteFile(fileName, []byte(content), 0644)
+	err = os.WriteFile(fileName, []byte(content), 0644)
 	if err != nil {
 		logger.Log.Errorf("Error writing file: %v", err)
 		return err

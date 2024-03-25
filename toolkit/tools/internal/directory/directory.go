@@ -5,13 +5,12 @@ package directory
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // LastModifiedFile returns the timestamp and path to the file last modified inside a directory.
@@ -53,7 +52,7 @@ func CopyContents(srcDir, dstDir string) (err error) {
 		return
 	}
 
-	fds, err := ioutil.ReadDir(srcDir)
+	fds, err := os.ReadDir(srcDir)
 	if err != nil {
 		return
 	}

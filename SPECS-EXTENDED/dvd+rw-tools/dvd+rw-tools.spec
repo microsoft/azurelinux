@@ -32,18 +32,18 @@ information see http://fy.chalmers.se/~appro/linux/DVD+RW/.
 
 %prep
 %setup -q
-%patch1 -p1 -b .manpatch
-%patch2 -p1 -b .wexit
-%patch3 -p1 -b .glibc2.6.90
-%patch4 -p1 -b .reload
-%patch5 -p0 -b .wctomb
-%patch6 -p0 -b .dvddl
-%patch7 -p1 -b .noevent
-%patch8 -p1 -b .lastshort
-%patch9 -p1 -b .format
-%patch10 -p1 -b .pow
-%patch11 -p1 -b .freespace
-%patch12 -p1 -b .sysmacro
+%patch 1 -p1 -b .manpatch
+%patch 2 -p1 -b .wexit
+%patch 3 -p1 -b .glibc2.6.90
+%patch 4 -p1 -b .reload
+%patch 5 -p0 -b .wctomb
+%patch 6 -p0 -b .dvddl
+%patch 7 -p1 -b .noevent
+%patch 8 -p1 -b .lastshort
+%patch 9 -p1 -b .format
+%patch 10 -p1 -b .pow
+%patch 11 -p1 -b .freespace
+%patch 12 -p1 -b .sysmacro
 
 install -m 644 %{SOURCE1} index.html
 

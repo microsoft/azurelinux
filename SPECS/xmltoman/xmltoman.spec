@@ -20,7 +20,7 @@ for doing rougly the same job is provided.
 
 %prep
 %setup -q
-%patch0 -p1 -b .timestamps
+%patch 0 -p1 -b .timestamps
 
 %build
 %make_build PREFIX=%{_prefix}

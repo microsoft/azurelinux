@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
@@ -42,10 +42,19 @@ type SystemConfig struct {
 	EnableHidepid        bool                      `json:"EnableHidepid"`
 }
 
+const (
+	enableGrubMkconfigDefault bool = true
+)
+
 // GetRootPartitionSetting returns a pointer to the partition setting describing the disk which
 // will be mounted at "/", or nil if no partition is found
 func (s *SystemConfig) GetRootPartitionSetting() (rootPartitionSetting *PartitionSetting) {
 	return FindRootPartitionSetting(s.PartitionSettings)
+}
+
+// We assume that any image without partitions is describing a rootfs image.
+func (s *SystemConfig) IsRootFS() bool {
+	return len(s.PartitionSettings) == 0
 }
 
 // GetMountpointPartitionSetting will search the system configuration for the partition setting
@@ -107,7 +116,7 @@ func (s *SystemConfig) IsValid() (err error) {
 			return fmt.Errorf("invalid [PartitionSettings]: %w", err)
 		}
 		if mountPointUsed[partitionSetting.MountPoint] {
-			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at '%s'", partitionSetting.MountPoint)
+			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at (%s)", partitionSetting.MountPoint)
 		}
 		if partitionSetting.MountPoint != "" {
 			// Don't track unmounted partition duplication (They will all mount at "")
@@ -150,7 +159,7 @@ func (s *SystemConfig) IsValid() (err error) {
 	repoNames := make(map[string]bool)
 	for _, packageRepo := range s.PackageRepos {
 		if err = packageRepo.IsValid(); err != nil {
-			return fmt.Errorf("invalid [PackageRepo]: %s. Error: %w", packageRepo.Name, err)
+			return fmt.Errorf("invalid [PackageRepo]: (%s):\n%w", packageRepo.Name, err)
 		}
 
 		if repoNames[packageRepo.Name] {
@@ -185,6 +194,7 @@ func (s *SystemConfig) IsValid() (err error) {
 func (s *SystemConfig) UnmarshalJSON(b []byte) (err error) {
 	// Use an intermediate type which will use the default JSON unmarshal implementation
 	type IntermediateTypeSystemConfig SystemConfig
+	(*s).EnableGrubMkconfig = enableGrubMkconfigDefault
 	err = json.Unmarshal(b, (*IntermediateTypeSystemConfig)(s))
 	if err != nil {
 		return fmt.Errorf("failed to parse [SystemConfig]: %w", err)

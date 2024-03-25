@@ -6,11 +6,11 @@ package installationview
 import (
 	"fmt"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uitext"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/uiutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/navigationbar"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uitext"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/uiutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 
 	"github.com/gdamore/tcell"
 	"github.com/rivo/tview"
@@ -152,6 +152,7 @@ func (iv *InstallationView) applyConfiguration(sysConfig *configuration.SystemCo
 	sysConfig.AdditionalFiles = selectedConfig.AdditionalFiles
 	sysConfig.PostInstallScripts = selectedConfig.PostInstallScripts
 	sysConfig.FinalizeImageScripts = selectedConfig.FinalizeImageScripts
+	sysConfig.EnableGrubMkconfig = selectedConfig.EnableGrubMkconfig
 }
 
 func (iv *InstallationView) populateInstallOptions() (err error) {

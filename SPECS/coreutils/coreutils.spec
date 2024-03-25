@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
 Version:        9.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,7 +17,7 @@ Requires:       gmp
 Requires:       libselinux
 Conflicts:      toybox
 Provides:       sh-utils
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl
 BuildRequires:  perl(File::Find)
 %endif
@@ -91,6 +91,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 9.4-2
+- fix serial-console.sh
+
 * Fri Jan 26 2024 Andrew Phelps <anphel@microsoft.com> - 9.4-1
 - Upgrade to version 9.4
 

@@ -23,7 +23,7 @@ BuildRequires:  perl(Module::Metadata) >= 1.000023
 BuildRequires:  perl(strict)
 BuildRequires:  perl(warnings)
 # Test
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  perl(CPAN::Meta) >= 2.120920
 BuildRequires:  perl(Env)
 BuildRequires:  perl(lib)
