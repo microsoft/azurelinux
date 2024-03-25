@@ -1,6 +1,6 @@
 Summary:        Virgl Rendering library.
 Name:           virglrenderer
-Version:        0.10.4
+Version:        1.0.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -38,10 +38,10 @@ that can be used along with the mesa virgl
 driver to test virgl rendering without GL.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
-%meson
+%meson -Dvideo=true -Dvenus=true
 %meson_build
 
 %install
@@ -53,6 +53,7 @@ driver to test virgl rendering without GL.
 %license COPYING
 %{_libdir}/lib*.so.1
 %{_libdir}/lib*.so.1.*
+%{_libexecdir}/virgl_render_server
 
 %files devel
 %dir %{_includedir}/virgl/
@@ -64,8 +65,8 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
-* Mon Feb 12 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.10.4-1
-- Auto-upgrade to 0.10.4 - Upgrade to 0.10.4 in Azure Linux 3.0
+* Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 1.0.1-1
+- Upgrade to 1.0.1 in Azure Linux 3.0
 
 * Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
 - Apply CVE-2022-0175 patch from upstream.
