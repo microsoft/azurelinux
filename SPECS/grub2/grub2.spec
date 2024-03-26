@@ -349,6 +349,7 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config() %{_sysconfdir}/grub.d/00_header
 %config() %{_sysconfdir}/grub.d/10_linux
 %config() %{_sysconfdir}/grub.d/20_linux_xen
+%config() %{_sysconfdir}/grub.d/25_bli
 %config() %{_sysconfdir}/grub.d/30_os-prober
 %config() %{_sysconfdir}/grub.d/30_uefi-firmware
 %config(noreplace) %{_sysconfdir}/grub.d/40_custom
