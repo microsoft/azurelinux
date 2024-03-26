@@ -140,6 +140,7 @@ mv gnulib-%{gnulibversion} gnulib
 %build
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
+LDFLAGS="-Wl,-d $LDFLAGS"
 export LDFLAGS
 
 export PYTHON=%{python3}
