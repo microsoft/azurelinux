@@ -22,7 +22,7 @@ type OS struct {
 	FinalizeImageScripts []Script            `yaml:"finalizeImageScripts"`
 	Users                []User              `yaml:"users"`
 	Services             Services            `yaml:"services"`
-	Modules              Modules             `yaml:"modules"`
+	Modules              []Module            `yaml:"modules"`
 	Verity               *Verity             `yaml:"verity"`
 	Overlays             *[]Overlay          `yaml:"overlays"`
 }
@@ -80,8 +80,17 @@ func (s *OS) IsValid() error {
 		return err
 	}
 
-	if err := s.Modules.IsValid(); err != nil {
-		return err
+	moduleMap := make(map[string]int)
+	for i, module := range s.Modules {
+		// Check if module is duplicated to avoid conflicts with modules potentially having different LoadMode
+		if _, exists := moduleMap[module.Name]; exists {
+			return fmt.Errorf("duplicate module found: %s at index %d", module.Name, i)
+		}
+		moduleMap[module.Name] = i
+		err = module.IsValid()
+		if err != nil {
+			return fmt.Errorf("invalid Modules item at index %d:\n%w", i, err)
+		}
 	}
 
 	if s.Verity != nil {
