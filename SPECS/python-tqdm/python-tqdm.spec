@@ -29,7 +29,6 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools_scm
 %if 0%{with_check}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-tensorflow
 %endif
 
 %description -n python3-%{srcname} %{_description}
