@@ -50,6 +50,6 @@ DIST_TAG            ?= .$(DIST_NAME_ABRV)$(dist_major_version_number)
 #
 # and should hold the value of the next (or current) official release, not the previous official
 # release.
-IMAGE_CUSTOMIZER_VERSION ?= 0.1.0
+IMAGE_CUSTOMIZER_VERSION ?= 0.2.0
 IMAGE_CUSTOMIZER_VERSION_PREVIEW ?= -dev.$(DATETIME_AS_VERSION)+$(GIT_COMMIT_ID)
 IMAGE_CUSTOMIZER_FULL_VERSION := $(IMAGE_CUSTOMIZER_VERSION)$(IMAGE_CUSTOMIZER_VERSION_PREVIEW)
