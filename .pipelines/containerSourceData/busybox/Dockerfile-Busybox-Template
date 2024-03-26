@@ -12,7 +12,7 @@ ARG RPMS_PATH="/dockerStage/RPMS"
 ARG LOCAL_REPO_FILE="/dockerStage/azurelinuxlocal.repo"
 ARG LOCAL_REPO_PATH="/localrepo"
 
-# Create local repo if RPMS are provided
+# Create local repo with the given RPMS.
 # This will allow the user to install packages from the local repo
 # instead of fetching from PMC
 RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \
