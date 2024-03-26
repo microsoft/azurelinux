@@ -25124,8 +25124,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.14",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
+          "version": "3.9.19",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.19.tar.xz"
         }
       }
     },
