@@ -977,26 +977,26 @@ ${CMAKE} .. \
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
 %if 0%{without ceph_test_package}
-    -DWITH_TESTS:BOOL=OFF \
+    -DWITH_TESTS=OFF \
 %endif
 %if 0%{with cephfs_java}
     -DJAVA_HOME=%{java_home} \
     -DJAVA_LIB_INSTALL_DIR=%{_jnidir} \
-    -DWITH_CEPHFS_JAVA:BOOL=ON \
+    -DWITH_CEPHFS_JAVA=ON \
 %endif
 %if 0%{with selinux}
-    -DWITH_SELINUX:BOOL=ON \
+    -DWITH_SELINUX=ON \
 %endif
 %if %{with lttng}
-    -DWITH_LTTNG:BOOL=ON \
-    -DWITH_BABELTRACE:BOOL=ON \
+    -DWITH_LTTNG=ON \
+    -DWITH_BABELTRACE=ON \
 %else
-    -DWITH_LTTNG:BOOL=OFF \
-    -DWITH_BABELTRACE:BOOL=OFF \
+    -DWITH_LTTNG=OFF \
+    -DWITH_BABELTRACE=OFF \
 %endif
     $CEPH_EXTRA_CMAKE_ARGS \
 %if 0%{with ocf}
-    -DWITH_OCF:BOOL=ON \
+    -DWITH_OCF=ON \
 %endif
 %ifarch aarch64 armv7hl mips mipsel ppc ppc64 ppc64le %{ix86} x86_64
     -DWITH_BOOST_CONTEXT=ON \
@@ -1004,54 +1004,54 @@ ${CMAKE} .. \
     -DWITH_BOOST_CONTEXT=OFF \
 %endif
 %if 0%{with cephfs_shell}
-    -DWITH_CEPHFS_SHELL:BOOL=ON \
+    -DWITH_CEPHFS_SHELL=ON \
 %endif
 %if 0%{with libradosstriper}
-    -DWITH_LIBRADOSSTRIPER:BOOL=ON \
+    -DWITH_LIBRADOSSTRIPER=ON \
 %else
-    -DWITH_LIBRADOSSTRIPER:BOOL=OFF \
+    -DWITH_LIBRADOSSTRIPER=OFF \
 %endif
 %if 0%{with amqp_endpoint}
-    -DWITH_RADOSGW_AMQP_ENDPOINT:BOOL=ON \
+    -DWITH_RADOSGW_AMQP_ENDPOINT=ON \
 %else
-    -DWITH_RADOSGW_AMQP_ENDPOINT:BOOL=OFF \
+    -DWITH_RADOSGW_AMQP_ENDPOINT=OFF \
 %endif
 %if 0%{with kafka_endpoint}
-    -DWITH_RADOSGW_KAFKA_ENDPOINT:BOOL=ON \
+    -DWITH_RADOSGW_KAFKA_ENDPOINT=ON \
 %else
-    -DWITH_RADOSGW_KAFKA_ENDPOINT:BOOL=OFF \
+    -DWITH_RADOSGW_KAFKA_ENDPOINT=OFF \
 %endif
 %if 0%{without lua_packages}
-    -DWITH_RADOSGW_LUA_PACKAGES:BOOL=OFF \
+    -DWITH_RADOSGW_LUA_PACKAGES=OFF \
 %endif
 %if 0%{with cmake_verbose_logging}
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
 %endif
 %if 0%{with rbd_rwl_cache}
-    -DWITH_RBD_RWL:BOOL=ON \
+    -DWITH_RBD_RWL=ON \
 %endif
 %if 0%{with rbd_ssd_cache}
-    -DWITH_RBD_SSD_CACHE:BOOL=ON \
+    -DWITH_RBD_SSD_CACHE=ON \
 %endif
 %if 0%{with system_pmdk}
-    -DWITH_SYSTEM_PMDK:BOOL=ON \
+    -DWITH_SYSTEM_PMDK=ON \
 %endif
 %if 0%{without jaeger}
-    -DWITH_JAEGER:BOOL=OFF \
+    -DWITH_JAEGER=OFF \
 %endif
 %if 0%{with system_arrow}
-    -DWITH_SYSTEM_ARROW:BOOL=ON \
-    -DWITH_SYSTEM_UTF8PROC:BOOL=ON \
+    -DWITH_SYSTEM_ARROW=ON \
+    -DWITH_SYSTEM_UTF8PROC=ON \
 %endif
 %if 0%{with system_qat}
-    -DWITH_SYSTEM_QATLIB:BOOL=ON \
-    -DWITH_SYSTEM_QATZIP:BOOL=ON \
+    -DWITH_SYSTEM_QATLIB=ON \
+    -DWITH_SYSTEM_QATZIP=ON \
 %endif
 %if 0%{with seastar}
-    -DWITH_SEASTAR:BOOL=ON \
-    -DWITH_JAEGER:BOOL=OFF \
+    -DWITH_SEASTAR=ON \
+    -DWITH_JAEGER=OFF \
 %endif
-    -DWITH_GRAFANA:BOOL=ON \
+    -DWITH_GRAFANA=ON \
 
 %if %{with cmake_verbose_logging}
 cat ./CMakeFiles/CMakeOutput.log
