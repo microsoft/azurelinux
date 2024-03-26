@@ -150,7 +150,3 @@ func downloadFile(srcUrl, dstFile string, caCerts *x509.CertPool, tlsCerts []tls
 	}
 	return
 }
-
-func getRpmUrl(url string, rpmFilename string) (result string, err error) {
-	return url + "/" + rpmFilename, nil
-}
