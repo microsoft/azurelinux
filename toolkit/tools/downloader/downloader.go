@@ -34,10 +34,10 @@ var (
 	tlsClientCert = app.Flag("certificate", "TLS client certificate to use when downloading files.").String()
 	tlsClientKey  = app.Flag("private-key", "TLS client key to use when downloading files.").String()
 
-	dstFile       = app.Flag("output-file", "Destination file to download to").Short('O').String()
-	prefixDir     = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
-	rpmFilename   = app.Arg("rpm-filename", "RPM to download").Required().String()
-	srcUrls       = app.Arg("url-list", "URLs to download").Required().Strings()
+	dstFile     = app.Flag("output-file", "Destination file to download to").Short('O').String()
+	prefixDir   = app.Flag("directory-prefix", "Directory to download to").Short('P').String()
+	rpmFilename = app.Arg("rpm-filename", "RPM to download").Required().String()
+	srcUrls     = app.Arg("url-list", "URLs to download").Required().Strings()
 )
 
 func main() {
@@ -119,6 +119,8 @@ func main() {
 			} else {
 				logger.Log.Errorf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, *dstFile, err)
 			}
+		} else {
+			break
 		}
 	}
 }
