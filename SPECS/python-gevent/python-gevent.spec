@@ -1,7 +1,7 @@
 Summary:        Coroutine-based network library
 Name:           python-gevent
 Version:        21.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -48,6 +48,7 @@ Features include:
 %autosetup -p1 -n gevent-%{version}
 
 %build
+export GEVENTSETUP_DISABLE_ARES=1
 %py3_build
 
 %install
@@ -64,6 +65,9 @@ cp %{SOURCE1} src/gevent/tests/tests_to_ignore.txt
 %{python3_sitelib}/*
 
 %changelog
+* Thu Mar 07 2024 Saul Paredes <saulparedes@microsoft.com> - 21.1.2-3
+- Disable c-ares module and fix CVE-2021-22931
+
 * Wed Jan 10 2024 Thien Trung Vuong <tvuong@microsoft.com> - 21.1.2-2
 - Disable unreliable tests
 

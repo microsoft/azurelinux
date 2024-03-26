@@ -3338,8 +3338,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.9",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.9.tar.gz"
+          "version": "3.5.12",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.12.tar.gz"
         }
       }
     },
@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "helm",
-          "version": "3.14.0",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.0.tar.gz"
+          "version": "3.14.2",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.2.tar.gz"
         }
       }
     },
@@ -14363,8 +14363,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.10",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.10.tar.gz"
+          "version": "0.8.17",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.17.tar.gz"
         }
       }
     },
@@ -30940,8 +30940,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz"
         }
       }
     },
