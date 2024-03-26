@@ -87,13 +87,12 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-# We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
-# is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
-# actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
+# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
+# We only parse the spec files we will actually pack.
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
-		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
+		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \

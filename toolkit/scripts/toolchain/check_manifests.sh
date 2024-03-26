@@ -4,7 +4,7 @@
 
 set -e
 
-TOOLCHAIN_SPEC_LIST_FILE=$1
+TOOLCHAIN_SPEC_LIST=$1
 SPECS_DIR=$2
 MANIFESTS_DIR=$3
 DIST_TAG=$4
@@ -36,8 +36,7 @@ write_rpms_from_spec () {
 
 write_rpms_from_toolchain () {
     # $1 = file to save to
-    specs=$(cat $TOOLCHAIN_SPEC_LIST_FILE)
-    for specName in $specs
+    for specName in $TOOLCHAIN_SPEC_LIST
     do
         if [[ "$specName" == *"msopenjdk"* ]]; then
             # special case to add msopenjdk-17 which is downloaded and does not have a SPEC
