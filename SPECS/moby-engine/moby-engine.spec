@@ -16,10 +16,10 @@ Source2: docker.socket
 Source3: daemon.json
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
-Patch2:  CVE-2024-23651.patch
+Patch1:  CVE-2024-23651.patch
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
-Patch3:  CVE-2024-23652.patch
+Patch2:  CVE-2024-23652.patch
 
 %{?systemd_requires}
 
