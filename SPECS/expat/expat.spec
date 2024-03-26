@@ -42,8 +42,6 @@ This package contains minimal set of shared expat libraries.
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 rm -rf %{buildroot}/%{_docdir}/%{name}
-echo "Listing files in the install directory:"
-ls -l %{buildroot}/
 %{_fixperms} %{buildroot}/*
 
 %check
