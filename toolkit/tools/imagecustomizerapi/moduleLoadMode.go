@@ -10,11 +10,11 @@ import (
 type ModuleLoadMode string
 
 const (
-	ModuleLoadModeAlways   ModuleLoadMode = "always"
-	ModuleLoadModeAuto     ModuleLoadMode = "auto"
-	ModuleLoadModeDisable  ModuleLoadMode = "disable"
-	ModuleLoadModeInherit  ModuleLoadMode = "inherit"
-	ModuleLoadModeDefault  ModuleLoadMode = ""
+	ModuleLoadModeAlways  ModuleLoadMode = "always"
+	ModuleLoadModeAuto    ModuleLoadMode = "auto"
+	ModuleLoadModeDisable ModuleLoadMode = "disable"
+	ModuleLoadModeInherit ModuleLoadMode = "inherit"
+	ModuleLoadModeDefault ModuleLoadMode = ""
 )
 
 func (loadmode ModuleLoadMode) IsValid() error {
