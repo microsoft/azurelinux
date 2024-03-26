@@ -1,5 +1,6 @@
 # Installed library version
 %global lib_version 2401.0.0
+%define lib_ver_min %(echo %{lib_version} | cut -d. -f1-2)
 
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
@@ -14,19 +15,14 @@ Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  ninja-build
-BuildRequires:  gcc-c++
-
-BuildRequires:  gmock
 BuildRequires:  gmock-devel
 BuildRequires:  gtest
 BuildRequires:  gtest-devel
 
-%ifarch s390x
-# Symbolize.SymbolizeWithMultipleMaps fails in absl_symbolize_test on s390x
-# with LTO
-# https://github.com/abseil/abseil-cpp/issues/1133
-%global _lto_cflags %{nil}
+%if 0%{?with_check}
+BuildRequires:  ninja-build
+BuildRequires:  gcc-c++
+BuildRequires:  gmock
 %endif
 
 %description
@@ -64,7 +60,9 @@ Development headers for %{name}
 
 %build
 %cmake \
+%if 0%{?with_check}
   -GNinja \
+%endif
   -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
   -DABSL_FIND_GOOGLETEST:BOOL=ON \
   -DABSL_ENABLE_INSTALL:BOOL=ON \
@@ -83,7 +81,7 @@ Development headers for %{name}
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2401.*
+%{_libdir}/libabsl_*.so.%{lib_ver_min}.*
 
 %files devel
 %{_includedir}/absl

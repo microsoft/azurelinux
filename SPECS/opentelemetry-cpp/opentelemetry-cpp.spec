@@ -67,9 +67,9 @@ mkdir build && cd build
 %files
 %license LICENSE
 %{_libdir}/libopentelemetry_*.so
-%{_libdir}/pkgconfig/opentelemetry_*.pc
 
 %files devel
+%{_libdir}/pkgconfig/opentelemetry_*.pc
 %{_includedir}/opentelemetry/*
 %{_libdir}/cmake/opentelemetry-cpp/*
 
