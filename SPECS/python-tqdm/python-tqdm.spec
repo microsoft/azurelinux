@@ -29,6 +29,9 @@ BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools_scm
 %if 0%{with_check}
 BuildRequires:  python3-pytest
+%ifarch x86_64
+BuildRequires:  python3-tensorflow
+%endif
 %endif
 
 %description -n python3-%{srcname} %{_description}
