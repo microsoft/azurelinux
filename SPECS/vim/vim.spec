@@ -2,7 +2,7 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2190
-Release:        10%{?dist}
+Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -197,9 +197,6 @@ fi
 %{_bindir}/vimdiff
 
 %changelog
-* Wed Mar 20 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 9.0.2190-10
-- Test update release
-
 * Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 9.0.2190-1
 - Upgrade version to 9.0.2190
 
