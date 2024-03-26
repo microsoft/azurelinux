@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
@@ -71,6 +71,8 @@ cat > %{buildroot}/etc/dhcp/dhclient.conf << "EOF"
 # Begin /etc/dhcp/dhclient.conf
 #
 # Basic dhclient.conf(5)
+
+option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 
 #prepend domain-name-servers 127.0.0.1;
 request subnet-mask, broadcast-address, time-offset, routers,
@@ -170,6 +172,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Fri Mar 08 2024 Chris Patterson <cpatterson@microsoft.com> - 4.4.2-7
+- Add option for classless static route configuration in dhclient.conf
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.4.2-6
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
