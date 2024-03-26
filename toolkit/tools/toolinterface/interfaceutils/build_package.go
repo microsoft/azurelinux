@@ -4,18 +4,23 @@
 package interfaceutils
 
 import (
-	"os/exec"
 	"fmt"
 
 //	packagelist "github.com/microsoft/azurelinux/toolkit/tools/internal/packlist"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/specreaderutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/toolinterface/configutils"
 )
 
 var (
 	azlSpecsDirs = [...] string {"SPECS", "SPECS-EXTENDED", "SPECS-SIGNED"}
+	// get relevant configs
+	toolkit_dir string
 )
 
 func BuildPackage(spec string) (err error) {
+
+	configutils.PopulateConfigFromFile()
+	toolkit_dir,_ = configutils.GetConfig("toolkit_root")
 
 	fmt.Println("Building packages specs are (%s)", spec)
 
@@ -25,6 +30,8 @@ func BuildPackage(spec string) (err error) {
 		err = fmt.Errorf("failed to validate specs:\n%w", err)
 		return err
 	}
+
+	// TODO: set sepcs dir in config
 
 	// any other checks
 
@@ -59,7 +66,7 @@ func validateSpecExistance(specList string) (specsDir string, err error) {
 //		err = fmt.Errorf("failed to parse package list file:\n%w", err)
 //		return nil, err
 //	}
-	
+
 	// TODO: currently, we have a limitation that all specs to be built must be present in the same specsDir
 	var specMap = make(map[string]bool)
 	for _, specsDir := range azlSpecsDirs {
@@ -71,72 +78,16 @@ func validateSpecExistance(specList string) (specsDir string, err error) {
 			fmt.Println("done with specreader, returned specFiles (%s)", specFiles)
 			return specsDir, nil
 		}
-	}	
+	}
 	fmt.Println("done with specreader")
 	return
 }
 
-func execCommands(app, dir string, args []string) (stdoutStr string, err error) {
-	cmd := exec.Command(app, args...)
-	if dir != "" {
-		cmd.Dir = dir
+func buildSpecs (specs, specsDir string) (err error) {
+	// TODO: use a command builder
+	err = execCommands("/usr/bin/make", "/home/neha/repos/test/CBL-Mariner/toolkit/", "build-packages", "SRPM_PACK_LIST=\"cracklib\"", "SPECS_DIR=/home/neha/repos/test/CBL-Mariner/SPECS2/")
+	if err != nil {
+		fmt.Println(err)
 	}
-	stdout, err := cmd.CombinedOutput()
-	return string(stdout), err
-}
-
-func buildSpecs(specs, specsDir string) (err error) {
-	fmt.Println("exuting using new funtion")
-	args := []string{"build-packages", "SRPM_PACK_LIST=\"cracklib\"", "SPECS_DIR=/home/neha/repos/test/CBL-Mariner/SPECS2/"}
-	stdout, err := execCommands("/usr/bin/make", "/home/neha/repos/test/CBL-Mariner/toolkit/", args)
-	fmt.Println(stdout)
-	fmt.Println(err)
-	return
-}
-
-func buildSpecs2(specs, specsDir string) (err error) {
-		app := "ls"
-	cmd := exec.Command(app)
-	stdout, err := cmd.Output()
-
-    if err != nil {
-        fmt.Println(err.Error())
-        return
-    }
-
-    fmt.Println(string(stdout))
-
-	app = "make"
-
-	cmd = exec.Command(app, "check-x86_64-manifests")
-	cmd = exec.Command(app, "check-aarch64-manifests")
-	cmd.Dir = "/home/neha/repos/test/CBL-Mariner/toolkit/"
-	stdout, err = cmd.Output()
-
-	fmt.Println("output is", string(stdout))
-
-    if err != nil {
-        fmt.Println("error is",err)
-        return
-    }
-
-    // Print the output
-    fmt.Println(string(stdout))
-	
-	cmd = exec.Command(app, "package-toolkit")
-	cmd = exec.Command(app, "toolchain", "REBUILD_TOOLCHAIN=n", "DAILY_BUILD_ID=3-0-20240321")
-	cmd = exec.Command(app, "build-packages", "SRPM_PACK_LIST=\"cracklib\"", "SPECS_DIR=/home/neha/repos/test/CBL-Mariner/SPECS2/")
-	cmd.Dir = "/home/neha/repos/test/CBL-Mariner/toolkit/"
-	stdout, err = cmd.CombinedOutput()
-    fmt.Println("output is", string(stdout))
-
-    if err != nil {
-        fmt.Println("error is",err)
-        return
-    }
-
-    // Print the output
-    fmt.Println(string(stdout))
-
 	return
 }

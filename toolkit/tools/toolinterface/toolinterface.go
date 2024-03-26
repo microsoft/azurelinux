@@ -16,23 +16,24 @@ var (
 	build        = app.Command("build", "Build azurelinux")
 	setup        = app.Command("setup", "Setup machine")
 	ready        = app.Command("ready", "Ready changes to contribute to opensource")
-	
+
 	buildPackage = build.Command("package", "Build package(s)")
 	spec         = buildPackage.Flag("spec", "space separated \"\" enclosed name(s) of spec(s) to build").Default("").String()
-	
+
 	buildImage   = build.Command("image", "Build image(s)")
 	config       = buildImage.Flag("config", "image config to build").Required().String()
 	configDir    = buildImage.Flag("configDir", "directory containing image config").String()
-	
+
 	buildTool     = build.Command("tools", "Build tool(s)")
 
     buildToolchain = build.Command("toolchain", "Build toolchain")
-		
+
   )
 
 func main() {
 	var err error
 	// go run main.go
+	// TODO: in each app we should check if the args are correct or not: upfront. first thing to do
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 		case buildPackage.FullCommand():
 			fmt.Println("If this is your first time building Azure Linux, please consider running `setup` to set up your machine")
@@ -64,4 +65,3 @@ func main() {
 			fmt.Println("Invalid call")
 	}
 }
-
