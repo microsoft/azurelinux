@@ -11,6 +11,10 @@
 toolkit_root := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SCRIPTS_DIR  ?= $(toolkit_root)/scripts
 
+# If SUDO_USER is set, grab that, otherwise grab USER
+MARINER_BUILDER_USER := $(if $(SUDO_USER),$(SUDO_USER),$(USER))
+export MARINER_BUILDER_USER
+
 # Build targets
 ##help:var:CONFIG_FILE:<config_path>=Path to image configuration file to use. Will add package dependencies and define final image generated.
 CONFIG_FILE             ?=
