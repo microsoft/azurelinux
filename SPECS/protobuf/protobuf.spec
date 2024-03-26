@@ -2,14 +2,14 @@
 
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.17.3
-Release:        3%{?dist}
+Version:        3.22.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
-Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-all-%{version}.tar.gz
+Source0:        https://github.com/protocolbuffers/protobuf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  cmake
 BuildRequires:  curl
@@ -68,7 +68,9 @@ This contains protobuf python3 libraries.
 %build
 pushd cmake
 %{cmake} \
-%if ! 0%{with_check}
+%if 0%{with_check}
+    -Dprotobuf_USE_EXTERNAL_GTEST=ON \
+%else
     -Dprotobuf_BUILD_TESTS=OFF \
 %endif
     -Dprotobuf_ABSL_PROVIDER=package \
@@ -124,7 +126,7 @@ pushd cmake
 %{python3_sitelib}/*
 
 %changelog
-* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.17.3-3
+* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-1
 - Switching to building with cmake and producing cmake package files.
 
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2

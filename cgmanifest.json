@@ -15,8 +15,8 @@
         "type": "other",
         "other": {
           "name": "abseil-cpp",
-          "version": "20220623.0",
-          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20220623.0/abseil-cpp-20220623.0.tar.gz"
+          "version": "20230125.0",
+          "downloadUrl": "https://github.com/abseil/abseil-cpp/archive/20230125.0/abseil-cpp-20230125.0.tar.gz"
         }
       }
     },
@@ -21594,8 +21594,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.17.3",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protobuf-all-3.17.3.tar.gz"
+          "version": "3.22.0",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.22.0.tar.gz"
         }
       }
     },
