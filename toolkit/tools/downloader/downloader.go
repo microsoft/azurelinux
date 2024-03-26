@@ -115,9 +115,9 @@ func main() {
 		err = downloadFile(srcUrl, localDstFile, caCerts, tlsCerts)
 		if err != nil {
 			if idx == len(*srcUrls)-1 {
-				logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, *dstFile, err)
+				logger.Log.Fatalf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, localDstFile, err)
 			} else {
-				logger.Log.Errorf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, *dstFile, err)
+				logger.Log.Errorf("Failed to download (%s) to (%s). Error:\n%s", srcUrl, localDstFile, err)
 			}
 		} else {
 			break
