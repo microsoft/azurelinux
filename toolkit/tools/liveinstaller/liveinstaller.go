@@ -266,7 +266,7 @@ func calamaresInstall(templateConfigFile string, args imagerArguments) (err erro
 	args.configFile = filepath.Join(calamaresDir, "unattended_config.json")
 
 	launchScript := filepath.Join(calamaresDir, "mariner-install.sh")
-	skuDir := filepath.Join(calamaresDir, "mariner-skus")
+	skuDir := filepath.Join(calamaresDir, "azurelinux-skus")
 
 	bootType := configuration.SystemBootType()
 	logger.Log.Infof("Boot type detected: %s", bootType)
