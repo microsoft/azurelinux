@@ -78,6 +78,10 @@ Requires:       ceph-mon = %{version}-%{release}
 Requires(post):	binutils
 Requires:       systemd
 	
+BuildRequires: e2fsprogs
+BuildRequires: psmisc   
+BuildRequires: lvm2 
+BuildRequires: logrotate    
 BuildRequires:	pkgconfig(libudev)
 BuildRequires:	pkgconfig(udev)
 BuildRequires: lmdb-devel >= 0.9.16
@@ -113,7 +117,9 @@ BuildRequires:	which
 BuildRequires:  xfsprogs
 BuildRequires:  xfsprogs-devel
 BuildRequires:	xmlstarlet
-BuildRequires:	nasm
+%ifarch x86_64
+BuildRequires: nasm
+%endif
 BuildRequires:	lua-devel
 BuildRequires:  lmdb-devel
 
@@ -232,7 +238,6 @@ BuildRequires:  xmlsec1-openssl-devel
 BuildRequires:	python%{python3_pkgversion}-asyncssh
 BuildRequires:	python%{python3_pkgversion}-natsort
 BuildRequires:  thrift-devel >= 0.13.0
-
 %ifarch x86_64
 BuildRequires:  xmlsec1-nss
 %endif
