@@ -108,6 +108,7 @@ extends:
                       isQuickRebuildPackages: true
                       isUseCCache: true
                       outputArtifactsFolder: $(ob_outputDirectory)
+                      maxCascadingRebuilds: 1
                       maxCPU: "${{ configuration.maxCPUs }}"
                       pipArtifactFeeds: "mariner/Mariner-Pypi-Feed"
                       selfRepoName: self
