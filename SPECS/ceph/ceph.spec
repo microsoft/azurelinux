@@ -1,7 +1,6 @@
 #disable debuginfo because ceph-debuginfo rpm is too large
 %define debug_package %{nil}
-%global _python_bytecompile_extra 1
- %define _unpackaged_files_terminate_build 0 
+%define _unpackaged_files_terminate_build 0 
  
 Summary:        User space components of the Ceph file system
 Name:           ceph
