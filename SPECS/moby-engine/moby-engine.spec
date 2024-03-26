@@ -1,8 +1,7 @@
-%define upstream_name moby
-%define commit_hash 5df983c7dbe2f8914e6efd4dd6e0083a20c41ce1
+%define commit_hash fca702de7f71362c8d103073c7e4a1d0a467fadd
 
 Summary: The open-source application container engine
-Name:    %{upstream_name}-engine
+Name:    moby-engine
 Version: 24.0.9
 Release: 1%{?dist}
 License: ASL 2.0
@@ -12,21 +11,15 @@ Vendor: Microsoft Corporation
 Distribution: Mariner
 
 Source0: https://github.com/moby/moby/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# docker-proxy binary comes from libnetwork
-# - The libnetwork version (more accurately commit hash) 
-#   that moby relies on is hard coded in 
-#   "hack/dockerfile/install/proxy.installer" (in moby github repo above)
-Source1: https://github.com/moby/libnetwork/archive/master.tar.gz/#/%{upstream_name}-libnetwork-%{version}.tar.gz
-Source3: docker.service
-Source4: docker.socket
-#Patch0:  CVE-2023-25153.patch
-#Patch1:  CVE-2022-21698.patch
+Source1: docker.service
+Source2: docker.socket
+Source3: daemon.json
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4604 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
-#Patch2:  CVE-2024-23651.patch
+Patch2:  CVE-2024-23651.patch
 # Backport of vendored "buildkit" v0.12.5 https://github.com/moby/buildkit/pull/4603 to 0.8.4-0.20221020190723-eeb7b65ab7d6 in this package.
 # Remove once we upgrade this package at least to version 25.0+.
-#Patch3:  CVE-2024-23652.patch
+Patch3:  CVE-2024-23652.patch
 
 %{?systemd_requires}
 
@@ -74,14 +67,10 @@ Moby is an open-source project created by Docker to enable and accelerate softwa
 %define OUR_GOPATH %{_topdir}/.gopath
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
-
-tar xf %{SOURCE1} --no-same-owner
+%autosetup -p1 -n moby-%{version}
 
 mkdir -p %{OUR_GOPATH}/src/github.com/docker
-LIBNETWORK_FOLDER=$(find -type d -name "libnetwork-*")
-ln -sfT %{_builddir}/%{upstream_name}-%{version}/${LIBNETWORK_FOLDER} %{OUR_GOPATH}/src/github.com/docker/libnetwork
-ln -sfT %{_builddir}/%{upstream_name}-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
+ln -sfT %{_builddir}/moby-%{version} %{OUR_GOPATH}/src/github.com/docker/docker
 
 %build
 export GOPATH=%{OUR_GOPATH}
@@ -91,33 +80,29 @@ export GO111MODULE=off
 export GOGC=off
 export VERSION=%{version}
 
-# build docker daemon
 GIT_COMMIT=%{commit_hash}
-GIT_COMMIT_SHORT=${GIT_COMMIT:0:7}
-DOCKER_GITCOMMIT=${GIT_COMMIT_SHORT} DOCKER_BUILDTAGS='apparmor seccomp' hack/make.sh dynbinary
-
-# build docker proxy
-go build \
-    -o libnetwork/docker-proxy \
-    github.com/docker/libnetwork/cmd/proxy
+DOCKER_GITCOMMIT=${GIT_COMMIT:0:7} DOCKER_BUILDTAGS='seccomp' hack/make.sh dynbinary
 
 %install
-mkdir -p %{buildroot}/%{_bindir}
-cp -aLT ./bundles/dynbinary-daemon/dockerd %{buildroot}/%{_bindir}/dockerd
-cp -aT libnetwork/docker-proxy %{buildroot}/%{_bindir}/docker-proxy
+mkdir -p %{buildroot}%{_bindir}
+install -p -m 755 ./bundles/dynbinary-daemon/dockerd %{buildroot}%{_bindir}/dockerd
 
-# install udev rules
-mkdir -p %{buildroot}/%{_sysconfdir}/udev/rules.d
-install -p -m 644 contrib/udev/80-docker.rules %{buildroot}/%{_sysconfdir}/udev/rules.d/80-docker.rules
+mkdir -p %{buildroot}%{_libexecdir}
+install -p -m 755 ./bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_libexecdir}/docker-proxy
 
-# add init scripts
-mkdir -p %{buildroot}/%{_unitdir}
-install -p -m 644 %{SOURCE3} %{buildroot}/%{_unitdir}/docker.service
-install -p -m 644 %{SOURCE4} %{buildroot}/%{_unitdir}/docker.socket
+mkdir -p %{buildroot}%{_sysconfdir}/udev/rules.d
+install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_sysconfdir}/udev/rules.d/80-docker.rules
+
+mkdir -p %{buildroot}%{_unitdir}
+install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}/docker.service
+install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/docker.socket
+
+mkdir -p -m 755 %{buildroot}%{_sysconfdir}/docker
+install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/docker/daemon.json
 
 %post
 if ! grep -q "^docker:" /etc/group; then
-	groupadd --system docker
+    groupadd --system docker
 fi
 
 %preun
@@ -129,11 +114,21 @@ fi
 # list files owned by the package here
 %files
 %license LICENSE NOTICE
-%{_bindir}/*
+%{_bindir}/dockerd
+%{_libexecdir}/docker-proxy
+%dir %{_sysconfdir}/docker
+%config(noreplace) %{_sysconfdir}/docker/daemon.json
 %{_sysconfdir}/*
 %{_unitdir}/*
 
 %changelog
+* Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 24.0.9-1
+- Bump version to 24.X
+- Drop un-needed patches
+- Remove docker-proxy as it's no longer used (2050e085f95bb796e9ff3a325b9985e319c193cf)
+- Add the in-tree version of docker proxy built from cmd/docker-proxy into /usr/libexec
+- Set userland-proxy-path explicitly by introducing /etc/docker/daemon.json
+
 * Mon Feb 12 2024 Muhammad Falak <mwani@microsoft.com> - 20.10.27-4
 - Bump release to rebuild with go 1.21.6
 
