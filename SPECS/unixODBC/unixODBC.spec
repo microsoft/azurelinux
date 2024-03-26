@@ -29,8 +29,7 @@ ODBC, you need to install this package.
 
 %prep
 
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 ./configure --prefix=%{_prefix}               \
