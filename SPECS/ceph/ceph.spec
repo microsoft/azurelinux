@@ -29,10 +29,7 @@ Patch1: 0032-cmake-modules-BuildBoost.cmake.patch
 #
 
 #################################################################################
-# conditional build section
-#
-# please read this for explanation of bcond syntax:
-# https://rpm-software-management.github.io/rpm/manual/conditionalbuilds.html
+# Mariner conditional build flags and macro definitions
 #################################################################################
 %bcond_with amqp_endpoint
 %bcond_with ceph_test_package
@@ -69,7 +66,7 @@ Patch1: 0032-cmake-modules-BuildBoost.cmake.patch
 
 
 #################################################################################
-# dependencies that apply across all distro families
+# Main package dependencies
 #################################################################################
 Requires:       ceph-osd = %{version}-%{release}
 Requires:       ceph-mds = %{version}-%{release}
@@ -80,7 +77,7 @@ Requires:       systemd
 	
 BuildRequires:	pkgconfig(libudev)
 BuildRequires:	pkgconfig(udev)
-BuildRequires: lmdb-devel >= 0.9.16
+BuildRequires:  lmdb-devel >= 0.9.16
 BuildRequires:	libaio-devel
 BuildRequires:	libblkid-devel >= 2.17
 BuildRequires:  cryptsetup
@@ -118,12 +115,8 @@ BuildRequires: nasm
 %endif
 BuildRequires:	lua-devel
 BuildRequires:  lmdb-devel
-
-#extra dependencies from 16.2.0 todo remove 
-
 BuildRequires:  libevent
 BuildRequires:  libevent-devel
-
 BuildRequires:  expat-devel
 BuildRequires:  fuse-devel
 BuildRequires:  gcc
@@ -134,30 +127,21 @@ BuildRequires:  keyutils-devel
 BuildRequires:  leveldb-devel > 1.2
 BuildRequires:  lua-devel
 BuildRequires:  util-linux-devel
-
 BuildRequires:  curl-devel
 BuildRequires:  libibverbs-devel
-
 BuildRequires:  lsb-release
 BuildRequires:  lz4-devel >= 1.7
-
-
 BuildRequires:  nss-devel
 BuildRequires:  parted
 BuildRequires:  pkg-config
-
 BuildRequires:  python3-prettytable
 BuildRequires:  python3-sphinx >= 7
 BuildRequires:  python3-sphinxcontrib-websupport
 BuildRequires:  python3-xml
 BuildRequires:  python3-yaml
 BuildRequires:  util-linux
-
-
-
 BuildRequires:  xmlstarlet
 BuildRequires:  yasm
-
 BuildRequires:  CUnit-devel
 BuildRequires:  boost
 BuildRequires:  cmake > 3.5
@@ -166,7 +150,6 @@ BuildRequires:  mariner-rpm-macros
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  procps-ng
-#*****************************************extra dependencies end here
 
 %if 0%{with cephfs_java}
 BuildRequires:	java-devel
@@ -334,7 +317,6 @@ Requires:      util-linux
 Requires:      xfsprogs
 Requires:      which
 
-
 %description base
 Base is the package that includes all the files shared amongst ceph servers
 
@@ -346,6 +328,7 @@ Requires:       lvm2
 Requires:       python%{python3_pkgversion}
 Requires:       openssh-server
 Requires:       which
+
 %description -n cephadm
 Utility to bootstrap a Ceph cluster and manage Ceph daemons deployed
 with systemd and podman.
@@ -914,8 +897,6 @@ This package provides a Ceph hardware monitoring agent.
 %prep
 %autosetup -p1 
 
-
-
 %build
 # LTO can be enabled as soon as the following GCC bug is fixed:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200
@@ -990,7 +971,7 @@ ${CMAKE} .. \
     -DWITH_SYSTEM_ARROW=ON \
     -DBOOST_J=4 \
     -DWITH_FMT_HEADER_ONLY=ON \
-    -Dthrift_HOME=/usr/include \
+    -Dthrift_HOME=%{_includedir} \
     -DSYSTEM_BOOST=OFF \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
@@ -2019,3 +2000,54 @@ exit 0
 
 
 %changelog
+* Tue Mar 26 2024 Himaja Kesari <himajakesari@microsoft.com> - 18.2.1-1
+- Updated to version 18.2.1.
+
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.10-3
+- Updating naming for 3.0 version of Azure Linux.
+
+* Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-2
+- Recompile with stack-protection fixed gcc version (CVE-2023-4039)
+
+* Fri Aug 05 2022 Cameron Baird <cameronbaird@microsoft.com> - 16.2.10-1
+- Update source to v16.2.10 to address CVE-2022-0670
+- Install ceph-smartctl instead of ceph-osd-smartctl
+- Since ceph-smartctl now seems needed for daemons of multiple subpackages, 
+    moved %files entry for ceph-smartctl from osd to base 
+
+* Wed Mar 09 2022 Mateusz Malisz <mamalisz@microsoft.com> - 16.2.5-4
+- Add libevent as a build requires to fix build error/warning for some hostnames
+
+* Fri Feb 18 2022 Thomas Crain <thcrain@microsoft.com> - 16.2.5-3
+- Add patch to fix build with snappy >= 1.1.9
+
+* Thu Feb 17 2022 Andrew Phelps <anphel@microsoft.com> - 16.2.5-2
+- Use _topdir instead of hard-coded value /usr/src/mariner
+
+* Mon Jan 03 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 16.2.5-1
+- Updated to version 16.2.5.
+
+* Thu Dec 16 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-6
+- Removing the explicit %%clean stage.
+
+* Tue Sep 21 2021 Henry Li <lihl@microsoft.com> - 16.2.0-5
+- Use util-linux-devel as BR instead of util-linux-libs
+
+* Tue Aug 31 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.2.0-4
+- Enabling the "libradosstriper" subpackages.
+
+* Wed Aug 18 2021 Thomas Crain <thcrain@microsoft.com> - 16.2.0-3
+- Enable python byte compilation for directories outside of %%python3_site{lib,arch}
+
+* Thu Jun 17 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-2
+- Disable debuginfo because ceph-debuginfo rpm is too large
+
+* Fri May 21 2021 Neha Agarwal <nehaagarwal@microsoft.com> 16.2.0-1
+- Update package version to fix CVE-2020-25660, CVE-2020-25678 and CVE-2020-27781
+
+* Fri Feb 05 2021 Joe Schmitt <joschmit@microsoft.com> - 15.2.4-2
+- Include python bytecompiled files in the resulting package.
+
+* Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> 15.2.4-1
+- Initial CBL-Mariner import from Ceph source (license: LGPLv2.1)
+- License verified
