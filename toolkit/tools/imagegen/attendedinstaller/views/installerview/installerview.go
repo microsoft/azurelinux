@@ -65,24 +65,38 @@ func New(calamaresInstallFunc func()) *InstallerView {
 	} else {
 		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
 
-		logger.Log.Debugf("Running chgrp for dbus-daemon-launch-helper")
-		cmd := exec.Command("chgrp", "messagebus", "/usr/libexec/dbus-daemon-launch-helper")
-		err = cmd.Run()
+		err = AssignDbusPermissions()
 		if err != nil {
-			logger.Log.Debugf("Error while running chgrp for dbus-daemon-launch-helper")
+			logger.Log.Debugf("An error occured during reassignment of dbus permissions")
 		}
-		logger.Log.Debugf("Running chmod for dbus-daemon-launch-helper")
-		cmd = exec.Command("chmod", "4750", "/usr/libexec/dbus-daemon-launch-helper")
-		err = cmd.Run()
-		if err != nil {
-			logger.Log.Debugf("Error while running chmod for dbus-daemon-launch-helper")
-		}
-
 	}
 
 	iv.needsToPrompt = (len(iv.installerOptions) != 1)
 
 	return iv
+}
+
+// This function is a workaround to deal with squashed,required permissions
+// within the iso_initrd environment. kpmcore requires that the
+// /usr/libexec/dbus-daemon-lauch-helper file have the group messagebus with
+// permissions 4750 in order to run properly. kpmcore is used by calamares to
+// power the partition module used by the gui installer to configure disk
+// selection.
+// Information on issue here: https://invent.kde.org/system/kpmcore/-/issues/15
+func AssignDbusPermissions() (err error) {
+	logger.Log.Debugf("Running chgrp for dbus-daemon-launch-helper")
+	cmd := exec.Command("chgrp", "messagebus", "/usr/libexec/dbus-daemon-launch-helper")
+	err = cmd.Run()
+	if err != nil {
+		logger.Log.Debugf("Error while running chgrp for dbus-daemon-launch-helper")
+	}
+	logger.Log.Debugf("Running chmod for dbus-daemon-launch-helper")
+	cmd = exec.Command("chmod", "4750", "/usr/libexec/dbus-daemon-launch-helper")
+	err = cmd.Run()
+	if err != nil {
+		logger.Log.Debugf("Error while running chmod for dbus-daemon-launch-helper")
+	}
+	return
 }
 
 // Initialize initializes the view.
