@@ -78,10 +78,6 @@ Requires:       ceph-mon = %{version}-%{release}
 Requires(post):	binutils
 Requires:       systemd
 	
-BuildRequires: e2fsprogs
-BuildRequires: psmisc   
-BuildRequires: lvm2 
-BuildRequires: logrotate    
 BuildRequires:	pkgconfig(libudev)
 BuildRequires:	pkgconfig(udev)
 BuildRequires: lmdb-devel >= 0.9.16
@@ -156,8 +152,7 @@ BuildRequires:  python3-sphinxcontrib-websupport
 BuildRequires:  python3-xml
 BuildRequires:  python3-yaml
 BuildRequires:  util-linux
-#BuildRequires:  systemd-bootstrap
-#BuildRequires:  systemd-bootstrap-devel
+
 
 
 BuildRequires:  xmlstarlet
