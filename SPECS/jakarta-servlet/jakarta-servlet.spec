@@ -1,5 +1,3 @@
-%global azl 3
-
 #
 # spec file for package jakarta-servlet
 #
@@ -30,11 +28,7 @@ Source1:        %{name}-api-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
-%if 0%{?azl}
 BuildRequires:  javapackages-local-bootstrap
-%else
-BuildRequires:  javapackages-local
-%endif
 BuildArch:      noarch
 
 Provides:       glassfish-servlet-api = %{version}-%{release}
@@ -98,7 +92,7 @@ cp -pr api/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %license LICENSE.md NOTICE.md
 
 %changelog
-* Wed Feb 28 2024 - corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 5.0.0-1
+* Wed Mar 27 2024 - corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 5.0.0-1
 - Initial Azure Linux import from openSUSE (license: same as "License" tag).
 - Use javapackages-local-bootstrap to avoid build cycle.
 
