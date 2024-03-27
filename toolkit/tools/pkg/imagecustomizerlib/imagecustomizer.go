@@ -241,11 +241,11 @@ func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomi
 		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", sourceFile, err))
 		}
 
 		if !isFile {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s): not a file", sourceFile))
 		}
 	}
 	return aggregateErr
