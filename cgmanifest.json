@@ -8141,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "keras",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v2.11.0.tar.gz"
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v3.0.0.tar.gz"
         }
       }
     },
