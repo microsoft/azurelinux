@@ -140,6 +140,8 @@ mv gnulib-%{gnulibversion} gnulib
 %build
 # Remove module_info.ld script due to error "grub2-install: error: Decompressor is too big"
 LDFLAGS="`echo " %{build_ldflags} " | sed 's#-Wl,-dT,%{_topdir}/BUILD/module_info.ld##'`"
+# Add linker option -d "assign space to common symbols", otherwise some symbols in grub's
+# kernel.img will be assigned to the SHN_COMMON section which is not supported by grub-mkimage
 LDFLAGS="-Wl,-d $LDFLAGS"
 export LDFLAGS
 
