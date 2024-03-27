@@ -1,6 +1,7 @@
 {
  "Signatures": {
   "LICENSE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-  "plexus-utils-3.3.0.tar.gz": "a8953a183887d026311742ef72ab64a8e38916097690c24566bcf28b82478b03"
+  "plexus-utils-3.3.0.tar.gz": "a8953a183887d026311742ef72ab64a8e38916097690c24566bcf28b82478b03",
+  "plexus-utils-build.xml": "ae5c5ed948c601783e32e64261cf2ca873c3ee0503fa623bd2ac2abfcc34fef3"
  }
 }
