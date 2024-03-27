@@ -1,3 +1,7 @@
+# We must match the C++ standard to the one used to build our abseil-cpp.
+# Otherwise the build will fail.
+%global cpp_std 17
+
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
 Version:        1.62.0
@@ -80,27 +84,23 @@ rm -r %{_builddir}/%{name}-%{version}/third_party/re2
 rm -r %{_builddir}/%{name}-%{version}/third_party/zlib
 
 %build
-# Set C++ version to use to be compatible with the one used the build dependencies.
-# This is specifically necessary to link against abseil-cpp (build will fail otherwise).
-CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
-
 # !!!!! DO NOT USE CMAKE or python RPM MACROS !!!!!
-# !!!!! this will block build                 !!!!!
+# !!!!! This will the block build             !!!!!
 
 mkdir -p cmake/build
 pushd cmake/build
 cmake ../.. -GNinja \
-   -DBUILD_SHARED_LIBS=ON                    \
-   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
-   -DCMAKE_BUILD_TYPE=Release                \
-   -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
-   -DgRPC_INSTALL=ON                         \
-   -DgRPC_BUILD_TESTS=OFF                    \
-   -DgRPC_ABSL_PROVIDER:STRING=package       \
-   -DgRPC_CARES_PROVIDER:STRING=package      \
-   -DgRPC_PROTOBUF_PROVIDER:STRING=package   \
-   -DgRPC_RE2_PROVIDER:STRING=package        \
-   -DgRPC_SSL_PROVIDER:STRING=package        \
+   -DBUILD_SHARED_LIBS=ON                   \
+   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}   \
+   -DCMAKE_BUILD_TYPE=Release               \
+   -DCMAKE_CXX_STANDARD=%{cpp_std}          \
+   -DgRPC_INSTALL=ON                        \
+   -DgRPC_BUILD_TESTS=OFF                   \
+   -DgRPC_ABSL_PROVIDER:STRING=package      \
+   -DgRPC_CARES_PROVIDER:STRING=package     \
+   -DgRPC_PROTOBUF_PROVIDER:STRING=package  \
+   -DgRPC_RE2_PROVIDER:STRING=package       \
+   -DgRPC_SSL_PROVIDER:STRING=package       \
    -DgRPC_ZLIB_PROVIDER:STRING=package
 
 # limit parallel build to avoid resource shortage while building

@@ -1,3 +1,5 @@
+%global cpp_std 17
+
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
 Version:        20230125.4
@@ -47,16 +49,17 @@ pushd build
 # by other packages to build their tests.
 # See: https://github.com/abseil/abseil-cpp/issues/1407.
 %cmake \
-  -DABSL_PROPAGATE_CXX_STD=ON \
+  -DABSL_PROPAGATE_CXX_STD=ON       \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DABSL_BUILD_TEST_HELPERS=ON \
-  -DABSL_FIND_GOOGLETEST=ON \
+  -DABSL_BUILD_TEST_HELPERS=ON      \
+  -DABSL_FIND_GOOGLETEST=ON         \
   -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
+  -DCMAKE_CXX_STANDARD=%{cpp_std}   \
 %if %{with_check}
-  -DABSL_BUILD_TESTING=ON \
-  -DBUILD_TESTING=ON \
+  -DABSL_BUILD_TESTING=ON           \
+  -DBUILD_TESTING=ON                \
 %else
-  -DBUILD_TESTING=OFF \
+  -DBUILD_TESTING=OFF               \
 %endif
   ..
 %make_build
