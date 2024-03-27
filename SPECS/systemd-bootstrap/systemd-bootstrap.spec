@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        18%{?dist}
+Release:        17%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,7 +75,7 @@ Requires:       libgcrypt
 Requires:       lz4
 Requires:       pam
 Requires:       xz
-AutoReqProv:    no
+AutoReq:        no
 
 %description
 Systemd is an init replacement with better process control and security
@@ -89,7 +89,7 @@ Systemd libraries
 %package rpm-macros
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
-AutoReqProv:    no
+AutoReq:        no
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -98,7 +98,7 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
-AutoReqProv:    no
+AutoReq:        no
 
 %description devel
 Development headers for developing applications linking to libsystemd
@@ -285,10 +285,6 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
-* Fri Mar 22 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-18
-- Remove automatic provides so pkgconfig(libsystemd) etc. don't get confused with
-  the real versions
-
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 250.3-17
 - Split libs into their own subpackage to align with full systemd.
 
