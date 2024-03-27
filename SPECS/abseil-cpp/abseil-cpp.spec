@@ -2,7 +2,7 @@
 
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20230125.4
+Version:        20240116.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -62,11 +62,11 @@ pushd build
   -DBUILD_TESTING=OFF               \
 %endif
   ..
-%make_build
+%cmake_build
 
 %install
 pushd build
-%make_install
+%cmake_install
 
 %check
 # Need to set the "TZDIR" environment variable to abseil's
@@ -75,12 +75,12 @@ pushd build
 export TZDIR=%{_builddir}/%{name}-%{version}/absl/time/internal/cctz/testdata/zoneinfo
 
 pushd build
-ctest --output-on-failure
+%ctest --output-on-failure
 
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2301.*
+%{_libdir}/libabsl_*.so.2401.*
 
 %files devel
 %{_includedir}/absl
@@ -89,8 +89,8 @@ ctest --output-on-failure
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230125.4-1
-- Updating to version 20230125.4.
+* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20240116.0-1
+- Updating to version 20240116.0.
 
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220623.0-1
 - Updating to 20220623.0 to remove workaround patches for GTest.
