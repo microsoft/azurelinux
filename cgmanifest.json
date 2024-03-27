@@ -4710,8 +4710,8 @@
         "type": "other",
         "other": {
           "name": "google-guice",
-          "version": "4.2.3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/google-guice-4.2.3.tar.gz"
+          "version": "5.1.0",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/google-guice-5.1.0.tar.gz"
         }
       }
     },
