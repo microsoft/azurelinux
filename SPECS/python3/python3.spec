@@ -21,7 +21,7 @@ URL:            https://www.python.org/
 Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.tar.xz
 Patch0:         cgi3.patch
 # Backport https://github.com/python/cpython/commit/069fefdaf42490f1e00243614fb5f3d5d2614b81 from 3.10 to 3.9
-Patch2:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
+Patch1:         0001-gh-95231-Disable-md5-crypt-modules-if-FIPS-is-enable.patch
 # Patch for setuptools, resolved in 65.5.1
 Patch1000:      CVE-2022-40897.patch
 
@@ -160,11 +160,6 @@ The test package contains all regression tests for Python as well as the modules
 # We use the CI to validate the toolchain manifests, which means we need to parse this .spec file
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 
 %build
 # Remove GCC specs and build environment linker scripts
