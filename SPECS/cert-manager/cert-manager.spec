@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
-Version:        1.11.2
-Release:        6%{?dist}
+Version:        1.13.3
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,15 +9,10 @@ URL:            https://github.com/jetstack/cert-manager
 Source0:        https://github.com/jetstack/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Below is a manually created tarball, no download link.
 # We're using pre-populated GO dependencies from this tarball, since network is disabled during build time.
-#   1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -o %%{name}-%%{version}.tar.gz
-#   2. tar -xf %%{name}-%%{version}.tar.gz
-#   3. cd %%{name}-%%{version}
-#   4. go mod vendor
-#   5. tar  --sort=name \
-#           --mtime="2021-04-26 00:00Z" \
-#           --owner=0 --group=0 --numeric-owner \
-#           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#           -cf %%{name}-%%{version}-govendor.tar.gz vendor
+#   1. wget https://github.com/jetstack/%%{name}/archive/refs/tags/v%%{version}.tar.gz -o ./SPECS/cert-manager/%%{name}-%%{version}.tar.gz
+#   2. tar -xf ./SPECS/cert-manager/%%{name}-%%{version}.tar.gz
+#   3. Run sudo .toolkit/scripts/nested-vendoring.sh -d ./SPECS/cert-manager -n cert-manager -v %%{version}
+#   4. should produce %{name}-%{version}-govendor.tar.gz
 Source1:        %{name}-%{version}-govendor.tar.gz
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
@@ -67,11 +62,25 @@ Webhook component providing API validation, mutation and conversion functionalit
 %setup -q -T -D -a 1
 
 %build
-go build -o bin/acmesolver cmd/acmesolver/main.go
-go build -o bin/cainjector cmd/cainjector/main.go
-go build -o bin/controller cmd/controller/main.go
-go build -o bin/cmctl cmd/ctl/main.go
-go build -o bin/webhook cmd/webhook/main.go
+pushd cmd/acmesolver
+go build -o ../../bin/acmesolver main.go
+popd
+
+pushd cmd/cainjector
+go build -o ../../bin/cainjector main.go
+popd
+
+pushd cmd/controller
+go build -o ../../bin/controller main.go
+popd
+
+pushd cmd/ctl
+go build -o ../../bin/cmctl main.go
+popd
+
+pushd cmd/webhook
+go build -o ../../bin/webhook main.go
+popd
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -109,6 +118,9 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+* Tue Jan 16 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.13.3-1
+- Bump release to rebuild with updated version of Go.
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.2-6
 - Bump release to rebuild with go 1.20.10
 
