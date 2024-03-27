@@ -98,8 +98,6 @@ Just the definitions of rpm macros.
 Summary:        Development headers for systemd
 Requires:       %{name} = %{version}-%{release}
 Requires:       glib-devel
-# device-mapper-devel needs this specifically, but we want to minimize the provides where possible.
-Provides:       pkgconfig(libudev)
 AutoReqProv:    no
 
 %description devel
