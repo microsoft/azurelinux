@@ -37,6 +37,8 @@ BuildRequires:  javapackages-local
 %endif
 BuildArch:      noarch
 
+Provides:       glassfish-servlet-api = %{version}-%{release}
+
 %description
 Jakarta Servlet defines a server-side API for handling HTTP requests
 and responses.
