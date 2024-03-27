@@ -2,7 +2,7 @@
 %global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
-Version:        2.11.0
+Version:        3.0.0
 Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -10,9 +10,6 @@ Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://keras.io/
 Source0:        https://github.com/keras-team/keras/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cache.tar.gz
-BuildRequires:  bazel
-BuildRequires:  build-essential
 BuildRequires:  git
 BuildRequires:  libstdc++-devel
 BuildRequires:  pyproject-rpm-macros
@@ -24,7 +21,7 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 BuildRequires:  tar
 BuildRequires:  which
-BuildRequires:  python3-tf-nightly
+BuildRequires:  python3-tensorflow
 ExclusiveArch:  x86_64
 
 %description
@@ -42,25 +39,10 @@ Python 3 version.
 
 
 %build
-tar -xf %{SOURCE1} -C /root/
-
-ln -s %{_bindir}/python3 %{_bindir}/python
-
-bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_package
-# ---------
-# steps to create the cache tar. network connection is required to create the cache.
-#----------------------------------
-# pushd /root
-# tar -czvf cacheroot.tar.gz .cache  #creating the cache using the /root/.cache directory
-# popd
-# mv /root/cacheroot.tar.gz /usr/
-
-./bazel-bin/keras/tools/pip_package/build_pip_package pyproject-wheeldir/
-# --------
-
+%{py3_build}
 
 %install
-%{pyproject_install}
+%{py3_install}
 
 
 %files -n python3-keras
@@ -69,6 +51,9 @@ bazel --batch build  --verbose_explanations //keras/tools/pip_package:build_pip_
 
 
 %changelog
+* Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
+- Relax requirement for python3-tf-nightly BR
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax requirement for python3-tf-nightly BR
 
