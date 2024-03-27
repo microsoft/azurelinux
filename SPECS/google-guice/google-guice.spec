@@ -1,8 +1,8 @@
 %bcond_without bootstrap
 Summary:        Lightweight dependency injection framework for Java 5 and above
 Name:           google-guice
-Version:        4.2.3
-Release:        12%{?dist}
+Version:        7.0.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -198,6 +198,9 @@ and above. This package provides Bill of Materials module for Guice.
 %files -n guice-bom -f .mfiles-guice-bom
 
 %changelog
+* Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 7.0.0-1
+- Updating naming for 3.0 version of Azure Linux.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.2.3-12
 - Updating naming for 3.0 version of Azure Linux.
 
