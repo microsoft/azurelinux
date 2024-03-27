@@ -14382,16 +14382,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nodejs",
-          "version": "16.20.2",
-          "downloadUrl": "https://nodejs.org/download/release/v16.20.2/node-v16.20.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nodejs-nodemon",
           "version": "2.0.3",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/nodemon-v2.0.3-bundled.tar.gz"
