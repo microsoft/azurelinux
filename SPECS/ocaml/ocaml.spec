@@ -319,8 +319,8 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/ocaml
 mkdir -p $RPM_BUILD_ROOT%{_rpmmacrodir}
 install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_rpmmacrodir}/macros.ocaml-rpm
 
-mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/redhat
-install -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/redhat
+mkdir -p $RPM_BUILD_ROOT%{_rpmconfigdir}/azl
+install -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{_rpmconfigdir}/azl
 
 # Link, rather than copy, identical binaries
 hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
@@ -464,13 +464,13 @@ hardlink -t $RPM_BUILD_ROOT%{_libdir}/ocaml/stublibs
 
 %files rpm-macros
 %{_rpmmacrodir}/macros.ocaml-rpm
-%{_rpmconfigdir}/redhat/ocaml_files.py
+%{_rpmconfigdir}/azl/ocaml_files.py
 
 
 %changelog
 * Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
 - Upgraded ocaml to 5.1.1
-- Importing and adopting spec changes from Fedora.
+- Importing and adopting spec changes from Fedora (License: MIT).
 - Removed unused patch files and added new.
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.13.1-3
