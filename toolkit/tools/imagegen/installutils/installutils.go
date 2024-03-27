@@ -760,7 +760,7 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 // BUILD_NUMBER: The build number of the image
 // IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
 // IMAGE_UUID: The UUID of the image
-func AddImageID(installChroot *safechroot.Chroot, buildNumber string) (err error) {
+func AddImageIDFile(installChroot *safechroot.Chroot, buildNumber string) (err error) {
 	const (
 		imageIDFile      = "/etc/image-id"
 		imageIDFilePerms = 0444
