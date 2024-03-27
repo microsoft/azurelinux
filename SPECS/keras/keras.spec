@@ -37,7 +37,6 @@ Python 3 version.
 %prep
 %autosetup -p1
 
-
 %build
 %{py3_build}
 
@@ -52,7 +51,7 @@ Python 3 version.
 
 %changelog
 * Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
-- Relax requirement for python3-tf-nightly BR
+- update keras to 3.0.0
 
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax requirement for python3-tf-nightly BR
