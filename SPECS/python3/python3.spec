@@ -6,7 +6,7 @@
 %global majmin 3.9
 %global majmin_nodots 39
 # See Lib/ensurepip/__init__.py in Source0 for these version numbers
-%global pip_version 22.0.4
+%global pip_version 24.0
 %global setuptools_version 58.1.0
 
 Summary:        A high-level scripting language
