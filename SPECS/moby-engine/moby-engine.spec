@@ -81,7 +81,7 @@ export GOGC=off
 export VERSION=%{version}
 
 GIT_COMMIT=%{commit_hash}
-DOCKER_GITCOMMIT=${GIT_COMMIT:0:7} DOCKER_BUILDTAGS='seccomp' hack/make.sh dynbinary
+DOCKER_GITCOMMIT=${GIT_COMMIT:0:7} DOCKER_BUILDTAGS='apparmor seccomp' hack/make.sh dynbinary
 
 %install
 mkdir -p %{buildroot}%{_bindir}
