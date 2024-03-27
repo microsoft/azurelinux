@@ -12,7 +12,8 @@ Source1:        openipmi-helper
 Source2:        ipmi.service
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
-BuildRequires:  perl
+BuildRequires:  glib2-devel
+BuildRequires:  perl-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  swig
