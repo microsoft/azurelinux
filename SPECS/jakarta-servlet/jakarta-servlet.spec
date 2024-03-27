@@ -1,53 +1,62 @@
-%bcond_with bootstrap
+%global azl 3
 
+#
+# spec file for package jakarta-servlet
+#
+# Copyright (c) 2024 SUSE LLC
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
+#
+
+
+%global artifactId jakarta.servlet-api
 Name:           jakarta-servlet
 Version:        5.0.0
-Release:        18%{?dist}
+Release:        1%{?dist}
 Summary:        Server-side API for handling HTTP requests and responses
-# most of the project is EPL-2.0 or GPLv2 w/exceptions,
-# but some files still have Apache-2.0 license headers:
-# https://github.com/eclipse-ee4j/servlet-api/issues/347
-License:        (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND Apache-2.0
-URL:            https://github.com/eclipse-ee4j/servlet-api
-BuildArch:      noarch
-ExclusiveArch:  %{java_arches} noarch
-
-Source0:        https://github.com/eclipse-ee4j/servlet-api/archive/%{version}-RELEASE/servlet-api-%{version}.tar.gz
-
-%if %{with bootstrap}
-BuildRequires:  javapackages-bootstrap
+License:        Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0)
+URL:            https://github.com/jakartaee/servlet
+Source0:        https://github.com/jakartaee/servlet/archive/refs/tags/%{version}-RELEASE.tar.gz#/%{name}-%{version}-RELEASE.tar.gz
+Source1:        %{name}-api-build.xml
+BuildRequires:  ant
+BuildRequires:  fdupes
+BuildRequires:  java-devel >= 1.8
+%if 0%{?azl}
+BuildRequires:  javapackages-local-bootstrap
 %else
-BuildRequires:  maven-local
-BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
-BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
+BuildRequires:  javapackages-local
 %endif
-
-Provides:       glassfish-servlet-api = %{version}-%{release}
+BuildArch:      noarch
 
 %description
 Jakarta Servlet defines a server-side API for handling HTTP requests
 and responses.
 
-%{?javadoc_package}
+%package javadoc
+Summary:        Javadoc for %{name}
+Group:          Documentation/HTML
+
+%description javadoc
+API documentation for %{name}.
 
 %prep
-%setup -q -n servlet-api-%{version}-RELEASE
+%setup -q -n servlet-%{version}-RELEASE
+cp LICENSE.md api/src/main/resources/META-INF/
+cp NOTICE.md api/src/main/resources/META-INF/
 
 # remove unnecessary dependency on parent POM
 %pom_remove_parent . api
 
-# do not build specification documentation
-%pom_disable_module spec
-
-# Copy to old package name
-# TODO: Remove when all dependencies are migrated from javax.servlet to jakarta.servlet
-cp -pr api/src/main/java/jakarta api/src/main/java/javax
-sed -i -e 's/jakarta\./javax./g' $(find api/src/main/java/javax -name *.java)
-%pom_xpath_replace pom:instructions/pom:Export-Package \
-  '<Export-Package>jakarta.servlet.*,javax.servlet.*;version="4.0.0"</Export-Package>' api
-
-# do not install useless parent POM
-%mvn_package jakarta.servlet:servlet-parent __noinstall
+cp %{SOURCE1} api/build.xml
 
 # remove unnecessary maven plugins
 %pom_remove_plugin -r :formatter-maven-plugin
@@ -56,76 +65,43 @@ sed -i -e 's/jakarta\./javax./g' $(find api/src/main/java/javax -name *.java)
 %pom_remove_plugin -r :maven-javadoc-plugin
 %pom_remove_plugin -r :maven-source-plugin
 
-# add maven artifact coordinate aliases for backwards compatibility
-%mvn_alias jakarta.servlet:jakarta.servlet-api \
-    javax.servlet:javax.servlet-api \
-    javax.servlet:servlet-api
-
-# add compat symlink for packages constructing the classpath manually
-%mvn_file :{*} %{name}/@1 glassfish-servlet-api
-
 %build
-%mvn_build
+pushd api
+%if 0%{?azl}
+ant jar javadoc
+%else
+%{ant} jar javadoc
+%endif
+popd
 
 %install
-%mvn_install
+# jar
+install -dm 0755 %{buildroot}%{_javadir}/%{name}
+install -pm 0644 api/target/%{artifactId}-%{version}.jar %{buildroot}%{_javadir}/%{name}/%{artifactId}.jar
+# pom
+install -dm 0755 %{buildroot}%{_mavenpomdir}/%{name}
+install -pm 0644 api/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/%{artifactId}.pom
+%add_maven_depmap %{name}/%{artifactId}.pom %{name}/%{artifactId}.jar
+# javadoc
+install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
+cp -pr api/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+%fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE.md NOTICE.md
 %doc README.md
 
+%files javadoc
+%{_javadocdir}/%{name}
+%license LICENSE.md NOTICE.md
+
 %changelog
-* Tue Feb 27 2024 Jiri Vanek <jvanek@redhat.com> - 5.0.0-18
-- Rebuilt for java-21-openjdk as system jdk
+* Wed Feb 28 2024 - corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 5.0.0-1
+- Initial Azure Linux import from openSUSE (license: same as "License" tag).
+- Use javapackages-local-bootstrap to avoid build cycle.
 
-* Fri Feb 23 2024 Jiri Vanek <jvanek@redhat.com> - 5.0.0-17
-- bump of release for for java-21-openjdk as system jdk
+* Mon Jan 08 2024 - Frederic Crozat <fcrozat@suse.com>
+- Update url for project and source tarball.
 
-* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-16
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-15
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
-
-* Fri Sep 01 2023 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.0.0-14
-- Convert License tag to SPDX format
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-13
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-12
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
-
-* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-11
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
-
-* Sat Feb 05 2022 Jiri Vanek <jvanek@redhat.com> - 5.0.0-10
-- Rebuilt for java-17-openjdk as system jdk
-
-* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-9
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Wed May 26 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.0.0-7
-- Re-add provides on glassfish-servlet-api
-
-* Mon May 17 2021 Mikolaj Izdebski <mizdebsk@redhat.com> - 5.0.0-6
-- Bootstrap build
-- Non-bootstrap build
-
-* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Thu Aug 20 2020 Mat Booth <mat.booth@redhat.com> - 5.0.0-4
-- Correct mvn_file macro invokation
-
-* Wed Aug 19 2020 Fabio Valentini <decathorpe@gmail.com> - 5.0.0-3
-- Add compat symlink for packages constructing the classpath manually.
-
-* Wed Aug 19 2020 Mat Booth <mat.booth@redhat.com> - 5.0.0-2
-- Also ship the API in the old javax namespace to aid transition
-
-* Thu Aug 13 2020 Fabio Valentini <decathorpe@gmail.com> - 5.0.0-1
-- Initial package renamed from glassfish-servlet-api.
+* Mon Dec 13 2021 - Fridrich Strba <fstrba@suse.com>
+- Initial packaging of jakarta-servlet 5.0.0
