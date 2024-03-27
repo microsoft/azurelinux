@@ -6,13 +6,13 @@ C++ libraries that might crash the process. To use the plugin, simply use the
 --forked argument when invoking py.test.}
 Summary:        py.test plugin for running tests in isolated forked subprocesses
 Name:           python-%{pypi_name}
-Version:        1.4.0
-Release:        2%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/pytest-dev/pytest-forked
-Source0:        https://files.pythonhosted.org/packages/f1/bc/0121a2e386b261b69f4f5aa48e5304c947451dce70d68628cb28d5cd0d28/%{pypi_name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/8c/c9/93ad2ba2413057ee694884b88cf7467a46c50c438977720aeac26e73fdb7/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
@@ -57,6 +57,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/pytest_forked*
 
 %changelog
+* Tue Feb 13 2024 Rohit Rawat <rohitrawat@microsoft.com> - 1.6.0-1
+- Upgrade to 1.6.0
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.4.0-2
 - Freezing 'pytest' test dependency to version 7.1.2.
 
