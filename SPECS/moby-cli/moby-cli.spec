@@ -1,4 +1,4 @@
-%define commit_hash 293681613032e6d1a39cc88115847d3984195c24
+%define commit_hash 672b1497b97348af636b8e075908656e302d5bb8
 %define OUR_GOPATH  %{_topdir}/.gopath
 Summary:        The open-source application container engine client.
 Name:           moby-cli
