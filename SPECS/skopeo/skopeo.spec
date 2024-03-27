@@ -1,6 +1,6 @@
 Summary:        Inspect container images and repositories on registries
 Name:           skopeo
-Version:        1.14.1
+Version:        1.14.2
 Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
@@ -46,6 +46,9 @@ make test-unit-local
 %{_mandir}/man1/%%{name}*
 
 %changelog
+* Tue Feb 13 2024 David Steele <davidsteele@microsoft.com> - 1.14.2-1
+- Bump version to 1.14.2 to address Docker Daemon version issue.
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.14.1-2
 - Bump release to rebuild with go 1.21.6
 
