@@ -24583,8 +24583,8 @@
         "type": "other",
         "other": {
           "name": "python-tqdm",
-          "version": "4.63.1",
-          "downloadUrl": "https://github.com/tqdm/tqdm/archive/refs/tags/v4.63.1.tar.gz"
+          "version": "4.66.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/tqdm/tqdm-4.66.2.tar.gz"
         }
       }
     },
