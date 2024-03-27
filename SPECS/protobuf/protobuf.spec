@@ -10,6 +10,9 @@ Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Backport from https://github.com/protocolbuffers/protobuf/commit/d38ba32c49bbb5a256746c7dc99eb5e543b0105a.
+# Also see: https://github.com/protocolbuffers/protobuf/issues/12104.
+Patch0:         full_test_c++17.patch
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  cmake
 BuildRequires:  curl
@@ -63,7 +66,7 @@ Provides:       %{name}-python3 = %{version}-%{release}
 This contains protobuf python3 libraries.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 pushd cmake
@@ -100,10 +103,8 @@ popd
 %ldconfig_scriptlets
 
 %check
-# run C++ unit tests
-# %make_build check
 pushd cmake
-%cmake_build --target check
+ctest --progress --output-on-failure
 
 %files
 %defattr(-,root,root)
