@@ -39,7 +39,8 @@ BuildRequires:  pkgconfig(gtk+-3.0) >= %{gtk3_version}
 %{!?azl:BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}}
 BuildRequires:  pkgconfig(icu-uc) >= %{icu_uc_version}
 BuildRequires:  pkgconfig(libpcre2-8) >= %{pcre2_version}
-BuildRequires:  pkgconfig(libsystemd) >= %{libsystemd_version}
+# azl's systemd-bootstrap causes conflicts with this specific package, explicitly use 'systemd-devel' instead of pkgconfig(libsystemd)
+BuildRequires:  systemd-devel >= %{libsystemd_version}
 BuildRequires:  pkgconfig(pango) >= %{pango_version}
 BuildRequires:  pkgconfig(zlib)
 BuildRequires:  gcc-c++
