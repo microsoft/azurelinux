@@ -7,6 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         add_missing_random_internal_mock_overload_set.patch
 
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
@@ -86,7 +87,7 @@ ctest --output-on-failure
 
 %changelog
 * Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230125.4-1
-- Updating to version 20230125.3.
+- Updating to version 20230125.4.
 
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220623.0-1
 - Updating to 20220623.0 to remove workaround patches for GTest.
