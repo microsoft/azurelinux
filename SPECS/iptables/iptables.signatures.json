@@ -2,9 +2,9 @@
  "Signatures": {
   "ip4save": "f786a0a55cee6aa5a29d0bfd531d982205dc566bb622250f13f0f90a85ac1e2a",
   "ip6save": "e676691dac74076ad1a9475bd1a9dcc35d40cc99faf56e4767725c94b53a5bdd",
-  "iptables": "31bdf451aa30c50f01d61fc748434759aa003fa2a2edb3a1c10f034e706eb2f4",
+  "iptables": "a1981d0e5a7e6b0546d17fcddb5bdc6b639a136b5c2f7f2b2b54d18a41b3d6ac",
   "iptables-1.8.10.tar.xz": "5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c",
   "iptables.service": "40c2a272a6abb4d3e50ff9ae83cedaa241ad5963f27cb5aee113d15597553620",
-  "iptables.stop": "82552df9a7edc2f764369d0b944a26abb2cafd9259f65b9da2760c4115a4ff29"
+  "iptables.stop": "749be754470183b3edf69ff53109806a81e0b4c4578858faf96d23d59966ef5d"
  }
 }

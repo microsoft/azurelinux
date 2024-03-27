@@ -1,7 +1,7 @@
 Summary:        Linux kernel packet control tool
 Name:           iptables
 Version:        1.8.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -100,6 +100,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*
 
 %changelog
+* Mon Mar 18 2024 Andy Zaugg <azaugg@linkedin.com> - 1.8.10-2
+- Flush raw table when restarting iptables service
+
 * Fri Feb 09 2024 Amrita Kohli <amritakohli@microsoft.com> - 1.8.10-1
 - Upgrade version for Mariner 3.0 release
 
