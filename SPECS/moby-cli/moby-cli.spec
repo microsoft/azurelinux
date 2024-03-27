@@ -2,7 +2,7 @@
 %define OUR_GOPATH  %{_topdir}/.gopath
 Summary:        The open-source application container engine client.
 Name:           moby-cli
-Version:        24.0.9
+Version:        23.0.10
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -77,8 +77,8 @@ install -p -m 644 contrib/completion/fish/docker.fish %{buildroot}%{_datadir}/fi
 %{_datadir}/fish/vendor_completions.d/docker.fish
 
 %changelog
-* Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 24.0.9-1
-- Bump version to 24.X
+* Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 23.0.10-1
+- Bump version to 23.X
 - Drop un-needed patches
 - Add vendor tarball for new deps in make manpages
 
