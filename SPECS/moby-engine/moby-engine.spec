@@ -1,8 +1,8 @@
-%define commit_hash fca702de7f71362c8d103073c7e4a1d0a467fadd
+%define commit_hash 548f37a132d9c0be7c066af1b314f856c9935a1c
 
 Summary: The open-source application container engine
 Name:    moby-engine
-Version: 24.0.9
+Version: 23.0.10
 Release: 1%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
@@ -122,8 +122,8 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 24.0.9-1
-- Bump version to 24.X
+* Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 23.0.10-1
+- Bump version to 23.X
 - Drop un-needed patches
 - Remove docker-proxy as it's no longer used (2050e085f95bb796e9ff3a325b9985e319c193cf)
 - Add the in-tree version of docker proxy built from cmd/docker-proxy into /usr/libexec
