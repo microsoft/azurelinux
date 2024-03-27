@@ -168,7 +168,8 @@ $(STATUS_FLAGS_DIR)/imager_disk_output.flag: $(go-imager) $(image_package_cache_
 		$(if $(filter y,$(ENABLE_CPU_PROFILE)),--enable-cpu-prof) \
 		$(if $(filter y,$(ENABLE_MEM_PROFILE)),--enable-mem-prof) \
 		$(if $(filter y,$(ENABLE_TRACE)),--enable-trace) \
-		--timestamp-file=$(TIMESTAMP_DIR)/imager.jsonl && \
+		--timestamp-file=$(TIMESTAMP_DIR)/imager.jsonl \
+		--build-number=$(BUILD_ID) && \
 	touch $@
 
 # Sometimes files will have been deleted, that is fine so long as we were able to detect the change

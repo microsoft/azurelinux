@@ -15,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
@@ -751,6 +752,35 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	err = installChroot.UnsafeRun(func() error {
 		return file.Create(machineIDFile, machineIDFilePerms)
 	})
+	return
+}
+
+// Adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageID(installChroot *safechroot.Chroot, buildNumber string) (err error) {
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+
+	err = installChroot.UnsafeRun(func() error {
+		return file.Create(imageIDFile, imageIDFilePerms)
+	})
+
+	err = installChroot.UnsafeRun(func() error {
+		return file.Write(imageIDContent, imageIDFile)
+	})
+
 	return
 }
 
