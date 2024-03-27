@@ -120,3 +120,32 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	assert.Equal(t, orig_contents, copy_1_contents)
 	assert.Equal(t, orig_contents, copy_2_contents)
 }
+
+// Test AddImageIDFile function in installutils.go
+func TestAddImageIDFile(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	proposedDir := filepath.Join(tmpDir, "TestAddImageIDFile")
+	chroot := safechroot.NewChroot(proposedDir, false)
+
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
+	assert.NoError(t, err)
+
+	defer chroot.Close(false)
+
+	buildNumber := "build-1234"
+	imageIDFilePath := "/etc/image-id"
+
+	err = AddImageIDFile(chroot, buildNumber)
+	assert.NoError(t, err)
+
+	imageIDFileContents, err := os.ReadFile(filepath.Join(chroot.RootDir(), imageIDFilePath))
+	assert.NoError(t, err)
+
+	assert.Contains(t, string(imageIDFileContents), "BUILD_NUMBER")
+	assert.Contains(t, string(imageIDFileContents), buildNumber)
+	assert.Contains(t, string(imageIDFileContents), "IMAGE_BUILD_DATE")
+	assert.Contains(t, string(imageIDFileContents), "IMAGE_UUID")
+}
