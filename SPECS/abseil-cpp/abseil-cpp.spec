@@ -1,6 +1,10 @@
+# Installed library version
+%global lib_version 2401.0.0
+%define lib_ver_min %(echo %{lib_version} | cut -d. -f1-2)
+
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20230802.1
+Version:        20240116.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -11,12 +15,14 @@ Source0:        https://github.com/abseil/abseil-cpp/archive/refs/tags/%{version
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
 BuildRequires:  make
+BuildRequires:  gmock-devel
+BuildRequires:  gtest
+BuildRequires:  gtest-devel
 
 %if 0%{?with_check}
-BuildRequires:  gmock >= 1.12.0
-BuildRequires:  gmock-devel >= 1.12.0
-BuildRequires:  gtest >= 1.12.0
-BuildRequires:  gtest-devel >= 1.12.0
+BuildRequires:  ninja-build
+BuildRequires:  gcc-c++
+BuildRequires:  gmock
 %endif
 
 %description
@@ -34,45 +40,48 @@ Abseil is not meant to be a competitor to the standard library; we've just
 found that many of these utilities serve a purpose within our code base,
 and we now want to provide those resources to the C++ community as a whole.
 
+%package testing
+Summary:        Libraries needed for running tests on the installed %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description testing
+%{summary}.
+
 %package devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Development headers for %{name}
 
 %prep
-%autosetup -p1
+%autosetup -p1 -S gendiff
 
 %build
-mkdir build
-pushd build
 %cmake \
-  -DABSL_PROPAGATE_CXX_STD=ON \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
 %if 0%{?with_check}
-  -DABSL_BUILD_TESTING=ON \
-  -DABSL_FIND_GOOGLETEST=ON \
-  -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
-  -DBUILD_TESTING=ON \
-%else
-  -DBUILD_TESTING=OFF \
+  -GNinja \
 %endif
-  ..
-%make_build
+  -DABSL_USE_EXTERNAL_GOOGLETEST:BOOL=ON \
+  -DABSL_FIND_GOOGLETEST:BOOL=ON \
+  -DABSL_ENABLE_INSTALL:BOOL=ON \
+  -DABSL_BUILD_TESTING:BOOL=ON \
+  -DABSL_BUILD_TEST_HELPERS:BOOL=ON \
+  -DCMAKE_BUILD_TYPE:STRING=None \
+  -DCMAKE_CXX_STANDARD:STRING=17
+%cmake_build
 
 %install
-pushd build
-%make_install
+%cmake_install
 
 %check
-pushd build
-ctest --output-on-failure
+%ctest --output-on-failure
 
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2308.*
+%{_libdir}/libabsl_*.so.%{lib_ver_min}.*
 
 %files devel
 %{_includedir}/absl
@@ -81,6 +90,9 @@ ctest --output-on-failure
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Mar 19 2024 Betty Lakes <bettylakes@microsoft.com> - 20240116.0-1
+- Upgrade version to 20240116.0
+
 * Sun Dec 17 2023 Muhammad Falak <mwani@microsoft.com> - 20230802.1-1
 - Bump version to 20230802.1
 

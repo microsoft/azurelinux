@@ -1,7 +1,7 @@
 Summary:        Google's data interchange format
 Name:           protobuf
 Version:        25.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -64,6 +64,7 @@ This contains protobuf python3 libraries.
 %{cmake} \
     -Dprotobuf_BUILD_TESTS=OFF \
     -Dprotobuf_ABSL_PROVIDER=package \
+    -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
@@ -108,6 +109,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 25.3-2
+- Set new abseil-cpp version
+
 * Thu Feb 29 2024 Sindhu Karri <lakarri@microsoft.com> - 25.3-1
 - Upgrade to 25.3
 - Added BR on abseil-cpp
