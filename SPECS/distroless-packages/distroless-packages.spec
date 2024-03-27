@@ -32,6 +32,8 @@ Requires:       libgcc
 Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
+Requires:       SymCrypt
+Requires:       SymCrypt-OpenSSL
 Requires:       tzdata
 
 %description base
