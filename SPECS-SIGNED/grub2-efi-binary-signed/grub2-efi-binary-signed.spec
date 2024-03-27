@@ -11,8 +11,8 @@
 %endif
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
-Version:        2.06
-Release:        17%{?dist}
+Version:        2.12
+Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +79,9 @@ cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
 /boot/efi/EFI/BOOT/%{grubpxeefiname}
 
 %changelog
+* Tue Mar 26 2024 Gary Swalling <gaswal@microsoft.com> - 2.12-1
+- Match grub2 version and release numbers
+
 * Wed Mar 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.06-17
 - Bump release number to match grub release number
 
