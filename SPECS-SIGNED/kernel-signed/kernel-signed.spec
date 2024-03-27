@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.14.1
-Release:        4%{?dist}
+Version:        6.6.22.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -146,7 +146,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
-* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.7.1-4
+* Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
+- Auto-upgrade to 6.6.22.1
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
+- remove unnecessary 10_kernel.cfg grub config file
+
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
 - Remove /var/lib/initramfs/kernel files.
 
 * Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
