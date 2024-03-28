@@ -17,6 +17,7 @@ BuildRequires:  python3-attrs
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
+BuildRequires:  python3-poetry
 BuildRequires:  python3-setuptools
 
 %description
@@ -41,9 +42,6 @@ code, tracebacks, and more — out of the box.
 
 %prep
 %autosetup -p1 -n rich-%{version}
-
-%generate_buildrequires
-%pyproject_buildrequires -r
 
 %build
 %pyproject_wheel
