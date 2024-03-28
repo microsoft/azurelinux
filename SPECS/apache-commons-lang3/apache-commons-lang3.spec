@@ -24,17 +24,22 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-lang
-Source0:        https://dlcdn.apache.org/commons/lang/source/%{short_name}-%{version}-src.tar.gz
-# maven is not being used here due to a circular dependency with this package.
-# Instead, ant is being used. ant relies on build.xml and default.properties.
-# Both files are used in other distributions like OpenSuse.
-Source1:        build.xml
-Source2:        default.properties
-BuildRequires:  ant
-BuildRequires:  ant-junit
-BuildRequires:  fdupes
-BuildRequires:  java-devel >= 1.8
+Source0:        https://archive.apache.org/dist/commons/lang/source/commons-lang3-%{version}-src.tar.gz
+# Source1:        default.properties
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  maven-resources-plugin-javadoc
+# BuildRequires:  maven-local
+# BuildRequires:  mvn(org.apache.maven.plugins:maven-javadoc-plugin)
+
+# BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
+# BuildRequires:  mvn(org.sonatype.plexus:plexus-cipher)
+# BuildRequires:  mvn(junit:junit)
+# BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
+# BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
+# BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
+
+BuildRequires:  fdupes
 BuildRequires:  junit
 Provides:       %{short_name} = %{version}-%{release}
 BuildArch:      noarch
@@ -61,36 +66,32 @@ Javadoc for %{name}.
 
 %prep
 %setup -q -n %{short_name}-%{version}-src
-cp %{SOURCE1} .
-cp %{SOURCE2} .
-sed -i 's/\r//' *.txt
+# %pom_remove_plugin -r :maven-javadoc-plugin:q
+# cp %{SOURCE1} .
+# sed -i 's/\r//' *.txt
 
-%pom_remove_parent .
-%pom_xpath_inject "pom:project" "<groupId>org.apache.commons</groupId>" .
+# %pom_remove_parent .
+# %pom_xpath_inject "pom:project" "<groupId>org.apache.commons</groupId>" .
 
 %build
-export OPT_JAR_LIST=`cat %{_sysconfdir}/ant.d/junit`
-export CLASSPATH=
-ant \
-    -Dcompile.source=1.8 -Dcompile.target=1.8 \
-    -Dfinal.name=%{short_name} \
-     jar javadoc
+%mvn_build -f
 
 %install
+%mvn_install
 
 # jars
-install -dm 755 %{buildroot}%{_javadir}
-install -m 0644  target/%{short_name}.jar %{buildroot}%{_javadir}/%{name}.jar
-ln -sf %{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
+# install -dm 755 %{buildroot}%{_javadir}
+# install -m 0644  target/%{short_name}.jar %{buildroot}%{_javadir}/%{name}.jar
+# ln -sf %{name}.jar %{buildroot}%{_javadir}/%{short_name}.jar
 # pom
-install -dm 755 %{buildroot}%{_mavenpomdir}
-install -m 0644  pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
-%add_maven_depmap %{name}.pom %{name}.jar
+# install -dm 755 %{buildroot}%{_mavenpomdir}
+# install -m 0644  pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+# %add_maven_depmap %{name}.pom %{name}.jar
 
 # javadoc
-install -dm 755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-%fdupes -s %{buildroot}%{_javadocdir}/%{name}/
+# install -dm 755 %{buildroot}%{_javadocdir}/%{name}
+# cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+# %fdupes -s %{buildroot}%{_javadocdir}/%{name}/
 
 %files -f .mfiles
 %license LICENSE.txt NOTICE.txt
