@@ -1,13 +1,13 @@
 Summary:        A shared library implementation of IPMI and the basic tools
 Name:           OpenIPMI
-Version:        2.0.32
-Release:        3%{?dist}
+Version:        2.0.33
+Release:        1%{?dist}
 License:        LGPLv2+ AND GPLv2+ OR BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://sourceforge.net/projects/openipmi/
-Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.32.tar.gz
+Source0:        https://downloads.sourceforge.net/openipmi/OpenIPMI-2.0.33.tar.gz
 Source1:        openipmi-helper
 Source2:        ipmi.service
 BuildRequires:  ncurses-devel
