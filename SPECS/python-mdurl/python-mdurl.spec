@@ -35,7 +35,7 @@ sed -i "s/pytest-cov//" tests/requirements.txt
 
 %install
 %{pyproject_install}
-%{pyproject_save_files} mdurl
+%pyproject_save_files mdurl
 
 
 %check
@@ -48,7 +48,7 @@ sed -i "s/pytest-cov//" tests/requirements.txt
 
 %changelog
 * Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.1.2-7
-- Initial CBL-Mariner import from Fedora 32 (license: MIT)
+- Initial CBL-Mariner import from Fedora 40 (license: MIT)
 - License verified
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.2-6

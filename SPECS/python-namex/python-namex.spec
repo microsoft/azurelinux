@@ -39,5 +39,6 @@ Namex is a simple utility to separate the implementation of your Python package 
 %{python3_sitelib}/*
 
 %changelog
-* Tue Mar 12 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.0.7-1
-- Original version for CBL-Mariner. License Verified.
+* Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.0.7-1
+- Original version for CBL-Mariner. 
+- License Verified.

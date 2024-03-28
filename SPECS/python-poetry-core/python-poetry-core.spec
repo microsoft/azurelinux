@@ -1,43 +1,38 @@
 
-Name:           python-poetry-core
-Version:        1.9.0
-Release:        3%{?dist}
-Summary:        Poetry PEP 517 Build Backend
-# SPDX
-License:        MIT
-URL:            https://github.com/python-poetry/poetry-core
-Source0:        %{url}/archive/%{version}/poetry-core-%{version}.tar.gz
-
-# This patch moves the vendored requires definition
-# from vendors/pyproject.toml to pyproject.toml
-# Intentionally contains the removed hunk to prevent patch aging
-Patch1:         poetry-core-1.9.0-devendor.patch
-
-BuildArch:      noarch
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-fastjsonschema
-BuildRequires:  python3-lark
-BuildRequires:  pyproject-rpm-macros
-
-
 %global _description %{expand:
 A PEP 517 build backend implementation developed for Poetry.
 This project is intended to be a light weight, fully compliant, self-contained
 package allowing PEP 517 compatible build frontends to build Poetry managed
 projects.}
+Summary:        Poetry PEP 517 Build Backend
+Name:           python-poetry-core
+Version:        1.9.0
+Release:        3%{?dist}
+# SPDX
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/python-poetry/poetry-core
+Source0:        %{url}/archive/%{version}/poetry-core-%{version}.tar.gz
+# This patch moves the vendored requires definition
+# from vendors/pyproject.toml to pyproject.toml
+# Intentionally contains the removed hunk to prevent patch aging
+Patch1:         poetry-core-1.9.0-devendor.patch
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-devel
+BuildRequires:  python3-fastjsonschema
+BuildRequires:  python3-lark
+BuildRequires:  python3-pip
+BuildArch:      noarch
 
-%description %_description
-
+%description %{_description}
 
 %package -n python3-poetry-core
 Summary:        %{summary}
-
 # Previous versions of poetry included poetry-core in it
 Conflicts:      python%{python3_version}dist(poetry) < 1.1
 
-%description -n python3-poetry-core %_description
-
+%description -n python3-poetry-core %{_description}
 
 %prep
 %autosetup -p1 -n poetry-core-%{version}
@@ -48,19 +43,17 @@ Conflicts:      python%{python3_version}dist(poetry) < 1.1
 # we debundle the deps after we use the bundled deps in previous step to parse the deps ðŸ¤¯
 rm -r src/poetry/core/_vendor
 
-%pyproject_wheel
+%{pyproject_wheel}
 
 
 %install
-%pyproject_install
+%{pyproject_install}
 %pyproject_save_files poetry
-
 
 
 %files -n python3-poetry-core -f %{pyproject_files}
 %doc README.md
 %license LICENSE
-
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.9.0-1
