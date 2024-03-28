@@ -23,7 +23,7 @@ Requires:       python3
 Namex is a simple utility to separate the implementation of your Python package and its public API.
 
 %prep
-%autosetup -a 1 -n namex-%{version}
+%autosetup -a 0 -n namex-%{version}
 
 
 %build
