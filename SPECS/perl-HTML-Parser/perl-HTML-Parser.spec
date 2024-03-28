@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS//HTML-Parser-%{version}.tar.gz#/perl-HTML-Parser-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-%{version}.tar.gz#/perl-HTML-Parser-%{version}.tar.gz
 URL:            https://metacpan.org/release/HTML-Parser
 BuildRequires:  coreutils
 BuildRequires:  findutils
