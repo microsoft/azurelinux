@@ -9,7 +9,7 @@
 Summary:        Virtualization API library that supports KVM, QEMU, Xen, ESX etc
 Name:           libvirt
 Version:        7.10.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -19,6 +19,7 @@ Source0:        https://libvirt.org/sources/%{name}-%{version}.tar.xz
 # CVE-2023-2700 is fixed by https://gitlab.com/libvirt/libvirt/-/commit/6425a311b8ad19d6f9c0b315bf1d722551ea3585
 Patch1:         CVE-2023-2700.patch
 Patch2:         CVE-2024-1441.patch
+Patch3:         CVE-2024-2496.patch
 
 BuildRequires:  audit-libs-devel
 BuildRequires:  augeas
@@ -1056,6 +1057,9 @@ exit 0
 %{_libdir}/libnss_libvirt_guest.so.2
 
 %changelog
+* Tue Mar 26 2024 Adit Jha <aditjha@microsoft.com> - 7.10.0-8
+- Introduce patch to address CVE-2024-2496
+
 * Tue Mar 19 2024 Muhammad Falak <mwani@microsoft.com> - 7.10.0-7
 - Introduce patch to address CVE-2024-1441
 
