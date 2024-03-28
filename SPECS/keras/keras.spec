@@ -21,7 +21,6 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-wheel
 BuildRequires:  tar
 BuildRequires:  which
-BuildRequires:  python3-tensorflow
 ExclusiveArch:  x86_64
 
 %description
