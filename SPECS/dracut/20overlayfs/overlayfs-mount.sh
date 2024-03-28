@@ -136,8 +136,12 @@ mount_overlayfs() {
     mount --rbind "${VERITY_MOUNT}" "${NEWROOT}"
 }
 
+# Parse kernel command line arguments to set environment variables.
+# This function populates variables based on the kernel command line, such as overlayfs.
 parse_kernel_cmdline_args
 
+# Check if the overlayfs variable is set, indicating that overlay filesystem parameters were found.
+# If not set, the process to enable and mount the overlay filesystem will be skipped.
 if [ -n "${overlayfs}" ]; then
     mount_overlayfs
 else
