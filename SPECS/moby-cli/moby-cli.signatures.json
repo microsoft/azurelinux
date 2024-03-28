@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "moby-cli-20.10.27.tar.gz": "32541cb51a541c6f38b0d4a7a638c28233a29dba5c9a843bc5dbb3a709d8ddf0"
+  "moby-cli-23.0.10-govendor-v1.tar.gz": "75dc6c52c64a78a14c3cc40d6c6a26889af7a75f3a4787bd144d8e0d12dc727e",
+  "moby-cli-23.0.10.tar.gz": "214f74c53a019c91d15fc06e84efcc69ef370bff8f441f37a69a2e2edb8aa651"
  }
 }

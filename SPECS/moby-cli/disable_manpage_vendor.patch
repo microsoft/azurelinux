@@ -1,0 +1,17 @@
+Prevent the manpage build from attemption to vendor golang modules.
+These dependencies have already been included in Source1
+
+diff -Naur a/scripts/docs/generate-man.sh b/scripts/docs/generate-man.sh
+--- a/scripts/docs/generate-man.sh	2023-10-26 00:06:42.000000000 -0700
++++ b/scripts/docs/generate-man.sh	2024-01-18 15:11:13.529735864 -0800
+@@ -21,10 +21,8 @@
+   ./scripts/vendor init
+   # install go-md2man and copy man/tools.go in root folder
+   # to be able to fetch the required dependencies
+-  go mod edit -modfile=vendor.mod -require=github.com/cpuguy83/go-md2man/v2@${MD2MAN_VERSION}
+   cp man/tools.go .
+   # update vendor
+-  ./scripts/vendor update
+   # build gen-manpages
+   go build -mod=vendor -modfile=vendor.mod -tags manpages -o /tmp/gen-manpages ./man/generate.go
+   # build go-md2man
