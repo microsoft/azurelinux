@@ -51,6 +51,9 @@ DAEMONIZE_DIR="$PARENT_DIR/daemonize"
 
 BAZEL_INSTALL_DIR="/usr/local/bin"
 
+BAZEL_DEP_VERSION="7.1.1"
+MANDOC_DEP_VERSION="1.14.6"
+
 # Store old PATH to restore later
 EXISTING_USER_PATH="$PATH"
 
@@ -73,25 +76,25 @@ rm -rf $BAZEL_DIR $MANDOC_DIR $DAEMONIZE_DIR
 dnf install msopenjdk-11 wget git build-essential python3 zip unzip
 
 # Get Dependency sources
-wget https://github.com/bazelbuild/bazel/releases/download/6.0.0/bazel-6.0.0-dist.zip
-wget https://mandoc.bsd.lv/snapshots/mandoc-1.14.6.tar.gz
+wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_DEP_VERSION/bazel-$BAZEL_DEP_VERSION-dist.zip
+wget https://mandoc.bsd.lv/snapshots/mandoc-$MANDOC_DEP_VERSION.tar.gz
 git clone http://github.com/bmc/daemonize.git
 
-# Install bazel 6.0.0
+# Install bazel
 mkdir $BAZEL_DIR
-mv bazel-6.0.0-dist.zip $BAZEL_DIR/bazel-6.0.0-dist.zip
+mv bazel-$BAZEL_DEP_VERSION-dist.zip $BAZEL_DIR/bazel-$BAZEL_DEP_VERSION-dist.zip
 pushd $BAZEL_DIR
-unzip bazel-6.0.0-dist.zip
+unzip bazel-$BAZEL_DEP_VERSION-dist.zip
 env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
 cp output/bazel $BAZEL_INSTALL_DIR/bazel
 popd
 
-# Install mandoc 1.14.6
+# Install mandoc
 mkdir $MANDOC_DIR
-mv mandoc-1.14.6.tar.gz $MANDOC_DIR/mandoc-1.14.6.tar.gz
+mv mandoc-$MANDOC_DEP_VERSION.tar.gz $MANDOC_DIR/mandoc-$MANDOC_DEP_VERSION.tar.gz
 pushd $MANDOC_DIR
-tar -zxvf mandoc-1.14.6.tar.gz
-cd mandoc-1.14.6
+tar -zxvf mandoc-$MANDOC_DEP_VERSION.tar.gz
+cd mandoc-$MANDOC_DEP_VERSION
 make
 make install
 popd

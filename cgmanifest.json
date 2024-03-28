@@ -25163,8 +25163,8 @@
         "type": "other",
         "other": {
           "name": "rabbitmq-server",
-          "version": "3.11.11",
-          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.11/rabbitmq-server-3.11.11.tar.xz"
+          "version": "3.13.0",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.13.0/rabbitmq-server-3.13.0.tar.xz"
         }
       }
     },
