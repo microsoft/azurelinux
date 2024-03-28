@@ -1,40 +1,39 @@
-Name:           python-fastjsonschema
-Version:        2.19.1
-Release:        1%{?dist}
-Summary:        Fastest Python implementation of JSON schema
-
-License:        BSD-3-Clause
-URL:            https://github.com/horejsek/%{name}
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-BuildArch:      noarch
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-pytest
-BuildRequires:  pyproject-rpm-macros
-
 %global _description %{expand:
 fastjsonschema implements validation of JSON documents by JSON schema.
 The library implements JSON schema drafts 04, 06 and 07.
 The main purpose is to have a really fast implementation.}
+Summary:        Fastest Python implementation of JSON schema
+Name:           python-fastjsonschema
+Version:        2.19.1
+Release:        2%{?dist}
+License:        BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/horejsek/%{name}
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-devel
+BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-wheel
+BuildArch:      noarch
 
-%description %_description
+%description %{_description}
 
 %package -n     python3-fastjsonschema
 Summary:        %{summary}
 
-%description -n python3-fastjsonschema %_description
+%description -n python3-fastjsonschema %{_description}
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
 
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 
 %install
-%pyproject_install
+%{pyproject_install}
 %pyproject_save_files fastjsonschema
 
 %check
@@ -45,6 +44,10 @@ Summary:        %{summary}
 %doc README.rst
 
 %changelog
+* Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.19.1-2
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified.
+
 * Tue Feb 13 2024 Packit <hello@packit.dev> - 2.19.1-1
 - Update to 2.19.1
 - Resolves rhbz#2241605

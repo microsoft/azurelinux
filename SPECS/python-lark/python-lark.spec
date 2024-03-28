@@ -1,18 +1,19 @@
+Summary:        Lark is a modern general-purpose parsing library for Python
 Name:           python-lark
 Version:        1.1.7
-Release:        3%{?dist}
-Summary:        Lark is a modern general-purpose parsing library for Python
+Release:        4%{?dist}
 # License breakdown:
 # lark/tools/standalone.py - MPL-2.0
 # lark/__pyinstaller/hook-lark.py - GPL-2.0-or-later
 # the rest is MIT
 License:        MIT AND MPL-2.0 AND GPL-2.0-or-later
-Url:            https://github.com/lark-parser/lark
+Vendor:         Microsoft Corporation
+Distribution:   Mariner
+URL:            https://github.com/lark-parser/lark
 Source:         %{pypi_source lark}
-
-BuildArch:      noarch
-BuildRequires:  python3-wheel
 BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildArch:      noarch
 
 %description
 Lark is a modern general-purpose parsing library for Python.
@@ -46,15 +47,15 @@ Features:
 %package -n python3-lark
 Summary:        %{summary}
 BuildRequires:  python3-devel
-%py_provides    python3-lark-parser
 Obsoletes:      python3-lark-parser < 1
+%{py_provides}    python3-lark-parser
 
 %description -n python3-lark
 Lark is a modern general-purpose parsing library for Python. With Lark, you can
 parse any context-free grammar, efficiently, with very little code.
 
 Main Features:
-    - Builds a parse-tree (AST) automagically, based on 
+    - Builds a parse-tree (AST) automagically, based on
       the structure of the grammar
     - Earley parser
     - Can parse all context-free grammars
@@ -80,9 +81,9 @@ sed -i 's/\r$//' README.md examples/*.py
 
 
 %build
-%pyproject_wheel
+%{pyproject_wheel}
 # This package was renamed from python-lark-parser and we want to provide the old distinfo
-# for packages that still need it. 
+# for packages that still need it.
 %global legacy_distinfo lark_parser-%{version}.dist-info
 mkdir %{legacy_distinfo}
 cat > %{legacy_distinfo}/METADATA << EOF
@@ -93,7 +94,7 @@ EOF
 echo rpm > %{legacy_distinfo}/INSTALLER
 
 %install
-%pyproject_install
+%{pyproject_install}
 %pyproject_save_files lark
 
 cp -a %{legacy_distinfo} %{buildroot}%{python3_sitelib}
@@ -105,8 +106,11 @@ cp -a %{legacy_distinfo} %{buildroot}%{python3_sitelib}
 %doc README.md examples
 %{python3_sitelib}/%{legacy_distinfo}/
 
-
 %changelog
+* Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.1.7-4
+- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- License verified.
+
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
