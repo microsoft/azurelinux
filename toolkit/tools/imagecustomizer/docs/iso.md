@@ -16,9 +16,12 @@ actions.
 
 While converting the input full disk image into a LiveOS ISO involves copying
 almost all the artifacts unchanged - some artifacts are changed as follows:
-- `grub.cfg` is replaced with a stock one that serves the LiveOS boot flow.
-  This can be important to account for if you rely on certain grub
-  configurations in your current grub.cfg.
+- `grub.cfg` is modified by updating the kernel command-line arguments as
+  follows:
+  - the root is updated to the LiveOS root file system image.
+  - the LiveOS dracut parameters are appended.
+  - the MIC user-specified new parameters are appended.
+  - SELinux is disabled.
 - `/etc/fstab` is dropped from the rootfs as it typically conflicts with the
   overlay setup required by the LiveOS.
 - `initrd.img` is regenerated to serve the LiveOS boot flow. This should have
