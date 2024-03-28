@@ -118,6 +118,7 @@ make test
 %changelog
 * Wed Mar 27 2024 Sam Meluch <sammeluch@microsoft.com> - 6.16-1
 - Upgrade to version 6.16 for Azure Linux 3.0
+- Add tests package
 
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.06-4
 - License Verified

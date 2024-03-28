@@ -97,6 +97,7 @@ make test
 %changelog
 * Wed Mar 27 2024 Sam Meluch <sammeluch@microsoft.com> - 6.11-1
 - Upgrade package to version 6.11
+- Add tests package
 
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.08-4
 - License Verified
