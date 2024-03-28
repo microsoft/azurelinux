@@ -47,11 +47,6 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json"
             ],
-            "PostInstallScripts": [
-                {
-                    "Path": "postinstallscripts/remove-tdnf-cache.sh"
-                }
-            ],
             "KernelOptions": {
                 "default": "kernel"
             },
