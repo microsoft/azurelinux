@@ -49,7 +49,7 @@ sed -i '/"pytest-cov",/d' pyproject.toml
 
 %install
 %{pyproject_install}
-%{pyproject_save_files} markdown_it
+%pyproject_save_files markdown_it
 
 %check
 %pytest tests/
