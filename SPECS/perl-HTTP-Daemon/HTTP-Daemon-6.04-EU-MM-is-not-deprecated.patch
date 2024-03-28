@@ -1,22 +1,14 @@
-From 30b91a0898e50874886343b66d27f78eaf960faf Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
-Date: Tue, 2 Apr 2019 16:54:42 +0200
-Subject: [PATCH] EU::MM is not deprecated
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From ccda3e57140dc018a356ef1f252bcc15f415c272 Mon Sep 17 00:00:00 2001
+From: Sam Meluch <sammeluch@microsoft.com>
+Date: Wed, 27 Mar 2024 12:08:29 -0700
+Subject: [PATCH] HTTP-Daemon-6.04 EU MM is not deprecated
 
-Contrary to the warning in the Makefile.PL, only ExtUtils::MakeMaker
-is a full-fledged system. Module::Build is not maintained anymore and
-Module::Build::Tiny contains design flaws regarding XS compilation.
-
-Signed-off-by: Petr Písař <ppisar@redhat.com>
 ---
  Makefile.PL | 61 -----------------------------------------------------
  1 file changed, 61 deletions(-)
 
 diff --git a/Makefile.PL b/Makefile.PL
-index 5915c46..e98af42 100644
+index 56713fa..a658c71 100644
 --- a/Makefile.PL
 +++ b/Makefile.PL
 @@ -9,67 +9,6 @@ use warnings;
@@ -34,7 +26,7 @@ index 5915c46..e98af42 100644
 -    $_ => $@,
 -} keys %configure_requires;
 -
--if (grep { $_ } values %errors)
+-if (grep $_, values %errors)
 -{
 -    warn "Errors from configure prereqs:\n"
 -        . do {
@@ -88,5 +80,5 @@ index 5915c46..e98af42 100644
    "ABSTRACT" => "A simple http server class",
    "AUTHOR" => "Gisle Aas <gisle\@activestate.com>",
 -- 
-2.20.1
+2.34.1
 
