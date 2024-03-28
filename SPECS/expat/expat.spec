@@ -2,7 +2,7 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.6.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -67,12 +67,12 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Thu Mar 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
+- Updated changelog to match fasttrack chnagelog 
+
 * Thu Mar 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
 - Upgrading to 2.6.2 to fix CVE-2023-52425 and CVE-2023-28757
 - No longer need Patch CVE-2023-52426 since 2.6.2 fixes it
-
-* Thu Mar 07 2024 Saul Paredes <saulparedes@microsoft.com> - 2.5.0-2
-- Patch CVE-2023-52426
 
 * Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.0-1
 - Upgrade to 2.5.0
