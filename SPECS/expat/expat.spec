@@ -67,7 +67,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
-* Thu Mar 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
+* Thu Mar 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-2
 - Updated changelog to match fasttrack chnagelog 
 
 * Thu Mar 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
