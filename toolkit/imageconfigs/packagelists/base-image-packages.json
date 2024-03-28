@@ -1,6 +1,9 @@
 {
     "packages": [
         "azurelinux-release",
+        "azurelinux-repos",
+        "azurelinux-repos-ms-non-oss",
+        "azurelinux-repos-ms-oss",
         "bash",
         "ca-certificates",
         "cronie-anacron",
@@ -11,9 +14,6 @@
         "filesystem",
         "grub2-efi-binary",
         "logrotate",
-        "mariner-repos",
-        "mariner-repos-extras",
-        "mariner-repos-microsoft",
         "procps-ng",
         "shim",
         "sudo",
