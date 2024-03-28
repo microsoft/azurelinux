@@ -105,7 +105,7 @@ make test
 %changelog
 * Tue Mar 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.82-1
 - Upgrade to version 3.82
-
+- Add tests package
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 3.72-23
 - License Verified
 
