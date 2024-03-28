@@ -1,5 +1,6 @@
 {
     "packages": [
+        "azurelinux-release",
         "bash",
         "ca-certificates",
         "cronie-anacron",
@@ -10,7 +11,6 @@
         "filesystem",
         "grub2-efi-binary",
         "logrotate",
-        "mariner-release",
         "mariner-repos",
         "mariner-repos-extras",
         "mariner-repos-microsoft",
