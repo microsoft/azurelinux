@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Cookies
-Version:        6.08
-Release:        4%{?dist}
+Version:        6.11
+Release:        1%{?dist}
 Summary:        HTTP cookie jars
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -44,6 +44,16 @@ This class is for objects that represent a "cookie jar" -- that is, a
 database of all the HTTP cookies that a given LWP::UserAgent object
 knows about.
 
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       coreutils
+Requires:       perl-Test-Harness
+ 
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
+
 %prep
 %setup -q -n HTTP-Cookies-%{version}
 
@@ -55,6 +65,23 @@ perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
 %{make_install}
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}%{_libexecdir}/%{name}
+cp -a t %{buildroot}%{_libexecdir}/%{name}
+rm -f %{buildroot}%{_libexecdir}/%{name}/t/00*
+cat > %{buildroot}%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Test t/cookies.t write into CWD
+DIR=$(mktemp -d)
+cp -a %{_libexecdir}/%{name}/* "$DIR"
+pushd "$DIR"
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -r "$DIR"
+EOF
+chmod +x %{buildroot}%{_libexecdir}/%{name}/test
+
 %check
 make test
 
@@ -64,7 +91,14 @@ make test
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 
+%files tests
+%{_libexecdir}/%{name}
+
 %changelog
+* Wed Mar 27 2024 Sam Meluch <sammeluch@microsoft.com> - 6.11-1
+- Upgrade package to version 6.11
+- Add tests package
+
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 6.08-4
 - License Verified
 
