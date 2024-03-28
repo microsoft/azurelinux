@@ -2,8 +2,8 @@
 %global debug_package %{nil}
 Summary:        Keras is a high-level neural networks API.
 Name:           keras
-Version:        3.0.0
-Release:        3%{?dist}
+Version:        3.1.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,12 @@ Keras is a deep learning API written in Python, running on top of the machine le
 
 %package -n     python3-keras
 Summary:        python-keras
+Requires:       python3-absl-py
+Requires:       python3-rich
+Requires:       python3-namex
+Requires:       python3-h5py
+Requires:       python3-optree
+Requires:       python3-ml-dtypes
 
 
 %description -n python3-keras
@@ -49,8 +55,8 @@ Python 3 version.
 
 
 %changelog
-* Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-1
-- update keras to 3.0.0
+* Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.1.1-1
+- update keras to 3.1.1
 
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax requirement for python3-tf-nightly BR
