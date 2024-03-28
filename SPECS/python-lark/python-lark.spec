@@ -48,7 +48,7 @@ Features:
 Summary:        %{summary}
 BuildRequires:  python3-devel
 Obsoletes:      python3-lark-parser < 1
-%{py_provides}    python3-lark-parser
+%py_provides    python3-lark-parser
 
 %description -n python3-lark
 Lark is a modern general-purpose parsing library for Python. With Lark, you can
