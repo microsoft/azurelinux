@@ -10,7 +10,7 @@ License:        MIT AND MPL-2.0 AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/lark-parser/lark
-Source:         %{pypi_source lark}
+Source0:        %{pypi_source lark}
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildArch:      noarch
