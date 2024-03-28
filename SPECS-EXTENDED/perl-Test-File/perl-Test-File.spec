@@ -1,11 +1,10 @@
 # This module usually ships with version numbers having two digits after the decimal point
 %global cpanversion 1.443
-%global rpmversion 1.44.3
 
 Summary:	Test file attributes through Test::Builder
 Name:		perl-Test-File
-Version:	%{rpmversion}
-Release:	11%{?dist}
+Version:	1.44.3
+Release:	12%{?dist}
 License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,6 +67,9 @@ make test
 %{_mandir}/man3/Test::File.3*
 
 %changelog
+* Thu Mar 28 2024 Andrew Phelps <anphel@microsoft.com> - 1.44.3-12
+- Remove `rpmversion` global definition due to macro conflict with rpm-4.18.2
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.44.3-11
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
