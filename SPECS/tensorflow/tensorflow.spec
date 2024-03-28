@@ -92,7 +92,7 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 
 %changelog
 * Wed Mar 27 2024 Riken Maharjan <rmaharjan@microsoft> - 2.16.1-2
-- Add Unnecessary requirements and add keras as runtime req
+- Remove Unnecessary requirements and add keras as runtime req
 
 * Tue Mar 05 2024 Riken Maharjan <rmaharjan@microsoft> - 2.16.1-1
 - Update to 2.16.1
