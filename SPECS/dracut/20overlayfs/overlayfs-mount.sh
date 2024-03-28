@@ -102,7 +102,8 @@ mount_overlayfs() {
     else
         echo "Mounting regular root"
         mkdir -p "${VERITY_MOUNT}"
-        mount -o ro,defaults "$root" "${VERITY_MOUNT}" || \
+        root_device="${root#block:}"  # Remove 'block:' prefix if present.
+        mount -o ro,defaults "$root_device" "${VERITY_MOUNT}" || \
             die "Failed to mount root"
     fi
 
@@ -136,4 +137,9 @@ mount_overlayfs() {
 }
 
 parse_kernel_cmdline_args
-mount_overlayfs
+
+if [ -n "${overlayfs}" ]; then
+    mount_overlayfs
+else
+    echo "OverlayFS parameter not found in kernel cmdline, skipping mount_overlayfs."
+fi
