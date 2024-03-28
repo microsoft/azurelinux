@@ -190,6 +190,9 @@ echo "disable ipmi.service" > %{buildroot}%{_libdir}/systemd/system-preset/50-ip
 %{_mandir}/man5/ipmi_sim_cmd.5.gz
 
 %changelog
+* Thu Mar 28 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 2.0.33-1
+- Upgrade to 2.0.33
+
 * Wed Mar 27 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> - 2.0.32-3
 - Adjust BuildRequires to build in 3.0
 
