@@ -20,8 +20,8 @@ Distribution:   Mariner
 
 Summary: A widely used Mail Transport Agent (MTA)
 Name: sendmail
-Version: 8.15.2
-Release: 46%{?dist}
+Version: 8.17.2
+Release: 1%{?dist}
 License: Sendmail
 URL: http://www.sendmail.org/
 
@@ -57,52 +57,40 @@ Source16: sendmail-etc-mail-trusted-users
 # default /etc/mail/virtusertable
 Source17: sendmail-etc-mail-virtusertable
 # fix man path and makemap man page
-Patch3: sendmail-8.14.4-makemapman.patch
+Patch3: sendmail-8.17.2-makemapman.patch
 # fix smrsh paths
-Patch4: sendmail-8.14.3-smrsh_paths.patch
+Patch4: sendmail-8.16.1-smrsh_paths.patch
 # fix sm-client.pid path
 Patch7: sendmail-8.14.9-pid.patch
 # fix sendmail man page
-Patch10: sendmail-8.15.1-manpage.patch
+Patch10: sendmail-8.17.1-manpage.patch
 # compile with -fpie
-Patch11: sendmail-8.15.1-dynamic.patch
+Patch11: sendmail-8.17.1-dynamic.patch
 # fix cyrus path
 Patch12: sendmail-8.13.0-cyrus.patch
 # fix aliases.db path
-Patch13: sendmail-8.15.1-aliases_dir.patch
+Patch13: sendmail-8.17.2-aliases_dir.patch
 # fix vacation Makefile
 Patch14: sendmail-8.14.9-vacation.patch
 # remove version information from sendmail helpfile
-Patch15: sendmail-8.14.9-noversion.patch
+Patch15: sendmail-8.17.2-noversion.patch
 # do not accept localhost.localdomain as valid address from SMTP
-Patch16: sendmail-8.15.2-localdomain.patch
+Patch16: sendmail-8.17.2-localdomain.patch
 # build libmilter as DSO
 Patch17: sendmail-8.14.3-sharedmilter.patch
 # skip colon separator when parsing service name in ServiceSwitchFile
-Patch18: sendmail-8.15.2-switchfile.patch
+Patch18: sendmail-8.17.1-switchfile.patch
 # silence warning about missing sasl2 config in /usr/lib*, now in /etc/sasl2
-Patch23: sendmail-8.14.8-sasl2-in-etc.patch
+Patch23: sendmail-8.17.2-sasl2-in-etc.patch
 # add QoS support, patch from Philip Prindeville <philipp@fedoraproject.org>
 # upstream reserved option ID 0xe7 for testing of this new feature, #576643
-Patch25: sendmail-8.15.2-qos.patch
-Patch26: sendmail-8.15.2-libmilter-socket-activation.patch
-# patch provided by upstream
-Patch27: sendmail-8.15.2-smtp-session-reuse-fix.patch
-Patch28: sendmail-8.15.2-openssl-1.1.0-fix.patch
-# patch taken from Debian
-# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=807258
-Patch29: sendmail-8.15.2-format-security.patch
-# rhbz#1473971
-Patch30: sendmail-8.15.2-openssl-1.1.0-ecdhe-fix.patch
-# rhbz#1736650
-Patch31: sendmail-8.15.2-gethostbyname2.patch
-# upstream patch:
-Patch32: sendmail-8.15.2-fix-covscan-issues.patch
-# sent upstream
-Patch33: sendmail-8.15.2-gcc-10-fix.patch
+Patch25: sendmail-8.17.2-qos.patch
+Patch26: sendmail-8.17.1-libmilter-socket-activation.patch
 
+BuildRequires: make
 BuildRequires: libdb-devel
 BuildRequires: libnsl2-devel
+BuildRequires: tinycdb-devel
 BuildRequires: groff
 BuildRequires: m4
 BuildRequires: systemd
@@ -203,13 +191,6 @@ cp devtools/M4/UNIX/{,shared}library.m4
 %patch23 -p1 -b .sasl2-in-etc
 %patch25 -p1 -b .qos
 %patch26 -p1 -b .libmilter-socket-activation
-%patch27 -p1 -b .smtp-session-reuse-fix
-%patch28 -p1 -b .openssl-1.1.0-fix
-%patch29 -p1 -b .format-security
-%patch30 -p1 -b .openssl-1.1.0-ecdhe-fix
-%patch31 -p1 -b .gethostbyname2
-%patch32 -p1 -b .fix-covscan-issues
-%patch33 -p1 -b .gcc-10-fix
 
 for f in RELEASE_NOTES contrib/etrn.0; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -221,11 +202,11 @@ sed -i 's|/usr/local/bin/perl|%{_bindir}/perl|' contrib/*.pl
 %build
 # generate redhat config file
 cat > redhat.config.m4 << EOF
-define(\`confMAPDEF', \`-DNEWDB -DNIS -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
+define(\`confMAPDEF', \`-DNEWDB -DCDB -DNIS -DMAP_REGEX -DSOCKETMAP -DNAMED_BIND=1')
 define(\`confOPTIMIZE', \`\`\`\`${RPM_OPT_FLAGS}'''')
-define(\`confENVDEF', \`-I%{_includedir}/libdb -I%{_prefix}/kerberos/include -Wall -DXDEBUG=0 -DNETINET6 -DHES_GETMAILHOST -DUSE_VENDOR_CF_PATH=1 -D_FFR_LINUX_MHNL -D_FFR_QOS -D_FILE_OFFSET_BITS=64 -DHAS_GETHOSTBYNAME2')
+define(\`confENVDEF', \`-I%{_includedir}/libdb -I%{_prefix}/kerberos/include -Wall -DXDEBUG=0 -DNETINET6 -DHES_GETMAILHOST -DUSE_VENDOR_CF_PATH=1 -D_FFR_LINUX_MHNL -D_FFR_QOS -D_FILE_OFFSET_BITS=64 -DHAS_GETHOSTBYNAME2 -DHASFLOCK')
 define(\`confLIBDIRS', \`-L%{_prefix}/kerberos/%{_lib}')
-define(\`confLIBS', \`-lnsl -lcrypt -ldb -lresolv')
+define(\`confLIBS', \`-lnsl -lcrypt -ldb -lcdb -lresolv')
 %{?_hardened_build:define(\`confLDOPTS', \`-Xlinker -z -Xlinker relro -Xlinker -z -Xlinker now')}
 define(\`confMANOWN', \`root')
 define(\`confMANGRP', \`root')
@@ -261,7 +242,7 @@ EOF
 
 %if "%{with_tls}" == "yes"
 cat >> redhat.config.m4 << EOF
-APPENDDEF(\`conf_sendmail_ENVDEF', \`-DSTARTTLS -D_FFR_TLS_1 -D_FFR_TLS_EC -D_FFR_TLS_USE_CERTIFICATE_CHAIN_FILE')dnl
+APPENDDEF(\`conf_sendmail_ENVDEF', \`-DSTARTTLS -D_FFR_TLS_1 -DTLS_EC -D_FFR_TLS_USE_CERTIFICATE_CHAIN_FILE -DDANE')dnl
 APPENDDEF(\`conf_sendmail_LIBS', \`-lssl -lcrypto')dnl
 EOF
 %endif
@@ -655,12 +636,12 @@ exit 0
 %config(noreplace) %{maildir}/virtusertable
 
 %ghost %{maildir}/aliasesdb-stamp
-%ghost %{maildir}/virtusertable.db
-%ghost %{maildir}/access.db
-%ghost %{maildir}/domaintable.db
-%ghost %{maildir}/mailertable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/virtusertable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/access.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/domaintable.db
+%ghost %attr(0640, root,root) %verify(not md5 size mtime) %{maildir}/mailertable.db
 
-%ghost %{spooldir}/clientmqueue/sm-client.st
+%ghost %attr(0660, smmsp, smmsp) %verify(not md5 size mtime) %{spooldir}/clientmqueue/sm-client.st
 
 %{_unitdir}/sendmail.service
 %{_unitdir}/sm-client.service
@@ -708,6 +689,12 @@ exit 0
 
 
 %changelog
+* Wed Sep 20 2023 Archana Choudhary <archana1@microsoft.com> - 8.17.2-1
+- Upgrade to 8.17.2 - CVE-2021-3618
+- Dropped smtp-session-reuse-fix, openssl-1.1.0-fix, openssl-1.1.0-ecdhe-fix,
+  gethostbyname2, fix-covscan-issues, format-security patch, 
+  gcc-10-fix patches (not needed)
+
 * Fri Feb 04 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.15.2-46
 - Removing dependency on 'ghostscript'.
 - License verified.
