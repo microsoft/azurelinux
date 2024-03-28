@@ -29276,8 +29276,8 @@
         "type": "other",
         "other": {
           "name": "vte291",
-          "version": "0.66.2",
-          "downloadUrl": "https://download.gnome.org/sources/vte/0.66/vte-0.66.2.tar.xz"
+          "version": "0.74.2",
+          "downloadUrl": "https://download.gnome.org/sources/vte/0.74/vte-0.74.2.tar.xz"
         }
       }
     },
