@@ -57,7 +57,7 @@ rm -r src/poetry/core/_vendor
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.9.0-1
-- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- Initial Azure Linux import from Fedora 40 (license: MIT).
 - License Verified
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.1-3

@@ -61,7 +61,7 @@ sed -i '/"pytest-cov",/d' pyproject.toml
 
 %changelog
 * Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-5
-- Initial CBL-Mariner import from Fedora 40 (license: MIT)
+- Initial Azure Linux import from Fedora 40 (license: MIT)
 - License verified
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-4

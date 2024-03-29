@@ -43,6 +43,6 @@ A PyTree is a recursive structure that can be an arbitrarily nested Python conta
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11.0-1
-- Original version for CBL-Mariner.
+- Original version for Azure Linux.
 - License Verified.
 

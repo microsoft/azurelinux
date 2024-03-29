@@ -108,7 +108,7 @@ cp -a %{legacy_distinfo} %{buildroot}%{python3_sitelib}
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.1.7-4
-- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.7-3

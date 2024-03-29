@@ -60,7 +60,7 @@ code, tracebacks, and more — out of the box.
 
 %changelog
 * Mon Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
-- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Thu Mar 14 2024 Parag Nemade <pnemade@fedoraproject.org> - 13.7.1-1

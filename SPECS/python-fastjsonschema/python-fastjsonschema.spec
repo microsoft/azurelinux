@@ -45,7 +45,7 @@ Summary:        %{summary}
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.19.1-2
-- Initial CBL-Mariner import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
 * Tue Feb 13 2024 Packit <hello@packit.dev> - 2.19.1-1
