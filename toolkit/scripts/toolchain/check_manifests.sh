@@ -31,7 +31,6 @@ then
 fi
 
 while (( "$#")); do
-  echo "$1 is $1"
   case "$1" in
     -a ) ARCH="$2"; shift 2;;
     -t ) TOOLCHAIN_SPEC_LIST="$2"; shift 2 ;;
