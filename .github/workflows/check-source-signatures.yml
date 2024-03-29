@@ -88,11 +88,11 @@ jobs:
             exit 0
           fi
 
-          if [ -n "${{ env.changed_pkgs_extended }}" ]; then
+          if [ -n "${{ env.changed_pkgs }}" ]; then
             # We want to ignore errors here so we can print a helpful message at the end.
             set +e
             set -x
-            sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs_extended }}" SPECS_DIR=../${{ matrix.specs-dir }}
+            sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}
             err=$?
             set +x
             set -e
@@ -103,7 +103,7 @@ jobs:
             printf "\n\n******************************"
             echo "Failed to check the signatures of the modified packages."
             echo "Check the logs above for details on the mismatches files and their expected hashes."
-            echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs_extended }}' SPECS_DIR=../${{ matrix.specs-dir }}"
+            echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}' SPECS_DIR=../${{ matrix.specs-dir }}"
             printf "\n\n******************************"
             exit 1
           else
