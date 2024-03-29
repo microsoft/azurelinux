@@ -49,6 +49,10 @@ jobs:
           changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
           changed_pkg_dirs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
 
+          echo "Folders with modified files in this PR:"
+          echo "SPECS/*:          ${changed_pkg_dirs}"
+          echo "SPECS-EXTENDED/*: ${changed_pkg_dirs_extended}"
+
           # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
           # We need to filter since some directories may not contain .spec files we can rebuild.
           changed_pkgs=""
