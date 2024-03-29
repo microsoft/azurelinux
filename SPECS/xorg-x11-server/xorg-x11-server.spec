@@ -60,7 +60,7 @@ Patch10: CVE-2024-21885.patch
 Patch11: CVE-2023-6816.patch
 Patch12: CVE-2023-5574.patch
 Patch13: CVE-2023-5367.patch
-Patch13: CVE-2023-5380.patch
+Patch14: CVE-2023-5380.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
