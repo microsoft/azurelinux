@@ -57,7 +57,7 @@ jobs:
           # We need to filter since some directories may not contain .spec files we can rebuild.
           changed_pkgs=""
           for pkg in $changed_pkgs_unfiltered; do
-            changed_pkgs="$changed_pkgs $(find SPECS_TEST/$pkg -name '*.spec' -exec basename {} \; | sed 's/\.spec//g' | xargs)"
+            changed_pkgs="$changed_pkgs $(find SPECS/$pkg -name '*.spec' -exec basename {} \; | sed 's/\.spec//g' | xargs)"
           done
           changed_pkgs_extended=""
           for pkg in $changed_pkgs_unfiltered_extended; do
