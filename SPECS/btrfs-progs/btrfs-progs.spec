@@ -1,6 +1,6 @@
 Name:       btrfs-progs
 Version:    6.8
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
@@ -43,7 +43,7 @@ btrfs filesystem-specific programs.
 
 %build
 ./autogen.sh
-%configure CFLAGS="%{optflags} -fno-strict-aliasing" --with-crypto=libgcrypt --disable-python
+%configure CFLAGS="%{optflags} -fno-strict-aliasing" --with-crypto=libgcrypt --disable-python --disable-zstd
 %make_build
 
 %install
@@ -77,6 +77,9 @@ rm -v %{buildroot}%{_libdir}/*.a
 
 
 %changelog
+* Wed Mar 27 2024 Betty Lakes <bettylakes@microsoft.com> - 6.8-2
+- Disable zstd
+
 * Wed Mar 27 2024 Betty Lakes <bettylakes@microsoft.com> - 6.8-1
 - Update to 6.8
 
