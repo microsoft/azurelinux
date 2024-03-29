@@ -982,6 +982,7 @@
                 "ocaml",
                 "ocaml-alcotest",
                 "ocaml-astring",
+                "ocaml-augeas",
                 "ocaml-base",
                 "ocaml-bigarray-compat",
                 "ocaml-bisect-ppx",
