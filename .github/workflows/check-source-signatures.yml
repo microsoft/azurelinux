@@ -64,7 +64,7 @@ jobs:
 
           echo "Packages modified in this PR:"
           echo "${{ matrix.specs-dir }}: '${changed_pkgs}'"
-          echo "changed_pkgs=${changed_pkgs" >> $GITHUB_ENV
+          echo "changed_pkgs=${changed_pkgs}" >> $GITHUB_ENV
 
       - name: Prepare the build environment
         run: |
@@ -90,7 +90,7 @@ jobs:
           fi
 
           if [ -n "${{ env.changed_pkgs_extended }}" ]; then
-            # We want to ignore errors here, as we want to check all the packages that have been modified. Capture the error code and check it later.
+            # We want to ignore errors here so we can print a helpful message at the end.
             set +e
             set -x
             sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs_extended }}" SPECS_DIR=../${{ matrix.specs-dir }}
