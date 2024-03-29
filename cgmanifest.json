@@ -27995,16 +27995,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "swupdate",
-          "version": "2021.04",
-          "downloadUrl": "https://github.com/sbabic/swupdate/archive/2021.04.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "SymCrypt",
           "version": "103.4.1",
           "downloadUrl": "https://github.com/microsoft/SymCrypt/archive/v103.4.1.tar.gz"
