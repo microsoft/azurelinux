@@ -1,9 +1,9 @@
 
-# Build Requirements on `Mariner`
+# Build Requirements on `Azure Linux`
 
-## Requirements were validated on `Mariner 2.0`
+## Requirements were validated on `Azure Linux`
 
-This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on a Mariner host.
+This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Azure Linux host.
 
 ```bash
 # Install required dependencies.
@@ -32,7 +32,8 @@ sudo tdnf -y install \
     sudo \
     tar \
     wget \
-    xfsprogs
+    xfsprogs \
+    zstd
 
 # Enable Docker daemon at boot
 sudo systemctl enable --now docker.service

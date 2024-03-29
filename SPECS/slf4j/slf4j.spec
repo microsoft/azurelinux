@@ -18,7 +18,7 @@
 Summary:        Simple Logging Facade for Java
 Name:           slf4j
 Version:        1.7.30
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -134,6 +134,11 @@ for i in */src/main/resources/META-INF/MANIFEST.MF; do
   perl -pi -e 's#\$\{slf4j\.api\.minimum\.compatible\.version\}#1\.6\.0#g' ${i}
 done
 
+for i in */maven-build.xml; do
+  sed -i 's/target="1.6"/target="1.8"/' ${i}
+  sed -i 's/source="1.6"/source="1.8"/' ${i}
+done
+
 # The general pattern is that the API package exports API classes and does
 # # not require impl classes. slf4j was breaking that causing "A cycle was
 # # detected when generating the classpath slf4j.api, slf4j.nop, slf4j.api."
@@ -162,6 +167,7 @@ export MAVEN_REPO_LOCAL=$(pwd)/.m2
 ant -Dmaven2.jpp.mode=true \
     -Dmaven.test.skip=true \
     -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
+    -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 \
     package javadoc \
 
 %install
@@ -234,6 +240,9 @@ rm -rf target/site
 %{_docdir}/%{name}-%{version}/site
 
 %changelog
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
+- rebuild with msopenjdk-17
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.7.30-5
 - Fixing maven provides
 

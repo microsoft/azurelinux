@@ -89,7 +89,7 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 find -name "*.class" -delete
 find -name "*.jar" -delete
 %patch 4 -p1
-perl -pi -e 's/1\.2/1.6/g' build.xml
+perl -pi -e 's/1\.2/1.8/g' build.xml
 mkdir -p classes dist
 cp %{SOURCE2} license.txt
 
@@ -126,6 +126,9 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %doc manual.html
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11-33
+- rebuild with msopenjdk-17
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-33
 - Updating naming for 3.0 version of Azure Linux.
 

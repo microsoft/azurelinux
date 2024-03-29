@@ -645,7 +645,7 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/azl/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd
@@ -956,7 +956,7 @@ popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
-RPM_WITH_VERSION=rpm-4.18.1
+RPM_WITH_VERSION=rpm-4.18.2
 RPM_FOLDER="$RPM_WITH_VERSION"
 echo $RPM_WITH_VERSION
 tar xf "$RPM_WITH_VERSION".tar.bz2

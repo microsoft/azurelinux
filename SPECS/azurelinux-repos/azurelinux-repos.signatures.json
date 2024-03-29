@@ -8,10 +8,10 @@
   "azurelinux-extended-debuginfo.repo": "f97d5ad35512d1d2e3c12f05f8989eebf3b94a7c4a78952c03803029eff0a8e9",
   "azurelinux-extended-preview.repo": "beecae94aae13ed0925a388287ec5afb912c2a1baf8ac7bf89c9e1c8174a5006",
   "azurelinux-extended.repo": "4bf12fd933bc6473a6ec5a99479219facccfd729f53b321a34887ba77317443c",
-  "azurelinux-ms-non-oss-preview.repo": "437d4da478923d8f3899844861af41017ccff39e24a9c0bf7cad40b6b5289419",
-  "azurelinux-ms-non-oss.repo": "6b449545113f9aaf8d75866a6f21882f06418855dd4acfaccc8b2a9979765a13",
-  "azurelinux-ms-oss-preview.repo": "a88ff698344c8d3e08fe74327db37689427c7bdaf2b5cf3210463c3971973637",
-  "azurelinux-ms-oss.repo": "df91cb066a87e1aa6e4c2e184e70bc6b819c2e34dac004c77b504664cdc40f8f",
+  "azurelinux-ms-non-oss-preview.repo": "ca29814b9dfb51ed2dfe18ee53298b42ed5428ce37a01b18f3f917446f609dc4",
+  "azurelinux-ms-non-oss.repo": "e6cefb7134697cfdda5e8736a1eba76f6872187632bec17c9ffad909934ec449",
+  "azurelinux-ms-oss-preview.repo": "1ee4d3b17f2963f3bfaff7e0ddef7d2c1680056e1468f193a6f7ec499d8b4095",
+  "azurelinux-ms-oss.repo": "4c6491c2139ba22439e1933b1647df4de1971d63fe60969437f1bc8d72d9a94b",
   "azurelinux-official-base.repo": "cae238430e90d3ba24ffc75ad2f56a5ac68f980fa6aa2e94350db41e06af8a09",
   "azurelinux-official-preview.repo": "2cbcd621253d399f4afd74a4c1a3a8c5ce9db3e49bddfef8344e42f186502d4b"
  }

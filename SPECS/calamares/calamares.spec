@@ -1,13 +1,13 @@
 # This package depends on automagic byte compilation
 # https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
+%global py_byte_compile 1
 Summary:        Installer from a live CD/DVD/USB to disk
 # do not use QtWebEngine because it no longer works with QtWebEngine >= 5.11
 # (it now refuses to run as root unless "export QTWEBENGINE_DISABLE_SANDBOX=1")
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.3.1
-Release:        1%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,11 +15,11 @@ URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
-Source1:        calamares-users-3.0.1.tar.gz
-Source2:        calamares-finished-3.0.1.tar.gz
-Source3:        calamares-welcome-3.0.1.tar.gz
-Source4:        calamares-partition-3.0.1.tar.gz
-Source5:        calamares-license-3.0.1.tar.gz
+Source1:        calamares-users-3.0.3.tar.gz
+Source2:        calamares-finished-3.0.2.tar.gz
+Source3:        calamares-welcome-3.0.2.tar.gz
+Source4:        calamares-partition-3.0.3.tar.gz
+Source5:        calamares-license-3.0.2.tar.gz
 # Source20..39 - configuration files
 Source20:       license.conf
 Source21:       settings.conf
@@ -221,6 +221,18 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 %{_libdir}/libcalamaresui.so
 
 %changelog
+* Wed Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 3.3.1-5
+- update calamares modules for runtime errors
+
+* Tue Mar 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-4
+- update license.conf file path to use azl-eula
+
+* Fri Mar 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-3
+- Fix python macros for calamares
+
+* Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.1-2
+- Updated reference to distro in patch file from "Mariner" to "Azure Linux"
+
 * Tue Jan 16 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-1
 - Upgrade to version 3.3.1 for Azure Linux 3.0
 - Update patches to accomodate version 3.3.1

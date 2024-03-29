@@ -2,7 +2,7 @@
 
 Name:        mdadm
 Version:     4.2
-Release:     1%{?dist}
+Release:     2%{?dist}
 Summary:     The mdadm program controls Linux md devices (software RAID arrays)
 URL:         http://www.kernel.org/pub/linux/utils/raid/mdadm/
 License:     GPLv2+
@@ -145,7 +145,7 @@ Patch198:    mdadm-2.5.2-static.patch
 Patch199:    disable-Werror.patch
 
 BuildRequires: make
-BuildRequires: glibc-static >= 2.38-2%{?dist}
+BuildRequires: glibc-static >= 2.38-3%{?dist}
 BuildRequires: systemd-rpm-macros 
 BuildRequires: binutils-devel 
 BuildRequires: gcc 
@@ -219,6 +219,9 @@ install -m644 %{SOURCE5} %{buildroot}/etc/libreport/events.d
 %{_datadir}/mdadm/mdcheck
 
 %changelog
+* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 4.2-2
+- update to build dep latest glibc-static version
+
 * Thu Feb 29 2024 Yash Panchal <yashpanchal@microsoft.com> - 4.2-1
 - Upgrade mdadm to 4.2
 
