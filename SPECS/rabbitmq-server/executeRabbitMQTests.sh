@@ -72,8 +72,11 @@ echo ""
 # Remove existing/old test directories
 rm -rf $BAZEL_DIR $MANDOC_DIR $DAEMONIZE_DIR
 
+# Ensure rabbitmq deps are installed
+tdnf install -y erlang elixir libxslt xmlto python python3-simplejson zip unzip rsync glibc-lang
+
 # Required dependencies are installed
-tdnf install msopenjdk-17 wget git build-essential python3 zip unzip kernel-headers binutils zlib-devel
+tdnf install -y msopenjdk-17 wget git build-essential python3 zip unzip kernel-headers binutils zlib-devel
 
 # Get Dependency sources
 wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_DEP_VERSION/bazel-$BAZEL_DEP_VERSION-dist.zip
