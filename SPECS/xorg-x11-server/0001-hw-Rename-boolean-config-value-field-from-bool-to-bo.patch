@@ -1,0 +1,153 @@
+From 454b3a826edb5fc6d0fea3a9cfd1a5e8fc568747 Mon Sep 17 00:00:00 2001
+From: Adam Jackson <ajax@redhat.com>
+Date: Mon, 22 Jul 2019 13:51:06 -0400
+Subject: [PATCH xserver] hw: Rename boolean config value field from bool to
+ boolean
+
+"bool" conflicts with C++ (meh) and stdbool.h (ngh alright fine). This
+is a driver-visible change and will likely break the build for mach64,
+but it can be fixed by simply using xf86ReturnOptValBool like every
+other driver.
+
+Signed-off-by: Adam Jackson <ajax@redhat.com>
+---
+ hw/xfree86/common/xf86Opt.h    |  2 +-
+ hw/xfree86/common/xf86Option.c | 10 +++++-----
+ hw/xwin/winconfig.c            | 22 +++++++++++-----------
+ hw/xwin/winconfig.h            |  2 +-
+ 4 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/hw/xfree86/common/xf86Opt.h b/hw/xfree86/common/xf86Opt.h
+index 3be2a0fc7..3046fbd41 100644
+--- a/hw/xfree86/common/xf86Opt.h
++++ b/hw/xfree86/common/xf86Opt.h
+@@ -41,7 +41,7 @@ typedef union {
+     unsigned long num;
+     const char *str;
+     double realnum;
+-    Bool bool;
++    Bool boolean;
+     OptFrequency freq;
+ } ValueUnion;
+ 
+diff --git a/hw/xfree86/common/xf86Option.c b/hw/xfree86/common/xf86Option.c
+index 06973bca3..ca538cc57 100644
+--- a/hw/xfree86/common/xf86Option.c
++++ b/hw/xfree86/common/xf86Option.c
+@@ -213,7 +213,7 @@ LookupBoolOption(XF86OptionPtr optlist, const char *name, int deflt,
+     o.name = name;
+     o.type = OPTV_BOOLEAN;
+     if (ParseOptionValue(-1, optlist, &o, markUsed))
+-        deflt = o.value.bool;
++        deflt = o.value.boolean;
+     return deflt;
+ }
+ 
+@@ -474,7 +474,7 @@ xf86ShowUnusedOptions(int scrnIndex, XF86OptionPtr opt)
+ static Bool
+ GetBoolValue(OptionInfoPtr p, const char *s)
+ {
+-    return xf86getBoolValue(&p->value.bool, s);
++    return xf86getBoolValue(&p->value.boolean, s);
+ }
+ 
+ static Bool
+@@ -678,7 +678,7 @@ ParseOptionValue(int scrnIndex, XF86OptionPtr options, OptionInfoPtr p,
+             if (markUsed)
+                 xf86MarkOptionUsedByName(options, newn);
+             if (GetBoolValue(&opt, s)) {
+-                p->value.bool = !opt.value.bool;
++                p->value.boolean = !opt.value.boolean;
+                 p->found = TRUE;
+             }
+             else {
+@@ -869,7 +869,7 @@ xf86GetOptValBool(const OptionInfoRec * table, int token, Bool *value)
+ 
+     p = xf86TokenToOptinfo(table, token);
+     if (p && p->found) {
+-        *value = p->value.bool;
++        *value = p->value.boolean;
+         return TRUE;
+     }
+     else
+@@ -883,7 +883,7 @@ xf86ReturnOptValBool(const OptionInfoRec * table, int token, Bool def)
+ 
+     p = xf86TokenToOptinfo(table, token);
+     if (p && p->found) {
+-        return p->value.bool;
++        return p->value.boolean;
+     }
+     else
+         return def;
+diff --git a/hw/xwin/winconfig.c b/hw/xwin/winconfig.c
+index 31894d2fb..646d69006 100644
+--- a/hw/xwin/winconfig.c
++++ b/hw/xwin/winconfig.c
+@@ -623,7 +623,7 @@ winSetBoolOption(void *optlist, const char *name, int deflt)
+     o.name = name;
+     o.type = OPTV_BOOLEAN;
+     if (ParseOptionValue(-1, optlist, &o))
+-        deflt = o.value.bool;
++        deflt = o.value.boolean;
+     return deflt;
+ }
+ 
+@@ -918,7 +918,7 @@ ParseOptionValue(int scrnIndex, void *options, OptionInfoPtr p)
+         }
+         if ((s = winFindOptionValue(options, newn)) != NULL) {
+             if (GetBoolValue(&opt, s)) {
+-                p->value.bool = !opt.value.bool;
++                p->value.boolean = !opt.value.boolean;
+                 p->found = TRUE;
+             }
+             else {
+@@ -968,25 +968,25 @@ static Bool
+ GetBoolValue(OptionInfoPtr p, const char *s)
+ {
+     if (*s == 0) {
+-        p->value.bool = TRUE;
++        p->value.boolean = TRUE;
+     }
+     else {
+         if (winNameCompare(s, "1") == 0)
+-            p->value.bool = TRUE;
++            p->value.boolean = TRUE;
+         else if (winNameCompare(s, "on") == 0)
+-            p->value.bool = TRUE;
++            p->value.boolean = TRUE;
+         else if (winNameCompare(s, "true") == 0)
+-            p->value.bool = TRUE;
++            p->value.boolean = TRUE;
+         else if (winNameCompare(s, "yes") == 0)
+-            p->value.bool = TRUE;
++            p->value.boolean = TRUE;
+         else if (winNameCompare(s, "0") == 0)
+-            p->value.bool = FALSE;
++            p->value.boolean = FALSE;
+         else if (winNameCompare(s, "off") == 0)
+-            p->value.bool = FALSE;
++            p->value.boolean = FALSE;
+         else if (winNameCompare(s, "false") == 0)
+-            p->value.bool = FALSE;
++            p->value.boolean = FALSE;
+         else if (winNameCompare(s, "no") == 0)
+-            p->value.bool = FALSE;
++            p->value.boolean = FALSE;
+     }
+     return TRUE;
+ }
+diff --git a/hw/xwin/winconfig.h b/hw/xwin/winconfig.h
+index f079368c7..bd1f59650 100644
+--- a/hw/xwin/winconfig.h
++++ b/hw/xwin/winconfig.h
+@@ -199,7 +199,7 @@ typedef union {
+     unsigned long num;
+     char *str;
+     double realnum;
+-    Bool bool;
++    Bool boolean;
+     OptFrequency freq;
+ } ValueUnion;
+ 
+-- 
+2.39.0
