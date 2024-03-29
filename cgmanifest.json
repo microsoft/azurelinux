@@ -25312,16 +25312,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "reaper",
-          "version": "3.1.1",
-          "downloadUrl": "https://github.com/thelastpickle/cassandra-reaper/archive/refs/tags/3.1.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rear",
           "version": "2.4",
           "downloadUrl": "https://sourceforge.net/projects/rear/files/rear/2.4/rear-2.4.tar.gz"
