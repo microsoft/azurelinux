@@ -73,7 +73,7 @@ echo ""
 rm -rf $BAZEL_DIR $MANDOC_DIR $DAEMONIZE_DIR
 
 # Required dependencies are installed
-dnf install msopenjdk-11 wget git build-essential python3 zip unzip
+tdnf install msopenjdk-17 wget git build-essential python3 zip unzip kernel-headers binutils zlib-devel
 
 # Get Dependency sources
 wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_DEP_VERSION/bazel-$BAZEL_DEP_VERSION-dist.zip
@@ -95,6 +95,7 @@ mv mandoc-$MANDOC_DEP_VERSION.tar.gz $MANDOC_DIR/mandoc-$MANDOC_DEP_VERSION.tar.
 pushd $MANDOC_DIR
 tar -zxvf mandoc-$MANDOC_DEP_VERSION.tar.gz
 cd mandoc-$MANDOC_DEP_VERSION
+sh configure
 make
 make install
 popd
