@@ -26,7 +26,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -39,6 +39,7 @@ Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
 Patch0:         CVE-2023-38710.patch
 Patch1:         CVE-2023-38711.patch
 Patch2:         CVE-2023-38712.patch
+Patch3:         CVE-2024-2357.patch
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -196,6 +197,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Fri Mar 29 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.7-6
+- Patch CVE-2024-2357
+
 * Mon Aug 28 2023 Henry Beberman <henry.beberman@microsoft.com> - 4.7-5
 - Backport patches for CVE-2023-38710, CVE-2023-38711, CVE-2023-38712
 
