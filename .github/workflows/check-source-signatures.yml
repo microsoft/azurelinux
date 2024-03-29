@@ -45,9 +45,21 @@ jobs:
       - name: Get changed packages
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
-          # the package name (ie the folder inside ./SPECS).
-          changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
-          changed_pkgs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
+          # the package's directory name (ie the folder inside ./SPECS).
+          changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
+          changed_pkg_dirs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
+
+          # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
+          # We need to filter since some directories may not contain .spec files we can rebuild.
+          changed_pkgs=""
+          for pkg in $changed_pkgs_unfiltered; do
+            changed_pkgs="$changed_pkgs $(find SPECS_TEST/$pkg -name '*.spec' -exec basename {} \; | sed 's/\.spec//g' | xargs)"
+          done
+          changed_pkgs_extended=""
+          for pkg in $changed_pkgs_unfiltered_extended; do
+            changed_pkgs_extended="$changed_pkgs_extended $(find SPECS-EXTENDED/$pkg -name '*.spec' -exec basename {} \; | sed 's/\.spec//g' | xargs)"
+          done
+
           echo "Packages modified in this PR:"
           echo "SPECS:          ${changed_pkgs}"
           echo "SPECS-EXTENDED: ${changed_pkgs_extended}"
