@@ -41,7 +41,7 @@ BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(xfixes)
 BuildRequires:  pkgconfig(xrandr)
-BuildRequires:  pkgconfig(xv)
+BuildRequires:  libXv-devel
 %if %{build_gl}
 BuildRequires:  pkgconfig(gl)
 BuildRequires:  pkgconfig(wayland-client) >= 1.11.0
