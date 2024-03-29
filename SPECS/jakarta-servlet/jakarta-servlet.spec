@@ -1,8 +1,8 @@
-%bcond_with bootstrap
-
 Name:           jakarta-servlet
 Version:        5.0.0
-Release:        13%{?dist}
+Release:        14%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Summary:        Server-side API for handling HTTP requests and responses
 # most of the project is EPL-2.0 or GPLv2 w/exceptions,
 # but some files still have Apache-2.0 license headers:
@@ -11,17 +11,10 @@ License:        (EPL-2.0 or GPLv2 with exceptions) and ASL 2.0
 URL:            https://github.com/eclipse-ee4j/servlet-api
 BuildArch:      noarch
 
-#Source0:        https://github.com/eclipse-ee4j/servlet-api/archive/%{version}-RELEASE/servlet-api-%{version}.tar.gz
 Source0:        https://github.com/jakartaee/servlet/archive/refs/tags/%{version}-RELEASE.tar.gz#/%{name}-%{version}-RELEASE.tar.gz
 
-#%%if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-#%%else
-#BuildRequires:  maven-local
-#BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
-#BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
-#%%endif
 
 Provides:       glassfish-servlet-api = %{version}-%{release}
 
@@ -74,6 +67,10 @@ sed -i -e 's/jakarta\./javax./g' $(find api/src/main/java/javax -name *.java)
 %doc README.md
 
 %changelog
+* Thu Mar 28 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 5.0.0-14
+- Initial Azure Linux import from Fedora 39 (license: MIT).
+- License verified
+
 * Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
