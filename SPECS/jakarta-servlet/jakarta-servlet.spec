@@ -32,7 +32,7 @@ and responses.
 %{?javadoc_package}
 
 %prep
-%setup -q -n servlet-api-%{version}-RELEASE
+%setup -q -n servlet-%{version}-RELEASE
 
 # remove unnecessary dependency on parent POM
 %pom_remove_parent . api
