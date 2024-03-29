@@ -28685,16 +28685,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "trousers",
-          "version": "0.3.14",
-          "downloadUrl": "https://sourceforge.net/projects/trousers/files/trousers/0.3.14/trousers-0.3.14.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tss2",
           "version": "1331",
           "downloadUrl": "https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss1331.tar.gz"
