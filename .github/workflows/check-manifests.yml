@@ -26,12 +26,12 @@ jobs:
     - name: Check x86_64 manifests
       run: |
         pushd toolkit
-        make check-x86_64-manifests
+        ./scripts/toolchain/check_manifests.sh -a "x86_64"
         popd
 
     - name: Check aarch64 manifests
       run: |
         pushd toolkit
-        make check-aarch64-manifests
+        ./scripts/toolchain/check_manifests.sh -a "aarch64"
         popd
       if: always()

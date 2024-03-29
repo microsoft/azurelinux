@@ -4,12 +4,53 @@
 
 set -e
 
-TOOLCHAIN_SPEC_LIST=$1
-SPECS_DIR=$2
-MANIFESTS_DIR=$3
-DIST_TAG=$4
-DISTRO_MACRO=$5
-ARCH=$6
+help () {
+    echo "Script to check that the manifest files only contain RPMs that could have been generated from toolchain specs"
+    echo "Usage:"
+    echo "[REQUIRED] -a -> architecture to run for (x86_64 or aarch64)"
+    echo "[OPTIONAL] -t -> space-separated list of toolchain specs"
+    echo "[OPTIONAL] -s -> SPECS_DIR"
+    echo "[OPTIONAL] -m -> TOOLCHAIN_MANIFESTS_DIR"
+    echo "[OPTIONAL] -d -> DIST_TAG"
+    echo "[OPTIONAL] -i -> DISTRO_MACRO"
+    echo "[OPTIONAL] -h -> print this help dialogue and exit"
+}
+
+# assign default value
+TOOLCHAIN_SPEC_LIST=$(make --no-print-directory -s printvar-toolchain_spec_list  2> /dev/null)
+SPECS_DIR=$(make --no-print-directory -s printvar-SPECS_DIR  2> /dev/null)
+MANIFESTS_DIR=$(make --no-print-directory -s printvar-TOOLCHAIN_MANIFESTS_DIR  2> /dev/null)
+DIST_TAG=$(make --no-print-directory -s printvar-DIST_TAG  2> /dev/null)
+DISTRO_MACRO=$(make --no-print-directory -s printvar-DIST_VERSION_MACRO  2> /dev/null)
+
+if [ "$#" -eq 0 ]
+then
+    echo -e "ERROR: Missing required arg\n\n"
+    help >&2
+    exit 1
+fi
+
+while (( "$#")); do
+  echo "$1 is $1"
+  case "$1" in
+    -a ) ARCH="$2"; shift 2;;
+    -t ) TOOLCHAIN_SPEC_LIST="$2"; shift 2 ;;
+    -s ) SPECS_DIR="$2"; shift 2 ;;
+    -m ) MANIFESTS_DIR="$2"; shift 2 ;;
+    -d ) DIST_TAG="$2"; shift 2;;
+    -i ) DISTRO_MACRO="$2"; shift 2;;
+    -h ) help; exit 0 ;;
+    ?* ) echo -e "ERROR: Invalid option\n\n"; help; exit 1 ;;
+  esac
+done
+
+# mandatory argument
+if [ ! "$ARCH" ]; then
+    echo -e "ERROR: Missing required arg\n\n"
+    help >&2
+    exit 1
+fi
+
 
 write_rpms_from_spec () {
     # $1 = spec file
