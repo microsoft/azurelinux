@@ -11371,8 +11371,8 @@
         "type": "other",
         "other": {
           "name": "libva",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/intel/libva/archive/2.11.0.tar.gz"
+          "version": "2.20.0",
+          "downloadUrl": "https://github.com/intel/libva/archive/2.20.0.tar.gz"
         }
       }
     },
