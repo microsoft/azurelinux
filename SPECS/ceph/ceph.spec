@@ -146,7 +146,7 @@ BuildRequires:  CUnit-devel
 BuildRequires:  boost
 BuildRequires:  cmake > 3.5
 BuildRequires:  librdmacm-devel
-BuildRequires:  mariner-rpm-macros
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  openldap
 BuildRequires:  openssl-devel
 BuildRequires:  procps-ng
