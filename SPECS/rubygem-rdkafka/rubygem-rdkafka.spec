@@ -14,6 +14,7 @@ BuildRequires:  git
 BuildRequires:  librdkafka-devel
 BuildRequires:  librdkafka1
 BuildRequires:  ruby
+BuildRequires:  git
 BuildRequires:  rubygem-mini_portile2
 BuildRequires:  rubygem-rake
 Requires:       rubygem-mini_portile2
@@ -26,16 +27,20 @@ It wraps the production-ready C client using the ffi gem and targets Kafka 1.0+ 
 
 %prep
 %setup -q -n rdkafka-ruby-%{version}
+%gemspec_clear_signing
+git init .
+git add .
 
 %build
 gem build %{gem_name}
 
 %install
+export RDKAFKA_EXT_PATH="/usr/"
 gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-%{version}.gem
 
 %files
 %defattr(-,root,root,-)
-%license %{gemdir}/gems/%{gem_name}-%{version}/LICENSE
+%license MIT-LICENSE
 %{gemdir}
 
 %changelog
