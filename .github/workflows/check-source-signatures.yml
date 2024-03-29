@@ -54,7 +54,7 @@ jobs:
           echo "SPECS-EXTENDED/*: ${changed_pkg_dirs_extended}"
 
           # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
-          # We need to filter since some directories may not contain .spec files we can rebuild.
+          # We need to filter since some directories may not contain .spec files we can rebuild, or the naming may not be 1:1.
           changed_pkgs=""
           for pkg in $changed_pkg_dirs; do
             changed_pkgs="$changed_pkgs $(find SPECS/$pkg -name '*.spec' -exec basename {} \; | sed 's/\.spec//g' | xargs)"
