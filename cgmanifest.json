@@ -28575,16 +28575,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tpm-tools",
-          "version": "1.3.9",
-          "downloadUrl": "http://downloads.sourceforge.net/trousers/tpm-tools-1.3.9.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tpm2-abrmd",
           "version": "3.0.0",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz"
