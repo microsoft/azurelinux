@@ -114,6 +114,8 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
+    - [kernelCommandLine](#kernelcommandline-type)
+      - [extraCommandLine](#extracommandline-string)
   - [os type](#os-type)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
