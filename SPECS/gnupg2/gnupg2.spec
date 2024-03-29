@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -63,6 +63,13 @@ ln -s gpg2 gpg
 ln -s gpgv2 gpgv
 popd
 
+# Disable GnuPG from using keyboxd for storage.
+install -vdm 755 %{buildroot}%{_sysconfdir}/skel/.gnupg
+cat > %{buildroot}%{_sysconfdir}/skel/.gnupg/common.conf << EOF
+# Uncomment to enabled keyboxd.
+# use_keyboxd
+EOF
+
 %find_lang %{name}
 
 %check
@@ -82,6 +89,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
+%{_sysconfdir}/skel/.gnupg/common.conf << EOF
 %exclude %{_infodir}/dir
 %exclude /usr/share/doc/*
 
@@ -89,6 +97,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Fri Mar 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.3-2
+- Disabled keyboxd by default.
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.3-1
 - Auto-upgrade to 2.4.3 - Azure Linux 3.0 - package upgrades
 
