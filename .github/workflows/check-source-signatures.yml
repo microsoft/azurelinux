@@ -56,10 +56,10 @@ jobs:
 
           # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
           # We need to filter since some directories may not contain .spec files we can rebuild, or the naming may not be 1:1.
-          changed_pkgs=()
-          while IFS= read -r pkg_dir; do
-            changed_pkgs+=("$(find ${{ matrix.specs-dir }}/$pkg_dir -name '*.spec' -exec basename {} .spec \;)")
-          done <<< "$changed_pkg_dirs"
+          changed_pkgs=""
+          for pkg in $changed_pkg_dirs; do
+            changed_pkgs="$changed_pkgs $(find ${{ matrix.specs-dir }}/$pkg -name '*.spec' -exec basename {} .spec \; | xargs)"
+          done
 
           echo "Packages modified in this PR:"
           echo "${{ matrix.specs-dir }}: ${changed_pkgs[@]}"
