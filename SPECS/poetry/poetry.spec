@@ -8,7 +8,7 @@ Version:        1.8.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://poetry.eustace.io/
 Source0:        https://files.pythonhosted.org/packages/source/p/poetry/poetry-%{version}.tar.gz
 # relax some too-strict dependencies that are specified in setup.py:

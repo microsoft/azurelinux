@@ -8,7 +8,7 @@ Version:        2.19.1
 Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/horejsek/%{name}
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  pyproject-rpm-macros

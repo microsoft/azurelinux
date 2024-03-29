@@ -5,7 +5,7 @@ Version:        0.0.7
 Release:        1%{?dist}
 License:        ASL-2.0
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/namex/
 Source0:        https://files.pythonhosted.org/packages/source/n/namex/namex-%{version}.tar.gz

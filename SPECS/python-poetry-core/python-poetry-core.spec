@@ -11,7 +11,7 @@ Release:        3%{?dist}
 # SPDX
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/python-poetry/poetry-core
 Source0:        %{url}/archive/%{version}/poetry-core-%{version}.tar.gz
 # This patch moves the vendored requires definition

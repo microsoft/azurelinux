@@ -12,7 +12,7 @@ Version:        3.0.0
 Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://github.com/executablebooks/markdown-it-py
 Source0:        %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
