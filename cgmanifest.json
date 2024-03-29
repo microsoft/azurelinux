@@ -20793,8 +20793,8 @@
         "type": "other",
         "other": {
           "name": "php-pecl-zip",
-          "version": "1.21.1",
-          "downloadUrl": "https://pecl.php.net/get/zip-1.21.1.tgz"
+          "version": "1.22.2",
+          "downloadUrl": "https://pecl.php.net/get/zip-1.22.3.tgz"
         }
       }
     },
