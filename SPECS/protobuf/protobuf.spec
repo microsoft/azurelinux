@@ -62,7 +62,7 @@ This contains protobuf python3 libraries.
 
 %build
 %{cmake} \
-    -Dprotobuf_BUILD_TESTS=OFF \
+    -Dprotobuf_BUILD_TESTS=ON \
     -Dprotobuf_ABSL_PROVIDER=package \
     -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
