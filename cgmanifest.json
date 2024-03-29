@@ -22314,7 +22314,7 @@
         "other": {
           "name": "python-fastjsonschema",
           "version": "2.19.1",
-          "downloadUrl": "https://github.com/horejsek/python-fastjsonschema/archive/v2.19.1/python-fastjsonschema-v2.19.1.tar.gz"
+          "downloadUrl": "https://github.com/horejsek/python-fastjsonschema/archive/v2.19.1/python-fastjsonschema-2.19.1.tar.gz"
         }
       }
     },
