@@ -63,7 +63,16 @@ ln -s gpg2 gpg
 ln -s gpgv2 gpgv
 popd
 
-# Disable GnuPG from using keyboxd for storage.
+# Empty legacy global configuration file.
+# Some GnuPG commands expect it to exist.
+install -Dm 644 /dev/null %{buildroot}%{_sysconfdir}/gnupg/gpgconf.conf
+
+# By default prevent GnuPG from using keyboxd for storage.
+# It tends to cause unexpected hangs of GnuPG commands and tools depending on GnuPG.
+# For more details, see:
+# - https://discussion.fedoraproject.org/t/gpg-blocking-forever-cant-git-commit-as-a-result/96605/6
+# - https://bugzilla.redhat.com/show_bug.cgi?id=2249218
+# - https://dev.gnupg.org/T6838
 install -vdm 755 %{buildroot}%{_sysconfdir}/skel/.gnupg
 cat > %{buildroot}%{_sysconfdir}/skel/.gnupg/common.conf << EOF
 # Uncomment to enabled keyboxd.
@@ -89,7 +98,8 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
-%{_sysconfdir}/skel/.gnupg/common.conf << EOF
+%{_sysconfdir}/gnupg
+%{_sysconfdir}/skel/.gnupg
 %exclude %{_infodir}/dir
 %exclude /usr/share/doc/*
 
