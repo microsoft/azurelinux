@@ -1,0 +1,26 @@
+--- ceph-18.1.2/src/pybind/rbd/rbd.pyx.orig	2023-07-21 13:30:08.156825317 -0400
++++ ceph-18.1.2/src/pybind/rbd/rbd.pyx	2023-07-24 09:09:27.930137117 -0400
+@@ -371,10 +371,10 @@
+     cdef rados_ioctx_t convert_ioctx(rados.Ioctx ioctx) except? NULL:
+         return <rados_ioctx_t>ioctx.io
+ 
+-cdef int progress_callback(uint64_t offset, uint64_t total, void* ptr) with gil:
++cdef int progress_callback(uint64_t offset, uint64_t total, void* ptr) noexcept with gil:
+     return (<object>ptr)(offset, total)
+ 
+-cdef int no_op_progress_callback(uint64_t offset, uint64_t total, void* ptr):
++cdef int no_op_progress_callback(uint64_t offset, uint64_t total, void* ptr) noexcept:
+     return 0
+ 
+ def cstr(val, name, encoding="utf-8", opt=False):
+@@ -426,7 +426,7 @@
+ 
+ cdef class Completion
+ 
+-cdef void __aio_complete_cb(rbd_completion_t completion, void *args) with gil:
++cdef void __aio_complete_cb(rbd_completion_t completion, void *args) noexcept with gil:
+     """
+     Callback to oncomplete() for asynchronous operations
+     """
+     
+     
