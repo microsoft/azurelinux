@@ -1619,12 +1619,12 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	if includeExistingKeys {
 		authorizedKeysFileFullPath := filepath.Join(installChroot.RootDir(), authorizedKeysFile)
 
-		exists, err := file.PathExists(authorizedKeysFileFullPath)
+		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
 		if err != nil {
 			return fmt.Errorf("failed to check if authorized_keys file exists:\n%w", err)
 		}
 
-		if exists {
+		if fileExists {
 			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
 			if err != nil {
 				return fmt.Errorf("failed to read existing authorized_keys file:\n%w", err)
