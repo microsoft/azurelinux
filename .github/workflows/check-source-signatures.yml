@@ -58,7 +58,7 @@ jobs:
           # We need to filter since some directories may not contain .spec files we can rebuild, or the naming may not be 1:1.
           changed_pkgs=()
           while IFS= read -r pkg_dir; do
-            changed_pkgs+=("$(find $pkg_dir -name '*.spec' -exec basename {} .spec \;)")
+            changed_pkgs+=("$(find ${{ matrix.specs-dir }}/$pkg_dir -name '*.spec' -exec basename {} .spec \;)")
           done <<< "$changed_pkg_dirs"
 
           echo "Packages modified in this PR:"
