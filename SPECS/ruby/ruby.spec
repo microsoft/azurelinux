@@ -408,7 +408,7 @@ sudo -u test make test TESTS="-v"
 
 %changelog
 * Mon Apr 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-3
-- Change the 'gemspec_clear_signing' macro to delete spec.signature also.
+- Change the 'gemspec_clear_signing' macro to delete gem.signature also.
 
 * Mon Jan 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-2
 - Added the 'gemspec_clear_signing' macro.
