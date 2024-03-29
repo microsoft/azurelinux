@@ -28,8 +28,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.14.1
-Release:        2%{?dist}
+Version:        6.6.22.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,6 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Source7:        10_kernel.cfg
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -248,18 +247,9 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-# Add kernel boot configurations to /etc/default/grub.d
-install -Dm 755 %{SOURCE7} %{buildroot}%{_sysconfdir}/default/grub.d/10_kernel.cfg
-
 # hmac sign the kernel for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
-
-# Register myself to initramfs
-mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
-cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
---add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
-EOF
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -312,7 +302,7 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
+rm -rf /boot/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %preun tools
@@ -348,8 +338,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -416,6 +404,19 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
+- Auto-upgrade to 6.6.22.1
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
+- remove unnecessary 10_kernel.cfg grub config file
+
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
+- Remove /var/lib/initramfs/kernel files.
+
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
+- Call dracut instead of mkinitrd
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
 * Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
 - Remove legacy /boot/mariner.cfg
 - Introduce /etc/default/grub.d/10_kernel.cfg

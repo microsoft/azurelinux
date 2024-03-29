@@ -12,15 +12,15 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/directory"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/schedulerutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
 	"github.com/jinzhu/copier"
 )
@@ -83,13 +83,13 @@ func ParseSPECsWrapper(buildDir, specsDir, rpmsDir, srpmsDir, toolchainDir, dist
 		if targetArch == "" {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, buildArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("failed to parse native specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse native specs:\n%w", parseError)
 				return err
 			}
 		} else {
 			packageRepo, parseError = parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, targetArch, specListSet, toolchainRPMs, workers, runCheck)
 			if parseError != nil {
-				err := fmt.Errorf("failed to parse cross specs (%w)", parseError)
+				err := fmt.Errorf("failed to parse cross specs:\n%w", parseError)
 				return err
 			}
 		}
@@ -183,20 +183,22 @@ func FindSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 			return nil, err
 		}
 	} else {
+		var specParseErrMsg strings.Builder
 		for specName := range specListSet {
 			specSearch := filepath.Join(specsDir, fmt.Sprintf("**/%s.spec", specName))
 			matchingSpecFiles, err := filepath.Glob(specSearch)
 
 			// If a SPEC is in the parse list, it should be parsed.
 			if err != nil {
-				err = fmt.Errorf("spec search failed on '%s'. Error:\n%w", specSearch, err)
-				return nil, err
+				specParseErrMsg.WriteString(fmt.Sprintf("\nspec search failed on (%s):\n%v", specSearch, err))
+			} else if len(matchingSpecFiles) != 1 {
+				specParseErrMsg.WriteString(fmt.Sprintf("\nunexpected number of matches (%d) for spec file (%s) in directory (%s)", len(matchingSpecFiles), specName, specsDir))
+			} else {
+				specFiles = append(specFiles, matchingSpecFiles[0])
 			}
-			if len(matchingSpecFiles) != 1 {
-				err = fmt.Errorf("unexpected number of matches '%d' for spec file '%s'", len(matchingSpecFiles), specName)
-				return nil, err
-			}
-			specFiles = append(specFiles, matchingSpecFiles[0])
+		}
+		if specParseErrMsg.Len() != 0 {
+			return nil, fmt.Errorf("failed to parse specs: %s", specParseErrMsg.String())
 		}
 	}
 	return
@@ -214,7 +216,6 @@ func parseSPECs(specsDir, rpmsDir, srpmsDir, toolchainDir, distTag, arch string,
 
 	specFiles, err = FindSpecFiles(specsDir, specListSet)
 	if err != nil {
-		logger.Log.Errorf("Failed to find *.spec files. Check that %s is the correct directory. Error: %v", specsDir, err)
 		return
 	}
 

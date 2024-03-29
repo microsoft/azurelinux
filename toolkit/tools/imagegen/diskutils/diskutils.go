@@ -15,19 +15,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 var (
 	// When calling mkfs, the default options change depending on the host OS you are running on and typically match
 	// what the distro has decided is best for their OS. For example, for ext2/3/4, the defaults are stored in
 	// /etc/mke2fs.conf.
-	// However, when building Mariner images, the defaults should be as consistent as possible and should only contain
-	// features that are supported on Mariner.
+	// However, when building Azure Linux images, the defaults should be as consistent as possible and should only contain
+	// features that are supported on Azure Linux.
 	DefaultMkfsOptions = map[string][]string{
 		"ext2": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr"},
 		"ext3": {"-b", "4096", "-O", "none,sparse_super,large_file,filetype,resize_inode,dir_index,ext_attr,has_journal"},
@@ -469,27 +469,27 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 
 		partDevPath, err := CreateSinglePartition(diskDevPath, partitionNumber, partitionTableType.String(), partition, partType)
 		if err != nil {
-			err = fmt.Errorf("Failed to create single partition:\n%w", err)
+			err = fmt.Errorf("failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		partFsType, err := FormatSinglePartition(partDevPath, partition)
 		if err != nil {
-			err = fmt.Errorf("Failed to format partition:\n%w", err)
+			err = fmt.Errorf("failed to format partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 		}
 
 		if rootEncryption.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			encryptedRoot, err = encryptRootPartition(partDevPath, partition, rootEncryption)
 			if err != nil {
-				err = fmt.Errorf("Failed to initialize encrypted root:\n%w", err)
+				err = fmt.Errorf("failed to initialize encrypted root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = GetEncryptedRootVolMapping()
 		} else if readOnlyRootConfig.Enable && partition.HasFlag(configuration.PartitionFlagDeviceMapperRoot) {
 			readOnlyRoot, err = PrepReadOnlyDevice(partDevPath, partition, readOnlyRootConfig)
 			if err != nil {
-				err = fmt.Errorf("Failed to initialize read only root:\n%w", err)
+				err = fmt.Errorf("failed to initialize read only root:\n%w", err)
 				return partDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err
 			}
 			partDevPathMap[partition.ID] = readOnlyRoot.MappedDevice

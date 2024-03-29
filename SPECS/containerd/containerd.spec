@@ -4,7 +4,7 @@
 Summary: Industry-standard container runtime
 Name: containerd
 Version: 1.7.13
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -85,6 +85,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.13-2
+- Add OOMScoreAdjust -999 to containerd.service
+
 * Fri Feb 23 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.13-1
 - Rename package to containerd
 - Upgrade to 1.7.13, remove unused patches

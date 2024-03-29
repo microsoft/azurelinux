@@ -15,8 +15,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // IsDir check if a given file path is a directory.
@@ -37,6 +37,17 @@ func IsFile(path string) (isFile bool, err error) {
 	}
 
 	return !info.IsDir(), nil
+}
+
+// IsFileOrSymlink returns true if the provided path is a file or a symlink.
+func IsFileOrSymlink(path string) (isFile bool, err error) {
+	info, err := os.Lstat(path)
+	if err != nil {
+		return
+	}
+
+	isSymlink := info.Mode().Type() == os.ModeSymlink
+	return isSymlink || !info.IsDir(), nil
 }
 
 // Move moves a file from src to dst. Will preserve permissions.
@@ -75,13 +86,7 @@ func Move(src, dst string) (err error) {
 // Copy copies a file from src to dst, creating directories for the destination if needed.
 // dst is assumed to be a file and not a directory. Will preserve permissions.
 func Copy(src, dst string) (err error) {
-	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm)
-}
-
-// CopyAndChangeMode copies a file from src to dst, creating directories with the given access rights for the destination if needed.
-// dst is assumed to be a file and not a directory. Will change the permissions to the given value.
-func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
-	return copyWithPermissions(src, dst, dirmode, true, filemode)
+	return NewFileCopyBuilder(src, dst).Run()
 }
 
 // Read reads a string from the file src.
@@ -245,37 +250,24 @@ func GetAbsPathWithBase(baseDirPath, inputPath string) string {
 	return filepath.Join(baseDirPath, inputPath)
 }
 
-// copyWithPermissions copies a file from src to dst, creating directories with the requested mode for the destination if needed.
-// Depending on the changeMode parameter, it may also change the file mode.
-func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, filemode os.FileMode) (err error) {
-	const squashErrors = false
-
-	logger.Log.Debugf("Copying (%s) -> (%s)", src, dst)
-
-	isSrcFile, err := IsFile(src)
+func IsDirEmpty(path string) (bool, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return
+		return false, err
 	}
-	if !isSrcFile {
-		return fmt.Errorf("source (%s) is not a file", src)
-	}
+	defer file.Close()
 
-	err = createDestinationDir(dst, dirmode)
+	_, err = file.Readdirnames(1)
+	if err == io.EOF {
+		// Directory has no children.
+		return true, nil
+	}
 	if err != nil {
-		return
+		return false, err
 	}
 
-	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
-	if err != nil {
-		return
-	}
-
-	if changeMode {
-		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
-		err = os.Chmod(dst, filemode)
-	}
-
-	return
+	// Directory has at least 1 child.
+	return false, nil
 }
 
 func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
@@ -305,7 +297,8 @@ func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
 	return
 }
 
-// CopyResourceFile copies a file from an embedded binary resource file.
+// CopyResourceFile copies a file from an embedded binary resource file to disk.
+// This will override any existing file.
 func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, filemode os.FileMode) error {
 	logger.Log.Debugf("Copying resource (%s) -> (%s)", srcFile, dst)
 
@@ -320,7 +313,7 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 	defer source.Close()
 
-	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE, filemode)
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, filemode)
 	if err != nil {
 		return fmt.Errorf("failed to copy resource (%s) -> (%s):\nfailed to open destination:\n%w", srcFile, dst, err)
 	}

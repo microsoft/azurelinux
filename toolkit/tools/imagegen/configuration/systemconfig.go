@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
@@ -116,7 +116,7 @@ func (s *SystemConfig) IsValid() (err error) {
 			return fmt.Errorf("invalid [PartitionSettings]: %w", err)
 		}
 		if mountPointUsed[partitionSetting.MountPoint] {
-			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at '%s'", partitionSetting.MountPoint)
+			return fmt.Errorf("invalid [PartitionSettings]: duplicate mount point found at (%s)", partitionSetting.MountPoint)
 		}
 		if partitionSetting.MountPoint != "" {
 			// Don't track unmounted partition duplication (They will all mount at "")
@@ -159,7 +159,7 @@ func (s *SystemConfig) IsValid() (err error) {
 	repoNames := make(map[string]bool)
 	for _, packageRepo := range s.PackageRepos {
 		if err = packageRepo.IsValid(); err != nil {
-			return fmt.Errorf("invalid [PackageRepo]: %s. Error: %w", packageRepo.Name, err)
+			return fmt.Errorf("invalid [PackageRepo]: (%s):\n%w", packageRepo.Name, err)
 		}
 
 		if repoNames[packageRepo.Name] {

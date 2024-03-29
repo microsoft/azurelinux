@@ -9,8 +9,8 @@
 %define container_image_components 'kube-proxy kube-apiserver kube-controller-manager kube-scheduler'
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
-Version:        1.28.7
-Release:        2%{?dist}
+Version:        1.29.1
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ URL:            https://kubernetes.io/
 Source0:        https://dl.k8s.io/v%{version}/kubernetes-src.tar.gz#/%{name}-v%{version}.tar.gz
 Source1:        kubelet.service
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.38-2%{?dist}
+BuildRequires:  glibc-static >= 2.38-3%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -93,9 +93,16 @@ Pause component for Microsoft Kubernetes %{version}.
 %setup -q -c -n %{name}
 
 %build
-# set version information using version file
+# set version information
 # (see k8s code: hack/lib/version.sh for more detail)
-export KUBE_GIT_VERSION_FILE=%{_builddir}/%{name}/version-file.sh
+export KUBE_GIT_TREE_STATE="clean"
+export KUBE_GIT_VERSION=v%{version}
+
+# use go provided by host
+go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
+go_version_min=$(cat %{_builddir}/%{name}/.go-version)
+echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
+export FORCE_HOST_GO=y
 
 # build host and container image related components
 echo "+++ build kubernetes components"
@@ -262,6 +269,15 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Mon Mar 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-3
+- Fix build break due to golang version upgrade
+
+* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.29.1-2
+- update to build dep latest glibc-static version
+
+* Tue Mar 05 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-1
+- Upgrade to 1.29.1
+
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.28.7-2
 - updated glibc-static buildrequires release
 

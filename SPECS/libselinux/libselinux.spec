@@ -1,7 +1,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        3.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,11 +11,12 @@ Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{ve
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  swig
-BuildRequires:  python3
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
-BuildRequires:  python3-wheel
+# python3-wheel (non-toolchain package) cannot be added as a BR to libselinux (since it is a toolchain package)
+# The raw toolchain environment does already provide python3-wheel
+#BuildRequires:  python3-wheel
 Requires:       pcre2
 Requires:       libsepol
 
@@ -78,7 +79,7 @@ make DESTDIR="%{buildroot}" LIBDIR="%{_libdir}" SHLIBDIR="%{_libdir}" BINDIR="%{
 
 mkdir -p %{buildroot}%{_libdir}/tmpfiles.d
 mkdir -p %{buildroot}%{_localstatedir}/run/setrans
-echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libselinux.conf
+echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libselinux.conf
 
 %ldconfig_scriptlets
 
@@ -109,6 +110,10 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 %{python3_sitelib}/*
 
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 3.6-2
+- fix tmpfiles.d conf to avoid "Line references path below legacy directory
+  /var/run/" warnings
+
 * Tue Feb 06 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.6-1
 - Upgrade to version 3.6
 - Build against pcre2
@@ -119,7 +124,7 @@ echo "d %{_localstatedir}/run/setrans 0755 root root" > %{buildroot}/%{_libdir}/
 
 * Fri Aug 13 2021 Thomas Crain <thcrain@microsoft.com> - 3.2-1
 - Upgrade to latest upstream version
-- Add -fno-semantic-interposition to CFLAGS as recommended by upstream 
+- Add -fno-semantic-interposition to CFLAGS as recommended by upstream
 - License verified
 - Remove manual pkgconfig provides
 - Update source URL to new format

@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/ptrutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -88,11 +88,11 @@ func TestShouldFailForUntaggedEncryptionDeviceMapperRoot(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [Partition] 'MyRootfs' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] 'SmallerDisk's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [Partition] 'MyRootfs' must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] 'SmallerDisk's root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[Partition] (MyRootfs) must include 'dmroot' device mapper root flag in [Flags] for [SystemConfig] (SmallerDisk)'s root partition since it uses [ReadOnlyVerityRoot] or [Encryption]", err.Error())
 }
 
 func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
@@ -117,11 +117,11 @@ func TestShouldFailDeviceMapperWithNoRootPartitions(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: can't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\ncan't find a root ('/') [PartitionSetting] to work with either [ReadOnlyVerityRoot] or [Encryption]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: failed to parse [SystemConfig]: invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\nfailed to parse [SystemConfig]: invalid [ReadOnlyVerityRoot] or [Encryption]: must have a partition mounted at '/'", err.Error())
 
 }
 
@@ -170,12 +170,12 @@ func TestShouldFailDeviceMapperWithMultipleRoots(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [SystemConfig] 'SmallerDisk' includes two (or more) device mapper root [PartitionSettings] 'MyRootfs' and 'MySecondRootfs', include only one", err.Error())
+	assert.Equal(t, "a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
 
 	// remarshal runs IsValid() on [SystemConfig] prior to running it on [Config], so we get a different error message here.
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: a config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured: [SystemConfig] 'SmallerDisk' includes two (or more) device mapper root [PartitionSettings] 'MyRootfs' and 'MySecondRootfs', include only one", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\na config in [SystemConfigs] enables a device mapper based root (Encryption or Read-Only), but partitions are miss-configured:\n[SystemConfig] (SmallerDisk) includes two (or more) device mapper root [PartitionSettings] (MyRootfs) and (MySecondRootfs), include only one", err.Error())
 
 }
 
@@ -192,11 +192,11 @@ func TestShouldFailDuplicatedIDs(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '0')", err.Error())
+	assert.Equal(t, "invalid [Config]:\na [Partition] on a [Disk] (0) shares an ID (duplicatedID) with another partition (on disk (0))", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '0')", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\na [Partition] on a [Disk] (0) shares an ID (duplicatedID) with another partition (on disk (0))", err.Error())
 
 	// Reset the config, then try across disks
 	testConfig.Disks = append([]Disk{}, expectedConfiguration.Disks...)
@@ -207,11 +207,11 @@ func TestShouldFailDuplicatedIDs(t *testing.T) {
 
 	err = testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '1')", err.Error())
+	assert.Equal(t, "invalid [Config]:\na [Partition] on a [Disk] (0) shares an ID (duplicatedID) with another partition (on disk (1))", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: invalid [Config]: a [Partition] on a [Disk] '0' shares an ID 'duplicatedID' with another partition (on disk '1')", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\na [Partition] on a [Disk] (0) shares an ID (duplicatedID) with another partition (on disk (1))", err.Error())
 }
 
 func TestShouldFailMissingPartition(t *testing.T) {
@@ -225,11 +225,11 @@ func TestShouldFailMissingPartition(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'NOT_AN_ID' which has no corresponding partition on a [Disk]", err.Error())
+	assert.Equal(t, "invalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (NOT_AN_ID) which has no corresponding partition on a [Disk]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'NOT_AN_ID' which has no corresponding partition on a [Disk]", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (NOT_AN_ID) which has no corresponding partition on a [Disk]", err.Error())
 }
 
 func TestShouldFailMissmatchedGPTMountsWithNonMBRDisk(t *testing.T) {
@@ -247,11 +247,11 @@ func TestShouldFailMissmatchedGPTMountsWithNonMBRDisk(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+	assert.Equal(t, "invalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but that partition is on an MBR disk which does not support PARTLABEL", err.Error())
 }
 
 func TestShouldFailPartLabelWithNoName(t *testing.T) {
@@ -264,11 +264,11 @@ func TestShouldFailPartLabelWithNoName(t *testing.T) {
 
 	err := testConfig.IsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but it has no [Name]", err.Error())
+	assert.Equal(t, "invalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but it has no [Name]", err.Error())
 
 	err = remarshalJSON(testConfig, &checkedConfig)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [Config]: invalid [Config]: [SystemConfig] 'SmallerDisk' mounts a [Partition] 'MyBoot' via PARTLABEL, but it has no [Name]", err.Error())
+	assert.Equal(t, "failed to parse [Config]:\ninvalid [Config]:\n[SystemConfig] (SmallerDisk) mounts a [Partition] (MyBoot) via PARTLABEL, but it has no [Name]", err.Error())
 }
 
 func TestShouldSucceedReturnPartitionIndexAndObjectForBootPartition(t *testing.T) {
@@ -423,7 +423,7 @@ var expectedConfiguration Config = Config{
 				"local/path/file5": {{Path: "/final/system/path/file5"}},
 				"local/path/file6": {{Path: "/final/system/path/file6"}, {Path: "/final/system/path/file6_copy"}},
 			},
-			Hostname: "Mariner-Test",
+			Hostname: "Azure-Linux-Test",
 			BootType: "efi",
 			Groups: []Group{
 				{
@@ -563,7 +563,7 @@ var expectedConfiguration Config = Config{
 			KernelOptions: map[string]string{
 				"default": "kernel",
 			},
-			Hostname: "Mariner-TestA",
+			Hostname: "Azure-Linux-TestA",
 			Users: []User{
 				{
 					Name:     "basicuser",
@@ -599,7 +599,7 @@ var expectedConfiguration Config = Config{
 			KernelOptions: map[string]string{
 				"default": "kernel",
 			},
-			Hostname: "Mariner-TestB",
+			Hostname: "Azure-Linux-TestB",
 			Users: []User{
 				{
 					Name:     "basicuser",

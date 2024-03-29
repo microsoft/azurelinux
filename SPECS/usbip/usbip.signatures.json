@@ -1,8 +1,8 @@
 {
  "Signatures": {
-  "usbip-5.15.34.1.tar.xz": "7e55ef3d527a08c4ae5fbe4e9115db180da94de1957f5dfa20b3b152a77e5bf5",
-  "usbip-server.service": "68a727d13e270564b5e2c97cad5ccdb97086c4d1065b6ef70205b54769260b0f",
+  "extract_usbip.sh": "166037eb914ad5495f2d29c92d803325a2143dd105794283d2e6d47df12ee885",
+  "usbip-6.6.14.1.tar.xz": "5eec720d9dec5e00387c0d19bd65667d3357a3be73689cdb36a95ca749c5a695",
   "usbip-client.service": "7b83311e550793014a897b43fe7b4e5339f114924b3d5f52cceb58787fc65008",
-  "extract_usbip.sh": "e19faf9d95444cc0b0757e3ad063e534478f9c28a6fb5b2beb17ca89b9461ad4"
+  "usbip-server.service": "68a727d13e270564b5e2c97cad5ccdb97086c4d1065b6ef70205b54769260b0f"
  }
 }

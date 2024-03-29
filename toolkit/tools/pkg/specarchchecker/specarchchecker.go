@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	simpletoolchroot "github.com/microsoft/CBL-Mariner/toolkit/tools/pkg/simpletoolchroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	simpletoolchroot "github.com/microsoft/azurelinux/toolkit/tools/pkg/simpletoolchroot"
 )
 
 type ArchChecker struct {

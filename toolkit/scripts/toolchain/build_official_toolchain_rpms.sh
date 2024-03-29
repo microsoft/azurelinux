@@ -38,7 +38,7 @@ TOOLCHAIN_FAILURES=$TOOLCHAIN_LOGS/failures.txt
 set -ex
 
 export LFS=$MARINER_BUILD_DIR/toolchain/populated_toolchain
-TOPDIR=/usr/src/mariner
+TOPDIR=/usr/src/azl
 CHROOT_BUILDROOT_DIR=$LFS$TOPDIR/BUILDROOT
 CHROOT_SOURCES_DIR=$LFS$TOPDIR/SOURCES
 CHROOT_SPECS_DIR=$LFS$TOPDIR/SPECS
@@ -54,12 +54,21 @@ PARAM_BUILD_NUM=$MARINER_BUILD_NUMBER
 PARAM_RELEASE_VER=$MARINER_RELEASE_VERSION
 
 if [ "$RUN_CHECK" = "y" ]; then
-    export CHECK_SETTING=" "
-    export CHECK_DEFINE_NUM="1"
+    CHECK_SETTING=" "
+    CHECK_DEFINE_NUM="1"
 else
-    export CHECK_SETTING="--nocheck"
-    export CHECK_DEFINE_NUM="0"
+    CHECK_SETTING="--nocheck"
+    CHECK_DEFINE_NUM="0"
 fi
+
+SHARED_RPM_MACROS=(                                                         \
+    -D "$MARINER_DIST_MACRO"                                                \
+    -D "dist                    $PARAM_DIST_TAG"                            \
+    -D "distro_module_ldflags   -Wl,-dT,%{_topdir}/BUILD/module_info.ld"    \
+    -D "distro_release_version  $PARAM_RELEASE_VER"                         \
+    -D "mariner_build_number    $PARAM_BUILD_NUM"                           \
+    -D "with_check              $CHECK_DEFINE_NUM"                          \
+    )
 
 # Assumption: pipeline has copied file: build/toolchain/toolchain_from_container.tar.gz
 # Or, if toolchain-build-all was called, both of the following will exist:
@@ -201,8 +210,8 @@ chroot_and_install_rpms () {
         # This is a heuristic to find the associated RPMs. In theory we should instead use a more selective filtering like
         # we use for build_rpm_in_chroot_no_install by querying for exact RPMs that match $2 found in $1.spec however to
         # preserve the existing behavior we'll just copy all RPMs that match the name-version-release string.
-        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
-        verrel=$(rpmspec -q $specPath --srpm --define="with_check $CHECK_DEFINE_NUM" --define="_sourcedir $specDir" --define="dist $PARAM_DIST_TAG" --define="$MARINER_DIST_MACRO" --queryformat %{VERSION}-%{RELEASE})
+        #     e.g. matching_rpms=$(rpmspec -q $specPath --srpm "${SHARED_RPM_MACROS[@]}" --define="_sourcedir $specDir" --builtrpms --queryformat '%{nvra}.rpm\n' | grep $2)
+        verrel=$(rpmspec -q $specPath --srpm "${SHARED_RPM_MACROS[@]}" --define="_sourcedir $specDir" --queryformat %{VERSION}-%{RELEASE})
         # Do not include any files with "debuginfo" in the name
         find $CHROOT_RPMS_DIR -name "$2*$verrel*" ! -name "*debuginfo*" -exec cp {} $CHROOT_INSTALL_RPM_DIR ';'
     else
@@ -230,17 +239,16 @@ chroot_and_run_rpmbuild () {
     echo "Will build spec for $1 in chroot"
     chroot_mount
 
-    chroot "$LFS" /usr/bin/env -i          \
-        HOME=/root                         \
-        TERM="$TERM"                       \
-        PS1='\u:\w\$ '                     \
-        PATH=/bin:/usr/bin:/sbin:/usr/sbin \
-        SHELL=/bin/bash                    \
-        rpmbuild --nodeps --rebuild --clean     \
-            $CHECK_SETTING                 \
-            --define "with_check $CHECK_DEFINE_NUM" --define "dist $PARAM_DIST_TAG" --define "$MARINER_DIST_MACRO" --define "mariner_build_number $PARAM_BUILD_NUM" \
-            --define "mariner_release_version $PARAM_RELEASE_VER" $TOPDIR/SRPMS/$1 \
-            --define "mariner_module_ldflags -Wl,-dT,%{_topdir}/BUILD/module_info.ld" \
+    chroot "$LFS" /usr/bin/env -i           \
+        HOME=/root                          \
+        TERM="$TERM"                        \
+        PS1='\u:\w\$ '                      \
+        PATH=/bin:/usr/bin:/sbin:/usr/sbin  \
+        SHELL=/bin/bash                     \
+        rpmbuild --nodeps --rebuild --clean \
+            "$CHECK_SETTING"                \
+            "${SHARED_RPM_MACROS[@]}"       \
+            "$TOPDIR/SRPMS/$1"              \
             || echo "$1" >> "$TOOLCHAIN_FAILURES"
 
     chroot_unmount
@@ -255,7 +263,7 @@ build_rpm_in_chroot_no_install () {
 
     specPath=$(find $SPECROOT -name "$1.spec" -print -quit)
     specDir=$(dirname $specPath)
-    rpmMacros=(-D "with_check $CHECK_DEFINE_NUM" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
+    rpmMacros=("${SHARED_RPM_MACROS[@]}" -D "_sourcedir $specDir")
     builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
     # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
@@ -310,11 +318,11 @@ echo Setting up initial chroot to build pass1 toolchain RPMs from SPECs
 
 # Configure rpm macros
 mkdir -pv $LFS/usr/etc/rpm
-cp -v $SPECROOT/mariner-rpm-macros/macros $LFS/usr/etc/rpm/macros
-mkdir -pv $LFS/usr/lib/rpm/mariner
-cp -v $SPECROOT/mariner-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/mariner/gen-ld-script.sh
-cp -v $SPECROOT/mariner-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/mariner/generate-package-note.py
-cp -v $SPECROOT/mariner-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/mariner/verify-package-notes.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/macros $LFS/usr/etc/rpm/macros
+mkdir -pv $LFS/usr/lib/rpm/azl
+cp -v $SPECROOT/azurelinux-rpm-macros/gen-ld-script.sh $LFS/usr/lib/rpm/azl/gen-ld-script.sh
+cp -v $SPECROOT/azurelinux-rpm-macros/generate-package-note.py $LFS/usr/lib/rpm/azl/generate-package-note.py
+cp -v $SPECROOT/azurelinux-rpm-macros/verify-package-notes.sh $LFS/usr/lib/rpm/azl/verify-package-notes.sh
 mkdir -pv $LFS/usr/lib/rpm/macros.d
 cp -v $MARINER_TOOLCHAIN_MANIFESTS_DIR/macros.override $LFS/usr/lib/rpm/macros.d/macros.override
 cp /etc/resolv.conf $LFS/etc/
@@ -325,9 +333,11 @@ start_record_timestamp "build packages/build"
 start_record_timestamp "build packages/install"
 
 echo Building final list of toolchain RPMs
-build_rpm_in_chroot_no_install mariner-rpm-macros
-chroot_and_install_rpms mariner-rpm-macros
-chroot_and_install_rpms mariner-check-macros
+build_rpm_in_chroot_no_install azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-rpm-macros
+chroot_and_install_rpms azurelinux-check-macros
+build_rpm_in_chroot_no_install python-rpm-generators
+chroot_and_install_rpms python-rpm-generators python3-rpm-generators
 build_rpm_in_chroot_no_install filesystem
 build_rpm_in_chroot_no_install kernel-headers
 build_rpm_in_chroot_no_install glibc
@@ -444,14 +454,14 @@ chroot_and_install_rpms python-setuptools python3-setuptools
 build_rpm_in_chroot_no_install libxml2
 chroot_and_install_rpms libxml2
 
-# Download JDK rpms (from CBL-Mariner 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
+# Download JDK rpms (from Azure Linux 2.0 repo until it reaches AzuleLinux 3.0 repo on PMC)
 echo Download JDK rpms
 case $(uname -m) in
     x86_64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-11-11.0.20.1-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
     aarch64)
-        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-11-11.0.20.1-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
+        wget -nv --no-clobber --timeout=30 https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm --directory-prefix=$CHROOT_RPMS_DIR_ARCH
     ;;
 esac
 
@@ -537,6 +547,17 @@ chroot_and_install_rpms docbook-dtd-xml
 chroot_and_install_rpms docbook-style-xsl
 chroot_and_install_rpms libxslt
 build_rpm_in_chroot_no_install gtk-doc
+
+build_rpm_in_chroot_no_install python-setuptools
+chroot_and_install_rpms python-setuptools python3-setuptools
+
+# python-packaging requires pyproject-rpm-macros
+build_rpm_in_chroot_no_install pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-rpm-macros
+chroot_and_install_rpms pyproject-rpm-macros pyproject-srpm-macros
+
+build_rpm_in_chroot_no_install python-packaging
+chroot_and_install_rpms python-packaging python3-packaging
 
 # python3-lxml requires python3-Cython and libxslt
 build_rpm_in_chroot_no_install Cython
@@ -626,6 +647,15 @@ build_rpm_in_chroot_no_install util-linux
 build_rpm_in_chroot_no_install debugedit
 chroot_and_install_rpms debugedit
 build_rpm_in_chroot_no_install rpm
+chroot_and_install_rpms rpm rpm-libs
+chroot_and_install_rpms rpm rpm
+chroot_and_install_rpms rpm rpm-build-libs
+chroot_and_install_rpms rpm rpm-devel
+chroot_and_install_rpms rpm rpm-build
+
+build_rpm_in_chroot_no_install python-wheel
+build_rpm_in_chroot_no_install python-flit-core
+build_rpm_in_chroot_no_install python-pip
 
 # python-jinja2 needs python3-markupsafe
 # python3-setuptools, python3-libs are also needed but already installed
@@ -675,7 +705,6 @@ chroot_and_install_rpms newt
 build_rpm_in_chroot_no_install chkconfig
 
 build_rpm_in_chroot_no_install azurelinux-repos
-build_rpm_in_chroot_no_install pyproject-rpm-macros
 
 # Rebuild audit with systemd-bootstrap-rpm-macros installed.
 # Without it, audit's systemd macros won't expand and install/uninstall

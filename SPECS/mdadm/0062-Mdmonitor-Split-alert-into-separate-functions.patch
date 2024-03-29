@@ -1,0 +1,233 @@
+From 3698867194f27fdd7824b8bdd172d619a2c087cc Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Wed, 7 Sep 2022 14:56:49 +0200
+Subject: [PATCH 62/83] Mdmonitor: Split alert() into separate functions
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Monitor.c | 186 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 95 insertions(+), 91 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 7d7dc4d2..0036e8cd 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -66,7 +66,7 @@ struct alert_info {
+ static int make_daemon(char *pidfile);
+ static int check_one_sharer(int scan);
+ static void write_autorebuild_pid(void);
+-static void alert(char *event, char *dev, char *disc, struct alert_info *info);
++static void alert(const char *event, const char *dev, const char *disc, struct alert_info *info);
+ static int check_array(struct state *st, struct mdstat_ent *mdstat,
+ 		       int test, struct alert_info *info,
+ 		       int increments, char *prefer);
+@@ -407,111 +407,115 @@ static void write_autorebuild_pid()
+ 	}
+ }
+ 
+-static void alert(char *event, char *dev, char *disc, struct alert_info *info)
++static void execute_alert_cmd(const char *event, const char *dev, const char *disc, struct alert_info *info)
++{
++	int pid = fork();
++
++	switch (pid) {
++	default:
++		waitpid(pid, NULL, 0);
++		break;
++	case -1:
++		pr_err("Cannot fork to execute alert command");
++		break;
++	case 0:
++		execl(info->alert_cmd, info->alert_cmd, event, dev, disc, NULL);
++		exit(2);
++	}
++}
++
++static void send_event_email(const char *event, const char *dev, const char *disc, struct alert_info *info)
++{
++	FILE *mp, *mdstat;
++	char hname[256];
++	char buf[BUFSIZ];
++	int n;
++
++	mp = popen(Sendmail, "w");
++	if (!mp) {
++		pr_err("Cannot open pipe stream for sendmail.\n");
++		return;
++	}
++
++	gethostname(hname, sizeof(hname));
++	signal(SIGPIPE, SIG_IGN);
++	if (info->mailfrom)
++		fprintf(mp, "From: %s\n", info->mailfrom);
++	else
++		fprintf(mp, "From: %s monitoring <root>\n", Name);
++	fprintf(mp, "To: %s\n", info->mailaddr);
++	fprintf(mp, "Subject: %s event on %s:%s\n\n", event, dev, hname);
++	fprintf(mp, "This is an automatically generated mail message. \n");
++	fprintf(mp, "A %s event had been detected on md device %s.\n\n", event, dev);
++
++	if (disc && disc[0] != ' ')
++		fprintf(mp,
++			"It could be related to component device %s.\n\n", disc);
++	if (disc && disc[0] == ' ')
++		fprintf(mp, "Extra information:%s.\n\n", disc);
++
++	mdstat = fopen("/proc/mdstat", "r");
++	if (!mdstat) {
++		pr_err("Cannot open /proc/mdstat\n");
++		pclose(mp);
++		return;
++	}
++
++	fprintf(mp, "The /proc/mdstat file currently contains the following:\n\n");
++	while ((n = fread(buf, 1, sizeof(buf), mdstat)) > 0)
++		n = fwrite(buf, 1, n, mp);
++	fclose(mdstat);
++	pclose(mp);
++}
++
++static void log_event_to_syslog(const char *event, const char *dev, const char *disc)
+ {
+ 	int priority;
++	/* Log at a different severity depending on the event.
++	 *
++	 * These are the critical events:  */
++	if (strncmp(event, "Fail", 4) == 0 ||
++		strncmp(event, "Degrade", 7) == 0 ||
++		strncmp(event, "DeviceDisappeared", 17) == 0)
++		priority = LOG_CRIT;
++	/* Good to know about, but are not failures: */
++	else if (strncmp(event, "Rebuild", 7) == 0 ||
++			strncmp(event, "MoveSpare", 9) == 0 ||
++			strncmp(event, "Spares", 6) != 0)
++		priority = LOG_WARNING;
++	/* Everything else: */
++	else
++		priority = LOG_INFO;
+ 
++	if (disc && disc[0] != ' ')
++		syslog(priority,
++			"%s event detected on md device %s, component device %s", event, dev, disc);
++	else if (disc)
++		syslog(priority, "%s event detected on md device %s: %s", event, dev, disc);
++	else
++		syslog(priority, "%s event detected on md device %s", event, dev);
++}
++
++static void alert(const char *event, const char *dev, const char *disc, struct alert_info *info)
++{
+ 	if (!info->alert_cmd && !info->mailaddr && !info->dosyslog) {
+ 		time_t now = time(0);
+ 
+ 		printf("%1.15s: %s on %s %s\n", ctime(&now) + 4,
+ 		       event, dev, disc?disc:"unknown device");
+ 	}
+-	if (info->alert_cmd) {
+-		int pid = fork();
+-		switch(pid) {
+-		default:
+-			waitpid(pid, NULL, 0);
+-			break;
+-		case -1:
+-			break;
+-		case 0:
+-			execl(info->alert_cmd, info->alert_cmd,
+-			      event, dev, disc, NULL);
+-			exit(2);
+-		}
+-	}
++	if (info->alert_cmd)
++		execute_alert_cmd(event, dev, disc, info);
++
+ 	if (info->mailaddr && (strncmp(event, "Fail", 4) == 0 ||
+ 			       strncmp(event, "Test", 4) == 0 ||
+ 			       strncmp(event, "Spares", 6) == 0 ||
+ 			       strncmp(event, "Degrade", 7) == 0)) {
+-		FILE *mp = popen(Sendmail, "w");
+-		if (mp) {
+-			FILE *mdstat;
+-			char hname[256];
+-
+-			gethostname(hname, sizeof(hname));
+-			signal_s(SIGPIPE, SIG_IGN);
+-
+-			if (info->mailfrom)
+-				fprintf(mp, "From: %s\n", info->mailfrom);
+-			else
+-				fprintf(mp, "From: %s monitoring <root>\n",
+-					Name);
+-			fprintf(mp, "To: %s\n", info->mailaddr);
+-			fprintf(mp, "Subject: %s event on %s:%s\n\n",
+-				event, dev, hname);
+-
+-			fprintf(mp,
+-				"This is an automatically generated mail message from %s\n", Name);
+-			fprintf(mp, "running on %s\n\n", hname);
+-
+-			fprintf(mp,
+-				"A %s event had been detected on md device %s.\n\n", event, dev);
+-
+-			if (disc && disc[0] != ' ')
+-				fprintf(mp,
+-					"It could be related to component device %s.\n\n", disc);
+-			if (disc && disc[0] == ' ')
+-				fprintf(mp, "Extra information:%s.\n\n", disc);
+-
+-			fprintf(mp, "Faithfully yours, etc.\n");
+-
+-			mdstat = fopen("/proc/mdstat", "r");
+-			if (mdstat) {
+-				char buf[8192];
+-				int n;
+-				fprintf(mp,
+-					"\nP.S. The /proc/mdstat file currently contains the following:\n\n");
+-				while ((n = fread(buf, 1, sizeof(buf),
+-						  mdstat)) > 0)
+-					n = fwrite(buf, 1, n, mp);
+-				fclose(mdstat);
+-			}
+-			pclose(mp);
+-		}
++		send_event_email(event, dev, disc, info);
+ 	}
+ 
+-	/* log the event to syslog maybe */
+-	if (info->dosyslog) {
+-		/* Log at a different severity depending on the event.
+-		 *
+-		 * These are the critical events:  */
+-		if (strncmp(event, "Fail", 4) == 0 ||
+-		    strncmp(event, "Degrade", 7) == 0 ||
+-		    strncmp(event, "DeviceDisappeared", 17) == 0)
+-			priority = LOG_CRIT;
+-		/* Good to know about, but are not failures: */
+-		else if (strncmp(event, "Rebuild", 7) == 0 ||
+-			 strncmp(event, "MoveSpare", 9) == 0 ||
+-			 strncmp(event, "Spares", 6) != 0)
+-			priority = LOG_WARNING;
+-		/* Everything else: */
+-		else
+-			priority = LOG_INFO;
+-
+-		if (disc && disc[0] != ' ')
+-			syslog(priority,
+-			       "%s event detected on md device %s, component device %s", event, dev, disc);
+-		else if (disc)
+-			syslog(priority,
+-			       "%s event detected on md device %s: %s",
+-			       event, dev, disc);
+-		else
+-			syslog(priority,
+-			       "%s event detected on md device %s",
+-			       event, dev);
+-	}
++	if (info->dosyslog)
++		log_event_to_syslog(event, dev, disc);
+ }
+ 
+ static int check_array(struct state *st, struct mdstat_ent *mdstat,
+-- 
+2.38.1
+

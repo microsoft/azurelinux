@@ -1,10 +1,11 @@
 
 %define dist_version 3
+%define distro_release_version_no_time %(echo %{distro_release_version} | cut -d. -f 1-3)
 
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +15,7 @@ URL:            https://aka.ms/azurelinux
 Source1:        90-default.preset
 Source2:        90-default-user.preset
 Source3:        99-default-disable.preset
+Source4:        15-azurelinux-default.conf
 
 Provides:       system-release
 Provides:       system-release(%{version})
@@ -35,24 +37,24 @@ install -d %{buildroot}%{_rpmmacrodir}
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/azurelinux-release
 %{distribution} %{version}
-AZURELINUX_BUILD_NUMBER=%{mariner_build_number}
+AZURELINUX_BUILD_NUMBER=%{distro_release_version_no_time}
 EOF
 ln -sv ..%{_libdir}/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/lsb-release
 DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{version}"
+DISTRIB_RELEASE="%{distro_release_version_no_time}"
 DISTRIB_CODENAME=AzureLinux
 DISTRIB_DESCRIPTION="%{distribution} %{version}"
 EOF
 ln -sv ..%{_libdir}/lsb-release %{buildroot}%{_sysconfdir}/lsb-release
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/os-release
-NAME="%{distribution}"
-VERSION="%{version}"
+NAME="Microsoft %{distribution}"
+VERSION="%{distro_release_version_no_time}"
 ID=azurelinux
 VERSION_ID="%{version}"
-PRETTY_NAME="%{distribution} %{version}"
+PRETTY_NAME="Microsoft %{distribution} %{version}"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
@@ -61,12 +63,12 @@ EOF
 ln -sv ..%{_libdir}/os-release %{buildroot}%{_sysconfdir}/os-release
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/issue
-Welcome to %{distribution} %{version} (%{_arch}) - (\l)
+Welcome to Microsoft %{distribution} %{version} (%{_arch}) - (\l)
 EOF
 ln -sv ..%{_libdir}/issue %{buildroot}%{_sysconfdir}/issue
 
 cat <<-"EOF" > %{buildroot}%{_libdir}/issue.net
-Welcome to %{distribution} %{version} (%{_arch})
+Welcome to Microsoft %{distribution} %{version} (%{_arch})
 EOF
 ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
@@ -94,6 +96,9 @@ install -Dm0644 %{SOURCE2} -t %{buildroot}%{_userpresetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_presetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 
+# Default sysctl settings
+install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -110,8 +115,19 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 %{_rpmmacrodir}/macros.dist
 %{_presetdir}/*.preset
 %{_userpresetdir}/*.preset
+%{_sysctldir}/*.conf
 
 %changelog
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-7
+- add 15-azurelinux-default.conf sysctl config
+
+* Thu Mar 14 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-6
+- Enable waagent.service in 90-default.preset
+
+* Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-5
+- Add 'Microsoft' to names in release files and welcome message
+- Restore full version number in release files
+
 * Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
 - remove %%config(noreplace) from *-release files
 - define dist_version and use local macros

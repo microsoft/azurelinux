@@ -7,17 +7,16 @@ package diskutils
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/randomization"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/randomization"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -75,7 +74,7 @@ func (v *VerityDevice) AddRootVerityFilesToInitramfs(workingFolder, initramfsPat
 		return fmt.Errorf("failed to open the initramfs:\n%w", err)
 	}
 
-	verityFiles, err := ioutil.ReadDir(verityWorkingDirectory)
+	verityFiles, err := os.ReadDir(verityWorkingDirectory)
 	if err != nil {
 		return
 	}

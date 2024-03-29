@@ -5,37 +5,48 @@ package imagecustomizerapi
 
 import (
 	"fmt"
+	"strings"
 )
 
 type Module struct {
-	Name string `yaml:"Name"`
+	Name     string            `yaml:"name"`
+	LoadMode ModuleLoadMode    `yaml:"loadMode"`
+	Options  map[string]string `yaml:"options"`
 }
 
 func (m *Module) IsValid() error {
-	if m.Name == "" {
-		return fmt.Errorf("name of module may not be empty")
+	if err := validateModuleName(m.Name); err != nil {
+		return err
 	}
 
+	if err := m.LoadMode.IsValid(); err != nil {
+		return err
+	}
+
+	for optionKey, optionValue := range m.Options {
+		if optionKey == "" {
+			return fmt.Errorf("option key cannot be empty for module %s", m.Name)
+		}
+		if optionValue == "" {
+			return fmt.Errorf("option value cannot be empty for module %s", m.Name)
+		}
+
+		if strings.ContainsAny(optionKey, " \n") {
+			return fmt.Errorf("option key cannot contain spaces or newline characters for module %s", m.Name)
+		}
+		if strings.ContainsAny(optionValue, " \n") {
+			return fmt.Errorf("option value cannot contain spaces or newline characters for module %s", m.Name)
+		}
+	}
 	return nil
 }
 
-type Modules struct {
-	Load    []Module `yaml:"Load"`
-	Disable []Module `yaml:"Disable"`
-}
-
-func (m *Modules) IsValid() error {
-	for i, module := range m.Load {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Load at index %d: %w", module.Name, i, err)
-		}
+func validateModuleName(moduleName string) error {
+	if moduleName == "" {
+		return fmt.Errorf("module name cannot be empty")
 	}
-
-	for i, module := range m.Disable {
-		if err := module.IsValid(); err != nil {
-			return fmt.Errorf("invalid module '%s' in Modules.Disable at index %d: %w", module.Name, i, err)
-		}
+	if strings.ContainsAny(moduleName, " \n") {
+		return fmt.Errorf("module name cannot contain spaces or newline characters")
 	}
-
 	return nil
 }

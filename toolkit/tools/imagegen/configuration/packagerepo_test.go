@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -103,11 +103,11 @@ func TestShouldFailParsingInvalidBaseUrlBogusUrl_PackageRepo(t *testing.T) {
 
 	err := testPackageRepo.repoUrlIsValid()
 	assert.Error(t, err)
-	assert.Equal(t, "parse \"asjhdjkshd\": invalid URI for request", err.Error())
+	assert.Equal(t, "failed to parse input URL (asjhdjkshd):\nparse \"asjhdjkshd\": invalid URI for request", err.Error())
 
 	err = remarshalJSON(testPackageRepo, &checkedPackageRepo)
 	assert.Error(t, err)
-	assert.Equal(t, "failed to parse [PackageRepo]: parse \"asjhdjkshd\": invalid URI for request", err.Error())
+	assert.Equal(t, "failed to parse [PackageRepo]: failed to parse input URL (asjhdjkshd):\nparse \"asjhdjkshd\": invalid URI for request", err.Error())
 }
 
 // TestShouldSucceedCreatingPackageRepoFile

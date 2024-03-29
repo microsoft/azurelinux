@@ -1,0 +1,61 @@
+From f5ff2988761625b43eb15555993f2797af29f166 Mon Sep 17 00:00:00 2001
+From: Kinga Tanska <kinga.tanska@intel.com>
+Date: Mon, 6 Jun 2022 12:32:13 +0200
+Subject: [PATCH 17/83] Mdmonitor: Improve logging method
+
+Change logging, and as a result, mdmonitor in verbose
+mode will report its configuration.
+
+Signed-off-by: Kinga Tanska <kinga.tanska@intel.com>
+Signed-off-by: Oleksandr Shchirskyi <oleksandr.shchirskyi@intel.com>
+Signed-off-by: Jes Sorensen <jsorensen@fb.com>
+---
+ Monitor.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 4e5802b5..6ca1ebe5 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -136,24 +136,27 @@ int Monitor(struct mddev_dev *devlist,
+ 	struct mddev_ident *mdlist;
+ 	int delay_for_event = c->delay;
+ 
+-	if (!mailaddr) {
++	if (!mailaddr)
+ 		mailaddr = conf_get_mailaddr();
+-		if (mailaddr && ! c->scan)
+-			pr_err("Monitor using email address \"%s\" from config file\n",
+-			       mailaddr);
+-	}
+-	mailfrom = conf_get_mailfrom();
+ 
+-	if (!alert_cmd) {
++	if (!alert_cmd)
+ 		alert_cmd = conf_get_program();
+-		if (alert_cmd && !c->scan)
+-			pr_err("Monitor using program \"%s\" from config file\n",
+-			       alert_cmd);
+-	}
++
++	mailfrom = conf_get_mailfrom();
++
+ 	if (c->scan && !mailaddr && !alert_cmd && !dosyslog) {
+ 		pr_err("No mail address or alert command - not monitoring.\n");
+ 		return 1;
+ 	}
++
++	if (c->verbose) {
++		pr_err("Monitor is started with delay %ds\n", c->delay);
++		if (mailaddr)
++			pr_err("Monitor using email address %s\n", mailaddr);
++		if (alert_cmd)
++			pr_err("Monitor using program %s\n", alert_cmd);
++	}
++
+ 	info.alert_cmd = alert_cmd;
+ 	info.mailaddr = mailaddr;
+ 	info.mailfrom = mailfrom;
+-- 
+2.38.1
+
