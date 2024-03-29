@@ -11,8 +11,8 @@ URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
-Patch0: 0034-src-pybind-rbd-rbd.pyx.patch
-Patch1: 0032-cmake-modules-BuildBoost.cmake.patch
+Patch0:         0034-src-pybind-rbd-rbd.pyx.patch
+Patch1:         0032-cmake-modules-BuildBoost.cmake.patch
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
