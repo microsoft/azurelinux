@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -168,8 +168,8 @@ find %{buildroot}%{_libdir} -name '*.o' -delete
 rm %{buildroot}%{_bindir}/2to3
 rm -rf %{buildroot}%{_bindir}/__pycache__
 
-# %check
-# make  %{?_smp_mflags} test
+%check
+%{buildroot}%{_bindir}/python3 -m test
 
 %ldconfig_scriptlets
 
@@ -238,6 +238,9 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Thu Mar 21 2024 Chris Co <chrco@microsoft.com> - 3.12.0-3
+- Enable and fix tests in check section
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.12.0-2
 - Remove pip subpackage
 
