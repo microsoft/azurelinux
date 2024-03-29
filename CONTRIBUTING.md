@@ -171,15 +171,15 @@ When creating your PR, please ensure the following:
    ```
 
 * LICENSE-MAP files are up-to-date. These files indicate which licenses are being used by Azure Linux's packages and where the package may be derived from. The license files include the following files:
-  * ./SPECS/LICENSES-AND-NOTICES/data/licenses.json
-  * ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md
+  * ./LICENSES-AND-NOTICES/SPECS/data/licenses.json
+  * ./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md
 
   This can be checked by running
 
   ```bash
   python3 ./toolkit/scripts/license_map.py \
-  ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
-  ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+  ./LICENSES-AND-NOTICES/SPECS/data/licenses.json \
+  ./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md \
   ./SPECS \
   ./SPECS-EXTENDED \
   ./SPECS-SIGNED

@@ -13,7 +13,7 @@ Feel free to delete sections of the template which do not apply to your PR, or a
 - [ ] Package tests (%check section) have been verified with RUN_CHECK=y for existing SPEC files, or added to new SPEC files
 - [ ] All package sources are available
 - [ ] cgmanifest files are up-to-date and sorted (`./cgmanifest.json`, `./toolkit/scripts/toolchain/cgmanifest.json`, `.github/workflows/cgmanifest.json`)
-- [ ] LICENSE-MAP files are up-to-date (`./SPECS/LICENSES-AND-NOTICES/data/licenses.json`, `./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md`, `./SPECS/LICENSES-AND-NOTICES/LICENSE-EXCEPTIONS.PHOTON`)
+- [ ] LICENSE-MAP files are up-to-date (`./LICENSES-AND-NOTICES/SPECS/data/licenses.json`, `./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md`, `./LICENSES-AND-NOTICES/SPECS/LICENSE-EXCEPTIONS.PHOTON`)
 - [ ] All source files have up-to-date hashes in the `*.signatures.json` files
 - [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
 - [ ] Documentation has been updated to match any changes to the build system

@@ -54,6 +54,6 @@ create_new_file_from_template "$SCRIPT_FOLDER/template_livepatch-signed.spec" "$
 echo "Updating licensing info."
 
 license_map.py --no_check --update \
-    SPECS/LICENSES-AND-NOTICES/data/licenses.json \
-    SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+    LICENSES-AND-NOTICES/SPECS/data/licenses.json \
+    LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md \
     "$LIVEPATCH_SIGNED_SPEC_PATH"
