@@ -311,7 +311,7 @@
                     "AMD64",
                     "ARM64"
                 ],
-                "comment": "Enable CUSE to support Nvidia rshim interface for Mariner hosts",
+                "comment": "Enable CUSE to support Nvidia rshim interface for Azure Linux hosts",
                 "value": [
                     "m"
                 ]
