@@ -43,8 +43,6 @@ var (
 func main() {
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	// log-file is created in InitBestEffort and should be used for all log messages
-	// for all the URLs in srcURLs
 	logger.InitBestEffort(logFlags)
 	if *noVerbose {
 		logger.Log.SetLevel(logrus.WarnLevel)
