@@ -85,6 +85,10 @@ pushd python
 %{py3_install}
 popd
 
+%check
+# run C++ unit tests
+%make_build check
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
