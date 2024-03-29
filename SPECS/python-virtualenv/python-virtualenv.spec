@@ -45,6 +45,8 @@ virtualenv is a tool to create isolated Python environment.
 
 %check
 pip3 install 'tox>=3.27.1,<4.0.0'
+# skip "test_can_build_c_extensions" tests since they fail on python3_version >= 3.12. See https://src.fedoraproject.org/rpms/python-virtualenv/blob/rawhide/f/python-virtualenv.spec#_153
+sed -i 's/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests --int}/coverage run -m pytest {posargs:--junitxml {toxworkdir}\/junit\.{envname}\.xml tests -k "not test_can_build_c_extensions" --int}/g' tox.ini
 tox -e py
 
 %files -n python3-virtualenv
