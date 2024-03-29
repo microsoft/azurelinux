@@ -207,8 +207,6 @@ fi
 
 # Remove useless "compat" symlink and path
 rm -f %{buildroot}/lib/netplan/generate
-# rmdir %{buildroot}/lib/netplan
-# rmdir %{buildroot}/lib
 
 # Remove __pycache__
 rm -rf %{buildroot}%{python3_sitelib}/%{name}/__pycache__
