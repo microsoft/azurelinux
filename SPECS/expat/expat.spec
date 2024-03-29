@@ -68,7 +68,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 
 %changelog
 * Thu Mar 28 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-2
-- Updated changelog to match fasttrack chnagelog 
+- Removed unnecessary "-p2" argument in "%%autosetup".
 
 * Thu Mar 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
 - Upgrading to 2.6.2 to fix CVE-2023-52425 and CVE-2023-28757
