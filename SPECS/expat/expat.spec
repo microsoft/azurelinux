@@ -1,7 +1,7 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.5.0
+Version:        2.6.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ Distribution:   Mariner
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
+
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -29,7 +30,7 @@ Group:          System Environment/Libraries
 This package contains minimal set of shared expat libraries.
 
 %prep
-%autosetup -p2
+%autosetup
 
 %build
 %configure \
@@ -52,6 +53,7 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %files
 %defattr(-,root,root)
 %doc AUTHORS Changes
+%{_mandir}/man1/xmlwf.1.gz
 %{_bindir}/*
 
 %files devel
@@ -65,6 +67,13 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Thu Mar 21 2024 Aditya Dubey <adityadubey@microsoft.com> - 2.6.2-1
+- Upgrading to 2.6.2 to fix CVE-2023-52425 and CVE-2023-28757
+- No longer need Patch CVE-2023-52426 since 2.6.2 fixes it
+
+* Thu Mar 07 2024 Saul Paredes <saulparedes@microsoft.com> - 2.5.0-2
+- Patch CVE-2023-52426
+
 * Wed Oct 26 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.5.0-1
 - Upgrade to 2.5.0
 

@@ -17,7 +17,7 @@
 %define config_source %{SOURCE1}
 Summary:        Linux Kernel for HCI
 Name:           kernel-hci
-Version:        5.15.148.2
+Version:        5.15.153.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -58,7 +58,6 @@ Patch27:        0028-net-mlx5-Bridge-Use-debug-instead-of-warn-if-entry-d.patch
 Patch28:        0029-Revert-net-mlx5-DR-Fix-uninitialized-var-warning.patch
 Patch29:        0030-net-mlx5-DR-Fix-code-indentation-in-dr_ste_v1.patch
 Patch30:        0031-net-mlx5-DR-Fix-vport-number-data-type-to-u16.patch
-Patch31:        0032-net-mlx5-DR-Replace-local-WIRE_PORT-macro-with-the-e.patch
 Patch32:        0033-net-mlx5-DR-Add-missing-query-for-vport-0.patch
 Patch33:        0034-net-mlx5-DR-Align-error-messages-for-failure-to-obta.patch
 Patch34:        0035-net-mlx5-DR-Support-csum-recalculation-flow-table-on.patch
@@ -111,7 +110,6 @@ Patch80:        0081-net-mlx5-DR-Fix-slab-out-of-bounds-in-mlx5_cmd_dr_cr.patch
 Patch81:        0082-net-mlx5-Create-eswitch-debugfs-root-directory.patch
 Patch82:        0083-net-mlx5-Bridge-pass-net-device-when-linking-vport-t.patch
 Patch83:        0084-net-mlx5-Bridge-expose-FDB-state-via-debugfs.patch
-Patch84:        0085-net-mlx5-DR-Align-mlx5dv_dr-API-vport-action-with-FW.patch
 Patch85:        0086-net-mlx5-Lag-add-debugfs-to-query-hardware-lag-state.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -261,7 +259,6 @@ manipulation of eBPF programs and maps.
 %patch28 -p1
 %patch29 -p1
 %patch30 -p1
-%patch31 -p1
 %patch32 -p1
 %patch33 -p1
 %patch34 -p1
@@ -314,7 +311,6 @@ manipulation of eBPF programs and maps.
 %patch81 -p1
 %patch82 -p1
 %patch83 -p1
-%patch84 -p1
 %patch85 -p1
 
 make mrproper
@@ -551,6 +547,22 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.153.1-1
+- Auto-upgrade to 5.15.153.1
+
+* Mon Mar 25 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.151.2-1
+- Upgrade to 5.15.151.2
+
+* Wed Mar 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.151.1-1
+- Auto-upgrade to 5.15.151.1
+
+* Sat Mar 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.150.1-1
+- Auto-upgrade to 5.15.150.1
+- Fix patch 31 net-mlx5-DR-Fix-vport-number-data-type-to-u16
+- Remove patches already applied in this version:
+-   - 32 net-mlx5-DR-Replace-local-WIRE_PORT-macro-with-the-e
+-   - 85 net-mlx5-DR-Align-mlx5dv_dr-API-vport-action-with-FW
+
 * Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.2-1
 - Auto-upgrade to 5.15.148.2
 

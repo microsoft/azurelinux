@@ -205,8 +205,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.14.12",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.12.tar.gz"
+          "version": "2.14.4",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.4.tar.gz"
         }
       }
     },
@@ -3338,8 +3338,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.9",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.9.tar.gz"
+          "version": "3.5.12",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.12.tar.gz"
         }
       }
     },
@@ -3398,8 +3398,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.5.0",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.bz2"
+          "version": "2.6.2",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.bz2"
         }
       }
     },
@@ -5240,8 +5240,8 @@
         "type": "other",
         "other": {
           "name": "helm",
-          "version": "3.14.0",
-          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.0.tar.gz"
+          "version": "3.14.2",
+          "downloadUrl": "https://github.com/helm/helm/archive/v3.14.2.tar.gz"
         }
       }
     },
@@ -6540,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8020,6 +8020,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jurand",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/fedora-java/jurand/archive/refs/tags/1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jx",
           "version": "3.2.236",
           "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
@@ -8121,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8191,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv14",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv14.tar.gz"
+          "version": "6.1.0.mshv16",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
@@ -13633,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz"
+          "version": "1.21.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.8-3/go.20240321.6.src.tar.gz"
         }
       }
     },
@@ -14353,8 +14363,8 @@
         "type": "other",
         "other": {
           "name": "nmi",
-          "version": "1.8.11",
-          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.11.tar.gz"
+          "version": "1.8.17",
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.17.tar.gz"
         }
       }
     },
@@ -14363,8 +14373,8 @@
         "type": "other",
         "other": {
           "name": "node-problem-detector",
-          "version": "0.8.10",
-          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.10.tar.gz"
+          "version": "0.8.17",
+          "downloadUrl": "https://github.com/kubernetes/node-problem-detector/archive/refs/tags/v0.8.17.tar.gz"
         }
       }
     },
@@ -25124,8 +25134,8 @@
         "type": "other",
         "other": {
           "name": "python3",
-          "version": "3.9.14",
-          "downloadUrl": "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
+          "version": "3.9.19",
+          "downloadUrl": "https://www.python.org/ftp/python/3.9.19/Python-3.9.19.tar.xz"
         }
       }
     },
@@ -30940,8 +30950,8 @@
         "type": "other",
         "other": {
           "name": "zstd",
-          "version": "1.5.0",
-          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-1.5.0.tar.gz"
+          "version": "1.5.4",
+          "downloadUrl": "https://github.com/facebook/zstd/releases/download/v1.5.4/zstd-1.5.4.tar.gz"
         }
       }
     },

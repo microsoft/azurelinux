@@ -39,7 +39,7 @@
 Summary:        Kata Containers
 Name:           kata-containers
 Version:        3.2.0.azl0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 URL:            https://github.com/microsoft/kata-containers
@@ -97,6 +97,7 @@ tar -xf %{SOURCE1}
 %build
 export PATH=$PATH:"$(pwd)/go/bin"
 export GOPATH="$(pwd)/go"
+export OPENSSL_NO_VENDOR=1
 
 mkdir -p go/src/github.com/%{name}
 ln -s $(pwd)/../%{name}-%{version} go/src/github.com/%{name}/%{name}
@@ -214,6 +215,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 %exclude %{kataosbuilderdir}/rootfs-builder/ubuntu
 
 %changelog
+* Tue Mar 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-2
+- Build using system OpenSSL.
+
 * Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
 - Use Microsoft sources based on upstream version 3.2.0.
 

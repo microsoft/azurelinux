@@ -1,6 +1,9 @@
+%global virtiofsd_binary        virtiofsd-rs
+
 %global runtime_make_vars       DEFMEMSZ=256 \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
                                 DEFSNPGUEST=true \\\
+                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"%{virtiofsd_binary}" \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
@@ -10,7 +13,7 @@
 
 Name:         kata-containers-cc
 Version:      3.2.0.azl0
-Release:      1%{?dist}
+Release:      3%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -45,7 +48,9 @@ BuildRequires:  kernel-uvm-devel
 # policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy and snapshotter features
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
-Requires:  qemu-virtiofsd
+# Must match the version specified by the `assets.virtiofsd.version` field in
+# %{SOURCE0}/versions.yaml.
+Requires:  virtiofsd = 1.8.0
 
 %description
 The Kata Confidential Containers package ships the Kata components for Confidential Containers on AKS.
@@ -162,7 +167,7 @@ ln -s /usr/bin/cloud-hypervisor-cvm           %{buildroot}%{coco_bin}/cloud-hype
 # this is again for testing without SEV SNP
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
 
-ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
+ln -sf /usr/libexec/%{virtiofsd_binary} %{buildroot}/%{coco_path}/libexec/%{virtiofsd_binary}
 
 find %{buildroot}/etc
 
@@ -246,7 +251,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{coco_bin}/kata-runtime
 
 %{defaults_kata}/configuration*.toml
-%{coco_path}/libexec/virtiofsd
+%{coco_path}/libexec/%{virtiofsd_binary}
 
 %{_bindir}/tardev-snapshotter
 %{_bindir}/kata-overlay
@@ -287,6 +292,12 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+*   Wed Mar 13 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-3
+-   Specify correct virtiofsd dependency
+
+*   Thu Feb 29 2024 Dallas Delaney <dadelan@microsoft.com> - 3.2.0.azl0-2
+-   Bump release to rebuild against kernel-uvm for LSG v2402.26.1
+
 *   Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
 -   Use Microsoft sources based on upstream Kata version 3.2.0.
 
