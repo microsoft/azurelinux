@@ -1340,7 +1340,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys, false)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys,
+			false /*includeExistingKeys*/)
 		if err != nil {
 			return
 		}
@@ -1590,8 +1591,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	userSSHKeyDir := userutils.UserSshDirectory(username)
-	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SshAuthorizedKeysFileName)
+	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1621,13 +1622,13 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 
 		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
 		if err != nil {
-			return fmt.Errorf("failed to check if authorized_keys file exists:\n%w", err)
+			return fmt.Errorf("failed to check if authorized_keys file (%s) exists:\n%w", authorizedKeysFileFullPath, err)
 		}
 
 		if fileExists {
 			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
 			if err != nil {
-				return fmt.Errorf("failed to read existing authorized_keys file:\n%w", err)
+				return fmt.Errorf("failed to read existing authorized_keys (%s) file:\n%w", authorizedKeysFileFullPath, err)
 			}
 
 			allSSHKeys = append(allSSHKeys, pubKeyData...)

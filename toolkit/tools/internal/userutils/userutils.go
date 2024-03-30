@@ -22,8 +22,8 @@ const (
 	UserHomeDirPrefix = "/home"
 
 	ShadowFile                = "/etc/shadow"
-	SshDirectoryName          = ".ssh"
-	SshAuthorizedKeysFileName = "authorized_keys"
+	SSHDirectoryName          = ".ssh"
+	SSHAuthorizedKeysFileName = "authorized_keys"
 )
 
 func HashPassword(password string) (string, error) {
@@ -145,10 +145,10 @@ func UserHomeDirectory(username string) string {
 	}
 }
 
-// UserSshDirectory returns the path of the .ssh directory for a user.
-func UserSshDirectory(username string) string {
+// UserSSHDirectory returns the path of the .ssh directory for a user.
+func UserSSHDirectory(username string) string {
 	homeDir := UserHomeDirectory(username)
-	userSSHKeyDir := filepath.Join(homeDir, SshDirectoryName)
+	userSSHKeyDir := filepath.Join(homeDir, SSHDirectoryName)
 	return userSSHKeyDir
 }
 
