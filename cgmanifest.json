@@ -20793,7 +20793,7 @@
         "type": "other",
         "other": {
           "name": "php-pecl-zip",
-          "version": "1.22.2",
+          "version": "1.22.3",
           "downloadUrl": "https://pecl.php.net/get/zip-1.22.3.tgz"
         }
       }
