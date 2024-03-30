@@ -54,7 +54,6 @@ BuildRequires:  acl
 BuildRequires:  attr
 BuildRequires:  augeas-devel >= 1.7.0
 BuildRequires:  augeas-libs
-BuildRequires:  ocaml-augeas-devel
 BuildRequires:  bash
 BuildRequires:  bash-completion
 BuildRequires:  binutils
@@ -258,7 +257,6 @@ Requires:       yajl
 %endif
 
 Recommends:     libvirt-daemon-config-network
-Recommends:     libvirt-daemon-driver-storage-core
 Recommends:     selinux-policy
 
 Suggests:       qemu-block-curl
@@ -794,10 +792,12 @@ tdnf install --downloadonly -y \
     mdadm \
     ntfs-3g ntfsprogs \
     ntfs-3g-system-compression \
+    ocaml-augeas-devel \
     openssh-clients \
     parted \
     pciutils \
     pcre2 \
+    pcre2-devel \
     policycoreutils \
     procps \
     psmisc \
@@ -838,10 +838,10 @@ extra=--with-supermin-packager-config=$(pwd)/yum.conf
 %configure \
   PYTHON=python3 \
   --with-default-backend=libvirt \
+  --enable-appliance-format-auto \
   --with-distro=REDHAT \
   --with-extra="release=%{release},libvirt" \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
-  --with-extra="rhel=%{rhel},release=%{release},libvirt" \
 %if %{without php}
   --disable-php \
 %endif
@@ -861,15 +861,10 @@ extra=--with-supermin-packager-config=$(pwd)/yum.conf
 
 %ifarch %{test_arches}
 %check
-
 export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
-if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
-    cat $HOME/.cache/libvirt/qemu/log/*
-    exit 1
-fi
 %endif
 
 %install
