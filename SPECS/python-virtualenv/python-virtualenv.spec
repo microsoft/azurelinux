@@ -20,7 +20,10 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
+
+%if 0%{?with_check}
 BuildRequires:  python3-pip
+%endif
 BuildRequires:  python3-flit
 BuildRequires:  python3-flit-core >= 3.8.0
 
@@ -58,7 +61,7 @@ tox -e py
 %changelog
 * Fri Mar 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.25.0-1
 - Auto-upgrade to 20.25.0 - 3.0 package upgrade
-- Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Mariner)
+- Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Azure Linux)
 
 * Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 20.14.0-4
 - Remove version restriction on python3-platformdirs Requires
