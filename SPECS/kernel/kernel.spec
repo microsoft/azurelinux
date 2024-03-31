@@ -405,7 +405,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 
 %changelog
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
-- Bring aarch64 kernel config into alignment with x86 for hv, xen, virtio drivers
+- Change aarch64 config to produce hv, xen, virtio as modules 
+- to support dracut initramfs generation on arm64 VM systems
 
 * Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
 - Auto-upgrade to 6.6.22.1
