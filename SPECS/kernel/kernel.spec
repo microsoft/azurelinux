@@ -29,7 +29,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.22.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -404,6 +404,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
+- Change aarch64 config to produce hv, xen, virtio as modules 
+- to support dracut initramfs generation on arm64 VM systems
+
 * Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
 - Auto-upgrade to 6.6.22.1
 

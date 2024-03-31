@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        15%{?dist}
+Release:        16%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -216,6 +216,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
+- Remove x86-specific xen-acpi-processor driver from defaults
+
 * Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 059-15
 - Exclude overlayfs module from main dracut package
 
