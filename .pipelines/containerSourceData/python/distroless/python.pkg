@@ -1,2 +1,3 @@
 distroless-packages-base
 python3
+prebuilt-ca-certificates
