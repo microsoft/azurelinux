@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	// With 5 attempts (4 retries) and a backoff factor of 2 seconds the total time spent retrying will be approximately:
-	// 1 + 4 + 8 + 16 = 31 seconds.
+	// With 8 attempts (7 retries) and a backoff factor of 2 seconds the total time spent retrying will be approximately:
+	// 0 + 1 + 2 + 4 + 8 + 16 + 32 + 64 = 127 seconds (2 min, 7 sec)
 	DefaultDownloadBackoffBase   = 2.0
-	DefaultDownloadRetryAttempts = 5
+	DefaultDownloadRetryAttempts = 8
 	DefaultDownloadRetryDuration = time.Second
 )
 

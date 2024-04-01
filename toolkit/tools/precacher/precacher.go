@@ -151,14 +151,14 @@ func downloadMissingPackages(rpmSnapshot *repocloner.RepoContents, packagesAvail
 	}()
 
 	// Monitor the results channel and update the progress counter accordingly. Return once the done channel is closed.
-	downloadedPackages = monitorProgress(len(rpmSnapshot.Repo), results, doneChannel)
+	downloadedPackages, err = monitorProgress(len(rpmSnapshot.Repo), results, doneChannel)
 
 	return
 }
 
 // monitorProgress will wait for results from the downloadResult channel and update the progress counter accordingly. If
 // no more results are available we expect the done channel to be closed, at which point we will return.
-func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string) {
+func monitorProgress(total int, results chan downloadResult, doneChannel chan struct{}) (downloadedPackages []string, err error) {
 	const progressIncrement = 10.0
 
 	downloaded := 0
@@ -199,6 +199,11 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 			lastProgressUpdate = progressPercent
 		}
 	}
+
+	if failed > 0 {
+		err = fmt.Errorf("failed to download %d package(s) out of %d total", failed, total)
+	}
+
 	return
 }
 
@@ -214,8 +219,6 @@ func monitorProgress(total int, results chan downloadResult, doneChannel chan st
 // responsible for removing itself from the wait group. As much processing as possible is done before acquiring the
 // network operations semaphore to minimize the time spent holding it.
 func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map[string]string, outDir string, wg *sync.WaitGroup, results chan<- downloadResult, netOpsSemaphore chan struct{}) {
-	var noCancel chan struct{} = nil
-
 	// File names are of the form "<name>-<version>.<distro>.<arch>.rpm"
 	pkgName, fileName := formatName(pkg)
 	fullFilePath := path.Join(outDir, fileName)
@@ -255,13 +258,23 @@ func precachePackage(pkg *repocloner.RepoPackage, packagesAvailableFromRepos map
 	}()
 
 	logger.Log.Debugf("Pre-caching '%s' from '%s'", fileName, url)
+	cancel := make(chan struct{})
+	retryNum := 1
 	_, err = retry.RunWithDefaultDownloadBackoff(func() error {
-		err := network.DownloadFile(url, fullFilePath, nil, nil)
-		if err != nil {
-			logger.Log.Warnf("Attempt to download (%s) failed. Error: %s", url, err)
+		netErr := network.DownloadFile(url, fullFilePath, nil, nil)
+		if netErr != nil {
+			// The precacher expects to get 404 errors when we're speculatively using the wrong URI; we don't want to retry,
+			// nor do we want to complain too loudly in that case.
+			if netErr.Error() == "invalid response: 404" {
+				close(cancel)
+			} else {
+				logger.Log.Warnf("Attempt %d to download (%s) failed. Error: %s", retryNum, url, netErr)
+			}
 		}
-		return err
-	}, noCancel)
+		retryNum++
+		return netErr
+	}, cancel)
+
 	if err != nil {
 		return
 	}
