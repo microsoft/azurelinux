@@ -27,7 +27,6 @@ Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
-Requires:       libgcc
 Requires:       mariner-release
 Requires:       openssl
 Requires:       openssl-libs
