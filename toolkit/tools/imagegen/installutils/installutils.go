@@ -1340,7 +1340,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys,
+			false /*includeExistingKeys*/)
 		if err != nil {
 			return
 		}
@@ -1572,7 +1573,9 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string,
+	sshPubKeys []string, includeExistingKeys bool,
+) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1588,9 +1591,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	homeDir := userutils.UserHomeDirectory(username)
-	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
+	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1613,7 +1615,25 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+	allSSHKeys := []string(nil)
+
+	if includeExistingKeys {
+		authorizedKeysFileFullPath := filepath.Join(installChroot.RootDir(), authorizedKeysFile)
+
+		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
+		if err != nil {
+			return fmt.Errorf("failed to check if authorized_keys file (%s) exists:\n%w", authorizedKeysFileFullPath, err)
+		}
+
+		if fileExists {
+			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read existing authorized_keys (%s) file:\n%w", authorizedKeysFileFullPath, err)
+			}
+
+			allSSHKeys = append(allSSHKeys, pubKeyData...)
+		}
+	}
 
 	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
