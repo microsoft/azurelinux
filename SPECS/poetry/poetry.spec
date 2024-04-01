@@ -1,58 +1,54 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 %global pypi_name poetry
-
 %global common_description %{expand:
 Poetry helps you declare, manage and install dependencies of Python
 projects, ensuring you have the right stack everywhere.}
-
-Name:           %{pypi_name}
 Summary:        Python dependency management and packaging made easy
-Version:        1.0.10
-Release:        2%{?dist}
+Name:           %{pypi_name}
+Version:        1.8.2
+Release:        1%{?dist}
 License:        MIT
-
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://poetry.eustace.io/
-Source0:        %{pypi_source}
-
+Source0:        https://files.pythonhosted.org/packages/source/p/poetry/poetry-%{version}.tar.gz
 # relax some too-strict dependencies that are specified in setup.py:
 # - importlib-metadata (either removed or too old in fedora)
 # - keyring (too new in fedora, but should be compatible)
 # - pyrsistent (too new in fedora, but should be compatible)
 # - requests-toolbelt (too new in fedora, but should be compatible)
-Patch0:         00-setup-requirements-fixes.patch
-
-BuildArch:      noarch
-
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(setuptools)
-
+BuildRequires:  python3-pip
+BuildRequires:  python3-poetry-core
+BuildRequires:  python3-fastjsonschema
+BuildRequires:  python3-lark
 Requires:       python3-%{pypi_name} = %{version}-%{release}
+BuildArch:      noarch
 
 %description %{common_description}
 
-
 %package -n     python3-%{pypi_name}
+%{?python_provide:%python_provide python3-%{pypi_name}}
 Summary:        %{summary}
-
 # this is an optional dependency of CacheControl, but it's required by poetry
 Requires:       python3dist(lockfile)
-
-%{?python_provide:%python_provide python3-%{pypi_name}}
+Requires:       python3-fastjsonschema
+Requires:       python3-poetry-core
+Requires:       python3-lark
 
 %description -n python3-%{pypi_name} %{common_description}
-
 
 %prep
 %autosetup -p1
 
 
 %build
-%py3_build
+%pyproject_wheel
 
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files poetry
 
 
 %files
@@ -66,10 +62,14 @@ Requires:       python3dist(lockfile)
 %doc README.md
 
 %{python3_sitelib}/%{pypi_name}/
-%{python3_sitelib}/%{pypi_name}-%{version}-py%{python3_version}.egg-info/
-
+%{python3_sitelib}/%{pypi_name}-%{version}.dist-info/
 
 %changelog
+* Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.8.2-1
+- Promoted to Core.
+- License verified.
+- Update to 1.8.2.
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.10-2
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -133,4 +133,3 @@ Requires:       python3dist(lockfile)
 
 * Wed Dec 12 2018 Fabio Valentini <decathorpe@gmail.com> - 0.12.10-1
 - Initial package.
-
