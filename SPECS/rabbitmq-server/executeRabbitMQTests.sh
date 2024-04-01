@@ -1,13 +1,13 @@
 #!/bin/bash
 
 ####   TESTING DISCLAIMER   ####
-# This script follows the steps to run the tests for RabbitMQ v3.11.9 as of 2/22/23 on Azure Linux. As a result, this script can likely 
+# This script follows the steps to run the tests for RabbitMQ v3.13.0 as of 4/1/24 on Azure Linux. As a result, this script can likely 
 # be used as a baseline to execute the test for future releases/upgrades to verify the package integrity. That said, some things may need
 # to be updated in order to make the tests succeed such as updating the links for erlang, elixir, bazel, and/or mandoc in order to have
 # some or all tests succeed.
 #
 # Additionally, there are 3 tests that remain as failutres due to some additional dependencies on large packages 'aws' and 'dotnet', or in
-# one case, an excluded command from openldap 'slapd' (see //SPECS/openldap/openldap.spec for details). With the other 506 test suites 
+# one case, an excluded command from openldap 'slapd' (see //SPECS/openldap/openldap.spec for details). With the other test suites 
 # passing, I decided to leave these as is since they also don't impact the running of the entire test suite.
 #
 # The 3 expected failures are the following:
@@ -15,9 +15,9 @@
 # //deps/rabbitmq_auth_backend_ldap:system_SUITE
 # //deps/rabbitmq_ampq1_0:system_SUITE - shard 1 of 2 specifically
 #
-# RabbitMQ depends on bazel 'latest'. As of 2/22/23, the latest bazel version is '6.0.0'.
+# RabbitMQ depends on bazel 'latest'. This can be updated as needed using the "BAZEL_DEP_VERSION" variable for the purposes of this script
 #
-# Some tests also rely on the 'mandoc' package. As of 2/22/23, this package was not available in Azure Linux. As a result, the package is
+# Some tests also rely on the 'mandoc' package. As of 4/1/24, this package was not available in Azure Linux. As a result, the package is
 # pulled from source and installed. These test break the entire run, so this dependency must be pulled in for the entire suite to succeed.
 #
 # The elixir package relies on having the UTF-8 character encoding set in your locale in order to function properly. Because of this, you 
@@ -32,6 +32,9 @@
 #### END TESTING DISCLAIMER ####
 
 ####   SCRIPT ASSUMPTIONS   ####
+# You have pulled the rabbitmq source from github as it contains additional bazel build files which our normal source does not
+# (And checked out the appropriate tag + applied any local patches from Azure Linux)
+#
 # The following line has been added to `$RABBIT_MQ_DIR/.bazelrc`:
 #   build --cache_test_results=no
 #
@@ -121,7 +124,15 @@ popd
 # Run tests using bazel
 pushd $RABBIT_MQ_DIR
 bazel clean
-bazel test //... --test_env="LC_ALL=en_US.UTF-8"
+# --noincompatible_sandbox_hermetic_tmp is required for runs due to flakey(?) failures noticed during
+# runs of this script for when using bazel-7.1.1. These failures had 'ebin' notied as a "dangling
+# symbolic link" causing most tests to not even start without the added flag. Azure Linux does not have 
+# support for older jdk versions nor older bazel versions as a result so we cannot roll back to 6.4.0 
+# before the issue was present upstream.
+# See the below issues for details:
+#   Actual Error: https://github.com/bazelbuild/bazel/issues/20886
+#   Workaround: https://github.com/bazelbuild/bazel/issues/21215
+bazel test //... --test_env="LC_ALL=en_US.UTF-8" --noincompatible_sandbox_hermetic_tmp
 popd
 
 # Restore PATH to original state
