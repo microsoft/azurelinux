@@ -56,7 +56,7 @@ BuildRequires:  make
 BuildRequires:  systemd
 BuildRequires:  gcc
 BuildRequires:  protobuf-compiler
-BuildRequires:  mariner-release
+BuildRequires:  azurelinux-release
 BuildRequires:  dracut
 BuildRequires:  kernel
 BuildRequires:  busybox
