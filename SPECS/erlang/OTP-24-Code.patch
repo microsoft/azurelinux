@@ -26,26 +26,11 @@ only the first two bytes would be correctly set:
     4> t:bar(-1, 1).
     <<255,255,3,0:7>>
 ---
- .gitignore                                |  3 +++
  erts/emulator/beam/jit/arm/instr_bs.cpp   |  9 ++-------
  erts/emulator/test/Makefile               |  1 +
  erts/emulator/test/bs_construct_SUITE.erl | 10 ++++++++++
- 4 files changed, 16 insertions(+), 7 deletions(-)
+ 3 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 94664b47c88a..42c9f963e00f 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -215,6 +215,9 @@ JAVADOC-GENERATED
- /erts/emulator/test/*_SUITE_make.erl
- /erts/emulator/test/*_native_SUITE.erl
- /erts/emulator/test/*_SUITE_data/Makefile
-+/erts/emulator/test/*_r24_SUITE.erl
-+/erts/emulator/test/*_r25_SUITE.erl
-+/erts/emulator/test/*_stripped_types_SUITE.erl
- /erts/test/install_SUITE_data/install_bin
- /erts/test/autoimport_SUITE_data/erlang.xml
- /erts/emulator/make_test_dir/
 diff --git a/erts/emulator/beam/jit/arm/instr_bs.cpp b/erts/emulator/beam/jit/arm/instr_bs.cpp
 index 2eb2d4201cf1..79349a095d91 100644
 --- a/erts/emulator/beam/jit/arm/instr_bs.cpp
