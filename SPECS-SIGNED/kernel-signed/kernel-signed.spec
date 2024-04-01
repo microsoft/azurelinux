@@ -136,7 +136,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
