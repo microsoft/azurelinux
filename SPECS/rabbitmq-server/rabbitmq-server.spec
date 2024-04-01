@@ -10,27 +10,27 @@ Group:          Development/Languages
 URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 
-BuildRequires:  erlang
 BuildRequires:  elixir
+BuildRequires:  erlang
+BuildRequires:  glibc-lang
 BuildRequires:  libxslt
-BuildRequires:  xmlto
 BuildRequires:  python
 BuildRequires:  python%{python3_pkgversion}-simplejson
-BuildRequires:  zip
-BuildRequires:  unzip
 BuildRequires:  rsync
-BuildRequires:  glibc-lang
+BuildRequires:  unzip
+BuildRequires:  xmlto
+BuildRequires:  zip
 
-Requires:       erlang
 Requires:       elixir
+Requires:       erlang
+Requires:       glibc-lang
 Requires:       libxslt
-Requires:       xmlto
 Requires:       python
 Requires:       python%{python3_pkgversion}-simplejson
-Requires:       zip
-Requires:       unzip
 Requires:       rsync
-Requires:       glibc-lang
+Requires:       unzip
+Requires:       xmlto
+Requires:       zip
 
 %description
 rabbitmq-server
