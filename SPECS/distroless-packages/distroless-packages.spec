@@ -55,7 +55,7 @@ Requires:       busybox
 
 %changelog
 * Mon Apr 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-4
-- Remove dependency on "prebuilt-ca-certificates-base".
+- Remove dependency on "prebuilt-ca-certificates".
 
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
