@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "cargo_config": "12345f7db392b3da68a9fa0ba39c4bc3c1cbc9bd8fc997316af6b3de0aee3903",
-  "virtiofsd-1.8.0-vendor.tar.gz": "be7f9bd60c6f5659febd881e1ac34c01c540cb61f698d91512ebfc9488e11e95",
-  "virtiofsd-1.8.0.tar.gz": "35a59628c44da64d72b25cbdea54fe2fa68ecd42482f34c4755f4020e6dc280b"
+  "virtiofsd-v1.8.0.tar.gz": "35a59628c44da64d72b25cbdea54fe2fa68ecd42482f34c4755f4020e6dc280b",
+  "virtiofsd-v1.8.0-cargo.tar.gz": "47a1595ccee910ddb2f786469ac2601b5e5e114a42796072aa03bfe9f3706fd7",
+  "config.toml": "77e9219c27274120197571fd165cbe4121963b5ad3bc0b20b383c86ef0ce6c2b"
  }
 }

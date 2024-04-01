@@ -22,88 +22,57 @@ Name:           virtiofsd
 # Version to be kept in sync with the `asset.virtiofsd.version` field from
 # https://github.com/microsoft/kata-containers/blob/msft-main/versions.yaml
 Version:        1.8.0
-Release:        1%{?dist}
-Summary:        vhost-user virtio-fs device backend written in Rust
-Group:          Development/Libraries/Rust
-License:        Apache-2.0
+Release:        2%{?dist}
+Summary:        Virtio-fs vhost-user device daemon (Rust version)
+License:        Apache-2.0 AND BSD-3-Clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 URL:            https://gitlab.com/virtio-fs/virtiofsd
-Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Below is a manually created tarball, no download link.
-# Note: the %%{name}-%%{version}-vendor.tar.gz file contains the vendored
-# sources created by capturing the contents downloaded into vendor/
-# To create the tarball run:
+Source0:        https://gitlab.com/virtio-fs/virtiofsd/-/archive/v%{version}/%{name}-v%{version}.tar.gz
+
+# To update the vendor tarball and config.toml:
+#   wget %{SOURCE0}
 #   tar -xf %{name}-v%{version}.tar.gz
 #   cd %{name}-v%{version}
-#   cargo vendor
-#   tar -cf %{name}-%{version}-vendor.tar.gz vendor/
-#
-Source1:        %{name}-%{version}-vendor.tar.gz
-Source2:        cargo_config
+#   cargo vendor > ../config.toml
+#   tar -czf ../%{name}-v%{version}-cargo.tar.gz vendor/
+Source1:        %{name}-v%{version}-cargo.tar.gz
+Source2:        config.toml
+
 BuildRequires:  cargo
-BuildRequires:  rust
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libseccomp-devel
-Conflicts:      qemu-tools < 8
-Provides:       vhostuser-backend(fs)
 
 %description
-vhost-user virtio-fs device backend written in Rust
+Virtio-fs vhost-user device daemon (Rust version)
 
 %prep
-%autosetup -n %{name}-v%{version}
+%autosetup -p1 -n %{name}-v%{version}
+
+pushd %{_builddir}/%{name}-v%{version}
 tar -xf %{SOURCE1}
-install -D %{SOURCE2} .cargo/config
+mkdir -p .cargo
+cp %{SOURCE2} .cargo/
+popd
 
 %build
+pushd %{_builddir}/%{name}-v%{version}
 cargo build --release --offline
+popd
 
 %install
 mkdir -p %{buildroot}%{_libexecdir}
-install -D -p -m 0755 %{_builddir}/%{name}-v%{version}/target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd
-install -D -p -m 0644 %{_builddir}/%{name}-v%{version}/50-qemu-virtiofsd.json %{buildroot}%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
-
-%check
-cargo test --release
+install -D -p -m 0755 target/release/virtiofsd %{buildroot}%{_libexecdir}/virtiofsd-rs
 
 %files
+%license LICENSE-APACHE LICENSE-BSD-3-Clause
 %doc README.md
-%{_libexecdir}/virtiofsd
-%dir %{_datadir}/qemu
-%dir %{_datadir}/qemu/vhost-user
-%{_datadir}/qemu/vhost-user/50-qemu-virtiofsd.json
+%{_libexecdir}/virtiofsd-rs
 
 %changelog
-* Wed Feb 07 2024 Kanika Nema <kanikanema@microsoft.com> - 1.8.0-1
-- Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag)
-- License verified
-- Remove build dependencies on cargo-packaging
-- Include vendored sources tarball
-* Tue Jan 30 2024 caleb.crane@suse.com
-- Fix CVE-2023-50711: vmm-sys-util: out of bounds memory accesses (bsc#1218502, bsc#1218500)
-- Update to version 1.10.1:
-  * Bump version to v1.10.1
-  * Fix mandatory user namespaces
-  * Don't drop supplemental groups in unprivileged user namespace
-  * Bump version to v1.10.0
-  * Update rust-vmm dependencies (bsc#1218500)
-  * Bump version to v1.9.0
-- Spec: switch to using the upstream virtio-fs config file for qemu
-- Spec: switch back to greedy cargo updates of vendored dependencies
-* Thu Aug 31 2023 Caleb Crane <caleb.crane@suse.com>
-- Update to upstream version v1.7.2 (jsc#4980)
-  - Add supplementary group extension support
-  - Prevent EPERM failures with O_NOATIME
-  - Fix cache timeouts
-  - seccomp: Allow SYS_sched_yield
-  - Allow to provide the same argument multiple times
-  - Add the -V/--version options
-- Upgrade vendored dependencies
-* Fri Jun  2 2023 Caleb Crane <caleb.crane@suse.com>
-- Add qemu config file to ensure qemu is aware of the virtiofsd executable
-- https://www.reddit.com/r/suse/comments/13xmote/vm_with_virtiofs_does_not_start_unable_to_find_a/
-* Thu May 25 2023 Caleb Crane <caleb.crane@suse.com>
-- Remove exclusive arch, only disable for 32-bit archs (i586 and armv7l)
-- Add package conflict with the previous implementation of virtiofsd inside
-  older versions of the qemu-tools package (qemu-tools < 8)
-* Tue May 23 2023 Caleb Crane <caleb.crane@suse.com>
-- Initial release of virtiofsd v1.6.1
+* Fri Feb 16 2024 Muhammad Falak <mwani@microsoft.com> - 1.8.0-2
+- Drop ExclusiveArch: x86_64 to build on all supported platforms
+
+* Tue Jan 9 2024 Aurélien Bombo <abombo@microsoft.com> - 1.8.0-1
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- License verified.
