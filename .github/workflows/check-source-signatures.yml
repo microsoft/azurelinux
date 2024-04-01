@@ -88,16 +88,8 @@ jobs:
             exit 0
           fi
 
-          # We want to ignore errors here so we can print a helpful message at the end.
-          set +e
           set -x
-          sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}
-          err=$?
-          set +x
-          set -e
-
-          # Print results
-          if [ $err -ne 0 ]; then
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}; then
             printf "\n\n******************************"
             echo "Failed to check the signatures of the modified packages."
             echo "Check the logs above for details on the mismatches files and their expected hashes."
