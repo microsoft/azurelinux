@@ -355,7 +355,7 @@ install -m644 %{SOURCE9} \
 * Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
 - Remove make-dummy-cert and renew-dummy-cert scripts
 
-* Thu Mar 13 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
+* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
 - Remove runtime dependency on coreutils
 
 * Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3
