@@ -325,7 +325,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 -   Add patch to retain UVM rootfs dependencies
 
 *   Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
--   Bump release to rebuild with go 1.20.9
+-   Bump release to rebuild with go 1.20.10
 
 *   Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.6.1-2
 -   Bump release to rebuild with updated version of Go.
@@ -344,7 +344,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 13 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2
