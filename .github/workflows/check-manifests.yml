@@ -25,12 +25,20 @@ jobs:
 
     - name: Check x86_64 manifests
       run: |
+        echo ##########
+        echo "Ensure toolchain and pkggen manifests (./toolkit/resources/manifests/package/*) match the versions in the .spec files"
+        echo "Run './scripts/toolchain/check_manifests.sh -a "x86_64"' to validate locally"
+        echo ##########
         pushd toolkit
         ./scripts/toolchain/check_manifests.sh -a "x86_64"
         popd
 
     - name: Check aarch64 manifests
       run: |
+        echo ##########
+        echo "Ensure toolchain and pkggen manifests (./toolkit/resources/manifests/package/*) match the versions in the .spec files"
+        echo "Run './scripts/toolchain/check_manifests.sh -a "aarch64"' to validate locally"
+        echo ##########
         pushd toolkit
         ./scripts/toolchain/check_manifests.sh -a "aarch64"
         popd

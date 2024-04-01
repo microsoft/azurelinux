@@ -30,16 +30,26 @@ then
     exit 1
 fi
 
-while (( "$#")); do
-  case "$1" in
-    -a ) ARCH="$2"; shift 2;;
-    -t ) TOOLCHAIN_SPEC_LIST="$2"; shift 2 ;;
-    -s ) SPECS_DIR="$2"; shift 2 ;;
-    -m ) MANIFESTS_DIR="$2"; shift 2 ;;
-    -d ) DIST_TAG="$2"; shift 2;;
-    -i ) DISTRO_MACRO="$2"; shift 2;;
-    -h ) help; exit 0 ;;
-    ?* ) echo -e "ERROR: Invalid option\n\n"; help; exit 1 ;;
+while getopts "a:t:s:m:d:i:h:" OPTIONS
+do
+  case "${OPTIONS}" in
+    a ) ARCH=$OPTARG ;;
+    t ) TOOLCHAIN_SPEC_LIST=$OPTARG ;;
+    s ) SPECS_DIR=$OPTARG ;;
+    m ) MANIFESTS_DIR=$OPTARG ;;
+    d ) DIST_TAG=$OPTARG ;;
+    i ) DISTRO_MACRO=$OPTARG ;;
+    h ) help; exit 0 ;;
+    \? )
+        echo "ERROR: Invalid Option: -$OPTARG" 1>&2
+        help
+        exit 1
+        ;;
+    : )
+        echo "ERROR: Invalid Option: -$OPTIONS requires an argument" 1>&2
+        help
+        exit 1
+        ;;
   esac
 done
 
@@ -49,7 +59,6 @@ if [ ! "$ARCH" ]; then
     help >&2
     exit 1
 fi
-
 
 write_rpms_from_spec () {
     # $1 = spec file
