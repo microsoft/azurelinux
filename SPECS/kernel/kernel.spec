@@ -42,7 +42,6 @@ Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013.pem
 Source5:        cpupower
 Source6:        cpupower.service
-Source7:        10_kernel.cfg
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -248,9 +247,6 @@ install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmli
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
 
-# Add kernel boot configurations to /etc/default/grub.d
-install -Dm 755 %{SOURCE7} %{buildroot}%{_sysconfdir}/default/grub.d/10_kernel.cfg
-
 # hmac sign the kernel for FIPS
 %{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
 cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -342,7 +338,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) %{_sysconfdir}/default/grub.d/10_kernel.cfg
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
