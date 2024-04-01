@@ -221,6 +221,9 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 * Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
 - Use Microsoft sources based on upstream version 3.2.0.
 
+* Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.1.3-2
+- Update the build dependency from mariner-release to azurelinux-release
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-11
 - Bump release to rebuild with go 1.21.6
 
@@ -228,8 +231,11 @@ ln -sf %{_bindir}/kata-runtime %{buildroot}%{_prefix}/local/bin/kata-runtime
 - Drop qemu-kvm-core dependency
 - Define explicit dependency on qemu-virtiofsd
 
+* Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.3-1
+- Auto-upgrade to 3.1.3 - Azure Linux 3.0 - package upgrades
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.1.0-9
-- Bump release to rebuild with go 1.20.9
+- Bump release to rebuild with go 1.20.10
 
 * Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 3.1.0-8
 - Bump release to rebuild with updated version of Go.
