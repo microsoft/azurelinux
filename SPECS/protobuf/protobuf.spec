@@ -2,7 +2,7 @@
 
 Summary:        Google's data interchange format
 Name:           protobuf
-Version:        3.22.0
+Version:        25.3
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -10,9 +10,6 @@ Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
 Source0:        https://github.com/protocolbuffers/protobuf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Backport from https://github.com/protocolbuffers/protobuf/commit/d38ba32c49bbb5a256746c7dc99eb5e543b0105a.
-# Also see: https://github.com/protocolbuffers/protobuf/issues/12104.
-Patch0:         full_test_c++17.patch
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  cmake
 BuildRequires:  curl
@@ -66,10 +63,9 @@ Provides:       %{name}-python3 = %{version}-%{release}
 This contains protobuf python3 libraries.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
-pushd cmake
 %{cmake} \
 %if 0%{with_check}
     -Dprotobuf_USE_EXTERNAL_GTEST=ON \
@@ -77,11 +73,11 @@ pushd cmake
     -Dprotobuf_BUILD_TESTS=OFF \
 %endif
     -Dprotobuf_ABSL_PROVIDER=package \
+    -Dprotobuf_ABSL_MIN=20240116.0 \
     -Dprotobuf_BUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 
 %{cmake_build}
-popd
 
 export PROTOC="%{protoc_path}"
 
@@ -90,9 +86,7 @@ pushd python
 popd
 
 %install
-pushd cmake
 %{cmake_install}
-popd
 
 export PROTOC="%{protoc_path}"
 
@@ -100,10 +94,10 @@ pushd python
 %{py3_install}
 popd
 
-%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %check
-pushd cmake
 ctest --progress --output-on-failure
 
 %files
@@ -127,8 +121,10 @@ ctest --progress --output-on-failure
 %{python3_sitelib}/*
 
 %changelog
-* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.22.0-1
+* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 25.3-1
+- Upgraded to version 3.25.3.
 - Switching to building with cmake and producing cmake package files.
+- Updated the %%check stage.
 
 * Mon Mar 20 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.17.3-2
 - Added check section for running tests

@@ -21594,8 +21594,8 @@
         "type": "other",
         "other": {
           "name": "protobuf",
-          "version": "3.22.0",
-          "downloadUrl": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v3.22.0.tar.gz"
+          "version": "25.3",
+          "downloadUrl": "https://github.com/protocolbuffers/protobuf/archive/refs/tags/v25.3.tar.gz"
         }
       }
     },
