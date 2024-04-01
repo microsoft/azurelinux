@@ -205,6 +205,7 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
 %changelog
 * Fri Mar 29 2024 Nan Liu <liunan@microsoft.com> - 2.20.0-1
 - Upgrade to 2.20.0 using openSUSE Tumbleweed.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.0-143
 - Converting the 'Release' tag to the '[number].[distribution]' format.

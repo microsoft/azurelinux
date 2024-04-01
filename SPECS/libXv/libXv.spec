@@ -71,6 +71,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %changelog
 * Mon Apr 1 2024 Nan Liu <liunan@microsoft.com> - 1.0.12-1
 - Upgrade to 1.0.12 using Fedora 40.
+- License verified.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.11-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
