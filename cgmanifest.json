@@ -13902,8 +13902,8 @@
         "type": "other",
         "other": {
           "name": "netplan",
-          "version": "0.107.1",
-          "downloadUrl": "https://github.com/canonical/netplan/archive/refs/tags/0.107.1.tar.gz"
+          "version": "1.0",
+          "downloadUrl": "https://github.com/canonical/netplan/archive/refs/tags/1.0.tar.gz"
         }
       }
     },
