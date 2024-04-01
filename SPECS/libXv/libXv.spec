@@ -6,17 +6,17 @@ Distribution:   Azure Linux
 
 Summary: X.Org X11 libXv runtime library
 Name:    libXv
-Version: 1.0.11
-Release: 12%{?dist}
+Version: 1.0.12
+Release: 1%{?dist}
 License: MIT
 URL: http://www.x.org
 
 %if 0%{?gitdate}
-Source0:    %{tarball}-%{gitdate}.tar.bz2
+Source0:    %{tarball}-%{gitdate}.tar.xz
 Source1:    make-git-snapshot.sh
 Source2:    commitid
 %else
-Source0: http://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.bz2
+Source0: http://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 %endif
 
 Requires: libX11 >= 1.5.99.902
@@ -69,6 +69,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon Apr 1 2024 Nan Liu <liunan@microsoft.com> - 1.0.12-1
+- Upgrade to 1.0.12 using Fedora 40.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.11-12
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

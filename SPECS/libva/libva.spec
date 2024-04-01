@@ -1,7 +1,7 @@
 #
 # spec file for package libva
 #
-# Copyright (c) 2021 SUSE LLC
+# Copyright (c) 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -18,18 +18,10 @@
 
 #
 
-%define flavor @BUILD_FLAVOR@%nil
-
 %define build_gl 0
 %define sover 2
 
-%if "%flavor" == "gl"
-%define build_gl 1
-%define name_suffix -%{flavor}
-%else
-%define name_suffix %{nil}
-%endif
-Name:           libva%{name_suffix}
+Name:           libva
 %define _name   libva
 Version:        2.20.0
 Release:        1%{?dist}
@@ -212,7 +204,7 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
 
 %changelog
 * Fri Mar 29 2024 Nan Liu <liunan@microsoft.com> - 2.20.0-1
-- Upgrade to 2.20.0.
+- Upgrade to 2.20.0 using openSUSE Tumbleweed.
 
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.0-143
 - Converting the 'Release' tag to the '[number].[distribution]' format.

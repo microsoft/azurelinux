@@ -11921,8 +11921,8 @@
         "type": "other",
         "other": {
           "name": "libXv",
-          "version": "1.0.11",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.11.tar.bz2"
+          "version": "1.0.12",
+          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.12.tar.xz"
         }
       }
     },
