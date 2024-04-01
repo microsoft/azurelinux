@@ -10,10 +10,10 @@ Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
+BuildRequires:  libva-devel
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
-BuildRequires:  pkgconfig(libva)
 BuildRequires:  python3
 BuildRequires:  vulkan-loader-devel
 BuildRequires:  xorg-x11-util-macros
@@ -67,7 +67,7 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
-* Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 1.0.1-1
+* Mon Apr 1 2024 Nan Liu <liunan@microsoft.com> - 1.0.1-1
 - Upgrade to 1.0.1 in Azure Linux 3.0 using Fedora 40
 
 * Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
