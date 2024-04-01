@@ -78,6 +78,14 @@ Requires:       tdnf-plugin-repogpgcheck
 Requires:       xz
 Requires:       zlib
 
+# TEMP: Add packages required to unblock partner team; remove before merging to 3.0-dev.
+Requires:       build-essential
+Requires:       openssh-server
+Requires:       openssl-devel
+Requires:       curl-devel
+Requires:       kernel-devel
+Requires:       kernel-headers
+
 %description    container
 %{summary}
 
