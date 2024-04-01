@@ -1,0 +1,27 @@
+From 6f3e7eadab87c7f9edaf77b45738c15ca2b946c6 Mon Sep 17 00:00:00 2001
+From: Kanika Nema <kanikanema@microsoft.com>
+Date: Mon, 1 Apr 2024 10:35:37 +0000
+Subject: [PATCH] On current 3.0 kernels eventfd is not working correctly.
+ Temporarily disable post-copy eventfd based tests
+
+Signed-off-by: Kanika Nema <kanikanema@microsoft.com>
+---
+ tests/qtest/migration-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+index 0fbaa6a90f..b43ed1bc92 100644
+--- a/tests/qtest/migration-test.c
++++ b/tests/qtest/migration-test.c
+@@ -3306,6 +3306,8 @@ int main(int argc, char **argv)
+     }
+ 
+     has_uffd = ufd_version_check();
++    /* Unblock azl qemu tests, eventfd may not be working properly */
++    has_uffd = 0;
+     arch = qtest_get_arch();
+ 
+     /*
+-- 
+2.25.1
+
