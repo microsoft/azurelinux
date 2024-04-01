@@ -331,3 +331,21 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 
 	return nil
 }
+
+func EnumerateDirFiles(dirPath string) (filePaths []string, err error) {
+	err = filepath.Walk(dirPath, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		filePaths = append(filePaths, filePath)
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to enumerate files under %s:\n%w", dirPath, err)
+	}
+	return filePaths, nil
+}
