@@ -25,6 +25,7 @@ BuildRequires:  xz-devel
 BuildRequires:  zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
+BuildRequires:  javapackages-tools
 BuildRequires:  msopenjdk-17
 %endif
 Requires:       bzip2
@@ -64,7 +65,7 @@ sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{majo
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
 rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
 
-export JAVA_HOME=/usr/lib/jvm/msopenjdk-17
+export JAVA_HOME="%{java_home}"
 bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
