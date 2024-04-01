@@ -7,7 +7,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        5.15.126.mshv9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -66,6 +66,7 @@ Source0:        kernel-mshv-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
 BuildRequires:  sed
 
@@ -148,6 +149,9 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Mon Apr 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-3
+- BuildRequires: grub2-rpm-macros to expand mkconfig configuration requirement
+
 * Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-2
 - Original version for CBL-Mariner.
 - License verified
