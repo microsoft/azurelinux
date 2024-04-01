@@ -1,6 +1,6 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.3
+Version:        2.4.4
 Release:        1%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
@@ -63,6 +63,10 @@ ln -s gpg2 gpg
 ln -s gpgv2 gpgv
 popd
 
+# Empty legacy global configuration file.
+# Some GnuPG commands expect it to exist.
+install -Dm 644 /dev/null %{buildroot}%{_sysconfdir}/gnupg/gpgconf.conf
+
 %find_lang %{name}
 
 %check
@@ -82,6 +86,7 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %{_infodir}/gnupg*
 %{_libexecdir}/*
 %{_datadir}/gnupg/*
+%{_sysconfdir}/gnupg
 %exclude %{_infodir}/dir
 %exclude /usr/share/doc/*
 
@@ -89,6 +94,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Fri Mar 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-1
+- Upgrade to 2.4.4.
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.3-1
 - Auto-upgrade to 2.4.3 - Azure Linux 3.0 - package upgrades
 
