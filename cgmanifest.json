@@ -29266,8 +29266,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-headers",
-          "version": "1.2.148.0",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-1.2.148.0.tar.gz"
+          "version": "1.3.268.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/vulkan-sdk-1.3.268.0.tar.gz"
         }
       }
     },
@@ -29276,8 +29276,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-loader",
-          "version": "1.2.148.1",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-1.2.148.1.tar.gz"
+          "version": "1.3.268.1",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/vulkan-sdk-1.3.268.0.tar.gz"
         }
       }
     },
