@@ -26394,8 +26394,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-msgpack",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.4.5.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.7.2.tar.gz"
         }
       }
     },
