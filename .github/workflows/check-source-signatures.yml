@@ -49,7 +49,7 @@ jobs:
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
           # the package's directory name (ie the folder inside ./SPECS).
-          changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep -oP "(?<=${{ matrix.specs-dir }}/)([^/]+)" || [[ $? -eq 1 ]]; } | sort -u | xargs)
+          changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep -oP "(?<=^${{ matrix.specs-dir }}/)([^/]+)" || [[ $? -eq 1 ]]; } | sort -u | xargs)
 
           echo "Folders with modified files in this PR:"
           echo "${{ matrix.specs-dir }}/*: '${changed_pkg_dirs}'"
