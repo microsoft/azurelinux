@@ -1,21 +1,21 @@
 Summary:        Virgl Rendering library.
 Name:           virglrenderer
-Version:        0.9.1
-Release:        3%{?dist}
+Version:        1.0.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.freedesktop.org/virgl/virglrenderer
 Source0:        %{url}/-/archive/%{version}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2022-0135.patch
-Patch1:         CVE-2022-0175.patch
 
 BuildRequires:  libdrm-devel
 BuildRequires:  libepoxy-devel
+BuildRequires:  libva-devel
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libgbm-devel
 BuildRequires:  meson
 BuildRequires:  python3
+BuildRequires:  vulkan-loader-devel
 BuildRequires:  xorg-x11-util-macros
 
 %description
@@ -40,10 +40,10 @@ that can be used along with the mesa virgl
 driver to test virgl rendering without GL.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
-%meson
+%meson -Dvideo=true -Dvenus=true
 %meson_build
 
 %install
@@ -55,6 +55,7 @@ driver to test virgl rendering without GL.
 %license COPYING
 %{_libdir}/lib*.so.1
 %{_libdir}/lib*.so.1.*
+%{_libexecdir}/virgl_render_server
 
 %files devel
 %dir %{_includedir}/virgl/
@@ -66,6 +67,9 @@ driver to test virgl rendering without GL.
 %{_bindir}/virgl_test_server
 
 %changelog
+* Mon Apr 1 2024 Nan Liu <liunan@microsoft.com> - 1.0.1-1
+- Upgrade to 1.0.1 in Azure Linux 3.0 using Fedora 40
+
 * Wed Sep 14 2022 Nan Liu <liunan@microsoft.com> - 0.9.1-3
 - Apply CVE-2022-0175 patch from upstream.
 

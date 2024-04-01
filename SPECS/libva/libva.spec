@@ -1,7 +1,7 @@
 #
 # spec file for package libva
 #
-# Copyright (c) 2021 SUSE LLC
+# Copyright (c) 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -23,29 +23,30 @@
 
 Name:           libva
 %define _name   libva
-Version:        2.11.0
-Release:        143%{?dist}
+Version:        2.20.0
+Release:        1%{?dist}
 Summary:        Video Acceleration (VA) API
 License:        MIT
 Group:          Development/Libraries/C and C++
 URL:            https://01.org/linuxmedia
 Source0:        https://github.com/intel/libva/archive/%{version}.tar.gz#/libva-%{version}.tar.gz
 Source2:        baselibs.conf
+Patch0:         propagate-dpy.patch
 BuildRequires:  gcc-c++
 BuildRequires:  libtool
+BuildRequires:  meson
 BuildRequires:  pkgconf-pkg-config
-BuildRequires:  xz
 BuildRequires:  pkgconfig(libdrm)
 BuildRequires:  pkgconfig(libudev)
+BuildRequires:  pkgconfig(wayland-client) >= 1.11.0
+BuildRequires:  pkgconfig(wayland-scanner) >= 1.11.0
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(xfixes)
 BuildRequires:  pkgconfig(xrandr)
-BuildRequires:  pkgconfig(xv)
+BuildRequires:  libXv-devel
 %if %{build_gl}
 BuildRequires:  pkgconfig(gl)
-BuildRequires:  pkgconfig(wayland-client) >= 1.11.0
-BuildRequires:  pkgconfig(wayland-scanner) >= 1.11.0
 %endif
 
 %description
@@ -77,11 +78,11 @@ Group:          Development/Languages/C and C++
 %if 0%{?build_gl}
 BuildRequires:  libva-devel = %{version}
 Requires:       libva-glx%{sover} = %{version}
-Requires:       libva-wayland%{sover} = %{version}
 Requires:       pkgconfig(gl)
 %else
 Requires:       libva%{sover} = %{version}
 Requires:       libva-drm%{sover} = %{version}
+Requires:       libva-wayland%{sover} = %{version}
 Requires:       libva-x11-%{sover} = %{version}
 Requires:       pkgconfig(libdrm)
 Requires:       pkgconfig(x11)
@@ -132,71 +133,48 @@ The library loads a hardware dependendent driver.
 This is the VA/X11 runtime library.
 
 %prep
-%setup -q -n %{_name}-%{version}
-# Add "libva-wayland%%{sover}" to baselibs.conf when enabling wayland build;
-# ugly I know ...This is needed since otherwise source validator
-#
-#   osc service run source_validator
-#
-# fails on sle
-echo libva-wayland%{sover} >> $RPM_SOURCE_DIR/baselibs.conf
+%autosetup -n %{_name}-%{version} -p1
 
 %build
-[ -d m4 ]  || mkdir m4
-autoreconf -v --install
-%configure \
+%meson \
+	-D driverdir=%{_libdir}/dri \
 %if %{build_gl}
-           --enable-glx \
-           --enable-wayland \
+	-D with_glx=yes \
+	-D with_x11=yes \
+	-D disable_drm=true \
+	-D with_wayland=no \
+	-D with_win32=no \
+%else
+	-D with_glx=no \
 %endif
-           --with-drivers-path=%{_libdir}/dri
-make %{?_smp_mflags}
+	%{nil}
+%meson_build
 
 %install
-make install DESTDIR=%{buildroot}
-find %{buildroot} -name '*.la' -delete -print
+%meson_install
 
 %if %{build_gl}
 # remove all files packaged during without gl mode
-rm -rf `find %{buildroot}%{_includedir}/va/* | grep -v "glx\|wayland"`
-rm -rf `find %{buildroot}%{_libdir}/libva* | grep -v "glx\|wayland"`
-rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx\|wayland"`
+rm -rf `find %{buildroot}%{_includedir}/va/* | grep -v "glx"`
+rm -rf `find %{buildroot}%{_libdir}/libva* | grep -v "glx"`
+rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
 %endif
 
-%post -n libva-glx%{sover} -p /sbin/ldconfig
-
-%postun -n libva-glx%{sover} -p /sbin/ldconfig
-
-%post -n libva-wayland%{sover} -p /sbin/ldconfig
-
-%postun -n libva-wayland%{sover} -p /sbin/ldconfig
-
-%post -n libva%{sover} -p /sbin/ldconfig
-
-%postun -n libva%{sover} -p /sbin/ldconfig
-
-%post -n libva-drm%{sover} -p /sbin/ldconfig
-
-%postun -n libva-drm%{sover} -p /sbin/ldconfig
-
-%post -n libva-x11-%{sover} -p /sbin/ldconfig
-
-%postun -n libva-x11-%{sover} -p /sbin/ldconfig
+%ldconfig_scriptlets -n libva-glx%{sover}
+%ldconfig_scriptlets -n libva-wayland%{sover}
+%ldconfig_scriptlets -n libva%{sover}
+%ldconfig_scriptlets -n libva-drm%{sover}
+%ldconfig_scriptlets -n libva-x11-%{sover}
 
 %if %{build_gl}
 %files -n libva-glx%{sover}
 %{_libdir}/libva-glx.so.%{sover}*
 
-%files -n libva-wayland%{sover}
-%{_libdir}/libva-wayland.so.%{sover}*
-
 %files devel
 %{_libdir}/libva-glx.so
-%{_includedir}/va
+%{_includedir}/va/va_glx.h
+%{_includedir}/va/va_backend_glx.h
 %{_libdir}/pkgconfig/libva-glx.pc
-%{_libdir}/pkgconfig/libva-wayland.pc
-%{_libdir}/libva-wayland.so
-
 %else
 
 %files -n libva%{sover}
@@ -209,17 +187,26 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx\|wayland"
 %files -n libva-drm%{sover}
 %{_libdir}/libva-drm.so.*
 
+%files -n libva-wayland%{sover}
+%{_libdir}/libva-wayland.so.%{sover}*
+
 %files devel
 %{_libdir}/libva.so
 %{_libdir}/libva-x11.so
 %{_libdir}/libva-drm.so
+%{_libdir}/libva-wayland.so
 %{_includedir}/va
 %{_libdir}/pkgconfig/libva-drm.pc
 %{_libdir}/pkgconfig/libva-x11.pc
+%{_libdir}/pkgconfig/libva-wayland.pc
 %{_libdir}/pkgconfig/libva.pc
 %endif
 
 %changelog
+* Fri Mar 29 2024 Nan Liu <liunan@microsoft.com> - 2.20.0-1
+- Upgrade to 2.20.0 using openSUSE Tumbleweed.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.11.0-143
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

@@ -1,28 +1,29 @@
 Summary:        Vulkan Header files and API registry
 Name:           vulkan-headers
-Version:        1.2.148.0
-Release:        3%{?dist}
+Version:        1.3.275.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/Vulkan-Headers
-#WARNING: the source file downloads as 'sdk-%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
-#Source0:       %%{url}/archive/sdk-%%{version}.tar.gz
+#WARNING: the source file downloads as 'vulkan-sdk-%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
+#Source0:       %%{url}/archive/vulkan-sdk-%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 BuildRequires:  cmake
+BuildRequires:  gcc
 
 %description
 Vulkan Header files and API registry
 
 %prep
-%autosetup -n Vulkan-Headers-sdk-%{version}
+%autosetup -n Vulkan-Headers-vulkan-sdk-%{version}
 
 
 %build
-%cmake -DCMAKE_INSTALL_LIBDIR=%{_libdir} .
+%cmake -DCMAKE_INSTALL_LIBDIR=%{_libdir}
 %make_build
 
 
@@ -31,13 +32,19 @@ Vulkan Header files and API registry
 
 
 %files
-%license LICENSE.txt
+%license LICENSE.md
 %doc README.md
 %{_includedir}/vulkan/
+%{_includedir}/vk_video/
 %dir %{_datadir}/vulkan/
+%dir %{_datadir}/cmake/VulkanHeaders/
 %{_datadir}/vulkan/registry/
+%{_datadir}/cmake/VulkanHeaders/*.cmake
 
 %changelog
+* Fri Mar 29 2024 Nan Liu <liunan@microsoft.com> - 1.3.275.0-1
+- Upgrade to 1.3.275.0.
+
 * Mon Mar 29 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.148.0-3
 - Changed source tarball name.
 

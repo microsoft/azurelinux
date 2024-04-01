@@ -11371,8 +11371,8 @@
         "type": "other",
         "other": {
           "name": "libva",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/intel/libva/archive/2.11.0.tar.gz"
+          "version": "2.20.0",
+          "downloadUrl": "https://github.com/intel/libva/archive/2.20.0.tar.gz"
         }
       }
     },
@@ -11921,8 +11921,8 @@
         "type": "other",
         "other": {
           "name": "libXv",
-          "version": "1.0.11",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.11.tar.bz2"
+          "version": "1.0.12",
+          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.12.tar.xz"
         }
       }
     },
@@ -29216,8 +29216,8 @@
         "type": "other",
         "other": {
           "name": "virglrenderer",
-          "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/1.0.1/virglrenderer-1.0.1.tar.gz"
         }
       }
     },
@@ -29346,8 +29346,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-headers",
-          "version": "1.2.148.0",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-1.2.148.0.tar.gz"
+          "version": "1.3.275.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -29356,8 +29356,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-loader",
-          "version": "1.2.148.1",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-1.2.148.1.tar.gz"
+          "version": "1.3.275.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
