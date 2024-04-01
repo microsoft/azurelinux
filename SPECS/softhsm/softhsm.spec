@@ -50,7 +50,6 @@ make %{?_smp_mflags}
 
 %check
 make check
-# Note: test result details are in: src/lib/crypto/test/test-results.xml
 
 %install
 make DESTDIR=%{buildroot} install
