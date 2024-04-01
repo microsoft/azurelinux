@@ -15,7 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:        The smallest useful package list.
 Requires:       filesystem
 Requires:       mariner-release
-Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
 %description minimal
@@ -56,8 +55,8 @@ Requires:       busybox
 %files debug
 
 %changelog
-* Mon Mar 25 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-4
-- Explicitly add libgcc as a runtime dependency for distroless-base
+* Mon Apr 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-4
+- Remove dependency on "prebuilt-ca-certificates-base".
 
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
