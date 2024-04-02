@@ -7,6 +7,9 @@
 # (mm) EFI binaries should be signed by the production build pipeline.
 # This package does *not* sign anything.
 #
+# To test secure boot after making changes to this, or the
+# shim-unsigned package, see the TESTING file.
+#
 
 %global debug_package %{nil}
 
