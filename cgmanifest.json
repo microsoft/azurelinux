@@ -26275,7 +26275,7 @@
         "other": {
           "name": "rubygem-http_parser",
           "version": "0.8.0",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/http_parser.rb-0.8.0.tar.gz"
+          "downloadUrl": "https://github.com/tmm1/http_parser.rb/archive/refs/tags/v0.8.0.tar.gz"
         }
       }
     },
