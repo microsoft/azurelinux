@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 %define our_gopath %{_topdir}/.gopath
-%define blobfuse2_version 2.1.2
+%define blobfuse2_version 2.2.1
 %define blobfuse2_health_monitor bfusemon
 
 Summary:        FUSE adapter - Azure Storage
@@ -80,6 +80,9 @@ install -D -m 0644 ./setup/blobfuse2-logrotate %{buildroot}%{_sysconfdir}/logrot
 %{_sysconfdir}/logrotate.d/blobfuse2
 
 %changelog
+* Wed April 3 2023 Anubhuti Shruti <ashruti@microsoft.com> - 2.2.1-1
+- Bump version to 2.2.1
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.2-2
 - Bump release to rebuild with go 1.21.6
 
