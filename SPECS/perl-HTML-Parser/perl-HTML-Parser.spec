@@ -1,11 +1,11 @@
 Name:           perl-HTML-Parser
 Summary:        Perl module for parsing HTML
-Version:        3.72
-Release:        23%{?dist}
+Version:        3.82
+Release:        1%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        https://cpan.metacpan.org/authors/id/G/GA/GAAS/HTML-Parser-%{version}.tar.gz 
+Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-%{version}.tar.gz#/perl-HTML-Parser-%{version}.tar.gz
 URL:            https://metacpan.org/release/HTML-Parser
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -15,27 +15,23 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(Carp)
 BuildRequires:  perl(Config)
-BuildRequires:  perl(Exporter)
 BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
-BuildRequires:  perl(File::Spec)
-BuildRequires:  perl(FileHandle)
-BuildRequires:  perl(HTML::Tagset) >= 3
-%if %{undefined perl_bootstrap}
-# This creates cycle with perl-HTTP-Message.
-BuildRequires:  perl(HTTP::Headers)
-%endif
-BuildRequires:  perl(IO::File)
-BuildRequires:  perl(SelectSaver)
 BuildRequires:  perl(strict)
-BuildRequires:  perl(Test)
+BuildRequires:  perl(warnings)
+# Run-time
+BuildRequires:  perl(Carp)
+BuildRequires:  perl(Exporter)
+BuildRequires:  perl(HTML::Tagset) >= 3
+BuildRequires:  perl(HTTP::Headers)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(URI)
+BuildRequires:  perl(XSLoader)
+# Tests
+BuildRequires:  perl(File::Spec)
+BuildRequires:  perl(SelectSaver)
 BuildRequires:  perl(Test::More)
 BuildRequires:  perl(threads)
-BuildRequires:  perl(URI)
-BuildRequires:  perl(vars)
-BuildRequires:  perl(XSLoader)
-Requires:       perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 Requires:       perl(HTML::Tagset) >= 3
 Requires:       perl(HTTP::Headers)
 Requires:       perl(IO::File)
@@ -48,6 +44,15 @@ Requires:       perl(URI)
 The HTML-Parser module for perl to parse and extract information from
 HTML documents, including the HTML::Entities, HTML::HeadParser,
 HTML::LinkExtor, HTML::PullParser, and HTML::TokeParser modules.
+
+%package tests
+Summary:        Tests for %{name}
+Requires:       %{name} = %{?epoch:%{epoch}:}%{version}-%{release}
+Requires:       perl-Test-Harness
+ 
+%description tests
+Tests from %{name}. Execute them
+with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n HTML-Parser-%{version}
@@ -67,16 +72,40 @@ iconv -f iso-8859-1 -t utf-8 <"$file" > "${file}_" && \
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} %{buildroot}/*
 
+# Install tests
+mkdir -p %{buildroot}/%{_libexecdir}/%{name}
+cp -a t %{buildroot}/%{_libexecdir}/%{name}
+cat > %{buildroot}/%{_libexecdir}/%{name}/test << 'EOF'
+#!/bin/bash
+set -e
+# Some tests write into temporary files/directories. The easiest solution
+# is to copy the tests into a writable directory and execute them from there.
+DIR=$(mktemp -d)
+pushd "$DIR"
+cp -a %{_libexecdir}/%{name}/* ./
+prove -I . -j "$(getconf _NPROCESSORS_ONLN)"
+popd
+rm -rf "$DIR"
+EOF
+chmod +x %{buildroot}/%{_libexecdir}/%{name}/test
+
 %check
+export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print $1} else {print 1}' -- '%{?_smp_mflags}')
 make test
 
 %files
 %doc Changes README TODO eg/
 %{perl_vendorarch}/HTML/
 %{perl_vendorarch}/auto/HTML/
-%{_mandir}/man3/*.3pm*
+%{_mandir}/man3/HTML::*.3pm*
+
+%files tests
+%{_libexecdir}/%{name}
 
 %changelog
+* Tue Mar 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.82-1
+- Upgrade to version 3.82
+- Add tests package
 * Tue Jul 26 2022 Henry Li <lihl@microsoft.com> - 3.72-23
 - License Verified
 
