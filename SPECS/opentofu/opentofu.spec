@@ -18,26 +18,26 @@ BuildRequires:  golang
 OpenTofu lets you declaratively manage your cloud infrastructure.
 
 %prep
-%autosetup -p1 %{?with_vendor:-b1}
+%autosetup -p1 %{?with_vendor:-a1}
 
 %build
-tar -xf %{SOURCE1} --no-same-owner
-
-export LDFLAGS="-X github.com/opentofu/opentofu/version.dev=no"
 export VERSION=%{version}
+export LDFLAGS="-X github.com/opentofu/opentofu/version.dev=no \
+                -X github.com/opentofu/opentofu/version=$VERSION \
+                -extldflags '-Wl,-z,relro'"
 go build \
   -buildmode pie \
   -compiler gc \
   -tags="rpm_crashtraceback" \
-  -ldflags "${LDFLAGS:-} -X github.com/opentofu/opentofu/version=$VERSION -extldflags '-Wl,-z,relro'" \
-  -mod=vendor \
+  -ldflags "$LDFLAGS" \
+  %{?with_vendor:-mod=vendor } \
   -a -v -x \
   -o ./bin/tofu \
   github.com/opentofu/opentofu/cmd/tofu
 
 %install
-install -m 0755 -vd                     %{buildroot}%{_bindir}
-install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
+install -m 0755 -vd %{buildroot}%{_bindir}
+install -m 0755 -vp ./bin/* %{buildroot}%{_bindir}/
 
 %check
 for test in "TestResourceProvider_ApplyCustomWorkingDirectory" \
