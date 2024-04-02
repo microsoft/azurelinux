@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://github.com/tmm1/http_parser.rb
 Source0:        https://github.com/tmm1/http_parser.rb/archive/refs/tags/v0.8.0.tar.gz#/http_parser-%{version}.tar.gz
-Source1:        rubygem-http_parser-%{version}-submodules.tar.gz
+Source1:        http_parser-%{version}-submodules.tar.gz
 BuildRequires:  git
 BuildRequires:  rubygem-ffi
 BuildRequires:  rubygem-json
