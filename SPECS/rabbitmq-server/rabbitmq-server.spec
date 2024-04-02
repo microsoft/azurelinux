@@ -40,7 +40,7 @@ rabbitmq-server
 
 %build
 export LANG="en_US.UTF-8"
-%make_build
+%make_build -j1
 
 %install
 export LANG="en_US.UTF-8"
