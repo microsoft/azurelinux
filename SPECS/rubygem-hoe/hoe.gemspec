@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name          = "hoe"
-  s.version       = "3.18.0"
+  s.version       = "4.0.4"
   s.authors       = ["Ryan Davis"]
   s.email         = ["ryand-ruby@zenspider.com"]
 
