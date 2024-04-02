@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script serves to generate the rabbitmq-server-hex-vendor-3.11.11.tar.gz
+# This script serves to generate the rabbitmq-server-hex-vendor-3.13.0.tar.gz
 # used in rabbitmq-server.spec. to run this script, use the following command:
 #   ./generate-rabbitmq-server-tarball.sh
 #
@@ -8,6 +8,24 @@
 # source), then tar everything up into the name specified in 
 # VENDOR_TARBALL_NAME. If the directory name in TEMP_TARBALL_DIR conflits 
 # locally, adjust the variable contents as necessary.
+#
+# NOTE: Rabbitmq currently does not seem to require an additional hex modules at this
+#       time. This may change in the future so this script is left in place for future
+#       reference. 
+#       Additionally, the steps to create the rabbitmq-server-hex-cache tarball are 
+#       included here rather than the spec.
+# --------
+# Steps to create the rabbitmq-server-hex-cache tarball. A network connection is required to create this cache.
+# --------
+# 1. To ensure the cache file is as small as possible, first delete ~/.hex/cache.ets if it exists
+# 2. Pull the rabbitmq-server source from Source0
+# 3. Unpack the source and run `make` with the rabbitmq-server-<version> directory
+# 4. Run `make install`
+# 5. Find the cache.ets file created by hex (likely ~/.hex/cache.ets by default)
+# 6. Copy the cache.ets file to the same directory as rabbitmqHexCacheMakefile
+# 7. Run `make generate-hex-cache -f rabbitmqHexCacheMakefile`
+# 8. Run `tar -czf rabbitmq-server-hex-cache-<version>.tar.gz cache.erl`
+# --------
 
 
 # baseline variables for filename and temporary directory to avoid filenme collisions

@@ -15,6 +15,12 @@
 # //deps/rabbitmq_auth_backend_ldap:system_SUITE
 # //deps/rabbitmq_ampq1_0:system_SUITE - shard 1 of 2 specifically
 #
+# Additional failures: 
+# //deps/rabbitmq_common:env_SUITE - test case 3 of 40 fails - fails for Assertion error
+# //deps/rabbit:feature_flags_with_unprivileged_user_SUITE-mixed - both shards fail for Assertion error
+# //deps/rabbit:feature_flags_with_unprivileged_user_SUITE - both shards fail for Assertion error
+# //deps/rabbitmq_shovel:amqp10_dynamic_SUITE-mixed - test case 6 - fails for early closed connection
+#
 # RabbitMQ depends on bazel 'latest'. This can be updated as needed using the "BAZEL_DEP_VERSION" variable for the purposes of this script
 #
 # Some tests also rely on the 'mandoc' package. As of 4/1/24, this package was not available in Azure Linux. As a result, the package is
@@ -32,6 +38,8 @@
 #### END TESTING DISCLAIMER ####
 
 ####   SCRIPT ASSUMPTIONS   ####
+# This test generates A LOT of files, you will need 5.0M+ inodes to run the full SUITE.
+#
 # You have pulled the rabbitmq source from github as it contains additional bazel build files which our normal source does not
 # (And checked out the appropriate tag + applied any local patches from Azure Linux)
 #
@@ -79,7 +87,7 @@ rm -rf $BAZEL_DIR $MANDOC_DIR $DAEMONIZE_DIR
 tdnf install -y erlang elixir libxslt xmlto python python3-simplejson zip unzip rsync glibc-lang
 
 # Required dependencies are installed
-tdnf install -y msopenjdk-17 wget git build-essential python3 zip unzip kernel-headers binutils zlib-devel
+tdnf install -y msopenjdk-17 wget git build-essential python python-pip zip unzip kernel-headers binutils zlib-devel
 
 # Get Dependency sources
 wget https://github.com/bazelbuild/bazel/releases/download/$BAZEL_DEP_VERSION/bazel-$BAZEL_DEP_VERSION-dist.zip

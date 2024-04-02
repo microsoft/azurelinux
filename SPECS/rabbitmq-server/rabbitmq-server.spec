@@ -33,13 +33,15 @@ Requires:       xmlto
 Requires:       zip
 
 %description
-rabbitmq-server
+RabbitMQ is a reliable and mature messaging and streaming broker, which is easy to deploy on cloud environments, on-premises, and on your local machine.
 
 %prep
 %autosetup
 
 %build
 export LANG="en_US.UTF-8"
+# Running with -j1 to solve a race condition during build with a patch added to erlang to resolve
+# an arm64 build error related to heap allocation
 %make_build -j1
 
 %install
