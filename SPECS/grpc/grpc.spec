@@ -117,9 +117,6 @@ pushd cmake/build
 DESTDIR="%{buildroot}" cmake --install .
 popd
 
-# grpcio (see comments above about not using python RPM macros and C++ version)
-CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
-
 export GRPC_BUILD_WITH_BORING_SSL_ASM=false
 export GRPC_PYTHON_BUILD_SYSTEM_ABSL=true
 export GRPC_PYTHON_BUILD_SYSTEM_CARES=true
@@ -127,7 +124,7 @@ export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true
 export GRPC_PYTHON_BUILD_SYSTEM_RE2=true
 export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=true
 export GRPC_PYTHON_BUILD_WITH_CYTHON=true
-export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++$CXX_VERSION"
+export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++%{cpp_std}"
 %{__python3} setup.py install --root %{buildroot}
 
 %files

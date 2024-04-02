@@ -9,6 +9,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
+# Despite the name, this library is required by external projects to
+# build their tests against Abseil.
 Patch0:         add_missing_random_internal_mock_overload_set.patch
 
 BuildRequires:  cmake >= 3.20.0
