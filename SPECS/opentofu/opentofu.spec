@@ -40,10 +40,11 @@ install -m 0755 -vd %{buildroot}%{_bindir}
 install -m 0755 -vp ./bin/* %{buildroot}%{_bindir}/
 
 %check
-for test in "TestResourceProvider_ApplyCustomWorkingDirectory" \
-            "TestGet_cancel" \
-            "TestInit_cancelModules" \
-            "TestFileExists" \
+# Disabling some tests:
+# - TestFileExists: This contains a test case where a file permisison is set to 000
+#   and the test expects the file cannot be found. However, since we are running
+#   %check section as root, we can always see the file, thus fail the unit test.
+for test in "TestFileExists" \
 ; do
 awk -i inplace '/^func.*'"$test"'\(/ { print; print "\tt.Skip(\"disabled failing test\")"; next}1' $(grep -rl $test)
 done
