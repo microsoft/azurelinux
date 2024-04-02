@@ -28386,8 +28386,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.29.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/refs/tags/v1.29.4.tar.gz"
         }
       }
     },
