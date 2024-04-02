@@ -78,6 +78,7 @@ Patch4:         postfix-3.8.0-large-fs.patch
 Patch9:         pflogsumm-1.1.5-datecalc.patch
 Patch10:        pflogsumm-1.1.5-ipv6-warnings-fix.patch
 Patch11:        postfix-3.4.4-chroot-example-fix.patch
+Patch12:        postfix-3.7.0-whitespace-name-fix.patch
 Patch13:        pflogsumm-1.1.5-syslog-name-underscore-fix.patch
 
 
