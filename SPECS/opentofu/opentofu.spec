@@ -9,7 +9,7 @@ Distribution:   Azure Linux
 
 License:        0BSD AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT AND MPL-2.0
 URL:            https://github.com/opentofu/opentofu
-Source0:        https://github.com/opentofu/opentofu/archive/v1.6.2.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/opentofu/opentofu/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
