@@ -9551,8 +9551,8 @@
         "type": "other",
         "other": {
           "name": "libguestfs",
-          "version": "1.44.0",
-          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "version": "1.52.0",
+          "downloadUrl": "https://libguestfs.org/download/1.52-stable/libguestfs-1.52.0.tar.gz"
         }
       }
     },
@@ -14404,6 +14404,16 @@
           "name": "ocaml-astring",
           "version": "0.8.5",
           "downloadUrl": "https://github.com/dbuenzli/astring/archive/v0.8.5/astring-0.8.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ocaml-augeas",
+          "version": "0.6",
+          "downloadUrl": "https://people.redhat.com/~rjones/augeas/files/ocaml-augeas-0.6.tar.gz"
         }
       }
     },

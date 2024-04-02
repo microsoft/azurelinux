@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "macros.ocaml-rpm": "82a9a732cffc1b5a87c240ca0637820967f9a9e7af704998e3ed5966e4ed3b67",
+  "ocaml-augeas-0.6.tar.gz": "8aba99ddacd08768ebeef4a2138361d13b41a30317fce7503140cd86a1307611",
+  "ocaml_files.py": "f5022a06638d7ba9f20863358e20e91de9d90f71d14e97e6cea99b18db3d6a8b"
+ }
+}

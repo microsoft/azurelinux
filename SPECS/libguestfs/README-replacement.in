@@ -8,8 +8,7 @@ list:
 
   http://www.redhat.com/mailman/listinfo/libguestfs
 
-This Fedora package comes with a lot of help and examples to get you
-started.
+This package comes with a lot of help and examples to get you started.
 
 The first place to start are the manual pages.  Type:
 
@@ -20,19 +19,19 @@ The first place to start are the manual pages.  Type:
   man virt-cat   # and other virt-* tools
 
 If you install the libguestfs-devel package, then in the
-/usr/share/doc/libguestfs-devel/ directory you will also
-find:
+/usr/share/doc/libguestfs-devel/ directory you will find other
+documentation including:
 
  - BUGS: list of open bugs in this version
 
- - ChangeLog: the detailed list of changes in this version
+ - ChangeLog.gz: the detailed list of changes in this version
 
- - ROADMAP: the roadmap for future versions
+ - HACKING: how to extend libguestfs
 
  - TODO: ideas for extending libguestfs
 
  - *.c: example C programs using the API
 
- - *.xml: example virt-inspector output
+ - *.xml.gz: example virt-inspector output (compressed)
 
- - *.rng: virt-inspector RelaxNG schema
+ - virt-inspector.rng: virt-inspector RelaxNG schema
