@@ -178,7 +178,7 @@ func RemoveFileIfExists(path string) (err error) {
 }
 
 // RemoveDirectoryContents will delete the contents of a directory, but not the
-// directory itself.
+// directory itself. If the directory does not exist, it will return an error.
 func RemoveDirectoryContents(path string) (err error) {
 	logger.Log.Debugf("Removing contents of directory (%s)", path)
 	dir, err := os.ReadDir(path)
