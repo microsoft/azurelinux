@@ -1,0 +1,89 @@
+From 53173fdab492f0f638f6616fcf01af0b9ea6338d Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 20 Jan 2022 10:20:38 +0100
+Subject: [PATCH xserver] render: Fix build with gcc 12
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The xserver fails to compile with the latest gcc 12:
+
+ render/picture.c: In function ‘CreateSolidPicture’:
+ render/picture.c:874:26: error: array subscript ‘union _SourcePict[0]’ is partly outside array bounds of ‘unsigned char[16]’ [-Werror=array-bounds]
+  874 |     pPicture->pSourcePict->type = SourcePictTypeSolidFill;
+      |                          ^~
+ render/picture.c:868:45: note: object of size 16 allocated by ‘malloc’
+  868 |     pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictSolidFill));
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ render/picture.c: In function ‘CreateLinearGradientPicture’:
+ render/picture.c:906:26: error: array subscript ‘union _SourcePict[0]’ is partly outside array bounds of ‘unsigned char[32]’ [-Werror=array-bounds]
+  906 |     pPicture->pSourcePict->linear.type = SourcePictTypeLinear;
+      |                          ^~
+ render/picture.c:899:45: note: object of size 32 allocated by ‘malloc’
+  899 |     pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictLinearGradient));
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ render/picture.c: In function ‘CreateConicalGradientPicture’:
+ render/picture.c:989:26: error: array subscript ‘union _SourcePict[0]’ is partly outside array bounds of ‘unsigned char[32]’ [-Werror=array-bounds]
+  989 |     pPicture->pSourcePict->conical.type = SourcePictTypeConical;
+      |                          ^~
+ render/picture.c:982:45: note: object of size 32 allocated by ‘malloc’
+  982 |     pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictConicalGradient));
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ cc1: some warnings being treated as errors
+ ninja: build stopped: subcommand failed.
+
+This is because gcc 12 has become stricter and raises a warning now.
+
+Fix the warning/error by allocating enough memory to store the union
+struct.
+
+Signed-off-by: Olivier Fourdan <ofourdan@redhat.com>
+Acked-by: Michel Dänzer <mdaenzer@redhat.com>
+Closes: https://gitlab.freedesktop.org/xorg/xserver/-/issues/1256
+(cherry picked from commit c6b0dcb82d4db07a2f32c09a8c09c85a5f57248e)
+---
+ render/picture.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/render/picture.c b/render/picture.c
+index afa0d258f..2be4b1954 100644
+--- a/render/picture.c
++++ b/render/picture.c
+@@ -865,7 +865,7 @@ CreateSolidPicture(Picture pid, xRenderColor * color, int *error)
+     }
+ 
+     pPicture->id = pid;
+-    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictSolidFill));
++    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
+     if (!pPicture->pSourcePict) {
+         *error = BadAlloc;
+         free(pPicture);
+@@ -896,7 +896,7 @@ CreateLinearGradientPicture(Picture pid, xPointFixed * p1, xPointFixed * p2,
+     }
+ 
+     pPicture->id = pid;
+-    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictLinearGradient));
++    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
+     if (!pPicture->pSourcePict) {
+         *error = BadAlloc;
+         free(pPicture);
+@@ -936,7 +936,7 @@ CreateRadialGradientPicture(Picture pid, xPointFixed * inner,
+     }
+ 
+     pPicture->id = pid;
+-    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictRadialGradient));
++    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
+     if (!pPicture->pSourcePict) {
+         *error = BadAlloc;
+         free(pPicture);
+@@ -979,7 +979,7 @@ CreateConicalGradientPicture(Picture pid, xPointFixed * center, xFixed angle,
+     }
+ 
+     pPicture->id = pid;
+-    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(PictConicalGradient));
++    pPicture->pSourcePict = (SourcePictPtr) malloc(sizeof(SourcePict));
+     if (!pPicture->pSourcePict) {
+         *error = BadAlloc;
+         free(pPicture);
+-- 
+2.34.1
