@@ -83,7 +83,7 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 
 	imagerEnd, _ := partition.GetEnd()
 
-	imagerFlags, err := partitionFlagsToImager(partition.Type)
+	imagerFlags, err := toImagerPartitionFlags(partition.Type)
 	if err != nil {
 		return configuration.Partition{}, err
 	}
@@ -99,8 +99,7 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 	return imagerPartition, nil
 }
 
-func partitionFlagsToImager(partitionType imagecustomizerapi.PartitionType,
-) ([]configuration.PartitionFlag, error) {
+func toImagerPartitionFlags(partitionType imagecustomizerapi.PartitionType) ([]configuration.PartitionFlag, error) {
 	switch partitionType {
 	case imagecustomizerapi.PartitionTypeESP:
 		return []configuration.PartitionFlag{configuration.PartitionFlagESP, configuration.PartitionFlagBoot}, nil
