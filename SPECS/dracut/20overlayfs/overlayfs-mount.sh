@@ -30,8 +30,8 @@ parse_kernel_cmdline_args() {
     # Ensure that the 'dracut-lib' is present and loaded.
     type getarg >/dev/null 2>&1 || . /lib/dracut-lib.sh
 
-    VERITY_MOUNT="/mnt/verity_mnt_$$"
-    OVERLAY_MOUNT="/mnt/overlay_mnt_$$"
+    VERITY_MOUNT="/mnt/verity_mnt"
+    OVERLAY_MOUNT="/mnt/overlay_mnt"
     OVERLAY_MNT_OPTS="rw,nodev,nosuid,nouser,noexec"
 
     # Retrieve the verity root. It is expected to be predefined by the dracut cmdline module.
@@ -102,7 +102,8 @@ mount_overlayfs() {
     else
         echo "Mounting regular root"
         mkdir -p "${VERITY_MOUNT}"
-        root_device="${root#block:}"  # Remove 'block:' prefix if present.
+        # Remove 'block:' prefix if present.
+        root_device=$(expand_persistent_dev "${root#block:}")
         mount -o ro,defaults "$root_device" "${VERITY_MOUNT}" || \
             die "Failed to mount root"
     fi
@@ -110,6 +111,9 @@ mount_overlayfs() {
     echo "Starting to create OverlayFS"
     for _group in ${overlayfs}; do
         IFS=',' read -r overlay upper work volume <<< "$_group"
+
+        # Resolve volume to its full device path.
+        volume=$(expand_persistent_dev "$volume")
 
         if [[ "$volume" == "" ]]; then
             overlay_mount_with_cnt="${OVERLAY_MOUNT}/${cnt}"
@@ -134,6 +138,31 @@ mount_overlayfs() {
     echo "Done Verity Root Mounting and OverlayFS Mounting"
     # Re-mount the verity mount along with overlayfs to the sysroot.
     mount --rbind "${VERITY_MOUNT}" "${NEWROOT}"
+}
+
+# Keep a copy of this function here from verity-read-only-root package.
+expand_persistent_dev() {
+    local _dev=$1
+
+    case "$_dev" in
+        LABEL=*)
+            _dev="/dev/disk/by-label/${_dev#LABEL=}"
+            ;;
+        UUID=*)
+            _dev="${_dev#UUID=}"
+            _dev="${_dev,,}"
+            _dev="/dev/disk/by-uuid/${_dev}"
+            ;;
+        PARTUUID=*)
+            _dev="${_dev#PARTUUID=}"
+            _dev="${_dev,,}"
+            _dev="/dev/disk/by-partuuid/${_dev}"
+            ;;
+        PARTLABEL=*)
+            _dev="/dev/disk/by-partlabel/${_dev#PARTLABEL=}"
+            ;;
+    esac
+    printf "%s" "$_dev"
 }
 
 # Parse kernel command line arguments to set environment variables.
