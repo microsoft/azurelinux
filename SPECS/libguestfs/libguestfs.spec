@@ -24,8 +24,8 @@
 
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
-Version:        1.44.0
-Release:        21%{?dist}
+Version:        1.52.0
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,13 +40,6 @@ Source5:        guestfish.sh
 Source6:        yum.conf.in
 # Maintainer script which helps with handling patches.
 Source8:        copy-patches.sh
-# Build cache RPMS configuration for tdnf downloading
-# This is a copy of toolkit/resources/manifests/package/local.repo
-Source9:        tdnf-build-cache.repo
-# Upstream patches not present in 1.44.0
-Patch0:         libguestfs-ocaml413compat.patch
-Patch1:         libguestfs-config-rpm.patch
-Patch2:         libguestfs-file-5.40.patch
 
 BuildRequires:  %{_bindir}/ping
 BuildRequires:  %{_bindir}/pod2text
@@ -131,6 +124,7 @@ BuildRequires:  ntfs-3g-system-compression
 BuildRequires:  ntfsprogs
 # For language bindings.
 BuildRequires:  ocaml
+BuildRequires:  ocaml-augeas-devel
 BuildRequires:  ocaml-findlib-devel
 BuildRequires:  ocaml-gettext-devel
 BuildRequires:  ocaml-hivex-devel
@@ -139,8 +133,8 @@ BuildRequires:  ocaml-ounit-devel
 BuildRequires:  openssh-clients
 BuildRequires:  parted
 BuildRequires:  pciutils
-BuildRequires:  pcre
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2
+BuildRequires:  pcre2-devel
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-libintl-perl
@@ -250,7 +244,7 @@ Requires:       libselinux
 Requires:       libvirt-daemon-driver-qemu
 Requires:       libvirt-daemon-driver-secret
 Requires:       libvirt-daemon-kvm >= 5.3.0
-Requires:       pcre
+Requires:       pcre2%{?_isa}
 # For qemu direct and libvirt backends.
 Requires:       qemu-kvm-core
 # For building the appliance.
@@ -263,7 +257,6 @@ Requires:       yajl
 %endif
 
 Recommends:     libvirt-daemon-config-network
-Recommends:     libvirt-daemon-driver-storage-core
 Recommends:     selinux-policy
 
 Suggests:       qemu-block-curl
@@ -747,19 +740,17 @@ fi
 mv README README.orig
 sed 's/@VERSION@/%{version}/g' < %{SOURCE4} > README
 
-# Re-enable upstream cache and local repos
-mkdir -pv %{_sysconfdir}/yum.repos.d
-cp %{SOURCE9} %{_sysconfdir}/yum.repos.d/allrepos.repo
-
 # Download appliance, since our chroot TDNF config does not have `keepcache=1`
 # Must keep in sync with BRs under "Build requirements for the appliance"
 # Download to
 mkdir -pv %{_var}/cache/tdnf
-tdnf install --downloadonly -y --disablerepo=* \
-  --enablerepo=local-repo \
-  --enablerepo=upstream-cache-repo \
-  --enablerepo=toolchain-repo \
-  --alldeps --downloaddir %{_var}/cache/tdnf \
+tdnf repolist
+tdnf install --downloadonly -y \
+    --disablerepo=* \
+    --enablerepo=local-repo \
+    --enablerepo=toolchain-repo \
+    --enablerepo=upstream-cache-repo \
+    --alldeps --downloaddir %{_var}/cache/tdnf \
     acl \
     attr \
     augeas-libs \
@@ -801,10 +792,12 @@ tdnf install --downloadonly -y --disablerepo=* \
     mdadm \
     ntfs-3g ntfsprogs \
     ntfs-3g-system-compression \
+    ocaml-augeas-devel \
     openssh-clients \
     parted \
     pciutils \
-    pcre \
+    pcre2 \
+    pcre2-devel \
     policycoreutils \
     procps \
     psmisc \
@@ -833,22 +826,22 @@ tdnf install --downloadonly -y --disablerepo=* \
     zfs-fuse \
 %endif
 
-
 mkdir cachedir repo
 find %{_var}/cache/tdnf -type f -name '*.rpm' -print0 | \
   xargs -0 -n 1 cp -t repo
 createrepo_c repo
 sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
+extra=--with-supermin-packager-config=$(pwd)/yum.conf
 
 %build
 # "--with-distro=REDHAT" is used to indicate Mariner is "Fedora-like" in package naming
 %configure \
   PYTHON=python3 \
   --with-default-backend=libvirt \
+  --enable-appliance-format-auto \
   --with-distro=REDHAT \
   --with-extra="release=%{release},libvirt" \
   --with-qemu="qemu-system-%{_build_arch} qemu" \
-  --with-supermin-packager-config=$(pwd)/yum.conf \
 %if %{without php}
   --disable-php \
 %endif
@@ -860,15 +853,11 @@ sed -e "s|@PWD@|$(pwd)|" %{SOURCE6} > yum.conf
   --enable-appliance=no \
 %endif
   --disable-erlang
+  $extra
 
-# Building index-parse.c by hand works around a race condition in the
-# autotools cruft, where two or more copies of yacc race with each
-# other, resulting in a corrupted file.
-#
 # 'INSTALLDIRS' ensures that Perl and Ruby libs are installed in the
 # vendor dir, not the site dir.
-make -j1 -C builder index-parse.c
-make V=1 INSTALLDIRS=vendor %{?_smp_mflags}
+%make_build INSTALLDIRS=vendor
 
 %ifarch %{test_arches}
 %check
@@ -876,17 +865,9 @@ export LIBGUESTFS_DEBUG=1
 export LIBGUESTFS_TRACE=1
 export LIBVIRT_DEBUG=1
 
-if ! make quickcheck QUICKCHECK_TEST_TOOL_ARGS="-t 1200"; then
-    cat $HOME/.cache/libvirt/qemu/log/* && false
-fi
 %endif
 
 %install
-# This file is creeping over 1 MB uncompressed, and since it is
-# included in the -devel subpackage, compress it to reduce
-# installation size.
-gzip -9 ChangeLog
-
 # supermin prepare does not detect configuration files for Mariner, so create
 # our own base tarball out of the root filesystem RPM
 mkdir -pv mariner-filesystem
@@ -912,16 +893,6 @@ find %{buildroot} -name .packlist -delete
 find %{buildroot} -name '*.bs' -delete
 find %{buildroot} -name 'bindtests.pl' -delete
 
-%if %{with appliances}
-# Remove obsolete binaries (RHBZ#1213298).
-rm %{buildroot}%{_bindir}/virt-list-filesystems
-rm %{buildroot}%{_bindir}/virt-list-partitions
-rm %{buildroot}%{_bindir}/virt-tar
-rm %{buildroot}%{_mandir}/man1/virt-list-filesystems.1*
-rm %{buildroot}%{_mandir}/man1/virt-list-partitions.1*
-rm %{buildroot}%{_mandir}/man1/virt-tar.1*
-%endif
-
 # golang: Ignore what libguestfs upstream installs, and just copy the
 # source files to %%{_datadir}/gocode/src.
 %ifarch %{golang_arches}
@@ -929,11 +900,6 @@ rm -r %{buildroot}%{_libdir}/golang
 mkdir -p %{buildroot}%{_datadir}/gocode/src
 cp -a golang/src/libguestfs.org %{buildroot}%{_datadir}/gocode/src
 %endif
-
-# Move installed documentation back to the source directory so
-# we can install it using a %%doc rule.
-mv %{buildroot}%{_docdir}/libguestfs installed-docs
-gzip --best installed-docs/*.xml
 
 %if %{with appliances}
 # Split up the monolithic packages file in the supermin appliance so
@@ -951,10 +917,6 @@ function move_to
     echo "$1" >> "$2"
 }
 
-move_to curl            zz-packages-dib
-move_to kpartx          zz-packages-dib
-move_to qemu-img        zz-packages-dib
-move_to which           zz-packages-dib
 move_to sleuthkit       zz-packages-forensics
 move_to gfs2-utils      zz-packages-gfs2
 move_to iputils         zz-packages-rescue
@@ -1006,15 +968,14 @@ rm ocaml/html/.gitignore
 %{_mandir}/man1/guestfs-faq.1*
 %{_mandir}/man1/guestfs-performance.1*
 %{_mandir}/man1/guestfs-recipes.1*
+%{_mandir}/man1/guestfs-release-notes.1*
 %{_mandir}/man1/guestfs-release-notes-1*.1*
-%{_mandir}/man1/guestfs-release-notes-historical.1*
 %{_mandir}/man1/guestfs-security.1*
 %{_mandir}/man1/libguestfs-test-tool.1*
 
 %files devel
-%doc AUTHORS BUGS ChangeLog.gz HACKING TODO README
+%doc AUTHORS HACKING TODO README
 %doc examples/*.c
-%doc installed-docs/*
 %{_libdir}/libguestfs.so
 %if %{with appliances}
 %{_sbindir}/libguestfs-make-fixed-appliance
@@ -1061,10 +1022,6 @@ rm ocaml/html/.gitignore
 %files tools-c
 %doc README
 %config(noreplace) %{_sysconfdir}/libguestfs-tools.conf
-%{_sysconfdir}/virt-builder
-%dir %{_sysconfdir}/xdg/virt-builder
-%dir %{_sysconfdir}/xdg/virt-builder/repos.d
-%config %{_sysconfdir}/xdg/virt-builder/repos.d/*
 %config %{_sysconfdir}/profile.d/guestfish.sh
 %{_mandir}/man5/libguestfs-tools.conf.5*
 %{_bindir}/guestfish
@@ -1073,52 +1030,12 @@ rm ocaml/html/.gitignore
 %{_mandir}/man1/guestmount.1*
 %{_bindir}/guestunmount
 %{_mandir}/man1/guestunmount.1*
-%{_bindir}/virt-alignment-scan
-%{_mandir}/man1/virt-alignment-scan.1*
-%{_bindir}/virt-builder
-%{_mandir}/man1/virt-builder.1*
-%{_bindir}/virt-builder-repository
-%{_mandir}/man1/virt-builder-repository.1*
-%{_bindir}/virt-cat
-%{_mandir}/man1/virt-cat.1*
 %{_bindir}/virt-copy-in
 %{_mandir}/man1/virt-copy-in.1*
 %{_bindir}/virt-copy-out
 %{_mandir}/man1/virt-copy-out.1*
-%{_bindir}/virt-customize
-%{_mandir}/man1/virt-customize.1*
-%{_bindir}/virt-df
-%{_mandir}/man1/virt-df.1*
-%{_bindir}/virt-diff
-%{_mandir}/man1/virt-diff.1*
-%{_bindir}/virt-edit
-%{_mandir}/man1/virt-edit.1*
-%{_bindir}/virt-filesystems
-%{_mandir}/man1/virt-filesystems.1*
-%{_bindir}/virt-format
-%{_mandir}/man1/virt-format.1*
-%{_bindir}/virt-get-kernel
-%{_mandir}/man1/virt-get-kernel.1*
-%{_bindir}/virt-index-validate
-%{_mandir}/man1/virt-index-validate.1*
-%{_bindir}/virt-inspector
-%{_mandir}/man1/virt-inspector.1*
-%{_bindir}/virt-log
-%{_mandir}/man1/virt-log.1*
-%{_bindir}/virt-ls
-%{_mandir}/man1/virt-ls.1*
-%{_bindir}/virt-make-fs
-%{_mandir}/man1/virt-make-fs.1*
 %{_bindir}/virt-rescue
 %{_mandir}/man1/virt-rescue.1*
-%{_bindir}/virt-resize
-%{_mandir}/man1/virt-resize.1*
-%{_bindir}/virt-sparsify
-%{_mandir}/man1/virt-sparsify.1*
-%{_bindir}/virt-sysprep
-%{_mandir}/man1/virt-sysprep.1*
-%{_bindir}/virt-tail
-%{_mandir}/man1/virt-tail.1*
 %{_bindir}/virt-tar-in
 %{_mandir}/man1/virt-tar-in.1*
 %{_bindir}/virt-tar-out
@@ -1127,17 +1044,10 @@ rm ocaml/html/.gitignore
 %if %{with appliances}
 %files tools
 %doc README
-%{_bindir}/virt-win-reg
-%{_mandir}/man1/virt-win-reg.1*
 %endif
 
 %files -n virt-dib
 %doc README
-%{_bindir}/virt-dib
-%{_mandir}/man1/virt-dib.1*
-%if %{with appliances}
-%{_libdir}/guestfs/supermin.d/zz-packages-dib
-%endif
 
 %files bash-completion
 %dir %{_datadir}/bash-completion/completions
@@ -1236,11 +1146,12 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-21
-- update to build dep latest glibc-static version
+* Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
+- Update to 1.52.0
+- Move to pcre2
 
 * Tue Feb 27 2024 Dan Streetman <ddstreet@microsoft.com> - 1.44.0-20
-- updated glibc-static buildrequires release
+- Updated glibc-static buildrequires release
 
 * Tue Nov 07 2023 Andrew Phelps <anphel@microsoft.com> - 1.44.0-19
 - Bump release to rebuild against glibc 2.38-1
