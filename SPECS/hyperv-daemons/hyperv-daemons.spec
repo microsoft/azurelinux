@@ -11,7 +11,7 @@
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
 Version:        6.6.22.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -221,6 +221,9 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
+- Bump release to match kernel
+
 * Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
 - Auto-upgrade to 6.6.22.1
 
