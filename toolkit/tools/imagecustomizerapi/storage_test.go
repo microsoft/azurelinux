@@ -16,12 +16,9 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:    "esp",
-					Start: 1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
-					},
+					Id:                "esp",
+					Start:             1,
+					BootPartitionType: BootPartitionTypeESP,
 				},
 			},
 		}},
@@ -59,7 +56,6 @@ func TestStorageIsValidUnsupportedFileSystem(t *testing.T) {
 					Id:    "a",
 					Start: 1,
 					End:   nil,
-					Flags: nil,
 				},
 			},
 		}},
@@ -84,10 +80,10 @@ func TestStorageIsValidBadEspFsType(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:    "esp",
-					Start: 1,
-					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagESP, PartitionFlagBoot},
+					Id:                "esp",
+					Start:             1,
+					End:               nil,
+					BootPartitionType: BootPartitionTypeESP,
 				},
 			},
 		}},
@@ -112,10 +108,10 @@ func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:    "bios",
-					Start: 1,
-					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagBiosGrub},
+					Id:                "bios",
+					Start:             1,
+					End:               nil,
+					BootPartitionType: BootPartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -140,10 +136,10 @@ func TestStorageIsValidBadBiosBootStart(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:    "bios",
-					Start: 2,
-					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagBiosGrub},
+					Id:                "bios",
+					Start:             2,
+					End:               nil,
+					BootPartitionType: BootPartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -168,12 +164,9 @@ func TestStorageIsValidBadDeviceId(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:    "esp",
-					Start: 1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
-					},
+					Id:                "esp",
+					Start:             1,
+					BootPartitionType: BootPartitionTypeESP,
 				},
 			},
 		}},
