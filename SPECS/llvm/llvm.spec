@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        12.0.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -9,6 +9,7 @@ Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{version}/%{name}-%{version}.src.tar.xz
 Patch1:         llvm-12.0.1-issue-49955-workaround.patch
+BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -52,6 +53,7 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
+      -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev ..
 
 %ninja_build LLVM
@@ -89,6 +91,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Tue Apr 02 2024 Andrew Phelps <anphel@microsoft.com> - 12.0.1-8
+- Define LLVM_BINUTILS_INCDIR so that LLVMgold.so is built.
+
 * Thu Jun 29 2023 Andrew Phelps <anphel@microsoft.com> - 12.0.1-7
 - Modify parallel compile jobs limit to _smp_ncpus_max if set, or _smp_build_ncpus
 
