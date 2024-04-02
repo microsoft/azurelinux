@@ -1,8 +1,8 @@
 %global _empty_manifest_terminate_build 0
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
-Version:        2.0.0
-Release:        2%{?dist}
+Version:        2.2.2
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,7 @@ BuildRequires:  python3-jinja2
 BuildRequires:  python3-numpy
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-typing-extensions
+BuildRequires:  python3-six
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -80,6 +81,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Tue Apr 02 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.2.2-1
+- Upgrade to pytorch 2.2.2
+
 * Thu Apr 06 2023 Riken Maharjan <rmaharjan@microsoft.com> - 2.0.0-2
 - Add missing runtine for 2.0.0
 
