@@ -19,8 +19,8 @@ type Partition struct {
 	End *uint64 `yaml:"end"`
 	// Size is the size of the partition in MiBs.
 	Size *uint64 `yaml:"size"`
-	// BootPartitionType specifies the type of boot partition the partition is (if any).
-	BootPartitionType BootPartitionType `yaml:"bootPartitionType"`
+	// Type specifies the type of partition the partition is.
+	Type PartitionType `yaml:"type"`
 }
 
 func (p *Partition) IsValid() error {
@@ -37,7 +37,7 @@ func (p *Partition) IsValid() error {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
-	err = p.BootPartitionType.IsValid()
+	err = p.Type.IsValid()
 	if err != nil {
 		return err
 	}
@@ -64,11 +64,11 @@ func (p *Partition) GetEnd() (uint64, bool) {
 }
 
 func (p *Partition) IsESP() bool {
-	return p.BootPartitionType == BootPartitionTypeESP
+	return p.Type == PartitionTypeESP
 }
 
 func (p *Partition) IsBiosBoot() bool {
-	return p.BootPartitionType == BootPartitionTypeBiosGrub
+	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

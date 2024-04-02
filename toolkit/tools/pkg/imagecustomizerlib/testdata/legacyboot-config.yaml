@@ -4,7 +4,7 @@ storage:
     maxSize: 4096
     partitions:
     - id: boot
-      bootPartitionType: bios-grub
+      type: bios-grub
       start: 1
       size: 8
 

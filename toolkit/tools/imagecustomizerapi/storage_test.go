@@ -16,9 +16,9 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:                "esp",
-					Start:             1,
-					BootPartitionType: BootPartitionTypeESP,
+					Id:    "esp",
+					Start: 1,
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},
@@ -80,10 +80,10 @@ func TestStorageIsValidBadEspFsType(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:                "esp",
-					Start:             1,
-					End:               nil,
-					BootPartitionType: BootPartitionTypeESP,
+					Id:    "esp",
+					Start: 1,
+					End:   nil,
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},
@@ -108,10 +108,10 @@ func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:                "bios",
-					Start:             1,
-					End:               nil,
-					BootPartitionType: BootPartitionTypeBiosGrub,
+					Id:    "bios",
+					Start: 1,
+					End:   nil,
+					Type:  PartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -136,10 +136,10 @@ func TestStorageIsValidBadBiosBootStart(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:                "bios",
-					Start:             2,
-					End:               nil,
-					BootPartitionType: BootPartitionTypeBiosGrub,
+					Id:    "bios",
+					Start: 2,
+					End:   nil,
+					Type:  PartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -164,9 +164,9 @@ func TestStorageIsValidBadDeviceId(t *testing.T) {
 			MaxSize:            2048,
 			Partitions: []Partition{
 				{
-					Id:                "esp",
-					Start:             1,
-					BootPartitionType: BootPartitionTypeESP,
+					Id:    "esp",
+					Start: 1,
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},

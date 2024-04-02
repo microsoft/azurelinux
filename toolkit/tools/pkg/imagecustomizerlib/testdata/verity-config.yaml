@@ -5,7 +5,7 @@ storage:
     maxSize: 5120
     partitions:
     - id: esp
-      bootPartitionType: esp
+      type: esp
       start: 1
       end: 9
 

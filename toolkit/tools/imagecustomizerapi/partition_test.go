@@ -124,27 +124,27 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	assert.ErrorContains(t, err, "ASCII")
 }
 
-func TestPartitionIsValidGoodFlag(t *testing.T) {
+func TestPartitionIsValidGoodType(t *testing.T) {
 	partition := Partition{
-		Id:                "a",
-		Start:             0,
-		End:               nil,
-		BootPartitionType: BootPartitionTypeESP,
+		Id:    "a",
+		Start: 0,
+		End:   nil,
+		Type:  PartitionTypeESP,
 	}
 
 	err := partition.IsValid()
 	assert.NoError(t, err)
 }
 
-func TestPartitionIsValidBadBootPartitionType(t *testing.T) {
+func TestPartitionIsValidBadType(t *testing.T) {
 	partition := Partition{
-		Id:                "a",
-		Start:             0,
-		End:               nil,
-		BootPartitionType: BootPartitionType("a"),
+		Id:    "a",
+		Start: 0,
+		End:   nil,
+		Type:  PartitionType("a"),
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "unknown partition boot type value")
+	assert.ErrorContains(t, err, "unknown partition type")
 }

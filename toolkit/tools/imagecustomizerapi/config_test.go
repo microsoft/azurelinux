@@ -17,9 +17,9 @@ func TestConfigIsValid(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:                "esp",
-						Start:             1,
-						BootPartitionType: BootPartitionTypeESP,
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -52,9 +52,9 @@ func TestConfigIsValidLegacy(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:                "boot",
-						Start:             1,
-						BootPartitionType: BootPartitionTypeBiosGrub,
+						Id:    "boot",
+						Start: 1,
+						Type:  PartitionTypeBiosGrub,
 					},
 				},
 			}},
@@ -109,9 +109,9 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:                "esp",
-						Start:             1,
-						BootPartitionType: BootPartitionTypeESP,
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -261,9 +261,9 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:                "esp",
-						Start:             1,
-						BootPartitionType: BootPartitionTypeESP,
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -298,9 +298,9 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:                "esp",
-						Start:             1,
-						BootPartitionType: BootPartitionTypeESP,
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},

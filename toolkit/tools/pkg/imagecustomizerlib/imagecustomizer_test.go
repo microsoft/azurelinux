@@ -280,10 +280,10 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		MaxSize:            4096,
 		Partitions: []imagecustomizerapi.Partition{
 			{
-				Id:                "boot",
-				BootPartitionType: imagecustomizerapi.BootPartitionTypeESP,
-				Start:             1,
-				End:               ptrutils.PtrTo(uint64(9)),
+				Id:    "boot",
+				Type:  imagecustomizerapi.PartitionTypeESP,
+				Start: 1,
+				End:   ptrutils.PtrTo(uint64(9)),
 			},
 			{
 				Id:    "rootfs",
