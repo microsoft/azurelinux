@@ -10,7 +10,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}-%{extended_release}.tar.gz
+Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}-%{extended_release}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  libibumad-devel
 BuildRequires:  libibverbs-devel
 BuildRequires:  librdmacm-devel
