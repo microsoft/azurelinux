@@ -44,8 +44,6 @@ tar -xf %{SOURCE1} --no-same-owner
 
 export LDFLAGS="-X github.com/opentofu/opentofu/version.dev=no"
 export VERSION=%{version}
-go env
-ls /usr/lib/golang
 go build \
   -buildmode pie \
   -compiler gc \
