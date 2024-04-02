@@ -1,8 +1,8 @@
 diff --git a/conf/postfix-files b/conf/postfix-files
-index 4ed9d1f..19711d2 100644
+index 5a93982..336c07b 100644
 --- a/conf/postfix-files
 +++ b/conf/postfix-files
-@@ -83,7 +83,6 @@ $shlib_directory/${LIB_PREFIX}sqlite${LIB_SUFFIX}:f:root:-:755
+@@ -84,7 +84,6 @@ $shlib_directory/${LIB_PREFIX}sqlite${LIB_SUFFIX}:f:root:-:755
  $meta_directory/dynamicmaps.cf.d:d:root:-:755
  $meta_directory/dynamicmaps.cf:f:root:-:644
  $meta_directory/main.cf.proto:f:root:-:644
@@ -10,7 +10,7 @@ index 4ed9d1f..19711d2 100644
  $meta_directory/master.cf.proto:f:root:-:644
  $meta_directory/postfix-files.d:d:root:-:755
  $meta_directory/postfix-files:f:root:-:644
-@@ -141,18 +140,13 @@ $command_directory/postqueue:f:root:$setgid_group:2755:u
+@@ -142,18 +141,13 @@ $command_directory/postqueue:f:root:$setgid_group:2755:u
  $sendmail_path:f:root:-:755
  $newaliases_path:l:$sendmail_path
  $mailq_path:l:$sendmail_path
@@ -29,7 +29,7 @@ index 4ed9d1f..19711d2 100644
  $config_directory/main.cf:f:root:-:644:p
  $config_directory/master.cf:f:root:-:644:p
  $config_directory/pcre_table:f:root:-:644:o
-@@ -165,8 +159,8 @@ $config_directory/postfix-script:f:root:-:755:o
+@@ -166,8 +160,8 @@ $config_directory/postfix-script:f:root:-:755:o
  $config_directory/postfix-script-sgid:f:root:-:755:o
  $config_directory/postfix-script-nosgid:f:root:-:755:o
  $config_directory/post-install:f:root:-:755:o
@@ -40,7 +40,7 @@ index 4ed9d1f..19711d2 100644
  $manpage_directory/man1/postalias.1:f:root:-:644
  $manpage_directory/man1/postcat.1:f:root:-:644
  $manpage_directory/man1/postconf.1:f:root:-:644
-@@ -180,9 +174,9 @@ $manpage_directory/man1/postmap.1:f:root:-:644
+@@ -181,9 +175,9 @@ $manpage_directory/man1/postmap.1:f:root:-:644
  $manpage_directory/man1/postmulti.1:f:root:-:644
  $manpage_directory/man1/postqueue.1:f:root:-:644
  $manpage_directory/man1/postsuper.1:f:root:-:644
@@ -52,7 +52,7 @@ index 4ed9d1f..19711d2 100644
  $manpage_directory/man5/body_checks.5:f:root:-:644
  $manpage_directory/man5/bounce.5:f:root:-:644
  $manpage_directory/man5/canonical.5:f:root:-:644
-@@ -230,7 +224,7 @@ $manpage_directory/man8/qmqpd.8:f:root:-:644
+@@ -232,7 +226,7 @@ $manpage_directory/man8/qmqpd.8:f:root:-:644
  $manpage_directory/man8/scache.8:f:root:-:644
  $manpage_directory/man8/showq.8:f:root:-:644
  $manpage_directory/man8/smtp.8:f:root:-:644

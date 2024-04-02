@@ -52,7 +52,7 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.8.5
+Version:        3.9.0
 Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
@@ -64,48 +64,41 @@ Source2:        postfix.service
 Source3:        README-Postfix-SASL-RedHat.txt
 Source4:        postfix.aliasesdb
 Source5:        postfix-chroot-update
+Source6:        postfix.sysusers
 # Postfix Log Entry Summarizer: http://jimsun.linxnet.com/postfix_contrib.html
 Source53:       http://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
 # Sources >= 100 are config files
 Source100:      postfix-sasl.conf
 Source101:      postfix-pam.conf
 # Patches
-Patch1:         postfix-3.5.0-config.patch
-Patch2:         postfix-3.4.0-files.patch
-Patch3:         postfix-3.3.3-alternatives.patch
-Patch4:         postfix-3.4.0-large-fs.patch
+Patch1:         postfix-3.8.0-config.patch
+Patch2:         postfix-3.9.0-files.patch
+Patch3:         postfix-3.9.0-alternatives.patch
+Patch4:         postfix-3.8.0-large-fs.patch
 Patch9:         pflogsumm-1.1.5-datecalc.patch
-# rhbz#1384871, sent upstream
 Patch10:        pflogsumm-1.1.5-ipv6-warnings-fix.patch
 Patch11:        postfix-3.4.4-chroot-example-fix.patch
-# upstream patch
-Patch12:        postfix-3.6.2-glibc-234-build-fix.patch
-# sent upstream
-Patch13:        postfix-3.6.2-whitespace-name-fix.patch
-# rhbz#1931403, sent upstream
-Patch14:        pflogsumm-1.1.5-syslog-name-underscore-fix.patch
-
-BuildRequires:  findutils
-BuildRequires:  gcc
-BuildRequires:  libdb-devel
-BuildRequires:  libicu-devel
-BuildRequires:  libnsl2-devel
-BuildRequires:  m4
-# Optional patches - set the appropriate environment variables to include
-#                    them when building the package/spec file
+Patch13:        pflogsumm-1.1.5-syslog-name-underscore-fix.patch
 
 
 # Determine the different packages required for building postfix
 BuildRequires:  make
 BuildRequires:  perl-generators
-BuildRequires:  pkg-config
-BuildRequires:  systemd-units
+BuildRequires:  pkgconfig
 BuildRequires:  zlib-devel
+BuildRequires:  systemd-units
+BuildRequires:  libicu-devel
+BuildRequires:  gcc
+BuildRequires:  m4
+BuildRequires:  findutils
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  sed
 
+%{?with_db:BuildRequires: libdb-devel}
 %{?with_ldap:BuildRequires: openldap-devel}
 %{?with_lmdb:BuildRequires: lmdb-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
-%{?with_pcre:BuildRequires: pcre-devel}
+%{?with_pcre:BuildRequires: pcre2-devel}
 %{?with_mysql:BuildRequires: mariadb-connector-c-devel}
 %{?with_pgsql:BuildRequires: libpq-devel}
 %{?with_sqlite:BuildRequires: sqlite-devel}
@@ -118,21 +111,18 @@ Requires:       findutils
 # for restorecon
 Requires:       policycoreutils
 
-Requires(post): %{_bindir}/openssl
+Requires(post): systemd systemd-sysv hostname
 Requires(post): %{_sbindir}/alternatives
-Requires(post): hostname
-Requires(post): systemd
-Requires(post): systemd-sysv
-Requires(postun): systemd
-Requires(pre):  %{_sbindir}/groupadd
-Requires(pre):  %{_sbindir}/useradd
+Requires(post): %{_bindir}/openssl
 Requires(preun): %{_sbindir}/alternatives
 Requires(preun): systemd
-
-Provides:       MTA
-Provides:       smtpd
-Provides:       smtpdaemon
-Provides:       server(smtp)
+Requires(postun): systemd
+# Required by /usr/libexec/postfix/postfix-script
+Requires: diffutils
+Requires: findutils
+# for restorecon
+Requires: policycoreutils
+Provides: MTA smtpd smtpdaemon server(smtp)
 
 %description
 Postfix is a Mail Transport Agent (MTA).
@@ -762,8 +752,8 @@ exit 0
 %endif
 
 %changelog
-* Fri Feb 22 2024 Elaine Zhao <elainezhao@microsoft.com> - 3.8.5.1
-- Bump version to 3.8.5
+* Fri Feb 22 2024 Elaine Zhao <elainezhao@microsoft.com> - 3.9.0-1
+- Bump version to 3.9.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
