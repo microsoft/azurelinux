@@ -1,0 +1,64 @@
+From 62d2664351ef37da34f6f3a3fd8ab34257d6fe30 Mon Sep 17 00:00:00 2001
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Date: Mon, 25 Jul 2022 00:06:12 +0300
+Subject: [PATCH] net/mlx5: DR, Fix SMFS steering info dump format
+
+Fix several issues in SMFS steering info dump:
+ - Fix outdated macro value for matcher mask in the SMFS debug dump format.
+   The existing value denotes the old format of the matcher mask, as it was
+   used during the early stages of development, and it results in wrong
+   parsing by the steering dump parser - wrong fields are shown in the
+   parsed output.
+ - Add the missing destination table to the dumped action.
+   The missing dest table handle breaks the ability to associate between
+   the "go to table" action and the actual table in the steering info.
+
+Fixes: 9222f0b27da2 ("net/mlx5: DR, Add support for dumping steering info")
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Muhammad Sammar <muhammads@nvidia.com>
+Reviewed-by: Alex Vesker <valex@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.c   | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
+index d5998ef59be4..7adcf0eec13b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
+@@ -21,10 +21,11 @@ enum dr_dump_rec_type {
+ 	DR_DUMP_REC_TYPE_TABLE_TX = 3102,
+ 
+ 	DR_DUMP_REC_TYPE_MATCHER = 3200,
+-	DR_DUMP_REC_TYPE_MATCHER_MASK = 3201,
++	DR_DUMP_REC_TYPE_MATCHER_MASK_DEPRECATED = 3201,
+ 	DR_DUMP_REC_TYPE_MATCHER_RX = 3202,
+ 	DR_DUMP_REC_TYPE_MATCHER_TX = 3203,
+ 	DR_DUMP_REC_TYPE_MATCHER_BUILDER = 3204,
++	DR_DUMP_REC_TYPE_MATCHER_MASK = 3205,
+ 
+ 	DR_DUMP_REC_TYPE_RULE = 3300,
+ 	DR_DUMP_REC_TYPE_RULE_RX_ENTRY_V0 = 3301,
+@@ -114,13 +115,15 @@ dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
+ 		break;
+ 	case DR_ACTION_TYP_FT:
+ 		if (action->dest_tbl->is_fw_tbl)
+-			seq_printf(file, "%d,0x%llx,0x%llx,0x%x\n",
++			seq_printf(file, "%d,0x%llx,0x%llx,0x%x,0x%x\n",
+ 				   DR_DUMP_REC_TYPE_ACTION_FT, action_id,
+-				   rule_id, action->dest_tbl->fw_tbl.id);
++				   rule_id, action->dest_tbl->fw_tbl.id,
++				   -1);
+ 		else
+-			seq_printf(file, "%d,0x%llx,0x%llx,0x%x\n",
++			seq_printf(file, "%d,0x%llx,0x%llx,0x%x,0x%llx\n",
+ 				   DR_DUMP_REC_TYPE_ACTION_FT, action_id,
+-				   rule_id, action->dest_tbl->tbl->table_id);
++				   rule_id, action->dest_tbl->tbl->table_id,
++				   DR_DBG_PTR_TO_ID(action->dest_tbl->tbl));
+ 
+ 		break;
+ 	case DR_ACTION_TYP_CTR:
+-- 
+2.31.1
+

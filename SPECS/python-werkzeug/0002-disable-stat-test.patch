@@ -1,0 +1,25 @@
+From ae808cb894699826acaa28c24c716caacc21a101 Mon Sep 17 00:00:00 2001
+From: Nick Samson <nisamson@microsoft.com>
+Date: Thu, 16 Nov 2023 13:14:37 -0800
+Subject: [PATCH] Removed stat test due to environmental concerns
+
+---
+ tests/test_serving.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_serving.py b/tests/test_serving.py
+index 4abc755d..eb7d161f 100644
+--- a/tests/test_serving.py
++++ b/tests/test_serving.py
+@@ -148,7 +148,7 @@ def test_windows_get_args_for_reloading(monkeypatch, tmp_path):
+ 
+ 
+ @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
+-@pytest.mark.parametrize("find", [_find_stat_paths, _find_watchdog_paths])
++@pytest.mark.parametrize("find", [_find_watchdog_paths])
+ def test_exclude_patterns(find):
+     # Select a path to exclude from the unfiltered list, assert that it is present and
+     # then gets excluded.
+-- 
+2.34.1
+

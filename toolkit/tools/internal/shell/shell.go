@@ -141,6 +141,38 @@ func ExecuteLive(squashErrors bool, program string, args ...string) (err error) 
 	return ExecuteLiveWithCallback(onStdout, onStderr, false, program, args...)
 }
 
+// ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
+// In addition, if there is an error, the last x lines of stderr will be attached to the err object.
+func ExecuteLiveWithErr(stderrLines int, program string, args ...string) (err error) {
+	return ExecuteLiveWithErrAndCallbacks(stderrLines, logger.Log.Debug, logger.Log.Debug, program, args...)
+}
+
+// ExecuteLiveWithErr runs a command in the shell and logs it in real-time.
+// In addition, if there is an error, the last x lines of stderr will be attached to the err object.
+func ExecuteLiveWithErrAndCallbacks(stderrLines int, onStdout, onStderr func(...interface{}), program string,
+	args ...string,
+) (err error) {
+	stderrChan := make(chan string, stderrLines)
+
+	err = ExecuteLiveWithCallbackAndChannels(onStdout, onStderr, nil, stderrChan, program, args...)
+	close(stderrChan)
+	if err != nil {
+		errLines := ""
+		for errLine := range stderrChan {
+			if errLines != "" {
+				errLines += "\n"
+			}
+			errLines += errLine
+		}
+
+		if errLines != "" {
+			err = fmt.Errorf("%s\n%w", errLines, err)
+		}
+		return
+	}
+	return nil
+}
+
 // ExecuteLiveWithCallback runs a command in the shell and invokes the provided callbacks in real-time on each line of stdout and stderr.
 // If printOutputOnError is true, the full output of the command will be printed after completion if the command returns an error. In the event
 // the buffer becomes full the oldest buffered output is discarded.
@@ -148,6 +180,33 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutpu
 	var outputChan chan string
 	const outputChanBufferSize = 1500
 
+	if printOutputOnError {
+		outputChan = make(chan string, outputChanBufferSize)
+	}
+
+	err = ExecuteLiveWithCallbackAndChannels(onStdout, onStderr, outputChan, outputChan, program, args...)
+	if err != nil {
+		return
+	}
+
+	// Optionally dump the output in the event of an error
+	if outputChan != nil {
+		close(outputChan)
+	}
+	if err != nil && printOutputOnError {
+		logger.Log.Errorf("Call to %s returned error, last %d lines of output:", program, outputChanBufferSize)
+		for line := range outputChan {
+			logger.Log.Warn(line)
+		}
+	}
+
+	return
+}
+
+func ExecuteLiveWithCallbackAndChannels(onStdout, onStderr func(...interface{}),
+	stdoutChannel, stderrChannel chan string,
+	program string, args ...string,
+) (err error) {
 	cmd := exec.Command(program, args...)
 
 	stdoutPipe, err := cmd.StdoutPipe()
@@ -174,25 +233,11 @@ func ExecuteLiveWithCallback(onStdout, onStderr func(...interface{}), printOutpu
 	wg := new(sync.WaitGroup)
 	wg.Add(2)
 
-	if printOutputOnError {
-		outputChan = make(chan string, outputChanBufferSize)
-	}
-	go logger.StreamOutput(stdoutPipe, onStdout, wg, outputChan)
-	go logger.StreamOutput(stderrPipe, onStderr, wg, outputChan)
+	go logger.StreamOutput(stdoutPipe, onStdout, wg, stdoutChannel)
+	go logger.StreamOutput(stderrPipe, onStderr, wg, stderrChannel)
 
 	wg.Wait()
 	err = cmd.Wait()
-
-	// Optionally dump the output in the event of an error
-	if outputChan != nil {
-		close(outputChan)
-	}
-	if err != nil && printOutputOnError {
-		logger.Log.Errorf("Call to %s returned error, last %d lines of output:", cmd.Args, outputChanBufferSize)
-		for line := range outputChan {
-			logger.Log.Warn(line)
-		}
-	}
 
 	return
 }

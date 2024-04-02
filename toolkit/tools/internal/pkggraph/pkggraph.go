@@ -608,6 +608,21 @@ func (g *PkgGraph) FindBestPkgNode(pkgVer *pkgjson.PackageVer) (lookupEntry *Loo
 	return
 }
 
+// HasNode returns true if pkgNode points to a node that is present in the graph.
+// If the object is not the same, but the ID is the same, it will return false (i.e., the node is a copy)
+func (g *PkgGraph) HasNode(pkgNode *PkgNode) bool {
+	if pkgNode == nil {
+		return false
+	}
+	nodeWithSameId := g.Node(pkgNode.ID())
+	if nodeWithSameId == nil {
+		return false
+	} else {
+		// Check if they are the same node object
+		return nodeWithSameId.(*PkgNode) == pkgNode
+	}
+}
+
 // AllNodes returns a list of all nodes in the graph.
 func (g *PkgGraph) AllNodes() []*PkgNode {
 	count := g.Nodes().Len()
@@ -636,13 +651,9 @@ func (g *PkgGraph) AllNodesFrom(rootNode *PkgNode) []*PkgNode {
 // It traverses the graph and returns all nodes of type TypeLocalRun and
 // TypeRemoteRun.
 func (g *PkgGraph) AllRunNodes() []*PkgNode {
-	nodes := make([]*PkgNode, 0, g.Nodes().Len())
-	for _, n := range g.AllNodes() {
-		if n.Type == TypeLocalRun || n.Type == TypeRemoteRun {
-			nodes = append(nodes, n)
-		}
-	}
-	return nodes
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeLocalRun || n.Type == TypeRemoteRun
+	})
 }
 
 // AllPreferredRunNodes returns all RunNodes in the LookupTable
@@ -653,22 +664,38 @@ func (g *PkgGraph) AllRunNodes() []*PkgNode {
 // 3. LocalRun Node if both LocalRun and RemoteRun nodes are present in the graph
 // This function will return all RunNodes in the LookupTable.
 func (g *PkgGraph) AllPreferredRunNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.RunNode
-	})
+	// We can estimate there will be ~1 run node per package.
+	foundNodes := 0
+	nodes := make([]*PkgNode, 0, len(g.lookupTable()))
+	for _, versionList := range g.lookupTable() {
+		for _, n := range versionList {
+			if n.RunNode != nil {
+				nodes = append(nodes, n.RunNode)
+				foundNodes++
+			}
+		}
+	}
+	return nodes[:foundNodes]
 }
 
 // AllBuildNodes returns a list of all build nodes in the graph
 func (g *PkgGraph) AllBuildNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.BuildNode
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeLocalBuild
 	})
 }
 
 // AllTestNodes returns a list of all test nodes in the graph
 func (g *PkgGraph) AllTestNodes() []*PkgNode {
-	return g.allNodesOfType(func(n *LookupNode) *PkgNode {
-		return n.TestNode
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Type == TypeTest
+	})
+}
+
+// AllImplicitNodes returns a list of all implicit remote nodes in the graph
+func (g *PkgGraph) AllImplicitNodes() []*PkgNode {
+	return g.NodesMatchingFilter(func(n *PkgNode) bool {
+		return n.Implicit
 	})
 }
 
@@ -1101,17 +1128,74 @@ func (g *PkgGraph) AddGoalNodeWithExtraLayers(goalName string, packages, tests [
 
 	err = g.safeAddNode(goalNode)
 	if err != nil {
+		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, packagesGoalSet, strict, TypeLocalRun)
 	if err != nil {
+		err = fmt.Errorf("failed to connect goal node '%s' to packages: %s", goalName, err.Error())
 		return
 	}
 
 	err = g.connectGoalEdges(goalNode, testsGoalSet, strict, TypeTest)
 	if err != nil {
+		err = fmt.Errorf("failed to connect goal node '%s' to tests: %s", goalName, err.Error())
 		return
+	}
+
+	// Expand the goal node if requested
+	if extraLayers > 0 {
+		g.addGoalNodeLayers(goalNode, extraLayers)
+	}
+
+	return
+}
+
+// AddGoalNodeToNodes behaves similarly to AddGoalNodeWithExtraLayers, but instead of using a list of package versions (via
+// graph lookup) to create the goal node, it uses a list of existing nodes in the graph.
+//   - goalName: The name of the goal node to add
+//   - existingNodes: A list of nodes to link the goal node to.
+//   - extraLayers: The number of levels to expand the goal node. Each level will add one more layer of packages beyond
+//     the goal node. For example, if the goal node is "x" and extraLevels is 1, the goal node will link to all nodes
+//     which depend on "x" as well as "x" itself (Specifically run nodes, all other nodes are stepped over)
+func (g *PkgGraph) AddGoalNodeToNodes(goalName string, existingNodes []*PkgNode, extraLayers int) (goalNode *PkgNode, err error) {
+	// Check if we already have a goal node with the requested name
+	if g.FindGoalNode(goalName) != nil {
+		err = fmt.Errorf("can't have two goal nodes named %s", goalName)
+		return
+	}
+
+	logger.Log.Debugf("Adding a goal node '%s'.", goalName)
+
+	// Create goal node and add an edge to all the other requested nodes
+	goalNode = &PkgNode{
+		State:      StateMeta,
+		Type:       TypeGoal,
+		SrpmPath:   NoSRPMPath,
+		RpmPath:    NoRPMPath,
+		SourceRepo: NoSourceRepo,
+		nodeID:     g.NewNode().ID(),
+		GoalName:   goalName,
+	}
+	goalNode.This = goalNode
+
+	err = g.safeAddNode(goalNode)
+	if err != nil {
+		err = fmt.Errorf("failed to add goal node '%s': %s", goalName, err.Error())
+		return
+	}
+
+	for _, node := range existingNodes {
+		if !g.HasNode(node) {
+			err = fmt.Errorf("can't add goal node '%s' from node '%s' which is not in the graph", goalName, node.FriendlyName())
+			return nil, err
+		}
+		err = g.AddEdge(goalNode, node)
+		if err != nil {
+			err = fmt.Errorf("failed to add edge from goal node '%s' to node '%s': %s", goalName, node.FriendlyName(), err.Error())
+			return nil, err
+		}
 	}
 
 	// Expand the goal node if requested
@@ -1361,25 +1445,6 @@ func (g *PkgGraph) CloneNode(pkgNode *PkgNode) (newNode *PkgNode) {
 	newNode.This = newNode
 
 	return
-}
-
-// allNodesOfType returns a list of all non-null nodes returned by the getter.
-func (g *PkgGraph) allNodesOfType(nodeGetter func(node *LookupNode) *PkgNode) []*PkgNode {
-	count := 0
-	for _, list := range g.lookupTable() {
-		count += len(list)
-	}
-
-	nodes := make([]*PkgNode, 0, count)
-	for _, list := range g.lookupTable() {
-		for _, n := range list {
-			if node := nodeGetter(n); node != nil {
-				nodes = append(nodes, node)
-			}
-		}
-	}
-
-	return nodes
 }
 
 // buildGoalSet returns a set of package versions that are the goal of the graph.

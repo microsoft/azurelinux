@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "nmi-1.8.7-vendor.tar.gz": "988259ffbfbf44452e951c0728de4f23db297face908a2c6c8429ac4be21fbad",
-  "nmi-1.8.7.tar.gz": "37a249105e1e3c6fca6ab6abc64a1af568bc1cf020a0e49bcba2fb485c11346f"
+    "nmi-1.8.17-vendor-v2.tar.gz": "91f35c1bd476e08a80090f72416cfaf056cbce40abf883ee0131a6555c21fe8b",
+    "nmi-1.8.17.tar.gz": "34b20c8e9ff26c8af3c89e5a795274d05f28aae0aa53e705ce0fbcd7569969c2"
  }
 }

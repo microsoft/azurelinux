@@ -1,8 +1,8 @@
 %{!?_versioneddocdir: %global _versioneddocdir %{_docdir}/%{name}-%{version}}
 Summary:        DBus for systemd
 Name:           dbus
-Version:        1.15.2
-Release:        4%{?dist}
+Version:        1.15.6
+Release:        1%{?dist}
 License:        GPLv2+ OR AFL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -86,6 +86,9 @@ make %{?_smp_mflags} check
 %{_libdir}/*.so
 
 %changelog
+* Thu Dec 28 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.15.6-1
+- Update to v1.15.6 to fix CVE-2023-34969
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.15.2-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

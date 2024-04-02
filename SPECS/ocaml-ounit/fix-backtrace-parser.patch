@@ -1,0 +1,22 @@
+From 2a9acf70aeb0f47de5a7c7c07129235a5f2ac0f0 Mon Sep 17 00:00:00 2001
+From: octachron <octa@polychoron.fr>
+Date: Tue, 30 Jun 2020 21:25:17 +0200
+Subject: [PATCH] Update the backtrace parser Scanf format string
+
+---
+ src/lib/ounit2/advanced/oUnitUtils.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/ounit2/advanced/oUnitUtils.ml b/src/lib/ounit2/advanced/oUnitUtils.ml
+index 3f31da1..350fa3d 100644
+--- a/src/lib/ounit2/advanced/oUnitUtils.ml
++++ b/src/lib/ounit2/advanced/oUnitUtils.ml
+@@ -114,7 +114,7 @@ let extract_backtrace_position str =
+               None
+             else
+               try
+-                Scanf.sscanf eol "file \"%s@\", line %d, characters %d-%d"
++                Scanf.sscanf eol "%_s@\"%s@\", line %d, characters %d-%d"
+                   (fun fn line _ _ -> Some (fn, line))
+               with Scanf.Scan_failure _ ->
+                 None

@@ -1,0 +1,218 @@
+See issue: https://github.com/gevent/gevent/issues/1839. This commit is first present in gevent 21.12.0
+From 0e7133598d47e8b42535e1348628e2083d3541ff Mon Sep 17 00:00:00 2001
+From: Jason Madden <jamadden@gmail.com>
+Date: Tue, 7 Dec 2021 11:57:25 -0600
+Subject: [PATCH] Fix #1839 in a ham-fisted way.
+
+There is probably a more elegant solution.
+---
+ docs/changes/1839.bugfix                      |  3 +++
+ src/gevent/monkey.py                          | 20 ++++++++++++++++++-
+ src/gevent/testing/errorhandler.py            |  8 ++++----
+ src/gevent/testing/sysinfo.py                 |  4 ++++
+ src/gevent/testing/testcase.py                |  4 ++--
+ ...st__threading_holding_lock_while_monkey.py |  1 +
+ .../tests/test__threading_monkey_in_thread.py | 19 ++++++++++--------
+ .../tests/test__threading_patched_local.py    |  3 +++
+ src/gevent/tests/test__util.py                |  1 +
+ 9 files changed, 48 insertions(+), 15 deletions(-)
+ create mode 100644 docs/changes/1839.bugfix
+
+diff --git a/docs/changes/1839.bugfix b/docs/changes/1839.bugfix
+new file mode 100644
+index 000000000..e0a53e3e2
+--- /dev/null
++++ b/docs/changes/1839.bugfix
+@@ -0,0 +1,3 @@
++Fix hanging the interpreter on shutdown if gevent monkey patching
++occurred on a non-main thread in Python 3.9.8 and above. (Note that
++this is not a recommended practice.)
+diff --git a/src/gevent/monkey.py b/src/gevent/monkey.py
+index bce672b22..a112f1f04 100644
+--- a/src/gevent/monkey.py
++++ b/src/gevent/monkey.py
+@@ -862,6 +862,7 @@ def join(timeout=None):
+         # gevent.threading.
+         greenlet = __import__('greenlet')
+         already_patched = is_object_patched('threading', '_shutdown')
++        orig_shutdown = threading_mod._shutdown
+
+         if orig_current_thread == threading_mod.main_thread() and not already_patched:
+             main_thread = threading_mod.main_thread()
+@@ -879,7 +880,7 @@ def join(timeout=None):
+             # C data structure).
+             main_thread._tstate_lock = threading_mod.Lock()
+             main_thread._tstate_lock.acquire()
+-            orig_shutdown = threading_mod._shutdown
++
+             def _shutdown():
+                 # Release anyone trying to join() me,
+                 # and let us switch to them.
+@@ -933,6 +934,23 @@ def _shutdown():
+                            "threading.main_thread().join() will hang from a greenlet",
+                            _warnings)
+
++            main_thread = threading_mod.main_thread()
++            def _shutdown():
++                # We've patched get_ident but *did not* patch the
++                # main_thread.ident value. Beginning in Python 3.9.8
++                # and then later releases (3.10.1, probably), the
++                # _main_thread object is only _stop() if the ident of
++                # the current thread (the *real* main thread) matches
++                # the ident of the _main_thread object. But without doing that,
++                # the main thread's shutdown lock (threading._shutdown_locks) is never
++                # removed *or released*, thus hanging the interpreter.
++                # XXX: There's probably a better way to do this. Probably need to take a
++                # step back and look at the whole picture.
++                main_thread._ident = threading_mod.get_ident()
++                orig_shutdown()
++                patch_item(threading_mod, '_shutdown', orig_shutdown)
++            patch_item(threading_mod, '_shutdown', _shutdown)
++
+     from gevent import events
+     _notify_patch(events.GeventDidPatchModuleEvent('thread', gevent_thread_mod, thread_mod))
+     _notify_patch(events.GeventDidPatchModuleEvent('threading', gevent_threading_mod, threading_mod))
+diff --git a/src/gevent/testing/errorhandler.py b/src/gevent/testing/errorhandler.py
+index 01c0595ca..76cbdaa56 100644
+--- a/src/gevent/testing/errorhandler.py
++++ b/src/gevent/testing/errorhandler.py
+@@ -26,7 +26,7 @@ def wrap_error_fatal(method):
+     system_error = get_hub_class().SYSTEM_ERROR
+
+     @wraps(method)
+-    def wrapper(self, *args, **kwargs):
++    def fatal_error_wrapper(self, *args, **kwargs):
+         # XXX should also be able to do gevent.SYSTEM_ERROR = object
+         # which is a global default to all hubs
+         get_hub_class().SYSTEM_ERROR = object
+@@ -34,7 +34,7 @@ def wrapper(self, *args, **kwargs):
+             return method(self, *args, **kwargs)
+         finally:
+             get_hub_class().SYSTEM_ERROR = system_error
+-    return wrapper
++    return fatal_error_wrapper
+
+
+ def wrap_restore_handle_error(method):
+@@ -42,7 +42,7 @@ def wrap_restore_handle_error(method):
+     from gevent import getcurrent
+
+     @wraps(method)
+-    def wrapper(self, *args, **kwargs):
++    def restore_fatal_error_wrapper(self, *args, **kwargs):
+         try:
+             return method(self, *args, **kwargs)
+         finally:
+@@ -54,4 +54,4 @@ def wrapper(self, *args, **kwargs):
+                 pass
+         if self.peek_error()[0] is not None:
+             getcurrent().throw(*self.peek_error()[1:])
+-    return wrapper
++    return restore_fatal_error_wrapper
+diff --git a/src/gevent/testing/sysinfo.py b/src/gevent/testing/sysinfo.py
+index 1eb859482..099ecc541 100644
+--- a/src/gevent/testing/sysinfo.py
++++ b/src/gevent/testing/sysinfo.py
+@@ -173,6 +173,10 @@ def get_python_version():
+
+     return version
+
++# XXX: In Python 3.10, distutils is deprecated and slated for removal in
++# 3.12. The suggestion is to use setuptools, but it only has LooseVersion
++# in an internal package and suggests using the new dependency of 'packaging'
++
+ def libev_supports_linux_aio():
+     # libev requires kernel 4.19 or above to be able to support
+     # linux AIO. It can still be compiled in, but will fail to create
+diff --git a/src/gevent/testing/testcase.py b/src/gevent/testing/testcase.py
+index e90dd92d0..cd5db8033 100644
+--- a/src/gevent/testing/testcase.py
++++ b/src/gevent/testing/testcase.py
+@@ -177,11 +177,11 @@ def _wrap_timeout(timeout, method):
+         return method
+
+     @wraps(method)
+-    def wrapper(self, *args, **kwargs):
++    def timeout_wrapper(self, *args, **kwargs):
+         with TestTimeout(timeout, method):
+             return method(self, *args, **kwargs)
+
+-    return wrapper
++    return timeout_wrapper
+
+ def _get_class_attr(classDict, bases, attr, default=AttributeError):
+     NONE = object()
+diff --git a/src/gevent/tests/test__threading_holding_lock_while_monkey.py b/src/gevent/tests/test__threading_holding_lock_while_monkey.py
+index 7c4882c44..b12da7655 100644
+--- a/src/gevent/tests/test__threading_holding_lock_while_monkey.py
++++ b/src/gevent/tests/test__threading_holding_lock_while_monkey.py
+@@ -4,5 +4,6 @@
+ # a threading lock. Under Python2, where RLock is implemented
+ # in python code, this used to throw RuntimeErro("Cannot release un-acquired lock")
+ # See https://github.com/gevent/gevent/issues/615
++# pylint:disable=useless-with-lock
+ with threading.RLock():
+     monkey.patch_all() # pragma: testrunner-no-monkey-combine
+diff --git a/src/gevent/tests/test__threading_monkey_in_thread.py b/src/gevent/tests/test__threading_monkey_in_thread.py
+index 4338a3216..6e2bb9456 100644
+--- a/src/gevent/tests/test__threading_monkey_in_thread.py
++++ b/src/gevent/tests/test__threading_monkey_in_thread.py
+@@ -45,15 +45,17 @@ def target():
+
+         # We generated some warnings
+         if greentest.PY3:
+-            self.assertEqual(all_warnings,
+-                             ['Monkey-patching outside the main native thread. Some APIs will not be '
+-                              'available. Expect a KeyError to be printed at shutdown.',
+-                              'Monkey-patching not on the main thread; threading.main_thread().join() '
+-                              'will hang from a greenlet'])
++            self.assertEqual(
++                all_warnings,
++                ['Monkey-patching outside the main native thread. Some APIs will not be '
++                 'available. Expect a KeyError to be printed at shutdown.',
++                 'Monkey-patching not on the main thread; threading.main_thread().join() '
++                 'will hang from a greenlet'])
+         else:
+-            self.assertEqual(all_warnings,
+-                             ['Monkey-patching outside the main native thread. Some APIs will not be '
+-                              'available. Expect a KeyError to be printed at shutdown.'])
++            self.assertEqual(
++                all_warnings,
++                ['Monkey-patching outside the main native thread. Some APIs will not be '
++                 'available. Expect a KeyError to be printed at shutdown.'])
+
+
+         # Manual clean up so we don't get a KeyError
+@@ -61,5 +63,6 @@ def target():
+         threading._active[(getattr(threading, 'get_ident', None) or threading._get_ident)()] = current
+
+
++
+ if __name__ == '__main__':
+     greentest.main()
+diff --git a/src/gevent/tests/test__threading_patched_local.py b/src/gevent/tests/test__threading_patched_local.py
+index 5ff33528f..6b78d3231 100644
+--- a/src/gevent/tests/test__threading_patched_local.py
++++ b/src/gevent/tests/test__threading_patched_local.py
+@@ -14,6 +14,9 @@ def func():
+         raise AssertionError('localdata.x must raise AttributeError')
+     except AttributeError:
+         pass
++    # We really want to check this is exactly an empty dict,
++    # not just anything falsey
++    # pylint:disable=use-implicit-booleaness-not-comparison
+     assert localdata.__dict__ == {}, localdata.__dict__
+     success.append(1)
+
+diff --git a/src/gevent/tests/test__util.py b/src/gevent/tests/test__util.py
+index efea789da..4790a4cdb 100644
+--- a/src/gevent/tests/test__util.py
++++ b/src/gevent/tests/test__util.py
+@@ -19,6 +19,7 @@
+ from gevent._compat import NativeStrIO
+
+ class MyLocal(local.local):
++    # pylint:disable=disallowed-name
+     def __init__(self, foo):
+         self.foo = foo
+

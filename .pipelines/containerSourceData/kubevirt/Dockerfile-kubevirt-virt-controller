@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN  adduser -u 1001 --create-home -s /bin/bash virt-controller
+USER 1001
+
+#simple smoke test
+RUN ls /usr/bin/virt-controller
+
+ENTRYPOINT [ "/usr/bin/virt-controller" ]

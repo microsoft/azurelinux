@@ -1,8 +1,8 @@
 Summary:        A network utility to retrieve files from the Web
 Name:           wget
 Version:        1.21.2
-Release:        1%{?dist}
-License:        GPLv3+
+Release:        2%{?dist}
+License:        GPL-3.0-or-later AND LGPL-3.0-or-later
 URL:            https://www.gnu.org/software/wget/wget.html
 Group:          System Environment/NetworkingPrograms
 Vendor:         Microsoft Corporation
@@ -11,6 +11,10 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
 %if %{with_check}
 BuildRequires:  perl
+BuildRequires:  perl(lib)
+BuildRequires:  perl(English)
+BuildRequires:  perl(local::lib)
+BuildRequires:  perl(HTTP::Daemon)
 %endif
 Requires:       openssl
 
@@ -19,23 +23,15 @@ The Wget package contains a utility useful for non-interactive
 downloading of files from the Web.
 
 %prep
-%setup -q
+%autosetup
 
 %build
-./configure \
-    CFLAGS="%{optflags}" \
-    CXXFLAGS="%{optflags}" \
-    --disable-silent-rules \
-    --prefix=%{_prefix} \
-    --bindir=%{_bindir} \
-    --libdir=%{_libdir} \
-    --sysconfdir=/etc \
+%configure \
     --with-ssl=openssl
-make %{?_smp_mflags}
+%make_build
 
 %install
-[ %{buildroot} != "/"] && rm -rf %{buildroot}/*
-make DESTDIR=%{buildroot} install
+%make_install
 install -vdm 755 %{buildroot}/etc
 cat >> %{buildroot}/etc/wgetrc <<-EOF
 #   default root certs location
@@ -47,10 +43,7 @@ rm -rf %{buildroot}/%{_infodir}
 %{_fixperms} %{buildroot}/*
 
 %check
-export PERL_MM_USE_DEFAULT=1
-cpan local::lib
-cpan HTTP::Daemon
-make  %{?_smp_mflags} check
+%make_build check
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -61,6 +54,12 @@ make  %{?_smp_mflags} check
 %{_datadir}/locale/*/LC_MESSAGES/*.mo
 
 %changelog
+* Thu Nov 30 2023 Olivia Crain <oliviacrain@microsoft.com> - 1.21.2-2
+- Require test-related perl modules at check-time
+- Invoke make/configure with macros 
+- License verified
+- Use SPDX license expression for license tag
+
 * Wed Jan 26 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 1.21.2-1
 - Update to version 1.21.2.
 

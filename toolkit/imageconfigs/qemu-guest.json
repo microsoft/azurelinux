@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 4096,
+            "MaxSize": 1024,
             "Artifacts": [
                 {
                     "Name": "core",
@@ -53,8 +53,13 @@
                 "ExtraCommandLine": "console=tty0 console=ttyS0"
             },
             "KernelOptions": {
-                "default": "kernel-hci"
+                "default": "kernel"
             },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]

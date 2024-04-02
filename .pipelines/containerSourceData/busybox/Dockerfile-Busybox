@@ -1,0 +1,58 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE AS BASE
+
+ARG AZL_VERSION=2.0
+
+ARG RPMS_TO_INSTALL
+ARG RPMS_PATH="/dockerStage/RPMS"
+ARG LOCAL_REPO_FILE="/dockerStage/marinerLocalRepo.repo"
+ARG LOCAL_REPO_PATH="/localrepo"
+
+# Create local repo with the given RPMS.
+# This will allow the user to install packages from the local repo
+# instead of fetching from PMC
+RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \
+    mkdir -p $LOCAL_REPO_PATH; \
+    tdnf install -y --releasever=$AZL_VERSION createrepo; \
+    cp -r ${RPMS_PATH} ${LOCAL_REPO_PATH}; \
+    cp ${LOCAL_REPO_FILE} /etc/yum.repos.d/local.repo; \
+    createrepo --compatibility --database ${LOCAL_REPO_PATH} --workers 10; \
+    tdnf makecache; \
+    tdnf autoremove -y createrepo;
+
+# Install packages into a staging location.
+# Staging directory is copied into the final scratch image.
+RUN mkdir /staging \
+    && tdnf install -y --releasever=$AZL_VERSION --installroot /staging \
+    ${RPMS_TO_INSTALL} \
+    && tdnf clean all \
+    && pushd /staging \
+    && rm -rf boot media mnt opt run \
+    && rm -rf usr/lib/sysimage \
+    && rm -rf var/cache \
+    && rm -rf var/lib/rpm; \
+	ln -vL /staging/usr/sbin/busybox /staging/bin/; \
+	chroot /staging /bin/busybox --install -s /bin
+
+# Smoke Tests
+# Test and make sure it works
+RUN chroot /staging /usr/bin/env sh -xec 'true'
+
+# Ensure correct timezone (UTC)
+RUN [ "$(chroot /staging date +%Z)" = 'UTC' ]
+
+# Test and make sure DNS works too
+RUN cp -L /etc/resolv.conf /staging/etc/; \
+	chroot /staging /bin/sh -xec 'nslookup microsoft.com'; \
+	rm /staging/etc/resolv.conf
+
+FROM scratch
+
+# Copy dependencies into the scratch image.
+COPY --from=BASE /staging/ .
+COPY --from=BASE EULA-Container.txt /
+CMD [ "sh" ]

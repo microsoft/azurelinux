@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        5.15.137.1
+Version:        5.15.153.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -153,6 +153,57 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Wed Mar 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.153.1-1
+- Auto-upgrade to 5.15.153.1
+
+* Mon Mar 25 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.151.2-1
+- Upgrade to 5.15.151.2
+
+* Wed Mar 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.151.1-1
+- Auto-upgrade to 5.15.151.1
+
+* Sat Mar 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.150.1-1
+- Auto-upgrade to 5.15.150.1
+
+* Wed Feb 14 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.148.2-2
+- Bump release to match kernel
+
+* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.2-1
+- Auto-upgrade to 5.15.148.2
+
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.1-1
+- Auto-upgrade to 5.15.148.1
+
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.147.1-1
+- Auto-upgrade to 5.15.147.1
+
+* Thu Jan 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.145.2-3
+- Bump release to match kernel
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
+- Bump release to match kernel-headers.
+
+* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
+- Update to 5.15.145.2
+
+* Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
+- Auto-upgrade to 5.15.139.1
+
+* Tue Nov 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.138.1-4
+- Bump release to match kernel
+
+* Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
+- Bump release to match kernel
+
+* Wed Nov 22 2023 David Daney <daviddaney@microsoft.com> - 5.15.138.1-2
+- Bump release to match kernel
+
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
+- Auto-upgrade to 5.15.138.1
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.137.1-2
+- Bump release to match kernel
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
 

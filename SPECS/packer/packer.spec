@@ -1,7 +1,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
-Version:        1.8.1
-Release:        15%{?dist}
+Version:        1.8.7
+Release:        2%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -27,6 +27,7 @@ Source0:        https://github.com/hashicorp/packer/archive/v%{version}.tar.gz#/
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-44487.patch
 
 BuildRequires:  golang >= 1.17.1
 BuildRequires:  kernel-headers
@@ -38,12 +39,15 @@ BuildRequires:  glibc-devel
 Packer is a tool for building identical machine images for multiple platforms from a single source configuration.
 
 %prep
-%autosetup -p1
+%autosetup -N
+# Apply vendor before patching
+tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1
 
 %build
-tar --no-same-owner -xf %{SOURCE1}
 export GOPATH=%{our_gopath}
-go build -mod=vendor -v -a -o packer
+LD_FLAGS="-X github.com/hashicorp/packer/version.Version=%{version} -X github.com/hashicorp/packer/version.VersionPrerelease="
+go build -mod=vendor -v -a -o packer -ldflags="$LD_FLAGS"
 
 %install
 install -m 755 -d %{buildroot}%{_bindir}
@@ -60,6 +64,12 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Fri Feb 02 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.8.7-2
+- Address CVE-2023-44487 by patching vendored golang.org/x/net
+
+* Wed Dec 20 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-1
+- Auto-upgrade to 1.8.7 - CVE-2023-45286
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.1-15
 - Bump release to rebuild with go 1.20.9
 

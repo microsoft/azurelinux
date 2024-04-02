@@ -1,0 +1,20 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+RUN useradd memcache
+
+USER memcache
+
+EXPOSE 11211
+
+# basic smoke test
+RUN memcached -h
+
+# set default command for the container
+CMD ["memcached"]

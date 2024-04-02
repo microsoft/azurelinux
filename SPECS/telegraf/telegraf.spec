@@ -1,28 +1,37 @@
+# Subversion for newer version of the vendor tarball for the same version of "telegraf".
+# Reset or remove %%vendor_patch_version after updating to a newer version of "telegraf".
+%global vendor_patch_version 2
+
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
-Version:        1.27.4
-Release:        1%{?dist}
+Version:        1.28.5
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarbbal.sh script to get the vendored sources.
-Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2023-46129.patch
-
+# Use the generate_source_tarball.sh script to get the vendored sources.
+# Reset or remove %%vendor_patch_version after updating to a newer version of "telegraf".
+Source1:        %{name}-%{version}%{?vendor_patch_version:-%vendor_patch_version}-vendor.tar.gz
+Patch1:         CVE-2024-28110.patch
+# CVE-2024-27304 patch also includes an update to the "vendor" tarball.
+Patch2:         CVE-2024-27304.patch
 BuildRequires:  golang
+BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
-
+BuildRequires:  tzdata
+Requires:       iana-etc
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
 Requires:       systemd
-Requires(pre):  %{_sbindir}/useradd
-Requires(pre):  %{_sbindir}/groupadd
-Requires(postun): %{_sbindir}/userdel
+Requires:       tzdata
 Requires(postun): %{_sbindir}/groupdel
+Requires(postun): %{_sbindir}/userdel
+Requires(pre):  %{_sbindir}/groupadd
+Requires(pre):  %{_sbindir}/useradd
 
 %description
 Telegraf is an agent written in Go for collecting, processing, aggregating, and writing metrics.
@@ -32,11 +41,10 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -p1
-tar -xf %{SOURCE1}
+%autosetup -a 1 -p1
 
 %build
-go build -mod=vendor ./cmd/telegraf
+go build -buildvcs=false -mod=vendor ./cmd/telegraf
 
 %install
 mkdir -pv %{buildroot}%{_sysconfdir}/%{name}/%{name}.d
@@ -47,6 +55,9 @@ install -m 755 -D etc/logrotate.d/%{name} %{buildroot}%{_sysconfdir}/logrotate.d
 # Provide empty config file.
 ./%{name} config > telegraf.conf
 install -m 755 -D telegraf.conf %{buildroot}%{_sysconfdir}/%{name}/telegraf.conf
+
+%check
+make test
 
 %pre
 getent group telegraf >/dev/null || groupadd -r telegraf
@@ -77,6 +88,22 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Mar 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.28.5-5
+- Patching CVE-2024-27304 in vendor/github.com/jackc/pgproto3.
+
+* Wed Mar 13 2024 Zhichun Wan <zhichunwan@microsoft.com> - 1.28.5-4
+- Address CVE-2024-28110 by patching vendored github.com/cloudevents
+
+* Thu Feb 15 2024 Nan Liu <liunan@microsoft.com> - 1.28.5-3
+- Address CVE-2023-48795 by patching vendored golang.org/x/crypto
+
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.5-2
+- Bump release to rebuild with go 1.21.6
+
+* Tue Dec 05 2023 Osama Esmail <osamaesmail@microsoft.com> - 1.28.5-1
+- Updating to version 1.28.5 to address critical CVEs
+- Fix testing
+
 * Thu Nov 09 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.27.4-1
 - Backporting patch for CVE-2023-46129.
 - Updating to version 1.27.4.

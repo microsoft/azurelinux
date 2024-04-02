@@ -243,7 +243,7 @@ check_config()
 		case "$config_opt" in
 		\#* | "")
 			;;
-		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes)
+		raw|ext2|ext3|ext4|minix|btrfs|xfs|nfs|ssh|sshkey|path|core_collector|kdump_post|kdump_pre|extra_bins|extra_modules|failure_action|default|final_action|force_rebuild|force_no_rebuild|dracut_args|fence_kdump_args|fence_kdump_nodes|mariner_2_initrd_use_suffix)
 			# remove inline comments after the end of a directive.
 			[ -z "$config_val" ] && {
 				echo "Invalid kdump config value for option $config_opt."
@@ -301,6 +301,33 @@ get_pcs_cluster_modified_files()
 
 setup_initrd()
 {
+	# Determine if user configured to apply the specific kdump suffix to the target initrd's filepath
+	local _mariner_2_initrd_use_suffix mariner_2_initrd_use_suffix="0"
+	local _force_no_rebuild force_no_rebuild="0"
+
+	_mariner_2_initrd_use_suffix=`grep ^mariner_2_initrd_use_suffix $KDUMP_CONFIG_FILE 2>/dev/null`
+	if [ $? -eq 0 ]; then
+		mariner_2_initrd_use_suffix=`echo $_mariner_2_initrd_use_suffix | cut -d' '  -f2`
+		if [ "$mariner_2_initrd_use_suffix" != "0" ] && [ "$mariner_2_initrd_use_suffix" != "1" ];then
+			echo "Error: mariner_2_initrd_use_suffix value is invalid"
+			return 1
+		fi
+	fi
+
+	_force_no_rebuild=`grep ^force_no_rebuild $KDUMP_CONFIG_FILE 2>/dev/null`
+	if [ $? -eq 0 ]; then
+		force_no_rebuild=`echo $_force_no_rebuild | cut -d' '  -f2`
+		if [ "$force_no_rebuild" != "0" ] && [ "$force_no_rebuild" != "1" ];then
+			echo "Error: force_no_rebuild value is invalid"
+			return 1
+		fi
+	fi
+
+	if [[ "$force_no_rebuild" == "1" && "$mariner_2_initrd_use_suffix" == "1" ]]; then
+		echo "Error: mariner_2_initrd_use_suffix and force_no_rebuild are enabled simultaneously in kdump.conf"
+		return 1
+	fi
+
 	KDUMP_BOOTDIR=$(check_boot_dir "${KDUMP_BOOTDIR}")
 
 	if [ -z "$KDUMP_KERNELVER" ]; then
@@ -320,7 +347,11 @@ setup_initrd()
 		# with fadump aware initrd
 		backup_default_initrd
 	else
-		TARGET_INITRD="${KDUMP_BOOTDIR}/initrd.img-${kdump_kver}"
+		if [ "$mariner_2_initrd_use_suffix" == "1" ]; then
+			TARGET_INITRD="${KDUMP_BOOTDIR}/initrd.img-${kdump_kver}kdump"
+		else
+			TARGET_INITRD="${KDUMP_BOOTDIR}/initrd.img-${kdump_kver}"
+		fi
 
 		# check if a backup of default initrd exists. If yes,
 		# it signifies a switch from fadump mode. So, restore

@@ -1,13 +1,14 @@
 Summary:        A fast and easy to use template engine written in pure Python
 Name:           python-jinja2
 Version:        3.0.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://jinja.pocoo.org/
 Source0:        https://files.pythonhosted.org/packages/91/a5/429efc6246119e1e3fbf562c00187d04e83e54619249eb732bb423efa6c6/Jinja2-%{version}.tar.gz
+Patch0:         CVE-2024-22195.patch
 BuildArch:      noarch
 
 %description
@@ -19,7 +20,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-markupsafe >= 2.0
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 Requires:       python3
@@ -33,7 +34,7 @@ inspired non-XML syntax but supports inline expressions and an optional
 sandboxed environment.
 
 %prep
-%autosetup -n Jinja2-%{version}
+%autosetup -p1 -n Jinja2-%{version}
 sed -i 's/\r$//' LICENSE.rst # Fix wrong EOL encoding
 
 %build
@@ -53,6 +54,9 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/Jinja2-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Jan 24 2024 Tobias Brick <tobiasb@microsoft.com> - 3.0.3-3
+- Backport CVE-2024-22195 from upstream
+
 * Tue Mar 15 2022 Muhammad Falak <mwani@microsoft.com> - 3.0.3-2
 - Use `py%{python3_version_nodots}` instead of harcoding `py39`
 

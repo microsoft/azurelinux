@@ -1,0 +1,9 @@
+glibc-i18n
+gnupg2
+gzip
+postgresql
+postgresql-libs
+shadow-utils
+util-linux
+xz
+zstd

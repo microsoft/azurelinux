@@ -1,0 +1,1232 @@
+From 4042576fd4a77d994eb491620f410b4761ff2aee Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Tue, 11 Jul 2023 15:30:27 -0700
+Subject: [PATCH 1/7] de-duplicate entries in common/config.h and
+ client/defines.h
+
+---
+ client/defines.h | 125 -----------------------------------------------
+ common/config.h  |   6 +++
+ 2 files changed, 6 insertions(+), 125 deletions(-)
+
+diff --git a/client/defines.h b/client/defines.h
+index fd8fa5d8..d9114bcf 100644
+--- a/client/defines.h
++++ b/client/defines.h
+@@ -51,131 +51,6 @@ typedef enum
+ 
+ #define STR_IS_TRUE(s) ((s) && (!strcmp((s), "1") || !strcasecmp((s), "true")))
+ 
+-//Misc
+-#define TDNF_RPM_EXT                      ".rpm"
+-#define TDNF_NAME                         "tdnf"
+-#define DIR_SEPARATOR                     '/'
+-#define SOLV_PATCH_MARKER                 "patch:"
+-
+-//repomd type
+-#define TDNF_REPOMD_TYPE_PRIMARY          "primary"
+-#define TDNF_REPOMD_TYPE_FILELISTS        "filelists"
+-#define TDNF_REPOMD_TYPE_UPDATEINFO       "updateinfo"
+-#define TDNF_REPOMD_TYPE_OTHER            "other"
+-
+-//Repo defines
+-#define TDNF_REPO_EXT                     ".repo"
+-#define TDNF_CONF_FILE                    "/etc/tdnf/tdnf.conf"
+-#define TDNF_CONF_GROUP                   "main"
+-//Conf file key names
+-#define TDNF_CONF_KEY_GPGCHECK            "gpgcheck"
+-#define TDNF_CONF_KEY_INSTALLONLY_LIMIT   "installonly_limit"
+-#define TDNF_CONF_KEY_CLEAN_REQ_ON_REMOVE "clean_requirements_on_remove"
+-#define TDNF_CONF_KEY_REPODIR             "repodir"
+-#define TDNF_CONF_KEY_CACHEDIR            "cachedir"
+-#define TDNF_CONF_KEY_PERSISTDIR          "persistdir"
+-#define TDNF_CONF_KEY_PROXY               "proxy"
+-#define TDNF_CONF_KEY_PROXY_USER          "proxy_username"
+-#define TDNF_CONF_KEY_PROXY_PASS          "proxy_password"
+-#define TDNF_CONF_KEY_KEEP_CACHE          "keepcache"
+-#define TDNF_CONF_KEY_DISTROVERPKG        "distroverpkg"
+-#define TDNF_CONF_KEY_DISTROARCHPKG       "distroarchpkg"
+-#define TDNF_CONF_KEY_MAX_STRING_LEN      "maxstringlen"
+-#define TDNF_CONF_KEY_PLUGINS             "plugins"
+-#define TDNF_CONF_KEY_NO_PLUGINS          "noplugins"
+-#define TDNF_CONF_KEY_PLUGIN_PATH         "pluginpath"
+-#define TDNF_CONF_KEY_PLUGIN_CONF_PATH    "pluginconfpath"
+-#define TDNF_PLUGIN_CONF_KEY_ENABLED      "enabled"
+-#define TDNF_CONF_KEY_EXCLUDE             "excludepkgs"
+-#define TDNF_CONF_KEY_MINVERSIONS         "minversions"
+-#define TDNF_CONF_KEY_OPENMAX             "openmax"
+-#define TDNF_CONF_KEY_CHECK_UPDATE_COMPAT "dnf_check_update_compat"
+-#define TDNF_CONF_KEY_DISTROSYNC_REINSTALL_CHANGED "distrosync_reinstall_changed"
+-
+-//Repo file key names
+-#define TDNF_REPO_KEY_BASEURL             "baseurl"
+-#define TDNF_REPO_KEY_ENABLED             "enabled"
+-#define TDNF_REPO_KEY_METALINK            "metalink"
+-#define TDNF_REPO_KEY_NAME                "name"
+-#define TDNF_REPO_KEY_SKIP                "skip_if_unavailable"
+-#define TDNF_REPO_KEY_GPGCHECK            "gpgcheck"
+-#define TDNF_REPO_KEY_GPGKEY              "gpgkey"
+-#define TDNF_REPO_KEY_USERNAME            "username"
+-#define TDNF_REPO_KEY_PASSWORD            "password"
+-#define TDNF_REPO_KEY_PRIORITY            "priority"
+-#define TDNF_REPO_KEY_METADATA_EXPIRE     "metadata_expire"
+-#define TDNF_REPO_KEY_TIMEOUT             "timeout"
+-#define TDNF_REPO_KEY_RETRIES             "retries"
+-#define TDNF_REPO_KEY_MINRATE             "minrate"
+-#define TDNF_REPO_KEY_THROTTLE            "throttle"
+-#define TDNF_REPO_KEY_SSL_VERIFY          "sslverify"
+-#define TDNF_REPO_KEY_SSL_CA_CERT         "sslcacert"
+-#define TDNF_REPO_KEY_SSL_CLI_CERT        "sslclientcert"
+-#define TDNF_REPO_KEY_SSL_CLI_KEY         "sslclientkey"
+-#define TDNF_REPO_KEY_SKIP_MD_FILELISTS   "skip_md_filelists"
+-#define TDNF_REPO_KEY_SKIP_MD_UPDATEINFO  "skip_md_updateinfo"
+-#define TDNF_REPO_KEY_SKIP_MD_OTHER       "skip_md_other"
+-
+-//setopt keys
+-#define TDNF_SETOPT_KEY_REPOSDIR          "reposdir"
+-
+-//file names
+-#define TDNF_REPO_METADATA_MARKER         "lastrefresh"
+-#define TDNF_REPO_METADATA_FILE_PATH      "repodata/repomd.xml"
+-#define TDNF_REPO_METADATA_FILE_NAME      "repomd.xml"
+-#define TDNF_REPO_METALINK_FILE_NAME      "metalink"
+-#define TDNF_REPO_BASEURL_FILE_NAME       "baseurl"
+-
+-#define TDNF_AUTOINSTALLED_FILE           "autoinstalled"
+-#define TDNF_HISTORY_DB_FILE              "history.db"
+-
+-// repo defaults
+-#define TDNF_DEFAULT_REPO_LOCATION        "/etc/yum.repos.d"
+-#define TDNF_DEFAULT_CACHE_LOCATION       "/var/cache/tdnf"
+-
+-/* pszPersistDir - default is configurable at build time,
+-   and configurable with "persistdir" at run time */
+-#define TDNF_DEFAULT_DB_LOCATION          HISTORY_DB_DIR
+-
+-#define TDNF_DEFAULT_DISTROVERPKG         "mariner-release"
+-#define TDNF_DEFAULT_DISTROARCHPKG        "x86_64"
+-#define TDNF_RPM_CACHE_DIR_NAME           "rpms"
+-#define TDNF_REPODATA_DIR_NAME            "repodata"
+-#define TDNF_SOLVCACHE_DIR_NAME           "solvcache"
+-#define TDNF_REPO_METADATA_EXPIRE_NEVER   "never"
+-
+-#define TDNF_DEFAULT_OPENMAX              1024
+-
+-// repo default settings
+-#define TDNF_REPO_DEFAULT_ENABLED            0
+-#define TDNF_REPO_DEFAULT_SKIP               0
+-#define TDNF_REPO_DEFAULT_GPGCHECK           1
+-#define TDNF_REPO_DEFAULT_MINRATE            0
+-#define TDNF_REPO_DEFAULT_THROTTLE           0
+-#define TDNF_REPO_DEFAULT_TIMEOUT            0
+-#define TDNF_REPO_DEFAULT_SSLVERIFY          1
+-#define TDNF_REPO_DEFAULT_RETRIES            10
+-#define TDNF_REPO_DEFAULT_PRIORITY           50
+-#define TDNF_REPO_DEFAULT_METADATA_EXPIRE    172800 // 48 hours in seconds
+-#define TDNF_REPO_DEFAULT_METADATA_EXPIRE_STR STRINGIFYX(TDNF_REPO_DEFAULT_METADATA_EXPIRE)
+-#define TDNF_REPO_DEFAULT_SKIP_MD_FILELISTS  0
+-#define TDNF_REPO_DEFAULT_SKIP_MD_UPDATEINFO 0
+-#define TDNF_REPO_DEFAULT_SKIP_MD_OTHER      0
+-
+-// var names
+-#define TDNF_VAR_RELEASEVER               "$releasever"
+-#define TDNF_VAR_BASEARCH                 "$basearch"
+-/* dummy setopt values */
+-#define TDNF_SETOPT_NAME_DUMMY             "opt.dummy.name"
+-#define TDNF_SETOPT_VALUE_DUMMY            "opt.dummy.value"
+-/* plugin defines */
+-#define TDNF_DEFAULT_PLUGINS_ENABLED      0
+-#define TDNF_DEFAULT_PLUGIN_PATH          SYSTEM_LIBDIR"/tdnf-plugins"
+-#define TDNF_DEFAULT_PLUGIN_CONF_PATH     "/etc/tdnf/pluginconf.d"
+-#define TDNF_PLUGIN_CONF_EXT              ".conf"
+-#define TDNF_PLUGIN_CONF_EXT_LEN          5
+-#define TDNF_PLUGIN_CONF_MAIN_SECTION     "main"
+-
+ #define TDNF_UNKNOWN_ERROR_STRING "Unknown error"
+ #define TDNF_ERROR_TABLE \
+ { \
+diff --git a/common/config.h b/common/config.h
+index 222a4480..1e525383 100644
+--- a/common/config.h
++++ b/common/config.h
+@@ -83,12 +83,18 @@
+ // repo defaults
+ #define TDNF_DEFAULT_REPO_LOCATION        "/etc/yum.repos.d"
+ #define TDNF_DEFAULT_CACHE_LOCATION       "/var/cache/tdnf"
++
++/* pszPersistDir - default is configurable at build time,
++   and configurable with "persistdir" at run time */
++#define TDNF_DEFAULT_DB_LOCATION          HISTORY_DB_DIR
++
+ #define TDNF_DEFAULT_DISTROVERPKG         "mariner-release"
+ #define TDNF_DEFAULT_DISTROARCHPKG        "x86_64"
+ #define TDNF_RPM_CACHE_DIR_NAME           "rpms"
+ #define TDNF_REPODATA_DIR_NAME            "repodata"
+ #define TDNF_SOLVCACHE_DIR_NAME           "solvcache"
+ #define TDNF_REPO_METADATA_EXPIRE_NEVER   "never"
++
+ #define TDNF_DEFAULT_OPENMAX              1024
+ 
+ // repo default settings
+
+From 644155353def61a88a8d009b3a95ac8f36cd2dd3 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Tue, 11 Jul 2023 17:04:31 -0700
+Subject: [PATCH 2/7] implement installonly option (but disregards
+ installonly_limit so far)
+
+---
+ client/config.c       |  7 +++++++
+ client/goal.c         | 48 +++++++++++++++++++++++++++++++++++++++++++
+ client/packageutils.c |  5 +++--
+ client/prototypes.h   | 10 ++++++++-
+ client/resolve.c      |  9 +++++++-
+ common/config.h       |  3 +++
+ include/tdnftypes.h   |  1 +
+ 7 files changed, 79 insertions(+), 4 deletions(-)
+
+diff --git a/client/config.c b/client/config.c
+index c8eef790..01b5c5af 100644
+--- a/client/config.c
++++ b/client/config.c
+@@ -125,6 +125,7 @@ TDNFReadConfig(
+     pConf->nCleanRequirementsOnRemove = 0;
+     pConf->nKeepCache = 0;
+     pConf->nOpenMax = TDNF_DEFAULT_OPENMAX;
++    pConf->nInstallOnlyLimit = TDNF_DEFAULT_INSTALLONLY_LIMIT;
+ 
+     register_ini(NULL);
+     mod_ini = find_cnfmodule("ini");
+@@ -229,6 +230,12 @@ TDNFReadConfig(
+         {
+             pszProxyPass = cn->value;
+         }
++        else if (strcmp(cn->name, TDNF_CONF_KEY_INSTALLONLYPKGS) == 0)
++        {
++            dwError = TDNFSplitStringToArray(cn->value,
++                                             " ", &pConf->ppszInstallOnlyPkgs);
++            BAIL_ON_TDNF_ERROR(dwError);
++        }
+         else if (strcmp(cn->name, TDNF_CONF_KEY_PLUGINS) == 0)
+         {
+             /* presence of option disables plugins, no matter the value */
+diff --git a/client/goal.c b/client/goal.c
+index 669cd7e8..afb175c4 100644
+--- a/client/goal.c
++++ b/client/goal.c
+@@ -328,6 +328,9 @@ TDNFSolv(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
++    dwError = TDNFSolvAddInstallOnlyPkgs(pTdnf, pQueueJobs, pTdnf->pSack->pPool);
++    BAIL_ON_TDNF_ERROR(dwError);
++
+     dwError = TDNFSolvAddPkgLocks(pTdnf, pQueueJobs, pTdnf->pSack->pPool);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+@@ -951,6 +954,51 @@ TDNFSolvAddPkgLocks(
+     goto cleanup;
+ }
+ 
++uint32_t
++TDNFSolvAddInstallOnlyPkgs(
++    PTDNF pTdnf,
++    Queue* pQueueJobs,
++    Pool *pPool
++    )
++{
++    uint32_t dwError = 0;
++    char **ppszPackages = NULL;
++    int i;
++
++    if(!pTdnf || !pQueueJobs || !pPool)
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    ppszPackages = pTdnf->pConf->ppszInstallOnlyPkgs;
++
++    for (i = 0; ppszPackages && ppszPackages[i]; i++)
++    {
++        char *pszPkg = ppszPackages[i];
++        Id idPkg = pool_str2id(pPool, pszPkg, 1);
++        if (idPkg)
++        {
++            Id p;
++            Solvable *s;
++            /* only mark if they are installed - first install doesn't care */
++            FOR_REPO_SOLVABLES(pPool->installed, p, s)
++            {
++                if (idPkg == s->name)
++                {
++                    queue_push2(pQueueJobs, SOLVER_SOLVABLE_NAME|SOLVER_MULTIVERSION, idPkg);
++                    break;
++                }
++            }
++        }
++    }
++
++cleanup:
++    return dwError;
++error:
++    goto cleanup;
++}
++
+ uint32_t
+ TDNFSolvAddMinVersions(
+     PTDNF pTdnf,
+diff --git a/client/packageutils.c b/client/packageutils.c
+index 22f12ea8..7c195eea 100644
+--- a/client/packageutils.c
++++ b/client/packageutils.c
+@@ -796,7 +796,8 @@ TDNFAddPackagesForInstall(
+     PSolvSack pSack,
+     Queue* pQueueGoal,
+     const char* pszPkgName,
+-    int nSource
++    int nSource,
++    int nInstallOnly
+     )
+ {
+     uint32_t dwError = 0;
+@@ -822,7 +823,7 @@ TDNFAddPackagesForInstall(
+                   &dwInstallPackage);
+     BAIL_ON_TDNF_ERROR(dwError);
+ 
+-    if(dwInstallPackage == 1)
++    if(dwInstallPackage == 1 || nInstallOnly)
+     {
+         queue_push(pQueueGoal, dwHighestAvailable);
+     }
+diff --git a/client/prototypes.h b/client/prototypes.h
+index 50abe98c..81e61e03 100644
+--- a/client/prototypes.h
++++ b/client/prototypes.h
+@@ -332,7 +332,8 @@ TDNFAddPackagesForInstall(
+     PSolvSack pSack,
+     Queue* pQueueGoal,
+     const char* pszPkgName,
+-    int nSource
++    int nSource,
++    int nInstallOnly
+     );
+ 
+ uint32_t
+@@ -517,6 +518,13 @@ TDNFSolvAddPkgLocks(
+     Pool *pPool
+     );
+ 
++uint32_t
++TDNFSolvAddInstallOnlyPkgs(
++    PTDNF pTdnf,
++    Queue* pQueueJobs,
++    Pool *pPool
++    );
++
+ uint32_t
+ TDNFSolvAddMinVersions(
+     PTDNF pTdnf,
+diff --git a/client/resolve.c b/client/resolve.c
+index 5d5fab85..a563af5b 100644
+--- a/client/resolve.c
++++ b/client/resolve.c
+@@ -360,12 +360,19 @@ TDNFPrepareSinglePkg(
+     else if (nAlterType == ALTER_INSTALL)
+     {
+         int nSource = pTdnf->pArgs->nSource;
++        int nInstallOnly = 0;
+ 
++        for (int i = 0; pTdnf->pConf->ppszInstallOnlyPkgs[i]; i++) {
++            if (strcmp(pTdnf->pConf->ppszInstallOnlyPkgs[i], pszPkgName) == 0) {
++                nInstallOnly = 1;
++            }
++        }
+         dwError = TDNFAddPackagesForInstall(
+                       pSack,
+                       queueGoal,
+                       pszPkgName,
+-                      nSource);
++                      nSource,
++                      nInstallOnly);
+         if (dwError == ERROR_TDNF_ALREADY_INSTALLED)
+         {
+             /* the package may have been already installed as a dependency,
+diff --git a/common/config.h b/common/config.h
+index 1e525383..c48d1dfb 100644
+--- a/common/config.h
++++ b/common/config.h
+@@ -16,9 +16,11 @@
+ #define TDNF_REPO_EXT                     ".repo"
+ #define TDNF_CONF_FILE                    "/etc/tdnf/tdnf.conf"
+ #define TDNF_CONF_GROUP                   "main"
++
+ //Conf file key names
+ #define TDNF_CONF_KEY_GPGCHECK            "gpgcheck"
+ #define TDNF_CONF_KEY_INSTALLONLY_LIMIT   "installonly_limit"
++#define TDNF_CONF_KEY_INSTALLONLYPKGS     "installonlypkgs"
+ #define TDNF_CONF_KEY_CLEAN_REQ_ON_REMOVE "clean_requirements_on_remove"
+ #define TDNF_CONF_KEY_REPODIR             "repodir" // typo, keep for back compatibility
+ #define TDNF_CONF_KEY_REPOSDIR            "reposdir"
+@@ -96,6 +98,7 @@
+ #define TDNF_REPO_METADATA_EXPIRE_NEVER   "never"
+ 
+ #define TDNF_DEFAULT_OPENMAX              1024
++#define TDNF_DEFAULT_INSTALLONLY_LIMIT    2
+ 
+ // repo default settings
+ #define TDNF_REPO_DEFAULT_ENABLED            0
+diff --git a/include/tdnftypes.h b/include/tdnftypes.h
+index ef33d1b0..58d5f5b6 100644
+--- a/include/tdnftypes.h
++++ b/include/tdnftypes.h
+@@ -272,6 +272,7 @@ typedef struct _TDNF_CONF
+     char** ppszMinVersions;
+     char** ppszPkgLocks;
+     char** ppszProtectedPkgs;
++    char **ppszInstallOnlyPkgs;
+ }TDNF_CONF, *PTDNF_CONF;
+ 
+ typedef struct _TDNF_REPO_DATA
+
+From a74928dc85eee861d4c27dcdc9d2672cac7dd039 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Thu, 13 Jul 2023 15:44:46 -0700
+Subject: [PATCH 3/7] use full name (including evr) when erasing a package
+
+---
+ client/rpmtrans.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/client/rpmtrans.c b/client/rpmtrans.c
+index ce2e6829..50f2dd1d 100644
+--- a/client/rpmtrans.c
++++ b/client/rpmtrans.c
+@@ -990,6 +990,7 @@ TDNFTransAddErasePkgs(
+ {
+     uint32_t dwError = 0;
+     PTDNF_PKG_INFO pInfo;
++    char *pszFullName = NULL;
+ 
+     if(!pInfos)
+     {
+@@ -999,11 +1000,14 @@ TDNFTransAddErasePkgs(
+ 
+     for(pInfo = pInfos; pInfo; pInfo = pInfo->pNext)
+     {
+-        dwError = TDNFTransAddErasePkg(pTS, pInfo->pszName);
++        dwError = TDNFAllocateStringPrintf(&pszFullName, "%s-%s", pInfo->pszName, pInfo->pszEVR);
++        BAIL_ON_TDNF_ERROR(dwError);
++        dwError = TDNFTransAddErasePkg(pTS, pszFullName);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+ cleanup:
++    TDNF_SAFE_FREE_MEMORY(pszFullName);
+     return dwError;
+ 
+ error:
+
+From 8c73a0e825e5e14496c30a3ccfb829aeaf019749 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Thu, 13 Jul 2023 17:21:40 -0700
+Subject: [PATCH 4/7] installonly: handle installonly_limit by removing
+ excessive versions
+
+---
+ client/goal.c       | 167 ++++++++++++++++++++++++++++++++++++++------
+ client/prototypes.h |   8 +++
+ client/resolve.c    |   9 ++-
+ include/tdnferror.h |   2 +-
+ 4 files changed, 162 insertions(+), 24 deletions(-)
+
+diff --git a/client/goal.c b/client/goal.c
+index afb175c4..8fe9b42a 100644
+--- a/client/goal.c
++++ b/client/goal.c
+@@ -298,6 +298,7 @@ TDNFSolv(
+     Transaction *pTrans = NULL;
+     int nFlags = 0;
+     int nProblems = 0;
++    int retries = 0;
+ 
+     if(!pTdnf || !ppInfo)
+     {
+@@ -361,21 +362,47 @@ TDNFSolv(
+     solver_set_flag(pSolv, SOLVER_FLAG_ALLOW_DOWNGRADE, 1);
+     solver_set_flag(pSolv, SOLVER_FLAG_INSTALL_ALSO_UPDATES, 1);
+ 
+-    nProblems = solver_solve(pSolv, pQueueJobs);
+-    if (nProblems > 0)
+-    {
+-        dwError = TDNFGetSkipProblemOption(pTdnf, &dwSkipProblem);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-        dwError = SolvReportProblems(pTdnf->pSack, pSolv, dwSkipProblem);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-    }
++    do {
++        /* in case this is second or later try */
++        if(pTrans)
++        {
++            transaction_free(pTrans);
++            pTrans = NULL;
++        }
+ 
+-    pTrans = solver_create_transaction(pSolv);
+-    if(!pTrans)
+-    {
+-        dwError = ERROR_TDNF_INVALID_PARAMETER;
+-        BAIL_ON_TDNF_ERROR(dwError);
+-    }
++        nProblems = solver_solve(pSolv, pQueueJobs);
++        if (nProblems > 0)
++        {
++            dwError = TDNFGetSkipProblemOption(pTdnf, &dwSkipProblem);
++            BAIL_ON_TDNF_ERROR(dwError);
++            dwError = SolvReportProblems(pTdnf->pSack, pSolv, dwSkipProblem);
++            BAIL_ON_TDNF_ERROR(dwError);
++        }
++
++        pTrans = solver_create_transaction(pSolv);
++        if(!pTrans)
++        {
++            dwError = ERROR_TDNF_INVALID_PARAMETER;
++            BAIL_ON_TDNF_ERROR(dwError);
++        }
++
++        if (pTdnf->pConf->ppszProtectedPkgs) {
++            /* catch protected obsoleted packages, and double check for removals */
++            dwError = TDNFSolvCheckProtectPkgsInTrans(pTdnf, pTrans, pTdnf->pSack->pPool);
++            BAIL_ON_TDNF_ERROR(dwError);
++        }
++
++        if (pTdnf->pConf->ppszInstallOnlyPkgs) {
++            /* check if we are going to exceed the installonly limit */
++            /* if so, removal jobs will be added and we'll try to solve again */
++            dwError = TDNFSolvCheckInstallOnlyLimitInTrans(pTdnf, pTrans, pTdnf->pSack->pPool, pQueueJobs);
++            if (dwError != ERROR_TDNF_INSTALLONLY_LIMIT_EXCEEDED) {
++                BAIL_ON_TDNF_ERROR(dwError);
++            }
++        }
++        retries++;
++    } while (dwError == ERROR_TDNF_INSTALLONLY_LIMIT_EXCEEDED && retries < 2);
++    BAIL_ON_TDNF_ERROR(dwError);
+ 
+     if(pTdnf->pArgs->nDebugSolver)
+     {
+@@ -383,12 +410,6 @@ TDNFSolv(
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+-    if (pTdnf->pConf->ppszProtectedPkgs) {
+-        /* catch protected obsoleted packages, and double check for removals */
+-        dwError = TDNFSolvCheckProtectPkgsInTrans(pTdnf, pTrans, pTdnf->pSack->pPool);
+-        BAIL_ON_TDNF_ERROR(dwError);
+-    }
+-
+     dwError = TDNFGoalGetAllResultsIgnoreNoData(
+                   pTrans,
+                   pSolv,
+@@ -982,6 +1003,9 @@ TDNFSolvAddInstallOnlyPkgs(
+             Id p;
+             Solvable *s;
+             /* only mark if they are installed - first install doesn't care */
++            /* we are marking the name, so we just need to mark it once */
++            /* the flag only affects to be installed packages and
++               it has no effect for already installed packages */
+             FOR_REPO_SOLVABLES(pPool->installed, p, s)
+             {
+                 if (idPkg == s->name)
+@@ -999,6 +1023,109 @@ TDNFSolvAddInstallOnlyPkgs(
+     goto cleanup;
+ }
+ 
++uint32_t
++TDNFSolvCheckInstallOnlyLimitInTrans(
++    PTDNF pTdnf,
++    Transaction *pTrans,
++    Pool *pPool,
++    Queue *pQueueJobs
++    )
++{
++    uint32_t dwError = 0;
++    char **ppszPackages = NULL;
++    int i;
++    int nLimit;
++    Queue qPkgs = {0};
++    Map *pMapRemove = NULL;
++
++    if(!pTdnf || !pTrans || !pPool || !pTdnf->pConf)
++    {
++        dwError = ERROR_TDNF_INVALID_PARAMETER;
++        BAIL_ON_TDNF_ERROR(dwError);
++    }
++
++    ppszPackages = pTdnf->pConf->ppszInstallOnlyPkgs;
++    nLimit = pTdnf->pConf->nInstallOnlyLimit;
++
++    dwError = TDNFAllocateMemory(
++                          1,
++                          sizeof(Map),
++                          (void**)&pMapRemove);
++    BAIL_ON_TDNF_ERROR(dwError);
++
++    map_init(pMapRemove, pPool->nsolvables);
++
++    for (i = 0; ppszPackages && ppszPackages[i]; i++)
++    {
++        char *pszPkg = ppszPackages[i];
++        Id idName = pool_str2id(pPool, pszPkg, 1);
++        int n = 0;
++
++        /* count installed packages */
++        if (idName)
++        {
++            Id p;
++            Solvable *s;
++
++            FOR_REPO_SOLVABLES(pPool->installed, p, s) {
++                if (idName == s->name) {
++                    n++;
++                }
++            }
++        }
++        /* increment if more gets installed,
++           subtract if any gets removed */
++        for (int j = 0; j < pTrans->steps.count; j++) {
++            Id idType;
++            Id idPkg = pTrans->steps.elements[j];
++            Solvable *s = pool_id2solvable(pPool, idPkg);
++
++            if (idName == s->name) {
++                idType = transaction_type(pTrans, idPkg,
++                                          SOLVER_TRANSACTION_SHOW_MULTIINSTALL);
++                if (idType == SOLVER_TRANSACTION_MULTIINSTALL) {
++                    n++;
++                } else if (idType == SOLVER_TRANSACTION_ERASE) {
++                    map_set(pMapRemove, idPkg);
++                    n--;
++                }
++            }
++        }
++
++        /* if we exceed the limit, add erase jobs */
++        if (n > nLimit) {
++            Id p;
++            Solvable *s;
++
++            /* we are going to add jobs and return this error,
++               so the caller can re-solve */
++            dwError = ERROR_TDNF_INSTALLONLY_LIMIT_EXCEEDED;
++
++            /* TODO: look for lowest versions? Currently looks like least
++               recent installed gets selected first - which may be fine too */
++            FOR_REPO_SOLVABLES(pPool->installed, p, s) {
++                if (idName == s->name && !MAPTST(pMapRemove, p)) {
++                    map_set(pMapRemove, p);
++                    queue_push2(pQueueJobs, SOLVER_SOLVABLE|SOLVER_ERASE, p);
++                    n--;
++                    if (n <= nLimit)
++                        break;
++                }
++            }
++        }
++    }
++
++cleanup:
++    if (pMapRemove) {
++        map_free(pMapRemove);
++        TDNFFreeMemory(pMapRemove);
++    }
++    queue_free(&qPkgs);
++    return dwError;
++error:
++    goto cleanup;
++}
++
+ uint32_t
+ TDNFSolvAddMinVersions(
+     PTDNF pTdnf,
+diff --git a/client/prototypes.h b/client/prototypes.h
+index 81e61e03..fd4fb242 100644
+--- a/client/prototypes.h
++++ b/client/prototypes.h
+@@ -545,6 +545,14 @@ TDNFSolvCheckProtectPkgsInTrans(
+     Pool *pPool
+     );
+ 
++uint32_t
++TDNFSolvCheckInstallOnlyLimitInTrans(
++    PTDNF pTdnf,
++    Transaction *pTrans,
++    Pool *pPool,
++    Queue *pQueueJobs
++    );
++
+ //config.c
+ int
+ TDNFConfGetRpmVerbosity(
+diff --git a/client/resolve.c b/client/resolve.c
+index a563af5b..741809d7 100644
+--- a/client/resolve.c
++++ b/client/resolve.c
+@@ -362,11 +362,14 @@ TDNFPrepareSinglePkg(
+         int nSource = pTdnf->pArgs->nSource;
+         int nInstallOnly = 0;
+ 
+-        for (int i = 0; pTdnf->pConf->ppszInstallOnlyPkgs[i]; i++) {
+-            if (strcmp(pTdnf->pConf->ppszInstallOnlyPkgs[i], pszPkgName) == 0) {
+-                nInstallOnly = 1;
++        if (pTdnf->pConf->ppszInstallOnlyPkgs) {
++            for (int i = 0; pTdnf->pConf->ppszInstallOnlyPkgs[i]; i++) {
++                if (strcmp(pTdnf->pConf->ppszInstallOnlyPkgs[i], pszPkgName) == 0) {
++                    nInstallOnly = 1;
++                }
+             }
+         }
++
+         dwError = TDNFAddPackagesForInstall(
+                       pSack,
+                       queueGoal,
+diff --git a/include/tdnferror.h b/include/tdnferror.h
+index c9349a06..a53058d3 100644
+--- a/include/tdnferror.h
++++ b/include/tdnferror.h
+@@ -155,6 +155,8 @@ extern "C" {
+ //RPM Transaction
+ #define ERROR_TDNF_TRANSACTION_FAILED        1525
+ #define ERROR_TDNF_RPMTS_OPENDB_FAILED       1526
++
++#define ERROR_TDNF_INSTALLONLY_LIMIT_EXCEEDED 1530
+ 
+ /* event context */
+ #define ERROR_TDNF_EVENT_CTXT_ITEM_NOT_FOUND      1551
+
+From 3332a42592944d55168a6ea5656317be5036b505 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Mon, 17 Jul 2023 14:34:33 -0700
+Subject: [PATCH 5/7] fix reinstall for multiversion packages - manual
+ crossport of commit 5475e87 from PR #428
+
+---
+ client/rpmtrans.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/client/rpmtrans.c b/client/rpmtrans.c
+index 50f2dd1d..29d85744 100644
+--- a/client/rpmtrans.c
++++ b/client/rpmtrans.c
+@@ -11,6 +11,10 @@
+ 
+ #include "rpm/rpmcli.h"
+ 
++#define INSTALL_INSTALL 0
++#define INSTALL_UPGRADE 1
++#define INSTALL_REINSTALL 2
++
+ uint32_t
+ TDNFRpmCleanupTS(PTDNF pTdnf,
+                  PTDNFRPMTS pTS)
+@@ -366,7 +370,7 @@ TDNFPopulateTransaction(
+         dwError = TDNFTransAddInstallPkgs(
+                       pTS,
+                       pTdnf,
+-                      pSolvedInfo->pPkgsToInstall, 0);
++                      pSolvedInfo->pPkgsToInstall, INSTALL_INSTALL);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+     if(pSolvedInfo->pPkgsToReinstall)
+@@ -375,7 +379,7 @@ TDNFPopulateTransaction(
+                       pTS,
+                       pTdnf,
+                       pSolvedInfo->pPkgsToReinstall,
+-                      1);
++                      INSTALL_REINSTALL);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+     if(pSolvedInfo->pPkgsToUpgrade)
+@@ -384,7 +388,7 @@ TDNFPopulateTransaction(
+                       pTS,
+                       pTdnf,
+                       pSolvedInfo->pPkgsToUpgrade,
+-                      1);
++                      INSTALL_UPGRADE);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+     if(pSolvedInfo->pPkgsToRemove)
+@@ -407,7 +411,7 @@ TDNFPopulateTransaction(
+                       pTS,
+                       pTdnf,
+                       pSolvedInfo->pPkgsToDowngrade,
+-                      0);
++                      INSTALL_INSTALL);
+         BAIL_ON_TDNF_ERROR(dwError);
+         if(pSolvedInfo->pPkgsRemovedByDowngrade)
+         {
+@@ -756,7 +760,7 @@ TDNFTransAddInstallPkgs(
+     PTDNFRPMTS pTS,
+     PTDNF pTdnf,
+     PTDNF_PKG_INFO pInfos,
+-    int nUpgrade
++    int nInstallFlag
+     )
+ {
+     uint32_t dwError = 0;
+@@ -781,7 +785,7 @@ TDNFTransAddInstallPkgs(
+                       pInfo->pszLocation,
+                       pInfo->pszName,
+                       pRepo,
+-                      nUpgrade);
++                      nInstallFlag);
+         BAIL_ON_TDNF_ERROR(dwError);
+     }
+ 
+@@ -803,7 +807,7 @@ TDNFTransAddInstallPkg(
+     const char* pszPackageLocation,
+     const char* pszPkgName,
+     PTDNF_REPO_DATA pRepo,
+-    int nUpgrade
++    int nInstallFlag
+     )
+ {
+     uint32_t dwError = 0;
+@@ -940,12 +944,19 @@ TDNFTransAddInstallPkg(
+             BAIL_ON_TDNF_RPM_ERROR(dwError);
+         }
+     } else {
+-        dwError = rpmtsAddInstallElement(
++        if (nInstallFlag == INSTALL_REINSTALL){
++            dwError = rpmtsAddReinstallElement(
+                       pTS->pTS,
+                       rpmHeader,
+-                      (fnpyKey)pszFilePath,
+-                      nUpgrade,
+-                      NULL);
++                      (fnpyKey)pszFilePath);
++        } else {
++            dwError = rpmtsAddInstallElement(
++                          pTS->pTS,
++                          rpmHeader,
++                          (fnpyKey)pszFilePath,
++                          nInstallFlag == INSTALL_UPGRADE,
++                          NULL);
++        }
+         BAIL_ON_TDNF_RPM_ERROR(dwError);
+     }
+ 
+
+From 3d9bb9f0d86d8e806626f5d08a9c8092cddf1479 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Mon, 17 Jul 2023 16:39:07 -0700
+Subject: [PATCH 6/7] refactor check_package() test using json and address
+ multiple installs
+
+---
+ pytests/conftest.py            | 10 +++++-----
+ pytests/tests/test_excludes.py | 22 ++++++----------------
+ 2 files changed, 11 insertions(+), 21 deletions(-)
+
+diff --git a/pytests/conftest.py b/pytests/conftest.py
+index 90a3c8ee..95b4bd34 100644
+--- a/pytests/conftest.py
++++ b/pytests/conftest.py
+@@ -195,11 +195,11 @@ def assert_file_exists(self, file_path):
+ 
+     def check_package(self, package, version=None):
+         ''' Check if a package exists '''
+-        ret = self.run(['tdnf', 'list', package])
+-        for line in ret['stdout']:
+-            if package in line and '@System' in line:
+-                if version is None or version in line:
+-                    return True
++        ret = self.run(["tdnf", "list", "-j", "--installed", package])
++        pkglist = json.loads('\n'.join(ret['stdout']))
++        for p in pkglist:
++            if p['Name'] == package and (version is None or p['Evr'] == version):
++                return True
+         return False
+ 
+     def erase_package(self, pkgname, pkgversion=None):
+diff --git a/pytests/tests/test_excludes.py b/pytests/tests/test_excludes.py
+index bf3da99b..3a7d77b6 100644
+--- a/pytests/tests/test_excludes.py
++++ b/pytests/tests/test_excludes.py
+@@ -73,19 +73,14 @@ def test_update_package(utils):
+     pkgversion1 = utils.config["mulversion_lower"]
+     pkgversion2 = utils.config["mulversion_higher"]
+ 
+-    if '-' in pkgversion1:
+-        pkgversion1 = pkgversion1.split('-')[0]
+-    if '-' in pkgversion2:
+-        pkgversion2 = pkgversion2.split('-')[0]
+-
+     utils.erase_package(pkgname)
+ 
+     utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname + '-' + pkgversion1])
+-    assert utils.check_package(pkgname, pkgversion1)
++    assert utils.check_package(pkgname, version=pkgversion1)
+ 
+     utils.run(['tdnf', 'update', '--exclude=', pkgname, '-y', '--nogpgcheck', pkgname + '-' + pkgversion2])
+-    assert not utils.check_package(pkgname, pkgversion2)
+-    assert utils.check_package(pkgname, pkgversion1)
++    assert not utils.check_package(pkgname, version=pkgversion2)
++    assert utils.check_package(pkgname, version=pkgversion1)
+ 
+ 
+ # removing an excluded package should fail (dnf behavior) (negative test)
+@@ -106,16 +101,11 @@ def test_with_minversion_existing(utils):
+     pkgversion1 = utils.config["mulversion_lower"]
+     pkgversion2 = utils.config["mulversion_higher"]
+ 
+-    if '-' in pkgversion1:
+-        pkgversion1 = pkgversion1.split('-')[0]
+-    if '-' in pkgversion2:
+-        pkgversion2 = pkgversion2.split('-')[0]
+-
+     utils.erase_package(pkgname)
+ 
+     utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname + '-' + pkgversion1])
+-    assert utils.check_package(pkgname, pkgversion1)
++    assert utils.check_package(pkgname, version=pkgversion1)
+ 
+     utils.run(['tdnf', 'update', '--exclude=', '-y', '--nogpgcheck', pkgname + '-' + pkgversion2])
+-    assert not utils.check_package(pkgname, pkgversion2)
+-    assert utils.check_package(pkgname, pkgversion1)
++    assert not utils.check_package(pkgname, version=pkgversion2)
++    assert utils.check_package(pkgname, version=pkgversion1)
+
+From 9c8724c23b58efbe144a2acf8089bde0cb5f7412 Mon Sep 17 00:00:00 2001
+From: Oliver Kurth <okurth@gmail.com>
+Date: Mon, 17 Jul 2023 16:40:22 -0700
+Subject: [PATCH 7/7] add tests for multiinstall (installonly) packages
+
+---
+ pytests/repo/tdnf-multi1.spec      |  31 ++++++
+ pytests/repo/tdnf-multi2.spec      |  33 +++++++
+ pytests/repo/tdnf-multi3.spec      |  35 +++++++
+ pytests/repo/tdnf-multi4.spec      |  37 +++++++
+ pytests/tests/test_multiinstall.py | 151 +++++++++++++++++++++++++++++
+ 5 files changed, 287 insertions(+)
+ create mode 100644 pytests/repo/tdnf-multi1.spec
+ create mode 100644 pytests/repo/tdnf-multi2.spec
+ create mode 100644 pytests/repo/tdnf-multi3.spec
+ create mode 100644 pytests/repo/tdnf-multi4.spec
+ create mode 100644 pytests/tests/test_multiinstall.py
+
+diff --git a/pytests/repo/tdnf-multi1.spec b/pytests/repo/tdnf-multi1.spec
+new file mode 100644
+index 00000000..ff8ceab8
+--- /dev/null
++++ b/pytests/repo/tdnf-multi1.spec
+@@ -0,0 +1,31 @@
++#
++# tdnf-test-one spec file
++#
++Summary:    multiinstall test
++Name:       tdnf-multi
++Version:    1.0.1
++Release:    1
++Vendor:     VMware, Inc.
++Distribution:   Photon
++License:    VMware
++Url:        http://www.vmware.com
++Group:      Applications/tdnftest
++
++%description
++Part of tdnf test spec. Basic install/remove/upgrade test
++
++%prep
++
++%build
++
++# files should not conflict
++%install
++mkdir -p %_topdir/%buildroot/usr/share/multiinstall
++touch %_topdir/%buildroot/usr/share/multiinstall-%{release}
++
++%files
++/usr/share/multiinstall-%{release}
++
++%changelog
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-1
++-   Add a service file for whatprovides test.
+diff --git a/pytests/repo/tdnf-multi2.spec b/pytests/repo/tdnf-multi2.spec
+new file mode 100644
+index 00000000..fba78695
+--- /dev/null
++++ b/pytests/repo/tdnf-multi2.spec
+@@ -0,0 +1,33 @@
++#
++# tdnf-test-one spec file
++#
++Summary:    multiinstall test
++Name:       tdnf-multi
++Version:    1.0.1
++Release:    2
++Vendor:     VMware, Inc.
++Distribution:   Photon
++License:    VMware
++Url:        http://www.vmware.com
++Group:      Applications/tdnftest
++
++%description
++Part of tdnf test spec. Basic install/remove/upgrade test
++
++%prep
++
++%build
++
++# files should not conflict
++%install
++mkdir -p %_topdir/%buildroot/usr/share/multiinstall
++touch %_topdir/%buildroot/usr/share/multiinstall-%{release}
++
++%files
++/usr/share/multiinstall-%{release}
++
++%changelog
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-2
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-1
++-   Add a service file for whatprovides test.
+diff --git a/pytests/repo/tdnf-multi3.spec b/pytests/repo/tdnf-multi3.spec
+new file mode 100644
+index 00000000..c0519c83
+--- /dev/null
++++ b/pytests/repo/tdnf-multi3.spec
+@@ -0,0 +1,35 @@
++#
++# tdnf-test-one spec file
++#
++Summary:    multiinstall test
++Name:       tdnf-multi
++Version:    1.0.1
++Release:    3
++Vendor:     VMware, Inc.
++Distribution:   Photon
++License:    VMware
++Url:        http://www.vmware.com
++Group:      Applications/tdnftest
++
++%description
++Part of tdnf test spec. Basic install/remove/upgrade test
++
++%prep
++
++%build
++
++# files should not conflict
++%install
++mkdir -p %_topdir/%buildroot/usr/share/multiinstall
++touch %_topdir/%buildroot/usr/share/multiinstall-%{release}
++
++%files
++/usr/share/multiinstall-%{release}
++
++%changelog
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-3
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-2
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-1
++-   Add a service file for whatprovides test.
+diff --git a/pytests/repo/tdnf-multi4.spec b/pytests/repo/tdnf-multi4.spec
+new file mode 100644
+index 00000000..9bcb0b42
+--- /dev/null
++++ b/pytests/repo/tdnf-multi4.spec
+@@ -0,0 +1,37 @@
++#
++# tdnf-test-one spec file
++#
++Summary:    multiinstall test
++Name:       tdnf-multi
++Version:    1.0.1
++Release:    4
++Vendor:     VMware, Inc.
++Distribution:   Photon
++License:    VMware
++Url:        http://www.vmware.com
++Group:      Applications/tdnftest
++
++%description
++Part of tdnf test spec. Basic install/remove/upgrade test
++
++%prep
++
++%build
++
++# files should not conflict
++%install
++mkdir -p %_topdir/%buildroot/usr/share/multiinstall
++touch %_topdir/%buildroot/usr/share/multiinstall-%{release}
++
++%files
++/usr/share/multiinstall-%{release}
++
++%changelog
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-4
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-3
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-2
++-   bump
++*   Mon Jul 17 2023 Oliver Kurth <okurth@vmware.com> 1.0.1-1
++-   Add a service file for whatprovides test.
+diff --git a/pytests/tests/test_multiinstall.py b/pytests/tests/test_multiinstall.py
+new file mode 100644
+index 00000000..efc921c7
+--- /dev/null
++++ b/pytests/tests/test_multiinstall.py
+@@ -0,0 +1,151 @@
++#
++# Copyright (C) 2023 VMware, Inc. All Rights Reserved.
++#
++# Licensed under the GNU General Public License v2 (the "License");
++# you may not use this file except in compliance with the License. The terms
++# of the License are located in the COPYING file of this distribution.
++#
++
++import pytest
++
++
++PKGNAME = "tdnf-multi"
++# must be sorted:
++PKG_VERSIONS = ["1.0.1-1", "1.0.1-2", "1.0.1-3", "1.0.1-4"]
++
++
++@pytest.fixture(scope='function', autouse=True)
++def setup_test(utils):
++    utils.edit_config({"installonlypkgs": PKGNAME})
++    yield
++    teardown_test(utils)
++
++
++def teardown_test(utils):
++    # removing package by name without version will remoe all versions
++    pkgname = PKGNAME
++    utils.run(['tdnf', 'erase', '-y', pkgname])
++    utils.edit_config({"installonlypkgs": None})
++
++
++# package can be installed twice
++def test_install_twice(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname])
++    # should install latest version
++    latest = PKG_VERSIONS[-1]
++    assert utils.check_package(pkgname, version=latest)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    # test that the other version is still there
++    assert utils.check_package(pkgname, version=latest)
++
++
++# package can be installed thrice
++def test_install_thrice(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname])
++    # should install latest version
++    latest = PKG_VERSIONS[-1]
++    assert utils.check_package(pkgname, version=latest)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    second = PKG_VERSIONS[1]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={second}"])
++    assert utils.check_package(pkgname, version=second)
++
++    # test that the other version is still there
++    assert utils.check_package(pkgname, version=latest)
++    assert utils.check_package(pkgname, version=first)
++
++
++# forth install removes the first installed one
++def test_install_fourth(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', pkgname])
++    # should install latest version
++    latest = PKG_VERSIONS[-1]
++    assert utils.check_package(pkgname, version=latest)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    second = PKG_VERSIONS[1]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={second}"])
++    assert utils.check_package(pkgname, version=second)
++
++    third = PKG_VERSIONS[2]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={third}"])
++    assert utils.check_package(pkgname, version=third)
++
++    # the first installed should be gone (default installonly_limit=3)
++    assert not utils.check_package(pkgname, version=latest)
++
++
++# remove without version removes all
++def test_install_remove_no_version(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    second = PKG_VERSIONS[1]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={second}"])
++    assert utils.check_package(pkgname, version=second)
++
++    utils.run(['tdnf', 'remove', '-y', pkgname])
++    assert not utils.check_package(pkgname, version=first)
++    assert not utils.check_package(pkgname, version=second)
++
++
++# remove with version removes one only
++def test_install_remove_with_version(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    second = PKG_VERSIONS[1]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={second}"])
++    assert utils.check_package(pkgname, version=second)
++
++    utils.run(['tdnf', 'remove', '-y', f"{pkgname}={first}"])
++    assert not utils.check_package(pkgname, version=first)
++    # other pkgs should remain installed:
++    assert utils.check_package(pkgname, version=second)
++
++
++# a reinstall leaves them intact
++def test_install_reinstall(utils):
++    pkgname = PKGNAME
++    utils.erase_package(pkgname)
++
++    first = PKG_VERSIONS[0]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    assert utils.check_package(pkgname, version=first)
++
++    second = PKG_VERSIONS[1]
++    utils.run(['tdnf', 'install', '-y', '--nogpgcheck', f"{pkgname}={second}"])
++    assert utils.check_package(pkgname, version=second)
++
++    utils.run(['tdnf', 'reinstall', '-y', '--nogpgcheck', f"{pkgname}={first}"])
++    # both pkgs should remain installed:
++    assert utils.check_package(pkgname, version=first)
++    assert utils.check_package(pkgname, version=second)

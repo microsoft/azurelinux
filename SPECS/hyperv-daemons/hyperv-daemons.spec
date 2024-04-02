@@ -8,7 +8,7 @@
 %global udev_prefix 70
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
-Version:        5.15.137.1
+Version:        5.15.153.1
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -219,6 +219,36 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+* Wed Mar 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.153.1-1
+- Auto-upgrade to 5.15.153.1
+
+* Mon Mar 25 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.151.2-1
+- Upgrade to 5.15.151.2
+
+* Wed Mar 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.151.1-1
+- Auto-upgrade to 5.15.151.1
+
+* Sat Mar 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.150.1-1
+- Auto-upgrade to 5.15.150.1
+
+* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.2-1
+- Auto-upgrade to 5.15.148.2
+
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.1-1
+- Auto-upgrade to 5.15.148.1
+
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.147.1-1
+- Auto-upgrade to 5.15.147.1
+
+* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
+- Update to 5.15.145.2
+
+* Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
+- Auto-upgrade to 5.15.139.1
+
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
+- Auto-upgrade to 5.15.138.1
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
 

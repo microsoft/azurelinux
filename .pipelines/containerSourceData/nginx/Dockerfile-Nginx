@@ -1,0 +1,21 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+ARG BASE_IMAGE
+
+FROM $BASE_IMAGE
+
+@INCLUDE_MAIN_RUN_INSTRUCTION@
+
+# basic smoke test
+RUN nginx -V
+
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/nginx.conf.default
+
+EXPOSE 80
+
+STOPSIGNAL SIGQUIT
+
+# set default command for the container
+CMD ["nginx", "-g", "daemon off;"]

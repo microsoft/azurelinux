@@ -1,13 +1,16 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.14.0
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/virtualenv
 Source0:        https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Derived from upstream patch https://github.com/pypa/virtualenv/commit/9f9dc6250fc88e92b1ca6206429966788846d696
+Patch0:         fix-plugin-attribute-name.patch
+Patch1:         pin-pytest-version.patch
 BuildArch:      noarch
 
 %description
@@ -20,7 +23,7 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-xml
 BuildRequires:  python3-wheel
 
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -28,13 +31,14 @@ Requires:       python3
 Requires:       python3-filelock
 Requires:       python3-platformdirs = 2.0.0
 Requires:       python3-distlib < 1
+Requires:       python3-six
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
 virtualenv is a tool to create isolated Python environment.
 
 %prep
-%autosetup -n virtualenv-%{version}
+%autosetup -p1 -n virtualenv-%{version}
 
 %build
 %py3_build
@@ -53,6 +57,15 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Feb 07 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-6
+- Fix pytest version to <8 for compatibility
+
+* Thu Jan 25 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 20.14.0-5
+- Add missing runtime dependency on python-six
+
+* Mon Dec 04 2023 Olivia Crain <oliviacrain@microsoft.com> - 20.14.0-4
+- Add upstream patch to fix package tests with newer versions of pluggy
+
 * Wed Dec 21 2022 Riken Maharjan <rmaharjan@microsoft.com> - 20.14.0-3
 - Add missing runtime dependencies
 
@@ -65,7 +78,7 @@ tox -e py
 * Tue Feb 08 2022 Muhammad Falak <mwani@microsoft.com> - 16.0.0-8
 - Add an explicit BR on `python3-pip` to enable ptest
 
-* Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 16.0.0-7
+* Wed Oct 20 2021 Olivia Crain <oliviacrain@microsoft.com> - 16.0.0-7
 - Add license, virtualenv binary to python3 package
 - Remove python2 package
 - Lint spec

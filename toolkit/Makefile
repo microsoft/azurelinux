@@ -132,6 +132,7 @@ PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR
 PACKAGE_URL_LIST   += https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/cbl-mariner/$(RELEASE_MAJOR_ID)/prod/base/srpms
+DAILY_BUILD_REPO   ?=
 
 # Preview URLs/repos will be appended (via override) even if the user sets custom values for the lists.
 ifeq ($(USE_PREVIEW_REPO),y)
@@ -150,6 +151,19 @@ ifeq ($(USE_PREVIEW_REPO),y)
    endif
 endif
 
+ifneq ($(DAILY_BUILD_REPO),)
+   PACKAGE_ROOT := $(shell grep -m 1 "baseurl" $(DAILY_BUILD_REPO) | sed 's|baseurl=||g')
+   $(warning )
+   $(warning ######################### WARNING #########################)
+   $(warning Using a Daily Build Repo at following location:)
+   $(warning $(PACKAGE_ROOT))
+   $(warning ######################### WARNING #########################)
+   $(warning )
+   override PACKAGE_URL_LIST  += $(PACKAGE_ROOT)/built_rpms_all
+   override SRPM_URL_LIST     += $(PACKAGE_ROOT)/SRPMS
+endif
+
+
 CA_CERT     ?=
 TLS_CERT    ?=
 TLS_KEY     ?=
@@ -157,6 +171,9 @@ TLS_KEY     ?=
 ##help:var:LOG_LEVEL:{panic,fatal,error,warn,info,debug,trace}=Set logging level for toolkit.
 # panic,fatal,error,warn,info,debug,trace
 LOG_LEVEL          ?= info
+##help:var:LOG_COLOR:{always,auto,never}=Set logging color for toolkit terminal output.
+# always,auto,never
+LOG_COLOR          ?= auto
 STOP_ON_WARNING    ?= n
 STOP_ON_PKG_FAIL   ?= n
 STOP_ON_FETCH_FAIL ?= n

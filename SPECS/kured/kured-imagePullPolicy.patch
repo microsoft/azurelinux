@@ -1,25 +1,21 @@
-From 492288d56314c65316a6d6f50b4b79c2eb0b267e Mon Sep 17 00:00:00 2001
-From: Rachel Menge <rachelmenge@microsoft.com>
-Date: Wed, 8 Nov 2023 10:51:46 -0800
-Subject: [PATCH] kured-imagePullPolicy patch updated for 1.13.2
+From: Mandeep Plaha <mandeepplaha@microsoft.com>
+Date: Tue, 16 Jan 2024 12:57:00 -0800
+Subject: [PATCH] kured-imagePullPolicy patch updated for 1.14.2
 
 ---
  kured-ds.yaml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/kured-ds.yaml b/kured-ds.yaml
-index 7721fa1..78322da 100644
+index 1f03c2c..9f0416f 100644
 --- a/kured-ds.yaml
 +++ b/kured-ds.yaml
 @@ -34,7 +34,7 @@ spec:
            # If you find yourself here wondering why there is no
            # :latest tag on Docker Hub,see the FAQ in the README
-           image: ghcr.io/kubereboot/kured:1.13.2
+           image: ghcr.io/kubereboot/kured:1.14.2
 -          imagePullPolicy: IfNotPresent
 +          imagePullPolicy: Always
            securityContext:
              privileged: true # Give permission to nsenter /proc/1/ns/mnt
-           ports:
--- 
-2.17.1
-
+             readOnlyRootFilesystem: true

@@ -37,8 +37,7 @@ var (
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
 	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
-	logFile         = exe.LogFileFlag(app)
-	logLevel        = exe.LogLevelFlag(app)
+	logFlags        = exe.SetupLogFlags(app)
 	profFlags       = exe.SetupProfileFlags(app)
 )
 
@@ -69,7 +68,7 @@ func main() {
 
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
-	logger.InitBestEffort(*logFile, *logLevel)
+	logger.InitBestEffort(logFlags)
 
 	prof, err := profile.StartProfiling(profFlags)
 	if err != nil {
@@ -244,7 +243,7 @@ func buildSystemConfig(systemConfig configuration.SystemConfig, disks []configur
 		extraMountPoints = append(extraMountPoints, additionalExtraMountPoints...)
 
 		setupChroot := safechroot.NewChroot(setupChrootDir, existingChrootDir)
-		err = setupChroot.Initialize(*tdnfTar, extraDirectories, extraMountPoints)
+		err = setupChroot.Initialize(*tdnfTar, extraDirectories, extraMountPoints, true)
 		if err != nil {
 			logger.Log.Error("Failed to create setup chroot")
 			return
@@ -416,11 +415,6 @@ func setupLoopDeviceDisk(outputDir, diskName string, diskConfig configuration.Di
 }
 
 func setupRealDisk(diskDevPath string, diskConfig configuration.Disk, rootEncryption configuration.RootEncryption, readOnlyRootConfig configuration.ReadOnlyVerityRoot) (partIDToDevPathMap, partIDToFsTypeMap map[string]string, encryptedRoot diskutils.EncryptedRootDevice, readOnlyRoot diskutils.VerityDevice, err error) {
-	const (
-		defaultBlockSize = diskutils.MiB
-		noMaxSize        = 0
-	)
-
 	// Set up partitions
 	partIDToDevPathMap, partIDToFsTypeMap, encryptedRoot, readOnlyRoot, err = diskutils.CreatePartitions(diskDevPath, diskConfig, rootEncryption, readOnlyRootConfig)
 	if err != nil {
@@ -533,17 +527,17 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		leaveChrootOnDisk = true
 	)
 
-	var installMap map[string]string
+	var mountList []string
 
 	// Only invoke CreateInstallRoot for a raw disk. This call will result in mount points being created from a raw disk
 	// into the install root. A rootfs will not have these.
 	if !isRootFS {
-		installMap, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
+		mountList, err = installutils.CreateInstallRoot(installRoot, mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, mountPointToOverlayMap)
 		if err != nil {
 			err = fmt.Errorf("failed to create install root: %s", err)
 			return
 		}
-		defer installutils.DestroyInstallRoot(installRoot, installMap, mountPointToOverlayMap)
+		defer installutils.DestroyInstallRoot(installRoot, mountList, mountPointMap, mountPointToOverlayMap)
 	}
 
 	// Install any tools required for the setup root to function
@@ -567,7 +561,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	installChroot := safechroot.NewChroot(installRoot, existingChrootDir)
 	extraInstallMountPoints := []*safechroot.MountPoint{}
 	extraDirectories := []string{}
-	err = installChroot.Initialize(emptyWorkerTar, extraDirectories, extraInstallMountPoints)
+	err = installChroot.Initialize(emptyWorkerTar, extraDirectories, extraInstallMountPoints, true)
 	if err != nil {
 		err = fmt.Errorf("failed to create install chroot: %s", err)
 		return
@@ -597,7 +591,9 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	timestamp.StopEvent(nil) // install chroot packages
 
 	// Populate image contents
-	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, installMap, mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot, diffDiskBuild, hidepidEnabled)
+	err = installutils.PopulateInstallRoot(installChroot, packagesToInstall, systemConfig, mountList, mountPointMap,
+		mountPointToFsTypeMap, mountPointToMountArgsMap, partIDToDevPathMap, partIDToFsTypeMap, isRootFS, encryptedRoot,
+		diffDiskBuild, hidepidEnabled)
 	if err != nil {
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
@@ -607,42 +603,42 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	if !isRootFS {
 		err = installutils.ConfigureDiskBootloader(systemConfig.BootType, systemConfig.Encryption.Enable,
 			systemConfig.ReadOnlyVerityRoot.Enable, systemConfig.PartitionSettings, systemConfig.KernelCommandLine,
-			installChroot, diskDevPath, installMap, encryptedRoot, readOnlyRoot)
+			installChroot, diskDevPath, mountPointMap, encryptedRoot, readOnlyRoot)
 		if err != nil {
 			err = fmt.Errorf("failed to configure boot loader: %w", err)
 			return
 		}
+	}
 
-		// Preconfigure SELinux labels now since all the changes to the filesystem should be done
-		if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
-			err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap)
-			if err != nil {
-				err = fmt.Errorf("failed to configure selinux: %w", err)
-				return
-			}
+	// Preconfigure SELinux labels now since all the changes to the filesystem should be done
+	if systemConfig.KernelCommandLine.SELinux != configuration.SELinuxOff {
+		err = installutils.SELinuxConfigure(systemConfig, installChroot, mountPointToFsTypeMap, isRootFS)
+		if err != nil {
+			err = fmt.Errorf("failed to configure selinux: %w", err)
+			return
 		}
+	}
 
-		// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
-		if systemConfig.ReadOnlyVerityRoot.Enable {
-			timestamp.StartEvent("configure DM Verity", nil)
-			var initramfsPathList []string
-			err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
-			if err != nil {
-				err = fmt.Errorf("failed to switch root to read-only: %w", err)
-				return
-			}
-			installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
-			initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
-			if err != nil || len(initramfsPathList) != 1 {
-				return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
-			}
-			err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
-			if err != nil {
-				err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
-				return
-			}
-			timestamp.StopEvent(nil) // configure DM Verity
+	// Snapshot the root filesystem as a read-only verity disk and update the initramfs.
+	if !isRootFS && systemConfig.ReadOnlyVerityRoot.Enable {
+		timestamp.StartEvent("configure DM Verity", nil)
+		var initramfsPathList []string
+		err = readOnlyRoot.SwitchDeviceToReadOnly(mountPointMap["/"], mountPointToMountArgsMap["/"])
+		if err != nil {
+			err = fmt.Errorf("failed to switch root to read-only: %w", err)
+			return
 		}
+		installutils.ReportAction("Hashing root for read-only with dm-verity, this may take a long time if error correction is enabled")
+		initramfsPathList, err = filepath.Glob(filepath.Join(installRoot, "/boot/initrd.img*"))
+		if err != nil || len(initramfsPathList) != 1 {
+			return fmt.Errorf("could not find single initramfs (%v): %w", initramfsPathList, err)
+		}
+		err = readOnlyRoot.AddRootVerityFilesToInitramfs(verityWorkingDir, initramfsPathList[0])
+		if err != nil {
+			err = fmt.Errorf("failed to include read-only root files in initramfs: %w", err)
+			return
+		}
+		timestamp.StopEvent(nil) // configure DM Verity
 	}
 
 	// Run finalize image scripts from within the installroot chroot

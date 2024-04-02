@@ -1,0 +1,22 @@
+From ca68628de86d18fda67ebcc4191c2b37891ed36e Mon Sep 17 00:00:00 2001
+From: Bas Zoetekouw <bas.zoetekouw@surfnet.nl>
+Date: Fri, 10 Aug 2018 12:52:26 +0200
+Subject: [PATCH] make sure make clean works if configure has not yet run
+
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index c8aa217..7047914 100644
+--- a/Makefile
++++ b/Makefile
+@@ -13,7 +13,7 @@
+ 
+ 
+ # local configuration options
+-include ./local.mk
++-include ./local.mk
+ 
+ 
+ # keep track of our current location

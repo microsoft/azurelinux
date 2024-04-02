@@ -47,7 +47,7 @@ func HashPassword(password string) (string, error) {
 	return hashedPassword, nil
 }
 
-func UserExists(username string, installChroot *safechroot.Chroot) (bool, error) {
+func UserExists(username string, installChroot safechroot.ChrootInterface) (bool, error) {
 	var userExists bool
 	err := installChroot.UnsafeRun(func() error {
 		_, stderr, err := shell.Execute("id", "-u", username)
@@ -70,7 +70,7 @@ func UserExists(username string, installChroot *safechroot.Chroot) (bool, error)
 	return userExists, nil
 }
 
-func AddUser(username string, hashedPassword string, uid string, installChroot *safechroot.Chroot) error {
+func AddUser(username string, hashedPassword string, uid string, installChroot safechroot.ChrootInterface) error {
 	var args = []string{username, "-m"}
 	if hashedPassword != "" {
 		args = append(args, "-p", hashedPassword)

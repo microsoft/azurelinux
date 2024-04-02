@@ -1,8 +1,8 @@
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Name:           libssh
-Version:        0.10.5
-Release:        2%{?dist}
+Version:        0.10.6
+Release:        1%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
 URL:            http://www.libssh.org
@@ -144,6 +144,9 @@ popd
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/libssh/libssh_server.config
 
 %changelog
+* Fri Dec 29 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.10.6-1
+- Upgrade to 0.10.6 to fix CVE-2023-48795
+
 * Fri May 26 2023 Vince Perri <viperri@microsoft.com> - 0.10.5-2
 - License verified.
 - Switched to out-of-source build.

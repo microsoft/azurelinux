@@ -1,8 +1,6 @@
-%global _default_patch_fuzz 2
-
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.9
+Version:        3.5.12
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -11,40 +9,11 @@ Group:          System Environment/Security
 URL:            https://github.com/etcd-io/etcd/
 Source0:        https://github.com/etcd-io/etcd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        etcd.service
-# Below is a manually created tarball, no download link.
 # We're using vendored Go modules from this tarball, since network is disabled during build time.
-#
-# How to re-build this file:
-#   1. either download etcd source tarball or git clone etcd repo from github and checkout relevant tag
-#   2. execute 'go mod vendor' in 'server', 'etcdctl' and 'etcdutl' folders 
-#      and create tarball containting 'vendor' folder for each
-#      (naming rule for tarball is 'vendor-[component].tar.gz', e.g.: 'vendor-server.tar.gz')
-#   3. create 'vendor' tarballs for dump tools
-#       a. cd 'tools/etcd-dump-db' folder, create 'go.mod' file ('go mod init go.etcd.io/etcd/tools/etcd-dump-db/v3')
-#       b. populate 'go.mod' file ('go mod tidy')
-#       c. add replace rules in 'go.mod' making sure that each etcd dependency is taken locally, 
-#          e.g. add the following (and remove them from require section):
-#          replace (
-#               go.etcd.io/etcd/api/v3 v3.5.1 => ../../api
-#               go.etcd.io/etcd/server/v3 v3.5.1 => ../../server
-#          )
-#       d. create vendor folder ('go mod vendor')
-#       e. create tarball containing 'vendor' folder and 'go.mod' and 'go.sum' files
-#          (same naming rules than described above)
-#       f. repeat above operations for 'etcd-dump-logs' folder
-#   4. create 'etcd-%{version}-vendor.tar.gz' tarball containing all tarballs created above
-#
-#   NOTES:
-#       - You require GNU tar version 1.28+.
-#       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
-#         See: https://reproducible-builds.org/docs/archives/
-#       - You can use the following tar command to create the tarballs
-#         tar --sort=name --mtime="2021-11-10 00:00Z" \
-#             --owner=0 --group=0 --numeric-owner \
-#             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
-#             -cJf [tarball name] [folder to tar]
+# In order to regenerate this tarball, download the source tarball and run:
+#   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang >= 1.16
+BuildRequires:  golang >= 1.20.13
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -145,6 +114,12 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Wed Mar 20 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.12-1
+- Upgrade to version 3.5.12 to patch CVE-2024-44487.
+
+* Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.9-2
+- Bump release to rebuild with go 1.21.6
+
 * Tue Oct 18 2023 Nicolas Guibourge <nicolasg@microsoft.com> - 3.5.9-1
 - Upgrade to 3.5.9 to match version required by kubernetes
 

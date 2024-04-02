@@ -1,5 +1,5 @@
 {
- "Signatures": {
-  "sriov-network-device-plugin-3.5.1.tar.gz": "60ea0e1dfd2eced7c6fadc13b38f80393f258dc65f14ca78b4fa2e6c22cb3433"
- }
+    "Signatures": {
+        "sriov-network-device-plugin-3.6.2.tar.gz": "3c296396e3badfa357f42fba89bb357fa0fffe9b04161b2dda2d804c5528c8ef"
+    }
 }

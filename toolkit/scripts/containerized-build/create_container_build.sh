@@ -60,7 +60,7 @@ build_worker_chroot() {
 build_tools() {
     pushd $toolkit_root
     echo "Building required tools..."
-    make go-srpmpacker go-depsearch go-grapher go-specreader REBUILD_TOOLS=y > /dev/null
+    make go-depsearch go-downloader go-grapher go-specreader go-srpmpacker REBUILD_TOOLS=y > /dev/null
     popd
 }
 
@@ -146,7 +146,7 @@ fi
 if [[ "${mode}" == "build" ]]; then
     pushd $toolkit_root
     echo "Populating Intermediate SRPMs..."
-    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" ) ]]; then build_tools; fi
+    if [[ ( ! -f "$TOOL_BINS_DIR/srpmpacker" )  || ( ! -f "$TOOL_BINS_DIR/downloader" ) ]]; then build_tools; fi
     make input-srpms SRPM_FILE_SIGNATURE_HANDLING="update" > /dev/null
     popd
 fi
@@ -164,14 +164,16 @@ if [[ "${mode}" == "build" ]]; then
 fi
 
 # ============ Setup tools ============
+if [[ "${mode}" == "build" ]]; then
 # Copy relavant build tool executables from $TOOL_BINS_DIR
-echo "Setting up tools..."
-if [[ ( ! -f "$TOOL_BINS_DIR/depsearch" ) || ( ! -f "$TOOL_BINS_DIR/grapher" ) || ( ! -f "$TOOL_BINS_DIR/specreader" ) ]]; then build_tools; fi
-if [[ ! -f "$PKGBUILD_DIR/graph.dot" ]]; then build_graph; fi
-cp $TOOL_BINS_DIR/depsearch ${tmp_dir}/
-cp $TOOL_BINS_DIR/grapher ${tmp_dir}/
-cp $TOOL_BINS_DIR/specreader ${tmp_dir}/
-cp $PKGBUILD_DIR/graph.dot ${tmp_dir}/
+    echo "Setting up tools..."
+    if [[ ( ! -f "$TOOL_BINS_DIR/depsearch" ) || ( ! -f "$TOOL_BINS_DIR/grapher" ) || ( ! -f "$TOOL_BINS_DIR/specreader" ) ]]; then build_tools; fi
+    if [[ ! -f "$PKGBUILD_DIR/graph.dot" ]]; then build_graph; fi
+    cp $TOOL_BINS_DIR/depsearch ${tmp_dir}/
+    cp $TOOL_BINS_DIR/grapher ${tmp_dir}/
+    cp $TOOL_BINS_DIR/specreader ${tmp_dir}/
+    cp $PKGBUILD_DIR/graph.dot ${tmp_dir}/
+fi
 
 # ========= Setup mounts =========
 echo "Setting up mounts..."

@@ -1,0 +1,74 @@
+From c2c922dae77f36e24d246c6e310cee0c61afc6fb Mon Sep 17 00:00:00 2001
+From: Mark Bloch <mbloch@nvidia.com>
+Date: Mon, 29 Nov 2021 16:24:28 +0200
+Subject: [PATCH 100/107] net/mlx5: Add ability to insert to specific flow
+ group
+
+If the flow table isn't an autogroup the upper driver has to create the
+flow groups explicitly. This information can't later be used when
+creating rules to insert into a specific flow group. Allow such use case.
+
+Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Reviewed-by: Maor Gottlieb <maorg@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 9 ++++++++-
+ include/linux/mlx5/fs.h                           | 1 +
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+index b628917e38e4..ebb7960ec62b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+@@ -1696,6 +1696,7 @@ static void free_match_list(struct match_list *head, bool ft_locked)
+ static int build_match_list(struct match_list *match_head,
+ 			    struct mlx5_flow_table *ft,
+ 			    const struct mlx5_flow_spec *spec,
++			    struct mlx5_flow_group *fg,
+ 			    bool ft_locked)
+ {
+ 	struct rhlist_head *tmp, *list;
+@@ -1710,6 +1711,9 @@ static int build_match_list(struct match_list *match_head,
+ 	rhl_for_each_entry_rcu(g, tmp, list, hash) {
+ 		struct match_list *curr_match;
+ 
++		if (fg && fg != g)
++			continue;
++
+ 		if (unlikely(!tree_get_node(&g->node)))
+ 			continue;
+ 
+@@ -1889,6 +1893,9 @@ _mlx5_add_flow_rules(struct mlx5_flow_table *ft,
+ 	if (!check_valid_spec(spec))
+ 		return ERR_PTR(-EINVAL);
+ 
++	if (flow_act->fg && ft->autogroup.active)
++		return ERR_PTR(-EINVAL);
++
+ 	for (i = 0; i < dest_num; i++) {
+ 		if (!dest_is_valid(&dest[i], flow_act, ft))
+ 			return ERR_PTR(-EINVAL);
+@@ -1898,7 +1905,7 @@ _mlx5_add_flow_rules(struct mlx5_flow_table *ft,
+ 	version = atomic_read(&ft->node.version);
+ 
+ 	/* Collect all fgs which has a matching match_criteria */
+-	err = build_match_list(&match_head, ft, spec, take_write);
++	err = build_match_list(&match_head, ft, spec, flow_act->fg, take_write);
+ 	if (err) {
+ 		if (take_write)
+ 			up_write_ref_node(&ft->node, false);
+diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
+index b1aad14689e3..e3bfed68b08a 100644
+--- a/include/linux/mlx5/fs.h
++++ b/include/linux/mlx5/fs.h
+@@ -224,6 +224,7 @@ struct mlx5_flow_act {
+ 	u32 flags;
+ 	struct mlx5_fs_vlan vlan[MLX5_FS_VLAN_DEPTH];
+ 	struct ib_counters *counters;
++	struct mlx5_flow_group *fg;
+ };
+ 
+ #define MLX5_DECLARE_FLOW_ACT(name) \
+-- 
+2.33.2
+

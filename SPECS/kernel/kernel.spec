@@ -3,9 +3,9 @@
 %define uname_r %{version}-%{release}
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
-# The default arguments regenerate the build-id for vmlinux in the 
+# The default arguments regenerate the build-id for vmlinux in the
 # debuginfo package causing a mismatch with the build-id for vmlinuz in
-# the kernel package. Therefore, explicilty set the relevant default 
+# the kernel package. Therefore, explicilty set the relevant default
 # settings to prevent this behavior.
 %undefine _unique_build_ids
 %undefine _unique_debug_names
@@ -27,7 +27,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        5.15.137.1
+Version:        5.15.153.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -44,6 +44,7 @@ BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
 BuildRequires:  build-essential
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -425,6 +426,57 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed Mar 27 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.153.1-1
+- Auto-upgrade to 5.15.153.1
+
+* Mon Mar 25 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.151.2-1
+- Upgrade to 5.15.151.2
+
+* Wed Mar 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.151.1-1
+- Auto-upgrade to 5.15.151.1
+
+* Sat Mar 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.150.1-1
+- Auto-upgrade to 5.15.150.1
+
+* Wed Feb 14 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.148.2-2
+- Enable Broadcom MPI3 Storage Controller Device Driver
+
+* Thu Feb 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.2-1
+- Auto-upgrade to 5.15.148.2
+
+* Tue Jan 30 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.148.1-1
+- Auto-upgrade to 5.15.148.1
+
+* Thu Jan 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.147.1-1
+- Auto-upgrade to 5.15.147.1
+
+* Thu Jan 18 2024 Rachel Menge <rachelmenge@microsoft.com> - 5.15.145.2-3
+- Enable CONFIG_X86_IOPL_IOPERM
+
+* Wed Jan 17 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.145.2-2
+- Bump release to match kernel-headers.
+
+* Tue Jan 16 2024 Gary Swalling <gaswal@microsoft.com> - 5.15.145.2-1
+- Update to 5.15.145.2
+
+* Tue Dec 05 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.139.1-1
+- Auto-upgrade to 5.15.139.1
+
+* Tue Nov 28 2023 Juan Camposeco <juanarturoc@microsoft.com> - 5.15.138.1-4
+- Enable CUSE module
+
+* Tue Nov 28 2023 Thien Trung Vuong <tvuong@microsoft.com> - 5.15.138.1-3
+- Enable CONFIG_BPF_LSM
+
+* Wed Nov 22 2023 David Daney <daviddaney@microsoft.com> - 5.15.138.1-2
+- Add IOMMU configs for aarch64
+
+* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.138.1-1
+- Auto-upgrade to 5.15.138.1
+
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.137.1-2
+- Add missing BuildRequires cpio
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.137.1-1
 - Auto-upgrade to 5.15.137.1
 
@@ -439,8 +491,8 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 - Remove CONFIG_NET_CLS_RSVP and CONFIG_NET_CLS_RSVP6 that don't apply to the new version
 
 * Thu Sep 21 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.131.1-3
-- Call grub2-mkconfig to regenerate configs only if the user has 
-    previously used grub2-mkconfig for boot configuration. 
+- Call grub2-mkconfig to regenerate configs only if the user has
+    previously used grub2-mkconfig for boot configuration.
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.15.131.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
