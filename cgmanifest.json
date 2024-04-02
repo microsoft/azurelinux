@@ -26634,8 +26634,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rdkafka",
-          "version": "0.12.0.beta.4",
-          "downloadUrl": "https://github.com/appsignal/rdkafka-ruby/archive/refs/tags/v0.12.0.beta.4.tar.gz"
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/appsignal/rdkafka-ruby/archive/refs/tags/v0.15.1.tar.gz"
         }
       }
     },
