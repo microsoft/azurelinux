@@ -5,7 +5,6 @@ package installutils
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -2215,30 +2214,9 @@ func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
 	// Remove all files and subdirectories in the tdnf cache directory, but leave
 	// the directory since it's owned by the tdnf package.
 	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
-	err = filepath.WalkDir(cacheDir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		// Ignore the cache directory itself
-		if path == cacheDir {
-			return nil
-		}
-		logger.Log.Debugf("Removing tdnf cache file (%s)", path)
-		removeErr := os.RemoveAll(path)
-		if removeErr != nil {
-			return fmt.Errorf("failed to remove tdnf cache file (%s):\n%w", path, removeErr)
-		}
-		// Do not recurse into directories, walk gets confused if we remove directories
-		// while walking them. os.RemoveAll will recursively remove the directory so no
-		// need to do it via walk.
-		if d.IsDir() {
-			return fs.SkipDir
-		} else {
-			return nil
-		}
-	})
+	err = file.RemoveDirectoryContents(cacheDir)
 	if err != nil {
-		err = fmt.Errorf("failed to scan tdnf cache directory for files to remove(%s):\n%w", cacheDir, err)
+		err = fmt.Errorf("failed to remove tdnf cache contents(%s/*):\n%w", cacheDir, err)
 		return err
 	}
 	return nil
