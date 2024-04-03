@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source2:        runuser-l
 Source3:        su
 Source4:        su-l
 Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
+Patch1:         CVE-2024-28085.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -151,6 +152,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 2.37.4-8
+- Add patch fix CVE-2024-28085
+
 * Thu Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
 - Add su-l file for PAM
 
