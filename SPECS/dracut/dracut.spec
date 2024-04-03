@@ -214,6 +214,9 @@ ln -sr %{buildroot}%{_bindir}/dracut %{buildroot}%{_sbindir}/dracut
 * Tue Apr 02 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-9
 - Cherry-picked Overlay Dracut Module changes from 3.0-dev to main.
 - PRs picked: #8332, #8481, #8597
+- PR #8332: Support multi-overlays and multi-volumes.
+- PR #8481: Remove set -ex from overlay script.
+- PR #8597: Optimization on overlay module resilient.
 
 * Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 055-8
 - Exclude overlayfs module from main dracut package
