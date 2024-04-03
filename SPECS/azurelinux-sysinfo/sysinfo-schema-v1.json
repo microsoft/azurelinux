@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://github.com/microsoft/azurelinux/tree/3.0-dev/SPECS/azurelinux-sysinfo/sysinfo-schema-v1.json",
+    "$id": "https://cblmarinerstorage.blob.core.windows.net/sources/core/sysinfo-schema-v1.json",
     "title": "Azure Linux Sysinfo Schema",
     "description": "This defines the schema for the collected Azure Linux system information",
     "type": "object",
