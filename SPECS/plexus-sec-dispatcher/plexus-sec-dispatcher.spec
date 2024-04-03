@@ -53,8 +53,9 @@ cp %{SOURCE1} .
 %license LICENSE-2.0.txt
  
 %changelog
-* Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2-1
+* Wed Apr 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0-1
 - Auto-upgrade to 2.0 - 3.0 package upgrade
+- Import prep and build section from Fedora 40 (license: MIT).
 
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.4-2
 - Rebuilt with msopenjdk-17
