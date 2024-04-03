@@ -4,7 +4,7 @@
 Summary:        Shared MIME information database
 Name:           shared-mime-info
 Version:        2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 URL:            https://freedesktop.org/Software/shared-mime-info
 Source0:        https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/%{version}/shared-mime-info-%{version}.tar.bz2
@@ -27,6 +27,7 @@ Source5:        evince-defaults.list
 Source6: https://gitlab.freedesktop.org/xdg/xdgmime/-/archive/%{xdgmime_commit}/xdgmime-%{xdgmime_commit}.tar.bz2
 # Work-around for https://bugs.freedesktop.org/show_bug.cgi?id=40354
 Patch0:         0001-Remove-sub-classing-from-OO.o-mime-types.patch
+BuildRequires:  azurelinux-rpm-macros
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gcc
@@ -35,7 +36,6 @@ BuildRequires:  git
 BuildRequires:  glib-devel
 BuildRequires:  itstool
 BuildRequires:  libxml2-devel
-BuildRequires:  mariner-rpm-macros
 BuildRequires:  meson
 BuildRequires:  xmlto
 
@@ -115,6 +115,9 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 %{_datadir}/gettext/its/shared-mime-info.loc
 
 %changelog
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2-2
+- Updating naming for 3.0 version of Azure Linux.
+
 * Tue Jan 16 2024 Bala <Balakumaran.kannan@microsoft.com> - 2.2-1
 - Update to 2.2
 

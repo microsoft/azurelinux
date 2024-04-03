@@ -1,118 +1,110 @@
-From 61a123e7dd146933570a252f147fa83666363de3 Mon Sep 17 00:00:00 2001
+From e953698dd68a09467fcaa4a390b61c580caefa96 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Mon, 27 Apr 2020 10:45:30 +0200
-Subject: [PATCH 2/3] Disable JUnit 4.8 test grouping
+Subject: [PATCH 2/4] Disable JUnit 4.8 test grouping
 
 ---
- .../surefire/junitcore/JUnitCoreProvider.java | 25 +++--------------
- .../maven/surefire/testng/TestNGExecutor.java | 27 -------------------
- 2 files changed, 3 insertions(+), 49 deletions(-)
+ .../surefire/junitcore/JUnitCoreProvider.java | 21 +++------------
+ .../maven/surefire/testng/TestNGExecutor.java | 27 +------------------
+ 2 files changed, 4 insertions(+), 44 deletions(-)
 
 diff --git a/surefire-providers/surefire-junit47/src/main/java/org/apache/maven/surefire/junitcore/JUnitCoreProvider.java b/surefire-providers/surefire-junit47/src/main/java/org/apache/maven/surefire/junitcore/JUnitCoreProvider.java
-index 7c74e8b..c86bb27 100644
+index f2f58fe..c09c51e 100644
 --- a/surefire-providers/surefire-junit47/src/main/java/org/apache/maven/surefire/junitcore/JUnitCoreProvider.java
 +++ b/surefire-providers/surefire-junit47/src/main/java/org/apache/maven/surefire/junitcore/JUnitCoreProvider.java
-@@ -25,7 +25,6 @@ import org.apache.maven.surefire.booter.CommandReader;
+@@ -39,7 +39,6 @@
  import org.apache.maven.surefire.common.junit4.JUnit4RunListener;
  import org.apache.maven.surefire.common.junit4.JUnitTestFailureListener;
  import org.apache.maven.surefire.common.junit4.Notifier;
 -import org.apache.maven.surefire.common.junit48.FilterFactory;
  import org.apache.maven.surefire.common.junit48.JUnit48Reflector;
  import org.apache.maven.surefire.common.junit48.JUnit48TestChecker;
- import org.apache.maven.surefire.providerapi.AbstractProvider;
-@@ -47,6 +46,7 @@ import java.util.Set;
- import java.util.concurrent.ConcurrentHashMap;
- 
- import static org.apache.maven.surefire.booter.CommandReader.getReader;
+ import org.junit.runner.Description;
+@@ -50,6 +49,7 @@
+ import static org.apache.maven.surefire.api.report.RunMode.RERUN_TEST_AFTER_FAILURE;
+ import static org.apache.maven.surefire.api.testset.TestListResolver.optionallyWildcardFilter;
+ import static org.apache.maven.surefire.api.util.TestsToRun.fromClass;
 +import static org.apache.maven.surefire.common.junit4.JUnit4ProviderUtil.createMatchAnyDescriptionFilter;
  import static org.apache.maven.surefire.common.junit4.JUnit4ProviderUtil.generateFailingTestDescriptions;
  import static org.apache.maven.surefire.common.junit4.JUnit4RunListenerFactory.createCustomListeners;
  import static org.apache.maven.surefire.common.junit4.Notifier.pureNotifier;
-@@ -126,7 +126,7 @@ public class JUnitCoreProvider
-             new Notifier( createRunListener( reporterFactory, consoleStream ), getSkipAfterFailureCount() );
+@@ -118,7 +118,7 @@ public RunResult invoke(Object forkTestSet) throws TestSetFailedException {
+         Notifier notifier = new Notifier(listener, getSkipAfterFailureCount());
          // startCapture() called in createRunListener() in prior to setTestsToRun()
  
 -        Filter filter = jUnit48Reflector.isJUnit48Available() ? createJUnit48Filter() : null;
 +        Filter filter = null;
  
-         if ( testsToRun == null )
-         {
-@@ -168,8 +168,7 @@ public class JUnitCoreProvider
-                 {
-                     Set<Description> failures = generateFailingTestDescriptions( testFailureListener.getAllFailures() );
+         if (testsToRun == null) {
+             setTestsToRun(forkTestSet);
+@@ -158,8 +158,7 @@ public RunResult invoke(Object forkTestSet) throws TestSetFailedException {
+                         i++) {
+                     Set<Description> failures = generateFailingTestDescriptions(testFailureListener.getAllFailures());
                      testFailureListener.reset();
--                    FilterFactory filterFactory = new FilterFactory( testClassLoader );
--                    Filter failureDescriptionFilter = filterFactory.createMatchAnyDescriptionFilter( failures );
-+                    Filter failureDescriptionFilter = createMatchAnyDescriptionFilter( failures );
-                     rerunCore.execute( testsToRun, failureDescriptionFilter );
+-                    FilterFactory filterFactory = new FilterFactory(testClassLoader);
+-                    Filter failureDescriptionFilter = filterFactory.createMatchAnyDescriptionFilter(failures);
++                    Filter failureDescriptionFilter = createMatchAnyDescriptionFilter(failures);
+                     rerunCore.execute(testsToRun, failureDescriptionFilter);
                  }
              }
-@@ -270,24 +269,6 @@ public class JUnitCoreProvider
+@@ -236,20 +235,6 @@ private boolean isParallelTypes() {
          return jUnitCoreParameters.isParallelClasses() || jUnitCoreParameters.isParallelSuites();
      }
  
--    private Filter createJUnit48Filter()
--    {
--        final FilterFactory factory = new FilterFactory( testClassLoader );
+-    private Filter createJUnit48Filter() {
+-        final FilterFactory factory = new FilterFactory(testClassLoader);
 -        Map<String, String> props = providerParameters.getProviderProperties();
--        Filter groupFilter = factory.canCreateGroupFilter( props ) ? factory.createGroupFilter( props ) : null;
--        TestListResolver methodFilter = optionallyWildcardFilter( testResolver );
+-        Filter groupFilter = factory.canCreateGroupFilter(props) ? factory.createGroupFilter(props) : null;
+-        TestListResolver methodFilter = optionallyWildcardFilter(testResolver);
 -        boolean onlyGroups = methodFilter.isEmpty() || methodFilter.isWildcard();
--        if ( onlyGroups )
--        {
+-        if (onlyGroups) {
 -            return groupFilter;
--        }
--        else
--        {
--            Filter jUnitMethodFilter = factory.createMethodFilter( methodFilter );
--            return groupFilter == null ? jUnitMethodFilter : factory.and( groupFilter, jUnitMethodFilter );
+-        } else {
+-            Filter jUnitMethodFilter = factory.createMethodFilter(methodFilter);
+-            return groupFilter == null ? jUnitMethodFilter : factory.and(groupFilter, jUnitMethodFilter);
 -        }
 -    }
 -
-     private TestsToRun scanClassPath()
-     {
-         TestsToRun scanned = scanResult.applyFilter( scannerFilter, testClassLoader );
+     private TestsToRun scanClassPath() {
+         TestsToRun scanned = scanResult.applyFilter(scannerFilter, testClassLoader);
+         return runOrderCalculator.orderTestClasses(scanned);
 diff --git a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/TestNGExecutor.java b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/TestNGExecutor.java
-index 6bc30a3..05c55f5 100644
+index 020212f..299b6bf 100644
 --- a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/TestNGExecutor.java
 +++ b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/TestNGExecutor.java
-@@ -237,36 +237,9 @@ final class TestNGExecutor
-     private static XmlMethodSelector createGroupMatchingSelector( Map<String, String> options )
-         throws TestSetFailedException
-     {
--        final String groups = options.get( ProviderParameterNames.TESTNG_GROUPS_PROP );
--        final String excludedGroups = options.get( ProviderParameterNames.TESTNG_EXCLUDEDGROUPS_PROP );
+@@ -258,32 +258,7 @@ private static XmlMethodSelector createMethodNameFilteringSelector(TestListResol
+     @SuppressWarnings("checkstyle:magicnumber")
+     private static XmlMethodSelector createGroupMatchingSelector(Map<String, String> options)
+             throws TestSetFailedException {
+-        final String groups = options.get(ProviderParameterNames.TESTNG_GROUPS_PROP);
+-        final String excludedGroups = options.get(ProviderParameterNames.TESTNG_EXCLUDEDGROUPS_PROP);
 -
--        if ( groups == null && excludedGroups == null )
-         {
-             return null;
-         }
+-        if (groups == null && excludedGroups == null) {
+-            return null;
+-        }
 -
 -        // the class is available in the testClassPath
 -        final String clazzName = "org.apache.maven.surefire.testng.utils.GroupMatcherMethodSelector";
--        try
--        {
--            Class<?> clazz = Class.forName( clazzName );
+-        try {
+-            Class<?> clazz = Class.forName(clazzName);
 -
 -            // HORRIBLE hack, but TNG doesn't allow us to setup a method selector instance directly.
--            Method method = clazz.getMethod( "setGroups", String.class, String.class );
--            method.invoke( null, groups, excludedGroups );
--        }
--        catch ( Exception e )
--        {
--            throw new TestSetFailedException( e.getMessage(), e );
+-            Method method = clazz.getMethod("setGroups", String.class, String.class);
+-            method.invoke(null, groups, excludedGroups);
+-        } catch (Exception e) {
+-            throw new TestSetFailedException(e.getMessage(), e);
 -        }
 -
 -        XmlMethodSelector xms = new XmlMethodSelector();
 -
--        xms.setName( clazzName );
+-        xms.setName(clazzName);
 -        // looks to need a high value
--        xms.setPriority( 9999 );
+-        xms.setPriority(9999);
 -
 -        return xms;
++        return null;
      }
  
-     static void run( List<String> suiteFiles, String testSourceDirectory,
+     static void run(
 -- 
-2.30.2
-
+2.43.0

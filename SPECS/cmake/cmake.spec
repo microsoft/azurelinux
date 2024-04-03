@@ -1,8 +1,8 @@
 %global major_version 3
 Summary:        Cmake
 Name:           cmake
-Version:        3.21.4
-Release:        10%{?dist}
+Version:        3.28.2
+Release:        2%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,15 +11,6 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         disableUnstableUT.patch
-# We could use --system-curl instead of patching, but unfortuately curl isn't currently available in time during the toolchain build.
-Patch1:         CVE-2022-43551.patch
-Patch2:         CVE-2023-23914-0001-share-add-sharing-of-HSTS-cache-among-handles.patch
-Patch3:         CVE-2023-23914-0002-hsts-handle-adding-the-same-host-name-again.patch
-Patch4:         CVE-2023-28322-lib-unify-the-upload-method-handling.patch
-Patch5:         CVE-2023-35945.patch
-Patch6:         CVE-2023-38545.patch
-Patch7:         CVE-2023-38546.patch
-Patch8:         cve-2023-44487.patch
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -33,6 +24,10 @@ BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  javapackages-tools
+BuildRequires:  msopenjdk-17
+%endif
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
@@ -70,6 +65,7 @@ sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{majo
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
 rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
 
+export JAVA_HOME="%{java_home}"
 bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
@@ -85,6 +81,13 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.28.2-2
+- Fix JDK test issue
+
+* Fri Feb 02 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.28.2-1
+- Auto-upgrade to 3.28.2 - Upgrades for 3.0-dev
+- Remove old CVE patches that don't apply
+
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 3.21.4-10
 - Patch vendored nghttp2 for CVE-2023-44487
 

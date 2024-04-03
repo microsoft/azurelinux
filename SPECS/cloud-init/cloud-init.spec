@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.3.3
-Release:        2%{?dist}
+Version:        23.4.3
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,8 +9,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         overrideDatasourceDetection.patch
-Patch1:         make_fallback_network_config_work.patch
+Patch:          0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -52,7 +51,7 @@ Requires:       python3-six
 Requires:       python3-xml
 Requires:       systemd
 BuildArch:      noarch
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-configobj
 BuildRequires:  python3-jsonpatch
 BuildRequires:  python3-pip
@@ -81,7 +80,7 @@ python3 setup.py build
 %install
 %{py3_install "--init-system=systemd"}
 
-python3 tools/render-cloudcfg --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
+python3 tools/render-template --variant azurelinux > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 sed -i "s,@@PACKAGED_VERSION@@,%{version}-%{release}," %{buildroot}/%{python3_sitelib}/cloudinit/version.py
 
 %if "%{_arch}" == "aarch64"
@@ -144,10 +143,14 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Mon Feb 26 2024 Dan Streetman <ddstreet@microsoft.com> - 23.4.3-1
+- update to 23.4.3
+- Use new 'azurelinux' cloud-init distro
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 23.3.3-2
 - Update the build dependency from mariner-release to azurelinux-release
 
-* Tue Oct 15 2023 Dan Streetman <ddstreet@ieee.org> - 23.3.3-1
+* Tue Oct 17 2023 Dan Streetman <ddstreet@ieee.org> - 23.3.3-1
 - Upgrade to cloud-init 23.3.3
 - Remove Photon-specific behavior of refusal to setup fallback network
 - Update Source0 to point to actual upstream URL

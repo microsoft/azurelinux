@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.14.1
-Release:        1%{?dist}
+Version:        6.6.22.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -69,8 +69,10 @@ Source0:        kernel-%{version}-%{release}.%{buildarch}.rpm
 Source1:        vmlinuz-%{uname_r}
 Source2:        sha512hmac-openssl.sh
 BuildRequires:  cpio
+BuildRequires:  grub2-rpm-macros
 BuildRequires:  openssl
 BuildRequires:  sed
+%{?grub2_configuration_requires}
 
 %description
 This package contains the Linux kernel package with kernel signed with the production key
@@ -117,23 +119,15 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -n kernel -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/initrd.img-%{uname_r}
+rm -rf /boot/initramfs-%{uname_r}.img
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun -n kernel
-if [ ! -e /boot/mariner.cfg ]
-then
-     ls /boot/linux-*.cfg 1> /dev/null 2>&1
-     if [ $? -eq 0 ]
-     then
-          list=`ls -tu /boot/linux-*.cfg | head -n1`
-          test -n "$list" && ln -sf "$list" /boot/mariner.cfg
-     fi
-fi
+%grub2_postun
 
 %post -n kernel
 /sbin/depmod -a %{uname_r}
-ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
+%grub2_post
 
 %files -n kernel
 %defattr(-,root,root)
@@ -142,8 +136,6 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/.vmlinuz-%{uname_r}.hmac
-%config(noreplace) /boot/linux-%{uname_r}.cfg
-%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 /lib/modules/%{uname_r}/.vmlinuz.hmac
@@ -153,6 +145,26 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %exclude /module_info.ld
 
 %changelog
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
+- Change aarch64 config to produce hv, xen, virtio as modules 
+- to support dracut initramfs generation on arm64 VM systems
+
+* Mon Mar 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.22.1-1
+- Auto-upgrade to 6.6.22.1
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.14.1-5
+- remove unnecessary 10_kernel.cfg grub config file
+
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-4
+- Remove /var/lib/initramfs/kernel files.
+
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 6.6.14.1-3
+- Rename initrd.img-<kver> to initramfs-<kver>.img
+
+* Tue Jan 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.14.1-2
+- Remove legacy /boot/mariner.cfg
+- Introduce /etc/default/grub.d/10_kernel.cfg
+
 * Fri Feb 09 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.14.1-1
 - Auto-upgrade to 6.6.14.1
 

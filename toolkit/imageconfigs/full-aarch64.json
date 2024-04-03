@@ -1,7 +1,7 @@
 {
     "SystemConfigs": [
         {
-            "Name": "CBL-Mariner Full",
+            "Name": "Azure Linux Full",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/developer-packages.json",
@@ -15,16 +15,24 @@
             },
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "AdditionalFiles": {
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network",
+                "../resources/imageconfigs/additionalfiles/iso_initrd/10-console-messages.conf": "/etc/sysctl.d/10-console-messages.conf"
             }
         },
         {
-            "Name": "CBL-Mariner Core",
+            "Name": "Azure Linux Core",
             "PackageLists": [
                 "packagelists/hyperv-packages.json",
                 "packagelists/core-packages-image-aarch64.json"
             ],
             "KernelOptions": {
                 "default": "kernel"
+            },
+            "AdditionalFiles": {
+                "additionalconfigs/99-dhcp-en.network": "/etc/systemd/network/99-dhcp-en.network",
+                "../resources/imageconfigs/additionalfiles/iso_initrd/10-console-messages.conf": "/etc/sysctl.d/10-console-messages.conf"
             }
         }
     ]

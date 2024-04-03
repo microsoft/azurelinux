@@ -1,67 +1,142 @@
+
+%define dist_version 3
+%define distro_release_version_no_time %(echo %{distro_release_version} | cut -d. -f 1-3)
+
 Summary:        Azure Linux release files
 Name:           azurelinux-release
-Version:        3.0
-Release:        3%{?dist}
+Version:        %{dist_version}.0
+Release:        7%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/azurelinux
-# Allows package management tools to find and set the default value
-# for the "releasever" variable from the RPM database.
-Provides:       system-release(releasever)
+
+Source1:        90-default.preset
+Source2:        90-default-user.preset
+Source3:        99-default-disable.preset
+Source4:        15-azurelinux-default.conf
+
+Provides:       system-release
+Provides:       system-release(%{version})
+
+Conflicts:      mariner-rpm-macros < 2.0-25
+
 BuildArch:      noarch
 
+BuildRequires:  systemd-bootstrap-rpm-macros
+
 %description
-Azure Linux release files such as yum configs and other %{_sysconfdir}/ release related files
+Azure Linux release files such as dnf configs and other %{_sysconfdir}/ release related files
+and systemd preset files that determine which services are enabled by default.
 
 %install
 install -d %{buildroot}%{_sysconfdir}
-install -d %{buildroot}/%{_libdir}
+install -d %{buildroot}%{_libdir}
+install -d %{buildroot}%{_rpmmacrodir}
 
-echo "Azure Linux %{mariner_release_version}" > %{buildroot}%{_sysconfdir}/azurelinux-release
-echo "AZURELINUX_BUILD_NUMBER=%{mariner_build_number}" >> %{buildroot}%{_sysconfdir}/azurelinux-release
-
-cat > %{buildroot}%{_sysconfdir}/lsb-release <<- "EOF"
-DISTRIB_ID="azurelinux"
-DISTRIB_RELEASE="%{mariner_release_version}"
-DISTRIB_CODENAME=AzureLinux
-DISTRIB_DESCRIPTION="Microsoft Azure Linux %{mariner_release_version}"
+cat <<-"EOF" > %{buildroot}%{_libdir}/azurelinux-release
+%{distribution} %{version}
+AZURELINUX_BUILD_NUMBER=%{distro_release_version_no_time}
 EOF
+ln -sv ..%{_libdir}/azurelinux-release %{buildroot}%{_sysconfdir}/azurelinux-release
 
-version_id=`echo %{mariner_release_version} | grep -o -E '[0-9]+.[0-9]+' | head -1`
-cat > %{buildroot}/%{_libdir}/os-release << EOF
-NAME="Microsoft Azure Linux"
-VERSION="%{mariner_release_version}"
+cat <<-"EOF" > %{buildroot}%{_libdir}/lsb-release
+DISTRIB_ID="azurelinux"
+DISTRIB_RELEASE="%{distro_release_version_no_time}"
+DISTRIB_CODENAME=AzureLinux
+DISTRIB_DESCRIPTION="%{distribution} %{version}"
+EOF
+ln -sv ..%{_libdir}/lsb-release %{buildroot}%{_sysconfdir}/lsb-release
+
+cat <<-"EOF" > %{buildroot}%{_libdir}/os-release
+NAME="Microsoft %{distribution}"
+VERSION="%{distro_release_version_no_time}"
 ID=azurelinux
-VERSION_ID="$version_id"
-PRETTY_NAME="Microsoft Azure Linux $version_id"
+VERSION_ID="%{version}"
+PRETTY_NAME="Microsoft %{distribution} %{version}"
 ANSI_COLOR="1;34"
 HOME_URL="%{url}"
 BUG_REPORT_URL="%{url}"
 SUPPORT_URL="%{url}"
 EOF
+ln -sv ..%{_libdir}/os-release %{buildroot}%{_sysconfdir}/os-release
 
-ln -sv ../usr/lib/os-release %{buildroot}%{_sysconfdir}/os-release
+cat <<-"EOF" > %{buildroot}%{_libdir}/issue
+Welcome to Microsoft %{distribution} %{version} (%{_arch}) - (\l)
+EOF
+ln -sv ..%{_libdir}/issue %{buildroot}%{_sysconfdir}/issue
 
-cat > %{buildroot}%{_sysconfdir}/issue <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch}) - (\l)
+cat <<-"EOF" > %{buildroot}%{_libdir}/issue.net
+Welcome to Microsoft %{distribution} %{version} (%{_arch})
+EOF
+ln -sv ..%{_libdir}/issue.net %{buildroot}%{_sysconfdir}/issue.net
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/issue.d
+
+cat <<-"EOF" > %{buildroot}%{_rpmmacrodir}/macros.dist
+# dist macros.
+
+%%__bootstrap         ~bootstrap
+%%azl                 %{dist_version}
+%%azl%{dist_version}  1
+%%dist                .azl%{dist_version}%%{?with_bootstrap:%%{__bootstrap}}
+%%dist_vendor         %{vendor}
+%%dist_name           %{distribution}
+%%dist_home_url       %{url}
+%%dist_bug_report_url %{url}
+%%dist_debuginfod_url %{url}
 EOF
 
-cat > %{buildroot}%{_sysconfdir}/issue.net <<- EOF
-Welcome to Azure Linux %{mariner_release_version} (%{_arch})
-EOF
+# Default presets for system and user
+install -Dm0644 %{SOURCE1} -t %{buildroot}%{_presetdir}/
+install -Dm0644 %{SOURCE2} -t %{buildroot}%{_userpresetdir}/
+
+# Default disable presets
+install -Dm0644 %{SOURCE3} -t %{buildroot}%{_presetdir}/
+install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
+
+# Default sysctl settings
+install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 
 %files
 %defattr(-,root,root,-)
-%config(noreplace) %{_sysconfdir}/azurelinux-release
-%config(noreplace) %{_sysconfdir}/lsb-release
-%config(noreplace) %{_libdir}/os-release
-%config(noreplace) %{_sysconfdir}/os-release
+%{_libdir}/azurelinux-release
+%{_libdir}/lsb-release
+%{_libdir}/os-release
+%{_libdir}/issue
+%{_libdir}/issue.net
+%{_sysconfdir}/azurelinux-release
+%{_sysconfdir}/lsb-release
+%{_sysconfdir}/os-release
 %config(noreplace) %{_sysconfdir}/issue
 %config(noreplace) %{_sysconfdir}/issue.net
+%dir %{_sysconfdir}/issue.d
+%{_rpmmacrodir}/macros.dist
+%{_presetdir}/*.preset
+%{_userpresetdir}/*.preset
+%{_sysctldir}/*.conf
 
 %changelog
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-7
+- add 15-azurelinux-default.conf sysctl config
+
+* Thu Mar 14 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-6
+- Enable waagent.service in 90-default.preset
+
+* Thu Mar 07 2024 Andrew Phelps <anphel@microsoft.com> - 3.0-5
+- Add 'Microsoft' to names in release files and welcome message
+- Restore full version number in release files
+
+* Thu Feb 22 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-4
+- remove %%config(noreplace) from *-release files
+- define dist_version and use local macros
+- move *-release and issue files under %%_libdir and make %%_sysconfdir symlinks
+- use consistent creation of here documents
+- add issue.d dir
+- move macros.dist into this package
+- Add default systemd presets
+
 * Thu Feb 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-3
 - Renamed mariner-release to azurelinux-release file
 - Renamed MARINER_BUILD_NUMBER property to AZURELINUX_BUILD_NUMBER

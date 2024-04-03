@@ -1,8 +1,8 @@
 %global srcname pytest-cov
 Summary:        Pytest plugin for coverage reporting
 Name:           python-%{srcname}
-Version:        2.12.1
-Release:        3%{?dist}
+Version:        4.1.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,7 @@ BuildRequires:  python%{python3_pkgversion}-coverage >= 4.4
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 # For tests
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
 
@@ -50,6 +50,9 @@ tox -e py%{python3_version_nodots} -v
 %{python3_sitelib}/*
 
 %changelog
+* Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0-1
+- Auto-upgrade to 4.1.0 - none
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.12.1-3
 - Updating source URL.
 

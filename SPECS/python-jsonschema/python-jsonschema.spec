@@ -1,7 +1,7 @@
 Summary:        An implementation of JSON Schema validation for Python
 Name:           python-jsonschema
-Version:        2.6.0
-Release:        6%{?dist}
+Version:        4.21.1
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,37 +16,66 @@ http://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %package -n     python3-jsonschema
 Summary:        An implementation of JSON Schema validation for Python
+BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-fancy-pypi-readme
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-packaging
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
 BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-vcversioner
+BuildRequires:  python3-wheel
 BuildRequires:  python3-xml
+%if %{with_check}
+BuildRequires:  python3-twisted
+BuildRequires:  python3-typing-extensions
+%endif
 Requires:       python3
 
 %description -n python3-jsonschema
 jsonschema is JSON Schema validator currently based on
 http://tools.ietf.org/html/draft-zyp-json-schema-03
 
+%pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
+
 %prep
 %autosetup -n jsonschema-%{version}
 
+# Requires a checkout of the JSON-Schema-Test-Suite
+# https://github.com/json-schema-org/JSON-Schema-Test-Suite
+rm jsonschema/tests/test_jsonschema_test_suite.py
+
+%generate_buildrequires
+%pyproject_buildrequires
+ 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-ln -s jsonschema %{buildroot}%{_bindir}/jsonschema3
+%pyproject_install
+%pyproject_save_files jsonschema
 
+%if %{with_check}
 %check
-%python3 setup test
+pip3 install jsonschema-specifications referencing
+PYTHONPATH=%{buildroot}%{python3_sitelib} trial3 jsonschema
+%endif
 
-%files -n python3-jsonschema
+%files -n python3-jsonschema -f %{pyproject_files}
 %defattr(-,root,root)
-%license COPYING
-%{python3_sitelib}/*
+%license COPYING json/LICENSE
+%doc README.rst
 %{_bindir}/jsonschema
-%{_bindir}/jsonschema3
 
 %changelog
+* Mon Feb 26 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.21.1-1
+- Auto-upgrade to 4.21.1 - Azure Linux 3.0 - package upgrades
+
 * Wed Oct 20 2021 Thomas Crain <thcrain@microsoft.com> - 2.6.0-6
 - Remove python2 package
 - Lint spec

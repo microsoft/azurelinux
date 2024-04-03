@@ -1,0 +1,78 @@
+From 6c9d9260633f2c8491985b0782cf0fbd7e51651b Mon Sep 17 00:00:00 2001
+From: Logan Gunthorpe <logang@deltatee.com>
+Date: Wed, 22 Jun 2022 14:25:11 -0600
+Subject: [PATCH 36/83] mdadm: Fix mdadm -r remove option regression
+
+The commit noted below globally adds a parameter to the -r option but missed
+the fact that -r is used for another purpose: --remove.
+
+After that commit, a command such as:
+
+  mdadm /dev/md0 -r /dev/loop0
+
+will do nothing seeing the device parameter will be consumed as a
+argument to the -r option; thus, there will only be one device
+seen one the command line, devs_found will only be 1 and nothing will
+happen.
+
+This caused the 01r5integ and 01raid6integ tests to hang indefinitely
+as mdadm did not remove the failed device. With the device not removed,
+it would not be readded. Then the loop waiting for the array status to
+change would loop forever.
+
+This commit was recently reverted, but the legitimate fix for the
+monitor operations was still not fixed. So add specific monitor
+short ops to re-fix the --monitor -r option.
+
+Fixes: 546047688e1c ("mdadm: fix coredump of mdadm --monitor -r")
+Fixes: 190dc029b141 ("Revert "mdadm: fix coredump of mdadm --monitor -r"")
+Cc: Wu Guanghao <wuguanghao3@huawei.com>
+Cc: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ ReadMe.c | 1 +
+ mdadm.c  | 1 +
+ mdadm.h  | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/ReadMe.c b/ReadMe.c
+index bec1be9a..7518a32a 100644
+--- a/ReadMe.c
++++ b/ReadMe.c
+@@ -82,6 +82,7 @@ char Version[] = "mdadm - v" VERSION " - " VERS_DATE EXTRAVERSION "\n";
+  */
+ 
+ char short_options[]="-ABCDEFGIQhVXYWZ:vqbc:i:l:p:m:n:x:u:c:d:z:U:N:sarfRSow1tye:k:";
++char short_monitor_options[]="-ABCDEFGIQhVXYWZ:vqbc:i:l:p:m:r:n:x:u:c:d:z:U:N:safRSow1tye:k:";
+ char short_bitmap_options[]=
+ 		"-ABCDEFGIQhVXYWZ:vqb:c:i:l:p:m:n:x:u:c:d:z:U:N:sarfRSow1tye:k:";
+ char short_bitmap_auto_options[]=
+diff --git a/mdadm.c b/mdadm.c
+index be40686c..d0c5e6de 100644
+--- a/mdadm.c
++++ b/mdadm.c
+@@ -227,6 +227,7 @@ int main(int argc, char *argv[])
+ 			shortopt = short_bitmap_auto_options;
+ 			break;
+ 		case 'F': newmode = MONITOR;
++			shortopt = short_monitor_options;
+ 			break;
+ 		case 'G': newmode = GROW;
+ 			shortopt = short_bitmap_options;
+diff --git a/mdadm.h b/mdadm.h
+index 974415b9..163f4a49 100644
+--- a/mdadm.h
++++ b/mdadm.h
+@@ -419,6 +419,7 @@ enum mode {
+ };
+ 
+ extern char short_options[];
++extern char short_monitor_options[];
+ extern char short_bitmap_options[];
+ extern char short_bitmap_auto_options[];
+ extern struct option long_options[];
+-- 
+2.38.1
+

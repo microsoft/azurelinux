@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
@@ -63,7 +63,7 @@ func enableLVMForEncryptedRoot(devicePath string) (volumePath string, err error)
 func createPhysicalVolume(devicePath string) (err error) {
 	_, stderr, err := shell.Execute("pvcreate", "-qy", devicePath)
 	if err != nil {
-		logger.Log.Warnf("Unable to create physical volume on %v: %v", devicePath, stderr)
+		err = fmt.Errorf("failed to create physical volume on (%v):\n%v\n%w", devicePath, stderr, err)
 		return
 	}
 

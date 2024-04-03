@@ -18,7 +18,7 @@
 Summary:        Java Programming Assistant: bytecode manipulation
 Name:           javassist
 Version:        3.30.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPL-2.1-or-later OR MPL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,7 +78,7 @@ for j in $(find . -name "*.jar"); do
 done
 
 %build
-ant -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 dist
+ant -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 dist
 
 %install
 # jars
@@ -126,6 +126,9 @@ cp -p License.html %{buildroot}/%{_docdir}/%{name}-%{version}
 %doc %{_docdir}/%{name}-%{version}/tutorial
 
 %changelog
+* Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.30.2-2
+- rebuild for msopenjdk-17
+
 * Tue Feb 13 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.30.2-1
 - Upgrade to latest version for AZL 3.0 release
 

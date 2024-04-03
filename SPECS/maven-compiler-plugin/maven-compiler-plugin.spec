@@ -1,17 +1,13 @@
 %bcond_without bootstrap
 Summary:        Maven Compiler Plugin
 Name:           maven-compiler-plugin
-Version:        3.8.1
-Release:        12%{?dist}
+Version:        3.11.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://maven.apache.org/plugins/maven-compiler-plugin
 Source0:        https://archive.apache.org/dist/maven/plugins/%{name}-%{version}-source-release.zip
-# port to plexus-languages 1.0.3
-Patch0:         0001-plexus-languages-1.0.patch
-# Taken from upstream commit: https://github.com/apache/maven-compiler-plugin/commit/116b98153ef5ce7b13c0275324baa28bca8bc887
-Patch1:         0002-MCOMPILER-359-Fix-for-NPE.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
@@ -27,8 +23,6 @@ API documentation for %{name}.
 
 %prep
 %setup -q
-%patch 0 -p1
-%patch 1 -p1
 
 # Replace path to junit in a test case with the system wide .jar
 sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar junit || find-jar javapackages-bootstrap/junit)"|' src/test/java/org/apache/maven/plugin/compiler/CompilerMojoTestCase.java
@@ -46,6 +40,9 @@ sed -i 's|localRepository,\ "junit/junit/3.8.1/junit-3.8.1.jar"|"%(find-jar juni
 %license LICENSE NOTICE
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.11.0-1
+- Auto-upgrade to 3.11.0 - azl 3.0
+
 * Thu Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 3.8.1-13
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

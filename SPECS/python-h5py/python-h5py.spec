@@ -12,27 +12,30 @@ data types and data structures and their HDF5 equivalents vastly\
 simplifies the process of reading and writing data from Python.
 Summary:        A Python interface to the HDF5 library
 Name:           h5py
-Version:        3.7.0
-Release:        4%{?dist}
+Version:        3.10.0
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.h5py.org/
 Source0:        https://files.pythonhosted.org/packages/source/h/h5py/h5py-%{version}.tar.gz
-# drop the unnecessary workaround for float128 type after
-# https://fedoraproject.org/wiki/Changes/PPC64LE_Float128_Transition
-# in F-36
-Patch0:         h5py-3.7.0-ppc-float128.patch
+
+# https://github.com/h5py/h5py/issues/2268; https://github.com/h5py/h5py/pull/2345
+# The contents of this patch are in the main line after the 3.10.0 release tag.
+# It can be removed with the next upgrade.
+Patch1:         Cython-3-support.patch
+
 BuildRequires:  gcc
 BuildRequires:  hdf5-devel
 BuildRequires:  liblzf-devel
 BuildRequires:  python%{python3_pkgversion}-Cython >= 0.23
-BuildRequires:  python%{python3_pkgversion}-cached_property
 BuildRequires:  python%{python3_pkgversion}-devel >= 3.2
-BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
-BuildRequires:  python%{python3_pkgversion}-pip
-BuildRequires:  python%{python3_pkgversion}-pkgconfig
 BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-cached_property
+BuildRequires:  python%{python3_pkgversion}-numpy >= 1.7
+BuildRequires:  python%{python3_pkgversion}-pkgconfig
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pytest
 BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  python%{python3_pkgversion}-sphinx
 
@@ -49,16 +52,14 @@ Requires:       python%{python3_pkgversion}-six
 %description -n python%{python3_pkgversion}-h5py %{_description}
 
 %prep
-%setup -q -c -n %{name}-%{version}
-%patch 0
+%autosetup -N -c -n %{name}-%{version}
+pushd %{name}-%{version}
+%autopatch -p1
+popd
 mv %{name}-%{version} serial
 cd serial
 %{__python3} api_gen.py
 cd -
-for x in mpich openmpi
-do
-  cp -al serial $x
-done
 
 
 %build
@@ -69,7 +70,11 @@ export H5PY_SYSTEM_LZF=1
 export CFLAGS="%{optflags} -fopenmp"
 cd serial
 %py3_build
+cd -
 
+# MPI
+export CC=mpicc
+export HDF5_MPI="ON"
 
 %install
 # Upstream requires a specific numpy without this
@@ -82,8 +87,6 @@ cd serial
 rm -rf %{buildroot}%{python3_sitearch}/h5py/tests
 cd -
 
-
-
 %files -n python%{python3_pkgversion}-h5py
 %license serial/licenses/*.txt
 
@@ -92,6 +95,12 @@ cd -
 %{python3_sitearch}/%{name}-%{version}-*.egg-info
 
 %changelog
+* Mon Mar 25 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 3.10.0-2
+- Fix Cython 3 support
+
+* Wed Feb 21 2024 Yash Panchal <yashpanchal@microsoft.com> - 3.10.0-1
+- Update to 3.10.0
+
 * Tue Nov 01 2022 Riken Maharjan <rmaharjan@microsoft.com> - 3.7.0-4
 - License verified
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).

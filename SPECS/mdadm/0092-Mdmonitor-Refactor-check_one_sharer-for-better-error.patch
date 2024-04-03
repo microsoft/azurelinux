@@ -1,0 +1,139 @@
+From 0a07dea8d3b78a22a59f4604a5e8da15690f28e3 Mon Sep 17 00:00:00 2001
+From: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Date: Thu, 2 Feb 2023 12:27:04 +0100
+Subject: [PATCH 092/120] Mdmonitor: Refactor check_one_sharer() for better
+ error handling
+
+Also check if autorebuild.pid is a symlink, which we shouldn't accept.
+
+Signed-off-by: Mateusz Grzonka <mateusz.grzonka@intel.com>
+Acked-by: Coly Li <colyli@suse.de>
+Signed-off-by: Jes Sorensen <jes@trained-monkey.org>
+---
+ Monitor.c | 89 ++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 62 insertions(+), 27 deletions(-)
+
+diff --git a/Monitor.c b/Monitor.c
+index 14a2dfe5..44918184 100644
+--- a/Monitor.c
++++ b/Monitor.c
+@@ -32,6 +32,7 @@
+ #include	<libudev.h>
+ #endif
+ 
++#define TASK_COMM_LEN 16
+ #define EVENT_NAME_MAX 32
+ #define AUTOREBUILD_PID_PATH MDMON_DIR "/autorebuild.pid"
+ 
+@@ -224,7 +225,7 @@ int Monitor(struct mddev_dev *devlist,
+ 	info.hostname[sizeof(info.hostname) - 1] = '\0';
+ 
+ 	if (share){
+-		if (check_one_sharer(c->scan))
++		if (check_one_sharer(c->scan) == 2)
+ 			return 1;
+ 	}
+ 
+@@ -406,39 +407,73 @@ static int make_daemon(char *pidfile)
+ 	return -1;
+ }
+ 
++/*
++ * check_one_sharer() - Checks for other mdmon processes running.
++ *
++ * Return:
++ * 0 - no other processes running,
++ * 1 - warning,
++ * 2 - error, or when scan mode is enabled, and one mdmon process already exists
++ */
+ static int check_one_sharer(int scan)
+ {
+ 	int pid;
+-	FILE *comm_fp;
+-	FILE *fp;
++	FILE *fp, *comm_fp;
+ 	char comm_path[PATH_MAX];
+-	char path[PATH_MAX];
+-	char comm[20];
+-
+-	sprintf(path, "%s/autorebuild.pid", MDMON_DIR);
+-	fp = fopen(path, "r");
+-	if (fp) {
+-		if (fscanf(fp, "%d", &pid) != 1)
+-			pid = -1;
+-		snprintf(comm_path, sizeof(comm_path),
+-			 "/proc/%d/comm", pid);
+-		comm_fp = fopen(comm_path, "r");
+-		if (comm_fp) {
+-			if (fscanf(comm_fp, "%19s", comm) &&
+-			    strncmp(basename(comm), Name, strlen(Name)) == 0) {
+-				if (scan) {
+-					pr_err("Only one autorebuild process allowed in scan mode, aborting\n");
+-					fclose(comm_fp);
+-					fclose(fp);
+-					return 1;
+-				} else {
+-					pr_err("Warning: One autorebuild process already running.\n");
+-				}
+-			}
++	char comm[TASK_COMM_LEN];
++
++	if (!is_directory(MDMON_DIR)) {
++		pr_err("%s is not a regular directory.\n", MDMON_DIR);
++		return 2;
++	}
++
++	if (access(AUTOREBUILD_PID_PATH, F_OK) != 0)
++		return 0;
++
++	if (!is_file(AUTOREBUILD_PID_PATH)) {
++		pr_err("%s is not a regular file.\n", AUTOREBUILD_PID_PATH);
++		return 2;
++	}
++
++	fp = fopen(AUTOREBUILD_PID_PATH, "r");
++	if (!fp) {
++		pr_err("Cannot open %s file.\n", AUTOREBUILD_PID_PATH);
++		return 2;
++	}
++
++	if (fscanf(fp, "%d", &pid) != 1) {
++		pr_err("Cannot read pid from %s file.\n", AUTOREBUILD_PID_PATH);
++		fclose(fp);
++		return 2;
++	}
++
++	snprintf(comm_path, sizeof(comm_path), "/proc/%d/comm", pid);
++
++	comm_fp = fopen(comm_path, "r");
++	if (!comm_fp) {
++		dprintf("Warning: Cannot open %s, continuing\n", comm_path);
++		fclose(fp);
++		return 1;
++	}
++
++	if (fscanf(comm_fp, "%15s", comm) == 0) {
++		dprintf("Warning: Cannot read comm from %s, continuing\n", comm_path);
++		fclose(comm_fp);
++		fclose(fp);
++		return 1;
++	}
++
++	if (strncmp(basename(comm), Name, strlen(Name)) == 0) {
++		if (scan) {
++			pr_err("Only one autorebuild process allowed in scan mode, aborting\n");
+ 			fclose(comm_fp);
++			fclose(fp);
++			return 2;
+ 		}
+-		fclose(fp);
++		pr_err("Warning: One autorebuild process already running.\n");
+ 	}
++	fclose(comm_fp);
++	fclose(fp);
+ 	return 0;
+ }
+ 
+-- 
+2.38.1
+

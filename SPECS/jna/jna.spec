@@ -21,7 +21,7 @@
 
 Summary:        Java Native Access
 Name:           jna
-Version:        5.10.0
+Version:        5.14.0
 Release:        1%{?dist}
 # Most of code is dual-licensed under either LGPL 2.1+ only or Apache
 # License 2.0.  WeakIdentityHashMap.java was taken from Apache CXF,
@@ -51,10 +51,10 @@ BuildRequires:  libffi-devel
 BuildRequires:  libX11-devel
 BuildRequires:  libXt-devel
 BuildRequires:  make
-BuildRequires:  msopenjdk-11
+BuildRequires:  msopenjdk-17
 BuildRequires:  objectweb-asm
 Requires:       libffi
-Requires:       msopenjdk-11
+Requires:       msopenjdk-17
 
 %description
 JNA provides Java programs easy access to native shared libraries
@@ -159,6 +159,11 @@ ant
 %license LICENSE
 
 %changelog
+* Tue Feb 20 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 5.14.0-1
+- Update from 5.10.0 to 5.14.0
+- Modifying jna_remove_clover_and_win32_native_jar.patch to remove already existing code in 5.14.0 versions
+- Modifying ant_tools_arbitrary_ow2.patch to reflect the new code added in the 5.14.0 version
+
 * Thu Feb 24 2022 Cameron Baird <cameronbaird@microsoft.com> - 5.10.0-1
 - Update source to v5.10.0
 - Update jna_remove_clover_and_win32_native_jar.patch

@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        12%{?dist}
+Release:        16%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -15,10 +15,11 @@ URL:            https://github.com/dracutdevs/dracut/wiki
 
 Source0:        https://github.com/dracutdevs/dracut/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
-Source2:        mkinitrd
 Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
+Source6:        defaults.conf
+
 Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
 # the Mariner team to allow skipping the user confirmation prompt during boot
@@ -27,7 +28,6 @@ Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
 
 Patch:          0002-disable-xattr.patch
-Patch:          0003-fix-initrd-naming-for-photon.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0007-feat-dracut.sh-support-multiple-config-dirs.patch
 Patch:          0008-fix-dracut-systemd-rootfs-generator-cannot-write-out.patch
@@ -131,13 +131,12 @@ mkdir -p %{buildroot}/boot/%{name} \
 install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracut.conf.d/40-fips.conf
 > %{buildroot}%{_sysconfdir}/system-fips
 
-install -m 0755 %{SOURCE2} %{buildroot}%{_bindir}/mkinitrd
-
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
+install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
 
-mkdir -p %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE4} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE5} %{buildroot}%{_libdir}/dracut/modules.d/20overlayfs/
+mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
+install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 
 touch %{buildroot}%{_var}/opt/%{name}/log/%{name}.log
 ln -srv %{buildroot}%{_var}/opt/%{name}/log/%{name}.log %{buildroot}%{_var}/log/
@@ -148,7 +147,6 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %files
 %defattr(-,root,root,0755)
 %{_bindir}/%{name}
-%{_bindir}/mkinitrd
 %{_bindir}/lsinitrd
 # compat symlink
 %{_sbindir}/%{name}
@@ -158,6 +156,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{dracutlibdir}/modules.d
 %{dracutlibdir}/modules.d/*
 %exclude %{_libdir}/kernel
+%exclude %{dracutlibdir}/modules.d/20overlayfs
 %{_libdir}/%{name}/%{name}-init.sh
 %{_datadir}/pkgconfig/%{name}.pc
 %{dracutlibdir}/%{name}-functions.sh
@@ -169,6 +168,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %{dracutlibdir}/skipcpio
 %{dracutlibdir}/%{name}-util
 %config(noreplace) %{_sysconfdir}/%{name}.conf
+%config %{_sysconfdir}/dracut.conf.d/00-defaults.conf
 %dir %{_sysconfdir}/%{name}.conf.d
 %dir %{dracutlibdir}/%{name}.conf.d
 %dir %{_var}/opt/%{name}/log
@@ -207,8 +207,8 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %defattr(-,root,root,0755)
 
 %files overlayfs
-%dir %{_libdir}/dracut/modules.d/20overlayfs
-%{_libdir}/dracut/modules.d/20overlayfs/*
+%dir %{dracutlibdir}/modules.d/20overlayfs
+%{dracutlibdir}/modules.d/20overlayfs/*
 
 %{_bindir}/%{name}-catimages
 %dir /boot/%{name}
@@ -216,6 +216,20 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
+- Remove x86-specific xen-acpi-processor driver from defaults
+
+* Fri Mar 22 2024 Lanze Liu <lanzeliu@microsoft.com> - 059-15
+- Exclude overlayfs module from main dracut package
+
+* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 059-14
+- Move defaults to /etc/dracut.conf.d/00-defaults.conf file
+- Add VM guest drivers to default config
+
+* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 059-13
+- Remove mkinitrd script
+- Set hostonly as default in /etc/dracut.conf
+
 * Wed Feb 07 2024 Dan Streetman <ddstreet@ieee.org> - 059-12
 - update to 059
 

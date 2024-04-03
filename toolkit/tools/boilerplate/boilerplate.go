@@ -1,23 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// A boilerplate for Mariner go tools
+// A boilerplate for Azure Linux go tools
 
 package main
 
 import (
 	"os"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/boilerplate/hello"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/exe"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/boilerplate/hello"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
-	app = kingpin.New("boilerplate", "A sample golang tool for Mariner.")
+	app = kingpin.New("boilerplate", "A sample golang tool for Azure Linux.")
 
 	logFlags      = exe.SetupLogFlags(app)
 	timestampFile = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()

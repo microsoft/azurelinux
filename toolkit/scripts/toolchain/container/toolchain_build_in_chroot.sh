@@ -76,17 +76,17 @@ popd
 rm -rf perl-5.38.0
 touch /logs/status_perl_complete
 
-echo Python-3.9.13
-tar xf Python-3.9.13.tar.xz
-pushd Python-3.9.13
+echo Python-3.12.0
+tar xf Python-3.12.0.tar.xz
+pushd Python-3.12.0
 ./configure --prefix=/usr   \
             --enable-shared \
             --without-ensurepip
 make -j$(nproc)
 make install
 popd
-rm -rf Python-3.9.13
-touch /logs/status_python39_complete
+rm -rf Python-3.12.0
+touch /logs/status_python312_temp_complete
 
 echo Texinfo-7.0.3
 tar xf texinfo-7.0.3.tar.xz
@@ -645,28 +645,51 @@ esac
 unset GCC_ARCH
 #	CFLAGS="-O2 -g" \
 #	CXXFLAGS="-O2 -g" \
-# Libffi is causing error building: find: '/usr/src/mariner/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
+# Libffi is causing error building: find: '/usr/src/azl/BUILDROOT/libffi-3.4.2-1.azl3.x86_64//usr/lib64': No such file or directory
 make -j$(nproc)
 make install
 popd
 rm -rf libffi-3.4.4
 touch /logs/status_libffi_complete
 
-echo Python-3.9.13
-tar xf Python-3.9.13.tar.xz
-pushd Python-3.9.13
+echo Python-3.12.0
+tar xf Python-3.12.0.tar.xz
+pushd Python-3.12.0
 ./configure --prefix=/usr       \
             --enable-shared     \
-            --with-system-expat \
-            --with-system-ffi
+            --with-system-expat
 make -j$(nproc)
 make install
-chmod -v 755 /usr/lib/libpython3.9.so.1.0
-chmod -v 755 /usr/lib/libpython3.so
-ln -sfv pip3.9 /usr/bin/pip3
 popd
-rm -rf Python-3.9.13
-touch /logs/status_python39_complete
+rm -rf Python-3.12.0
+touch /logs/status_python312_complete
+
+echo Flit-Core-3.9.0
+tar xf flit_core-3.9.0.tar.gz
+pushd flit_core-3.9.0
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --no-user --find-links dist flit_core
+popd
+rm -rf flit_core-3.9.0
+touch /logs/status_flit_core_390_complete
+
+echo wheel-0.42.0
+tar xf wheel-0.42.0.tar.gz
+pushd wheel-0.42.0
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --find-links dist wheel
+popd
+rm -rf wheel-0.42.0
+touch /logs/status_wheel_0420_complete
+
+echo setuptools-69.0.3
+tar xf setuptools-69.0.3.tar.gz
+pushd setuptools-69.0.3
+pip3 wheel -w dist --no-cache-dir --no-build-isolation --no-deps $PWD
+pip3 install --no-index --find-links dist setuptools
+popd
+rm -rf setuptools-69.0.3
+touch /logs/status_setuptools_6903_complete
 
 echo Coreutils-9.4
 tar xf coreutils-9.4.tar.xz
@@ -933,7 +956,7 @@ popd
 rm -rf "$DEBUGEDIT_WITH_VERSION"
 touch /logs/status_debugedit_complete
 
-RPM_WITH_VERSION=rpm-4.18.1
+RPM_WITH_VERSION=rpm-4.18.2
 RPM_FOLDER="$RPM_WITH_VERSION"
 echo $RPM_WITH_VERSION
 tar xf "$RPM_WITH_VERSION".tar.bz2
@@ -951,7 +974,7 @@ sed -iE '/Always build/,+16 d' Makefile.am
         --enable-ndb \
         --without-selinux \
         --with-crypto=openssl \
-        --with-vendor=mariner
+        --with-vendor=azl
 make -j$(nproc)
 make install
 install -d /var/lib/rpm
@@ -960,12 +983,6 @@ rpm --initdb --root=/ --dbpath /var/lib/rpm
 popd
 
 rm -rf "$RPM_FOLDER"
-
-# Fix the interpreter path for python replacing the first line
-sed -i '1 s:.*:#!/usr/bin/python3:' pythondistdeps.py
-install -p pythondistdeps.py /usr/lib/rpm/pythondistdeps.py
-install -p pythondeps.sh /usr/lib/rpm/pythondeps.sh
-install -p python.attr /usr/lib/rpm/fileattrs/python.attr
 
 touch /logs/status_rpm_complete
 

@@ -4,7 +4,7 @@
 Summary:        C++ fast alternative to backtracking RE engines
 Name:           re2
 Version:        %{shortver}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,7 @@ BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  cmake
 BuildRequires:  abseil-cpp-devel
-%if %{with_check}
+%if 0%{?with_check}
 BuildRequires:  gtest-devel
 BuildRequires:  gmock-devel
 BuildRequires:  gbenchmark-devel
@@ -52,7 +52,7 @@ you will need to install %{name}-devel.
   -DOVERRIDE_INSTALL_PREFIX=/usr \
   -DCMAKE_COLOR_MAKEFILE:BOOL=OFF \
   -DINSTALL_LIBDIR:PATH=%{_libdir} \
-%if %{with_check}
+%if 0%{?with_check}
   -DRE2_BUILD_TESTING:BOOL=ON \
 %endif
   "-GUnix Makefiles"
@@ -83,6 +83,9 @@ rm -fv %{buildroot}%{_libdir}/libre2.a
 %{_libdir}/cmake/re2/*.cmake
 
 %changelog
+* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 20240201-2
+- Bumping release to rebuild with latest 'abseil-cpp'.
+
 * Wed Jan 31 2024 Jon Slobodzian <joslobo@microsoft.com> - 20240201-1
 - Upgrading for Mariner 3.0
 - Removed unnecessary patch file

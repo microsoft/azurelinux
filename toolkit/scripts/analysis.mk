@@ -6,7 +6,7 @@
 #	- Run check for ABI changes of built packages.
 #	- Run check for .so files version change of built packages.
 
-# Requires DNF on Mariner / yum and yum-utils on Ubuntu.
+# Requires DNF on Azure Linux / yum and yum-utils on Ubuntu.
 
 # A folder with sodiff-related artifacts
 SODIFF_OUTPUT_FOLDER=$(BUILD_DIR)/sodiff
@@ -17,11 +17,11 @@ BUILD_SUMMARY_FILE=$(SODIFF_OUTPUT_FOLDER)/build-summary.csv
 BUILT_PACKAGES_FILE=$(SODIFF_OUTPUT_FOLDER)/built-packages.txt
 # Repositories that SODIFF runs the checks against
 ifneq ($(build_arch),x86_64)
-# Microsoft repository only exists for x86_64 - skip that .repo file;
+# Microsoft OSS repository only exists for x86_64 - skip that .repo file;
 # otherwise package manager will signal an error due to being unable to make contact
-SODIFF_REPO_SOURCES="mariner-official-base.repo"
+SODIFF_REPO_SOURCES="azurelinux-official-base.repo"
 else
-SODIFF_REPO_SOURCES="mariner-official-base.repo mariner-microsoft.repo"
+SODIFF_REPO_SOURCES="azurelinux-official-base.repo azurelinux-ms-oss.repo"
 endif
 
 SODIFF_REPO_FILE=$(SCRIPTS_DIR)/sodiff/sodiff.repo
@@ -70,14 +70,14 @@ fake-built-packages-list: | $(SODIFF_OUTPUT_FOLDER)
 sodiff-repo: $(SODIFF_REPO_FILE)
 
 $(SODIFF_REPO_FILE):
-	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/mariner-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
+	echo $(SODIFF_REPO_SOURCES) | sed -E 's:([^ ]+[.]repo):$(SPECS_DIR)/azurelinux-repos/\1:g' | xargs cat > $(SODIFF_REPO_FILE)
 
-# sodiff-setup: populate gpg-keys from SPECS/mariner-repos for mariner official repos for ubuntu
+# sodiff-setup: populate gpg-keys from SPECS/azurelinux-repos for mariner official repos for ubuntu
 .PHONY: sodiff-setup
 sodiff-setup:
 	mkdir -p /etc/pki/rpm-gpg
-	cp $(SPECS_DIR)/mariner-repos/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/
-	cp $(SPECS_DIR)/mariner-repos/MICROSOFT-METADATA-GPG-KEY /etc/pki/rpm-gpg/
+	cp $(SPECS_DIR)/azurelinux-repos/MICROSOFT-RPM-GPG-KEY /etc/pki/rpm-gpg/
+	cp $(SPECS_DIR)/azurelinux-repos/MICROSOFT-METADATA-GPG-KEY /etc/pki/rpm-gpg/
 
 # sodiff-check: runs check in a mariner container. Each failed package will be listed in $(SODIFF_OUTPUT_FOLDER).
 .SILENT .PHONY: sodiff-check

@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+from pathlib import Path
 from pyrpm.spec import Spec
 from os.path import dirname, realpath
 
@@ -19,6 +20,10 @@ invalid_distribution_tag_regex = re.compile(
 # For more info, see: https://rpm-software-management.github.io/rpm/manual/spec.html.
 invalid_patch_macro_regex = re.compile(
     r'^\s*%patch\d', re.MULTILINE)
+
+# Check for '%patch' macros not using the '-P' flag.
+invalid_toolchain_patch_macro = re.compile(
+    r'^\s*%patch((?!-P\s+\d+).)*$', re.MULTILINE)
 
 license_regex = re.compile(
     r"\b(license verified|verified license)\b", re.IGNORECASE)
@@ -65,7 +70,7 @@ ERROR: use of deprecated '%patch[number]' format (no space between '%patch' and 
 
 
 def check_release_tag(spec_path: str):
-    """Checks if the 'Release' tag is in one of CBL-Mariner's expected formats. """
+    """Checks if the 'Release' tag is in one of Azure Linux's expected formats. """
     spec = Spec.from_file(spec_path)
 
     if valid_release_tag_regex.match(spec.release) is None:
@@ -121,7 +126,31 @@ ERROR: no valid source attribution.
     return False
 
 
-def check_spec(spec_path):
+def check_toolchain_patch_lines(spec_path: str, toolchain_specs: set):
+    """Checks if a toolchain spec file applies patches using the '%patch -P [number]' format.
+       RPM < 4.18 will fail building a spec otherwise and toolchain specs are parsed directly on the host,
+       which may have older versions of RPM.
+    """
+
+    if Path(spec_path).stem not in toolchain_specs:
+        return True
+
+    with open(spec_path) as file:
+        contents = file.read()
+        
+    if invalid_toolchain_patch_macro.search(contents) is not None:
+        print(f"""
+ERROR: detected a toolchain spec with invalid '%patch' macros.
+
+    Toolchain specs may only use the '%patch -P [number]' format.
+    Using '%patch[number]' or '%patch' without the '-P' flag will cause RPM < 4.18 to fail building the spec.
+""")
+        return False
+
+    return True
+
+
+def check_spec(spec_path, toolchain_specs):
     spec_correct = True
 
     print(f"Checking {spec_path}")
@@ -140,23 +169,33 @@ def check_spec(spec_path):
 
     if not check_license_verification(spec_path):
         spec_correct = False
+    
+    if not check_toolchain_patch_lines(spec_path, toolchain_specs):
+        spec_correct = False
 
     return spec_correct
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="Tool for checking if an RPM spec file follows CBL-Mariner's guidelines.")
-    parser.add_argument('specs',
+        description="Tool for checking if an RPM spec file follows Azure Linux's guidelines.")
+    parser.add_argument('--toolchain_specs',
+                        metavar='toolchain_specs',
+                        dest='toolchain_specs',
+                        help='a list of toolchain specs')
+    parser.add_argument('--specs',
                         metavar='spec_path',
+                        dest='specs',
                         type=argparse.FileType('r'),
                         nargs='+',
                         help='path to an RPM spec file')
     args = parser.parse_args()
+    
+    toolchain_specs = set(args.toolchain_specs.split())
 
     specs_correct = True
     for spec in args.specs:
-        if not check_spec(spec.name):
+        if not check_spec(spec.name, toolchain_specs):
             specs_correct = False
 
     if not specs_correct:

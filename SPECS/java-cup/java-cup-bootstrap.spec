@@ -21,14 +21,14 @@
 Summary:        LALR Parser Generator in Java
 Name:           java-cup-bootstrap
 Version:        0.11
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Url:            http://www2.cs.tum.edu/projects/cup/
 # TODO the version of our 11a source is no longer published
-Source0:        %{_mariner_sources_url}/develop.tar.bz2
+Source0:        %{_distro_sources_url}/develop.tar.bz2
 Source1:        java-cup-generated-files.tar.bz2
 Source2:        java-cup.license
 # From          http://www2.cs.tum.edu/projects/cup/
@@ -65,7 +65,7 @@ java-cup is a LALR Parser Generator in Java. With v0.11, you can:
 %setup -q -T -D -a 1 -n develop
 %patch 2 -p1
 %patch 4 -p1
-perl -pi -e 's/1\.2/1.6/g' build.xml
+perl -pi -e 's/1\.2/1.8/g' build.xml
 mkdir -p classes dist
 cp %{SOURCE2} license.txt
 
@@ -101,6 +101,12 @@ install -p -m 755 %{SOURCE1} %{buildroot}%{_bindir}/%{real_name}
 %{_javadir}/*
 
 %changelog
+* Tue Feb 27 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.11-33
+- rebuild with msopenjdk-17
+
+* Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-33
+- Updating naming for 3.0 version of Azure Linux.
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.11-32
 - Fixing source URL.
 

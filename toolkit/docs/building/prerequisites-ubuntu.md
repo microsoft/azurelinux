@@ -3,7 +3,7 @@
 
 ## Requirements were validated on `Ubuntu 22.04`
 
-This page lists host machine requirements for building with the CBL-Mariner toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
+This page lists host machine requirements for building with the Azure Linux toolkit. They cover building the toolchain, packages, and images on an Ubuntu 22.04 host.
 
 ```bash
 sudo apt-get update
@@ -25,7 +25,8 @@ sudo apt -y install \
     rpm \
     tar \
     wget \
-    xfsprogs
+    xfsprogs \
+    zstd
 
 # Fix go 1.20 link
 sudo ln -vsf /usr/lib/go-1.20/bin/go /usr/bin/go

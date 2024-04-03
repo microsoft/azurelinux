@@ -68,10 +68,10 @@ Summary:        Firewalld directory layout and rpm macros
 %description -n firewalld-filesystem
 This package provides directories and rpm macros which
 are required by other packages that add firewalld configuration files.
-	
+
 %package -n firewalld-test
 Summary: Firewalld testsuite
- 
+
 %description -n firewalld-test
 This package provides the firewalld testsuite.
 
@@ -1070,7 +1070,7 @@ fi
 - Fixed wrong default zone names for server and workstation (RHBZ#1120296)
 
 * Tue Jul  8 2014 Thomas Woerner <twoerner@redhat.com> - 0.3.10-4
-- renamed fedora specific zones to FedoraServer and FedoraWorkstation for 
+- renamed fedora specific zones to FedoraServer and FedoraWorkstation for
   zone name limitations (length and allowed chars)
 
 * Mon Jul  7 2014 Thomas Woerner <twoerner@redhat.com> - 0.3.10-3
@@ -1486,12 +1486,12 @@ fi
 - firewall-cmd: created alias --change-zone for --change-interface
 - firewall-cmd man page updates (RHBZ#806511)
 - Merged branch 'build-cleanups'
-- dropped call to autogen.sh in build stage, not needed anymore due to 
+- dropped call to autogen.sh in build stage, not needed anymore due to
   'build-cleanups' merge
 
 * Thu Dec 13 2012 Thomas Woerner <twoerner@redhat.com> 0.2.11-2
 - require pygobject3-base instead of pygobject3 (no cairo needed) (RHBZ#874378)
-- fixed dependencies of firewall-config to use gtk3 with pygobject3-base and 
+- fixed dependencies of firewall-config to use gtk3 with pygobject3-base and
   not pygtk2
 
 * Tue Dec 11 2012 Thomas Woerner <twoerner@redhat.com> 0.2.11-1
@@ -1594,7 +1594,7 @@ fi
 - New firewall-convert-scfw-config config script
 
 * Fri Apr 20 2012 Thomas Woerner <twoerner@redhat.com> 0.2.5-1
-- Fixed traceback in firewall-cmd for failed or canceled authorization, 
+- Fixed traceback in firewall-cmd for failed or canceled authorization,
   return proper error codes, new error codes NOT_RUNNING and NOT_AUTHORIZED
 - Enhanced firewalld service file (RHBZ#806868) and (RHBZ#811240)
 - Fixed duplicates in zone after reload, enabled timed settings after reload
@@ -1613,7 +1613,7 @@ fi
 - Add Type=dbus and BusName to service file (RHBZ#811240)
 
 * Fri Mar 16 2012 Thomas Woerner <twoerner@redhat.com> 0.2.4-1
-- fixed firewalld.conf save exception if no temporary file can be written to 
+- fixed firewalld.conf save exception if no temporary file can be written to
   /etc/firewalld/
 
 * Thu Mar 15 2012 Thomas Woerner <twoerner@redhat.com> 0.2.3-1
@@ -1685,7 +1685,7 @@ fi
 * Mon Feb  6 2012 Thomas Woerner <twoerner@redhat.com> 0.2.0-1
 - version 0.2.0 with new FirewallD1 D-BUS interface
 - supports zones with a default zone
-- new direct interface as a replacement of the partial virt interface with 
+- new direct interface as a replacement of the partial virt interface with
   additional passthrough functionality
 - dropped custom rules, use direct interface instead
 - dropped trusted interface funcionality, use trusted zone instead

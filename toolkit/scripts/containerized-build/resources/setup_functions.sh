@@ -12,13 +12,24 @@ IS_REPO_ENABLED=false
 
 # General setup
 
-## Mariner macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
+## Azure Linux macro files used during spec parsing (as defined in toolkit/scripts/rpmops.sh)
 DEFINES=(-D "with_check 1")
 MACROS=()
-for macro_file in "$SPECS_DIR"/mariner-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
+for macro_file in "$SPECS_DIR"/azurelinux-rpm-macros/macros* "$SPECS_DIR"/pyproject-rpm-macros/macros.pyproject "$SPECS_DIR"/perl/macros.perl
 do
   MACROS+=("--load=$macro_file")
 done
+
+# Extra arguments for tdnf
+TDNF_ARGS=(--releasever=$CONTAINERIZED_RPMBUILD_AZL_VERSION)
+
+# TODO Remove once PMC is available for 3.0
+if [[ $CONTAINERIZED_RPMBUILD_AZL_VERSION == "3.0" ]]; then
+    repo_file_src="/azl_setup_dir/azl-3_repo"
+    repo_name=$(awk -F'[][]' '/^\[/{print $2}' "${repo_file_src}")
+    TDNF_ARGS+=("--disablerepo=*" "--enablerepo=${repo_name}")
+    mv "${repo_file_src}" /etc/yum.repos.d/azl-3.repo
+fi
 
 ## Create $SOURCES_DIR
 mkdir -p $SOURCES_DIR
@@ -55,8 +66,8 @@ build_pkg() {
 
 # Show help on useful commands
 show_help() {
-    echo -e "`cat /mariner_setup_dir/welcome.txt`"
-    cat /mariner_setup_dir/mounts.txt
+    echo -e "`cat /azl_setup_dir/welcome.txt`"
+    cat /azl_setup_dir/mounts.txt
     echo -e "* \n* \e[31mLocal repo information:\e[0m"
     if [[ "${IS_REPO_ENABLED}" == "true" ]]; then
         echo -e "*\tLocal repo is enabled. Package dependencies will be installed from $RPMS_DIR, /repo and upstream server"
@@ -66,7 +77,7 @@ show_help() {
     echo "******************************************************************************************"
 }
 
-# Refresh repo cache with newly built RPM, use Mariner specific DEFINES
+# Refresh repo cache with newly built RPM, use Azure Linux specific DEFINES
 rpmbuild() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
@@ -111,9 +122,9 @@ enable_local_repo() {
 # Update dependency graph using build tools
 update_specs_metadata() {
     # update specs.json
-    /mariner_setup_dir/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/mariner_setup_dir/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
+    /azl_setup_dir/specreader --dir=$SPECS_DIR  --srpm-dir="/mnt/INTERMEDIATE_SRPMS/" --output=/azl_setup_dir/specs.json --dist-tag="containerized" --rpm-dir="/mnt/RPMS/"
     # update graph.dot
-    /mariner_setup_dir/grapher --input=/mariner_setup_dir/specs.json --output=/mariner_setup_dir/graph.dot
+    /azl_setup_dir/grapher --input=/azl_setup_dir/specs.json --output=/azl_setup_dir/graph.dot
 }
 
 # Install package dependencies using depsearch tool
@@ -132,37 +143,52 @@ install_dependencies_depsearch() {
 get_pkg_dependency() {
     local PKG=("$@")
     if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
-    /mariner_setup_dir/depsearch --input=/mariner_setup_dir/graph.dot  --packages=$PKG --reverse
+    /azl_setup_dir/depsearch --input=/azl_setup_dir/graph.dot  --packages=$PKG --reverse
 }
 
 # Install package dependencies listed as BuildRequires in spec
 install_dependencies() {
-    local PKG=("$@")
-    if [ -z "$PKG" ]; then echo "Please provide pkg name"; return; fi
+    # Accept a single argument, which is a pattern to find spec files.
+    if [ "$#" -ne 1 ]; then
+        echo "Usage: $0 <pkg_pattern>"
+        return 1
+    fi
+
+    local PKG="$1"
+
     echo "-------- installing build dependencies ---------"
-    spec_file=$SPECS_DIR/$PKG/$PKG.spec
-    dep_list=$(grep "BuildRequires:" $spec_file | cut -d ':' -f 2)
-    for dependency in $dep_list
+
+    # Find all spec files for the package pattern given.
+    spec_file_pattern=$SPECS_DIR/$PKG/$PKG.spec
+    echo "using spec file pattern: '$spec_file_pattern'"
+    spec_files=($spec_file_pattern)
+
+    # Install dependencies for each spec file found, preserving tdnf error codes.
+    echo "found ${#spec_files[@]} spec files; installing dependencies for each spec file sequentially"
+    exit_code=0
+    for spec_file in "${spec_files[@]}"
     do
-        tdnf install -y $dependency 2>&1
+        echo "installing dependencies for spec file: '$spec_file'"
+
+        # Get the list of dependencies from the spec file.
+        mapfile -t dep_list < <(rpmspec -q --buildrequires $spec_file)
+
+        # Install all the dependencies.
+        tdnf install -y "${dep_list[@]}" || exit_code=$?
     done
+
+    return $exit_code
 }
 
-# use Mariner specific DEFINES
+# use Azure Linux specific DEFINES
 rpmspec() {
     local args=("$@")
     command "$FUNCNAME" "${DEFINES[@]}" "${args[@]}"
 }
 
-# TODO: Remove when PMC is available for 3.0
-# Add mariner 3.0 Daily Build Repo
-enable_mariner3_repo() {
+# use proper tdnf arguments
+tdnf() {
     local args=("$@")
-    alias tdnf='tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build'
-    mv /mariner_setup_dir/mariner-3_repo /etc/yum.repos.d/mariner-3.repo
-    echo "Installing vim, git and other packages ..."
-    tdnf  --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy vim git
-    if [[ ! -z "$@" ]]; then
-        tdnf --releasever=3.0 --disablerepo=* --enablerepo=mariner-3.0-daily-build install -qy "${args[@]}"
-    fi
+    command "$FUNCNAME" "${TDNF_ARGS[@]}" "${args[@]}"
+
 }

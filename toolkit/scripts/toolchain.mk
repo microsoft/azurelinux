@@ -19,9 +19,7 @@ toolchain_downloads_logs_dir = $(toolchain_logs_dir)/downloads
 toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest.txt
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
-toolchain_sources_dir = $(populated_toolchain_chroot)/usr/src/mariner/SOURCES
-populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/mariner/RPMS
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
+populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/azl/RPMS
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
@@ -29,7 +27,7 @@ final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name '*.sh') \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
-
+toolchain_spec_list := $(call shell_real_build_only, $(SCRIPTS_DIR)/toolchain/list_toolchain_specs.sh $(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh)
 TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
@@ -61,7 +59,7 @@ endif
 
 clean: clean-toolchain
 
-clean-toolchain:
+clean-toolchain: clean-toolchain-rpms
 	$(SCRIPTS_DIR)/safeunmount.sh "$(toolchain_build_dir)"
 	rm -rf $(toolchain_build_dir)
 	rm -rf $(toolchain_local_temp)
@@ -85,8 +83,8 @@ clean-toolchain-containers:
 	$(SCRIPTS_DIR)/toolchain/toolchain_clean.sh $(BUILD_DIR)
 
 clean-toolchain-rpms:
-	for f in $(toolchain_rpms_buildarch); do rm -vf $(RPMS_DIR)/$(build_arch)/$$f; done
-	for f in $(toolchain_rpms_noarch); do rm -vf $(RPMS_DIR)/noarch/$$f; done
+	@for f in $(toolchain_out_rpms); do rm -vf $$f; done
+	rm -rvf $(TOOLCHAIN_RPMS_DIR)
 
 copy-toolchain-rpms:
 	for f in $(toolchain_rpms_buildarch); do cp -vf $(TOOLCHAIN_RPMS_DIR)/$(build_arch)/$$f $(RPMS_DIR)/$(build_arch); done
@@ -98,29 +96,10 @@ copy-toolchain-rpms:
 
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
-check-aarch64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			aarch64
-check-x86_64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			$(toolchain_spec_list) \
-			$(SPECS_DIR) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(DIST_TAG) \
-			x86_64
-
-# Generate a list of a specs built as part of the toolchain.
-$(toolchain_spec_list): $(toolchain_files)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./list_toolchain_specs.sh \
-			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
-			$(toolchain_spec_list)
+check-aarch64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "aarch64"
+check-x86_64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "x86_64"
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line
@@ -219,21 +198,22 @@ $(final_toolchain): $(no_repo_acl) $(raw_toolchain) $(toolchain_rpms_rehydrated)
 	$(if $(filter y,$(INCREMENTAL_TOOLCHAIN)),,rm -rf $(populated_toolchain_chroot))
 	cd $(SCRIPTS_DIR)/toolchain && \
 		./build_mariner_toolchain.sh \
-			$(DIST_TAG) \
-			$(BUILD_NUMBER) \
-			$(RELEASE_VERSION) \
-			$(BUILD_DIR) \
-			$(RPMS_DIR) \
-			$(SPECS_DIR) \
-			$(RUN_CHECK) \
-			$(TOOLCHAIN_MANIFESTS_DIR) \
-			$(INCREMENTAL_TOOLCHAIN) \
-			$(BUILD_SRPMS_DIR) \
-			$(SRPMS_DIR) \
-			$(toolchain_from_repos) \
-			$(TOOLCHAIN_MANIFEST) \
-			$(go-bldtracker) \
-			$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl && \
+			"$(DIST_TAG)" \
+			"$(DIST_VERSION_MACRO)" \
+			"$(BUILD_NUMBER)" \
+			"$(RELEASE_VERSION)" \
+			"$(BUILD_DIR)" \
+			"$(RPMS_DIR)" \
+			"$(SPECS_DIR)" \
+			"$(RUN_CHECK)" \
+			"$(TOOLCHAIN_MANIFESTS_DIR)" \
+			"$(INCREMENTAL_TOOLCHAIN)" \
+			"$(BUILD_SRPMS_DIR)" \
+			"$(SRPMS_DIR)" \
+			"$(toolchain_from_repos)" \
+			"$(TOOLCHAIN_MANIFEST)" \
+			"$(go-bldtracker)" \
+			"$(TIMESTAMP_DIR)/build_mariner_toolchain.jsonl" && \
 	$(if $(filter y,$(UPDATE_TOOLCHAIN_LIST)), ls -1 $(toolchain_build_dir)/built_rpms_all > $(MANIFESTS_DIR)/package/toolchain_$(build_arch).txt && ) \
 	touch $@
 
