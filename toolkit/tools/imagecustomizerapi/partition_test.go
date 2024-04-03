@@ -124,27 +124,27 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	assert.ErrorContains(t, err, "ASCII")
 }
 
-func TestPartitionIsValidGoodFlag(t *testing.T) {
+func TestPartitionIsValidGoodType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
 		End:   nil,
-		Flags: []PartitionFlag{"esp"},
+		Type:  PartitionTypeESP,
 	}
 
 	err := partition.IsValid()
 	assert.NoError(t, err)
 }
 
-func TestPartitionIsValidBadFlag(t *testing.T) {
+func TestPartitionIsValidBadType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
 		End:   nil,
-		Flags: []PartitionFlag{"a"},
+		Type:  PartitionType("a"),
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partitionFlag")
+	assert.ErrorContains(t, err, "unknown partition type")
 }
