@@ -1,11 +1,11 @@
 [Unit]
-Description=Mariner Metrics Service
+Description=Azure Linux Sysinfo Service
 After=cloud-init.target multi-user.target
 
 [Service]
 Environment=PYTHONUNBUFFERED=1
 Type=simple
-ExecStart=/usr/bin/python3 /usr/local/bin/collect-mariner-metrics.py "livecd"
+ExecStart=/usr/bin/python3 /usr/local/bin/collect-sysinfo.py
 StandardOutput=journal
 StandardError=journal
 

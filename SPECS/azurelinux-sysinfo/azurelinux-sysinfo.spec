@@ -1,30 +1,23 @@
-Summary:        Package to TODO
+Summary:        Package to deploy azurelinux-sysinfo service
 Name:           azurelinux-sysinfo
 Version:        %{azl}.0
-Release:        5%{?dist}
-License:        MIT
+Release:        9%{?dist}
+License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            https://aka.ms/mariner
-Source0: collect-mariner-metrics.py
-Source1: mariner_metrics_schema_v1.json
-Source2: mariner-metrics-livecd.service
+URL:            https://aka.ms/azurelinux
+Source0: collect-sysinfo.py
+Source1: sysinfo-schema-v1.json
+Source2: azurelinux-sysinfo.service
 Requires: systemd
-Requires: selinux-policy
-# Requires: python-attrs
 Requires: python3-psutil
-# Apr 03 15:33:47 mariner-vm python3[1576]:     from attrs import define
-# Apr 03 15:33:47 mariner-vm python3[1576]: ModuleNotFoundError: No module named 'attrs'
-BuildRequires: systemd 
-BuildRequires: selinux-policy
-# do we need this in requires or buildrequires? find out through trial and error
 
 %description
-This is my first RPM package, which does nothing.
-
-%prep
-# we have no source, so nothing here
+Deploys a systemd service that collects system information related to the device, operating system, cloud-init, boot 
+time, resource utilization, installed packages, and SELinux mode. Collected information is written in JSON format to
+a log file on the user's system for easy access and analysis. The systemd service runs at boot time if installed during 
+image creation.
 
 %install
 # Copy collection python script to /usr/local/bin/
@@ -40,41 +33,17 @@ mkdir -p %{buildroot}/etc/systemd/system/
 install -m 755 %{SOURCE2} %{buildroot}/etc/systemd/system/
 
 %files
-/usr/local/bin/collect-mariner-metrics.py
-/usr/local/data/mariner_metrics_schema_v1.json
-/etc/systemd/system/mariner-metrics-livecd.service
+/usr/local/bin/collect-sysinfo.py
+/usr/local/data/sysinfo-schema-v1.json
+/etc/systemd/system/azurelinux-sysinfo.service
 
 %post
-# selinux policies for service needed:
-FILE10=/tmp/selinuxpolicies.cil
-cat << EOF > $FILE10
-(allow semanage_t rpm_script_tmp_t (file (read open getattr map)))
-(allow systemd_analyze_t sysctl_kernel_t (dir (search)))
-(allow systemd_analyze_t locale_t (dir (search)))
-(allow systemd_analyze_t init_runtime_t (dir (search)))
-(allow systemd_analyze_t sysctl_kernel_t (file (read)))
-(allow systemd_analyze_t locale_t (file (read)))
-(allow systemd_analyze_t systemd_analyze_t (capability (net_admin)))
-(allow systemd_analyze_t init_t (unix_stream_socket (connectto)))
-(allow systemd_analyze_t system_dbusd_runtime_t (dir (search)))
-(allow systemd_analyze_t security_t (filesystem (getattr)))
-(allow systemd_analyze_t selinux_config_t (dir (search)))
-(allow systemd_analyze_t init_t (system (status)))
-(allow systemd_analyze_t init_t (service (status)))
-(allow systemd_analyze_t systemdunit (service (status)))
-(allow systemd_analyze_t etc_t (service (status)))
-
-EOF
-
-semodule -X 100 -i $FILE10
-
 #!/bin/sh
-systemctl enable mariner-metrics-livecd.service
+systemctl enable azurelinux-sysinfo.service
 
 %changelog
-* Fri Mar 29 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
-- Initial CBL-Mariner import from Azure (license: MIT)
-- License verified
-- Bump version to 3.0 for AzureLinux 3.0
+* Wed Apr 03 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
+- License verified.
+- Implementation of package that deploys azurelinux-sysinfo service.
 
 

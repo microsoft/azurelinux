@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://dev.azure.com/mariner-org/ECF/_git/afo-images?path=/images/files/mariner-metrics/mariner_metrics_schema_v1.json",
-    "title": "Mariner Metrics Schema",
-    "description": "This defines the schema for the collected mariner metrics",
+    "$id": "https://github.com/microsoft/azurelinux/tree/3.0-dev/SPECS/azurelinux-sysinfo/sysinfo-schema-v1.json",
+    "title": "Azure Linux Sysinfo Schema",
+    "description": "This defines the schema for the collected Azure Linux system information",
     "type": "object",
     "properties": {
         "source": {
@@ -12,16 +12,6 @@
             "description": "Service the logs are obtained from",
             "required": [
                 "source"
-            ],
-            "additionalProperties": false
-        },
-        "image_type": {
-            "$id": "#/properties/image_type",
-            "type": "string",
-            "title": "Type of image",
-            "description": "Type of image the service is running on",
-            "required": [
-                "image_type"
             ],
             "additionalProperties": false
         },
@@ -39,7 +29,7 @@
             "$id": "#/properties/os_info",
             "type": "object",
             "title": "Operating system information",
-            "description": "Information about the Mariner operating system",
+            "description": "Information about the Azure Linux operating system",
             "properties": {
                 "kernel_version": {
                     "$id": "#/properties/os_info/properties/kernel_version",
@@ -50,14 +40,14 @@
                 "release_version": {
                     "$id": "#/properties/os_info/properties/release_version",
                     "type": "string",
-                    "title": "Mariner operating system release version",
-                    "description": "The release version of upstream Mariner"
+                    "title": "Azure Linux operating system release version",
+                    "description": "The release version of upstream Azure Linux"
                 },
                 "release_version_id": {
                     "$id": "#/properties/os_info/properties/release_version_id",
                     "type": "string",
-                    "title": "Mariner operating system release version id",
-                    "description": "The release version id of upstream Mariner"
+                    "title": "Azure Linux operating system release version id",
+                    "description": "The release version id of upstream Azure Linux"
                 }
             },
             "required": [
@@ -71,7 +61,7 @@
             "$id": "#/properties/cloud_init_info",
             "type": "object",
             "title": "Cloud-init information",
-            "description": "Information about cloud-init applied to the Mariner operating system",
+            "description": "Information about cloud-init applied to the Azure Linux operating system",
             "properties": {
                 "hostname": {
                     "$id": "#/properties/cloud_init_info/properties/hostname",
@@ -96,7 +86,7 @@
             "$id": "#/properties/boot_info",
             "type": "object",
             "title": "Operating system boot information",
-            "description": "Information about Mariner operating system booting",
+            "description": "Information about Azure Linux operating system booting",
             "properties": {
                 "boot_time": {
                     "$id": "#/properties/boot_info/properties/boot_time",
@@ -246,13 +236,13 @@
             "$id": "#/properties/package_info",
             "type": "object",
             "title": "Package Information",
-            "description": "Information about the packages installed on Mariner",
+            "description": "Information about the packages installed on Azure Linux",
             "properties": {
                 "package_count": {
                     "$id": "#/properties/package_info/properties/package_count",
                     "type": "integer",
                     "title": "Package Count",
-                    "description": "The number of packages installed on Mariner"
+                    "description": "The number of packages installed on Azure Linux"
                 }
             },
             "required": [

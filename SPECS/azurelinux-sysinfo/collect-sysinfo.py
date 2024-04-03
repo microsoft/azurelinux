@@ -11,9 +11,9 @@ import subprocess
 
 DATA_SCHEMA_DIR = "/usr/local/data"
 DATA_SCHEMA_VERSION = "v1"
-DATA_SCHEMA_FILENAME = f"mariner_metrics_schema_{DATA_SCHEMA_VERSION}.json"
-LOG_FILE_PATH = "/var/log/mariner-metrics.log"
-SERVICE_NAME = "mariner-metrics-service"
+DATA_SCHEMA_FILENAME = f"sysinfo-schema-{DATA_SCHEMA_VERSION}.json"
+LOG_FILE_PATH = "/var/log/azurelinux-sysinfo.log"
+SERVICE_NAME = "azurelinux-sysinfo-service"
 
 
 # This function converts a string that matches
@@ -58,7 +58,9 @@ def collect_os_info():
 
 def collect_boot_info():
     print("Collecting boot info...")
-
+    # Known issue: In SELinux enforcing mode, systemd-analyze commands are expected to fail until required policies are added.
+    # In this case, the boot times will be 0 and longest running processes will be empty.
+    
     # Collect boot time
     result = subprocess.run(["systemd-analyze", "time"], capture_output=True, text=True)
 
@@ -245,11 +247,7 @@ def has_valid_schema(data):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Script to collect metrics as part of mariner metrics service")
-    parser.add_argument("image_type", type=str, help ="The type of image in use - livecd, worker, or controller")
-    args = parser.parse_args()
-
-    print("Running mariner metrics collection...")
+    print("Running azurelinux sysinfo collection...")
     asset_id = get_asset_id()
     os_info = collect_os_info()
     cloud_init_info = collect_cloud_init_info()
@@ -263,7 +261,6 @@ def main():
     data = {
         "$schema": f"{DATA_SCHEMA_VERSION}",
         "source": f"{SERVICE_NAME}",
-        "image_type": f"{args.image_type}",
         "asset_id": asset_id,
         "os_info": os_info,
         "cloud_init_info": cloud_init_info,
@@ -284,9 +281,9 @@ def main():
             # Add newline so that the fluentd tail plug-in consumes the log
             # line.
             file.write("\n")
-        print("Mariner metrics collection completed successfully.")
+        print("Azure Linux sysinfo collection completed successfully.")
     else:
-        print("Mariner metrics collection failed.")
+        print("Azure Linux sysinfo collection failed.")
         exit(1)
 
 
