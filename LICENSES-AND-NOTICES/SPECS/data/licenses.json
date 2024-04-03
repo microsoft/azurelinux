@@ -2193,7 +2193,6 @@
                 "cmake-fedora",
                 "containerd",
                 "coredns",
-                "csi-driver-lvm",
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",

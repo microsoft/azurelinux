@@ -2306,16 +2306,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "csi-driver-lvm",
-          "version": "0.4.1",
-          "downloadUrl": "https://github.com/metal-stack/csi-driver-lvm/archive/refs/tags/v0.4.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ctags",
           "version": "6.1.0",
           "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/v6.1.0.tar.gz"
