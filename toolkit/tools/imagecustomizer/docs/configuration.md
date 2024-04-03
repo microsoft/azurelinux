@@ -99,7 +99,7 @@ os:
             - [start](#start-uint64)
             - [end](#end-uint64)
             - [size](#size-uint64)
-            - [bootPartitionType](#bootpartitiontype-string)
+            - [type](#partition-type-string)
     - [fileSystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
@@ -193,7 +193,7 @@ storage:
     maxSize: 4096
     partitions:
     - id: esp
-      bootPartitionType: esp
+      type: esp
       start: 1
       end: 9
 
@@ -711,7 +711,9 @@ remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
 The size of the partition, specified in MiBs.
 
-### bootPartitionType [string]
+<div id="partition-type-string"></div>
+
+### type [string]
 
 Specifies options for the partition.
 
