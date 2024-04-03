@@ -3,7 +3,7 @@
 Summary:        A configuration system
 Name:           dconf
 Version:        0.40.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ BuildRequires:  gcc
 BuildRequires:  glib2-devel >= %{glib2_version}
 BuildRequires:  gtk-doc
 BuildRequires:  meson
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  vala
 Requires:       dbus
 Requires:       glib2 >= %{glib2_version}
@@ -100,6 +101,9 @@ dconf update
 %{_datadir}/vala
 
 %changelog
+* Fri Mar 29 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.40.0-2
+- Add systemd-rpm-macros as a BuildRequires
+
 * Mon Feb 05 2024 Sean Dougherty <sdougherty@microsoft.com> - 0.40.0-1
 - Upgrade from 0.36.0 to 0.40.0
 - Added dconf.service

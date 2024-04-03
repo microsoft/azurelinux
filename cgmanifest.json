@@ -2306,16 +2306,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "csi-driver-lvm",
-          "version": "0.4.1",
-          "downloadUrl": "https://github.com/metal-stack/csi-driver-lvm/archive/refs/tags/v0.4.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "ctags",
           "version": "6.1.0",
           "downloadUrl": "https://github.com/universal-ctags/ctags/archive/refs/tags/v6.1.0.tar.gz"
@@ -15713,8 +15703,8 @@
         "type": "other",
         "other": {
           "name": "perftest",
-          "version": "4.5",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/perftest_4.5.orig.tar.gz"
+          "version": "24.01.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.01-0.3.3.1/SRPMS/perftest-24.01.0-0.38.gd185c9b.tar.gz"
         }
       }
     },
@@ -17593,8 +17583,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTML-Parser",
-          "version": "3.72",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GAAS/HTML-Parser-3.72.tar.gz"
+          "version": "3.82",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-3.82.tar.gz"
         }
       }
     },
@@ -24793,8 +24783,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+          "version": "20.25.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/94/d7/adb787076e65dc99ef057e0118e25becf80dd05233ef4c86f07aa35f6492/virtualenv-20.25.0.tar.gz"
         }
       }
     },
@@ -28386,8 +28376,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.29.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/refs/tags/v1.29.4.tar.gz"
         }
       }
     },
