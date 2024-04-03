@@ -20,8 +20,6 @@ URL: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/
 # git clone git://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git
 # cd libtracefs
 # git archive --prefix=libtracefs-%%{version}/ -o libtracefs-%%{version}.tar.gz %%{git_commit}
-#Source0: libtracefs-%%{version}.tar.gz
-#Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%%{commit}.tar.gz
 Source0: https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  make
