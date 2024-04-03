@@ -58,13 +58,13 @@ func connectToExistingImageHelper(imageConnection *ImageConnection, imageFilePat
 }
 
 func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, buildDir string, chrootDirName string,
+	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
 ) error {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, buildDir, chrootDirName,
+	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
 		installOS)
 	if err != nil {
 		return fmt.Errorf("failed to create new image:\n%w", err)
@@ -80,20 +80,21 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 }
 
 func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, bootType imagecustomizerapi.BootType,
-	kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string, chrootDirName string,
-	currentSELinuxMode imagecustomizerapi.SELinux, installOS installOSFunc,
+	fileSystems []imagecustomizerapi.FileSystem, bootType imagecustomizerapi.BootType,
+	selinuxConfig imagecustomizerapi.SELinux, kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string,
+	chrootDirName string, currentSELinuxMode imagecustomizerapi.SELinuxMode, installOS installOSFunc,
 ) error {
 	imageConnection := NewImageConnection()
 	defer imageConnection.Close()
 
-	err := createNewImageHelper(imageConnection, filename, diskConfig, partitionSettings, buildDir, chrootDirName,
+	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
 		installOS)
 	if err != nil {
 		return fmt.Errorf("failed to create new image:\n%w", err)
 	}
 
-	err = configureDiskBootLoader(imageConnection, partitionSettings, bootType, kernelCommandLine, currentSELinuxMode)
+	err = configureDiskBootLoader(imageConnection, fileSystems, bootType, selinuxConfig, kernelCommandLine,
+		currentSELinuxMode)
 	if err != nil {
 		return fmt.Errorf("failed to add bootloader to new image:\n%w", err)
 	}
@@ -108,17 +109,17 @@ func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi
 }
 
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
-	partitionSettings []imagecustomizerapi.PartitionSetting, buildDir string, chrootDirName string,
+	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
 ) error {
 
 	// Convert config to image config types, so that the imager's utils can be used.
-	imagerDiskConfig, err := diskConfigToImager(diskConfig)
+	imagerDiskConfig, err := diskConfigToImager(diskConfig, fileSystems)
 	if err != nil {
 		return err
 	}
 
-	imagerPartitionSettings, err := partitionSettingsToImager(partitionSettings)
+	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
 	if err != nil {
 		return err
 	}
@@ -147,21 +148,21 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 	return nil
 }
 
-func configureDiskBootLoader(imageConnection *ImageConnection, partitionSettings []imagecustomizerapi.PartitionSetting,
-	bootType imagecustomizerapi.BootType, kernelCommandLine imagecustomizerapi.KernelCommandLine,
-	currentSELinuxMode imagecustomizerapi.SELinux,
+func configureDiskBootLoader(imageConnection *ImageConnection, fileSystems []imagecustomizerapi.FileSystem,
+	bootType imagecustomizerapi.BootType, selinuxConfig imagecustomizerapi.SELinux,
+	kernelCommandLine imagecustomizerapi.KernelCommandLine, currentSELinuxMode imagecustomizerapi.SELinuxMode,
 ) error {
 	imagerBootType, err := bootTypeToImager(bootType)
 	if err != nil {
 		return err
 	}
 
-	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine, currentSELinuxMode)
+	imagerKernelCommandLine, err := kernelCommandLineToImager(kernelCommandLine, selinuxConfig, currentSELinuxMode)
 	if err != nil {
 		return err
 	}
 
-	imagerPartitionSettings, err := partitionSettingsToImager(partitionSettings)
+	imagerPartitionSettings, err := partitionSettingsToImager(fileSystems)
 	if err != nil {
 		return err
 	}

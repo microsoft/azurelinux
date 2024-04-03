@@ -21,13 +21,13 @@ func customizePartitionsUsingFileCopy(buildDir string, baseConfigPath string, co
 	}
 	defer existingImageConnection.Close()
 
-	diskConfig := (*config.Disks)[0]
+	diskConfig := config.Storage.Disks[0]
 
 	installOSFunc := func(imageChroot *safechroot.Chroot) error {
 		return copyFilesIntoNewDisk(existingImageConnection.Chroot(), imageChroot)
 	}
 
-	err = createNewImage(newBuildImageFile, diskConfig, config.SystemConfig.PartitionSettings,
+	err = createNewImage(newBuildImageFile, diskConfig, config.Storage.FileSystems,
 		buildDir, "newimageroot", installOSFunc)
 	if err != nil {
 		return err

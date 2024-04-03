@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,6 +54,8 @@ Patch6:         0001-Fedora-hack-Make-the-suid-root-wrapper-always-start-.patch
 
 # Backports from "master" upstream:
 Patch7: CVE-2023-1594.patch
+Patch101: 0001-render-Fix-build-with-gcc-12.patch
+Patch104: 0001-hw-Rename-boolean-config-value-field-from-bool-to-bo.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -384,6 +386,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Mon Apr 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.20.10-5
+- Add patch 0001-render-Fix-build-with-gcc-12.patch from Fedora 41 (License: MIT)
+- Add patch 0001-hw-Rename-boolean-config-value-field-from-bool-to-bo.patch from Fedora 41 (License: MIT)
+
 * Fri Aug 11 2023 Sean Dougherty <sdougherty@microsoft.com> - 1.20.10-4
 - Add patch for CVE-2023-1594
 

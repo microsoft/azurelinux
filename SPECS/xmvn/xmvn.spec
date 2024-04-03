@@ -6,8 +6,8 @@
 
 Summary:        Local Extensions for Apache Maven
 Name:           xmvn
-Version:        4.0.0
-Release:        2%{?dist}
+Version:        4.2.0
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ BuildRequires:  javapackages-local-bootstrap
 # Maven home is used as template for XMvn home
 BuildRequires:  maven
 BuildRequires:  mvn(com.beust:jcommander)
+BuildRequires:  mvn(javax.inject:javax.inject)
 BuildRequires:  mvn(org.apache.commons:commons-compress)
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-assembly-plugin)
@@ -36,14 +37,13 @@ BuildRequires:  mvn(org.apache.maven:maven-model)
 BuildRequires:  mvn(org.apache.maven:maven-model-builder)
 BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
 BuildRequires:  mvn(org.codehaus.modello:modello-maven-plugin)
-BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-classworlds)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-component-annotations)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
-BuildRequires:  mvn(org.codehaus.plexus:plexus-container-default)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-utils)
 BuildRequires:  mvn(org.easymock:easymock)
-BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.inject)
+BuildRequires:  mvn(org.eclipse.sisu:org.eclipse.sisu.plexus)
+BuildRequires:  mvn(org.eclipse.sisu:sisu-maven-plugin)
+BuildRequires:  mvn(org.junit.jupiter:junit-jupiter-api)
 BuildRequires:  mvn(org.ow2.asm:asm)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 BuildRequires:  mvn(org.slf4j:slf4j-simple)
@@ -153,10 +153,17 @@ mver=$(sed -n '/<mavenVersion>/{s/.*>\(.*\)<.*/\1/;p}' \
 mkdir -p target/dependency/
 cp -a "${maven_home}" target/dependency/apache-maven-$mver
 
+# Workaround easymock incompatibility with Java 17 that should be fixed            
+# in easymock 4.4: https://github.com/easymock/easymock/issues/274            
+%pom_add_plugin :maven-surefire-plugin xmvn-connector "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+%pom_add_plugin :maven-surefire-plugin xmvn-tools/xmvn-install "<configuration>
+    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine></configuration>"
+    
 %build
 %mvn_build -j -f -- -P\\!quality -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
 
-version=4.0.0
+version=4.2.0
 tar --delay-directory-restore -xvf target/xmvn-*-bin.tar.gz
 chmod -R +rwX %{name}-${version}*
 # These are installed as doc
@@ -170,7 +177,7 @@ rm -f %{name}-${version}*/bin/*
 %install
 %mvn_install
 
-version=4.0.0
+version=4.2.0
 maven_home=$(realpath $(dirname $(realpath $(%{?jpb_env} which mvn)))/..)
 
 install -d -m 755 %{buildroot}%{_datadir}/%{name}
@@ -263,6 +270,9 @@ end
 %license LICENSE NOTICE
 
 %changelog
+* Mon Mar 25 2024 Nan Liu <liunan@microsoft.com> - 4.2.0-3
+- Imported workaround for OpenJDK 17 from Fedora 40, upgrade to 4.2.0
+
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 4.2.0-2
 - Rebuilt with msopenjdk-17 
 - change source, target

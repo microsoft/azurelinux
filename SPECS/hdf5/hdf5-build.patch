@@ -10,19 +10,19 @@ index f29739a..fc9cddb 100644
 +JARFILE=@PACKAGE_TARNAME@.jar
  TESTJARFILE=jar@PACKAGE_TARNAME@datasets.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
- 
+
 diff --git a/java/examples/datasets/Makefile.am b/java/examples/datasets/Makefile.am
 index 41a914b..195201a 100644
 --- a/java/examples/datasets/Makefile.am
 +++ b/java/examples/datasets/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
  pkgpath = examples/datasets
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
- 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+
  jarfile = jar$(PACKAGE_TARNAME)datasets.jar
 diff --git a/java/examples/datatypes/JavaDatatypeExample.sh.in b/java/examples/datatypes/JavaDatatypeExample.sh.in
 index e26d8c0..f6a9d87 100644
@@ -36,19 +36,19 @@ index e26d8c0..f6a9d87 100644
 +JARFILE=@PACKAGE_TARNAME@.jar
  TESTJARFILE=jar@PACKAGE_TARNAME@datatypes.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
- 
+
 diff --git a/java/examples/datatypes/Makefile.am b/java/examples/datatypes/Makefile.am
 index 90790f7..450edef 100644
 --- a/java/examples/datatypes/Makefile.am
 +++ b/java/examples/datatypes/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
  pkgpath = examples/datatypes
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
- 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+
  jarfile = jar$(PACKAGE_TARNAME)datatypes.jar
 diff --git a/java/examples/groups/JavaGroupExample.sh.in b/java/examples/groups/JavaGroupExample.sh.in
 index 3b0e9d1..416c69f 100644
@@ -69,12 +69,12 @@ index bfde9ae..f48a5b9 100644
 +++ b/java/examples/groups/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
  pkgpath = examples/groups
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
- 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+
  jarfile = jar$(PACKAGE_TARNAME)groups.jar
 diff --git a/java/examples/intro/JavaIntroExample.sh.in b/java/examples/intro/JavaIntroExample.sh.in
 index db741e5..d0ba65d 100644
@@ -88,19 +88,19 @@ index db741e5..d0ba65d 100644
 +JARFILE=@PACKAGE_TARNAME@.jar
  TESTJARFILE=jar@PACKAGE_TARNAME@intro.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
- 
+
 diff --git a/java/examples/intro/Makefile.am b/java/examples/intro/Makefile.am
 index 7d1aeab..01a10c9 100644
 --- a/java/examples/intro/Makefile.am
 +++ b/java/examples/intro/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
  pkgpath = examples/intro
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
- 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+
  jarfile = jar$(PACKAGE_TARNAME)intro.jar
 diff --git a/java/src/Makefile.am b/java/src/Makefile.am
 index 98630e6..fd8d057 100644
@@ -109,26 +109,26 @@ index 98630e6..fd8d057 100644
 @@ -32,8 +32,8 @@ JAVAROOT = .classes
  classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
 -jarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 -hdf5_javadir = $(libdir)
 +jarfile = $(PACKAGE_TARNAME).jar
 +hdf5_javadir = $(prefix)/lib/java
- 
+
  pkgpath = hdf/hdf5lib
- CLASSPATH_ENV=CLASSPATH=.:$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$$CLASSPATH
+ CLASSPATH_ENV=CLASSPATH=.:$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$$CLASSPATH
 diff --git a/java/test/Makefile.am b/java/test/Makefile.am
 index 08e79e3..b336c2f 100644
 --- a/java/test/Makefile.am
 +++ b/java/test/Makefile.am
 @@ -26,7 +26,7 @@ classes:
  	test -d $(@D)/$(JAVAROOT) || $(MKDIR_P) $(@D)/$(JAVAROOT)
- 
+
  pkgpath = test
 -hdfjarfile = jar$(PACKAGE_TARNAME)-$(PACKAGE_VERSION).jar
 +hdfjarfile = $(PACKAGE_TARNAME).jar
- CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/junit.jar:$(top_srcdir)/java/lib/hamcrest-core.jar:$(top_srcdir)/java/lib/slf4j-api-1.7.25.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-1.7.25.jar:$$CLASSPATH
- 
+ CLASSPATH_ENV=CLASSPATH=.:$(JAVAROOT):$(top_builddir)/java/src/$(hdfjarfile):$(top_srcdir)/java/lib/junit.jar:$(top_srcdir)/java/lib/hamcrest-core.jar:$(top_srcdir)/java/lib/slf4j-api-2.0.6.jar:$(top_srcdir)/java/lib/ext/slf4j-simple-2.0.6.jar:$$CLASSPATH
+
  jarfile = jar$(PACKAGE_TARNAME)test.jar
 diff --git a/java/test/junit.sh.in b/java/test/junit.sh.in
 index 39db296..83d6c7c 100644
@@ -136,10 +136,9 @@ index 39db296..83d6c7c 100644
 +++ b/java/test/junit.sh.in
 @@ -47,7 +47,7 @@ BLDLIBDIR="$BLDDIR/testlibs"
  HDFTEST_HOME="$top_srcdir/java/test"
- TOOLS_TESTFILES="$top_srcdir/tools/testfiles"
- 
+ DUMP_TESTFILES="$top_srcdir/tools/test/h5dump/testfiles"
+
 -JARFILE=jar@PACKAGE_TARNAME@-@PACKAGE_VERSION@.jar
 +JARFILE=@PACKAGE_TARNAME@.jar
  TESTJARFILE=jar@PACKAGE_TARNAME@test.jar
  test -d $BLDLIBDIR || mkdir -p $BLDLIBDIR
- 

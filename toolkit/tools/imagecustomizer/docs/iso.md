@@ -16,9 +16,12 @@ actions.
 
 While converting the input full disk image into a LiveOS ISO involves copying
 almost all the artifacts unchanged - some artifacts are changed as follows:
-- `grub.cfg` is replaced with a stock one that serves the LiveOS boot flow.
-  This can be important to account for if you rely on certain grub
-  configurations in your current grub.cfg.
+- `grub.cfg` is modified by updating the kernel command-line arguments as
+  follows:
+  - the root is updated to the LiveOS root file system image.
+  - the LiveOS dracut parameters are appended.
+  - the MIC user-specified new parameters are appended.
+  - SELinux is disabled.
 - `/etc/fstab` is dropped from the rootfs as it typically conflicts with the
   overlay setup required by the LiveOS.
 - `initrd.img` is regenerated to serve the LiveOS boot flow. This should have
@@ -64,18 +67,18 @@ cloud-init data files).
 If cloud-init data is to be placed directly within the iso file system:
 
 ```yaml
-Iso:
-  AdditionalFiles:
+iso:
+  additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data
-  KernelCommandLine:
+  kernelCommandLine:
     ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
-    PrimaryGroup: sudo
+os:
+  users:
+  - name: test
+    password: testpassword
+    primaryGroup: sudo
 ```
 
 #### Example 2
@@ -83,15 +86,15 @@ SystemConfig:
 If cloud-init data is to be placed within the LiveOS root file system:
 
 ```yaml
-Iso:
-  KernelCommandLine:
-    ExtraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
-SystemConfig:
-  Users:
-  - Name: test
-    Password: testpassword
-    PrimaryGroup: sudo
-  AdditionalFiles:
+iso:
+  kernelCommandLine:
+    extraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
+os:
+  users:
+  - name: test
+    password: testpassword
+    primaryGroup: sudo
+  additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
     cloud-init-data/meta-data: /cloud-init-data/meta-data

@@ -21,6 +21,6 @@ func (t ResetBootLoaderType) IsValid() error {
 		return nil
 
 	default:
-		return fmt.Errorf("invalid ResetBootLoaderType value (%v)", t)
+		return fmt.Errorf("invalid resetBootLoaderType value (%v)", t)
 	}
 }

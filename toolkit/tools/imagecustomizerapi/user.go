@@ -10,17 +10,17 @@ import (
 )
 
 type User struct {
-	Name                string   `yaml:"Name"`
-	UID                 *int     `yaml:"UID"`
-	PasswordHashed      bool     `yaml:"PasswordHashed"`
-	Password            string   `yaml:"Password"`
-	PasswordPath        string   `yaml:"PasswordPath"`
-	PasswordExpiresDays *int64   `yaml:"PasswordExpiresDays"`
-	SSHPubKeyPaths      []string `yaml:"SSHPubKeyPaths"`
-	SSHPubKeys          []string `yaml:"SSHPubKeys"`
-	PrimaryGroup        string   `yaml:"PrimaryGroup"`
-	SecondaryGroups     []string `yaml:"SecondaryGroups"`
-	StartupCommand      string   `yaml:"StartupCommand"`
+	Name                string   `yaml:"name"`
+	UID                 *int     `yaml:"uid"`
+	PasswordHashed      bool     `yaml:"passwordHashed"`
+	Password            string   `yaml:"password"`
+	PasswordPath        string   `yaml:"passwordPath"`
+	PasswordExpiresDays *int64   `yaml:"passwordExpiresDays"`
+	SSHPublicKeyPaths   []string `yaml:"sshPublicKeyPaths"`
+	SSHPublicKeys       []string `yaml:"sshPublicKeys"`
+	PrimaryGroup        string   `yaml:"primaryGroup"`
+	SecondaryGroups     []string `yaml:"secondaryGroups"`
+	StartupCommand      string   `yaml:"startupCommand"`
 }
 
 func (u *User) IsValid() error {
@@ -37,7 +37,7 @@ func (u *User) IsValid() error {
 	}
 
 	if u.Password != "" && u.PasswordPath != "" {
-		return fmt.Errorf("user (%s) is invalid:\nfields Password and PasswordPath must not both be specified", u.Name)
+		return fmt.Errorf("user (%s) is invalid:\nfields password and passwordPath must not both be specified", u.Name)
 	}
 
 	if u.PasswordExpiresDays != nil {
