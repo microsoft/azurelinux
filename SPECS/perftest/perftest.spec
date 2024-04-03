@@ -1,17 +1,16 @@
-%global         extended_release 0.14.gd962d8c.56068 
-%global         MLNX_OFED_VERSION 5.6-1.0.3.3
-%global         BF_VERSION 3.9.0
+%global         extended_release 0.38.gd185c9b
+%global         MLNX_OFED_VERSION 24.01-0.3.3.1
 Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
-Version:        4.5
-Release:        2%{?dist}
+Version:        24.01.0
+Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
-Source0:        https://linux.mellanox.com/public/repo/bluefield/%{BF_VERSION}/extras/mlnx_ofed/%{MLNX_OFED_VERSION}/SOURCES/%{name}_%{version}.orig.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/%{MLNX_OFED_VERSION}/SRPMS/%{name}-%{version}-%{extended_release}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  libibumad-devel
 BuildRequires:  libibverbs-devel
 BuildRequires:  librdmacm-devel
@@ -36,8 +35,12 @@ chmod -x runme
 %doc README runme
 %license COPYING
 %_bindir/*
+%_mandir/man1/*.1*
 
 %changelog
+* Wed Apr 03 2024 Juan Camposeco <juanarturoc@microsoft.com> - 24.01.0-1
+- Upgrade version to 24.01.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
