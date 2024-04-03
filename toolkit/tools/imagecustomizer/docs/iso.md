@@ -116,7 +116,7 @@ MIC to be able to generate an iso image out of it:
   - `/boot/grub2/grub.cfg` must exist and is the 'main' grub configuration (not
     a redirection grub configuration file for example).
   - `bootx64.efi` and `grubx64.efi` (or `grubx64-noprefix.efi`) must be under
-    the `/boot` folder (exact location is irrelevant).
+    the `/boot` folder or any of its subdirectories.
   - All grub configurations and related files must be stored under the `/boot`
     folder. For example, grub.cfg cannot reference files outside that folder.
     If it does, those referenced files will not be copied to the iso and may

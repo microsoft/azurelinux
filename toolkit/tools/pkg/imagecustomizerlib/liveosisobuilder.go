@@ -344,7 +344,7 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 		for _, exclusion := range exclusions {
 			match := exclusion.FindStringIndex(sourcePath)
 			if match != nil {
-				logger.Log.Debugf("Skipping %s", sourcePath)
+				logger.Log.Debugf("Not copying %s. File is either unnecessary or will be re-generated.", sourcePath)
 				continue
 			}
 		}
