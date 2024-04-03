@@ -31,7 +31,7 @@ the community can easily add support for collecting metrics from well known serv
 Postgres, or Redis) and third party APIs (like Mailchimp, AWS CloudWatch, or Google Analytics).
 
 %prep
-%autosetup -a 1 -p1
+%autosetup -p1
 
 %build
 go build -buildvcs=false -mod=vendor ./cmd/telegraf
