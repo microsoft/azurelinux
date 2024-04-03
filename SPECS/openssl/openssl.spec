@@ -83,6 +83,7 @@ BuildRequires: perl(Text::Template)
 BuildRequires: sed
 
 %if 0%{?with_check}
+BuildRequires: perl(Math::BigInt)
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 %endif
@@ -354,7 +355,7 @@ install -m644 %{SOURCE9} \
 
 %changelog
 * Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
-- At build requirement for Perl(Test::Harness)
+- At check build requirements
 - Modify patch patch to not force load default provider
 
 * Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
