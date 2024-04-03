@@ -7,8 +7,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-48105.patch
-Patch1:         CVE-2023-52284.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
