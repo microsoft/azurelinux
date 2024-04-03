@@ -78,7 +78,6 @@ Patch4:         postfix-3.8.0-large-fs.patch
 Patch9:         pflogsumm-1.1.5-datecalc.patch
 Patch10:        pflogsumm-1.1.5-ipv6-warnings-fix.patch
 Patch11:        postfix-3.4.4-chroot-example-fix.patch
-Patch12:        postfix-3.7.0-whitespace-name-fix.patch
 Patch13:        pflogsumm-1.1.5-syslog-name-underscore-fix.patch
 
 
@@ -219,10 +218,10 @@ maps with Postfix, you need this.
 %prep
 %setup -q
 # Apply obligatory patches
-%patch1 -p1 -b .config
-%patch2 -p1 -b .files
-%patch3 -p1 -b .alternatives
-%patch4 -p1 -b .large-fs
+%patch 1 -p1 -b .config
+%patch 2 -p1 -b .files
+%patch 3 -p1 -b .alternatives
+%patch 4 -p1 -b .large-fs
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
@@ -232,12 +231,12 @@ src/global/mail_params.h
 %if %{with pflogsumm}
 gzip -dc %{SOURCE53} | tar xf -
 pushd pflogsumm-%{pflogsumm_ver}
-%patch9 -p1 -b .datecalc
-%patch10 -p1 -b .ipv6-warnings-fix
+%patch 9 -p1 -b .datecalc
+%patch 10 -p1 -b .ipv6-warnings-fix
 popd
 %endif
-%patch11 -p1 -b .chroot-example-fix
-%patch13 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
+%patch 11 -p1 -b .chroot-example-fix
+%patch 13 -p1 -b .pflogsumm-1.1.5-syslog-name-underscore-fix
 
 # Backport 3.8-20221006 fix for uname -r detection
 sed -i makedefs -e '\@Linux\.@s|345|3456|'
