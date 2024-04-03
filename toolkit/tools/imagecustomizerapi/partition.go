@@ -6,8 +6,6 @@ package imagecustomizerapi
 import (
 	"fmt"
 	"unicode"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Partition struct {
@@ -21,8 +19,8 @@ type Partition struct {
 	End *uint64 `yaml:"end"`
 	// Size is the size of the partition in MiBs.
 	Size *uint64 `yaml:"size"`
-	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"flags"`
+	// Type specifies the type of partition the partition is.
+	Type PartitionType `yaml:"type"`
 }
 
 func (p *Partition) IsValid() error {
@@ -39,11 +37,9 @@ func (p *Partition) IsValid() error {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
-	for _, f := range p.Flags {
-		err := f.IsValid()
-		if err != nil {
-			return err
-		}
+	err = p.Type.IsValid()
+	if err != nil {
+		return err
 	}
 
 	if p.IsBiosBoot() {
@@ -68,11 +64,11 @@ func (p *Partition) GetEnd() (uint64, bool) {
 }
 
 func (p *Partition) IsESP() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
+	return p.Type == PartitionTypeESP
 }
 
 func (p *Partition) IsBiosBoot() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagBiosGrub)
+	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

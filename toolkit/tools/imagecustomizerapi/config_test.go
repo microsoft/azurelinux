@@ -19,10 +19,7 @@ func TestConfigIsValid(t *testing.T) {
 					{
 						Id:    "esp",
 						Start: 1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -57,9 +54,7 @@ func TestConfigIsValidLegacy(t *testing.T) {
 					{
 						Id:    "boot",
 						Start: 1,
-						Flags: []PartitionFlag{
-							"bios-grub",
-						},
+						Type:  PartitionTypeBiosGrub,
 					},
 				},
 			}},
@@ -116,10 +111,7 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 					{
 						Id:    "esp",
 						Start: 1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -271,10 +263,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 					{
 						Id:    "esp",
 						Start: 1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -311,10 +300,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 					{
 						Id:    "esp",
 						Start: 1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},

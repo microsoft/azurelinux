@@ -236,50 +236,6 @@ func TestDiskIsValidZeroSize(t *testing.T) {
 	assert.ErrorContains(t, err, "maxSize")
 }
 
-func TestDiskIsValidMissingEspFlag(t *testing.T) {
-	disk := &Disk{
-		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            3,
-		Partitions: []Partition{
-			{
-				Id:    "a",
-				Start: 1,
-				Flags: []PartitionFlag{
-					"boot",
-				},
-			},
-		},
-	}
-
-	err := disk.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "esp")
-	assert.ErrorContains(t, err, "boot")
-	assert.ErrorContains(t, err, "flag")
-}
-
-func TestDiskIsValidMissingBootFlag(t *testing.T) {
-	disk := &Disk{
-		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            3,
-		Partitions: []Partition{
-			{
-				Id:    "a",
-				Start: 1,
-				Flags: []PartitionFlag{
-					"esp",
-				},
-			},
-		},
-	}
-
-	err := disk.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "esp")
-	assert.ErrorContains(t, err, "boot")
-	assert.ErrorContains(t, err, "flag")
-}
-
 func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,

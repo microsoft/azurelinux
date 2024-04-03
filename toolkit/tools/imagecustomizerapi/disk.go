@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
-
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 type Disk struct {
@@ -44,16 +42,6 @@ func (d *Disk) IsValid() error {
 		}
 
 		partitionIDSet[partition.Id] = false // dummy value
-
-		if d.PartitionTableType == PartitionTableTypeGpt {
-			isESP := sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
-			isBoot := sliceutils.ContainsValue(partition.Flags, PartitionFlagBoot)
-
-			if isESP != isBoot {
-				return fmt.Errorf(
-					"invalid partition at index %d:\n'esp' and 'boot' flags must be specified together on GPT disks", i)
-			}
-		}
 	}
 
 	// Check for overlapping partitions.

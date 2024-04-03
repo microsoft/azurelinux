@@ -99,7 +99,7 @@ os:
             - [start](#start-uint64)
             - [end](#end-uint64)
             - [size](#size-uint64)
-            - [flag](#flags-string)
+            - [type](#partition-type-string)
     - [fileSystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
@@ -193,9 +193,7 @@ storage:
     maxSize: 4096
     partitions:
     - id: esp
-      flags:
-      - esp
-      - boot
+      type: esp
       start: 1
       end: 9
 
@@ -713,7 +711,9 @@ remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
 The size of the partition, specified in MiBs.
 
-### flags [string[]]
+<div id="partition-type-string"></div>
+
+### type [string]
 
 Specifies options for the partition.
 
@@ -721,8 +721,6 @@ Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
   The partition must have a `fileSystemType` of `fat32`.
-
-  When specified on a GPT formatted disk, the `boot` flag must also be added.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -732,13 +730,6 @@ Supported options:
   This flag is only supported on GPT formatted disks.
 
   For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
-
-- `boot`: Specifies that this partition contains the boot loader.
-
-  When specified on a GPT formatted disk, the `esp` flag must also be added.
-
-These options mirror those in
-[parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
 
 ## mountPoint type
 

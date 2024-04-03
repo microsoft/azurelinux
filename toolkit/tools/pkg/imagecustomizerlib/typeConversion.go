@@ -83,7 +83,7 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 
 	imagerEnd, _ := partition.GetEnd()
 
-	imagerFlags, err := partitionFlagsToImager(partition.Flags)
+	imagerFlags, err := toImagerPartitionFlags(partition.Type)
 	if err != nil {
 		return configuration.Partition{}, err
 	}
@@ -99,33 +99,19 @@ func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []ima
 	return imagerPartition, nil
 }
 
-func partitionFlagsToImager(flags []imagecustomizerapi.PartitionFlag) ([]configuration.PartitionFlag, error) {
-	imagerFlags := []configuration.PartitionFlag(nil)
-	for _, flag := range flags {
-		imagerFlag, err := partitionFlagToImager(flag)
-		if err != nil {
-			return nil, err
-		}
+func toImagerPartitionFlags(partitionType imagecustomizerapi.PartitionType) ([]configuration.PartitionFlag, error) {
+	switch partitionType {
+	case imagecustomizerapi.PartitionTypeESP:
+		return []configuration.PartitionFlag{configuration.PartitionFlagESP, configuration.PartitionFlagBoot}, nil
 
-		imagerFlags = append(imagerFlags, imagerFlag)
-	}
+	case imagecustomizerapi.PartitionTypeBiosGrub:
+		return []configuration.PartitionFlag{configuration.PartitionFlagBiosGrub}, nil
 
-	return imagerFlags, nil
-}
-
-func partitionFlagToImager(flag imagecustomizerapi.PartitionFlag) (configuration.PartitionFlag, error) {
-	switch flag {
-	case imagecustomizerapi.PartitionFlagESP:
-		return configuration.PartitionFlagESP, nil
-
-	case imagecustomizerapi.PartitionFlagBiosGrub:
-		return configuration.PartitionFlagBiosGrub, nil
-
-	case imagecustomizerapi.PartitionFlagBoot:
-		return configuration.PartitionFlagBoot, nil
+	case imagecustomizerapi.PartitionTypeDefault:
+		return nil, nil
 
 	default:
-		return "", fmt.Errorf("unknown partition flag (%s)", flag)
+		return nil, fmt.Errorf("unknown partition type (%s)", partitionType)
 	}
 }
 
