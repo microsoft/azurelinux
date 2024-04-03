@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.126.mshv3
-Release:        8%{?dist}
+Version:        5.15.126.mshv9
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -20,12 +20,11 @@ Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
-Source4:        50_mariner_mshv_menuentry
-Patch0:         perf_bpf_test_add_nonnull_argument.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
+BuildRequires:  cpio
 BuildRequires:  diffutils
 BuildRequires:  dwarves
 BuildRequires:  elfutils-libelf-devel
@@ -67,6 +66,15 @@ Requires:       python3
 
 %description docs
 This package contains the MSHV kernel doc files
+
+%package tools
+Summary:        This package contains the 'perf' performance analysis tools for MSHV kernel
+Group:          System/Tools
+Requires:       %{name} = %{version}-%{release}
+Requires:       audit
+
+%description tools
+This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
 %autosetup -p1
@@ -111,9 +119,9 @@ make INSTALL_MOD_PATH=%{buildroot} modules_install
 
 # Add kernel-mshv-specific boot configurations to /etc/default/grub.d
 # This configuration contains additional boot parameters required in our
-# Linux-Dom0-based images.
-install -Dm 755 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-install -Dm 755 %{SOURCE4} %{buildroot}%{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
+# Linux-Dom0-based images. 
+mkdir -p %{buildroot}%{_sysconfdir}/default/grub.d
+install -m 750 %{SOURCE3} %{buildroot}%{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
 
 %ifarch x86_64
 install -vm 600 arch/x86/boot/bzImage %{buildroot}/boot/vmlinuz-%{uname_r}
@@ -128,6 +136,20 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 644 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
+
+cat > %{buildroot}/boot/linux-%{uname_r}.cfg << "EOF"
+# GRUB Environment Block
+mariner_cmdline_mshv=rd.auto=1 lockdown=integrity sysctl.kernel.unprivileged_bpf_disabled=1 init=/lib/systemd/systemd ro no-vmw-sta crashkernel=128M audit=0 console=ttyS0,115200n8 earlyprintk
+mariner_linux_mshv=vmlinuz-%{uname_r}
+mariner_initrd_mshv=initrd.img-%{uname_r}
+EOF
+chmod 600 %{buildroot}/boot/linux-%{uname_r}.cfg
+
+# Register myself to initramfs
+mkdir -p %{buildroot}/%{_localstatedir}/lib/initramfs/kernel
+cat > %{buildroot}/%{_localstatedir}/lib/initramfs/kernel/%{uname_r} << "EOF"
+--add-drivers "xen-scsifront xen-blkfront xen-acpi-processor xen-evtchn xen-gntalloc xen-gntdev xen-privcmd xen-pciback xenfs hv_utils hv_vmbus hv_storvsc hv_netvsc hv_sock hv_balloon virtio_blk virtio-rng virtio_console virtio_crypto virtio_mem vmw_vsock_virtio_transport vmw_vsock_virtio_transport_common 9pnet_virtio vrf"
+EOF
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 mkdir -p %{buildroot}/lib/modules/%{uname_r}
@@ -151,6 +173,14 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
+# disable (JOBS=1) parallel build to fix this issue:
+# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
+# Linux version that was affected is 4.4.26
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
+
+# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
+rm -vf %{buildroot}%{_bindir}/trace
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -158,14 +188,24 @@ echo "initrd generation of kernel %{uname_r} will be triggered later" >&2
 
 %triggerun -- initramfs
 rm -rf %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
-rm -rf /boot/efi/initramfs-%{uname_r}.img
+rm -rf /boot/efi/initrd.img-%{uname_r}
 echo "initrd of kernel %{uname_r} removed" >&2
 
 %postun
+if [ ! -e /boot/mariner-mshv.cfg ]
+then
+     ls /boot/linux-*.cfg 1> /dev/null 2>&1
+     if [ $? -eq 0 ]
+     then
+          list=`ls -tu /boot/linux-*.cfg | head -n1`
+          test -n "$list" && ln -sf "$list" /boot/mariner-mshv.cfg
+     fi
+fi
 %grub2_postun
 
 %post
 /sbin/depmod -a %{uname_r}
+ln -sf linux-%{uname_r}.cfg /boot/mariner-mshv.cfg
 %grub2_post
 
 %files
@@ -176,8 +216,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
 /boot/efi/vmlinuz-%{uname_r}
+%config(noreplace) /boot/linux-%{uname_r}.cfg
 %config(noreplace) %{_sysconfdir}/default/grub.d/50_mariner_mshv.cfg
-%config %{_sysconfdir}/grub.d/50_mariner_mshv_menuentry
+%config %{_localstatedir}/lib/initramfs/kernel/%{uname_r}
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
 %exclude /lib/modules/%{uname_r}/build
@@ -191,51 +232,50 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_defaultdocdir}/linux-%{uname_r}/*
 
+%files tools
+%defattr(-,root,root)
+%{_libexecdir}
+%exclude %dir %{_libdir}/debug
+%{_lib64dir}/traceevent
+%{_lib64dir}/libperf-jvmti.so
+%{_bindir}
+%{_sysconfdir}/bash_completion.d/*
+%{_datadir}/perf-core/strace/groups/file
+%{_datadir}/perf-core/strace/groups/string
+%{_docdir}/*
+%{_libdir}/perf/examples/bpf/*
+%{_libdir}/perf/include/bpf/*
+%{_includedir}/perf/perf_dlfilter.h
+
 %changelog
-* Mon Mar 25 2024 Manuel Huber <mahuber@microsoft.com> - 5.15.126.mshv3-8
-- Remove the tools subpackage.
+* Mon Apr 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-3
+- Bump release to match kernel-mshv-signed package
 
-* Wed Mar 06 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-7
-- Remove /var/lib/initramfs/kernel files.
+* Mon Nov 20 2023 Rachel Menge <rachelmenge@microsoft.com> - 5.15.126.mshv9-2
+- Add cpio as BuildRequires
 
-* Fri Feb 23 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 5.15.126.mshv3-6
-- Updating naming for 3.0 version of Azure Linux.
-
-* Fri Feb 23 2024 Chris Gunn <chrisgun@microsoft.com> - 5.15.126.mshv3-5
-- Rename initrd.img-<kver> to initramfs-<kver>.img
-
-* Tue Feb 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-4
-- Remove legacy /boot/mariner-mshv.cfg
-
-* Thu Sep 28 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-3
-- Introduce 50_mariner_mshv_menuentry, which implements
-    the custom boot path when running over MSHV.
-- Check for required mshv components in 50_mariner_mshv.cfg before
-    defaulting to kernel-mshv boot.
-
-* Tue Dec 12 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv3-2
-- Add patch for perf_bpf_test_add_nonnull_argument
-- Update config to reflect gcc 13 toolchain
+* Mon Nov 6 2023 Dallas Delaney <dadelan@microsoft.com> - 5.15.126.mshv9-1
+- Update to v5.15.126.mshv9
 
 * Thu Sep 21 2023 Saul Paredes <saulparedes@microsoft.com> - 5.15.126.mshv3-1
 - Update to v5.15.126.mshv3
 
 * Tue Sep 19 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-5
-- Enable grub2-mkconfig-based boot path by installing
-    50_mariner_mshv.cfg
-- Call grub2-mkconfig to regenerate configs only if the user has
-    previously used grub2-mkconfig for boot configuration.
+- Enable grub2-mkconfig-based boot path by installing 
+    50_mariner_mshv.cfg 
+- Call grub2-mkconfig to regenerate configs only if the user has 
+    previously used grub2-mkconfig for boot configuration. 
 
 * Thu Jun 22 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-4
 - Don't include duplicate systemd parameters in mariner-mshv.cfg; should be read from
     systemd.cfg which is packaged in systemd
 
 * Tue May 30 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-3
-- Align mariner_cmdline_mshv with the working configuration from
+- Align mariner_cmdline_mshv with the working configuration from 
     old loader's linuxloader.conf
 
 * Wed May 24 2023 Cameron Baird <cameronbaird@microsoft.com> - 5.15.110.mshv2-2
-- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader.
+- Add temporary 0001-Support-new-HV-loader... patch to support lxhvloader. 
 - Can be reverted once the kernel patch is upstreamed.
 - Introduce mariner-mshv.cfg symlink to improve grub menuentry
 
