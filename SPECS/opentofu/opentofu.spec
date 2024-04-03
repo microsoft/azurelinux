@@ -2,7 +2,7 @@
 
 Name:           opentofu
 Version:        1.6.2
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        OpenTofu lets you declaratively manage your cloud infrastructure
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,7 +58,7 @@ go test -mod=vendor ./...
 %{_bindir}/tofu
 
 %changelog
-* Mon Apr 01 2024 - Thien Trung Vuong <tvuong@microsoft.com> - 1.6.1-3
+* Mon Apr 01 2024 - Thien Trung Vuong <tvuong@microsoft.com> - 1.6.2-1
 - Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.
 
