@@ -33,26 +33,38 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 9. Write the `/etc/mariner-customizer-release` file.
 
-10. Run post-install scripts. ([postInstallScripts](#postinstallscripts-script))
-
-11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+10. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
     If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
-12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
+11. Update the SELinux mode.
 
-13. Run finalize image scripts. ([finalizeImageScripts](#finalizeimagescripts-script))
+12. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
+    and update the grub config.
 
-14. Delete `/etc/resolv.conf` file.
+13. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
+    and update the grub config.
 
-15. Enable overlay filesystem. ([overlay](#overlay-type))
+14. Regenerate the initramfs file (if needed).
 
-16. Enable dm-verity root protection. ([verity](#verity-type))
+15. Run ([postCustomization](#postcustomization-script)) scripts.
 
-17. if the output format is set to `iso`, copy additional iso media files.
+16. If SELinux is enabled, call `setfiles`.
+
+17. Delete `/etc/resolv.conf` file.
+
+18. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
+
+19. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
+    the file systems.
+
+20. If ([verity](#verity-type)) is specified, then create the hash tree and update the
+    grub config.
+
+21. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -138,14 +150,6 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
-    - [postInstallScripts](#postinstallscripts-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
-    - [finalizeImageScripts](#finalizeimagescripts-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
@@ -168,6 +172,15 @@ os:
         - [options](#options-mapstring-string)
     - [overlay type](#overlay-type)
     - [verity type](#verity-type)
+  - [scripts type](#scripts-type)
+    - [postCustomization](#postcustomization-script)
+      - [script type](#script-type)
+        - [path](#script-path)
+        - [args](#args-string)
+    - [finalizeCustomization](#finalizecustomization-script)
+      - [script type](#script-type)
+        - [path](#script-path)
+        - [args](#args-string)
 
 ## Top-level
 
@@ -304,7 +317,7 @@ os:
       workDir: /work_etc
       partition:
         idType: part-label
-        Id: partition-etc
+        id: partition-etc
     - lowerDir: /var/lib
       upperDir: /upper_var_lib
       workDir: /work_var_lib
@@ -807,8 +820,8 @@ in.
 Example:
 
 ```yaml
-os:
-  postInstallScripts:
+scripts:
+  postCustomization:
   - path: scripts/a.sh
 ```
 
@@ -819,10 +832,47 @@ Additional arguments to pass to the script.
 Example:
 
 ```yaml
-os:
-  postInstallScripts:
+scripts:
+  postCustomization:
   - path: scripts/a.sh
     args: abc
+```
+
+## scripts type
+
+Note: Script files must be in the same directory or a child directory of the directory
+that contains the config file.
+
+### postCustomization [[script](#script-type)[]]
+
+Scripts to run after all the in-built customization steps have run.
+
+These scripts are run under a chroot of the customized OS.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - path: scripts/a.sh
+```
+
+### finalizeCustomization [[script](#script-type)[]]
+
+Scripts to run at the end of the customization process.
+
+These scripts are run under a chroot of the customized OS.
+
+Note: Most scripts should be added to [postCustomization](#postcustomization-script).
+Only add scripts to `finalizeCustomization` if you want to customize the
+`/etc/resolv.conf` file or you want manually set SELinux file labels.
+
+Example:
+
+```yaml
+os:
+  finalizeCustomization:
+  - path: scripts/b.sh
 ```
 
 ## services type
@@ -927,40 +977,6 @@ os:
       permissions: "664"
 ```
 
-### postInstallScripts [[script](#script-type)[]]
-
-Scripts to run against the image after the packages have been added and removed.
-
-These scripts are run under a chroot of the customized OS.
-
-Note: Scripts must be in the same directory or a child directory of the directory
-that contains the config file.
-
-Example:
-
-```yaml
-os:
-  postInstallScripts:
-  - path: scripts/a.sh
-```
-
-### finalizeImageScripts [[script](#script-type)[]]
-
-Scripts to run against the image just before the image is finalized.
-
-These scripts are run under a chroot of the customized OS.
-
-Note: Scripts must be in the same directory or a child directory of the directory
-that contains the config file.
-
-Example:
-
-```yaml
-os:
-  finalizeImageScripts:
-  - path: scripts/a.sh
-```
-
 ### users [[user](#user-type)]
 
 Used to add and/or update user accounts.
@@ -984,7 +1000,6 @@ os:
   modules:
     - name: vfio
 ```
-
 
 ### services [[services](#services-type)]
 

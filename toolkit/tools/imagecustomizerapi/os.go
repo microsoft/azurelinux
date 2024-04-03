@@ -12,19 +12,17 @@ import (
 
 // OS defines how each system present on the image is supposed to be configured.
 type OS struct {
-	ResetBootLoaderType  ResetBootLoaderType `yaml:"resetBootLoaderType"`
-	Hostname             string              `yaml:"hostname"`
-	Packages             Packages            `yaml:"packages"`
-	SELinux              SELinux             `yaml:"selinux"`
-	KernelCommandLine    KernelCommandLine   `yaml:"kernelCommandLine"`
-	AdditionalFiles      AdditionalFilesMap  `yaml:"additionalFiles"`
-	PostInstallScripts   []Script            `yaml:"postInstallScripts"`
-	FinalizeImageScripts []Script            `yaml:"finalizeImageScripts"`
-	Users                []User              `yaml:"users"`
-	Services             Services            `yaml:"services"`
-	Modules              []Module            `yaml:"modules"`
-	Verity               *Verity             `yaml:"verity"`
-	Overlays             *[]Overlay          `yaml:"overlays"`
+	ResetBootLoaderType ResetBootLoaderType `yaml:"resetBootLoaderType"`
+	Hostname            string              `yaml:"hostname"`
+	Packages            Packages            `yaml:"packages"`
+	SELinux             SELinux             `yaml:"selinux"`
+	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
+	AdditionalFiles     AdditionalFilesMap  `yaml:"additionalFiles"`
+	Users               []User              `yaml:"users"`
+	Services            Services            `yaml:"services"`
+	Modules             []Module            `yaml:"modules"`
+	Verity              *Verity             `yaml:"verity"`
+	Overlays            *[]Overlay          `yaml:"overlays"`
 }
 
 func (s *OS) IsValid() error {
@@ -53,20 +51,6 @@ func (s *OS) IsValid() error {
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid additionalFiles: %w", err)
-	}
-
-	for i, script := range s.PostInstallScripts {
-		err = script.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid postInstallScripts item at index %d: %w", i, err)
-		}
-	}
-
-	for i, script := range s.FinalizeImageScripts {
-		err = script.IsValid()
-		if err != nil {
-			return fmt.Errorf("invalid finalizeImageScripts item at index %d: %w", i, err)
-		}
 	}
 
 	for i, user := range s.Users {

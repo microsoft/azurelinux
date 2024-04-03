@@ -157,43 +157,40 @@ func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 }
 
 func TestValidateConfigScript(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			PostInstallScripts: []imagecustomizerapi.Script{
-				{
-					Path: "scripts/postinstallscript.sh",
-				},
+	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+		PostCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/postcustomizationscript.sh",
 			},
-			FinalizeImageScripts: []imagecustomizerapi.Script{
-				{
-					Path: "scripts/finalizeimagescript.sh",
-				},
+		},
+		FinalizeCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "scripts/finalizecustomizationscript.sh",
 			},
-		}}, nil, true)
+		},
+	})
 	assert.NoError(t, err)
 }
 
 func TestValidateConfigScriptNonLocalFile(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			PostInstallScripts: []imagecustomizerapi.Script{
-				{
-					Path: "../a.sh",
-				},
+	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+		FinalizeCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "../a.sh",
 			},
-		}}, nil, true)
+		},
+	})
 	assert.Error(t, err)
 }
 
 func TestValidateConfigScriptNonExecutable(t *testing.T) {
-	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
-			FinalizeImageScripts: []imagecustomizerapi.Script{
-				{
-					Path: "files/a.txt",
-				},
+	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+		FinalizeCustomization: []imagecustomizerapi.Script{
+			{
+				Path: "files/a.txt",
 			},
-		}}, nil, true)
+		},
+	})
 	assert.Error(t, err)
 }
 

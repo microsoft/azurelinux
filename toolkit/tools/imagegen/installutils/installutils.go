@@ -1731,12 +1731,12 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(selinuxMode, installChroot)
+	err = SELinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		err = fmt.Errorf("failed to update SELinux config:\n%w", err)
 		return
 	}
-	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
+	err = SELinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		err = fmt.Errorf("failed to label SELinux files:\n%w", err)
 		return
@@ -1744,7 +1744,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1763,7 +1763,7 @@ func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
 		squashErrors        = false
