@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -222,10 +222,6 @@ BuildRequires:  golang
 %ifarch x86_64
 BuildRequires:  syslinux
 BuildRequires:  syslinux-devel
-%endif
-
-%ifnarch aarch64
-BuildRequires:  zfs-fuse
 %endif
 
 # For core disk-create API.
@@ -1146,6 +1142,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Wed Apr 3 2024 Jon Slobodzian <joslobo@microsoft.com> - 1.52.0-2
+* Remove dependency on zfs-fuse
+
 * Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
 - Update to 1.52.0
 - Move to pcre2

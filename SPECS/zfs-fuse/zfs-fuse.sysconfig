@@ -1,9 +1,0 @@
-# Set this option to yes if you want all ZFS filesystems to be mounted on boot.
-ZFS_AUTOMOUNT=yes
-
-# Set this option to yes to enable weekly scrubbing of your ZFS pools.
-ZFS_WEEKLY_SCRUB=no
-
-# Set this option to yes_really to kill all processes with unknown working directory at zfs-fuse startup
-# Use with extreme care.  This will also kill processes totally unrelated to zfs-fuse.
-# ZFS_KILL_ORPHANS=no|yes_really

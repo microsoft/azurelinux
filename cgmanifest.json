@@ -30598,16 +30598,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "zfs-fuse",
-          "version": "0.7.2.2",
-          "downloadUrl": "http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/0.7.2.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "zip",
           "version": "3.0",
           "downloadUrl": "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
