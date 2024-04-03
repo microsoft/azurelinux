@@ -26244,8 +26244,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-hoe",
-          "version": "3.18.0",
-          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
+          "version": "4.0.4",
+          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v4.0.4.tar.gz"
         }
       }
     },
@@ -26263,9 +26263,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-http_parser.rb",
-          "version": "0.6.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/http_parser.rb-0.6.1.tar.gz"
+          "name": "rubygem-http_parser",
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/tmm1/http_parser.rb/archive/refs/tags/v0.8.0.tar.gz"
         }
       }
     },
