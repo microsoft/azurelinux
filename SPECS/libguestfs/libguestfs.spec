@@ -21,6 +21,7 @@
 %bcond_with php
 %bcond_with inspect-icons
 %bcond_with man-pages
+%bcond_with zfs
 
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
@@ -385,6 +386,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This adds XFS support to %{name}.  Install it if you want to process
 disk images containing XFS.
 
+%if %{with zfs}
 %ifnarch aarch64
 %package zfs
 Summary:        ZFS support for %{name}
@@ -396,7 +398,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This adds ZFS support to %{name}.  Install it if you want to process
 disk images containing ZFS.
 %endif
-
+%endif
 
 %if %{with inspect-icons}
 %package inspect-icons
@@ -818,8 +820,10 @@ tdnf install --downloadonly -y \
     xz \
     yajl \
     zerofree \
+%if %{with zfs}
 %ifnarch aarch64
     zfs-fuse \
+%endif
 %endif
 
 mkdir cachedir repo
@@ -923,8 +927,10 @@ move_to strace          zz-packages-rescue
 move_to vim             zz-packages-rescue
 move_to rsync           zz-packages-rsync
 move_to xfsprogs        zz-packages-xfs
+%if %{with zfs}
 %ifnarch aarch64
 move_to zfs-fuse        zz-packages-zfs
+%endif
 %endif
 
 popd
@@ -1003,9 +1009,11 @@ rm ocaml/html/.gitignore
 %files xfs
 %{_libdir}/guestfs/supermin.d/zz-packages-xfs
 
+%if %{with zfs}
 %ifnarch aarch64
 %files zfs
 %{_libdir}/guestfs/supermin.d/zz-packages-zfs
+%endif
 %endif
 
 %endif
