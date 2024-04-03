@@ -2,7 +2,7 @@ Summary:        Package to deploy azurelinux-sysinfo service
 Name:           azurelinux-sysinfo
 Version:        %{azl}.0
 Release:        1%{?dist}
-License:        GPLv2+
+License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
