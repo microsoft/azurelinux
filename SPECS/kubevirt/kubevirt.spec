@@ -121,14 +121,6 @@ Group:          System/Packages
 The pr-helper-conf package provides configuration files for persistent
 reservation helper
 
-%package        manifests
-Summary:        YAML manifests used to install kubevirt
-Group:          System/Packages
-
-%description    manifests
-This contains the built YAML manifests used to install kubevirt into a
-kubernetes installation with kubectl apply.
-
 %package        tests
 Summary:        Kubevirt functional tests
 Group:          System/Packages
@@ -269,22 +261,12 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %doc README.md
 %dir %{_datadir}/kube-virt
 %dir %{_datadir}/kube-virt/pr-helper
-%{_datadir}/kube-virt/pr-helper
-
-%files manifests
-%license LICENSE
-%doc README.md
-%dir %{_datadir}/kube-virt
-%dir %{_datadir}/kube-virt/manifests
-%{_datadir}/kube-virt/manifests/release
 
 %files tests
 %license LICENSE
 %doc README.md
 %dir %{_datadir}/kube-virt
-%dir %{_datadir}/kube-virt/manifests
 %{_bindir}/virt-tests
-%{_datadir}/kube-virt/manifests/testing
 
 %changelog
 * Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
