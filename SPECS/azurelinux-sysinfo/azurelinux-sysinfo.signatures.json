@@ -1,0 +1,8 @@
+{
+    "Signatures": {
+     "collect-mariner-metrics.py": "4abe7ec4f9020f70907b36547494426cb68a8d80b172cdec49e2421e95aa34d1",
+     "mariner_metrics_schema_v1.json": "9588e2958b594153c15cffb20dc9fa060083383a5e15622b022e8a271717a53a",
+     "mariner-metrics-livecd.service": "20ab6690707805170154f4d6fcccacc9830eaf0b93d6263beb6986be631c5522"
+    }
+}
+   

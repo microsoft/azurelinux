@@ -1,0 +1,13 @@
+[Unit]
+Description=Mariner Metrics Service
+After=cloud-init.target multi-user.target
+
+[Service]
+Environment=PYTHONUNBUFFERED=1
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/collect-mariner-metrics.py "livecd"
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
