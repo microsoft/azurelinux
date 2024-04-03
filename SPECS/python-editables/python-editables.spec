@@ -52,7 +52,7 @@ Summary:        %{summary}
 
 %changelog
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.5-6
-- Initial import for Azure Linux (License:MIT).
+- Initial Azure Linux import from Fedora 41 (license: MIT).
 - License Verified.
 
 * Fri Mar 29 2024 Benjamin A. Beasley <code@musicinmybrain.net> - 0.5-5
