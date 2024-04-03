@@ -23932,16 +23932,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-redis",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/andymccurdy/redis-py/archive/python-redis-3.5.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-remoto",
           "version": "1.2.1",
           "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-1.2.1.tar.gz"
@@ -25415,16 +25405,6 @@
           "name": "recordproto",
           "version": "1.14.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "redis",
-          "version": "7.2.4",
-          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
         }
       }
     },
