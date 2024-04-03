@@ -794,6 +794,8 @@ func AddImageIDFile(installChroot *safechroot.Chroot, buildNumber string) (err e
 		return
 	}
 
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
 	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
 	if fileWriteErr != nil {
 		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
