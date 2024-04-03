@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-sec-dispatcher
-Source0:        %{url}/archive/refs/tags/plexus-sec-dispatcher-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt 
 BuildArch:      noarch
 
@@ -54,7 +54,7 @@ cp %{SOURCE1} .
  
 %changelog
 * Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2-1
-- Auto-upgrade to 2 - 3.0 package upgrade
+- Auto-upgrade to 2.0 - 3.0 package upgrade
 
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.4-2
 - Rebuilt with msopenjdk-17

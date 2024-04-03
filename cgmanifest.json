@@ -20963,7 +20963,7 @@
         "type": "other",
         "other": {
           "name": "plexus-sec-dispatcher",
-          "version": "2",
+          "version": "2.0",
           "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/refs/tags/plexus-sec-dispatcher-2.0.tar.gz"
         }
       }
