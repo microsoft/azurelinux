@@ -34,9 +34,8 @@ var (
 	specsToSearch = app.Flag("specs", "Space seperated list of specfiles to search from.").String()
 	goalsToSearch = app.Flag("goals", "Space seperated list of goal names to search (Try 'ALL' or 'PackagesToBuild').").String()
 
-	reverseSearch        = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
-	runtimeOnly          = app.Flag("runtime-only", "Only consider runtime dependencies").Bool()
-	runtimeOnlyPlusBuild = app.Flag("runtime-only-plus-build", "Only consider runtime dependencies, but include the root build nodes").Bool()
+	reverseSearch      = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
+	runtimeFilterLevel = app.Flag("runtime-filter-level", "Only consider only runtime dependencies beyond this layer of the graph. -1 to disable filter, 0 for no build nodes, 1 for searched nodes' build nodes, etc.").Default("-1").Int()
 
 	printTree       = app.Flag("tree", "Print output as a simple tree instead of a list").Bool()
 	verbosity       = app.Flag("verbosity", "Print the full node details (4), limited details (3), RPM (2), or SPEC name (1) for each result").Default("1").Int()
@@ -69,14 +68,8 @@ func main() {
 	}
 
 	// Only one of runtimeOnlyPlusBuild or runtimeOnly can be set
-	if *runtimeOnly && *runtimeOnlyPlusBuild {
-		logger.Log.Fatalf("Only one of --runtime-only or --runtime-only-plus-build can be set")
-	}
-	runtimeFilterLevel := -1
-	if *runtimeOnlyPlusBuild {
-		runtimeFilterLevel = 1
-	} else if *runtimeOnly {
-		runtimeFilterLevel = 0
+	if *runtimeFilterLevel < -1 {
+		logger.Log.Fatalf("Invalid runtime filter level '%d', valid ranges are -1, >=0", *runtimeFilterLevel)
 	}
 
 	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
@@ -122,7 +115,7 @@ func main() {
 		logger.Log.Panicf("Failed to generate graph to run depsearch on: %s", err)
 	}
 
-	printSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, runtimeFilterLevel, root)
+	printSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, *runtimeFilterLevel, root)
 
 	if len(*outputGraphFile) > 0 {
 		pkggraph.WriteDOTGraphFile(outputGraph, *outputGraphFile)
