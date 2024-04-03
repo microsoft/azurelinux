@@ -761,6 +761,20 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 // IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
 // IMAGE_UUID: The UUID of the image
 func AddImageIDFile(installChroot *safechroot.Chroot, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChroot.RootDir(), "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
 	const (
 		imageIDFile      = "/etc/image-id"
 		imageIDFilePerms = 0444
@@ -772,14 +786,19 @@ func AddImageIDFile(installChroot *safechroot.Chroot, buildNumber string) (err e
 	imageBuildDate := time.Now().UTC().Format("20060102150405")
 
 	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChroot.RootDir(), imageIDFile)
 
-	err = installChroot.UnsafeRun(func() error {
-		return file.Create(imageIDFile, imageIDFilePerms)
-	})
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
 
-	err = installChroot.UnsafeRun(func() error {
-		return file.Write(imageIDContent, imageIDFile)
-	})
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
 
 	return
 }
