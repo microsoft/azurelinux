@@ -45,5 +45,6 @@ systemctl enable azurelinux-sysinfo.service
 * Wed Apr 03 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.
+- Original version for Azure Linux.
 
 
