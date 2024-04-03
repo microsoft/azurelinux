@@ -7,11 +7,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/azurelinux
-Source0: collect-sysinfo.py
-Source1: sysinfo-schema-v1.json
-Source2: azurelinux-sysinfo.service
-Requires: systemd
-Requires: python3-psutil
+Source0:        collect-sysinfo.py
+Source1:        sysinfo-schema-v1.json
+Source2:        azurelinux-sysinfo.service
+Requires:       systemd
+Requires:       python3-psutil
 
 %description
 Deploys a systemd service that collects system information related to the device, operating system, cloud-init, boot 
