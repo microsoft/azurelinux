@@ -1,7 +1,3 @@
-# Subversion for newer version of the vendor tarball for the same version of "telegraf".
-# Reset or remove %%vendor_patch_version after updating to a newer version of "telegraf".
-%global vendor_patch_version 2
-
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.29.4
@@ -12,12 +8,6 @@ Distribution:   Mariner
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Use the generate_source_tarball.sh script to get the vendored sources.
-# Reset or remove %%vendor_patch_version after updating to a newer version of "telegraf".
-Source1:        %{name}-%{version}%{?vendor_patch_version:-%vendor_patch_version}-vendor.tar.gz
-Patch1:         CVE-2024-28110.patch
-# CVE-2024-27304 patch also includes an update to the "vendor" tarball.
-Patch2:         CVE-2024-27304.patch
 BuildRequires:  golang
 BuildRequires:  iana-etc
 BuildRequires:  systemd-devel
