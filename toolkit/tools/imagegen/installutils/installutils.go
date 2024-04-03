@@ -755,7 +755,7 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	return
 }
 
-// Adds image-id file in the /etc directory of the install root.
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
 // The file contains the following fields:
 // BUILD_NUMBER: The build number of the image
 // IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
