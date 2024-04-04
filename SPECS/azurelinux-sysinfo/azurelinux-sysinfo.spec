@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://aka.ms/azurelinux
-Source0:        collect-sysinfo.py
+Source0:        collect-sysinfo
 Source1:        sysinfo-schema-v1.json
 Source2:        azurelinux-sysinfo.service
 Requires:       systemd
@@ -20,9 +20,9 @@ a log file on the user's system for easy access and analysis. The systemd servic
 image creation.
 
 %install
-# Copy collection python script to /usr/local/bin/
-mkdir -p %{buildroot}/usr/local/bin/
-install -m 755 %{SOURCE0} %{buildroot}/usr/local/bin/
+# Copy collection python script to /usr/bin/
+mkdir -p %{buildroot}/usr/bin/
+install -m 755 %{SOURCE0} %{buildroot}/usr/bin/
 
 # Copy data schema to /usr/local/data/
 mkdir -p %{buildroot}/usr/local/data/
@@ -33,7 +33,7 @@ mkdir -p %{buildroot}/etc/systemd/system/
 install -m 755 %{SOURCE2} %{buildroot}/etc/systemd/system/
 
 %files
-/usr/local/bin/collect-sysinfo.py
+/usr/bin/collect-sysinfo
 /usr/local/data/sysinfo-schema-v1.json
 /etc/systemd/system/azurelinux-sysinfo.service
 
