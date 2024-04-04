@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -109,7 +109,8 @@ export CXXFLAGS="`echo " %{build_cxxflags} " | sed 's/ -g//'`"
 sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
-    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
+    --enable-profiler \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv,rust-demangler" \
     --release-channel="stable" \
     --release-description="Azure Linux %{version}-%{release}"
 
@@ -149,6 +150,7 @@ rm %{buildroot}%{_bindir}/*.old
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
+%{_bindir}/rust-demangler
 %{_bindir}/cargo
 %{_bindir}/cargo-clippy
 %{_bindir}/cargo-fmt
@@ -167,6 +169,9 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Mon Apr 01 2024 Muhammad Falak <mwani@microsoft.com> - 1.75.0-5
+- Enable profiler support 
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.75.0-4
 - update to build dep latest glibc-static version
 
