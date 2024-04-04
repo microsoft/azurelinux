@@ -1,0 +1,272 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "SPECS/azurelinux-sysinfo/sysinfo-schema-v1.json",
+    "title": "Azure Linux Sysinfo Schema",
+    "description": "This defines the schema for the collected Azure Linux system information",
+    "type": "object",
+    "properties": {
+        "source": {
+            "$id": "#/properties/source",
+            "type": "string",
+            "title": "Name of the service",
+            "description": "Service the logs are obtained from",
+            "required": [
+                "source"
+            ],
+            "additionalProperties": false
+        },
+        "asset_id": {
+            "$id": "#/properties/asset_id",
+            "type": "string",
+            "title": "Asset ID",
+            "description": "Unique identifier (uuid) of the device",
+            "required": [
+                "asset_id"
+            ],
+            "additionalProperties": false
+        },
+        "os_info": {
+            "$id": "#/properties/os_info",
+            "type": "object",
+            "title": "Operating system information",
+            "description": "Information about the Azure Linux operating system",
+            "properties": {
+                "kernel_version": {
+                    "$id": "#/properties/os_info/properties/kernel_version",
+                    "type": "string",
+                    "title": "Linux kernel version",
+                    "description": "The kernel version of Linux"
+                },
+                "release_version": {
+                    "$id": "#/properties/os_info/properties/release_version",
+                    "type": "string",
+                    "title": "Azure Linux operating system release version",
+                    "description": "The release version of upstream Azure Linux"
+                },
+                "release_version_id": {
+                    "$id": "#/properties/os_info/properties/release_version_id",
+                    "type": "string",
+                    "title": "Azure Linux operating system release version id",
+                    "description": "The release version id of upstream Azure Linux"
+                }
+            },
+            "required": [
+                "kernel_version",
+                "release_version",
+                "release_version_id"
+            ],
+            "additionalProperties": false
+        },
+        "cloud_init_info": {
+            "$id": "#/properties/cloud_init_info",
+            "type": "object",
+            "title": "Cloud-init information",
+            "description": "Information about cloud-init applied to the Azure Linux operating system",
+            "properties": {
+                "hostname": {
+                    "$id": "#/properties/cloud_init_info/properties/hostname",
+                    "type": "string",
+                    "title": "Hostname",
+                    "description": "The hostname of the system"
+                },
+                "longest_running_processes": {
+                    "$id": "#/properties/cloud_init_info/properties/longest_running_processes",
+                    "type": "array",
+                    "title": "Longest Running Processes",
+                    "description": "List of top running processes that took the most time during cloud-init"
+                }
+            },
+            "required": [
+                "hostname",
+                "longest_running_processes"
+            ],
+            "additionalProperties": false
+        },
+        "boot_info": {
+            "$id": "#/properties/boot_info",
+            "type": "object",
+            "title": "Operating system boot information",
+            "description": "Information about Azure Linux operating system booting",
+            "properties": {
+                "boot_time": {
+                    "$id": "#/properties/boot_info/properties/boot_time",
+                    "type": "object",
+                    "title": "Boot time",
+                    "description": "Boot time information",
+                    "properties": {
+                        "kernel_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/kernel_boot_time_secs",
+                            "type": "number",
+                            "title": "Kernel boot time in seconds",
+                            "description": "Time spent in the kernel before userspace has been reached"
+                        },
+                        "initrd_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/initrd_boot_time_secs",
+                            "type": "number",
+                            "title": "Initrd boot time in seconds",
+                            "description": "Time spent in the initrd before userspace has been reached"
+                        },
+                        "userspace_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/userspace_boot_time_secs",
+                            "type": "number",
+                            "title": "Userspace boot time in seconds",
+                            "description": "Time spent in userspace before the system is ready to use"
+                        },
+                        "firmware_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/firmware_boot_time_secs",
+                            "type": "number",
+                            "title": "Firmware boot time in seconds",
+                            "description": "Time spent in firmware before the system is ready to use"
+                        },
+                        "loader_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/loader_boot_time_secs",
+                            "type": "number",
+                            "title": "Loader boot time in seconds",
+                            "description": "Time spent in loader before the system is ready to use"
+                        },
+                        "total_boot_time_secs": {
+                            "$id": "#/properties/boot_info/properties/boot_time/properties/total_boot_time_secs",
+                            "type": "number",
+                            "title": "Total boot time in seconds",
+                            "description": "Total time spent in the boot process"
+                        }
+                    },
+                    "required": [
+                        "kernel_boot_time_secs",
+                        "userspace_boot_time_secs",
+                        "total_boot_time_secs"
+                    ]
+                },
+                "longest_running_processes": {
+                    "$id": "#/properties/boot_info/properties/longest_running_processes",
+                    "type": "array",
+                    "title": "Longest running processes",
+                    "description": "List of top running processes that took the most time during boot"
+                }
+            },
+            "required": [
+                "boot_time",
+                "longest_running_processes"
+            ]
+        },
+        "resource_utilization": {
+            "$id": "#/properties/resource_utilization",
+            "type": "object",
+            "title": "System resources utilization",
+            "description": "Information about resources usage",
+            "properties": {
+                "disk_usage": {
+                    "$id": "#/properties/resource_utilization/properties/disk_usage",
+                    "type": "object",
+                    "title": "Disk usage",
+                    "description": "Disk usage information",
+                    "properties": {
+                        "disk_size_gib": {
+                            "$id": "#/properties/resource_utilization/properties/disk_usage/properties/disk_size_gib",
+                            "type": "string",
+                            "title": "Os disk size",
+                            "description": "Os disk size in GiB when the system was booted"
+                        },
+                        "disk_usage_gib": {
+                            "$id": "#/properties/resource_utilization/properties/disk_usage/properties/disk_usage_gib",
+                            "type": "string",
+                            "title": "Os disk usage",
+                            "description": "Os disk usage in GiB when the system was booted"
+                        }
+                    },
+                    "required": [
+                        "disk_size_gib",
+                        "disk_usage_gib"
+                    ]
+                },
+                "memory_usage": {
+                    "$id": "#/properties/resource_utilization/properties/memory_usage",
+                    "type": "object",
+                    "title": "Memory usage",
+                    "description": "Memory usage information",
+                    "properties": {
+                        "total_memory_gib": {
+                            "$id": "#properties/resource_utilization/properties/memory_usage/properties/total_memory_gib",
+                            "type": "integer",
+                            "title": "Total memory",
+                            "description": "Total memory in GiB when the system was booted"
+                        },
+                        "available_memory_gib": {
+                            "$id": "#properties/resource_utilization/properties/memory_usage/properties/available_memory_gib",
+                            "type": "integer",
+                            "title": "Available memory",
+                            "description": "Available memory in GiB when the system was booted"
+                        }
+                    }
+                },
+                "cpu_usage": {
+                    "$id": "#/properties/resource_utilization/properties/memory_usage",
+                    "type": "object",
+                    "title": "cpu usage & info",
+                    "description": "Cpu usage information",
+                    "properties": {
+                        "physical_cpu_count": {
+                            "$id": "#properties/resource_utilization/properties/cpu_usage/properties/physical_cpu_count",
+                            "type": "integer",
+                            "title": "Physical cpu count",
+                            "description": "Physical cpu count"
+                        },
+                        "logical_cpu_count": {
+                            "$id": "#properties/resource_utilization/properties/cpu_usage/properties/logical_cpu_count",
+                            "type": "integer",
+                            "title": "Logical cpu count",
+                            "description": "Logical cpu count"
+                        },
+                        "cpu_usage_percent": {
+                            "$id": "#properties/resource_utilization/properties/cpu_usage/properties/cpu_usage_percent",
+                            "type": "number",
+                            "title": "Cpu usage percent",
+                            "description": "Cpu usage percent"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "disk_usage",
+                "memory_usage",
+                "cpu_usage"
+            ]
+        },
+        "package_info": {
+            "$id": "#/properties/package_info",
+            "type": "object",
+            "title": "Package Information",
+            "description": "Information about the packages installed on Azure Linux",
+            "properties": {
+                "package_count": {
+                    "$id": "#/properties/package_info/properties/package_count",
+                    "type": "integer",
+                    "title": "Package Count",
+                    "description": "The number of packages installed on Azure Linux"
+                }
+            },
+            "required": [
+                "package_count"
+            ],
+            "additionalProperties": false
+        },
+        "system_info": {
+            "$id": "#/properties/system_info",
+            "type": "object",
+            "title": "System Information",
+            "description": "Information about the system-wide settings",
+            "properties": {
+                "selinux_mode": {
+                    "$id": "#/properties/package_info/properties/package_count",
+                    "type": "string",
+                    "title": "SELinux Mode",
+                    "description": "Enforced or Permissive"
+                }
+            },
+            "required": [
+                "selinux_mode"
+            ],
+            "additionalProperties": false
+        }
+    }
+}
