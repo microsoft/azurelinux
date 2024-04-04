@@ -157,7 +157,7 @@ func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 }
 
 func TestValidateConfigScript(t *testing.T) {
-	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
 		PostCustomization: []imagecustomizerapi.Script{
 			{
 				Path: "scripts/postcustomizationscript.sh",
@@ -173,7 +173,7 @@ func TestValidateConfigScript(t *testing.T) {
 }
 
 func TestValidateConfigScriptNonLocalFile(t *testing.T) {
-	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
 		FinalizeCustomization: []imagecustomizerapi.Script{
 			{
 				Path: "../a.sh",
@@ -184,7 +184,7 @@ func TestValidateConfigScriptNonLocalFile(t *testing.T) {
 }
 
 func TestValidateConfigScriptNonExecutable(t *testing.T) {
-	err := validScripts(testDir, &imagecustomizerapi.Scripts{
+	err := validateScripts(testDir, &imagecustomizerapi.Scripts{
 		FinalizeCustomization: []imagecustomizerapi.Script{
 			{
 				Path: "files/a.txt",
