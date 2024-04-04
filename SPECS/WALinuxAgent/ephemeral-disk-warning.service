@@ -7,7 +7,7 @@ ConditionPathExists=/dev/disk/azure/resource-part1
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/ephemeral-disk-warning
+ExecStart=/usr/sbin/ephemeral-disk-warning
 RemainAfterExit=yes
 StandardOutput=journal+console
 
