@@ -226,12 +226,14 @@ def collect_system_info():
     system_info = {"selinux_mode": get_selinux_mode()}
     return system_info
 
+
 def get_asset_id():
     print("Collecting asset id...")
     
     return subprocess.run(
         ["cat", "/sys/devices/virtual/dmi/id/product_uuid"], capture_output=True, text=True
     ).stdout.lower().strip()
+
 
 def has_valid_schema(data):
     schema_file = os.path.join(DATA_SCHEMA_DIR, DATA_SCHEMA_FILENAME)
