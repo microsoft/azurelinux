@@ -2180,6 +2180,7 @@
                 "azurelinux-release",
                 "azurelinux-repos",
                 "azurelinux-rpm-macros",
+                "azurelinux-sysinfo",
                 "bazel",
                 "blobfuse2",
                 "bmon",
