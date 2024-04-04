@@ -1,8 +1,8 @@
 {
     "Signatures": {
-     "collect-sysinfo": "808a32c81f3a7fad453b2055f59ccb33d24d04bd874222cf78a47836572a1ee1",
+     "collect-sysinfo": "fe4cb0d42e762abdf1e8f02f663e9cdb3dfa1cef25980157b463a7d72dc37da0",
      "sysinfo-schema-v1.json": "3ecc64f5aaba3b0430c5441c8e792f134dbb5dcc7319f4351eb434c00240044c",
-     "azurelinux-sysinfo.service": "570e176d5664deacc7804e792892ecc56e491d5e2b1079eacbb4041c478130ac"
+     "azurelinux-sysinfo.service": "c719ab2238d0412b7ac6a793cd83e5be7879023161f86fb29d1c0ca18e70631c"
     }
 }
    
