@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.9.0.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -93,6 +93,9 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Tue Apr 02 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.9.0.4-3
+- Fix ephemeral-disk-warning script path from /usr/bin to /usr/sbin
+
 * Wed Mar 13 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.9.0.4-2
 - Sed service file to refer to actual waagent location, /usr/sbin/waagent
 

@@ -4,9 +4,7 @@ storage:
     maxSize: 4096
     partitions:
     - id: efi
-      flags:
-      - esp
-      - boot
+      type: esp
       start: 1
       end: 65
 
