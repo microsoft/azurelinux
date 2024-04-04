@@ -1,0 +1,104 @@
+From 45db22e7eaa7a68c57e15114670017a07e71106f Mon Sep 17 00:00:00 2001
+From: Rachel Menge <rachelmenge@microsoft.com>
+Date: Thu, 4 Apr 2024 17:32:11 -0400
+Subject: [PATCH] Revert "mm/sparsemem: fix race in accessing
+ memory_section->usage"
+
+This reverts commit b448de2459b6d62a53892487ab18b7d823ff0529.
+due to NVIDIA driver incompatibility
+https://github.com/NVIDIA/open-gpu-kernel-modules/issues/594
+---
+ include/linux/mmzone.h | 14 +++-----------
+ mm/sparse.c            | 17 ++++++++---------
+ 2 files changed, 11 insertions(+), 20 deletions(-)
+
+diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+index 8b8349ffa1cd..9e1485083398 100644
+--- a/include/linux/mmzone.h
++++ b/include/linux/mmzone.h
+@@ -1287,7 +1287,6 @@ static inline unsigned long section_nr_to_pfn(unsigned long sec)
+ #define SUBSECTION_ALIGN_DOWN(pfn) ((pfn) & PAGE_SUBSECTION_MASK)
+ 
+ struct mem_section_usage {
+-	struct rcu_head rcu;
+ #ifdef CONFIG_SPARSEMEM_VMEMMAP
+ 	DECLARE_BITMAP(subsection_map, SUBSECTIONS_PER_SECTION);
+ #endif
+@@ -1458,7 +1457,7 @@ static inline int pfn_section_valid(struct mem_section *ms, unsigned long pfn)
+ {
+ 	int idx = subsection_map_index(pfn);
+ 
+-	return test_bit(idx, READ_ONCE(ms->usage)->subsection_map);
++	return test_bit(idx, ms->usage->subsection_map);
+ }
+ #else
+ static inline int pfn_section_valid(struct mem_section *ms, unsigned long pfn)
+@@ -1482,7 +1481,6 @@ static inline int pfn_section_valid(struct mem_section *ms, unsigned long pfn)
+ static inline int pfn_valid(unsigned long pfn)
+ {
+ 	struct mem_section *ms;
+-	int ret;
+ 
+ 	/*
+ 	 * Ensure the upper PAGE_SHIFT bits are clear in the
+@@ -1496,19 +1494,13 @@ static inline int pfn_valid(unsigned long pfn)
+ 	if (pfn_to_section_nr(pfn) >= NR_MEM_SECTIONS)
+ 		return 0;
+ 	ms = __pfn_to_section(pfn);
+-	rcu_read_lock();
+-	if (!valid_section(ms)) {
+-		rcu_read_unlock();
++	if (!valid_section(ms))
+ 		return 0;
+-	}
+ 	/*
+ 	 * Traditionally early sections always returned pfn_valid() for
+ 	 * the entire section-sized span.
+ 	 */
+-	ret = early_section(ms) || pfn_section_valid(ms, pfn);
+-	rcu_read_unlock();
+-
+-	return ret;
++	return early_section(ms) || pfn_section_valid(ms, pfn);
+ }
+ #endif
+ 
+diff --git a/mm/sparse.c b/mm/sparse.c
+index 27092badd15b..120bc8ea5293 100644
+--- a/mm/sparse.c
++++ b/mm/sparse.c
+@@ -789,13 +789,6 @@ static void section_deactivate(unsigned long pfn, unsigned long nr_pages,
+ 	if (empty) {
+ 		unsigned long section_nr = pfn_to_section_nr(pfn);
+ 
+-		/*
+-		 * Mark the section invalid so that valid_section()
+-		 * return false. This prevents code from dereferencing
+-		 * ms->usage array.
+-		 */
+-		ms->section_mem_map &= ~SECTION_HAS_MEM_MAP;
+-
+ 		/*
+ 		 * When removing an early section, the usage map is kept (as the
+ 		 * usage maps of other sections fall into the same page). It
+@@ -804,10 +797,16 @@ static void section_deactivate(unsigned long pfn, unsigned long nr_pages,
+ 		 * was allocated during boot.
+ 		 */
+ 		if (!PageReserved(virt_to_page(ms->usage))) {
+-			kfree_rcu(ms->usage, rcu);
+-			WRITE_ONCE(ms->usage, NULL);
++			kfree(ms->usage);
++			ms->usage = NULL;
+ 		}
+ 		memmap = sparse_decode_mem_map(ms->section_mem_map, section_nr);
++		/*
++		 * Mark the section invalid so that valid_section()
++		 * return false. This prevents code from dereferencing
++		 * ms->usage array.
++		 */
++		ms->section_mem_map &= ~SECTION_HAS_MEM_MAP;
+ 	}
+ 
+ 	/*
+-- 
+2.34.1
