@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        17.0.6
-Release:        4%{?dist}
+Version:        18.1.2
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -99,6 +99,9 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Wed Mar 27 2024 Andrew Phelps <anphel@microsoft.com> - 17.0.6-4
 - Define LLVM_BINUTILS_INCDIR so that LLVMgold.so is built.
 

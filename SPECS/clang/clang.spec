@@ -1,11 +1,11 @@
-%global maj_ver 17
+%global maj_ver 18
 
 %global clang_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        C, C++, Objective C and Objective C++ front-end for the LLVM compiler.
 Name:           clang
-Version:        17.0.6
-Release:        2%{?dist}
+Version:        18.1.2
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -92,18 +92,18 @@ Development header files for clang tools.
 %setup -q -n %{clang_srcdir}
 
 %py3_shebang_fix \
-	clang-tools-extra/clang-tidy/tool/ \
-	clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+    clang-tools-extra/clang-tidy/tool/ \
+    clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
  
 %py3_shebang_fix \
-	clang/tools/clang-format/ \
-	clang/tools/clang-format/git-clang-format \
-	clang/utils/hmaptool/hmaptool \
-	clang/tools/scan-view/bin/scan-view \
-	clang/tools/scan-view/share/Reporter.py \
-	clang/tools/scan-view/share/startfile.py \
-	clang/tools/scan-build-py/bin/* \
-	clang/tools/scan-build-py/libexec/*
+    clang/tools/clang-format/ \
+    clang/tools/clang-format/git-clang-format \
+    clang/utils/hmaptool/hmaptool \
+    clang/tools/scan-view/bin/scan-view \
+    clang/tools/scan-view/share/Reporter.py \
+    clang/tools/scan-view/share/startfile.py \
+    clang/tools/scan-build-py/bin/* \
+    clang/tools/scan-build-py/libexec/*
 
 %build
 # Disable symbol generation
@@ -120,7 +120,7 @@ cmake  -DCMAKE_INSTALL_PREFIX=%{_prefix}       \
        -DLLVM_ENABLE_RTTI=ON                   \
        -DLLVM_LINK_LLVM_DYLIB:BOOL=ON          \
        -DCLANG_LINK_CLANG_DYLIB=ON             \
- 	     -DLLVM_INCLUDE_TESTS=OFF                \
+       -DLLVM_INCLUDE_TESTS=OFF                \
        -DLLVM_EXTERNAL_CLANG_TOOLS_EXTRA_SOURCE_DIR=../clang-tools-extra \
        -DCLANG_RESOURCE_DIR=../lib/clang/%{maj_ver} \
        -Wno-dev ../clang
@@ -242,6 +242,9 @@ make clang-check
 %{_includedir}/clang-tidy/
  
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Mon Jan 29 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - Fix missing binaries and tests
 
