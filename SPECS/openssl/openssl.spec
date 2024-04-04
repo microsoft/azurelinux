@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -83,6 +83,8 @@ BuildRequires: perl(Text::Template)
 BuildRequires: sed
 
 %if 0%{?with_check}
+BuildRequires: perl(Math::BigInt)
+BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 %endif
 
@@ -352,6 +354,10 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
+- At check build requirements
+- Modify patch patch to not force load default provider
+
 * Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
 - Remove make-dummy-cert and renew-dummy-cert scripts
 

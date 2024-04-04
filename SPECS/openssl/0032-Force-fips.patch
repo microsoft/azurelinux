@@ -30,7 +30,7 @@ index 058fb58837..d4948555d7 100644
  
          if (ok) {
              if (!ossl_provider_activate(prov, 1, 0)) {
-@@ -309,6 +311,46 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -309,6 +311,42 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
@@ -67,10 +67,6 @@ index 058fb58837..d4948555d7 100644
 +        // Always load the symcrypt provider for fips mode
 +        } else if (ossl_get_kernel_fips_flag()
 +                   && provider_conf_activate(libctx, "symcryptprovider", NULL, NULL, 0, NULL) != 1)
-+            return 0;
-+
-+        if ((!default_prov_activated && provider_conf_activate(libctx, "default", NULL, NULL, 0, NULL) != 1)
-+            || !EVP_set_default_properties(libctx, "?provider=symcrypt"))
 +            return 0;
 +    }
 +
