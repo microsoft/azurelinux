@@ -1,19 +1,17 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
-Version:        2.37.4
-Release:        9%{?dist}
+Version:        2.40
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Applications/System
 URL:            https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/about/
-Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.37/%{name}-%{version}.tar.xz
+Source0:        https://mirrors.edge.kernel.org/pub/linux/utils/%{name}/v2.40/%{name}-%{version}.tar.xz
 Source1:        runuser
 Source2:        runuser-l
 Source3:        su
 Source4:        su-l
-Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
-Patch1:         CVE-2024-28085.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -142,6 +140,8 @@ rm -rf %{buildroot}/lib/systemd/system
 /lib/libuuid.so.*
 /lib/libsmartcols.so.*
 /lib/libfdisk.so.*
+/lib/liblastlog2.so.*
+/lib/security/pam_lastlog2.so
 
 %files devel
 %defattr(-,root,root)
@@ -152,8 +152,8 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
-* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 2.37.4-8
-- Add patch fix CVE-2024-28085
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 2.40-1
+- Upgrade to 2.40 fix CVE-2024-28085
 
 * Thu Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
 - Add su-l file for PAM
