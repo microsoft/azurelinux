@@ -78,3 +78,4 @@ Requires:       busybox
 
 * Tue Sep 01 2020 Jon Slobodzian <joslobo@microsoft.com> - 0.1-1
 - Original version for CBL-Mariner
+
