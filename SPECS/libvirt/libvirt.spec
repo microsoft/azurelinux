@@ -397,6 +397,10 @@ Requires: polkit >= 0.112
 # For virConnectGetSysinfo
 Requires: dmidecode
     %endif
+# For service management
+# azl has systemd-bootstrap which also provides /usr/bin/sysctl, explicitly request full systemd.
+Requires(posttrans): systemd
+Requires(preun):  systemd
 # libvirtd depends on 'messagebus' service
 Requires: dbus
 # For uid creation during pre
