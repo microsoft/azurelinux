@@ -202,8 +202,6 @@ libsepol-3.6-1.azl3.aarch64.rpm
 glib-2.78.1-2.azl3.aarch64.rpm
 libltdl-2.4.7-1.azl3.aarch64.rpm
 libltdl-devel-2.4.7-1.azl3.aarch64.rpm
-pcre-8.45-2.azl3.aarch64.rpm
-pcre-libs-8.45-2.azl3.aarch64.rpm
 lua-5.4.6-1.azl3.aarch64.rpm
 lua-libs-5.4.6-1.azl3.aarch64.rpm
 azurelinux-rpm-macros-3.0-2.azl3.noarch.rpm
@@ -243,7 +241,7 @@ python3-libs-3.12.0-3.azl3.aarch64.rpm
 python3-setuptools-69.0.3-2.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.aarch64.rpm
-libselinux-3.6-2.azl3.aarch64.rpm
+libselinux-3.6-3.azl3.aarch64.rpm
 slang-2.3.3-1.azl3.aarch64.rpm
 newt-0.52.23-1.azl3.aarch64.rpm
 newt-lang-0.52.23-1.azl3.aarch64.rpm
