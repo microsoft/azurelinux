@@ -26,17 +26,11 @@ Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
-Source2:        build.xml.tar.bz2
-BuildRequires:  ant >= 1.6.5
-BuildRequires:  ant-junit >= 1.6.5
-BuildRequires:  apache-commons-lang3
-BuildRequires:  apache-commons-logging
-BuildRequires:  cal10n
-BuildRequires:  java-devel >= 1.5.0
+BuildRequires:  ant
+BuildRequires:  ant-junit
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  javapackages-tools
-BuildRequires:  javassist >= 3.4
-BuildRequires:  junit >= 3.8.2
+BuildRequires:  log4j
 Requires:       cal10n
 Requires:       java
 # this is ugly hack, which creates package which requires the same,
@@ -111,63 +105,37 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 Log4j implemented over SLF4J.
 
 %prep
-%setup -q -n %{name}-v_%{version} -a2
+%setup -q -n %{name}-v_%{version}
 find . -name "*.jar" | xargs rm
 cp -p %{SOURCE1} APACHE-LICENSE
-rm -r .github
-rm -r .idea
 
-sed -i -e "s|ant<|org.apache.ant<|g" integration/pom.xml
-
-%{_bindir}/find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
-    %{_bindir}/xargs -t perl -pi -e 's/
-$//g'
-
-# Unexpanded variable in the manifests
-ls
-for i in */src/main/resources/META-INF/MANIFEST.MF; do
-  echo "" >> ${i}
-  echo "Bundle-Version: %{version}" >> ${i}
-  sed -i '/^$/d' ${i}
-  perl -pi -e 's#\$\{parsedVersion\.osgiVersion\}#%{version}#g' ${i}
-  perl -pi -e 's#\$\{slf4j\.api\.minimum\.compatible\.version\}#1\.6\.0#g' ${i}
-done
-
-for i in */maven-build.xml; do
-  sed -i 's/target="1.6"/target="1.8"/' ${i}
-  sed -i 's/source="1.6"/source="1.8"/' ${i}
-done
-
-# The general pattern is that the API package exports API classes and does
-# # not require impl classes. slf4j was breaking that causing "A cycle was
-# # detected when generating the classpath slf4j.api, slf4j.nop, slf4j.api."
-# # The API bundle requires impl package, so to avoid cyclic dependencies
-# # during build time, it is necessary to mark the imported package as an
-# # optional one.
-# # Reported upstream: http://bugzilla.slf4j.org/show_bug.cgi?id=283
-sed -i "/Import-Package/s/$/;resolution:=optional/" slf4j-api/src/main/resources/META-INF/MANIFEST.MF
-
-%pom_change_dep -r -f ::::: :::::
-
-# Disabling log4j12 and modules depending on it.
-sed -i "/log4j12/d" maven-build.xml
+%pom_disable_module integration
 %pom_disable_module slf4j-log4j12
 %pom_disable_module jul-to-slf4j
 %pom_disable_module slf4j-ext
 
+# Port to maven-antrun-plugin 3.0.0
+sed -i s/tasks/target/ slf4j-api/pom.xml
+
+# dos2unix
+find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
+    xargs -t sed -i 's/\r$//'
+
+# Remove wagon-ssh build extension
+%pom_xpath_remove "pom:extensions" parent
+%pom_xpath_remove "pom:dependency[pom:groupId='ch.qos.reload4j']" parent
+%pom_xpath_remove "pom:dependency[pom:groupId='ch.qos.reload4j']" slf4j-reload4j
+
+%mvn_package :::sources: sources
+ 
+%mvn_package :%{name}-parent __noinstall
+%mvn_package :%{name}-site __noinstall
+%mvn_package :%{name}-api
+%mvn_package :%{name}-simple
+%mvn_package :%{name}-nop
+
 %build
-export CLASSPATH=$(build-classpath \
-                   commons-logging \
-                   commons-lang3 \
-                   javassist-3.14.0 \
-                   cal10n)
-export CLASSPATH=$CLASSPATH:$(pwd)/slf4j-api/target/slf4j-api-%{version}.jar
-export MAVEN_REPO_LOCAL=$(pwd)/.m2
-ant -Dmaven2.jpp.mode=true \
-    -Dmaven.test.skip=true \
-    -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-    -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 \
-    package javadoc \
+%mvn_build -f -s -- -Drequired.jdk.version=1.8
 
 %install
 # jars
