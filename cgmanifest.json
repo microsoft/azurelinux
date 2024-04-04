@@ -25563,16 +25563,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rook",
-          "version": "1.6.2",
-          "downloadUrl": "https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "rp-pppoe",
           "version": "3.12",
           "downloadUrl": "https://dianne.skoll.ca/projects/rp-pppoe/download/OLD/rp-pppoe-3.12.tar.gz"
