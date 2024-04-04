@@ -1,0 +1,13 @@
+--- pyproject.toml.orig
++++ pyproject.toml
+@@ -1,8 +1,6 @@
+ [build-system]
+-build-backend = "setuptools.build_meta"
+-requires = [
+-  "setuptools",
+-]
++build-backend = 'flit_core.buildapi'
++requires = ['flit_core>=3.3']
+ 
+ [project]
+ name = "nose2"
