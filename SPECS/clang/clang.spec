@@ -1,4 +1,4 @@
-%global maj_ver %(echo %{version} | cut -d. -f1)
+%global maj_ver 18
 
 %global clang_srcdir llvm-project-llvmorg-%{version}
 
