@@ -21,21 +21,21 @@ image creation.
 
 %install
 # Copy collection python script to /usr/bin/
-mkdir -p %{buildroot}/usr/bin/
-install -m 755 %{SOURCE0} %{buildroot}/usr/bin/
+mkdir -p %{buildroot}%{_bindir}/
+install -m 755 %{SOURCE0} %{buildroot}%{_bindir}/
 
 # Copy data schema to /usr/local/data/
 mkdir -p %{buildroot}/usr/local/data/
 install -m 755 %{SOURCE1} %{buildroot}/usr/local/data/
 
 # Copy service to /etc/systemd/system/
-mkdir -p %{buildroot}/etc/systemd/system/
-install -m 755 %{SOURCE2} %{buildroot}/etc/systemd/system/
+mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/
+install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 
 %files
-/usr/bin/collect-sysinfo
+%{_bindir}/collect-sysinfo
 /usr/local/data/sysinfo-schema-v1.json
-/etc/systemd/system/azurelinux-sysinfo.service
+%{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
 
 %post
 #!/bin/sh
