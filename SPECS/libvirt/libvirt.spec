@@ -2186,7 +2186,7 @@ exit 0
 
 %changelog
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 10.0.0-2
-- Remove systemd-bootstrap dependency
+- Make systemd dependency explicit to avoid confusion with systemd-bootstrap.
 
 * Thu Jan 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 10.0.0-1
 - Updating to version 10.0.0.
