@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        %{azl}.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,7 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:        The smallest useful package list.
 Requires:       filesystem
 Requires:       azurelinux-release
-Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
 %description minimal
@@ -56,6 +55,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Thu Apr 04 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0-4
+- Remove dependency on "prebuilt-ca-certificates".
+
 * Fri Mar 22 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.0-3
 - Explicitly add libgcc as a runtime dependency for distroless-base
 
