@@ -17,8 +17,8 @@
 
 Summary:        Simple Logging Facade for Java
 Name:           slf4j
-Version:        1.7.30
-Release:        6%{?dist}
+Version:        2.0.12
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,8 +27,6 @@ URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
 Source2:        build.xml.tar.bz2
-Patch1:         build-remove-slf4j_api-binder.patch
-Patch2:         slf4j-commons-lang3.patch
 BuildRequires:  ant >= 1.6.5
 BuildRequires:  ant-junit >= 1.6.5
 BuildRequires:  apache-commons-lang3
@@ -114,10 +112,10 @@ Log4j implemented over SLF4J.
 
 %prep
 %setup -q -n %{name}-v_%{version} -a2
-%patch 1 -p1
-%patch 2 -p1
 find . -name "*.jar" | xargs rm
 cp -p %{SOURCE1} APACHE-LICENSE
+rm -r .github
+rm -r .idea
 
 sed -i -e "s|ant<|org.apache.ant<|g" integration/pom.xml
 
@@ -126,6 +124,7 @@ sed -i -e "s|ant<|org.apache.ant<|g" integration/pom.xml
 $//g'
 
 # Unexpanded variable in the manifests
+ls
 for i in */src/main/resources/META-INF/MANIFEST.MF; do
   echo "" >> ${i}
   echo "Bundle-Version: %{version}" >> ${i}

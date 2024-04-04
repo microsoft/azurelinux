@@ -27576,8 +27576,8 @@
         "type": "other",
         "other": {
           "name": "slf4j",
-          "version": "1.7.30",
-          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_1.7.30.tar.gz"
+          "version": "2.0.12",
+          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_2.0.12.tar.gz"
         }
       }
     },
