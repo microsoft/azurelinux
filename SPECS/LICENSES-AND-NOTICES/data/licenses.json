@@ -2152,6 +2152,7 @@
                 "azcopy",
                 "azure-iot-sdk-c",
                 "azure-storage-cpp",
+                "azurelinux-sysinfo",
                 "bazel",
                 "blobfuse",
                 "blobfuse2",
