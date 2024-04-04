@@ -15242,6 +15242,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "opentofu",
+          "version": "1.6.2",
+          "downloadUrl": "https://github.com/opentofu/opentofu/archive/v1.6.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "openvswitch",
           "version": "3.3.0",
           "downloadUrl": "http://openvswitch.org/releases/openvswitch-3.3.0.tar.gz"
