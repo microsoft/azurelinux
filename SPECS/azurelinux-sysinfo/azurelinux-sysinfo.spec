@@ -14,7 +14,7 @@ Requires:       systemd
 Requires:       python3-psutil
 
 %description
-Deploys a systemd service that collects system information related to the device, operating system, cloud-init, boot 
+Deploys a systemd service that gathers system information related to the device, operating system, cloud-init, boot 
 time, resource utilization, installed packages, and SELinux mode. Collected information is written in JSON format to
 a log file on the user's system for easy access and analysis. The systemd service runs at boot time if installed during 
 image creation.
