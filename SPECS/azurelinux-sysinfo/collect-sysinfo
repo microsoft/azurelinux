@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 
-DATA_SCHEMA_DIR = "/usr/local/data"
+DATA_SCHEMA_DIR = "/usr/share/azurelinux-sysinfo"
 DATA_SCHEMA_VERSION = "v1"
 DATA_SCHEMA_FILENAME = f"sysinfo-schema-{DATA_SCHEMA_VERSION}.json"
 LOG_FILE_PATH = "/var/log/azurelinux-sysinfo.log"

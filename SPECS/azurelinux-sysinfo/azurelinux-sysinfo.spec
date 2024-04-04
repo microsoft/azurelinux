@@ -24,9 +24,9 @@ image creation.
 mkdir -p %{buildroot}%{_bindir}/
 install -m 755 %{SOURCE0} %{buildroot}%{_bindir}/
 
-# Copy data schema to /usr/local/data/
-mkdir -p %{buildroot}/usr/local/data/
-install -m 755 %{SOURCE1} %{buildroot}/usr/local/data/
+# Copy data schema to /usr/share/azurelinux-sysinfo/
+mkdir -p %{buildroot}%{_datadir}/azurelinux-sysinfo/
+install -m 755 %{SOURCE1} %{buildroot}%{_datadir}/azurelinux-sysinfo/
 
 # Copy service to /etc/systemd/system/
 mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/
@@ -34,7 +34,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 
 %files
 %{_bindir}/collect-sysinfo
-/usr/local/data/sysinfo-schema-v1.json
+%{_datadir}/azurelinux-sysinfo/sysinfo-schema-v1.json
 %{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
 
 %post
