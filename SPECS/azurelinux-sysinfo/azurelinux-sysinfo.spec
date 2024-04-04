@@ -42,7 +42,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 systemctl enable azurelinux-sysinfo.service
 
 %changelog
-* Wed Apr 03 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
+* Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.
 - Original version for Azure Linux.
