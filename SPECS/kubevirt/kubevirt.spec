@@ -15,6 +15,7 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+%define _missing_build_ids_terminate_build 0
 
 Summary:        Container native virtualization
 Name:           kubevirt
@@ -233,10 +234,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %license LICENSE
 %doc README.md
 %dir %{_datadir}/kube-virt
-%dir %{_datadir}/kube-virt/virt-handler
+%{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
-%{_datadir}/kube-virt/virt-handler
 
 %files virt-launcher
 %license LICENSE
@@ -261,6 +261,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %doc README.md
 %dir %{_datadir}/kube-virt
 %dir %{_datadir}/kube-virt/pr-helper
+%{_datadir}/kube-virt/pr-helper/multipath.conf
 
 %files tests
 %license LICENSE
