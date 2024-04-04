@@ -1,15 +1,15 @@
 storage:
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4G
     partitions:
     - id: efi
       type: esp
-      start: 1
-      end: 65
+      start: 1M
+      end: 65M
 
     - id: rootfs
-      start: 65
+      start: 65M
 
   bootType: efi
 
