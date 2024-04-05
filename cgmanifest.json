@@ -12370,6 +12370,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "lujavrite",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/mizdebsk/lujavrite/archive/refs/tags/1.0.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "luksmeta",
           "version": "9",
           "downloadUrl": "https://github.com/latchset/luksmeta/releases/download/v9/luksmeta-9.tar.bz2"
