@@ -1,7 +1,7 @@
 Summary:        AsciiDoc is a human readable text document format
 Name:           asciidoc
 Version:        10.2.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 URL:            https://asciidoc.org/
 Group:          System Environment/Development
