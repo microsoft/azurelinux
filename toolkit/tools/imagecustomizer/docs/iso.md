@@ -118,7 +118,7 @@ MIC to be able to generate an iso image out of it:
   - The bootloader and the shim must exist under the `/boot` folder or any of
     its subdirectories.
     - For x64, `bootx64.efi` and `grubx64.efi` (or `grubx64-noprefix.efi`).
-    - For ARM64, `bootaa64.efi` and `grubaa64.efi` (or `grubx64-noprefix.efi`).
+    - For ARM64, `bootaa64.efi` and `grubaa64.efi` (or `grubaa64-noprefix.efi`).
   - All grub configurations and related files must be stored under the `/boot`
     folder. For example, grub.cfg cannot reference files outside that folder.
     If it does, those referenced files will not be copied to the iso and may
