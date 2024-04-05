@@ -175,6 +175,8 @@ Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li
 Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.patch
 
 Patch202:       CVE-2023-47100.patch
+Patch203:       CVE-2023-31486.patch
+Patch204:       CVE-2023-31484.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -4076,6 +4078,8 @@ you're not running VMS, this module does nothing.
 %patch200 -p1
 %patch201 -p1
 %patch202 -p1
+%patch203 -p1
+%patch204 -p1
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
