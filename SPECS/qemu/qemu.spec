@@ -2367,10 +2367,11 @@ echo "Testing %{name}-build"
 #   Last check: 2023-10
 #   Added: 2022-06
 %ifnarch %{power64}
-# %make_build check
+%make_build check
 # For debugging tests use https://www.qemu.org/docs/master/devel/testing.html
-# QTEST_LOG=1 make check-qtest-x86_64 V=1
-make check-qtest-x86_64 V=1
+# e.g.
+# QTEST_LOG=1 make check-qtest-x86_64 V=1 OR
+# make check-qtest-x86_64 V=1 for runs with trace off
 %endif
 
 popd
