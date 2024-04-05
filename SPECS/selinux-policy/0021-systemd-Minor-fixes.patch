@@ -1,0 +1,36 @@
+From 348d5e0152a8b694c5573c9122b002da679bf1ee Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 10:04:38 -0400
+Subject: [PATCH 21/24] systemd: Minor fixes.
+
+sys_rawio on systemd_generator_t is from running blkid.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/systemd.te | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index a7dd320d1..89ead9f00 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -497,7 +497,7 @@ seutil_search_default_contexts(systemd_coredump_t)
+ #
+ 
+ allow systemd_generator_t self:fifo_file rw_fifo_file_perms;
+-allow systemd_generator_t self:capability { dac_override sys_admin sys_resource };
++allow systemd_generator_t self:capability { dac_override sys_admin sys_rawio sys_resource };
+ allow systemd_generator_t self:process { getcap getsched setfscreate signal };
+ 
+ corecmd_exec_shell(systemd_generator_t)
+@@ -1737,6 +1737,7 @@ files_read_etc_files(systemd_sysctl_t)
+ fs_getattr_all_fs(systemd_sysctl_t)
+ fs_search_cgroup_dirs(systemd_sysctl_t)
+ fs_search_ramfs(systemd_sysctl_t)
++fs_search_tmpfs(systemd_sysctl_t)
+ 
+ systemd_log_parse_environment(systemd_sysctl_t)
+ 
+-- 
+2.44.0
+

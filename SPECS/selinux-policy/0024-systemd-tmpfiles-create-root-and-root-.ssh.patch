@@ -1,0 +1,44 @@
+From b7d27857b240a62a102320d5540b803650a3f4ad Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 13:17:00 -0400
+Subject: [PATCH 24/24] systemd-tmpfiles: create /root and /root/.ssh
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/services/ssh.te      | 4 ++++
+ policy/modules/system/userdomain.te | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/policy/modules/services/ssh.te b/policy/modules/services/ssh.te
+index a93f2447d..f3c966ed0 100644
+--- a/policy/modules/services/ssh.te
++++ b/policy/modules/services/ssh.te
+@@ -73,6 +73,10 @@ userdom_user_tmpfs_file(ssh_tmpfs_t)
+ type ssh_home_t;
+ userdom_user_home_content(ssh_home_t)
+ 
++optional_policy(`
++    systemd_tmpfilesd_managed(ssh_home_t)
++')
++
+ type sshd_keytab_t;
+ files_type(sshd_keytab_t)
+ 
+diff --git a/policy/modules/system/userdomain.te b/policy/modules/system/userdomain.te
+index 82f31a554..0c89e2295 100644
+--- a/policy/modules/system/userdomain.te
++++ b/policy/modules/system/userdomain.te
+@@ -95,6 +95,10 @@ files_poly_member(user_home_dir_t)
+ files_poly_parent(user_home_dir_t)
+ ubac_constrained(user_home_dir_t)
+ 
++optional_policy(`
++    systemd_tmpfilesd_managed(user_home_dir_t)
++')
++
+ type user_home_t;
+ userdom_user_home_content(user_home_t)
+ fs_associate_tmpfs(user_home_t)
+-- 
+2.44.0
+

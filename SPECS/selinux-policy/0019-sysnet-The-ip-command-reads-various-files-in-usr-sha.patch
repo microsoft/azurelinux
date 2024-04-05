@@ -1,0 +1,26 @@
+From f7d9d754187192d5cb8c37bc582cc70b36af0d38 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 09:59:04 -0400
+Subject: [PATCH 19/24] sysnet: The ip command reads various files in
+ /usr/share/iproute2/rt_tables.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/sysnetwork.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/sysnetwork.te b/policy/modules/system/sysnetwork.te
+index 9ef1300ef..48f3548e7 100644
+--- a/policy/modules/system/sysnetwork.te
++++ b/policy/modules/system/sysnetwork.te
+@@ -353,6 +353,7 @@ term_dontaudit_use_all_ptys(ifconfig_t)
+ term_dontaudit_use_ptmx(ifconfig_t)
+ term_dontaudit_use_generic_ptys(ifconfig_t)
+ 
++files_read_usr_files(ifconfig_t)
+ files_dontaudit_read_root_files(ifconfig_t)
+ 
+ init_use_fds(ifconfig_t)
+-- 
+2.44.0
+

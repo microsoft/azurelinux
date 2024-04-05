@@ -10,7 +10,8 @@ Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
  policy/modules/admin/usermanage.te | 4 ++--
  policy/modules/services/chronyd.te | 4 ++--
  policy/modules/system/authlogin.te | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ policy/modules/system/systemd.te   | 2 ++
+ 4 files changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
 index daeaa090e..57a9848bc 100644
@@ -69,6 +70,19 @@ index 3a5d1ac3e..e65c0c41d 100644
  dontaudit chkpwd_t self:capability sys_tty_config;
  allow chkpwd_t self:process { getattr signal };
  dontaudit chkpwd_t self:process getcap;
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index aa9198591..2398854e7 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -773,6 +773,8 @@ optional_policy(`
+ # hw local policy
+ #
+ 
++allow systemd_hw_t self:capability dac_override;
++
+ kernel_read_kernel_sysctls(systemd_hw_t)
+ 
+ allow systemd_hw_t systemd_hwdb_t:file { manage_file_perms relabel_file_perms };
 -- 
 2.43.2
 

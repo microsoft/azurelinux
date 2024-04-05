@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,18 @@ Patch11:        0011-iptables-Support-Mariner-non-standard-config-locatio.patch
 Patch12:        0012-systemd-Fix-run-systemd-shutdown-handling.patch
 Patch13:        0013-modutils-Temporary-fix-for-mkinitrd-dracut.patch
 Patch14:        0014-Add-additional-Fedora-policy-compatibility.patch
+Patch15:        0015-various-Add-new-pidfd-uses.patch
+Patch16:        0016-various-Add-use-of-pressure-stall-information-in-sys.patch
+Patch17:        0017-various-Add-additional-logging-access-for-domains-ru.patch
+Patch18:        0018-unconfined-Add-user-namespace-creation.patch
+Patch19:        0019-sysnet-The-ip-command-reads-various-files-in-usr-sha.patch
+Patch20:        0020-rpm-Minor-fixes.patch
+Patch21:        0021-systemd-Minor-fixes.patch
+Patch22:        0022-irqbalance-Dontaudit-net_admin.patch
+Patch23:        0023-systemd-tmpfiles-loadkeys-Read-var_t-symlinks.patch
+Patch24:        0024-systemd-tmpfiles-create-root-and-root-.ssh.patch
+Patch25:        0025-kernel-Exec-systemctl.patch
+Patch26:        0026-getty-grant-checkpoint_restore.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -316,6 +328,11 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-2
+- Add fixes from BVTs
+- Add new systemd pidfd uses
+- Add new pressure stall information in systemd
+- Fixes for systemd-tmpfiles and loadkeys
 * Tue Mar 12 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-1
 - Rebase to upstream release 2.20240226.
 
