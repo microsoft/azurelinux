@@ -17,7 +17,7 @@
 Summary:        Plexus Interpolation API
 Name:           plexus-interpolation
 Version:        1.26
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,13 +25,12 @@ Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/%{name}
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}-build.xml
-BuildRequires:  ant
-BuildRequires:  fdupes
+BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
-%if %{with tests}
-BuildRequires:  ant-junit
-%endif
+
+
+Patch0:         0001-Use-PATH-env-variable-instead-of-JAVA_HOME.patch
 
 %description
 Plexus interpolator is the outgrowth of multiple iterations of development
@@ -47,33 +46,19 @@ Group:          Documentation/HTML
 API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
-cp %{SOURCE1} build.xml
+%setup -q -n %{name}-%{name}-%{version}	
+%patch 0 -p1
+	
+%pom_add_dep junit:junit:4.13.1:test
 %pom_remove_plugin :maven-release-plugin
-
-%pom_remove_parent
-
-%pom_xpath_inject "pom:project" "<groupId>org.codehaus.plexus</groupId>"
-
+%pom_remove_plugin :maven-scm-publish-plugin
+	
 %build
-%ant \
-%if %{without tests}
-  -Dtest.skip=true \
-%endif
-  jar javadoc
+%mvn_file : plexus/interpolation
+%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
 
 %install
-# jar
-install -dm 0755 %{buildroot}%{_javadir}/plexus
-install -pm 0644 target/%{name}-%{version}.jar %{buildroot}%{_javadir}/plexus/interpolation.jar
-# pom
-install -dm 0755 %{buildroot}%{_mavenpomdir}/plexus
-install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/plexus/interpolation.pom
-%add_maven_depmap plexus/interpolation.pom plexus/interpolation.jar
-# javadoc
-install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
-%fdupes -s %{buildroot}%{_javadocdir}
+%mvn_install
 
 %files -f .mfiles
 
@@ -81,6 +66,12 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-5
+- Add patch using Fedora 40 (License: MIT)
+
+* Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-4
+- Rebuilt with msopenjdk-17, and maven
+
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.26-3
 - Moved from extended to core
 - License verified

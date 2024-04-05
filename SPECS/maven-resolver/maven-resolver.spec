@@ -1,14 +1,13 @@
 
 Summary:        Apache Maven Artifact Resolver library
 Name:           maven-resolver
-Version:        1.7.3
-Release:        7%{?dist}
+Version:        1.9.15
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://maven.apache.org/resolver/
 Source0:        https://archive.apache.org/dist/maven/resolver/%{name}-%{version}-source-release.zip
-Patch0:         0001-Remove-use-of-deprecated-SHA-1-and-MD5-algorithms.patch
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 Provides:       maven-resolver-api = %{version}-%{release}
@@ -32,23 +31,20 @@ artifact transports and artifact resolution.
 
 %prep
 %setup -q
-%patch 0 -p1
 
-# requires internet connection
-rm maven-resolver-transport-http/src/test/java/org/eclipse/aether/transport/http/HttpTransporterTest.java
+# Skip tests that equire internet connection
+rm maven-resolver-supplier/src/test/java/org/eclipse/aether/supplier/RepositorySystemSupplierTest.java
+rm maven-resolver-transport-http/src/test/java/org/eclipse/aether/transport/http/{HttpServer,HttpTransporterTest}.java
+%pom_remove_dep org.eclipse.jetty: maven-resolver-transport-http
 
 %pom_remove_plugin -r :bnd-maven-plugin
 %pom_remove_plugin -r org.codehaus.mojo:animal-sniffer-maven-plugin
-%pom_remove_plugin -r org.apache.maven.plugins:maven-enforcer-plugin
+%pom_remove_plugin -r :japicmp-maven-plugin
 
 %pom_disable_module maven-resolver-demos
 %pom_disable_module maven-resolver-named-locks-hazelcast
 %pom_disable_module maven-resolver-named-locks-redisson
 %pom_disable_module maven-resolver-transport-classpath
-%if %{without maven_resolver_extra_modules}
-%pom_disable_module maven-resolver-transport-file
-%pom_disable_module maven-resolver-transport-http
-%endif
 %{mvn_package} :maven-resolver-test-util __noinstall
 
 # generate OSGi manifests
@@ -90,6 +86,9 @@ done
 %license LICENSE NOTICE
 
 %changelog
+* Wed Mar 20 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.9.15-1
+- Upgrade to 1.9.15 for azl3.0 using Fedora 40 (LIcense: MIT)
+
 * Fri Mar 24 2023 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.3-7
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - License verified

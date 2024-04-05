@@ -1,7 +1,7 @@
 Summary:      Default file system
 Name:         filesystem
 Version:      1.1
-Release:      19%{?dist}
+Release:      21%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
@@ -58,9 +58,8 @@ ln -svfn ../lib %{buildroot}/usr/lib/debug/usr/lib
         ln -svfn ../lib %{buildroot}/usr/lib/debug/usr/lib64
         ln -svfn ../.dwz %{buildroot}/usr/lib/debug/usr/.dwz
 
-install -vdm 755 %{buildroot}/var/{log,mail,spool,mnt,srv}
+install -vdm 755 %{buildroot}/var/{log,mail,spool,mnt}
 
-ln -svfn var/srv %{buildroot}/srv
 ln -svfn ../run %{buildroot}/var/run
 ln -svfn ../run/lock %{buildroot}/var/lock
 install -vdm 755 %{buildroot}/var/{opt,cache,lib/{color,misc,locate},local}
@@ -91,7 +90,7 @@ systemd-resolve:x:77:77:systemd Resolver:/:/bin/false
 systemd-timesync:x:78:78:systemd Time Synchronization:/:/bin/false
 systemd-coredump:x:79:79:systemd Core Dumper:/:/usr/bin/false
 systemd-oom:x:80:80:systemd Userspace OOM Killer:/:/usr/bin/false
-nobody:x:65534:65533:Unprivileged User:/dev/null:/bin/false
+nobody:x:65534:65534:Unprivileged User:/dev/null:/bin/false
 EOF
 cat > %{buildroot}/etc/group <<- "EOF"
 root:x:0:
@@ -129,6 +128,7 @@ systemd-timesync:x:78:
 systemd-coredump:x:79:
 systemd-oom:x:80:
 nogroup:x:65533:
+nobody:x:65534:
 users:x:100:
 sudo:x:27:
 wheel:x:28:
@@ -575,7 +575,6 @@ return 0
 %dir /root
 %dir /run
 /sbin
-/srv
 %ghost %attr(555,root,root) /sys
 %dir /tmp
 %dir /usr
@@ -682,7 +681,6 @@ return 0
 %dir /var/log
 %dir /var/mail
 %dir /var/mnt
-%dir /var/srv
 %dir /var/opt
 %dir /var/spool
 %dir /var/tmp
@@ -710,6 +708,12 @@ return 0
 %config(noreplace) /etc/modprobe.d/tipc.conf
 
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-21
+- remove /srv and /var/srv
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-20
+- fix nobody uid:gid and nogroup/nobody groups
+
 * Wed Feb 28 2024 Dan Streetman <ddstreet@microsoft.com> - 1.1-19
 - fix /etc/hosts
 - add /etc/host.conf to enable multi

@@ -179,17 +179,19 @@ def check_spec(spec_path, toolchain_specs):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="Tool for checking if an RPM spec file follows Azure Linux's guidelines.")
-    parser.add_argument('toolchain_specs',
-                        type=argparse.FileType('r'),
-                        help='Path to a file containing a list of toolchain specs.')
-    parser.add_argument('specs',
+    parser.add_argument('--toolchain_specs',
+                        metavar='toolchain_specs',
+                        dest='toolchain_specs',
+                        help='a list of toolchain specs')
+    parser.add_argument('--specs',
                         metavar='spec_path',
+                        dest='specs',
                         type=argparse.FileType('r'),
                         nargs='+',
                         help='path to an RPM spec file')
     args = parser.parse_args()
     
-    toolchain_specs = set(args.toolchain_specs.read().splitlines())
+    toolchain_specs = set(args.toolchain_specs.split())
 
     specs_correct = True
     for spec in args.specs:

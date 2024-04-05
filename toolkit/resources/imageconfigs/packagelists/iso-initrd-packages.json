@@ -1,6 +1,7 @@
 {
     "packages": [
         "pam",
+        "audit",
         "attr",
         "bash",
         "bzip2",

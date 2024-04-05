@@ -1,6 +1,6 @@
 Summary:        GNU Emacs text editor
 Name:           emacs
-Version:        29.1
+Version:        29.3
 Release:        1%{?dist}
 License:        GPLv3+ AND CC0-1.0
 Vendor:         Microsoft Corporation
@@ -30,7 +30,7 @@ This package provides some directories which are required by other
 packages that add functionality to Emacs.
 
 %prep
-%autosetup -p1
+%autosetup
 
 %build
 %configure \
@@ -84,6 +84,9 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 29.3-1
+- Upgrade to 29.3
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 29.1-1
 - Auto-upgrade to 29.1 - Azure Linux 3.0 - package upgrades
 

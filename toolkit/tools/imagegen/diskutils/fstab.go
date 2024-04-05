@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"golang.org/x/sys/unix"
 )
@@ -15,13 +16,14 @@ import (
 type MountFlags uintptr
 
 type FstabEntry struct {
-	Source    string     `json:"source"`
-	Target    string     `json:"target"`
-	FsType    string     `json:"fstype"`
-	Options   MountFlags `json:"vfs-options"`
-	FsOptions string     `json:"fs-options"`
-	Freq      int        `json:"freq"`
-	PassNo    int        `json:"passno"`
+	Source     string     `json:"source"`
+	Target     string     `json:"target"`
+	FsType     string     `json:"fstype"`
+	Options    string     `json:"options"`
+	VfsOptions MountFlags `json:"vfs-options"`
+	FsOptions  string     `json:"fs-options"`
+	Freq       int        `json:"freq"`
+	PassNo     int        `json:"passno"`
 }
 
 type findmntOutput struct {
@@ -132,7 +134,7 @@ func ReadFstabFile(fstabPath string) ([]FstabEntry, error) {
 	// The `findmnt` command provides a convenient JSON output. In addition, it helpfully splits the
 	// common vfs options from the filesystem specific options.
 	jsonString, _, err := shell.Execute("findmnt", "--fstab", "--tab-file", fstabPath,
-		"--json", "--output", "source,target,fstype,vfs-options,fs-options,freq,passno")
+		"--json", "--output", "source,target,fstype,options,vfs-options,fs-options,freq,passno")
 	if err != nil {
 		return nil, fmt.Errorf("failed to read fstab file (%s):\n%w", fstabPath, err)
 	}
@@ -144,4 +146,31 @@ func ReadFstabFile(fstabPath string) ([]FstabEntry, error) {
 	}
 
 	return output.FileSystems, nil
+}
+
+func WriteFstabFile(entries []FstabEntry, fstabPath string) error {
+	var err error
+
+	if err != nil {
+		return fmt.Errorf("failed to read fstab file: %v", err)
+	}
+
+	var updatedLines []string
+	for _, entry := range entries {
+		line := fmt.Sprintf("%s %s %s %s %d %d",
+			entry.Source,
+			entry.Target,
+			entry.FsType,
+			entry.Options,
+			entry.Freq,
+			entry.PassNo)
+		updatedLines = append(updatedLines, line)
+	}
+
+	err = file.WriteLines(updatedLines, fstabPath)
+	if err != nil {
+		return fmt.Errorf("failed to write updated fstab file: %v", err)
+	}
+
+	return nil
 }

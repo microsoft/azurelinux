@@ -41,7 +41,7 @@ DIST_VERSION_MACRO := $(DIST_NAME_ABRV) $(dist_major_version_number)
 ##help:var:DIST_TAG:<dist_tag>=Distribution tag, defines the "dist" macro used by the specs. Default: '.<DIST_NAME_ABRV><dist_major_version_number>' e.g., ".azl3"
 DIST_TAG            ?= .$(DIST_NAME_ABRV)$(dist_major_version_number)
 
-# Mariner Image Customizer version.
+# Azure Linux Image Customizer version.
 # This is using semantic versioning.
 #
 # IMAGE_CUSTOMIZER_VERSION should have the format:
@@ -50,6 +50,6 @@ DIST_TAG            ?= .$(DIST_NAME_ABRV)$(dist_major_version_number)
 #
 # and should hold the value of the next (or current) official release, not the previous official
 # release.
-IMAGE_CUSTOMIZER_VERSION ?= 0.1.0
+IMAGE_CUSTOMIZER_VERSION ?= 0.2.0
 IMAGE_CUSTOMIZER_VERSION_PREVIEW ?= -dev.$(DATETIME_AS_VERSION)+$(GIT_COMMIT_ID)
 IMAGE_CUSTOMIZER_FULL_VERSION := $(IMAGE_CUSTOMIZER_VERSION)$(IMAGE_CUSTOMIZER_VERSION_PREVIEW)

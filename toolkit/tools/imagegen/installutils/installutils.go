@@ -78,6 +78,9 @@ const (
 	// /boot directory should be only accesible by root. The directories need the execute bit as well.
 	bootDirectoryFileMode = 0400
 	bootDirectoryDirMode  = 0700
+
+	// Configuration files related to boot behavior. Users should be able to read these files, and root should have RW access.
+	bootUsrConfigFileMode = 0644
 )
 
 // PackageList represents the list of packages to install into an image
@@ -1131,7 +1134,7 @@ func InstallGrubEnv(installRoot string) (err error) {
 // - kernelCommandLine contains additional kernel parameters which may be optionally set
 // - readOnlyRoot holds the dm-verity read-only root partition information if dm-verity is enabled.
 // - isBootPartitionSeparate is a boolean value which is true if the /boot partition is separate from the root partition
-// - includeLegacyCfg specifies if the legacy grub.cfg from Mariner 2.0 should also be added.
+// - includeLegacyCfg specifies if the legacy grub.cfg from Azure Linux should also be added.
 // Note: this boot partition could be different than the boot partition specified in the bootloader.
 // This boot partition specifically indicates where to find the kernel, config files, and initrd
 func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
@@ -1147,7 +1150,7 @@ func InstallGrubDefaults(installRoot, rootDevice, bootUUID, bootPrefix string,
 	}
 
 	if includeLegacyCfg {
-		// Add the legacy /boot/grub2/grub.cfg file, which was used in Mariner 2.0.
+		// Add the legacy /boot/grub2/grub.cfg file, which was used in Azure Linux 2.0.
 		err = installGrubTemplateFile(resources.AssetsGrubCfgFile, GrubCfgFile, installRoot, rootDevice, bootUUID,
 			bootPrefix, encryptedRoot, kernelCommandLine, readOnlyRoot, isBootPartitionSeparate)
 		if err != nil {
@@ -1166,7 +1169,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 	installGrubDefFile := filepath.Join(installRoot, targetFile)
 
 	err = file.CopyResourceFile(resources.ResourcesFS, assetFile, installGrubDefFile, bootDirectoryDirMode,
-		bootDirectoryFileMode)
+		bootUsrConfigFileMode)
 	if err != nil {
 		return
 	}
@@ -1337,7 +1340,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys,
+			false /*includeExistingKeys*/)
 		if err != nil {
 			return
 		}
@@ -1569,7 +1573,9 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string,
+	sshPubKeys []string, includeExistingKeys bool,
+) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1585,9 +1591,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	homeDir := userutils.UserHomeDirectory(username)
-	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
+	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1610,7 +1615,25 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+	allSSHKeys := []string(nil)
+
+	if includeExistingKeys {
+		authorizedKeysFileFullPath := filepath.Join(installChroot.RootDir(), authorizedKeysFile)
+
+		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
+		if err != nil {
+			return fmt.Errorf("failed to check if authorized_keys file (%s) exists:\n%w", authorizedKeysFileFullPath, err)
+		}
+
+		if fileExists {
+			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read existing authorized_keys (%s) file:\n%w", authorizedKeysFileFullPath, err)
+			}
+
+			allSSHKeys = append(allSSHKeys, pubKeyData...)
+		}
+	}
 
 	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
@@ -1766,6 +1789,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 	fileContextPath := fmt.Sprintf(fileContextBasePath, selinuxType)
 
 	targetRootPath := "/mnt/_bindmountroot"
+	targetRootFullPath := filepath.Join(installChroot.RootDir(), targetRootPath)
 
 	for _, mountToLabel := range listOfMountsToLabel {
 		logger.Log.Debugf("Running setfiles to apply SELinux labels on mount points: %v", mountToLabel)
@@ -1819,7 +1843,7 @@ func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap
 		// Cleanup the temporary directory.
 		// Note: This is intentionally done within the for loop to ensure the directory is always empty for the next
 		// mount. For example, if a parent directory mount is processed after a nested child directory mount.
-		err = os.RemoveAll(targetRootPath)
+		err = os.RemoveAll(targetRootFullPath)
 		if err != nil {
 			return fmt.Errorf("failed to remove temporary bind mount directory:\n%w", err)
 		}
@@ -2040,7 +2064,7 @@ func installEfiBootloader(encryptEnabled bool, installRoot, bootUUID, bootPrefix
 	}
 
 	// Set the boot prefix path
-	prefixPath := filepath.Join(bootPrefix, "grub2")
+	prefixPath := filepath.Join("/", bootPrefix, "grub2")
 	err = setGrubCfgPrefixPath(prefixPath, grubFinalPath)
 	if err != nil {
 		logger.Log.Warnf("Failed to set prefixPath in grub.cfg: %v", err)

@@ -15,7 +15,7 @@ func TestOverlayValidConfiguration(t *testing.T) {
 		UpperDir: "/upper",
 		WorkDir:  "/work",
 		Partition: &IdentifiedPartition{
-			IdType: "PartUuid",
+			IdType: "part-uuid",
 			Id:     "123e4567-e89b-4d3a-a456-426614174000",
 		},
 	}
@@ -45,5 +45,5 @@ func TestOverlayInvalidSameUpperAndWorkDir(t *testing.T) {
 
 	err := overlay.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "UpperDir and WorkDir must be distinct")
+	assert.ErrorContains(t, err, "upperDir and workDir must be distinct")
 }

@@ -1,0 +1,80 @@
+From f55eb704c3b7f29232628f3f915551ec79244289 Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Tue, 19 Mar 2024 21:52:15 +0000
+Subject: [PATCH] remove openssl::cipher::Cipher::chacha20_poly1305
+
+---
+ src/rust/src/backend/aead.rs | 44 ++++++++++++++++++------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/src/rust/src/backend/aead.rs b/src/rust/src/backend/aead.rs
+index 7c364dede..9d4e9c3c0 100644
+--- a/src/rust/src/backend/aead.rs
++++ b/src/rust/src/backend/aead.rs
+@@ -445,41 +445,41 @@ impl ChaCha20Poly1305 {
+                 CRYPTOGRAPHY_OPENSSL_320_OR_GREATER,
+                 not(CRYPTOGRAPHY_OPENSSL_300_OR_GREATER
+             )))] {
+-                if cryptography_openssl::fips::is_enabled() {
++                // if cryptography_openssl::fips::is_enabled() {
+                     return Err(CryptographyError::from(
+                         exceptions::UnsupportedAlgorithm::new_err((
+                             "ChaCha20Poly1305 is not supported by this version of OpenSSL",
+                             exceptions::Reasons::UNSUPPORTED_CIPHER,
+                         )),
+                     ));
+-                }
+-
+-                Ok(ChaCha20Poly1305 {
+-                    ctx: EvpCipherAead::new(
+-                        openssl::cipher::Cipher::chacha20_poly1305(),
+-                        key_buf.as_bytes(),
+-                        16,
+-                        false,
+-                    )?,
+-                })
++                // }
++
++                // Ok(ChaCha20Poly1305 {
++                //     ctx: EvpCipherAead::new(
++                //         openssl::cipher::Cipher::chacha20_poly1305(),
++                //         key_buf.as_bytes(),
++                //         16,
++                //         false,
++                //     )?,
++                // })
+             } else {
+-                if cryptography_openssl::fips::is_enabled() {
++                // if cryptography_openssl::fips::is_enabled() {
+                     return Err(CryptographyError::from(
+                         exceptions::UnsupportedAlgorithm::new_err((
+                             "ChaCha20Poly1305 is not supported by this version of OpenSSL",
+                             exceptions::Reasons::UNSUPPORTED_CIPHER,
+                         )),
+                     ));
+-                }
+-
+-                Ok(ChaCha20Poly1305{
+-                    ctx: LazyEvpCipherAead::new(
+-                        openssl::cipher::Cipher::chacha20_poly1305(),
+-                        key,
+-                        16,
+-                        false,
+-                    )
+-                })
++                // }
++
++                // Ok(ChaCha20Poly1305{
++                //     ctx: LazyEvpCipherAead::new(
++                //         openssl::cipher::Cipher::chacha20_poly1305(),
++                //         key,
++                //         16,
++                //         false,
++                //     )
++                // })
+             }
+         }
+     }
+-- 
+2.34.1
+

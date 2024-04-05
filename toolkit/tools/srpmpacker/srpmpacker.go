@@ -7,7 +7,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -108,7 +107,7 @@ var (
 
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	srpmPackList = app.Flag("pack-list", "List of SPECs to pack. If empty will pack all SPECs.").Default("").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
@@ -165,7 +164,7 @@ func main() {
 	templateSrcConfig.caCerts, err = x509.SystemCertPool()
 	logger.PanicOnError(err, "Received error calling x509.SystemCertPool(). Error: %v", err)
 	if *caCertFile != "" {
-		newCACert, err := ioutil.ReadFile(*caCertFile)
+		newCACert, err := os.ReadFile(*caCertFile)
 		if err != nil {
 			logger.Log.Panicf("Invalid CA certificate (%s), error: %s", *caCertFile, err)
 		}
@@ -186,7 +185,7 @@ func main() {
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
-	packList, err := packagelist.ParsePackageListFile(*packListFile)
+	packList, err := packagelist.ParsePackageList(*srpmPackList)
 	logger.PanicOnError(err)
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)
@@ -273,7 +272,7 @@ func findSPECFiles(specsDir string, packList map[string]bool) (specFiles []strin
 				return
 			}
 			if len(specFile) != 1 {
-				if strings.HasPrefix(specName, "msopenjdk-11") {
+				if strings.HasPrefix(specName, "msopenjdk-17") {
 					logger.Log.Debugf("Ignoring missing match for '%s', which is externally-provided and thus doesn't have a local spec.", specName)
 					continue
 				} else {

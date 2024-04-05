@@ -30,6 +30,13 @@ parameters:
     type: boolean
     default: true
 
+  - name: inputCacheArtifacts
+    type: object
+    default: []
+    # Sample:
+    # - name: build-artifacts
+    #   rpmsTarball: cache.tar.gz
+
   - name: isCheckBuild
     type: string
     default: "default"
@@ -86,6 +93,18 @@ parameters:
     type: string
     default: ""
 
+  - name: outputRPMsCacheTarballName
+    type: string
+    default: ""
+
+  - name: outputRPMsTarballName
+    type: string
+    default: "rpms.tar.gz"
+
+  - name: outputSRPMsTarballName
+    type: string
+    default: "srpms.tar.gz"
+
   - name: pipArtifactFeeds
     type: string
     default: ""
@@ -93,18 +112,6 @@ parameters:
   - name: publishLogs
     type: boolean
     default: true
-
-  - name: rpmsCacheArtifactName
-    type: string
-    default: ""
-
-  - name: rpmsCacheTarballName
-    type: string
-    default: "rpms.tar.gz"
-
-  - name: rpmsTarballName
-    type: string
-    default: "rpms.tar.gz"
 
   - name: selfRepoName
     type: string
@@ -117,10 +124,6 @@ parameters:
   - name: srpmPackList
     type: string
     default: ""
-
-  - name: srpmsTarballName
-    type: string
-    default: "srpms.tar.gz"
 
   - name: testSuiteName
     type: string
@@ -155,28 +158,32 @@ steps:
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" toolchain TOOLCHAIN_ARCHIVE="$toolchain_archive"
         displayName: "Populate toolchain"
 
-  - ${{ if parameters.rpmsCacheArtifactName }}:
+  - ${{ each inputCacheArtifact in parameters.inputCacheArtifacts }}:
       - task: DownloadPipelineArtifact@2
-        displayName: "Download RPM cache"
+        displayName: "Download input cache RPM from ${{ inputCacheArtifact.name }}"
         inputs:
-          artifact: "${{ parameters.rpmsCacheArtifactName }}"
-          patterns: "**/${{ parameters.rpmsCacheTarballName }}"
+          artifact: "${{ inputCacheArtifact.name }}"
+          patterns: "**/${{ inputCacheArtifact.rpmsTarball }}"
 
       - script: |
-          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ parameters.rpmsCacheTarballName }}" -print -quit)"
+          rpms_archive="$(find "$(Pipeline.Workspace)" -name "${{ inputCacheArtifact.rpmsTarball }}" -print -quit)"
           if [[ ! -f "$rpms_archive" ]]; then
-            echo "ERROR: RPMs cache archive not found!" >&2
+            echo "ERROR: cache RPMs archive '${{ inputCacheArtifact.rpmsTarball }}' not found!" >&2
             exit 1
           fi
 
           sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" hydrate-cached-rpms CACHED_PACKAGES_ARCHIVE="$rpms_archive"
-        displayName: "Populate RPMs cache"
+        displayName: "Populate cache RPMs"
 
   - script: |
       if [[ ${{ parameters.isDeltaBuild }} == "true" ]]; then
         delta_fetch_arg="DELTA_FETCH=y"
       elif [[ ${{ parameters.isDeltaBuild }} == "false" ]]; then
         delta_fetch_arg="DELTA_FETCH=n"
+      fi
+
+      if [[ -n "${{ parameters.maxCascadingRebuilds }}" ]]; then
+        max_cascading_rebuilds_arg="MAX_CASCADING_REBUILDS=${{ parameters.maxCascadingRebuilds }}"
       fi
 
       if [[ ${{ parameters.isQuickRebuildPackages }} == "true" ]]; then
@@ -191,20 +198,19 @@ steps:
         run_check_arg="RUN_CHECK=n"
       fi
 
+      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
+        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
+      fi
+
       if [[ ${{ parameters.isUseCCache }} == "true" ]]; then
         use_ccache_arg="USE_CCACHE=y"
       elif [[ ${{ parameters.isUseCCache }} == "false" ]]; then
         use_ccache_arg="USE_CCACHE=n"
       fi
 
-      if [[ -n "${{ parameters.customToolchainArtifactName }}" ]]; then
-        toolchain_archive_arg="TOOLCHAIN_ARCHIVE=$(toolchainArchive)"
-      fi
-
       sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" build-packages -j$(nproc) \
         CONCURRENT_PACKAGE_BUILDS=${{ parameters.concurrentPackageBuilds }} \
         CONFIG_FILE="" \
-        MAX_CASCADING_REBUILDS="${{ parameters.maxCascadingRebuilds }}" \
         MAX_CPU="${{ parameters.maxCPU }}" \
         REBUILD_TOOLS=y \
         REPO_LIST="${{ parameters.extraPackageRepos }}" \
@@ -212,6 +218,7 @@ steps:
         SRPM_PACK_LIST="${{ parameters.srpmPackList }}" \
         TEST_RERUN_LIST="${{ parameters.testRerunList }}" \
         $delta_fetch_arg \
+        $max_cascading_rebuilds_arg \
         $quick_rebuild_packages_arg \
         $run_check_arg \
         $toolchain_archive_arg \
@@ -219,7 +226,18 @@ steps:
     displayName: "Build packages"
 
   - ${{ if parameters.outputArtifactsFolder }}:
-      - ${{ if parameters.rpmsTarballName }}:
+      - ${{ if parameters.outputRPMsCacheTarballName }}:
+          - script: |
+              sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-cached-rpms
+            displayName: "Compress cached RPMs"
+
+          - bash: |
+              published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
+              mkdir -p "$published_artifacts_dir"
+              cp "${{ parameters.buildRepoRoot }}"/out/cache.tar.gz "$published_artifacts_dir/${{ parameters.outputRPMsCacheTarballName }}"
+            displayName: "Copy cached RPMs for publishing"
+
+      - ${{ if parameters.outputRPMsTarballName }}:
           - script: |
               sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-rpms
             displayName: "Compress RPMs"
@@ -227,10 +245,10 @@ steps:
           - bash: |
               published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
               mkdir -p "$published_artifacts_dir"
-              cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.rpmsTarballName }}"
+              cp "${{ parameters.buildRepoRoot }}"/out/rpms.tar.gz "$published_artifacts_dir/${{ parameters.outputRPMsTarballName }}"
             displayName: "Copy RPMs for publishing"
 
-      - ${{ if parameters.srpmsTarballName }}:
+      - ${{ if parameters.outputSRPMsTarballName }}:
           - script: |
               sudo make -C "${{ parameters.buildRepoRoot }}/toolkit" compress-srpms
             displayName: "Compress SRPMs"
@@ -238,7 +256,7 @@ steps:
           - bash: |
               published_artifacts_dir="${{ parameters.outputArtifactsFolder }}/${{ parameters.outputArtifactsPackagesSubfolder }}"
               mkdir -p "$published_artifacts_dir"
-              cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.srpmsTarballName }}"
+              cp "${{ parameters.buildRepoRoot }}"/out/srpms.tar.gz "$published_artifacts_dir/${{ parameters.outputSRPMsTarballName }}"
             displayName: "Copy SRPMs for publishing"
 
       - ${{ if parameters.publishLogs }}:
