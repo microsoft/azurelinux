@@ -14913,8 +14913,8 @@
         "type": "other",
         "other": {
           "name": "opa",
-          "version": "0.55.0",
-          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.55.0.tar.gz"
+          "version": "0.63.0",
+          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.63.0.tar.gz"
         }
       }
     },
