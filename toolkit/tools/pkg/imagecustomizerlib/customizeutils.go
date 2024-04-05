@@ -42,7 +42,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.OS, imageChroot, rpmsSources,
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, config.OS, imageChroot, rpmsSources,
 		useBaseImageRpmRepos)
 	if err != nil {
 		return err
