@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -150,8 +150,8 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Wed Apr 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 1:23.3-1
-- Downgrade to 23.3
+* Wed Apr 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 1:23.3-2
+- Downgrade to 23.3 with release 2 to avoid collision with 23.3 in PMC
 - Add back overrideDatasourceDetection.patch
 - Remove ci-Pin-pytest-8.0.0.patch as pytest is pinned to pytest<=7.3.1
 - Remove Retain-exit-code-in-cloud-init-status-for-recoverabl.patch
