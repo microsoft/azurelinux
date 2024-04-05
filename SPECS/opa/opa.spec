@@ -4,8 +4,8 @@
 %global short_commit    e88ad165
 Summary:        Open source, general-purpose policy engine
 Name:           opa
-Version:        0.50.2
-Release:        8%{?dist}
+Version:        0.63.0
+Release:        1%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -53,6 +53,9 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-1
+- Auto-upgrade to 0.63.0 - CVE-2023-45142
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.50.2-8
 - Bump release to rebuild with go 1.21.6
 
