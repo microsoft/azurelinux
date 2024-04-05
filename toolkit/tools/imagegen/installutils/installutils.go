@@ -6,6 +6,7 @@ package installutils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -2193,6 +2194,9 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	return
 }
 
+// cleanupTdnfCache runs 'tdnf clean all' and removes the contents of the tdnf cache directory.
+// If 'tdnf' is not installed, the function will skip the cleanup.
+// If /var/cache/tdnf does not exist, the function will skip removing its contents.
 func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
 	const (
 		squashErrors      = false
@@ -2201,8 +2205,14 @@ func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
 
 	ReportActionf("Cleaning tdnf cache")
 	err := installChroot.UnsafeRun(func() error {
+		// Check if 'tdnf' is in the chroot's PATH, some images may have removed it.
+		_, chrootErr := exec.LookPath("tdnf")
+		if chrootErr != nil {
+			logger.Log.Debugf("Skipping tdnf cache cleanup since 'tdnf' is not installed")
+			return nil
+		}
 		logger.Log.Infof("Cleaning tdnf cache")
-		chrootErr := shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
+		chrootErr = shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
 		return chrootErr
 	})
 
@@ -2220,10 +2230,11 @@ func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
 		return fmt.Errorf("failed to check if tdnf cache directory exists (%s):\n%w", cacheDir, err)
 	}
 	if !exists {
-		logger.Log.Infof("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
+		logger.Log.Debugf("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
 		return nil
 	}
 
+	logger.Log.Infof("Removing contents of (%s)", cacheDir)
 	err = file.RemoveDirectoryContents(cacheDir)
 	if err != nil {
 		err = fmt.Errorf("failed to remove tdnf cache contents (%s/*):\n%w", cacheDir, err)
