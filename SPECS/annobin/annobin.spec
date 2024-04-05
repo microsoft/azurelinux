@@ -351,7 +351,6 @@ make check
 %files plugin-clang
 %dir %{clang_plugin_dir}
 %{clang_plugin_dir}/annobin-for-clang.so
-%endif
 
 %files plugin-gcc
 %dir %{ANNOBIN_GCC_PLUGIN_DIR}
