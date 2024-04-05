@@ -3468,7 +3468,8 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 %changelog
 * Mon Apr 01 2024 Kanika Nema <kanikanema@microsoft.com> - 8.2.0-5
-- Disable eventfd based migration tests as it hangs when run as part of check.
+- Disable eventfd based migration tests as they hang when run as part of check.
+- Diable TLS PSK tests as they fail.
 - Remove patch that disables all migration tests.
 
 * Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 8.2.0-4
