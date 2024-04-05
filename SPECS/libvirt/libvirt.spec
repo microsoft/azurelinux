@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -398,8 +398,9 @@ Requires: polkit >= 0.112
 Requires: dmidecode
     %endif
 # For service management
-Requires(posttrans): /usr/bin/systemctl
-Requires(preun): /usr/bin/systemctl
+# azl has systemd-bootstrap which also provides /usr/bin/sysctl, explicitly request full systemd.
+Requires(posttrans): systemd
+Requires(preun):  systemd
 # libvirtd depends on 'messagebus' service
 Requires: dbus
 # For uid creation during pre
@@ -2184,6 +2185,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 10.0.0-2
+- Make systemd dependency explicit to avoid confusion with systemd-bootstrap.
+
 * Thu Jan 18 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 10.0.0-1
 - Updating to version 10.0.0.
 - Hard code configuration options to match Mariner 2.0 configurations. Ensure that
