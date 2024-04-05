@@ -28,7 +28,6 @@ BuildRequires:  python3-xml
 BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 Requires:       python3
-
 %if 0%{?with_check}
 BuildRequires:  curl-devel
 BuildRequires:  openssl-devel
@@ -46,7 +45,7 @@ Requires:       python3-werkzeug = %{version}-%{release}
 Documentation and examples for python3-werkzeug.
 
 %generate_buildrequires
-%if %{with_check}
+%if 0%{?with_check}
 # -t picks test.txt by default which contains too tight pins
 %pyproject_buildrequires requirements/tests.in requirements/docs.in
 %else
@@ -55,7 +54,6 @@ Documentation and examples for python3-werkzeug.
 
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
-find examples/ -type f -name '*.png' -executable -print -exec chmod -x "{}" +
 
 %build
 %pyproject_wheel
@@ -65,12 +63,12 @@ find examples/ -type f -name '*.png' -executable -print -exec chmod -x "{}" +
 %pyproject_save_files %{modname}
 
 %check
-pip3 install more-itertools exceptiongroup iniconfig tomli ephemeral_port_reserve pytest-xprocess MarkupSafe watchdog pytest requests cryptography
+pip3 install --ignore-installed -r requirements/tests.txt
+pip3 install markupsafe
 %py3_check_import %{modname}
-%if %{with_check}
+%if 0%{?with_check}
 # deselect the test_exclude_patterns test case as it's failing
 # when we set PYTHONPATH: https://github.com/pallets/werkzeug/issues/2404
-# also deselect multiple tests that fail with ConnectionRefusedError when trying to connect to a port 
 %pytest -Wdefault --deselect tests/test_serving.py::test_exclude_patterns
 %endif
 
@@ -80,7 +78,7 @@ pip3 install more-itertools exceptiongroup iniconfig tomli ephemeral_port_reserv
 %files -n python3-werkzeug-doc
 
 %changelog
-* Tue Feb 13 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.1-1
+* Thu Apr 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.1-1
 - Auto-upgrade to 3.0.1 - 3.0 package upgrade
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
