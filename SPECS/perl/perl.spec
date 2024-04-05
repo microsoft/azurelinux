@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        488%{?dist}
+Release:        489%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -173,6 +173,10 @@ Patch200:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-CBuilder-on-Li
 
 # Link XS modules to libperl.so with EU::MM on Linux, bug #960048
 Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.patch
+
+Patch202:       CVE-2023-47100.patch
+Patch203:       CVE-2023-31486.patch
+Patch204:       CVE-2023-31484.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -4073,6 +4077,9 @@ you're not running VMS, this module does nothing.
 %patch13 -p1
 %patch200 -p1
 %patch201 -p1
+%patch202 -p1
+%patch203 -p1
+%patch204 -p1
 
 #copy Pod-Html license clarification
 cp %{SOURCE6} .
@@ -6813,6 +6820,9 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+* Thu Apr 04 2024 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-489
+- Add patch for CVE-2023-47100
+
 * Fri May 20 2022 Andrew Phelps <anphel@microsoft.com> - 4:5.34.1-488
 - Undefine "mariner_module_ldflags" to remove references to module_info.ld in embedded ldflags
 
@@ -8796,5 +8806,3 @@ related to tests!
 
 * Thu Nov 29 2007 Robin Norwood <rnorwood@redhat.com> - 4:5.10.0_RC2-0.1
 - first attempt at building 5.10.0
-
-
