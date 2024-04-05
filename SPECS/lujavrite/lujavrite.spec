@@ -37,7 +37,7 @@ lua test.lua
 
 %changelog
 * Thu Apr 04 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.0.2-5
-- Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- Initial Azure Linux import from Fedora 40 (license: MIT).
 - License verified.
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-4
