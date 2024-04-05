@@ -688,7 +688,7 @@ Requires: gzip
 Requires: bzip2
 Requires: lzop
 Requires: xz
-#Requires: swtpm-tools
+Requires: swtpm-tools
         %if %{with_numad}
 Requires: numad
         %endif
@@ -1968,7 +1968,7 @@ exit 0
 %ghost %dir %{_rundir}/libvirt/qemu/dbus/
 %ghost %dir %{_rundir}/libvirt/qemu/passt/
 %ghost %dir %{_rundir}/libvirt/qemu/slirp/
-#%ghost %dir %{_rundir}/libvirt/qemu/swtpm/
+%ghost %dir %{_rundir}/libvirt/qemu/swtpm/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/checkpoint/
 %dir %attr(0751, %{qemu_user}, %{qemu_group}) %{_localstatedir}/lib/libvirt/qemu/dump/
@@ -1980,8 +1980,8 @@ exit 0
 %{_datadir}/augeas/lenses/libvirtd_qemu.aug
 %{_datadir}/augeas/lenses/tests/test_libvirtd_qemu.aug
 %{_libdir}/libvirt/connection-driver/libvirt_driver_qemu.so
-#%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/swtpm/
-#%dir %attr(0730, tss, tss) %{_localstatedir}/log/swtpm/libvirt/qemu/
+%dir %attr(0711, root, root) %{_localstatedir}/lib/libvirt/swtpm/
+%dir %attr(0730, tss, tss) %{_localstatedir}/log/swtpm/libvirt/qemu/
 %{_bindir}/virt-qemu-run
 %{_mandir}/man1/virt-qemu-run.1*
 %{_mandir}/man8/virtqemud.8*
