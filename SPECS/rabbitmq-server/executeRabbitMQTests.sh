@@ -15,11 +15,18 @@
 # //deps/rabbitmq_auth_backend_ldap:system_SUITE
 # //deps/rabbitmq_ampq1_0:system_SUITE - shard 1 of 2 specifically
 #
-# Additional failures: 
-# //deps/rabbitmq_common:env_SUITE - test case 3 of 40 fails - fails for Assertion error
+# Additional failures in v3.13.0: 
 # //deps/rabbit:feature_flags_with_unprivileged_user_SUITE-mixed - both shards fail for Assertion error
 # //deps/rabbit:feature_flags_with_unprivileged_user_SUITE - both shards fail for Assertion error
-# //deps/rabbitmq_shovel:amqp10_dynamic_SUITE-mixed - test case 6 - fails for early closed connection
+# //deps/rabbit:feature_flag_v2_SUITE - rpc_calls Assertion error
+# //deps/rabbit:per_vhost_msg_store_SUITE - badmatch(?)
+# //deps/rabbit:per_vhost_msg_store_SUITE-mixed - badmatch(?)
+# //deps/rabbitmq_federation:federation_status_command_SUITE - Condition did not materialize in the expected period of time (aka timeout)
+# //deps/rabbitmq_federation:federation_status_command_SUITE-mixed - Condition did not materialize in the expected period of time (aka timeout)
+
+# Skipped tests:
+# //deps/rabbitmq_cli:check_formatted
+# //deps/rabbitmq_cli:compile_warnings_as_errors
 #
 # RabbitMQ depends on bazel 'latest'. This can be updated as needed using the "BAZEL_DEP_VERSION" variable for the purposes of this script
 #
@@ -38,7 +45,7 @@
 #### END TESTING DISCLAIMER ####
 
 ####   SCRIPT ASSUMPTIONS   ####
-# This test generates A LOT of files, you will need 5.0M+ inodes to run the full SUITE.
+# This test generates A LOT of files, you will need 2.6M+ inodes to run the full SUITE. (aka about 50GB free in ext4 filesystem)
 #
 # You have pulled the rabbitmq source from github as it contains additional bazel build files which our normal source does not
 # (And checked out the appropriate tag + applied any local patches from Azure Linux)
