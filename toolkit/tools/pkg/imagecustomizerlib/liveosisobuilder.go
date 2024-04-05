@@ -6,6 +6,7 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -60,12 +61,33 @@ type IsoArtifacts struct {
 	vmlinuzPath       string
 	initrdImagePath   string
 	squashfsImagePath string
-	bootDirFiles      map[string]string // local-build-path -> iso-media-path
+	additionalFiles   map[string]string // local-build-path -> iso-media-path
 }
 
 type LiveOSIsoBuilder struct {
 	workingDirs IsoWorkingDirs
 	artifacts   IsoArtifacts
+}
+
+func (b *LiveOSIsoBuilder) dump(title string) {
+	logger.Log.Debugf("----<><>---- " + title + "----<><>---- ")
+	logger.Log.Debugf("- workingDirs")
+	logger.Log.Debugf("  |- isoBuildDir      : %s", b.workingDirs.isoBuildDir)
+	logger.Log.Debugf("  |- isoArtifactsDir  : %s", b.workingDirs.isoArtifactsDir)
+	logger.Log.Debugf("  |- isomakerBuildDir : %s", b.workingDirs.isomakerBuildDir)
+	logger.Log.Debugf("- artifacts")
+	logger.Log.Debugf("  |- kernelVersion    : %s", b.artifacts.kernelVersion)
+	logger.Log.Debugf("  |- bootx64EfiPath   : %s", b.artifacts.bootx64EfiPath)
+	logger.Log.Debugf("  |- grubx64EfiPath   : %s", b.artifacts.grubx64EfiPath)
+	logger.Log.Debugf("  |- grubCfgPath      : %s", b.artifacts.grubCfgPath)
+	logger.Log.Debugf("  |- vmlinuzPath      : %s", b.artifacts.vmlinuzPath)
+	logger.Log.Debugf("  |- initrdImagePath  : %s", b.artifacts.initrdImagePath)
+	logger.Log.Debugf("  |- squashfsImagePath: %s", b.artifacts.squashfsImagePath)
+	logger.Log.Debugf("  |- additionalFiles  : ")
+	for source, target := range b.artifacts.additionalFiles {
+		logger.Log.Debugf("     |- %s            : %s", source, target)
+	}
+	logger.Log.Debugf("----<><>---- ----<><>---- ")
 }
 
 // populateWriteableRootfsDir
@@ -185,6 +207,8 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 		return fmt.Errorf("failed to delete fstab:\n%w", err)
 	}
 
+	// ToDo: why create it some where and then copy it?
+	//       just create it at the destination...
 	sourceConfigFile := filepath.Join(b.workingDirs.isoArtifactsDir, "20-live-cd.conf")
 	err = os.WriteFile(sourceConfigFile, []byte(dracutConfig), 0o644)
 	if err != nil {
@@ -274,11 +298,13 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 //     b.artifacts.bootx64EfiPath
 //     b.artifacts.grubx64EfiPath
 //     b.artifacts.vmlinuzPath
-//     b.artifacts.bootDirFiles
+//     b.artifacts.additionalFiles
 func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error {
 
+	b.dump("Starting extractBootDirFiles()")
+
 	sourceBootDir := filepath.Join(writeableRootfsDir, "/boot")
-	b.artifacts.bootDirFiles = make(map[string]string)
+	b.artifacts.additionalFiles = make(map[string]string)
 
 	var exclusions []*regexp.Regexp
 	// the following files will be re-created - no need to copy them only to
@@ -331,7 +357,7 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 		// If not copied by IsoMaker, add it to the list of files we will copy
 		// later. Otherwise, do not do anything and leave it to IsoMaker.
 		if !copiedByIsoMaker {
-			b.artifacts.bootDirFiles[targetPath] = strings.TrimPrefix(targetPath, b.workingDirs.isoArtifactsDir)
+			b.artifacts.additionalFiles[targetPath] = strings.TrimPrefix(targetPath, b.workingDirs.isoArtifactsDir)
 		}
 
 		return nil
@@ -340,6 +366,8 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 	if err != nil {
 		return fmt.Errorf("failed to extract files from under the boot folder:\n%w", err)
 	}
+
+	b.dump("Finished extractBootDirFiles()")
 
 	return nil
 }
@@ -479,6 +507,9 @@ func (b *LiveOSIsoBuilder) createSquashfsImage(writeableRootfsDir string) error 
 	}
 
 	b.artifacts.squashfsImagePath = squashfsImagePath
+
+	b.dump("Finished createSquashfsImage()")
+
 	return nil
 }
 
@@ -535,6 +566,8 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 		return fmt.Errorf("failed to copy generated initrd:\n%w", err)
 	}
 	b.artifacts.initrdImagePath = targetInitrdPath
+
+	b.dump("Finished generateInitrdImage()")
 
 	return nil
 }
@@ -647,7 +680,7 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
 
 	// Add /boot/* files
-	for sourceFile, targetFile := range b.artifacts.bootDirFiles {
+	for sourceFile, targetFile := range b.artifacts.additionalFiles {
 		fileToCopy := safechroot.FileToCopy{
 			Src:           sourceFile,
 			Dest:          targetFile,
@@ -802,4 +835,136 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecusto
 	}
 
 	return nil
+}
+
+func expandIso(buildDir, isoImageFile, isoExpandionFolder string) (err error) {
+	logger.Log.Debugf("---- dev ---- expandIso() - 1 - isoImageFile=%s", isoImageFile)
+
+	mountDir, err := ioutil.TempDir(buildDir, "tmp-iso-mount-")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary mount folder for iso:\n%w", err)
+	}
+	defer os.RemoveAll(mountDir)
+
+	logger.Log.Debugf("---- dev ---- expandIso() - 2 - created mountDir=%s", mountDir)
+
+	mountParams := []string{isoImageFile, mountDir}
+	err = shell.ExecuteLive(false, "mount", mountParams...)
+	if err != nil {
+		return fmt.Errorf("failed to create squashfs:\n%w", err)
+	}
+	defer func() {
+		unmountParams := []string{mountDir}
+		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
+		if cleanupErr != nil {
+			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, mountDir, cleanupErr)
+		}
+	}()
+
+	logger.Log.Debugf("---- dev ---- expandIso() - 3 - mounted")
+
+	err = os.MkdirAll(isoExpandionFolder, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create folder %s:\n%w", isoExpandionFolder, err)
+	}
+
+	logger.Log.Debugf("---- dev ---- expandIso() - 4 - copying %s to %s", mountDir, isoExpandionFolder)
+
+	err = copyPartitionFiles(mountDir+"/.", isoExpandionFolder)
+	if err != nil {
+		return fmt.Errorf("failed to copy iso image contents to a writeable folder (%s):\n%w", isoExpandionFolder, err)
+	}
+
+	return nil
+}
+
+func isoBuilderFromLayout(buildDir, isoExpandionFoldr string, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, outputImageDir, outputImageBase string) (isoBuilder *LiveOSIsoBuilder, err error) {
+	logger.Log.Debugf("---- dev ---- fromLayout() - 1")
+
+	isoBuildDir := filepath.Join(buildDir, "tmp")
+	err = os.MkdirAll(isoBuildDir, os.ModePerm)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create folder %s:\n%w", isoBuildDir, err)
+	}
+
+	isoBuilder = &LiveOSIsoBuilder{
+		//
+		// buildDir (might be shared with other build tools)
+		//  |--tmp   (LiveOSIsoBuilder specific)
+		//     |--<various mount points>
+		//     |--artifacts        (extracted and generated artifacts)
+		//     |--isomaker-tmp     (used exclusively by isomaker)
+		//
+		workingDirs: IsoWorkingDirs{
+			isoBuildDir:     isoBuildDir,
+			isoArtifactsDir: filepath.Join(isoBuildDir, "artifacts"),
+			// IsoMaker needs its own folder to work in (it starts by deleting and re-creating it).
+			isomakerBuildDir: filepath.Join(isoBuildDir, "isomaker-tmp"),
+		},
+	}
+	/*
+		defer func() {
+			cleanupErr := os.RemoveAll(isoBuilder.workingDirs.isoBuildDir)
+			if cleanupErr != nil {
+				if err != nil {
+					err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, isoBuilder.workingDirs.isoBuildDir, cleanupErr)
+				} else {
+					err = fmt.Errorf("failed to clean-up (%s): %w", isoBuilder.workingDirs.isoBuildDir, cleanupErr)
+				}
+			}
+		}()
+	*/
+
+	isoFiles, err := file.EnumerateDirFiles(isoExpandionFoldr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to enumerate expanded iso files under %s:\n%w", isoExpandionFoldr, err)
+	}
+
+	isoBuilder.artifacts.additionalFiles = make(map[string]string)
+
+	for _, isoFile := range isoFiles {
+		logger.Log.Debugf("---- dev ---- processing %s", isoFile)
+		fileName := filepath.Base(isoFile)
+
+		// copiedByIsoMaker is true when isoMaker extracts the file from initrd.
+		copiedByIsoMaker := false
+
+		switch fileName {
+		case "bootx64.efi", "grubx64.efi":
+			copiedByIsoMaker = true
+		case "grub.cfg":
+			isoBuilder.artifacts.grubCfgPath = isoFile
+			copiedByIsoMaker = true
+		case "rootfs.img":
+			isoBuilder.artifacts.squashfsImagePath = isoFile
+			copiedByIsoMaker = true
+		case "initrd.img":
+			isoBuilder.artifacts.initrdImagePath = isoFile
+			copiedByIsoMaker = true
+		}
+		if strings.HasPrefix(fileName, "vmlinuz-") {
+			copiedByIsoMaker = true
+		}
+
+		if !copiedByIsoMaker {
+			isoBuilder.artifacts.additionalFiles[isoFile] = strings.TrimPrefix(isoFile, isoExpandionFoldr)
+		}
+	}
+
+	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
+	}
+
+	err = isoBuilder.updateGrubCfg(isoBuilder.artifacts.grubCfgPath, extraCommandLine)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update grub.cfg:\n%w", err)
+	}
+
+	err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	if err != nil {
+		return nil, err
+	}
+
+	return isoBuilder, nil
 }
