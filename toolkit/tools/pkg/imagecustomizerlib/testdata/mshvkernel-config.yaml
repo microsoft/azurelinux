@@ -4,26 +4,24 @@ storage:
     maxSize: 4096
     partitions:
     - id: efi
-      flags:
-      - esp
-      - boot
+      type: esp
       start: 1
       end: 65
-      fileSystemType: fat32
 
     - id: rootfs
       start: 65
-      fileSystemType: ext4
 
   bootType: efi
 
   fileSystems:
   - deviceId: efi
+    type: fat32
     mountPoint:
       path: /boot/efi
       options: umask=0077
 
   - deviceId: rootfs
+    type: ext4
     mountPoint:
       path: /
 

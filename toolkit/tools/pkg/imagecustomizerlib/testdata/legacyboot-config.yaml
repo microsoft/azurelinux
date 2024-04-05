@@ -4,22 +4,21 @@ storage:
     maxSize: 4096
     partitions:
     - id: boot
-      flags:
-      - bios-grub
+      type: bios-grub
       start: 1
       size: 8
-      fileSystemType: fat32
 
     - id: rootfs
       start: 9
-      fileSystemType: ext4
 
   bootType: legacy
 
   fileSystems:
   - deviceId: boot
+    type: fat32
 
   - deviceId: rootfs
+    type: ext4
     mountPoint:
       path: /
 

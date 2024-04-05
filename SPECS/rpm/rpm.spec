@@ -1,7 +1,7 @@
 Summary:        Package manager
 Name:           rpm
-Version:        4.18.1
-Release:        4%{?dist}
+Version:        4.18.2
+Release:        1%{?dist}
 License:        GPLv2+ AND LGPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -266,6 +266,9 @@ popd
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 22 2024 Sam Meluch <sammeluch@microsoft.com> - 4.18.2-1
+- Upgrade rpm to version 4.18.2
+
 * Thu Feb 29 2024 Andrew Phelps <anphel@microsoft.com> - 4.18.1-4
 - Remove python generator scripts, which are now provided by the python-rpm-generators package.
 

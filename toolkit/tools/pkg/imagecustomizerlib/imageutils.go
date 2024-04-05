@@ -114,7 +114,7 @@ func createNewImageHelper(imageConnection *ImageConnection, filename string, dis
 ) error {
 
 	// Convert config to image config types, so that the imager's utils can be used.
-	imagerDiskConfig, err := diskConfigToImager(diskConfig)
+	imagerDiskConfig, err := diskConfigToImager(diskConfig, fileSystems)
 	if err != nil {
 		return err
 	}

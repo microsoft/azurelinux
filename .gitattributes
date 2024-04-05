@@ -3,5 +3,5 @@
 *.spec linguist-detectable linguist-language=RPM-Spec
 toolkit/docs/** linguist-documentation
 LICENSES-AND-NOTICES/** linguist-documentation
-SPECS/LICENSES-AND-NOTICES/** linguist-documentation
-SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md linguist-generated
+LICENSES-AND-NOTICES/SPECS/** linguist-documentation
+LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md linguist-generated

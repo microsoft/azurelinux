@@ -20,7 +20,6 @@ toolchain_downloads_manifest = $(toolchain_downloads_logs_dir)/download_manifest
 toolchain_log_tail_length = 20
 populated_toolchain_chroot = $(toolchain_build_dir)/populated_toolchain
 populated_toolchain_rpms = $(populated_toolchain_chroot)/usr/src/azl/RPMS
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
 toolchain_actual_contents = $(toolchain_build_dir)/actual_archive_contents.txt
 toolchain_expected_contents = $(toolchain_build_dir)/expected_archive_contents.txt
 raw_toolchain = $(toolchain_build_dir)/toolchain_from_container.tar.gz
@@ -28,7 +27,7 @@ final_toolchain = $(toolchain_build_dir)/toolchain_built_rpms_all.tar.gz
 toolchain_files = \
 	$(call shell_real_build_only, find $(SCRIPTS_DIR)/toolchain -name '*.sh') \
 	$(SCRIPTS_DIR)/toolchain/container/Dockerfile
-
+toolchain_spec_list := $(call shell_real_build_only, $(SCRIPTS_DIR)/toolchain/list_toolchain_specs.sh $(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh)
 TOOLCHAIN_MANIFEST ?= $(TOOLCHAIN_MANIFESTS_DIR)/toolchain_$(build_arch).txt
 # Find the *.rpm corresponding to each of the entries in the manifest
 # regex operation: (.*\.([^\.]+)\.rpm) extracts *.(<arch>).rpm" to determine
@@ -57,8 +56,6 @@ ifeq ($(REBUILD_TOOLCHAIN),y)
 # If we are rebuilding the toolchain, we also expect the built RPMs to end up in out/RPMS
 toolchain: $(toolchain_out_rpms)
 endif
-##help:target:toolchain_spec_list=Generate a file containing a list of toolchain specs.
-toolchain_spec_list: $(toolchain_spec_list)
 
 clean: clean-toolchain
 
@@ -99,32 +96,10 @@ copy-toolchain-rpms:
 
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
-check-aarch64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"aarch64"
-check-x86_64-manifests: $(toolchain_spec_list)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"x86_64"
-
-# Generate a list of a specs built as part of the toolchain.
-$(toolchain_spec_list): $(toolchain_files)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./list_toolchain_specs.sh \
-			$(SCRIPTS_DIR)/toolchain/build_official_toolchain_rpms.sh \
-			$(toolchain_spec_list)
-	@echo "Toolchain spec list created under '$(toolchain_spec_list)'."
+check-aarch64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "aarch64"
+check-x86_64-manifests: $(toolchain_files)
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "x86_64"
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line

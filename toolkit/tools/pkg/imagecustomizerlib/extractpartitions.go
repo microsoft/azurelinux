@@ -51,36 +51,50 @@ func extractPartitions(imageLoopDevice string, outDir string, basename string, p
 	}
 
 	// Extract partitions to files
-	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		if diskPartitions[partitionNum].Type == "part" {
-			partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
-			rawFilename := partitionFilename + ".raw"
-			partitionLoopDevice := diskPartitions[partitionNum].Path
+	for partitionNum := range diskPartitions {
+		partition := diskPartitions[partitionNum]
+		if partition.Type != "part" {
+			continue
+		}
 
-			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
+		rawFilename := partitionFilename + ".raw"
+		partitionLoopDevice := partition.Path
+
+		partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		if err != nil {
+			return err
+		}
+
+		partitionFullFilePath, err := filepath.Abs(partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path (%s):\n%w", partitionFilepath, err)
+		}
+
+		// Sanity check the partition file.
+		err = checkFileSystemFile(partition.FileSystemType, partitionFullFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to check file system integrity (%s):\n%w", partitionFilepath, err)
+		}
+
+		switch partitionFormat {
+		case "raw":
+			// Do nothing for "raw" case
+		case "raw-zst":
+			partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
 			if err != nil {
 				return err
 			}
-
-			switch partitionFormat {
-			case "raw":
-				// Do nothing for "raw" case
-			case "raw-zst":
-				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
-				if err != nil {
-					return err
-				}
-			default:
-				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
-			}
-
-			partitionMetadata, err := constructOutputPartitionMetadata(diskPartitions[partitionNum], partitionNum, partitionFilepath)
-			if err != nil {
-				return fmt.Errorf("failed to construct partition metadata:\n%w", err)
-			}
-			partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
-			logger.Log.Infof("Partition file created: %s", partitionFilepath)
+		default:
+			return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 		}
+
+		partitionMetadata, err := constructOutputPartitionMetadata(partition, partitionNum, partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to construct partition metadata:\n%w", err)
+		}
+		partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
+		logger.Log.Infof("Partition file created: %s", partitionFilepath)
 	}
 
 	// Write partition metadata JSON to a file

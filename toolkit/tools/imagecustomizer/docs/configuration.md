@@ -29,7 +29,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 7. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([modules](#modules-type))
+8. Configure kernel modules. ([modules](#modules-module))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
@@ -95,15 +95,15 @@ os:
         - [partitions](#partitions-partition)
           - [partition type](#partition-type)
             - [id](#id-string)
-            - [fileSystemType](#filesystemtype-string)
             - [label](#label-string)
             - [start](#start-uint64)
             - [end](#end-uint64)
             - [size](#size-uint64)
-            - [flag](#flags-string)
+            - [type](#partition-type-string)
     - [fileSystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
+        - [type](#type-string)
         - [mountPoint](#mountpoint-mountpoint)
           - [mountPoint type](#mountpoint-type)
             - [idType](#idtype-string)
@@ -114,6 +114,8 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
+    - [kernelCommandLine](#kernelcommandline-type)
+      - [extraCommandLine](#extracommandline-string)
   - [os type](#os-type)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
@@ -159,13 +161,11 @@ os:
     - [services](#services-type)
       - [enable](#enable-string)
       - [disable](#disable-string)
-    - [modules](#modules-type)
-      - [load](#load-module)
-        - [module type](#module-type)
-          - [name](#module-name)
-      - [disable](#disable-module)
-        - [module type](#module-type)
-          - [name](#module-name)
+    - [modules](#modules-module)
+      - [module type](#module-type)
+        - [name](#module-name)
+        - [loadMode](#loadMode-string)
+        - [options](#options-mapstring-string)
     - [overlay type](#overlay-type)
     - [verity type](#verity-type)
 
@@ -193,24 +193,22 @@ storage:
     maxSize: 4096
     partitions:
     - id: esp
-      flags:
-      - esp
-      - boot
+      type: esp
       start: 1
       end: 9
-      fileSystemType: fat32
 
     - id: rootfs
       start: 9
-      fileSystemType: ext4
       
   fileSystems:
   - deviceId: esp
+    type: fat32
     mountPoint:
       path: /boot/efi
       options: umask=0077
 
   - deviceId: rootfs
+    type: ext4
     mountPoint:
       path: /
 
@@ -395,6 +393,18 @@ Required.
 The ID of the partition.
 This is used correlate [partition](#partition-type) objects with fileSystem objects.
 
+### type [string]
+
+Required.
+
+The filesystem type of the partition.
+
+Supported options:
+
+- `ext4`
+- `fat32`
+- `xfs`
+
 ### mountPoint [[mountPoint](#mountpoint-type)]
 
 Optional settings for where and how to mount the filesystem.
@@ -477,45 +487,62 @@ Options for configuring a kernel module.
 
 <div id="module-name"></div>
 
-### name
+### name [string]
 
 Name of the module.
 
 ```yaml
 os:
   modules:
-    load:
-    - name: br_netfilter
+  - name: br_netfilter
 ```
 
-## modules type
+### loadMode [string]
 
-Options for configuring kernel modules.
+The loadMode setting for kernel modules dictates how and when these modules 
+are loaded or disabled in the system.
 
-### load [[module](#module-type)[]]
+Supported loadmodes:
 
-Sets kernel modules to be loaded automatically on boot.
+- `always`: Set kernel modules to be loaded automatically at boot time.
+  - If the module is blacklisted in the base image, remove the blacklist entry.
+  - Add the module to `/etc/modules-load.d/modules-load.conf`.
+  - Write the options, if provided.
 
-Implemented by adding an entry to `/etc/modules-load.d/`.
+- `auto`: Used for modules that are automatically loaded by the kernel as needed,
+    without explicit configuration to load them at boot.
+  - If the module is disabled in the base image, remove the blacklist entry to
+    allow it to be loaded automatically.
+  - Write the provided options to `/etc/modprobe.d/module-options.conf`, but do not
+    add the module to `/etc/modules-load.d/modules-load.conf`, as it should be loaded automatically by
+    the kernel when necessary.
 
-```yaml
-OS:
-  Modules:
-    Load:
-    - Name: br_netfilter
-```
+- `disable`: Configures kernel modules to be explicitly disabled, preventing them from
+  loading automatically.
+  - If the module is not already disabled in the base image, a blacklist entry will
+    be added to `/etc/modprobe.d/blacklist.conf` to ensure the module is disabled.
 
-### disable [[module](#module-type)[]]
+- `inherit`: Configures kernel modules to inherit the loading behavior set in the base
+  image. Only applying new options where they are explicitly provided and applicable.
+  - If the module is not disabled, and options are provided, these options will be
+    written to `/etc/modprobe.d/module-options.conf`.
 
-Disable kernel modules from being loaded.
+-  empty string or not set, it will default to `inherit`.
 
-Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
+
+### options [map\<string, string>]
+
+Kernel options for modules can specify how these modules interact with the system, 
+and adjust performance or security settings specific to each module.
 
 ```yaml
 os:
   modules:
-    disable:
-    - name: mousedev
+  - name: vfio
+    loadMode: always
+    options:
+      enable_unsafe_noiommu_mode: Y
+      disable_vga: Y
 ```
 
 ## packageList type
@@ -659,18 +686,6 @@ The ID of the partition.
 This is used to correlate Partition objects with [fileSystem](#filesystem-type)
 objects.
 
-### fileSystemType [string]
-
-Required.
-
-The filesystem type of the partition.
-
-Supported options:
-
-- `ext4`
-- `fat32`
-- `xfs`
-
 ### label [string]
 
 The label to assign to the partition.
@@ -696,7 +711,9 @@ remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
 The size of the partition, specified in MiBs.
 
-### flags [string[]]
+<div id="partition-type-string"></div>
+
+### type [string]
 
 Specifies options for the partition.
 
@@ -704,8 +721,6 @@ Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
   The partition must have a `fileSystemType` of `fat32`.
-
-  When specified on a GPT formatted disk, the `boot` flag must also be added.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -715,13 +730,6 @@ Supported options:
   This flag is only supported on GPT formatted disks.
 
   For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
-
-- `boot`: Specifies that this partition contains the boot loader.
-
-  When specified on a GPT formatted disk, the `esp` flag must also be added.
-
-These options mirror those in
-[parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
 
 ## mountPoint type
 
@@ -941,6 +949,19 @@ os:
   - name: test
 ```
 
+### modules [[module](#module-type)[]]
+
+Used to configure kernel modules.
+
+Example:
+
+```yaml
+os:
+  modules:
+    - name: vfio
+```
+
+
 ### services [[services](#services-type)]
 
 Options for configuring systemd services.
@@ -951,10 +972,6 @@ os:
     enable:
     - sshd
 ```
-
-### modules [[modules](#modules-type)]
-
-Options for configuration kernel modules.
 
 ## user type
 

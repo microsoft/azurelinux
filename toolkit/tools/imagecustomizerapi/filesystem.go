@@ -9,7 +9,11 @@ import (
 
 // FileSystem holds the file system information for a partition.
 type FileSystem struct {
-	DeviceId   string      `yaml:"deviceId"`
+	// DeviceId is the ID of the source partition.
+	DeviceId string `yaml:"deviceId"`
+	// FileSystemType is the type of file system to use on the partition.
+	Type FileSystemType `yaml:"type"`
+	// MountPoint contains the mount settings.
 	MountPoint *MountPoint `yaml:"mountPoint"`
 }
 
@@ -17,6 +21,11 @@ type FileSystem struct {
 func (f *FileSystem) IsValid() error {
 	if f.DeviceId == "" {
 		return fmt.Errorf("invalid deviceId value: must not be empty")
+	}
+
+	err := f.Type.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid fileSystem (%s) type value:\n%w", f.DeviceId, err)
 	}
 
 	if f.MountPoint != nil {

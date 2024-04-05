@@ -2,7 +2,7 @@
 Summary:        Eclipse dependency injection framework
 Name:           sisu
 Version:        0.3.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 # sisu is EPL-1.0, the bundled asm is BSD
 License:        EPL-1.0 AND BSD
 Vendor:         Microsoft Corporation
@@ -51,7 +51,7 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 %{mvn_file} ":{*}" @1
 %{mvn_package} ":*{inject,plexus}"
 %{mvn_package} : __noinstall
-%{mvn_alias} :org.eclipse.sisu.plexus org.sonatype.sisu:sisu-inject-plexus
+%{mvn_alias} :org.eclipse.sisu.plexus org.sonatype.sisu:sisu-inject-plexus org.codehaus.plexus:plexus-container-default
 
 %build
 %{mvn_build} -X  -- -Dmaven.compiler.source=17 -Dmaven.compiler.target=17 -Dmaven.javadoc.source=17 -Dmaven.compiler.release=17
@@ -63,6 +63,9 @@ cp %{SOURCE102} sisu-plexus/pom.xml
 %license sisu-inject/LICENSE.txt
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-6
+- Increase Junit version to match with the bootstrap's Junit using Fedora 40 (License: MIT)
+
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.5-5
 - Rebuilt with msopenjdk-17
 - change source, target and release version

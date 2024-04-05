@@ -17,13 +17,9 @@ func TestConfigIsValid(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -31,6 +27,7 @@ func TestConfigIsValid(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "esp",
+					Type:     "fat32",
 					MountPoint: &MountPoint{
 						Path: "/boot/efi",
 					},
@@ -55,16 +52,19 @@ func TestConfigIsValidLegacy(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "boot",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"bios-grub",
-						},
+						Id:    "boot",
+						Start: 1,
+						Type:  PartitionTypeBiosGrub,
 					},
 				},
 			}},
 			BootType: "legacy",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "boot",
+					Type:     "fat32",
+				},
+			},
 		},
 		OS: OS{
 			ResetBootLoaderType: "hard-reset",
@@ -84,9 +84,8 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "a",
-						FileSystemType: "ext4",
-						Start:          1,
+						Id:    "a",
+						Start: 1,
 					},
 				},
 			}},
@@ -110,17 +109,22 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
 			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+			},
 		},
 		OS: OS{
 			Hostname: "test",
@@ -257,13 +261,9 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -271,6 +271,7 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "esp",
+					Type:     "fat32",
 					MountPoint: &MountPoint{
 						Path: "boot/efi",
 					},
@@ -289,46 +290,6 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 	assert.ErrorContains(t, err, "absolute path")
 }
 
-func TestConfigIsValidInvalidPartitionId(t *testing.T) {
-	config := &Config{
-		Storage: &Storage{
-			Disks: []Disk{{
-				PartitionTableType: "gpt",
-				MaxSize:            2,
-				Partitions: []Partition{
-					{
-						Id:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
-					},
-				},
-			}},
-			BootType: "efi",
-			FileSystems: []FileSystem{
-				{
-					DeviceId: "boot",
-					MountPoint: &MountPoint{
-						Path: "/boot/efi",
-					},
-				},
-			},
-		},
-		OS: OS{
-			ResetBootLoaderType: "hard-reset",
-			Hostname:            "test",
-		},
-	}
-
-	err := config.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "id")
-}
-
 func TestConfigIsValidKernelCLI(t *testing.T) {
 	config := &Config{
 		Storage: &Storage{
@@ -337,13 +298,9 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 				MaxSize:            2,
 				Partitions: []Partition{
 					{
-						Id:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
@@ -351,6 +308,7 @@ func TestConfigIsValidKernelCLI(t *testing.T) {
 			FileSystems: []FileSystem{
 				{
 					DeviceId: "esp",
+					Type:     "fat32",
 					MountPoint: &MountPoint{
 						Path: "/boot/efi",
 					},

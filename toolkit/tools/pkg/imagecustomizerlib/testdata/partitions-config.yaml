@@ -4,44 +4,42 @@ storage:
     maxSize: 4096
     partitions:
     - id: esp
-      flags:
-      - esp
-      - boot
+      type: esp
       start: 1
       end: 9
-      fileSystemType: fat32
 
     - id: boot
       start: 9
       end: 108
-      fileSystemType: ext4
 
     - id: rootfs
       start: 108
       end: 2048
-      fileSystemType: xfs
 
     - id: var
       start: 2048
-      fileSystemType: xfs
-
+      
   bootType: efi
 
   fileSystems:
   - deviceId: esp
+    type: fat32
     mountPoint:
       path: /boot/efi
       options: umask=0077
 
   - deviceId: boot
+    type: ext4
     mountPoint:
       path: /boot
 
   - deviceId: rootfs
+    type: xfs
     mountPoint:
       path: /
 
   - deviceId: var
+    type: xfs
     mountPoint:
       path: /var
 
