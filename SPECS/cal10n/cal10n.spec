@@ -1,5 +1,3 @@
-%bcond_without bootstrap
-
 #
 # spec file for package cal10n
 #
@@ -24,20 +22,16 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        https://github.com/qos-ch/%{name}/archive/refs/tags/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-%if %{with bootstrap}
-BuildRequires:  javapackages-bootstrap
+Source0:        %{_distro_sources_url}/cal10n-0.8.1.tar.xz
+Source1:        %{_distro_sources_url}/cal10n-build.tar.xz
+BuildRequires:  ant
+BuildRequires:  fdupes
+BuildRequires:  java-devel >= 1.8
 BuildRequires:  javapackages-local-bootstrap
-%else
-BuildRequires:  maven-local
-BuildRequires:  mvn(junit:junit)
-BuildRequires:  mvn(org.apache.maven:maven-artifact)
-BuildRequires:  mvn(org.apache.maven:maven-artifact-manager)
-BuildRequires:  mvn(org.apache.maven:maven-plugin-api)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
-%endif
-
+BuildRequires:  javapackages-tools
+BuildRequires:  junit
+BuildRequires:  xz
+Requires:       java
 BuildArch:      noarch
 
 %description
@@ -52,57 +46,78 @@ Features:
     * automatic reloading of resource bundles upon change
 
 %package javadoc
-Summary:        API documentation for %{name}
+Summary:        Javadoc for %{name}
+Group:          Development/Libraries/Java
 
 %description javadoc
-%{summary}.
-	
-%package -n maven-%{name}-plugin
-Summary:        CAL10N maven plugin
- 
-%description -n maven-%{name}-plugin
-Maven plugin verifying that the codes defined in
-an enum type match those in the corresponding resource bundles. 
+API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-v_%{version}
+%setup -q -a1
+find . -name "*.jar" -exec rm -f {} \;
 
-find . -name "*.jar" -delete
+# We don't want to depend on ant, since it will be
+# present when we try to use the task
+%pom_change_dep :ant :::provided %{name}-ant-task 
 
-%pom_xpath_remove pom:extensions
-%pom_add_dep org.apache.maven:maven-artifact maven-%{name}-plugin
-%pom_disable_module %{name}-site
-%pom_disable_module maven-%{name}-plugin-smoke
-%mvn_package :*-{plugin} @1
+# bnc#759912
+rm -rf docs cal10n-site
+cat > README.SUSE <<EOF
 
-# remove maven-compiler-plugin configuration that is broken with Java 11
-%pom_xpath_remove 'pom:plugin[pom:artifactId="maven-compiler-plugin"]/pom:configuration'
+The documentation under Creative Commons Attribution-NonCommercial-ShareAlike
+2.5 License is not suitable for Linux distributors, so it has been removed.
 
-# Disable default-jar execution of maven-jar-plugin, which is causing
-# problems with version 3.0.0 of the plugin.
-%pom_xpath_inject "pom:plugin[pom:artifactId='maven-jar-plugin']/pom:executions" "
-    <execution>
-      <id>default-jar</id>
-      <phase>skip</phase>
-    </execution>" cal10n-api
- 
+You may find the online version at
+http://cal10n.qos.ch/manual.html
+
+EOF
+
 %build
-%mvn_build -- -Dproject.build.sourceEncoding=ISO-8859-1 -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
- 
+mkdir -p lib
+build-jar-repository -s lib \
+%if %{with tests}
+    ant-antunit \
+%endif
+    ant/ant
+%{ant} \
+%if %{without tests}
+    -Dtest.skip=true \
+%endif
+    package javadoc
+
 %install
-%mvn_install
+# jars
+install -d -m 0755 %{buildroot}%{_javadir}/%{name}
+install -m 644 %{name}-api/target/%{name}-api-*.jar \
+        %{buildroot}%{_javadir}/%{name}/%{name}-api.jar
+install -m 644 %{name}-ant-task/target/%{name}-ant-task-*.jar \
+        %{buildroot}%{_javadir}/%{name}/%{name}-ant-task.jar
+
+# pom
+install -d -m 755 %{buildroot}%{_mavenpomdir}
+install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
+%add_maven_depmap %{name}.pom
+install -pm 644 %{name}-api/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-api.pom
+%add_maven_depmap %{name}-api.pom %{name}/%{name}-api.jar
+install -pm 644 %{name}-ant-task/pom.xml %{buildroot}%{_mavenpomdir}/%{name}-ant-task.pom
+%add_maven_depmap %{name}-ant-task.pom %{name}/%{name}-ant-task.jar
+
+# javadoc
+install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
+for i in api ant-task; do
+  install -dm 0755 %{buildroot}%{_javadocdir}/%{name}/${i}
+  cp -pr %{name}-${i}/target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/${i}/
+done
+%fdupes -s %{buildroot}%{_javadocdir}/%{name}
 
 %files -f .mfiles
-%dir %{_javadir}/%{name}
-%license LICENSE.txt
- 
-%files -n maven-%{name}-plugin -f .mfiles-plugin
- 
-%files javadoc -f .mfiles-javadoc
-%license LICENSE.txt
+%doc README.SUSE
+
+%files javadoc
+%{_javadocdir}/%{name}
 
 %changelog
-* Wed Feb 14 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
+* Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
 - Update to version 0.8.1
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
