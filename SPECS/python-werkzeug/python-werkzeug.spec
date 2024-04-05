@@ -80,6 +80,7 @@ pip3 install markupsafe
 %changelog
 * Thu Apr 04 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.1-1
 - Auto-upgrade to 3.0.1 - 3.0 package upgrade
+- Import build, install and check section from Fedora 40 (license: MIT).
 
 * Tue Mar 14 2023 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 2.2.3-1
 - Updated to version 2.2.3 for CVE-2023-23934 adn CVE-2023-25577
