@@ -36,6 +36,7 @@ pip3 install 2to3
 %endif
 %autosetup -p1
 
+%build
 ./autogen.sh
 
 %configure \
@@ -54,10 +55,7 @@ mkdir -p %{buildroot}%{_libdir}/ccache
 ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 %check
-%if %{with testsuite}
-# Test suite
 make check PY3=1
-%endif
 
 %files
 %license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES
