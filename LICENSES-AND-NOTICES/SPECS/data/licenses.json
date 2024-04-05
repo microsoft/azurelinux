@@ -848,6 +848,7 @@
                 "lua-rpm-macros",
                 "lua-term",
                 "luajit",
+                "lujavrite",
                 "luksmeta",
                 "lutok",
                 "lv2",
