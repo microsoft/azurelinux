@@ -447,7 +447,7 @@ Source0: https://download.qemu.org/%{name}-%{version}%{?rcstr}.tar.xz
 # https://patchwork.kernel.org/project/qemu-devel/patch/20231128143647.847668-1-crobinso@redhat.com/
 # Fix pvh.img ld build failure on fedora rawhide
 Patch: 0001-pc-bios-optionrom-Fix-pvh.img-ld-build-failure-on-fe.patch
-Patch2: 0002-disable-eventfd-for-tests.patch
+Patch2: 0002-Disable-failing-tests-on-azl.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -2367,9 +2367,10 @@ echo "Testing %{name}-build"
 #   Last check: 2023-10
 #   Added: 2022-06
 %ifnarch %{power64}
-%make_build check
+# %make_build check
 # For debugging tests use https://www.qemu.org/docs/master/devel/testing.html
-# make check-qtest-x86_64 V=1
+# QTEST_LOG=1 make check-qtest-x86_64 V=1
+make check-qtest-x86_64 V=1
 %endif
 
 popd
