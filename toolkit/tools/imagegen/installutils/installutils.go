@@ -2214,9 +2214,19 @@ func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
 	// Remove all files and subdirectories in the tdnf cache directory, but leave
 	// the directory since it's owned by the tdnf package.
 	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
+	// Skip if directory is missing already
+	exists, err := file.DirExists(cacheDir)
+	if err != nil {
+		return fmt.Errorf("failed to check if tdnf cache directory exists (%s):\n%w", cacheDir, err)
+	}
+	if !exists {
+		logger.Log.Infof("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
+		return nil
+	}
+
 	err = file.RemoveDirectoryContents(cacheDir)
 	if err != nil {
-		err = fmt.Errorf("failed to remove tdnf cache contents(%s/*):\n%w", cacheDir, err)
+		err = fmt.Errorf("failed to remove tdnf cache contents (%s/*):\n%w", cacheDir, err)
 		return err
 	}
 	return nil
