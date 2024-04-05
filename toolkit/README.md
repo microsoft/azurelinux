@@ -3,7 +3,7 @@
 - **Recommended if you want to try Azure Linux.**
 - Quickly build the **Standard Azure Linux** image, install and use.
 
-## [Tutorial for Building Custom Mariner Based Images](https://github.com/microsoft/azurelinux-tutorials)
+## [Tutorial for Building Custom Azure Linux Based Images](https://github.com/microsoft/azurelinux-tutorials)
 
 - **Recommended if you are a developer and want to experiment with Azure Linux.**
 - Quickly build a **Custom Azure Linux** image, install and use.
@@ -27,6 +27,10 @@
 ## [Understanding build logs](docs/how_it_works/6_logs.md)
 
 - Understanding common build logs with a focus on errors and warnings and how to interpret them.
+
+## [Adding a new package](docs/building/add-package.md)
+
+- A tutorial on how to add a new package to Azure Linux and test it.
 
 ## [OS security](docs/security/intro.md)
 

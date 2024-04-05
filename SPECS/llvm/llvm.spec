@@ -1,13 +1,14 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
-Version:        17.0.6
-Release:        3%{?dist}
+Version:        18.1.2
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://llvm.org/
 Source0:        https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-%{version}.tar.gz
+BuildRequires:  binutils-devel
 BuildRequires:  cmake
 BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
@@ -52,6 +53,7 @@ cmake -G Ninja                              \
       -DLLVM_TARGETS_TO_BUILD="host;AMDGPU;BPF" \
       -DLLVM_INCLUDE_GO_TESTS=No            \
       -DLLVM_ENABLE_RTTI=ON                 \
+      -DLLVM_BINUTILS_INCDIR=%{_includedir} \
       -Wno-dev ../llvm
 
 %ninja_build LLVM
@@ -97,6 +99,12 @@ ninja check-all
 %{_includedir}/*
 
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
+* Wed Mar 27 2024 Andrew Phelps <anphel@microsoft.com> - 17.0.6-4
+- Define LLVM_BINUTILS_INCDIR so that LLVMgold.so is built.
+
 * Mon Feb 05 2024 Kanika Nema <kanikanema@microsoft.com> - 17.0.6-3
 - Re-add 'BPF' and 'AMDGPU' as target-to-build. Without them, clang cannot
   compile files for the specified targets.

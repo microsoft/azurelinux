@@ -1,11 +1,11 @@
-%global maj_ver 17
+%global maj_ver %(echo %{version} | cut -d. -f1)
 
 %global compiler_rt_srcdir llvm-project-llvmorg-%{version}
 
 Summary:        LLVM compiler support routines
 Name:           compiler-rt
-Version:        17.0.6
-Release:        2%{?dist}
+Version:        18.1.2
+Release:        1%{?dist}
 License:        Apache 2.0 WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,9 @@ cd build
 %{_libdir}/clang/%{maj_ver}/share/*
 
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Mon Jan 29 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-2
 - fix install folder
 

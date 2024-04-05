@@ -3,43 +3,55 @@
 %global glib2_version 2.52.0
 %global gnutls_version 3.2.7
 %global gtk3_version 3.24.22
+%global gtk4_version 4.0.1
 %global icu_uc_version 4.8
 %global libsystemd_version 220
 %global pango_version 1.22.0
 %global pcre2_version 10.21
 %define majorver %(echo %{version} | cut -d. -f1-2)
-Summary:        Terminal emulator library
+%if 0%{?azl}
+# Azl does not have gi-docgen, disable docs
+%bcond docs 0
+%else
+%bcond docs 1
+%endif
+
 Name:           vte291
-Version:        0.66.2
-Release:        2%{?dist}
-License:        CC-BY AND GPLv2+ AND LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://www.gnome.org/
+Version:        0.74.2
+Release:        5%{?dist}
+Summary:        GTK+ 3 terminal emulator library
+
+# libvte-2.91.so is generated from LGPLv2+ and MIT sources
+License:        GPL-3.0-or-later AND LGPL-3.0-or-later AND MIT AND X11 AND CC-BY-4.0
+
+URL:            https://wiki.gnome.org/Apps/Terminal/VTE
 Source0:        https://download.gnome.org/sources/vte/%{majorver}/vte-%{version}.tar.xz
 # https://bugzilla.gnome.org/show_bug.cgi?id=711059
 # https://bugzilla.redhat.com/show_bug.cgi?id=1103380
-# https://gitlab.gnome.org/GNOME/vte/-/issues/226
-Patch100:       vte291-cntnr-precmd-preexec-scroll.patch
-BuildRequires:  gcc-c++
-BuildRequires:  gettext
-BuildRequires:  gobject-introspection-devel
-BuildRequires:  gperf
-BuildRequires:  gtk-doc
-BuildRequires:  meson
-BuildRequires:  pkg-config
-BuildRequires:  systemd-rpm-macros
-BuildRequires:  vala
+# https://pagure.io/fedora-workstation/issue/216
+Patch0:         vte291-cntnr-precmd-preexec-scroll.patch
 BuildRequires:  pkgconfig(fribidi) >= %{fribidi_version}
 BuildRequires:  pkgconfig(gio-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(glib-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gnutls) >= %{gnutls_version}
 BuildRequires:  pkgconfig(gobject-2.0) >= %{glib2_version}
 BuildRequires:  pkgconfig(gtk+-3.0) >= %{gtk3_version}
+%{!?azl:BuildRequires:  pkgconfig(gtk4) >= %{gtk4_version}}
 BuildRequires:  pkgconfig(icu-uc) >= %{icu_uc_version}
 BuildRequires:  pkgconfig(libpcre2-8) >= %{pcre2_version}
+# azl's systemd-bootstrap causes conflicts with this specific package, explicitly use 'systemd-devel' instead of pkgconfig(libsystemd)
 BuildRequires:  systemd-devel >= %{libsystemd_version}
 BuildRequires:  pkgconfig(pango) >= %{pango_version}
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  gcc-c++
+BuildRequires:  gettext
+%{?with_docs:BuildRequires:  gi-docgen}
+BuildRequires:  gobject-introspection-devel
+BuildRequires:  gperf
+BuildRequires:  meson
+BuildRequires:  systemd-rpm-macros
+BuildRequires:  vala
+
 Requires:       fribidi >= %{fribidi_version}
 Requires:       glib2 >= %{glib2_version}
 Requires:       gnutls >= %{gnutls_version}
@@ -47,21 +59,60 @@ Requires:       gtk3 >= %{gtk3_version}
 Requires:       libicu >= %{icu_uc_version}
 Requires:       pango >= %{pango_version}
 Requires:       pcre2 >= %{pcre2_version}
-Requires:       systemd >= %{libsystemd_version}
+Requires:       systemd-libs >= %{libsystemd_version}
 Requires:       vte-profile
+
+%{!?azl:Conflicts:      gnome-terminal < 3.20.1-2}
 
 %description
 VTE is a library implementing a terminal emulator widget for GTK+. VTE
 is mainly used in gnome-terminal, but can also be used to embed a
 console/terminal in games, editors, IDEs, etc.
 
+# We don't have gtk4
+%if ! 0%{?azl}
+%package        gtk4
+Summary:        GTK4 terminal emulator library
+
+# libvte-2.91.so is generated from LGPLv2+ and MIT sources
+License:        LGPLv3+ and MIT
+
+Requires:       %{name} = %{version}-%{release}
+
+%description gtk4
+VTE is a library implementing a terminal emulator widget for GTK 4. VTE
+is mainly used in gnome-terminal, but can also be used to embed a
+console/terminal in games, editors, IDEs, etc.
+%endif
+
 %package        devel
-Summary:        Development files for %{name}
+Summary:        Development files for GTK+ 3 %{name}
+
+# vte-2.91 is generated from GPLv3+ sources, while the public headers are
+# LGPLv3+
+License:        GPL-3.0-or-later AND LGPL-3.0-or-later
+
 Requires:       %{name} = %{version}-%{release}
 
 %description devel
 The %{name}-devel package contains libraries and header files for
-developing applications that use %{name}.
+developing GTK+ 3 applications that use %{name}.
+
+%if ! 0%{?azl}
+%package        gtk4-devel
+Summary:        Development files for GTK 4 %{name}
+
+# vte-2.91 is generated from GPLv3+ sources, while the public headers are
+# LGPLv3+
+License:        GPL-3.0-or-later AND LGPL-3.0-or-later
+
+Requires:       %{name}-gtk4 = %{version}-%{release}
+Requires:       %{name}-devel = %{version}-%{release}
+
+%description gtk4-devel
+The %{name}-gtk4-devel package contains libraries and header files for
+developing GTK 4 applications that use %{name}.
+%endif
 
 # vte-profile is deliberately not noarch to avoid having to obsolete a noarch
 # subpackage in the future when we get rid of the vte3 / vte291 split. Yum is
@@ -69,25 +120,23 @@ developing applications that use %{name}.
 # of the multilib packages (i686 + x86_64) as the replacement.
 %package -n     vte-profile
 Summary:        Profile script for VTE terminal emulator library
+License:        GPL-3.0-or-later
+# vte.sh was previously part of the vte3 package
+Conflicts:      vte3 < 0.36.1-3
 
 %description -n vte-profile
 The vte-profile package contains a profile.d script for the VTE terminal
 emulator library.
 
 %prep
-%setup -q -n vte-%{version}
-%patch 100 -p1 -b .cntnr-precmd-preexec-scroll
+%autosetup -p1 -n vte-%{version}
 %if 0%{?flatpak}
 # Install user units where systemd macros expect them
 sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %endif
 
 %build
-# Avoid overriding vte's own -fno-exceptions
-# https://gitlab.gnome.org/GNOME/gnome-build-meta/issues/207
-%global optflags %(echo %{optflags} | sed 's/-fexceptions //')
-
-%meson --buildtype=plain -Ddocs=true
+%meson --buildtype=plain -Ddocs=%{?with_docs:true}%{!?with_docs:false} -Dgtk3=true -Dgtk4=%{?azl:false}%{!?azl:true}
 %meson_build
 
 %install
@@ -100,25 +149,53 @@ sed -i -e "/^vte_systemduserunitdir =/s|vte_prefix|'/usr'|" meson.build
 %license COPYING.XTERM
 %doc README.md
 %{_libdir}/libvte-%{apiver}.so.0*
-%{_libdir}/girepository-1.0/
+%dir %{_libdir}/girepository-1.0
+%{_libdir}/girepository-1.0/Vte-2.91.typelib
 %{_userunitdir}/vte-spawn-.scope.d
 
+%if ! 0%{?azl}
+%files gtk4
+%{_libdir}/libvte-%{apiver}-gtk4.so.0*
+%{_libdir}/girepository-1.0/Vte-3.91.typelib
+%endif
+
 %files devel
+%license COPYING.GPL3
 %{_bindir}/vte-%{apiver}
 %{_includedir}/vte-%{apiver}/
 %{_libdir}/libvte-%{apiver}.so
 %{_libdir}/pkgconfig/vte-%{apiver}.pc
-%{_datadir}/gir-1.0/
-%doc %{_datadir}/gtk-doc/
-%{_datadir}/vala/
+%dir %{_datadir}/gir-1.0
+%{_datadir}/gir-1.0/Vte-2.91.gir
 %{_datadir}/glade/
+%{?with_doc:%doc %{_docdir}/vte-2.91/}
+%dir %{_datadir}/vala
+%dir %{_datadir}/vala/vapi
+%{_datadir}/vala/vapi/vte-2.91.deps
+%{_datadir}/vala/vapi/vte-2.91.vapi
+
+%if ! 0%{?azl}
+%files gtk4-devel
+%{_bindir}/vte-%{apiver}-gtk4
+%{_includedir}/vte-%{apiver}-gtk4/
+%{_libdir}/libvte-%{apiver}-gtk4.so
+%{_libdir}/pkgconfig/vte-%{apiver}-gtk4.pc
+%{_datadir}/gir-1.0/Vte-3.91.gir
+%{?with_doc:%doc %{_docdir}/vte-2.91-gtk4/}
+%{_datadir}/vala/vapi/vte-2.91-gtk4.deps
+%{_datadir}/vala/vapi/vte-2.91-gtk4.vapi
+%endif
 
 %files -n vte-profile
+%license COPYING.GPL3
 %{_libexecdir}/vte-urlencode-cwd
 %{_sysconfdir}/profile.d/vte.csh
 %{_sysconfdir}/profile.d/vte.sh
 
 %changelog
+* Thu Mar 21 2024 Daniel McIlvaney <damcilav@microsoft.com> - 0.74.2-5
+- Refresh from F40
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 0.66.2-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

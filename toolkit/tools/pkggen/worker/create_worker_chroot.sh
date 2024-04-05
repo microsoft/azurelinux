@@ -79,7 +79,7 @@ while read -r package || [ -n "$package" ]; do
     install_one_toolchain_rpm "$package"
 done < "$packages"
 
-# If the host machine rpm version is >= 4.16 (such as Mariner 2.0), it will create an "sqlite" rpm database backend incompatible with Mariner 1.0 (which uses "bdb")
+# If the host machine rpm version is >= 4.16 (such as Mariner 2.0 or Azure Linux 3.0), it will create an "sqlite" rpm database backend incompatible with Azure Linux 1.0 (which uses "bdb")
 # To resolve this, enter the 1.0 chroot after the packages are installed, and use the older rpm tool in the chroot to re-create the database in "bdb" format.
 HOST_RPM_VERSION="$(rpm --version)"
 HOST_RPM_DB_BACKEND="$(rpm -E '%{_db_backend}')"

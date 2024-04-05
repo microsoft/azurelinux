@@ -24,7 +24,7 @@ const (
 
 // IsRegularBuild indicates if it is a regular build (without using docker)
 func IsRegularBuild() bool {
-	// some specific build pipeline builds Mariner from a Docker container and
+	// some specific build pipeline builds Azure Linux from a Docker container and
 	// consequently have special requirements with regards to chroot
 	// check if .dockerenv file exist to disambiguate build pipeline
 	dockerEnvExists, _ := file.PathExists("/.dockerenv")

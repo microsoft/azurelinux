@@ -2,7 +2,7 @@
 
 Name:           mdevctl
 Version:        1.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only
@@ -14,8 +14,6 @@ BuildRequires:  cargo
 BuildRequires:  make
 BuildRequires:  python3-docutils
 BuildRequires:  systemd-rpm-macros
-
-ExclusiveArch:  x86_64
 
 %ifarch x86_64
 %define rust_def_target x86_64-unknown-linux-gnu
@@ -94,6 +92,9 @@ cargo test
 %{bashcompletiondir}/lsmdev
 
 %changelog
+* Wed Mar 06 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-3
+- Enable for other architectures.
+
 * Fri Jan 19 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 1.3.0-2
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
 - License verified.

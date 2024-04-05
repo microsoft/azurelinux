@@ -21,7 +21,9 @@ const (
 	RootHomeDir       = "/root"
 	UserHomeDirPrefix = "/home"
 
-	ShadowFile = "/etc/shadow"
+	ShadowFile                = "/etc/shadow"
+	SSHDirectoryName          = ".ssh"
+	SSHAuthorizedKeysFileName = "authorized_keys"
 )
 
 func HashPassword(password string) (string, error) {
@@ -96,7 +98,7 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 		// In the /etc/shadow file, the values `*` and `!` both mean the user's password login is disabled but the user
 		// may login using other means (e.g. ssh, auto-login, etc.). This interpretation is also used by PAM. When sshd
 		// has `UsePAM` set to `yes`, then sshd defers to PAM the decision on whether or not the user is disabled.
-		// However, when `UsePAM` is set to `no`, then sshd must make this interpretation for itself. And the Mariner
+		// However, when `UsePAM` is set to `no`, then sshd must make this interpretation for itself. And the Azure Linux
 		// build of sshd is configured to interpret the `!` in the shadow file to mean the user is fully disabled, even
 		// for ssh login. But it interprets `*` to mean that only password login is disabled but sshd public/private key
 		// login is fine.
@@ -134,12 +136,20 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	return nil
 }
 
+// UserHomeDirectory returns the home directory for a user.
 func UserHomeDirectory(username string) string {
 	if username == RootUser {
 		return RootHomeDir
 	} else {
 		return filepath.Join(UserHomeDirPrefix, username)
 	}
+}
+
+// UserSSHDirectory returns the path of the .ssh directory for a user.
+func UserSSHDirectory(username string) string {
+	homeDir := UserHomeDirectory(username)
+	userSSHKeyDir := filepath.Join(homeDir, SSHDirectoryName)
+	return userSSHKeyDir
 }
 
 // NameIsValid returns an error if the User name is empty

@@ -12,8 +12,8 @@
 %global ini_name  40-%{pecl_name}.ini
 Summary:        A ZIP archive management extension
 Name:           php-pecl-zip
-Version:        1.21.1
-Release:        3%{?dist}
+Version:        1.22.3
+Release:        1%{?dist}
 License:        PHP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,10 +24,12 @@ BuildRequires:  make
 BuildRequires:  php-devel
 BuildRequires:  php-pear
 BuildRequires:  pkg-config
+BuildRequires:  tzdata
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(libzip) >= 1.0.0
 Requires:       php(api) = 20210902-%{__isa_bits}
 Requires:       php(zend-abi) = 20210902-%{__isa_bits}
+Requires:       tzdata
 # Supposed to use these macros from SPECS/php/macros.php
 #Requires:     php(zend-abi) = %{php_zend_api}
 #Requires:     php(api) = %{php_core_api}
@@ -152,6 +154,10 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 %endif
 
 %changelog
+* Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.22.3-1
+- Upgrade to version 1.22.3
+- Add tzdata BR and requires.
+
 * Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.21.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
