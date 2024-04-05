@@ -1,7 +1,7 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
-Version:        4.1.1
-Release:        2%{?dist}
+Version:        4.2.1
+Release:        1%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -66,8 +66,8 @@ make check PY3=1
 %{_libdir}/ccache
 
 %changelog
-* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 4.1.1-2
-- Move from pcre to pcre2
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 4.2.1-1
+- Ugrade to 4.2.1
 - Add swig-java-Avoid-using-deprecated-API-in-doxygen-example patch from Fedora
 
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-1

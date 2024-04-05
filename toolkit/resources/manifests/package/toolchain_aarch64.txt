@@ -565,8 +565,8 @@ sqlite-3.44.0-1.azl3.aarch64.rpm
 sqlite-debuginfo-3.44.0-1.azl3.aarch64.rpm
 sqlite-devel-3.44.0-1.azl3.aarch64.rpm
 sqlite-libs-3.44.0-1.azl3.aarch64.rpm
-swig-4.1.1-2.azl3.aarch64.rpm
-swig-debuginfo-4.1.1-2.azl3.aarch64.rpm
+swig-4.2.1-1.azl3.aarch64.rpm
+swig-debuginfo-4.2.1-1.azl3.aarch64.rpm
 systemd-bootstrap-250.3-17.azl3.aarch64.rpm
 systemd-bootstrap-debuginfo-250.3-17.azl3.aarch64.rpm
 systemd-bootstrap-devel-250.3-17.azl3.aarch64.rpm
