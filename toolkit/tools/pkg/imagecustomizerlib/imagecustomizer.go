@@ -143,11 +143,19 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			return fmt.Errorf("failed to expand input iso file:\n%w", err)
 		}
 
-		//liveOSIsoBuilder, err := isoBuilderFromLayout(buildDir, isoExpansionFolder)
-		// buildDir, isoExpandionFoldr string, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, outputImageDir, outputImageBase string
-		_, err = isoBuilderFromLayout(buildDir, isoExpansionFolder, baseConfigPath, config.Iso, outputImageDir, outputImageBase)
+		isoBuilder, err := isoBuilderFromLayout(buildDir, isoExpansionFolder)
 		if err != nil {
-			return fmt.Errorf("failed to process LiveOS layout:\n%w", err)
+			return fmt.Errorf("failed to load input iso artifacts:\n%w", err)
+		}
+
+		err = isoBuilder.createWriteableImage(buildDir, rawImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to create writeable image:\n%w", err)
+		}
+
+		err = isoBuilder.recreateLiveOSIsoImage(baseConfigPath, config.Iso, outputImageDir, outputImageBase)
+		if err != nil {
+			return fmt.Errorf("failed to create LiveOS ISO:\n%w", err)
 		}
 
 		// return fmt.Errorf("FAKE FAKE FAKE error to return early.")

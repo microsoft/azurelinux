@@ -10,10 +10,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
@@ -851,7 +853,7 @@ func expandIso(buildDir, isoImageFile, isoExpandionFolder string) (err error) {
 	mountParams := []string{isoImageFile, mountDir}
 	err = shell.ExecuteLive(false, "mount", mountParams...)
 	if err != nil {
-		return fmt.Errorf("failed to create squashfs:\n%w", err)
+		return fmt.Errorf("failed to mount iso:\n%w", err)
 	}
 	defer func() {
 		unmountParams := []string{mountDir}
@@ -878,7 +880,7 @@ func expandIso(buildDir, isoImageFile, isoExpandionFolder string) (err error) {
 	return nil
 }
 
-func isoBuilderFromLayout(buildDir, isoExpandionFoldr string, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, outputImageDir, outputImageBase string) (isoBuilder *LiveOSIsoBuilder, err error) {
+func isoBuilderFromLayout(buildDir, isoExpandionFoldr string) (isoBuilder *LiveOSIsoBuilder, err error) {
 	logger.Log.Debugf("---- dev ---- fromLayout() - 1")
 
 	isoBuildDir := filepath.Join(buildDir, "tmp")
@@ -951,20 +953,173 @@ func isoBuilderFromLayout(buildDir, isoExpandionFoldr string, baseConfigPath str
 		}
 	}
 
+	return isoBuilder, nil
+}
+
+func (b *LiveOSIsoBuilder) recreateLiveOSIsoImage(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, outputImageDir, outputImageBase string) error {
+
 	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
+		return fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
 	}
 
-	err = isoBuilder.updateGrubCfg(isoBuilder.artifacts.grubCfgPath, extraCommandLine)
+	err = b.updateGrubCfg(b.artifacts.grubCfgPath, extraCommandLine)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update grub.cfg:\n%w", err)
+		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
 
-	err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	err = b.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return isoBuilder, nil
+	return nil
+}
+
+func getDiskSize(rootDir string) (size uint64, err error) {
+
+	duParams := []string{"-sh", rootDir}
+	duStdout, _, err := shell.Execute("du", duParams...)
+	if err != nil {
+		return 0, fmt.Errorf("failed to find the size of the expanded squashfs:\n%w", err)
+	}
+	duStdoutParts := strings.Split(duStdout, "\t")
+
+	logger.Log.Debugf("du output:\n%s", duStdout)
+
+	diskSizeRegex := regexp.MustCompile(`^(\d+)([KMGT])?.*$`)
+	match := diskSizeRegex.FindStringSubmatch(duStdoutParts[0])
+	if match == nil {
+		return 0, fmt.Errorf("disk size (%s) has incorrect format: <num>[KMGT] (e.g. 100M, 1G)", duStdout)
+	}
+
+	numString := match[1]
+	logger.Log.Debugf("du output numString=%s", numString)
+
+	num, err := strconv.ParseUint(numString, 0, 10)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse disk size:\n%w", err)
+	}
+	logger.Log.Debugf("du output num=%d", num)
+
+	if len(match) >= 3 {
+		unit := match[2]
+		multiplier := uint64(1)
+		switch unit {
+		case "K":
+			multiplier = diskutils.KiB
+		case "M":
+			multiplier = diskutils.MiB
+		case "G":
+			multiplier = diskutils.GiB
+		case "T":
+			multiplier = diskutils.TiB
+		case "":
+			return 0, fmt.Errorf("disk size (%s) must have a suffix (i.e. K, M, G, or T)", numString)
+		}
+
+		num *= multiplier
+	}
+	logger.Log.Debugf("du output num=%d", num)
+
+	// The imager's diskutils works in MiB. So, restrict disk and partition sizes to multiples of 1 MiB.
+	if num%diskutils.MiB != 0 {
+		return 0, fmt.Errorf("disk size (%d) must be a multiple of 1 MiB", num)
+	}
+
+	return num, nil
+}
+
+func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) error {
+
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 1 - creating %s", rawImageFile)
+
+	// mount squash fs
+	squashMountDir, err := ioutil.TempDir(buildDir, "tmp-squashfs-mount-")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary mount folder for squashfs:\n%w", err)
+	}
+	defer os.RemoveAll(squashMountDir)
+
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 2 - created squashMountDir=%s", squashMountDir)
+
+	squashMountParams := []string{b.artifacts.squashfsImagePath, squashMountDir}
+	err = shell.ExecuteLive(false, "mount", squashMountParams...)
+	if err != nil {
+		return fmt.Errorf("failed to mount squashfs:\n%w", err)
+	}
+	defer func() {
+		unmountParams := []string{squashMountDir}
+		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
+		if cleanupErr != nil {
+			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, squashMountDir, cleanupErr)
+		}
+	}()
+
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 3 - mounted b.artifacts.squashfsImagePath=%s", b.artifacts.squashfsImagePath)
+
+	// get disk space
+	diskSizeBytes, err := getDiskSize(squashMountDir)
+	if err != nil {
+		return fmt.Errorf("failed to calculate the disk size of %s:\n%w", squashMountDir, err)
+	}
+	diskSizeMB := diskSizeBytes/1024/1024 + 1
+	logger.Log.Debugf("------ disk size = %d bytes or %d MB", diskSizeBytes, diskSizeMB)
+
+	// create raw image
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 4 - creating writeable image=%s", rawImageFile)
+	var safetyFactor uint64
+	safetyFactor = 2
+	diskSizeMBString := strconv.FormatUint(diskSizeMB*safetyFactor, 10)
+	createImageParams := []string{"if=/dev/zero", "of=" + rawImageFile, "bs=1M", "count=" + diskSizeMBString}
+	err = shell.ExecuteLive(false, "dd", createImageParams...)
+	if err != nil {
+		return fmt.Errorf("failed to create raw image %s with size %dM", rawImageFile, diskSizeMBString)
+	}
+
+	// format raw image
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 5 - formatting writeable image=%s", rawImageFile)
+	formatParams := []string{rawImageFile}
+	err = shell.ExecuteLive(false, "mkfs.ext4", formatParams...)
+	if err != nil {
+		return fmt.Errorf("failed to format raw image %s", rawImageFile)
+	}
+
+	// mount raw image
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 6 - mounting writeable image=%s", rawImageFile)
+
+	writeableMountDir, err := ioutil.TempDir(buildDir, "tmp-writeable-mount-")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary mount folder for writeable image:\n%w", err)
+	}
+	defer os.RemoveAll(writeableMountDir)
+
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - 2 - created writeableMountDir=%s", writeableMountDir)
+
+	writeableMountParams := []string{rawImageFile, writeableMountDir}
+	err = shell.ExecuteLive(false, "mount", writeableMountParams...)
+	if err != nil {
+		return fmt.Errorf("failed to mount writeable image:\n%w", err)
+	}
+	defer func() {
+		unmountParams := []string{writeableMountDir}
+		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
+		if cleanupErr != nil {
+			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, writeableMountDir, cleanupErr)
+		}
+	}()
+
+	// copy contents
+	err = copyPartitionFiles(squashMountDir+"/.", writeableMountDir)
+	if err != nil {
+		return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableMountDir, err)
+	}
+
+	// unmount raw image and delete mount dir
+	// ok - defer
+
+	// unmount squashfs and delete mount dir
+	// ok - defer
+
+	return nil
 }
