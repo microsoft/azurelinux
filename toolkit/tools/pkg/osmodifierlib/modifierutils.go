@@ -3,6 +3,7 @@
 
 package osmodifierlib
 
+
 import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
@@ -12,6 +13,11 @@ import (
 func doModifications(baseConfigPath string, osConfig *imagecustomizerapi.OS) error {
 	var dummyChroot safechroot.ChrootInterface = &safechroot.DummyChroot{}
 	err := imagecustomizerlib.AddOrUpdateUsers(osConfig.Users, baseConfigPath, dummyChroot)
+	if err != nil {
+		return err
+	}
+
+	err = imagecustomizerlib.UpdateHostname(osConfig.Hostname, dummyChroot)
 	if err != nil {
 		return err
 	}
