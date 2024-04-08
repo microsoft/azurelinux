@@ -1,4 +1,8 @@
 #!/bin/bash
+set -o pipefail
+
+# Setup RPM tools
+source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
 
 # Define directories to watch
 SPEC_DIRS=("SPECS" "SPECS-EXTENDED")
@@ -7,10 +11,9 @@ SPEC_DIRS=("SPECS" "SPECS-EXTENDED")
 git fetch origin $GITHUB_BASE_REF
 
 # Function to check for duplicate package names in a directory
-check_duplicates() {
+check_multi_package_add_remove() {
     local DIR=$1
     echo "Checking directory: $DIR for duplicates..."
-    echo "Test"
     # Array to hold package names
     declare -A package_counts
     # Loop through .spec files in the directory
@@ -18,7 +21,6 @@ check_duplicates() {
         if [ -e "$spec_file" ]; then # Check if the spec file exists
             # Extract package name from the spec file
             package_name=$(mariner_rpmspec -q --qf "%{NAME}\n" "$spec_file" 2>/dev/null)
-            echo "Package name: $package_name"
             # Increment package name count
             ((package_counts[$package_name]++))
         fi
@@ -26,7 +28,7 @@ check_duplicates() {
     # Check for duplicates
     for package in "${!package_counts[@]}"; do
         if [ "${package_counts[$package]}" -gt 1 ]; then
-            echo "Duplicate package name detected: $package in $DIR"
+            echo "Multi-package add/remove of .spec file detected: $package in $DIR"
         fi
     done
 }
@@ -39,6 +41,6 @@ for spec_dir in "${SPEC_DIRS[@]}"; do
     for file in $CHANGED_FILES; do
         dir_path=$(dirname "$file")
         # Check for duplicates in the directory
-        check_duplicates "$dir_path"
+        check_multi_package_add_remove "$dir_path"
     done
 done
