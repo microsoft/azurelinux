@@ -43,7 +43,7 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 if rpm -q coreutils checkpolicy policycoreutils selinux-policy-devel &> /dev/null; then
     if [[ $(getenforce) == "Enforcing" ]]; then
         mkdir -p /tmp/
-        FILE1=/tmp/sysinfo-selinuxpolicies.cil
+        POLICYFILE=/tmp/sysinfo-selinuxpolicies.cil
         cat << EOF > $POLICYFILE
         (allow systemd_analyze_t sysctl_kernel_t (dir (search)))
         (allow systemd_analyze_t locale_t (dir (search)))
