@@ -190,15 +190,15 @@ storage:
 
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4096M
     partitions:
     - id: esp
       type: esp
-      start: 1
-      end: 9
+      start: 1M
+      end: 9M
 
     - id: rootfs
-      start: 9
+      start: 9M
       
   fileSystems:
   - deviceId: esp
@@ -241,7 +241,11 @@ Supported options:
 
 ### maxSize [uint64]
 
-The size of the disk, specified in mebibytes (MiB).
+The size of the disk.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### partitions [[partition](#partition-type)[]]
 
@@ -694,11 +698,15 @@ The label to assign to the partition.
 
 Required.
 
-The start location (inclusive) of the partition, specified in MiBs.
+The start location (inclusive) of the partition.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### end [uint64]
 
-The end location (exclusive) of the partition, specified in MiBs.
+The end location (exclusive) of the partition.
 
 The End and Size fields cannot be specified at the same time.
 
@@ -707,9 +715,17 @@ partition.
 When both the Size and End fields are omitted, the last partition will fill the
 remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
+
 ### size [uint64]
 
-The size of the partition, specified in MiBs.
+The size of the partition.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 <div id="partition-type-string"></div>
 
