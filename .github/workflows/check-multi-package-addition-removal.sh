@@ -1,6 +1,9 @@
 #!/bin/bash
 set -o pipefail
 
+# Initialize the variable
+echo "MULTI_PACKAGE_ADD_REMOVE_DETECTED=false" >> $GITHUB_ENV
+
 # Setup RPM tools
 source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
 
@@ -29,6 +32,7 @@ check_multi_package_add_remove() {
     for package in "${!package_counts[@]}"; do
         if [ "${package_counts[$package]}" -gt 1 ]; then
             echo "Multi-package add/remove of .spec file detected: $package in $DIR"
+            echo "MULTI_PACKAGE_ADD_REMOVE_DETECTED=true" >> $GITHUB_ENV
         fi
     done
 }
