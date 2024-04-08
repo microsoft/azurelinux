@@ -29,7 +29,7 @@ Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
 
 %description
-Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
+Go is an open source programming language that makes it easy to build simple, reliable, and efficient software. awf awfawfawfawf
 
 %prep
 # Setup go 1.4 bootstrap source
