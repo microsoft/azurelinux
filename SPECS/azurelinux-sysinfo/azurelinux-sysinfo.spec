@@ -38,6 +38,38 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 %{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
 
 %post
+# Create and apply SElinux policies only if SELinux mode is enforcing
+# and specified packages are present
+if rpm -q coreutils checkpolicy policycoreutils selinux-policy-devel &> /dev/null; then
+    if [[ $(getenforce) == "Enforcing" ]]; then
+        mkdir -p /tmp/
+        FILE1=/tmp/selinuxpolicies.cil
+        cat << EOF > $FILE1
+        (allow systemd_analyze_t sysctl_kernel_t (dir (search)))
+        (allow systemd_analyze_t locale_t (dir (search)))
+        (allow systemd_analyze_t init_runtime_t (dir (search)))
+        (allow systemd_analyze_t sysctl_kernel_t (file (read)))
+        (allow systemd_analyze_t locale_t (file (read)))
+        (allow systemd_analyze_t systemd_analyze_t (capability (net_admin)))
+        (allow systemd_analyze_t init_t (unix_stream_socket (connectto)))
+        (allow systemd_analyze_t system_dbusd_runtime_t (dir (search)))
+        (allow systemd_analyze_t security_t (filesystem (getattr)))
+        (allow systemd_analyze_t selinux_config_t (dir (search)))
+        (allow systemd_analyze_t init_t (system (status)))
+        (allow systemd_analyze_t init_t (service (status)))
+        (allow systemd_analyze_t systemdunit (service (status)))
+        (allow systemd_analyze_t etc_t (service (status)))
+
+EOF
+
+        # Change SELinux context of file to user_tmp_t so that it can be read by semanage_t
+        chcon -t user_tmp_t $FILE1
+        # Apply the SELinux policies
+        semodule -i $FILE1
+    fi
+fi
+
+# Script to enable the systemd service
 #!/bin/sh
 systemctl enable azurelinux-sysinfo.service
 
