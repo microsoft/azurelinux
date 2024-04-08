@@ -1060,7 +1060,6 @@
                 "openssl",
                 "openssl-ibmpkcs11",
                 "openssl-pkcs11",
-                "opentofu",
                 "openwsman",
                 "optipng",
                 "opus",
