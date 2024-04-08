@@ -38,13 +38,11 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 %{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
 
 %post
-# Apply required SElinux policies only if SELinux mode is enforcing
-# and specified packages are present
-if rpm -q coreutils checkpolicy policycoreutils selinux-policy-devel &> /dev/null; then
-    if [[ $(getenforce) == "Enforcing" ]]; then
-        mkdir -p /tmp/
-        POLICYFILE=/tmp/sysinfo-selinuxpolicies.cil
-        cat << EOF > $POLICYFILE
+# Apply required SElinux policies only if selinux-policy is present
+if rpm -q selinux-policy &> /dev/null; then
+    mkdir -p /tmp/
+    POLICYFILE=/tmp/sysinfo-selinuxpolicies.cil
+    cat << EOF > $POLICYFILE
 (allow systemd_analyze_t sysctl_kernel_t (dir (search)))
 (allow systemd_analyze_t locale_t (dir (search)))
 (allow systemd_analyze_t init_runtime_t (dir (search)))
@@ -62,11 +60,10 @@ if rpm -q coreutils checkpolicy policycoreutils selinux-policy-devel &> /dev/nul
 
 EOF
 
-        # Change SELinux context of file to user_tmp_t so that it can be read by semanage_t
-        chcon -t user_tmp_t $POLICYFILE
-        # Apply the SELinux policies
-        semodule -i $POLICYFILE
-    fi
+    # Change SELinux context of file to user_tmp_t so that it can be read by semanage_t
+    chcon -t user_tmp_t $POLICYFILE
+    # Apply the SELinux policies
+    semodule -i $POLICYFILE
 fi
 
 # Script to enable the systemd service
