@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Setup RPM tools
+source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
+
 # Define directories to watch
 SPEC_DIRS=("SPECS" "SPECS-EXTENDED")
 
