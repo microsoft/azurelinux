@@ -10,6 +10,7 @@ git fetch origin $GITHUB_BASE_REF
 check_duplicates() {
     local DIR=$1
     echo "Checking directory: $DIR for duplicates..."
+    echo "Test"
     # Array to hold package names
     declare -A package_counts
     # Loop through .spec files in the directory
@@ -17,6 +18,7 @@ check_duplicates() {
         if [ -e "$spec_file" ]; then # Check if the spec file exists
             # Extract package name from the spec file
             package_name=$(mariner_rpmspec -q --qf "%{NAME}\n" "$spec_file" 2>/dev/null)
+            echo "Package name: $package_name"
             # Increment package name count
             ((package_counts[$package_name]++))
         fi
