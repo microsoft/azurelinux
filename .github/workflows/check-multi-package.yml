@@ -1,0 +1,28 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: Check Multi-package addition/removal
+
+on:
+  pull_request:
+    paths:
+      - 'SPECS/**'
+      - 'SPECS-EXTENDED/**'
+
+permissions: read-all
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Ensures history for all branches is available
+
+      - name: Check Multi-package addition/removal
+        run: |
+          .github/workflows/check-multi-package-addition-removal.sh
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
