@@ -10,6 +10,7 @@ git fetch origin $GITHUB_BASE_REF
 check_duplicates() {
     local DIR=$1
     echo "Checking directory: $DIR for duplicates..."
+    echo "Test"
     # Array to hold package names
     declare -A package_counts
     # Loop through .spec files in the directory
