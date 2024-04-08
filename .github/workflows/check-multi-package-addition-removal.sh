@@ -17,6 +17,7 @@ check_duplicates() {
         if [ -e "$spec_file" ]; then # Check if the spec file exists
             # Extract package name from the spec file
             package_name=$(mariner_rpmspec -q --qf "%{NAME}\n" "$spec_file" 2>/dev/null)
+            echo "Package name: $package_name"
             # Increment package name count
             ((package_counts[$package_name]++))
         fi
