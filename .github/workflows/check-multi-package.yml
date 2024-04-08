@@ -11,7 +11,9 @@ on:
       - 'SPECS/**'
       - 'SPECS-EXTENDED/**'
 
-permissions: read-all
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   detect-changes:
