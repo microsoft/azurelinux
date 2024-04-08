@@ -28,3 +28,13 @@ jobs:
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
           GITHUB_WORKSPACE: ${{ github.workspace }}
+
+      - name: Add Reviewer if Duplicates Found
+        if: env.MULTI_PACKAGE_ADD_REMOVE_DETECTED == 'true'
+        run: |
+          curl \
+            -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            ${GITHUB_API_URL}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+            -d '{"team_reviewers": ["cbl-mariner-multi-package-reviewers"]}'
