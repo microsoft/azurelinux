@@ -1,10 +1,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-name: Check Multi-package addition/removal
+name: Check Multi-package
 
 on:
   pull_request:
+    branches:
+      - karimeldegwy/*
     paths:
       - 'SPECS/**'
       - 'SPECS-EXTENDED/**'
