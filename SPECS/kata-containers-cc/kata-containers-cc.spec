@@ -1,4 +1,4 @@
-%global virtiofsd_binary        virtiofsd-rs
+%global virtiofsd_binary        virtiofsd
 
 %global runtime_make_vars       DEFMEMSZ=256 \\\
                                 DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
