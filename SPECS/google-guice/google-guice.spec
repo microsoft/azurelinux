@@ -17,7 +17,7 @@ BuildArch:      noarch
 Put simply, Guice alleviates the need for factories and the use of new
 in your Java code. Think of Guice's @Inject as the new new. You will
 still need to write factories in some cases, but your code will not
-depend directly on them. Your code will be easier to change, unit test
+depend directly on them. Your code will be easier to change, unit testafwwafwafwaf
 and reuse in other contexts.
 
 Guice embraces Java's type safe nature, especially when it comes to
