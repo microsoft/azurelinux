@@ -1,7 +1,7 @@
 Summary:        Package to deploy azurelinux-sysinfo service
 Name:           azurelinux-sysinfo
 Version:        %{azl}.0
-Release:        1%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,20 +45,20 @@ if rpm -q coreutils checkpolicy policycoreutils selinux-policy-devel &> /dev/nul
         mkdir -p /tmp/
         POLICYFILE=/tmp/sysinfo-selinuxpolicies.cil
         cat << EOF > $POLICYFILE
-        (allow systemd_analyze_t sysctl_kernel_t (dir (search)))
-        (allow systemd_analyze_t locale_t (dir (search)))
-        (allow systemd_analyze_t init_runtime_t (dir (search)))
-        (allow systemd_analyze_t sysctl_kernel_t (file (read)))
-        (allow systemd_analyze_t locale_t (file (read)))
-        (allow systemd_analyze_t systemd_analyze_t (capability (net_admin)))
-        (allow systemd_analyze_t init_t (unix_stream_socket (connectto)))
-        (allow systemd_analyze_t system_dbusd_runtime_t (dir (search)))
-        (allow systemd_analyze_t security_t (filesystem (getattr)))
-        (allow systemd_analyze_t selinux_config_t (dir (search)))
-        (allow systemd_analyze_t init_t (system (status)))
-        (allow systemd_analyze_t init_t (service (status)))
-        (allow systemd_analyze_t systemdunit (service (status)))
-        (allow systemd_analyze_t etc_t (service (status)))
+(allow systemd_analyze_t sysctl_kernel_t (dir (search)))
+(allow systemd_analyze_t locale_t (dir (search)))
+(allow systemd_analyze_t init_runtime_t (dir (search)))
+(allow systemd_analyze_t sysctl_kernel_t (file (read)))
+(allow systemd_analyze_t locale_t (file (read)))
+(allow systemd_analyze_t systemd_analyze_t (capability (net_admin)))
+(allow systemd_analyze_t init_t (unix_stream_socket (connectto)))
+(allow systemd_analyze_t system_dbusd_runtime_t (dir (search)))
+(allow systemd_analyze_t security_t (filesystem (getattr)))
+(allow systemd_analyze_t selinux_config_t (dir (search)))
+(allow systemd_analyze_t init_t (system (status)))
+(allow systemd_analyze_t init_t (service (status)))
+(allow systemd_analyze_t systemdunit (service (status)))
+(allow systemd_analyze_t etc_t (service (status)))
 
 EOF
 
