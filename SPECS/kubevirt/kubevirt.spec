@@ -273,6 +273,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 * Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
 - Bump package version to 1.2.0 from 0.59.0
 - Referenced kubevirt.spec from https://code.opensuse.org/package/kubevirt/blob/master/f/kubevirt.spec
+- Setting _missing_build_ids_terminate_build to 0 to prevent the build from terminating if build IDs are missing
 
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 0.59.0-14
 - update to build dep latest glibc-static version
