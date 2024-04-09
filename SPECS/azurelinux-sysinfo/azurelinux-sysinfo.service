@@ -1,0 +1,13 @@
+[Unit]
+Description=Azure Linux Sysinfo Service
+After=cloud-init.target multi-user.target
+
+[Service]
+Environment=PYTHONUNBUFFERED=1
+Type=simple
+ExecStart=/usr/bin/python3 /usr/bin/collect-sysinfo
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,14 +1,13 @@
 Summary:        Open Source Security Compliance Solution
 Name:           openscap
-Version:        1.3.5
-Release:        4%{?dist}
+Version:        1.3.9
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.open-scap.org
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
-Patch0:         support_rpm_418.patch
 BuildRequires:  bzip2-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -18,7 +17,7 @@ BuildRequires:  libgcrypt-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  perl-devel
 BuildRequires:  perl-XML-Parser
 BuildRequires:  popt-devel
@@ -69,7 +68,9 @@ mkdir build
 
 %build
 cd build
-%cmake -DENABLE_PERL=ON \
+%cmake \
+       -DWITH_PCRE2=ON \
+       -DENABLE_PERL=ON \
        -DENABLE_SCE=ON \
        -DPYTHON_EXECUTABLE:STRING=%{python3} \
        -DPYTHON_VERSION_MAJOR:STRING=$(%{python3} -c "import sys; print(sys.version_info.major)") \
@@ -116,6 +117,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 08 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.9-1
+- Upgrade to 1.3.9
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.3.5-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
