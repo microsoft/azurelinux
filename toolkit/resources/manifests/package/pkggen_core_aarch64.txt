@@ -165,11 +165,11 @@ texinfo-7.0.3-1.azl3.aarch64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-1.azl3.noarch.rpm
 automake-1.16.5-1.azl3.noarch.rpm
-openssl-3.1.4-5.azl3.aarch64.rpm
-openssl-devel-3.1.4-5.azl3.aarch64.rpm
-openssl-libs-3.1.4-5.azl3.aarch64.rpm
-openssl-perl-3.1.4-5.azl3.aarch64.rpm
-openssl-static-3.1.4-5.azl3.aarch64.rpm
+openssl-3.1.4-6.azl3.aarch64.rpm
+openssl-devel-3.1.4-6.azl3.aarch64.rpm
+openssl-libs-3.1.4-6.azl3.aarch64.rpm
+openssl-perl-3.1.4-6.azl3.aarch64.rpm
+openssl-static-3.1.4-6.azl3.aarch64.rpm
 libcap-2.69-1.azl3.aarch64.rpm
 libcap-devel-2.69-1.azl3.aarch64.rpm
 debugedit-5.0-2.azl3.aarch64.rpm
@@ -221,8 +221,8 @@ libksba-devel-1.6.4-1.azl3.aarch64.rpm
 libxslt-1.1.39-1.azl3.aarch64.rpm
 npth-1.6-4.azl3.aarch64.rpm
 pinentry-1.2.1-1.azl3.aarch64.rpm
-gnupg2-2.4.3-1.azl3.aarch64.rpm
-gnupg2-lang-2.4.3-1.azl3.aarch64.rpm
+gnupg2-2.4.4-1.azl3.aarch64.rpm
+gnupg2-lang-2.4.4-1.azl3.aarch64.rpm
 gpgme-1.23.2-2.azl3.aarch64.rpm
 azurelinux-repos-shared-3.0-2.azl3.noarch.rpm
 azurelinux-repos-3.0-2.azl3.noarch.rpm

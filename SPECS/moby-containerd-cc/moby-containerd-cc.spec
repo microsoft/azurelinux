@@ -33,9 +33,6 @@ Requires: moby-runc >= 1.1.0
 Conflicts: moby-containerd
 Conflicts: moby-engine <= 3.0.10
 
-Obsoletes: containerd
-Obsoletes: containerd-io
-
 %description
 This is the containerd runtime meant for use with confidential containers
 
@@ -81,6 +78,12 @@ fi
 %changelog
 * Mon Apr 08 2024 Mitch Zhu <mitchzhu@microsoft.com> - 1.7.7-3
 - Drop obsolete btrfs-progs-devel build dependency
+
+* Mon Apr 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-9
+- Remove Obsoletes containerd as it was causing dnf to pick moby-containerd-cc over containerd.
+
+* Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-8
+- Add OOMScoreAdjust -999 to containerd.service
 
 * Wed Feb 21 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.7-2
 - Backport upstream patch for no-inlining seccomp and apparmor functions to fix tests.

@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -1947,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "compiler-rt",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -2299,16 +2299,6 @@
           "name": "cscope",
           "version": "15.9",
           "downloadUrl": "https://downloads.sourceforge.net/project/cscope/cscope/15.9/cscope-15.9.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "csi-driver-lvm",
-          "version": "0.4.1",
-          "downloadUrl": "https://github.com/metal-stack/csi-driver-lvm/archive/refs/tags/v0.4.1.tar.gz"
         }
       }
     },
@@ -3248,8 +3238,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "29.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.1.tar.xz"
+          "version": "29.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
         }
       }
     },
@@ -4540,8 +4530,8 @@
         "type": "other",
         "other": {
           "name": "gnupg2",
-          "version": "2.4.3",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.3.tar.bz2"
+          "version": "2.4.4",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.4.tar.bz2"
         }
       }
     },
@@ -8141,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "keras",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v2.11.0.tar.gz"
+          "version": "3.1.1",
+          "downloadUrl": "https://github.com/keras-team/keras/archive/refs/tags/v3.1.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8371,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "0.59.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.59.0.tar.gz"
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.2.0.tar.gz"
         }
       }
     },
@@ -9551,8 +9541,8 @@
         "type": "other",
         "other": {
           "name": "libguestfs",
-          "version": "1.44.0",
-          "downloadUrl": "https://libguestfs.org/download/1.44-stable/libguestfs-1.44.0.tar.gz"
+          "version": "1.52.0",
+          "downloadUrl": "https://libguestfs.org/download/1.52-stable/libguestfs-1.52.0.tar.gz"
         }
       }
     },
@@ -11371,8 +11361,8 @@
         "type": "other",
         "other": {
           "name": "libva",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/intel/libva/archive/2.11.0.tar.gz"
+          "version": "2.20.0",
+          "downloadUrl": "https://github.com/intel/libva/archive/2.20.0.tar.gz"
         }
       }
     },
@@ -11921,8 +11911,8 @@
         "type": "other",
         "other": {
           "name": "libXv",
-          "version": "1.0.11",
-          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.11.tar.bz2"
+          "version": "1.0.12",
+          "downloadUrl": "http://xorg.freedesktop.org/archive/individual/lib/libXv-1.0.12.tar.xz"
         }
       }
     },
@@ -12051,8 +12041,8 @@
         "type": "other",
         "other": {
           "name": "lld",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12061,8 +12051,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12091,8 +12081,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12373,6 +12363,16 @@
           "name": "luajit",
           "version": "2.1.1707061634",
           "downloadUrl": "https://github.com/LuaJIT/LuaJIT/archive/0d313b243194a0b8d2399d8b549ca5a0ff234db5/luajit-2.1.1707061634.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lujavrite",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/mizdebsk/lujavrite/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -14411,6 +14411,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ocaml-augeas",
+          "version": "0.6",
+          "downloadUrl": "https://people.redhat.com/~rjones/augeas/files/ocaml-augeas-0.6.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "ocaml-base",
           "version": "0.15.0",
           "downloadUrl": "https://github.com/janestreet/base/archive/v0.15.0/base-0.15.0.tar.gz"
@@ -15153,8 +15163,8 @@
         "type": "other",
         "other": {
           "name": "openscap",
-          "version": "1.3.5",
-          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.5/openscap-1.3.5.tar.gz"
+          "version": "1.3.9",
+          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.9/openscap-1.3.9.tar.gz"
         }
       }
     },
@@ -15703,8 +15713,8 @@
         "type": "other",
         "other": {
           "name": "perftest",
-          "version": "4.5",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/bluefield/3.9.0/extras/mlnx_ofed/5.6-1.0.3.3/SOURCES/perftest_4.5.orig.tar.gz"
+          "version": "24.01.0",
+          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.01-0.3.3.1/SRPMS/perftest-24.01.0-0.38.gd185c9b.tar.gz"
         }
       }
     },
@@ -17583,8 +17593,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTML-Parser",
-          "version": "3.72",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/G/GA/GAAS/HTML-Parser-3.72.tar.gz"
+          "version": "3.82",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-3.82.tar.gz"
         }
       }
     },
@@ -20963,8 +20973,8 @@
         "type": "other",
         "other": {
           "name": "plexus-sec-dispatcher",
-          "version": "1.4",
-          "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/refs/tags/sec-dispatcher-1.4.tar.gz"
+          "version": "2.0",
+          "downloadUrl": "https://github.com/codehaus-plexus/plexus-sec-dispatcher/archive/refs/tags/plexus-sec-dispatcher-2.0.tar.gz"
         }
       }
     },
@@ -21063,8 +21073,8 @@
         "type": "other",
         "other": {
           "name": "poetry",
-          "version": "1.0.10",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/poetry/poetry-1.0.10.tar.gz"
+          "version": "1.8.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/poetry/poetry-1.8.2.tar.gz"
         }
       }
     },
@@ -22312,6 +22322,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-fastjsonschema",
+          "version": "2.19.1",
+          "downloadUrl": "https://github.com/horejsek/python-fastjsonschema/archive/v2.19.1/python-fastjsonschema-2.19.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-fields",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/ionelmc/python-fields/archive/v5.0.0/python-fields-5.0.0.tar.gz"
@@ -22882,6 +22902,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-lark",
+          "version": "1.1.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/lark/lark-1.1.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-lazy-object-proxy",
           "version": "1.4.3",
           "downloadUrl": "https://github.com/ionelmc/python-lazy-object-proxy/archive/v1.4.3/lazy-object-proxy-1.4.3.tar.gz"
@@ -23002,9 +23032,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-markdown-it-py",
+          "version": "3.0.0",
+          "downloadUrl": "https://github.com/executablebooks/markdown-it-py/archive/v3.0.0/markdown-it-py-3.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-markupsafe",
           "version": "2.1.3",
           "downloadUrl": "https://pypi.python.org/packages/source/M/MarkupSafe/MarkupSafe-2.1.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-mdurl",
+          "version": "0.1.2",
+          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
         }
       }
     },
@@ -23142,6 +23192,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-namex",
+          "version": "0.0.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/n/namex/namex-0.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-netaddr",
           "version": "1.2.1",
           "downloadUrl": "https://github.com/netaddr/netaddr/archive/refs/tags/1.2.1.tar.gz"
@@ -23193,8 +23253,8 @@
         "type": "other",
         "other": {
           "name": "python-nose2",
-          "version": "0.10.0",
-          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.10.0.tar.gz"
+          "version": "0.14.1",
+          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.14.1.tar.gz"
         }
       }
     },
@@ -23265,6 +23325,16 @@
           "name": "python-opt-einsum",
           "version": "3.3.0",
           "downloadUrl": "https://pypi.python.org/packages/source/o/opt_einsum/opt_einsum-3.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-optree",
+          "version": "0.11.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/o/optree/optree-0.11.0.tar.gz"
         }
       }
     },
@@ -23435,6 +23505,16 @@
           "name": "python-podman-api",
           "version": "0.0.0",
           "downloadUrl": "https://github.com/containers/python-podman/archive/d4b8263bf08b72082cfb45e7367ebf4309facc54/python-podman-api-d4b8263.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-poetry-core",
+          "version": "1.9.0",
+          "downloadUrl": "https://github.com/python-poetry/poetry-core/archive/1.9.0/poetry-core-1.9.0.tar.gz"
         }
       }
     },
@@ -23862,16 +23942,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-redis",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/andymccurdy/redis-py/archive/python-redis-3.5.3.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "python-remoto",
           "version": "1.2.1",
           "downloadUrl": "https://pypi.io/packages/source/r/remoto/remoto-1.2.1.tar.gz"
@@ -24005,6 +24075,16 @@
           "name": "python-rfc3986",
           "version": "1.2.0",
           "downloadUrl": "https://pypi.python.org/packages/source/r/rfc3986/rfc3986-1.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-rich",
+          "version": "13.7.1",
+          "downloadUrl": "https://github.com/Textualize/rich/archive/v13.7.1/rich-13.7.1.tar.gz"
         }
       }
     },
@@ -24573,8 +24653,8 @@
         "type": "other",
         "other": {
           "name": "python-tqdm",
-          "version": "4.63.1",
-          "downloadUrl": "https://github.com/tqdm/tqdm/archive/refs/tags/v4.63.1.tar.gz"
+          "version": "4.66.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/t/tqdm/tqdm-4.66.2.tar.gz"
         }
       }
     },
@@ -24703,8 +24783,8 @@
         "type": "other",
         "other": {
           "name": "python-virtualenv",
-          "version": "20.14.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/4a/c3/04f361a90ed4e6b3f3f696d61db5c786eaa741d2a6c125bc905b8a1c0200/virtualenv-20.14.0.tar.gz"
+          "version": "20.25.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/94/d7/adb787076e65dc99ef057e0118e25becf80dd05233ef4c86f07aa35f6492/virtualenv-20.25.0.tar.gz"
         }
       }
     },
@@ -24943,8 +25023,8 @@
         "type": "other",
         "other": {
           "name": "pytorch",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.0.0/pytorch-v2.0.0.tar.gz"
+          "version": "2.2.2",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.2.2/pytorch-v2.2.2.tar.gz"
         }
       }
     },
@@ -25163,8 +25243,8 @@
         "type": "other",
         "other": {
           "name": "rabbitmq-server",
-          "version": "3.11.11",
-          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.11/rabbitmq-server-3.11.11.tar.xz"
+          "version": "3.13.0",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.13.0/rabbitmq-server-3.13.0.tar.xz"
         }
       }
     },
@@ -25342,16 +25422,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "redis",
-          "version": "7.2.4",
-          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "redland",
           "version": "1.0.17",
           "downloadUrl": "http://download.librdf.org/source/redland-1.0.17.tar.gz"
@@ -25476,16 +25546,6 @@
           "name": "rocksdb",
           "version": "8.9.1",
           "downloadUrl": "https://github.com/facebook/rocksdb/archive/v8.9.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rook",
-          "version": "1.6.2",
-          "downloadUrl": "https://github.com/rook/rook/archive/refs/tags/v1.6.2.tar.gz"
         }
       }
     },
@@ -26164,8 +26224,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-hoe",
-          "version": "3.18.0",
-          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v3.18.0.tar.gz"
+          "version": "4.0.4",
+          "downloadUrl": "https://github.com/seattlerb/hoe/archive/refs/tags/v4.0.4.tar.gz"
         }
       }
     },
@@ -26183,9 +26243,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "rubygem-http_parser.rb",
-          "version": "0.6.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/http_parser.rb-0.6.1.tar.gz"
+          "name": "rubygem-http_parser",
+          "version": "0.8.0",
+          "downloadUrl": "https://github.com/tmm1/http_parser.rb/archive/refs/tags/v0.8.0.tar.gz"
         }
       }
     },
@@ -26314,8 +26374,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-msgpack",
-          "version": "1.4.5",
-          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.4.5.tar.gz"
+          "version": "1.7.2",
+          "downloadUrl": "https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v1.7.2.tar.gz"
         }
       }
     },
@@ -26544,8 +26604,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rdkafka",
-          "version": "0.12.0.beta.4",
-          "downloadUrl": "https://github.com/appsignal/rdkafka-ruby/archive/refs/tags/v0.12.0.beta.4.tar.gz"
+          "version": "0.15.1",
+          "downloadUrl": "https://github.com/appsignal/rdkafka-ruby/archive/refs/tags/v0.15.1.tar.gz"
         }
       }
     },
@@ -28296,8 +28356,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.27.3",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.27.3.tar.gz"
+          "version": "1.29.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/refs/tags/v1.29.4.tar.gz"
         }
       }
     },
@@ -28485,26 +28545,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "tpm-quote-tools",
-          "version": "1.0.4",
-          "downloadUrl": "http://downloads.sourceforge.net/tpmquotetools/tpm-quote-tools-1.0.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "tpm-tools",
-          "version": "1.3.9",
-          "downloadUrl": "http://downloads.sourceforge.net/trousers/tpm-tools-1.3.9.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "tpm2-abrmd",
           "version": "3.0.0",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz"
@@ -28588,16 +28628,6 @@
           "name": "trilead-ssh2",
           "version": "217.8",
           "downloadUrl": "https://github.com/jenkinsci/trilead-ssh2/archive/trilead-ssh2-build217-jenkins-8.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "trousers",
-          "version": "0.3.14",
-          "downloadUrl": "https://sourceforge.net/projects/trousers/files/trousers/0.3.14/trousers-0.3.14.tar.gz"
         }
       }
     },
@@ -29136,8 +29166,8 @@
         "type": "other",
         "other": {
           "name": "virglrenderer",
-          "version": "0.9.1",
-          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/0.9.1/virglrenderer-0.9.1.tar.gz"
+          "version": "1.0.1",
+          "downloadUrl": "https://gitlab.freedesktop.org/virgl/virglrenderer/-/archive/1.0.1/virglrenderer-1.0.1.tar.gz"
         }
       }
     },
@@ -29266,8 +29296,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-headers",
-          "version": "1.2.148.0",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/sdk-1.2.148.0.tar.gz"
+          "version": "1.3.275.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Headers/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
@@ -29276,8 +29306,8 @@
         "type": "other",
         "other": {
           "name": "vulkan-loader",
-          "version": "1.2.148.1",
-          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/sdk-1.2.148.1.tar.gz"
+          "version": "1.3.275.0",
+          "downloadUrl": "https://github.com/KhronosGroup/Vulkan-Loader/archive/vulkan-sdk-1.3.275.0.tar.gz"
         }
       }
     },
