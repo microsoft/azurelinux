@@ -10,6 +10,7 @@ URL:            https://aka.ms/azurelinux
 Source0:        collect-sysinfo
 Source1:        sysinfo-schema-v1.json
 Source2:        azurelinux-sysinfo.service
+Source3:        sysinfo-selinuxpolicies.cil
 Requires:       systemd
 Requires:       python3-psutil
 
@@ -32,48 +33,35 @@ install -m 755 %{SOURCE1} %{buildroot}%{_datadir}/azurelinux-sysinfo/
 mkdir -p %{buildroot}%{_sysconfdir}/systemd/system/
 install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 
+# Copy the sysinfo-selinuxpolicies file to /usr/share/selinux/packages/
+mkdir -p %{buildroot}%{_datadir}/selinux/packages/
+install -m 755 %{SOURCE3} %{buildroot}%{_datadir}/selinux/packages/
+
 %files
 %{_bindir}/collect-sysinfo
+%dir %{_datadir}/azurelinux-sysinfo/
 %{_datadir}/azurelinux-sysinfo/sysinfo-schema-v1.json
 %{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
+%{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
 
 %post
 #!/bin/sh
-# Apply required SElinux policies only if selinux-policy is present
-if rpm -q selinux-policy &> /dev/null; then
-    mkdir -p %{_datadir}/selinux/packages/
-    POLICYFILE=%{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
-    cat << EOF > $POLICYFILE
-(allow systemd_analyze_t sysctl_kernel_t (dir (search)))
-(allow systemd_analyze_t locale_t (dir (search)))
-(allow systemd_analyze_t init_runtime_t (dir (search)))
-(allow systemd_analyze_t sysctl_kernel_t (file (read)))
-(allow systemd_analyze_t locale_t (file (read)))
-(allow systemd_analyze_t systemd_analyze_t (capability (net_admin)))
-(allow systemd_analyze_t init_t (unix_stream_socket (connectto)))
-(allow systemd_analyze_t system_dbusd_runtime_t (dir (search)))
-(allow systemd_analyze_t security_t (filesystem (getattr)))
-(allow systemd_analyze_t selinux_config_t (dir (search)))
-(allow systemd_analyze_t init_t (system (status)))
-(allow systemd_analyze_t init_t (service (status)))
-(allow systemd_analyze_t systemdunit (service (status)))
-(allow systemd_analyze_t etc_t (service (status)))
-
-EOF
-
-    # Apply the SELinux policies
-    semodule -i $POLICYFILE
-fi
-
 # Enable the systemd service
 systemctl enable azurelinux-sysinfo.service
 
+if rpm -q selinux-policy &> /dev/null; then
+    # Apply required SElinux policies only if selinux-policy is present
+    semodule -i %{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
+else
+    # Otherwise remove the /usr/share/selinux/ directory that was created
+    rm -rf %{_datadir}/selinux/
+fi
+
+
 %postun
 # If selinux-policy is present, remove the sysinfo-selinuxpolicies module
-# and delete the policy file.
 if rpm -q selinux-policy &> /dev/null; then
     semodule -r sysinfo-selinuxpolicies
-    rm -f %{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
 fi
 
 %changelog
