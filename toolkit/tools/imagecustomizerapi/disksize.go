@@ -31,15 +31,25 @@ func (s *DiskSize) UnmarshalYAML(value *yaml.Node) error {
 		return fmt.Errorf("failed to parse disk size:\n%w", err)
 	}
 
-	match := diskSizeRegex.FindStringSubmatch(stringValue)
+	diskSize, err := parseDiskSize(stringValue)
+	if err != nil {
+		return fmt.Errorf("%w:\nexpected format: <NUM>(K|M|G|T) (e.g. 100M, 1G)", err)
+	}
+
+	*s = diskSize
+	return nil
+}
+
+func parseDiskSize(diskSizeString string) (DiskSize, error) {
+	match := diskSizeRegex.FindStringSubmatch(diskSizeString)
 	if match == nil {
-		return fmt.Errorf("disk size (%s) has incorrect format: <num>[KMGT] (e.g. 100M, 1G)", stringValue)
+		return 0, fmt.Errorf("(%s) has incorrect format", diskSizeString)
 	}
 
 	numString := match[1]
 	num, err := strconv.ParseUint(numString, 0, 64)
 	if err != nil {
-		return fmt.Errorf("failed to parse disk size:\n%w", err)
+		return 0, err
 	}
 
 	if len(match) >= 3 {
@@ -55,7 +65,7 @@ func (s *DiskSize) UnmarshalYAML(value *yaml.Node) error {
 		case "T":
 			multiplier = diskutils.TiB
 		case "":
-			return fmt.Errorf("disk size (%s) must have a suffix (i.e. K, M, G, or T)", numString)
+			return 0, fmt.Errorf("(%s) must have a unit suffix (K, M, G, or T)", diskSizeString)
 		}
 
 		num *= multiplier
@@ -63,9 +73,8 @@ func (s *DiskSize) UnmarshalYAML(value *yaml.Node) error {
 
 	// The imager's diskutils works in MiB. So, restrict disk and partition sizes to multiples of 1 MiB.
 	if num%diskutils.MiB != 0 {
-		return fmt.Errorf("disk size (%d) must be a multiple of 1 MiB", num)
+		return 0, fmt.Errorf("(%d) must be a multiple of 1 MiB", num)
 	}
 
-	*s = DiskSize(num)
-	return nil
+	return DiskSize(num), nil
 }
