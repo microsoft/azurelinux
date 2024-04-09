@@ -2474,7 +2474,6 @@
                 "args4j",
                 "atinject",
                 "base64coder",
-                "bazel-workspaces",
                 "bcel",
                 "bea-stax",
                 "beust-jcommander",
