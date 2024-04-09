@@ -170,7 +170,7 @@ Install this package if you want intelligent bash tab-completion
 for %{name}.
 
 %prep
-%if 0%{verify_tarball_signature} && ! 0%{?azl}
+%if 0%{verify_tarball_signature}
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %endif
 %autosetup -p1
@@ -210,7 +210,7 @@ rm %{buildroot}%{_mandir}/man3/libnbd-ocaml.3*
 %endif
 
 %if 0%{?rhel} || 0%{?azl}
-# Delete nbdublk on RHEL.
+# Delete nbdublk on RHEL and azl.
 rm -f %{buildroot}%{_datadir}/bash-completion/completions/nbdublk
 %endif
 
