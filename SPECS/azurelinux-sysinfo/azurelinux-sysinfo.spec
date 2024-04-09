@@ -57,7 +57,6 @@ else
     rm -rf %{_datadir}/selinux/
 fi
 
-
 %postun
 # If selinux-policy is present, remove the sysinfo-selinuxpolicies module
 if rpm -q selinux-policy &> /dev/null; then
