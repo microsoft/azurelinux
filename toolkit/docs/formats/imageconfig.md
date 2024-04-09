@@ -324,6 +324,10 @@ By default the repo will only be used during ISO install, it may also be made av
 RemoveRpmDb triggers RPM database removal after the packages have been installed.
 Removing the RPM database may break any package managers inside the image.
 
+### PreserveTdnfCache
+
+PreserveTdnfCache leaves the `tdnf` cache intact after image generation. By default the cache will be cleaned via `tdnf clean all` to save space after installing packages and running `PostInstallScripts`.
+
 ### KernelOptions
 
 KernelOptions key consists of a map of key-value pairs, where a key is an identifier and a value is a name of the package (kernel) used in a scenario described by the identifier. During the build time, all kernels provided in KernelOptions will be built.

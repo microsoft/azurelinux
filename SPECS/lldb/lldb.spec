@@ -2,7 +2,7 @@
 
 Summary:        A next generation, high-performance debugger.
 Name:           lldb
-Version:        17.0.6
+Version:        18.1.2
 Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
@@ -106,6 +106,9 @@ rm -f %{buildroot}%{python3_sitelib}/six.*
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Tue Jan 16 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
 - Upgrade to 17.0.6
 
