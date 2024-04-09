@@ -17,7 +17,7 @@
 
 Summary:        Simple Logging Facade for Java
 Name:           slf4j
-Version:        2.0.12
+Version:        2.0.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -26,11 +26,8 @@ Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
-BuildRequires:  ant
-BuildRequires:  ant-junit
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
-BuildRequires:  log4j
 Requires:       cal10n
 Requires:       java
 # this is ugly hack, which creates package which requires the same,
@@ -76,16 +73,6 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description jdk14
 SLF4J JDK14 Binding.
 
-%package jcl
-Summary:        SLF4J JCL Binding
-License:        MIT
-Group:          Development/Libraries/Java
-Requires:       mvn(commons-logging:commons-logging)
-Requires:       mvn(org.slf4j:slf4j-api) = %{version}
-
-%description jcl
-SLF4J JCL Binding.
-
 %package -n jcl-over-slf4j
 Summary:        JCL 1.1.1 implemented over SLF4J
 License:        ASL 2.0
@@ -113,6 +100,8 @@ cp -p %{SOURCE1} APACHE-LICENSE
 %pom_disable_module slf4j-log4j12
 %pom_disable_module jul-to-slf4j
 %pom_disable_module slf4j-ext
+%pom_disable_module slf4j-reload4j
+%pom_disable_module osgi-over-slf4j
 
 # Port to maven-antrun-plugin 3.0.0
 sed -i s/tasks/target/ slf4j-api/pom.xml
@@ -121,15 +110,10 @@ sed -i s/tasks/target/ slf4j-api/pom.xml
 find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
     xargs -t sed -i 's/\r$//'
 
-# Remove wagon-ssh build extension
-%pom_xpath_remove "pom:extensions" parent
-%pom_xpath_remove "pom:dependency[pom:groupId='ch.qos.reload4j']" parent
-%pom_xpath_remove "pom:dependency[pom:groupId='ch.qos.reload4j']" slf4j-reload4j
+%pom_xpath_remove "pom:extensions"
 
 %mvn_package :::sources: sources
- 
-%mvn_package :%{name}-parent __noinstall
-%mvn_package :%{name}-site __noinstall
+
 %mvn_package :%{name}-api
 %mvn_package :%{name}-simple
 %mvn_package :%{name}-nop
@@ -138,63 +122,22 @@ find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
 %mvn_build -f -s -- -Drequired.jdk.version=1.8
 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}/%{name}
-for i in api jcl jdk14 nop simple; do
-  install -m 644 slf4j-${i}/target/slf4j-${i}-%{version}.jar \
-    %{buildroot}%{_javadir}/%{name}/${i}.jar
-  ln -sf ${i}.jar %{buildroot}%{_javadir}/%{name}/%{name}-${i}.jar
-done
-for i in jcl-over-slf4j log4j-over-slf4j; do
-  install -m 644 ${i}/target/${i}-%{version}.jar %{buildroot}%{_javadir}/%{name}/${i}.jar
-done
-
-# poms
-install -d -m 755 %{buildroot}%{_mavenpomdir}/%{name}
-for i in api jcl jdk14 nop simple; do
-  %pom_remove_parent slf4j-${i}
-  %pom_xpath_inject "pom:project" "
-    <groupId>org.slf4j</groupId>
-    <version>%{version}</version>" slf4j-${i}
-  install -pm 644 slf4j-${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
-done
-for i in jcl-over-slf4j log4j-over-slf4j; do
-  %pom_remove_parent ${i}
-  %pom_xpath_inject "pom:project" "
-    <groupId>org.slf4j</groupId>
-    <version>%{version}</version>" ${i}
-  install -pm 644 ${i}/pom.xml %{buildroot}%{_mavenpomdir}/%{name}/${i}.pom
-done
-for i in api nop simple; do
-  %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar
-done
-for i in jcl jdk14 jcl-over-slf4j log4j-over-slf4j; do
-  %add_maven_depmap %{name}/${i}.pom %{name}/${i}.jar -f ${i}
-done
+# Compat symlinks
+%mvn_file ':%{name}-{*}' %{name}/%{name}-@1 %{name}/@1
+%mvn_install
 
 # manual
 install -d -m 0755 %{buildroot}%{_docdir}/%{name}-%{version}
-rm -f target/site/.htaccess
-cp -pr target/site %{buildroot}%{_docdir}/%{name}-%{version}/
-install -m 644 LICENSE.txt %{buildroot}%{_docdir}/%{name}-%{version}/
-
-# javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
-cp -pr target/site/* %{buildroot}%{_javadocdir}/%{name}/
-rm -rf target/site
+rm -f .xmwn/apidoc
+cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 %files -f .mfiles
-%dir %{_docdir}/%{name}-%{version}
-%license %{_docdir}/%{name}-%{version}/LICENSE.txt
-%{_javadir}/%{name}/%{name}-api.jar
-%{_javadir}/%{name}/%{name}-nop.jar
-%{_javadir}/%{name}/%{name}-simple.jar
+%license LICENSE.txt APACHE-LICENSE
+%{_javadir}/%{name}/
+%{_datadir}/maven-metadata/
+%{_datadir}/maven-poms/
 
-%files jdk14 -f .mfiles-jdk14
-%{_javadir}/%{name}/%{name}-jdk14.jar
-
-%files jcl -f .mfiles-jcl
-%{_javadir}/%{name}/%{name}-jcl.jar
+%files jdk14 -f .mfiles-%{name}-jdk14
 
 %files -n jcl-over-slf4j -f .mfiles-jcl-over-slf4j
 
@@ -204,9 +147,12 @@ rm -rf target/site
 %{_javadocdir}/%{name}
 
 %files manual
-%{_docdir}/%{name}-%{version}/site
+%{_docdir}/%{name}-%{version}/
 
 %changelog
+* Thu Apr 04 2024 Henry Li <lihl@microsoft.com> - 2.0.7-1
+- rebuild with msopenjdk-17
+
 * Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
 - rebuild with msopenjdk-17
 
