@@ -79,35 +79,6 @@ func createNewImage(filename string, diskConfig imagecustomizerapi.Disk,
 	return nil
 }
 
-func createNewImageWithBootLoader(filename string, diskConfig imagecustomizerapi.Disk,
-	fileSystems []imagecustomizerapi.FileSystem, bootType imagecustomizerapi.BootType,
-	selinuxConfig imagecustomizerapi.SELinux, kernelCommandLine imagecustomizerapi.KernelCommandLine, buildDir string,
-	chrootDirName string, currentSELinuxMode imagecustomizerapi.SELinuxMode, installOS installOSFunc,
-) error {
-	imageConnection := NewImageConnection()
-	defer imageConnection.Close()
-
-	err := createNewImageHelper(imageConnection, filename, diskConfig, fileSystems, buildDir, chrootDirName,
-		installOS)
-	if err != nil {
-		return fmt.Errorf("failed to create new image:\n%w", err)
-	}
-
-	err = configureDiskBootLoader(imageConnection, fileSystems, bootType, selinuxConfig, kernelCommandLine,
-		currentSELinuxMode)
-	if err != nil {
-		return fmt.Errorf("failed to add bootloader to new image:\n%w", err)
-	}
-
-	// Close image.
-	err = imageConnection.CleanClose()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func createNewImageHelper(imageConnection *ImageConnection, filename string, diskConfig imagecustomizerapi.Disk,
 	fileSystems []imagecustomizerapi.FileSystem, buildDir string, chrootDirName string,
 	installOS installOSFunc,
