@@ -1,0 +1,130 @@
+diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
+index 7996960..c91b958 100644
+--- a/src/network/networkd-dhcp-common.c
++++ b/src/network/networkd-dhcp-common.c
+@@ -455,6 +455,36 @@ int config_parse_dhcp_use_domains(
+         return 0;
+ }
+ 
++int config_parse_default_dhcp_use_domains(
++                const char* unit,
++                const char *filename,
++                unsigned line,
++                const char *section,
++                unsigned section_line,
++                const char *lvalue,
++                int ltype,
++                const char *rvalue,
++                void *data,
++                void *userdata) {
++
++        DHCPUseDomains *use_domains = ASSERT_PTR(data);
++
++        assert(filename);
++        assert(lvalue);
++        assert(rvalue);
++
++        DHCPUseDomains d = dhcp_use_domains_from_string(rvalue);
++        if (d < 0) {
++                log_syntax(unit, LOG_WARNING, filename, line, d,
++                           "Failed to parse %s=%s, ignoring assignment: %m", lvalue, rvalue);
++                return 0;
++        }
++
++        *use_domains = d;
++
++        return 0;
++}
++
+ int config_parse_dhcp_use_ntp(
+                 const char* unit,
+                 const char *filename,
+diff --git a/src/network/networkd-dhcp-common.h b/src/network/networkd-dhcp-common.h
+index c19bc10..5a1d446 100644
+--- a/src/network/networkd-dhcp-common.h
++++ b/.src/network/networkd-dhcp-common.h
+@@ -92,6 +92,7 @@ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_or_ra_route_metric);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_dns);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_domains);
++CONFIG_PARSER_PROTOTYPE(config_parse_default_dhcp_use_domains);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_ntp);
+ CONFIG_PARSER_PROTOTYPE(config_parse_iaid);
+ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_or_ra_route_table);
+diff --git a/src/network/networkd-gperf.gperf b/src/network/networkd-gperf.gperf
+index 8ed90f0..19d78c9 100644
+--- a/src/network/networkd-gperf.gperf
++++ b/src/network/networkd-gperf.gperf
+@@ -26,8 +26,10 @@ Network.SpeedMeterIntervalSec,           config_parse_sec,
+ Network.ManageForeignRoutingPolicyRules, config_parse_bool,                      0,          offsetof(Manager, manage_foreign_rules)
+ Network.ManageForeignRoutes,             config_parse_bool,                      0,          offsetof(Manager, manage_foreign_routes)
+ Network.RouteTable,                      config_parse_route_table_names,         0,          0
++DHCPv4.DefaultUseDomains,                config_parse_default_dhcp_use_domains,  0,          offsetof(Manager, dhcp_use_domains)
+ DHCPv4.DUIDType,                         config_parse_duid_type,                 0,          offsetof(Manager, dhcp_duid)
+ DHCPv4.DUIDRawData,                      config_parse_duid_rawdata,              0,          offsetof(Manager, dhcp_duid)
++DHCPv6.DefaultUseDomains,                config_parse_default_dhcp_use_domains,  0,          offsetof(Manager, dhcp6_use_domains)
+ DHCPv6.DUIDType,                         config_parse_duid_type,                 0,          offsetof(Manager, dhcp6_duid)
+ DHCPv6.DUIDRawData,                      config_parse_duid_rawdata,              0,          offsetof(Manager, dhcp6_duid)
+ /* Deprecated */
+diff --git a/src/network/networkd-manager.c b/src/network/networkd-manager.c
+index 7e89366..4daa25f 100644
+--- a/src/network/networkd-manager.c
++++ b/src/network/networkd-manager.c
+@@ -474,7 +474,9 @@ int manager_new(Manager **ret, bool test_mode) {
+                 .manage_foreign_routes = true,
+                 .manage_foreign_rules = true,
+                 .ethtool_fd = -1,
++                .dhcp_use_domains = DHCP_USE_DOMAINS_NO,
+                 .dhcp_duid.type = DUID_TYPE_EN,
++                .dhcp6_use_domains = DHCP_USE_DOMAINS_NO,
+                 .dhcp6_duid.type = DUID_TYPE_EN,
+                 .duid_product_uuid.type = DUID_TYPE_UUID,
+         };
+diff --git a/src/network/networkd-manager.h b/src/network/networkd-manager.h
+index 3631358..cd0012c 100644
+--- a/src/network/networkd-manager.h
++++ b/src/network/networkd-manager.h
+@@ -54,6 +54,9 @@ struct Manager {
+         OrderedSet *address_pools;
+         Set *dhcp_pd_subnet_ids;
+ 
++        DHCPUseDomains dhcp_use_domains;
++        DHCPUseDomains dhcp6_use_domains;
++
+         usec_t network_dirs_ts_usec;
+ 
+         DUID dhcp_duid;
+diff --git a/src/network/networkd-network.c b/src/network/networkd-network.c
+index 873ad2e..ddec0e1 100644
+--- a/src/network/networkd-network.c
++++ b/src/network/networkd-network.c
+@@ -393,6 +393,7 @@ int network_load_one(Manager *manager, OrderedHashmap **networks, const char *fi
+                 .dhcp_use_sip = true,
+                 .dhcp_use_dns = true,
+                 .dhcp_routes_to_dns = true,
++                .dhcp_use_domains = manager->dhcp_use_domains,
+                 .dhcp_use_hostname = true,
+                 .dhcp_use_routes = true,
+                 .dhcp_use_gateway = -1,
+@@ -407,6 +408,7 @@ int network_load_one(Manager *manager, OrderedHashmap **networks, const char *fi
+                 .dhcp6_use_address = true,
+                 .dhcp6_use_pd_prefix = true,
+                 .dhcp6_use_dns = true,
++                .dhcp6_use_domains = manager->dhcp6_use_domains,
+                 .dhcp6_use_hostname = true,
+                 .dhcp6_use_ntp = true,
+                 .dhcp6_duid.type = _DUID_TYPE_INVALID,
+diff --git a/src/network/networkd.conf b/src/network/networkd.conf
+index 38dc9f1..008cf9e 100644
+--- a/src/network/networkd.conf
++++ b/src/network/networkd.conf
+@@ -22,7 +22,9 @@
+ [DHCPv4]
+ #DUIDType=vendor
+ #DUIDRawData=
++#DefaultUseDomains=no
+ 
+ [DHCPv6]
+ #DUIDType=vendor
+ #DUIDRawData=
++#DefaultUseDomains=no
