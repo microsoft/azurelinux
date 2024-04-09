@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 )
 
 type Partition struct {
@@ -16,13 +16,13 @@ type Partition struct {
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"start"`
+	Start DiskSize `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"end"`
+	End *DiskSize `yaml:"end"`
 	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"size"`
-	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"flags"`
+	Size *DiskSize `yaml:"size"`
+	// Type specifies the type of partition the partition is.
+	Type PartitionType `yaml:"type"`
 }
 
 func (p *Partition) IsValid() error {
@@ -39,23 +39,21 @@ func (p *Partition) IsValid() error {
 		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
-	for _, f := range p.Flags {
-		err := f.IsValid()
-		if err != nil {
-			return err
-		}
+	err = p.Type.IsValid()
+	if err != nil {
+		return err
 	}
 
 	if p.IsBiosBoot() {
-		if p.Start != 1 {
-			return fmt.Errorf("BIOS boot partition must start at block 1")
+		if p.Start != diskutils.MiB {
+			return fmt.Errorf("BIOS boot partition must start at 1 MiB")
 		}
 	}
 
 	return nil
 }
 
-func (p *Partition) GetEnd() (uint64, bool) {
+func (p *Partition) GetEnd() (DiskSize, bool) {
 	if p.End != nil {
 		return *p.End, true
 	}
@@ -68,11 +66,11 @@ func (p *Partition) GetEnd() (uint64, bool) {
 }
 
 func (p *Partition) IsESP() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
+	return p.Type == PartitionTypeESP
 }
 
 func (p *Partition) IsBiosBoot() bool {
-	return sliceutils.ContainsValue(p.Flags, PartitionFlagBiosGrub)
+	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

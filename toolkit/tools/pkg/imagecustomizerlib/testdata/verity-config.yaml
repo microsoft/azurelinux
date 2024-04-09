@@ -2,31 +2,29 @@ storage:
   bootType: efi
   disks:
   - partitionTableType: gpt
-    maxSize: 5120
+    maxSize: 5120M
     partitions:
     - id: esp
-      flags:
-      - esp
-      - boot
-      start: 1
-      end: 9
+      type: esp
+      start: 1M
+      end: 9M
 
     - id: boot
-      start: 9
-      end: 1024
+      start: 9M
+      end: 1024M
 
     - id: root
       label: root
-      start: 1024
-      end: 3072
+      start: 1024M
+      end: 3072M
 
     - id: verityhash
       label: root-hash
-      start: 3072
-      end: 3200
+      start: 3072M
+      end: 3200M
 
     - id: var
-      start: 3200
+      start: 3200M
 
   fileSystems:
   - deviceId: esp

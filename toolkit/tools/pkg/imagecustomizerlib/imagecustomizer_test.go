@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
@@ -277,17 +278,17 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	// Use a prototypical Azure Linux image partition config.
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
-		MaxSize:            4096,
+		MaxSize:            4 * diskutils.GiB,
 		Partitions: []imagecustomizerapi.Partition{
 			{
 				Id:    "boot",
-				Flags: []imagecustomizerapi.PartitionFlag{"esp", "boot"},
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(9)),
+				Type:  imagecustomizerapi.PartitionTypeESP,
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(imagecustomizerapi.DiskSize(9 * diskutils.MiB)),
 			},
 			{
 				Id:    "rootfs",
-				Start: 9,
+				Start: 9 * diskutils.MiB,
 				End:   nil,
 			},
 		},

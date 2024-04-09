@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,15 +14,12 @@ func TestStorageIsValidDuplicatePartitionID(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
 			PartitionTableType: "gpt",
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
-					},
+					Start: 1 * diskutils.MiB,
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},
@@ -53,13 +51,12 @@ func TestStorageIsValidUnsupportedFileSystem(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "a",
-					Start: 1,
+					Start: 1 * diskutils.MiB,
 					End:   nil,
-					Flags: nil,
 				},
 			},
 		}},
@@ -81,13 +78,13 @@ func TestStorageIsValidBadEspFsType(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1,
+					Start: 1 * diskutils.MiB,
 					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagESP, PartitionFlagBoot},
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},
@@ -109,13 +106,13 @@ func TestStorageIsValidBadBiosBootFsType(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "bios",
-					Start: 1,
+					Start: 1 * diskutils.MiB,
 					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagBiosGrub},
+					Type:  PartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -137,13 +134,13 @@ func TestStorageIsValidBadBiosBootStart(t *testing.T) {
 	storage := Storage{
 		Disks: []Disk{{
 			PartitionTableType: PartitionTableTypeGpt,
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "bios",
-					Start: 2,
+					Start: 2 * diskutils.MiB,
 					End:   nil,
-					Flags: []PartitionFlag{PartitionFlagBiosGrub},
+					Type:  PartitionTypeBiosGrub,
 				},
 			},
 		}},
@@ -158,22 +155,19 @@ func TestStorageIsValidBadBiosBootStart(t *testing.T) {
 
 	err := storage.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "BIOS boot partition must start at block 1")
+	assert.ErrorContains(t, err, "BIOS boot partition must start at 1 MiB")
 }
 
 func TestStorageIsValidBadDeviceId(t *testing.T) {
 	value := Storage{
 		Disks: []Disk{{
 			PartitionTableType: "gpt",
-			MaxSize:            2048,
+			MaxSize:            2 * diskutils.GiB,
 			Partitions: []Partition{
 				{
 					Id:    "esp",
-					Start: 1,
-					Flags: []PartitionFlag{
-						"esp",
-						"boot",
-					},
+					Start: 1 * diskutils.MiB,
+					Type:  PartitionTypeESP,
 				},
 			},
 		}},
