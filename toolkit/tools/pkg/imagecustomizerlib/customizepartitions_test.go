@@ -4,10 +4,12 @@
 package imagecustomizerlib
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +31,7 @@ func TestCustomizeImagePartitions(t *testing.T) {
 	// Check output file type.
 	checkFileType(t, outImageFilePath, "raw")
 
-	imageConnection, err := connectToImage(buildDir, outImageFilePath, []mountPoint{
+	mountPoints := []mountPoint{
 		{
 			PartitionNum:   3,
 			Path:           "/",
@@ -50,14 +52,17 @@ func TestCustomizeImagePartitions(t *testing.T) {
 			Path:           "/var",
 			FileSystemType: "xfs",
 		},
-	})
+	}
+
+	imageConnection, err := connectToImage(buildDir, outImageFilePath, mountPoints)
 	if !assert.NoError(t, err) {
 		return
 	}
 	defer imageConnection.Close()
 
 	// Check for key files/directories on the partitions.
-	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/etc/fstab"))
+	fstabPath := filepath.Join(imageConnection.Chroot().RootDir(), "/etc/fstab")
+	_, err = os.Stat(fstabPath)
 	assert.NoError(t, err, "check for /etc/fstab")
 
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/usr/bin/bash"))
@@ -71,4 +76,25 @@ func TestCustomizeImagePartitions(t *testing.T) {
 
 	_, err = os.Stat(filepath.Join(imageConnection.Chroot().RootDir(), "/var/log"))
 	assert.NoError(t, err, "check for /var/log")
+
+	// Check that the fstab entries are correct.
+	fstabEntries, err := diskutils.ReadFstabFile(fstabPath)
+	assert.NoError(t, err, "read /etc/fstab")
+
+	partitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	assert.NoError(t, err, "get disk partitions")
+
+	assert.Equal(t, len(mountPoints), len(fstabEntries), "/etc/fstab entries count")
+
+	for i := range mountPoints {
+		mountPoint := mountPoints[i]
+		fstabEntry := fstabEntries[i]
+		partition := partitions[mountPoint.PartitionNum]
+
+		assert.Equalf(t, mountPoint.FileSystemType, fstabEntry.FsType, "fstab [%d]: file system type", i)
+		assert.Equalf(t, mountPoint.Path, fstabEntry.Target, "fstab [%d]: target path", i)
+
+		expectedSource := fmt.Sprintf("PARTUUID=%s", partition.PartUuid)
+		assert.Equalf(t, expectedSource, fstabEntry.Source, "fstab [%d]: source", i)
+	}
 }
