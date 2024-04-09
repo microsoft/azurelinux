@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ Patch23:        0023-systemd-tmpfiles-loadkeys-Read-var_t-symlinks.patch
 Patch24:        0024-systemd-tmpfiles-create-root-and-root-.ssh.patch
 Patch25:        0025-kernel-Exec-systemctl.patch
 Patch26:        0026-getty-grant-checkpoint_restore.patch
+Patch27:        0027-systemd-Add-basic-systemd-analyze-rules.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -328,11 +329,15 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Tue Apr 09 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
+- Add mising rules for systemd-analyze.
+
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-2
 - Add fixes from BVTs
 - Add new systemd pidfd uses
 - Add new pressure stall information in systemd
 - Fixes for systemd-tmpfiles and loadkeys
+
 * Tue Mar 12 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-1
 - Rebase to upstream release 2.20240226.
 
