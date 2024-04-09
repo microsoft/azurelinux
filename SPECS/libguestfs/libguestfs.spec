@@ -1150,7 +1150,7 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
-* Wed Apr 3 2024 Jon Slobodzian <joslobo@microsoft.com> - 1.52.0-2
+* Wed Apr 03 2024 Jon Slobodzian <joslobo@microsoft.com> - 1.52.0-2
 * Remove dependency on zfs-fuse
 
 * Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
