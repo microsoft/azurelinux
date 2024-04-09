@@ -289,6 +289,9 @@ fi
 %files lang -f %{name}.lang
 
 %changelog
+* Mon Apr 08 2024 Henry Li <lihl@microsoft.com> - 250.3-21
+- Add patch to allow configurability of "UseDomains=" for networkd
+
 * Thu Mar 14 2024 Dan Streetman <ddstreet@microsoft.com> - 250.3-20
 - force use of lz4 for coredump
 
