@@ -13142,8 +13142,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd-cc",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.1.tar.gz"
+          "version": "1.7.7",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },
