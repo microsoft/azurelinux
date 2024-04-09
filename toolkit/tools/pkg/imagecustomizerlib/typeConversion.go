@@ -8,6 +8,8 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 func bootTypeToImager(bootType imagecustomizerapi.BootType) (string, error) {
@@ -23,20 +25,26 @@ func bootTypeToImager(bootType imagecustomizerapi.BootType) (string, error) {
 	}
 }
 
-func diskConfigToImager(diskConfig imagecustomizerapi.Disk) (configuration.Disk, error) {
+func diskConfigToImager(diskConfig imagecustomizerapi.Disk, fileSystems []imagecustomizerapi.FileSystem,
+) (configuration.Disk, error) {
 	imagerPartitionTableType, err := partitionTableTypeToImager(diskConfig.PartitionTableType)
 	if err != nil {
 		return configuration.Disk{}, err
 	}
 
-	imagerPartitions, err := partitionsToImager(diskConfig.Partitions)
+	imagerPartitions, err := partitionsToImager(diskConfig.Partitions, fileSystems)
 	if err != nil {
 		return configuration.Disk{}, err
 	}
 
+	imagerMaxSize := diskConfig.MaxSize / diskutils.MiB
+	if diskConfig.MaxSize%diskutils.MiB != 0 {
+		return configuration.Disk{}, fmt.Errorf("disk max size (%d) must be a multiple of 1 MiB", diskConfig.MaxSize)
+	}
+
 	imagerDisk := configuration.Disk{
 		PartitionTableType: imagerPartitionTableType,
-		MaxSize:            diskConfig.MaxSize,
+		MaxSize:            uint64(imagerMaxSize),
 		Partitions:         imagerPartitions,
 	}
 	return imagerDisk, err
@@ -53,10 +61,11 @@ func partitionTableTypeToImager(partitionTableType imagecustomizerapi.PartitionT
 	}
 }
 
-func partitionsToImager(partitions []imagecustomizerapi.Partition) ([]configuration.Partition, error) {
+func partitionsToImager(partitions []imagecustomizerapi.Partition, fileSystems []imagecustomizerapi.FileSystem,
+) ([]configuration.Partition, error) {
 	imagerPartitions := []configuration.Partition(nil)
 	for _, partition := range partitions {
-		imagerPartition, err := partitionToImager(partition)
+		imagerPartition, err := partitionToImager(partition, fileSystems)
 		if err != nil {
 			return nil, err
 		}
@@ -67,60 +76,65 @@ func partitionsToImager(partitions []imagecustomizerapi.Partition) ([]configurat
 	return imagerPartitions, nil
 }
 
-func partitionToImager(partition imagecustomizerapi.Partition) (configuration.Partition, error) {
-	imagerEnd, _ := partition.GetEnd()
+func partitionToImager(partition imagecustomizerapi.Partition, fileSystems []imagecustomizerapi.FileSystem,
+) (configuration.Partition, error) {
+	fileSystem, foundMountPoint := sliceutils.FindValueFunc(fileSystems,
+		func(fileSystem imagecustomizerapi.FileSystem) bool {
+			return fileSystem.DeviceId == partition.Id
+		},
+	)
+	if !foundMountPoint {
+		return configuration.Partition{}, fmt.Errorf("failed to find mount point with ID (%s)", partition.Id)
+	}
 
-	imagerFlags, err := partitionFlagsToImager(partition.Flags)
+	imagerStart := partition.Start / diskutils.MiB
+	if partition.Start%diskutils.MiB != 0 {
+		return configuration.Partition{}, fmt.Errorf("partition start (%d) must be a multiple of 1 MiB", partition.Start)
+	}
+
+	end, _ := partition.GetEnd()
+	imagerEnd := end / diskutils.MiB
+	if end%diskutils.MiB != 0 {
+		return configuration.Partition{}, fmt.Errorf("partition end (%d) must be a multiple of 1 MiB", end)
+	}
+
+	imagerFlags, err := toImagerPartitionFlags(partition.Type)
 	if err != nil {
 		return configuration.Partition{}, err
 	}
 
 	imagerPartition := configuration.Partition{
-		ID:     partition.ID,
-		FsType: string(partition.FileSystemType),
+		ID:     partition.Id,
+		FsType: string(fileSystem.Type),
 		Name:   partition.Label,
-		Start:  partition.Start,
-		End:    imagerEnd,
+		Start:  uint64(imagerStart),
+		End:    uint64(imagerEnd),
 		Flags:  imagerFlags,
 	}
 	return imagerPartition, nil
 }
 
-func partitionFlagsToImager(flags []imagecustomizerapi.PartitionFlag) ([]configuration.PartitionFlag, error) {
-	imagerFlags := []configuration.PartitionFlag(nil)
-	for _, flag := range flags {
-		imagerFlag, err := partitionFlagToImager(flag)
-		if err != nil {
-			return nil, err
-		}
+func toImagerPartitionFlags(partitionType imagecustomizerapi.PartitionType) ([]configuration.PartitionFlag, error) {
+	switch partitionType {
+	case imagecustomizerapi.PartitionTypeESP:
+		return []configuration.PartitionFlag{configuration.PartitionFlagESP, configuration.PartitionFlagBoot}, nil
 
-		imagerFlags = append(imagerFlags, imagerFlag)
-	}
+	case imagecustomizerapi.PartitionTypeBiosGrub:
+		return []configuration.PartitionFlag{configuration.PartitionFlagBiosGrub}, nil
 
-	return imagerFlags, nil
-}
-
-func partitionFlagToImager(flag imagecustomizerapi.PartitionFlag) (configuration.PartitionFlag, error) {
-	switch flag {
-	case imagecustomizerapi.PartitionFlagESP:
-		return configuration.PartitionFlagESP, nil
-
-	case imagecustomizerapi.PartitionFlagBiosGrub:
-		return configuration.PartitionFlagBiosGrub, nil
-
-	case imagecustomizerapi.PartitionFlagBoot:
-		return configuration.PartitionFlagBoot, nil
+	case imagecustomizerapi.PartitionTypeDefault:
+		return nil, nil
 
 	default:
-		return "", fmt.Errorf("unknown partition flag (%s)", flag)
+		return nil, fmt.Errorf("unknown partition type (%s)", partitionType)
 	}
 }
 
-func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionSetting,
+func partitionSettingsToImager(fileSystems []imagecustomizerapi.FileSystem,
 ) ([]configuration.PartitionSetting, error) {
 	imagerPartitionSettings := []configuration.PartitionSetting(nil)
-	for _, partitionSetting := range partitionSettings {
-		imagerPartitionSetting, err := partitionSettingToImager(partitionSetting)
+	for _, fileSystem := range fileSystems {
+		imagerPartitionSetting, err := partitionSettingToImager(fileSystem)
 		if err != nil {
 			return nil, err
 		}
@@ -129,18 +143,27 @@ func partitionSettingsToImager(partitionSettings []imagecustomizerapi.PartitionS
 	return imagerPartitionSettings, nil
 }
 
-func partitionSettingToImager(partitionSettings imagecustomizerapi.PartitionSetting,
+func partitionSettingToImager(fileSystem imagecustomizerapi.FileSystem,
 ) (configuration.PartitionSetting, error) {
-	imagerMountIdentifierType, err := mountIdentifierTypeToImager(partitionSettings.MountIdentifierType)
+	mountIdType := imagecustomizerapi.MountIdentifierTypeDefault
+	mountOptions := ""
+	mountPath := ""
+	if fileSystem.MountPoint != nil {
+		mountIdType = fileSystem.MountPoint.IdType
+		mountOptions = fileSystem.MountPoint.Options
+		mountPath = fileSystem.MountPoint.Path
+	}
+
+	imagerMountIdentifierType, err := mountIdentifierTypeToImager(mountIdType)
 	if err != nil {
 		return configuration.PartitionSetting{}, err
 	}
 
 	imagerPartitionSetting := configuration.PartitionSetting{
-		ID:              partitionSettings.ID,
+		ID:              fileSystem.DeviceId,
 		MountIdentifier: imagerMountIdentifierType,
-		MountOptions:    partitionSettings.MountOptions,
-		MountPoint:      partitionSettings.MountPoint,
+		MountOptions:    mountOptions,
+		MountPoint:      mountPath,
 	}
 	return imagerPartitionSetting, nil
 }

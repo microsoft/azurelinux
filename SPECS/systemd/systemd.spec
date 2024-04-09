@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        11%{?dist}
+Release:        10%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -275,7 +275,6 @@ Provides:       /sbin/shutdown
 Provides:       syslog
 Provides:       systemd-units = %{version}-%{release}
 Obsoletes:      systemd-bootstrap <= %{version}-%{release}
-Provides:       systemd-bootstrap = %{version}-%{release}
 Obsoletes:      system-setup-keyboard < 0.9
 Provides:       system-setup-keyboard = 0.9
 # systemd-sysv-convert was removed in f20: https://fedorahosted.org/fpc/ticket/308
@@ -349,7 +348,6 @@ Obsoletes:      nss-myhostname < 0.4
 Provides:       nss-myhostname = 0.4
 Provides:       nss-myhostname%{_isa} = 0.4
 Obsoletes:      systemd-bootstrap-libs <= %{version}-%{release}
-Provides:       systemd-bootstrap-libs = %{version}-%{release}
 
 %description libs
 Libraries for systemd and udev.
@@ -365,7 +363,6 @@ Systemd PAM module registers the session with systemd-logind.
 Summary:        Macros that define paths and scriptlets related to systemd
 BuildArch:      noarch
 Obsoletes:      systemd-bootstrap-rpm-macros <= %{version}-%{release}
-Provides:       systemd-bootstrap-rpm-macros = %{version}-%{release}
 
 %description rpm-macros
 Just the definitions of rpm macros.
@@ -385,7 +382,6 @@ Provides:       libudev-devel = %{version}
 Provides:       libudev-devel%{_isa} = %{version}
 Obsoletes:      libudev-devel < 183
 Obsoletes:      systemd-bootstrap-devel <= %{version}-%{release}
-Provides:       systemd-bootstrap-devel = %{version}-%{release}
 
 %description devel
 Development headers and auxiliary files for developing applications linking
@@ -1194,11 +1190,8 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Thu Mar 21 2024 Dan Streetman <ddstreet@microsoft.com> - 255-11
+* Thu Mar 21 2024 Dan Streetman <ddstreet@microsoft.com> - 255-10
 - add networkd manager conf setting to control default UseDomains value
-
-* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-10
-- provide the "bootstrap" package names
 
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-9
 - build dep the "bootstrap" macros because our maint scripts are broken without

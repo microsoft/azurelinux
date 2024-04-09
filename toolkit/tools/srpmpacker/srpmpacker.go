@@ -107,7 +107,7 @@ var (
 
 	buildDir     = app.Flag("build-dir", "Directory to store temporary files while building.").Default(defaultBuildDir).String()
 	distTag      = app.Flag("dist-tag", "The distribution tag SRPMs will be built with.").Required().String()
-	packListFile = app.Flag("pack-list", "Path to a list of SPECs to pack. If empty will pack all SPECs.").ExistingFile()
+	srpmPackList = app.Flag("pack-list", "List of SPECs to pack. If empty will pack all SPECs.").Default("").String()
 	runCheck     = app.Flag("run-check", "Whether or not to run the spec file's check section during package build.").Bool()
 
 	workers          = app.Flag("workers", "Number of concurrent goroutines to parse with.").Default(defaultWorkerCount).Uint()
@@ -185,7 +185,7 @@ func main() {
 
 	// A pack list may be provided, if so only pack this subset.
 	// If non is provided, pack all srpms.
-	packList, err := packagelist.ParsePackageListFile(*packListFile)
+	packList, err := packagelist.ParsePackageList(*srpmPackList)
 	logger.PanicOnError(err)
 
 	err = createAllSRPMsWrapper(*specsDir, *distTag, *buildDir, *outDir, *workerTar, *workers, *concurrentNetOps, *nestedSourcesDir, *repackAll, *runCheck, packList, templateSrcConfig)

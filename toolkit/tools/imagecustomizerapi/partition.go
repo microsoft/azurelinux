@@ -7,74 +7,53 @@ import (
 	"fmt"
 	"unicode"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 )
 
 type Partition struct {
 	// ID is used to correlate `Partition` objects with `PartitionSetting` objects.
-	ID string `yaml:"id"`
-	// FileSystemType is the type of file system to use on the partition.
-	FileSystemType FileSystemType `yaml:"fileSystemType"`
+	Id string `yaml:"id"`
 	// Name is the label to assign to the partition.
 	Label string `yaml:"label"`
 	// Start is the offset where the partition begins (inclusive), in MiBs.
-	Start uint64 `yaml:"start"`
+	Start DiskSize `yaml:"start"`
 	// End is the offset where the partition ends (exclusive), in MiBs.
-	End *uint64 `yaml:"end"`
+	End *DiskSize `yaml:"end"`
 	// Size is the size of the partition in MiBs.
-	Size *uint64 `yaml:"size"`
-	// Flags assigns features to the partition.
-	Flags []PartitionFlag `yaml:"flags"`
+	Size *DiskSize `yaml:"size"`
+	// Type specifies the type of partition the partition is.
+	Type PartitionType `yaml:"type"`
 }
 
 func (p *Partition) IsValid() error {
-	err := p.FileSystemType.IsValid()
-	if err != nil {
-		return fmt.Errorf("invalid partition (%s) fileSystemType value:\n%w", p.ID, err)
-	}
-
-	err = isGPTNameValid(p.Label)
+	err := isGPTNameValid(p.Label)
 	if err != nil {
 		return err
 	}
 
 	if p.End != nil && p.Size != nil {
-		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.ID)
+		return fmt.Errorf("cannot specify both end and size on partition (%s)", p.Id)
 	}
 
 	if (p.End != nil && p.Start >= *p.End) || (p.Size != nil && *p.Size <= 0) {
-		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.ID)
+		return fmt.Errorf("partition's (%s) size can't be 0 or negative", p.Id)
 	}
 
-	for _, f := range p.Flags {
-		err := f.IsValid()
-		if err != nil {
-			return err
-		}
+	err = p.Type.IsValid()
+	if err != nil {
+		return err
 	}
 
-	isESP := sliceutils.ContainsValue(p.Flags, PartitionFlagESP)
-	if isESP {
-		if p.FileSystemType != FileSystemTypeFat32 {
-			return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
-		}
-	}
-
-	isBiosBoot := sliceutils.ContainsValue(p.Flags, PartitionFlagBiosGrub)
-	if isBiosBoot {
-		if p.Start != 1 {
-			return fmt.Errorf("BIOS boot partition must start at block 1")
-		}
-
-		if p.FileSystemType != FileSystemTypeFat32 {
-			return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
+	if p.IsBiosBoot() {
+		if p.Start != diskutils.MiB {
+			return fmt.Errorf("BIOS boot partition must start at 1 MiB")
 		}
 	}
 
 	return nil
 }
 
-func (p *Partition) GetEnd() (uint64, bool) {
+func (p *Partition) GetEnd() (DiskSize, bool) {
 	if p.End != nil {
 		return *p.End, true
 	}
@@ -84,6 +63,14 @@ func (p *Partition) GetEnd() (uint64, bool) {
 	}
 
 	return 0, false
+}
+
+func (p *Partition) IsESP() bool {
+	return p.Type == PartitionTypeESP
+}
+
+func (p *Partition) IsBiosBoot() bool {
+	return p.Type == PartitionTypeBiosGrub
 }
 
 // isGPTNameValid checks if a GPT partition name is valid.

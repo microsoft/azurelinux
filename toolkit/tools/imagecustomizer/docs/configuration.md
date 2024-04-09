@@ -29,7 +29,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 7. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([modules](#modules-type))
+8. Configure kernel modules. ([modules](#modules-module))
 
 9. Write the `/etc/mariner-customizer-release` file.
 
@@ -48,9 +48,11 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 14. Delete `/etc/resolv.conf` file.
 
-15. Enable dm-verity root protection.
+15. Enable overlay filesystem. ([overlay](#overlay-type))
 
-16. if the output format is set to `iso`, copy additional iso media files.
+16. Enable dm-verity root protection. ([verity](#verity-type))
+
+17. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -84,58 +86,65 @@ os:
 ## Schema Overview
 
 - [config type](#config-type)
-  - [disks](#disks-disk)
-    - [disk type](#disk-type)
-      - [partitionTableType](#partitiontabletype-string)
-      - [maxSize](#maxsize-uint64)
-      - [partitions](#partitions-partition)
-        - [partition type](#partition-type)
-          - [id](#id-string)
-          - [fileSystemType](#filesystemtype-string)
-          - [label](#partition-label)
-          - [start](#start-uint64)
-          - [end](#end-uint64)
-          - [size](#size-uint64)
-          - [flag](#flags-string)
+  - [storage](#storage-storage)
+    - [bootType](#boottype-string)
+    - [disks](#disks-disk)
+      - [disk type](#disk-type)
+        - [partitionTableType](#partitiontabletype-string)
+        - [maxSize](#maxsize-uint64)
+        - [partitions](#partitions-partition)
+          - [partition type](#partition-type)
+            - [id](#id-string)
+            - [label](#label-string)
+            - [start](#start-uint64)
+            - [end](#end-uint64)
+            - [size](#size-uint64)
+            - [type](#partition-type-string)
+    - [fileSystems](#filesystems-filesystem)
+      - [fileSystem type](#filesystem-type)
+        - [deviceId](#deviceid-string)
+        - [type](#type-string)
+        - [mountPoint](#mountpoint-mountpoint)
+          - [mountPoint type](#mountpoint-type)
+            - [idType](#idtype-string)
+            - [options](#options-string)
+            - [path](#mountpoint-path)
   - [iso](#iso-type)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
-        - [path](#path-string)
+        - [path](#fileconfig-path)
         - [permissions](#permissions-string)
+    - [kernelCommandLine](#kernelcommandline-type)
+      - [extraCommandLine](#extracommandline-string)
   - [os type](#os-type)
-    - [bootType](#boottype-string)
     - [resetBootLoaderType](#resetbootloadertype-string)
     - [hostname](#hostname-string)
     - [kernelCommandLine](#kernelcommandline-type)
       - [extraCommandLine](#extracommandline-string)
-    - [updateBaseImagePackages](#updatebaseimagepackages-bool)
-    - [packageListsInstall](#packagelistsinstall-string)
-      - [packageList type](#packagelist-type)
-        - [packages](#packages-string)
-    - [packagesInstall](#packagesinstall-string)
-    - [packageListsRemove](#packagelistsremove-string)
-      - [packageList type](#packagelist-type)
-        - [packages](#packages-string)
-    - [packagesRemove](#packagesremove-string)
-    - [packageListsUpdate](#packagelistsupdate-string)
-    - [packagesUpdate](#packagesupdate-string)
+    - [packages](#packages-packages)
+      - [packages type](#packages-type)
+        - [updateExistingPackages](#updateexistingpackages-bool)
+        - [installLists](#installlists-string)
+          - [packageList type](#packagelist-type)
+            - [packages](#packages-string)
+        - [install](#install-string)
+        - [removeLists](#removelists-string)
+          - [packageList type](#packagelist-type)
+            - [packages](#packages-string)
+        - [remove](#remove-string)
+        - [updateLists](#updatelists-string)
+        - [update](#update-string)
     - [additionalFiles](#additionalfiles-mapstring-fileconfig)
       - [fileConfig type](#fileconfig-type)
-        - [path](#path-string)
+        - [path](#fileconfig-path)
         - [permissions](#permissions-string)
-    - [partitionSettings](#partitionsettings-partitionsetting)
-      - [partitionSetting type](#partitionsetting-type)
-        - [id](#id-string)
-        - [mountIdentifierType](#mountidentifiertype-string)
-        - [mountOptions](#mountoptions-string)
-        - [mountPoint](#mountpoint-string)
     - [postInstallScripts](#postinstallscripts-script)
       - [script type](#script-type)
-        - [path](#path-string)
+        - [path](#script-path)
         - [args](#args-string)
     - [finalizeImageScripts](#finalizeimagescripts-script)
       - [script type](#script-type)
-        - [path](#path-string)
+        - [path](#script-path)
         - [args](#args-string)
     - [users](#users-user)
       - [user type](#user-type)
@@ -152,13 +161,12 @@ os:
     - [services](#services-type)
       - [enable](#enable-string)
       - [disable](#disable-string)
-    - [modules](#modules-type)
-      - [load](#load-module)
-        - [module type](#module-type)
-          - [name](#module-name)
-      - [disable](#disable-module)
-        - [module type](#module-type)
-          - [name](#module-name)
+    - [modules](#modules-module)
+      - [module type](#module-type)
+        - [name](#module-name)
+        - [loadMode](#loadMode-string)
+        - [options](#options-mapstring-string)
+    - [overlay type](#overlay-type)
     - [verity type](#verity-type)
 
 ## Top-level
@@ -169,47 +177,43 @@ The top level type for the YAML file is the [config](#config-type) type.
 
 The top-level type of the configuration.
 
-### disks [[disk](#disk-type)[]]
+### storage [[storage](#storage-type)]
 
-Contains the options for provisioning disks and their partitions.
-
-If the Disks field isn't specified, then the partitions of the base image aren't
-changed.
-
-If Disks is specified, then both [os.bootType](#boottype-string) and
-[os.resetBootLoaderType](#resetbootloadertype-string) must also be
-specified.
+Contains the options for provisioning disks, partitions, and file systems.
 
 While Disks is a list, only 1 disk is supported at the moment.
 Support for multiple disks may (or may not) be added in the future.
 
 ```yaml
-disks:
-- partitionTableType: gpt
-  maxSize: 4096
-  partitions:
-  - id: esp
-    flags:
-    - esp
-    - boot
-    start: 1
-    end: 9
-    fileSystemType: fat32
+storage:
+  bootType: efi
 
-  - id: rootfs
-    start: 9
-    fileSystemType: ext4
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: rootfs
+      start: 9M
+      
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
 
 os:
-  bootType: efi
   resetBootLoaderType: hard-reset
-  partitionSettings:
-  - id: esp
-    mountPoint: /boot/efi
-    mountOptions: umask=0077
-
-  - id: rootfs
-    mountPoint: /
 ```
 
 ### os [[os](#os-type)]
@@ -237,7 +241,11 @@ Supported options:
 
 ### maxSize [uint64]
 
-The size of the disk, specified in mebibytes (MiB).
+The size of the disk.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### partitions [[partition](#partition-type)[]]
 
@@ -255,9 +263,63 @@ Specifies the configuration for the generated ISO media.
 
 - See [additionalFiles](#additionalfiles-mapstring-fileconfig).
 
+## overlay type
+
+Specifies the configuration for overlay filesystem.
+
+- `lowerDir`: This directory acts as the read-only layer in the overlay
+  filesystem. It contains the base files and directories which will be overlaid
+  by the upperDir. Changes to the overlay filesystem do not affect the contents
+  of lowerDir.
+
+- `upperDir`: This directory is the writable layer of the overlay filesystem.
+  Any modifications, such as file additions, deletions, or changes, are made in
+  the upperDir. These changes are what make the overlay filesystem appear
+  different from the lowerDir alone.
+
+- `workDir`: This is a required directory used for preparing files before they
+  are merged into the upperDir. It needs to be on the same filesystem as the
+  upperDir and is used for temporary storage by the overlay filesystem to ensure
+  atomic operations. The workDir is not directly accessible to users.
+
+- `partition`: Optional field: If configured, a partition will be attached to
+  the current targeted overlay, making it persistent and ensuring that changes
+  are retained. If not configured, the overlay will be volatile.
+
+  - `idType`: Specifies the type of id for the partition. The options are
+    `part-label` (partition label), `uuid` (filesystem UUID), and `part-uuid`
+    (partition UUID).
+
+  - `id`: The unique identifier value of the partition, corresponding to the
+    specified IdType.
+
+Example:
+
+```yaml
+os:
+  overlays:
+    - lowerDir: /etc
+      upperDir: /upper_etc
+      workDir: /work_etc
+      partition:
+        idType: part-label
+        Id: partition-etc
+    - lowerDir: /var/lib
+      upperDir: /upper_var_lib
+      workDir: /work_var_lib
+    - lowerDir: /var/log
+      upperDir: /upper_var_log
+      workDir: /work_var_log
+```
+
 ## verity type
 
-Specifies the configuration for dm-verity root integrity verification.
+Specifies the configuration for dm-verity root integrity verification. Please
+execute `sudo modprobe nbd` before building the image with verity enablement.
+
+Please enable overlays for the `/var/lib` and `/var/log` directories, along with
+verity enablement, to ensure proper functioning of services. For an example,
+please refer to the [overlay type](#overlay-type) section.
 
 - `dataPartition`: A partition configured with dm-verity, which verifies integrity
   at each system boot.
@@ -291,6 +353,8 @@ Specifies options for placing a file in the OS.
 
 Type is used by: [additionalFiles](#additionalfiles-mapstring-fileconfig)
 
+<div id="fileconfig-path"></div>
+
 ### path [string]
 
 The absolute path of the destination file.
@@ -321,6 +385,33 @@ os:
     - path: /a.txt
       permissions: "664"
 ```
+
+## fileSystem type
+
+Specifies the mount options for a partition.
+
+### deviceId [string]
+
+Required.
+
+The ID of the partition.
+This is used correlate [partition](#partition-type) objects with fileSystem objects.
+
+### type [string]
+
+Required.
+
+The filesystem type of the partition.
+
+Supported options:
+
+- `ext4`
+- `fat32`
+- `xfs`
+
+### mountPoint [[mountPoint](#mountpoint-type)]
+
+Optional settings for where and how to mount the filesystem.
 
 ## kernelCommandLine type
 
@@ -400,45 +491,62 @@ Options for configuring a kernel module.
 
 <div id="module-name"></div>
 
-### name
+### name [string]
 
 Name of the module.
 
 ```yaml
 os:
   modules:
-    load:
-    - name: br_netfilter
+  - name: br_netfilter
 ```
 
-## modules type
+### loadMode [string]
 
-Options for configuring kernel modules.
+The loadMode setting for kernel modules dictates how and when these modules 
+are loaded or disabled in the system.
 
-### load [[module](#module-type)[]]
+Supported loadmodes:
 
-Sets kernel modules to be loaded automatically on boot.
+- `always`: Set kernel modules to be loaded automatically at boot time.
+  - If the module is blacklisted in the base image, remove the blacklist entry.
+  - Add the module to `/etc/modules-load.d/modules-load.conf`.
+  - Write the options, if provided.
 
-Implemented by adding an entry to `/etc/modules-load.d/`.
+- `auto`: Used for modules that are automatically loaded by the kernel as needed,
+    without explicit configuration to load them at boot.
+  - If the module is disabled in the base image, remove the blacklist entry to
+    allow it to be loaded automatically.
+  - Write the provided options to `/etc/modprobe.d/module-options.conf`, but do not
+    add the module to `/etc/modules-load.d/modules-load.conf`, as it should be loaded automatically by
+    the kernel when necessary.
 
-```yaml
-OS:
-  Modules:
-    Load:
-    - Name: br_netfilter
-```
+- `disable`: Configures kernel modules to be explicitly disabled, preventing them from
+  loading automatically.
+  - If the module is not already disabled in the base image, a blacklist entry will
+    be added to `/etc/modprobe.d/blacklist.conf` to ensure the module is disabled.
 
-### disable [[module](#module-type)[]]
+- `inherit`: Configures kernel modules to inherit the loading behavior set in the base
+  image. Only applying new options where they are explicitly provided and applicable.
+  - If the module is not disabled, and options are provided, these options will be
+    written to `/etc/modprobe.d/module-options.conf`.
 
-Disable kernel modules from being loaded.
+-  empty string or not set, it will default to `inherit`.
 
-Implemented by adding a "blacklist" entry to `/etc/modprobe.d/`.
+
+### options [map\<string, string>]
+
+Kernel options for modules can specify how these modules interact with the system, 
+and adjust performance or security settings specific to each module.
 
 ```yaml
 os:
   modules:
-    disable:
-    - name: mousedev
+  - name: vfio
+    loadMode: always
+    options:
+      enable_unsafe_noiommu_mode: Y
+      disable_vga: Y
 ```
 
 ## packageList type
@@ -579,22 +687,8 @@ os:
 Required.
 
 The ID of the partition.
-This is used to correlate Partition objects with [partitionSetting](#partitionsetting-type)
+This is used to correlate Partition objects with [fileSystem](#filesystem-type)
 objects.
-
-### fileSystemType [string]
-
-Required.
-
-The filesystem type of the partition.
-
-Supported options:
-
-- `ext4`
-- `fat32`
-- `xfs`
-
-<div id="partition-label"></div>
 
 ### label [string]
 
@@ -604,11 +698,15 @@ The label to assign to the partition.
 
 Required.
 
-The start location (inclusive) of the partition, specified in MiBs.
+The start location (inclusive) of the partition.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### end [uint64]
 
-The end location (exclusive) of the partition, specified in MiBs.
+The end location (exclusive) of the partition.
 
 The End and Size fields cannot be specified at the same time.
 
@@ -617,11 +715,21 @@ partition.
 When both the Size and End fields are omitted, the last partition will fill the
 remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
+
 ### size [uint64]
 
-The size of the partition, specified in MiBs.
+The size of the partition.
 
-### flags [string[]]
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
+
+<div id="partition-type-string"></div>
+
+### type [string]
 
 Specifies options for the partition.
 
@@ -629,8 +737,6 @@ Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
   The partition must have a `fileSystemType` of `fat32`.
-
-  When specified on a GPT formatted disk, the `boot` flag must also be added.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -641,26 +747,9 @@ Supported options:
 
   For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
 
-- `boot`: Specifies that this partition contains the boot loader.
+## mountPoint type
 
-  When specified on a GPT formatted disk, the `esp` flag must also be added.
-
-These options mirror those in
-[parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
-
-## partitionSetting type
-
-Specifies the mount options for a partition.
-
-### id [string]
-
-Required.
-
-The ID of the partition.
-This is used correlate [partition](#partition-type) objects with PartitionSetting
-objects.
-
-### mountIdentifierType [string]
+### idType [string]
 
 Default: `part-uuid`
 
@@ -674,7 +763,7 @@ Supported options:
 
 - `part-label`: The partition label specified in the partition table.
 
-### mountOptions [string]
+### options [string]
 
 The additional options used when mounting the file system.
 
@@ -682,7 +771,9 @@ These options are in the same format as [mount](https://linux.die.net/man/8/moun
 `-o` option (or the `fs_mntops` field of the
 [fstab](https://man7.org/linux/man-pages/man5/fstab.5.html) file).
 
-### mountPoint [string]
+<div id="mountpoint-path"></div>
+
+### path [string]
 
 Required.
 
@@ -695,6 +786,8 @@ For example, `/boot` will be mounted before `/boot/efi`.
 ## script type
 
 Points to a script file (typically a Bash script) to be run during customization.
+
+<div id="script-path"></div>
 
 ### path [string]
 
@@ -759,22 +852,6 @@ os:
 ## os type
 
 Contains the configuration options for the OS.
-
-### bootType [string]
-
-Specifies the boot system that the image supports.
-
-Supported options:
-
-- `legacy`: Support booting from BIOS firmware.
-
-  When this option is specified, the partition layout must contain a partition with the
-  `bios-grub` flag.
-
-- `efi`: Support booting from UEFI firmware.
-
-  When this option is specified, the partition layout must contain a partition with the
-  `esp` flag.
 
 ### resetBootLoaderType [string]
 
@@ -842,10 +919,6 @@ os:
       permissions: "664"
 ```
 
-### partitionSettings [[partitionSetting](#partitionsetting-type)[]]
-
-Specifies the mount options of the partitions.
-
 ### postInstallScripts [[script](#script-type)[]]
 
 Scripts to run against the image after the packages have been added and removed.
@@ -892,6 +965,19 @@ os:
   - name: test
 ```
 
+### modules [[module](#module-type)[]]
+
+Used to configure kernel modules.
+
+Example:
+
+```yaml
+os:
+  modules:
+    - name: vfio
+```
+
+
 ### services [[services](#services-type)]
 
 Options for configuring systemd services.
@@ -902,10 +988,6 @@ os:
     enable:
     - sshd
 ```
-
-### modules [[modules](#modules-type)]
-
-Options for configuration kernel modules.
 
 ## user type
 
@@ -1070,3 +1152,29 @@ os:
   - name: test
     startupCommand: /sbin/nologin
 ```
+
+## storage type
+
+### bootType [string]
+
+Specifies the boot system that the image supports.
+
+Supported options:
+
+- `legacy`: Support booting from BIOS firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `bios-grub` flag.
+
+- `efi`: Support booting from UEFI firmware.
+
+  When this option is specified, the partition layout must contain a partition with the
+  `esp` flag.
+
+### disks [[disk](#disk-type)[]]
+
+Contains the options for provisioning disks and their partitions.
+
+### fileSystems [[fileSystem](#filesystem-type)[]]
+
+Specifies the mount options of the partitions.

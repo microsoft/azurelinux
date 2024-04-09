@@ -1,0 +1,93 @@
+storage:
+  bootType: efi
+  disks:
+  - partitionTableType: gpt
+    maxSize: 5120M
+    partitions:
+    - id: esp
+      type: esp
+      start: 1M
+      end: 9M
+
+    - id: boot
+      start: 9M
+      end: 1024M
+
+    - id: root
+      label: root
+      start: 1024M
+      end: 3072M
+
+    - id: verityhash
+      label: root-hash
+      start: 3072M
+      end: 3200M
+
+    - id: var
+      start: 3200M
+
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: root
+    type: ext4
+    mountPoint:
+      path: /
+      
+  - deviceId: verityhash
+    type: ext4
+
+  - deviceId: var
+    type: ext4
+    mountPoint:
+      path: /var
+
+os:
+  resetBootLoaderType: hard-reset
+  selinux:
+    mode: disabled
+
+  kernelCommandLine:
+    extraCommandLine: "rd.info"
+
+  packages:
+    install:
+    - openssh-server
+    - veritysetup
+    - vim
+
+  verity:
+    dataPartition:
+      idType: part-label
+      id: root
+    hashPartition:
+      idType: part-label
+      id: root-hash
+
+  postInstallScripts:
+    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
+  - path: scripts/ssh-move-host-keys.sh
+
+  additionalFiles:
+    # Change the directory that the sshd-keygen service writes the SSH host keys to.
+    files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
+
+  services:
+    enable:
+    - sshd
+    
+  users:
+  - name: test
+    sshPublicKeys:
+      # Your SSH public key here.
+    secondaryGroups:
+    - sudo

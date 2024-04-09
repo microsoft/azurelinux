@@ -71,7 +71,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = loadOrDisableModules(config.OS.Modules, imageChroot)
+	err = loadOrDisableModules(config.OS.Modules, imageChroot.RootDir())
 	if err != nil {
 		return err
 	}
@@ -278,6 +278,10 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	if userExists {
+		if user.UID != nil {
+			return fmt.Errorf("cannot set UID (%d) on a user (%s) that already exists", *user.UID, user.Name)
+		}
+
 		// Update the user's password.
 		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
@@ -315,7 +319,8 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 		user.SSHPublicKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPublicKeyPaths[i])
 	}
 
-	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPublicKeyPaths, user.SSHPublicKeys)
+	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPublicKeyPaths, user.SSHPublicKeys,
+		userExists)
 	if err != nil {
 		return err
 	}
@@ -359,33 +364,6 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
-	var err error
-
-	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-		err = file.Write(module.Name, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module load configuration: %w", err)
-		}
-	}
-
-	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
-		data := fmt.Sprintf("blacklist %s\n", module.Name)
-		err = file.Write(data, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module disable configuration: %w", err)
-		}
-	}
-
-	return nil
-}
-
 func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
 	var err error
 
@@ -416,7 +394,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
 		// Hard-reset the grub config.
-		err := configureDiskBootLoader(imageConnection, config.Storage.PartitionSettings,
+		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
 			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
 		if err != nil {
 			return fmt.Errorf("failed to configure bootloader:\n%w", err)

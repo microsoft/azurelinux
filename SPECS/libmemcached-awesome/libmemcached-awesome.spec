@@ -11,8 +11,8 @@
 %global libname libmemcached
 Summary:        Client library and command line tools for memcached server
 Name:           %{libname}-awesome
-Version:        1.1.1
-Release:        4%{?dist}
+Version:        1.1.4
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -113,6 +113,7 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_libdir}/libmemcached.so.11*
 %{_libdir}/libmemcachedprotocol.so.0*
 %{_libdir}/libmemcachedutil.so.2*
+%{_libdir}/libp9y.a
 
 %files devel
 %doc example
@@ -142,6 +143,9 @@ rm -r %{buildroot}%{_docdir}/%{name}/
 %{_mandir}/man1/mem*
 
 %changelog
+* Tue Mar 22 2024 Harshit Gupta <guptaharshit@microsoft.com> - 1.1.4-1
+- Auto-upgrade to 1.1.4 - 3.0 upgrade
+
 * Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft.com> - 1.1.1-4
 - Adding python-devel to fix python-sphinx build issue
 

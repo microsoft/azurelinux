@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,24 +15,23 @@ func TestConfigIsValid(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1 * diskutils.MiB,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
 				},
 			},
 		},
@@ -50,19 +50,22 @@ func TestConfigIsValidLegacy(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "boot",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"bios-grub",
-						},
+						Id:    "boot",
+						Start: 1 * diskutils.MiB,
+						Type:  PartitionTypeBiosGrub,
 					},
 				},
 			}},
 			BootType: "legacy",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "boot",
+					Type:     "fat32",
+				},
+			},
 		},
 		OS: OS{
 			ResetBootLoaderType: "hard-reset",
@@ -79,12 +82,11 @@ func TestConfigIsValidNoBootType(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "a",
-						FileSystemType: "ext4",
-						Start:          1,
+						Id:    "a",
+						Start: 1 * diskutils.MiB,
 					},
 				},
 			}},
@@ -105,20 +107,25 @@ func TestConfigIsValidMissingBootLoaderReset(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1 * diskutils.MiB,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
 			BootType: "efi",
+			FileSystems: []FileSystem{
+				{
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
+				},
+			},
 		},
 		OS: OS{
 			Hostname: "test",
@@ -136,11 +143,11 @@ func TestConfigIsValidMultipleDisks(t *testing.T) {
 			Disks: []Disk{
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1,
+					MaxSize:            1 * diskutils.MiB,
 				},
 				{
 					PartitionTableType: "gpt",
-					MaxSize:            1,
+					MaxSize:            1 * diskutils.MiB,
 				},
 			},
 			BootType: "legacy",
@@ -208,7 +215,7 @@ func TestConfigIsValidMissingEsp(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions:         []Partition{},
 			}},
 			BootType: "efi",
@@ -230,7 +237,7 @@ func TestConfigIsValidMissingBiosBoot(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions:         []Partition{},
 			}},
 			BootType: "legacy",
@@ -252,24 +259,23 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1 * diskutils.MiB,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "boot/efi",
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "boot/efi",
+					},
 				},
 			},
 		},
@@ -285,67 +291,28 @@ func TestConfigIsValidInvalidMountPoint(t *testing.T) {
 	assert.ErrorContains(t, err, "absolute path")
 }
 
-func TestConfigIsValidInvalidPartitionId(t *testing.T) {
-	config := &Config{
-		Storage: &Storage{
-			Disks: []Disk{{
-				PartitionTableType: "gpt",
-				MaxSize:            2,
-				Partitions: []Partition{
-					{
-						ID:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
-					},
-				},
-			}},
-			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
-				{
-					ID:         "boot",
-					MountPoint: "/boot/efi",
-				},
-			},
-		},
-		OS: OS{
-			ResetBootLoaderType: "hard-reset",
-			Hostname:            "test",
-		},
-	}
-
-	err := config.IsValid()
-	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "id")
-}
-
 func TestConfigIsValidKernelCLI(t *testing.T) {
 	config := &Config{
 		Storage: &Storage{
 			Disks: []Disk{{
 				PartitionTableType: "gpt",
-				MaxSize:            2,
+				MaxSize:            2 * diskutils.MiB,
 				Partitions: []Partition{
 					{
-						ID:             "esp",
-						FileSystemType: "fat32",
-						Start:          1,
-						Flags: []PartitionFlag{
-							"esp",
-							"boot",
-						},
+						Id:    "esp",
+						Start: 1 * diskutils.MiB,
+						Type:  PartitionTypeESP,
 					},
 				},
 			}},
 			BootType: "efi",
-			PartitionSettings: []PartitionSetting{
+			FileSystems: []FileSystem{
 				{
-					ID:         "esp",
-					MountPoint: "/boot/efi",
+					DeviceId: "esp",
+					Type:     "fat32",
+					MountPoint: &MountPoint{
+						Path: "/boot/efi",
+					},
 				},
 			},
 		},

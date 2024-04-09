@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
@@ -277,35 +278,37 @@ func createFakeEfiImage(buildDir string) (string, error) {
 	// Use a prototypical Azure Linux image partition config.
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
-		MaxSize:            4096,
+		MaxSize:            4 * diskutils.GiB,
 		Partitions: []imagecustomizerapi.Partition{
 			{
-				ID:             "boot",
-				Flags:          []imagecustomizerapi.PartitionFlag{"esp", "boot"},
-				Start:          1,
-				End:            ptrutils.PtrTo(uint64(9)),
-				FileSystemType: "fat32",
+				Id:    "boot",
+				Type:  imagecustomizerapi.PartitionTypeESP,
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(imagecustomizerapi.DiskSize(9 * diskutils.MiB)),
 			},
 			{
-				ID:             "rootfs",
-				Start:          9,
-				End:            nil,
-				FileSystemType: "ext4",
+				Id:    "rootfs",
+				Start: 9 * diskutils.MiB,
+				End:   nil,
 			},
 		},
 	}
 
-	partitionSettings := []imagecustomizerapi.PartitionSetting{
+	fileSystems := []imagecustomizerapi.FileSystem{
 		{
-			ID:                  "boot",
-			MountPoint:          "/boot/efi",
-			MountOptions:        "umask=0077",
-			MountIdentifierType: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "boot",
+			Type:     "fat32",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path:    "/boot/efi",
+				Options: "umask=0077",
+			},
 		},
 		{
-			ID:                  "rootfs",
-			MountPoint:          "/",
-			MountIdentifierType: imagecustomizerapi.MountIdentifierTypeDefault,
+			DeviceId: "rootfs",
+			Type:     "ext4",
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path: "/",
+			},
 		},
 	}
 
@@ -318,7 +321,7 @@ func createFakeEfiImage(buildDir string) (string, error) {
 		return nil
 	}
 
-	err = createNewImageWithBootLoader(rawDisk, diskConfig, partitionSettings, "efi", imagecustomizerapi.SELinux{},
+	err = createNewImageWithBootLoader(rawDisk, diskConfig, fileSystems, "efi", imagecustomizerapi.SELinux{},
 		imagecustomizerapi.KernelCommandLine{}, buildDir, testImageRootDirName, imagecustomizerapi.SELinuxModeDisabled,
 		installOS)
 	if err != nil {

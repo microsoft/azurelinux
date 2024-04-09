@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.29.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -97,6 +97,12 @@ Pause component for Microsoft Kubernetes %{version}.
 # (see k8s code: hack/lib/version.sh for more detail)
 export KUBE_GIT_TREE_STATE="clean"
 export KUBE_GIT_VERSION=v%{version}
+
+# use go provided by host
+go_version_host=`go version | { read _ _ v _; echo ${v#go}; }`
+go_version_min=$(cat %{_builddir}/%{name}/.go-version)
+echo "+++ using go version ${go_version_host} (minimum ${go_version_min})"
+export FORCE_HOST_GO=y
 
 # build host and container image related components
 echo "+++ build kubernetes components"
@@ -263,6 +269,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Mon Mar 25 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.29.1-3
+- Fix build break due to golang version upgrade
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 1.29.1-2
 - update to build dep latest glibc-static version
 

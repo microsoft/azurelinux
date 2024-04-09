@@ -1,7 +1,7 @@
 diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
 --- hdf5-1.10.7/bin/h5cc.in.wrappers	2020-10-07 20:24:29.127283333 -0600
 +++ hdf5-1.10.7/bin/h5cc.in	2020-10-07 20:27:05.289536904 -0600
-@@ -89,10 +89,10 @@ CLINKERBASE="@CC@"
+@@ -88,10 +88,10 @@ CLINKERBASE="@CC@"
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
  # to the user's flags.
@@ -12,7 +12,7 @@ diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
 -H5BLD_LIBS="@LIBS@"
 +H5BLD_LDFLAGS=
 +H5BLD_LIBS=
- 
+
  CC="${HDF5_CC:-$CCBASE}"
  CLINKER="${HDF5_CLINKER:-$CLINKERBASE}"
 @@ -105,7 +105,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
@@ -33,11 +33,11 @@ diff -up hdf5-1.10.7/bin/h5cc.in.wrappers hdf5-1.10.7/bin/h5cc.in
 +  $SHOW $CLINKER $H5BLD_CPPFLAGS $CPPFLAGS $H5BLD_CFLAGS $CFLAGS $LDFLAGS $clibpath $link_objs $LIBS $link_args
    status=$?
  fi
- 
+
 diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
 --- hdf5-1.10.7/c++/src/h5c++.in.wrappers	2020-08-27 21:38:23.000000000 -0600
 +++ hdf5-1.10.7/c++/src/h5c++.in	2020-10-07 20:24:29.126283325 -0600
-@@ -87,10 +87,10 @@ CXXLINKERBASE="@CXX@"
+@@ -86,10 +86,10 @@ CXXLINKERBASE="@CXX@"
  # paths and libraries from AM_LDFLAGS, LDFLAGS, AM_LIBS or LIBS carried in
  # from the hdf5 build. The order of the flags is intended to give precedence
  # to the user's flags.
@@ -48,9 +48,9 @@ diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
 -H5BLD_LIBS="@LIBS@"
 +H5BLD_LDFLAGS=
 +H5BLD_LIBS=
- 
+
  CXX="${HDF5_CXX:-$CXXBASE}"
- CXXLINKER="${HDF5_CLINKER:-$CXXLINKERBASE}"
+ CXXLINKER="${HDF5_CXXLINKER:-$CXXLINKERBASE}"
 @@ -103,7 +103,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
  # available library is shared, it will be used by default.  The user can
  # override either default, although choosing an unavailable library will result
@@ -64,10 +64,10 @@ diff -up hdf5-1.10.7/c++/src/h5c++.in.wrappers hdf5-1.10.7/c++/src/h5c++.in
 @@ -385,7 +386,7 @@ if test "x$do_link" = "xyes"; then
    # from the hdf5 build. The order of the flags is intended to give precedence
    # to the user's flags.
- 
+
 -  $SHOW $CXXLINKER $H5BLD_CPPFLAGS $CPPFLAGS $H5BLD_CXXFLAGS $CXXFLAGS $LDFLAGS $clibpath $link_objs $LIBS $link_args $shared_link
 +  $SHOW $CXXLINKER $H5BLD_CPPFLAGS $CPPFLAGS $H5BLD_CXXFLAGS $CXXFLAGS $LDFLAGS $clibpath $link_objs $LIBS $link_args
- 
+
    status=$?
  fi
 diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.in
@@ -85,7 +85,7 @@ diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.i
 -H5BLD_LIBS="@LIBS@"
 +H5BLD_LDFLAGS=
 +H5BLD_LIBS=
- 
+
  FC="${HDF5_FC:-$FCBASE}"
  FLINKER="${HDF5_FLINKER:-$FLINKERBASE}"
 @@ -99,7 +99,8 @@ LIBS="${HDF5_LIBS:-$LIBSBASE}"
@@ -106,4 +106,3 @@ diff -up hdf5-1.10.7/fortran/src/h5fc.in.wrappers hdf5-1.10.7/fortran/src/h5fc.i
 +  $SHOW $FLINKER $FCFLAGS $H5BLD_FCFLAGS $F9XSUFFIXFLAG $LDFLAGS $fmodules $link_objs $LIBS $link_args
    status=$?
  fi
- 

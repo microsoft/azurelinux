@@ -1,0 +1,53 @@
+From 749b5ec6d04904d82747b60f209945a917ec479e Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Mon, 10 Jul 2017 10:37:50 +0200
+Subject: [PATCH 1/4] Port to TestNG 7.4.0
+
+---
+ surefire-providers/surefire-testng/pom.xml                     | 3 +--
+ .../maven/surefire/testng/conf/AbstractDirectConfigurator.java | 2 +-
+ .../maven/surefire/testng/conf/TestNGMapConfigurator.java      | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/surefire-providers/surefire-testng/pom.xml b/surefire-providers/surefire-testng/pom.xml
+index 5cf9b2e..d23b123 100644
+--- a/surefire-providers/surefire-testng/pom.xml
++++ b/surefire-providers/surefire-testng/pom.xml
+@@ -54,8 +54,7 @@
+     <dependency>
+       <groupId>org.testng</groupId>
+       <artifactId>testng</artifactId>
+-      <version>5.10</version>
+-      <classifier>jdk15</classifier>
++      <version>7.4.0</version>
+       <scope>provided</scope>
+     </dependency>
+     <dependency>
+diff --git a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
+index b73b9ba..ab187b6 100644
+--- a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
++++ b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/AbstractDirectConfigurator.java
+@@ -57,7 +57,7 @@ public void configure(TestNG testng, Map<String, String> options) throws TestSet
+         testng.setUseDefaultListeners(false);
+         configureInstance(testng, options);
+         // TODO: we should have the Profile so that we can decide if this is needed or not
+-        testng.setListenerClasses(loadListenerClasses(listeners));
++        testng.setListenerClasses((List)loadListenerClasses(listeners));
+     }
+ 
+     @Override
+diff --git a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/TestNGMapConfigurator.java b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/TestNGMapConfigurator.java
+index d91e76a..06dbd23 100755
+--- a/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/TestNGMapConfigurator.java
++++ b/surefire-providers/surefire-testng/src/main/java/org/apache/maven/surefire/testng/conf/TestNGMapConfigurator.java
+@@ -71,7 +71,7 @@ protected void configureThreadCount(XmlSuite suite, Map<String, String> options)
+     protected void configureParallel(XmlSuite suite, Map<String, String> options) throws TestSetFailedException {
+         String parallel = options.get(PARALLEL_PROP);
+         if (parallel != null) {
+-            suite.setParallel(parallel);
++            suite.setParallel(XmlSuite.ParallelMode.getValidParallel(parallel));
+         }
+     }
+ 
+-- 
+2.43.0

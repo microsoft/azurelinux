@@ -28,6 +28,10 @@
 
 - Understanding common build logs with a focus on errors and warnings and how to interpret them.
 
+## [Adding a new package](docs/building/add-package.md)
+
+- A tutorial on how to add a new package to Azure Linux and test it.
+
 ## [OS security](docs/security/intro.md)
 
 - Topics related to system security.

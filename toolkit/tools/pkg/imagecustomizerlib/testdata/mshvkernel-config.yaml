@@ -1,29 +1,29 @@
 storage:
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4G
     partitions:
     - id: efi
-      flags:
-      - esp
-      - boot
-      start: 1
-      end: 65
-      fileSystemType: fat32
+      type: esp
+      start: 1M
+      end: 65M
 
     - id: rootfs
-      start: 65
-      fileSystemType: ext4
+      start: 65M
 
   bootType: efi
 
-  partitionSettings:
-  - id: efi
-    mountPoint: /boot/efi
-    mountOptions: umask=0077
+  fileSystems:
+  - deviceId: efi
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
 
-  - id: rootfs
-    mountPoint: /
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
 
 os:
   resetBootLoaderType: hard-reset

@@ -17,7 +17,7 @@
 Summary:        Plexus Interpolation API
 Name:           plexus-interpolation
 Version:        1.26
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0 AND Apache-1.1 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,6 +29,8 @@ BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
 
+
+Patch0:         0001-Use-PATH-env-variable-instead-of-JAVA_HOME.patch
 
 %description
 Plexus interpolator is the outgrowth of multiple iterations of development
@@ -44,7 +46,12 @@ Group:          Documentation/HTML
 API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
+%setup -q -n %{name}-%{name}-%{version}	
+%patch 0 -p1
+	
+%pom_add_dep junit:junit:4.13.1:test
+%pom_remove_plugin :maven-release-plugin
+%pom_remove_plugin :maven-scm-publish-plugin
 	
 %build
 %mvn_file : plexus/interpolation
@@ -59,6 +66,9 @@ API documentation for %{name}.
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Mar 21 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-5
+- Add patch using Fedora 40 (License: MIT)
+
 * Fri Feb 23 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.26-4
 - Rebuilt with msopenjdk-17, and maven
 

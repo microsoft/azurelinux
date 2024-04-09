@@ -1,0 +1,25 @@
+--- ceph-18.0.0-2950-g1c931bc4/cmake/modules/BuildBoost.cmake.orig	2023-04-28 18:30:19.133064577 -0400
++++ ceph-18.0.0-2950-g1c931bc4/cmake/modules/BuildBoost.cmake	2023-04-28 18:31:55.290354383 -0400
+@@ -104,12 +104,21 @@
+   set(user_config ${CMAKE_BINARY_DIR}/user-config.jam)
+   # edit the user-config.jam so b2 will be able to use the specified
+   # toolset and python
++if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
++  file(WRITE ${user_config}
++    "using ${toolset}"
++    " : "
++    " : ${CMAKE_CXX_COMPILER}"
++    " : <compileflags>-fPIC <compileflags>-w <compileflags>-fcf-protection <compileflags>-Wno-everything" 
++    " ;\n")
++else()
+   file(WRITE ${user_config}
+     "using ${toolset}"
+     " : "
+     " : ${CMAKE_CXX_COMPILER}"
+     " : <compileflags>-fPIC <compileflags>-w <compileflags>-Wno-everything"
+     " ;\n")
++endif()
+   if(with_python_version)
+     find_package(Python3 ${with_python_version} QUIET REQUIRED
+       COMPONENTS Development)
+       

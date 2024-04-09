@@ -1,0 +1,6 @@
+{
+ "Signatures": {
+  "http_parser-0.8.0.tar.gz": "6034aff70d414ddcb8a23103a0599a224d8a3d68dd58c2fb0ef2e0937a9f833f",
+  "http_parser-0.8.0-submodules.tar.gz":"20f53f7b758c56f377394d3fc66089bd31b38a2dc438a3416c51c9db7111ad97"
+ }
+}

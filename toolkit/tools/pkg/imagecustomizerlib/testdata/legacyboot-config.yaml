@@ -1,26 +1,26 @@
 storage:
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4G
     partitions:
     - id: boot
-      flags:
-      - bios-grub
-      start: 1
-      size: 8
-      fileSystemType: fat32
+      type: bios-grub
+      start: 1M
+      size: 8M
 
     - id: rootfs
       start: 9
-      fileSystemType: ext4
 
   bootType: legacy
 
-  partitionSettings:
-  - id: boot
+  fileSystems:
+  - deviceId: boot
+    type: fat32
 
-  - id: rootfs
-    mountPoint: /
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
 
 os:
   resetBootLoaderType: hard-reset

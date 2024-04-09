@@ -10,9 +10,9 @@ import (
 )
 
 type Storage struct {
-	BootType          BootType           `yaml:"bootType"`
-	Disks             []Disk             `yaml:"disks"`
-	PartitionSettings []PartitionSetting `yaml:"partitionSettings"`
+	BootType    BootType     `yaml:"bootType"`
+	Disks       []Disk       `yaml:"disks"`
+	FileSystems []FileSystem `yaml:"fileSystems"`
 }
 
 func (s *Storage) IsValid() error {
@@ -37,18 +37,37 @@ func (s *Storage) IsValid() error {
 		}
 	}
 
-	partitionIDSet := make(map[string]bool)
-	for i, partition := range s.PartitionSettings {
-		err = partition.IsValid()
+	fileSystemSet := make(map[string]FileSystem)
+	for i, fileSystem := range s.FileSystems {
+		err = fileSystem.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid partitionSettings item at index %d: %w", i, err)
+			return fmt.Errorf("invalid fileSystems item at index %d: %w", i, err)
 		}
 
-		if _, existingName := partitionIDSet[partition.ID]; existingName {
-			return fmt.Errorf("duplicate partitionSettings ID used (%s) at index %d", partition.ID, i)
+		if _, existingName := fileSystemSet[fileSystem.DeviceId]; existingName {
+			return fmt.Errorf("duplicate fileSystem deviceId used (%s) at index %d", fileSystem.DeviceId, i)
 		}
 
-		partitionIDSet[partition.ID] = false // dummy value
+		fileSystemSet[fileSystem.DeviceId] = fileSystem
+	}
+
+	// Ensure special partitions have the correct filesystem type.
+	for _, disk := range s.Disks {
+		for _, partition := range disk.Partitions {
+			fileSystem, hasFileSystem := fileSystemSet[partition.Id]
+
+			if partition.IsESP() {
+				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+					return fmt.Errorf("ESP partition must have 'fat32' filesystem type")
+				}
+			}
+
+			if partition.IsBiosBoot() {
+				if !hasFileSystem || fileSystem.Type != FileSystemTypeFat32 {
+					return fmt.Errorf("BIOS boot partition must have 'fat32' filesystem type")
+				}
+			}
+		}
 	}
 
 	// Ensure the correct partitions exist to support the specified the boot type.
@@ -56,7 +75,7 @@ func (s *Storage) IsValid() error {
 	case BootTypeEfi:
 		hasEsp := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
+				return partition.IsESP()
 			})
 		})
 		if !hasEsp {
@@ -66,7 +85,7 @@ func (s *Storage) IsValid() error {
 	case BootTypeLegacy:
 		hasBiosBoot := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return sliceutils.ContainsValue(partition.Flags, PartitionFlagBiosGrub)
+				return partition.IsBiosBoot()
 			})
 		})
 		if !hasBiosBoot {
@@ -74,16 +93,16 @@ func (s *Storage) IsValid() error {
 		}
 	}
 
-	// Ensure all the partition settings object have an equivalent partition object.
-	for i, partitionSetting := range s.PartitionSettings {
+	// Ensure all the filesystems objects have an equivalent partition object.
+	for i, fileSystem := range s.FileSystems {
 		diskExists := sliceutils.ContainsFunc(s.Disks, func(disk Disk) bool {
 			return sliceutils.ContainsFunc(disk.Partitions, func(partition Partition) bool {
-				return partition.ID == partitionSetting.ID
+				return partition.Id == fileSystem.DeviceId
 			})
 		})
 		if !diskExists {
-			return fmt.Errorf("invalid partitionSetting at index %d:\nno partition with matching ID (%s)", i,
-				partitionSetting.ID)
+			return fmt.Errorf("invalid fileSystem at index %d:\nno partition with matching ID (%s)", i,
+				fileSystem.DeviceId)
 		}
 	}
 

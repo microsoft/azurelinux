@@ -34,7 +34,8 @@ var (
 	specsToSearch = app.Flag("specs", "Space seperated list of specfiles to search from.").String()
 	goalsToSearch = app.Flag("goals", "Space seperated list of goal names to search (Try 'ALL' or 'PackagesToBuild').").String()
 
-	reverseSearch = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
+	reverseSearch      = app.Flag("reverse", "Reverse the search to give a traditional dependency list for the packages instead of dependants.").Bool()
+	runtimeFilterLevel = app.Flag("runtime-filter-level", "Only consider only runtime dependencies beyond this layer of the graph. -1 to disable filter, 0 for no build nodes, 1 for searched nodes' build nodes, etc.").Default("-1").Int()
 
 	printTree       = app.Flag("tree", "Print output as a simple tree instead of a list").Bool()
 	verbosity       = app.Flag("verbosity", "Print the full node details (4), limited details (3), RPM (2), or SPEC name (1) for each result").Default("1").Int()
@@ -64,6 +65,11 @@ func main() {
 
 	if !(*maxDepth == -1 || *maxDepth >= 1) {
 		logger.Log.Fatalf("Invalid max depth '%d', valid ranges are -1, >=1", *maxDepth)
+	}
+
+	// Only one of runtimeOnlyPlusBuild or runtimeOnly can be set
+	if *runtimeFilterLevel < -1 {
+		logger.Log.Fatalf("Invalid runtime filter level '%d', valid ranges are -1, >=0", *runtimeFilterLevel)
 	}
 
 	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
@@ -109,7 +115,7 @@ func main() {
 		logger.Log.Panicf("Failed to generate graph to run depsearch on: %s", err)
 	}
 
-	printSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, root)
+	printSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, *runtimeFilterLevel, root)
 
 	if len(*outputGraphFile) > 0 {
 		pkggraph.WriteDOTGraphFile(outputGraph, *outputGraphFile)
@@ -320,7 +326,7 @@ func (t *treeSearch) printProgress() {
 // Run a DFS and generate a string representation of the tree. Optionally ignore all branches that only container nodes in
 //
 //	the filter list (ie given the toolchain manifest, only print those branches which container non-toolchain packages)
-func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, filter bool, filterFile string, verbosity int, generateStrings, printDuplicates bool) (lines []string, hasNonToolchain bool) {
+func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, filter bool, filterFile string, verbosity int, generateStrings, printDuplicates bool, runtimeFilterLevel int) (lines []string, hasNonToolchain bool) {
 	t.printProgress()
 	// We only care about run nodes for the purposes of detecting toolchain files
 	hasNonToolchain = n.Type == pkggraph.TypeLocalBuild && !isFilteredFile(n.RpmPath, filterFile)
@@ -363,7 +369,12 @@ func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, 
 		)
 		for nodes.Next() {
 			child := nodes.Node().(*pkggraph.PkgNode)
-			childLines, childHasMissingToolchainPkg = t.treeNodeToString(child, depth+1, maxDepth, filter, filterFile, verbosity, generateStrings, printDuplicates)
+
+			// If we are only looking for runtime, skip build nodes (except for the root nodes: goal + each package node we care about)
+			if runtimeFilterLevel != -1 && depth > runtimeFilterLevel && child.Type == pkggraph.TypeLocalBuild {
+				continue
+			}
+			childLines, childHasMissingToolchainPkg = t.treeNodeToString(child, depth+1, maxDepth, filter, filterFile, verbosity, generateStrings, printDuplicates, runtimeFilterLevel)
 			hasNonToolchain = hasNonToolchain || childHasMissingToolchainPkg
 
 			// A child will return an empty string list if it, and all its children, are either duplicates or have been filtered out
@@ -407,14 +418,14 @@ func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, 
 	return lines, hasNonToolchain
 }
 
-func printSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, printDuplicates bool, verbosity, maxDepth int, root *pkggraph.PkgNode) {
+func printSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, printDuplicates bool, verbosity, maxDepth, runtimeFilterLevel int, root *pkggraph.PkgNode) {
 	t, err := createSearch(graph, root)
 	if err != nil {
 		logger.Log.Fatalf("Failed to start search: %s", err)
 	}
 	// May as well use the tree searh to parse all the filtered packages etc, even if we are
 	//    just printing a list
-	lines, _ := t.treeNodeToString(root, 0, maxDepth, filter, filterFile, verbosity, tree, printDuplicates)
+	lines, _ := t.treeNodeToString(root, 0, maxDepth, filter, filterFile, verbosity, tree, printDuplicates, runtimeFilterLevel)
 	if tree {
 		for _, l := range lines {
 			fmt.Println(l)

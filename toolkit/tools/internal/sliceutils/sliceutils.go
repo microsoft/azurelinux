@@ -119,3 +119,16 @@ func ContainsFunc[K any](inputSlice []K, fn func(K) bool) bool {
 	}
 	return false
 }
+
+// FindValueFunc returns the first value in the slice that matches fn(item) == true along with true, otherwise it
+// returns the default value for an instance of value's type, and false.
+func FindValueFunc[K any](inputSlice []K, fn func(K) bool) (K, bool) {
+	for _, item := range inputSlice {
+		if fn(item) {
+			return item, true
+		}
+	}
+
+	var value K
+	return value, false
+}
