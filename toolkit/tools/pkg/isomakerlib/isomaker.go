@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/cavaliercoder/go-cpio"
 	"github.com/klauspost/pgzip"
@@ -21,10 +20,14 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 const (
+	DefaultVolumeId = "CDROM"
+
 	efiBootImgPathRelativeToIsoRoot = "boot/grub2/efiboot.img"
 	initrdEFIBootDirectoryPath      = "boot/efi/EFI/BOOT"
 	isoRootArchDependentDirPath     = "assets/isomaker/iso_root_arch-dependent_files"
@@ -182,7 +185,7 @@ func (im *IsoMaker) buildIsoImage() error {
 
 	mkisofsArgs = append(mkisofsArgs,
 		// General mkisofs parameters.
-		"-R", "-l", "-D", "-o", isoImageFilePath)
+		"-R", "-l", "-D", "-o", isoImageFilePath, "-V", DefaultVolumeId)
 
 	if im.enableBiosBoot {
 		mkisofsArgs = append(mkisofsArgs,
@@ -258,47 +261,20 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 	}
 
 	efiBootImgTempMountDir := filepath.Join(im.buildDirPath, "efiboot_temp")
-	logger.Log.Tracef("Creating temporary mount directory '%s'.", efiBootImgTempMountDir)
-	err = os.Mkdir(efiBootImgTempMountDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
 
-	defer func() {
-		logger.Log.Debugf("Removing '%s'.", efiBootImgTempMountDir)
-		cleanupErr := os.RemoveAll(efiBootImgTempMountDir)
-		if cleanupErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%w\nclean-up error: failed to remove temporary mount directory '%s':\n%w", err, efiBootImgTempMountDir, cleanupErr)
-			} else {
-				err = fmt.Errorf("clean-up error: failed to remove temporary mount directory '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
-			}
-		}
-	}()
-
-	mountArgs := []string{
-		"-o",                   // Indicates we're passing options to "mount". Needed to mount a loop device.
-		"loop",                 // Indicates we'd like to mount a loop device. We let the system choose a free /dev/loop* device.
-		im.efiBootImgPath,      // Efiboot.img file we'd like to mount to act like a block-based device.
-		efiBootImgTempMountDir, // Path to mount the image to.
-	}
 	logger.Log.Debugf("Mounting '%s' to '%s' to copy EFI modules required to boot grub2.", im.efiBootImgPath, efiBootImgTempMountDir)
-	err = shell.ExecuteLive(false /*squashErrors*/, "mount", mountArgs...)
+	loopback, err := safeloopback.NewLoopback(im.efiBootImgPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect efiboot.img:\n%w", err)
 	}
+	defer loopback.Close()
 
-	defer func() {
-		logger.Log.Debugf("Unmounting '%s'.", efiBootImgTempMountDir)
-		cleanupErr := syscall.Unmount(efiBootImgTempMountDir, 0)
-		if cleanupErr != nil {
-			if err != nil {
-				err = fmt.Errorf("%w\nclean-up error: failed to unmount '%s':\n%w", err, efiBootImgTempMountDir, cleanupErr)
-			} else {
-				err = fmt.Errorf("clean-up error: failed to unmount '%s':\n%w", efiBootImgTempMountDir, cleanupErr)
-			}
-		}
-	}()
+	mount, err := safemount.NewMount(loopback.DevicePath(), efiBootImgTempMountDir, "vfat", 0, "",
+		true /*makeAndDeleteDir*/)
+	if err != nil {
+		return fmt.Errorf("failed to mount efiboot.img:\n%w", err)
+	}
+	defer mount.Close()
 
 	logger.Log.Debug("Copying EFI modules into efiboot.img.")
 	// Copy Shim (boot<arch>64.efi) and grub2 (grub<arch>64.efi)
@@ -312,6 +288,16 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		if err != nil {
 			return err
 		}
+	}
+
+	err = mount.CleanClose()
+	if err != nil {
+		return fmt.Errorf("failed to unmount efiboot.img:\n%w", err)
+	}
+
+	err = loopback.CleanClose()
+	if err != nil {
+		return fmt.Errorf("failed to disconnect efiboot.img:\n%w", err)
 	}
 
 	return nil
@@ -572,6 +558,7 @@ func (im *IsoMaker) copyAndRenameConfigFiles() (err error) {
 // files can be used by custom initrd/LiveOS images that will look for them
 // on the iso media.
 func (im *IsoMaker) copyIsoAdditionalFiles() (err error) {
+	logger.Log.Debugf("Copying ISO additional files")
 	return safechroot.AddFilesToDestination(im.buildDirPath, im.additionalIsoFiles...)
 }
 

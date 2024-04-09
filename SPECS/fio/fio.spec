@@ -1,7 +1,7 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.30
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,6 @@ BuildRequires:  python3-devel
 BuildRequires:  zlib-devel
 %ifarch x86_64
 BuildRequires:  libpmem-devel
-BuildRequires:  libpmemblk-devel
 %endif
 %if 0%{?with_check}
 BuildRequires:  CUnit-devel
@@ -37,7 +36,6 @@ Recommends:     %{name}-engine-rbd
 Recommends:     %{name}-engine-rdma
 %ifarch x86-64
 Recommends:     %{name}-engine-dev-dax
-Recommends:     %{name}-engine-pmemblk
 Recommends:     %{name}-engine-libpmem
 %endif
 
@@ -79,17 +77,6 @@ Requires:       %{name} = %{version}-%{release}
 dev-dax engine for %{name}.
 Read and write using device DAX to a persistent memory device
 (e.g., /dev/dax0.0) through the PMDK libpmem library.
-%endif
-
-%ifarch x86_64
-%package engine-pmemblk
-Summary:        PMDK pmemblk engine for %{name}.
-Requires:       %{name} = %{version}-%{release}
-
-%description engine-pmemblk
-pmemblk engine for %{name}.
-Read and write using filesystem DAX to a file on a filesystem mounted with
-DAX on a persistent memory device through the PMDK libpmemblk library.
 %endif
 
 %ifarch x86_64
@@ -176,11 +163,6 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %files engine-nbd
 %{_libdir}/fio/fio-nbd.so
 
-%ifarch x86_64
-%files engine-pmemblk
-%{_libdir}/fio/fio-pmemblk.so
-%endif
-
 %files engine-rados
 %{_libdir}/fio/fio-rados.so
 
@@ -191,6 +173,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_libdir}/fio/fio-rdma.so
 
 %changelog
+* Mon Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
+- Remove engine-pmemblk subpackage and BR on libpmemblk-devel
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
@@ -421,40 +406,40 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.11-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
-* Tue Jul 15 2014 Eric Sandeen <sandeen@redhat.com> 2.1.11-1 
+* Tue Jul 15 2014 Eric Sandeen <sandeen@redhat.com> 2.1.11-1
 - New upstream version
 
-* Mon Jun 16 2014 Eric Sandeen <sandeen@redhat.com> 2.1.10-1 
+* Mon Jun 16 2014 Eric Sandeen <sandeen@redhat.com> 2.1.10-1
 - New upstream version
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
-* Tue May 13 2014 Eric Sandeen <sandeen@redhat.com> 2.1.9-1 
+* Tue May 13 2014 Eric Sandeen <sandeen@redhat.com> 2.1.9-1
 - New upstream version
 
-* Mon Apr 14 2014 Eric Sandeen <sandeen@redhat.com> 2.1.8-1 
+* Mon Apr 14 2014 Eric Sandeen <sandeen@redhat.com> 2.1.8-1
 - New upstream version
 
-* Mon Apr 07 2014 Eric Sandeen <sandeen@redhat.com> 2.1.7-1 
+* Mon Apr 07 2014 Eric Sandeen <sandeen@redhat.com> 2.1.7-1
 - New upstream version
 
-* Wed Feb 12 2014 Eric Sandeen <sandeen@redhat.com> 2.1.5-1 
+* Wed Feb 12 2014 Eric Sandeen <sandeen@redhat.com> 2.1.5-1
 - New upstream version
 
-* Wed Sep 25 2013 Eric Sandeen <sandeen@redhat.com> 2.1.3-1 
+* Wed Sep 25 2013 Eric Sandeen <sandeen@redhat.com> 2.1.3-1
 - New upstream version
 
-* Thu Aug 08 2013 Eric Sandeen <sandeen@redhat.com> 2.1.2-1 
+* Thu Aug 08 2013 Eric Sandeen <sandeen@redhat.com> 2.1.2-1
 - New upstream version
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Wed May 15 2013 Eric Sandeen <sandeen@redhat.com> 2.1-1 
+* Wed May 15 2013 Eric Sandeen <sandeen@redhat.com> 2.1-1
 - New upstream version
 
-* Wed Apr 17 2013 Eric Sandeen <sandeen@redhat.com> 2.0.15-1 
+* Wed Apr 17 2013 Eric Sandeen <sandeen@redhat.com> 2.0.15-1
 - New upstream version
 
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.13-2
@@ -466,16 +451,16 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Tue Jan 01 2013 Dan Horák <dan[at]danny.cz> - 2.0.12.2-2
 - fix build on arches without ARCH_HAVE_CPU_CLOCK (arm, s390)
 
-* Fri Dec 21 2012 Eric Sandeen <sandeen@redhat.com> 2.0.12.2-1 
+* Fri Dec 21 2012 Eric Sandeen <sandeen@redhat.com> 2.0.12.2-1
 - New upstream version
 
-* Sat Nov 24 2012 Eric Sandeen <sandeen@redhat.com> 2.0.11-1 
+* Sat Nov 24 2012 Eric Sandeen <sandeen@redhat.com> 2.0.11-1
 - New upstream version
 
 * Thu Nov 15 2012 Peter Robinson <pbrobinson@fedoraproject.org> 2.0.10-2
 - Merge latest from F16 to master, bump release
 
-* Fri Oct 12 2012 Eric Sandeen <sandeen@redhat.com> 2.0.10-1 
+* Fri Oct 12 2012 Eric Sandeen <sandeen@redhat.com> 2.0.10-1
 - New upstream version
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.8-2

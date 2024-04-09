@@ -36,15 +36,24 @@ Disadvantages:
    For example:
 
     ```yaml
-    SystemConfig:
-      PackagesInstall:
+    os:
+      packagesInstall:
       - dnf
     ```
 
    For documentation on the supported configuration options, see:
    [Azure Linux Image Customizer configuration](./docs/configuration.md)
 
-3. Install prerequisites to run Azure Linux Image Customizer: `qemu-img,rpm,dd,lsblk,losetup,sfdisk,udevadm,flock,blkid,openssl,sed,createrepo,squashfs-tools,genisoimage,dosfstools`
+3. Install prerequisites: `qemu-img`, `rpm`, `dd`, `lsblk`, `losetup`, `sfdisk`,
+   `udevadm`, `flock`, `blkid`, `openssl`, `sed`, `createrepo`, `mksquashfs`,
+   `genisoimage`, `mkfs`, `mkfs.ext4`, `mkfs.vfat`, `mkfs.xfs`, `fsck`, `e2fsck`,
+   `xfs_repair`, `zstd`.
+
+   - For Ubuntu 22.04 images, run:
+
+     ```bash
+     sudo apt -y install qemu-utils rpm coreutils util-linux mount fdisk udev openssl sed createrepo-c squashfs-tools genisoimage e2fsprogs dosfstools xfsprogs zstd
+     ```
 
 4. Run the Azure Linux Image Customizer tool.
 

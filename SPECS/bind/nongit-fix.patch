@@ -1,0 +1,36 @@
+From 26d6eeabf3925d6fb7da4bbdabed6091c10c87e6 Mon Sep 17 00:00:00 2001
+From: alejandro-microsoft <alejandroma@microsoft.com>
+Date: Fri, 1 Mar 2024 17:49:51 -0800
+Subject: [PATCH] Fix issue where bind directory isn't downloaded via git
+
+---
+ configure.ac | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 512cb83..1f31c35 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 19)dnl
+ m4_define([bind_VERSION_PATCH], 21)dnl
+ m4_define([bind_VERSION_EXTRA], )dnl
+ m4_define([bind_DESCRIPTION], [(Development Release)])dnl
+-m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD | cut -b1-7])])dnl
++m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD 2>/dev/null || echo "unsetID" | cut -b1-7])])dnl 
+ m4_define([bind_PKG_VERSION], [[bind_VERSION_MAJOR.bind_VERSION_MINOR.bind_VERSION_PATCH]bind_VERSION_EXTRA])dnl
+ 
+ #
+@@ -60,7 +60,9 @@ AC_CONFIG_MACRO_DIR([m4])
+ # and not cross compling
+ #
+ AS_IF([test "$cross_compiling" = no],
+-      [AM_MAINTAINER_MODE(m4_ifset([bind_SRCID],[enable],[disable]))],
++      [AS_IF([test bind_SRCID = unsetID],
++             [AM_MAINTAINER_MODE([enable])],
++             [AM_MAINTAINER_MODE([disable])])],
+       [AM_MAINTAINER_MODE([disable])])
+ 
+ #
+-- 
+2.34.1
+

@@ -1,10 +1,10 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
-Version:        4.4.3
-Release:        1%{?dist}
+Version:        4.4.3.P1
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
-Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,9 +38,9 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n dhcp-4.4.3-P1
 
-%build
+%build -n dhcp-4.4.3-P1
 CFLAGS="$CFLAGS \
         -D_PATH_DHCLIENT_SCRIPT='\"/sbin/dhclient-script\"' \
         -D_PATH_DHCPD_CONF='\"/etc/dhcp/dhcpd.conf\"' \
@@ -169,6 +169,15 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Thu Apr 04 2024 Sindhu <lakarri@microsoft.com> - 4.4.3.P1-2
+- Revert option for classless static route configuration in dhclient.conf
+
+* Fri Mar 08 2024 Dan Streetman <ddstreet@microsoft.com> - 4.4.3.P1-1
+- update to final isc-dhcp version, which has been EOL since Dec 2022
+
+* Fri Mar 08 2024 Chris Patterson <cpatterson@microsoft.com> - 4.4.3-2
+- Add option for classless static route configuration in dhclient.conf
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
 - Auto-upgrade to 4.4.3 - Azure Linux 3.0 - package upgrades
 

@@ -1,0 +1,16 @@
+Index: libva-2.20.0/va/va.c
+===================================================================
+--- libva-2.20.0.orig/va/va.c
++++ libva-2.20.0/va/va.c
+@@ -373,6 +373,11 @@ static char *va_getDriverPath(const char
+ static VAStatus va_openDriver(VADisplay dpy, char *driver_name)
+ {
+     VADriverContextP ctx = CTX(dpy);
++    /* workaround for broken dpy blocks returned by vaGetDisplayDRM */
++    if (NULL == ctx->native_dpy) {
++        ctx->native_dpy = dpy;
++    }
++
+     VAStatus vaStatus = VA_STATUS_ERROR_UNKNOWN;
+     char *search_path = NULL;
+     char *saveptr;

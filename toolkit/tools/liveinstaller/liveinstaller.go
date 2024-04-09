@@ -190,7 +190,13 @@ func removeOldAzureLinuxBootTargets() (err error) {
 
 func ejectDisk() (err error) {
 	logger.Log.Info("Ejecting CD-ROM.")
-	_, _, err = shell.Execute("eject", "--cdrom")
+	const squashErrors = false
+	program := "eject"
+	commandArgs := []string{
+		"--cdrom",
+		"--force",
+	}
+	err = shell.ExecuteLive(squashErrors, program, commandArgs...)
 
 	if err != nil {
 		// If there was an error ejecting the CD-ROM, assume this is a USB installation and prompt the user
@@ -260,7 +266,7 @@ func calamaresInstall(templateConfigFile string, args imagerArguments) (err erro
 	args.configFile = filepath.Join(calamaresDir, "unattended_config.json")
 
 	launchScript := filepath.Join(calamaresDir, "mariner-install.sh")
-	skuDir := filepath.Join(calamaresDir, "mariner-skus")
+	skuDir := filepath.Join(calamaresDir, "azurelinux-skus")
 
 	bootType := configuration.SystemBootType()
 	logger.Log.Infof("Boot type detected: %s", bootType)

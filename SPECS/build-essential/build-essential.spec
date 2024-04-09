@@ -1,6 +1,6 @@
 Summary:        Metapackage to install all build tools
 Name:           build-essential
-Version:        3.0
+Version:        %{azl}.0
 Release:        2%{?dist}
 License:        GPLv2
 Requires:       autoconf

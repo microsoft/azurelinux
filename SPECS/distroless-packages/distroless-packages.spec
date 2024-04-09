@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
-Version:        3.0
-Release:        2%{?dist}
+Version:        %{azl}.0
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,7 @@ Requires:       %{name}-minimal = %{version}-%{release}
 Requires:       filesystem
 Requires:       glibc-iconv
 Requires:       iana-etc
+Requires:       libgcc
 Requires:       azurelinux-release
 Requires:       openssl
 Requires:       openssl-libs
@@ -55,6 +56,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Fri Mar 22 2024 Mandeep Plaha <mandeepplaha@microsoft.com> - 3.0-3
+- Explicitly add libgcc as a runtime dependency for distroless-base
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.0-2
 - Update the runtime dependency from mariner-release to azurelinux-release
 

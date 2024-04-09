@@ -1,7 +1,7 @@
 Summary:        Library to control and monitor control groups
 Name:           libcgroup
 Version:        3.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,7 +24,8 @@ Patch1: libcgroup-0.37-chmod.patch
 Patch2: libcgroup-0.40.rc1-coverity.patch
 Patch3: libcgroup-0.40.rc1-fread.patch
 Patch4: libcgroup-0.40.rc1-templates-fix.patch
-Patch5: no-googletests.patch
+Patch5: fix-libcgroup-tests.patch
+Patch6: test.patch
 
 %{?systemd_requires}
 
@@ -74,46 +75,20 @@ It provides API to create/delete and modify cgroup nodes. It will also in the
 future allow creation of persistent configuration for control groups and
 provide scripts to manage that configuration.
 
-# libcgroup unit test (tests/gunit - make check) must be performed from a CBL-Mariner container
-# to avoid jeopardizing cgroup of the host (/proc/mounts)
-%package tests
-Summary: libcgroup's tests
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: gcc
-Requires: gtest
-
-%description tests
-Provides tests (tests/gunit) that can be used to validate libcgroup.
-
 %prep
 %autosetup -p1 -n %{name}
 
 %build
-# build test binaries but do not execute tests
-sed -i '/TESTS = gtest/d' ./tests/gunit/Makefile.am
-
 autoreconf -vif
 %configure --enable-pam-module-dir=%{_libdir}/security \
            --enable-opaque-hierarchy="name=systemd" \
            --disable-daemon
 
 # build libcgroup
-export CXXFLAGS="$CXXFLAGS -std=c++14"
-
 make %{?_smp_mflags}
-
-# build test
-cd tests/gunit
-make check
 
 %install
 make DESTDIR=$RPM_BUILD_ROOT install
-
-# install tests
-install -d ${RPM_BUILD_ROOT}/tests/gunit
-install -d ${RPM_BUILD_ROOT}/tests/gunit/.libs
-install tests/gunit/gtest ${RPM_BUILD_ROOT}/tests/gunit
-install tests/gunit/.libs/gtest ${RPM_BUILD_ROOT}/tests/gunit/.libs/lt-gtest
 
 # install config files
 install -d ${RPM_BUILD_ROOT}%{_sysconfdir}
@@ -134,6 +109,21 @@ rm -f %{_mandir}/man5/cgred.conf.5*
 rm -f %{_mandir}/man5/cgrules.conf.5*
 rm -f %{_mandir}/man8/cgrulesengd.8*
 popd
+	
+%check
+# The following tests will try modifying /proc/mounts and thus
+# are not applicable when testing in work chroot environment
+# and need to be skipped:
+# - CgroupGetCgroupTest.CgroupGetCgroup1
+# - CgroupGetCgroupTest.CgroupGetCgroup_NoTasksFile
+# - SetValuesRecursiveTest.SuccessfulSetValues
+# - SubtreeControlTest.AddController
+# - SubtreeControlTest.RemoveController
+# - CgroupCreateCgroupTest.CgroupCreateCgroupV1
+# - CgroupCreateCgroupTest.CgroupCreateCgroupV2
+# - CgroupCreateCgroupTest.CgroupCreateCgroupV1AndV2
+make -C tests/gunit check
+cat /usr/src/azl/BUILD/libcgroup/tests/gunit/test-suite.log
 
 %pre
 getent group cgred >/dev/null || groupadd -r cgred
@@ -189,13 +179,17 @@ getent group cgred >/dev/null || groupadd -r cgred
 %{_libdir}/libcgroup.so
 %{_libdir}/pkgconfig/libcgroup.pc
 
-%files tests
-%license COPYING
-%doc README
-/tests/gunit/gtest
-/tests/gunit/.libs/lt-gtest
-
 %changelog
+* Wed Mar 06 2024 Henry Li <lihl@microsoft.com> - 3.1.0-3
+- Remove libcgroup-tests subpackage
+- Force c++ 14 standard when running package tests
+- Remove libcgroup-tests subpackage
+- Remove changes to disable package test run
+- Patch test Makefile to compile with C++14 since gtest requires at 
+  least C++14
+- Skip 8 tests that are not applicable to work chroot testing
+- Fix API_cgroup_set_permissions package test
+
 * Fri Mar 01 2024 Andrew Phelps <anphel@microsoft.com> - 3.1.0-2
 - Fix build by forcing C++ 14 standard
 

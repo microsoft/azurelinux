@@ -1,8 +1,8 @@
-%bcond_with ssh
+
 Summary:        A utility for setting up encrypted disks
 Name:           cryptsetup
 Version:        2.4.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,12 +25,7 @@ BuildRequires:  util-linux
 Requires:       cryptsetup-libs = %{version}-%{release}
 Requires:       libpwquality >= 1.2.0
 Provides:       cryptsetup-luks = %{version}-%{release}
-# Disabling SSH tokens with --disable-ssh-token since libssh-devel here creates
-# a circular dependency with systemd through its dependency on openssh-clients:
-#   systemd -> cryptsetup-devel -> libssh-devel -> openssh-clients -> systemd
-%if %{with ssh}
 BuildRequires:  libssh-devel
-%endif
 
 %description
 The cryptsetup package contains a utility for setting up
@@ -56,14 +51,12 @@ Provides:       cryptsetup-luks-libs = %{version}-%{release}
 %description libs
 This package contains the cryptsetup shared library, libcryptsetup.
 
-%if %{with ssh}
 %package ssh-token
 Summary:        Cryptsetup LUKS2 SSH token
 Requires:       cryptsetup-libs = %{version}-%{release}
 
 %description ssh-token
 This package contains the LUKS2 SSH token.
-%endif
 
 %package -n veritysetup
 Summary:        A utility for setting up dm-verity volumes
@@ -103,9 +96,6 @@ chmod -x misc/dracut_90reencrypt/*
     --enable-fips \
     --enable-pwquality \
     --enable-internal-sse-argon2 \
-%if !%{with ssh}
-    --disable-ssh-token \
-%endif
     --with-default-luks-format=LUKS2
 make %{?_smp_mflags}
 
@@ -152,15 +142,16 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_tmpfilesdir}/cryptsetup.conf
 %ghost %dir /run/cryptsetup
 
-%if %{with ssh}
 %files ssh-token
 %license COPYING COPYING.LGPL
 %{_libdir}/%{name}/libcryptsetup-token-ssh.so
 %{_mandir}/man8/cryptsetup-ssh.8.gz
 %{_sbindir}/cryptsetup-ssh
-%endif
 
 %changelog
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 2.4.3-5
+- enable ssh-token
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.4.3-4
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

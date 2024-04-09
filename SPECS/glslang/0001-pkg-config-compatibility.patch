@@ -1,0 +1,189 @@
+diff -up glslang-sdk-1.3.275.0/CMakeLists.txt.dma glslang-sdk-1.3.275.0/CMakeLists.txt
+--- glslang-sdk-1.3.275.0/CMakeLists.txt.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/CMakeLists.txt	2023-09-05 13:21:45.113297799 +1000
+@@ -106,6 +106,13 @@ endif()
+ 
+ option(ENABLE_PCH "Enables Precompiled header" ON)
+ 
++# using pkg-config to configure include paths and link libraries
++include(FindPkgConfig)
++pkg_check_modules(SPIRV_TOOLS REQUIRED SPIRV-Tools>=2019.2.1)
++if(BUILD_SHARED_LIBS)
++    pkg_check_modules(SPIRV_TOOLS_SHARED REQUIRED SPIRV-Tools-shared>=2019.2.1)
++endif(BUILD_SHARED_LIBS)
++
+ if(ENABLE_HLSL)
+     add_compile_definitions(ENABLE_HLSL)
+ endif()
+@@ -264,27 +271,7 @@ if(BUILD_EXTERNAL AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/External)
+     add_subdirectory(External)
+ endif()
+ 
+-option(ALLOW_EXTERNAL_SPIRV_TOOLS "Allows to build against installed SPIRV-Tools-opt")
+-if(NOT TARGET SPIRV-Tools-opt)
+-    if(ALLOW_EXTERNAL_SPIRV_TOOLS)
+-        # Look for external SPIR-V Tools build, if not building in-tree
+-        message(STATUS "Trying to find local SPIR-V tools")
+-        find_package(SPIRV-Tools-opt)
+-        if(NOT TARGET SPIRV-Tools-opt)
+-            if(ENABLE_OPT)
+-                message(WARNING "ENABLE_OPT set but SPIR-V tools not found! Disabling SPIR-V optimization.")
+-            endif()
+-            set(ENABLE_OPT OFF)
+-        endif()
+-    else()
+-        if(ENABLE_OPT)
+-            message(SEND_ERROR "ENABLE_OPT set but SPIR-V tools not found. Please run update_glslang_sources.py, "
+-                "set the ALLOW_EXTERNAL_SPIRV_TOOLS option to use a local install of SPIRV-Tools, or set ENABLE_OPT=0.")
+-        endif()
+-    endif()
+-endif()
+-
+-if(ENABLE_OPT)
++if(${SPIRV_TOOLS_FOUND} EQUAL 1)
+     message(STATUS "optimizer enabled")
+     add_definitions(-DENABLE_OPT=1)
+ else()
+diff -up glslang-sdk-1.3.275.0/External/CMakeLists.txt.dma glslang-sdk-1.3.275.0/External/CMakeLists.txt
+--- glslang-sdk-1.3.275.0/External/CMakeLists.txt.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/External/CMakeLists.txt	2023-09-05 13:21:45.113297799 +1000
+@@ -68,10 +68,4 @@ if(GLSLANG_TESTS)
+     endif()
+ endif()
+ 
+-if(ENABLE_OPT AND NOT TARGET SPIRV-Tools-opt)
+-    if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/spirv-tools)
+-        set(SPIRV_SKIP_TESTS ON CACHE BOOL "Skip building SPIRV-Tools tests")
+-        add_subdirectory(spirv-tools)
+-    endif()
+-endif()
+ 
+ 
+diff -up glslang-sdk-1.3.275.0/glslang/CMakeLists.txt.dma glslang-sdk-1.3.275.0/glslang/CMakeLists.txt
+--- glslang-sdk-1.3.275.0/glslang/CMakeLists.txt.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/glslang/CMakeLists.txt	2023-09-05 13:21:45.114297825 +1000
+@@ -249,6 +249,8 @@ if(PROJECT_IS_TOP_LEVEL)
+                 add_library(GenericCodeGen ALIAS glslang::GenericCodeGen)
+             endif()
+         ")
++        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/glslang.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc @ONLY)
++        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/glslang.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+         install(FILES "${CMAKE_CURRENT_BINARY_DIR}/glslangTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+     endif()
+ 
+diff -up glslang-sdk-1.3.275.0/glslang/glslang.pc.cmake.in.dma glslang-sdk-1.3.275.0/glslang/glslang.pc.cmake.in
+--- glslang-sdk-1.3.275.0/glslang/glslang.pc.cmake.in.dma	2023-09-05 13:21:45.115297852 +1000
++++ glslang-sdk-1.3.275.0/glslang/glslang.pc.cmake.in	2023-09-05 13:21:45.115297852 +1000
+@@ -0,0 +1,11 @@
++    prefix=@CMAKE_INSTALL_PREFIX@
++    exec_prefix=@CMAKE_INSTALL_PREFIX@
++    libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
++    includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++    
++    Name: @PROJECT_NAME@
++    Description: OpenGL and OpenGL ES shader front end and validator
++    Requires:
++    Version: @VERSION@
++    Libs: -L${libdir} -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper
++    Cflags: -I${includedir}
+\ No newline at end of file
+diff -up glslang-sdk-1.3.275.0/SPIRV/CMakeLists.txt.dma glslang-sdk-1.3.275.0/SPIRV/CMakeLists.txt
+--- glslang-sdk-1.3.275.0/SPIRV/CMakeLists.txt.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/SPIRV/CMakeLists.txt	2023-09-05 13:21:45.116297879 +1000
+@@ -89,6 +89,10 @@ target_include_directories(SPIRV PUBLIC
+ 
+ glslang_add_build_info_dependency(SPIRV)
+ 
++
++set(SPIRV_NAME spirv)
++set(SPIRV_VERSION 1.3)
++
+ if (ENABLE_SPVREMAPPER)
+     add_library(SPVRemapper ${LIB_TYPE} ${SPVREMAP_SOURCES} ${SPVREMAP_HEADERS})
+     set_target_properties(SPVRemapper PROPERTIES
+@@ -105,10 +109,17 @@ if(WIN32 AND BUILD_SHARED_LIBS)
+     endif()
+ endif()
+ 
++target_include_directories(SPIRV PUBLIC ${SPIRV_TOOLS_INCLUDE_DIRS})
++target_compile_options(SPIRV PUBLIC ${SPIRV_TOOLS_CFLAGS_OTHER})
++target_link_libraries(SPIRV ${SPIRV_TOOLS_LIBRARIES})
++if(BUILD_SHARED_LIBS)
++    target_include_directories(SPIRV PUBLIC ${SPIRV_TOOLS_SHARED_INCLUDE_DIRS})
++    target_compile_options(SPIRV PUBLIC ${SPIRV_TOOLS_SHARED_CFLAGS_OTHER})
++    target_link_libraries(SPIRV ${SPIRV_TOOLS_SHARED_LIBRARIES})
++endif(BUILD_SHARED_LIBS)
++
+ if(ENABLE_OPT)
+-    target_link_libraries(SPIRV PRIVATE MachineIndependent PUBLIC SPIRV-Tools-opt)
+-    target_include_directories(SPIRV PUBLIC
+-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../External>)
++    target_link_libraries(SPIRV glslang)
+ else()
+     target_link_libraries(SPIRV PRIVATE MachineIndependent)
+ endif()
+@@ -150,5 +161,9 @@ if(PROJECT_IS_TOP_LEVEL)
+     ")
+     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/SPIRVTargets.cmake" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+ 
++    # spirv.pc Configuration
++    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/spirv.pc.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/spirv.pc @ONLY)
++    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pkgconfig/spirv.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
++
+     install(FILES ${PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/glslang/SPIRV/)
+ endif()
+diff -up glslang-sdk-1.3.275.0/SPIRV/spirv.pc.cmake.in.dma glslang-sdk-1.3.275.0/SPIRV/spirv.pc.cmake.in
+--- glslang-sdk-1.3.275.0/SPIRV/spirv.pc.cmake.in.dma	2023-09-05 13:21:45.116297879 +1000
++++ glslang-sdk-1.3.275.0/SPIRV/spirv.pc.cmake.in	2023-09-05 13:21:45.116297879 +1000
+@@ -0,0 +1,11 @@
++    prefix=@CMAKE_INSTALL_PREFIX@
++    exec_prefix=@CMAKE_INSTALL_PREFIX@
++    libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
++    includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
++    
++    Name: @SPIRV_NAME@
++    Description: SPIR-V is a binary intermediate language for representing graphical-shader stages and compute kernels for multiple Khronos APIs, including OpenCL, OpenGL, and Vulkan
++    Requires:
++    Version: @SPIRV_VERSION@
++    Libs: -L${libdir} -lSPIRV
++    Cflags: -I${includedir}
+\ No newline at end of file
+diff -up glslang-sdk-1.3.275.0/SPIRV/SpvTools.cpp.dma glslang-sdk-1.3.275.0/SPIRV/SpvTools.cpp
+--- glslang-sdk-1.3.275.0/SPIRV/SpvTools.cpp.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/SPIRV/SpvTools.cpp	2023-09-05 13:21:45.117297906 +1000
+@@ -43,7 +43,7 @@
+ #include <iostream>
+ 
+ #include "SpvTools.h"
+-#include "spirv-tools/optimizer.hpp"
++#include <spirv-tools/optimizer.hpp>
+ 
+ namespace glslang {
+ 
+diff -up glslang-sdk-1.3.275.0/StandAlone/CMakeLists.txt.dma glslang-sdk-1.3.275.0/StandAlone/CMakeLists.txt
+--- glslang-sdk-1.3.275.0/StandAlone/CMakeLists.txt.dma	2023-08-09 04:49:36.000000000 +1000
++++ glslang-sdk-1.3.275.0/StandAlone/CMakeLists.txt	2023-09-05 13:22:23.806333232 +1000
+@@ -63,6 +63,14 @@ set(LIBRARIES
+     SPIRV
+     glslang-default-resource-limits)
+ 
++if(BUILD_SHARED_LIBS)
++    set(LIBRARIES ${LIBRARIES} ${SPIRV_TOOLS_SHARED_LIBRARIES})
++    target_include_directories(glslang-standalone PUBLIC ${SPIRV_TOOLS_SHARED_INCLUDE_DIRS})
++else()
++    set(LIBRARIES ${LIBRARIES} ${SPIRV_TOOLS_LIBRARIES})
++    target_include_directories(glslang-standalone PUBLIC ${SPIRV_TOOLS_INCLUDE_DIRS})
++endif(BUILD_SHARED_LIBS)
++
+ if(WIN32)
+     set(LIBRARIES ${LIBRARIES} psapi)
+ elseif(UNIX)
+@@ -72,8 +80,6 @@ elseif(UNIX)
+ endif()
+ 
+ target_link_libraries(glslang-standalone ${LIBRARIES})
+-target_include_directories(glslang-standalone PUBLIC
+-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../External>)
+ 
+ if(ENABLE_SPVREMAPPER)
+     set(REMAPPER_SOURCES spirv-remap.cpp)

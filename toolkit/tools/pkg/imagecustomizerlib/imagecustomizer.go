@@ -147,12 +147,18 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}
 
-	if config.SystemConfig.Verity != nil {
+	if config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
 		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
+	}
+
+	// Check file systems for corruption.
+	err = checkFileSystems(rawImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to check filesystems:\n%w", err)
 	}
 
 	// Create final output image file if requested.
@@ -216,7 +222,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	err = validateSystemConfig(baseConfigPath, &config.SystemConfig, rpmsSources, useBaseImageRpmRepos,
+	err = validateSystemConfig(baseConfigPath, &config.OS, rpmsSources, useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
@@ -226,7 +232,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 }
 
 func hasPartitionCustomizations(config *imagecustomizerapi.Config) bool {
-	return config.Disks != nil
+	return config.Storage != nil
 }
 
 func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizerapi.AdditionalFilesMap) error {
@@ -235,11 +241,11 @@ func validateAdditionalFiles(baseConfigPath string, additionalFiles imagecustomi
 		sourceFileFullPath := file.GetAbsPathWithBase(baseConfigPath, sourceFile)
 		isFile, err := file.IsFile(sourceFileFullPath)
 		if err != nil {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s):\n%w", sourceFile, err))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s):\n%w", sourceFile, err))
 		}
 
 		if !isFile {
-			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid AdditionalFiles source file (%s): not a file", sourceFile))
+			aggregateErr = errors.Join(aggregateErr, fmt.Errorf("invalid additionalFiles source file (%s): not a file", sourceFile))
 		}
 	}
 	return aggregateErr
@@ -250,12 +256,7 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 		return nil
 	}
 
-	err := validateIsoKernelCommandline(config.KernelCommandLine)
-	if err != nil {
-		return err
-	}
-
-	err = validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
+	err := validateAdditionalFiles(baseConfigPath, config.AdditionalFiles)
 	if err != nil {
 		return err
 	}
@@ -263,14 +264,7 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 	return nil
 }
 
-func validateIsoKernelCommandline(kernelCommandLine imagecustomizerapi.KernelCommandLine) error {
-	if kernelCommandLine.SELinux != imagecustomizerapi.SELinuxDefault {
-		return fmt.Errorf("unsupported SELinux configuration for the output ISO image.")
-	}
-	return nil
-}
-
-func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
@@ -325,20 +319,20 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 	return nil
 }
 
-func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.SystemConfig, rpmsSources []string,
+func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, rpmsSources []string,
 	useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
-	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.PackageListsRemove, config.PackagesRemove)
+	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.Packages.RemoveLists, config.Packages.Remove)
 	if err != nil {
 		return err
 	}
 
-	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.PackageListsInstall, config.PackagesInstall)
+	allPackagesInstall, err := collectPackagesList(baseConfigPath, config.Packages.InstallLists, config.Packages.Install)
 	if err != nil {
 		return err
 	}
 
-	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.PackageListsUpdate, config.PackagesUpdate)
+	allPackagesUpdate, err := collectPackagesList(baseConfigPath, config.Packages.UpdateLists, config.Packages.Update)
 	if err != nil {
 		return err
 	}
@@ -346,7 +340,8 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 	hasRpmSources := len(rpmsSources) > 0 || useBaseImageRpmRepos
 
 	if !hasRpmSources {
-		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 || config.UpdateBaseImagePackages
+		needRpmsSources := len(allPackagesInstall) > 0 || len(allPackagesUpdate) > 0 ||
+			config.Packages.UpdateExistingPackages
 
 		if needRpmsSources {
 			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
@@ -355,13 +350,13 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.Syst
 		}
 	}
 
-	config.PackagesRemove = allPackagesRemove
-	config.PackagesInstall = allPackagesInstall
-	config.PackagesUpdate = allPackagesUpdate
+	config.Packages.Remove = allPackagesRemove
+	config.Packages.Install = allPackagesInstall
+	config.Packages.Update = allPackagesUpdate
 
-	config.PackageListsRemove = nil
-	config.PackageListsInstall = nil
-	config.PackageListsUpdate = nil
+	config.Packages.RemoveLists = nil
+	config.Packages.InstallLists = nil
+	config.Packages.UpdateLists = nil
 
 	return nil
 }
@@ -376,7 +371,7 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	defer imageConnection.Close()
 
 	// Do the actual customizations.
-	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection.Chroot(), rpmsSources,
+	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
@@ -462,11 +457,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	// Extract the partition block device path.
-	dataPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id, nbdDevice, diskPartitions)
+	dataPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
-	hashPartition, err := idToPartitionBlockDevicePath(config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, nbdDevice, diskPartitions)
+	hashPartition, err := idToPartitionBlockDevicePath(config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, nbdDevice, diskPartitions)
 	if err != nil {
 		return err
 	}
@@ -512,8 +507,8 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 		return fmt.Errorf("failed to stat file (%s):\n%w", grubCfgFullPath, err)
 	}
 
-	err = updateGrubConfig(config.SystemConfig.Verity.DataPartition.IdType, config.SystemConfig.Verity.DataPartition.Id,
-		config.SystemConfig.Verity.HashPartition.IdType, config.SystemConfig.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+	err = updateGrubConfig(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
+		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
 	if err != nil {
 		return err
 	}

@@ -182,3 +182,5 @@ enable cloud-config.service
 enable cloud-final.service
 enable cloud-init.service
 enable cloud-init-local.service
+
+enable waagent.service

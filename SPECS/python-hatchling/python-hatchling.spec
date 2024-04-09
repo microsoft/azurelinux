@@ -1,5 +1,3 @@
-# Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 %global srcname hatchling
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -8,7 +6,7 @@ Distribution:   Azure Linux
 
 Name:           python-%{srcname}
 Version:        1.21.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        The build backend used by Hatch
 
 # SPDX
@@ -33,11 +31,12 @@ BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 BuildRequires:  python3-pathspec
 BuildRequires:  python3-pluggy
-BuildRequires:  python3-tomli
 BuildRequires:  python3-packaging
 BuildRequires:  python3-pyparsing
 BuildRequires:  python3-trove-classifiers
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
+%endif
 
 %global common_description %{expand:
 This is the extensible, standards compliant build backend used by Hatch.}
@@ -76,9 +75,13 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
 
 
 %check
-%if 0%{?with_check}
-%pytest
-%endif
+# We cannot run the “downstream integration tests” included with the PyPI sdist
+# in an offline build. The primary tests are Hatch’s “backend” tests, but these
+# are not included in the PyPI sdist or github release tarball as of v1.21.1.
+# Check that the package is importable as a sanity check.
+
+# %%pytest # Add this back when the tests are included in the release tarball.
+%pyproject_check_import
 
 
 %files -n python3-%{srcname} -f %{pyproject_files}
@@ -91,6 +94,10 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 \
 
 
 %changelog
+* Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.21.1-4
+- Remove unnecessary build dependency
+- Re-enable tests (after a fashion)
+
 * Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.21.1-3
 - Updating naming for 3.0 version of Azure Linux.
 

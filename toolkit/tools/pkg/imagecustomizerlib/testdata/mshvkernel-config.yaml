@@ -1,0 +1,36 @@
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4G
+    partitions:
+    - id: efi
+      type: esp
+      start: 1M
+      end: 65M
+
+    - id: rootfs
+      start: 65M
+
+  bootType: efi
+
+  fileSystems:
+  - deviceId: efi
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  resetBootLoaderType: hard-reset
+
+  packages:
+    remove:
+    - kernel
+
+    install:
+    - kernel-mshv

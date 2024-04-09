@@ -87,13 +87,12 @@ analyze-built-graph: $(go-graphanalytics)
 	fi
 
 # Parse specs in $(SPECS_DIR) and generate a specs.json file encoding all dependency information
-# We look at the same pack list as the srpmpacker tool via the target $(srpm_pack_list_file), which
-# is build from the contents of $(SRPM_PACK_LIST) if it is set. We only parse the spec files we will
-# actually pack.
-$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(srpm_pack_list_file) $(depend_RUN_CHECK)
+# We look at the same pack list as the srpmpacker tool via the target $(SRPM_PACK_LIST) if it is set.
+# We only parse the spec files we will actually pack.
+$(specs_file): $(chroot_worker) $(SPECS_DIR) $(build_specs) $(build_spec_dirs) $(go-specreader) $(depend_SPECS_DIR) $(depend_SRPM_PACK_LIST) $(depend_RUN_CHECK)
 	$(go-specreader) \
 		--dir $(SPECS_DIR) \
-		$(if $(SRPM_PACK_LIST),--spec-list=$(srpm_pack_list_file)) \
+		$(if $(SRPM_PACK_LIST),--spec-list="$(SRPM_PACK_LIST)") \
 		--build-dir $(parse_working_dir) \
 		--srpm-dir $(BUILD_SRPMS_DIR) \
 		--rpm-dir $(RPMS_DIR) \
@@ -233,6 +232,7 @@ $(preprocessed_file): $(cached_file) $(go-graphPreprocessor)
 
 ######## PACKAGE BUILD ########
 
+cache_archive	= $(OUT_DIR)/cache.tar.gz
 pkggen_archive	= $(OUT_DIR)/rpms.tar.gz
 srpms_archive  	= $(OUT_DIR)/srpms.tar.gz
 
@@ -326,6 +326,10 @@ compress-rpms:
 	tar -cvp -f $(BUILD_DIR)/temp_rpms_tarball.tar.gz -C $(RPMS_DIR)/.. $(notdir $(RPMS_DIR))
 	mv $(BUILD_DIR)/temp_rpms_tarball.tar.gz $(pkggen_archive)
 
+##help:target:compress-cached-rpms=Compresses all cached RPMs in `build/rpm_cache/cache` into `out/cache.tar.gz`.
+compress-cached-rpms:
+	tar -cvp -f $(cache_archive) -C $(remote_rpms_cache_dir)/.. $(notdir $(remote_rpms_cache_dir))
+
 ##help:target:compress-srpms=Compresses all SRPMs in `../out/SRPMS` into `../out/srpms.tar.gz`.
 # use temp tarball to avoid tar warning "file changed as we read it"
 # that can sporadically occur when tarball is the dir that is compressed
@@ -333,7 +337,10 @@ compress-srpms:
 	tar -cvp -f $(BUILD_DIR)/temp_srpms_tarball.tar.gz -C $(SRPMS_DIR)/.. $(notdir $(SRPMS_DIR))
 	mv $(BUILD_DIR)/temp_srpms_tarball.tar.gz $(srpms_archive)
 
-# Seed the cached RPMs folder files from the archive.
+##help:target:hydrate-cached-rpms=Hydrates the external RPMs cache from the `CACHED_PACKAGES_ARCHIVE` file.
+# All of the '*.rpm' files inside the archive will be extracted into the cache directory in flat manner.
+# Any duplicates inside the archive's subdirectories will be overwritten by the last one.
+# Also see the `compress-cached-rpms` target.
 hydrate-cached-rpms:
 	$(if $(CACHED_PACKAGES_ARCHIVE),,$(error Must set CACHED_PACKAGES_ARCHIVE=<path>))
 	@mkdir -p $(remote_rpms_cache_dir)

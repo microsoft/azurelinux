@@ -64,11 +64,51 @@ func New(calamaresInstallFunc func()) *InstallerView {
 		logger.Log.Debugf("Calamares not found, defaulting to terminal based installer")
 	} else {
 		iv.installerOptions = append(iv.installerOptions, uitext.InstallerGraphicalOption)
+
+		err = AssignDbusPermissions()
+		if err != nil {
+			logger.Log.Debugf("An error occured during reassignment of dbus permissions: %s", err)
+		}
 	}
 
 	iv.needsToPrompt = (len(iv.installerOptions) != 1)
 
 	return iv
+}
+
+// This function is a workaround to deal with squashed, required permissions
+// within the iso_initrd environment. A required file for launching a dbus service,
+// /usr/libexec/dbus-daemon-lauch-helper, must have the group messagebus with
+// permissions 4750 in order to start properly. As a part of the calamares
+// setup process, kpmcore is launched using this dbus-daemon-launch-helper.
+// When initially loaded the iso_initrd has squashed the group to be root causing
+// an error to occur during the calamares validation phase for the partition
+// module. By reseting the permissions at runtime of the environment, the issue
+// is resolved. But, it still remains unknown why the group is being set to root
+// when the iso_initrd is loaded.
+// Links to Information on the Issue:
+//
+//	https://invent.kde.org/system/kpmcore/-/issues/15
+//	https://forums.gentoo.org/viewtopic-t-1079170-start-0.html
+//	https://forums.freebsd.org/threads/gdbus-error-org-freedesktop-dbus-error-spawn-execfailed.91776/
+//	https://forums.gentoo.org/viewtopic-t-1007656-start-0.html
+func AssignDbusPermissions() (err error) {
+	logger.Log.Debugf("Running chgrp for dbus-daemon-launch-helper")
+	cmd := exec.Command("chgrp", "messagebus", "/usr/libexec/dbus-daemon-launch-helper")
+	err = cmd.Run()
+	if err != nil {
+		logger.Log.Debugf("Error while running chgrp for dbus-daemon-launch-helper: %s", err)
+		return
+	}
+
+	//chmod is required after resetting the group, even if permissions "look" correct
+	logger.Log.Debugf("Running chmod for dbus-daemon-launch-helper")
+	cmd = exec.Command("chmod", "4750", "/usr/libexec/dbus-daemon-launch-helper")
+	err = cmd.Run()
+	if err != nil {
+		logger.Log.Debugf("Error while running chmod for dbus-daemon-launch-helper: %s", err)
+	}
+	return
 }
 
 // Initialize initializes the view.

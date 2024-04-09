@@ -10,9 +10,21 @@ import (
 	"strconv"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
+
+type outputPartitionMetadata struct {
+	PartitionNum      int    `json:"partitionnum"` // Example: 1
+	PartitionFilename string `json:"filename"`     // Example: image_1.raw.zst
+	PartLabel         string `json:"partlabel"`    // Example: boot
+	FileSystemType    string `json:"fstype"`       // Example: vfat
+	PartitionTypeUuid string `json:"parttype"`     // Example: c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+	Uuid              string `json:"uuid"`         // Example: 4BD9-3A78
+	PartUuid          string `json:"partuuid"`     // Example: 7b1367a6-5845-43f2-99b1-a742d873f590
+	Mountpoint        string `json:"mountpoint"`   // Example: /mnt/os/boot
+}
 
 const (
 	SkippableFrameMagicNumber uint32 = 0x184D2A50
@@ -23,47 +35,78 @@ const (
 // Extract all partitions of connected image into separate files with specified format.
 func extractPartitions(imageLoopDevice string, outDir string, basename string, partitionFormat string) error {
 
-	// Get partition info.
+	// Get partition info
 	diskPartitions, err := diskutils.GetDiskPartitions(imageLoopDevice)
 	if err != nil {
 		return err
 	}
 
-	// Create skippable frame metadata defined as a random 128-Bit number
+	// Stores the output partition metadata that will be written to JSON file
+	var partitionMetadataOutput []outputPartitionMetadata
+
+	// Create skippable frame metadata defined as a random 128-bit number
 	skippableFrameMetadata, err := createSkippableFrameMetadata()
 	if err != nil {
 		return err
 	}
 
-	for partitionNum := 0; partitionNum < len(diskPartitions); partitionNum++ {
-		if diskPartitions[partitionNum].Type == "part" {
-			partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
-			rawFilename := partitionFilename + ".raw"
-			partitionLoopDevice := diskPartitions[partitionNum].Path
+	// Extract partitions to files
+	for partitionNum := range diskPartitions {
+		partition := diskPartitions[partitionNum]
+		if partition.Type != "part" {
+			continue
+		}
 
-			partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		partitionFilename := basename + "_" + strconv.Itoa(partitionNum)
+		rawFilename := partitionFilename + ".raw"
+		partitionLoopDevice := partition.Path
+
+		partitionFilepath, err := copyBlockDeviceToFile(outDir, partitionLoopDevice, rawFilename)
+		if err != nil {
+			return err
+		}
+
+		partitionFullFilePath, err := filepath.Abs(partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to get absolute path (%s):\n%w", partitionFilepath, err)
+		}
+
+		// Sanity check the partition file.
+		err = checkFileSystemFile(partition.FileSystemType, partitionFullFilePath)
+		if err != nil {
+			return fmt.Errorf("failed to check file system integrity (%s):\n%w", partitionFilepath, err)
+		}
+
+		switch partitionFormat {
+		case "raw":
+			// Do nothing for "raw" case
+		case "raw-zst":
+			partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
 			if err != nil {
 				return err
 			}
-
-			switch partitionFormat {
-			case "raw":
-				// Do nothing for "raw" case.
-			case "raw-zst":
-				partitionFilepath, err = extractRawZstPartition(partitionFilepath, skippableFrameMetadata, partitionFilename, outDir)
-				if err != nil {
-					return err
-				}
-			default:
-				return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
-			}
-			logger.Log.Infof("Partition file created: %s", partitionFilepath)
+		default:
+			return fmt.Errorf("unsupported partition format (supported: raw, raw-zst): %s", partitionFormat)
 		}
+
+		partitionMetadata, err := constructOutputPartitionMetadata(partition, partitionNum, partitionFilepath)
+		if err != nil {
+			return fmt.Errorf("failed to construct partition metadata:\n%w", err)
+		}
+		partitionMetadataOutput = append(partitionMetadataOutput, partitionMetadata)
+		logger.Log.Infof("Partition file created: %s", partitionFilepath)
+	}
+
+	// Write partition metadata JSON to a file
+	jsonFilename := basename + "_partition_metadata.json"
+	err = writePartitionMetadataJson(outDir, jsonFilename, &partitionMetadataOutput)
+	if err != nil {
+		return fmt.Errorf("failed to write partition metadata json:\n%w", err)
 	}
 	return nil
 }
 
-// Extract raw-zst partition
+// Extract raw-zst partition.
 func extractRawZstPartition(partitionRawFilepath string, skippableFrameMetadata [SkippableFramePayloadSize]byte, partitionFilename string, outDir string) (partitionFilepath string, err error) {
 	// Define file path for temporary partition
 	tempPartitionFilepath := outDir + "/" + partitionFilename + "_temp.raw.zst"
@@ -189,4 +232,31 @@ func generateRandom128BitNumber() ([SkippableFramePayloadSize]byte, error) {
 		return randomBytes, err
 	}
 	return randomBytes, nil
+}
+
+// Construct outputPartitionMetadata for given partition.
+func constructOutputPartitionMetadata(diskPartition diskutils.PartitionInfo, partitionNum int, partitionFilepath string) (partitionMetadata outputPartitionMetadata, err error) {
+	partitionMetadata.PartitionNum = partitionNum
+	partitionMetadata.PartitionFilename = filepath.Base(partitionFilepath)
+	partitionMetadata.PartLabel = diskPartition.PartLabel
+	partitionMetadata.FileSystemType = diskPartition.FileSystemType
+	partitionMetadata.PartitionTypeUuid = diskPartition.PartitionTypeUuid
+	partitionMetadata.Uuid = diskPartition.Uuid
+	partitionMetadata.PartUuid = diskPartition.PartUuid
+	partitionMetadata.Mountpoint = diskPartition.Mountpoint
+
+	return partitionMetadata, nil
+}
+
+// Write partition metadata as JSON to a file.
+func writePartitionMetadataJson(outDir string, name string, output *[]outputPartitionMetadata) (err error) {
+	fullPath := filepath.Join(outDir, name)
+
+	err = jsonutils.WriteJSONFile(fullPath, output)
+	if err != nil {
+		return err
+	}
+
+	logger.Log.Infof("Partition metadata file created: %s", fullPath)
+	return nil
 }

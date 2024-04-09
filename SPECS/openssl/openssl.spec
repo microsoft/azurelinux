@@ -9,14 +9,12 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 2%{?dist}
+Release: 6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
 Source2: Makefile.certificate
 Source3: genpatches
-Source6: make-dummy-cert
-Source7: renew-dummy-cert
 Source9: configuration-switch.h
 Source10: configuration-prefix.h
 Source14: 0025-for-tests.patch
@@ -85,11 +83,12 @@ BuildRequires: perl(Text::Template)
 BuildRequires: sed
 
 %if 0%{?with_check}
+BuildRequires: perl(Math::BigInt)
+BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: coreutils
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -99,8 +98,6 @@ protocols.
 
 %package libs
 Summary: A general purpose cryptography library with TLS implementation
-Requires: ca-certificates >= 2008-5
-Recommends: openssl-pkcs11%{?_isa}
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -249,8 +246,6 @@ done
 # for generating them on the fly.
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
 install -m644 %{SOURCE2} $RPM_BUILD_ROOT%{_pkgdocdir}/Makefile.certificate
-install -m755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/make-dummy-cert
-install -m755 %{SOURCE7} $RPM_BUILD_ROOT%{_bindir}/renew-dummy-cert
 
 # Move runable perl scripts to bindir
 mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
@@ -310,8 +305,6 @@ install -m644 %{SOURCE9} \
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc NEWS.md README.md
-%{_bindir}/make-dummy-cert
-%{_bindir}/renew-dummy-cert
 %{_bindir}/openssl
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -361,6 +354,19 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
+- At check build requirements
+- Modify patch patch to not force load default provider
+
+* Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
+- Remove make-dummy-cert and renew-dummy-cert scripts
+
+* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
+- Remove runtime dependency on coreutils
+
+* Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3
+- Remove dependencies for the libs sub-package to realign with azure linux 2.0
+
 * Thu Feb 29 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.4-2
 - Perl will be installed with openssl-perl sub-package and not needed as default runtime dependency.
 

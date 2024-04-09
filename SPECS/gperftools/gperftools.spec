@@ -28,13 +28,32 @@ Group:          Development/Tools
 %description docs
 The contains gperftools package doc files.
 
+%package libs
+Summary:	Libraries provided by gperftools
+Group:   Development/Tools
+ 
+%description libs
+Libraries provided by gperftools, including libtcmalloc and libprofiler.
+
 %prep
 %setup -q
 
 %build
+export CFLAGS=`echo $RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs -DTCMALLOC_LARGE_PAGES | sed -e 's|-fexceptions||g'`
+export CXXFLAGS=`echo $RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs -DTCMALLOC_LARGE_PAGES | sed -e 's|-fexceptions||g'`
 ./configure \
    --prefix=%{_prefix} \
-   --docdir=%{_defaultdocdir}/%{name}-%{version}
+   --docdir=%{_defaultdocdir}/%{name}-%{version} \
+%ifarch s390x aarch64
+	--disable-general-dynamic-tls \
+%endif
+	--disable-dynamic-sized-delete-support \
+	--disable-static
+ 
+# Bad rpath!
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+
 make %{?_smp_mflags}
 
 %install
@@ -43,6 +62,8 @@ find %{buildroot} -name '*.la' -delete
 
 %check
 TCMALLOC_SAMPLE_PARAMETER=128 && make check
+
+%ldconfig_scriptlets libs
 
 %files
 %defattr(-,root,root)
@@ -55,9 +76,7 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %files devel
 %{_includedir}/google/*
 %{_includedir}/gperftools/*
-%{_libdir}/libprofiler*.a
 %{_libdir}/libprofiler*.so
-%{_libdir}/libtcmalloc*.a
 %{_libdir}/libtcmalloc*.so
 %{_libdir}/pkgconfig/lib*
 
@@ -65,7 +84,13 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %{_docdir}/%{name}-%{version}/*
 %{_mandir}/man1/*
 
+%files libs
+%{_libdir}/*.so.*
+
 %changelog
+* Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
+- Update build step from fedora and add libs package
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.12-1
 - Auto-upgrade to 2.12 - Azure Linux 3.0 - package upgrades
 

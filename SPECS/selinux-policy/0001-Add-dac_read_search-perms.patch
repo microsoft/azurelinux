@@ -1,0 +1,88 @@
+From c6610980178372411338a6b4d07687598b7c9066 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Fri, 20 Aug 2021 18:11:23 +0000
+Subject: [PATCH 01/14] Add dac_read_search perms.
+
+May be Mariner-specific.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/admin/usermanage.te | 4 ++--
+ policy/modules/services/chronyd.te | 4 ++--
+ policy/modules/system/authlogin.te | 2 +-
+ policy/modules/system/systemd.te   | 2 ++
+ 4 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/policy/modules/admin/usermanage.te b/policy/modules/admin/usermanage.te
+index daeaa090e..57a9848bc 100644
+--- a/policy/modules/admin/usermanage.te
++++ b/policy/modules/admin/usermanage.te
+@@ -303,7 +303,7 @@ optional_policy(`
+ # Passwd local policy
+ #
+ 
+-allow passwd_t self:capability { chown dac_override fsetid setgid setuid sys_nice sys_resource };
++allow passwd_t self:capability { chown dac_override dac_read_search fsetid setgid setuid sys_nice sys_resource };
+ dontaudit passwd_t self:capability sys_tty_config;
+ allow passwd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+ allow passwd_t self:fd use;
+@@ -478,7 +478,7 @@ optional_policy(`
+ # Useradd local policy
+ #
+ 
+-allow useradd_t self:capability { chown dac_override fowner fsetid kill setuid sys_resource };
++allow useradd_t self:capability { chown dac_read_search dac_override fowner fsetid kill setuid sys_resource };
+ dontaudit useradd_t self:capability { net_admin sys_ptrace sys_tty_config };
+ dontaudit useradd_t self:cap_userns sys_ptrace;
+ allow useradd_t self:process { transition signal_perms getsched setsched getsession getpgid setpgid getcap setcap share getattr setfscreate noatsecure siginh rlimitinh dyntransition setkeycreate setsockcreate getrlimit };
+diff --git a/policy/modules/services/chronyd.te b/policy/modules/services/chronyd.te
+index 9e6ba5bf1..500ce6fe2 100644
+--- a/policy/modules/services/chronyd.te
++++ b/policy/modules/services/chronyd.te
+@@ -54,7 +54,7 @@ logging_log_file(chronyd_var_log_t)
+ # chronyd local policy
+ #
+ 
+-allow chronyd_t self:capability { chown dac_override ipc_lock setgid setuid sys_resource sys_time };
++allow chronyd_t self:capability { chown dac_read_search dac_override ipc_lock setgid setuid sys_resource sys_time };
+ allow chronyd_t self:process { getcap setcap setrlimit signal };
+ allow chronyd_t self:shm create_shm_perms;
+ allow chronyd_t self:fifo_file rw_fifo_file_perms;
+@@ -134,7 +134,7 @@ optional_policy(`
+ # chronyc local policy
+ #
+ 
+-allow chronyc_t self:capability { dac_override };
++allow chronyc_t self:capability { dac_read_search dac_override };
+ allow chronyc_t self:process { signal };
+ allow chronyc_t self:udp_socket create_socket_perms;
+ allow chronyc_t self:netlink_route_socket create_netlink_socket_perms;
+diff --git a/policy/modules/system/authlogin.te b/policy/modules/system/authlogin.te
+index 3a5d1ac3e..e65c0c41d 100644
+--- a/policy/modules/system/authlogin.te
++++ b/policy/modules/system/authlogin.te
+@@ -109,7 +109,7 @@ optional_policy(`
+ # Check password local policy
+ #
+ 
+-allow chkpwd_t self:capability { dac_override setuid };
++allow chkpwd_t self:capability { dac_read_search dac_override setuid };
+ dontaudit chkpwd_t self:capability sys_tty_config;
+ allow chkpwd_t self:process { getattr signal };
+ dontaudit chkpwd_t self:process getcap;
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index aa9198591..2398854e7 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -773,6 +773,8 @@ optional_policy(`
+ # hw local policy
+ #
+ 
++allow systemd_hw_t self:capability dac_override;
++
+ kernel_read_kernel_sysctls(systemd_hw_t)
+ 
+ allow systemd_hw_t systemd_hwdb_t:file { manage_file_perms relabel_file_perms };
+-- 
+2.43.2
+

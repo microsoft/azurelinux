@@ -7,7 +7,7 @@ Summary:        Installer from a live CD/DVD/USB to disk
 # https://github.com/calamares/calamares/issues/1051
 Name:           calamares
 Version:        3.3.1
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,11 +15,11 @@ URL:            https://calamares.io/
 # Source0..19 - source tarballs
 Source0:        https://github.com/calamares/calamares/releases/download/v%{version}/%{name}-%{version}.tar.gz
 # Source1..4 is an artifact from https://dev.azure.com/mariner-org/mariner/_git/calamares-installer-module
-Source1:        calamares-users-3.0.1.tar.gz
-Source2:        calamares-finished-3.0.1.tar.gz
-Source3:        calamares-welcome-3.0.1.tar.gz
-Source4:        calamares-partition-3.0.1.tar.gz
-Source5:        calamares-license-3.0.1.tar.gz
+Source1:        calamares-users-3.0.3.tar.gz
+Source2:        calamares-finished-3.0.2.tar.gz
+Source3:        calamares-welcome-3.0.2.tar.gz
+Source4:        calamares-partition-3.0.3.tar.gz
+Source5:        calamares-license-3.0.2.tar.gz
 # Source20..39 - configuration files
 Source20:       license.conf
 Source21:       settings.conf
@@ -221,6 +221,12 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 %{_libdir}/libcalamaresui.so
 
 %changelog
+* Wed Mar 20 2024 Sam Meluch <sammeluch@microsfot.com> - 3.3.1-5
+- update calamares modules for runtime errors
+
+* Tue Mar 12 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-4
+- update license.conf file path to use azl-eula
+
 * Fri Mar 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.3.1-3
 - Fix python macros for calamares
 

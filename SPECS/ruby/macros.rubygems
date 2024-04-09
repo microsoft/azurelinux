@@ -204,5 +204,5 @@ Either set the "gem_name" macro, or use "%%gemspec_clear_signing" with the "-f <
     }
   }
 }
-sed -Ei '/spec.(cert_chain|signing_key)/d' "%{-f*}%{!-f:%{gem_name}.gemspec}"
+sed -Ei '/(spec|gem).(cert_chain|signing_key)/d' "%{-f*}%{!-f:%{gem_name}.gemspec}"
 }

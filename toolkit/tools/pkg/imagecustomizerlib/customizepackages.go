@@ -14,14 +14,14 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.SystemConfig,
+func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.OS,
 	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
 
 	// Note: The 'validatePackageLists' function read the PackageLists files and merged them into the inline package lists.
-	needRpmsSources := len(config.PackagesInstall) > 0 || len(config.PackagesUpdate) > 0 ||
-		config.UpdateBaseImagePackages || partitionsCustomized
+	needRpmsSources := len(config.Packages.Install) > 0 || len(config.Packages.Update) > 0 ||
+		config.Packages.UpdateExistingPackages || partitionsCustomized
 
 	// Mount RPM sources.
 	var mounts *rpmSourcesMounts
@@ -42,26 +42,26 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 		}
 	}
 
-	err = removePackages(config.PackagesRemove, imageChroot)
+	err = removePackages(config.Packages.Remove, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	if config.UpdateBaseImagePackages {
+	if config.Packages.UpdateExistingPackages {
 		err = updateAllPackages(imageChroot)
 		if err != nil {
 			return err
 		}
 	}
 
-	logger.Log.Infof("Installing packages: %v", config.PackagesInstall)
-	err = installOrUpdatePackages("install", config.PackagesInstall, imageChroot)
+	logger.Log.Infof("Installing packages: %v", config.Packages.Install)
+	err = installOrUpdatePackages("install", config.Packages.Install, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	logger.Log.Infof("Updating packages: %v", config.PackagesUpdate)
-	err = installOrUpdatePackages("update", config.PackagesUpdate, imageChroot)
+	logger.Log.Infof("Updating packages: %v", config.Packages.Update)
+	err = installOrUpdatePackages("update", config.Packages.Update, imageChroot)
 	if err != nil {
 		return err
 	}

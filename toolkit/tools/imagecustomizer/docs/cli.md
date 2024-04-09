@@ -33,14 +33,18 @@ The image format of the the final customized image.
 
 Options: vhd, vhdx, qcow2, raw, and iso.
 
-At least one of `--output-image-format` and `--output-split-partitions-format` is required.
+At least one of `--output-image-format` and `--output-split-partitions-format` is 
+required.
 
 When the output image format is set to iso, the generated image is a LiveOS
-iso image. For more details on this format, see: [Azure Linux Image Customizer ISO Support](./iso.md).
+iso image. For more details on this format, see: 
+[Azure Linux Image Customizer ISO Support](./iso.md).
 
 ## --output-split-partitions-format=FORMAT
 
-Format of partition files. If specified, disk partitions will be extracted as separate files.
+Format of partition files. If specified, disk partitions will be extracted as separate
+files and a json file with partition metadata will be produced. For more details on 
+the json file format, see: [Partition Metadata JSON Format](./partitionmetadatajson.md).
 
 Options: raw, raw-zst.
 

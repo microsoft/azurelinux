@@ -29,9 +29,11 @@ const (
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	imageConnection *ImageConnection, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
 	var err error
+
+	imageChroot := imageConnection.Chroot()
 
 	// Note: The ordering of the customization steps here should try to mirror the order of the equivalent steps in imager
 	// tool as closely as possible.
@@ -43,33 +45,33 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.SystemConfig, imageChroot, rpmsSources,
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.OS, imageChroot, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
-	err = updateHostname(config.SystemConfig.Hostname, imageChroot)
+	err = updateHostname(config.OS.Hostname, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalFiles(baseConfigPath, config.SystemConfig.AdditionalFiles, imageChroot)
+	err = copyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = AddOrUpdateUsers(config.SystemConfig.Users, baseConfigPath, imageChroot)
+	err = AddOrUpdateUsers(config.OS.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = enableOrDisableServices(config.SystemConfig.Services, imageChroot)
+	err = enableOrDisableServices(config.OS.Services, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = loadOrDisableModules(config.SystemConfig.Modules, imageChroot)
+	err = loadOrDisableModules(config.OS.Modules, imageChroot.RootDir())
 	if err != nil {
 		return err
 	}
@@ -79,23 +81,23 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.SystemConfig.PostInstallScripts, imageChroot)
+	err = runScripts(baseConfigPath, config.OS.PostInstallScripts, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = handleKernelCommandLine(config.SystemConfig.KernelCommandLine.ExtraCommandLine, imageChroot,
-		partitionsCustomized)
-	if err != nil {
-		return fmt.Errorf("failed to add extra kernel command line: %w", err)
-	}
-
-	err = handleSELinux(config.SystemConfig.KernelCommandLine.SELinux, partitionsCustomized, imageChroot)
+	err = handleBootLoader(baseConfigPath, config, imageConnection)
 	if err != nil {
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.SystemConfig.FinalizeImageScripts, imageChroot)
+	err = handleSELinux(config.OS.SELinux.Mode, config.OS.ResetBootLoaderType,
+		imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = runScripts(baseConfigPath, config.OS.FinalizeImageScripts, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -105,12 +107,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = enableOverlays(config.SystemConfig.Overlays, imageChroot)
+	err = enableOverlays(config.OS.Overlays, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = enableVerityPartition(config.SystemConfig.Verity, imageChroot)
+	err = enableVerityPartition(buildDir, config.OS.Verity, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -276,6 +278,10 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	if userExists {
+		if user.UID != nil {
+			return fmt.Errorf("cannot set UID (%d) on a user (%s) that already exists", *user.UID, user.Name)
+		}
+
 		// Update the user's password.
 		err = userutils.UpdateUserPassword(imageChroot.RootDir(), user.Name, hashedPassword)
 		if err != nil {
@@ -309,11 +315,12 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 	}
 
 	// Set user's SSH keys.
-	for i, _ := range user.SSHPubKeyPaths {
-		user.SSHPubKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPubKeyPaths[i])
+	for i, _ := range user.SSHPublicKeyPaths {
+		user.SSHPublicKeyPaths[i] = file.GetAbsPathWithBase(baseConfigPath, user.SSHPublicKeyPaths[i])
 	}
 
-	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+	err = installutils.ProvisionUserSSHCerts(imageChroot, user.Name, user.SSHPublicKeyPaths, user.SSHPublicKeys,
+		userExists)
 	if err != nil {
 		return err
 	}
@@ -357,33 +364,6 @@ func enableOrDisableServices(services imagecustomizerapi.Services, imageChroot *
 	return nil
 }
 
-func loadOrDisableModules(modules imagecustomizerapi.Modules, imageChroot *safechroot.Chroot) error {
-	var err error
-
-	for _, module := range modules.Load {
-		logger.Log.Infof("Loading kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modules-load.d/", moduleFileName)
-		err = file.Write(module.Name, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module load configuration: %w", err)
-		}
-	}
-
-	for _, module := range modules.Disable {
-		logger.Log.Infof("Disabling kernel module (%s)", module.Name)
-		moduleFileName := module.Name + ".conf"
-		moduleFilePath := filepath.Join(imageChroot.RootDir(), "/etc/modprobe.d/", moduleFileName)
-		data := fmt.Sprintf("blacklist %s\n", module.Name)
-		err = file.Write(data, moduleFilePath)
-		if err != nil {
-			return fmt.Errorf("failed to write module disable configuration: %w", err)
-		}
-	}
-
-	return nil
-}
-
 func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, buildTime string) error {
 	var err error
 
@@ -404,21 +384,52 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 	return nil
 }
 
-func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized bool, imageChroot *safechroot.Chroot,
+func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
+) error {
+	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
+	if err != nil {
+		return err
+	}
+
+	switch config.OS.ResetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		// Hard-reset the grub config.
+		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
+			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
+		if err != nil {
+			return fmt.Errorf("failed to configure bootloader:\n%w", err)
+		}
+
+	default:
+		// Append the kernel command-line args to the existing grub config.
+		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
+		if err != nil {
+			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+		}
+	}
+
+	return nil
+}
+
+func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
+	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
 	// Resolve the default SELinux mode.
-	if selinuxMode == imagecustomizerapi.SELinuxDefault {
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
 		if err != nil {
 			return err
 		}
 	}
 
-	// If the partitions were customized, then the grub.cfg file will have been recreated from scratch and therefore
-	// the SELinux args will already be correct and don't need to be updated.
-	if !partitionsCustomized {
+	switch resetBootLoaderType {
+	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		// The grub.cfg file has been recreated from scratch and therefore the SELinux args will already be correct and
+		// don't need to be updated.
+
+	default:
 		// Update the SELinux kernel command-line args.
 		err := updateSELinuxCommandLine(selinuxMode, imageChroot)
 		if err != nil {
@@ -426,7 +437,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized 
 		}
 	}
 
-	if selinuxMode != imagecustomizerapi.SELinuxDisabled {
+	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
 		err = updateSELinuxMode(selinuxMode, imageChroot)
 		if err != nil {
 			return err
@@ -436,7 +447,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinux, partitionsCustomized 
 	return nil
 }
 
-func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinux, imageChroot *safechroot.Chroot) error {
+func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	imagerSELinuxMode, err := selinuxModeToImager(selinuxMode)
 	if err != nil {
 		return err

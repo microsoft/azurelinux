@@ -15,27 +15,27 @@
 # Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
+%define _missing_build_ids_terminate_build 0
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        0.59.0
-Release:        14%{?dist}
+Version:        1.2.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        disks-images-provider.yaml
+# The containers_meta packages and associated files are not required for the Mariner build
 # Nexus team needs these to-be-upstreamed patches for the operator Edge to work
 # correctly.
 Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         Allocate-2-cpu-for-the-emulator-thread.patch
-Patch2:         Hotplug_detach_grace_period.patch
+Patch1:         Hotplug_detach_grace_period.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-3%{?dist}
-BuildRequires:  golang
+BuildRequires:  golang >= 1.21
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -74,6 +74,22 @@ Group:          System/Packages
 %description    virt-controller
 The virt-controller package provides a controller for kubevirt
 
+%package        virt-exportproxy
+Summary:        Export proxy for kubevirt
+Group:          System/Packages
+
+%description    virt-exportproxy
+The virt-exportproxy package provides a proxy for kubevirt to pass
+requests to virt-exportserver
+
+%package        virt-exportserver
+Summary:        Export server for kubevirt
+Group:          System/Packages
+
+%description    virt-exportserver
+The virt-exportserver package provides an http server for kubevirt to
+serve the data of VirtualMachineExport resource in different formats
+
 %package        virt-handler
 Summary:        Handler component for kubevirt
 Group:          System/Packages
@@ -84,6 +100,9 @@ The virt-handler package provides a handler for kubevirt
 %package        virt-launcher
 Summary:        Launcher component for kubevirt
 Group:          System/Packages
+# Starting from v1.1.0, KubeVirt ships /usr/bin/virt-tail which conflicts with
+# the respective guestfs tool.
+Conflicts:      guestfs-tools
 
 %description    virt-launcher
 The virt-launcher package provides a launcher for kubevirt
@@ -94,6 +113,14 @@ Group:          System/Packages
 
 %description    virt-operator
 The virt-opertor package provides an operator for kubevirt CRD
+
+%package        pr-helper-conf
+Summary:        Configuration files for persistent reservation helper
+Group:          System/Packages
+
+%description    pr-helper-conf
+The pr-helper-conf package provides configuration files for persistent
+reservation helper
 
 %package        tests
 Summary:        Kubevirt functional tests
@@ -106,9 +133,15 @@ The package provides Kubevirt end-to-end tests.
 %autosetup -p1
 
 %build
-export GOFLAGS+=" -buildmode=pie"
+mkdir -p go/src/kubevirt.io go/pkg
+ln -s ../../../ go/src/kubevirt.io/kubevirt
+export GOPATH=${PWD}/go
+export GOFLAGS="-buildmode=pie"
+cd ${GOPATH}/src/kubevirt.io/kubevirt
+env \
+KUBEVIRT_GO_BASE_PKGDIR="${GOPATH}/pkg" \
 KUBEVIRT_VERSION=%{version} \
-KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%{s})" \
+KUBEVIRT_SOURCE_DATE_EPOCH="$(date -r LICENSE +%s)" \
 KUBEVIRT_GIT_COMMIT='v%{version}' \
 KUBEVIRT_GIT_VERSION='v%{version}' \
 KUBEVIRT_GIT_TREE_STATE="clean" \
@@ -117,14 +150,19 @@ build_tests="true" \
     cmd/virt-api \
     cmd/virt-chroot \
     cmd/virt-controller \
+    cmd/virt-exportproxy \
+    cmd/virt-exportserver \
     cmd/virt-freezer \
     cmd/virt-handler \
     cmd/virt-launcher \
     cmd/virt-launcher-monitor \
     cmd/virt-operator \
     cmd/virt-probe \
+    cmd/virt-tail \
     cmd/virtctl \
     %{nil}
+
+env DOCKER_PREFIX=$reg_path DOCKER_TAG=%{version}-%{release} KUBEVIRT_NO_BAZEL=true ./hack/build-manifests.sh
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -134,28 +172,33 @@ install -p -m 0755 _out/cmd/virtctl/virtctl %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-api/virt-api %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-controller/virt-controller %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-chroot/virt-chroot %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/virt-exportproxy/virt-exportproxy %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/virt-exportserver/virt-exportserver %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-handler/virt-handler %{buildroot}%{_bindir}/
-install -p -m 0555 _out/cmd/virt-launcher/virt-launcher %{buildroot}%{_bindir}/
-install -p -m 0555 _out/cmd/virt-launcher-monitor/virt-launcher-monitor %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/virt-launcher/virt-launcher %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/virt-launcher-monitor/virt-launcher-monitor %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-freezer/virt-freezer %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-probe/virt-probe %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/virt-tail/virt-tail %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-operator/virt-operator %{buildroot}%{_bindir}/
 install -p -m 0755 _out/tests/tests.test %{buildroot}%{_bindir}/virt-tests
 install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}%{_bindir}/
 
-# virt-launcher configurations
-mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
-install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
-install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
-install -p -m 0644 cmd/virt-launcher/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher/
-
-
-# virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
-
 # Install network stuff
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
+
+# virt-launcher SELinux policy needs to land in virt-handler container
+install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}%{_datadir}/kube-virt/virt-handler/
+
+# Persistent reservation helper configuration files
+mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
+install -p -m 0644 cmd/pr-helper/multipath.conf %{buildroot}%{_datadir}/kube-virt/pr-helper/
+
+# Configuration files for libvirt
+mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-launcher
+install -p -m 0644 cmd/virt-launcher/virtqemud.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
+install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt/virt-launcher
 
 %files virtctl
 %license LICENSE
@@ -177,15 +220,23 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %doc README.md
 %{_bindir}/virt-controller
 
+%files virt-exportproxy
+%license LICENSE
+%doc README.md
+%{_bindir}/virt-exportproxy
+
+%files virt-exportserver
+%license LICENSE
+%doc README.md
+%{_bindir}/virt-exportserver
+
 %files virt-handler
 %license LICENSE
 %doc README.md
 %dir %{_datadir}/kube-virt
-%dir %{_datadir}/kube-virt/virt-handler
+%{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
-%{_datadir}/kube-virt/virt-handler
-/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
@@ -196,6 +247,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-launcher-monitor
 %{_bindir}/virt-freezer
 %{_bindir}/virt-probe
+%{_bindir}/virt-tail
 %{_bindir}/node-labeller.sh
 %{_datadir}/kube-virt/virt-launcher
 
@@ -204,6 +256,13 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %doc README.md
 %{_bindir}/virt-operator
 
+%files pr-helper-conf
+%license LICENSE
+%doc README.md
+%dir %{_datadir}/kube-virt
+%dir %{_datadir}/kube-virt/pr-helper
+%{_datadir}/kube-virt/pr-helper/multipath.conf
+
 %files tests
 %license LICENSE
 %doc README.md
@@ -211,6 +270,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Mar 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 1.2.0-1
+- Bump package version to 1.2.0 from 0.59.0
+- Referenced kubevirt.spec from https://code.opensuse.org/package/kubevirt/blob/master/f/kubevirt.spec
+- Setting _missing_build_ids_terminate_build to 0 to prevent the build from terminating if build IDs are missing
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 0.59.0-14
 - update to build dep latest glibc-static version
 
@@ -232,7 +296,7 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 * Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-7
 - Bump release to rebuild with go 1.19.12
 
-* Wed Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
+* Fri Jul 14 2023 Andrew Phelps <anphel@microsoft.com> - 0.59.0-6
 - Bump release to rebuild against glibc 2.35-4
 
 * Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.59.0-5

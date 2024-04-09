@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "firefox-78.10.0esr.source.tar.xz": "979141a6d94bbe303815e9cd1ab1d23b5ce2f9c77d9d5486871eaecf0ea2df40"
+  "firefox-102.15.1esr.source.tar.xz": "09194fb765953bc6979a35aa8834118c453b9d6060bf1ec4e134551bad740113",
+  "known_failures.txt": "57e3eba3f0811c154a826b23e12f29ab1325fd9488e0cbece11de32a733d35a9"
  }
 }

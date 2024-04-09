@@ -1,5 +1,3 @@
-# Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
@@ -12,7 +10,7 @@ Distribution:   Azure Linux
 
 Name:           python-hatch-vcs
 Version:        0.4.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Hatch plugin for versioning with your preferred VCS
 
 # SPDX
@@ -30,13 +28,13 @@ BuildRequires:  python3-six
 BuildRequires:  python3-wheel
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-pathspec
-BuildRequires:  python3-tomli
 BuildRequires:  python3-packaging
 BuildRequires:  python3-trove-classifiers
 
 %if %{with tests}
 BuildRequires:  python3dist(pytest)
 BuildRequires:  git-core
+BuildRequires:  python3-setuptools_scm
 %endif
 
 %global common_description %{expand:
@@ -70,12 +68,11 @@ Summary:        %{summary}
 
 
 %check
-%if 0%{?with_check}
 %if %{with tests}
+pip3 install iniconfig
 %pytest
 %else
 %pyproject_check_import
-%endif
 %endif
 
 
@@ -86,6 +83,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Tue Mar 12 2024 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 0.4.0-4
+- Improve check section and dependencies
+
 * Fri Mar 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.0-3
 - Updating naming for 3.0 version of Azure Linux.
 
