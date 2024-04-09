@@ -1,5 +1,5 @@
 diff --git a/src/network/networkd-dhcp-common.c b/src/network/networkd-dhcp-common.c
-index 7996960..c91b958 100644
+index 7996960..bd50eb4 100644
 --- a/src/network/networkd-dhcp-common.c
 +++ b/src/network/networkd-dhcp-common.c
 @@ -455,6 +455,36 @@ int config_parse_dhcp_use_domains(
@@ -18,7 +18,7 @@ index 7996960..c91b958 100644
 +                void *data,
 +                void *userdata) {
 +
-+        DHCPUseDomains *use_domains = ASSERT_PTR(data);
++        DHCPUseDomains *use_domains = data;
 +
 +        assert(filename);
 +        assert(lvalue);
@@ -42,7 +42,7 @@ index 7996960..c91b958 100644
 diff --git a/src/network/networkd-dhcp-common.h b/src/network/networkd-dhcp-common.h
 index c19bc10..5a1d446 100644
 --- a/src/network/networkd-dhcp-common.h
-+++ b/.src/network/networkd-dhcp-common.h
++++ b/src/network/networkd-dhcp-common.h
 @@ -92,6 +92,7 @@ CONFIG_PARSER_PROTOTYPE(config_parse_dhcp);
  CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_or_ra_route_metric);
  CONFIG_PARSER_PROTOTYPE(config_parse_dhcp_use_dns);
