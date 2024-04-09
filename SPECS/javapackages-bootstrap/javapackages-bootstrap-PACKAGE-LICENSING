@@ -1,621 +1,124 @@
 # This is the license breakdown of each component
-
-downstream/ant: ASL 2.0 (License-Verified)
-downstream/apache-pom: ASL 2.0 (License-Verified)
-downstream/apiguardian: ASL 2.0 (License-Verified)
-downstream/asm: BSD-3-Clause (License-Verified)
-downstream/assertj-core: ASL 2.0 (License-Verified)
-downstream/bnd: ASL 2.0 or EPL-2.0 (License-Verified)
-downstream/build-helper-maven-plugin: MIT (License-Verified)
-downstream/byte-buddy: ASL 2.0 (License-Verified)
-downstream/cdi: ASL 2.0 (License-Verified)
-downstream/cglib: ASL 2.0 (License-Verified)
-downstream/common-annotations-api: EPL-2.0 or GPLv2 with exceptions (License-Verified)
-downstream/commons-beanutils: ASL 2.0 (License-Verified)
-downstream/commons-cli: ASL 2.0 (License-Verified)
-downstream/commons-codec: ASL 2.0 (License-Verified)
-downstream/commons-collections: ASL 2.0 (License-Verified)
-downstream/commons-compress: ASL 2.0 (License-Verified)
-downstream/commons-io: ASL 2.0 (License-Verified)
-downstream/commons-jxpath: ASL 2.0 (License-Verified)
-downstream/commons-lang: ASL 2.0 (License-Verified)
-downstream/commons-logging: ASL 2.0 (License-Verified)
-downstream/commons-parent-pom: ASL 2.0 (License-Verified)
-downstream/cup: MIT (License-Verified)
-downstream/easymock: ASL 2.0 (License-Verified)
-downstream/felix-parent-pom: ASL 2.0 (License-Verified)
-downstream/felix-utils: ASL 2.0 (License-Verified)
-downstream/fusesource-pom: ASL 2.0 (License-Verified)
-downstream/guava: ASL 2.0 and CC0 (License-Verified)
-	com/google/common/hash/Striped64.java: CC0
-	com/google/common/hash/LongAdder.java: CC0
-	com/google/common/collect/Hashing.java: ASL 2.0 and CC0
-	com/google/common/cache/Striped64.java: CC0
-	com/google/common/cache/LongAdder.java: CC0
-	com/google/common/util/concurrent/AtomicDoubleArray.java: CC0
-	com/google/common/util/concurrent/Striped.java: ASL 2.0 and CC0
-	com/google/common/util/concurrent/MoreExecutors.java: ASL 2.0 and CC0
-	com/google/common/base/SmallCharMatcher.java: ASL 2.0 and CC0
-	everything else is ASL 2.0
-downstream/guice: ASL 2.0 (License-Verified)
-downstream/hamcrest: BSD (License-Verified)
-downstream/httpcomponents-client: ASL 2.0 (License-Verified)
-downstream/httpcomponents-core: ASL 2.0 (License-Verified)
-downstream/httpcomponents-parent-pom: ASL 2.0 (License-Verified)
-downstream/injection-api: ASL 2.0 (License-Verified)
-downstream/jansi: ASL 2.0 (License-Verified)
-downstream/jcommander: ASL 2.0 (License-Verified)
-downstream/jdom: BSD with advertising (License-Verified)
-downstream/jdom2: BSD with advertising (License-Verified)
-downstream/jflex: BSD-3-Clause (License-Verified)
-downstream/jsoup: MIT (License-Verified)
-downstream/jsr-305: BSD (License-Verified)
-downstream/junit4: EPL-1.0 (License-Verified)
-downstream/junit5: EPL-2.0 (License-Verified)
-downstream/maven: ASL 2.0 (License-Verified)
-downstream/maven-antrun-plugin: ASL 2.0 (License-Verified)
-downstream/maven-archiver: ASL 2.0 (License-Verified)
-downstream/maven-artifact-transfer: ASL 2.0 (License-Verified)
-downstream/maven-assembly-plugin: ASL 2.0 (License-Verified)
-downstream/maven-bundle-plugin: ASL 2.0 (License-Verified)
-downstream/maven-common-artifact-filters: ASL 2.0 (License-Verified)
-downstream/maven-compiler-plugin: ASL 2.0 (License-Verified)
-downstream/maven-dependency-analyzer: ASL 2.0 (License-Verified)
-downstream/maven-dependency-plugin: ASL 2.0 (License-Verified)
-downstream/maven-dependency-tree: ASL 2.0 (License-Verified)
-downstream/maven-enforcer: ASL 2.0 (License-Verified)
-downstream/maven-file-management: ASL 2.0 (License-Verified)
-downstream/maven-filtering: ASL 2.0 (License-Verified)
-downstream/maven-jar-plugin: ASL 2.0 (License-Verified)
-downstream/maven-parent-pom: ASL 2.0 (License-Verified)
-downstream/maven-plugin-testing: ASL 2.0 (License-Verified)
-downstream/maven-plugin-tools: ASL 2.0 (License-Verified)
-downstream/maven-remote-resources-plugin: ASL 2.0 (License-Verified)
-downstream/maven-resolver: ASL 2.0 (License-Verified)
-downstream/maven-resources: ASL 2.0 (License-Verified)
-downstream/maven-resources-plugin: ASL 2.0 (License-Verified)
-downstream/maven-shared-incremental: ASL 2.0 (License-Verified)
-downstream/maven-shared-io: ASL 2.0 (License-Verified)
-downstream/maven-shared-utils: ASL 2.0 (License-Verified)
-downstream/maven-source-plugin: ASL 2.0 (License-Verified)
-downstream/maven-surefire: ASL 2.0 (License-Verified)
-downstream/maven-verifier: ASL 2.0 (License-Verified)
-downstream/maven-wagon: ASL 2.0 (License-Verified)
-downstream/mockito: MIT (License-Verified)
-downstream/modello: MIT and ASL 2.0 (License-Verified)
-	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/BiDirectionalOverrideJavaGeneratorTest.java: Apache License 2.0
-	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/Permission.java: Apache License 2.0
-	modello-plugins/modello-plugin-java/src/test/java/org/codehaus/modello/plugin/java/Role.java: Apache License 2.0
-	modello-plugins/modello-plugin-java/src/main/java/org/codehaus/modello/plugin/java/javasource/JArrayType.java: Apache License 2.0
-	modello-plugins/modello-plugin-java/src/main/java/org/codehaus/modello/plugin/java/javasource/JCollectionType.java: Apache License 2.0
-	modello-plugins/modello-plugin-java/src/main/java/org/codehaus/modello/plugin/java/javasource/JComponentizedType.java: Apache License 2.0
-	modello-plugins/modello-plugin-jdom/src/main/java/org/codehaus/modello/plugin/jdom/JDOMWriterGenerator.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdAssociationMetadata.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdClassMetadata.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdFieldMetadata.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdInterfaceMetadata.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdMetadataPlugin.java: Apache License 2.0
-	modello-plugins/modello-plugin-xsd/src/main/java/org/codehaus/modello/plugin/xsd/metadata/XsdModelMetadata.java: Apache License 2.0
-	everything else is MIT
-downstream/mojo-parent-pom: ASL 2.0 (License-Verified)
-downstream/munnge-maven-plugin: CDDL-1.0 (License-Verified)
-downstream/objenesis: ASL 2.0 (License-Verified)
-downstream/opentest4j: ASL 2.0 (License-Verified)
-downstream/osgi-annotation: ASL 2.0 (License-Verified)
-downstream/osgi-cmpn: ASL 2.0 (License-Verified)
-downstream/osgi-core: ASL 2.0 (License-Verified)
-downstream/oss-parent-pom: ASL 2.0 (License-Verified)
-downstream/plexus-archiver: ASL 2.0 (License-Verified)
-downstream/plexus-cipher: ASL 2.0 (License-Verified)
-downstream/plexus-classworlds: ASL 2.0 (License-Verified)
-downstream/plexus-compiler: MIT and ASL 2.0 (License-Verified)
-	complete breakdown:
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerMessage.java: MIT and ASL 2.0
-	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/JavacCompiler.java: MIT and ASL 2.0
-	
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerError.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerResult.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/AbstractSourceInclusionScanner.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/InclusionScanException.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/SourceInclusionScanner.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/StaleSourceScanner.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/mapping/SourceMapping.java: ASL 2.0
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/mapping/SuffixMapping.java: ASL 2.0
-	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/JavaxToolsCompiler.java: ASL 2.0
-	
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/AbstractCompiler.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/Compiler.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerConfiguration.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerException.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerNotImplementedException.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/CompilerOutputStyle.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/StreamPumper.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/SimpleSourceInclusionScanner.java: MIT
-	plexus-compiler-api/src/main/java/org/codehaus/plexus/compiler/util/scan/mapping/SingleTargetSourceMapping.java: MIT
-	plexus-compiler-manager/src/main/java/org/codehaus/plexus/compiler/manager/CompilerManager.java: MIT
-	plexus-compiler-manager/src/main/java/org/codehaus/plexus/compiler/manager/DefaultCompilerManager.java: MIT
-	plexus-compiler-manager/src/main/java/org/codehaus/plexus/compiler/manager/NoSuchCompilerException.java: MIT
-	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/IsolatedClassLoader.java: MIT
-	
-	plexus-compilers/plexus-compiler-javac/src/main/java/org/codehaus/plexus/compiler/javac/InProcessCompiler.java: ASL 2.0
-downstream/plexus-components-pom: ASL 2.0 (License-Verified)
-downstream/plexus-containers: ASL 2.0 and MIT and xpp (License-Verified)
-	complete breakdown:
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/Driver.java: xpp
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MXParser.java: xpp
-	
-	plexus-container-default/src/main/java/org/codehaus/plexus/ClassRealmUtil.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/ComponentRegistry.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/ContainerConfiguration.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/DefaultComponentRegistry.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/DefaultContainerConfiguration.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/DefaultPlexusContainer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/DuplicateChildContainerException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/MutablePlexusContainer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/PlexusConstants.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/PlexusContainer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/PlexusContainerException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/PlexusJUnit4TestCase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/PlexusTestCase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/CastUtils.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/MapOrientedComponent.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/DefaultPlexusConfiguration.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/PlexusComponentDescriptorMerger.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/PlexusConfiguration.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/PlexusConfigurationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/PlexusConfigurationMerger.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/PlexusConfigurationResourceException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/context/Context.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/context/ContextException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/context/ContextMapAdapter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/context/DefaultContext.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/AbstractLifecycleHandler.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/BasicLifecycleHandler.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/DefaultLifecycleHandlerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/LifecycleHandler.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/LifecycleHandlerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/UndefinedLifecycleHandlerException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/AbstractLogEnabled.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/AbstractLogger.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/AbstractLoggerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/BaseLoggerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/LogEnabled.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/Logger.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/LoggerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/builder/AbstractComponentBuildListener.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/builder/ComponentBuildListener.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/builder/ComponentBuilder.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/builder/XBeanComponentBuilder.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/collections/AbstractComponentCollection.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/collections/ComponentList.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/collections/ComponentMap.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/composition/CompositionResolver.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/composition/CycleDetectedInComponentGraphException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/composition/DefaultCompositionResolver.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/composition/UndefinedComponentComposerException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/AbstractComponentConfigurator.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/BasicComponentConfigurator.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/ComponentConfigurationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/ComponentConfigurator.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/ConfigurationListener.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/MapOrientedComponentConfigurator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/AbstractResourceBasedComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/AnnotationBasedComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/ComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/ComponentDiscovererManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/ComponentDiscoveryEvent.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/ComponentDiscoveryListener.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/DefaultComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/DefaultComponentDiscovererManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/DiscoveryListenerDescriptor.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/PlexusXmlComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/discovery/ResourceBasedComponentDiscoverer.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/AbstractComponentFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/ComponentFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/ComponentFactoryManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/ComponentInstantiationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/DefaultComponentFactoryManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/UndefinedComponentFactoryException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/AbstractComponentManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/ComponentManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/ComponentManagerFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/PerLookupComponentManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/PerLookupComponentManagerFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/SingletonComponentManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/SingletonComponentManagerFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/manager/UndefinedComponentManagerException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentDependency.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentDescriptor.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentRepository.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentRequirement.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentRequirementList.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/ComponentSetDescriptor.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/DefaultComponentRepository.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/io/PlexusConfigurationReader.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/io/PlexusConfigurationWriter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/io/XmlPlexusConfigurationReader.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/io/XmlPlexusConfigurationWriter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/source/ChainedConfigurationSource.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/source/ConfigurationSource.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/source/ContainerConfigurationSource.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/configuration/xml/XmlPlexusConfiguration.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/AbstractContainerInitializationPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/AbstractCoreComponentInitializationPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/ContainerInitializationContext.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/ContainerInitializationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/ContainerInitializationPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeComponentDiscovererManagerPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeComponentFactoryManagerPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeComponentRegistryPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeContainerConfigurationSourcePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeLoggerManagerPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeSystemPropertiesPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/container/initialization/InitializeUserConfigurationSourcePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/phase/AbstractPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/lifecycle/phase/Phase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/console/ConsoleLogger.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/logging/console/ConsoleLoggerManager.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/AbstractConfigurationConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/ComponentValueSetter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/ConfigurationConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/expression/DefaultExpressionEvaluator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/expression/ExpressionEvaluationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/expression/ExpressionEvaluator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/expression/TypeAwareExpressionEvaluator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/factory/java/JavaComponentFactory.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentConfigurationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentDescriptorUnmarshallingException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentImplementationNotFoundException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentLifecycleException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentLookupException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentLookupRuntimeException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentManagerImplementationNotFoundException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentProfileException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/exception/ComponentRepositoryException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/repository/io/PlexusTools.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/AbstractBasicConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/BooleanConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/ByteConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/CharConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/ClassConverter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/Converter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/DateConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/DoubleConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/EnumConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/FileConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/FloatConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/IntConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/LongConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/ShortConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/StringBufferConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/StringConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/UriConverter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/basic/UrlConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/ArrayConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/CollectionConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/MapConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/ObjectWithFieldsConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/PlexusConfigurationConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/composite/PropertiesConverter.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/lookup/ConverterLookup.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/lookup/DefaultConverterLookup.java: MIT
-	plexus-container-default/src/main/java/org/codehaus/plexus/component/configurator/converters/special/ClassRealmConverter.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/AutoConfigurePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Configurable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/ConfigurablePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Contextualizable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/ContextualizePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Disposable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/DisposePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Initializable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/InitializationException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/InitializePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/LogDisablePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/LogEnablePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/PhaseExecutionException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/PlexusContainerLocator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/ResumePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/ServiceLocator.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Serviceable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/ServiceablePhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/StartPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Startable.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/StartingException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/StopPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/StoppingException.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/SuspendPhase.java: ASL 2.0
-	plexus-container-default/src/main/java/org/codehaus/plexus/personality/plexus/lifecycle/phase/Suspendable.java: ASL 2.0
-	
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ClassComponentDescriptorExtractor.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ComponentDescriptorExtractor.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ComponentDescriptorExtractorSupport.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ComponentDescriptorWriteException.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ComponentDescriptorWriter.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/DefaultComponentDescriptorWriter.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/DefaultMetadataGenerator.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/MetadataGenerationRequest.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/MetadataGenerator.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/SourceComponentDescriptorExtractor.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/component/repository/ComponentDescriptor.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/component/repository/ComponentRequirement.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/component/repository/ComponentRequirementList.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/component/repository/ComponentSetDescriptor.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/component/repository/README.txt: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/maven/plugin/AbstractDescriptorMojo.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/maven/plugin/PlexusDescriptorMojo.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/maven/plugin/PlexusMergeMojo.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/maven/plugin/PlexusTestDescriptorMojo.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/Ann.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnClass.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnEnum.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnField.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnInvocationHandler.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnMethod.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/ann/AnnReader.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/AnnotationComponentGleaner.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/ClassComponentGleaner.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/ComponentGleanerException.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/ComponentGleanerSupport.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/QDoxComponentGleaner.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/gleaner/SourceComponentGleaner.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/AbstractMerger.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/ComponentsXmlMerger.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MergeException.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/MergeStrategy.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/Merger.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/PlexusXmlMerger.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/AbstractMergeableElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/AbstractMergeableElementList.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/AbstractMergeableSupport.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/ComponentElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/ComponentSetElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/ComponentsElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/ConfigurationElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/DescriptorTag.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/MergeStrategies.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/Mergeable.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/PlexusRootElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/PlexusXmlTag.java: ASL 2.0
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/RequirementElement.java: MIT
-	plexus-component-metadata/src/main/java/org/codehaus/plexus/metadata/merge/support/RequirementsElement.java: MIT
-downstream/plexus-interpolation: ASL 2.0 and ASL 1.1 and MIT (License-Verified)
-	complete breakdown:
-	src/main/java/org/codehaus/plexus/interpolation/AbstractDelegatingValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/AbstractFunctionValueSourceWrapper.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/AbstractValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/BasicInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/EnvarBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/FeedbackEnabledValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/FixedInterpolatorValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/InterpolationCycleException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/InterpolationException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/InterpolationPostProcessor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/Interpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/InterpolatorFilterReader.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/interpolation/MapBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/ObjectBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/PrefixAwareRecursionInterceptor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/PrefixedObjectValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/PrefixedPropertiesValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/PrefixedValueSourceWrapper.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/PropertiesBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/QueryEnabledValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/RecursionInterceptor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/RegexBasedInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/SimpleRecursionInterceptor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/SingleResponseValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/StringSearchInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/ValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/AbstractDelegatingValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/EnvarBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/FixedStringSearchInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/FixedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/InterpolationCycleException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/InterpolationState.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/MapBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/ObjectBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/PrefixedObjectValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/PrefixedPropertiesValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/PrefixedValueSourceWrapper.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/fixed/PropertiesBasedValueSource.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/multi/DelimiterSpecification.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/multi/MultiDelimiterInterpolatorFilterReader.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/interpolation/multi/MultiDelimiterStringSearchInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/object/FieldBasedObjectInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/object/ObjectInterpolationWarning.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/object/ObjectInterpolator.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/os/OperatingSystemUtils.java: MIT
-	src/main/java/org/codehaus/plexus/interpolation/os/Os.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/interpolation/reflection/ClassMap.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/reflection/MethodMap.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/reflection/ReflectionValueExtractor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/interpolation/util/StringUtils.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/interpolation/util/ValueSourceUtils.java: ASL 2.0
-downstream/plexus-io: ASL 2.0 (License-Verified)
-downstream/plexus-languages: ASL 2.0 (License-Verified)
-downstream/plexus-pom: ASL 2.0 (License-Verified)
-downstream/plexus-resources: MIT (License-Verified)
-downstream/plexus-sec-dispatcher: ASL 2.0 (License-Verified)
-downstream/plexus-utils: ASL 2.0 and ASL 1.1 and BSD and xpp and Public Domain (License-Verified)
-	complete breakdown:
-	src/main/java/org/codehaus/plexus/util/AbstractScanner.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/Base64.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/CollectionUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/DirectoryWalkListener.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/DirectoryWalker.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/Java7Detector.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/LineOrientedInterpolatingReader.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/MatchPattern.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/NioFiles.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/PathTool.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/PropertyUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/ReaderFactory.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/ReflectionUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/Scanner.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/StringOutputStream.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/SweeperPool.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/WriterFactory.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/AbstractStreamHandler.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/Arg.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/CommandLineCallable.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/CommandLineException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/CommandLineTimeOutException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/CommandLineUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/DefaultConsumer.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/EnhancedStringTokenizer.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/ShutdownHookUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/StreamFeeder.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/WriterStreamConsumer.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/dag/CycleDetectedException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/dag/CycleDetector.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/dag/DAG.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/dag/TopologicalSorter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/dag/Vertex.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/introspection/ClassMap.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/introspection/MethodMap.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/introspection/ReflectionValueExtractor.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/io/InputStreamFacade.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/io/RawInputStreamFacade.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/io/URLInputStreamFacade.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/reflection/Reflector.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/reflection/ReflectorException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/CompactXMLWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/PrettyPrintXMLWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/SerializerXMLWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XMLWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlReader.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlReaderException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlStreamReader.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlStreamReaderException.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlStreamWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlUtil.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/XmlWriterUtil.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/Xpp3Dom.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/Xpp3DomBuilder.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/Xpp3DomUtils.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/Xpp3DomWriter.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/shell/BourneShell.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/shell/CmdShell.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/shell/CommandShell.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/shell/Shell.java: ASL 2.0
-	src/main/java/org/codehaus/plexus/util/xml/pull/EntityReplacementMap.java: ASL 2.0
-
-	src/main/java/org/codehaus/plexus/util/cli/Commandline.java: BSD and ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/StreamConsumer.java: BSD and ASL 2.0
-	src/main/java/org/codehaus/plexus/util/cli/StreamPumper.java: BSD and ASL 2.0
-	
-	src/main/java/org/codehaus/plexus/util/CachedMap.java: Public Domain
-	src/main/java/org/codehaus/plexus/util/FastMap.java: Public Domain
-	src/main/java/org/codehaus/plexus/util/TypeFormat.java: Public Domain
-	
-	src/main/java/org/codehaus/plexus/util/xml/pull/MXParser.java: xpp
-	src/main/java/org/codehaus/plexus/util/xml/pull/MXSerializer.java: xpp
-	src/main/java/org/codehaus/plexus/util/xml/pull/XmlPullParser.java: xpp
-	src/main/java/org/codehaus/plexus/util/xml/pull/XmlPullParserException.java: xpp
-	src/main/java/org/codehaus/plexus/util/xml/pull/XmlSerializer.java: xpp
-	
-	src/main/java/org/codehaus/plexus/util/DirectoryScanner.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/ExceptionUtils.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/Expand.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/FileUtils.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/IOUtil.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/InterpolationFilterReader.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/Os.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/SelectorUtils.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/StringInputStream.java: ASL 1.1
-	src/main/java/org/codehaus/plexus/util/StringUtils.java: ASL 1.1
-downstream/qdox: ASL 2.0 (License-Verified)
-downstream/servlet-api: ASL 2.0 and (EPL-2.0 or GPLv2 with exceptions) (License-Verified)
-	complete breakdown:
-	api/src/main/java/javax/servlet/RequestDispatcher.java: ASL 2.0
-	api/src/main/java/javax/servlet/annotation/HttpMethodConstraint.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/HttpConstraint.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/HandlesTypes.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/WebServlet.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/WebInitParam.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/WebListener.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/WebFilter.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/ServletSecurity.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/annotation/MultipartConfig.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletRequestAttributeEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletConfig.java: ASL 2.0
-	api/src/main/java/javax/servlet/WriteListener.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletSecurityElement.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletRegistration.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/HttpMethodConstraintElement.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/SessionTrackingMode.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletContextEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/SingleThreadModel.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletRequestAttributeListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/SessionCookieConfig.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/GenericServlet.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletInputStream.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletContextAttributeEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/Servlet.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletContextListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/HttpConstraintElement.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/AsyncContext.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletResponse.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletResponseWrapper.java: ASL 2.0
-	api/src/main/java/javax/servlet/Registration.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/DispatcherType.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletContainerInitializer.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletException.java: ASL 2.0
-	api/src/main/java/javax/servlet/MultipartConfigElement.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/descriptor/TaglibDescriptor.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/descriptor/JspPropertyGroupDescriptor.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/descriptor/JspConfigDescriptor.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletContextAttributeListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/GenericFilter.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletRequest.java: ASL 2.0
-	api/src/main/java/javax/servlet/Filter.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServlet.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpSessionAttributeListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServletRequest.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpUpgradeHandler.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpSessionBindingEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpSessionListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/WebConnection.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpSessionIdListener.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpSessionBindingListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServletRequestWrapper.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpSession.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/MappingMatch.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpSessionContext.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpFilter.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpSessionEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpSessionActivationListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServletResponseWrapper.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/Part.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/PushBuilder.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/HttpUtils.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServletResponse.java: ASL 2.0
-	api/src/main/java/javax/servlet/http/HttpServletMapping.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/http/Cookie.java: ASL 2.0
-	api/src/main/java/javax/servlet/UnavailableException.java: ASL 2.0
-	api/src/main/java/javax/servlet/FilterRegistration.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletRequestEvent.java: ASL 2.0
-	api/src/main/java/javax/servlet/FilterChain.java: ASL 2.0
-	api/src/main/java/javax/servlet/AsyncEvent.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/ServletContext.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletOutputStream.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletRequestWrapper.java: ASL 2.0
-	api/src/main/java/javax/servlet/ServletRequestListener.java: ASL 2.0
-	api/src/main/java/javax/servlet/FilterConfig.java: ASL 2.0
-	api/src/main/java/javax/servlet/ReadListener.java: EPL-2.0 or GPLv2 with exceptions
-	api/src/main/java/javax/servlet/AsyncListener.java: EPL-2.0 or GPLv2 with exceptions
-downstream/sisu-build-api: ASL 2.0 (License-Verified)
-downstream/sisu-inject: EPL-1.0 and BSD (License-Verified)
-	org.eclipse.sisu.inject/src/org/eclipse/sisu/space/asm/*: BSD 
-	everything else: EPL-1.0
-downstream/sisu-mojos: EPL-1.0 (License-Verified) 
-downstream/sisu-plexus: EPL-1.0 (License-Verified)
-downstream/slf4j: MIT (License-Verified)
-downstream/testng: ASL 2.0 (License-Verified)
-downstream/univocity-parsers: ASL 2.0 (License-Verified)
-downstream/velocity-engine: ASL 2.0 (License-Verified)
-downstream/xbean: ASL 2.0 (License-Verified)
-downstream/xmlunit: ASL 2.0 (License-Verified)
-downstream/xmvn: ASL 2.0 (License-Verified)
-downstream/xz-java: Public Domain (License-Verified)
-mbi: ASL 2.0 (License-Verified)
+# Licensing breakdown: 
+#    ant has license: Apache-2.0
+#    aopalliance has license: LicenseRef-Fedora-Public-Domain
+#    apache-pom has license: Apache-2.0
+#    apiguardian has license: Apache-2.0
+#    asm has license: BSD-3-Clause
+#    assertj-core has license: Apache-2.0
+#    bnd has license: Apache-2.0 OR EPL-2.0
+#    build-helper-maven-plugin has license: MIT
+#    byte-buddy has license: Apache-2.0
+#    cdi has license: Apache-2.0
+#    cglib has license: Apache-2.0 AND BSD-3-Clause
+#    common-annotations-api has license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+#    commons-beanutils has license: Apache-2.0
+#    commons-cli has license: Apache-2.0
+#    commons-codec has license: Apache-2.0
+#    commons-collections has license: Apache-2.0
+#    commons-compress has license: Apache-2.0
+#    commons-io has license: Apache-2.0
+#    commons-jxpath has license: Apache-2.0
+#    commons-lang has license: Apache-2.0
+#    commons-logging has license: Apache-2.0
+#    commons-parent-pom has license: Apache-2.0
+#    cup has license: SMLNJ
+#    disruptor has license: Apache-2.0
+#    easymock has license: Apache-2.0
+#    extra-enforcer-rules has license: Apache-2.0
+#    felix-parent-pom has license: Apache-2.0
+#    felix-utils has license: Apache-2.0
+#    fusesource-pom has license: Apache-2.0
+#    guava has license: Apache-2.0 AND CC0-1.0
+#    guice has license: Apache-2.0
+#    hamcrest has license: BSD-3-Clause
+#    httpcomponents-client has license: Apache-2.0
+#    httpcomponents-core has license: Apache-2.0
+#    httpcomponents-parent-pom has license: Apache-2.0
+#    injection-api has license: Apache-2.0
+#    jaf-api has license: BSD-3-Clause
+#    jansi has license: Apache-2.0
+#    javacc has license: BSD-2-Clause AND BSD-3-Clause
+#    javacc-maven-plugin has license: Apache-2.0
+#    javaparser has license: Apache-2.0 OR LGPL-2.0-or-later
+#    jcommander has license: Apache-2.0
+#    jctools has license: Apache-2.0
+#    jdom has license: Saxpath
+#    jdom2 has license: Saxpath
+#    jflex has license: BSD-3-Clause
+#    jsoup has license: MIT
+#    jsr-305 has license: BSD-3-Clause AND CC-BY-2.5
+#    junit4 has license: EPL-1.0
+#    junit5 has license: EPL-2.0
+#    log4j has license: Apache-2.0
+#    mail-api has license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+#    maven has license: Apache-2.0 AND MIT
+#    maven-antrun-plugin has license: Apache-2.0
+#    maven-apache-resources has license: Apache-2.0
+#    maven-archiver has license: Apache-2.0
+#    maven-artifact-transfer has license: Apache-2.0
+#    maven-assembly-plugin has license: Apache-2.0
+#    maven-bundle-plugin has license: Apache-2.0
+#    maven-common-artifact-filters has license: Apache-2.0
+#    maven-compiler-plugin has license: Apache-2.0
+#    maven-dependency-analyzer has license: Apache-2.0
+#    maven-dependency-plugin has license: Apache-2.0
+#    maven-dependency-tree has license: Apache-2.0
+#    maven-enforcer has license: Apache-2.0
+#    maven-file-management has license: Apache-2.0
+#    maven-filtering has license: Apache-2.0
+#    maven-jar-plugin has license: Apache-2.0
+#    maven-parent-pom has license: Apache-2.0
+#    maven-plugin-testing has license: Apache-2.0
+#    maven-plugin-tools has license: Apache-2.0
+#    maven-remote-resources-plugin has license: Apache-2.0
+#    maven-resolver has license: Apache-2.0
+#    maven-resources-plugin has license: Apache-2.0
+#    maven-shared-incremental has license: Apache-2.0
+#    maven-shared-io has license: Apache-2.0
+#    maven-shared-utils has license: Apache-2.0
+#    maven-source-plugin has license: Apache-2.0
+#    maven-surefire has license: Apache-2.0 AND CPL-1.0
+#    maven-verifier has license: Apache-2.0
+#    maven-wagon has license: Apache-2.0
+#    mbi has license: Apache-2.0
+#    mockito has license: MIT
+#    modello has license: Apache-2.0 AND MIT AND Plexus
+#    moditect has license: Apache-2.0
+#    modulemaker-maven-plugin has license: Apache-2.0
+#    mojo-parent-pom has license: Apache-2.0
+#    objenesis has license: Apache-2.0
+#    opentest4j has license: Apache-2.0
+#    osgi-annotation has license: Apache-2.0
+#    osgi-cmpn has license: Apache-2.0
+#    osgi-core has license: Apache-2.0
+#    plexus-archiver has license: Apache-2.0
+#    plexus-build-api has license: Apache-2.0
+#    plexus-cipher has license: Apache-2.0
+#    plexus-classworlds has license: Apache-2.0 AND Plexus
+#    plexus-compiler has license: Apache-2.0 AND MIT
+#    plexus-components-pom has license: Apache-2.0
+#    plexus-containers has license: Apache-2.0 AND MIT AND xpp
+#    plexus-interpolation has license: Apache-1.1 AND Apache-2.0 AND MIT
+#    plexus-io has license: Apache-2.0
+#    plexus-languages has license: Apache-2.0
+#    plexus-pom has license: Apache-2.0
+#    plexus-resources has license: Apache-2.0 AND MIT
+#    plexus-sec-dispatcher has license: Apache-2.0
+#    plexus-utils has license: Apache-1.1 AND Apache-2.0 AND BSD-3-Clause AND LicenseRef-Fedora-Public-Domain AND xpp
+#    qdox has license: Apache-2.0
+#    servlet-api has license: Apache-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0)
+#    sisu-inject has license: BSD-3-Clause AND EPL-1.0
+#    sisu-mojos has license: EPL-1.0
+#    sisu-plexus has license: BSD-3-Clause AND EPL-1.0
+#    slf4j has license: Apache-2.0 AND MIT
+#    testng has license: Apache-2.0
+#    univocity-parsers has license: Apache-2.0
+#    velocity-engine has license: Apache-2.0
+#    xbean has license: Apache-2.0
+#    xmlunit has license: Apache-2.0
+#    xmvn has license: Apache-2.0
+#    xmvn-generator has license: Apache-2.0
+#    xz-java has license: LicenseRef-Fedora-Public-Domain
+# Therefore combined license is:
+License:        Apache-1.1 AND Apache-2.0 AND (Apache-2.0 OR EPL-2.0) AND (Apache-2.0 OR LGPL-2.0-or-later) AND BSD-2-Clause AND BSD-3-Clause AND CC-BY-2.5 AND CC0-1.0 AND CPL-1.0 AND EPL-1.0 AND EPL-2.0 AND (EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0) AND LicenseRef-Fedora-Public-Domain AND MIT AND Plexus AND SMLNJ AND Saxpath AND xpp

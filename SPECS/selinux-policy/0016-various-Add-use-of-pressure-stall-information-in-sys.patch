@@ -1,0 +1,76 @@
+From c01ba45d2bc6f3e6dd03629937c02152ccfd7f1c Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 25 Mar 2024 09:46:25 -0400
+Subject: [PATCH 16/24] various: Add use of pressure stall information in
+ systemd domains.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/system/logging.te | 1 +
+ policy/modules/system/systemd.te | 4 ++++
+ policy/modules/system/udev.te    | 1 +
+ 3 files changed, 6 insertions(+)
+
+diff --git a/policy/modules/system/logging.te b/policy/modules/system/logging.te
+index 9d9a01fcc..6892a0be3 100644
+--- a/policy/modules/system/logging.te
++++ b/policy/modules/system/logging.te
+@@ -522,6 +522,7 @@ ifdef(`init_systemd',`
+ 	kernel_rw_unix_dgram_sockets(syslogd_t)
+ 	kernel_rw_netlink_audit_sockets(syslogd_t)
+ 	kernel_use_fds(syslogd_t)
++	kernel_rw_psi(syslogd_t)
+ 
+ 	dev_read_kmsg(syslogd_t)
+ 	dev_read_urand(syslogd_t)
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 183c4c3fc..a7dd320d1 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -908,6 +908,7 @@ stream_connect_pattern(systemd_logind_t, systemd_userdbd_runtime_t, systemd_user
+ 
+ kernel_dontaudit_getattr_proc(systemd_logind_t)
+ kernel_read_kernel_sysctls(systemd_logind_t)
++kernel_rw_psi(systemd_logind_t)
+ 
+ dev_getattr_dri_dev(systemd_logind_t)
+ dev_getattr_generic_usb_dev(systemd_logind_t)
+@@ -1216,6 +1217,7 @@ kernel_read_network_state(systemd_networkd_t)
+ kernel_request_load_module(systemd_networkd_t)
+ kernel_rw_net_sysctls(systemd_networkd_t)
+ kernel_dontaudit_getattr_proc(systemd_networkd_t)
++kernel_rw_psi(systemd_networkd_t)
+ 
+ corecmd_bin_entry_type(systemd_networkd_t)
+ corecmd_exec_bin(systemd_networkd_t)
+@@ -1621,6 +1623,7 @@ dev_read_sysfs(systemd_resolved_t)
+ kernel_read_kernel_sysctls(systemd_resolved_t)
+ kernel_read_net_sysctls(systemd_resolved_t)
+ kernel_dontaudit_getattr_proc(systemd_resolved_t)
++kernel_rw_psi(systemd_resolved_t)
+ 
+ corenet_tcp_bind_generic_node(systemd_resolved_t)
+ corenet_tcp_bind_dns_port(systemd_resolved_t)
+@@ -2054,6 +2057,7 @@ fs_search_cgroup_dirs(systemd_userdbd_t)
+ fs_read_efivarfs_files(systemd_userdbd_t)
+ 
+ kernel_read_system_state(systemd_userdbd_t)
++kernel_rw_psi(systemd_userdbd_t)
+ 
+ init_stream_connect(systemd_userdbd_t)
+ init_search_runtime(systemd_userdbd_t)
+diff --git a/policy/modules/system/udev.te b/policy/modules/system/udev.te
+index aac135f9f..bebefdda8 100644
+--- a/policy/modules/system/udev.te
++++ b/policy/modules/system/udev.te
+@@ -111,6 +111,7 @@ kernel_rw_net_sysctls(udev_t)
+ kernel_read_network_state(udev_t)
+ kernel_read_software_raid_state(udev_t)
+ kernel_dontaudit_search_unlabeled(udev_t)
++kernel_rw_psi(udev_t)
+ 
+ corecmd_exec_all_executables(udev_t)
+ 
+-- 
+2.44.0
+

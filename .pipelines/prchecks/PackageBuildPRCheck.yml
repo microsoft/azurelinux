@@ -42,8 +42,6 @@ variables:
 extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
-    featureFlags:
-      runOnHost: true
     globalSdl:
       credscan:
         suppressionsFile: .config/CredScanSuppressions.json

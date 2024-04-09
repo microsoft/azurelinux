@@ -60,10 +60,10 @@ jobs:
           path: 'spec-cleaner'
 
       # For consistency, we use the same major/minor version of Python that Azure Linux ships
-      - name: Setup Python 3.7
-        uses: actions/setup-python@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.7
+          python-version: 3.12
 
       # We take our version of the linting tool from the master branch to ensure rules
       # are consistent across all branches

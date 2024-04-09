@@ -1,0 +1,619 @@
+From 96118b7e35198b23fae8ddece5aa7a078b6351e0 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 16 Feb 2023 15:23:48 +0000
+Subject: [PATCH 07/14] Port tomcat module from Fedora policy.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/kernel/corenetwork.te.in |   4 +
+ policy/modules/services/tomcat.fc       |  14 +
+ policy/modules/services/tomcat.if       | 399 ++++++++++++++++++++++++
+ policy/modules/services/tomcat.te       | 133 ++++++++
+ 4 files changed, 550 insertions(+)
+ create mode 100644 policy/modules/services/tomcat.fc
+ create mode 100644 policy/modules/services/tomcat.if
+ create mode 100644 policy/modules/services/tomcat.te
+
+diff --git a/policy/modules/kernel/corenetwork.te.in b/policy/modules/kernel/corenetwork.te.in
+index 71096934f..699ff7f7d 100644
+--- a/policy/modules/kernel/corenetwork.te.in
++++ b/policy/modules/kernel/corenetwork.te.in
+@@ -105,6 +105,7 @@ network_port(armtechdaemon, tcp,9292,s0, udp,9292,s0)
+ network_port(asterisk, tcp,1720,s0, udp,2427,s0, udp,2727,s0, udp,4569,s0)
+ network_port(audit, tcp,60,s0)
+ network_port(auth, tcp,113,s0)
++network_port(bctp, tcp,8999,s0, udp,8999,s0)
+ network_port(bgp, tcp,179,s0, udp,179,s0, tcp,2605,s0, udp,2605,s0)
+ network_port(boinc, tcp,31416,s0)
+ network_port(boinc_client, tcp,1043,s0, udp,1034,s0)
+@@ -158,6 +159,7 @@ network_port(hplip, tcp,1782,s0, tcp,2207,s0, tcp,2208,s0, tcp, 8290,s0, tcp,500
+ network_port(http, tcp,80,s0, tcp,443,s0, tcp,488,s0, tcp,8008,s0, tcp,8009,s0, tcp,8443,s0, tcp,8448,s0) #8443 is mod_nss default port
+ network_port(http_cache, tcp,3128,s0, udp,3130,s0, tcp,8080,s0, tcp,8118,s0, tcp,10001-10010,s0) # 8118 is for privoxy
+ network_port(i18n_input, tcp,9010,s0)
++network_port(ibm_dt_2, tcp,1792,s0, udp,1792,s0)
+ network_port(imaze, tcp,5323,s0, udp,5323,s0)
+ network_port(inetd_child, tcp,1,s0, udp,1,s0, tcp,7,s0, udp,7,s0, tcp,9,s0, udp,9,s0, tcp,13,s0, udp,13,s0, tcp,19,s0, udp,19,s0, tcp,37,s0, udp,37,s0, tcp,512,s0, tcp,543,s0, tcp,544,s0, tcp,891,s0, udp,891,s0, tcp,892,s0, udp,892,s0, tcp,2105,s0, tcp,5666,s0)
+ network_port(innd, tcp,119,s0)
+@@ -173,6 +175,7 @@ network_port(isns, tcp,3205,s0, udp,3205,s0)
+ network_port(jabber_client, tcp,5222,s0, tcp,5223,s0)
+ network_port(jabber_interserver, tcp,5269,s0)
+ network_port(jboss_iiop, tcp,3528,s0, udp,3528,s0)
++network_port(jboss_management, tcp,4712,s0, udp,4712,s0, tcp,4447,s0, tcp,7600,s0, tcp,9123,s0, udp,9123,s0, tcp, 9990, s0, tcp, 9999, s0, tcp, 18001, s0)
+ network_port(kerberos, tcp,88,s0, udp,88,s0, tcp,750,s0, udp,750,s0)
+ network_port(kerberos_admin, tcp,464,s0, udp,464,s0, tcp,749,s0)
+ network_port(kerberos_master, tcp,4444,s0, udp,4444,s0)
+@@ -192,6 +195,7 @@ network_port(memcache, tcp,11211,s0, udp,11211,s0)
+ network_port(milter) # no defined portcon
+ network_port(mmcc, tcp,5050,s0, udp,5050,s0)
+ network_port(mon, tcp,2583,s0, udp,2583,s0)
++network_port(mongod, tcp,27017-27019,s0, tcp, 28017-28019,s0)
+ network_port(monit, tcp,2812,s0)
+ network_port(monopd, tcp,1234,s0)
+ network_port(mountd, tcp,20048,s0, udp,20048,s0)
+diff --git a/policy/modules/services/tomcat.fc b/policy/modules/services/tomcat.fc
+new file mode 100644
+index 000000000..f7c06af9b
+--- /dev/null
++++ b/policy/modules/services/tomcat.fc
+@@ -0,0 +1,14 @@
++/usr/lib/systemd/system/tomcat\.service -- gen_context(system_u:object_r:tomcat_unit_t,s0)
++
++/usr/libexec/tomcat/server	--	gen_context(system_u:object_r:tomcat_exec_t,s0)
++
++/usr/sbin/tomcat6?		--	gen_context(system_u:object_r:tomcat_exec_t,s0)
++
++/var/cache/tomcat6?(/.*)?		gen_context(system_u:object_r:tomcat_cache_t,s0)
++
++/var/lib/tomcat6?(/.*)?			gen_context(system_u:object_r:tomcat_var_lib_t,s0)
++/var/lib/tomcats?(/.*)?			gen_context(system_u:object_r:tomcat_var_lib_t,s0)
++
++/var/log/tomcat6?(/.*)?			gen_context(system_u:object_r:tomcat_log_t,s0)
++
++/var/run/tomcat6?\.pid		--	gen_context(system_u:object_r:tomcat_runtime_t,s0)
+diff --git a/policy/modules/services/tomcat.if b/policy/modules/services/tomcat.if
+new file mode 100644
+index 000000000..795344923
+--- /dev/null
++++ b/policy/modules/services/tomcat.if
+@@ -0,0 +1,399 @@
++
++## <summary>policy for tomcat</summary>
++
++######################################
++## <summary>
++##      Creates types and rules for a basic
++##      tomcat daemon domain.
++## </summary>
++## <param name="prefix">
++##      <summary>
++##      Prefix for the domain.
++##      </summary>
++## </param>
++#
++template(`tomcat_domain_template',`
++        gen_require(`
++                attribute tomcat_domain;
++        ')
++
++	type $1_t, tomcat_domain;
++	type $1_exec_t;
++	init_daemon_domain($1_t, $1_exec_t)
++
++	type $1_cache_t;
++	files_type($1_cache_t)
++
++	type $1_log_t;
++	logging_log_file($1_log_t)
++
++	type $1_var_lib_t;
++	files_type($1_var_lib_t)
++
++	type $1_runtime_t;
++	files_runtime_file($1_runtime_t)
++
++	type $1_tmp_t;
++	files_tmp_file($1_tmp_t)
++
++	##################################
++	#
++	# Local policy
++	#
++
++	manage_dirs_pattern($1_t, $1_cache_t, $1_cache_t)
++	manage_files_pattern($1_t, $1_cache_t, $1_cache_t)
++	manage_lnk_files_pattern($1_t, $1_cache_t, $1_cache_t)
++	files_var_filetrans($1_t, $1_cache_t, { dir file })
++
++	manage_dirs_pattern($1_t, $1_log_t, $1_log_t)
++	manage_files_pattern($1_t, $1_log_t, $1_log_t)
++	manage_lnk_files_pattern($1_t, $1_log_t, $1_log_t)
++	logging_log_filetrans($1_t, $1_log_t, { dir file })
++
++	manage_dirs_pattern($1_t, $1_var_lib_t, $1_var_lib_t)
++	manage_files_pattern($1_t, $1_var_lib_t, $1_var_lib_t)
++	manage_lnk_files_pattern($1_t, $1_var_lib_t, $1_var_lib_t)
++	files_var_lib_filetrans($1_t, $1_var_lib_t, { dir file lnk_file })
++	allow $1_t $1_var_lib_t:file map;
++
++	manage_dirs_pattern($1_t, $1_runtime_t, $1_runtime_t)
++	manage_files_pattern($1_t, $1_runtime_t, $1_runtime_t)
++	manage_lnk_files_pattern($1_t, $1_runtime_t, $1_runtime_t)
++	files_runtime_filetrans($1_t, $1_runtime_t, { dir file lnk_file })
++
++	manage_dirs_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	manage_files_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	manage_fifo_files_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	manage_lnk_files_pattern($1_t, $1_tmp_t, $1_tmp_t)
++	files_tmp_filetrans($1_t, $1_tmp_t, { file fifo_file dir lnk_file })
++	allow $1_t $1_tmp_t:file map;
++
++	can_exec($1_t, $1_exec_t)
++
++	kernel_read_system_state($1_t)
++
++	logging_send_syslog_msg($1_t)
++')
++
++########################################
++## <summary>
++##	Transition to tomcat.
++## </summary>
++## <param name="domain">
++## <summary>
++##	Domain allowed to transition.
++## </summary>
++## </param>
++#
++interface(`tomcat_domtrans',`
++	gen_require(`
++		type tomcat_t, tomcat_exec_t;
++	')
++
++	corecmd_search_bin($1)
++	domtrans_pattern($1, tomcat_exec_t, tomcat_t)
++')
++
++########################################
++## <summary>
++##	Search tomcat cache directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_search_cache',`
++	gen_require(`
++		type tomcat_cache_t;
++	')
++
++	allow $1 tomcat_cache_t:dir search_dir_perms;
++	files_search_var($1)
++')
++
++########################################
++## <summary>
++##	Read tomcat cache files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_read_cache_files',`
++	gen_require(`
++		type tomcat_cache_t;
++	')
++
++	files_search_var($1)
++	read_files_pattern($1, tomcat_cache_t, tomcat_cache_t)
++')
++
++########################################
++## <summary>
++##	Create, read, write, and delete
++##	tomcat cache files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_manage_cache_files',`
++	gen_require(`
++		type tomcat_cache_t;
++	')
++
++	files_search_var($1)
++	manage_files_pattern($1, tomcat_cache_t, tomcat_cache_t)
++')
++
++########################################
++## <summary>
++##	Manage tomcat cache dirs.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_manage_cache_dirs',`
++	gen_require(`
++		type tomcat_cache_t;
++	')
++
++	files_search_var($1)
++	manage_dirs_pattern($1, tomcat_cache_t, tomcat_cache_t)
++')
++
++########################################
++## <summary>
++##	Read tomcat's log files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`tomcat_read_log',`
++	gen_require(`
++		type tomcat_log_t;
++	')
++
++	logging_search_logs($1)
++	read_files_pattern($1, tomcat_log_t, tomcat_log_t)
++')
++
++########################################
++## <summary>
++##	Append to tomcat log files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_append_log',`
++	gen_require(`
++		type tomcat_log_t;
++	')
++
++	logging_search_logs($1)
++	append_files_pattern($1, tomcat_log_t, tomcat_log_t)
++')
++
++########################################
++## <summary>
++##	Manage tomcat log files
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_manage_log',`
++	gen_require(`
++		type tomcat_log_t;
++	')
++
++	logging_search_logs($1)
++	manage_dirs_pattern($1, tomcat_log_t, tomcat_log_t)
++	manage_files_pattern($1, tomcat_log_t, tomcat_log_t)
++	manage_lnk_files_pattern($1, tomcat_log_t, tomcat_log_t)
++')
++
++########################################
++## <summary>
++##	Search tomcat lib directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_search_lib',`
++	gen_require(`
++		type tomcat_var_lib_t;
++	')
++
++	allow $1 tomcat_var_lib_t:dir search_dir_perms;
++	files_search_var_lib($1)
++')
++
++########################################
++## <summary>
++##	Read tomcat lib files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_read_lib_files',`
++	gen_require(`
++		type tomcat_var_lib_t;
++	')
++
++	files_search_var_lib($1)
++	read_files_pattern($1, tomcat_var_lib_t, tomcat_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Manage tomcat lib files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_manage_lib_files',`
++	gen_require(`
++		type tomcat_var_lib_t;
++	')
++
++	files_search_var_lib($1)
++	manage_files_pattern($1, tomcat_var_lib_t, tomcat_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Manage tomcat lib directories.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_manage_lib_dirs',`
++	gen_require(`
++		type tomcat_var_lib_t;
++	')
++
++	files_search_var_lib($1)
++	manage_dirs_pattern($1, tomcat_var_lib_t, tomcat_var_lib_t)
++')
++
++########################################
++## <summary>
++##	Read tomcat PID files.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`tomcat_read_pid_files',`
++	gen_require(`
++		type tomcat_runtime_t;
++	')
++
++	files_search_pids($1)
++	allow $1 tomcat_runtime_t:file read_file_perms;
++')
++
++########################################
++## <summary>
++##	Execute tomcat server in the tomcat domain.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed to transition.
++##	</summary>
++## </param>
++#
++interface(`tomcat_systemctl',`
++	gen_require(`
++		type tomcat_t;
++		type tomcat_unit_t;
++	')
++
++	systemd_exec_systemctl($1)
++	init_reload_services($1)
++	allow $1 tomcat_unit_t:file read_file_perms;
++	allow $1 tomcat_unit_t:service manage_service_perms;
++
++	ps_process_pattern($1, tomcat_t)
++')
++
++
++########################################
++## <summary>
++##	All of the rules required to administrate
++##	an tomcat environment
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++## <rolecap/>
++#
++interface(`tomcat_admin',`
++	gen_require(`
++		type tomcat_t;
++		type tomcat_cache_t;
++		type tomcat_log_t;
++		type tomcat_var_lib_t;
++		type tomcat_runtime_t;
++		type tomcat_unit_t;
++	')
++
++	allow $1 tomcat_t:process { ptrace signal_perms };
++	ps_process_pattern($1, tomcat_t)
++
++	files_search_var($1)
++	admin_pattern($1, tomcat_cache_t)
++
++	logging_search_logs($1)
++	admin_pattern($1, tomcat_log_t)
++
++	files_search_var_lib($1)
++	admin_pattern($1, tomcat_var_lib_t)
++
++	files_search_pids($1)
++	admin_pattern($1, tomcat_runtime_t)
++
++	tomcat_systemctl($1)
++	admin_pattern($1, tomcat_unit_t)
++	allow $1 tomcat_unit_t:service all_service_perms;
++	optional_policy(`
++		systemd_passwd_agent_exec($1)
++		systemd_read_fifo_file_passwd_run($1)
++	')
++')
+diff --git a/policy/modules/services/tomcat.te b/policy/modules/services/tomcat.te
+new file mode 100644
+index 000000000..59dd6e0d6
+--- /dev/null
++++ b/policy/modules/services/tomcat.te
+@@ -0,0 +1,133 @@
++policy_module(tomcat)
++
++########################################
++#
++# Declarations
++#
++
++## <desc>
++## <p>
++## Allow tomcat to read rpm database.
++## </p>
++## </desc>
++gen_tunable(tomcat_read_rpm_db, false)
++
++## <desc>
++## <p>
++## Allow tomcat to use executable memory and executable stack
++## </p>
++## </desc>
++gen_tunable(tomcat_use_execmem, false)
++
++## <desc>
++## <p>
++## Allow tomcat to connect to databases over the network.
++## </p>
++## </desc>
++gen_tunable(tomcat_can_network_connect_db, false)
++
++attribute tomcat_domain;
++
++tomcat_domain_template(tomcat)
++
++type tomcat_unit_t;
++init_unit_file(tomcat_unit_t)
++
++#######################################
++#
++# tomcat local policy
++#
++
++auth_use_nsswitch(tomcat_t)
++
++# Temporary fix, while missing SELinux policies for HSM
++init_stream_connect_script(tomcat_t)
++
++########################################
++#
++# tomcat domain local policy
++#
++
++allow tomcat_t self:capability { setuid kill };
++
++allow tomcat_t self:process { execmem setcap setsched signal signull };
++
++allow tomcat_t self:tcp_socket { accept listen };
++allow tomcat_domain self:fifo_file rw_fifo_file_perms;
++allow tomcat_domain self:unix_stream_socket create_stream_socket_perms;
++
++# we want to stay in a new tomcat domain if we call tomcat binary from a script
++# initrc_t@tomcat_test_exec_t->tomcat_test_t@tomcat_exec_t->tomcat_test_t
++can_exec(tomcat_domain, tomcat_exec_t)
++
++kernel_read_network_state(tomcat_domain)
++kernel_read_net_sysctls(tomcat_domain)
++
++corecmd_exec_bin(tomcat_domain)
++corecmd_exec_shell(tomcat_domain)
++
++corenet_tcp_bind_generic_node(tomcat_domain)
++corenet_udp_bind_generic_node(tomcat_domain)
++corenet_tcp_bind_http_port(tomcat_domain)
++corenet_tcp_bind_http_cache_port(tomcat_domain)
++corenet_tcp_bind_mxi_port(tomcat_domain)
++corenet_tcp_bind_bctp_port(tomcat_domain)
++corenet_tcp_connect_http_port(tomcat_domain)
++corenet_tcp_connect_ldap_port(tomcat_domain)
++corenet_tcp_connect_mxi_port(tomcat_domain)
++corenet_tcp_connect_http_cache_port(tomcat_domain)
++corenet_tcp_connect_amqp_port(tomcat_domain)
++corenet_tcp_connect_ibm_dt_2_port(tomcat_domain)
++corenet_tcp_connect_generic_port(tomcat_domain)
++corenet_tcp_bind_jboss_management_port(tomcat_domain)
++corenet_tcp_connect_smtp_port(tomcat_domain)
++
++dev_dontaudit_append_rand(tomcat_domain)
++dev_read_rand(tomcat_domain)
++dev_read_urand(tomcat_domain)
++dev_read_sysfs(tomcat_domain)
++
++domain_use_interactive_fds(tomcat_domain)
++
++libs_exec_ldconfig(tomcat_domain)
++
++files_delete_usr_dirs(tomcat_domain)
++files_manage_usr_files(tomcat_domain)
++
++fs_getattr_all_fs(tomcat_domain)
++fs_read_cgroup_files(tomcat_domain)
++
++sysnet_dns_name_resolve(tomcat_domain)
++
++tunable_policy(`tomcat_can_network_connect_db',`
++	corenet_tcp_connect_gds_db_port(tomcat_domain)
++	corenet_tcp_connect_mssql_port(tomcat_domain)
++	corenet_tcp_connect_mongod_port(tomcat_domain)
++	corenet_sendrecv_mssql_client_packets(tomcat_domain)
++	corenet_tcp_connect_oracledb_port(tomcat_domain)
++	corenet_sendrecv_oracledb_client_packets(tomcat_domain)
++    corenet_tcp_connect_postgresql_port(tomcat_domain)
++    corenet_tcp_connect_mysqld_port(tomcat_domain)
++    corenet_tcp_connect_redis_port(tomcat_domain)
++')
++
++tunable_policy(`tomcat_read_rpm_db',`
++    rpm_exec(tomcat_domain)
++    rpm_read_db(tomcat_domain)
++')
++
++tunable_policy(`tomcat_use_execmem',`
++	allow tomcat_domain self:process { execmem execstack };
++')
++
++optional_policy(`
++    cobbler_read_lib_files(tomcat_domain)
++')
++
++optional_policy(`
++    mta_send_mail(tomcat_domain)
++')
++
++optional_policy(`
++	tomcat_search_lib(tomcat_domain)
++')
+-- 
+2.43.2
+

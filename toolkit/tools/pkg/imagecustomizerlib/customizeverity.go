@@ -17,7 +17,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
+func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
 	var err error
 
 	if verity == nil {
@@ -28,6 +28,11 @@ func enableVerityPartition(verity *imagecustomizerapi.Verity, imageChroot *safec
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
 	err = buildDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = updateFstabForVerity(buildDir, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -86,6 +91,34 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 	})
 	if err != nil {
 		return fmt.Errorf("failed to build initrd img for kernel - (%s):\n%w", kernelVersion, err)
+	}
+
+	return nil
+}
+
+func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error {
+	var err error
+
+	fstabFile := filepath.Join(imageChroot.RootDir(), "etc", "fstab")
+	fstabEntries, err := diskutils.ReadFstabFile(fstabFile)
+	if err != nil {
+		return fmt.Errorf("failed to read fstab file: %v", err)
+	}
+
+	var updatedEntries []diskutils.FstabEntry
+	for _, entry := range fstabEntries {
+		if entry.Target == "/" {
+			// Replace existing root partition line with the Verity target.
+			entry.Source = "/dev/mapper/root"
+			entry.Options = "ro," + entry.Options
+		}
+		updatedEntries = append(updatedEntries, entry)
+	}
+
+	// Write the updated fstab entries back to the fstab file
+	err = diskutils.WriteFstabFile(updatedEntries, fstabFile)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -180,8 +213,12 @@ func idToPartitionBlockDevicePath(idType imagecustomizerapi.IdType, id string, n
 // systemdFormatPartitionId formats the partition ID based on the ID type following systemd dm-verity style.
 func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (string, error) {
 	switch idType {
-	case imagecustomizerapi.IdTypePartLabel, imagecustomizerapi.IdTypeUuid, imagecustomizerapi.IdTypePartUuid:
-		return fmt.Sprintf("%s=%s", strings.ToUpper(string(idType)), id), nil
+	case imagecustomizerapi.IdTypePartLabel:
+		return fmt.Sprintf("%s=%s", "PARTLABEL", id), nil
+	case imagecustomizerapi.IdTypeUuid:
+		return fmt.Sprintf("%s=%s", "UUID", id), nil
+	case imagecustomizerapi.IdTypePartUuid:
+		return fmt.Sprintf("%s=%s", "PARTUUID", id), nil
 	default:
 		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
 	}

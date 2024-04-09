@@ -1,33 +1,41 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        25.2
-Release:        1%{?dist}
+Version:        26.2.3
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
-Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz
+Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         OTP-24-Code.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  unzip
 
+%if 0%{?with_check}
+BuildRequires:  clang-tools-extra
+%endif
+
 %description
-erlang programming language
+Erlang is a programming language and runtime system for building massively scalable soft real-time systems with requirements on high availability.
 
 %prep
-%setup -q -n otp-OTP-%{version}
+%autosetup -n otp-OTP-%{version} -p1
 
 %build
 export ERL_TOP=`pwd`
 %configure
-make
+%make_build
 
 %install
-
 %make_install
+
+%check
+export ERL_TOP=`pwd`
+./otp_build check --no-docs
 
 %post
 
@@ -46,6 +54,12 @@ make
 %{_libdir}/erlang/*
 
 %changelog
+* Mon Apr 01 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-2
+- Add patch to fix issue when running with compiled code from OTP-24 on aarch64
+
+* Thu Mar 21 2024 Sam Meluch <sammeluch@microsoft.com> - 26.2.3-1
+- Update to version 26.2.3
+
 * Tue Feb 14 2023 Sam Meluch <sammeluch@microsoft.com> - 25.2-1
 - Update to version 25.2
 

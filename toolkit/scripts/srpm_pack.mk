@@ -16,21 +16,14 @@ SRPM_FILE_SIGNATURE_HANDLING ?= enforce
 SRPM_BUILD_CHROOT_DIR = $(BUILD_DIR)/SRPM_packaging
 SRPM_BUILD_LOGS_DIR = $(LOGS_DIR)/pkggen/srpms
 
-toolchain_spec_list = $(toolchain_build_dir)/toolchain_specs.txt
-srpm_pack_list_file = $(BUILD_SRPMS_DIR)/pack_list.txt
-
 # Configure the list of packages we want to process into SRPMs
 # Strip any whitespace from user input and reasign using override so we can compare it with the empty string
 override SRPM_PACK_LIST := $(strip $(SRPM_PACK_LIST))
 
 ifneq ($(SRPM_PACK_LIST),) # Pack list has user entries in it, only build selected .spec files
 local_specs = $(wildcard $(addprefix $(SPECS_DIR)/*/,$(addsuffix .spec,$(SRPM_PACK_LIST))))
-$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@echo $(SRPM_PACK_LIST) | tr " " "\n" > $(srpm_pack_list_file)
 else # Empty pack list, build all under $(SPECS_DIR)
 local_specs = $(call shell_real_build_only, find $(SPECS_DIR)/ -type f -name '*.spec')
-$(srpm_pack_list_file): $(depend_SRPM_PACK_LIST)
-	@truncate -s 0 $@
 endif
 local_spec_dirs = $(foreach spec,$(local_specs),$(dir $(spec)))
 local_spec_sources = $(call shell_real_build_only, find $(local_spec_dirs) -type f -name '*')
@@ -84,7 +77,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(local_specs) $(local_spec_dirs) $(local_
 $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(STATUS_FLAGS_DIR)/build_srpms.flag
 	@touch $@
 else
-$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(srpm_pack_list_file) $(local_spec_sources)
+$(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_spec_dirs) $(SPECS_DIR) $(go-srpmpacker) $(depend_SRPM_PACK_LIST) $(local_spec_sources)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -97,7 +90,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
 		--worker-tar=$(chroot_worker) \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
-		$(if $(SRPM_PACK_LIST),--pack-list=$(srpm_pack_list_file)) \
+		$(if $(SRPM_PACK_LIST),--pack-list="$(SRPM_PACK_LIST)") \
 		--log-file=$(SRPM_BUILD_LOGS_DIR)/srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \
 		--log-color=$(LOG_COLOR) \
@@ -110,7 +103,7 @@ $(STATUS_FLAGS_DIR)/build_srpms.flag: $(chroot_worker) $(local_specs) $(local_sp
 		--timestamp-file=$(TIMESTAMP_DIR)/srpm_packer.jsonl && \
 	touch $@
 
-$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpmpacker)
+$(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_files) $(go-srpmpacker)
 	GODEBUG=netdns=go $(go-srpmpacker) \
 		--dir=$(SPECS_DIR) \
 		--output-dir=$(BUILD_SRPMS_DIR) \
@@ -121,7 +114,7 @@ $(STATUS_FLAGS_DIR)/build_toolchain_srpms.flag: $(toolchain_spec_list) $(go-srpm
 		--tls-key=$(TLS_KEY) \
 		--build-dir=$(SRPM_BUILD_CHROOT_DIR) \
 		--signature-handling=$(SRPM_FILE_SIGNATURE_HANDLING) \
-		--pack-list=$(toolchain_spec_list) \
+		--pack-list="$(toolchain_spec_list)" \
 		$(if $(filter y,$(RUN_CHECK)),--run-check) \
 		--log-file=$(LOGS_DIR)/toolchain/srpms/toolchain_srpmpacker.log \
 		--log-level=$(LOG_LEVEL) \

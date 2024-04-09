@@ -27,17 +27,17 @@ echo "
 Usage:
 sudo make containerized-rpmbuild [REPO_PATH=/path/to/azurelinux] [MODE=test|build] [VERSION=2.0|3.0] [MOUNTS=/path/in/host:/path/in/container ...] [BUILD_MOUNT=/path/to/build/chroot/mount] [EXTRA_PACKAGES=pkg ...] [ENABLE_REPO=y] [KEEP_CONTAINER=y] [QUIET=y]
 
-Starts a docker container with the specified version of mariner.
+Starts a docker container with the specified version of Azure Linux
 
 Optional arguments:
     REPO_PATH:      path to the Azure Linux repo root directory. default: "current directory"
     MODE            build or test. default:"build"
-                        In 'test' mode it will use a pre-built mariner chroot image.
-                        In 'build' mode it will use the latest published container.
+                        In 'test' mode it will use a pre-built azl chroot image
+                        In 'build' mode it will use the latest published container
     VERSION         2.0 or 3.0. default: "3.0"
     MOUNTS          Mount a host directory into container. Should be of form '/host/dir:/container/dir'. For multiple mounts, please use space (\" \") as delimiter
                         e.g. MOUNTS=\"/host/dir1:/container/dir1 /host/dir2:/container/dir2\"
-    BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories.
+    BUILD_MOUNT     path to folder to create mountpoints for container's BUILD and BUILDROOT directories
                         Mountpoints will be ${BUILD_MOUNT}/container-build and ${BUILD_MOUNT}/container-buildroot. default: $REPO_PATH/build
     EXTRA_PACKAGES  Space delimited list of packages to tdnf install in the container on startup. e.g. EXTRA_PACKAGES=\"pkg1 pkg2\" default: \"\"
     ENABLE_REPO:    Set to 'y' to use local RPMs to satisfy package dependencies. default: n
@@ -159,11 +159,11 @@ repo_branch=$(git -C ${repo_path} rev-parse --abbrev-ref HEAD)
 # Generate text based on mode (Use figlet to generate splash text once available on Azure Linux)
 if [[ "${mode}" == "build" ]]; then
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
-    echo -e "\033[31m ----------------------------------- MARINER BUILDER ! ----------------------------------- \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m --------------------------------- AZURE LINUX BUILDER ! ---------------------------------\033[0m" >> ${tmp_dir}/splash.txt
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 else
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" > ${tmp_dir}/splash.txt
-    echo -e "\033[31m ----------------------------------- MARINER TESTER ! ------------------------------------ \033[0m" >> ${tmp_dir}/splash.txt
+    echo -e "\033[31m --------------------------------- AZURE LINUX TESTER ! ----------------------------------\033[0m" >> ${tmp_dir}/splash.txt
     echo -e "\033[31m -----------------------------------------------------------------------------------------\033[0m" >> ${tmp_dir}/splash.txt
 fi
 
@@ -204,7 +204,7 @@ fi
 # ========= Setup mounts =========
 echo "Setting up mounts..."
 
-mounts="${mounts} $RPMS_DIR:/mnt/RPMS ${tmp_dir}:/mariner_setup_dir"
+mounts="${mounts} $RPMS_DIR:/mnt/RPMS ${tmp_dir}:/azl_setup_dir"
 # Add extra 'build' mounts
 if [[ "${mode}" == "build" ]]; then
     mounts="${mounts} $BUILD_SRPMS_DIR:/mnt/INTERMEDIATE_SRPMS $SPECS_DIR:${topdir}/SPECS"
@@ -232,17 +232,17 @@ cp resources/setup_functions.sh $tmp_dir/setup_functions.sh
 sed -i "s~<TOPDIR>~${topdir}~" $tmp_dir/setup_functions.sh
 # TODO: Remove when PMC is available for 3.0
 if [[ "${version}" == "3.0" ]]; then # Add 3.0 DailyBuild repo
-    cp resources/mariner-3_repo $tmp_dir/mariner-3_repo
-    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/mariner-3_repo
+    cp resources/azl-3_repo $tmp_dir/azl-3_repo
+    sed -i "s~<DAILY_BUILD_ID>~${DAILY_BUILD_ID}~" $tmp_dir/azl-3_repo
     if [[ $(uname -m) == "x86_64" ]]; then
-        sed -i "s~<ARCH>~x86-64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~x86-64~" $tmp_dir/azl-3_repo
     else
-        sed -i "s~<ARCH>~aarch64~" $tmp_dir/mariner-3_repo
+        sed -i "s~<ARCH>~aarch64~" $tmp_dir/azl-3_repo
     fi
 fi
 
 # ============ Build the image ============
-dockerfile="${script_dir}/resources/mariner.Dockerfile"
+dockerfile="${script_dir}/resources/azl.Dockerfile"
 
 # TODO: Remove test mode when image is available for 3.0
 if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base image
@@ -250,7 +250,7 @@ if [[ "${mode}" == "build" || "${mode}" == "test" ]]; then # Configure base imag
     chroot_file="$BUILD_DIR/worker/worker_chroot.tar.gz"
     if [[ ! -f "${chroot_file}" ]]; then build_worker_chroot; fi
     chroot_hash=$(sha256sum "${chroot_file}" | cut -d' ' -f1)
-    container_img="mcr.microsoft.com/cbl-mariner/containerized-rpmbuild:${version}"
+    container_img="mcr.microsoft.com/azurelinux/containerized-rpmbuild:${version}"
     # Check if the chroot file's hash has changed since the last build
     if [[ ! -f "${tmp_dir}/hash" ]] || [[ "$(cat "${tmp_dir}/hash")" != "${chroot_hash}" ]]; then
         echo "Chroot file has changed, updating..."
@@ -270,14 +270,14 @@ fi
 
 # ================== Launch Container ==================
 echo "Checking if build env is up-to-date..."
-docker_image_tag="mcr.microsoft.com/cbl-mariner/${USER}-containerized-rpmbuild:${version}"
+docker_image_tag="mcr.microsoft.com/azurelinux/${USER}-containerized-rpmbuild:${version}"
 docker build -q \
                 -f "${dockerfile}" \
                 -t "${docker_image_tag}" \
                 --build-arg container_img="$container_img" \
                 --build-arg version="$version" \
                 --build-arg enable_local_repo="$enable_local_repo" \
-                --build-arg mariner_repo="$repo_path" \
+                --build-arg azl_repo="$repo_path" \
                 --build-arg mode="$mode" \
                 --build-arg extra_packages="$extra_packages" \
                 .

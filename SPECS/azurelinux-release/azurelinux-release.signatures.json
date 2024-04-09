@@ -2,6 +2,7 @@
  "Signatures": {
   "90-default.preset": "307a6d6ab554caa22f9067cccda74afc0db0c10f0e80bdd8d0668f1bd5e3c3cc",
   "90-default-user.preset": "7cf8f4d2ca1760e04ff46bd2444609cfd27a7ab456be2f9e73b0f89c284e134d",
-  "99-default-disable.preset": "3127b197b9eae62eb84eeed69b0413419612238332006183e36a3fba89578378"
+  "99-default-disable.preset": "3127b197b9eae62eb84eeed69b0413419612238332006183e36a3fba89578378",
+  "15-azurelinux-default.conf": "63a46ecbed4b92f996718ea9202e914ff119c2c06fdaeed3d1e2710aabc663b4"
  }
 }
