@@ -1,24 +1,26 @@
-%global runtime_make_vars       DEFSTATICRESOURCEMGMT=true \\\
+%global virtiofsd_binary        virtiofsd
+
+%global runtime_make_vars       DEFMEMSZ=256 \\\
+                                DEFSTATICSANDBOXWORKLOADMEM=1792 \\\
+                                DEFSNPGUEST=true \\\
+                                DEFVIRTIOFSDAEMON=%{_libexecdir}/"%{virtiofsd_binary}" \\\
                                 SKIP_GO_VERSION_CHECK=1
 
 %global agent_make_vars         LIBC=gnu \\\
-                                SECURITY_POLICY=yes
+                                AGENT_POLICY=yes
 
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      0.6.1
-Release:      4%{?dist}
-Summary:      Kata Confidential Containers
+Version:      3.2.0.azl0
+Release:      3%{?dist}
+Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
 URL:          https://github.com/microsoft/kata-containers
-Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/cc-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{name}-%{version}.tar.gz
-Source2:      %{name}-%{version}-cargo.tar.gz
-Source3:      mariner-coco-build-uvm.sh
-Patch0:       0001-tardev-snapshotter-enable-feature-impl_trait_in_asso.patch
-Patch1:       drop-mut-for-variables-that-are-not-mutated.patch
+Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:      %{name}-%{version}-cargo.tar.gz
+Source2:      mariner-coco-build-uvm.sh
 
 ExclusiveArch: x86_64
 
@@ -43,16 +45,21 @@ BuildRequires:  fuse-devel
 BuildRequires:  kernel-uvm-devel
 
 # kernel-uvm is required for allowing to test the kata-cc handler w/o SEV SNP but with the
-# policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy features
+# policy feature using kernel-uvm and the kata-cc shim/agent from this package with policy and snapshotter features
 Requires:  kernel-uvm
 Requires:  moby-containerd-cc
+# Must match the version specified by the `assets.virtiofsd.version` field in
+# %{SOURCE0}/versions.yaml.
+Requires:  virtiofsd = 1.8.0
 
 %description
-Kata Confidential Containers.
+The Kata Confidential Containers package ships the Kata components for Confidential Containers on AKS.
+The package sources are based on a Microsoft fork of the kata-containers project and tailored to the use
+for Mariner-based AKS node images.
 
-# This subpackage is used to build the uvm and therefore has dependencies on the kernel-uvm binaries
+# This subpackage is used to build the UVM and therefore has dependencies on the kernel-uvm(-cvm) binaries
 %package tools
-Summary:        Kata CC tools package for building UVM components
+Summary:        Kata Confidential Containers tools package for building the UVM
 Requires:       cargo
 Requires:       qemu-img
 Requires:       parted
@@ -62,12 +69,12 @@ Requires:       opa >= 0.50.2
 Requires:       kernel-uvm
 
 %description tools
-This package contains the UVM osbuilder files
+This package contains the the tooling and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
 pushd %{_builddir}/%{name}-%{version}
-tar -xf %{SOURCE2}
+tar -xf %{SOURCE1}
 popd
 
 %build
@@ -135,7 +142,7 @@ pushd %{_builddir}/%{name}-%{version}
 rm tools/osbuilder/.gitignore
 rm tools/osbuilder/rootfs-builder/.gitignore
 
-install -D -m 0755 %{SOURCE3}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
+install -D -m 0755 %{SOURCE2}           %{buildroot}%{osbuilder}/mariner-coco-build-uvm.sh
 install -D -m 0644 VERSION              %{buildroot}%{osbuilder}/VERSION
 install -D -m 0644 ci/install_yq.sh     %{buildroot}%{osbuilder}/ci/install_yq.sh
 install -D -m 0644 versions.yaml        %{buildroot}%{osbuilder}/versions.yaml
@@ -160,17 +167,18 @@ ln -s /usr/bin/cloud-hypervisor-cvm           %{buildroot}%{coco_bin}/cloud-hype
 # this is again for testing without SEV SNP
 ln -s /usr/share/cloud-hypervisor/vmlinux.bin %{buildroot}%{share_kata}/vmlinux.container
 
-ln -sf /usr/libexec/virtiofsd %{buildroot}/%{coco_path}/libexec/virtiofsd
+ln -sf /usr/libexec/%{virtiofsd_binary} %{buildroot}/%{coco_path}/libexec/%{virtiofsd_binary}
 
 find %{buildroot}/etc
 
 # agent
 pushd %{_builddir}/%{name}-%{version}/src/agent
-mkdir -p %{buildroot}%{osbuilder}/src/agent/samples/policy
-cp -aR samples/policy/all-allowed         %{buildroot}%{osbuilder}/src/agent/samples/policy
+mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
+cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/kata-opa.service.in %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
-install -D -m 0755 coco-opa.service       %{buildroot}%{osbuilder}/coco-opa.service
 install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
 popd
 
@@ -181,14 +189,27 @@ install -D -m 0755 kata-monitor %{buildroot}%{coco_bin}/kata-monitor
 install -D -m 0755 kata-runtime %{buildroot}%{coco_bin}/kata-runtime
 install -D -m 0755 data/kata-collect-data.sh %{buildroot}%{coco_bin}/kata-collect-data.sh
 
-# Note: we deploy two configurations - the additional one is for policy/snapshotter testing w/o SEV SNP or IGVM
-install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
+# We deploy 3 configurations:
+# configuration-clh-snp: production Kata-CC - IGVM & image, confidential_guest=true, sev_snp_guest=true
+# configuration-clh-snp-debug: debug Kata-CC - kernel & image, confidential_guest=true, sev_snp_guest=false
+# configuration-clh (symlinked to by configuration.toml): vanilla Kata - kernel & initrd, confidential_guest=false, sev_snp_guest=false
 install -D -m 0644 config/configuration-clh-snp.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
+install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+install -D -m 0644 config/configuration-clh.toml %{buildroot}/%{defaults_kata}/configuration-clh.toml
 
-# adapt upstream config files
-# change paths with locations specific to our distribution
-sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
-sed -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp.toml
+# Adapt configuration files:
+# - Change paths with locations specific to our distribution.
+sed --follow-symlinks -i 's|/usr|/opt/confidential-containers|g' %{buildroot}/%{defaults_kata}/configuration-clh*.toml
+# - Set up configuration-clh-snp-debug. Note that kernel and image are already
+#   set through configuration-clh.toml.in.
+sed -i 's|-igvm.img|-igvm-debug.img|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+sed -i '/^#confidential_guest =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+sed -i '/^#enable_debug =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+sed -i '/^#debug_console_enabled =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+sed -i 's|shared_fs = "virtio-fs"|shared_fs = "none"|g' %{buildroot}/%{defaults_kata}/configuration-clh-snp-debug.toml
+# - Set up configuration-clh.
+sed -i '/^#initrd =/s|^#||g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
+sed -i '/^image =/s|^|#|g' %{buildroot}/%{defaults_kata}/configuration-clh.toml
 popd
 
 # tardev-snapshotter
@@ -230,7 +251,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %{coco_bin}/kata-runtime
 
 %{defaults_kata}/configuration*.toml
-%{coco_path}/libexec/virtiofsd
+%{coco_path}/libexec/%{virtiofsd_binary}
 
 %{_bindir}/tardev-snapshotter
 %{_bindir}/kata-overlay
@@ -243,13 +264,14 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %doc README.md
 
 %files tools
-%dir %{osbuilder}/src/agent/samples/policy/all-allowed
-%{osbuilder}/src/agent/samples/policy/all-allowed/all-allowed.rego
+%dir %{osbuilder}/src/kata-opa
+%{osbuilder}/src/kata-opa/allow-all.rego
+%{osbuilder}/src/kata-opa/allow-set-policy.rego
+%{osbuilder}/src/kata-opa/kata-opa.service.in
 
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
 %{osbuilder}/kata-agent.service.in
-%{osbuilder}/coco-opa.service
 %{osbuilder}/kata-agent
 %{osbuilder}/ci/install_yq.sh
 
@@ -270,13 +292,40 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
-*   Thu Feb 29 2024 Cameron Baird <cameronbaird@microsoft.com> - 0.6.1-4
+*   Wed Mar 13 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-3
+-   Specify correct virtiofsd dependency
+
+*   Thu Feb 29 2024 Dallas Delaney <dadelan@microsoft.com> - 3.2.0.azl0-2
+-   Bump release to rebuild against kernel-uvm for LSG v2402.26.1
+
+*   Mon Feb 12 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-1
+-   Use Microsoft sources based on upstream Kata version 3.2.0.
+
+*   Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.3-4
+-   Bump release to rebuild with go 1.21.6
+
+*   Tue Jan 30 2024 Archana Choudhary <archana1@microsoft.com> - 0.6.3-3
 -   Remove kernel-uvm-cvm(-devel) dependency
 -   Remove kernel-uvm-cvm modules/sources/files
 -   Remove instructions to build kernel-uvm-cvm related binaries
 
-* Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
-- Bump release to rebuild with go 1.20.10
+*   Tue Jan 24 2024 Manuel Huber <mahuber@microsoft.com> - 0.6.3-2
+-   Enforce a restrictive security policy
+
+*   Mon Jan 08 2024 Dallas Delaney <dadelan@microsoft.com> - 0.6.3-1
+-   Upgrade to version 0.6.3
+
+*   Tue Dec 05 2023 Archana Choudhary <archana1@microsoft.com> - 0.6.2-2
+-   Add qemu-virtiofsd as a requirement
+
+*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.2-1
+-   Upgrade to version 0.6.2
+
+*   Fri Nov 3 2023 Dallas Delaney <dadelan@microsoft.com> - 0.6.1-4
+-   Add patch to retain UVM rootfs dependencies
+
+*   Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.1-3
+-   Bump release to rebuild with go 1.20.10
 
 *   Tue Oct 10 2023 Dan Streetman <ddstreet@ieee.org> - 0.6.1-2
 -   Bump release to rebuild with updated version of Go.
