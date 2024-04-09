@@ -151,7 +151,10 @@ cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 %changelog
 * Thu Apr 04 2024 Henry Li <lihl@microsoft.com> - 2.0.7-1
-- rebuild with msopenjdk-17
+- Upgrade to v2.0.7
+- Change to maven build and install
+- Remove jcl subpackage as it does not exist in updated version
+- Add additional files in main package
 
 * Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
 - rebuild with msopenjdk-17
