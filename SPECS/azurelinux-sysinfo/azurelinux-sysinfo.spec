@@ -38,10 +38,11 @@ install -m 755 %{SOURCE2} %{buildroot}%{_sysconfdir}/systemd/system/
 %{_sysconfdir}/systemd/system/azurelinux-sysinfo.service
 
 %post
+#!/bin/sh
 # Apply required SElinux policies only if selinux-policy is present
 if rpm -q selinux-policy &> /dev/null; then
-    mkdir -p /tmp/
-    POLICYFILE=/tmp/sysinfo-selinuxpolicies.cil
+    mkdir -p %{_datadir}/selinux/packages/
+    POLICYFILE=%{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
     cat << EOF > $POLICYFILE
 (allow systemd_analyze_t sysctl_kernel_t (dir (search)))
 (allow systemd_analyze_t locale_t (dir (search)))
@@ -60,14 +61,11 @@ if rpm -q selinux-policy &> /dev/null; then
 
 EOF
 
-    # Change SELinux context of file to user_tmp_t so that it can be read by semanage_t
-    chcon -t user_tmp_t $POLICYFILE
     # Apply the SELinux policies
     semodule -i $POLICYFILE
 fi
 
-# Script to enable the systemd service
-#!/bin/sh
+# Enable the systemd service
 systemctl enable azurelinux-sysinfo.service
 
 %changelog
