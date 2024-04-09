@@ -2336,7 +2336,7 @@
                 "rubygem-hirb",
                 "rubygem-hocon",
                 "rubygem-hoe",
-                "rubygem-http_parser.rb",
+                "rubygem-http_parser",
                 "rubygem-httpclient",
                 "rubygem-io-event",
                 "rubygem-jmespath",
