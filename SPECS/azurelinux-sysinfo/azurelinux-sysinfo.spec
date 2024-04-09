@@ -68,6 +68,14 @@ fi
 # Enable the systemd service
 systemctl enable azurelinux-sysinfo.service
 
+%postun
+# If selinux-policy is present, remove the sysinfo-selinuxpolicies module
+# and delete the policy file.
+if rpm -q selinux-policy &> /dev/null; then
+    semodule -r sysinfo-selinuxpolicies
+    rm -f %{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
+fi
+
 %changelog
 * Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
