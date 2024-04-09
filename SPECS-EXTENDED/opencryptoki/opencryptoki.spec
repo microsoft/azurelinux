@@ -1,7 +1,7 @@
 Summary:        Implementation of the PKCS#11 (Cryptoki) specification v2.11
 Name:           opencryptoki
 Version:        3.17.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        CPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,7 +22,10 @@ BuildRequires:  libtool
 BuildRequires:  openldap-devel
 BuildRequires:  openssl-devel
 BuildRequires:  systemd
+%if !0%{?azl}
+# Azure Linux only supports tpm 2.0, so drop tpm 1.2 support
 BuildRequires:  trousers-devel
+%endif
 Requires:       %{name}(token)
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
 Requires(post): systemd
@@ -79,6 +82,7 @@ hardware.
 This package brings the software token implementation to use opencryptoki
 without any specific cryptographic hardware.
 
+%if !0%{?azl}
 %package tpmtok
 Summary:        Trusted Platform Module (TPM) device support for opencryptoki
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -93,6 +97,7 @@ token implementation that can be used without any cryptographic
 hardware.
 This package brings the necessary libraries and files to support
 Trusted Platform Module (TPM) devices in the opencryptoki stack.
+%endif
 
 %package icsftok
 Summary:        ICSF token support for opencryptoki
@@ -171,6 +176,9 @@ configured with Enterprise PKCS#11 (EP11) firmware.
 ./bootstrap.sh
 
 %configure --with-systemd=%{_unitdir} --enable-testcases	\
+%if 0%{?azl}
+    --disable-tpmtok \
+%endif
 %ifarch s390 s390x
     --enable-icatok --enable-ccatok --enable-ep11tok --enable-pkcsep11_migrate
 %else
@@ -255,11 +263,13 @@ fi
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/swtok/
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/swtok/TOK_OBJ/
 
+%if !0%{?azl}
 %files tpmtok
 %doc doc/README.tpm_stdll
 %{_libdir}/opencryptoki/stdll/libpkcs11_tpm.*
 %{_libdir}/opencryptoki/stdll/PKCS11_TPM.so
 %dir %attr(770,root,pkcs11) %{_sharedstatedir}/%{name}/tpm/
+%endif
 
 %files icsftok
 %doc doc/README.icsf_stdll
@@ -301,6 +311,9 @@ fi
 
 
 %changelog
+* Fri Mar 29 2024 Chris Co <chrco@microsoft.com> - 3.17.0-2
+- Drop tpm 1.2 support
+
 * Mon Sep 04 2023 Muhammad Falak <mwani@microsoft.com> - 3.17.0-1
 - Upgrade version to address CVE-2021-3798
 - Lint spec

@@ -6,7 +6,7 @@
 Summary: Industry-standard container runtime for confidential containers
 Name: moby-%{upstream_name}
 Version: 1.7.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -29,9 +29,6 @@ Requires: moby-runc >= 1.1.0
 
 Conflicts: moby-containerd
 Conflicts: moby-engine <= 3.0.10
-
-Obsoletes: containerd
-Obsoletes: containerd-io
 
 %description
 This is the containerd runtime meant for use with confidential containers
@@ -76,6 +73,9 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 
 %changelog
+* Mon Apr 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-9
+- Remove Obsoletes containerd as it was causing dnf to pick moby-containerd-cc over containerd.
+
 * Fri Mar 08 2024 Henry Beberman <henry.beberman@microsoft.com> - 1.7.1-8
 - Add OOMScoreAdjust -999 to containerd.service
 

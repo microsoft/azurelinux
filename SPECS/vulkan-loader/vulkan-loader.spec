@@ -1,13 +1,13 @@
 Summary:        Vulkan ICD desktop loader
 Name:           vulkan-loader
-Version:        1.2.148.1
-Release:        5%{?dist}
+Version:        1.3.275.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/KhronosGroup/Vulkan-Loader
-#WARNING: the source file downloads as 'sdk-%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
-#Source0:       %%{url}/archive/sdk-%%{version}.tar.gz
+#WARNING: the source file downloads as 'vulkan-sdk-%%{version}.tar.gz' and MUST be re-named to match the 'Source0' tag.
+#Source0:       %%{url}/archive/vulkan-sdk-%%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
@@ -15,7 +15,7 @@ BuildRequires:  gcc
 BuildRequires:  ninja-build
 BuildRequires:  pkg-config
 BuildRequires:  python3-devel
-BuildRequires:  vulkan-headers = 1.2.148.0
+BuildRequires:  vulkan-headers = %{version}
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-cursor)
 BuildRequires:  pkgconfig(wayland-egl)
@@ -48,16 +48,16 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n Vulkan-Loader-sdk-%{version}
+%autosetup -n Vulkan-Loader-vulkan-sdk-%{version}
 
 
 %build
-%cmake -GNinja -DCMAKE_BUILD_TYPE=Release .
-%ninja_build
+%cmake -GNinja -DCMAKE_BUILD_TYPE=Release
+%cmake_build
 
 
 %install
-%ninja_install
+%cmake_install
 
 # create the filesystem
 mkdir -p %{buildroot}%{_sysconfdir}/vulkan/{explicit,implicit}_layer.d/ \
@@ -84,8 +84,12 @@ mkdir -p %{buildroot}%{_sysconfdir}/vulkan/{explicit,implicit}_layer.d/ \
 %files devel
 %{_libdir}/pkgconfig/vulkan.pc
 %{_libdir}/*.so
+%{_libdir}/cmake/VulkanLoader/*.cmake
 
 %changelog
+* Fri Mar 29 2024 Nan Liu <liunan@microsoft.com> - 1.3.275.0-1
+- Upgrade to 1.3.275.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.2.148.1-5
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

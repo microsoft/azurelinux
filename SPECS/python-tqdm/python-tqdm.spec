@@ -6,13 +6,13 @@ Instantly make your loops show a smart progress meter - just wrap any iterable\
 with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
-Version:        4.63.1
-Release:        2%{?dist}
+Version:        4.66.2
+Release:        1%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/tqdm/tqdm
-Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+Source0:        %{pypi_source}
 BuildArch:      noarch
 
 %description %{_description}
@@ -21,40 +21,83 @@ BuildArch:      noarch
 %{?python_provide:%python_provide python3-%{srcname}}
 Summary:        %{summary}
 BuildRequires:  python3-devel
+BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
+BuildRequires:  python3-packaging
+BuildRequires:  python3-setuptools_scm
+%if 0%{with_check}
+BuildRequires:  python3-pytest
+%ifarch x86_64
+BuildRequires:  python3-tensorflow
+%endif
+%endif
 
 %description -n python3-%{srcname} %{_description}
 
 Python 3 version.
 
 %prep
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %autosetup -n %{srcname}-%{version}
+chmod -x tqdm/completion.sh
+
+# https://github.com/tqdm/tqdm/pull/1292
+echo 'include tqdm/tqdm.1' >> MANIFEST.in
+echo 'include tqdm/completion.sh' >> MANIFEST.in
+
+%generate_buildrequires
+%pyproject_buildrequires -r
 
 %build
-%py3_build
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+%pyproject_wheel
 
 %install
-%py3_install
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+%pyproject_install
+%pyproject_save_files %{srcname}
 
-mkdir -p %{buildroot}%{_mandir}/man1/
-mv -v %{buildroot}%{python3_sitelib}/%{srcname}/%{srcname}.1 %{buildroot}%{_mandir}/man1/
+install -Dpm0644 \
+  %{buildroot}%{python3_sitelib}/tqdm/tqdm.1 \
+  %{buildroot}%{_mandir}/man1/tqdm.1
+install -Dpm0644 \
+  %{buildroot}%{python3_sitelib}/tqdm/completion.sh \
+  %{buildroot}%{_datadir}/bash-completion/completions/tqdm.bash
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-tox -e setup.py
+export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
+pip3 install --upgrade pip
+pip3 install iniconfig \
+  pytest-timeout \
+  pytest-asyncio>=0.17 \
+  numpy \
+  dask \
+  rich \
+  pandas \
+  keras
+%pytest
 
-%files -n python3-%{srcname}
+%files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENCE
 %doc README.rst examples
 %{_bindir}/%{srcname}
 %{_mandir}/man1/%{srcname}.1*
-%{python3_sitelib}/%{srcname}-*.egg-info/
-%{python3_sitelib}/%{srcname}/
+%dir %{_datadir}/bash-completion
+%dir %{_datadir}/bash-completion/completions
+%{_datadir}/bash-completion/completions/tqdm.bash
 
 
 %changelog
+* Tue Mar 26 2024 Henry Li <lihl@microsoft.com> - 4.66.2-1
+- Upgrade version to v4.66.2
+- Modify Source0
+- Add python3-pip, python3-packaging and python3-setuptools_scm as BR
+- Add python3-pytest and python3-tensorflow as BR for package test
+- Refine build, install and test implementation to enable build and package test
+- Add additional files to %files section
+
 * Fri Dec 16 2022 Sam Meluch <sammeluch@microsoft.com> - 4.63.1-2
 - Update version of tox used for package tests
 

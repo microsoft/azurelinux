@@ -13,6 +13,9 @@ jobs:
   spec-check:
     name: Source Signature Check
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        specs-dir: [SPECS, SPECS-EXTENDED]
 
     steps:
       # Checkout the branch of our repo that triggered this action
@@ -45,14 +48,22 @@ jobs:
       - name: Get changed packages
         run: |
           # Find the packages that have been modified in the current PR. They will be of the form '/path/to/SPECS/<pkgname>/**/.*', and we want to extract
-          # the package name (ie the folder inside ./SPECS).
-          changed_pkgs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS/.*" || test $? = 1; } | sed -n 's#SPECS/\([^/]*\)/.*#\1#p' | sort -u | xargs)
-          changed_pkgs_extended=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep "SPECS-EXTENDED/.*" || test $? = 1; } | sed -n 's#SPECS-EXTENDED/\([^/]*\)/.*#\1#p' | sort -u | xargs)
+          # the package's directory name (ie the folder inside ./SPECS).
+          changed_pkg_dirs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r ${{ env.base_sha }} ${{ github.sha }} | { grep -oP "(?<=^${{ matrix.specs-dir }}/)([^/]+)" || [[ $? -eq 1 ]]; } | sort -u | xargs)
+
+          echo "Folders with modified files in this PR:"
+          echo "${{ matrix.specs-dir }}/*: '${changed_pkg_dirs}'"
+
+          # For each package directory, get the names of all .spec files contained and add them to the list of SRPMS to repack.
+          # We need to filter since some directories may not contain .spec files we can rebuild, or the naming may not be 1:1.
+          changed_pkgs=""
+          for pkg in $changed_pkg_dirs; do
+            changed_pkgs="$changed_pkgs $(find ${{ matrix.specs-dir }}/$pkg -name '*.spec' -exec basename {} .spec \; | xargs)"
+          done
+
           echo "Packages modified in this PR:"
-          echo "SPECS:          ${changed_pkgs}"
-          echo "SPECS-EXTENDED: ${changed_pkgs_extended}"
+          echo "${{ matrix.specs-dir }}: '${changed_pkgs}'"
           echo "changed_pkgs=${changed_pkgs}" >> $GITHUB_ENV
-          echo "changed_pkgs_extended=${changed_pkgs_extended}" >> $GITHUB_ENV
 
       - name: Prepare the build environment
         run: |
@@ -72,45 +83,19 @@ jobs:
 
       - name: Check for invalid source signatures
         run: |
-          if [ -z "${{ env.changed_pkgs }}" ] && [ -z "${{ env.changed_pkgs_extended }}" ]; then
-            echo "No package changes detected."
+          if [ -z "${{ env.changed_pkgs }}" ]; then
+            echo "No package changes detected in '${{ matrix.specs-dir }}''."
             exit 0
           fi
 
-          # Core SPECs
-          if [ -n "${{ env.changed_pkgs }}" ]; then
-            # We want to ignore errors here, as we want to check all the packages that have been modified. Capture the error code and check it later.
-            set +e
-            set -x
-            sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}"
-            core_err=$?
+          set -x
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}; then
             set +x
-            set -e
-          fi
-
-          # Extended SPECs
-          if [ -n "${{ env.changed_pkgs_extended }}" ]; then
-            # We want to ignore errors here, as we want to check all the packages that have been modified. Capture the error code and check it later.
-            set +e
-            set -x
-            sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs_extended }}" SPECS_DIR=../SPECS-EXTENDED
-            extended_err=$?
-            set +x
-            set -e
-          fi
-
-          # Print results
-          if [ $core_err -ne 0 ] || [ $extended_err -ne 0 ]; then
-            printf "\n\n******************************"
+            printf "\n\n******************************\n"
             echo "Failed to check the signatures of the modified packages."
             echo "Check the logs above for details on the mismatches files and their expected hashes."
-            if [ $core_err -ne 0 ]; then
-              echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}'"
-            fi
-            if [ $extended_err -ne 0 ]; then
-              echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs_extended }}' SPECS_DIR=../SPECS-EXTENDED"
-            fi
-            printf "\n\n******************************"
+            echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}' SPECS_DIR=../${{ matrix.specs-dir }}"
+            printf "******************************\n\n"
             exit 1
           else
             echo "All modified packages have valid source signatures."
