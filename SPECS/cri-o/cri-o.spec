@@ -25,8 +25,8 @@
 Summary:        OCI-based implementation of Kubernetes Container Runtime Interface
 # Define macros for further referenced sources
 Name:           cri-o
-Version:        1.21.2
-Release:        19%{?dist}
+Version:        1.21.7
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -52,6 +52,7 @@ Source3:        sysconfig.crio
 Source4:        crio.conf
 Source5:        cri-o-rpmlintrc
 Source6:        kubelet.env
+Patch0:         CVE-2022-1708.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -99,9 +100,10 @@ This package provides the CRI-O container runtime configuration for kubeadm
 
 %prep
 %setup -q
+tar -xf %{SOURCE1} --no-same-owner
+%patch0 -p1 -b .files
 
 %build
-tar -xf %{SOURCE1} --no-same-owner
 
 # We can't use symlinks here because go-list gets confused by symlinks, so we
 # have to copy the source to $HOME/go and then use that as the GOPATH.
@@ -203,6 +205,10 @@ mkdir -p /opt/cni/bin
 %{_fillupdir}/sysconfig.kubelet
 
 %changelog
+* Tue Apr 09 2024 Adithya Jayachandran <adjayach@microsoft.com> - 1.21.7-1
+- Update to 1.21.7 to fix CVE-2022-0811
+- Added sumsharma's backported patch for 1.21.7 to fix CVE-2022-1708
+
 * Fri Feb 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.21.2-19
 - Bump release to rebuild with go 1.21.6
 
