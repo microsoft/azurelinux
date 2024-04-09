@@ -97,23 +97,9 @@ copy-toolchain-rpms:
 # check that the manifest files only contain RPMs that could have been generated from toolchain specs.
 check-manifests: check-x86_64-manifests check-aarch64-manifests
 check-aarch64-manifests: $(toolchain_files)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"aarch64"
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "aarch64"
 check-x86_64-manifests: $(toolchain_files)
-	cd $(SCRIPTS_DIR)/toolchain && \
-		./check_manifests.sh \
-			"$(toolchain_spec_list)" \
-			"$(SPECS_DIR)" \
-			"$(TOOLCHAIN_MANIFESTS_DIR)" \
-			"$(DIST_TAG)" \
-			"$(DIST_VERSION_MACRO)" \
-			"x86_64"
+	$(SCRIPTS_DIR)/toolchain/check_manifests.sh -a "x86_64"
 
 # To save toolchain artifacts use compress-toolchain and cache the tarballs
 # To restore toolchain artifacts use hydrate-toolchain and give the location of the tarballs on the command-line

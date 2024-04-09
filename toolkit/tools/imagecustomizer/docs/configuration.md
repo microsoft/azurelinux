@@ -99,7 +99,7 @@ os:
             - [start](#start-uint64)
             - [end](#end-uint64)
             - [size](#size-uint64)
-            - [flag](#flags-string)
+            - [type](#partition-type-string)
     - [fileSystems](#filesystems-filesystem)
       - [fileSystem type](#filesystem-type)
         - [deviceId](#deviceid-string)
@@ -190,17 +190,15 @@ storage:
 
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4096M
     partitions:
     - id: esp
-      flags:
-      - esp
-      - boot
-      start: 1
-      end: 9
+      type: esp
+      start: 1M
+      end: 9M
 
     - id: rootfs
-      start: 9
+      start: 9M
       
   fileSystems:
   - deviceId: esp
@@ -243,7 +241,11 @@ Supported options:
 
 ### maxSize [uint64]
 
-The size of the disk, specified in mebibytes (MiB).
+The size of the disk.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### partitions [[partition](#partition-type)[]]
 
@@ -696,11 +698,15 @@ The label to assign to the partition.
 
 Required.
 
-The start location (inclusive) of the partition, specified in MiBs.
+The start location (inclusive) of the partition.
+
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
 
 ### end [uint64]
 
-The end location (exclusive) of the partition, specified in MiBs.
+The end location (exclusive) of the partition.
 
 The End and Size fields cannot be specified at the same time.
 
@@ -709,11 +715,21 @@ partition.
 When both the Size and End fields are omitted, the last partition will fill the
 remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
 
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
+
 ### size [uint64]
 
-The size of the partition, specified in MiBs.
+The size of the partition.
 
-### flags [string[]]
+Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+
+Must be a multiple of 1 MiB.
+
+<div id="partition-type-string"></div>
+
+### type [string]
 
 Specifies options for the partition.
 
@@ -721,8 +737,6 @@ Supported options:
 
 - `esp`: The UEFI System Partition (ESP).
   The partition must have a `fileSystemType` of `fat32`.
-
-  When specified on a GPT formatted disk, the `boot` flag must also be added.
 
 - `bios-grub`: Specifies this partition is the BIOS boot partition.
   This is required for GPT disks that wish to be bootable using legacy BIOS mode.
@@ -732,13 +746,6 @@ Supported options:
   This flag is only supported on GPT formatted disks.
 
   For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
-
-- `boot`: Specifies that this partition contains the boot loader.
-
-  When specified on a GPT formatted disk, the `esp` flag must also be added.
-
-These options mirror those in
-[parted](https://www.gnu.org/software/parted/manual/html_node/set.html).
 
 ## mountPoint type
 

@@ -1,7 +1,7 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3.P1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        https://downloads.isc.org/isc/dhcp/4.4.3-P1/dhcp-4.4.3-P1.tar.gz
@@ -70,8 +70,6 @@ cat > %{buildroot}/etc/dhcp/dhclient.conf << "EOF"
 # Begin /etc/dhcp/dhclient.conf
 #
 # Basic dhclient.conf(5)
-
-option rfc3442-classless-static-routes code 121 = array of unsigned integer 8;
 
 #prepend domain-name-servers 127.0.0.1;
 request subnet-mask, broadcast-address, time-offset, routers,
@@ -171,6 +169,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Thu Apr 04 2024 Sindhu <lakarri@microsoft.com> - 4.4.3.P1-2
+- Revert option for classless static route configuration in dhclient.conf
+
 * Fri Mar 08 2024 Dan Streetman <ddstreet@microsoft.com> - 4.4.3.P1-1
 - update to final isc-dhcp version, which has been EOL since Dec 2022
 

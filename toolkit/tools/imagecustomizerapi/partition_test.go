@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ func TestPartitionIsValidFixedSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		End:   ptrutils.PtrTo(uint64(1)),
+		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
 	err := partition.IsValid()
@@ -35,7 +36,7 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		End:   ptrutils.PtrTo(uint64(0)),
+		End:   ptrutils.PtrTo(DiskSize(0)),
 	}
 
 	err := partition.IsValid()
@@ -48,7 +49,7 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		Size:  ptrutils.PtrTo(uint64(0)),
+		Size:  ptrutils.PtrTo(DiskSize(0)),
 	}
 
 	err := partition.IsValid()
@@ -60,8 +61,8 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2,
-		End:   ptrutils.PtrTo(uint64(1)),
+		Start: 2 * diskutils.MiB,
+		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
 	err := partition.IsValid()
@@ -73,9 +74,9 @@ func TestPartitionIsValidNegativeSize(t *testing.T) {
 func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2,
-		End:   ptrutils.PtrTo(uint64(3)),
-		Size:  ptrutils.PtrTo(uint64(1)),
+		Start: 2 * diskutils.MiB,
+		End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
+		Size:  ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
 	err := partition.IsValid()
@@ -124,27 +125,27 @@ func TestPartitionIsValidNameNonASCII(t *testing.T) {
 	assert.ErrorContains(t, err, "ASCII")
 }
 
-func TestPartitionIsValidGoodFlag(t *testing.T) {
+func TestPartitionIsValidGoodType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
 		End:   nil,
-		Flags: []PartitionFlag{"esp"},
+		Type:  PartitionTypeESP,
 	}
 
 	err := partition.IsValid()
 	assert.NoError(t, err)
 }
 
-func TestPartitionIsValidBadFlag(t *testing.T) {
+func TestPartitionIsValidBadType(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
 		End:   nil,
-		Flags: []PartitionFlag{"a"},
+		Type:  PartitionType("a"),
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partitionFlag")
+	assert.ErrorContains(t, err, "unknown partition type")
 }

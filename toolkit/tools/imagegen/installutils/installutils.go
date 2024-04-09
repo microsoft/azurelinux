@@ -6,6 +6,7 @@ package installutils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -562,6 +563,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	if err != nil {
+		return
+	}
+
+	// The system should be fully populated with packages, we can clear the tdnf cache now to free up space.
+	if !config.PreserveTdnfCache {
+		err = cleanupTdnfCache(installChroot)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -1340,7 +1352,8 @@ func addUsers(installChroot *safechroot.Chroot, users []configuration.User) (err
 			return
 		}
 
-		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys)
+		err = ProvisionUserSSHCerts(installChroot, user.Name, user.SSHPubKeyPaths, user.SSHPubKeys,
+			false /*includeExistingKeys*/)
 		if err != nil {
 			return
 		}
@@ -1572,7 +1585,9 @@ func ConfigureUserStartupCommand(installChroot safechroot.ChrootInterface, usern
 	return
 }
 
-func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string, sshPubKeys []string) (err error) {
+func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username string, sshPubKeyPaths []string,
+	sshPubKeys []string, includeExistingKeys bool,
+) (err error) {
 	var (
 		pubKeyData []string
 		exists     bool
@@ -1588,9 +1603,8 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 
-	homeDir := userutils.UserHomeDirectory(username)
-	userSSHKeyDir := filepath.Join(homeDir, ".ssh")
-	authorizedKeysFile := filepath.Join(userSSHKeyDir, "authorized_keys")
+	userSSHKeyDir := userutils.UserSSHDirectory(username)
+	authorizedKeysFile := filepath.Join(userSSHKeyDir, userutils.SSHAuthorizedKeysFileName)
 
 	exists, err = file.PathExists(authorizedKeysTempFile)
 	if err != nil {
@@ -1613,7 +1627,25 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 	}
 	defer os.Remove(authorizedKeysTempFile)
 
-	allSSHKeys := make([]string, 0, len(sshPubKeyPaths)+len(sshPubKeys))
+	allSSHKeys := []string(nil)
+
+	if includeExistingKeys {
+		authorizedKeysFileFullPath := filepath.Join(installChroot.RootDir(), authorizedKeysFile)
+
+		fileExists, err := file.PathExists(authorizedKeysFileFullPath)
+		if err != nil {
+			return fmt.Errorf("failed to check if authorized_keys file (%s) exists:\n%w", authorizedKeysFileFullPath, err)
+		}
+
+		if fileExists {
+			pubKeyData, err = file.ReadLines(authorizedKeysFileFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read existing authorized_keys (%s) file:\n%w", authorizedKeysFileFullPath, err)
+			}
+
+			allSSHKeys = append(allSSHKeys, pubKeyData...)
+		}
+	}
 
 	// Add SSH keys from sshPubKeyPaths
 	for _, pubKey := range sshPubKeyPaths {
@@ -2160,6 +2192,55 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	}
 
 	return
+}
+
+// cleanupTdnfCache runs 'tdnf clean all' and removes the contents of the tdnf cache directory.
+// If 'tdnf' is not installed, the function will skip the cleanup.
+// If /var/cache/tdnf does not exist, the function will skip removing its contents.
+func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
+	const (
+		squashErrors      = false
+		rpmCacheDirectory = "/var/cache/tdnf"
+	)
+
+	ReportActionf("Cleaning tdnf cache")
+	err := installChroot.UnsafeRun(func() error {
+		// Check if 'tdnf' is in the chroot's PATH, some images may have removed it.
+		_, chrootErr := exec.LookPath("tdnf")
+		if chrootErr != nil {
+			logger.Log.Debugf("Skipping tdnf cache cleanup since 'tdnf' is not installed")
+			return nil
+		}
+		logger.Log.Infof("Cleaning tdnf cache")
+		chrootErr = shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
+		return chrootErr
+	})
+
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup tdnf cache:\n%w", err)
+		return err
+	}
+
+	// Remove all files and subdirectories in the tdnf cache directory, but leave
+	// the directory since it's owned by the tdnf package.
+	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
+	// Skip if directory is missing already
+	exists, err := file.DirExists(cacheDir)
+	if err != nil {
+		return fmt.Errorf("failed to check if tdnf cache directory exists (%s):\n%w", cacheDir, err)
+	}
+	if !exists {
+		logger.Log.Debugf("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
+		return nil
+	}
+
+	logger.Log.Infof("Removing contents of (%s)", cacheDir)
+	err = file.RemoveDirectoryContents(cacheDir)
+	if err != nil {
+		err = fmt.Errorf("failed to remove tdnf cache contents (%s/*):\n%w", cacheDir, err)
+		return err
+	}
+	return nil
 }
 
 func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {

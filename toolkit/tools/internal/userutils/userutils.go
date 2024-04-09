@@ -21,7 +21,9 @@ const (
 	RootHomeDir       = "/root"
 	UserHomeDirPrefix = "/home"
 
-	ShadowFile = "/etc/shadow"
+	ShadowFile                = "/etc/shadow"
+	SSHDirectoryName          = ".ssh"
+	SSHAuthorizedKeysFileName = "authorized_keys"
 )
 
 func HashPassword(password string) (string, error) {
@@ -134,12 +136,20 @@ func UpdateUserPassword(installRoot, username, hashedPassword string) error {
 	return nil
 }
 
+// UserHomeDirectory returns the home directory for a user.
 func UserHomeDirectory(username string) string {
 	if username == RootUser {
 		return RootHomeDir
 	} else {
 		return filepath.Join(UserHomeDirPrefix, username)
 	}
+}
+
+// UserSSHDirectory returns the path of the .ssh directory for a user.
+func UserSSHDirectory(username string) string {
+	homeDir := UserHomeDirectory(username)
+	userSSHKeyDir := filepath.Join(homeDir, SSHDirectoryName)
+	return userSSHKeyDir
 }
 
 // NameIsValid returns an error if the User name is empty

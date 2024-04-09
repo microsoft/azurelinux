@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 )
 
 type Disk struct {
@@ -16,7 +16,7 @@ type Disk struct {
 	PartitionTableType PartitionTableType `yaml:"partitionTableType"`
 
 	// The virtual size of the disk.
-	MaxSize uint64 `yaml:"maxSize"`
+	MaxSize DiskSize `yaml:"maxSize"`
 
 	// The partitions to allocate on the disk.
 	Partitions []Partition `yaml:"partitions"`
@@ -44,16 +44,6 @@ func (d *Disk) IsValid() error {
 		}
 
 		partitionIDSet[partition.Id] = false // dummy value
-
-		if d.PartitionTableType == PartitionTableTypeGpt {
-			isESP := sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
-			isBoot := sliceutils.ContainsValue(partition.Flags, PartitionFlagBoot)
-
-			if isESP != isBoot {
-				return fmt.Errorf(
-					"invalid partition at index %d:\n'esp' and 'boot' flags must be specified together on GPT disks", i)
-			}
-		}
 	}
 
 	// Check for overlapping partitions.
@@ -76,7 +66,7 @@ func (d *Disk) IsValid() error {
 			bEnd, bHasEnd := b.GetEnd()
 			bEndStr := ""
 			if bHasEnd {
-				bEndStr = strconv.FormatUint(bEnd, 10)
+				bEndStr = strconv.FormatUint(uint64(bEnd), 10)
 			}
 			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
 				a.Id, a.Start, aEnd, b.Id, b.Start, bEndStr)
@@ -86,8 +76,8 @@ func (d *Disk) IsValid() error {
 	if len(sortedPartitions) > 0 {
 		// Make sure the first block isn't used.
 		firstPartition := sortedPartitions[0]
-		if firstPartition.Start == 0 {
-			return fmt.Errorf("block 0 must be reserved for the MBR header (%s)", firstPartition.Id)
+		if firstPartition.Start < diskutils.MiB {
+			return fmt.Errorf("first 1 MiB must be reserved for the MBR header (%s)", firstPartition.Id)
 		}
 
 		// Check that the disk is big enough for the partition layout.
@@ -95,15 +85,15 @@ func (d *Disk) IsValid() error {
 
 		lastPartitionEnd, lastPartitionHasEnd := lastPartition.GetEnd()
 
-		var requiredSize uint64
+		var requiredSize DiskSize
 		if !lastPartitionHasEnd {
-			requiredSize = lastPartition.Start + 1
+			requiredSize = lastPartition.Start + diskutils.MiB
 		} else {
 			requiredSize = lastPartitionEnd
 		}
 
 		if requiredSize > d.MaxSize {
-			return fmt.Errorf("disk's partitions need %d MiB but maxSize is only %d MiB", requiredSize, d.MaxSize)
+			return fmt.Errorf("disk's partitions need %d bytes but maxSize is only %d bytes", requiredSize, d.MaxSize)
 		}
 	}
 

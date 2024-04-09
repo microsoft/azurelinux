@@ -177,6 +177,26 @@ func RemoveFileIfExists(path string) (err error) {
 	return
 }
 
+// RemoveDirectoryContents will delete the contents of a directory, but not the
+// directory itself. If the directory does not exist, it will return an error.
+func RemoveDirectoryContents(path string) (err error) {
+	dir, err := os.ReadDir(path)
+	if err != nil {
+		return
+	}
+
+	for _, entry := range dir {
+		childPath := filepath.Join(path, entry.Name())
+		logger.Log.Debugf("Removing (%s)", childPath)
+		err = os.RemoveAll(childPath)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 // GenerateSHA1 calculates a sha1 of a file
 func GenerateSHA1(path string) (hash string, err error) {
 	file, err := os.Open(path)
@@ -330,4 +350,22 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 
 	return nil
+}
+
+func EnumerateDirFiles(dirPath string) (filePaths []string, err error) {
+	err = filepath.Walk(dirPath, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		filePaths = append(filePaths, filePath)
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to enumerate files under %s:\n%w", dirPath, err)
+	}
+	return filePaths, nil
 }
