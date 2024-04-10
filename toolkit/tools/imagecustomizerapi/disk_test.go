@@ -52,7 +52,10 @@ func TestDiskIsValidWithSize(t *testing.T) {
 			{
 				Id:    "a",
 				Start: 1 * diskutils.MiB,
-				Size:  ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
+				Size: PartitionSize{
+					Type: PartitionSizeTypeExplicit,
+					Size: 1 * diskutils.MiB,
+				},
 			},
 		},
 	}
@@ -131,7 +134,31 @@ func TestDiskIsValidTwoExpanding(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "is not last partition")
+	assert.ErrorContains(t, err, "is not last partition but size is set to \"grow\"")
+}
+
+func TestDiskIsValidTwoExpandingGrow(t *testing.T) {
+	disk := &Disk{
+		PartitionTableType: PartitionTableTypeGpt,
+		MaxSize:            4 * diskutils.MiB,
+		Partitions: []Partition{
+			{
+				Id:    "a",
+				Start: 1 * diskutils.MiB,
+			},
+			{
+				Id:    "b",
+				Start: 2 * diskutils.MiB,
+				Size: PartitionSize{
+					Type: PartitionSizeTypeGrow,
+				},
+			},
+		},
+	}
+
+	err := disk.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "is not last partition but size is set to \"grow\"")
 }
 
 func TestDiskIsValidOverlaps(t *testing.T) {

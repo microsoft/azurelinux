@@ -60,7 +60,7 @@ func (d *Disk) IsValid() error {
 
 		aEnd, aHasEnd := a.GetEnd()
 		if !aHasEnd {
-			return fmt.Errorf("partition (%s) is not last partition but ommitted end value", a.Id)
+			return fmt.Errorf("partition (%s) is not last partition but size is set to \"grow\"", a.Id)
 		}
 		if aEnd > b.Start {
 			bEnd, bHasEnd := b.GetEnd()

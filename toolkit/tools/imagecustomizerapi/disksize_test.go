@@ -13,7 +13,7 @@ import (
 func TestDiskSizeNum(t *testing.T) {
 	var diskSize DiskSize
 	err := UnmarshalYaml([]byte("1048576"), &diskSize)
-	assert.ErrorContains(t, err, "must have a suffix (i.e. K, M, G, or T)")
+	assert.ErrorContains(t, err, "must have a unit suffix (K, M, G, or T)")
 }
 
 func TestDiskSizeKiB(t *testing.T) {
