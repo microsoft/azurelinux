@@ -600,7 +600,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		return
 	}
 
-	err = installutils.AddImageIDFile(installChroot, *buildNumber)
+	err = installutils.AddImageIDFile(installChroot.RootDir(), *buildNumber)
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {

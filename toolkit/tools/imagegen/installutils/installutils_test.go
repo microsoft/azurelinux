@@ -140,7 +140,7 @@ func TestAddImageIDFile(t *testing.T) {
 
 	etcPath := filepath.Join(chroot.RootDir(), "etc")
 	os.Mkdir(etcPath, os.ModePerm)
-	err = AddImageIDFile(chroot, buildNumber)
+	err = AddImageIDFile(chroot.RootDir(), buildNumber)
 	assert.NoError(t, err)
 
 	imageIDFileContents, err := os.ReadFile(filepath.Join(chroot.RootDir(), imageIDFilePath))
@@ -173,7 +173,7 @@ func TestAddImageIDFileEmptyBuildNumber(t *testing.T) {
 
 	etcPath := filepath.Join(chroot.RootDir(), "etc")
 	os.Mkdir(etcPath, os.ModePerm)
-	err = AddImageIDFile(chroot, buildNumber)
+	err = AddImageIDFile(chroot.RootDir(), buildNumber)
 	assert.NoError(t, err)
 
 	imageIDFileContents, err := os.ReadFile(filepath.Join(chroot.RootDir(), imageIDFilePath))
@@ -194,6 +194,6 @@ func TestAddImageIDFileGuardClause(t *testing.T) {
 
 	defer chroot.Close(false)
 
-	err = AddImageIDFile(chroot, "")
+	err = AddImageIDFile(chroot.RootDir(), "")
 	assert.Error(t, err)
 }
