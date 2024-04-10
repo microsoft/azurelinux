@@ -6,7 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -36,6 +36,8 @@ Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 
 Provides:       npm = %{npm_version}.%{version}-%{release}
+Provides:       nodejs
+Obsoletes:      nodejs < 18.0.0
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -118,6 +120,9 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
+* Wed Mar 27 2024 Jon Slobodzian <joslobo@microsoft.com> - 18.18.2-6
+- This change Obsoletes nodejs (nodejs16) which is end of life.
+
 * Wed Mar 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 18.18.2-5
 - Patch CVE-2024-22025
 
