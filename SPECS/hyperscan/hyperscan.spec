@@ -1,7 +1,7 @@
 %global __cmake_in_source_build 1
 Name:           hyperscan
 Version:        5.4.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        High-performance regular expression matching library
 License:        BSD
 Group:          Development/Libraries
@@ -15,12 +15,12 @@ BuildRequires:  libstdc++-devel
 BuildRequires:  libstdc++
 BuildRequires:  boost-devel
 BuildRequires:  cmake
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  ragel
 BuildRequires:  sqlite-devel >= 3.0
 BuildRequires:  libpcap-devel
-Requires:       pcre
+Requires:       pcre2
 
 #package requires SSE support and fails to build on non x86_64 archs
 ExclusiveArch: x86_64
@@ -89,6 +89,9 @@ needed for developing Hyperscan applications.
 %{_includedir}/hs/
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 5.4.2-3
+- Move from pcre to pcre2
+
 * Tue Feb 13 2024 Andrew Phelps <anphel@microsoft.com> - 5.4.2-2
 - Fix build issue with python 3.12 by defining PYTHON_EXECUTABLE
 

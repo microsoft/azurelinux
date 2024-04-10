@@ -1,7 +1,7 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,7 +10,7 @@ URL:            https://www.haproxy.org
 Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.gz
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
@@ -32,7 +32,7 @@ Requires:       %{name} = %{version}-%{release}
 %setup -q
 
 %build
-make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE=1 USE_OPENSSL=1 \
+make %{?_smp_mflags} TARGET="linux-glibc" USE_PCRE2=1 USE_OPENSSL=1 \
         USE_GETADDRINFO=1 USE_ZLIB=1 USE_SYSTEMD=1
 make %{?_smp_mflags} -C admin/systemd
 sed -i s/"local\/"/""/g admin/systemd/haproxy.service
@@ -59,6 +59,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.9.1-2
+- Move from pcre to pcre2
+
 * Tue Jan 02 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.1-1
 - Update version to 2.9.1
 
