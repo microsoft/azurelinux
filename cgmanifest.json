@@ -22242,6 +22242,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-editables",
+          "version": "0.5",
+          "downloadUrl": "https://github.com/pfmoore/editables/archive/0.5/editables-0.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-enchant",
           "version": "3.2.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyenchant/pyenchant-3.2.2.tar.gz"
