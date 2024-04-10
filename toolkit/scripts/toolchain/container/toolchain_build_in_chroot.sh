@@ -359,6 +359,7 @@ LD=ld \
              --disable-bootstrap      \
              --disable-fixincludes    \
              --disable-libsanitizer   \
+             --with-arch=x86-64-v3    \
              --with-system-zlib       \
              --enable-languages=c,c++,fortran
 make -j$(nproc)
