@@ -25,6 +25,7 @@ ignore_multiple_sources=" \
 ignore_no_source_tarball=" \
   azurelinux-repos \
   azurelinux-rpm-macros \
+  azurelinux-sysinfo \
   ca-certificates \
   check-restart \
   core-packages \

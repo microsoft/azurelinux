@@ -1,7 +1,7 @@
 {
-  "Signatures": {
-    "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
-    "containerd.toml": "a228a28965a30845c10bae150fb5bc60a07f5bc0f78d5b17bfaa6cf48a47a7ca",
-    "moby-containerd-cc-1.7.1.tar.gz": "f8969a4e03d42f49a7788d2021f38861f34c9136829a2906fcbd9a0bf79c8f96"
-  }
+ "Signatures": {
+  "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
+  "containerd.toml": "a228a28965a30845c10bae150fb5bc60a07f5bc0f78d5b17bfaa6cf48a47a7ca",
+  "moby-containerd-cc-1.7.7.tar.gz": "90cfcd3b2776f1b0869f8ca37513963de5f2305b81b409c84804297217f8414b"
+ }
 }

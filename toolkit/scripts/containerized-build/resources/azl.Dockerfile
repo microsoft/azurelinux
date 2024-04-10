@@ -25,5 +25,5 @@ RUN if [[ "${mode}" == "build" ]]; then echo "cd /usr/src/azl || { echo \"ERROR:
 RUN if [[ "${mode}" == "test" ]]; then echo "cd /mnt || { echo \"ERROR: Could not change directory to /mnt \"; exit 1; }"  >> /root/.bashrc; fi
 
 # Install packages from bashrc so we can use the previously setup tdnf defaults.
-RUN echo "echo installing packages vim git ${coextra_packages}" >> /root/.bashrc && \
+RUN echo "echo installing packages vim git ${extra_packages}" >> /root/.bashrc && \
     echo "tdnf install -qy vim git ${extra_packages}" >> /root/.bashrc
