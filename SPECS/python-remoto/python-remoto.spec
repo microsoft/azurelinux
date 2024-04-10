@@ -2,7 +2,7 @@
 Summary:        A very simplistic remote-command-executor
 Name:           python-%{pkgname}
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -44,7 +44,7 @@ remoto as well to inspect Ceph clusters.
 %py3_install
 
 %check
-pip3 install pytest mock
+pip3 install pytest==7.4.4 mock
 python3 -m pytest -v remoto/tests
 
 %files -n python3-%{pkgname}
@@ -53,6 +53,9 @@ python3 -m pytest -v remoto/tests
 %{python3_sitelib}/*
 
 %changelog
+* Sun Mar 03 2024 Jon Slobodzian <joslobo@microsoft.com> - 1.2.1-2
+* Pin pytest to a version less than 8.0.0 to fix package test failures
+
 * Wed Mar 30 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.2.1-1
 - Upgrade to latest upstream version
 - Pass check section with newer python environment

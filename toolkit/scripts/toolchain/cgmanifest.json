@@ -5,8 +5,8 @@
                 "Type": "DockerImage",
                 "DockerImage": {
                     "Name": "mcr.microsoft.com/cbl-mariner/base/core",
-                    "Digest": "sha256:c159685dca0d770885dbdbe3b39a43537acaba2d61c3c08a86b975b77f87155e",
-                    "Tag": "2.0.20230609"
+                    "Digest": "sha256:82314abb594a695fd8817774e8b7f101934902cc1d99b3075e80acbc8b9b23ee",
+                    "Tag": "2.0.20240123"
                 }
             }
         }

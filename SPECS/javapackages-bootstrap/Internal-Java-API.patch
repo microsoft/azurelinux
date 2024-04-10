@@ -1,0 +1,89 @@
+diff -urN a/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/CompilerTool.java b/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/CompilerTool.java
+--- a/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/CompilerTool.java	2024-03-22 11:02:12.472882868 -0700
++++ b/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/CompilerTool.java	2024-03-22 11:05:04.539120103 -0700
+@@ -49,6 +49,8 @@
+ 
+     private Predicate<Path> sourceFilter = source -> true;
+ 
++    private boolean accessInternalJavaAPI;
++
+     private int release = 8;
+ 
+     @Instruction
+@@ -58,6 +60,12 @@
+     }
+ 
+     @Instruction
++    public void accessInternalJavaAPI( String dummy )
++    {
++        this.accessInternalJavaAPI = true;
++    }
++
++    @Instruction
+     public void addSourceRoot( String sourceRoot )
+     {
+         sourceRoots.add( sourceRoot );
+@@ -101,7 +109,7 @@
+         }
+         List<Path> allIncluded = new ArrayList<>();
+         EclipseProjectGenerator eclipse =
+-            new EclipseProjectGenerator( getReactor(), getProject(), getModule(), release );
++            new EclipseProjectGenerator( getReactor(), getProject(), getModule(), release, accessInternalJavaAPI );
+         for ( Path sourceDir : sourceDirs )
+         {
+             List<Path> included = new ArrayList<>();
+@@ -116,8 +124,20 @@
+         List<String> options = new ArrayList<>();
+         options.add( "-d" );
+         options.add( getClassesDir().toString() );
+-        options.add( "--release" );
+-        options.add( release + "" );
++        // If internal Java APIs need to be visible then --release can't be used
++        // https://bugs.openjdk.org/browse/JDK-8206937
++        if ( accessInternalJavaAPI )
++        {
++            options.add( "-source" );
++            options.add( release + "" );
++            options.add( "-target" );
++            options.add( release + "" );
++        }
++        else
++        {
++            options.add( "--release" );
++            options.add( release + "" );
++        }
+         options.add( "-cp" );
+         options.add( getClassPath().stream().map( Path::toString ).collect( Collectors.joining( ":" ) ) );
+         StringWriter compilerOutput = new StringWriter();
+diff -urN a/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/EclipseProjectGenerator.java b/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/EclipseProjectGenerator.java
+--- a/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/EclipseProjectGenerator.java	2024-03-22 11:02:12.480882972 -0700
++++ b/javapackages-bootstrap-1.5.0/mbi/core/src/org/fedoraproject/mbi/tool/compiler/EclipseProjectGenerator.java	2024-03-22 11:08:44.793998047 -0700
+@@ -39,12 +39,15 @@
+ 
+     private final int release;
+ 
+-    public EclipseProjectGenerator( Reactor reactor, ProjectDescriptor project, ModuleDescriptor module, int release )
++    private boolean accessInternalJavaAPI;
++
++    public EclipseProjectGenerator( Reactor reactor, ProjectDescriptor project, ModuleDescriptor module, int release,boolean accessInternalJavaAPI )
+     {
+         this.reactor = reactor;
+         this.project = project;
+         this.module = module;
+         this.release = release;
++        this.accessInternalJavaAPI = accessInternalJavaAPI;
+     }
+ 
+     private StringBuilder eclipseClasspath = new StringBuilder( "<classpath>" );
+@@ -99,7 +102,10 @@
+             bw.write( "org.eclipse.jdt.core.compiler.compliance=" + vm + "\n" );
+             bw.write( "org.eclipse.jdt.core.compiler.source=" + vm + "\n" );
+             bw.write( "org.eclipse.jdt.core.compiler.codegen.targetPlatform=" + vm + "\n" );
+-            bw.write( "org.eclipse.jdt.core.compiler.release=enabled\n" );
++            if ( !accessInternalJavaAPI )
++            {
++                bw.write( "org.eclipse.jdt.core.compiler.release=enabled\n" );
++            }
+             bw.write( "org.eclipse.jdt.core.compiler.problem.forbiddenReference=warning\n" );
+         }
+     }

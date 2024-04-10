@@ -205,8 +205,8 @@
         "type": "other",
         "other": {
           "name": "ansible",
-          "version": "2.14.12",
-          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.12.tar.gz"
+          "version": "2.14.4",
+          "downloadUrl": "https://github.com/ansible/ansible/archive/refs/tags/v2.14.4.tar.gz"
         }
       }
     },
@@ -3238,8 +3238,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "28.2",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz"
+          "version": "29.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
         }
       }
     },
@@ -6540,8 +6540,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8020,6 +8020,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "jurand",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/fedora-java/jurand/archive/refs/tags/1.3.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "jx",
           "version": "3.2.236",
           "downloadUrl": "https://github.com/jenkins-x/jx/archive/v3.2.236.tar.gz"
@@ -8041,8 +8051,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.1.0",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.0.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8051,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.3",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.3.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8121,8 +8131,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8131,8 +8141,8 @@
         "type": "other",
         "other": {
           "name": "kernel-azure",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8141,8 +8151,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hci",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8151,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "5.15.148.2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.148.2.tar.gz"
+          "version": "5.15.153.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-2/5.15.153.1.tar.gz"
         }
       }
     },
@@ -8191,8 +8201,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv14",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv14.tar.gz"
+          "version": "6.1.0.mshv16",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
@@ -10771,8 +10781,8 @@
         "type": "other",
         "other": {
           "name": "libreswan",
-          "version": "4.7",
-          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.7.tar.gz"
+          "version": "4.14",
+          "downloadUrl": "https://github.com/libreswan/libreswan/archive/refs/tags/v4.14.tar.gz"
         }
       }
     },
@@ -13633,8 +13643,8 @@
         "type": "other",
         "other": {
           "name": "msft-golang",
-          "version": "1.21.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.6-1/go.20240111.3.src.tar.gz"
+          "version": "1.21.8",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.21.8-3/go.20240321.6.src.tar.gz"
         }
       }
     },
@@ -14353,8 +14363,8 @@
         "type": "other",
         "other": {
           "name": "nmi",
-          "version": "1.8.11",
-          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.11.tar.gz"
+          "version": "1.8.17",
+          "downloadUrl": "https://github.com/Azure/aad-pod-identity/archive/refs/tags/v1.8.17.tar.gz"
         }
       }
     },

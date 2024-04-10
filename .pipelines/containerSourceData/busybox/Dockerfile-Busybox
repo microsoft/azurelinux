@@ -7,31 +7,28 @@ FROM $BASE_IMAGE AS BASE
 
 ARG AZL_VERSION=2.0
 
-ARG RPMS
-ARG LOCAL_REPO_FILE="local.repo"
-ARG LOCAL_REPO_PATH="/localrepo" 
+ARG RPMS_TO_INSTALL
+ARG RPMS_PATH="/dockerStage/RPMS"
+ARG LOCAL_REPO_FILE="/dockerStage/marinerLocalRepo.repo"
+ARG LOCAL_REPO_PATH="/localrepo"
 
-COPY ${RPMS} /WORKDIR/RPMS
-COPY ${LOCAL_REPO_FILE} /WORKDIR/REPO/local.repo
-
-# Create local repo if RPMS are provided
+# Create local repo with the given RPMS.
 # This will allow the user to install packages from the local repo
 # instead of fetching from PMC
-RUN if [ "${RPMS}" ]; then \
+RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \
     mkdir -p $LOCAL_REPO_PATH; \
     tdnf install -y --releasever=$AZL_VERSION createrepo; \
-    cp -r /WORKDIR/RPMS ${LOCAL_REPO_PATH}; \
-    cp /WORKDIR/REPO/local.repo /etc/yum.repos.d/local.repo; \
-    createrepo --database ${LOCAL_REPO_PATH} --workers 10; \
+    cp -r ${RPMS_PATH} ${LOCAL_REPO_PATH}; \
+    cp ${LOCAL_REPO_FILE} /etc/yum.repos.d/local.repo; \
+    createrepo --compatibility --database ${LOCAL_REPO_PATH} --workers 10; \
     tdnf makecache; \
-    tdnf autoremove -y createrepo; \
-fi
+    tdnf autoremove -y createrepo;
 
-# Install busybox, glibc, and their dependencies into a staging location.
+# Install packages into a staging location.
 # Staging directory is copied into the final scratch image.
 RUN mkdir /staging \
     && tdnf install -y --releasever=$AZL_VERSION --installroot /staging \
-    busybox glibc \
+    ${RPMS_TO_INSTALL} \
     && tdnf clean all \
     && pushd /staging \
     && rm -rf boot media mnt opt run \
