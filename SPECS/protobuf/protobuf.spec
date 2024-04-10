@@ -9,7 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://developers.google.com/protocol-buffers/
-Source0:        https://github.com/protocolbuffers/protobuf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/protocolbuffers/protobuf/releases/download/v%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  abseil-cpp-devel
 BuildRequires:  cmake
 BuildRequires:  curl
