@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        16%{?dist}
+Release:        17%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -40,6 +40,7 @@ BuildRequires:  asciidoc
 BuildRequires:  systemd-rpm-macros
 
 Requires:       bash >= 4
+Requires:       gawk
 Requires:       kmod
 Requires:       sed
 Requires:       grep
@@ -216,6 +217,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Wed Apr 10 2024 Daniel McIlvaney <damcilva@microsoft.com> - 059-17
+- Add missing runtime requirement on awk
+
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
 - Remove x86-specific xen-acpi-processor driver from defaults
 
@@ -313,7 +317,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 -   Remove toybox from requires.
 
 *   Thu Mar 26 2020 Nicolas Ontiveros <niontive@microsoft.com> 049-1
--   Update version to 49. License verified. 
+-   Update version to 49. License verified.
 
 *   Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> 048-2
 -   Initial CBL-Mariner import from Photon (license: Apache2).
