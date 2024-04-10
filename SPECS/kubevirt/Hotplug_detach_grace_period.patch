@@ -2,7 +2,7 @@ diff --git a/pkg/virt-launcher/virtwrap/manager.go b/pkg/virt-launcher/virtwrap/
 index 63d8d43d2..0e608c4bb 100644
 --- a/pkg/virt-launcher/virtwrap/manager.go
 +++ b/pkg/virt-launcher/virtwrap/manager.go
-@@ -97,6 +97,11 @@ const (
+@@ -103,6 +108,11 @@ const (
  const maxConcurrentHotplugHostDevices = 1
  const maxConcurrentMemoryDumps = 1
  
@@ -14,7 +14,7 @@ index 63d8d43d2..0e608c4bb 100644
  type contextStore struct {
  	ctx    context.Context
  	cancel context.CancelFunc
-@@ -142,6 +147,7 @@ type LibvirtDomainManager struct {
+@@ -154,6 +160,7 @@ type LibvirtDomainManager struct {
  
  	hotplugHostDevicesInProgress chan struct{}
  	memoryDumpInProgress         chan struct{}
@@ -22,7 +22,7 @@ index 63d8d43d2..0e608c4bb 100644
  
  	virtShareDir             string
  	ephemeralDiskDir         string
-@@ -204,6 +210,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
+@@ -216,6 +223,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralD
  		cancelSafetyUnfreezeChan: make(chan struct{}),
  		migrateInfoStats:         &stats.DomainJobInfo{},
  		metadataCache:            metadataCache,
@@ -30,7 +30,7 @@ index 63d8d43d2..0e608c4bb 100644
  	}
  
  	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
-@@ -828,11 +835,11 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
+@@ -1028,11 +1036,11 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
  }
  
  func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmulation bool, options *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error) {
@@ -43,7 +43,7 @@ index 63d8d43d2..0e608c4bb 100644
  	domain := &api.Domain{}
  
  	c, err := l.generateConverterContext(vmi, allowEmulation, options, false)
-@@ -922,19 +929,94 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -1123,19 +1140,94 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		return nil, err
  	}
  
@@ -79,7 +79,7 @@ index 63d8d43d2..0e608c4bb 100644
  			logger.Reason(err).Error("marshalling detached disk failed")
  			return nil, err
  		}
--		err = dom.DetachDeviceFlags(strings.ToLower(string(detachBytes)), affectLiveAndConfigLibvirtFlags)
+-		err = dom.DetachDeviceFlags(strings.ToLower(string(detachBytes)), affectDeviceLiveAndConfigLibvirtFlags)
 -		if err != nil {
 -			logger.Reason(err).Error("detaching device")
 -			return nil, err
@@ -135,7 +135,7 @@ index 63d8d43d2..0e608c4bb 100644
 +					logger.Reason(err).Error("getting domain for device detach")
 +					return
 +				}
-+				err = dom.DetachDeviceFlags(strings.ToLower(string(detachBytes)), affectLiveAndConfigLibvirtFlags)
++				err = dom.DetachDeviceFlags(strings.ToLower(string(detachBytes)), affectDeviceLiveAndConfigLibvirtFlags)
 +				if err != nil {
 +					logger.Reason(err).Error("detaching device")
 +				}
@@ -145,7 +145,7 @@ index 63d8d43d2..0e608c4bb 100644
  	}
  	// Look up all the disks to attach
  	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
-@@ -945,7 +1027,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
+@@ -1146,7 +1228,18 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
  		if !allowAttach {
  			continue
  		}
@@ -165,7 +165,7 @@ index 63d8d43d2..0e608c4bb 100644
  		// set drivers cache mode
  		err = converter.SetDriverCacheMode(&attachDisk, l.directIOChecker)
  		if err != nil {
-@@ -1032,7 +1125,7 @@ func isHotplugDisk(disk api.Disk) bool {
+@@ -1249,7 +1342,7 @@ func isHotplugDisk(disk api.Disk) bool {
  	return strings.HasPrefix(getSourceFile(disk), v1.HotplugDiskDir)
  }
  
@@ -174,7 +174,7 @@ index 63d8d43d2..0e608c4bb 100644
  	newDiskMap := make(map[string]api.Disk)
  	for _, disk := range newDisks {
  		file := getSourceFile(disk)
-@@ -1040,14 +1133,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
+@@ -1257,14 +1350,15 @@ func getDetachedDisks(oldDisks, newDisks []api.Disk) []api.Disk {
  			newDiskMap[file] = disk
  		}
  	}

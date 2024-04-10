@@ -1,15 +1,16 @@
 storage:
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4G
     partitions:
     - id: boot
       type: bios-grub
-      start: 1
-      size: 8
+      start: 1M
+      size: 8M
 
     - id: rootfs
-      start: 9
+      start: 9M
+      size: grow
 
   bootType: legacy
 

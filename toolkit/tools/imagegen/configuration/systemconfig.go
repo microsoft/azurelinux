@@ -38,6 +38,7 @@ type SystemConfig struct {
 	Users                []User                    `json:"Users"`
 	Encryption           RootEncryption            `json:"Encryption"`
 	RemoveRpmDb          bool                      `json:"RemoveRpmDb"`
+	PreserveTdnfCache    bool                      `json:"PreserveTdnfCache"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
 	EnableHidepid        bool                      `json:"EnableHidepid"`
 }
