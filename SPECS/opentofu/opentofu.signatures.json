@@ -1,6 +1,0 @@
-{
-  "Signatures": {
-    "opentofu-1.6.2.tar.gz": "3bf0fc807004ba26305331ecf1334ff2160f8c131ee53c107292d60069400da6",
-    "opentofu-1.6.2-govendor-v1.tar.gz": "dc735fbddb7555b3aa4f4840ee4d10108c93d54aaedb8c2002aedaa4d5151ce6"
-  }
-}

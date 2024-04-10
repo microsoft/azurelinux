@@ -164,7 +164,7 @@ os:
     - [modules](#modules-module)
       - [module type](#module-type)
         - [name](#module-name)
-        - [loadMode](#loadMode-string)
+        - [loadMode](#loadmode-string)
         - [options](#options-mapstring-string)
     - [overlay type](#overlay-type)
     - [verity type](#verity-type)
@@ -190,15 +190,15 @@ storage:
 
   disks:
   - partitionTableType: gpt
-    maxSize: 4096
+    maxSize: 4096M
     partitions:
     - id: esp
       type: esp
-      start: 1
-      end: 9
+      start: 1M
+      end: 9M
 
     - id: rootfs
-      start: 9
+      start: 9M
       
   fileSystems:
   - deviceId: esp
@@ -241,7 +241,12 @@ Supported options:
 
 ### maxSize [uint64]
 
-The size of the disk, specified in mebibytes (MiB).
+The size of the disk.
+
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
+
+Must be a multiple of 1 MiB.
 
 ### partitions [[partition](#partition-type)[]]
 
@@ -694,22 +699,41 @@ The label to assign to the partition.
 
 Required.
 
-The start location (inclusive) of the partition, specified in MiBs.
+The start location (inclusive) of the partition.
+
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
+
+Must be a multiple of 1 MiB.
 
 ### end [uint64]
 
-The end location (exclusive) of the partition, specified in MiBs.
+The end location (exclusive) of the partition.
 
-The End and Size fields cannot be specified at the same time.
+The `end` and `size` fields cannot be specified at the same time.
 
-Either the Size or End field is required for all partitions except for the last
+Either the `size` or `end` field is required for all partitions except for the last
 partition.
-When both the Size and End fields are omitted, the last partition will fill the
-remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
+When both the `size` and `end` fields are omitted or when the `size` field is set to the
+value `grow`, the last partition will fill the remainder of the disk based on the disk's
+[maxSize](#maxsize-uint64) field.
+
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
+
+Must be a multiple of 1 MiB.
 
 ### size [uint64]
 
-The size of the partition, specified in MiBs.
+The size of the partition.
+
+Supported formats:
+
+- `<NUM>(K|M|G|T)`: An explicit size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB (`T`).
+
+- `grow`: Fill up the remainder of the disk. Must be the last partition.
+
+Must be a multiple of 1 MiB.
 
 <div id="partition-type-string"></div>
 
