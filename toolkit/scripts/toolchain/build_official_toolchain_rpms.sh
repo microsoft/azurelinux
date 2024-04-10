@@ -257,15 +257,28 @@ build_rpm_in_chroot_no_install () {
     rpmMacros=(-D "with_check $CHECK_DEFINE_NUM" -D "_sourcedir $specDir" -D "dist $PARAM_DIST_TAG")
     builtRpms="$(rpmspec -q $specPath --builtrpms "${rpmMacros[@]}" --queryformat="%{nvra}.rpm\n")"
 
-    # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory
-    foundAllRPMs="false"
-    if [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
-        foundAllRPMs="true"
+    builtEarlier=false
+    if grep -qP "^$1\$" $TEMP_BUILT_SPECS_LIST; then
+        builtEarlier=true
+    fi
+
+    # If a package was built earlier and we try to build it again,
+    # it means the earlier builds happened while only a subset of its build-time dependencies were available.
+    # Later builds are expected to have more/all dependencies available, so we rebuild the package.
+    #
+    # If the incremental build skipped the first build, it means the final version of the package
+    # was present from the beginning, so we skip further build attempts as well.
+    skipBuild=false
+    if $builtEarlier; then
+        echo "Package '$1' was built earlier. Skipping incremental toolchain check and building again."
+    elif [ "$INCREMENTAL_TOOLCHAIN" = "y" ]; then
+        # Find all the associated RPMs for the SRPM and check if they are in the chroot RPM directory.
+        skipBuild=true
         for rpm in $builtRpms; do
             rpmPath=$(find $CHROOT_RPMS_DIR -name "$rpm" -print -quit)
             if [ -z "$rpmPath" ]; then
                 echo "Did not find incremental toolchain rpm '$rpm' in '$CHROOT_RPMS_DIR', must rebuild."
-                foundAllRPMs="false"
+                skipBuild=false
                 break
             else
                 cp $rpmPath $FINISHED_RPM_DIR
@@ -273,7 +286,7 @@ build_rpm_in_chroot_no_install () {
         done
     fi
 
-    if [ "$foundAllRPMs" = "false" ]; then
+    if ! $skipBuild; then
         echo only building RPM $1 within the chroot
         srpmName=$(rpmspec -q $specPath --srpm "${rpmMacros[@]}" --queryformat %{NAME}-%{VERSION}-%{RELEASE}.src.rpm)
         srpmPath=$MARINER_INPUT_SRPMS_DIR/$srpmName

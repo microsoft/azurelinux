@@ -1,6 +1,6 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
-Version:        2.14.12
+Version:        2.14.4
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -47,6 +47,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Fri Mar 08 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.14.4-1
+- Auto-upgrade to 2.14.4 - fix CVE-2024-0690
+
 * Tue Dec 26 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 2.14.12-1
 - Update to v2.14.12 to fix CVE-2023-5764
 

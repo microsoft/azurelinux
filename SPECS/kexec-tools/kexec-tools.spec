@@ -6,7 +6,7 @@
 Summary:        The kexec/kdump userspace component
 Name:           kexec-tools
 Version:        2.0.23
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -324,6 +324,10 @@ done
 /usr/share/makedumpfile/
 
 %changelog
+* Tue Feb 20 2024 Chris Co <chrco@microsoft.com> - 2.0.23-4
+- Add mariner_2_initrd_use_suffix option to use a different kdump initrd path than the host's initrd
+- Change compressed vmcore directory path to align with default directory naming scheme
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.0.23-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

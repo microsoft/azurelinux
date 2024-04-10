@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        23.4.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{na
 Source1:        10-azure-kvp.cfg
 Patch0:         Retain-exit-code-in-cloud-init-status-for-recoverabl.patch
 Patch1:         ci-Pin-pytest-8.0.0.patch
+Patch2:         exec_cmd_error_handling.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -146,6 +147,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Mar 13 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.1-4
+- Add patch to resolve error handling approach when executing command
+
 * Fri Feb 09 2024 Chris Co <chrco@microsoft.com> - 23.4.1-3
 - Add patch to pin pytest to <8.0.0 so cloud-init tests run correctly
 
