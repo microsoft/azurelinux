@@ -7,14 +7,13 @@
 %endif
 Summary:        OCI container runtime monitor
 Name:           conmon
-Version:        2.1.0
+Version:        2.1.2
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://github.com/containers/conmon
-#Source0:       https://github.com/containers/conmon/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/containers/conmon/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  glib2-devel
@@ -52,6 +51,9 @@ make PREFIX=%{buildroot}%{_prefix} install install.crio
 %dir %{_libexecdir}/crio
 
 %changelog
+* Fri Apr 05 2024 Sumedh Sharma <sumsharma@microsoft.com> - 2.1.2-1
+- Bump version to 2.1.2 needed for CVE-2022-1708
+
 * Fri Jul 22 2022 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 2.1.0-1
 - Upgrade to latest version 2.1.0.
 - Updated SPEC file with required 2.1.0 version compatibility.
