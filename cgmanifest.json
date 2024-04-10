@@ -10171,8 +10171,8 @@
         "type": "other",
         "other": {
           "name": "libnbd",
-          "version": "1.12.1",
-          "downloadUrl": "https://libguestfs.org/download/libnbd/1.12-stable/libnbd-1.12.1.tar.gz"
+          "version": "1.18.3",
+          "downloadUrl": "https://libguestfs.org/download/libnbd/1.18-stable/libnbd-1.18.3.tar.gz"
         }
       }
     },
