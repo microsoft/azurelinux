@@ -39,6 +39,7 @@ ignore_no_source_tarball=" \
   hyphen-mn \
   initramfs \
   javapackages-tools-meta \
+  kata-packages-uvm \
   kde-filesystem \
   kf \
   livepatching \
