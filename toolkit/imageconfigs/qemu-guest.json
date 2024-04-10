@@ -53,7 +53,7 @@
                 "ExtraCommandLine": "console=tty0 console=ttyS0"
             },
             "KernelOptions": {
-                "default": "kernel-hci"
+                "default": "kernel"
             },
             "FinalizeImageScripts": [
                 {
