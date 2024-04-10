@@ -3688,8 +3688,8 @@
         "type": "other",
         "other": {
           "name": "fluent-bit",
-          "version": "2.1.10",
-          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.1.10.tar.gz"
+          "version": "2.2.2",
+          "downloadUrl": "https://github.com/fluent/fluent-bit/archive/refs/tags/v2.2.2.tar.gz"
         }
       }
     },
@@ -15274,8 +15274,8 @@
         "type": "other",
         "other": {
           "name": "opa",
-          "version": "0.50.2",
-          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.50.2.tar.gz"
+          "version": "0.63.0",
+          "downloadUrl": "https://github.com/open-policy-agent/opa/archive/refs/tags/v0.63.0.tar.gz"
         }
       }
     },
@@ -28667,8 +28667,8 @@
         "type": "other",
         "other": {
           "name": "telegraf",
-          "version": "1.28.5",
-          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.28.5.tar.gz"
+          "version": "1.29.4",
+          "downloadUrl": "https://github.com/influxdata/telegraf/archive/v1.29.4.tar.gz"
         }
       }
     },
