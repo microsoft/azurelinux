@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        13.2.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -329,6 +329,7 @@ LD=ld \
     --enable-plugin \
     --enable-shared \
     --enable-threads=posix \
+    --with-arch=x86-64-v3 \
     --with-system-zlib
 
 popd
@@ -523,6 +524,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
+- Test change for arch x86-64-v3
+
 * Mon Feb 26 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-3
 - Re-enable libsanitizer
 
