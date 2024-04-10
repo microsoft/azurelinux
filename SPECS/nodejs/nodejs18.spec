@@ -119,7 +119,7 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Wed Apr 10 2023 Nadiia Dubchak <ndubchak@microsoft.com> - 18.18.2-6
+* Wed Apr 10 2024 Nadiia Dubchak <ndubchak@microsoft.com> - 18.18.2-6
 - Patch CVE-2024-27983.
 
 * Wed Mar 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 18.18.2-5
