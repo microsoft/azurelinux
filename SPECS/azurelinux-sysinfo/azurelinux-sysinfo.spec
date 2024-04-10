@@ -49,8 +49,8 @@ install -m 755 %{SOURCE3} %{buildroot}%{_datadir}/selinux/packages/
 # Enable the systemd service
 systemctl enable azurelinux-sysinfo.service
 
-if rpm -q selinux-policy &> /dev/null; then
-    # Apply required SElinux policies only if selinux-policy is present
+# Apply required SElinux policies only if selinux-policy is present
+if rpm -q selinux-policy &> /dev/null; then    
     semodule -i %{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
 fi
 
