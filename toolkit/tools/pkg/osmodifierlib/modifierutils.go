@@ -3,7 +3,6 @@
 
 package osmodifierlib
 
-
 import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
