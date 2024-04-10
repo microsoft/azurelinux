@@ -52,9 +52,6 @@ systemctl enable azurelinux-sysinfo.service
 if rpm -q selinux-policy &> /dev/null; then
     # Apply required SElinux policies only if selinux-policy is present
     semodule -i %{_datadir}/selinux/packages/sysinfo-selinuxpolicies.cil
-else
-    # Otherwise remove the /usr/share/selinux/ directory that was created
-    rm -rf %{_datadir}/selinux/
 fi
 
 %postun
