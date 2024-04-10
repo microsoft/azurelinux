@@ -3,7 +3,7 @@
 Summary:        The Apache HTTP Server
 Name:           httpd
 Version:        2.4.58
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,7 +42,7 @@ BuildRequires:  lua-devel
 BuildRequires:  openldap
 BuildRequires:  openssl
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  systemd-rpm-macros
 
 Requires:       apr-util
@@ -50,7 +50,7 @@ Requires:       libdb
 Requires:       lua
 Requires:       openldap
 Requires:       openssl
-Requires:       pcre
+Requires:       pcre2
 Requires(postun): %{_sbindir}/groupdel
 Requires(postun): %{_sbindir}/userdel
 Requires(pre):  %{_sbindir}/groupadd
@@ -345,6 +345,9 @@ fi
 %{_libexecdir}/httpd-ssl-pass-dialog
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2.4.58-2
+- Move from pcre to pcre2
+
 * Fri Oct 20 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.58-1
 - Upgrade version to address CVE-2023-45802, CVE-2023-43622 & CVE-2023-31122
 
