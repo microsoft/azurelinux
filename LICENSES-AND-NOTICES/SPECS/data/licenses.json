@@ -2224,6 +2224,7 @@
                 "jsonbuilder",
                 "jx",
                 "kata-containers-cc",
+                "kata-packages-uvm",
                 "keda",
                 "keras",
                 "kernel-signed",
