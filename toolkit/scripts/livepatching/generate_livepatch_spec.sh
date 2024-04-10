@@ -103,8 +103,8 @@ generate_livepatch_spec
 echo "Updating licensing info."
 
 license_map.py --no_check --update \
-    SPECS/LICENSES-AND-NOTICES/data/licenses.json \
-    SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+    LICENSES-AND-NOTICES/SPECS/data/licenses.json \
+    LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md \
     "$LIVEPATCH_SPEC_PATH"
 
 echo "Updating the cgmanifest.json."

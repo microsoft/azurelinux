@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "README": "62096159e1ed9692a12538242e9bd8af72288349804759198f7357ced65ef6c7",
-  "rook-1.6.2-vendor.tar.gz": "699e305ca8f5a4c22317c71fe0b6b1a0bf7a7683da3d82f06fd2d59bb94c65c9",
-  "rook-1.6.2.tar.gz": "0d8af94c6e163e376c39969934dc15e989e3b7101f1b588dd304d04190b6290c",
-  "update-tarball.sh": "fd98c71b1b407e8fe7713da2ec26670642cd1e005b28e3f56a76f851cf7fc6bf"
- }
-}

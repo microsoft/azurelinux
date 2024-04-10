@@ -74,7 +74,7 @@ func processEscapedCharacter(text string, start int, count int, escapedCharacter
 			return start, nil
 		}
 	}
-	return i, fmt.Errorf("missing escaped character. '\\' must be followed by a character.")
+	return i, fmt.Errorf("missing escaped character. '\\' must be followed by a character")
 }
 
 func processDoubleQuotedString(text string, start int, count int) (lastProcessed int, err error) {
@@ -93,7 +93,7 @@ func processDoubleQuotedString(text string, start int, count int) (lastProcessed
 		}
 		i++
 	}
-	return i, fmt.Errorf("invalid double-quoted string. Missing closing double-quotes.")
+	return i, fmt.Errorf("invalid double-quoted string: missing closing double-quotes")
 }
 
 func processSingleQuotedString(text string, start int, count int) (lastProcessed int, err error) {
@@ -104,7 +104,7 @@ func processSingleQuotedString(text string, start int, count int) (lastProcessed
 		}
 		i++
 	}
-	return i, fmt.Errorf("invalid single-quoted string. Missing closing single-quote.")
+	return i, fmt.Errorf("invalid single-quoted string: missing closing single-quote")
 }
 
 func validateQuotedSubstrings(kernelArguments string) (err error) {
@@ -136,7 +136,7 @@ func validateKernelArgumentsFormat(kernelArguments string) (err error) {
 	// In addition, disallow the "`" character, since it is used as the sed
 	// escape character by `installutils.setGrubCfgAdditionalCmdLine()`.
 	if strings.ContainsAny(kernelArguments, "$`") {
-		return fmt.Errorf("the ExtraCommandLine value contains invalid characters")
+		return fmt.Errorf("the extraCommandLine value contains invalid characters")
 	}
 
 	err = validateQuotedSubstrings(kernelArguments)

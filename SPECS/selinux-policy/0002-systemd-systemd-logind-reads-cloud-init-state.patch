@@ -1,0 +1,57 @@
+From 2089a192e6675a6fb6336c61904d176dcb4b8bcd Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 26 Feb 2024 14:43:09 -0500
+Subject: [PATCH 02/14] systemd: systemd-logind reads cloud-init state.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/admin/cloudinit.if | 18 ++++++++++++++++++
+ policy/modules/system/systemd.te  |  4 ++++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/policy/modules/admin/cloudinit.if b/policy/modules/admin/cloudinit.if
+index 1d9d54daa..7496b800a 100644
+--- a/policy/modules/admin/cloudinit.if
++++ b/policy/modules/admin/cloudinit.if
+@@ -1,5 +1,23 @@
+ ## <summary>Init scripts for cloud VMs</summary>
+ 
++########################################
++## <summary>
++##	Read cloud-init process state.
++## </summary>
++## <param name="domain">
++##	<summary>
++##	Domain allowed access.
++##	</summary>
++## </param>
++#
++interface(`cloudinit_read_state',`
++	gen_require(`
++		type cloud_init_t;
++	')
++
++	ps_process_pattern($1, cloud_init_t)
++')
++
+ ########################################
+ ## <summary>
+ ##	Read and write inherited cloud-init pipes.
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index aa9198591..4eed1bd31 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1027,6 +1027,10 @@ tunable_policy(`systemd_logind_get_bootloader',`
+ # This reads the first sectors of fixed disk devices.
+ storage_raw_read_fixed_disk_cond(systemd_logind_t, systemd_logind_get_bootloader)
+ 
++optional_policy(`
++	cloudinit_read_state(systemd_logind_t)
++')
++
+ optional_policy(`
+ 	dbus_connect_system_bus(systemd_logind_t)
+ 	dbus_system_bus_client(systemd_logind_t)
+-- 
+2.43.2
+

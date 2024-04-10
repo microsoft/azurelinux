@@ -1,0 +1,48 @@
+From ad02aa2f0ce9d047e5cb8e249e896265a778fca0 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Thu, 30 Mar 2023 14:28:16 +0000
+Subject: [PATCH 11/14] iptables: Support Mariner non-standard config location.
+
+/etc/systemd/scripts/ip(4|6)save
+
+MSFT_TAG: not upstreamable
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/iptables.fc | 4 ++++
+ policy/modules/system/iptables.if | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/policy/modules/system/iptables.fc b/policy/modules/system/iptables.fc
+index ba65e811d..ddda936a0 100644
+--- a/policy/modules/system/iptables.fc
++++ b/policy/modules/system/iptables.fc
+@@ -4,6 +4,10 @@
+ /etc/sysconfig/ip6?tables.*		--	gen_context(system_u:object_r:iptables_conf_t,s0)
+ /etc/sysconfig/system-config-firewall.*	--	gen_context(system_u:object_r:iptables_conf_t,s0)
+ 
++ifdef(`distro_mariner',`
++/etc/systemd/scripts/ip(4|6)save	--	gen_context(system_u:object_r:iptables_conf_t,s0)
++')
++
+ /run/ebtables\.lock			--	gen_context(system_u:object_r:iptables_runtime_t,s0)
+ /run/xtables.*				--	gen_context(system_u:object_r:iptables_runtime_t,s0)
+ 
+diff --git a/policy/modules/system/iptables.if b/policy/modules/system/iptables.if
+index f1ddfcdee..38e916305 100644
+--- a/policy/modules/system/iptables.if
++++ b/policy/modules/system/iptables.if
+@@ -327,4 +327,10 @@ interface(`iptables_admin',`
+ 
+ 	files_search_runtime($1)
+ 	admin_pattern($1, iptables_runtime_t)
++
++	ifdef(`distro_mariner',`
++		# store rules at /etc/systemd/scripts/ip(4|6)save
++		files_etc_filetrans($1, iptables_conf_t, file, "ip4save")
++		files_etc_filetrans($1, iptables_conf_t, file, "ip6save")
++	')
+ ')
+-- 
+2.43.2
+

@@ -25,6 +25,7 @@ ignore_multiple_sources=" \
 ignore_no_source_tarball=" \
   azurelinux-repos \
   azurelinux-rpm-macros \
+  azurelinux-sysinfo \
   ca-certificates \
   check-restart \
   core-packages \
@@ -42,8 +43,6 @@ ignore_no_source_tarball=" \
   kf \
   livepatching \
   lua-rpm-macros \
-  azurelinux-repos \
-  mariner-rpm-macros \
   multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \

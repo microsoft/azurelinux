@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        6%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ URL:            https://aka.ms/azurelinux
 Source1:        90-default.preset
 Source2:        90-default-user.preset
 Source3:        99-default-disable.preset
+Source4:        15-azurelinux-default.conf
 
 Provides:       system-release
 Provides:       system-release(%{version})
@@ -95,6 +96,9 @@ install -Dm0644 %{SOURCE2} -t %{buildroot}%{_userpresetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_presetdir}/
 install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 
+# Default sysctl settings
+install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
+
 %files
 %defattr(-,root,root,-)
 %{_libdir}/azurelinux-release
@@ -111,8 +115,15 @@ install -Dm0644 %{SOURCE3} -t %{buildroot}%{_userpresetdir}/
 %{_rpmmacrodir}/macros.dist
 %{_presetdir}/*.preset
 %{_userpresetdir}/*.preset
+%{_sysctldir}/*.conf
 
 %changelog
+* Mon Apr 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0-8
+- Azure Linux 3.0 April Preview Release 2
+
+* Tue Mar 19 2024 Dan Streetman <ddstreet@microsoft.com> - 3.0-7
+- add 15-azurelinux-default.conf sysctl config
+
 * Thu Mar 14 2024 Cameron Baird <cameronbaird@microsoft.com> - 3.0-6
 - Enable waagent.service in 90-default.preset
 

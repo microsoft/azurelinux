@@ -25,7 +25,8 @@ sudo apt -y install \
     rpm \
     tar \
     wget \
-    xfsprogs
+    xfsprogs \
+    zstd
 
 # Fix go 1.20 link
 sudo ln -vsf /usr/lib/go-1.20/bin/go /usr/bin/go

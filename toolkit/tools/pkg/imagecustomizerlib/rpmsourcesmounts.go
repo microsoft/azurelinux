@@ -112,7 +112,7 @@ func (m *rpmSourcesMounts) mountRpmSourcesHelper(buildDir string, imageChroot *s
 			err = m.createRepoFromRepoConfig(rpmSource, true, allReposConfig, imageChroot)
 
 		default:
-			return fmt.Errorf("unknown RPM source type (%s)", rpmSource)
+			return fmt.Errorf("unknown RPM source type (%s):\nmust be a .repo file or a directory", rpmSource)
 		}
 		if err != nil {
 			return err
@@ -286,7 +286,7 @@ func getRpmSourceFileType(rpmSourcePath string) (string, error) {
 	}
 
 	filename := filepath.Base(rpmSourcePath)
-	dotIndex := strings.Index(filename, ".")
+	dotIndex := strings.LastIndex(filename, ".")
 	fileExt := ""
 	if dotIndex >= 0 {
 		fileExt = filename[dotIndex:]

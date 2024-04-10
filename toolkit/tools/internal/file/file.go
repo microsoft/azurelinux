@@ -39,6 +39,17 @@ func IsFile(path string) (isFile bool, err error) {
 	return !info.IsDir(), nil
 }
 
+// IsFileOrSymlink returns true if the provided path is a file or a symlink.
+func IsFileOrSymlink(path string) (isFile bool, err error) {
+	info, err := os.Lstat(path)
+	if err != nil {
+		return
+	}
+
+	isSymlink := info.Mode().Type() == os.ModeSymlink
+	return isSymlink || !info.IsDir(), nil
+}
+
 // Move moves a file from src to dst. Will preserve permissions.
 func Move(src, dst string) (err error) {
 	const squashErrors = false
@@ -75,13 +86,7 @@ func Move(src, dst string) (err error) {
 // Copy copies a file from src to dst, creating directories for the destination if needed.
 // dst is assumed to be a file and not a directory. Will preserve permissions.
 func Copy(src, dst string) (err error) {
-	return copyWithPermissions(src, dst, os.ModePerm, false, os.ModePerm)
-}
-
-// CopyAndChangeMode copies a file from src to dst, creating directories with the given access rights for the destination if needed.
-// dst is assumed to be a file and not a directory. Will change the permissions to the given value.
-func CopyAndChangeMode(src, dst string, dirmode os.FileMode, filemode os.FileMode) (err error) {
-	return copyWithPermissions(src, dst, dirmode, true, filemode)
+	return NewFileCopyBuilder(src, dst).Run()
 }
 
 // Read reads a string from the file src.
@@ -172,6 +177,26 @@ func RemoveFileIfExists(path string) (err error) {
 	return
 }
 
+// RemoveDirectoryContents will delete the contents of a directory, but not the
+// directory itself. If the directory does not exist, it will return an error.
+func RemoveDirectoryContents(path string) (err error) {
+	dir, err := os.ReadDir(path)
+	if err != nil {
+		return
+	}
+
+	for _, entry := range dir {
+		childPath := filepath.Join(path, entry.Name())
+		logger.Log.Debugf("Removing (%s)", childPath)
+		err = os.RemoveAll(childPath)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 // GenerateSHA1 calculates a sha1 of a file
 func GenerateSHA1(path string) (hash string, err error) {
 	file, err := os.Open(path)
@@ -245,37 +270,24 @@ func GetAbsPathWithBase(baseDirPath, inputPath string) string {
 	return filepath.Join(baseDirPath, inputPath)
 }
 
-// copyWithPermissions copies a file from src to dst, creating directories with the requested mode for the destination if needed.
-// Depending on the changeMode parameter, it may also change the file mode.
-func copyWithPermissions(src, dst string, dirmode os.FileMode, changeMode bool, filemode os.FileMode) (err error) {
-	const squashErrors = false
-
-	logger.Log.Debugf("Copying (%s) -> (%s)", src, dst)
-
-	isSrcFile, err := IsFile(src)
+func IsDirEmpty(path string) (bool, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return
+		return false, err
 	}
-	if !isSrcFile {
-		return fmt.Errorf("source (%s) is not a file", src)
-	}
+	defer file.Close()
 
-	err = createDestinationDir(dst, dirmode)
+	_, err = file.Readdirnames(1)
+	if err == io.EOF {
+		// Directory has no children.
+		return true, nil
+	}
 	if err != nil {
-		return
+		return false, err
 	}
 
-	err = shell.ExecuteLive(squashErrors, "cp", "--preserve=mode", src, dst)
-	if err != nil {
-		return
-	}
-
-	if changeMode {
-		logger.Log.Debugf("Calling chmod on (%s) with the mode (%v)", dst, filemode)
-		err = os.Chmod(dst, filemode)
-	}
-
-	return
+	// Directory has at least 1 child.
+	return false, nil
 }
 
 func createDestinationDir(dst string, dirmode os.FileMode) (err error) {
@@ -338,4 +350,22 @@ func CopyResourceFile(srcFS fs.FS, srcFile, dst string, dirmode os.FileMode, fil
 	}
 
 	return nil
+}
+
+func EnumerateDirFiles(dirPath string) (filePaths []string, err error) {
+	err = filepath.Walk(dirPath, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		filePaths = append(filePaths, filePath)
+
+		return nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to enumerate files under %s:\n%w", dirPath, err)
+	}
+	return filePaths, nil
 }

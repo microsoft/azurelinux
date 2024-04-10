@@ -1,0 +1,27 @@
+From 36496f7cd9fa33327f1d09c6618c3c62f84c3181 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+Date: Wed, 5 Apr 2023 13:41:55 +0000
+Subject: [PATCH 12/14] systemd: Fix /run/systemd/shutdown handling.
+
+Scheduled shutdown/reboot will not work without this access.
+
+Signed-off-by: Chris PeBenito <Christopher.PeBenito@microsoft.com>
+---
+ policy/modules/system/systemd.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+index 4eed1bd31..f266d2790 100644
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -888,6 +888,7 @@ init_var_lib_filetrans(systemd_logind_t, systemd_logind_var_lib_t, dir)
+ manage_fifo_files_pattern(systemd_logind_t, systemd_logind_runtime_t, systemd_logind_runtime_t)
+ manage_files_pattern(systemd_logind_t, systemd_logind_runtime_t, systemd_logind_runtime_t)
+ allow systemd_logind_t systemd_logind_runtime_t:dir manage_dir_perms;
++init_runtime_filetrans(systemd_logind_t, systemd_logind_runtime_t, dir)
+ 
+ manage_dirs_pattern(systemd_logind_t, systemd_logind_inhibit_runtime_t, systemd_logind_inhibit_runtime_t)
+ manage_files_pattern(systemd_logind_t, systemd_logind_inhibit_runtime_t, systemd_logind_inhibit_runtime_t)
+-- 
+2.43.2
+

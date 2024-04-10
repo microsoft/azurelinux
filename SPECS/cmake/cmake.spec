@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.28.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,10 @@ BuildRequires:  xz
 BuildRequires:  xz-devel
 BuildRequires:  zlib
 BuildRequires:  zlib-devel
+%if 0%{?with_check}
+BuildRequires:  javapackages-tools
+BuildRequires:  msopenjdk-17
+%endif
 Requires:       bzip2
 Requires:       expat
 Requires:       libarchive
@@ -61,6 +65,7 @@ sed -i -e "s|@@CMAKE_VERSION@@|%{version}|" -e "s|@@CMAKE_MAJOR_VERSION@@|%{majo
 # Should be removed once the issue is fixed upstream and we apply the fix: https://gitlab.kitware.com/cmake/cmake/-/issues/22470.
 rm -f %{_lib64dir}/lib{stdc++,gfortran}.a
 
+export JAVA_HOME="%{java_home}"
 bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 
 %files
@@ -76,6 +81,9 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_prefix}/doc/%{name}-*/*
 
 %changelog
+* Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 3.28.2-2
+- Fix JDK test issue
+
 * Fri Feb 02 2024 Rakshaa Viswanathan <rviswanathan@microsoft.com> - 3.28.2-1
 - Auto-upgrade to 3.28.2 - Upgrades for 3.0-dev
 - Remove old CVE patches that don't apply
