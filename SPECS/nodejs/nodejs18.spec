@@ -6,8 +6,7 @@ Name:           nodejs18
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        18.18.2
-Release:        5%{?dist}
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD and MIT and Public Domain and NAIST-2003 and Artistic-2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation
@@ -20,8 +19,8 @@ Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2023-42282.patch
 Patch2:         CVE-2024-24806.patch
-Patch3:         CVE-2024-27983.patch
 Patch3:         CVE-2024-22025.patch
+Patch4:         CVE-2024-27983.patch
 BuildRequires:  brotli-devel
 BuildRequires:  coreutils >= 8.22
 BuildRequires:  gcc
@@ -120,7 +119,7 @@ make cctest
 %{_datadir}/systemtap/tapset/node.stp
 
 %changelog
-* Wed Apr 10 2023 Nadiia Dubchak <ndubchak@microsoft.com> - 18.18.2-5
+* Wed Apr 10 2023 Nadiia Dubchak <ndubchak@microsoft.com> - 18.18.2-6
 - Patch CVE-2024-27983.
 
 * Wed Mar 20 2024 Aditya Dubey <adityadubey@microsoft.com> - 18.18.2-5
