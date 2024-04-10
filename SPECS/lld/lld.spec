@@ -2,7 +2,7 @@
 
 Summary:        LLD is a linker from the LLVM project that is a drop-in replacement for system linkers and runs much faster than them
 Name:           lld
-Version:        17.0.6
+Version:        18.1.2
 Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
@@ -71,9 +71,12 @@ cd build
 %{_libdir}/*.so.*
 
 %changelog
+* Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
+- Upgrade to version 18.1.2
+
 * Tue Jan 16 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 17.0.6-1
 - Upgrade to 17.0.6
 
-*   Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  12.0.1-1
--   Original version for CBL-Mariner.
--   License verified
+* Thu Aug 12 2021 Andy Caldwell <andycaldwell@microsoft.com>  12.0.1-1
+- Original version for CBL-Mariner.
+- License verified
