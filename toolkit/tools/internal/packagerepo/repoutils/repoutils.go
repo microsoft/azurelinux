@@ -5,6 +5,7 @@ package repoutils
 
 import (
 	"fmt"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -156,4 +157,25 @@ func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner
 	logger.Log.Infof("Cloned repo contents verified successfully.")
 
 	return
+}
+
+// FindCreateRepoCommand searches for createrepo or createrepo_c in $PATH and returns the first one found
+func FindCreateRepoCommand() (cmd string, err error) {
+	creatrepo_cmds := []string{"createrepo", "createrepo_c"}
+
+	selectedCmd := ""
+	// Check if a command exists in the $PATH
+	for _, cmd := range creatrepo_cmds {
+		_, err = exec.LookPath(cmd)
+		if err == nil {
+			selectedCmd = cmd
+			break
+		}
+	}
+
+	if selectedCmd == "" {
+		return "", fmt.Errorf("failed to find a working createrepo command.\nattempted commands: %v", creatrepo_cmds)
+	}
+
+	return selectedCmd, nil
 }
