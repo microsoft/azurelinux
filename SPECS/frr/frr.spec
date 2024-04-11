@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -28,8 +28,6 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  groff
-BuildRequires:  grpc-devel
-BuildRequires:  grpc-plugins
 BuildRequires:  json-c-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
@@ -99,8 +97,7 @@ autoreconf -ivf
     --disable-babeld \
     --with-moduledir=%{_libdir}/frr/modules \
     --with-crypto=openssl \
-    --enable-fpm \
-    --enable-grpc
+    --enable-fpm
 
 %make_build MAKEINFO="makeinfo --no-split" PYTHON=python3
 
@@ -201,6 +198,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Thu Apr 11 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 8.5.3-5
+- Build without grpc.
+
 * Tue Nov 14 2023 Sam Meluch <sammeluch@microsoft.com> - 8.5.3-4
 - Patch CVE-2023-47234 and CVE-2023-47235
 
