@@ -1,6 +1,6 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
-Version:        5.2.2
+Version:        5.3.0
 Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
@@ -35,6 +35,9 @@ cp -v doc/{awkforai.txt,*.{eps,pdf,jpg}} %{buildroot}%{_defaultdocdir}/%{name}-%
 rm -rf %{buildroot}%{_infodir}
 find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}
+# Identical binaries are produced for gawk and gawk-%%{version}; replace the former with a link
+rm -rvf %{buildroot}%{_bindir}/gawk
+ln -sv gawk-%{version} %{buildroot}%{_bindir}/gawk
 
 %check
 # Skip the timeout test, which is unreliable on our (vm) build machines
@@ -52,7 +55,10 @@ make %{?_smp_mflags} check
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
-%{_bindir}/*
+%{_bindir}/awk
+%{_bindir}/gawk
+%{_bindir}/gawk-%{version}
+%{_bindir}/gawkbug
 %{_libdir}/%{name}/*
 %{_includedir}/*
 %{_libexecdir}/*
@@ -63,6 +69,10 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Apr 10 2024 Andrew Phelps <anphel@microsoft.com> - 5.3.0-1
+- Upgrade to version 5.3.0
+- Replace duplicate gawk binary with symlink
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
 
