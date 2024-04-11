@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repoutils"
 	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
 )
 
@@ -36,8 +37,14 @@ func CreateRepo(repoDir string) (err error) {
 		return
 	}
 
+	createRepoCmd, err := repoutils.FindCreateRepoCommand()
+	if err != nil {
+		logger.Log.Warn(err)
+		return
+	}
+
 	// Create a new repodata
-	_, stderr, err := shell.Execute("createrepo", repoDir)
+	_, stderr, err := shell.Execute(createRepoCmd, repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}
@@ -48,8 +55,15 @@ func CreateRepo(repoDir string) (err error) {
 // CreateOrUpdateRepo will create an RPM repository at repoDir or update
 // it if the metadata files already exist.
 func CreateOrUpdateRepo(repoDir string) (err error) {
+	// Check if createrepo command is available
+	createRepoCmd, err := repoutils.FindCreateRepoCommand()
+	if err != nil {
+		logger.Log.Warn(err)
+		return
+	}
+
 	// Create or update repodata
-	_, stderr, err := shell.Execute("createrepo", "--update", repoDir)
+	_, stderr, err := shell.Execute(createRepoCmd, "--update", repoDir)
 	if err != nil {
 		logger.Log.Warn(stderr)
 	}
