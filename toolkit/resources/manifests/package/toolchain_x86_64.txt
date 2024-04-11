@@ -107,8 +107,8 @@ findutils-lang-4.9.0-1.azl3.x86_64.rpm
 flex-2.6.4-7.azl3.x86_64.rpm
 flex-debuginfo-2.6.4-7.azl3.x86_64.rpm
 flex-devel-2.6.4-7.azl3.x86_64.rpm
-gawk-5.2.2-1.azl3.x86_64.rpm
-gawk-debuginfo-5.2.2-1.azl3.x86_64.rpm
+gawk-5.3.0-1.azl3.x86_64.rpm
+gawk-debuginfo-5.3.0-1.azl3.x86_64.rpm
 gcc-13.2.0-3.azl3.x86_64.rpm
 gcc-aarch64-linux-gnu-13.2.0-3.azl3.x86_64.rpm
 gcc-c++-13.2.0-3.azl3.x86_64.rpm
