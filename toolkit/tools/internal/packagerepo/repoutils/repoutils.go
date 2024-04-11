@@ -174,7 +174,7 @@ func FindCreateRepoCommand() (cmd string, err error) {
 	}
 
 	if selectedCmd == "" {
-		return "", fmt.Errorf("failed to find a working createrepo command. Attempted commands: %v", creatrepo_cmds)
+		return "", fmt.Errorf("failed to find a working createrepo command:\nattempted commands: %v", creatrepo_cmds)
 	}
 
 	return selectedCmd, nil

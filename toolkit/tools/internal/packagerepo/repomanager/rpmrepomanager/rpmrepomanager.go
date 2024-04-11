@@ -40,7 +40,6 @@ func CreateRepo(repoDir string) (err error) {
 	createRepoCmd, err := repoutils.FindCreateRepoCommand()
 	if err != nil {
 		return fmt.Errorf("unable to create repo:\n%w", err)
-		return
 	}
 
 	// Create a new repodata
@@ -58,8 +57,7 @@ func CreateOrUpdateRepo(repoDir string) (err error) {
 	// Check if createrepo command is available
 	createRepoCmd, err := repoutils.FindCreateRepoCommand()
 	if err != nil {
-		logger.Log.Warn(err)
-		return
+		return fmt.Errorf("unable to create repo:\n%w", err)
 	}
 
 	// Create or update repodata
