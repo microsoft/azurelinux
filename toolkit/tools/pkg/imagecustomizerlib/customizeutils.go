@@ -51,7 +51,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = updateHostname(config.OS.Hostname, imageChroot)
+	err = UpdateHostname(config.OS.Hostname, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -159,7 +159,7 @@ func deleteResolvConf(imageChroot *safechroot.Chroot) error {
 	return err
 }
 
-func updateHostname(hostname string, imageChroot *safechroot.Chroot) error {
+func UpdateHostname(hostname string, imageChroot safechroot.ChrootInterface) error {
 	if hostname == "" {
 		return nil
 	}
