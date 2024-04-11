@@ -22,8 +22,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        %{_distro_sources_url}/cal10n-0.8.1.tar.xz
-Source1:        %{_distro_sources_url}/cal10n-build.tar.xz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.xz
+Source1:        %{name}-build.tar.xz
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
