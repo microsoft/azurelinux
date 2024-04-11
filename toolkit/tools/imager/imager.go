@@ -37,6 +37,7 @@ var (
 	liveInstallFlag = app.Flag("live-install", "Enable to perform a live install to the disk specified in config file.").Bool()
 	emitProgress    = app.Flag("emit-progress", "Write progress updates to stdout, such as percent complete and current action.").Bool()
 	timestampFile   = app.Flag("timestamp-file", "File that stores timestamps for this program.").String()
+	buildNumber     = app.Flag("build-number", "Build number to be used in the image.").String()
 	logFlags        = exe.SetupLogFlags(app)
 	profFlags       = exe.SetupProfileFlags(app)
 )
@@ -598,6 +599,8 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 		err = fmt.Errorf("failed to populate image contents: %s", err)
 		return
 	}
+
+	err = installutils.AddImageIDFile(installChroot.RootDir(), *buildNumber)
 
 	// Only configure the bootloader or read only partitions for actual disks, a rootfs does not need these
 	if !isRootFS {
