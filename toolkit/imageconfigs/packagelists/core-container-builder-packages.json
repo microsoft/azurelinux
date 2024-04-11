@@ -2,6 +2,7 @@
     "packages": [
         "shadow-utils",
         "build-essential",
-        "createrepo_c"
+        "createrepo_c",
+        "python3"
     ]
 }
