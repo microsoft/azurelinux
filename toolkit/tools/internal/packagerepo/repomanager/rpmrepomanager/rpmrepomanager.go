@@ -39,7 +39,7 @@ func CreateRepo(repoDir string) (err error) {
 
 	createRepoCmd, err := repoutils.FindCreateRepoCommand()
 	if err != nil {
-		logger.Log.Warn(err)
+		return fmt.Errorf("unable to create repo:\n%w", err)
 		return
 	}
 
