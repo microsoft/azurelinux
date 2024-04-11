@@ -24,6 +24,7 @@ ARG EULA=@EULA_FILE@
 
 COPY $EULA .
 
-COPY --from=builder /staging/ /
+COPY --from=builder /staging/etc/ /etc/
+COPY --from=builder --chown=${USER_UID}:${USER_GID} /staging/home/ /home/
 
 CMD [ "bash" ]
