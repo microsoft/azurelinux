@@ -93,7 +93,7 @@ Summary:       Test scripts and binaries for checking the behaviour and output o
 Requires: %{name}-docs = %{version}-%{release}
 BuildRequires: make
 BuildRequires: sharutils
-BuildRequires: elfutils-debuginfod-client-devel
+BuildRequires: elfutils-devel
 
 %description tests
 Provides a means to test the generation of annotated binaries and the parsing
@@ -108,7 +108,6 @@ BuildRequires: gcc
 BuildRequires: elfutils
 BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
-BuildRequires: elfutils-debuginfod-client-devel
 BuildRequires: rpm-devel
 BuildRequires: make
 
@@ -130,7 +129,6 @@ BuildRequires: elfutils-devel
 BuildRequires: elfutils-libelf-devel
 BuildRequires: rpm-devel
 BuildRequires: make
-BuildRequires: elfutils-debuginfod-client-devel
 
 Requires: %{name}-docs = %{version}-%{release}
 
