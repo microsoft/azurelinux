@@ -329,7 +329,11 @@ LD=ld \
     --enable-plugin \
     --enable-shared \
     --enable-threads=posix \
-    --with-arch=x86-64-v3 \
+%ifarch x86_64
+    --with-arch=x86-64-v4 \
+%else
+    --with-arch=armv9.4-a \
+%endif
     --with-system-zlib
 
 popd
@@ -525,7 +529,7 @@ $tests_ok
 
 %changelog
 * Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
-- Test change for arch x86-64-v3
+- Test change for arch x86-64-v4
 
 * Mon Feb 26 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-3
 - Re-enable libsanitizer

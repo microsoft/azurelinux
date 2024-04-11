@@ -47,9 +47,11 @@ tar xf ../mpc-1.3.1.tar.gz
 mv -v mpc-1.3.1 mpc
 case $(uname -m) in
   x86_64)
+    GCC_CONFIG_WITH_ARCH="x86-64-v4"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
+    GCC_CONFIG_WITH_ARCH="armv9.4-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
@@ -75,6 +77,7 @@ cd       build
     --disable-libssp                               \
     --disable-libvtv                               \
     --disable-libstdcxx                            \
+    --with-arch=$GCC_CONFIG_WITH_ARCH              \
     --enable-languages=c,c++
 make -j$(nproc)
 make install
@@ -421,9 +424,11 @@ tar -xf ../mpc-1.3.1.tar.gz
 mv -v mpc-1.3.1 mpc
 case $(uname -m) in
   x86_64)
+    GCC_CONFIG_WITH_ARCH="x86-64-v4"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
+    GCC_CONFIG_WITH_ARCH="armv9.4-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
@@ -449,6 +454,7 @@ cd       build
     --disable-libsanitizer                         \
     --disable-libssp                               \
     --disable-libvtv                               \
+    --with-arch=$GCC_CONFIG_WITH_ARCH              \
     --enable-languages=c,c++
 make -j$(nproc)
 make DESTDIR=$LFS install
