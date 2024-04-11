@@ -280,8 +280,8 @@ function docker_build_marinara {
     local build_dir="$WORK_DIR/marinara_build_dir"
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
-    git checkout d6a7ab915cc25343d17056f7a76b9c76ce97b2b4
     pushd "$build_dir"
+    git checkout d6a7ab915cc25343d17056f7a76b9c76ce97b2b4
     sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
