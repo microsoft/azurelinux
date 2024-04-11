@@ -246,12 +246,13 @@ function docker_build_marinara {
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
     pushd "$build_dir"
 
-    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_IMAGE_NAME as installer|g" -i "dockerfile-$MARINARA"
+    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
+        --build-arg INSTALL_DEPENDENCIES=false \
         --no-cache \
         --progress=plain
 
