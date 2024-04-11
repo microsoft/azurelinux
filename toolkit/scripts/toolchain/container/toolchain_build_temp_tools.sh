@@ -51,7 +51,7 @@ case $(uname -m) in
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    GCC_CONFIG_WITH_ARCH="armv9.4-a"
+    GCC_CONFIG_WITH_ARCH="armv9.3-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
@@ -424,11 +424,9 @@ tar -xf ../mpc-1.3.1.tar.gz
 mv -v mpc-1.3.1 mpc
 case $(uname -m) in
   x86_64)
-    GCC_CONFIG_WITH_ARCH="x86-64-v4"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
-    GCC_CONFIG_WITH_ARCH="armv9.4-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac

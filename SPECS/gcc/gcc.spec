@@ -332,7 +332,7 @@ LD=ld \
 %ifarch x86_64
     --with-arch=x86-64-v4 \
 %else
-    --with-arch=armv9.4-a \
+    --with-arch=armv9.3-a \
 %endif
     --with-system-zlib
 
