@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ ExclusiveArch:  x86_64
 Requires:       bash
 Requires:       ca-certificates
 Requires:       chrony
+Requires:       cifs-utils
 Requires:       cpio
 Requires:       cryptsetup
 Requires:       curl
@@ -95,6 +96,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Thu Apr 11 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-3.cm2
+- Add cifs-utils to the list of dependencies
+
 * Tue Feb 06 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-2
 - Remove dependency on kernel-uvm-cvm
 
