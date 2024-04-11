@@ -1,10 +1,27 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+ARG BUILDER_IMAGE
 ARG BASE_IMAGE
 
-FROM $BASE_IMAGE
+FROM $BUILDER_IMAGE as builder
+
+ARG USERNAME=nonroot
+ARG USER_UID=65532
+ARG USER_GID=$USER_UID
+
+RUN mkdir -p /staging/etc \
+    && groupadd --gid $USER_GID $USERNAME \
+    && useradd --gid $USER_GID $USERNAME --uid $USER_UID --create-home --comment "Nonroot User" \
+    # Copy user/group info to staging
+    && cp /etc/group /staging/etc/group \
+    && cp /etc/passwd /staging/etc/passwd \
+    && cp -r /home /staging/home
+
+FROM $BASE_IMAGE AS final
 
 ARG EULA=@EULA_FILE@
 
 COPY $EULA .
+
+COPY --from=builder /staging/ /
