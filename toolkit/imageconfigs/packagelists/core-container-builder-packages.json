@@ -1,8 +1,8 @@
 {
     "packages": [
-        "shadow-utils",
         "build-essential",
         "createrepo_c",
-        "python3"
+        "python3",
+        "shadow-utils"
     ]
 }
