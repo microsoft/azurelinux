@@ -8,6 +8,10 @@ set -e
 echo Begin building Azure Linux toolchain
 echo Parameters passed: $@
 
+echo Checking CPU info before toolchain build
+lscpu
+cat /proc/cpuinfo
+
 MARINER_DIST_TAG=$1
 MARINER_DIST_MACRO=$2
 MARINER_BUILD_NUMBER=$3
