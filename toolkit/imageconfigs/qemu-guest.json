@@ -55,15 +55,14 @@
             "KernelOptions": {
                 "default": "kernel"
             },
-            "AdditionalFiles": {
-                "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs"
-            },
             "FinalizeImageScripts": [
                 {
                     "Path": "scripts/cleanup.sh"
                 }
             ],
-            "Hostname": "azure-linux"
+            "Hostname": "azure-linux",
+            "DisableDocs": true,
+            "DisableLocales": true
         }
     ]
 }

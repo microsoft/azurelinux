@@ -283,6 +283,28 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	return defines
 }
 
+// DisableBuildRequiresDefines sets the macros to disable documentation files when installing RPMs.
+// - defines: optional map of defines to update. If nil, a new map will be created.
+func DisableDocumentationDefines(defines map[string]string) map[string]string {
+	if defines == nil {
+		defines = make(map[string]string)
+	}
+	defines["_excludedocs"] = "1"
+	return defines
+}
+
+// DisableLocaleDefines sets the macros to disable locales when installing RPMs.
+// - defines: optional map of defines to update. If nil, a new map will be created.
+func DisableLocaleDefines(defines map[string]string) map[string]string {
+	if defines == nil {
+		defines = make(map[string]string)
+	}
+	// POSIX effectively disables locales since it does not match any locale.
+	// Instead it will use the default locales built in.
+	defines["_install_langs"] = "POSIX"
+	return defines
+}
+
 // DefaultDefines returns a new map of default defines that can be used during RPM queries.
 func defaultDefines(runCheck bool) map[string]string {
 	// "with_check" definition should align with the RUN_CHECK Make variable whenever possible

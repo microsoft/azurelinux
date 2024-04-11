@@ -418,3 +418,47 @@ func TestDistroMacrosLdLoad(t *testing.T) {
 		})
 	}
 }
+
+func TestDisableDocumentationDefines(t *testing.T) {
+	defines := map[string]string{
+		"dist":       ".azlX",
+		"with_check": "1",
+	}
+	expectedDefines := map[string]string{
+		"dist":         ".azlX",
+		"with_check":   "1",
+		"_excludedocs": "1",
+	}
+	result := DisableDocumentationDefines(defines)
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestDisableDocumentationDefinesNil(t *testing.T) {
+	expectedDefines := map[string]string{
+		"_excludedocs": "1",
+	}
+	result := DisableDocumentationDefines(nil)
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestDisableLocaleDefines(t *testing.T) {
+	defines := map[string]string{
+		"dist":       ".azlX",
+		"with_check": "1",
+	}
+	expectedDefines := map[string]string{
+		"dist":           ".azlX",
+		"with_check":     "1",
+		"_install_langs": "POSIX",
+	}
+	result := DisableLocaleDefines(defines)
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestDisableLocaleDefinesNil(t *testing.T) {
+	expectedDefines := map[string]string{
+		"_install_langs": "POSIX",
+	}
+	result := DisableLocaleDefines(nil)
+	assert.Equal(t, expectedDefines, result)
+}

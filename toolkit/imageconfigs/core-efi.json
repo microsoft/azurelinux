@@ -49,10 +49,15 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json"
             ],
+            "Packages": [
+                "wget"
+            ],
             "KernelOptions": {
                 "default": "kernel"
             },
-            "Hostname": "azurelinux"
+            "Hostname": "azurelinux",
+            "DisableDocs": true,
+            "DisableLocales": true
         }
     ]
 }
