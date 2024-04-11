@@ -1997,8 +1997,8 @@
         "type": "other",
         "other": {
           "name": "conmon",
-          "version": "2.1.0",
-          "downloadUrl": "https://github.com/containers/conmon/archive/v2.1.0.tar.gz"
+          "version": "2.1.2",
+          "downloadUrl": "https://github.com/containers/conmon/archive/refs/tags/v2.1.2.tar.gz"
         }
       }
     },
@@ -2247,8 +2247,8 @@
         "type": "other",
         "other": {
           "name": "cri-o",
-          "version": "1.21.2",
-          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.2.tar.gz"
+          "version": "1.21.7",
+          "downloadUrl": "https://github.com/cri-o/cri-o/archive/refs/tags/v1.21.7.tar.gz"
         }
       }
     },
@@ -15784,8 +15784,8 @@
         "type": "other",
         "other": {
           "name": "packer",
-          "version": "1.8.7",
-          "downloadUrl": "https://github.com/hashicorp/packer/archive/v1.8.7.tar.gz"
+          "version": "1.10.1",
+          "downloadUrl": "https://github.com/hashicorp/packer/archive/refs/tags/v1.10.1.tar.gz"
         }
       }
     },
