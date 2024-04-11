@@ -1,24 +1,47 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2022.1
-Release:        7%{?dist}
+Version:        2024.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Patch0:         rpm-ostree-libdnf-build.patch
-Patch1:         rpm-ostree-disable-selinux.patch
-Patch2:         CVE-2022-31394.patch
-Patch3:         rpm-ostree-drop-lint-which-treats-warning-as-error.patch
-Patch4:         CVE-2022-47085.patch
+# Below is a manually created tarball, no download link.
+# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# To update the cache and config.toml run:
+#   tar -xf %{name}-%{version}.tar.gz
+#   cd %{name}-%{version}/libflux
+#   cargo vendor > config.toml
+#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
+#
+Source1:        %{name}-%{version}-cargo.tar.gz
+Source2:        config.toml
+Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
+
+
+# Enable ASAN + UBSAN
+%bcond_with sanitizers
+# Embedded unit tests
+%bcond_with bin_unit_tests
+
+%ifarch x86_64
+%define cargo_pkg_feature_opts --no-default-features --features "mshv,kvm"
+%endif
+%ifarch aarch64
+%define cargo_pkg_feature_opts --all
+%endif
+
+%define cargo_offline --offline
+
+BuildRequires:  make
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
 BuildRequires:  automake
 BuildRequires:  bubblewrap
+BuildRequires:  cargo
 BuildRequires:  check
-BuildRequires:  cmake
 BuildRequires:  cppunit-devel
 BuildRequires:  createrepo_c
 BuildRequires:  dbus-devel
@@ -27,14 +50,12 @@ BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  python3-gobject-introspection
 BuildRequires:  gperf
-BuildRequires:  gpgme-devel
 BuildRequires:  gtk-doc
 BuildRequires:  jq
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
-BuildRequires:  libgsystem-devel
 BuildRequires:  libmodulemd-devel
 BuildRequires:  librepo-devel
 BuildRequires:  libsolv
@@ -49,11 +70,77 @@ BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-pygments
-BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
+BuildRequires:  pkgconfig(libsolv)
+
+
+# Needed by curl-rust
+BuildRequires: pkgconfig(libcurl)
+
+# This is copied from the libdnf spec
+%if 0%{?rhel} && ! 0%{?centos}
+%bcond_without rhsm
+%else
+%bcond_with rhsm
+%endif
+
+
+# RHEL (8,9) doesn't ship zchunk today.  Keep this in sync
+# with libdnf: https://gitlab.com/redhat/centos-stream/rpms/libdnf/-/blob/762f631e36d1e42c63a794882269d26c156b68c1/libdnf.spec#L45
+%if 0%{?rhel}
+%bcond_with zchunk
+%else
+%bcond_without zchunk
+%endif
+
+
+#########################################################################
+#                         libdnf build deps                             #
+#                                                                       #
+# Copy/pasted from libdnf/libdnf.spec. Removed the irrelevant bits like #
+# valgrind, rhsm, swig, python, and sanitizer stuff.                    #
+#########################################################################
+
+
+%global libsolv_version 0.7.21
+%global libmodulemd_version 2.13.0
+%global librepo_version 1.13.1
+
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libsolv-devel >= %{libsolv_version}
+BuildRequires:  pkgconfig(librepo) >= %{librepo_version}
+BuildRequires:  pkgconfig(check)
+BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.46.0
+BuildRequires:  pkgconfig(gtk-doc)
+BuildRequires:  rpm-devel >= 4.15.0
+%if %{with rhsm}
+BuildRequires:  pkgconfig(librhsm) >= 0.0.3
+%endif
+%if %{with zchunk}
+BuildRequires:  pkgconfig(zck) >= 0.9.11
+%endif
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(json-c)
+BuildRequires:  pkgconfig(cppunit)
+BuildRequires:  pkgconfig(modulemd-2.0) >= %{libmodulemd_version}
+BuildRequires:  pkgconfig(smartcols)
+BuildRequires:  gettext
+BuildRequires:  gpgme-devel
+
+Requires:       libmodulemd
+Requires:       libsolv
+Requires:       librepo
+
+#########################################################################
+#                     end of libdnf build deps                          #
+#########################################################################
+
+
 
 %if 0%{?with_check}
 BuildRequires:  python3-gobject
@@ -63,7 +150,6 @@ Requires:       bubblewrap
 Requires:       json-c
 Requires:       json-glib
 Requires:       libcap
-Requires:       libgsystem
 Requires:       libmodulemd
 Requires:       librepo
 Requires:       libsolv
@@ -73,6 +159,13 @@ Requires:       ostree-grub2
 Requires:       ostree-libs
 Requires:       polkit
 ExclusiveArch:  x86_64
+
+Requires:       bubblewrap
+Requires:       fuse
+
+# For container functionality
+# https://github.com/coreos/rpm-ostree/issues/3286
+Requires:       skopeo
 
 %description
 This tool takes a set of packages, and commits them to an OSTree
@@ -103,12 +196,28 @@ Requires:       %{name} = %{version}-%{release}
 Includes the scripts for rpm-ostree repo creation to act as server
 
 %prep
-%autosetup -p1
+%autosetup -Sgit -p1
+tar xf %{SOURCE1}
+mkdir -p .cargo
+cp %{SOURCE2} .cargo/
+%if 0%{?__isa_bits} == 32
+sed -ie 's,^lto = true,lto = false,' Cargo.toml
+%endif
 
 %build
+cargo_version=$(cargo --version)
+echo ${cargo_version}
+echo "CARGO VERSION"
+cargo build --release
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-gtk-doc
-make %{?_smp_mflags}
+%if 0%{?build_rustflags:1}
+export RUSTFLAGS="%{build_rustflags}"
+%endif
+%configure --disable-silent-rules --enable-gtk-doc %{?rpmdb_default} %{?with_sanitizers:--enable-sanitizers}  %{?with_bin_unit_tests:--enable-bin-unit-tests} \
+  %{?with_rhsm:--enable-featuresrs=rhsm}
+
+%make_build
+
 
 %install
 make install DESTDIR=%{buildroot} INSTALL="install -p -c"
@@ -157,6 +266,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.4-1
+- Upgrade to 2024.4 and remove libgsystem dependency
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-7
 - Update the build dependency from mariner-release to azurelinux-release
 

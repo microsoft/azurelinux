@@ -1,18 +1,13 @@
 Summary:        Git for operating system binaries
 Name:           ostree
-Version:        2022.1
-Release:        4%{?dist}
+Version:        2024.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://ostree.readthedocs.io/en/latest
 Source0:        https://github.com/ostreedev/ostree/releases/download/v%{version}/lib%{name}-%{version}.tar.xz
-Source1:        91-ostree.preset
-Patch0:         dualboot-support.patch
-Patch1:         0001-ostree-Copying-photon-config-to-boot-directory.patch
-Patch2:         0002-ostree-Adding-load-env-to-menuentry.patch
-Patch3:         0003-ostree-converting-osname-to-azurelinux.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -81,7 +76,7 @@ Requires:       grub2-efi
 GRUB2 integration for OSTree
 
 %prep
-%autosetup -p 1 -n lib%{name}-%{version}
+%autosetup -n lib%{name}-%{version}
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -98,10 +93,8 @@ make %{?_smp_mflags}
 make check
 
 %install
-make DESTDIR=%{buildroot} INSTALL="install -p -c" install
-find %{buildroot} -type f -name "*.la" -delete -print
-install -D -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system-preset/91-ostree.preset
-install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
+%make_install INSTALL="install -p -c"
+find %{buildroot} -name '*.la' -delete
 
 %post
 %systemd_post ostree-remount.service
@@ -114,7 +107,6 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 
 %files
 %license COPYING
-%license COPYING
 %doc README.md
 %{_bindir}/ostree
 %{_bindir}/rofiles-fuse
@@ -123,9 +115,8 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_unitdir}/ostree*.service
 %{_unitdir}/ostree-finalize-staged.path
 %{_libdir}/dracut/modules.d/98ostree/*
-%{_mandir}/man1/ostree-admin*
+%{_mandir}/man*/*.gz
 %{_libdir}/systemd/system-generators/ostree-system-generator
-%{_libdir}/systemd/system-preset/91-ostree.preset
 %exclude %{_sysconfdir}/grub.d/*ostree
 %exclude %{_libexecdir}/libostree/grub2*
 %{_libdir}/ostree/ostree-prepare-root
@@ -155,6 +146,9 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libexecdir}/libostree/grub2*
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.5-1
+- Upgrade to 2024.4
+
 * Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-4
 - Renamed "0003-ostree-converting-osname-to-mariner.patch" to "0003-ostree-converting-osname-to-azurelinux.patch"
 

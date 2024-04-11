@@ -9061,8 +9061,8 @@
         "type": "other",
         "other": {
           "name": "libdnf",
-          "version": "0.73.0",
-          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.73.0.tar.gz"
+          "version": "0.73.1",
+          "downloadUrl": "https://github.com/rpm-software-management/libdnf/archive/0.73.1.tar.gz"
         }
       }
     },
@@ -15413,8 +15413,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2022.1/libostree-2022.1.tar.xz"
+          "version": "2024.5",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2024.5/libostree-2024.5.tar.xz"
         }
       }
     },
@@ -25614,8 +25614,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2022.1/rpm-ostree-2022.1.tar.xz"
+          "version": "2024.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2024.4/rpm-ostree-2024.4.tar.xz"
         }
       }
     },
