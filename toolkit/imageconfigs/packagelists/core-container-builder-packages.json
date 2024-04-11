@@ -1,0 +1,7 @@
+{
+    "packages": [
+        "shadow-utils",
+        "build-essential",
+        "createrepo_c"
+    ]
+}
