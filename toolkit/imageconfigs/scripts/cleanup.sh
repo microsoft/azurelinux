@@ -29,10 +29,6 @@ tdnf clean all
 # remove all python py cache files
 find /usr/lib/python* -type d -name '__pycache__' -exec rm -rf {} +
 
-# remove installed packages documentation
-rm -rf /usr/share/doc/*
-rm -rf /usr/share/man/*
-
 # clear any journal logs
 journalctl --vacuum-time=1s
 
