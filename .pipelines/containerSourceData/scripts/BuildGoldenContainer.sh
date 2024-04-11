@@ -28,6 +28,7 @@ set -e
 # - t) Script to create SBOM for the container image.
 # - u) Create Distroless container (e.g. true, false. If true, the script will also create a distroless container)
 # - v) Version extract command (e.g. 'busybox | head -1 | cut -c 10-15')
+# - w) Is NVIDIA image (e.g. true, false. NVIDIA images have different naming convention)
 
 # Assuming you are in your current working directory. Below should be the directory structure:
 #   │   rpms.tar.gz
@@ -80,6 +81,7 @@ while getopts ":a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:" OPTIONS; do
     t ) SBOM_SCRIPT=$OPTARG;;
     u ) DISTROLESS=$OPTARG;;
     v ) VERSION_EXTRACT_CMD=$OPTARG;;
+    w ) IS_NVIDIA_IMAGE=$OPTARG;;
 
     \? )
         echo "Error - Invalid Option: -$OPTARG" 1>&2
@@ -123,6 +125,7 @@ function print_inputs {
     echo "SBOM_TOOL_PATH                -> $SBOM_TOOL_PATH"
     echo "SBOM_SCRIPT                   -> $SBOM_SCRIPT"
     echo "DISTROLESS                    -> $DISTROLESS"
+    echo "IS_NVIDIA_IMAGE               -> $IS_NVIDIA_IMAGE"
 }
 
 function validate_inputs {
