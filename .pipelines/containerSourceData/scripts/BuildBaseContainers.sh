@@ -28,6 +28,8 @@ set -e
 #   │   container_tarballs
 #   │   ├── container_base
 #   │   │   ├── core-2.0.20230607.tar.gz
+#   │   ├── core_container_builder
+#   │   │   ├── core-container-builder-2.0.20230607.tar.gz
 #   │   ├── distroless_base
 #   │   │   ├── distroless-base-2.0.20230607.tar.gz
 #   │   ├── distroless_debug
@@ -100,6 +102,7 @@ function validate_inputs {
     fi
 
     BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-[0-9.]*.tar.gz")
+    BASE_BUILDER_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-container-builder-[0-9.]*.tar.gz")
     DISTROLESS_BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-base-[0-9.]*.tar.gz")
     DISTROLESS_DEBUG_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-debug-[0-9.]*.tar.gz")
     DISTROLESS_MINIMAL_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-minimal-[0-9.]*.tar.gz")
@@ -162,6 +165,7 @@ function initialization {
     EULA_FILE_NAME="EULA-Container.txt"
 
     # Image types
+    BASE_BUILDER="base-builder"
     BASE="base"
     DISTROLESS="distroless"
     MARINARA="marinara"
@@ -201,6 +205,10 @@ function initialization {
     echo "MARINARA_IMAGE_NAME                   -> $MARINARA_IMAGE_NAME"
 }
 
+function build_builder_image {
+    echo "+++ Build builder image"
+    docker import - "$BASE_BUILDER" < "$BASE_BUILDER_TARBALL"
+}
 function docker_build {
     local image_type=$1
     local image_full_name=$2
@@ -273,12 +281,13 @@ function docker_build_marinara {
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
     pushd "$build_dir"
-    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_IMAGE_NAME as installer|g" -i "dockerfile-$MARINARA"
+    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
+        --build-arg INSTALL_DEPENDENCIES=false \
         --no-cache \
         --progress=plain
 
@@ -327,4 +336,5 @@ function build_images {
 print_inputs
 validate_inputs
 initialization
+build_builder_image
 build_images
