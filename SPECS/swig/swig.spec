@@ -65,7 +65,7 @@ make check PY3=1
 
 %changelog
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 4.2.1-1
-- Ugrade to 4.2.1
+- Upgrade to 4.2.1
 - Add swig-java-Avoid-using-deprecated-API-in-doxygen-example patch from Fedora
 
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-1

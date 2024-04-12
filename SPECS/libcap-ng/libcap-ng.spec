@@ -47,15 +47,6 @@ The libraries and header files needed for libcap_ng development.
 %make_install
 find %{buildroot} -type f -name "*.la" -delete -print
 
-
-# Remove a couple things so they don't get picked up
-rm -f $RPM_BUILD_ROOT%{_libdir}/libcap-ng.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/libcap-ng.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/libdrop_ambient.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/libdrop_ambient.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/python%{python3_version}/site-packages/_capng.a
-rm -f $RPM_BUILD_ROOT%{_libdir}/python%{python3_version}/site-packages/_capng.la
-
 %check
 %make_build check
 
@@ -79,6 +70,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/python%{python3_version}/site-packages/_capng.la
 %{_includedir}/*.h
 %{_mandir}/man3/*
 %{_datadir}/aclocal/*.m4
+%{_libdir}/*.a
 
 %changelog
 * Mon Apr 08 2024 Betty Lakes <bettylakes@microsoft.com> - 0.8.4-1
