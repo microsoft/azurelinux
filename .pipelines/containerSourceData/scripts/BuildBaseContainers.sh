@@ -252,7 +252,6 @@ function docker_build_marinara {
 
     pushd "$build_dir" > /dev/null
 
-    git checkout e318131e718e37abf6ada4ed19857322607f027f
     sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
