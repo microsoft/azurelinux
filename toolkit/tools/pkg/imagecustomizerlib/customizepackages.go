@@ -15,13 +15,13 @@ import (
 )
 
 func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *imagecustomizerapi.OS,
-	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	imageChroot *safechroot.Chroot, rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
 	// Note: The 'validatePackageLists' function read the PackageLists files and merged them into the inline package lists.
 	needRpmsSources := len(config.Packages.Install) > 0 || len(config.Packages.Update) > 0 ||
-		config.Packages.UpdateExistingPackages || partitionsCustomized
+		config.Packages.UpdateExistingPackages
 
 	// Mount RPM sources.
 	var mounts *rpmSourcesMounts
@@ -31,15 +31,6 @@ func addRemoveAndUpdatePackages(buildDir string, baseConfigPath string, config *
 			return err
 		}
 		defer mounts.close()
-	}
-
-	if partitionsCustomized {
-		logger.Log.Infof("Updating initrd file")
-
-		err = installOrUpdatePackages("reinstall", []string{"initramfs"}, imageChroot)
-		if err != nil {
-			return err
-		}
 	}
 
 	err = removePackages(config.Packages.Remove, imageChroot)

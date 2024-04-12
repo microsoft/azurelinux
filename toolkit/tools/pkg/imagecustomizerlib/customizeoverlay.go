@@ -14,29 +14,29 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
-func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) error {
+func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechroot.Chroot) (bool, error) {
 	var err error
 
 	if overlays == nil {
-		return nil
+		return false, nil
 	}
 
 	// Integrate overlay dracut module and overlay driver into initramfs img.
 	overlayDracutModule := "overlayfs"
 	overlayDracutDriver := "overlay"
-	err = buildDracutModule(overlayDracutModule, overlayDracutDriver, imageChroot)
+	err = addDracutModule(overlayDracutModule, overlayDracutDriver, imageChroot)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	// Dereference the pointer to get the slice
 	overlaysDereference := *overlays
 	err = updateGrubConfigForOverlay(imageChroot, overlaysDereference)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
 func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []imagecustomizerapi.Overlay) error {

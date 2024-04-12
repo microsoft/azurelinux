@@ -215,15 +215,17 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	partitionsCustomized := hasPartitionCustomizations(config)
-
 	err = validateIsoConfig(baseConfigPath, config.Iso)
 	if err != nil {
 		return err
 	}
 
-	err = validateSystemConfig(baseConfigPath, &config.OS, rpmsSources, useBaseImageRpmRepos,
-		partitionsCustomized)
+	err = validateSystemConfig(baseConfigPath, &config.OS, rpmsSources, useBaseImageRpmRepos)
+	if err != nil {
+		return err
+	}
+
+	err = validateScripts(baseConfigPath, &config.Scripts)
 	if err != nil {
 		return err
 	}
@@ -265,11 +267,11 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 }
 
 func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
-	rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
+	rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
 	var err error
 
-	err = validatePackageLists(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos, partitionsCustomized)
+	err = validatePackageLists(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
@@ -279,17 +281,21 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 		return err
 	}
 
-	for i, script := range config.PostInstallScripts {
-		err = validateScript(baseConfigPath, &script)
+	return nil
+}
+
+func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts) error {
+	for i, script := range scripts.PostCustomization {
+		err := validateScript(baseConfigPath, &script)
 		if err != nil {
-			return fmt.Errorf("invalid PostInstallScripts item at index %d: %w", i, err)
+			return fmt.Errorf("invalid postCustomization item at index %d:\n%w", i, err)
 		}
 	}
 
-	for i, script := range config.FinalizeImageScripts {
-		err = validateScript(baseConfigPath, &script)
+	for i, script := range scripts.FinalizeCustomization {
+		err := validateScript(baseConfigPath, &script)
 		if err != nil {
-			return fmt.Errorf("invalid FinalizeImageScripts item at index %d: %w", i, err)
+			return fmt.Errorf("invalid finalizeCustomization item at index %d:\n%w", i, err)
 		}
 	}
 
@@ -320,7 +326,7 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 }
 
 func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, rpmsSources []string,
-	useBaseImageRpmRepos bool, partitionsCustomized bool,
+	useBaseImageRpmRepos bool,
 ) error {
 	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.Packages.RemoveLists, config.Packages.Remove)
 	if err != nil {
@@ -345,8 +351,6 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 
 		if needRpmsSources {
 			return fmt.Errorf("have packages to install or update but no RPM sources were specified")
-		} else if partitionsCustomized {
-			return fmt.Errorf("partitions were customized so the initramfs package needs to be reinstalled but no RPM sources were specified")
 		}
 	}
 

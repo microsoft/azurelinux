@@ -14,61 +14,33 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot) error {
+func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, imageChroot *safechroot.Chroot,
+) (bool, error) {
 	var err error
 
 	if verity == nil {
-		return nil
+		return false, nil
 	}
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
 	dmVerityDracutDriver := "dm-verity"
-	err = buildDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
+	err = addDracutModule(systemdVerityDracutModule, dmVerityDracutDriver, imageChroot)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	err = updateFstabForVerity(buildDir, imageChroot)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return nil
+	return true, nil
 }
 
-func buildDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
-	var err error
-
-	listKernels := func() ([]string, error) {
-		var kernels []string
-		// Use RootDir to get the path on the host OS
-		bootDir := filepath.Join(imageChroot.RootDir(), "boot")
-		files, err := filepath.Glob(filepath.Join(bootDir, "vmlinuz-*"))
-		if err != nil {
-			return nil, err
-		}
-		for _, file := range files {
-			kernels = append(kernels, filepath.Base(file))
-		}
-		return kernels, nil
-	}
-
-	kernelFiles, err := listKernels()
-	if err != nil {
-		return fmt.Errorf("failed to list kernels: %w", err)
-	}
-
-	if len(kernelFiles) != 1 {
-		return fmt.Errorf("expected one kernel file, but found %d", len(kernelFiles))
-	}
-
-	// Extract the version from the kernel filename (e.g., vmlinuz-5.15.131.1-2.cm2 -> 5.15.131.1-2.cm2)
-	kernelVersion := strings.TrimPrefix(kernelFiles[0], "vmlinuz-")
-
+func addDracutModule(dracutModuleName string, dracutDriverName string, imageChroot *safechroot.Chroot) error {
 	dracutConfigFile := filepath.Join(imageChroot.RootDir(), "etc", "dracut.conf.d", dracutModuleName+".conf")
 
 	// Check if the dracut module configuration file already exists.
@@ -82,15 +54,6 @@ func buildDracutModule(dracutModuleName string, dracutDriverName string, imageCh
 		if err != nil {
 			return fmt.Errorf("failed to write to dracut module config file (%s): %w", dracutConfigFile, err)
 		}
-	}
-
-	err = imageChroot.Run(func() error {
-		initrdImagePath := "/boot/initrd.img-" + kernelVersion
-		err = shell.ExecuteLiveWithErr(1, "mkinitrd", "-f", initrdImagePath, kernelVersion)
-		return err
-	})
-	if err != nil {
-		return fmt.Errorf("failed to build initrd img for kernel - (%s):\n%w", kernelVersion, err)
 	}
 
 	return nil

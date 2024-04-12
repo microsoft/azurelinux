@@ -1,6 +1,6 @@
-os:
-  postInstallScripts:
-  - path: scripts/postinstallscript.sh
+scripts:
+  postCustomization:
+  - path: scripts/postcustomizationscript.sh
 
-  finalizeImageScripts:
-  - path: scripts/finalizeimagescript.sh
+  finalizeCustomization:
+  - path: scripts/finalizecustomizationscript.sh

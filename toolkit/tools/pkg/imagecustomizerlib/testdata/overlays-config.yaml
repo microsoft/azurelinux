@@ -1,0 +1,56 @@
+storage:
+  disks:
+  - partitionTableType: gpt
+    maxSize: 4096
+    partitions:
+    - id: esp
+      type: esp
+      start: 1
+      end: 9
+
+    - id: boot
+      start: 9
+      end: 108
+
+    - id: rootfs
+      start: 108
+      end: 2048
+      label: rootfs
+      
+  bootType: efi
+
+  fileSystems:
+  - deviceId: esp
+    type: fat32
+    mountPoint:
+      path: /boot/efi
+      options: umask=0077
+
+  - deviceId: boot
+    type: ext4
+    mountPoint:
+      path: /boot
+
+  - deviceId: rootfs
+    type: ext4
+    mountPoint:
+      path: /
+
+os:
+  resetBootLoaderType: hard-reset
+
+  packages:
+    install:
+    - dracut-overlayfs
+    - openssh-server
+    - vim
+
+  additionalFiles:
+    # Workaround until updated dracut-overlayfs package has been published.
+    ../../../../../SPECS/dracut/20overlayfs/module-setup.sh: /lib/dracut/modules.d/20overlayfs/module-setup.sh
+    ../../../../../SPECS/dracut/20overlayfs/overlayfs-mount.sh: /lib/dracut/modules.d/20overlayfs/overlayfs-mount.sh
+
+  overlays:
+  - lowerDir: /
+    upperDir: /upper_root
+    workDir: /work_root
