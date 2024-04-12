@@ -247,7 +247,9 @@ function docker_build_marinara {
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
 
     if [ -d "$EULA_FILE_PATH" ]; then
+        echo "+++ Copy EULA file to $build_dir"
         cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
+        ls -l "$build_dir"
     fi
 
     pushd "$build_dir" > /dev/null
@@ -260,7 +262,7 @@ function docker_build_marinara {
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
         --build-arg INSTALL_DEPENDENCIES=false \
-        --build-arg EULA="$EULA_FILE_NAME" \
+        --build-arg EULA=$EULA_FILE_NAME \
         --no-cache \
         --progress=plain
 
