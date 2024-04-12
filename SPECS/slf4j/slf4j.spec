@@ -91,6 +91,32 @@ Requires:       mvn(org.slf4j:slf4j-api) = %{version}
 %description -n log4j-over-slf4j
 Log4j implemented over SLF4J.
 
+%package migrator
+Summary:        SLF4J Migrator
+License:        MIT
+Group:          Development/Libraries/Java
+Requires:       mvn(org.slf4j:slf4j-api) = %{version}
+ 
+%description migrator
+SLF4J Migrator.
+
+%package jdk-platform-logging
+Summary:        SLF4J jdk Platform Logging
+License:        MIT
+Group:          Development/Libraries/Java
+Requires:       mvn(org.slf4j:slf4j-api) = %{version}
+ 
+%description jdk-platform-logging
+SLF4J jdk Platform Logging.
+
+%package sources
+Summary:        SLF4J Source JARs
+License:        MIT
+Group:          Documentation/Other
+ 
+%description sources
+SLF4J Source JARs.
+
 %prep
 %setup -q -n %{name}-v_%{version}
 find . -name "*.jar" | xargs rm
@@ -133,15 +159,33 @@ cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 %files -f .mfiles
 %license LICENSE.txt APACHE-LICENSE
-%{_javadir}/%{name}/
-%{_datadir}/maven-metadata/
-%{_datadir}/maven-poms/
+%{_javadir}/%{name}/api.jar
+%{_javadir}/%{name}/nop.jar
+%{_javadir}/%{name}/simple.jar
+%{_javadir}/%{name}/%{name}-nop.jar
+%{_javadir}/%{name}/%{name}-simple.jar
+%{_datadir}/maven-metadata/%{name}-%{name}-parent.xml
+%{_datadir}/maven-metadata/%{name}.xml
+%{_datadir}/maven-poms/%{name}/api.pom
+%{_datadir}/maven-poms/%{name}/nop.pom
+%{_datadir}/maven-poms/%{name}/parent.pom
+%{_datadir}/maven-poms/%{name}/simple.pom
+%{_datadir}/maven-poms/%{name}/%{name}-api.pom
+%{_datadir}/maven-poms/%{name}/%{name}-nop.pom
+%{_datadir}/maven-poms/%{name}/%{name}-parent.pom
+%{_datadir}/maven-poms/%{name}/%{name}-simple.pom
 
-%files jdk14 -f .mfiles-%{name}-jdk14
+%files jdk14 -f .mfiles-slf4j-jdk14
 
 %files -n jcl-over-slf4j -f .mfiles-jcl-over-slf4j
 
 %files -n log4j-over-slf4j -f .mfiles-log4j-over-slf4j
+
+%files migrator -f .mfiles-slf4j-migrator
+
+%files jdk-platform-logging -f .mfiles-slf4j-jdk-platform-logging
+
+%files sources -f .mfiles-sources
 
 %files javadoc
 %{_javadocdir}/%{name}
@@ -154,7 +198,8 @@ cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 - Upgrade to v2.0.7
 - Change to maven build and install
 - Remove jcl subpackage as it does not exist in updated version
-- Add additional files in main package
+- Add and modify files provided by main package
+- Add subpackages for migrator, jdk-platform-logging and sources
 
 * Wed Feb 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.7.30-6
 - rebuild with msopenjdk-17
