@@ -299,9 +299,9 @@ func DisableLocaleDefines(defines map[string]string) map[string]string {
 	if defines == nil {
 		defines = make(map[string]string)
 	}
-	// POSIX effectively disables locales since it does not match any locale.
+	// NONE effectively disables locales since it does not match any locale.
 	// Instead it will use the default locales built in.
-	defines["_install_langs"] = "POSIX"
+	defines["_install_langs"] = "NONE"
 	return defines
 }
 

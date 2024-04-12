@@ -257,7 +257,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 					// check we set the macro we wanted
 					foundMacro := false
 					for _, line := range localeContents {
-						if line == "%_install_langs POSIX" {
+						if line == "%_install_langs NONE" {
 							foundMacro = true
 							break
 						}

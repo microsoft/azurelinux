@@ -34,9 +34,9 @@ var (
 	}
 	localeComments []string = []string{
 		"# This stops locale files from being installed. %%_install_langs acts as a filter for locales",
-		"# which start with the provides strings. Setting it to an invalid value (ie 'POSIX') will",
+		"# which start with the provides strings. Setting it to an invalid value (ie 'NONE') will",
 		"# prevent any locale files from being installed.",
-		"# To enable locale files, remove this file, or comment out '%%_install_langs POSIX'",
+		"# To enable locale files, remove this file, or comment out '%%_install_langs NONE'",
 		"# Any packages which are already installed must be reinstalled for this change to take effect.",
 	}
 )
