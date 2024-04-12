@@ -25,6 +25,7 @@ ignore_multiple_sources=" \
 ignore_no_source_tarball=" \
   azurelinux-repos \
   azurelinux-rpm-macros \
+  azurelinux-sysinfo \
   ca-certificates \
   check-restart \
   core-packages \
@@ -38,6 +39,7 @@ ignore_no_source_tarball=" \
   hyphen-mn \
   initramfs \
   javapackages-tools-meta \
+  kata-packages-uvm \
   kde-filesystem \
   kf \
   livepatching \

@@ -14,6 +14,7 @@
         "filesystem",
         "grub2-efi-binary",
         "logrotate",
+        "openssh-server",
         "procps-ng",
         "shim",
         "sudo",

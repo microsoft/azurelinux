@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clang",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -1947,8 +1947,8 @@
         "type": "other",
         "other": {
           "name": "compiler-rt",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -3238,8 +3238,8 @@
         "type": "other",
         "other": {
           "name": "emacs",
-          "version": "29.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.1.tar.xz"
+          "version": "29.3",
+          "downloadUrl": "https://ftp.gnu.org/gnu/emacs/emacs-29.3.tar.xz"
         }
       }
     },
@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.1.3",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.3.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8071,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.1.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv3.tar.gz"
+          "version": "5.15.126.mshv9",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
         }
       }
     },
@@ -8181,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
+          "version": "6.1.0.mshv16",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
@@ -8371,8 +8371,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "0.59.0",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v0.59.0.tar.gz"
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.2.0.tar.gz"
         }
       }
     },
@@ -10171,8 +10171,8 @@
         "type": "other",
         "other": {
           "name": "libnbd",
-          "version": "1.12.1",
-          "downloadUrl": "https://libguestfs.org/download/libnbd/1.12-stable/libnbd-1.12.1.tar.gz"
+          "version": "1.18.3",
+          "downloadUrl": "https://libguestfs.org/download/libnbd/1.18-stable/libnbd-1.18.3.tar.gz"
         }
       }
     },
@@ -12041,8 +12041,8 @@
         "type": "other",
         "other": {
           "name": "lld",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12051,8 +12051,8 @@
         "type": "other",
         "other": {
           "name": "lldb",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12081,8 +12081,8 @@
         "type": "other",
         "other": {
           "name": "llvm",
-          "version": "17.0.6",
-          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-17.0.6.tar.gz"
+          "version": "18.1.2",
+          "downloadUrl": "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-18.1.2.tar.gz"
         }
       }
     },
@@ -12363,6 +12363,16 @@
           "name": "luajit",
           "version": "2.1.1707061634",
           "downloadUrl": "https://github.com/LuaJIT/LuaJIT/archive/0d313b243194a0b8d2399d8b549ca5a0ff234db5/luajit-2.1.1707061634.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "lujavrite",
+          "version": "1.0.2",
+          "downloadUrl": "https://github.com/mizdebsk/lujavrite/archive/refs/tags/1.0.2.tar.gz"
         }
       }
     },
@@ -13132,8 +13142,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd-cc",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.1.tar.gz"
+          "version": "1.7.7",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },
@@ -15153,8 +15163,8 @@
         "type": "other",
         "other": {
           "name": "openscap",
-          "version": "1.3.5",
-          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.5/openscap-1.3.5.tar.gz"
+          "version": "1.3.9",
+          "downloadUrl": "https://github.com/OpenSCAP/openscap/releases/download/1.3.9/openscap-1.3.9.tar.gz"
         }
       }
     },
@@ -20743,8 +20753,8 @@
         "type": "other",
         "other": {
           "name": "pesign",
-          "version": "0.112",
-          "downloadUrl": "https://github.com/vathpela/pesign/releases/download/0.112/pesign-0.112.tar.bz2"
+          "version": "116",
+          "downloadUrl": "https://github.com/rhboot/pesign/releases/download/116/pesign-116.tar.bz2"
         }
       }
     },
@@ -22232,6 +22242,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-editables",
+          "version": "0.5",
+          "downloadUrl": "https://github.com/pfmoore/editables/archive/0.5/editables-0.5.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-enchant",
           "version": "3.2.2",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyenchant/pyenchant-3.2.2.tar.gz"
@@ -23243,8 +23263,8 @@
         "type": "other",
         "other": {
           "name": "python-nose2",
-          "version": "0.10.0",
-          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.10.0.tar.gz"
+          "version": "0.14.1",
+          "downloadUrl": "https://github.com/nose-devs/nose2/archive/refs/tags/0.14.1.tar.gz"
         }
       }
     },
@@ -23925,16 +23945,6 @@
           "name": "python-recommonmark",
           "version": "0.6.0",
           "downloadUrl": "https://github.com/readthedocs/recommonmark/archive/0.6.0/recommonmark-0.6.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "python-redis",
-          "version": "3.5.3",
-          "downloadUrl": "https://github.com/andymccurdy/redis-py/archive/python-redis-3.5.3.tar.gz"
         }
       }
     },
@@ -24863,8 +24873,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/3.0.1.tar.gz"
         }
       }
     },
@@ -25023,8 +25033,8 @@
         "type": "other",
         "other": {
           "name": "pytorch",
-          "version": "2.0.0",
-          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.0.0/pytorch-v2.0.0.tar.gz"
+          "version": "2.2.2",
+          "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.2.2/pytorch-v2.2.2.tar.gz"
         }
       }
     },
@@ -25243,8 +25253,8 @@
         "type": "other",
         "other": {
           "name": "rabbitmq-server",
-          "version": "3.11.11",
-          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.11/rabbitmq-server-3.11.11.tar.xz"
+          "version": "3.13.0",
+          "downloadUrl": "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.13.0/rabbitmq-server-3.13.0.tar.xz"
         }
       }
     },
@@ -25415,16 +25425,6 @@
           "name": "recordproto",
           "version": "1.14.2",
           "downloadUrl": "https://www.x.org/pub/individual/proto/recordproto-1.14.2.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "redis",
-          "version": "7.2.4",
-          "downloadUrl": "https://download.redis.io/releases/redis-7.2.4.tar.gz"
         }
       }
     },

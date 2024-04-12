@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,11 +14,11 @@ import (
 func TestDiskIsValid(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
+				Start: 1 * diskutils.MiB,
 			},
 		},
 	}
@@ -29,12 +30,12 @@ func TestDiskIsValid(t *testing.T) {
 func TestDiskIsValidWithEnd(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(2)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 			},
 		},
 	}
@@ -46,12 +47,15 @@ func TestDiskIsValidWithEnd(t *testing.T) {
 func TestDiskIsValidWithSize(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				Size:  ptrutils.PtrTo(uint64(1)),
+				Start: 1 * diskutils.MiB,
+				Size: PartitionSize{
+					Type: PartitionSizeTypeExplicit,
+					Size: 1 * diskutils.MiB,
+				},
 			},
 		},
 	}
@@ -63,7 +67,7 @@ func TestDiskIsValidWithSize(t *testing.T) {
 func TestDiskIsValidStartAt0(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
@@ -74,18 +78,17 @@ func TestDiskIsValidStartAt0(t *testing.T) {
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "block 0")
-	assert.ErrorContains(t, err, "MBR header")
+	assert.ErrorContains(t, err, "first 1 MiB must be reserved for the MBR header")
 }
 
 func TestDiskIsValidInvalidTableType(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: "a",
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
+				Start: 1 * diskutils.MiB,
 			},
 		},
 	}
@@ -98,12 +101,12 @@ func TestDiskIsValidInvalidTableType(t *testing.T) {
 func TestDiskIsValidInvalidPartition(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 2,
-				End:   ptrutils.PtrTo(uint64(0)),
+				Start: 2 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(0)),
 			},
 		},
 	}
@@ -116,38 +119,62 @@ func TestDiskIsValidInvalidPartition(t *testing.T) {
 func TestDiskIsValidTwoExpanding(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            4,
+		MaxSize:            4 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
+				Start: 1 * diskutils.MiB,
 			},
 			{
 				Id:    "b",
-				Start: 2,
+				Start: 2 * diskutils.MiB,
 			},
 		},
 	}
 
 	err := disk.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "is not last partition")
+	assert.ErrorContains(t, err, "is not last partition but size is set to \"grow\"")
+}
+
+func TestDiskIsValidTwoExpandingGrow(t *testing.T) {
+	disk := &Disk{
+		PartitionTableType: PartitionTableTypeGpt,
+		MaxSize:            4 * diskutils.MiB,
+		Partitions: []Partition{
+			{
+				Id:    "a",
+				Start: 1 * diskutils.MiB,
+			},
+			{
+				Id:    "b",
+				Start: 2 * diskutils.MiB,
+				Size: PartitionSize{
+					Type: PartitionSizeTypeGrow,
+				},
+			},
+		},
+	}
+
+	err := disk.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "is not last partition but size is set to \"grow\"")
 }
 
 func TestDiskIsValidOverlaps(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            4,
+		MaxSize:            4 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(3)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 			},
 			{
 				Id:    "b",
-				Start: 2,
-				End:   ptrutils.PtrTo(uint64(4)),
+				Start: 2 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(4 * diskutils.MiB)),
 			},
 		},
 	}
@@ -160,16 +187,16 @@ func TestDiskIsValidOverlaps(t *testing.T) {
 func TestDiskIsValidOverlapsExpanding(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            4,
+		MaxSize:            4 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(3)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 			},
 			{
 				Id:    "b",
-				Start: 2,
+				Start: 2 * diskutils.MiB,
 			},
 		},
 	}
@@ -182,17 +209,17 @@ func TestDiskIsValidOverlapsExpanding(t *testing.T) {
 func TestDiskIsValidTooSmall(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            3,
+		MaxSize:            3 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(2)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 			},
 			{
 				Id:    "b",
-				Start: 3,
-				End:   ptrutils.PtrTo(uint64(4)),
+				Start: 3 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(4 * diskutils.MiB)),
 			},
 		},
 	}
@@ -205,16 +232,16 @@ func TestDiskIsValidTooSmall(t *testing.T) {
 func TestDiskIsValidTooSmallExpanding(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            3,
+		MaxSize:            3 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(3)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
 			},
 			{
 				Id:    "b",
-				Start: 3,
+				Start: 3 * diskutils.MiB,
 			},
 		},
 	}
@@ -239,16 +266,16 @@ func TestDiskIsValidZeroSize(t *testing.T) {
 func TestDiskIsValidDuplicatePartitionId(t *testing.T) {
 	disk := &Disk{
 		PartitionTableType: PartitionTableTypeGpt,
-		MaxSize:            2,
+		MaxSize:            2 * diskutils.MiB,
 		Partitions: []Partition{
 			{
 				Id:    "a",
-				Start: 1,
-				End:   ptrutils.PtrTo(uint64(2)),
+				Start: 1 * diskutils.MiB,
+				End:   ptrutils.PtrTo(DiskSize(2 * diskutils.MiB)),
 			},
 			{
 				Id:    "a",
-				Start: 2,
+				Start: 2 * diskutils.MiB,
 			},
 		},
 	}

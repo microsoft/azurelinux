@@ -1,0 +1,237 @@
+From 8508cef07d5d559e48d51d159a30f64897c3903f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Gustavsson?= <bjorn@erlang.org>
+Date: Mon, 11 Mar 2024 07:41:23 +0100
+Subject: [PATCH 1/2] AArch64: Fix incorrect result for running code compiled
+ by OTP 24
+
+On AArch64, when constructing a binary using the bit syntax, using a
+unit greater than 16 and not being a power of two would, would cause
+erroneous results. For example, given this module compiled with
+Erlang/OTP 24:
+
+    -module(t).
+    -export([bar/2]).
+
+    bar(Contents, Size) ->
+        <<Contents:Size/unit:31>>.
+
+only the first two bytes would be correctly set:
+
+    1> t:bar(-1, 1).
+    <<255,255,0,0:7>>
+    2> t:bar(-1, 1).
+    <<255,255,149,35:7>>
+    3> t:bar(-1, 1).
+    <<255,255,0,0:7>>
+    4> t:bar(-1, 1).
+    <<255,255,3,0:7>>
+---
+ erts/emulator/beam/jit/arm/instr_bs.cpp   |  9 ++-------
+ erts/emulator/test/Makefile               |  1 +
+ erts/emulator/test/bs_construct_SUITE.erl | 10 ++++++++++
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/erts/emulator/beam/jit/arm/instr_bs.cpp b/erts/emulator/beam/jit/arm/instr_bs.cpp
+index 2eb2d4201cf1..79349a095d91 100644
+--- a/erts/emulator/beam/jit/arm/instr_bs.cpp
++++ b/erts/emulator/beam/jit/arm/instr_bs.cpp
+@@ -99,13 +99,8 @@ int BeamModuleAssembler::emit_bs_get_field_size(const ArgSource &Size,
+                 a.lsl(out, out, imm(trailing_bits - _TAG_IMMED1_SIZE));
+             }
+         } else {
+-            if (unit >= (1 << _TAG_IMMED1_SIZE)) {
+-                mov_imm(TMP1, unit >> _TAG_IMMED1_SIZE);
+-            } else {
+-                a.lsr(out, out, imm(_TAG_IMMED1_SIZE));
+-                mov_imm(TMP1, unit);
+-            }
+-
++            a.lsr(out, out, imm(_TAG_IMMED1_SIZE));
++            mov_imm(TMP1, unit);
+             a.mul(out, out, TMP1);
+         }
+ 
+diff --git a/erts/emulator/test/Makefile b/erts/emulator/test/Makefile
+index c058fe72d266..f87aabead35d 100644
+--- a/erts/emulator/test/Makefile
++++ b/erts/emulator/test/Makefile
+@@ -152,6 +152,7 @@ NO_OPT= bs_bincomp \
+ 	map
+ 
+ R24= \
++	bs_construct \
+ 	process_max_heap_size
+ 
+ R25= \
+diff --git a/erts/emulator/test/bs_construct_SUITE.erl b/erts/emulator/test/bs_construct_SUITE.erl
+index adf893d9993a..3bbe53e5ab56 100644
+--- a/erts/emulator/test/bs_construct_SUITE.erl
++++ b/erts/emulator/test/bs_construct_SUITE.erl
+@@ -1389,6 +1389,16 @@ do_zero_init_1(Size, LPad, RPad) ->
+         end()).
+ 
+ error_info(_Config) ->
++    case ?MODULE of
++        bs_construct_r24_SUITE ->
++            %% Error information is not implemented for old bit syntax
++            %% instructions.
++            ok;
++        _ ->
++            error_info()
++    end.
++
++error_info() ->
+     Atom = id(some_atom),
+     NegSize = id(-1),
+     HugeNegSize = id(-1 bsl 64),
+
+From 3ab2cc66a5c5abb049aec20043b45e428ece6d9a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Gustavsson?= <bjorn@erlang.org>
+Date: Mon, 11 Mar 2024 10:19:55 +0100
+Subject: [PATCH 2/2] AArch64: Fix crash for running bit syntax code compiled
+ by OTP 24
+
+This bug was introduced in 67c52b69250ebf.
+
+Closes #8238
+---
+ erts/emulator/beam/jit/arm/instr_bs.cpp       |  2 +-
+ erts/emulator/test/bs_construct_SUITE.erl     | 22 +++++++-
+ .../otp_24_code_gh_8238.S                     | 50 +++++++++++++++++++
+ .../otp_24_code_gh_8238.erl                   | 10 ++++
+ 4 files changed, 81 insertions(+), 3 deletions(-)
+ create mode 100644 erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.S
+ create mode 100644 erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.erl
+
+diff --git a/erts/emulator/beam/jit/arm/instr_bs.cpp b/erts/emulator/beam/jit/arm/instr_bs.cpp
+index 79349a095d91..09db80c2048d 100644
+--- a/erts/emulator/beam/jit/arm/instr_bs.cpp
++++ b/erts/emulator/beam/jit/arm/instr_bs.cpp
+@@ -148,7 +148,7 @@ void BeamModuleAssembler::emit_i_bs_init_fail_heap(const ArgSource &Size,
+     }
+ 
+     if (emit_bs_get_field_size(Size, 1, fail, ARG4) >= 0) {
+-        a.lsr(ARG4, ARG4, imm(3));
++        a.lsl(ARG4, ARG4, imm(3));
+         mov_arg(ARG5, Heap);
+         mov_arg(ARG6, Live);
+         fragment_call(ga->get_bs_init_bits_shared());
+diff --git a/erts/emulator/test/bs_construct_SUITE.erl b/erts/emulator/test/bs_construct_SUITE.erl
+index 3bbe53e5ab56..66d538e1a271 100644
+--- a/erts/emulator/test/bs_construct_SUITE.erl
++++ b/erts/emulator/test/bs_construct_SUITE.erl
+@@ -30,7 +30,9 @@
+ 	 otp_7422/1, zero_width/1, bad_append/1, bs_append_overflow/1,
+          bs_append_offheap/1,
+          reductions/1, fp16/1, zero_init/1, error_info/1, little/1,
+-         heap_binary_unit/1]).
++         heap_binary_unit/1,
++         otp_24_code_gh_8238/1
++        ]).
+ 
+ -include_lib("common_test/include/ct.hrl").
+ 
+@@ -45,7 +47,8 @@ all() ->
+      copy_writable_binary, kostis, dynamic, bs_add, otp_7422, zero_width,
+      bad_append, bs_append_overflow, bs_append_offheap,
+      reductions, fp16, zero_init,
+-     error_info, little, heap_binary_unit].
++     error_info, little, heap_binary_unit,
++     otp_24_code_gh_8238].
+ 
+ init_per_suite(Config) ->
+     Config.
+@@ -1706,6 +1709,21 @@ heap_binary_unit_2(Variant, Rest) ->
+             {error2, Bin2}
+     end.
+ 
++otp_24_code_gh_8238(Config) ->
++    case ?MODULE of
++        bs_construct_SUITE ->
++            %% GH-8238. Code compiled with Erlang/OTP 24 would crash
++            %% when run on OTP-26.2.3.
++            DataDir = proplists:get_value(data_dir, Config),
++            Asm = filename:join(DataDir, atom_to_list(?FUNCTION_NAME) ++ ".S"),
++            {ok,Mod,Beam} = compile:file(Asm, [binary,from_asm,report]),
++            {module,Mod} = code:load_binary(Mod, "", Beam),
++            Mod:Mod(),
++            ok;
++        _ ->
++            {skip,"Enough to run once"}
++    end.
++
+ %%%
+ %%% Common utilities.
+ %%%
+diff --git a/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.S b/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.S
+new file mode 100644
+index 000000000000..7944fa818a69
+--- /dev/null
++++ b/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.S
+@@ -0,0 +1,50 @@
++{module, otp_24_code_gh_8238}.  %% version = 0
++
++{exports, [{module_info,0},{module_info,1},{otp_24_code_gh_8238,0}]}.
++
++{attributes, []}.
++
++{labels, 7}.
++
++
++{function, otp_24_code_gh_8238, 0, 2}.
++  {label,1}.
++    {line,[{location,"otp_24_code_gh_8238.erl",4}]}.
++    {func_info,{atom,otp_24_code_gh_8238},{atom,otp_24_code_gh_8238},0}.
++  {label,2}.
++    {allocate,0,0}.
++    {move,{integer,1000},{x,0}}.
++    {line,[{location,"otp_24_code_gh_8238.erl",5}]}.
++    {call_ext,1,{extfunc,erlang,integer_to_binary,1}}.
++    {line,[{location,"otp_24_code_gh_8238.erl",6}]}.
++    {gc_bif,byte_size,{f,0},1,[{x,0}],{x,1}}.
++    {bs_add,{f,0},[{x,1},{integer,9},1],{x,1}}.
++    {bs_init2,{f,0},{x,1},2,2,{field_flags,[]},{x,1}}.
++    {bs_put_integer,{f,0},
++                    {integer,72},
++                    1,
++                    {field_flags,[unsigned,big]},
++                    {integer,1281499675772873685536}}.
++    {bs_put_binary,{f,0},{atom,all},8,{field_flags,[unsigned,big]},{x,0}}.
++    {put_list,{x,1},nil,{x,1}}.
++    {move,{literal,"~p\n"},{x,0}}.
++    {call_ext_last,2,{extfunc,io,format,2},0}.
++
++
++{function, module_info, 0, 4}.
++  {label,3}.
++    {line,[]}.
++    {func_info,{atom,otp_24_code_gh_8238},{atom,module_info},0}.
++  {label,4}.
++    {move,{atom,otp_24_code_gh_8238},{x,0}}.
++    {call_ext_only,1,{extfunc,erlang,get_module_info,1}}.
++
++
++{function, module_info, 1, 6}.
++  {label,5}.
++    {line,[]}.
++    {func_info,{atom,otp_24_code_gh_8238},{atom,module_info},1}.
++  {label,6}.
++    {move,{x,0},{x,1}}.
++    {move,{atom,otp_24_code_gh_8238},{x,0}}.
++    {call_ext_only,2,{extfunc,erlang,get_module_info,2}}.
+diff --git a/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.erl b/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.erl
+new file mode 100644
+index 000000000000..d18a7c096d0a
+--- /dev/null
++++ b/erts/emulator/test/bs_construct_SUITE_data/otp_24_code_gh_8238.erl
+@@ -0,0 +1,10 @@
++-module(otp_24_code_gh_8238).
++-export([?MODULE/0]).
++
++%% Produce otp_24_code_gh_8238.S using Erlang/OTP 24 like this:
++%%     erlc -S +no_copt +no_ssa_opt otp_24_code_gh_8238.erl
++
++?MODULE() ->
++    Bin = integer_to_binary(1000),
++    io:format("~p\n", [<<"Example: ", Bin/binary>>]).
++

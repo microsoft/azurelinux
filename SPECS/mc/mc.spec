@@ -1,7 +1,7 @@
 Summary:        File manager
 Name:           mc
 Version:        4.8.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,11 +10,11 @@ URL:            https://www.midnight-commander.org
 Source0:        http://ftp.midnight-commander.org/%{name}-%{version}.tar.xz
 Patch0:         disable-extfs-test.patch
 BuildRequires:  glib-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  python3-devel
 BuildRequires:  slang-devel
 Requires:       glib
-Requires:       pcre
+Requires:       pcre2
 Requires:       slang
 
 %description
@@ -45,6 +45,9 @@ MC (Midnight Commander) is a text-mode full-screen file manager and visual shell
 %exclude %{_prefix}/src
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 4.8.30-2
+- Move from pcre to pcre2
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.8.30-1
 - Auto-upgrade to 4.8.30 - Azure Linux 3.0 - package upgrades
 

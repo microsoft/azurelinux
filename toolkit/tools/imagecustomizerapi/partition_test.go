@@ -6,6 +6,7 @@ package imagecustomizerapi
 import (
 	"testing"
 
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ func TestPartitionIsValidFixedSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		End:   ptrutils.PtrTo(uint64(1)),
+		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
 	err := partition.IsValid()
@@ -35,7 +36,7 @@ func TestPartitionIsValidZeroSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		End:   ptrutils.PtrTo(uint64(0)),
+		End:   ptrutils.PtrTo(DiskSize(0)),
 	}
 
 	err := partition.IsValid()
@@ -48,40 +49,58 @@ func TestPartitionIsValidZeroSizeV2(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
 		Start: 0,
-		Size:  ptrutils.PtrTo(uint64(0)),
+		Size: PartitionSize{
+			Type: PartitionSizeTypeExplicit,
+			Size: 0,
+		},
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "size")
+	assert.ErrorContains(t, err, "size can't be 0 or negative")
 }
 
 func TestPartitionIsValidNegativeSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2,
-		End:   ptrutils.PtrTo(uint64(1)),
+		Start: 2 * diskutils.MiB,
+		End:   ptrutils.PtrTo(DiskSize(1 * diskutils.MiB)),
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "partition")
-	assert.ErrorContains(t, err, "size")
+	assert.ErrorContains(t, err, "size can't be 0 or negative")
 }
 
 func TestPartitionIsValidBothEndAndSize(t *testing.T) {
 	partition := Partition{
 		Id:    "a",
-		Start: 2,
-		End:   ptrutils.PtrTo(uint64(3)),
-		Size:  ptrutils.PtrTo(uint64(1)),
+		Start: 2 * diskutils.MiB,
+		End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
+		Size: PartitionSize{
+			Type: PartitionSizeTypeExplicit,
+			Size: 1 * diskutils.MiB,
+		},
 	}
 
 	err := partition.IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "end")
-	assert.ErrorContains(t, err, "size")
+	assert.ErrorContains(t, err, "cannot specify both end and size on partition")
+}
+
+func TestPartitionIsValidEndAndGrow(t *testing.T) {
+	partition := Partition{
+		Id:    "a",
+		Start: 2 * diskutils.MiB,
+		End:   ptrutils.PtrTo(DiskSize(3 * diskutils.MiB)),
+		Size: PartitionSize{
+			Type: PartitionSizeTypeGrow,
+		},
+	}
+
+	err := partition.IsValid()
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, "cannot specify both end and size on partition")
 }
 
 func TestPartitionIsValidGoodName(t *testing.T) {

@@ -16,5 +16,10 @@ func doModifications(baseConfigPath string, osConfig *imagecustomizerapi.OS) err
 		return err
 	}
 
+	err = imagecustomizerlib.UpdateHostname(osConfig.Hostname, dummyChroot)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
