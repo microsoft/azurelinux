@@ -23,6 +23,7 @@ Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-%{version}.tar.xz
+# cal10n-build.tar.gz imported from https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-build.tar.xz
 Source1:        %{name}-build.tar.xz
 BuildRequires:  ant
 BuildRequires:  fdupes
@@ -119,6 +120,7 @@ done
 %changelog
 * Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1.10-1
 - Update to version 0.8.1.10
+- Import build, install section, and source file from openSUSE (license: MIT).
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
 - Moved from extended to core
