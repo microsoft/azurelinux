@@ -10,7 +10,6 @@ Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
 Patch1:         rpm-ostree-libdnf-build.patch
 
-BuildRequires:  make
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
@@ -50,6 +49,32 @@ BuildRequires:  rust
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
+BuildRequires:  pkgconfig(libsolv)
+
+#########################################################################
+#                         libdnf build deps                             #
+#                                                                       #
+#        Copy/pasted some build requires from libdnf/libdnf.spec.       #
+#                                                                       #
+#########################################################################
+
+BuildRequires:  cmake
+BuildRequires:  pkgconfig(librepo) >= 1.13.1
+BuildRequires:  pkgconfig(check)
+BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.46.0
+BuildRequires:  pkgconfig(gtk-doc)
+BuildRequires:  rpm-devel >= 4.15.0
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(json-c)
+BuildRequires:  pkgconfig(cppunit)
+BuildRequires:  pkgconfig(modulemd-2.0) >= 2.13.0
+BuildRequires:  pkgconfig(smartcols)
+BuildRequires:  gettext
+BuildRequires:  gpgme-devel
+
+#########################################################################
+#                     end of libdnf build deps                          #
+#########################################################################
 
 %if 0%{?with_check}
 BuildRequires:  python3-gobject
@@ -98,7 +123,7 @@ Requires:       %{name} = %{version}-%{release}
 Includes the scripts for rpm-ostree repo creation to act as server
 
 %prep
-%autosetup -Sgit -p1
+%autosetup -p1
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
