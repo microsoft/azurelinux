@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "cal10n",
-          "version": "0.8.1",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/cal10n-0.8.1.tar.xz"
+          "version": "0.8.1.10",
+          "downloadUrl": "https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-0.8.1.10.tar.xz"
         }
       }
     },

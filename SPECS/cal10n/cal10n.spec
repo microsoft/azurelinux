@@ -15,14 +15,14 @@
 #
 Summary:        Compiler assisted localization library (CAL10N)
 Name:           cal10n
-Version:        0.8.1
+Version:        0.8.1.10
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.xz
+Source0:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-%{version}.tar.xz
 Source1:        %{name}-build.tar.xz
 BuildRequires:  ant
 BuildRequires:  fdupes
@@ -117,8 +117,8 @@ done
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1-1
-- Update to version 0.8.1
+* Fri Apr 05 2024 Mitch Zhu <mitchzhu@microsoft.com> - 0.8.1.10-1
+- Update to version 0.8.1.10
 
 * Fri Mar 17 2023 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.7.7-6
 - Moved from extended to core
