@@ -22672,6 +22672,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-iniconfig",
+          "version": "1.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/iniconfig/iniconfig-1.1.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-iniparse",
           "version": "0.5",
           "downloadUrl": "https://files.pythonhosted.org/packages/4c/9a/02beaf11fc9ea7829d3a9041536934cd03990e09c359724f99ee6bd2b41b/iniparse-0.5.tar.gz"

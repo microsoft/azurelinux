@@ -141,6 +141,10 @@ include $(SCRIPTS_DIR)/utils.mk
 
 ######## REMAINING BUILD FLAGS ########
 
+ifeq ($(RUN_CHECK),y)
+	override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/extended/$(build_arch)
+endif
+
 ifneq ($(DAILY_BUILD_ID),)
    $(warning Using Daily Build $(DAILY_BUILD_ID))
    # Ensure build_arch is set

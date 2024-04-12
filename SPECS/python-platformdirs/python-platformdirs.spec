@@ -1,5 +1,4 @@
 # Disable tests as it requires new package python-exceptiongroup
-%global with_check 0
 %global srcname platformdirs
 %bcond_without tests
 %global common_description %{expand:
@@ -8,7 +7,7 @@ a "user data dir".}
 Summary:        Python module for determining appropriate platform-specific dirs
 Name:           python-%{srcname}
 Version:        4.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,6 +26,12 @@ BuildRequires:  python3-pluggy
 BuildRequires:  python3-tomli
 BuildRequires:  python3-trove-classifiers
 BuildArch:      noarch
+%if %{with tests}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-iniconfig
+BuildRequires:  python3-appdirs
+BuildRequires:  python3-pytest-mock
+%endif
 
 %description %{common_description}
 
@@ -51,12 +56,10 @@ BuildRequires:  python3-devel
 
 
 %check
-%if 0%{?with_check}
 %if %{with tests}
 %pytest
 %else
 %pyproject_check_import
-%endif
 %endif
 
 
@@ -65,6 +68,9 @@ BuildRequires:  python3-devel
 %doc README.rst
 
 %changelog
+* Fri Apr 12 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-2
+- Fix PTest failures by adding necessary packages as dependencies
+
 * Mon Feb 26 2024 Bala <balakumaran.kannan@microsoft.com> - 4.2.0-1
 - Upgraded to 4.2.0
 - Disable tests as pytest requires new package python-exceptiongroup

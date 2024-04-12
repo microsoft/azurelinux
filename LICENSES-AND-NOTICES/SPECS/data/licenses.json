@@ -1692,6 +1692,7 @@
                 "python-humanize",
                 "python-hwdata",
                 "python-importlib-metadata",
+                "python-iniconfig",
                 "python-inotify",
                 "python-into-dbus-python",
                 "python-IPy",
