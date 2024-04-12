@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns='http://maven.apache.org/POM/4.0.0' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+  xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.fedoraproject.xmvn.objectweb-asm</groupId>
+  <artifactId>aggregator</artifactId>
+  <version>any</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <modules>
+    <module>asm</module>
+    <module>asm-analysis</module>
+    <module>asm-commons</module>
+    <module>asm-tree</module>
+    <module>asm-util</module>
+    <module>tools/retrofitter</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Run the retrofitter tool which:
+          * downgrades the class bytecode version to 1.5
+          * generates module-info.class files in each .jar
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>any</version>
+          <executions>
+            <execution>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <target>
+                  <java classname="org.objectweb.asm.tools.Retrofitter" failonerror="true">
+                    <arg value="${project.build.directory}/classes"/>
+                    <arg value="${project.version}"/>
+                    <classpath>
+                      <path refid="maven.compile.classpath"/>
+                    </classpath>
+                  </java>
+                </target>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
