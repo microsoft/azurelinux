@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/moby/sys/mountinfo"
 	"github.com/stretchr/testify/assert"
 )

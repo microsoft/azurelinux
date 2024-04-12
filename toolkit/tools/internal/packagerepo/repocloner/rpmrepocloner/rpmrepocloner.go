@@ -12,16 +12,16 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/buildpipeline"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repomanager/rpmrepomanager"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
 )
 
 // RepoFlag* flags are used to denote which repos the cloner is allowed to use for its queries.
