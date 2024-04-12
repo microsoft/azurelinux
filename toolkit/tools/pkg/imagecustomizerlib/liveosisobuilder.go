@@ -1036,9 +1036,9 @@ func getDiskSize(rootDir string) (size uint64, err error) {
 	return num, nil
 }
 
-func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) error {
+func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFile string) error {
 
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 1 - creating %s", rawImageFile)
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - mounting squashfs %s", b.artifacts.squashfsImagePath)
 
 	// mount squash fs
 	squashMountDir, err := ioutil.TempDir(buildDir, "tmp-squashfs-mount-")
@@ -1046,8 +1046,6 @@ func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) e
 		return fmt.Errorf("failed to create temporary mount folder for squashfs:\n%w", err)
 	}
 	defer os.RemoveAll(squashMountDir)
-
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 2 - created squashMountDir=%s", squashMountDir)
 
 	squashMountParams := []string{b.artifacts.squashfsImagePath, squashMountDir}
 	err = shell.ExecuteLive(false, "mount", squashMountParams...)
@@ -1062,72 +1060,19 @@ func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) e
 		}
 	}()
 
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 3 - mounted b.artifacts.squashfsImagePath=%s", b.artifacts.squashfsImagePath)
-
 	// get disk space
 	diskSizeBytes, err := getDiskSize(squashMountDir)
 	if err != nil {
 		return fmt.Errorf("failed to calculate the disk size of %s:\n%w", squashMountDir, err)
 	}
 	diskSizeMB := diskSizeBytes/1024/1024 + 1
-	logger.Log.Debugf("------ disk size = %d bytes or %d MB", diskSizeBytes, diskSizeMB)
+
+	logger.Log.Debugf("---- dev ---- createWriteableImage() - creating writeable disk image %s", rawImageFile)
 
 	// create raw image
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 4 - creating writeable image=%s", rawImageFile)
 	var safetyFactor uint64
 	safetyFactor = 2
 	safeDiskSizeMB := diskSizeMB * safetyFactor
-
-	/*
-		#
-		# create raw writeable image
-		#
-		diskSizeMBString := strconv.FormatUint(safeDiskSizeMB, 10)
-
-		createImageParams := []string{"if=/dev/zero", "of=" + rawImageFile, "bs=1M", "count=" + diskSizeMBString}
-		err = shell.ExecuteLive(false, "dd", createImageParams...)
-		if err != nil {
-			return fmt.Errorf("failed to create raw image %s with size %dM", rawImageFile, diskSizeMBString)
-		}
-
-		// format raw image
-		logger.Log.Debugf("---- dev ---- createWriteableImage() - 5 - formatting writeable image=%s", rawImageFile)
-		formatParams := []string{rawImageFile}
-		err = shell.ExecuteLive(false, "mkfs.ext4", formatParams...)
-		if err != nil {
-			return fmt.Errorf("failed to format raw image %s", rawImageFile)
-		}
-
-		// mount raw image
-		logger.Log.Debugf("---- dev ---- createWriteableImage() - 6 - mounting writeable image=%s", rawImageFile)
-
-		writeableMountDir, err := ioutil.TempDir(buildDir, "tmp-writeable-mount-")
-		if err != nil {
-			return fmt.Errorf("failed to create temporary mount folder for writeable image:\n%w", err)
-		}
-		defer os.RemoveAll(writeableMountDir)
-
-		logger.Log.Debugf("---- dev ---- createWriteableImage() - 7 - created writeableMountDir=%s", writeableMountDir)
-
-		writeableMountParams := []string{rawImageFile, writeableMountDir}
-		err = shell.ExecuteLive(false, "mount", writeableMountParams...)
-		if err != nil {
-			return fmt.Errorf("failed to mount writeable image:\n%w", err)
-		}
-		defer func() {
-			unmountParams := []string{writeableMountDir}
-			cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
-			if cleanupErr != nil {
-				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, writeableMountDir, cleanupErr)
-			}
-		}()
-
-		// copy contents
-		err = copyPartitionFiles(squashMountDir+"/.", writeableMountDir)
-		if err != nil {
-			return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableMountDir, err)
-		}
-	*/
 
 	var bootPartitionEnd uint64
 	bootPartitionEnd = 9
@@ -1177,19 +1122,12 @@ func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) e
 		return copyPartitionFiles(squashMountDir+"/.", imageChroot.RootDir())
 	}
 
-	fancyRawImage := rawImageFile
-	fancyChrootDir := "fancy-raw-image"
+	writeableChrootDir := "writeable-raw-image"
 
-	err = createNewImage(fancyRawImage, diskConfig, fileSystemConfigs, buildDir, fancyChrootDir, installOSFunc)
+	err = createNewImage(rawImageFile, diskConfig, fileSystemConfigs, buildDir, writeableChrootDir, installOSFunc)
 	if err != nil {
-		return fmt.Errorf("failed to copy squashfs into new fancy image (%s):\n%w", fancyRawImage, err)
+		return fmt.Errorf("failed to copy squashfs into new fancy image (%s):\n%w", rawImageFile, err)
 	}
-
-	// unmount raw image and delete mount dir
-	// ok - defer
-
-	// unmount squashfs and delete mount dir
-	// ok - defer
 
 	return nil
 }

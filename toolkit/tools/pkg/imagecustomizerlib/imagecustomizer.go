@@ -130,14 +130,18 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 
 	var isoBuilder *LiveOSIsoBuilder
 
-	// If iso, explore...
+	// ToDo: how do we know if there is os customizations?
+	osCustomizations := true
+
+	// Load iso meta data...
 	if isInputImageIso {
-		logger.Log.Debugf("---- dev ---- input is iso")
+		logger.Log.Debugf("---- dev ---- input is iso - 1")
 
 		isoExpansionFolder, err := ioutil.TempDir(buildDirAbs, "expanded-input-iso-")
 		if err != nil {
 			return fmt.Errorf("failed to create temporary iso expansion folder for iso:\n%w", err)
 		}
+		// clean-up
 		// defer os.RemoveAll(isoExpansionFolder)
 
 		err = expandIso(buildDir, imageFile, isoExpansionFolder)
@@ -145,21 +149,31 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			return fmt.Errorf("failed to expand input iso file:\n%w", err)
 		}
 
-		isoBuilder, err := isoBuilderFromLayout(buildDir, isoExpansionFolder)
+		isoBuilder, err = isoBuilderFromLayout(buildDir, isoExpansionFolder)
 		if err != nil {
 			return fmt.Errorf("failed to load input iso artifacts:\n%w", err)
 		}
+	}
 
-		err = isoBuilder.createWriteableImage(buildDir, rawImageFile)
-		if err != nil {
-			return fmt.Errorf("failed to create writeable image:\n%w", err)
+	// Create writeable image
+	if isInputImageIso {
+		logger.Log.Debugf("---- dev ---- input is iso - 2")
+
+		if osCustomizations {
+			logger.Log.Debugf("---- dev ---- there is os customization - 3")
+			err = isoBuilder.createWriteableImageFromSquashfs(buildDir, rawImageFile)
+			if err != nil {
+				return fmt.Errorf("failed to create writeable image:\n%w", err)
+			}
+		} else {
+			logger.Log.Debugf("---- dev ---- there is no os customization - 4")
+			err = isoBuilder.recreateLiveOSIsoImage(baseConfigPath, config.Iso, outputImageDir, outputImageBase)
+			if err != nil {
+				return fmt.Errorf("failed to create LiveOS ISO:\n%w", err)
+			}
 		}
-
-		// return fmt.Errorf("FAKE FAKE FAKE error to return early.")
 	} else {
-
-		logger.Log.Debugf("---- dev ---- input is not iso")
-
+		logger.Log.Debugf("---- dev ---- input is not iso - 5")
 		logger.Log.Infof("Creating raw base image: %s", rawImageFile)
 		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
 		if err != nil {
@@ -167,73 +181,64 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}
 
-	osCustomizations := true
-	if !osCustomizations {
-		err = isoBuilder.recreateLiveOSIsoImage(baseConfigPath, config.Iso, outputImageDir, outputImageBase)
-		if err != nil {
-			return fmt.Errorf("failed to create LiveOS ISO:\n%w", err)
-		}
-	} else {
+	// Customize the partitions.
+	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
+	if err != nil {
+		return err
+	}
 
-		// Customize the partitions.
-		partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
+	// Customize the raw image file.
+	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
+		partitionsCustomized)
+	if err != nil {
+		return err
+	}
+
+	// Shrink the filesystems.
+	if enableShrinkFilesystems {
+		err = shrinkFilesystemsHelper(rawImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
+		}
+	}
+
+	if config.OS.Verity != nil {
+		// Customize image for dm-verity, setting up verity metadata and security features.
+		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
+	}
 
-		// Customize the raw image file.
-		err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
-			partitionsCustomized)
+	// Check file systems for corruption.
+	err = checkFileSystems(rawImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to check filesystems:\n%w", err)
+	}
+
+	// Create final output image file if requested.
+	switch outputImageFormat {
+	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+		logger.Log.Infof("Writing: %s", outputImageFile)
+
+		os.MkdirAll(outputImageDir, os.ModePerm)
+		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+		}
+	case ImageFormatIso:
+		err = createLiveOSIsoImage(buildDir, baseConfigPath, config.Iso, rawImageFile, outputImageDir, outputImageBase)
 		if err != nil {
 			return err
 		}
+	}
 
-		// Shrink the filesystems.
-		if enableShrinkFilesystems {
-			err = shrinkFilesystemsHelper(rawImageFile)
-			if err != nil {
-				return fmt.Errorf("failed to shrink filesystems:\n%w", err)
-			}
-		}
-
-		if config.OS.Verity != nil {
-			// Customize image for dm-verity, setting up verity metadata and security features.
-			err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
-			if err != nil {
-				return err
-			}
-		}
-
-		// Check file systems for corruption.
-		err = checkFileSystems(rawImageFile)
+	// If outputSplitPartitionsFormat is specified, extract the partition files.
+	if outputSplitPartitionsFormat != "" {
+		logger.Log.Infof("Extracting partition files")
+		err = extractPartitionsHelper(rawImageFile, outputImageDir, outputImageBase, outputSplitPartitionsFormat)
 		if err != nil {
-			return fmt.Errorf("failed to check filesystems:\n%w", err)
-		}
-
-		// Create final output image file if requested.
-		switch outputImageFormat {
-		case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
-			logger.Log.Infof("Writing: %s", outputImageFile)
-
-			os.MkdirAll(outputImageDir, os.ModePerm)
-			err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
-			if err != nil {
-				return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
-			}
-		case ImageFormatIso:
-			err = createLiveOSIsoImage(buildDir, baseConfigPath, config.Iso, rawImageFile, outputImageDir, outputImageBase)
-			if err != nil {
-				return err
-			}
-		}
-
-		// If outputSplitPartitionsFormat is specified, extract the partition files.
-		if outputSplitPartitionsFormat != "" {
-			logger.Log.Infof("Extracting partition files")
-			err = extractPartitionsHelper(rawImageFile, outputImageDir, outputImageBase, outputSplitPartitionsFormat)
-			if err != nil {
-				return err
-			}
+			return err
 		}
 	}
 
