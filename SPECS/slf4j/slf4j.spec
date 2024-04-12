@@ -128,7 +128,7 @@ find -name "*.css" -o -name "*.js" -o -name "*.txt" | \
 
 # manual
 install -d -m 0755 %{buildroot}%{_docdir}/%{name}-%{version}
-rm -f .xmwn/apidoc
+rm -f .xmvn/apidoc
 cp -pr .xmvn/* %{buildroot}%{_docdir}/%{name}-%{version}/
 
 %files -f .mfiles
