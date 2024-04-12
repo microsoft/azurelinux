@@ -174,13 +174,8 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 // isRequiredRebuild checks if a node is required to be rebuilt due to:
 // - missing RPMs or
 // - user explicitly requesting the node to be rebuilt.
-func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState) (requiredRebuild bool) {
-	requiredRebuild = nodeHasMissingRPMs(pkgGraph, node, buildState)
-	if requiredRebuild {
-		return
-	}
-
-	return nodeRequestedForRebuildByUser(node, packagesToRebuild)
+func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState) bool {
+	return nodeHasMissingRPMs(pkgGraph, node, buildState) || nodeRequestedForRebuildByUser(node, packagesToRebuild)
 }
 
 // canUseCacheForNode checks if the cache can be used for a given node by:
