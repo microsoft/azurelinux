@@ -245,13 +245,14 @@ function docker_build_marinara {
     local build_dir="$WORK_DIR/marinara_build_dir"
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
-    pushd "$build_dir"
 
     if [ -d "$EULA_FILE_PATH" ]; then
         cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
     fi
 
-    git checkout e2d4113f1a4877e4d4e1f5a7e6ff3ae98a82e30c
+    pushd "$build_dir" > /dev/null
+
+    git checkout 1855286a56d4742308f679433a80a1029157c21e
     sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
