@@ -1,3 +1,10 @@
+# We haven't tried to ship the tests on RHEL
+%if 0%{?rhel}
+    %bcond_with tests
+%else
+    %bcond_without tests
+%endif
+
 Summary:        Git for operating system binaries
 Name:           ostree
 Version:        2024.5
@@ -80,12 +87,19 @@ GRUB2 integration for OSTree
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-
 %configure \
      --disable-silent-rules \
      --enable-gtk-doc \
      --with-dracut \
-     --without-selinux \
+     --with-selinux \
+     --with-curl \
+     --with-openssl \
+     --without-soup \
+     --with-composefs \
+     %{?with_tests:--with-soup3} \
+     %{?!with_tests:--without-soup3} \
+     %{?with_tests:--enable-installed-tests=exclusive} \
+     --with-dracut=yesbutnoconf \
      --enable-libsoup-client-certs
 make %{?_smp_mflags}
 
@@ -120,10 +134,11 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_sysconfdir}/grub.d/*ostree
 %exclude %{_libexecdir}/libostree/grub2*
 %{_libdir}/ostree/ostree-prepare-root
-%{_sysconfdir}/dracut.conf.d/ostree.conf
 %{_libdir}/ostree/ostree-remount
 %{_libdir}/tmpfiles.d/ostree-tmpfiles.conf
-%{_libexecdir}/libostree/*
+%{_libexecdir}/lib%{name}/*
+%{_libexecdir}/installed-tests/*
+%{_datadir}/installed-tests/*
 
 %files libs
 %{_sysconfdir}/ostree
@@ -143,7 +158,7 @@ find %{buildroot} -name '*.la' -delete
 
 %files grub2
 %{_sysconfdir}/grub.d/*ostree
-%{_libexecdir}/libostree/grub2*
+%{_libexecdir}/lib%{name}/grub2*
 
 %changelog
 * Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.5-1

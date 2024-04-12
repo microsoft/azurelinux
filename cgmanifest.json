@@ -9510,16 +9510,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libgsystem",
-          "version": "2015.2",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/libgsystem/libgsystem-2015.2.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/libgsystem-2015.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libgta",
           "version": "1.2.1",
           "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz"
