@@ -209,6 +209,12 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 		return fmt.Errorf("failed to delete fstab:\n%w", err)
 	}
 
+	// empty fstab only...
+	touchParams := []string{fstabFile}
+	err = shell.ExecuteLive(false, "touch", touchParams...)
+	if err != nil {
+		return fmt.Errorf("failed to create %s:\n%w", fstabFile, err)
+	}
 	// ToDo: why create it some where and then copy it?
 	//       just create it at the destination...
 	sourceConfigFile := filepath.Join(b.workingDirs.isoArtifactsDir, "20-live-cd.conf")
@@ -1070,49 +1076,113 @@ func (b *LiveOSIsoBuilder) createWriteableImage(buildDir, rawImageFile string) e
 	logger.Log.Debugf("---- dev ---- createWriteableImage() - 4 - creating writeable image=%s", rawImageFile)
 	var safetyFactor uint64
 	safetyFactor = 2
-	diskSizeMBString := strconv.FormatUint(diskSizeMB*safetyFactor, 10)
-	createImageParams := []string{"if=/dev/zero", "of=" + rawImageFile, "bs=1M", "count=" + diskSizeMBString}
-	err = shell.ExecuteLive(false, "dd", createImageParams...)
-	if err != nil {
-		return fmt.Errorf("failed to create raw image %s with size %dM", rawImageFile, diskSizeMBString)
-	}
+	safeDiskSizeMB := diskSizeMB * safetyFactor
 
-	// format raw image
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 5 - formatting writeable image=%s", rawImageFile)
-	formatParams := []string{rawImageFile}
-	err = shell.ExecuteLive(false, "mkfs.ext4", formatParams...)
-	if err != nil {
-		return fmt.Errorf("failed to format raw image %s", rawImageFile)
-	}
+	/*
+		#
+		# create raw writeable image
+		#
+		diskSizeMBString := strconv.FormatUint(safeDiskSizeMB, 10)
 
-	// mount raw image
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 6 - mounting writeable image=%s", rawImageFile)
-
-	writeableMountDir, err := ioutil.TempDir(buildDir, "tmp-writeable-mount-")
-	if err != nil {
-		return fmt.Errorf("failed to create temporary mount folder for writeable image:\n%w", err)
-	}
-	defer os.RemoveAll(writeableMountDir)
-
-	logger.Log.Debugf("---- dev ---- createWriteableImage() - 2 - created writeableMountDir=%s", writeableMountDir)
-
-	writeableMountParams := []string{rawImageFile, writeableMountDir}
-	err = shell.ExecuteLive(false, "mount", writeableMountParams...)
-	if err != nil {
-		return fmt.Errorf("failed to mount writeable image:\n%w", err)
-	}
-	defer func() {
-		unmountParams := []string{writeableMountDir}
-		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
-		if cleanupErr != nil {
-			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, writeableMountDir, cleanupErr)
+		createImageParams := []string{"if=/dev/zero", "of=" + rawImageFile, "bs=1M", "count=" + diskSizeMBString}
+		err = shell.ExecuteLive(false, "dd", createImageParams...)
+		if err != nil {
+			return fmt.Errorf("failed to create raw image %s with size %dM", rawImageFile, diskSizeMBString)
 		}
-	}()
 
-	// copy contents
-	err = copyPartitionFiles(squashMountDir+"/.", writeableMountDir)
+		// format raw image
+		logger.Log.Debugf("---- dev ---- createWriteableImage() - 5 - formatting writeable image=%s", rawImageFile)
+		formatParams := []string{rawImageFile}
+		err = shell.ExecuteLive(false, "mkfs.ext4", formatParams...)
+		if err != nil {
+			return fmt.Errorf("failed to format raw image %s", rawImageFile)
+		}
+
+		// mount raw image
+		logger.Log.Debugf("---- dev ---- createWriteableImage() - 6 - mounting writeable image=%s", rawImageFile)
+
+		writeableMountDir, err := ioutil.TempDir(buildDir, "tmp-writeable-mount-")
+		if err != nil {
+			return fmt.Errorf("failed to create temporary mount folder for writeable image:\n%w", err)
+		}
+		defer os.RemoveAll(writeableMountDir)
+
+		logger.Log.Debugf("---- dev ---- createWriteableImage() - 7 - created writeableMountDir=%s", writeableMountDir)
+
+		writeableMountParams := []string{rawImageFile, writeableMountDir}
+		err = shell.ExecuteLive(false, "mount", writeableMountParams...)
+		if err != nil {
+			return fmt.Errorf("failed to mount writeable image:\n%w", err)
+		}
+		defer func() {
+			unmountParams := []string{writeableMountDir}
+			cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
+			if cleanupErr != nil {
+				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, writeableMountDir, cleanupErr)
+			}
+		}()
+
+		// copy contents
+		err = copyPartitionFiles(squashMountDir+"/.", writeableMountDir)
+		if err != nil {
+			return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableMountDir, err)
+		}
+	*/
+
+	var bootPartitionEnd uint64
+	bootPartitionEnd = 9
+
+	diskConfig := imagecustomizerapi.Disk{
+		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
+		MaxSize:            safeDiskSizeMB,
+		Partitions: []imagecustomizerapi.Partition{
+			{
+				Id:    "esp",
+				Start: 1,
+				End:   &bootPartitionEnd,
+				Flags: []imagecustomizerapi.PartitionFlag{
+					imagecustomizerapi.PartitionFlagESP,
+					imagecustomizerapi.PartitionFlagBoot,
+				},
+			},
+			{
+				Id:    "rootfs",
+				Start: bootPartitionEnd,
+			},
+		},
+	}
+
+	fileSystemConfigs := []imagecustomizerapi.FileSystem{
+		{
+			DeviceId: "esp",
+			Type:     imagecustomizerapi.FileSystemTypeFat32,
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path:    "/boot/efi",
+				Options: "umask=0077",
+			},
+		},
+		{
+			DeviceId: "rootfs",
+			Type:     imagecustomizerapi.FileSystemTypeExt4,
+			MountPoint: &imagecustomizerapi.MountPoint{
+				Path: "/",
+			},
+		},
+	}
+
+	installOSFunc := func(imageChroot *safechroot.Chroot) error {
+		// At the point when this copy will be executed, both the boot and the root
+		// partitions will be mounted, and the files of /boot/efi will land on the
+		// the boot partition, while the rest will be on the rootfs partition.
+		return copyPartitionFiles(squashMountDir+"/.", imageChroot.RootDir())
+	}
+
+	fancyRawImage := rawImageFile
+	fancyChrootDir := "fancy-raw-image"
+
+	err = createNewImage(fancyRawImage, diskConfig, fileSystemConfigs, buildDir, fancyChrootDir, installOSFunc)
 	if err != nil {
-		return fmt.Errorf("failed to copy rootfs contents to a writeable folder (%s):\n%w", writeableMountDir, err)
+		return fmt.Errorf("failed to copy squashfs into new fancy image (%s):\n%w", fancyRawImage, err)
 	}
 
 	// unmount raw image and delete mount dir

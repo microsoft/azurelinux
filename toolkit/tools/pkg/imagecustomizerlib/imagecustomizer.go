@@ -128,6 +128,8 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		isInputImageIso = true
 	}
 
+	var isoBuilder *LiveOSIsoBuilder
+
 	// If iso, explore...
 	if isInputImageIso {
 		logger.Log.Debugf("---- dev ---- input is iso")
@@ -153,11 +155,6 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			return fmt.Errorf("failed to create writeable image:\n%w", err)
 		}
 
-		err = isoBuilder.recreateLiveOSIsoImage(baseConfigPath, config.Iso, outputImageDir, outputImageBase)
-		if err != nil {
-			return fmt.Errorf("failed to create LiveOS ISO:\n%w", err)
-		}
-
 		// return fmt.Errorf("FAKE FAKE FAKE error to return early.")
 	} else {
 
@@ -168,6 +165,15 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 		}
+	}
+
+	osCustomizations := true
+	if !osCustomizations {
+		err = isoBuilder.recreateLiveOSIsoImage(baseConfigPath, config.Iso, outputImageDir, outputImageBase)
+		if err != nil {
+			return fmt.Errorf("failed to create LiveOS ISO:\n%w", err)
+		}
+	} else {
 
 		// Customize the partitions.
 		partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
