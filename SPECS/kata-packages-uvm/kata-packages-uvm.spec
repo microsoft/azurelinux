@@ -96,7 +96,7 @@ Requires:       golang
 %files coco-sign
 
 %changelog
-* Thu Apr 11 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-3.cm2
+* Thu Apr 11 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-3
 - Add cifs-utils to the list of dependencies
 
 * Tue Feb 06 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-2
