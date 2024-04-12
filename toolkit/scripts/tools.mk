@@ -91,6 +91,9 @@ clean-go-tools:
 	rm -rf $(TOOL_BINS_DIR)
 	rm -rf $(BUILD_DIR)/tools
 
+go_ldflags := 	-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION) \
+				-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)
+
 # Matching rules for the above targets
 # Tool specific pre-requisites are tracked via $(go-util): $(shell find...) dynamic variable defined above
 ifneq ($(REBUILD_TOOLS),y)
@@ -108,20 +111,16 @@ else
 # Rebuild the go tools as needed
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
-		TOOLKIT_VER="-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" && \
-		IMGCUST_VER="-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)" && \
-		go test -ldflags="$$TOOLKIT_VER $$IMGCUST_VER" -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
+		go test -ldflags="$(go_ldflags)" -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
 		CGO_ENABLED=0 go build \
-			-ldflags="$$TOOLKIT_VER $$IMGCUST_VER" \
+			-ldflags="$(go_ldflags)" \
 			-o $(TOOL_BINS_DIR)
 endif
 
 # Runs tests for common components
 $(BUILD_DIR)/tools/internal.test_coverage: $(go_internal_files) $(go_imagegen_files) $(STATUS_FLAGS_DIR)/got_go_deps.flag
 	cd $(TOOLS_DIR)/$* && \
-		TOOLKIT_VER="-X github.com/microsoft/azurelinux/toolkit/tools/internal/exe.ToolkitVersion=$(RELEASE_VERSION)" && \
-		IMGCUST_VER="-X github.com/microsoft/azurelinux/toolkit/tools/pkg/imagecustomizerlib.ToolVersion=$(IMAGE_CUSTOMIZER_FULL_VERSION)" && \
-		go test -ldflags="$$TOOLKIT_VER $$IMGCUST_VER" -test.short -covermode=atomic -coverprofile=$@ ./...
+		go test -ldflags="$(go_ldflags)" -test.short -covermode=atomic -coverprofile=$@ ./...
 
 # Downloads all the go dependencies without using sudo, so we don't break other go use cases for the user.
 # We can check if $SUDO_USER is set (the user who invoked sudo), and if so, use that user to run go get via sudo -u.
