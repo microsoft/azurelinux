@@ -1,0 +1,25 @@
+diff -ruN a/cloudinit/distros/photon.py b/cloudinit/distros/photon.py
+--- a/cloudinit/distros/photon.py	2023-12-14 09:17:35.000000000 -0800
++++ b/cloudinit/distros/photon.py	2024-03-20 14:34:15.375591963 -0700
+@@ -45,7 +45,6 @@
+                 LOG.warning(
+                     "Running %s resulted in stderr output: %s", cmd, err
+                 )
+-                return True, out, err
+             return False, out, err
+         except subp.ProcessExecutionError:
+             util.logexc(LOG, "Command %s failed", cmd)
+diff -ruN a/tests/unittests/distros/test_photon.py b/tests/unittests/distros/test_photon.py
+--- a/tests/unittests/distros/test_photon.py	2023-12-14 09:17:35.000000000 -0800
++++ b/tests/unittests/distros/test_photon.py	2024-03-20 14:57:38.141906589 -0700
+@@ -42,11 +42,6 @@
+         ret = self.distro._read_hostname(hostfile)
+         self.assertEqual(ret, hostname)
+ 
+-        self.logs.truncate(0)
+-        m_subp.return_value = (None, "bla")
+-        self.distro._write_hostname(hostname, None)
+-        self.assertIn("Error while setting hostname", self.logs.getvalue())
+-
+     @mock.patch("cloudinit.net.generate_fallback_config")
+     def test_fallback_netcfg(self, m_fallback_cfg):

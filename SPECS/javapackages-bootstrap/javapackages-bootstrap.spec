@@ -13,7 +13,7 @@
 
 Name:           javapackages-bootstrap
 Version:        1.5.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A means of bootstrapping Java Packages Tools
 # For detailed info see the file javapackages-bootstrap-PACKAGE-LICENSING
 License:        ASL 2.0 and ASL 1.1 and (ASL 2.0 or EPL-2.0) and (EPL-2.0 or GPLv2 with exceptions) and MIT and (BSD with advertising) and BSD-3-Clause and EPL-1.0 and EPL-2.0 and CDDL-1.0 and xpp and CC0 and Public Domain
@@ -25,6 +25,7 @@ Source0:        https://github.com/fedora-java/javapackages-bootstrap/releases/d
 # License breakdown
 Source1:        javapackages-bootstrap-PACKAGE-LICENSING
 Source2:        ignore.upstream.patch.txt
+Source3:        guava.xml
 
 Source1002:     apache-pom.tar.xz
 Source1001:     ant.tar.xz
@@ -52,7 +53,7 @@ Source1023:     easymock.tar.xz
 Source1024:     felix-parent-pom.tar.xz
 Source1025:     felix-utils.tar.xz
 Source1026:     fusesource-pom.tar.xz
-Source1027:     guava.tar.xz
+Source1027:     guava-32.1.3b.tar.xz
 Source1028:     guice.tar.xz
 Source1029:     hamcrest.tar.xz
 Source1030:     httpcomponents-client.tar.xz
@@ -138,6 +139,7 @@ Source1108:     xz-java.tar.xz
 Patch0:         0001-Bind-to-OpenJDK-11-for-runtime.patch
 Patch1:         0001-Remove-usage-of-ArchiveStreamFactory.patch
 Patch2:         CVE-2023-37460.patch
+Patch3:         Internal-Java-API.patch
 
 Provides:       bundled(ant) = 1.10.9
 Provides:       bundled(apache-parent) = 23
@@ -165,7 +167,7 @@ Provides:       bundled(easymock) = 4.2
 Provides:       bundled(felix-parent) = 7
 Provides:       bundled(felix-utils) = 1.11.6
 Provides:       bundled(fusesource-pom) = 1.12
-Provides:       bundled(guava) = 30.1
+Provides:       bundled(guava) = 32.1.3
 Provides:       bundled(google-guice) = 4.2.3
 Provides:       bundled(hamcrest) = 2.2
 Provides:       bundled(httpcomponents-client) = 4.5.11
@@ -252,6 +254,7 @@ BuildRequires:  byaccj
 BuildRequires:  msopenjdk-11
 BuildRequires:  javapackages-generators
 BuildRequires:  java-devel
+BuildRequires:  jurand
 
 Requires:       bash
 Requires:       coreutils
@@ -277,11 +280,11 @@ XMvn, allowing JPT to be used before one builds XMvn package.
 
 %prep
 %setup -q
-
+%patch 3 -p2
 # leave out the first source as it has already been extracted
 # leave out licensing breakdown file
 # leave ignore patch text file
-other_sources=$(echo %{sources} | cut -d' ' -f4-)
+other_sources=$(echo %{sources} | cut -d' ' -f5-)
 
 for source in ${other_sources}
 do
@@ -297,11 +300,28 @@ pushd "downstream/plexus-archiver"
 %patch2 -p1 
 popd
 
+# remove guava.xml from javapackage-bootstrap 1.5.0
+# import guava.xml 32.1.3 from Fedora 40
+# edit version from guava.properties
+pushd "project"
+rm guava.xml
+cp %{SOURCE3} .
+sed -i 's|version=30.1|version=32.1.3|' guava.properties
+sed -i 's|ref=v@.@|ref=v@.@.@|' guava.properties
+popd
+
+
 for patch_path in patches/*/*
 do
   package_name="$(echo ${patch_path} | cut -f2 -d/)"
   patch_name="$(echo ${patch_path} | cut -f3 -d/)"
-  
+
+  # ignore the patch provided by upstream javapackages-bootstrap as guava version has changed
+  # and no longer compatible
+  if [[ "$patch_name" == "0001-Fix-compilation-error-with-ECJ.patch" || "$patch_name" == "0002-Remove-use-of-sun.misc.Unsafe.patch" ]]
+  then
+      continue
+  fi
   pushd "downstream/${package_name}"
   # not applying some patches provided by javapackages-bootstrap
   # some upstream patches become not applicable when upgrading any of the sources
@@ -364,6 +384,9 @@ sed -i 's|/usr/lib/jvm/java-11-openjdk|%{java_home}|' %{buildroot}%{launchersPat
 %doc AUTHORS
 
 %changelog
+* Fri Mar 22 2024 Riken Maharjan <rmaharjan@microsoft.com> - 1.5.0-5
+- Update Guava to fix CVE-2023-2976 using Fedora 40 (License: MIT).
+
 * Fri Aug 11 2023 Saul Paredes <saulparedes@microsoft.com> - 1.5.0-4
 - Patch plexus-archiver to fix CVE-2023-37460
 

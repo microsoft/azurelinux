@@ -25,7 +25,7 @@
 Summary:        Open Virtual Machine Tools for virtual machines hosted on VMware
 Name:           open-vm-tools
 Version:        11.3.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -36,6 +36,8 @@ Source2:        %{vgauthdaemon}.service
 Source3:        vmblock.mount
 Source4:        open-vm-tools.conf
 Source5:        vmtoolsd.pam
+Patch0:         CVE-2023-34058.patch
+Patch1:         CVE-2023-34059.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 #BuildRequires:    doxygen
@@ -122,7 +124,7 @@ useful for verifying the functioning of %{name} in VMware virtual
 machines.
 
 %prep
-%autosetup -n %{name}-%{version}-%{toolsbuild}
+%autosetup -p1 -n %{name}-%{version}-%{toolsbuild}
 
 %build
 # Required for regenerating configure script when
@@ -332,6 +334,9 @@ fi
 %{_bindir}/vmware-vgauth-smoketest
 
 %changelog
+* Fri Mar 28 2024 Adit Jha <aditjha@microsoft.com> - 11.3.0-3
+- Address CVE-2023-34058 and CVE-2023-34059
+
 * Wed Mar 16 2022 Matthew Torr <matthewtorr@microsoft.com> - 11.3.0-2
 - Reinstate ConditionVirtualization service option so that the services only run on VMware.
 
