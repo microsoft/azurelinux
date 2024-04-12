@@ -9,6 +9,7 @@ URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Standard proto files source: https://github.com/open-telemetry/opentelemetry-proto
 Source1:        opentelemetry-proto-1.1.0.tar.gz
+BuildRequires:  abseil-cpp-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  curl-devel
@@ -16,11 +17,10 @@ BuildRequires:  gmock-devel
 BuildRequires:  grpc-devel
 BuildRequires:  grpc-plugins
 BuildRequires:  gtest-devel
-BuildRequires:  abseil-cpp-devel
 BuildRequires:  nlohmann-json-devel
+BuildRequires:  protobuf-c-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  protobuf-static
-BuildRequires:  protobuf-c-devel
 BuildRequires:  re2-devel
 BuildRequires:  systemd-devel
 Requires:       abseil-cpp

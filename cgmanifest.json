@@ -15534,8 +15534,8 @@
         "type": "other",
         "other": {
           "name": "opentelemetry-cpp",
-          "version": "1.10.0",
-          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.10.0.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.14.2.tar.gz"
         }
       }
     },
@@ -21604,8 +21604,8 @@
         "type": "other",
         "other": {
           "name": "protobuf-c",
-          "version": "1.4.1",
-          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.4.1/protobuf-c-1.4.1.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/protobuf-c/protobuf-c/releases/download/v1.5.0/protobuf-c-1.5.0.tar.gz"
         }
       }
     },

@@ -122,7 +122,7 @@ ctest --progress --output-on-failure
 
 %changelog
 * Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 25.3-1
-- Upgraded to version 3.25.3.
+- Upgraded to version 25.3.
 - Switching to building with cmake and producing cmake package files.
 - Updated the %%check stage.
 
