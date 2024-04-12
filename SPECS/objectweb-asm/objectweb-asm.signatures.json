@@ -7,7 +7,6 @@
   "asm-test-9.6.pom": "c39ee7e11f382a2e8352a29cc87daf6ec8445dfc595c1bdb512620b579ab165f",
   "asm-tree-9.6.pom": "1bcb481d7fc16b955bb60ca07c8cfa2424bcee78bdc405bba31c7d6f5dc2d113",
   "asm-util-9.6.pom": "52c5c1d357404779d1a99b49a85bf9d3a085025b8516cb73dbef77c8ae34005e",
-  "generate-tarball.sh": "eb68ca4078c4e7823285fa9fc96127e2f0527af57290cdb62c2fa1cbd12c0e72",
   "objectweb-asm-9.6.tar.gz": "b99a90ae698a29e1dbb45d7302920c5c74ce5403f69de469b08aabf9b1d420c0",
   "tools-retrofitter.pom": "4d0747996d4dc34e8f0d24e3c1175860bbb3efae9cccaa2537fa23fa8b535484"
  }

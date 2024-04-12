@@ -25,7 +25,6 @@ Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://asm.ow2.io/
-# ./generate-tarball.sh
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Source1:        aggregator.pom
 Source2:        https://repo1.maven.org/maven2/org/ow2/asm/asm/%{version}/asm-%{version}.pom
@@ -34,7 +33,6 @@ Source4:        https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/%{version
 Source5:        https://repo1.maven.org/maven2/org/ow2/asm/asm-test/%{version}/asm-test-%{version}.pom
 Source6:        https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/%{version}/asm-tree-%{version}.pom
 Source7:        https://repo1.maven.org/maven2/org/ow2/asm/asm-util/%{version}/asm-util-%{version}.pom
-Source9:        generate-tarball.sh
 Source10:       tools-retrofitter.pom
 
 BuildRequires:  lujavrite
@@ -103,6 +101,7 @@ done
 %changelog
 * Thu Apr 04 2024 Mitch Zhu <mitchzhu@microsoft.com> - 9.6-1
 - Upgrade to version 9.6
+- Import build and install section from Fedora 40 (license: MIT).
 
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.2-5
 - Updating naming for 3.0 version of Azure Linux.
