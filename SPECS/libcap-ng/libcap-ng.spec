@@ -9,13 +9,10 @@ Group:          System Environment/Libraries
 URL:            https://people.redhat.com/sgrubb/libcap-ng
 Source0:        https://people.redhat.com/sgrubb/libcap-ng/%{name}-%{version}.tar.gz
 Patch1:         libcap-ng-0.8.5-python-exception.patch
-BuildRequires:  python3-devel
-BuildRequires:  python-setuptools
 BuildRequires:  swig
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:  kernel-headers
-BuildRequires:  libattr-devel
 Provides:       %{name}-utils = %{version}-%{release}
 
 %description
