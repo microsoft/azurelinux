@@ -73,10 +73,6 @@ os:
       idType: part-label
       id: root-hash
 
-  postInstallScripts:
-    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
-  - path: scripts/ssh-move-host-keys.sh
-
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
     files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
@@ -91,3 +87,8 @@ os:
       # Your SSH public key here.
     secondaryGroups:
     - sudo
+
+scripts:
+  postCustomization:
+    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
+  - path: scripts/ssh-move-host-keys.sh

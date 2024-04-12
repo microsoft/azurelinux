@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.ow2</groupId>
-    <artifactId>ow2</artifactId>
-    <version>1.5</version>
-  </parent>
   <groupId>org.ow2.asm</groupId>
-  <artifactId>asm-tree</artifactId>
-  <version>7.2</version>
-  <name>asm-tree</name>
-  <description>Tree API of ASM, a very small and fast Java bytecode manipulation framework</description>
+  <artifactId>asm-util</artifactId>
+  <version>9.6</version>
+  <name>asm-util</name>
+  <description>Utilities for ASM, a very small and fast Java bytecode manipulation framework</description>
   <url>http://asm.ow2.io/</url>
   <inceptionYear>2000</inceptionYear>
   <organization>
@@ -77,26 +71,25 @@
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <version>7.2</version>
+      <version>9.6</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-test</artifactId>
-      <version>7.2</version>
-      <scope>test</scope>
+      <artifactId>asm-tree</artifactId>
+      <version>9.6</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>5.3.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <version>5.3.2</version>
-      <scope>test</scope>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-analysis</artifactId>
+      <version>9.6</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
+  <parent>
+    <groupId>org.ow2</groupId>
+    <artifactId>ow2</artifactId>
+    <version>1.5.1</version>
+  </parent>
 </project>

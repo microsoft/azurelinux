@@ -14362,8 +14362,8 @@
         "type": "other",
         "other": {
           "name": "objectweb-asm",
-          "version": "7.2",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/objectweb-asm-7.2.tar.xz"
+          "version": "9.6",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/objectweb-asm-9.6.tar.gz"
         }
       }
     },
@@ -20753,8 +20753,8 @@
         "type": "other",
         "other": {
           "name": "pesign",
-          "version": "0.112",
-          "downloadUrl": "https://github.com/vathpela/pesign/releases/download/0.112/pesign-0.112.tar.bz2"
+          "version": "116",
+          "downloadUrl": "https://github.com/rhboot/pesign/releases/download/116/pesign-116.tar.bz2"
         }
       }
     },
