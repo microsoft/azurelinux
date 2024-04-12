@@ -8061,8 +8061,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.1.3",
-          "downloadUrl": "https://github.com/kata-containers/kata-containers/archive/refs/tags/3.1.3.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8071,8 +8071,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-cc",
-          "version": "0.6.1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/cc-0.6.1.tar.gz"
+          "version": "3.2.0.azl0",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.2.0.azl0.tar.gz"
         }
       }
     },
@@ -8161,8 +8161,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "5.15.126.mshv3",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv3.tar.gz"
+          "version": "5.15.126.mshv9",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-mshv-5.15.126.mshv9.tar.gz"
         }
       }
     },
@@ -8181,8 +8181,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.1.0.mshv11",
-          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv11.tar.gz"
+          "version": "6.1.0.mshv16",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"
         }
       }
     },
@@ -10171,8 +10171,8 @@
         "type": "other",
         "other": {
           "name": "libnbd",
-          "version": "1.12.1",
-          "downloadUrl": "https://libguestfs.org/download/libnbd/1.12-stable/libnbd-1.12.1.tar.gz"
+          "version": "1.18.3",
+          "downloadUrl": "https://libguestfs.org/download/libnbd/1.18-stable/libnbd-1.18.3.tar.gz"
         }
       }
     },
@@ -13142,8 +13142,8 @@
         "type": "other",
         "other": {
           "name": "moby-containerd-cc",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.1.tar.gz"
+          "version": "1.7.7",
+          "downloadUrl": "https://github.com/microsoft/confidential-containers-containerd/archive/refs/tags/1.7.7.tar.gz"
         }
       }
     },
@@ -20753,8 +20753,8 @@
         "type": "other",
         "other": {
           "name": "pesign",
-          "version": "0.112",
-          "downloadUrl": "https://github.com/vathpela/pesign/releases/download/0.112/pesign-0.112.tar.bz2"
+          "version": "116",
+          "downloadUrl": "https://github.com/rhboot/pesign/releases/download/116/pesign-116.tar.bz2"
         }
       }
     },
@@ -22235,6 +22235,16 @@
           "name": "python-ecdsa",
           "version": "0.18.0",
           "downloadUrl": "https://github.com/tlsfuzzer/python-ecdsa/archive/refs/tags/python-ecdsa-0.18.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-editables",
+          "version": "0.5",
+          "downloadUrl": "https://github.com/pfmoore/editables/archive/0.5/editables-0.5.tar.gz"
         }
       }
     },
@@ -24863,8 +24873,8 @@
         "type": "other",
         "other": {
           "name": "python-werkzeug",
-          "version": "2.2.3",
-          "downloadUrl": "https://github.com/pallets/werkzeug/archive/2.2.3.tar.gz"
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/pallets/werkzeug/archive/3.0.1.tar.gz"
         }
       }
     },

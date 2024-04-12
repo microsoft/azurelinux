@@ -9,7 +9,8 @@ storage:
       size: 8M
 
     - id: rootfs
-      start: 9
+      start: 9M
+      size: grow
 
   bootType: legacy
 

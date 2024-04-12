@@ -164,7 +164,7 @@ os:
     - [modules](#modules-module)
       - [module type](#module-type)
         - [name](#module-name)
-        - [loadMode](#loadMode-string)
+        - [loadMode](#loadmode-string)
         - [options](#options-mapstring-string)
     - [overlay type](#overlay-type)
     - [verity type](#verity-type)
@@ -243,7 +243,8 @@ Supported options:
 
 The size of the disk.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -700,7 +701,8 @@ Required.
 
 The start location (inclusive) of the partition.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -708,14 +710,16 @@ Must be a multiple of 1 MiB.
 
 The end location (exclusive) of the partition.
 
-The End and Size fields cannot be specified at the same time.
+The `end` and `size` fields cannot be specified at the same time.
 
-Either the Size or End field is required for all partitions except for the last
+Either the `size` or `end` field is required for all partitions except for the last
 partition.
-When both the Size and End fields are omitted, the last partition will fill the
-remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
+When both the `size` and `end` fields are omitted or when the `size` field is set to the
+value `grow`, the last partition will fill the remainder of the disk based on the disk's
+[maxSize](#maxsize-uint64) field.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -723,7 +727,11 @@ Must be a multiple of 1 MiB.
 
 The size of the partition.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported formats:
+
+- `<NUM>(K|M|G|T)`: An explicit size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB (`T`).
+
+- `grow`: Fill up the remainder of the disk. Must be the last partition.
 
 Must be a multiple of 1 MiB.
 
