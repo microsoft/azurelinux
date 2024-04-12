@@ -1,45 +1,39 @@
-# We must match the C++ standard to the one used to build our abseil-cpp.
-# Otherwise the build will fail.
-%global cpp_std 17
-
 Summary:        Open source remote procedure call (RPC) framework
 Name:           grpc
-Version:        1.62.0
-Release:        1%{?dist}
+Version:        1.42.0
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:   Mariner
 Group:          Applications/System
 URL:            https://www.grpc.io
 Source0:        https://github.com/grpc/grpc/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-submodules.tar.gz
-Patch0:         grpcio-cython3.patch
 BuildRequires:  abseil-cpp-devel
-BuildRequires:  build-essential
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
-BuildRequires:  ninja-build
-BuildRequires:  openssl-devel
+BuildRequires:  git
 BuildRequires:  protobuf-devel
-BuildRequires:  protobuf-static
 BuildRequires:  re2-devel
-BuildRequires:  systemd-devel
 BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  ninja-build
 Requires:       abseil-cpp
 Requires:       c-ares
 Requires:       openssl
 Requires:       protobuf
-Requires:       systemd
 Requires:       zlib
 
 # Python
-BuildRequires:  python3-devel
-BuildRequires:  python3-Cython
-BuildRequires:  python3-six
-BuildRequires:  python3-wheel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-protobuf
+BuildRequires:      build-essential
+BuildRequires:      python3-devel
+BuildRequires:      python3-Cython
+BuildRequires:      python3-six
+BuildRequires:      python3-wheel
+BuildRequires:      python3-setuptools
+BuildRequires:      python3-protobuf
+
 
 %description
 gRPC is a modern, open source, high-performance remote procedure call (RPC) framework that can run anywhere. It enables client and server applications to communicate transparently, and simplifies the building of connected systems.
@@ -58,6 +52,7 @@ Summary:        Plugins files for grpc
 Requires:       %{name} = %{version}-%{release}
 Requires:       protobuf
 
+
 %description plugins
 The grpc-plugins package contains the grpc plugins.
 
@@ -70,62 +65,52 @@ Requires:       python3-six
 %description -n python3-grpcio
 Python language bindings for gRPC.
 
+
 %prep
 %setup -q -n %{name}-%{version}
 %setup -T -D -a 1
-%patch 0 -p1
-
-# remove third party code taken from installed packages (build requires)
-rm -r %{_builddir}/%{name}-%{version}/third_party/abseil-cpp
-rm -r %{_builddir}/%{name}-%{version}/third_party/boringssl-with-bazel
-rm -r %{_builddir}/%{name}-%{version}/third_party/cares
-rm -r %{_builddir}/%{name}-%{version}/third_party/protobuf
-rm -r %{_builddir}/%{name}-%{version}/third_party/re2
-rm -r %{_builddir}/%{name}-%{version}/third_party/zlib
 
 %build
-# !!!!! DO NOT USE CMAKE or python RPM MACROS !!!!!
-# !!!!! This will the block build             !!!!!
+# Updating used C++ version to be compatible with the build dependencies.
+# Without this fix 'grpc' compiles with C++11 against 'abseil-cpp' headers,
+# which generate a different set of APIs than the ones provided by the BR 'abseil-cpp'.
+CXX_VERSION=$(c++ -dM -E -x c++ /dev/null | grep -oP "(?<=__cplusplus \d{2})\d{2}")
 
 mkdir -p cmake/build
 pushd cmake/build
-cmake ../.. -GNinja \
-   -DBUILD_SHARED_LIBS=ON                   \
-   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}   \
-   -DCMAKE_BUILD_TYPE=Release               \
-   -DCMAKE_CXX_STANDARD=%{cpp_std}          \
-   -DgRPC_INSTALL=ON                        \
-   -DgRPC_BUILD_TESTS=OFF                   \
-   -DgRPC_ABSL_PROVIDER:STRING=package      \
-   -DgRPC_CARES_PROVIDER:STRING=package     \
-   -DgRPC_PROTOBUF_PROVIDER:STRING=package  \
-   -DgRPC_RE2_PROVIDER:STRING=package       \
-   -DgRPC_SSL_PROVIDER:STRING=package       \
-   -DgRPC_ZLIB_PROVIDER:STRING=package
-
-# limit parallel build to avoid resource shortage while building
-NB_CORE_TO_USE=$(($(nproc) / 2))
-if [[ $NB_CORE_TO_USE -eq 0 ]]; then
-  NB_CORE_TO_USE=1
-fi
-cmake --build . -j$NB_CORE_TO_USE
-
+%cmake ../.. -GNinja                         \
+   -DgRPC_INSTALL=ON                         \
+   -DBUILD_SHARED_LIBS=ON                    \
+   -DCMAKE_BUILD_TYPE=Release                \
+   -DCMAKE_CXX_STANDARD=$CXX_VERSION         \
+   -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}    \
+   -DgRPC_ABSL_PROVIDER:STRING='package'     \
+   -DgRPC_CARES_PROVIDER:STRING='package'    \
+   -DgRPC_PROTOBUF_PROVIDER:STRING='package' \
+   -DgRPC_RE2_PROVIDER:STRING='package'      \
+   -DgRPC_SSL_PROVIDER:STRING='package'      \
+   -DgRPC_ZLIB_PROVIDER:STRING='package'
+%cmake_build 
 popd
+#uncommenting below line causes the whole build to get stuck in aarch64 machine 
+#py3_build
 
 %install
 pushd cmake/build
-DESTDIR="%{buildroot}" cmake --install .
+%cmake_install
 popd
 
-export GRPC_BUILD_WITH_BORING_SSL_ASM=false
-export GRPC_PYTHON_BUILD_SYSTEM_ABSL=true
-export GRPC_PYTHON_BUILD_SYSTEM_CARES=true
-export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=true
-export GRPC_PYTHON_BUILD_SYSTEM_RE2=true
-export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=true
-export GRPC_PYTHON_BUILD_WITH_CYTHON=true
-export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++%{cpp_std}"
-%{__python3} setup.py install --root %{buildroot}
+#python
+export GRPC_PYTHON_BUILD_WITH_CYTHON=True
+export GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=True
+export GRPC_PYTHON_BUILD_SYSTEM_ZLIB=True
+export GRPC_PYTHON_BUILD_SYSTEM_CARES=True
+export GRPC_PYTHON_BUILD_SYSTEM_RE2=True
+export GRPC_PYTHON_BUILD_SYSTEM_ABSL=True
+#uncommenting below line causes the whole build to get stuck in aarch64 machine 
+#py3_install
+#using macros causes build to get stuck forever
+%{__python3} setup.py install -O1 --root %{buildroot}
 
 %files
 %license LICENSE
@@ -136,7 +121,18 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++%{cpp_std}"
 %{_includedir}/grpc
 %{_includedir}/grpc++
 %{_includedir}/grpcpp
-%{_libdir}/*.so
+%{_libdir}/libaddress_sorting.so
+%{_libdir}/libgpr.so
+%{_libdir}/libgrpc++.so
+%{_libdir}/libgrpc++_alts.so
+%{_libdir}/libgrpc++_error_details.so
+%{_libdir}/libgrpc++_reflection.so
+%{_libdir}/libgrpc++_unsecure.so
+%{_libdir}/libgrpc.so
+%{_libdir}/libgrpc_plugin_support.so
+%{_libdir}/libgrpc_unsecure.so
+%{_libdir}/libgrpcpp_channelz.so
+%{_libdir}/libupb.so
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/cmake/*
 
@@ -144,16 +140,14 @@ export GRPC_PYTHON_CFLAGS="%{optflags} -std=c++%{cpp_std}"
 %license LICENSE
 %{_bindir}/grpc_*_plugin
 
+
 %files -n python3-grpcio
 %license LICENSE
 %{python3_sitearch}/grpc
 %{python3_sitearch}/grpcio-%{version}-py%{python3_version}.egg-info
 
-%changelog
-* Thu Mar 07 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.62.0-1
-- Upgrade to 1.62.0
-- Import 'grpcio-cython3.patch' from OpenSUSE
 
+%changelog
 * Thu Oct 19 2023 Dan Streetman <ddstreet@ieee.org> - 1.42.0-7
 - Bump release to rebuild with updated version of Go.
 

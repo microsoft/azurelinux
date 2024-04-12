@@ -1,23 +1,27 @@
 %global nginx_user nginx
-%global njs_version 0.8.3
+%global njs_version 0.7.12
+%global opentelemetry_cpp_contrib_git_commit 37e4466d882cbddff6f607a20fe327060de76166
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.25.4
-Release:        1%{?dist}
+Version:        1.22.1
+Release:        11%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Distribution:   Mariner
 Group:          Applications/System
 URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+Source3:        https://github.com/open-telemetry/opentelemetry-cpp-contrib/archive/%{opentelemetry_cpp_contrib_git_commit}.tar.gz#/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}.tar.gz
+Patch0:         CVE-2023-44487.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
+BuildRequires:  pcre-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  readline-devel
 BuildRequires:  which
@@ -38,15 +42,35 @@ The nginx-filesystem package contains the basic directory layout
 for the Nginx server including the correct permissions for the
 directories.
 
+%package otel_ngx_module
+License:        Apache-2.0
+Summary:        OpenTelemetry Nginx Module
+BuildRequires:  grpc-devel
+BuildRequires:  opentelemetry-cpp-devel
+BuildRequires:  protobuf-devel
+Requires:       opentelemetry-cpp
+
+%description otel_ngx_module
+The OpenTelemetry module for Nginx
+
 %prep
 %autosetup -p1
 pushd ../
 mkdir nginx-njs
 tar -C nginx-njs -xf %{SOURCE2}
+mkdir otel-cpp-contrib
+tar -C otel-cpp-contrib -xf %{SOURCE3}
+# The following change is a build break in upstream and a PR has been raised to fix it.
+# PR: https://github.com/open-telemetry/opentelemetry-cpp-contrib/pull/314
+sed -i \
+        '/\#include <opentelemetry\/sdk\/trace\/processor.h>$/a \#include <opentelemetry\/sdk\/trace\/batch_span_processor_options.h>' \
+        otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx/src/otel_ngx_module.cpp
+popd
 
 %build
 sh configure \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
+    --add-dynamic-module=../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/instrumentation/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
     --group=%{nginx_user} \
@@ -66,6 +90,7 @@ sh configure \
     --with-http_sub_module \
     --with-http_v2_module \
     --with-ipv6 \
+    --with-pcre \
     --with-stream \
     --with-compat
 
@@ -115,14 +140,11 @@ exit 0
 %files filesystem
 %dir %{_sysconfdir}/%{name}
 
+%files otel_ngx_module
+%license ../otel-cpp-contrib/opentelemetry-cpp-contrib-%{opentelemetry_cpp_contrib_git_commit}/LICENSE
+%{_sysconfdir}/%{name}/modules/otel_ngx_module.so
+
 %changelog
-* Wed Mar 20 2024 Betty Lakes <bettylakes@microsoft.com> - 1.25.4-1
-- Upgrade to 1.25.4, upgrade njs to 0.8.3
-- Move from pcre to pcre2
-
-* Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.25.2-1
-- Auto-upgrade to 1.25.2 - Azure Linux 3.0 - package upgrades
-
 * Thu Oct 05 2023 Dan Streetman <ddstreet@ieee.org> - 1.22.1-11
 - Fix CVE-2023-44487
 

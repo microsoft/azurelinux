@@ -1,23 +1,23 @@
-%global cpp_std 17
-
 Summary:        C++ Common Libraries
 Name:           abseil-cpp
-Version:        20240116.0
+Version:        20220623.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://abseil.io
 Source0:        https://github.com/abseil/abseil-cpp/archive/%{version}/%{name}-%{version}.tar.gz
-# Despite the name, this library is required by external projects to
-# build their tests against Abseil.
-Patch0:         add_missing_random_internal_mock_overload_set.patch
 
 BuildRequires:  cmake >= 3.20.0
 BuildRequires:  gcc
-BuildRequires:  gmock-devel >= 1.12.0
-BuildRequires:  gtest-devel >= 1.12.0
 BuildRequires:  make
+
+%if %{with_check}
+BuildRequires:  gmock >= 1.12.0
+BuildRequires:  gmock-devel >= 1.12.0
+BuildRequires:  gtest >= 1.12.0
+BuildRequires:  gtest-devel >= 1.12.0
+%endif
 
 %description
 Abseil is an open-source collection of C++ library code designed to augment
@@ -47,42 +47,32 @@ Development headers for %{name}
 %build
 mkdir build
 pushd build
-# We enable "ABSL_BUILD_TEST_HELPERS" as it produces abseil artifacts required
-# by other packages to build their tests.
-# See: https://github.com/abseil/abseil-cpp/issues/1407.
 %cmake \
-  -DABSL_PROPAGATE_CXX_STD=ON       \
+  -DABSL_PROPAGATE_CXX_STD=ON \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DABSL_BUILD_TEST_HELPERS=ON      \
-  -DABSL_FIND_GOOGLETEST=ON         \
-  -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
-  -DCMAKE_CXX_STANDARD=%{cpp_std}   \
 %if %{with_check}
-  -DABSL_BUILD_TESTING=ON           \
-  -DBUILD_TESTING=ON                \
+  -DABSL_BUILD_TESTING=ON \
+  -DABSL_FIND_GOOGLETEST=ON \
+  -DABSL_USE_EXTERNAL_GOOGLETEST=ON \
+  -DBUILD_TESTING=ON \
 %else
-  -DBUILD_TESTING=OFF               \
+  -DBUILD_TESTING=OFF \
 %endif
   ..
-%cmake_build
+%make_build
 
 %install
 pushd build
-%cmake_install
+%make_install
 
 %check
-# Need to set the "TZDIR" environment variable to abseil's
-# time zones test directory to fix test "absl_time_test".
-# See: https://github.com/abseil/abseil-cpp/issues/329.
-export TZDIR=%{_builddir}/%{name}-%{version}/absl/time/internal/cctz/testdata/zoneinfo
-
 pushd build
-%ctest --output-on-failure
+ctest --output-on-failure
 
 %files
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
-%{_libdir}/libabsl_*.so.2401.*
+%{_libdir}/libabsl_*.so.2206.*
 
 %files devel
 %{_includedir}/absl
@@ -91,9 +81,6 @@ pushd build
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Mar 21 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 20240116.0-1
-- Updating to version 20240116.0.
-
 * Thu Jun 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 20220623.0-1
 - Updating to 20220623.0 to remove workaround patches for GTest.
 
