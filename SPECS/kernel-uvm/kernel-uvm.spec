@@ -11,7 +11,7 @@
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
 Version:        6.1.0.mshv16
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -154,6 +154,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Wed Mar 27 2024 Archana Choudhary <archana1@microsoft.com> - 6.1.0.mshv16-2
+- Enable CIFS modules
+
 * Thu Feb 29 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.1.0.mshv16-1
 - Auto-upgrade to 6.1.0.mshv16 for LSG v2402.26.1
 
