@@ -38,17 +38,6 @@ The nginx-filesystem package contains the basic directory layout
 for the Nginx server including the correct permissions for the
 directories.
 
-%package otel_ngx_module
-License:        Apache-2.0
-Summary:        OpenTelemetry Nginx Module
-BuildRequires:  grpc-devel
-BuildRequires:  opentelemetry-cpp-devel
-BuildRequires:  protobuf-devel
-Requires:       opentelemetry-cpp
-
-%description otel_ngx_module
-The OpenTelemetry module for Nginx
-
 %prep
 %autosetup -p1
 pushd ../
