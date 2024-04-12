@@ -15,7 +15,7 @@ BuildRequires:      python3-devel
 BuildRequires:      pyproject-rpm-macros
 BuildRequires:      python3-pip
 BuildRequires:      python3-setuptools
-BuildRequires:      python3-setuptools_scm
+BuildRequires:      python3-setuptools_scm >= 8.0.3-1
 BuildRequires:      python3-six
 BuildRequires:      python3-wheel
 
