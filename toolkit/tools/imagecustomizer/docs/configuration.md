@@ -861,11 +861,21 @@ scripts:
 
 Scripts to run at the end of the customization process.
 
-These scripts are run under a chroot of the customized OS.
+In particular, these scripts run after:
 
-Note: Most scripts should be added to [postCustomization](#postcustomization-script).
-Only add scripts to `finalizeCustomization` if you want to customize the
-`/etc/resolv.conf` file or you want manually set SELinux file labels.
+1. The `setfiles` command has been called to update/fix the SELinux files labels (if
+   SELinux is enabled), and
+
+2. The temporary `/etc/resolv.conf` file has been deleted,
+
+but before the conversion to the requested output type.
+(See, [Operation ordering](#operation-ordering) for details.)
+
+Most scripts should be added to [postCustomization](#postcustomization-script).
+Only add scripts to [finalizeCustomization](#finalizecustomization-script) if you want
+to customize the `/etc/resolv.conf` file or you want manually set SELinux file labels.
+
+These scripts are run under a chroot of the customized OS.
 
 Example:
 
