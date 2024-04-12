@@ -20,6 +20,8 @@ RUN mkdir -p /staging/etc \
 
 FROM $BASE_IMAGE AS final
 
+ARG USER_UID=65532
+ARG USER_GID=$USER_UID
 ARG EULA=@EULA_FILE@
 
 COPY $EULA .
