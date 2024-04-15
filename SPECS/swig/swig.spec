@@ -55,7 +55,7 @@ mkdir -p %{buildroot}%{_libdir}/ccache
 ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 %check
-make check PY3=1
+%make_build check PY3=1
 
 %files
 %license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES

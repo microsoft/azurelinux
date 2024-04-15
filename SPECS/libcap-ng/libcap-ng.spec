@@ -62,7 +62,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %files devel
 %defattr(-, root, root)
-%{_libdir}/*.so*
+%{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_includedir}/*.h
 %{_mandir}/man3/*
