@@ -1,6 +1,2 @@
 # Exclude documentation files by default
 %_excludedocs 1
-
-# Additional rules to exclude specific documentation files or directories
-%_exclude_path /usr/share/doc/*
-%_exclude_path /usr/share/man/*
