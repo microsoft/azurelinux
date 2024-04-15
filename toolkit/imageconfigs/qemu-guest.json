@@ -62,7 +62,7 @@
             ],
             "Hostname": "azure-linux",
             "DisableDocs": true,
-            "DisableLocales": true
+            "DisableRpmLocales": true
         }
     ]
 }

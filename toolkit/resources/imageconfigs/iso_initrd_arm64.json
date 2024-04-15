@@ -42,7 +42,7 @@
                 }
             ],
             "DisableDocs": true,
-            "DisableLocales": true
+            "DisableRpmLocales": true
         }
     ]
 }

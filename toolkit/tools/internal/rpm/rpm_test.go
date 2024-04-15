@@ -462,3 +462,25 @@ func TestDisableLocaleDefinesNil(t *testing.T) {
 	result := DisableLocaleDefines(nil)
 	assert.Equal(t, expectedDefines, result)
 }
+
+func TestOverrideLocaleDefines(t *testing.T) {
+	defines := map[string]string{
+		"dist":       ".azlX",
+		"with_check": "1",
+	}
+	expectedDefines := map[string]string{
+		"dist":           ".azlX",
+		"with_check":     "1",
+		"_install_langs": "ab:cd:ef",
+	}
+	result := OverrideLocaleDefines(defines, "ab:cd:ef")
+	assert.Equal(t, expectedDefines, result)
+}
+
+func TestOverrideLocaleDefinesNil(t *testing.T) {
+	expectedDefines := map[string]string{
+		"_install_langs": "ab:cd:ef",
+	}
+	result := OverrideLocaleDefines(nil, "ab:cd:ef")
+	assert.Equal(t, expectedDefines, result)
+}

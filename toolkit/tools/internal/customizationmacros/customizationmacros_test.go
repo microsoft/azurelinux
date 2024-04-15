@@ -187,41 +187,63 @@ func TestAddMacroFileComments(t *testing.T) {
 func TestAddCustomizationMacros(t *testing.T) {
 	// Define the test cases
 	testCases := []struct {
-		name           string
-		disableDocs    bool
-		disableLocales bool
-		expectError    bool
+		name                string
+		disableDocs         bool
+		DisableRpmLocales   bool
+		OverrideRpmLocales  string
+		expectError         bool
+		expectedDocMacro    string
+		expectedLocaleMacro string
 	}{
 		{
-			name:           "DisableDocs",
-			disableDocs:    true,
-			disableLocales: false,
-			expectError:    false,
+			name:              "DisableDocs",
+			disableDocs:       true,
+			DisableRpmLocales: false,
+			expectError:       false,
+			expectedDocMacro:  "%_excludedocs 1",
 		},
 		{
-			name:           "DisableLocales",
-			disableDocs:    false,
-			disableLocales: true,
-			expectError:    false,
+			name:                "DisableRpmLocales",
+			disableDocs:         false,
+			DisableRpmLocales:   true,
+			expectError:         false,
+			expectedLocaleMacro: "%_install_langs NONE",
 		},
 		{
-			name:           "DisableDocsAndLocales",
-			disableDocs:    true,
-			disableLocales: true,
-			expectError:    false,
+			name:                "DisableDocsAndLocales",
+			disableDocs:         true,
+			DisableRpmLocales:   true,
+			expectError:         false,
+			expectedDocMacro:    "%_excludedocs 1",
+			expectedLocaleMacro: "%_install_langs NONE",
 		},
 		{
-			name:           "EnableDocsAndLocales",
-			disableDocs:    false,
-			disableLocales: false,
-			expectError:    false,
+			name:              "EnableDocsAndLocales",
+			disableDocs:       false,
+			DisableRpmLocales: false,
+			expectError:       false,
+		},
+		{
+			name:                "OverrideRpmLocales",
+			disableDocs:         false,
+			DisableRpmLocales:   false,
+			OverrideRpmLocales:  "en:de:fr",
+			expectError:         false,
+			expectedLocaleMacro: "%_install_langs en:de:fr",
+		},
+		{
+			name:               "DisableRpmLocalesAndOverrideRpmLocales",
+			disableDocs:        false,
+			DisableRpmLocales:  true,
+			OverrideRpmLocales: "en_US",
+			expectError:        true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			err := AddCustomizationMacros(tempDir, tc.disableDocs, tc.disableLocales)
+			err := AddCustomizationMacros(tempDir, tc.disableDocs, tc.DisableRpmLocales, tc.OverrideRpmLocales)
 
 			if tc.expectError {
 				assert.Error(t, err)
@@ -229,7 +251,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 				assert.NoError(t, err)
 
 				// If neither are enabled, ensure no file
-				if !tc.disableDocs && !tc.disableLocales {
+				if !tc.disableDocs && !tc.DisableRpmLocales && tc.OverrideRpmLocales == "" {
 					_, err := os.Stat(filepath.Join(tempDir, "/usr/lib/rpm/macros.d"))
 					assert.True(t, os.IsNotExist(err))
 				}
@@ -242,7 +264,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 					// check we set the macro we wanted
 					foundMacro := false
 					for _, line := range docContents {
-						if line == "%_excludedocs 1" {
+						if line == tc.expectedDocMacro {
 							foundMacro = true
 							break
 						}
@@ -250,14 +272,14 @@ func TestAddCustomizationMacros(t *testing.T) {
 					assert.True(t, foundMacro)
 				}
 
-				if tc.disableLocales {
-					expectedLocaleFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", disableLocalesMacroFile)
+				if tc.DisableRpmLocales {
+					expectedLocaleFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", DisableRpmLocalesMacroFile)
 					localeContents, err := file.ReadLines(expectedLocaleFilePath)
 					assert.NoError(t, err)
 					// check we set the macro we wanted
 					foundMacro := false
 					for _, line := range localeContents {
-						if line == "%_install_langs NONE" {
+						if line == tc.expectedLocaleMacro {
 							foundMacro = true
 							break
 						}

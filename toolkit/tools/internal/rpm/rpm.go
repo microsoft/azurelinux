@@ -60,6 +60,9 @@ const (
 
 	// MaxCPUDefine specifies the max number of CPUs to use for parallel build
 	MaxCPUDefine = "_smp_ncpus_max"
+
+	// DisableAllLocalesString is used to disable all locales when installing RPMs by setting %_install_langs to "NONE"
+	DisableAllLocalesString = "NONE"
 )
 
 const (
@@ -283,7 +286,7 @@ func DefaultDistroDefines(runChecks bool, distTag string) map[string]string {
 	return defines
 }
 
-// DisableBuildRequiresDefines sets the macros to disable documentation files when installing RPMs.
+// DisableBuildRequiresDefines sets the macro to disable documentation files when installing RPMs.
 // - defines: optional map of defines to update. If nil, a new map will be created.
 func DisableDocumentationDefines(defines map[string]string) map[string]string {
 	if defines == nil {
@@ -293,15 +296,20 @@ func DisableDocumentationDefines(defines map[string]string) map[string]string {
 	return defines
 }
 
-// DisableLocaleDefines sets the macros to disable locales when installing RPMs.
+// DisableLocaleDefines sets the macro to disable locales when installing RPMs.
 // - defines: optional map of defines to update. If nil, a new map will be created.
 func DisableLocaleDefines(defines map[string]string) map[string]string {
+	return OverrideLocaleDefines(defines, DisableAllLocalesString)
+}
+
+// OverrideLocaleDefines sets the macro to override the default locales when installing RPMs.
+// - defines: optional map of defines to update. If nil, a new map will be created.
+// - overrideLocale: the locale string to set as the default. Should be of the form ""
+func OverrideLocaleDefines(defines map[string]string, overrideLocale string) map[string]string {
 	if defines == nil {
 		defines = make(map[string]string)
 	}
-	// NONE effectively disables locales since it does not match any locale.
-	// Instead it will use the default locales built in.
-	defines["_install_langs"] = "NONE"
+	defines["_install_langs"] = overrideLocale
 	return defines
 }
 
