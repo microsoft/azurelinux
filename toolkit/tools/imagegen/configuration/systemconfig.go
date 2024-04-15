@@ -41,7 +41,7 @@ type SystemConfig struct {
 	PreserveTdnfCache    bool                      `json:"PreserveTdnfCache"`
 	ReadOnlyVerityRoot   ReadOnlyVerityRoot        `json:"ReadOnlyVerityRoot"`
 	EnableHidepid        bool                      `json:"EnableHidepid"`
-	DisableDocs          bool                      `json:"DisableDocs"`
+	DisableRpmDocs       bool                      `json:"DisableRpmDocs"`
 	DisableRpmLocales    bool                      `json:"DisableRpmLocales"`
 	OverrideRpmLocales   string                    `json:"OverrideRpmLocales"`
 }

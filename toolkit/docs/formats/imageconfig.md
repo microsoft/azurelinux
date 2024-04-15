@@ -199,7 +199,7 @@ A sample PackageLists entry pointing to three files containing package lists:
 For size constrained images it may be desirable to omit documentation and non-default locales from an image.
 
 ``` json
-"DisableDocs": true,
+"DisableRpmDocs": true,
 "DisableRpmLocales": true,
 ```
 
