@@ -49,9 +49,6 @@
                 "packagelists/core-packages-image.json",
                 "packagelists/cloud-init-packages.json"
             ],
-            "Packages": [
-                "wget"
-            ],
             "KernelOptions": {
                 "default": "kernel"
             },
