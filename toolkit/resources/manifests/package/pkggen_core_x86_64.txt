@@ -64,8 +64,8 @@ gettext-0.22-1.azl3.x86_64.rpm
 gzip-1.13-1.azl3.x86_64.rpm
 make-4.4.1-1.azl3.x86_64.rpm
 patch-2.7.6-9.azl3.x86_64.rpm
-libcap-ng-0.8.3-1.azl3.x86_64.rpm
-libcap-ng-devel-0.8.3-1.azl3.x86_64.rpm
+libcap-ng-0.8.4-1.azl3.x86_64.rpm
+libcap-ng-devel-0.8.4-1.azl3.x86_64.rpm
 util-linux-2.39.2-1.azl3.x86_64.rpm
 util-linux-devel-2.39.2-1.azl3.x86_64.rpm
 util-linux-libs-2.39.2-1.azl3.x86_64.rpm
@@ -199,11 +199,9 @@ libxml2-devel-2.11.5-1.azl3.x86_64.rpm
 docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-13.azl3.noarch.rpm
 libsepol-3.6-1.azl3.x86_64.rpm
-glib-2.78.1-2.azl3.x86_64.rpm
+glib-2.78.1-3.azl3.x86_64.rpm
 libltdl-2.4.7-1.azl3.x86_64.rpm
 libltdl-devel-2.4.7-1.azl3.x86_64.rpm
-pcre-8.45-2.azl3.x86_64.rpm
-pcre-libs-8.45-2.azl3.x86_64.rpm
 lua-5.4.6-1.azl3.x86_64.rpm
 lua-libs-5.4.6-1.azl3.x86_64.rpm
 azurelinux-rpm-macros-3.0-2.azl3.noarch.rpm
@@ -243,7 +241,7 @@ python3-libs-3.12.0-3.azl3.x86_64.rpm
 python3-setuptools-69.0.3-2.azl3.noarch.rpm
 python3-pygments-2.5.2-1.azl3.noarch.rpm
 which-2.21-8.azl3.x86_64.rpm
-libselinux-3.6-2.azl3.x86_64.rpm
+libselinux-3.6-3.azl3.x86_64.rpm
 slang-2.3.3-1.azl3.x86_64.rpm
 newt-0.52.23-1.azl3.x86_64.rpm
 newt-lang-0.52.23-1.azl3.x86_64.rpm

@@ -1,6 +1,6 @@
 Summary:        POSIX capability Library
 Name:           libcap-ng
-Version:        0.8.3
+Version:        0.8.4
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -8,8 +8,11 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://people.redhat.com/sgrubb/libcap-ng
 Source0:        https://people.redhat.com/sgrubb/libcap-ng/%{name}-%{version}.tar.gz
-BuildRequires:  python3-devel
+Patch1:         libcap-ng-0.8.5-python-exception.patch
 BuildRequires:  swig
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  kernel-headers
 Provides:       %{name}-utils = %{version}-%{release}
 
 %description
@@ -31,7 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 The libraries and header files needed for libcap_ng development.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %configure --with-python=no --with-python3
@@ -67,6 +70,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/*.a
 
 %changelog
+* Mon Apr 08 2024 Betty Lakes <bettylakes@microsoft.com> - 0.8.4-1
+- Upgrade to 0.8.4
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.8.3-1
 - Auto-upgrade to 0.8.3 - Azure Linux 3.0 - package upgrades
 

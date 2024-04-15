@@ -428,8 +428,8 @@ build_rpm_in_chroot_no_install perl-generators
 chroot_and_install_rpms perl-generators
 
 # build and install additional openjdk build dependencies
-build_rpm_in_chroot_no_install pcre
-chroot_and_install_rpms pcre
+build_rpm_in_chroot_no_install pcre2
+chroot_and_install_rpms pcre2
 build_rpm_in_chroot_no_install which
 chroot_and_install_rpms which
 build_rpm_in_chroot_no_install zip
@@ -571,9 +571,6 @@ chroot_and_install_rpms gtk-doc
 build_rpm_in_chroot_no_install libtasn1
 
 build_rpm_in_chroot_no_install libsepol
-# swig requires pcre2
-build_rpm_in_chroot_no_install pcre2
-chroot_and_install_rpms pcre2
 build_rpm_in_chroot_no_install swig
 
 # libselinux requires libsepol and swig
