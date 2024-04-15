@@ -33,8 +33,8 @@ jobs:
         if: env.MULTI_PACKAGE_ADD_REMOVE_DETECTED == 'true'
         run: |
           curl \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            ${GITHUB_API_URL}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
-            -d '{"team_reviewers": ["cbl-mariner-multi-package-reviewers"]}'
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          https://api.github.com/repos/microsoft/azurelinux/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+          -d '{"team_reviewers": ["cbl-mariner-multi-package-reviewers"]}'
