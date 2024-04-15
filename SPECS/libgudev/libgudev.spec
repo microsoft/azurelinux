@@ -1,18 +1,14 @@
 Summary:        A library providing GObject bindings for libudev
 Name:           libgudev
-Version:        237
+Version:        238
 Release:        1%{?dist}
-License:        LGPL2.1
+License:        LGPLv2+
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://git.gnome.org/browse/libgudev/
 Source0:        https://download.gnome.org/sources/%{name}/%{version}/%{name}-%{version}.tar.xz
-
-%{?systemd_requires}
-
-BuildRequires:  glib >= 2.22.0
-BuildRequires:  glib-devel
+BuildRequires:  glib2-devel
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gtk-doc
 BuildRequires:  libudev-devel
@@ -20,7 +16,6 @@ BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  systemd-devel
 BuildRequires:  which
-
 Requires:       systemd
 Provides:       %{name}1 = %{version}-%{release}
 
@@ -30,15 +25,14 @@ used to be part of udev, and now is a project on its own.
 
 %package devel
 Summary:        Header and development files for libgudev
-Requires:       %{name} = %{version}
-Requires:       glib-devel
+Requires:       %{name} = %{version}-%{release}
 Provides:       %{name}1-devel = %{version}-%{release}
 
 %description devel
 libgudev-devel package contains header files for building gudev applications.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %meson -Dgtk_doc=false -Dtests=disabled -Dvapi=disabled
@@ -64,11 +58,14 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %files devel
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/gudev-1.0.pc
+%{_libdir}/pkgconfig/gudev-1.0.*
 %{_libdir}/girepository-1.0/GUdev-1.0.typelib
 %{_datadir}/gir-1.0/GUdev-1.0.gir
 
 %changelog
+* Thu Feb 01 2024 Sumedh Sharma <sumsharma@microsoft.com> - 238-1
+- Upgrade to version 238
+
 * Mon Mar 14 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 237-1
 - Upgrade to version 237
 
