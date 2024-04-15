@@ -129,7 +129,7 @@ find %{buildroot} -name '*.la' -delete
 %{_unitdir}/ostree*.service
 %{_unitdir}/ostree-finalize-staged.path
 %{_libdir}/dracut/modules.d/98ostree/*
-%{_mandir}/man*/*.gz
+%{_mandir}/man1/ostree-admin*
 %{_libdir}/systemd/system-generators/ostree-system-generator
 %exclude %{_sysconfdir}/grub.d/*ostree
 %exclude %{_libexecdir}/libostree/grub2*
@@ -137,8 +137,8 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/ostree/ostree-remount
 %{_libdir}/tmpfiles.d/ostree-tmpfiles.conf
 %{_libexecdir}/lib%{name}/*
-%{_libexecdir}/installed-tests/*
-%{_datadir}/installed-tests/*
+%{_libexecdir}/installed-tests/lib%{name}/*
+%{_datadir}/installed-tests/lib%{name}/*
 
 %files libs
 %{_sysconfdir}/ostree
@@ -155,6 +155,7 @@ find %{buildroot} -name '*.la' -delete
 %exclude %{_mandir}/man1/ostree-admin*
 %{_mandir}/man1/*.gz
 %{_mandir}/man5/*.gz
+%{_mandir}/man8/*.gz
 
 %files grub2
 %{_sysconfdir}/grub.d/*ostree
