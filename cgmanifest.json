@@ -9531,8 +9531,8 @@
         "type": "other",
         "other": {
           "name": "libgudev",
-          "version": "237",
-          "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
+          "version": "238",
+          "downloadUrl": "https://download.gnome.org/sources/libgudev/238/libgudev-238.tar.xz"
         }
       }
     },
