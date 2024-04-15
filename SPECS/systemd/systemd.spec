@@ -1190,6 +1190,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Apr 15 2024 Henry Li <lihl@microsoft.com> - 255-10
+- Add patch to allow configurability of "UseDomains=" for networkd
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-9
 - build dep the "bootstrap" macros because our maint scripts are broken without
   our rpm macros available during the build
