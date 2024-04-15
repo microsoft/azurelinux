@@ -1,0 +1,117 @@
+From ec56bff28d3ad5acf82e139a83da8135aa2dd618 Mon Sep 17 00:00:00 2001
+From: Olly Betts <olly@survex.com>
+Date: Fri, 1 Mar 2024 10:42:22 +1300
+Subject: [PATCH] [java] Suppress System.runFinalization() removal warnings
+
+These need to be addressed, but meanwhile it makes running the testsuite
+with OpenJDK 21 or newer unhelpfully noisy so suppressing it seems more
+helpful than not.
+
+Closes: #2819
+---
+ Examples/test-suite/java/cpp11_std_unique_ptr_runme.java   | 2 ++
+ Examples/test-suite/java/director_pass_by_value_runme.java | 2 ++
+ Examples/test-suite/java/java_director_runme.java          | 2 ++
+ Examples/test-suite/java/li_boost_intrusive_ptr_runme.java | 4 ++++
+ Examples/test-suite/java/li_boost_shared_ptr_runme.java    | 4 ++++
+ Examples/test-suite/java/li_std_auto_ptr_runme.java        | 2 ++
+ 6 files changed, 16 insertions(+)
+
+diff --git a/Examples/test-suite/java/cpp11_std_unique_ptr_runme.java b/Examples/test-suite/java/cpp11_std_unique_ptr_runme.java
+index f90ef7041..c5622f65f 100644
+--- a/Examples/test-suite/java/cpp11_std_unique_ptr_runme.java
++++ b/Examples/test-suite/java/cpp11_std_unique_ptr_runme.java
+@@ -10,6 +10,8 @@ public class cpp11_std_unique_ptr_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC()
+   {
+     System.gc();
+diff --git a/Examples/test-suite/java/director_pass_by_value_runme.java b/Examples/test-suite/java/director_pass_by_value_runme.java
+index 1d34c3b55..48ccabf73 100644
+--- a/Examples/test-suite/java/director_pass_by_value_runme.java
++++ b/Examples/test-suite/java/director_pass_by_value_runme.java
+@@ -12,6 +12,8 @@ public class director_pass_by_value_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC() {
+     System.gc();
+     System.runFinalization();
+diff --git a/Examples/test-suite/java/java_director_runme.java b/Examples/test-suite/java/java_director_runme.java
+index 2167d2621..40829463b 100644
+--- a/Examples/test-suite/java/java_director_runme.java
++++ b/Examples/test-suite/java/java_director_runme.java
+@@ -13,6 +13,8 @@ public class java_director_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC()
+   {
+     System.gc();
+diff --git a/Examples/test-suite/java/li_boost_intrusive_ptr_runme.java b/Examples/test-suite/java/li_boost_intrusive_ptr_runme.java
+index 750ec5067..721a78d56 100644
+--- a/Examples/test-suite/java/li_boost_intrusive_ptr_runme.java
++++ b/Examples/test-suite/java/li_boost_intrusive_ptr_runme.java
+@@ -13,6 +13,8 @@ public class li_boost_intrusive_ptr_runme {
+   // Debugging flag
+   public final static boolean debug = false;
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC()
+   {
+     System.gc();
+@@ -23,6 +25,8 @@ public class li_boost_intrusive_ptr_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   public static void main(String argv[])
+   {
+     if (debug)
+diff --git a/Examples/test-suite/java/li_boost_shared_ptr_runme.java b/Examples/test-suite/java/li_boost_shared_ptr_runme.java
+index b513fade7..c1ec7f7bf 100644
+--- a/Examples/test-suite/java/li_boost_shared_ptr_runme.java
++++ b/Examples/test-suite/java/li_boost_shared_ptr_runme.java
+@@ -13,6 +13,8 @@ public class li_boost_shared_ptr_runme {
+   // Debugging flag
+   public final static boolean debug = false;
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC()
+   {
+     System.gc();
+@@ -23,6 +25,8 @@ public class li_boost_shared_ptr_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   public static void main(String argv[]) 
+   {
+     if (debug)
+diff --git a/Examples/test-suite/java/li_std_auto_ptr_runme.java b/Examples/test-suite/java/li_std_auto_ptr_runme.java
+index 24e353ddc..978a72504 100644
+--- a/Examples/test-suite/java/li_std_auto_ptr_runme.java
++++ b/Examples/test-suite/java/li_std_auto_ptr_runme.java
+@@ -10,6 +10,8 @@ public class li_std_auto_ptr_runme {
+     }
+   }
+
++  // Suppress warning about System.runFinalization() call.
++  @SuppressWarnings({"deprecation", "removal"})
+   private static void WaitForGC()
+   {
+     System.gc();
+-- 
+2.44.0

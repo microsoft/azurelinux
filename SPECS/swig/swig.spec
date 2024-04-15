@@ -1,6 +1,6 @@
 Summary:        Connects C/C++/Objective C to some high-level programming languages
 Name:           swig
-Version:        4.1.1
+Version:        4.2.1
 Release:        1%{?dist}
 License:        GPLv3+ AND BSD
 Vendor:         Microsoft Corporation
@@ -8,9 +8,9 @@ Distribution:   Azure Linux
 URL:            https://swig.sourceforge.net/
 #Source0:       https://github.com/swig/swig/archive/refs/tags/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
-BuildRequires:  pcre-devel
+Patch0:         swig-java-Suppress-System.runFinalization-removal-warning.patch
 BuildRequires:  pcre2-devel
-Requires:       pcre
+Requires:       pcre2
 %if 0%{?with_check}
 BuildRequires:  python3
 BuildRequires:  python3-devel
@@ -34,7 +34,7 @@ tool for building user interfaces
 %if 0%{?with_check}
 pip3 install 2to3
 %endif
-%autosetup
+%autosetup -p1
 
 %build
 ./autogen.sh
@@ -55,7 +55,7 @@ mkdir -p %{buildroot}%{_libdir}/ccache
 ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 
 %check
-%make_build check PY3=y
+%make_build check PY3=1
 
 %files
 %license LICENSE LICENSE-GPL LICENSE-UNIVERSITIES
@@ -64,6 +64,10 @@ ln -fs ../../bin/ccache-swig %{buildroot}%{_libdir}/ccache/swig
 %{_libdir}/ccache
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 4.2.1-1
+- Upgrade to 4.2.1
+- Add swig-java-Avoid-using-deprecated-API-in-doxygen-example patch from Fedora
+
 * Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.1-1
 - Auto-upgrade to 4.1.1 - Azure Linux 3.0 - package upgrades
 

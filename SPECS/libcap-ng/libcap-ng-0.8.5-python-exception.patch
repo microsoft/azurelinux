@@ -1,0 +1,24 @@
+commit 30453b6553948cd05c438f9f509013e3bb84f25b
+Author: Steve Grubb <ausearch.1@gmail.com>
+Date:   Thu Jan 4 15:06:29 2024 -0500
+
+    Remove python global exception handler since its deprecated
+
+diff --git a/bindings/src/capng_swig.i b/bindings/src/capng_swig.i
+index fcdaf18..fa85e13 100644
+--- a/bindings/src/capng_swig.i
++++ b/bindings/src/capng_swig.i
+@@ -30,13 +30,6 @@
+ 
+ %varargs(16, signed capability = 0) capng_updatev;
+ 
+-%except(python) {
+-  $action
+-  if (result < 0) {
+-    PyErr_SetFromErrno(PyExc_OSError);
+-    return NULL;
+-  }
+-}
+ #endif
+ 
+ %define __signed__
