@@ -597,7 +597,7 @@ func buildImage(mountPointMap, mountPointToFsTypeMap, mountPointToMountArgsMap, 
 	}
 	timestamp.StopEvent(nil) // install chroot packages
 
-	// Configure setup macros for the setup environment. We run 'rpm' from outside the install chroot since it starts
+	// Configure rpm install macros for the setup environment. We run 'rpm' from outside the install chroot since it starts
 	// empty. So the macros must be defined here before we install packages.
 	logger.Log.Debugf("Adding setup environment customization macros if needed")
 	err = customizationmacros.AddCustomizationMacros(rootDir, systemConfig.DisableDocs, systemConfig.DisableRpmLocales, systemConfig.OverrideRpmLocales)
