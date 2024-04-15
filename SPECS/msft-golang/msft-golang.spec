@@ -13,16 +13,17 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.21.8
+Version:        1.22.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.21.8-3/go.20240321.6.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.22.2-1/go1.22.2-20240403.7.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
 Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.%{bootstrap_compiler_version}.src.tar.gz
+Source3:        https://github.com/microsoft/go/releases/download/v1.21.8-3/go.20240321.6.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
 Conflicts:      golang
@@ -65,6 +66,18 @@ rm -rf %{_libdir}/golang
 
 # Make go.%{bootstrap_compiler_version} as the new bootstrapper (Go boostrap)
 mv -v %{_topdir}/BUILD/go.%{bootstrap_compiler_version} %{_libdir}/golang
+
+# Build go 1.21
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go.1.21
+tar xf %{SOURCE3} -C %{_topdir}/BUILD/go.1.21 --strip-components=1
+pushd %{_topdir}/BUILD/go.1.21/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Remove 1.17 bootstrapper
+rm -rf %{_libdir}/golang
+# Make 1.21 as the new bootstrapper
+mv -v %{_topdir}/BUILD/go.1.21 %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -137,6 +150,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Apr 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.2-1
+- Bump version to 1.22.2
+
 * Fri Mar 22 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.8-1
 - Bump version to 1.21.8
 
