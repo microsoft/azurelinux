@@ -21,8 +21,8 @@ import (
 
 const (
 	// macro files to customize the installer and final images
-	disableDocsMacroFile       = "macros.installercustomizations_disable_docs"
-	DisableRpmLocalesMacroFile = "macros.installercustomizations_disable_locales"
+	DisableDocsMacroFile         = "macros.installercustomizations_disable_docs"
+	ConfigureRpmLocalesMacroFile = "macros.installercustomizations_customize_locales"
 )
 
 var (
@@ -56,21 +56,21 @@ func AddCustomizationMacros(rootDir string, disableDocs, DisableRpmLocales bool,
 
 	if disableDocs {
 		logger.Log.Debugf("Disabling documentation packages")
-		err = AddMacroFile(rootDir, rpm.DisableDocumentationDefines(nil), disableDocsMacroFile, docComments)
+		err = AddMacroFile(rootDir, rpm.DisableDocumentationDefines(nil), DisableDocsMacroFile, docComments)
 		if err != nil {
 			return fmt.Errorf("failed to add disable docs macro file:\n%w", err)
 		}
 	}
 	if DisableRpmLocales {
 		logger.Log.Debugf("Disabling locale packages")
-		err = AddMacroFile(rootDir, rpm.DisableLocaleDefines(nil), DisableRpmLocalesMacroFile, localeComments)
+		err = AddMacroFile(rootDir, rpm.DisableLocaleDefines(nil), ConfigureRpmLocalesMacroFile, localeComments)
 		if err != nil {
 			return fmt.Errorf("failed to add disable locales macro file:\n%w", err)
 		}
 	}
 	if overrideRpmLocales != "" {
 		logger.Log.Debugf("Overriding locale packages with (%s)", overrideRpmLocales)
-		err = AddMacroFile(rootDir, rpm.OverrideLocaleDefines(nil, overrideRpmLocales), DisableRpmLocalesMacroFile, localeComments)
+		err = AddMacroFile(rootDir, rpm.OverrideLocaleDefines(nil, overrideRpmLocales), ConfigureRpmLocalesMacroFile, localeComments)
 		if err != nil {
 			return fmt.Errorf("failed to add override locales macro file:\n%w", err)
 		}

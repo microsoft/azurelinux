@@ -254,7 +254,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 
 				// Verify the existence and contents of the macro files
 				if tc.disableDocs {
-					expectedDocFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", disableDocsMacroFile)
+					expectedDocFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", DisableDocsMacroFile)
 					docContents, err := file.ReadLines(expectedDocFilePath)
 					assert.NoError(t, err)
 					// check we set the macro we wanted
@@ -269,7 +269,7 @@ func TestAddCustomizationMacros(t *testing.T) {
 				}
 
 				if tc.DisableRpmLocales {
-					expectedLocaleFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", DisableRpmLocalesMacroFile)
+					expectedLocaleFilePath := filepath.Join(tempDir, "/usr/lib/rpm/macros.d", ConfigureRpmLocalesMacroFile)
 					localeContents, err := file.ReadLines(expectedLocaleFilePath)
 					assert.NoError(t, err)
 					// check we set the macro we wanted
