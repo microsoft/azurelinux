@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -354,9 +354,12 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Apr 16 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-7
+- Change config to load symcrypt provider if present
+
 * Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
-- At check build requirements
-- Modify patch patch to not force load default provider
+- Add check build requirements
+- Modify patch to not force load default provider
 
 * Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
 - Remove make-dummy-cert and renew-dummy-cert scripts
