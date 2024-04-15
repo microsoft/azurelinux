@@ -64,30 +64,38 @@ func TestAddMacroFileWithEmptyMacros(t *testing.T) {
 
 func TestAddMacroFileComments(t *testing.T) {
 	// Define the test cases
+	defaultMacrosInput := map[string]string{
+		"MACRO1": "VALUE1",
+		"MACRO2": "VALUE2",
+	}
+	defaultExpectedContents := []string{
+		"%MACRO1 VALUE1",
+		"%MACRO2 VALUE2",
+	}
 	testCases := []struct {
-		name           string
-		macros         map[string]string
-		customComments []string
-		expectError    bool
+		name             string
+		macros           map[string]string
+		customComments   []string
+		expectError      bool
+		expectedContents []string
 	}{
 		{
-			name: "WithCustomComments",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
+			name:   "WithCustomComments",
+			macros: defaultMacrosInput,
 			customComments: []string{
 				"# Custom comment 1",
 				"# Custom comment 2",
 			},
 			expectError: false,
+			expectedContents: append(append(customizationMacroHeaderComments, []string{
+				"# Custom comment 1",
+				"# Custom comment 2",
+				"",
+			}...), defaultExpectedContents...),
 		},
 		{
-			name: "WithBadComment",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
+			name:   "WithBadComment",
+			macros: defaultMacrosInput,
 			customComments: []string{
 				"# Custom comment 1",
 				"Custom comment 2",
@@ -95,43 +103,39 @@ func TestAddMacroFileComments(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name: "WithEmptyCustomComments",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
-			customComments: []string{},
-			expectError:    false,
+			name:             "WithEmptyCustomComments",
+			macros:           defaultMacrosInput,
+			customComments:   []string{},
+			expectError:      false,
+			expectedContents: append(customizationMacroHeaderComments, defaultExpectedContents...),
 		},
 		{
-			name: "WithNilCustomComments",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
-			customComments: nil,
-			expectError:    false,
+			name:             "WithNilCustomComments",
+			macros:           defaultMacrosInput,
+			customComments:   nil,
+			expectError:      false,
+			expectedContents: append(customizationMacroHeaderComments, defaultExpectedContents...),
 		},
 		{
-			name: "With whitespace in custom comments",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
+			name:   "WithWhitespaceInCustomComments",
+			macros: defaultMacrosInput,
 			customComments: []string{
 				"  # Custom comment 1",
 				"  # Custom comment 2",
 			},
 			expectError: false,
+			expectedContents: append(append(customizationMacroHeaderComments, []string{
+				"  # Custom comment 1",
+				"  # Custom comment 2",
+				"",
+			}...), defaultExpectedContents...),
 		},
 		{
-			name: "With empty custom comments",
-			macros: map[string]string{
-				"MACRO1": "VALUE1",
-				"MACRO2": "VALUE2",
-			},
-			customComments: []string{""},
-			expectError:    false,
+			name:             "WithEmptyStringCustomComments",
+			macros:           defaultMacrosInput,
+			customComments:   []string{""},
+			expectError:      false,
+			expectedContents: append(append(customizationMacroHeaderComments, []string{"", ""}...), defaultExpectedContents...),
 		},
 	}
 
@@ -155,15 +159,7 @@ func TestAddMacroFileComments(t *testing.T) {
 				actualContents, err := file.ReadLines(expectedFilePath)
 				assert.NoError(t, err)
 
-				expectedContents := append(customizationMacroHeaderComments, tc.customComments...)
-				if len(tc.customComments) > 0 {
-					expectedContents = append(expectedContents, "")
-				}
-				expectedContents = append(expectedContents, []string{
-					"%MACRO1 VALUE1",
-					"%MACRO2 VALUE2",
-				}...)
-				assert.Equal(t, expectedContents, actualContents)
+				assert.Equal(t, tc.expectedContents, actualContents)
 
 				// Ensure all lines are either empty, one of the macros, or have a "#" prefix
 				for _, line := range actualContents {
