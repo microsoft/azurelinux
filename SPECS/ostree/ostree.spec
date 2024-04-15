@@ -1,18 +1,20 @@
+# We haven't tried to ship the tests on RHEL
+%if 0%{?rhel}
+    %bcond_with tests
+%else
+    %bcond_without tests
+%endif
+
 Summary:        Git for operating system binaries
 Name:           ostree
-Version:        2022.1
-Release:        4%{?dist}
+Version:        2024.5
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://ostree.readthedocs.io/en/latest
 Source0:        https://github.com/ostreedev/ostree/releases/download/v%{version}/lib%{name}-%{version}.tar.xz
-Source1:        91-ostree.preset
-Patch0:         dualboot-support.patch
-Patch1:         0001-ostree-Copying-photon-config-to-boot-directory.patch
-Patch2:         0002-ostree-Adding-load-env-to-menuentry.patch
-Patch3:         0003-ostree-converting-osname-to-azurelinux.patch
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -81,16 +83,23 @@ Requires:       grub2-efi
 GRUB2 integration for OSTree
 
 %prep
-%autosetup -p 1 -n lib%{name}-%{version}
+%autosetup -n lib%{name}-%{version}
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-
 %configure \
      --disable-silent-rules \
      --enable-gtk-doc \
      --with-dracut \
-     --without-selinux \
+     --with-selinux \
+     --with-curl \
+     --with-openssl \
+     --without-soup \
+     --with-composefs \
+     %{?with_tests:--with-soup3} \
+     %{?!with_tests:--without-soup3} \
+     %{?with_tests:--enable-installed-tests=exclusive} \
+     --with-dracut=yesbutnoconf \
      --enable-libsoup-client-certs
 make %{?_smp_mflags}
 
@@ -98,10 +107,8 @@ make %{?_smp_mflags}
 make check
 
 %install
-make DESTDIR=%{buildroot} INSTALL="install -p -c" install
-find %{buildroot} -type f -name "*.la" -delete -print
-install -D -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system-preset/91-ostree.preset
-install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
+%make_install INSTALL="install -p -c"
+find %{buildroot} -name '*.la' -delete
 
 %post
 %systemd_post ostree-remount.service
@@ -114,7 +121,6 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 
 %files
 %license COPYING
-%license COPYING
 %doc README.md
 %{_bindir}/ostree
 %{_bindir}/rofiles-fuse
@@ -125,14 +131,14 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %{_libdir}/dracut/modules.d/98ostree/*
 %{_mandir}/man1/ostree-admin*
 %{_libdir}/systemd/system-generators/ostree-system-generator
-%{_libdir}/systemd/system-preset/91-ostree.preset
 %exclude %{_sysconfdir}/grub.d/*ostree
 %exclude %{_libexecdir}/libostree/grub2*
 %{_libdir}/ostree/ostree-prepare-root
-%{_sysconfdir}/dracut.conf.d/ostree.conf
 %{_libdir}/ostree/ostree-remount
 %{_libdir}/tmpfiles.d/ostree-tmpfiles.conf
-%{_libexecdir}/libostree/*
+%{_libexecdir}/lib%{name}/*
+%{_libexecdir}/installed-tests/lib%{name}/*
+%{_datadir}/installed-tests/lib%{name}/*
 
 %files libs
 %{_sysconfdir}/ostree
@@ -149,12 +155,16 @@ install -vdm 755 %{buildroot}%{_sysconfdir}/ostree/remotes.d
 %exclude %{_mandir}/man1/ostree-admin*
 %{_mandir}/man1/*.gz
 %{_mandir}/man5/*.gz
+%{_mandir}/man8/*.gz
 
 %files grub2
 %{_sysconfdir}/grub.d/*ostree
-%{_libexecdir}/libostree/grub2*
+%{_libexecdir}/lib%{name}/grub2*
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.5-1
+- Upgrade to 2024.4
+
 * Thu Mar 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-4
 - Renamed "0003-ostree-converting-osname-to-mariner.patch" to "0003-ostree-converting-osname-to-azurelinux.patch"
 

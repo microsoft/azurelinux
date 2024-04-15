@@ -1,12 +1,24 @@
+From 1a6faf9fba297be339749abb7c1fb520373eb73a Mon Sep 17 00:00:00 2001
+From: Pawel Winogrodzki <pawelwi@microsoft.com>
+Date: Thu, 11 Apr 2024 14:21:20 -0700
+Subject: [PATCH] Apply patch.
+
+---
+ libdnf/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
 diff --git a/libdnf/CMakeLists.txt b/libdnf/CMakeLists.txt
-index 2dd55c5..701cd4a 100644
+index 405dc4e8..f535db43 100644
 --- a/libdnf/CMakeLists.txt
 +++ b/libdnf/CMakeLists.txt
-@@ -50,6 +50,7 @@ endif()
+@@ -52,6 +52,7 @@ endif()
  
  # build dependencies
  find_package(Gpgme REQUIRED)
 +set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH};/usr/share/cmake/Modules/)
- find_package(LibSolv 0.6.30 REQUIRED COMPONENTS ext)
- find_package(OpenSSL REQUIRED)
+ find_package(LibSolv 0.7.21 REQUIRED COMPONENTS ext)
  
+ 
+-- 
+2.34.1
+

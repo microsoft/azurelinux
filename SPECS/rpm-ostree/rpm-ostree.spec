@@ -1,24 +1,22 @@
 Summary:        Commit RPMs to an OSTree repository
 Name:           rpm-ostree
-Version:        2022.1
-Release:        7%{?dist}
+Version:        2024.4
+Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/coreos/rpm-ostree
 Source0:        %{url}/releases/download/v%{version}/%{name}-%{version}.tar.xz
-Patch0:         rpm-ostree-libdnf-build.patch
-Patch1:         rpm-ostree-disable-selinux.patch
-Patch2:         CVE-2022-31394.patch
-Patch3:         rpm-ostree-drop-lint-which-treats-warning-as-error.patch
-Patch4:         CVE-2022-47085.patch
+Patch0:         0001-Revert-compose-Inject-our-static-tmpfiles.d-dropins-.patch
+Patch1:         rpm-ostree-libdnf-build.patch
+
 BuildRequires:  attr-devel
 BuildRequires:  autoconf
 BuildRequires:  autogen
 BuildRequires:  automake
 BuildRequires:  bubblewrap
+BuildRequires:  cargo
 BuildRequires:  check
-BuildRequires:  cmake
 BuildRequires:  cppunit-devel
 BuildRequires:  createrepo_c
 BuildRequires:  dbus-devel
@@ -27,14 +25,12 @@ BuildRequires:  git
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  python3-gobject-introspection
 BuildRequires:  gperf
-BuildRequires:  gpgme-devel
 BuildRequires:  gtk-doc
 BuildRequires:  jq
 BuildRequires:  json-c-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  libarchive-devel
 BuildRequires:  libcap-devel
-BuildRequires:  libgsystem-devel
 BuildRequires:  libmodulemd-devel
 BuildRequires:  librepo-devel
 BuildRequires:  libsolv
@@ -49,11 +45,36 @@ BuildRequires:  polkit-devel
 BuildRequires:  popt-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-pygments
-BuildRequires:  rpm-devel
 BuildRequires:  rust
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd-devel
 BuildRequires:  which
+BuildRequires:  pkgconfig(libsolv)
+
+#########################################################################
+#                         libdnf build deps                             #
+#                                                                       #
+#        Copy/pasted some build requires from libdnf/libdnf.spec.       #
+#                                                                       #
+#########################################################################
+
+BuildRequires:  cmake
+BuildRequires:  pkgconfig(librepo) >= 1.13.1
+BuildRequires:  pkgconfig(check)
+BuildRequires:  pkgconfig(gio-unix-2.0) >= 2.46.0
+BuildRequires:  pkgconfig(gtk-doc)
+BuildRequires:  rpm-devel >= 4.15.0
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(json-c)
+BuildRequires:  pkgconfig(cppunit)
+BuildRequires:  pkgconfig(modulemd-2.0) >= 2.13.0
+BuildRequires:  pkgconfig(smartcols)
+BuildRequires:  gettext
+BuildRequires:  gpgme-devel
+
+#########################################################################
+#                     end of libdnf build deps                          #
+#########################################################################
 
 %if 0%{?with_check}
 BuildRequires:  python3-gobject
@@ -63,7 +84,6 @@ Requires:       bubblewrap
 Requires:       json-c
 Requires:       json-glib
 Requires:       libcap
-Requires:       libgsystem
 Requires:       libmodulemd
 Requires:       librepo
 Requires:       libsolv
@@ -157,6 +177,9 @@ make check
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Fri Apr 05 2024 Betty Lakes <bettylakes@microsoft.com> - 2024.4-1
+- Upgrade to 2024.4 and remove libgsystem dependency
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2022.1-7
 - Update the build dependency from mariner-release to azurelinux-release
 
