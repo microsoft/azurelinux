@@ -1,0 +1,54 @@
+From 93a786a00163e50c29f0394df198518617e1c9a5 Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Sun, 14 Aug 2022 15:51:54 +0800
+Subject: [PATCH 08/13] kern/efi/sb: Enforce verification of font files
+
+As a mitigation and hardening measure enforce verification of font
+files. Then only trusted font files can be load. This will reduce the
+attack surface at cost of losing the ability of end-users to customize
+fonts if e.g. UEFI Secure Boot is enabled. Vendors can always customize
+fonts because they have ability to pack fonts into their GRUB bundles.
+
+This goal is achieved by:
+
+  * Removing GRUB_FILE_TYPE_FONT from shim lock verifier's
+    skip-verification list.
+
+  * Adding GRUB_FILE_TYPE_FONT to lockdown verifier's defer-auth list,
+    so font files must be verified by a verifier before they can be loaded.
+
+Suggested-by: Daniel Kiper <daniel.kiper@oracle.com>
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/kern/efi/sb.c   | 1 -
+ grub-core/kern/lockdown.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/efi/sb.c b/grub-core/kern/efi/sb.c
+index 89c4bb3fd..db42c2539 100644
+--- a/grub-core/kern/efi/sb.c
++++ b/grub-core/kern/efi/sb.c
+@@ -145,7 +145,6 @@ shim_lock_verifier_init (grub_file_t io __attribute__ ((unused)),
+     case GRUB_FILE_TYPE_PRINT_BLOCKLIST:
+     case GRUB_FILE_TYPE_TESTLOAD:
+     case GRUB_FILE_TYPE_GET_SIZE:
+-    case GRUB_FILE_TYPE_FONT:
+     case GRUB_FILE_TYPE_ZFS_ENCRYPTION_KEY:
+     case GRUB_FILE_TYPE_CAT:
+     case GRUB_FILE_TYPE_HEXCAT:
+diff --git a/grub-core/kern/lockdown.c b/grub-core/kern/lockdown.c
+index 0bc70fd42..af6d493cd 100644
+--- a/grub-core/kern/lockdown.c
++++ b/grub-core/kern/lockdown.c
+@@ -51,6 +51,7 @@ lockdown_verifier_init (grub_file_t io __attribute__ ((unused)),
+     case GRUB_FILE_TYPE_EFI_CHAINLOADED_IMAGE:
+     case GRUB_FILE_TYPE_ACPI_TABLE:
+     case GRUB_FILE_TYPE_DEVICE_TREE_IMAGE:
++    case GRUB_FILE_TYPE_FONT:
+       *flags = GRUB_VERIFY_FLAGS_DEFER_AUTH;
+ 
+       /* Fall through. */
+-- 
+2.34.1
+

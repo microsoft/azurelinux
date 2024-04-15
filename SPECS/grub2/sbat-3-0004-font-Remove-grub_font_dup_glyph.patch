@@ -1,0 +1,42 @@
+From c51292274ded3259eb04c2f1c8d253ffbdb5216a Mon Sep 17 00:00:00 2001
+From: Zhang Boyang <zhangboyang.id@gmail.com>
+Date: Fri, 5 Aug 2022 02:13:29 +0800
+Subject: [PATCH 04/13] font: Remove grub_font_dup_glyph()
+
+Remove grub_font_dup_glyph() since nobody is using it since 2013, and
+I'm too lazy to fix the integer overflow problem in it.
+
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/font/font.c | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/grub-core/font/font.c b/grub-core/font/font.c
+index e6548892f..a8576ffec 100644
+--- a/grub-core/font/font.c
++++ b/grub-core/font/font.c
+@@ -1055,20 +1055,6 @@ grub_font_get_glyph_with_fallback (grub_font_t font, grub_uint32_t code)
+   return best_glyph;
+ }
+ 
+-#if 0
+-static struct grub_font_glyph *
+-grub_font_dup_glyph (struct grub_font_glyph *glyph)
+-{
+-  static struct grub_font_glyph *ret;
+-  ret = grub_malloc (sizeof (*ret) + (glyph->width * glyph->height + 7) / 8);
+-  if (!ret)
+-    return NULL;
+-  grub_memcpy (ret, glyph, sizeof (*ret)
+-	       + (glyph->width * glyph->height + 7) / 8);
+-  return ret;
+-}
+-#endif
+-
+ /* FIXME: suboptimal.  */
+ static void
+ grub_font_blit_glyph (struct grub_font_glyph *target,
+-- 
+2.34.1
+

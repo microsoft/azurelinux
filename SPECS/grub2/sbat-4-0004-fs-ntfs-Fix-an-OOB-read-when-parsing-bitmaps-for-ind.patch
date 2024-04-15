@@ -1,0 +1,51 @@
+From 7a5a116739fa6d8a625da7d6b9272c9a2462f967 Mon Sep 17 00:00:00 2001
+From: Maxim Suhanov <dfirblog@gmail.com>
+Date: Mon, 28 Aug 2023 16:33:44 +0300
+Subject: [PATCH 4/6] fs/ntfs: Fix an OOB read when parsing bitmaps for index
+ attributes
+
+This fix introduces checks to ensure that bitmaps for directory indices
+are never read beyond their actual sizes.
+
+The lack of this check is a minor issue, likely not exploitable in any way.
+
+Reported-by: Maxim Suhanov <dfirblog@gmail.com>
+Signed-off-by: Maxim Suhanov <dfirblog@gmail.com>
+Reviewed-by: Daniel Kiper <daniel.kiper@oracle.com>
+---
+ grub-core/fs/ntfs.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/grub-core/fs/ntfs.c b/grub-core/fs/ntfs.c
+index 2d78b96e1..bb70c89fb 100644
+--- a/grub-core/fs/ntfs.c
++++ b/grub-core/fs/ntfs.c
+@@ -843,6 +843,25 @@ grub_ntfs_iterate_dir (grub_fshelp_node_t dir,
+ 
+ 	  if (is_resident)
+ 	    {
++              if (bitmap_len > (at->mft->data->mft_size << GRUB_NTFS_BLK_SHR))
++		{
++		  grub_error (GRUB_ERR_BAD_FS, "resident bitmap too large");
++		  goto done;
++		}
++
++              if (cur_pos >= at->mft->buf + (at->mft->data->mft_size << GRUB_NTFS_BLK_SHR))
++		{
++		  grub_error (GRUB_ERR_BAD_FS, "resident bitmap out of range");
++		  goto done;
++		}
++
++              if (u16at (cur_pos, 0x14) + u32at (cur_pos, 0x10) >
++		  (grub_addr_t) at->mft->buf + (at->mft->data->mft_size << GRUB_NTFS_BLK_SHR) - (grub_addr_t) cur_pos)
++		{
++		  grub_error (GRUB_ERR_BAD_FS, "resident bitmap out of range");
++		  goto done;
++		}
++
+               grub_memcpy (bmp, cur_pos + u16at (cur_pos, 0x14),
+                            bitmap_len);
+ 	    }
+-- 
+2.34.1
+
