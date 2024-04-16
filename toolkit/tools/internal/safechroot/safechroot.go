@@ -434,7 +434,11 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 		// Stops gpg-agent and keyboxd if they are running inside the chroot.
 		// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
-		c.stopGPGComponents()
+		err = c.stopGPGComponents()
+		if err != nil {
+			// Don't want to leave a stale root if gpg components fail to exit. Logging a Warn and letting close continue...
+			logger.Log.Warnf("Failed to stop GPG components: %s", err)
+		}
 
 		// mount is only supported in regular pipeline
 		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
@@ -706,17 +710,17 @@ func (c *Chroot) stopGPGComponents() (err error) {
 	if err != nil {
 		// gpgconf is not installed, so gpg-agent is not running.
 		logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
-		return err
+		return
 	}
 
-	err = c.UnsafeRun(func() error {
+	err = c.UnsafeRun(func() (err error) {
 		stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
 
 		logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
 
 		if err != nil || stderr != "" {
-			logger.Log.Errorf("Failed to list gpg components: %s\nUnable to check and stop GPG components.", err)
-			return err
+			err = fmt.Errorf("failed to list gpg components.\nerr: %s\nstderr: %s\nUnable to check and stop GPG components", err, stderr)
+			return
 		}
 
 		componentsToKill := []string{"gpg-agent", "keyboxd"}
@@ -728,15 +732,15 @@ func (c *Chroot) stopGPGComponents() (err error) {
 					logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
 					_, _, err = shell.Execute("gpgconf", "--kill", component)
 					if err != nil {
-						logger.Log.Errorf("Failed to stop %s: %s", component, err)
-						return err
+						err = fmt.Errorf("failed to stop gpg component \"%s\": \n%s", component, err)
+						return
 					}
 				}
 			}
 		}
 
-		return err
+		return
 	})
 
-	return err
+	return
 }
