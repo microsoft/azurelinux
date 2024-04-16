@@ -6,6 +6,7 @@ package safechroot
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"sync"
@@ -416,6 +417,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 	activeChrootsMutex.Lock()
 	defer activeChrootsMutex.Unlock()
 
+	// Stops gpg-agent and keyboxd if they are running inside the chroot.
+	// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
+	c.stopGPGAgent()
+
 	if buildpipeline.IsRegularBuild() {
 		index := -1
 		for i, chroot := range activeChroots {
@@ -688,4 +693,34 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 	// Create a copy of the list so that the caller can't mess with the list.
 	mountPoints := append([]*MountPoint(nil), c.mountPoints...)
 	return mountPoints
+}
+
+// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the chroot.
+//
+// It is possible that one of the packages or post-install scripts started a GPG agent.
+// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// To be able to cleanly exit the setup chroot, we must stop it.
+func (c *Chroot) stopGPGAgent() {
+	_, err := exec.LookPath("gpgconf")
+	if err != nil {
+		// gpgconf is not installed, so gpg-agent is not running.
+		logger.Log.Warnf("gpgconf is not installed, so gpg-agent is not running: %s", err)
+		return
+	}
+
+	c.UnsafeRun(func() error {
+		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
+		if err != nil {
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
+			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed or is no longer running: %s", err)
+		}
+
+		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
+		if err != nil {
+			// This is non-fatal, as there is no guarantee the image has gpg agent started.
+			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed or is no longer running: %s", err)
+		}
+
+		return nil
+	})
 }
