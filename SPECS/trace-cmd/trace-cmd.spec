@@ -2,10 +2,8 @@
 #%%global git_commit trace-cmd-v2.6.2
 #%%global git_commit 57371aaa2f469d0ba15fd85276deca7bfdd7ce36
 
-%global srcversion 3.2
-
 Name:          trace-cmd
-Version:       %{srcversion}
+Version:       3.2
 Release:       1%{?dist}
 License:       LGPL-2.1-only AND LGPL-2.1-or-later AND GPL-2.0-only AND GPL-2.0-or-later
 Summary:       A user interface to Ftrace
@@ -17,7 +15,7 @@ ExcludeArch:   %{ix86} %{arm}
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
 URL:           http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
-Source0:       https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{srcversion}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:       https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       trace-cmd.conf
 Source2:       trace-cmd.service
 Source3:       98-trace-cmd.rules
@@ -53,7 +51,7 @@ BuildRequires: python3-devel
 Python plugin support for trace-cmd
 
 %prep
-%autosetup -n %{name}-v%{srcversion}
+%autosetup -n %{name}-v%{version}
 cp %{SOURCE1} .
 cp %{SOURCE2} .
 cp %{SOURCE3} .
