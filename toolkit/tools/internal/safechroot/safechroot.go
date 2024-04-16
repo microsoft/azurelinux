@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -433,7 +434,7 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 
 		// Stops gpg-agent and keyboxd if they are running inside the chroot.
 		// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
-		c.stopGPGAgent()
+		c.stopGPGComponents()
 
 		// mount is only supported in regular pipeline
 		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
@@ -709,16 +710,29 @@ func (c *Chroot) stopGPGComponents() (err error) {
 	}
 
 	err = c.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Debugf("Failed to stop gpg-agent. This is expected if it is not installed or is no longer running: %s", err)
+		stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
+
+		logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
+
+		if err != nil || stderr != "" {
+			logger.Log.Errorf("Failed to list gpg components: %s\nUnable to check and stop GPG components.", err)
+			return err
 		}
 
-		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Debugf("Failed to stop keyboxd. This is expected if it is not installed or is no longer running: %s", err)
+		componentsToKill := []string{"gpg-agent", "keyboxd"}
+		// Split --list-components stdout on newline and iterate over each line
+		for _, line := range strings.Split(stdout, "\n") {
+			for _, component := range componentsToKill {
+				// Check if the line contains a component to kill
+				if strings.Contains(line, component) {
+					logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
+					_, _, err = shell.Execute("gpgconf", "--kill", component)
+					if err != nil {
+						logger.Log.Errorf("Failed to stop %s: %s", component, err)
+						return err
+					}
+				}
+			}
 		}
 
 		return err
