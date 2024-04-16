@@ -417,10 +417,6 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 	activeChrootsMutex.Lock()
 	defer activeChrootsMutex.Unlock()
 
-	// Stops gpg-agent and keyboxd if they are running inside the chroot.
-	// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
-	c.stopGPGAgent()
-
 	if buildpipeline.IsRegularBuild() {
 		index := -1
 		for i, chroot := range activeChroots {
@@ -434,6 +430,10 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 			// Already closed.
 			return
 		}
+
+		// Stops gpg-agent and keyboxd if they are running inside the chroot.
+		// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
+		c.stopGPGAgent()
 
 		// mount is only supported in regular pipeline
 		err = c.unmountAndRemove(leaveOnDisk, unmountTypeNormal)
@@ -697,30 +697,32 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 
 // stopGPGAgent stops gpg-agent and keyboxd if they are running inside the chroot.
 //
-// It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// A GPG agent may have been started while the chroot was in use.
+// E.g. when installing the azurelinux-repos-shared package, a GPG import occurs. This starts the gpg-agent process inside the chroot.
 // To be able to cleanly exit the setup chroot, we must stop it.
-func (c *Chroot) stopGPGAgent() {
-	_, err := exec.LookPath("gpgconf")
+func (c *Chroot) stopGPGAgent() (err error) {
+	_, err = exec.LookPath("gpgconf")
 	if err != nil {
 		// gpgconf is not installed, so gpg-agent is not running.
-		logger.Log.Warnf("gpgconf is not installed, so gpg-agent is not running: %s", err)
-		return
+		logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
+		return err
 	}
 
-	c.UnsafeRun(func() error {
+	err = c.UnsafeRun(func() error {
 		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
 		if err != nil {
 			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed or is no longer running: %s", err)
+			logger.Log.Debugf("Failed to stop gpg-agent. This is expected if it is not installed or is no longer running: %s", err)
 		}
 
 		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
 		if err != nil {
 			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed or is no longer running: %s", err)
+			logger.Log.Debugf("Failed to stop keyboxd. This is expected if it is not installed or is no longer running: %s", err)
 		}
 
-		return nil
+		return err
 	})
+
+	return err
 }
