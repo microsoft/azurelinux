@@ -1,8 +1,0 @@
-This project contains set of RPM packaging helpers to make the multilib fixes
-centralized at one place for whole distribution.
-
-For more info have a look at:
-https://fedorahosted.org/fpc/ticket/312
-https://fedoraproject.org/wiki/PackagingDrafts/MultilibTricks
-https://bugzilla.redhat.com/show_bug.cgi?id=1286193
-https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/thread/F6YVSCNNFFFNEOQ4TN6BJOPJZ2KMPEOJ/

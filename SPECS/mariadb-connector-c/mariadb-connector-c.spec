@@ -3,7 +3,7 @@
 Summary:        The MariaDB Native Client library (C driver)
 Name:           mariadb-connector-c
 Version:        3.3.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ developed in C/C++ to MariaDB and MySQL databases.
 
 %package        devel
 Summary:        Development files for mariadb-connector-c
-BuildRequires:  multilib-rpm-config
+%{!?azl:BuildRequires:  multilib-rpm-config}
 Requires:       %{name} = %{version}-%{release}
 Requires:       openssl-devel
 Requires:       zlib-devel
@@ -125,7 +125,10 @@ cmake -B %{__cmake_builddir} -LAH
 %install
 %cmake_install
 
+# azl does not support multilib, no need for this
+%if ! 0%{?azl}
 %{multilib_fix_c_header} --file %{_includedir}/mysql/mariadb_version.h
+%endif
 
 # Remove static linked libraries and symlinks to them
 rm %{buildroot}%{_libdir}/lib*.a
@@ -204,6 +207,9 @@ popd
 #      NEW:         PR submitted, problem explained, waiting on upstream response
 
 %changelog
+* Tue Apr 09 2024 Daniel McIlvaney <damcilva@microsoft.com> - 3.3.8-2
+- Remove multilib handling since azl doesn't support it
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.3.8-1
 - Upgrading to version 3.3.8
 - Added docs subpackage
