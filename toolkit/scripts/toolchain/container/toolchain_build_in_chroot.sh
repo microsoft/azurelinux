@@ -342,7 +342,7 @@ tar xf gcc-13.2.0.tar.xz
 pushd gcc-13.2.0
 case $(uname -m) in
   x86_64)
-    GCC_CONFIG_WITH_ARCH="x86-64-v3"
+    GCC_CONFIG_WITH_ARCH="x86-64-v2"
     sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)

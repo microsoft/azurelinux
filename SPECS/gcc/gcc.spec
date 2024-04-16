@@ -330,7 +330,7 @@ LD=ld \
     --enable-shared \
     --enable-threads=posix \
 %ifarch x86_64
-    --with-arch=x86-64-v3 \
+    --with-arch=x86-64-v2 \
 %else
     --with-arch=armv8.1-a \
 %endif
@@ -529,7 +529,7 @@ $tests_ok
 
 %changelog
 * Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-4
-- Test change for arch x86-64-v3
+- Test change for arch x86-64-v2
 
 * Mon Feb 26 2024 Andrew Phelps <anphel@microsoft.com> - 13.2.0-3
 - Re-enable libsanitizer
