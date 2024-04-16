@@ -53,7 +53,7 @@ fi
 SOURCEURL="https://archive.apache.org/dist/maven/maven-3/${VERSION}/source/apache-maven-${VERSION}-src.tar.gz"
 # Maven binary dependency to download from blocb store.
 # NOTE: Version IN THIS IS HARDCODED.
-MAVENBINARY="https://cblmarinerstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.${BUILDARCH}.rpm"
+MAVENBINARY="https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/maven-3.5.4-13.cm1.${BUILDARCH}.rpm"
 
 maven_m2_cache_tarball_name="apache-maven-${VERSION}-m2.tar.gz"
 maven_licenses_tarball_name="apache-maven-${VERSION}-licenses.tar.gz"
