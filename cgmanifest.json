@@ -13652,6 +13652,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "msft-golang",
+          "version": "1.22.2",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.22.2-1/go1.22.2-20240403.7.src.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "msgpack",
           "version": "3.3.0",
           "downloadUrl": "https://github.com/msgpack/msgpack-c/archive/cpp-3.3.0.tar.gz"

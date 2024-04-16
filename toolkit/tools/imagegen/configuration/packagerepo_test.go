@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/stretchr/testify/assert"
 )
 

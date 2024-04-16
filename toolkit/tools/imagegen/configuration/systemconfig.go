@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 // SystemConfig defines how each system present on the image is supposed to be configured.
