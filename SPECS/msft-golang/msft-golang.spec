@@ -1,4 +1,5 @@
-%global bootstrap_compiler_version 20230802.5
+%global bootstrap_pre_1_20_compiler_version 20230802.5
+%global bootstrap_post_1_20_compiler_version 20240321.6
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
 %ifarch aarch64
@@ -13,16 +14,17 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.21.8
+Version:        1.22.2
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
-Source0:        https://github.com/microsoft/go/releases/download/v1.21.8-3/go.20240321.6.src.tar.gz
+Source0:        https://github.com/microsoft/go/releases/download/v1.22.2-1/go1.22.2-20240403.7.src.tar.gz
 Source1:        https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
-Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.%{bootstrap_compiler_version}.src.tar.gz
+Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.%{bootstrap_pre_1_20_compiler_version}.src.tar.gz
+Source3:        https://github.com/microsoft/go/releases/download/v1.21.8-3/go.%{bootstrap_post_1_20_compiler_version}.src.tar.gz
 Patch0:         go14_bootstrap_aarch64.patch
 Conflicts:      go
 Conflicts:      golang
@@ -39,11 +41,13 @@ mv -v go go-bootstrap
 %setup -q -n go
 
 %build
-# (go >= 1.20 bootstraps with go >= 1.17)
-# This condition makes go compiler >= 1.20 build a 3 step process:
+# Go >= 1.20, < 1.22 bootstraps with go >= 1.17 and
+# go >= 1.22 bootstraps with go >= 1.20.6.
+# This condition makes go compiler >= 1.20 build a 4 step process:
 # - Build the bootstrap compiler 1.4 (bootstrap bits in c)
-# - Use the 1.4 compiler to build %{bootstrap_compiler_version}
-# - Use the %{bootstrap_compiler_version} compiler to build go >= 1.20 compiler
+# - Use the 1.4 compiler to build the %%{bootstrap_pre_1_20_compiler_version} compiler.
+# - Use the %%{bootstrap_pre_1_20_compiler_version} compiler to build go %%{bootstrap_post_1_20_compiler_version} compiler.
+# - Use the go %%{bootstrap_post_1_20_compiler_version} compiler to build the final go compiler.
 
 # Build go 1.4 bootstrap
 pushd %{_topdir}/BUILD/go-bootstrap/src
@@ -52,19 +56,31 @@ popd
 mv -v %{_topdir}/BUILD/go-bootstrap %{_libdir}/golang
 export GOROOT=%{_libdir}/golang
 
-# Use go1.4 bootstrap to compile go.%{bootstrap_compiler_version} (C bootstrap)
+# Use go1.4 bootstrap to compile go.%%{bootstrap_pre_1_20_compiler_version} (C bootstrap)
 export GOROOT_BOOTSTRAP=%{_libdir}/golang
-mkdir -p %{_topdir}/BUILD/go.%{bootstrap_compiler_version}
-tar xf %{SOURCE2} -C %{_topdir}/BUILD/go.%{bootstrap_compiler_version} --strip-components=1
-pushd %{_topdir}/BUILD/go.%{bootstrap_compiler_version}/src
+mkdir -p %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version}
+tar xf %{SOURCE2} -C %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version} --strip-components=1
+pushd %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version}/src
 CGO_ENABLED=0 ./make.bash
 popd
 
 # Nuke the older go 1.4 bootstrap
 rm -rf %{_libdir}/golang
 
-# Make go.%{bootstrap_compiler_version} as the new bootstrapper (Go boostrap)
-mv -v %{_topdir}/BUILD/go.%{bootstrap_compiler_version} %{_libdir}/golang
+# Make go.%%{bootstrap_pre_1_20_compiler_version} as the new bootstrapper (Go boostrap)
+mv -v %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version} %{_libdir}/golang
+
+# Build go %%{bootstrap_post_1_20_compiler_version}
+export GOROOT_BOOTSTRAP=%{_libdir}/golang
+mkdir -p %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version}
+tar xf %{SOURCE3} -C %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version} --strip-components=1
+pushd %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version}/src
+CGO_ENABLED=0 ./make.bash
+popd
+# Remove %%{bootstrap_pre_1_20_compiler_version} bootstrapper
+rm -rf %{_libdir}/golang
+# Make %%{bootstrap_post_1_20_compiler_version} as the new bootstrapper
+mv -v %{_topdir}/BUILD/go.%{bootstrap_pre_1_20_compiler_version} %{_libdir}/golang
 
 # Build current go version
 export GOHOSTOS=linux
@@ -93,7 +109,7 @@ rm -rfv %{buildroot}%{goroot}/lib/time
 rm -rfv %{buildroot}%{goroot}/doc/Makefile
 
 # put binaries to bindir, linked to the arch we're building,
-# leave the arch independent pieces in %{goroot}
+# leave the arch independent pieces in %%{goroot}
 mkdir -p %{buildroot}%{goroot}/bin/linux_%{gohostarch}
 ln -sfv ../go %{buildroot}%{goroot}/bin/linux_%{gohostarch}/go
 ln -sfv ../gofmt %{buildroot}%{goroot}/bin/linux_%{gohostarch}/gofmt
@@ -137,6 +153,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Apr 15 2024 Muhammad Falak <mwani@microsoft.com> - 1.22.2-1
+- Bump version to 1.22.2
+
 * Fri Mar 22 2024 Muhammad Falak <mwani@microsoft.com> - 1.21.8-1
 - Bump version to 1.21.8
 

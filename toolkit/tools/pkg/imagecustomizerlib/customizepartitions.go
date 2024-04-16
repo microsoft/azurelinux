@@ -6,7 +6,7 @@ package imagecustomizerlib
 import (
 	"path/filepath"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 )
 
 func customizePartitions(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
