@@ -17,6 +17,7 @@ Feel free to delete sections of the template which do not apply to your PR, or a
 - [ ] All source files have up-to-date hashes in the `*.signatures.json` files
 - [ ] `sudo make go-tidy-all` and `sudo make go-test-coverage` pass
 - [ ] Documentation has been updated to match any changes to the build system
+- [ ] If you are adding/removing a .spec file that has multiple-versions supported, please add [@microsoft/cbl-mariner-multi-package-reviewers](https://github.com/orgs/microsoft/teams/cbl-mariner-multi-package-reviewers) team as reviewer [(Eg. golang has 2 versions 1.18, 1.21+)](https://github.com/microsoft/azurelinux/tree/2.0/SPECS/golang)
 - [ ] Ready to merge
 
 ---
