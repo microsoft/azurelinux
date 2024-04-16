@@ -46,6 +46,8 @@ Patch24:        0024-systemd-tmpfiles-create-root-and-root-.ssh.patch
 Patch25:        0025-kernel-Exec-systemctl.patch
 Patch26:        0026-getty-grant-checkpoint_restore.patch
 Patch27:        0027-systemd-Add-basic-systemd-analyze-rules.patch
+Patch28:        0028-cloudinit-Add-support-for-cloud-init-growpart.patch
+Patch29:        0029-filesystem-memory.pressure-fixes.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -211,10 +213,10 @@ rm -f %{buildroot}%{_sharedstatedir}/selinux/%{1}/active/*.linked \
 FILE_CONTEXT=%{_sysconfdir}/selinux/%{1}/contexts/files/file_contexts; \
 %{_sbindir}/selinuxenabled; \
 if [ $? = 0  -a "${SELINUXTYPE}" = %{1} -a -f ${FILE_CONTEXT}.pre ]; then \
-     /sbin/fixfiles -C ${FILE_CONTEXT}.pre restore &> /dev/null > /dev/null; \
+     /sbin/fixfiles -C ${FILE_CONTEXT}.pre restore; \
      rm -f ${FILE_CONTEXT}.pre; \
 fi; \
-if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null;then \
+if /sbin/restorecon -e /run/media -R /root %{_var}/log %{_var}/run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* ;then \
     continue; \
 fi;
 %define preInstall() \
@@ -236,7 +238,7 @@ if [ -e %{_sysconfdir}/selinux/%{2}/.rebuild ]; then \
 fi; \
 [ "${SELINUXTYPE}" == "%{2}" ] && selinuxenabled && load_policy; \
 if [ %{1} -eq 1 ]; then \
-   /sbin/restorecon -R /root %{_var}/log /run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* 2> /dev/null; \
+   /sbin/restorecon -R /root %{_var}/log /run %{_sysconfdir}/passwd* %{_sysconfdir}/group* %{_sysconfdir}/*shadow* ; \
 else \
 %relabel %{2} \
 fi;
@@ -299,7 +301,7 @@ SELINUXTYPE=%{policy_name}
 " > %{_sysconfdir}/selinux/config
 
      ln -sf ../selinux/config %{_sysconfdir}/sysconfig/selinux
-     restorecon %{_sysconfdir}/selinux/config 2> /dev/null || :
+     restorecon %{_sysconfdir}/selinux/config || :
 else
      . %{_sysconfdir}/selinux/config
 fi
@@ -331,6 +333,8 @@ exit 0
 %changelog
 * Tue Apr 09 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
 - Add mising rules for systemd-analyze.
+- Enable cloud-init-growpart support by default.
+- Add fixes for systemd memory pressure feature.
 
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-2
 - Add fixes from BVTs
