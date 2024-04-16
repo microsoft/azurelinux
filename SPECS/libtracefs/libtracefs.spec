@@ -39,7 +39,7 @@ Requires: %{name}%{_isa} = %{version}-%{release}
 Development headers of %{name}
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %set_build_flags
