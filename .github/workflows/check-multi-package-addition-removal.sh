@@ -1,14 +1,14 @@
 #!/bin/bash
 set -o pipefail
 
-# Initialize the variable
-echo "MULTI_PACKAGE_ADD_REMOVE_DETECTED=false" >> $GITHUB_ENV
-
 # Setup RPM tools
 source "$(git rev-parse --show-toplevel)"/toolkit/scripts/rpmops.sh
 
 # Define directories to watch
 SPEC_DIRS=("SPECS" "SPECS-EXTENDED")
+
+# Initialize the variable to false
+multi_package_add_remove_detected=false
 
 # Fetch the latest state of the base branch
 git fetch origin $GITHUB_BASE_REF
@@ -32,7 +32,7 @@ check_multi_package_add_remove() {
     for package in "${!package_counts[@]}"; do
         if [ "${package_counts[$package]}" -gt 1 ]; then
             echo "Multi-package add/remove of .spec file detected: $package in $DIR"
-            echo "MULTI_PACKAGE_ADD_REMOVE_DETECTED=true" >> $GITHUB_ENV
+            multi_package_add_remove_detected=true
         fi
     done
 }
@@ -48,3 +48,6 @@ for spec_dir in "${SPEC_DIRS[@]}"; do
         check_multi_package_add_remove "$dir_path"
     done
 done
+
+# Print true or false based on detection of duplicates
+echo $multi_package_add_remove_detected
