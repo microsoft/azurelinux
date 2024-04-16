@@ -695,12 +695,12 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 	return mountPoints
 }
 
-// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the chroot.
+// stopGPGComponents stops gpg-agent and keyboxd if they are running inside the chroot.
 //
-// A GPG agent may have been started while the chroot was in use.
+// A GPG agent may have been started while the chroot was in use. Newer versions of "gnupg2" will also start keyboxd.
 // E.g. when installing the azurelinux-repos-shared package, a GPG import occurs. This starts the gpg-agent process inside the chroot.
 // To be able to cleanly exit the setup chroot, we must stop it.
-func (c *Chroot) stopGPGAgent() (err error) {
+func (c *Chroot) stopGPGComponents() (err error) {
 	_, err = exec.LookPath("gpgconf")
 	if err != nil {
 		// gpgconf is not installed, so gpg-agent is not running.
