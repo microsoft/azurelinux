@@ -28,6 +28,8 @@ set -e
 #   │   container_tarballs
 #   │   ├── container_base
 #   │   │   ├── core-2.0.20230607.tar.gz
+#   │   ├── core_container_builder
+#   │   │   ├── core-container-builder-2.0.20230607.tar.gz
 #   │   ├── distroless_base
 #   │   │   ├── distroless-base-2.0.20230607.tar.gz
 #   │   ├── distroless_debug
@@ -100,6 +102,7 @@ function validate_inputs {
     fi
 
     BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-[0-9.]*.tar.gz")
+    BASE_BUILDER_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "core-container-builder-[0-9.]*.tar.gz")
     DISTROLESS_BASE_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-base-[0-9.]*.tar.gz")
     DISTROLESS_DEBUG_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-debug-[0-9.]*.tar.gz")
     DISTROLESS_MINIMAL_TARBALL=$(find "$CONTAINER_TARBALLS_DIR" -name "distroless-minimal-[0-9.]*.tar.gz")
@@ -162,6 +165,7 @@ function initialization {
     EULA_FILE_NAME="EULA-Container.txt"
 
     # Image types
+    BASE_BUILDER="base-builder"
     BASE="base"
     DISTROLESS="distroless"
     MARINARA="marinara"
@@ -199,8 +203,15 @@ function initialization {
     echo "DISTROLESS_DEBUG_IMAGE_NAME           -> $DISTROLESS_DEBUG_IMAGE_NAME"
     echo "DISTROLESS_DEBUG_NONROOT_IMAGE_NAME   -> $DISTROLESS_DEBUG_NONROOT_IMAGE_NAME"
     echo "MARINARA_IMAGE_NAME                   -> $MARINARA_IMAGE_NAME"
+
+    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
+    EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
 }
 
+function build_builder_image {
+    echo "+++ Build builder image"
+    docker import - "$BASE_BUILDER" < "$BASE_BUILDER_TARBALL"
+}
 function docker_build {
     local image_type=$1
     local image_full_name=$2
@@ -214,8 +225,6 @@ function docker_build {
     local build_dir="$WORK_DIR/container_build_dir"
     mkdir -p "$build_dir"
 
-    ROOT_FOLDER="$(git rev-parse --show-toplevel)"
-    EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
     if [ -d "$EULA_FILE_PATH" ]; then
         cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
     fi
@@ -272,13 +281,21 @@ function docker_build_marinara {
     local build_dir="$WORK_DIR/marinara_build_dir"
     mkdir -p "$build_dir"
     git clone "https://github.com/microsoft/$MARINARA.git" "$build_dir"
-    pushd "$build_dir"
-    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_IMAGE_NAME as installer|g" -i "dockerfile-$MARINARA"
+
+    if [ -d "$EULA_FILE_PATH" ]; then
+        cp "$EULA_FILE_PATH/$EULA_FILE_NAME" "$build_dir"/
+    fi
+
+    pushd "$build_dir" > /dev/null
+
+    sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
     docker build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
+        --build-arg INSTALL_DEPENDENCIES=false \
+        --build-arg EULA=$EULA_FILE_NAME \
         --no-cache \
         --progress=plain
 
@@ -327,4 +344,5 @@ function build_images {
 print_inputs
 validate_inputs
 initialization
+build_builder_image
 build_images

@@ -6,7 +6,7 @@ package sliceutils
 import (
 	"reflect"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
 )
 
 // NotFound value is returned by Find(), if a given value is not present in the slice.
