@@ -99,21 +99,6 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 		}
 
 		req := buildRequest(pkgGraph, buildState, packagesToRebuild, defaultNode, buildNodes, isCacheAllowed, hasADeltaNode)
-
-		if req.UseCache {
-			expectedFiles, missingFiles := pkggraph.FindRPMFiles(defaultNode.SrpmPath, pkgGraph, nil)
-			if len(missingFiles) > 0 && len(missingFiles) < len(expectedFiles) {
-				logger.Log.Infof("SRPM '%s' will be rebuilt due to partially missing components: %v", defaultNode.SRPMFileName(), missingFiles)
-			}
-
-			req.ExpectedFiles = expectedFiles
-			if len(missingFiles) != 0 {
-				req.UseCache = false
-				req.Freshness = buildState.GetMaxFreshness()
-				logger.Log.Debugf("Resetting freshness to %d due to missing files.", req.Freshness)
-			}
-		}
-
 		requests = append(requests, req)
 
 		partnerTestNodeRequest := partnerTestNodesToRequest(pkgGraph, buildState, testsToRerun, buildNodes, req.UseCache)
@@ -148,7 +133,7 @@ func buildRequest(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildState, pack
 		Freshness:      buildState.GetMaxFreshness(),
 	}
 
-	requiredRebuild := isRequiredRebuild(request.Node, packagesToRebuild)
+	requiredRebuild := isRequiredRebuild(pkgGraph, request.Node, packagesToRebuild, buildState)
 	if !requiredRebuild && isCacheAllowed {
 		// We might be able to use the cache, set the freshness based on node's dependencies.
 		request.UseCache, request.Freshness = canUseCacheForNode(pkgGraph, request.Node, buildState)
@@ -218,14 +203,11 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 	return
 }
 
-// isRequiredRebuild checks if a node is required to be rebuilt based  on the packagesToRebuild list.
-func isRequiredRebuild(node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer) (requiredRebuild bool) {
-	packageVer := node.VersionedPkg
-	requiredRebuild = sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
-	if requiredRebuild {
-		logger.Log.Debugf("Marking (%s) for rebuild per user request", packageVer)
-	}
-	return
+// isRequiredRebuild checks if a node is required to be rebuilt due to:
+// - missing RPMs or
+// - user explicitly requesting the node to be rebuilt.
+func isRequiredRebuild(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer, buildState *GraphBuildState) bool {
+	return nodeHasMissingRPMs(pkgGraph, node, buildState) || nodeRequestedForRebuildByUser(node, packagesToRebuild)
 }
 
 // canUseCacheForNode checks if the cache can be used for a given node by:
@@ -279,4 +261,28 @@ func calculateExpectedFreshness(dependencyNode *pkggraph.PkgNode, buildState *Gr
 	}
 
 	return expectedFreshness, shouldRebuild
+}
+
+// nodeHasMissingRPMs checks if all RPMs expected from the node's SRPM are present.
+// If any of the RPMs produced by the SRPM are missing, we must build the SRPM and reset the freshness of the node.
+func nodeHasMissingRPMs(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, buildState *GraphBuildState) (rpmsMissing bool) {
+	expectedFiles, missingFiles := pkggraph.FindRPMFiles(node.SrpmPath, pkgGraph, nil)
+
+	rpmsMissing = len(missingFiles) != 0
+	if rpmsMissing && len(missingFiles) < len(expectedFiles) {
+		logger.Log.Infof("SRPM (%s) will be rebuilt due to partially missing components: %v", node.SRPMFileName(), missingFiles)
+	}
+
+	return
+}
+
+// nodeRequestedForRebuildByUser checks if the user has explicitly requested the node to be rebuilt.
+func nodeRequestedForRebuildByUser(node *pkggraph.PkgNode, packagesToRebuild []*pkgjson.PackageVer) (rebuildRequested bool) {
+	packageVer := node.VersionedPkg
+	rebuildRequested = sliceutils.Contains(packagesToRebuild, packageVer, sliceutils.PackageVerMatch)
+	if rebuildRequested {
+		logger.Log.Infof("SRPM (%s) will be rebuilt due to user request.", packageVer)
+	}
+
+	return
 }
