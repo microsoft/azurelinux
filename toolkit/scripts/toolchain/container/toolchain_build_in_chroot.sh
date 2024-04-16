@@ -18,9 +18,11 @@ echo Now, running the final build steps in chroot inside container
 # Set BUILD_TARGET
 case $(uname -m) in
     x86_64)
+        GCC_CONFIG_WITH_ARCH="x86-64-v3"
         BUILD_TARGET=x86_64-pc-linux-gnu
     ;;
     aarch64)
+        GCC_CONFIG_WITH_ARCH="armv8.1-a"
         BUILD_TARGET=aarch64-unknown-linux-gnu
     ;;
 esac
@@ -354,6 +356,7 @@ SED=sed \
                 --enable-linker-build-id \
                 --enable-plugin \
                 --enable-default-pie \
+                --with-arch=$GCC_CONFIG_WITH_ARCH \
                 --with-system-zlib
 # --enable-install-libiberty
 # --disable-install-libiberty

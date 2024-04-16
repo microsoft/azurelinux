@@ -56,7 +56,7 @@
 Summary:        Contains the GNU compiler collection
 Name:           gcc
 Version:        11.2.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -327,6 +327,11 @@ SED=sed \
     --enable-plugin \
     --enable-shared \
     --enable-threads=posix \
+    %ifarch x86_64
+    --with-arch=x86-64-v3 \
+    %else
+    --with-arch=armv8.1-a \
+    %endif
     --with-system-zlib
 
 popd
@@ -520,6 +525,9 @@ $tests_ok
 %do_files aarch64-linux-gnu %{build_cross}
 
 %changelog
+* Tue Apr 09 2024 Andrew Phelps <anphel@microsoft.com> - 11.2.0-9
+- Test change for microarchitecture levels
+
 * Mon Dec 11 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 11.2.0-8
 - Added cross-compilation support for aarch64.
 - Used Fedora 36 spec (license: MIT) for guidance.

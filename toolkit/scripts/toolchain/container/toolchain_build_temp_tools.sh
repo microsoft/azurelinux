@@ -77,10 +77,12 @@ case $(uname -m) in
 esac
 case $(uname -m) in
   x86_64)
+    GCC_CONFIG_WITH_ARCH="x86-64-v3"
     sed -e '/m64=/s/lib64/lib/' \
         -i.orig gcc/config/i386/t-linux64
   ;;
   aarch64)
+    GCC_CONFIG_WITH_ARCH="armv8.1-a"
     sed -e '/mabi.lp64=/s/lib64/lib/' -i.orig gcc/config/aarch64/t-aarch64-linux
   ;;
 esac
@@ -107,6 +109,7 @@ cd       build
     --disable-libssp                               \
     --disable-libvtv                               \
     --disable-libstdcxx                            \
+    --with-arch=$GCC_CONFIG_WITH_ARCH              \
     --enable-languages=c,c++
 make -j$(nproc)
 make install
@@ -278,6 +281,7 @@ RANLIB=$LFS_TGT-ranlib                             \
     --disable-libstdcxx-pch                        \
     --disable-multilib                             \
     --disable-bootstrap                            \
+    --with-arch=$GCC_CONFIG_WITH_ARCH              \
     --disable-libgomp
 make -j$(nproc)
 make install
