@@ -1,7 +1,7 @@
 Summary:        PC/SC Lite smart card framework and applications
 Name:           pcsc-lite
 Version:        1.9.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +79,7 @@ done
 %configure \
   --disable-static \
   --enable-polkit \
+  --with-systemdsystemunitdir=%{_unitdir} \
   --enable-usbdropdir=%{_libdir}/pcsc/drivers
 make %{?_smp_mflags}
 doxygen doc/doxygen.conf ; rm -f doc/api/*.{map,md5}
@@ -149,6 +150,9 @@ fi
 %doc doc/api/ doc/example/pcsc_demo.c
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 1.9.5-3
+- Fix build issue by configuring with --with-systemdsystemunitdir defined
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 1.9.5-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
