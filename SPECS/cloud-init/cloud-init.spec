@@ -1,17 +1,20 @@
+%define upstream_version_group 23.3.3
+%define package_version %(echo %{upstream_version_group} | cut -d. -f1-2)
+
 Summary:        Cloud instance init scripts
 Name:           cloud-init
-Version:        23.4.1
-Release:        4%{?dist}
+Epoch:          1
+Version:        %{package_version}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
-Source0:        https://launchpad.net/cloud-init/trunk/%{version}/+download/%{name}-%{version}.tar.gz
+Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}/+download/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:         Retain-exit-code-in-cloud-init-status-for-recoverabl.patch
-Patch1:         ci-Pin-pytest-8.0.0.patch
-Patch2:         exec_cmd_error_handling.patch
+Patch0:         overrideDatasourceDetection.patch
+Patch1:         exec_cmd_error_handling.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -70,7 +73,7 @@ ssh keys and to let the user run various scripts.
 
 %package azure-kvp
 Summary:        Cloud-init configuration for Hyper-V telemetry
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name} = %{epoch}:%{version}-%{release}
 
 %description    azure-kvp
 Cloud-init configuration for Hyper-V telemetry
@@ -84,7 +87,7 @@ python3 setup.py build
 %install
 %{py3_install "--init-system=systemd"}
 
-python3 tools/render-template --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
+python3 tools/render-cloudcfg --variant mariner > %{buildroot}/%{_sysconfdir}/cloud/cloud.cfg
 sed -i "s,@@PACKAGED_VERSION@@,%{version}-%{release}," %{buildroot}/%{python3_sitelib}/cloudinit/version.py
 
 %if "%{_arch}" == "aarch64"
@@ -147,6 +150,12 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Apr 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 1:23.3-2
+- Downgrade to 23.3 with release 2 to avoid collision with 23.3 in PMC
+- Add back overrideDatasourceDetection.patch
+- Remove ci-Pin-pytest-8.0.0.patch as pytest is pinned to pytest<=7.3.1
+- Remove Retain-exit-code-in-cloud-init-status-for-recoverabl.patch
+
 * Wed Mar 13 2024 Minghe Ren <mingheren@microsoft.com> - 23.4.1-4
 - Add patch to resolve error handling approach when executing command
 
