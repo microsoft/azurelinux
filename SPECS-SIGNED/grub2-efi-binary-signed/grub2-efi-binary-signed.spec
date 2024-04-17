@@ -1,4 +1,5 @@
 %global debug_package %{nil}
+%global efidir azurelinux
 %ifarch x86_64
 %global buildarch x86_64
 %global grubefiname grubx64.efi
@@ -12,7 +13,7 @@
 Summary:        Signed GRand Unified Bootloader for %{buildarch} systems
 Name:           grub2-efi-binary-signed-%{buildarch}
 Version:        2.06
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,17 +69,20 @@ specifically created for installing on %{buildarch} systems
 %build
 
 %install
-mkdir -p %{buildroot}/boot/efi/EFI/BOOT
-cp %{SOURCE2} %{buildroot}/boot/efi/EFI/BOOT/%{grubefiname}
-cp %{SOURCE3} %{buildroot}/boot/efi/EFI/BOOT/%{grubpxeefiname}
+mkdir -p %{buildroot}/boot/efi/EFI/%{efidir}
+cp %{SOURCE2} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubefiname}
+cp %{SOURCE3} %{buildroot}/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 %files -n grub2-efi-binary
-/boot/efi/EFI/BOOT/%{grubefiname}
+/boot/efi/EFI/%{efidir}/%{grubefiname}
 
 %files -n grub2-efi-binary-noprefix
-/boot/efi/EFI/BOOT/%{grubpxeefiname}
+/boot/efi/EFI/%{efidir}/%{grubpxeefiname}
 
 %changelog
+* Wed Apr 17 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-19
+- move EFI binary from BOOT into efidir
+
 * Mon Apr 15 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-18
 - update grub to sbat 4
 
