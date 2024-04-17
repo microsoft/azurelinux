@@ -43,6 +43,8 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 Requires:       grub2-tools-minimal = %{version}-%{release}
+Recommends:     shim-x64 >= 15.8-1
+Conflicts:      shim < 15.8-1
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -59,6 +61,8 @@ specifically created for installing on %{buildarch} systems
 Summary:        GRand Unified Bootloader
 Group:          Applications/System
 Requires:       grub2-tools-minimal = %{version}-%{release}
+Recommends:     shim-x64 >= 15.8-1
+Conflicts:      shim < 15.8-1
 
 %description -n grub2-efi-binary-noprefix
 This package contains the GRUB EFI image with no prefix directory set and is signed for secure boot. The package is
