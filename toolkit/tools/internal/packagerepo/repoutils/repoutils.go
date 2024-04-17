@@ -161,7 +161,7 @@ func verifyClonedRepoContents(clonedRepoContents, expectedPackages []*repocloner
 
 // FindCreateRepoCommand searches for createrepo or createrepo_c in $PATH and returns the first one found
 func FindCreateRepoCommand() (cmd string, err error) {
-	creatrepo_cmds := []string{"createrepo", "createrepo_c"}
+	creatrepo_cmds := []string{"createrepo_c", "createrepo"}
 
 	selectedCmd := ""
 	// Check if a command exists in the $PATH
