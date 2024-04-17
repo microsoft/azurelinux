@@ -49,8 +49,8 @@ var (
 // AddCustomizationMacros adds the currently defined image custimization macros to the specified root directory.
 // For each of disableDocs and DisableRpmLocales a macro file is created with the corresponding macros defined in the
 // default rpm macros directory.
-func AddCustomizationMacros(rootDir string, disableDocs, DisableRpmLocales bool, overrideRpmLocales string) (err error) {
-	if overrideRpmLocales != "" && DisableRpmLocales {
+func AddCustomizationMacros(rootDir string, disableDocs, disableRpmLocales bool, overrideRpmLocales string) (err error) {
+	if overrideRpmLocales != "" && disableRpmLocales {
 		return fmt.Errorf("cannot set both DisableRpmLocales and OverrideRpmLocales")
 	}
 
@@ -61,7 +61,7 @@ func AddCustomizationMacros(rootDir string, disableDocs, DisableRpmLocales bool,
 			return fmt.Errorf("failed to add disable docs macro file:\n%w", err)
 		}
 	}
-	if DisableRpmLocales {
+	if disableRpmLocales {
 		logger.Log.Debugf("Disabling locale packages")
 		err = AddMacroFile(rootDir, rpm.DisableLocaleDefines(nil), ConfigureRpmLocalesMacroFile, localeComments)
 		if err != nil {
