@@ -4,6 +4,7 @@
 package safechroot
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -437,7 +438,7 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 		err = c.stopGPGComponents()
 		if err != nil {
 			// Don't want to leave a stale root if gpg components fail to exit. Logging a Warn and letting close continue...
-			logger.Log.Warnf("Failed to stop GPG components: %s", err)
+			logger.Log.Warnf("Failed to stop GPG components while tearing down the (%s) chroot: %s", c.rootDir, err)
 		}
 
 		// mount is only supported in regular pipeline
@@ -714,33 +715,51 @@ func (c *Chroot) stopGPGComponents() (err error) {
 	}
 
 	err = c.UnsafeRun(func() (err error) {
-		stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
-
-		logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
-
-		if err != nil || stderr != "" {
-			err = fmt.Errorf("failed to list gpg components.\nerr: %s\nstderr: %s\nUnable to check and stop GPG components", err, stderr)
-			return
-		}
-
+		// Split --list-components stdout into a list of name tags, one for each component
+		components, err := c.listGPGComponents()
+		// List of components to kill. The names must be verbatim identical to the name tag that is used by `gpgconf`
 		componentsToKill := []string{"gpg-agent", "keyboxd"}
-		// Split --list-components stdout on newline and iterate over each line
-		for _, line := range strings.Split(stdout, "\n") {
-			for _, component := range componentsToKill {
-				// Check if the line contains a component to kill
-				if strings.Contains(line, component) {
-					logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
-					_, _, err = shell.Execute("gpgconf", "--kill", component)
-					if err != nil {
-						err = fmt.Errorf("failed to stop gpg component \"%s\": \n%s", component, err)
-						return
-					}
+		for _, component := range componentsToKill {
+			// Check if the line contains a component to kill
+			if components[component] {
+				logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
+				_, stderr, err := shell.Execute("gpgconf", "--kill", component)
+				if err != nil {
+					err = fmt.Errorf("failed to stop GPG component (%s):\nerr: %w\nstderr: %s", component, err, stderr)
+					return err
 				}
 			}
 		}
 
 		return
 	})
+
+	return
+}
+
+func (c *Chroot) listGPGComponents() (components map[string]bool, err error) {
+	stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
+
+	if err != nil {
+		err = fmt.Errorf("failed to list GPG components.\nerr: %w\nstderr: %s", err, stderr)
+		return
+	}
+
+	logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
+
+	reader := strings.NewReader(stdout)
+	scanner := bufio.NewScanner(reader)
+
+	components = make(map[string]bool)
+	for scanner.Scan() {
+		line := scanner.Text()
+		components[strings.Split(line, ":")[0]] = true
+	}
+
+	err = scanner.Err()
+	if err != nil {
+		err = fmt.Errorf("error parsing gpgconf --list-components output: %w", err)
+	}
 
 	return
 }
