@@ -1,4 +1,5 @@
 %define debug_package %{nil}
+%define efidir azurelinux
 %define __os_install_post %{nil}
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
@@ -6,7 +7,7 @@
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.06
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -320,7 +321,7 @@ install -d %{buildroot}%{_datadir}/grub2-efi
 %endif
 
 # Install to efi directory
-EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/BOOT
+EFI_BOOT_DIR=%{buildroot}/boot/efi/EFI/%{efidir}
 GRUB_MODULE_NAME=
 GRUB_MODULE_SOURCE=
 
@@ -394,18 +395,18 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 
 %files efi-binary
 %ifarch x86_64
-/boot/efi/EFI/BOOT/grubx64.efi
+/boot/efi/EFI/%{efidir}/grubx64.efi
 %endif
 %ifarch aarch64
-/boot/efi/EFI/BOOT/grubaa64.efi
+/boot/efi/EFI/%{efidir}/grubaa64.efi
 %endif
 
 %files efi-binary-noprefix
 %ifarch x86_64
-/boot/efi/EFI/BOOT/grubx64-noprefix.efi
+/boot/efi/EFI/%{efidir}/grubx64-noprefix.efi
 %endif
 %ifarch aarch64
-/boot/efi/EFI/BOOT/grubaa64-noprefix.efi
+/boot/efi/EFI/%{efidir}/grubaa64-noprefix.efi
 %endif
 
 %ifarch aarch64
@@ -428,6 +429,9 @@ cp $GRUB_PXE_MODULE_SOURCE $EFI_BOOT_DIR/$GRUB_PXE_MODULE_NAME
 %config(noreplace) %{_sysconfdir}/grub.d/41_custom
 
 %changelog
+* Wed Oct 28 2024 Dan Streetman <ddstreet@microsoft.com> - 2.06-22
+- move EFI binary from BOOT into efidir
+
 * Mon Oct 28 2024 Chris Co <chrco@microsoft.com> - 2.06-21
 - Add Fedora SBAT entries
 
