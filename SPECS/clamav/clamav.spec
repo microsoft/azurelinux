@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        0.105.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  rust
+BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
@@ -136,6 +137,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 0.105.2-5
+- Fix build break by adding BR for systemd
+
 * Fri Dec 08 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.105.2-4
 - Fix resetting of user and group settings on package update
 
