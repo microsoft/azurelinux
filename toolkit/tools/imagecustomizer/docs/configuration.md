@@ -33,26 +33,38 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 9. Write the `/etc/mariner-customizer-release` file.
 
-10. Run post-install scripts. ([postInstallScripts](#postinstallscripts-script))
-
-11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+10. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
     If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
-12. Change SELinux mode and, if SELinux is enabled, call `setfiles`.
+11. Update the SELinux mode.
 
-13. Run finalize image scripts. ([finalizeImageScripts](#finalizeimagescripts-script))
+12. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
+    and update the grub config.
 
-14. Delete `/etc/resolv.conf` file.
+13. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
+    and update the grub config.
 
-15. Enable overlay filesystem. ([overlay](#overlay-type))
+14. Regenerate the initramfs file (if needed).
 
-16. Enable dm-verity root protection. ([verity](#verity-type))
+15. Run ([postCustomization](#postcustomization-script)) scripts.
 
-17. if the output format is set to `iso`, copy additional iso media files.
+16. If SELinux is enabled, call `setfiles`.
+
+17. Delete `/etc/resolv.conf` file.
+
+18. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
+
+19. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
+    the file systems.
+
+20. If ([verity](#verity-type)) is specified, then create the hash tree and update the
+    grub config.
+
+21. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -138,14 +150,6 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
-    - [postInstallScripts](#postinstallscripts-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
-    - [finalizeImageScripts](#finalizeimagescripts-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
@@ -164,10 +168,19 @@ os:
     - [modules](#modules-module)
       - [module type](#module-type)
         - [name](#module-name)
-        - [loadMode](#loadMode-string)
+        - [loadMode](#loadmode-string)
         - [options](#options-mapstring-string)
     - [overlay type](#overlay-type)
     - [verity type](#verity-type)
+  - [scripts type](#scripts-type)
+    - [postCustomization](#postcustomization-script)
+      - [script type](#script-type)
+        - [path](#script-path)
+        - [args](#args-string)
+    - [finalizeCustomization](#finalizecustomization-script)
+      - [script type](#script-type)
+        - [path](#script-path)
+        - [args](#args-string)
 
 ## Top-level
 
@@ -243,7 +256,8 @@ Supported options:
 
 The size of the disk.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -303,7 +317,7 @@ os:
       workDir: /work_etc
       partition:
         idType: part-label
-        Id: partition-etc
+        id: partition-etc
     - lowerDir: /var/lib
       upperDir: /upper_var_lib
       workDir: /work_var_lib
@@ -700,7 +714,8 @@ Required.
 
 The start location (inclusive) of the partition.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -708,14 +723,16 @@ Must be a multiple of 1 MiB.
 
 The end location (exclusive) of the partition.
 
-The End and Size fields cannot be specified at the same time.
+The `end` and `size` fields cannot be specified at the same time.
 
-Either the Size or End field is required for all partitions except for the last
+Either the `size` or `end` field is required for all partitions except for the last
 partition.
-When both the Size and End fields are omitted, the last partition will fill the
-remainder of the disk (based on the disk's [maxSize](#maxsize-uint64) field).
+When both the `size` and `end` fields are omitted or when the `size` field is set to the
+value `grow`, the last partition will fill the remainder of the disk based on the disk's
+[maxSize](#maxsize-uint64) field.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported format: `<NUM>(K|M|G|T)`: A size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB
+(`T`).
 
 Must be a multiple of 1 MiB.
 
@@ -723,7 +740,11 @@ Must be a multiple of 1 MiB.
 
 The size of the partition.
 
-Supported suffixes: `K` (KiB), `M` (MiB), `G` (GiB), and `T` (TiB).
+Supported formats:
+
+- `<NUM>(K|M|G|T)`: An explicit size in KiB (`K`), MiB (`M`), GiB (`G`), or TiB (`T`).
+
+- `grow`: Fill up the remainder of the disk. Must be the last partition.
 
 Must be a multiple of 1 MiB.
 
@@ -799,8 +820,8 @@ in.
 Example:
 
 ```yaml
-os:
-  postInstallScripts:
+scripts:
+  postCustomization:
   - path: scripts/a.sh
 ```
 
@@ -811,10 +832,57 @@ Additional arguments to pass to the script.
 Example:
 
 ```yaml
-os:
-  postInstallScripts:
+scripts:
+  postCustomization:
   - path: scripts/a.sh
     args: abc
+```
+
+## scripts type
+
+Note: Script files must be in the same directory or a child directory of the directory
+that contains the config file.
+
+### postCustomization [[script](#script-type)[]]
+
+Scripts to run after all the in-built customization steps have run.
+
+These scripts are run under a chroot of the customized OS.
+
+Example:
+
+```yaml
+scripts:
+  postCustomization:
+  - path: scripts/a.sh
+```
+
+### finalizeCustomization [[script](#script-type)[]]
+
+Scripts to run at the end of the customization process.
+
+In particular, these scripts run after:
+
+1. The `setfiles` command has been called to update/fix the SELinux files labels (if
+   SELinux is enabled), and
+
+2. The temporary `/etc/resolv.conf` file has been deleted,
+
+but before the conversion to the requested output type.
+(See, [Operation ordering](#operation-ordering) for details.)
+
+Most scripts should be added to [postCustomization](#postcustomization-script).
+Only add scripts to [finalizeCustomization](#finalizecustomization-script) if you want
+to customize the `/etc/resolv.conf` file or you want manually set SELinux file labels.
+
+These scripts are run under a chroot of the customized OS.
+
+Example:
+
+```yaml
+os:
+  finalizeCustomization:
+  - path: scripts/b.sh
 ```
 
 ## services type
@@ -919,40 +987,6 @@ os:
       permissions: "664"
 ```
 
-### postInstallScripts [[script](#script-type)[]]
-
-Scripts to run against the image after the packages have been added and removed.
-
-These scripts are run under a chroot of the customized OS.
-
-Note: Scripts must be in the same directory or a child directory of the directory
-that contains the config file.
-
-Example:
-
-```yaml
-os:
-  postInstallScripts:
-  - path: scripts/a.sh
-```
-
-### finalizeImageScripts [[script](#script-type)[]]
-
-Scripts to run against the image just before the image is finalized.
-
-These scripts are run under a chroot of the customized OS.
-
-Note: Scripts must be in the same directory or a child directory of the directory
-that contains the config file.
-
-Example:
-
-```yaml
-os:
-  finalizeImageScripts:
-  - path: scripts/a.sh
-```
-
 ### users [[user](#user-type)]
 
 Used to add and/or update user accounts.
@@ -976,7 +1010,6 @@ os:
   modules:
     - name: vfio
 ```
-
 
 ### services [[services](#services-type)]
 

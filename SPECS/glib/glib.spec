@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,7 @@ BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
 BuildRequires:  libselinux-devel
 BuildRequires:  meson
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 BuildRequires:  pkg-config
 BuildRequires:  python3-xml
 BuildRequires:  python3
@@ -23,7 +23,7 @@ BuildRequires:  which
 BuildRequires:  python3-pygments
 Requires:       libffi
 Requires:       libselinux
-Requires:       pcre-libs
+Requires:       pcre2-devel
 Provides:       glib2 = %{version}-%{release}
 Provides:       glib2%{?_isa} = %{version}-%{release}
 Provides:       glib2-static = %{version}-%{release}
@@ -37,7 +37,7 @@ Group:          Development/Libraries
 Requires:       glib = %{version}-%{release}
 Requires:       glib-schemas = %{version}-%{release}
 Requires:       libffi-devel
-Requires:       pcre-devel
+Requires:       pcre2-devel
 Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
@@ -123,6 +123,9 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-3
+- Move to pcre2
+
 * Fri Mar 15 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.78.1-2
 - Adding link for gio-querymodules.
 

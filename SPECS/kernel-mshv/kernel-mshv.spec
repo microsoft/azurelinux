@@ -10,8 +10,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        5.15.126.mshv3
-Release:        8%{?dist}
+Version:        5.15.126.mshv9
+Release:        3%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -21,7 +21,7 @@ Source1:        config
 Source2:        cbl-mariner-ca-20211013.pem
 Source3:        50_mariner_mshv.cfg
 Source4:        50_mariner_mshv_menuentry
-Patch0:         perf_bpf_test_add_nonnull_argument.patch
+Patch0:         fix_python_3.12_build_errors.patch
 ExclusiveArch:  x86_64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -67,6 +67,15 @@ Requires:       python3
 
 %description docs
 This package contains the MSHV kernel doc files
+
+%package tools
+Summary:        This package contains the 'perf' performance analysis tools for MSHV kernel
+Group:          System/Tools
+Requires:       %{name} = %{version}-%{release}
+Requires:       audit
+
+%description tools
+This package contains the 'perf' performance analysis tools for MSHV kernel.
 
 %prep
 %autosetup -p1
@@ -151,6 +160,14 @@ cp .config %{buildroot}%{_prefix}/src/linux-headers-%{uname_r} # copy .config ma
 ln -sf "%{_prefix}/src/linux-headers-%{uname_r}" "%{buildroot}/lib/modules/%{uname_r}/build"
 find %{buildroot}/lib/modules -name '*.ko' -print0 | xargs -0 chmod u+x
 
+# disable (JOBS=1) parallel build to fix this issue:
+# fixdep: error opening depfile: ./.plugin_cfg80211.o.d: No such file or directory
+# Linux version that was affected is 4.4.26
+make -C tools JOBS=1 DESTDIR=%{buildroot} prefix=%{_prefix} perf_install
+
+# Remove trace (symlink to perf). This file causes duplicate identical debug symbols
+rm -vf %{buildroot}%{_bindir}/trace
+
 %triggerin -- initramfs
 mkdir -p %{_localstatedir}/lib/rpm-state/initramfs/pending
 touch %{_localstatedir}/lib/rpm-state/initramfs/pending/%{uname_r}
@@ -191,7 +208,26 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %defattr(-,root,root)
 %{_defaultdocdir}/linux-%{uname_r}/*
 
+%files tools
+%defattr(-,root,root)
+%{_libexecdir}
+%exclude %dir %{_libdir}/debug
+%{_lib64dir}/traceevent
+%{_lib64dir}/libperf-jvmti.so
+%{_bindir}
+%{_sysconfdir}/bash_completion.d/*
+%{_datadir}/perf-core/strace/groups/file
+%{_datadir}/perf-core/strace/groups/string
+%{_docdir}/*
+%{_libdir}/perf/examples/bpf/*
+%{_libdir}/perf/include/bpf/*
+%{_includedir}/perf/perf_dlfilter.h
+
 %changelog
+* Tue Apr 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.126.mshv9-3
+- Update to v5.15.126.mshv9
+- Add patch to fix python 3.12 build errors
+
 * Mon Mar 25 2024 Manuel Huber <mahuber@microsoft.com> - 5.15.126.mshv3-8
 - Remove the tools subpackage.
 

@@ -1,14 +1,13 @@
 {
  "Signatures": {
-  "asm-7.2.pom": "e9e529afbd4bc699f6a3380855d27d13017c360fdb68547e06d1c3842d84e262",
-  "asm-all.pom": "80b1f57c62e769c55f1d52e41347904dfc77d530f0aac0de7b79bd7e708ec07d",
-  "asm-analysis-7.2.pom": "71faa63489b3de4d6251581d2b26e87e0c167c5a08198ca62853fd83644d841f",
-  "asm-commons-7.2.pom": "190ed352a8c20594b196b20194d06773b91c86b8d36868f937e5dbd0e9c0d78d",
-  "asm-test-7.2.pom": "48f87850fa612a3b1373070f1ddb7ba0a6e4439995ad7c312a1c4fa64fe272c7",
-  "asm-tree-7.2.pom": "56765f0a8bd0978214f7ec87a9dafb5825b8191cff554a5adc14c65d1f5b0442",
-  "asm-util-7.2.pom": "d1c3709a0a3573954d4baf73169fc942929c72b5c4a6b719656f5958c2a25f3c",
-  "generate-tarball.sh": "7a13c27b599d1fd9918f9f42c12370119d5c50830765dbc12087436acbdbb843",
-  "objectweb-asm-7.2-build.tar.xz": "f79f429a6847d77bef6e97c7f3a98e89a7850a6b9eb03c98c612332f1b7a65b1",
-  "objectweb-asm-7.2.tar.xz": "7fe9e3ec1838b48ad6865a667ce0a9c305e18650158a9c7b7206daef1404bb7d"
+  "aggregator.pom": "88dc1406a630c3050d8c4ddd33f3bcf0ffe548764f906e25e92abdc96c84ea76",
+  "asm-9.6.pom": "92eee24bc3c843e4881d46c1dd6505471ee3142facfb466b428cfea5a56c6b60",
+  "asm-analysis-9.6.pom": "fa3f995021cff4f4139306e6cffeeea07539106440d29b19cc06a7a636a13850",
+  "asm-commons-9.6.pom": "a98ae4895334baf8ff86bd66516210dbd9a03f1a6e15e47dda82afcf6b53d77c",
+  "asm-test-9.6.pom": "c39ee7e11f382a2e8352a29cc87daf6ec8445dfc595c1bdb512620b579ab165f",
+  "asm-tree-9.6.pom": "1bcb481d7fc16b955bb60ca07c8cfa2424bcee78bdc405bba31c7d6f5dc2d113",
+  "asm-util-9.6.pom": "52c5c1d357404779d1a99b49a85bf9d3a085025b8516cb73dbef77c8ae34005e",
+  "objectweb-asm-9.6.tar.gz": "b99a90ae698a29e1dbb45d7302920c5c74ce5403f69de469b08aabf9b1d420c0",
+  "tools-retrofitter.pom": "4d0747996d4dc34e8f0d24e3c1175860bbb3efae9cccaa2537fa23fa8b535484"
  }
 }
