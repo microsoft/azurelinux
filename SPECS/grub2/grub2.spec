@@ -174,6 +174,8 @@ Unsigned GRUB UEFI image
 Summary:        GRUB UEFI image
 Group:          System Environment/Base
 Requires:       %{name}-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 # Some distros split 'grub2' into more subpackages. For now we're bundling it all together
 # inside the default package and adding these 'Provides' to make installation more user-friendly
@@ -189,6 +191,8 @@ GRUB UEFI bootloader binaries
 Summary:        GRUB UEFI image with no prefix directory set
 Group:          System Environment/Base
 Requires:       %{name}-tools-minimal = %{version}-%{release}
+Recommends:     shim >= 15.8-3
+Conflicts:      shim < 15.8-3
 
 %description efi-binary-noprefix
 GRUB UEFI bootloader binaries with no prefix directory set
