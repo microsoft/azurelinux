@@ -3,7 +3,7 @@
 Summary:        Statistics collection daemon for filling RRD files
 Name:           collectd
 Version:        5.12.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        GPLv2 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Source97:       rrdtool.conf
 Source98:       onewire.conf
 Patch0:         %{name}-include-collectd.d.patch
 Patch1:         %{name}-gcc11.patch
+Patch2:         fix_missing_longintrepr_header.patch
 BuildRequires:  libgcrypt-devel
 BuildRequires:  perl
 BuildRequires:  perl(ExtUtils::Embed)
@@ -866,6 +867,9 @@ make check
 %{_libdir}/collectd/write_tsdb.so
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 5.12.0-10
+- Add patch to fix build break.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.12.0-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
