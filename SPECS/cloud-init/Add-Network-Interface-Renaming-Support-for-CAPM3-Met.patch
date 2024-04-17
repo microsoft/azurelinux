@@ -49,7 +49,7 @@ index 1f48dac..cc41e0a 100644
 +                "type": link["type"],
 +            }
 +
-+        else:
++        elif "name" not in link:
 +            cfg["name"] = link["id"]
 +
 +            link_mac_addr = None
