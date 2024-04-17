@@ -52,8 +52,8 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.7.0
-Release:        2%{?dist}
+Version:        3.9.0
+Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,7 +105,7 @@ BuildRequires:  zlib-devel
 %{?with_ldap:BuildRequires: openldap-devel}
 %{?with_lmdb:BuildRequires: lmdb-devel}
 %{?with_sasl:BuildRequires: cyrus-sasl-devel}
-%{?with_pcre:BuildRequires: pcre-devel}
+%{?with_pcre:BuildRequires: pcre2-devel}
 %{?with_mysql:BuildRequires: mariadb-connector-c-devel}
 %{?with_pgsql:BuildRequires: libpq-devel}
 %{?with_sqlite:BuildRequires: sqlite-devel}
@@ -274,9 +274,8 @@ CCARGS="${CCARGS} -fsigned-char"
   AUXLIBS_LMDB="-llmdb"
 %endif
 %if %{with pcre}
-  # -I option required for pcre 3.4 (and later?)
-  CCARGS="${CCARGS} -DHAS_PCRE -I%{_includedir}/pcre"
-  AUXLIBS_PCRE="-lpcre"
+  CCARGS="${CCARGS} -DHAS_PCRE=2 `pcre2-config --cflags`"
+  AUXLIBS_PCRE=`pcre2-config --libs8`
 %endif
 %if %{with mysql}
   CCARGS="${CCARGS} -DHAS_MYSQL -I%{_includedir}/mysql"
@@ -762,6 +761,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Apr 15 2024 Betty Lakes <bettylakes@microsoft.com> - 3.9.0-1
+- Update to version 3.9.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.7.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

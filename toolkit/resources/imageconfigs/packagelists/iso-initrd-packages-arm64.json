@@ -45,7 +45,6 @@
         "openssl",
         "azurelinux-release",
         "parted",
-        "pcre",
         "pkg-config",
         "popt",
         "readline",
