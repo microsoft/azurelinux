@@ -57,6 +57,8 @@ Patch1:         CVE-2021-3602.patch
 Patch2:         CVE-2022-27651.patch
 Patch3:         CVE-2022-2995.patch
 Patch4:         CVE-2023-42821.patch
+Patch5:         CVE-2022-29526.patch
+patch6:         CVE-2021-44716.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -110,6 +112,8 @@ tar -xf %{SOURCE1} --no-same-owner
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 %build
 
@@ -215,6 +219,7 @@ mkdir -p /opt/cni/bin
 %changelog
 * Tue Apr 16 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.21.7-2
 - Apply patches to fix CVE-2021-3602, CVE-2022-27651, CVE-2022-2995, CVE-2023-42821
+- CVE-2021-44716, CVE-2022-29526
 
 * Tue Apr 09 2024 Adithya Jayachandran <adjayach@microsoft.com> - 1.21.7-1
 - Update to 1.21.7 to fix CVE-2022-0811
