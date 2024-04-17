@@ -26,7 +26,7 @@
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
 Version:        4.7
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,6 +39,7 @@ Source5:        https://download.libreswan.org/cavs/ikev2.fax.bz2
 Patch0:         CVE-2023-38710.patch
 Patch1:         CVE-2023-38711.patch
 Patch2:         CVE-2023-38712.patch
+Patch3:         capng_apply.patch
 
 BuildRequires: audit-libs-devel
 BuildRequires: bison
@@ -196,6 +197,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.7-7
+- Add capng_apply.patch to fix build break
+
 * Wed Feb 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.7-6
 - Update the build dependency from mariner-release to azurelinux-release
 
