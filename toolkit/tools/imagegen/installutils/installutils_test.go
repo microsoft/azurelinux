@@ -120,3 +120,80 @@ func TestCopyAdditionalFiles(t *testing.T) {
 	assert.Equal(t, orig_contents, copy_1_contents)
 	assert.Equal(t, orig_contents, copy_2_contents)
 }
+
+// Test AddImageIDFile function in installutils.go
+func TestAddImageIDFile(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	proposedDir := filepath.Join(tmpDir, "TestAddImageIDFile")
+	chroot := safechroot.NewChroot(proposedDir, false)
+
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
+	assert.NoError(t, err)
+
+	defer chroot.Close(false)
+
+	buildNumber := "build-1234"
+	imageIDFilePath := "/etc/image-id"
+
+	etcPath := filepath.Join(chroot.RootDir(), "etc")
+	os.Mkdir(etcPath, os.ModePerm)
+	err = AddImageIDFile(chroot.RootDir(), buildNumber)
+	assert.NoError(t, err)
+
+	imageIDFileContents, err := os.ReadFile(filepath.Join(chroot.RootDir(), imageIDFilePath))
+	assert.NoError(t, err)
+
+	// assert that file has BUILD_NUMBER and the build number
+	assert.Contains(t, string(imageIDFileContents), "BUILD_NUMBER="+buildNumber)
+	// assert that file has IMAGE_BUILD_DATE and a timestamp in the format of YYYYMMDDHHMMSS
+	assert.Regexp(t, "IMAGE_BUILD_DATE=[0-9]{14}", string(imageIDFileContents))
+	// assert that file has IMAGE_UUID and a UUID
+	assert.Regexp(t, "IMAGE_UUID=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", string(imageIDFileContents))
+}
+
+func TestAddImageIDFileEmptyBuildNumber(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	proposedDir := filepath.Join(tmpDir, "TestAddImageIDFile")
+	chroot := safechroot.NewChroot(proposedDir, false)
+
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
+	assert.NoError(t, err)
+
+	defer chroot.Close(false)
+
+	buildNumber := ""
+	expectedBuildNumber := "local"
+	imageIDFilePath := "/etc/image-id"
+
+	etcPath := filepath.Join(chroot.RootDir(), "etc")
+	os.Mkdir(etcPath, os.ModePerm)
+	err = AddImageIDFile(chroot.RootDir(), buildNumber)
+	assert.NoError(t, err)
+
+	imageIDFileContents, err := os.ReadFile(filepath.Join(chroot.RootDir(), imageIDFilePath))
+	assert.NoError(t, err)
+	assert.Contains(t, string(imageIDFileContents), expectedBuildNumber)
+}
+
+func TestAddImageIDFileGuardClause(t *testing.T) {
+	if os.Geteuid() != 0 {
+		t.Skip("Test must be run as root because it uses a chroot")
+	}
+
+	proposedDir := filepath.Join(tmpDir, "TestAddImageIDFileGuardClause")
+	chroot := safechroot.NewChroot(proposedDir, false)
+
+	err := chroot.Initialize("", []string{}, []*safechroot.MountPoint{}, true)
+	assert.NoError(t, err)
+
+	defer chroot.Close(false)
+
+	err = AddImageIDFile(chroot.RootDir(), "")
+	assert.Error(t, err)
+}
