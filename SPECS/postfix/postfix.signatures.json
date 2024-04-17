@@ -2,12 +2,12 @@
  "Signatures": {
   "README-Postfix-SASL-RedHat.txt": "ee4f586103caeb67439389542f4f4937168a4a34e7576e64060517fb9a216a3f",
   "pflogsumm-1.1.5.tar.gz": "da6443679117de5109fd7d65fe915286c20ad1ecee63fe07d8cdddd0b75fe466",
-  "postfix-3.7.0.tar.gz": "645c6a74959703f8dff5b696b2df2e8bc0c91ac530127a21c998e3defbb9528c",
+  "postfix-3.9.0.tar.gz": "56f5e420e7c25455a4e96c19b672f80f9a0a35fb5becc9247c9e3d5dcc617f34",
   "postfix-chroot-update": "a6180d5b2cb81e8f84388d889fe671c80a5bc953a122ef03633346dc3f21a16a",
-  "postfix-etc-init.d-postfix": "ede617a0d1210d61d3d2557954d16caeccb0bac1137e6b202c5d201be7adfc32",
+  "postfix-etc-init.d-postfix": "61db4e9056c5c345fc8fe301417dba595ad5084cbbe574a14bed0f5c5aeaa3d6",
   "postfix-pam.conf": "b0fb611f3e88f94068ee2d5b7e26d433283ad2d3c2dbf11c36eceadac6bcc91a",
   "postfix-sasl.conf": "6617c2faa6edec2450a9cfe004b09f3c37a2ccb4cd6fd2cb945bb95790f96375",
-  "postfix.aliasesdb": "c20e79af7ef43fd79d86b506990a7d57ad56e533595cabbba74c8971d9bbb010",
-  "postfix.service": "e90d00d1560aa5a3298c1bd5ff760e2423d7d9f8b290e1b137845dedf291f136"
+  "postfix.aliasesdb": "2791d10b2d335533456e3d79f4e576eede143d61a7823a8df567fa2de44295ad",
+  "postfix.service": "2d8f604c65075efecd40a81d7a9e7f8fcd9c2e5b6d335561a033ca7b6335495c"
  }
 }
