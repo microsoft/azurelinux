@@ -263,18 +263,39 @@ function docker_build {
     pushd "$WORK_DIR" > /dev/null
     echo " docker build command"
     echo "----------------------"
-    echo "docker buildx build $DOCKER_BUILD_ARGS" \
-    "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
-    "--build-arg RPMS_TO_INSTALL=$PACKAGES_TO_INSTALL" \
-    "-t $GOLDEN_IMAGE_NAME --no-cache --progress=plain" \
-    "-f $WORK_DIR/Dockerfile ."
+        
+    if [ "$IS_NVIDIA_IMAGE" = true ]; then
+        # Obtain the kernel version, NVIDIA GPU driver version and Azure Linux version
+        export KERNEL_VERSION=$(rpm -q --qf '%{VERSION}-%{release}\n' -p kernel-devel*)
+        export DRIVER_VERSION=$(rpm -q --qf '%{VERSION}' -p cuda*)
+        export DRIVER_BRANCH="${DRIVER_VERSION%%.*}"
+        export AZURE_LINUX_VERSION=${BASE_IMAGE_TAG%.*}
+        
+        echo "docker buildx build $DOCKER_BUILD_ARGS" \
+        "--build-arg RPMS_TO_INSTALL=$PACKAGES_TO_INSTALL" \
+        "-t $GOLDEN_IMAGE_NAME --no-cache --progress=plain" \
+        "-f $WORK_DIR/Dockerfile ."
+    else
+        echo "docker buildx build $DOCKER_BUILD_ARGS" \
+        "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
+        "--build-arg RPMS_TO_INSTALL=$PACKAGES_TO_INSTALL" \
+        "-t $GOLDEN_IMAGE_NAME --no-cache --progress=plain" \
+        "-f $WORK_DIR/Dockerfile ."
+    fi
 
     echo ""
-    docker buildx build $DOCKER_BUILD_ARGS \
-        --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
-        --build-arg RPMS_TO_INSTALL="$PACKAGES_TO_INSTALL" \
-        -t "$GOLDEN_IMAGE_NAME" --no-cache --progress=plain \
-        -f "$WORK_DIR/Dockerfile" .
+    if [ "$IS_NVIDIA_IMAGE" = true ]; then
+        docker buildx build $DOCKER_BUILD_ARGS \
+            --build-arg RPMS_TO_INSTALL="$PACKAGES_TO_INSTALL" \
+            -t "$GOLDEN_IMAGE_NAME" --no-cache --progress=plain \
+            -f "$WORK_DIR/Dockerfile" .
+    else
+        docker buildx build $DOCKER_BUILD_ARGS \
+            --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
+            --build-arg RPMS_TO_INSTALL="$PACKAGES_TO_INSTALL" \
+            -t "$GOLDEN_IMAGE_NAME" --no-cache --progress=plain \
+            -f "$WORK_DIR/Dockerfile" .
+    fi
     popd > /dev/null
 }
 
@@ -311,6 +332,13 @@ function set_image_tag {
     if [ "$IS_HCI_IMAGE" = true ]; then
         # Example: acrafoimages.azurecr.io/base/kubevirt/virt-operator:0.59.0-2.2.0.20230607-amd64
         GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION.$BASE_IMAGE_TAG"
+    elif [ "$IS_NVIDIA_IMAGE" = true ]; then
+        # Example: azurelinuxpreview.azurecr.io/base/driver:550-5.15.153.1-1.cm2-mariner2.0
+        # Fetch the ID and VERSION_ID from /etc/os-release file
+        ID=$(docker exec -u 0 "$containerId" cat /etc/os-release | grep "^ID=" | cut -d'=' -f2)
+        VERSION_ID=$(docker exec -u 0 "$containerId" cat /etc/os-release | grep "^VERSION_ID=" | cut -d'=' -f2 | sed -e 's/^"//' -e 's/"$//')
+        OS_TAG=$ID$VERSION_ID
+        GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$DRIVER_BRANCH-$KERNEL_VERSION-$OS_TAG"
     else
         # Example: azurelinuxpreview.azurecr.io/base/nodejs:16.19.1-2-$DISTRO_IDENTIFIER2.0.20230607-amd64
         GOLDEN_IMAGE_NAME_FINAL="$GOLDEN_IMAGE_NAME:$COMPONENT_VERSION-$DISTRO_IDENTIFIER$BASE_IMAGE_TAG"

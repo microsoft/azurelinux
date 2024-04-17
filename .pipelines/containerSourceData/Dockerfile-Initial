@@ -11,7 +11,11 @@ RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \\\
     tdnf autoremove -y createrepo; \\\
     for rpm in "${RPMS_TO_INSTALL[@]}"; do \\\
        echo "RPM: $rpm"; \\\
-       tdnf install -y $rpm; \\\
+       if [[ $rpm == *"nvidia"* ]] || [[ $string == *"cuda"* ]]; then \\\
+         tdnf -y --downloadonly --downloaddir=/opt/nvidia install $rpm; \\\
+       else \\\
+         tdnf install -y $rpm; \\\
+       fi; \\\
     done; \\\
     tdnf clean all; \\\
     rm -f /etc/yum.repos.d/local.repo; \\\
