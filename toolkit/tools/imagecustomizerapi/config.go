@@ -9,7 +9,7 @@ type Config struct {
 	Storage *Storage `yaml:"storage"`
 	Iso     *Iso     `yaml:"iso"`
 	OS      *OS      `yaml:"os"`
-	Scripts Scripts  `yaml:"scripts"`
+	Scripts *Scripts `yaml:"scripts"`
 }
 
 func (c *Config) IsValid() (err error) {
@@ -39,9 +39,11 @@ func (c *Config) IsValid() (err error) {
 		hasResetBootLoader = c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
 	}
 
-	err = c.Scripts.IsValid()
-	if err != nil {
-		return err
+	if c.Scripts != nil {
+		err = c.Scripts.IsValid()
+		if err != nil {
+			return err
+		}
 	}
 
 	if hasStorage != hasResetBootLoader {

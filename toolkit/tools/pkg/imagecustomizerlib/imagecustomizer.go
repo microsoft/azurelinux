@@ -131,7 +131,7 @@ func createImageCustomizer(buildDir string,
 	// configuration
 	ic.configPath = configPath
 	ic.config = config
-	ic.customizeOSPartitions = (config.Storage != nil) || (config.OS != nil)
+	ic.customizeOSPartitions = (config.Storage != nil) || (config.OS != nil) || (config.Scripts != nil)
 
 	ic.useBaseImageRpmRepos = useBaseImageRpmRepos
 	ic.rpmsSources = rpmsSources
@@ -393,7 +393,7 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	err = validateScripts(baseConfigPath, &config.Scripts)
+	err = validateScripts(baseConfigPath, config.Scripts)
 	if err != nil {
 		return err
 	}
@@ -458,6 +458,11 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 }
 
 func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts) error {
+
+	if scripts == nil {
+		return nil
+	}
+
 	for i, script := range scripts.PostCustomization {
 		err := validateScript(baseConfigPath, &script)
 		if err != nil {
