@@ -1,24 +1,22 @@
-Name: ck
-Version: 0.7.2
-Release: 1%{?dist}
-Summary: Library for high performance concurrent programming
-
-License: BSD-2-clause AND Apache-2.0 AND BSD-3-clause
-# concurrencykit.org has been done for many months now, so use github instead
-URL: https://github.com/concurrencykit/ck
-Source: %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-
+Summary:        Library for high performance concurrent programming
+Name:           ck
+Version:        0.7.2
+Release:        1%{?dist}
+License:        BSD-2-clause AND Apache-2.0 AND BSD-3-clause
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+URL:            https://github.com/concurrencykit/ck
+Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 # disable ck_hclh_test from ck_spinlock temporary solution
 # github issue: https://github.com/concurrencykit/ck/issues/153
-Patch3: ck_disable_ck_hclh_test.patch
+Patch3:         ck_disable_ck_hclh_test.patch
 # measure unit test times
-Patch4: ck-unit-time.patch
+Patch4:         ck-unit-time.patch
 # specify SEQUENCE_CORES different for one test
-Patch5: ck-unit-sequence.patch
-
-BuildRequires: gcc
-BuildRequires: make
-BuildRequires: sed
+Patch5:         ck-unit-sequence.patch
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  sed
 
 %description
 Concurrency Kit provides a plethora of concurrency primitives, safe memory
@@ -29,8 +27,8 @@ and most of the interface relies only on a strict subset of the standard
 library and more popular compiler extensions.
 
 %package devel
-Summary: Header files and libraries for CK development
-Requires: %{name} = %{version}-%{release}
+Summary:        Header files and libraries for CK development
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
 Concurrency Kit provides a plethora of concurrency primitives, safe memory
@@ -193,4 +191,3 @@ time timeout -k $TIMEOUT_KILL $TIMEOUT \
 
 * Sat Feb 04 2017 Honza Horak <hhorak@redhat.com> - 0.5.2-1
 - Initial packaging
-
