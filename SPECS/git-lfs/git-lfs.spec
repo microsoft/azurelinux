@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.1.4
-Release:       17%{?dist}
+Release:       18%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:  Mariner
@@ -30,6 +30,8 @@ Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{
 Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2023-44487.patch
 Patch1:        CVE-2021-44716.patch
+Patch2:        CVE-2022-32149.patch
+Patch3:        CVE-2023-39325.patch
 
 BuildRequires: golang
 BuildRequires: which
