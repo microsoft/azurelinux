@@ -1,7 +1,7 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        3.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,9 +14,7 @@ BuildRequires:  swig
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
-# python3-wheel (non-toolchain package) cannot be added as a BR to libselinux (since it is a toolchain package)
-# The raw toolchain environment does already provide python3-wheel
-#BuildRequires:  python3-wheel
+BuildRequires:  python3-wheel
 Requires:       pcre2
 Requires:       libsepol
 
@@ -47,7 +45,7 @@ The libselinux-utils package contains the utilities
 Summary:        Header files and libraries used to build SELinux
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       pcre-devel
+Requires:       pcre2-devel
 Requires:       libsepol-devel >= %{version}
 
 %description    devel
@@ -69,6 +67,7 @@ SELinux applications.
 %autosetup
 
 %build
+export USE_PCRE2="y"
 sed '/unistd.h/a#include <sys/uio.h>' -i src/setrans_client.c
 %make_build clean
 %make_build swigify CFLAGS="%{build_cflags} -Wno-error=strict-overflow -fno-semantic-interposition"
@@ -110,6 +109,9 @@ echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libsel
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 3.6-3
+- Move to pcre2
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 3.6-2
 - fix tmpfiles.d conf to avoid "Line references path below legacy directory
   /var/run/" warnings

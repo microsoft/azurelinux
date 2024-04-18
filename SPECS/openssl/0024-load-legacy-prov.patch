@@ -1,18 +1,17 @@
-From fc2fc6cf6e58448ae23bc22743673b2c34c5cc02 Mon Sep 17 00:00:00 2001
-From: Tobias Brick <tobiasb@microsoft.com>
-Date: Mon, 20 Nov 2023 19:21:49 +0000
-Subject: [PATCH] second attempt to patch
+From ffc4f8f57d2e341afd5fd2e073390aaa0df4d003 Mon Sep 17 00:00:00 2001
+From: Maxwell Moyer-McKee <mamckee@microsoft.com>
+Date: Thu, 11 Apr 2024 14:32:29 -0700
+Subject: [PATCH] Add default provider configuration
 
 ---
- apps/openssl.cnf    | 34 +++++++++++++---------------------
- doc/man5/config.pod |  8 ++++++++
- 2 files changed, 21 insertions(+), 21 deletions(-)
+ apps/openssl.cnf | 39 ++++++++++++++++++---------------------
+ 1 file changed, 18 insertions(+), 21 deletions(-)
 
 diff --git a/apps/openssl.cnf b/apps/openssl.cnf
-index 8141ab2..fa5d751 100644
+index bd25e0c622..9a92ea410c 100644
 --- a/apps/openssl.cnf
 +++ b/apps/openssl.cnf
-@@ -42,35 +42,27 @@ tsa_policy1 = 1.2.3.4.1
+@@ -42,35 +42,32 @@ tsa_policy1 = 1.2.3.4.1
  tsa_policy2 = 1.2.3.4.5.6
  tsa_policy3 = 1.2.3.4.5.7
  
@@ -25,9 +24,14 @@ index 8141ab2..fa5d751 100644
 -# .include fipsmodule.cnf
 -
  [openssl_init]
++alg_section = evp_settings
  providers = provider_sect
  
 -# List of providers to load
++# Use the SymCrypt provider by default, if available
++[evp_settings]
++default_properties = "?provider=symcryptprovider"
++
 +# Uncomment the sections that start with ## below to enable the legacy provider.
 +# Loading the legacy provider enables support for the following algorithms:
 +# Hashing Algorithms / Message Digests: MD2, MD4, MDC2, WHIRLPOOL, RIPEMD160
@@ -61,25 +65,6 @@ index 8141ab2..fa5d751 100644
  
  ####################################################################
  [ ca ]
-diff --git a/doc/man5/config.pod b/doc/man5/config.pod
-index 8d312c6..714a104 100644
---- a/doc/man5/config.pod
-+++ b/doc/man5/config.pod
-@@ -273,6 +273,14 @@ significant.
- All parameters in the section as well as sub-sections are made
- available to the provider.
- 
-+=head3 Loading the legacy provider
-+
-+Uncomment the sections that start with ## in openssl.cnf
-+to enable the legacy provider.
-+Note: In general it is not recommended to use the above mentioned algorithms for
-+security critical operations, as they are cryptographically weak or vulnerable
-+to side-channel attacks and as such have been deprecated.
-+
- =head3 Default provider and its activation
- 
- If no providers are activated explicitly, the default one is activated implicitly.
 -- 
-2.33.8
+2.34.1
 

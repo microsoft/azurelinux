@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -804,6 +805,56 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 			return file.Create(machineIDFile, machineIDFilePerms)
 		})
 	}
+	return
+}
+
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageIDFile(installChrootRootDir string, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChrootRootDir, "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChrootRootDir, imageIDFile)
+
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
+
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
+
 	return
 }
 
@@ -1731,12 +1782,12 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(selinuxMode, installChroot)
+	err = SELinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		err = fmt.Errorf("failed to update SELinux config:\n%w", err)
 		return
 	}
-	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
+	err = SELinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		err = fmt.Errorf("failed to label SELinux files:\n%w", err)
 		return
@@ -1744,7 +1795,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1763,7 +1814,7 @@ func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
 		squashErrors        = false

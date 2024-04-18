@@ -21,7 +21,7 @@ Summary:        An optimized BLAS library based on GotoBLAS2
 # "obsoleted" features are still kept in the spec.
 Name:           openblas
 Version:        0.3.26
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,7 +40,7 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
 BuildRequires:  make
-BuildRequires:  multilib-rpm-config
+%{!?azl:BuildRequires:  multilib-rpm-config}
 BuildRequires:  perl-devel
 %if %{with system_lapack}
 # Do we have LAPACKE? (Needs at least lapack 3.4.0)
@@ -352,8 +352,11 @@ make -C serial USE_THREAD=0 PREFIX=%{buildroot} OPENBLAS_LIBRARY_DIR=%{buildroot
 cp -a %{_includedir}/lapacke %{buildroot}%{_includedir}/%{name}
 %endif
 
+# azl does not support multilib, no need for this
+%if ! 0%{?azl}
 # Fix i686-x86_64 multilib difference
 %multilib_fix_c_header --file %{_includedir}/openblas/openblas_config.h
+%endif
 
 # Fix name of libraries: runtime CPU detection has none
 suffix=""
@@ -555,6 +558,9 @@ rm -rf %{buildroot}%{_libdir}/pkgconfig
 %{_libdir}/lib%{name}p64_.a
 
 %changelog
+* Tue Apr 09 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.3.26-2
+- Remove multilib handling since azl doesn't support it
+
 * Mon Feb 05 2024 Nan Liu <liunan@microsoft.com> - 0.3.26-1
 - Upgrade to 0.3.26
 - Update License to BSD-3-Clause

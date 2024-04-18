@@ -51,15 +51,20 @@ conf_check() {
 }
 
 make_aliasesdb() {
-	if [ "$(/usr/sbin/postconf -h alias_database)" == "hash:/etc/aliases" ]
+	local MAP=""
+	local ALIASESDB="$(/usr/sbin/postconf -h alias_database)"
+	[ "$ALIASESDB" = "hash:/etc/aliases" ] && MAP="db"
+	[ "$ALIASESDB" = "lmdb:/etc/aliases" ] && MAP="lmdb"
+
+	if [ "$MAP" = "db" -o "$MAP" = "lmdb" ]
 	then
-		# /etc/aliases.db may be used by other MTA, make sure nothing
+		# /etc/aliases.db|lmdb may be used by other MTA, make sure nothing
 		# has touched it since our last newaliases call
-		[ /etc/aliases -nt /etc/aliases.db ] ||
-			[ "$ALIASESDB_STAMP" -nt /etc/aliases.db ] ||
-			[ "$ALIASESDB_STAMP" -ot /etc/aliases.db ] || return
+		[ /etc/aliases -nt /etc/aliases.$MAP ] ||
+			[ "$ALIASESDB_STAMP" -nt /etc/aliases.$MAP ] ||
+			[ "$ALIASESDB_STAMP" -ot /etc/aliases.$MAP ] || return
 		/usr/bin/newaliases
-		touch -r /etc/aliases.db "$ALIASESDB_STAMP"
+		touch -r /etc/aliases.$MAP "$ALIASESDB_STAMP"
 	else
 		/usr/bin/newaliases
 	fi
