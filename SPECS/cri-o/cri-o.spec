@@ -59,6 +59,8 @@ Patch3:         CVE-2022-2995.patch
 Patch4:         CVE-2023-42821.patch
 Patch5:         CVE-2022-29526.patch
 patch6:         CVE-2021-44716.patch
+patch7:         CVE-2022-21698.patch
+patch8:         CVE-2023-44487.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
@@ -114,6 +116,8 @@ tar -xf %{SOURCE1} --no-same-owner
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 %build
 
