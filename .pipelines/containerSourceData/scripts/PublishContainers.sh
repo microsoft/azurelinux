@@ -194,6 +194,7 @@ function create_multi_arch_tags {
     echo "+++ push $full_multiarch_tag tag"
     docker manifest push "$full_multiarch_tag"
     echo "+++ $full_multiarch_tag tag pushed successfully"
+    oras_attach "$full_multiarch_tag"
 
     # Save the multi-arch tag to a file.
     image_basename=${multiarch_name#*/}
