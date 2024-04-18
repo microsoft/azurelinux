@@ -1,0 +1,33 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+name: MultiPackage Check
+
+pr:
+  branches:
+    include:
+      - karimeldegwy/**
+
+variables:
+  - group: "Agent pools (DEV)"
+
+resources:
+  repositories:
+    - repository: CBL-Mariner-Pipelines
+      type: git
+      name: mariner/CBL-Mariner-Pipelines
+
+jobs:
+  - job: 'MultiPackageCheck'
+    pool:
+      type: linux
+      isCustom: true
+      name: "$(DEV_AMD64_Ubuntu_Managed)"
+    timeoutInMinutes: 15
+    displayName: 'Add reviewer if multi-package addition/removal detected'
+
+    steps:
+    - template: pipelines/multi-package/AddMultiPackTeamAsReviewer.yml@CBL-Mariner-Pipelines
+      parameters:
+        githubBaseRef: $(System.PullRequest.TargetBranch)
+        prID: $(System.PullRequest.PullRequestId)
