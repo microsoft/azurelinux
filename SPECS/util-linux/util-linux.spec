@@ -13,6 +13,7 @@ Source2:        runuser-l
 Source3:        su
 Source4:        su-l
 Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
+Patch1:         0001-wall-fix-escape-sequence-Injection-CVE-2024-28085.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -151,6 +152,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Thu Apr 18 2024 Bala <balakumaran.kannan@microsoft.com> - 2.37.4-9
+- Patch CVE-2024-28085 in wall command
+
 * Thu Sep 21 2023 Andrew Phelps <anphel@microsoft.com> - 2.37.4-8
 - Add su-l file for PAM
 
