@@ -4,7 +4,7 @@
 Summary:        A framework for creating UPnP devices & control points
 Name:           gupnp
 Version:        1.6.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -14,11 +14,13 @@ Source0:        https://github.com/GNOME/%{name}/archive/refs/tags/%{name}-%{ver
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gi-docgen
 %endif
+BuildRequires:  cmake
 BuildRequires:  gobject-introspection-devel
+BuildRequires:  gssdp-devel
 BuildRequires:  meson
 BuildRequires:  vala
 BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  pkgconfig(gssdp-1.6) >= %{gssdp_version}
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(libsoup-3.0)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(uuid)
@@ -85,9 +87,7 @@ This package contains developer documentation for %{name}.
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/gupnp*
-%if %{with docs}
 %{_mandir}/man1/gupnp-binding-tool-%{apiver}.1*
-%endif
 
 %if %{with docs}
 %files docs
@@ -95,6 +95,9 @@ This package contains developer documentation for %{name}.
 %endif
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 1.6.3-4
+- Fix build break
+
 * Wed Feb 01 2023 Sumedh Sharma <sumsharma@microsoft.com> - 1.6.3-3
 - Initial CBL-Mariner import from Fedora 38 (license: MIT)
 - Disable docs
