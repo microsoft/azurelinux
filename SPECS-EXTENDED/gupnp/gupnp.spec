@@ -14,13 +14,11 @@ Source0:        https://github.com/GNOME/%{name}/archive/refs/tags/%{name}-%{ver
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gi-docgen
 %endif
-BuildRequires:  cmake
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  gssdp-devel
 BuildRequires:  meson
 BuildRequires:  vala
 BuildRequires:  %{_bindir}/xsltproc
-BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(gssdp-1.6) >= %{gssdp_version}
 BuildRequires:  pkgconfig(libsoup-3.0)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  pkgconfig(uuid)
