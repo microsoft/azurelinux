@@ -1,6 +1,6 @@
 Summary:        Berkeley Packet Filter Tracing Language
 Name:           bpftrace
-Version:        0.19.1
+Version:        0.20.3
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -8,6 +8,7 @@ Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://github.com/iovisor/bpftrace
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         bpftrace-0.20-llvm18.patch
 BuildRequires:  bcc-devel
 BuildRequires:  binutils-devel
 BuildRequires:  bison
@@ -80,6 +81,10 @@ install -p -m 644 tools/*.txt %{buildroot}%{_datadir}/bpftrace/tools/doc
 %{_datadir}/bpftrace/tools
 
 %changelog
+* Thu Apr 18 2024 Andrew Phelps <anphel@microsoft.com> - 0.20.3-1
+- Upgrade version to 0.20.3
+- Add patch to support building with LLVM 18
+
 * Thu Jan 04 2024 Muhammad Falak <mwani@microsoft.com> - 0.19.1-1
 - Upgrade version to 0.19.1
 - Use system libbpf
