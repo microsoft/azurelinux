@@ -33,6 +33,11 @@ version_release_matching_groups = [
     frozenset([
         "SPECS/cyrus-sasl/cyrus-sasl.spec",
         "SPECS/cyrus-sasl-bootstrap/cyrus-sasl-bootstrap.spec"
+    ]),
+    frozenset([
+        "SPECS/shim/shim.spec",
+        "SPECS/shim-unsigned-x64/shim-unsigned-x64.spec",
+        "SPECS/shim-unsigned-aarch64/shim-unsigned-aarch64.spec"
     ])
 ]
 
