@@ -44,9 +44,6 @@ func (c *Config) IsValid() (err error) {
 		return err
 	}
 
-	hasStorage := c.Storage != nil
-	hasResetBootLoader := c.OS.ResetBootLoaderType != ResetBootLoaderTypeDefault
-
 	if hasStorage != hasResetBootLoader {
 		return fmt.Errorf("os.resetBootLoaderType and storage must be specified together")
 	}
