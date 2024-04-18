@@ -26,8 +26,7 @@ more stable. You can also perform detailed profiling to help speed up your
 programs.
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 
 %build
 CFLAGS="`echo " %{build_cflags} " | sed 's/-fstack-protector-strong//'`"
