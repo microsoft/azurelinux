@@ -22,7 +22,7 @@ BuildRequires:  gcc
 BuildRequires:  git
 BuildRequires:  libbpf-devel
 BuildRequires:  libpcap-devel
-BuildRequires:  llvm-devel >= 12.0.1-1
+BuildRequires:  llvm-devel >= 18
 BuildRequires:  make
 BuildRequires:  systemtap-sdt-devel
 BuildRequires:  vim-extra
@@ -33,7 +33,7 @@ Requires:       clang
 Requires:       glibc
 Requires:       libgcc
 Requires:       libstdc++
-Requires:       llvm >= 12.0.1-1
+Requires:       llvm >= 18
 %if 0%{?with_check}
 BuildRequires:  gmock
 BuildRequires:  gmock-devel
@@ -56,16 +56,18 @@ cd build
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_SHARED_LIBS:BOOL=OFF \
     -DUSE_SYSTEM_BPF_BCC:BOOL=ON \
-%if !%{with_check}
-    -DBUILD_TESTING=0 \
+%if 0%{?with_check}
+    -DBUILD_TESTING:BOOL=ON \
+%else
+    -DBUILD_TESTING:BOOL=OFF \
 %endif
     ..
 
-make bpftrace
+make
 
 %check
 cd build
-make test
+./tests/bpftrace_test --rerun-failed --output-on-failure
 
 %install
 mkdir -p %{buildroot}%{_bindir}/
