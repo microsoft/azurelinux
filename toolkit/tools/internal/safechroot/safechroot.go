@@ -754,6 +754,7 @@ func listGPGComponents() (components map[string]bool, err error) {
 	components = make(map[string]bool)
 
 	// Split --list-components stdout into a list of name tags, one for each component
+	// Stdout has the following format: <component>:<description>:<pgmname>:
 	for _, line := range strings.Split(stdout, "\n") {
 		components[strings.Split(line, ":")[0]] = true
 	}
