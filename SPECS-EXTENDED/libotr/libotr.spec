@@ -1,21 +1,25 @@
+%global         snapshot 0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
-%global snapshot 0
-Summary: Off-The-Record Messaging library and toolkit
-Name: libotr
-Version: 4.1.1
-Release: 10%{?dist}
-License: GPLv2 and LGPLv2
-Source0: http://otr.cypherpunks.ca/%{name}-%{version}.tar.gz
-Url: http://otr.cypherpunks.ca/
-Provides: libotr-toolkit = %{version}
-Obsoletes: libotr-toolkit < %{version}
-Requires: libgcrypt >= 1.2.0
-Requires: pkgconfig
+Summary:        Off-The-Record Messaging library and toolkit
+Name:           libotr
+Version:        4.1.1
+Release:        11%{?dist}
+License:        GPLv2 and LGPLv2
+Source0:        http://otr.cypherpunks.ca/%{name}-%{version}.tar.gz
+Url:            http://otr.cypherpunks.ca/
+Patch0:         libotr-4.1.1-socket-h.patch
+Provides:       libotr-toolkit = %{version}
+Obsoletes:      libotr-toolkit < %{version}
+Requires:       libgcrypt >= 1.2.0
+Requires:       pkgconfig
 BuildRequires:  gcc
-BuildRequires: libgcrypt-devel >= 1.2.0, libgpg-error-devel
+BuildRequires:  libgcrypt-devel >= 1.2.0
+BuildRequires:  libgpg-error-devel
 %if %{snapshot}
-Buildrequires: libtool automake autoconf
+Buildrequires:  autoconf
+Buildrequires:  automake
+Buildrequires:  libtool
 %endif
 
 %description
@@ -33,7 +37,7 @@ Conflicts: libotr3-devel
 The devel package contains the libotr library and include files.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %if %{snapshot}
 aclocal
@@ -73,6 +77,9 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.1.1-11
+- Add patch to fix build break
+
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 
@@ -216,4 +223,3 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 - Bumped version to 0.8.1
 * Sun Nov 21 2004 Paul Wouters <paul@cypherpunks.ca>
 - Initial version
-
