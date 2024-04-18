@@ -572,11 +572,11 @@ texinfo-6.8-1.cm2.aarch64.rpm
 texinfo-debuginfo-6.8-1.cm2.aarch64.rpm
 unzip-6.0-20.cm2.aarch64.rpm
 unzip-debuginfo-6.0-20.cm2.aarch64.rpm
-util-linux-2.37.4-8.cm2.aarch64.rpm
-util-linux-debuginfo-2.37.4-8.cm2.aarch64.rpm
-util-linux-devel-2.37.4-8.cm2.aarch64.rpm
-util-linux-lang-2.37.4-8.cm2.aarch64.rpm
-util-linux-libs-2.37.4-8.cm2.aarch64.rpm
+util-linux-2.37.4-9.cm2.aarch64.rpm
+util-linux-debuginfo-2.37.4-9.cm2.aarch64.rpm
+util-linux-devel-2.37.4-9.cm2.aarch64.rpm
+util-linux-lang-2.37.4-9.cm2.aarch64.rpm
+util-linux-libs-2.37.4-9.cm2.aarch64.rpm
 which-2.21-8.cm2.aarch64.rpm
 which-debuginfo-2.21-8.cm2.aarch64.rpm
 xz-5.2.5-1.cm2.aarch64.rpm
