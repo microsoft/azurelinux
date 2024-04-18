@@ -1,14 +1,13 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.4.0
+Version:        1.4.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
-#Source0:       https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  SymCrypt
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -54,8 +53,7 @@ install SymCryptEngine/inc/e_scossl.h %{buildroot}%{_includedir}/e_scossl.h
 install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %check
-# SslPlay has some dependencies on the 1.1.1 engine behavior that must be updated for 3.0
-# ./bin/SslPlay/SslPlay
+./bin/SslPlay/SslPlay
 
 %files
 %license LICENSE
@@ -65,6 +63,11 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %changelog
+* Wed Apr 17 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.1-1
+- Update SymCrypt-OpenSSL to v1.4.1
+- Adds support for RSASSA-PSS keys, SP800-108 KDF
+- Fixes smoke test for check in OpenSSL 3.1
+
 * Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.0-1
 - Update SymCrypt-OpenSSL to v1.4.0.
 - Adds SymCrypt-OpenSSL provider for OpenSSL 3.
