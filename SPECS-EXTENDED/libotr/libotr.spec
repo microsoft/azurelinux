@@ -62,7 +62,8 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 %ldconfig_scriptlets
 
 %files
-%doc AUTHORS README COPYING COPYING.LIB NEWS Protocol*
+%license COPYING COPYING.LIB
+%doc AUTHORS README NEWS Protocol*
 %{_libdir}/libotr.so.*
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -79,6 +80,7 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/*.la
 %changelog
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.1.1-11
 - Add patch to fix build break
+- License verified
 
 * Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 4.1.1-10
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
