@@ -108,8 +108,8 @@
 # Enable linking with module_info.ld in Azure Linux build environment by defining: distro_module_ldflags  -Wl,-dT,%{_topdir}/BUILD/module_info.ld
 
 # Compilation and linking flag macros
-%build_cflags %{optflags}
-%build_cxxflags %{optflags}
+%build_cflags %{optflags} --fno-omit-frame-pointer --fno-omit-leaf-frame-pointer
+%build_cxxflags %{optflags} --fno-omit-frame-pointer --fno-omit-leaf-frame-pointer
 %build_fflags %{optflags} -I%{_fmoddir}
 %build_ldflags -Wl,-z,relro %{_ld_as_needed_flags} %{_ld_symbols_flags} %{_hardened_ldflags} %{?distro_module_ldflags :%{distro_module_ldflags }}
 
