@@ -96,6 +96,10 @@ time timeout -k $TIMEOUT_KILL $TIMEOUT \
 %{_mandir}/man3/*.3.gz
 
 %changelog
+* Wed Apr 17 2024 Muhammad Falak <mwani@microsoft.com> - 0.7.2-1
+- Initial Azure Linux import from Fedora 40 (license: MIT)
+- License Verified
+
 * Tue Jan 23 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
 
