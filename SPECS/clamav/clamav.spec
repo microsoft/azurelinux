@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        0.105.2
-Release:        5%{?dist}
+Version:        1.3.1
+Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,8 +14,7 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 
 # Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
 # specific event. Revert back to the original filename when a new cache is created for a different version.
-Source1:        %{name}-%{name}-%{version}-cargo-rev2.tar.gz
-Patch0:         CVE-2022-48579.patch
+Source1:        %{name}-%{version}-cargo.tar.gz
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -35,6 +34,7 @@ BuildRequires:  python3-pytest
 BuildRequires:  rust
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
+BuildRequires:  systemd-rpm-macros
 BuildRequires:  valgrind
 BuildRequires:  zlib-devel
 Requires:       openssl
@@ -56,7 +56,7 @@ mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
 popd
-%autosetup -p1 -n clamav-clamav-%{version}
+%autosetup -n clamav-clamav-%{version}
 
 %build
 export CARGO_NET_OFFLINE=true
@@ -77,11 +77,12 @@ cmake \
     -D ENABLE_SYSTEMD=ON \
     -D ENABLE_MILTER=OFF \
     -D ENABLE_EXAMPLES=OFF
-%cmake_build
+%cmake3_build
 
 %check
-cd build
-ctest --verbose
+%ctest3 -- -E valgrind
+# valgrind tests fail https://github.com/Cisco-Talos/clamav/issues/584
+%ctest3 -- -R valgrind || :
 
 %install
 %cmake_install
@@ -126,6 +127,7 @@ fi
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/systemd/system/*
+%{_libdir}/*.a
 %{_bindir}/*
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
@@ -137,8 +139,8 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 0.105.2-5
-- Fix build break by adding BR for systemd
+* Thu Apr 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
+- Upgrade to 1.3.1
 
 * Fri Dec 08 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.105.2-4
 - Fix resetting of user and group settings on package update
