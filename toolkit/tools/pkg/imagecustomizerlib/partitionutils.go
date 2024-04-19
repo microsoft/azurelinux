@@ -126,6 +126,11 @@ func findRootfsPartition(diskPartitions []diskutils.PartitionInfo, buildDir stri
 			continue
 		}
 
+		// Check if the partition is using DM_verity_hash file system type.
+		if diskPartition.FileSystemType == "DM_verity_hash" {
+			return nil, fmt.Errorf("this image has dm-verity pre-enabled, stop the customized build process")
+		}
+
 		// Temporarily mount the partition.
 		partitionMount, err := safemount.NewMount(diskPartition.Path, tmpDir, diskPartition.FileSystemType, 0,
 			"", true)
