@@ -1,6 +1,6 @@
 Name:    annobin
 Summary: Binary annotation plugin for GCC
-Version: 12.40
+Version: 12.49
 Release: 1%{?dist}
 License: GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
 Vendor:         Microsoft Corporation
@@ -271,6 +271,8 @@ export CFLAGS="$CFLAGS -DAARCH64_BRANCH_PROTECTION_SUPPORTED=1"
 export CFLAGS="$CFLAGS $RPM_OPT_FLAGS %build_cflags"
 export LDFLAGS="$LDFLAGS %build_ldflags"
 
+export PLUGIN_FORTIFY_OPTION="-D_FORTIFY_SOURCE=3"
+
 # Set target-specific security options to be used when building the
 # Clang and LLVM plugins.  FIXME: There should be a better way to do
 # this.
@@ -304,10 +306,12 @@ make -C gcc-plugin CXXFLAGS="$OPTS $BUILD_FLAGS"
 rm %{_tmppath}/tmp_annobin.so
 
 cp clang-plugin/annobin-for-clang.so %{_tmppath}/tmp_annobin.so
-make -C clang-plugin all CXXFLAGS="$OPTS $BUILD_FLAGS"
+# To enable verbose more in the plugin append the following: ANNOBIN="verbose"
+make -C clang-plugin clean all CLANG_TARGET_OPTIONS="$CLANG_TARGET_OPTIONS $BUILD_FLAGS" 
 
 cp llvm-plugin/annobin-for-llvm.so %{_tmppath}/tmp_annobin.so
-make -C llvm-plugin all CXXFLAGS="$OPTS $BUILD_FLAGS"
+# To enable verbose more in the plugin append the following: ANNOBIN_VERBOSE="true"            
+make -C llvm-plugin clean all CLANG_TARGET_OPTIONS="$CLANG_TARGET_OPTIONS $BUILD_FLAGS"
 
 #---------------------------------------------------------------------------------
 
@@ -391,7 +395,7 @@ make check
 %changelog
 * Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 12.40-1
 - Promoted package from extended to core
-- Upgraded to 12.40
+- Upgraded to 12.49
 - Imported and adopted the spec from Fedora
 - License verified
 
