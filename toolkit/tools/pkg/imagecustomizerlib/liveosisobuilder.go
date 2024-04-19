@@ -27,7 +27,8 @@ const (
 	grubCfg               = "grub.cfg"
 
 	searchCommandTemplate = "search --label %s --set root"
-	rootValueTemplate     = "live:LABEL=%s"
+	// rootValueTemplate     = "live:LABEL=%s"
+	rootValueTemplate = "live:/gmileka-workaround/rootfs.img"
 	// The names initrd.img and vmlinuz are expected by isomaker.
 	isoBootDir    = "boot"
 	isoInitrdPath = "/boot/initrd.img"
@@ -213,7 +214,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	}
 
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
-	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	// rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	rootValue := rootValueTemplate
 
 	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
 	if err != nil {
@@ -701,11 +703,13 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	targetSystemConfig := configuration.Config{}
 
 	// Add the squashfs file
-	squashfsImageToCopy := safechroot.FileToCopy{
-		Src:  b.artifacts.squashfsImagePath,
-		Dest: filepath.Join(liveOSDir, liveOSImage),
-	}
-	additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
+	/*
+		squashfsImageToCopy := safechroot.FileToCopy{
+			Src:  b.artifacts.squashfsImagePath,
+			Dest: filepath.Join(liveOSDir, liveOSImage),
+		}
+		additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
+	*/
 
 	// Add /boot/* files
 	for sourceFile, targetFile := range b.artifacts.bootDirFiles {

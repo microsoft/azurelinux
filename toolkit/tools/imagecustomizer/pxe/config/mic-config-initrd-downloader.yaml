@@ -11,3 +11,4 @@ os:
     dracut-downloader-module/module-setup.sh: /usr/lib/dracut/modules.d/90micdownloader/module-setup.sh
     dracut-downloader-module/dracut-include-mic-downloader.conf: /etc/dracut.conf.d/90-dracut-include-mic-downloader.conf
     initrd-additional-artifacts/dracut-additional-files.conf: /etc/dracut.conf.d/91-dracut-additional-files.conf
+    initrd-additional-artifacts/rootfs-20240419-1220.img: /gmileka-workaround/rootfs.img
