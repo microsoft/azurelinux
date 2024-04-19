@@ -2,29 +2,29 @@ storage:
   bootType: efi
   disks:
   - partitionTableType: gpt
-    maxSize: 5120
+    maxSize: 5120M
     partitions:
     - id: esp
       type: esp
-      start: 1
-      end: 9
+      start: 1M
+      end: 9M
 
     - id: boot
-      start: 9
-      end: 1024
+      start: 9M
+      end: 1024M
 
     - id: root
       label: root
-      start: 1024
-      end: 3072
+      start: 1024M
+      end: 3072M
 
     - id: verityhash
       label: root-hash
-      start: 3072
-      end: 3200
+      start: 3072M
+      end: 3200M
 
     - id: var
-      start: 3200
+      start: 3200M
 
   fileSystems:
   - deviceId: esp
@@ -73,10 +73,6 @@ os:
       idType: part-label
       id: root-hash
 
-  postInstallScripts:
-    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
-  - path: scripts/ssh-move-host-keys.sh
-
   additionalFiles:
     # Change the directory that the sshd-keygen service writes the SSH host keys to.
     files/sshd-keygen.service: /usr/lib/systemd/system/sshd-keygen.service
@@ -91,3 +87,8 @@ os:
       # Your SSH public key here.
     secondaryGroups:
     - sudo
+
+scripts:
+  postCustomization:
+    # Move the SSH host keys off of the read-only /etc directory, so that sshd can run.
+  - path: scripts/ssh-move-host-keys.sh

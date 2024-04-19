@@ -84,7 +84,6 @@ remove_packages_for_pkggen_core () {
     sed -ri '/azurelinux-repos-(debug|extended|extras|microsoft)/d' $TmpPkgGen
     sed -i '/nghttp2-devel/d' $TmpPkgGen
     sed -i '/npth-[[:alpha:]]/d' $TmpPkgGen
-    sed -i '/pcre-devel/d' $TmpPkgGen
     sed -i '/perl-5/d' $TmpPkgGen
     sed -i '/perl-A/d' $TmpPkgGen
     sed -i '/perl-a/d' $TmpPkgGen
@@ -277,7 +276,6 @@ generate_pkggen_core () {
         grep "^libsepol-" $TmpPkgGen
         grep "^glib-" $TmpPkgGen
         grep "^libltdl-" $TmpPkgGen
-        grep "^pcre-" $TmpPkgGen
         grep "^lua-" $TmpPkgGen
         grep "^azurelinux-rpm-macros-" $TmpPkgGen
         grep "^mariner-check-" $TmpPkgGen

@@ -6,6 +6,7 @@ package installutils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -433,8 +435,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		filesystemPkg = "filesystem"
 	)
 
-	defer stopGPGAgent(installChroot)
-
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
@@ -562,6 +562,17 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 
 	// Run post-install scripts from within the installroot chroot
 	err = runPostInstallScripts(installChroot, config)
+	if err != nil {
+		return
+	}
+
+	// The system should be fully populated with packages, we can clear the tdnf cache now to free up space.
+	if !config.PreserveTdnfCache {
+		err = cleanupTdnfCache(installChroot)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -792,6 +803,56 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 			return file.Create(machineIDFile, machineIDFilePerms)
 		})
 	}
+	return
+}
+
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageIDFile(installChrootRootDir string, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChrootRootDir, "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChrootRootDir, imageIDFile)
+
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
+
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
+
 	return
 }
 
@@ -1719,12 +1780,12 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	defer timestamp.StopEvent(nil)
 	logger.Log.Infof("Preconfiguring SELinux policy in %s mode", selinuxMode)
 
-	err = selinuxUpdateConfig(selinuxMode, installChroot)
+	err = SELinuxUpdateConfig(selinuxMode, installChroot)
 	if err != nil {
 		err = fmt.Errorf("failed to update SELinux config:\n%w", err)
 		return
 	}
-	err = selinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
+	err = SELinuxRelabelFiles(installChroot, mountPointToFsTypeMap, isRootFS)
 	if err != nil {
 		err = fmt.Errorf("failed to label SELinux files:\n%w", err)
 		return
@@ -1732,7 +1793,7 @@ func SELinuxConfigure(selinuxMode configuration.SELinux, installChroot *safechro
 	return
 }
 
-func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
+func SELinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safechroot.Chroot) (err error) {
 	const (
 		selinuxPattern = "^SELINUX=.*"
 	)
@@ -1751,7 +1812,7 @@ func selinuxUpdateConfig(selinuxMode configuration.SELinux, installChroot *safec
 	return
 }
 
-func selinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
+func SELinuxRelabelFiles(installChroot *safechroot.Chroot, mountPointToFsTypeMap map[string]string, isRootFS bool,
 ) (err error) {
 	const (
 		squashErrors        = false
@@ -2180,6 +2241,55 @@ func runPostInstallScripts(installChroot *safechroot.Chroot, config configuratio
 	}
 
 	return
+}
+
+// cleanupTdnfCache runs 'tdnf clean all' and removes the contents of the tdnf cache directory.
+// If 'tdnf' is not installed, the function will skip the cleanup.
+// If /var/cache/tdnf does not exist, the function will skip removing its contents.
+func cleanupTdnfCache(installChroot *safechroot.Chroot) error {
+	const (
+		squashErrors      = false
+		rpmCacheDirectory = "/var/cache/tdnf"
+	)
+
+	ReportActionf("Cleaning tdnf cache")
+	err := installChroot.UnsafeRun(func() error {
+		// Check if 'tdnf' is in the chroot's PATH, some images may have removed it.
+		_, chrootErr := exec.LookPath("tdnf")
+		if chrootErr != nil {
+			logger.Log.Debugf("Skipping tdnf cache cleanup since 'tdnf' is not installed")
+			return nil
+		}
+		logger.Log.Infof("Cleaning tdnf cache")
+		chrootErr = shell.ExecuteLive(squashErrors, "tdnf", "clean", "all")
+		return chrootErr
+	})
+
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup tdnf cache:\n%w", err)
+		return err
+	}
+
+	// Remove all files and subdirectories in the tdnf cache directory, but leave
+	// the directory since it's owned by the tdnf package.
+	cacheDir := filepath.Join(installChroot.RootDir(), rpmCacheDirectory)
+	// Skip if directory is missing already
+	exists, err := file.DirExists(cacheDir)
+	if err != nil {
+		return fmt.Errorf("failed to check if tdnf cache directory exists (%s):\n%w", cacheDir, err)
+	}
+	if !exists {
+		logger.Log.Debugf("Skipping tdnf cache cleanup since directory does not exist (%s)", cacheDir)
+		return nil
+	}
+
+	logger.Log.Infof("Removing contents of (%s)", cacheDir)
+	err = file.RemoveDirectoryContents(cacheDir)
+	if err != nil {
+		err = fmt.Errorf("failed to remove tdnf cache contents (%s/*):\n%w", cacheDir, err)
+		return err
+	}
+	return nil
 }
 
 func RunFinalizeImageScripts(installChroot *safechroot.Chroot, config configuration.SystemConfig) (err error) {
@@ -2652,27 +2762,4 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 		}
 	}
 	return packageList
-}
-
-// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
-//
-// It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
-// To be able to cleanly exit the setup chroot, we must stop it.
-func stopGPGAgent(installChroot *safechroot.Chroot) {
-	installChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
-		}
-
-		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
-		}
-
-		return nil
-	})
 }
