@@ -435,8 +435,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		filesystemPkg = "filesystem"
 	)
 
-	defer stopGPGAgent(installChroot)
-
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
@@ -2764,27 +2762,4 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 		}
 	}
 	return packageList
-}
-
-// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
-//
-// It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
-// To be able to cleanly exit the setup chroot, we must stop it.
-func stopGPGAgent(installChroot *safechroot.Chroot) {
-	installChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
-		}
-
-		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
-		}
-
-		return nil
-	})
 }
