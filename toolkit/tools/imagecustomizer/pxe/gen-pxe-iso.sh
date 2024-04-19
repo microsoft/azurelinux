@@ -1,7 +1,7 @@
 #!/bin/bash
 
 inputVhdxImage=/home/george/git/linux-workspace/core-2.0.20240404.vhdx
-enlistmentDir=/home/george/git/CBL-Mariner-DL
+enlistmentDir=/home/george/git/CBL-Mariner-PXE
 configRoot=$enlistmentDir/toolkit/tools/imagecustomizer/pxe/config
 
 isoBuildDir=$enlistmentDir/mic-build

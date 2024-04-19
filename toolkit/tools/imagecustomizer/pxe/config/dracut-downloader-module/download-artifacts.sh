@@ -34,17 +34,9 @@ function setUrlFromKernelCmdLine() {
 setUrlFromKernelCmdLine
 
 # verify network connectivity
-systemctl status systemd-networkd
-sleep 2s
+ls -la /etc/systemd/network
 
 ip a
-sleep 2s
-
-ip link set dev eth0 up
-sleep 2s
-
-ip a
-sleep 2s
 
 # use configuration to write file
 mkdir -p $downloadFolder
