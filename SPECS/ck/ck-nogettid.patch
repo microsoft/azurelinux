@@ -1,0 +1,21 @@
+Static function gettid makes troubles when compiling tests,
+because the extern declaration exists.
+This might not be the best way to fix this, but it makes the tests succeed.
+
+diff -up ck-0.6.0/regressions/common.h.nogettid ck-0.6.0/regressions/common.h
+--- ck-0.6.0/regressions/common.h.nogettid	2019-08-21 08:10:51.593209466 +0200
++++ ck-0.6.0/regressions/common.h	2019-08-21 08:11:05.320341728 +0200
+@@ -267,13 +267,6 @@ struct affinity {
+ #define AFFINITY_INITIALIZER {0, 0}
+ 
+ #ifdef __linux__
+-#ifndef gettid
+-static pid_t
+-gettid(void)
+-{
+-	return syscall(__NR_gettid);
+-}
+-#endif /* gettid */
+ 
+ CK_CC_UNUSED static int
+ aff_iterate(struct affinity *acb)

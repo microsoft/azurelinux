@@ -1,0 +1,38 @@
+From baf41283f37caa9086f55455bd0b1b5b47df384f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 17 Feb 2023 00:32:42 +0100
+Subject: [PATCH] Allow different limit for ck_sequence validation
+
+This test takes significantly longer when it does not receive all CPUs
+on the platform. It takes significantly longer on ppc64le and aarch64
+platform when CORES is less than actually detected.
+
+Allow overriding just this test by CORES_SEQUENCE variable.
+---
+ regressions/ck_sequence/validate/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/regressions/ck_sequence/validate/Makefile b/regressions/ck_sequence/validate/Makefile
+index bc2e5be..2aeb32b 100644
+--- a/regressions/ck_sequence/validate/Makefile
++++ b/regressions/ck_sequence/validate/Makefile
+@@ -1,6 +1,7 @@
+ .PHONY: check clean distribution
+ 
+ OBJECTS=ck_sequence
++SEQUENCE_CORES=$(CORES)
+ 
+ all: $(OBJECTS)
+ 
+@@ -8,7 +9,7 @@ ck_sequence: ck_sequence.c ../../../include/ck_sequence.h
+ 	$(CC) $(CFLAGS) -o ck_sequence ck_sequence.c
+ 
+ check: all
+-	./ck_sequence $(CORES) 1
++	./ck_sequence $(SEQUENCE_CORES) 1
+ 
+ clean:
+ 	rm -rf *~ *.o $(OBJECTS) *.dSYM *.exe
+-- 
+2.39.1
+
