@@ -703,13 +703,11 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 	targetSystemConfig := configuration.Config{}
 
 	// Add the squashfs file
-	/*
-		squashfsImageToCopy := safechroot.FileToCopy{
-			Src:  b.artifacts.squashfsImagePath,
-			Dest: filepath.Join(liveOSDir, liveOSImage),
-		}
-		additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
-	*/
+	squashfsImageToCopy := safechroot.FileToCopy{
+		Src:  b.artifacts.squashfsImagePath,
+		Dest: filepath.Join(liveOSDir, liveOSImage),
+	}
+	additionalIsoFiles = append(additionalIsoFiles, squashfsImageToCopy)
 
 	// Add /boot/* files
 	for sourceFile, targetFile := range b.artifacts.bootDirFiles {
