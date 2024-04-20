@@ -12,7 +12,7 @@
 Summary:        CUPS printing system
 Name:           cups
 Version:        2.3.3%{OP_VER}
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -60,6 +60,9 @@ Patch11:        cups-web-devices-timeout.patch
 Patch12:        cups-failover-backend.patch
 # add device id for dymo printer
 Patch13:        cups-dymo-deviceid.patch
+Patch14:        CVE-2023-4504.patch
+Patch15:        CVE-2023-32324.patch
+Patch16:        CVE-2023-34241.patch
 #### UPSTREAM PATCHES (starts with 1000) ####
 ##### Patches removed because IMHO they aren't no longer needed
 ##### but still I'll leave them in git in case their removal
@@ -257,8 +260,10 @@ to CUPS daemon. This solution will substitute printer drivers and raw queues in 
 # Added IEEE 1284 Device ID for a Dymo device (bug #747866).
 %patch13 -p1 -b .dymo-deviceid
 
-# UPSTREAM PATCHES
-
+# CVE Patches
+%patch14 -p1 
+%patch15 -p1
+%patch16 -p1
 
 # LSPP support.
 %patch100 -p1 -b .lspp
@@ -650,6 +655,13 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Fri Apr 12 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.3.3op2-7
+- Add patch for CVE-2023-32324.
+- Add patch for CVE-2023-34241.
+
+* Wed Apr 10 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.3.3op2-6
+- Add patch for CVE-2023-4504.
+
 * Wed Dec 08 2021 Thomas Crain <thcrain@microsoft.com> - 2.3.3op2-5
 - License verified
 - Lint spec

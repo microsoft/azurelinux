@@ -1,7 +1,7 @@
 Summary:        Metapackage with core sets of packages for distroless containers.
 Name:           distroless-packages
 Version:        0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,7 +15,6 @@ Metapackage holding sets of core packages for different applications.
 Summary:        The smallest useful package list.
 Requires:       filesystem
 Requires:       mariner-release
-Requires:       prebuilt-ca-certificates
 Requires:       tzdata
 
 %description minimal
@@ -55,6 +54,9 @@ Requires:       busybox
 %files debug
 
 %changelog
+* Mon Apr 01 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-4
+- Remove dependency on "prebuilt-ca-certificates".
+
 * Wed Nov 16 2022 Mandeep Plaha <mandeepplaha@microsoft.com> - 0.1-3
 - Replace prebuilt-ca-certificates-base with prebuilt-ca-certificates in minimal
 - Add tzdata to minimal

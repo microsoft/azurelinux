@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/attendedinstaller/primitives/customshortcutlist"
 
 	"github.com/rivo/tview"
 )

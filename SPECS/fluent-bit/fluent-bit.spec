@@ -1,14 +1,12 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        2.1.10
-Release:        3%{?dist}
+Version:        2.2.2
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 URL:            https://fluentbit.io
 Source0:        https://github.com/fluent/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-48105.patch
-Patch1:         CVE-2023-52284.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -82,6 +80,9 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Wed Apr 03 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.2-1
+- Auto-upgrade to 2.2.2 - CVE-2024-23722
+
 * Wed Jan 10 2024 Henry Li <lihl@microsoft.com> - 2.1.10-3
 - Address CVE-2023-52284
 - Change to autosetup

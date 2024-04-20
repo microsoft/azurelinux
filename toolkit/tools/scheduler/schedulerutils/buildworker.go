@@ -12,14 +12,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/rpm"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/sliceutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/scheduler/buildagents"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/buildagents"
 	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/traverse"
 )
@@ -38,7 +38,6 @@ type BuildRequest struct {
 	Node           *pkggraph.PkgNode   // The main node being analyzed for the build.
 	PkgGraph       *pkggraph.PkgGraph  // The graph of all packages.
 	AncillaryNodes []*pkggraph.PkgNode // For SRPM builds: other nodes stemming from the same SRPM. Empty otherwise.
-	ExpectedFiles  []string            // List of RPMs built by this node.
 	UseCache       bool                // Can we use a cached copy of this package instead of building it.
 	IsDelta        bool                // Is this a pre-downloaded RPM (not traditional cache) that we may be able to skip rebuilding.
 	Freshness      uint                // The freshness of the node (used to determine if we can skip building future nodes).
@@ -164,7 +163,7 @@ func buildNode(request *BuildRequest, graphMutex *sync.RWMutex, agent buildagent
 
 	if request.UseCache {
 		logger.Log.Debugf("%s is prebuilt, skipping", baseSrpmName)
-		builtFiles = request.ExpectedFiles
+		builtFiles, _ = pkggraph.FindRPMFiles(node.SrpmPath, request.PkgGraph, graphMutex)
 		return
 	}
 
