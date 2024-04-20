@@ -36,7 +36,6 @@ Group:          Development/Libraries
 Requires:       glib = %{version}-%{release}
 Requires:       glib-schemas = %{version}-%{release}
 Requires:       libffi-devel
-Requires:       pcre2
 Requires:       python3-xml
 Requires:       python3
 Provides:       glib2-devel = %{version}-%{release}
