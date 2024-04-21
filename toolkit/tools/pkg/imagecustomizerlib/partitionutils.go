@@ -126,14 +126,6 @@ func findRootfsPartition(diskPartitions []diskutils.PartitionInfo, buildDir stri
 			continue
 		}
 
-		// Check if the partition is using DM_verity_hash file system type.
-		// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
-		// the verity hash device should not be assigned this type. We do not support customization on verity enabled base
-		// images at this time because such modifications would compromise the integrity and security mechanisms enforced by dm-verity.
-		if diskPartition.FileSystemType == "DM_verity_hash" {
-			return nil, fmt.Errorf("this image has dm-verity pre-enabled, stop the customized build process")
-		}
-
 		// Temporarily mount the partition.
 		partitionMount, err := safemount.NewMount(diskPartition.Path, tmpDir, diskPartition.FileSystemType, 0,
 			"", true)
