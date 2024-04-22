@@ -3,7 +3,7 @@ Name:           prebuilt-ca-certificates
 # When updating, "Epoch, "Version", AND "Release" tags must be updated in the "ca-certificates" package as well.
 Epoch:          1
 Version:        %{azl}.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,6 +49,9 @@ find %{buildroot} -name README -delete
 %{_sysconfdir}/pki/java/cacerts
 
 %changelog
+* Mon Apr 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0.0-6
+- Updating Microsoft trusted root CAs.
+
 * Mon Mar 18 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.0-5
 - Extending base set of certificates.
 
