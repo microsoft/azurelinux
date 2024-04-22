@@ -17,5 +17,5 @@ func TestBootTypeIsValid(t *testing.T) {
 func TestBootTypeIsValidBadValue(t *testing.T) {
 	err := BootType("bad").IsValid()
 	assert.Error(t, err)
-	assert.ErrorContains(t, err, "invalid BootType value")
+	assert.ErrorContains(t, err, "invalid bootType value")
 }

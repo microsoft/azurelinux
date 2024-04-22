@@ -21,10 +21,10 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.9
-        uses: actions/setup-python@v4
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: 3.12
 
       - name: Get Python dependencies
         run: python3 -m pip install python-rpm-spec
@@ -32,8 +32,8 @@ jobs:
       - name: Run license map checking script
         run: |
           python3 ./toolkit/scripts/license_map.py \
-          ./SPECS/LICENSES-AND-NOTICES/data/licenses.json \
-          ./SPECS/LICENSES-AND-NOTICES/LICENSES-MAP.md \
+          ./LICENSES-AND-NOTICES/SPECS/data/licenses.json \
+          ./LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md \
           ./SPECS \
           ./SPECS-EXTENDED \
           ./SPECS-SIGNED

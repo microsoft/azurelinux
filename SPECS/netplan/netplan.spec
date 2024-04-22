@@ -8,11 +8,11 @@
 %{?!_systemdgeneratordir:%global _systemdgeneratordir /usr/lib/systemd/system-generators}
 
 # Netplan library soversion major
-%global libsomajor 0.0
+%global libsomajor 1
 
 
 Name:           netplan
-Version:        0.107.1
+Version:        1.0
 Release:        1%{?dist}
 Summary:        Network configuration tool using YAML
 Group:          System Environment/Base
@@ -21,18 +21,6 @@ Distribution:   Azure Linux
 License:        GPLv3
 URL:            https://netplan.io/
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-
-# netplan build optionally depends on pyflakes, but there is a hard check for it
-# in the meson file. This patch disables that check.
-Patch0:         remove-flakes-check.patch
-
-# Some unit tests require openvswitch to be installed. This is a backported
-# patch from upstream that adds logic to skip openvswitch tests when it is not
-# installed. It also removes this dependency from a couple parsing tests that do
-# not necessarily need openvswitch by replacing the test fixture with another
-# one that does not require openvswitch to be parsed. See note on
-# `BuildRequires: openvswitch` below.
-Patch1:         skip-ovs-tests.patch
 
 # Fix bug in netplan when python3-rich is not present.
 Patch2:         rich-import-failure-no-log.patch
@@ -55,14 +43,12 @@ BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  util-linux-devel
+BuildRequires:  python%{python3_pkgversion}-pyflakes
 
 # BuildRequires below are only required for %check:
 BuildRequires:  iproute
 BuildRequires:  libcmocka-devel
-# Disabled: openvswitch is not building on 3.0 yet. This is only required for
-# some tests, not blocking the build. Should be enabled once the dependency is
-# satisfied.
-# BuildRequires:  openvswitch
+BuildRequires:  openvswitch
 BuildRequires:  python%{python3_pkgversion}-cffi
 BuildRequires:  python%{python3_pkgversion}-coverage
 BuildRequires:  python%{python3_pkgversion}-netifaces
@@ -204,9 +190,6 @@ This package configures Netplan to use systemd-networkd as its backend.
 # /usr/include/glib-2.0/glib/glib-autocleanups.h:28:3: error: 'ip_str' may be used uninitialized in this function [-Werror=maybe-uninitialized]
 sed -e "s/werror=true/werror=false/g" -i meson.build
 
-cp doc/netplan.md doc/netplan.5
-cp doc/netplan.md doc/netplan.html
-
 %build
 
 # python3-coverage provides /usr/bin/coverage3, but the meson config expects it to be called coverage-3
@@ -224,8 +207,6 @@ fi
 
 # Remove useless "compat" symlink and path
 rm -f %{buildroot}/lib/netplan/generate
-rmdir %{buildroot}/lib/netplan
-rmdir %{buildroot}/lib
 
 # Remove __pycache__
 rm -rf %{buildroot}%{python3_sitelib}/%{name}/__pycache__
@@ -247,6 +228,9 @@ chmod 600 %{buildroot}%{_prefix}/lib/%{name}/00-netplan-default-renderer-network
 %meson_test
 
 %changelog
+* Fri Mar 29 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 1.0-1
+- Upgrade to 1.0
+
 * Thu Feb 15 2024 Francisco Huelsz prince <frhuelsz@microsoft.com> - 0.107.1-1
 - Upgrade to 0.107.1
 

@@ -1,5 +1,6 @@
 {
  "Signatures": {
-  "cryptography-42.0.5.tar.gz": "6fe07eec95dfd477eb9530aef5bead34fec819b3aaf6c5bd6d20565da607bfe1"
+  "cryptography-42.0.5.tar.gz": "6fe07eec95dfd477eb9530aef5bead34fec819b3aaf6c5bd6d20565da607bfe1",
+  "cryptography-42.0.5-vendor.tar.gz": "823c5fde5d5d7df2e7c90fb08b726f0cb5153f089e01f037d4f476285949e443"
  }
 }

@@ -25,6 +25,7 @@ ignore_multiple_sources=" \
 ignore_no_source_tarball=" \
   azurelinux-repos \
   azurelinux-rpm-macros \
+  azurelinux-sysinfo \
   ca-certificates \
   check-restart \
   core-packages \
@@ -38,11 +39,11 @@ ignore_no_source_tarball=" \
   hyphen-mn \
   initramfs \
   javapackages-tools-meta \
+  kata-packages-uvm \
   kde-filesystem \
   kf \
   livepatching \
   lua-rpm-macros \
-  multilib-rpm-config \
   opencl-filesystem \
   patterns-ceph-containers \
   pyproject-rpm-macros \
@@ -224,7 +225,7 @@ do
       # Parsing output instead of using error codes because 'wget' returns code 8 for FTP, even if the file exists.
       # Sample HTTP(S) output:  Remote file exists.
       # Sample FTP output:      File ‘time-1.9.tar.gz’ exists.
-      if ! wget --secure-protocol=TLSv1_2 --spider --timeout=2 --tries=10 "${manifesturl}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists.*"
+      if ! wget --secure-protocol=TLSv1_2 --spider --timeout=30 --tries=10 "${manifesturl}" 2>&1 | grep -qP "^(Remote file|File ‘.*’) exists.*"
       then
         echo "Registration for $name:$version has invalid URL '$manifesturl' (could not download)"  >> bad_registrations.txt
       fi

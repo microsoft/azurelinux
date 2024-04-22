@@ -88,7 +88,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -407,6 +407,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Mon Apr 01 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.3.0-3
+- Change the 'gemspec_clear_signing' macro to delete gem.signature also.
+
 * Mon Jan 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.3.0-2
 - Added the 'gemspec_clear_signing' macro.
 

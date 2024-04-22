@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 1024,
+            "MaxSize": 528,
             "Artifacts": [
                 {
                     "Name": "core",
@@ -46,17 +46,25 @@
             ],
             "PackageLists": [
                 "packagelists/baremetal-packages.json",
+                "packagelists/base-image-packages.json",
                 "packagelists/cloud-init-packages.json",
-                "packagelists/core-packages-image.json",
-                "packagelists/selinux-full.json"
+                "packagelists/selinux.json"
             ],
             "KernelCommandLine": {
-                "ExtraCommandLine": "console=tty0 console=ttyS0",
-                "SELinux": "enforcing"
+                "ExtraCommandLine": "console=tty0 console=ttyS0 rd.info log_buf_len=1M",
+                "SELinux": "permissive"
             },
             "KernelOptions": {
                 "default": "kernel"
             },
+            "AdditionalFiles": {
+                "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs"
+            },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]

@@ -1,7 +1,7 @@
 {
  "Signatures": {
-  "glu-9.0.1.tar.xz": "fb5a4c2dd6ba6d1c21ab7c05129b0769544e1d68e1e3b0ffecb18e73c93055bc",
   "LICENSE.PTR": "79d45231a71a83e895d4330153a10f730a0fe02a9d5c990e9dc802232d4aeeea",
-  "make-git-snapshot.sh": "9da65259fc1f2a23f33c55227b20cfe8a72d12a36ceac37199f1130397ddd305"
+  "make-git-snapshot.sh": "9da65259fc1f2a23f33c55227b20cfe8a72d12a36ceac37199f1130397ddd305",
+  "mesa-libGLU-9.0.3.tar.gz": "7e919cbc1b2677b01d65fc28fd36a19d1f3e23d76663020e0f3b82b991475e8b"
  }
 }

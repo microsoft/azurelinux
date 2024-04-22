@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.9.0.4
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -58,6 +58,7 @@ install -m 644 config/66-azure-storage.rules %{buildroot}/%{_sysconfdir}/udev/ru
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent
 sed -i 's,#!/usr/bin/env python,#!/usr/bin/python3,' %{buildroot}%{_sbindir}/waagent2.0
 sed -i 's,/usr/bin/python ,/usr/bin/python3 ,' %{buildroot}/lib/systemd/system/waagent.service
+sed -i 's,/usr/bin/waagent,/usr/sbin/waagent,' %{buildroot}/lib/systemd/system/waagent.service
 install -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/ephemeral-disk-warning.service
 install -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/ephemeral-disk-warning.conf
 install -m 644 %{SOURCE3} %{buildroot}%{_sbindir}/ephemeral-disk-warning
@@ -92,6 +93,12 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Tue Apr 02 2024 Sudipta Pandit <sudpandit@microsoft.com> - 2.9.0.4-3
+- Fix ephemeral-disk-warning script path from /usr/bin to /usr/sbin
+
+* Wed Mar 13 2024 Cameron Baird <cameronbaird@microsoft.com> - 2.9.0.4-2
+- Sed service file to refer to actual waagent location, /usr/sbin/waagent
+
 * Tue Feb 27 2024 Henry Li <lihl@microsoft.com> - 2.9.0.4-1
 - Upgrade to version 2.9.0.4
 - Fix installation path from /usr/lib/systemd to /lib/systemd and /usr/bin to /usr/sbin

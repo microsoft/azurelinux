@@ -1,0 +1,28 @@
+{
+    "packages": [
+        "azurelinux-release",
+        "azurelinux-repos",
+        "azurelinux-repos-ms-non-oss",
+        "azurelinux-repos-ms-oss",
+        "bash",
+        "ca-certificates",
+        "cronie-anacron",
+        "chrony",
+        "cryptsetup",
+        "dbus",
+        "e2fsprogs",
+        "filesystem",
+        "grub2-efi-binary",
+        "logrotate",
+        "openssh-server",
+        "procps-ng",
+        "shim",
+        "sudo",
+        "systemd",
+        "tdnf",
+        "tdnf-plugin-repogpgcheck",
+        "util-linux",
+        "zlib",
+        "initramfs"
+    ]
+}

@@ -6,8 +6,10 @@ package safechroot
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -31,6 +33,8 @@ type FileToCopy struct {
 	Src         string
 	Dest        string
 	Permissions *os.FileMode
+	// Set to true to copy symlinks as symlinks.
+	NoDereference bool
 }
 
 // MountPoint represents a system mount point used by a Chroot.
@@ -309,15 +313,15 @@ func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 func AddFilesToDestination(destDir string, filesToCopy ...FileToCopy) error {
 	for _, f := range filesToCopy {
 		dest := filepath.Join(destDir, f.Dest)
-		logger.Log.Debugf("Copying '%s' to '%s'", f.Src, dest)
-
-		var err error
+		fileCopyOp := file.NewFileCopyBuilder(f.Src, dest)
+		if f.NoDereference {
+			fileCopyOp = fileCopyOp.SetNoDereference()
+		}
 		if f.Permissions != nil {
-			err = file.CopyAndChangeMode(f.Src, dest, os.ModePerm, *f.Permissions)
-		} else {
-			err = file.Copy(f.Src, dest)
+			fileCopyOp = fileCopyOp.SetFileMode(*f.Permissions)
 		}
 
+		err := fileCopyOp.Run()
 		if err != nil {
 			return fmt.Errorf("failed to copy (%s):\n%w", f.Src, err)
 		}
@@ -426,6 +430,14 @@ func (c *Chroot) Close(leaveOnDisk bool) (err error) {
 		if index < 0 {
 			// Already closed.
 			return
+		}
+
+		// Stops gpg-agent and keyboxd if they are running inside the chroot.
+		// This is to avoid leaving folders like /dev mounted when the chroot folder is forcefully deleted in cleanup.
+		err = c.stopGPGComponents()
+		if err != nil {
+			// Don't want to leave a stale root if GPG components fail to exit. Logging a Warn and letting close continue...
+			logger.Log.Warnf("Failed to stop GPG components while tearing down the (%s) chroot: %s", c.rootDir, err)
 		}
 
 		// mount is only supported in regular pipeline
@@ -686,4 +698,66 @@ func (c *Chroot) GetMountPoints() []*MountPoint {
 	// Create a copy of the list so that the caller can't mess with the list.
 	mountPoints := append([]*MountPoint(nil), c.mountPoints...)
 	return mountPoints
+}
+
+// stopGPGComponents stops gpg-agent and keyboxd if they are running inside the chroot.
+//
+// A GPG agent may have been started while the chroot was in use. Newer versions of "gnupg2" will also start keyboxd.
+// E.g. when installing the azurelinux-repos-shared package, a GPG import occurs. This starts the gpg-agent process inside the chroot.
+// To be able to cleanly exit the setup chroot, we must stop it.
+func (c *Chroot) stopGPGComponents() (err error) {
+	_, err = exec.LookPath("gpgconf")
+	if err != nil {
+		logger.Log.Debugf("gpgconf is not installed, so gpg-agent is not running: %s", err)
+		return nil
+	}
+
+	err = c.UnsafeRun(func() (err error) {
+		components, err := listGPGComponents()
+		if err != nil {
+			return err
+		}
+		// List of components to kill. The names must be verbatim identical to the name tag that is used by `gpgconf`
+		componentsToKill := []string{"gpg-agent", "keyboxd"}
+		return killGPGComponents(componentsToKill, components)
+	})
+
+	return
+}
+
+// killGPGComponents will kill the GPG components from the 'componentsToKill' list
+// if they are inside the 'availableComponents' set.
+func killGPGComponents(componentsToKill []string, availableComponents map[string]bool) (err error) {
+	for _, component := range componentsToKill {
+		if availableComponents[component] {
+			logger.Log.Debugf("Found %s running inside chroot. Stopping it.", component)
+			_, stderr, err := shell.Execute("gpgconf", "--kill", component)
+			if err != nil {
+				return fmt.Errorf("failed to stop GPG component (%s):\nerr: %w\nstderr: %s", component, err, stderr)
+			}
+		}
+	}
+	return
+}
+
+// listGPGComponents will return a set of all GPG component.
+func listGPGComponents() (components map[string]bool, err error) {
+	stdout, stderr, err := shell.Execute("gpgconf", "--list-components")
+
+	if err != nil {
+		err = fmt.Errorf("failed to list GPG components.\nerr:%w\nstderr: %s", err, stderr)
+		return
+	}
+
+	logger.Log.Debugf("gpgconf --list-components output:\n%s", stdout)
+
+	components = make(map[string]bool)
+
+	// Split --list-components stdout into a list of name tags, one for each component
+	// Stdout has the following format: <component>:<description>:<pgmname>:
+	for _, line := range strings.Split(stdout, "\n") {
+		components[strings.Split(line, ":")[0]] = true
+	}
+
+	return
 }

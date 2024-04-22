@@ -1,0 +1,13 @@
+diff --git a/./tests/gunit/001-path.cpp b/home/henry/Downloads/libcgroup/tests/gunit/001-path.cpp
+index 5bf8532..17dd726 100644
+--- a/./tests/gunit/001-path.cpp
++++ b/home/henry/Downloads/libcgroup/tests/gunit/001-path.cpp
+@@ -38,6 +38,8 @@ class BuildPathV1Test : public ::testing::Test {
+ 		const int ENTRY_CNT = 6;
+ 		int i, ret;
+ 
++		cgroup_set_default_logger(-1);
++
+ 		memset(&cg_mount_table, 0, sizeof(cg_mount_table));
+ 		memset(cg_namespace_table, 0,
+ 			CG_CONTROLLER_MAX * sizeof(cg_namespace_table[0]));

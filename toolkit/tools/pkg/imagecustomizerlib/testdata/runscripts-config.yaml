@@ -1,6 +1,6 @@
-SystemConfig:
-  PostInstallScripts:
-  - Path: scripts/postinstallscript.sh
+scripts:
+  postCustomization:
+  - path: scripts/postcustomizationscript.sh
 
-  FinalizeImageScripts:
-  - Path: scripts/finalizeimagescript.sh
+  finalizeCustomization:
+  - path: scripts/finalizecustomizationscript.sh

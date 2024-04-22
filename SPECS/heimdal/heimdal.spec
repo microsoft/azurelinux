@@ -12,7 +12,7 @@
 Summary:        A Kerberos 5 implementation without export restrictions
 Name:           heimdal
 Version:        7.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,7 @@ Patch2:         heimdal-configure.patch
 Patch5:         0001-lib-krb5-krb5_pac_parse-mem-leak-if-pac_header_size-.patch
 Patch6:         0002-kdc-Check-generate_pac-return-code.patch
 Patch7:         0003-kdc-avoid-re-encoding-KDC-REQ-BODY.patch
+Patch8:         fixautoconf.patch
 BuildRequires:  bison
 #libcom_err-devel is in
 #BuildRequires:  libcom_err-devel
@@ -485,6 +486,9 @@ fi
 %{_sysconfdir}/profile.d/%{name}.csh
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 7.8.0-2
+- Add patch to fix build with autoconf 2.72
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 7.8.0-1
 - Auto-upgrade to 7.8.0 - Azure Linux 3.0 - package upgrades
 

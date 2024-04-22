@@ -1,15 +1,38 @@
+# If we should verify tarball signature with GPGv2.
+%global verify_tarball_signature %{?azl:%{nil}}
+
+# If there are patches which touch autotools files, set this to 1.
+%global patches_touch_autotools %{nil}
+
 # The source directory.
-%global source_directory 1.12-stable
-Summary:        NBD client library in userspace
+%global source_directory 1.18-stable
 Name:           libnbd
-Version:        1.12.1
-Release:        4%{?dist}
-License:        LGPLv2+
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
+Version:        1.18.3
+Release:        1%{?dist}
+Summary:        NBD client library in userspace
+License:        LGPL-2.0-or-later AND BSD-3-Clause
 URL:            https://gitlab.com/nbdkit/libnbd
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
-Patch0:         CVE-2023-5215.patch
+
+%if !0%{?azl}
+Source1:        http://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz.sig
+# Keyring used to verify tarball signature.  This contains the single
+# key from here:
+# https://pgp.key-server.io/pks/lookup?search=rjones%40redhat.com&fingerprint=on&op=vindex
+Source2:       libguestfs.keyring
+
+# Maintainer script which helps with handling patches.
+Source3:        copy-patches.sh
+%endif
+
+%if 0%{patches_touch_autotools}
+BuildRequires: autoconf, automake, libtool
+%endif
+
+%if 0%{verify_tarball_signature}
+BuildRequires:  gnupg2
+%endif
+
 # For the core library.
 BuildRequires:  gcc
 BuildRequires:  make
@@ -19,6 +42,12 @@ BuildRequires:  libxml2-devel
 
 # For nbdfuse.
 BuildRequires:  fuse3, fuse3-devel
+
+%if !0%{?rhel} && !0%{?azl}
+# For nbdublk
+BuildRequires:  liburing-devel >= 2.2
+BuildRequires:  ubdsrv-devel >= 1.0-3.rc6
+%endif
 
 # For the Python 3 bindings.
 BuildRequires:  python3-devel
@@ -33,16 +62,25 @@ BuildRequires:  glib2-devel
 
 # For bash-completion.
 BuildRequires:  bash-completion
+BuildRequires:  bash-completion-devel
 
+# Only for running the test suite.
 %if 0%{?with_check}
 BuildRequires:  coreutils
 BuildRequires:  gcc-c++
 BuildRequires:  gnutls-utils
 BuildRequires:  iproute
 BuildRequires:  jq
+%if !0%{?rhel}
 BuildRequires:  nbd
+%endif
 BuildRequires:  qemu-img
 BuildRequires:  util-linux
+%endif
+
+%if 0%{?have_ocaml}
+# The OCaml runtime system does not provide this symbol
+%global __ocaml_requires_opts -x Stdlib__Callback
 %endif
 
 %description
@@ -67,7 +105,6 @@ The key features are:
 
 %package        devel
 Summary:        Development headers for %{name}
-License:        LGPLv2+ and BSD
 Requires:       %{name} = %{version}-%{release}
 
 %description devel
@@ -82,7 +119,6 @@ This package contains OCaml language bindings for %{name}.
 
 %package -n     ocaml-%{name}-devel
 Summary:        OCaml language development package for %{name}
-License:        LGPLv2+ and BSD
 Requires:       ocaml-%{name} = %{version}-%{release}
 
 %description -n ocaml-%{name}-devel
@@ -104,14 +140,26 @@ python3-%{name} contains Python 3 bindings for %{name}.
 
 %package -n     nbdfuse
 Summary:        FUSE support for %{name}
-License:        LGPLv2+ and BSD
 Requires:       %{name} = %{version}-%{release}
 Recommends:     fuse3
 
 %description -n nbdfuse
 This package contains FUSE support for %{name}.
 
-%package        bash-completion
+%if !0%{?rhel}  && !0%{?azl}
+%package -n nbdublk
+Summary:        Userspace NBD block device
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Recommends:     kernel >= 6.0.0
+Recommends:     %{_sbindir}/ublk
+
+
+%description -n nbdublk
+This package contains a userspace NBD block device
+based on %{name}.
+%endif
+
+%package       bash-completion
 Summary:       Bash tab-completion for %{name}
 BuildArch:     noarch
 Requires:      bash-completion >= 2.0
@@ -122,25 +170,50 @@ Install this package if you want intelligent bash tab-completion
 for %{name}.
 
 %prep
+%if 0%{verify_tarball_signature}
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%endif
 %autosetup -p1
+%if 0%{patches_touch_autotools} && ! 0%{?azl}
+autoreconf -i
+%endif
+
 
 %build
 %configure \
     --disable-static \
     --with-tls-priority=@LIBNBD,SYSTEM \
+    --with-bash-completions \
     PYTHON=%{__python3} \
     --enable-python \
     --enable-ocaml \
     --enable-fuse \
-    --disable-golang
+    --disable-golang \
+    --disable-rust \
+    %{!?azl:--enable-ublk}
+
 %make_build
+
 
 %install
 %make_install
-find %{buildroot} -type f -name '*.la' -print -delete
+
+# Delete libtool crap.
+find %{buildroot} -name '*.la' -delete
 
 # Delete the golang man page since we're not distributing the bindings.
 rm %{buildroot}%{_mandir}/man3/libnbd-golang.3*
+
+%ifarch %{ix86}
+# Delete the OCaml man page on i686.
+rm %{buildroot}%{_mandir}/man3/libnbd-ocaml.3*
+%endif
+
+%if 0%{?rhel} || 0%{?azl}
+# Delete nbdublk on RHEL and azl.
+rm -f %{buildroot}%{_datadir}/bash-completion/completions/nbdublk
+%endif
+
 
 %check
 function skip_test ()
@@ -151,6 +224,19 @@ function skip_test ()
         chmod +x "$f"
     done
 }
+
+# interop/structured-read.sh fails with the old qemu-nbd in Fedora 29,
+# so disable it there.
+%if 0%{?fedora} <= 29
+skip_test interop/structured-read.sh
+%endif
+
+# interop/interop-qemu-storage-daemon.sh fails in RHEL 9 because of
+# this bug in qemu:
+# https://lists.nongnu.org/archive/html/qemu-devel/2021-03/threads.html#03544
+%if 0%{?rhel}
+skip_test interop/interop-qemu-storage-daemon.sh
+%endif
 
 # All fuse tests fail in Koji with:
 # fusermount: entry for fuse/test-*.d not found in /etc/mtab
@@ -172,12 +258,14 @@ skip_test tests/connect-tcp6
 
 
 %files
-%doc README
+%doc README.md
 %license COPYING.LIB
 %{_bindir}/nbdcopy
+%{_bindir}/nbddump
 %{_bindir}/nbdinfo
 %{_libdir}/libnbd.so.*
 %{_mandir}/man1/nbdcopy.1*
+%{_mandir}/man1/nbddump.1*
 %{_mandir}/man1/nbdinfo.1*
 
 %files devel
@@ -192,11 +280,10 @@ skip_test tests/connect-tcp6
 %{_mandir}/man3/nbd_*.3*
 
 %files -n ocaml-%{name}
-%{_libdir}/ocaml/nbd
-%exclude %{_libdir}/ocaml/nbd/*.a
-%exclude %{_libdir}/ocaml/nbd/*.cmxa
-%exclude %{_libdir}/ocaml/nbd/*.cmx
-%exclude %{_libdir}/ocaml/nbd/*.mli
+%dir %{_libdir}/ocaml/nbd
+%{_libdir}/ocaml/nbd/META
+%{_libdir}/ocaml/nbd/*.cma
+%{_libdir}/ocaml/nbd/*.cmi
 %{_libdir}/ocaml/stublibs/dllmlnbd.so
 %{_libdir}/ocaml/stublibs/dllmlnbd.so.owner
 
@@ -215,6 +302,7 @@ skip_test tests/connect-tcp6
 %{python3_sitearch}/libnbdmod*.so
 %{python3_sitearch}/nbd.py
 %{python3_sitearch}/nbdsh.py
+%{python3_sitearch}/__pycache__/nbd*.py*
 %{_bindir}/nbdsh
 %{_mandir}/man1/nbdsh.1*
 
@@ -222,17 +310,27 @@ skip_test tests/connect-tcp6
 %{_bindir}/nbdfuse
 %{_mandir}/man1/nbdfuse.1*
 
+%if !0%{?rhel} && !0%{?azl}
+%files -n nbdublk
+%{_bindir}/nbdublk
+%{_mandir}/man1/nbdublk.1*
+%endif
+
 %files bash-completion
 %dir %{_datadir}/bash-completion/completions
 %{_datadir}/bash-completion/completions/nbdcopy
+%{_datadir}/bash-completion/completions/nbddump
 %{_datadir}/bash-completion/completions/nbdfuse
 %{_datadir}/bash-completion/completions/nbdinfo
 %{_datadir}/bash-completion/completions/nbdsh
+%if !0%{?rhel} && !0%{?azl}
+%{_datadir}/bash-completion/completions/nbdublk
+%endif
 
 
 %changelog
-* Fri Feb 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.12.1-4
-- Fix python3.12 build issue
+* Wed Mar 20 2024 Daniel McIlvaney <damcilva@microsoft.com> - 1.18.3-1
+- Refresh from Fedora 39
 
 * Thu Oct 19 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 1.12.1-3
 - Add patch to fix CVE-2023-5215

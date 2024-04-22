@@ -8,18 +8,18 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 )
 
 type Disk struct {
 	// The type of partition table to use (e.g. mbr, gpt)
-	PartitionTableType PartitionTableType `yaml:"PartitionTableType"`
+	PartitionTableType PartitionTableType `yaml:"partitionTableType"`
 
 	// The virtual size of the disk.
-	MaxSize uint64 `yaml:"MaxSize"`
+	MaxSize DiskSize `yaml:"maxSize"`
 
 	// The partitions to allocate on the disk.
-	Partitions []Partition `yaml:"Partitions"`
+	Partitions []Partition `yaml:"partitions"`
 }
 
 func (d *Disk) IsValid() error {
@@ -29,7 +29,7 @@ func (d *Disk) IsValid() error {
 	}
 
 	if d.MaxSize <= 0 {
-		return fmt.Errorf("a disk's MaxSize value (%d) must be a positive non-zero number", d.MaxSize)
+		return fmt.Errorf("a disk's maxSize value (%d) must be a positive non-zero number", d.MaxSize)
 	}
 
 	partitionIDSet := make(map[string]bool)
@@ -39,21 +39,11 @@ func (d *Disk) IsValid() error {
 			return fmt.Errorf("invalid partition at index %d:\n%w", i, err)
 		}
 
-		if _, existingName := partitionIDSet[partition.ID]; existingName {
-			return fmt.Errorf("duplicate partition ID used (%s) at index %d", partition.ID, i)
+		if _, existingName := partitionIDSet[partition.Id]; existingName {
+			return fmt.Errorf("duplicate partition id used (%s) at index %d", partition.Id, i)
 		}
 
-		partitionIDSet[partition.ID] = false // dummy value
-
-		if d.PartitionTableType == PartitionTableTypeGpt {
-			isESP := sliceutils.ContainsValue(partition.Flags, PartitionFlagESP)
-			isBoot := sliceutils.ContainsValue(partition.Flags, PartitionFlagBoot)
-
-			if isESP != isBoot {
-				return fmt.Errorf(
-					"invalid partition at index %d:\n'esp' and 'boot' flags must be specified together on GPT disks", i)
-			}
-		}
+		partitionIDSet[partition.Id] = false // dummy value
 	}
 
 	// Check for overlapping partitions.
@@ -70,24 +60,24 @@ func (d *Disk) IsValid() error {
 
 		aEnd, aHasEnd := a.GetEnd()
 		if !aHasEnd {
-			return fmt.Errorf("partition (%s) is not last partition but ommitted End value", a.ID)
+			return fmt.Errorf("partition (%s) is not last partition but size is set to \"grow\"", a.Id)
 		}
 		if aEnd > b.Start {
 			bEnd, bHasEnd := b.GetEnd()
 			bEndStr := ""
 			if bHasEnd {
-				bEndStr = strconv.FormatUint(bEnd, 10)
+				bEndStr = strconv.FormatUint(uint64(bEnd), 10)
 			}
 			return fmt.Errorf("partition's (%s) range [%d, %d) overlaps partition's (%s) range [%d, %s)",
-				a.ID, a.Start, aEnd, b.ID, b.Start, bEndStr)
+				a.Id, a.Start, aEnd, b.Id, b.Start, bEndStr)
 		}
 	}
 
 	if len(sortedPartitions) > 0 {
 		// Make sure the first block isn't used.
 		firstPartition := sortedPartitions[0]
-		if firstPartition.Start == 0 {
-			return fmt.Errorf("block 0 must be reserved for the MBR header (%s)", firstPartition.ID)
+		if firstPartition.Start < diskutils.MiB {
+			return fmt.Errorf("first 1 MiB must be reserved for the MBR header (%s)", firstPartition.Id)
 		}
 
 		// Check that the disk is big enough for the partition layout.
@@ -95,15 +85,15 @@ func (d *Disk) IsValid() error {
 
 		lastPartitionEnd, lastPartitionHasEnd := lastPartition.GetEnd()
 
-		var requiredSize uint64
+		var requiredSize DiskSize
 		if !lastPartitionHasEnd {
-			requiredSize = lastPartition.Start + 1
+			requiredSize = lastPartition.Start + diskutils.MiB
 		} else {
 			requiredSize = lastPartitionEnd
 		}
 
 		if requiredSize > d.MaxSize {
-			return fmt.Errorf("disk's partitions need %d MiB but MaxSize is only %d MiB", requiredSize, d.MaxSize)
+			return fmt.Errorf("disk's partitions need %d bytes but maxSize is only %d bytes", requiredSize, d.MaxSize)
 		}
 	}
 

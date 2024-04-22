@@ -32,7 +32,8 @@
                 "additionalfiles/iso_initrd/usr/lib/mariner/terminfo/mariner-installer": "/usr/lib/mariner/terminfo/m/mariner-installer",
                 "additionalfiles/iso_initrd/usr/lib/systemd/system/getty@.service": "/usr/lib/systemd/system/getty@.service",
                 "additionalfiles/iso_initrd/usr/lib/systemd/system/serial-getty@.service": "/usr/lib/systemd/system/serial-getty@.service",
-                "../manifests/image/local.repo": "/etc/yum.repos.d/mariner-iso.repo"
+                "../manifests/image/local.repo": "/etc/yum.repos.d/mariner-iso.repo",
+                "additionalfiles/iso_initrd/10-console-messages.conf": "/etc/sysctl.d/10-console-messages.conf"
             },
             "Users": [
                 {

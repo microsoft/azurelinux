@@ -17,7 +17,6 @@ BuildRequires:  python3-pytest
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-toml
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-wheel
 
@@ -70,6 +69,7 @@ pip3 install iniconfig
 %changelog
 * Tue Mar 05 2024 Osama Esmail <osamaesmail@microsoft.com> - 24.1.0-4
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
+- Remove toml.
 - License verified.
 
 * Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 24.1.0-3

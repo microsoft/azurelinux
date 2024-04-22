@@ -1,14 +1,15 @@
 %global _description \
-Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (baded on Pyrex). It makes writing C extensions for Python as easy as Python itself.
+Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language (based on Pyrex). It makes writing C extensions for Python as easy as Python itself.
 Summary:        Language for writing Python extension modules
 Name:           Cython
 Version:        3.0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.cython.org
 Source0:        https://github.com/cython/cython/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         fix_testcycache.patch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -39,8 +40,9 @@ Provides:       %{name}%{?_isa} = %{version}-%{release}
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
-pip3 install -r test-requirements.txt
-%python3 runtests.py -vv
+pip3 install -r test-requirements-312.txt
+# Skip the file based tests, since they typically take over 5 hours to run.
+%python3 runtests.py -vv --no-file
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
@@ -55,6 +57,11 @@ pip3 install -r test-requirements.txt
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
+* Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
+- Switch to test-requirements-312.txt
+- Skip long-running file based tests
+- Add patch to fix TestPyCache test
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 3.0.5-1
 - Upgrade to version 3.0.5
 

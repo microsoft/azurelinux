@@ -2,7 +2,7 @@
     "Disks": [
         {
             "PartitionTableType": "gpt",
-            "MaxSize": 1024,
+            "MaxSize": 528,
             "Artifacts": [
                 {
                     "Name": "core",
@@ -45,7 +45,7 @@
                 }
             ],
             "PackageLists": [
-                "packagelists/core-packages-image.json",
+                "packagelists/base-image-packages.json",
                 "packagelists/cloud-init-packages.json",
                 "packagelists/qemu-guest-packages.json"
             ],
@@ -55,6 +55,14 @@
             "KernelOptions": {
                 "default": "kernel"
             },
+            "AdditionalFiles": {
+                "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs"
+            },
+            "FinalizeImageScripts": [
+                {
+                    "Path": "scripts/cleanup.sh"
+                }
+            ],
             "Hostname": "azure-linux"
         }
     ]

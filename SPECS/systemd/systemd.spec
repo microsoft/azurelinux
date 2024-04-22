@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        8%{?dist}
+Release:        9%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -143,6 +143,8 @@ BuildRequires:  p11-kit-devel
 BuildRequires:  polkit-devel
 # This is required for /etc/os-release, as the systemd uses this during src/boot/efi build
 BuildRequires:  azurelinux-release
+# This is required because...toolkit
+BuildRequires:  systemd-bootstrap-rpm-macros
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -1187,6 +1189,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-9
+- build dep the "bootstrap" macros because our maint scripts are broken without
+  our rpm macros available during the build
+
 * Mon Mar 11 2024 Daniel McIlvaney <damcilva@microsoft.com> - 255-8
 - Obsolete the new systemd-bootstrap-libs subpacakge.
 
