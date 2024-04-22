@@ -136,16 +136,9 @@ Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 # verification with "ovmf-vars-generator".
 BuildRequires:  python3-devel
 BuildRequires:  libuuid-devel
-BuildRequires:  /usr/bin/iasl
+BuildRequires:  iasl
 BuildRequires:  binutils gcc git gcc-c++ make
 BuildRequires:  qemu-img
-
-# openssl configure
-BuildRequires:  perl(FindBin)
-BuildRequires:  perl(IPC::Cmd)
-BuildRequires:  perl(File::Compare)
-BuildRequires:  perl(File::Copy)
-BuildRequires:  perl(JSON)
 
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
