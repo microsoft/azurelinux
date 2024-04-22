@@ -21,7 +21,11 @@ Distribution:   Azure Linux
 # in theory should build everywhere without much trouble, but
 # in practice the edk2 build system barfs on archs it doesn't know
 # (such as ppc), so lets limit things to the known-good ones.
-ExclusiveArch: x86_64 aarch64 riscv64
+#
+# Can't build aarch64 due to a dependency on "nasm", which doesn't
+# officially support the ARM64 architecture. See here:
+# https://github.com/netwide-assembler/nasm/pull/3
+ExclusiveArch: x86_64
 
 # edk2-stable202402
 %define GITDATE        20240223
@@ -141,6 +145,7 @@ BuildRequires:  binutils gcc git gcc-c++ make
 BuildRequires:  qemu-img
 
 # openssl configure
+BuildRequires:  perl-core
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IPC::Cmd)
 BuildRequires:  perl(File::Compare)
