@@ -53,7 +53,7 @@ func TestVerityIsValid(t *testing.T) {
 			IdType: "part-label",
 			Id:     "hash_partition",
 		},
-		corruptionOption: "panic",
+		CorruptionOption: "panic",
 	}
 
 	err := validVerity.IsValid()
@@ -70,7 +70,7 @@ func TestVerityIsValidInvalidCorruptionOption(t *testing.T) {
 			IdType: "part-label",
 			Id:     "hash_partition",
 		},
-		corruptionOption: "bad",
+		CorruptionOption: "bad",
 	}
 
 	err := invalidVerity.IsValid()
