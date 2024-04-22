@@ -350,15 +350,13 @@ please refer to the [overlay type](#overlay-type) section.
 
 - `corruptionOption`: Optional. Specifies the behavior in case of detected
   corruption. This is configurable with the following options:
-  - `CorruptionOptionDefault`: Without specifying corruption behaviors, or
-    giving empty string `""`, by default kernel fails the IO operation with I/O
-    error.
-  - `CorruptionOptionIgnore`: `ignore`, ignores the corruption and continues
-    operation.
-  - `CorruptionOptionPanic`: `panic`, causes the system to panic if corruption
-    is detected.
-  - `CorruptionOptionRestart`: `restart`, attempts to restart the system upon
-    detecting corruption.
+  - `"fail"`: Default setting. Without specifying argument of corruption
+    behaviors, or giving an string `fail`, by default kernel fails the IO
+    operation with I/O error.
+  - `ignore`: ignores the corruption and continues operation.
+  - `panic`: causes the system to panic (print errors) and then try restarting
+    if corruption is detected.
+  - `restart`: attempts to restart the system upon detecting corruption.
 
 Example:
 
