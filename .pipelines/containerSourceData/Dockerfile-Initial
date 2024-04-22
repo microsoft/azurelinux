@@ -9,12 +9,12 @@ RUN --mount=type=bind,source=./Stage/,target=/dockerStage/ \\\
     cat /dockerStage/marinerLocalRepo.repo >> /etc/yum.repos.d/local.repo; \\\
     createrepo --database ${LOCAL_REPO_PATH} --workers 10; tdnf makecache; \\\
     tdnf autoremove -y createrepo; \\\
-    for rpm in "${RPMS_TO_INSTALL[@]}"; do \\\
+    for rpm in ${RPMS_TO_INSTALL}; do \\\
        echo "RPM: $rpm"; \\\
-       if [[ $rpm == *"nvidia"* ]] || [[ $string == *"cuda"* ]]; then \\\
-         tdnf -y --downloadonly --downloaddir=/opt/nvidia install $rpm; \\\
+       if [[ $rpm == *"nvidia"* || $rpm == *"cuda"* ]]; then \\\
+          tdnf -y --downloadonly --downloaddir=/opt/nvidia install $rpm; \\\
        else \\\
-         tdnf install -y $rpm; \\\
+          tdnf install -y $rpm; \\\
        fi; \\\
     done; \\\
     tdnf clean all; \\\
