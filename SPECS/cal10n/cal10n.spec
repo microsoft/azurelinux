@@ -76,12 +76,12 @@ EOF
 %build
 mkdir -p lib
 build-jar-repository -s lib \
-%if %{with_check}
+%if 0%{?with_check}
     ant-antunit \
 %endif
     ant/ant
 %{ant} \
-%if %{without tests}
+%if ! 0%{?with_check}
     -Dtest.skip=true \
 %endif
     package javadoc
