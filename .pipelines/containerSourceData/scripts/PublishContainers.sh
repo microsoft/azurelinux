@@ -264,13 +264,11 @@ do
 
         amd64_image=${image_name%-*}-amd64
         docker pull "$amd64_image"
-        oras_attach "$amd64_image"
 
         # Some container images are only built for AMD64 architecture.
         if [[ $ARCHITECTURE_TO_BUILD == *"ARM64"*  ]]; then
             arm64_image=${image_name%-*}-arm64
             docker pull "$arm64_image"
-            oras_attach "$arm64_image"
         fi
 
         if [[ $container_registry != "$TARGET_ACR" ]]; then
