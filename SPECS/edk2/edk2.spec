@@ -140,6 +140,13 @@ BuildRequires:  iasl
 BuildRequires:  binutils gcc git gcc-c++ make
 BuildRequires:  qemu-img
 
+# openssl configure
+BuildRequires:  perl(FindBin)
+BuildRequires:  perl(IPC::Cmd)
+BuildRequires:  perl(File::Compare)
+BuildRequires:  perl(File::Copy)
+BuildRequires:  perl(JSON)
+
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
 BuildRequires:  nasm
@@ -796,7 +803,7 @@ done
 * Tue Oct 17 2023 Francisco Huelsz Prince <frhuelsz@microsoft.com> - 20230301gitf80f052277c8-37
 - Patch CVE-2023-0465 and CVE-2023-2650 in bundled OpenSSL.
 
-* Tue Oct 13 2023 Sindhu Karri <lakarri@microsoft.com> - 20230301gitf80f052277c8-36
+* Fri Oct 13 2023 Sindhu Karri <lakarri@microsoft.com> - 20230301gitf80f052277c8-36
 - Patch CVE-2023-3817 in bundled OpenSSL
 
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 20230301gitf80f052277c8-35
