@@ -551,8 +551,13 @@ func isDmVerityEnabled(buildDir string, rawImageFile string) error {
 		diskPartition := diskPartitions[i]
 
 		if diskPartition.FileSystemType == "DM_verity_hash" {
-			return fmt.Errorf("cannot customize base image that has dm-verity enabled.")
+			return fmt.Errorf("cannot customize base image that has dm-verity enabled")
 		}
+	}
+
+	err = imageConnection.CleanClose()
+	if err != nil {
+		return err
 	}
 
 	return nil
