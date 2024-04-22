@@ -23,8 +23,8 @@ Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            http://cal10n.qos.ch
 Source0:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-%{version}.tar.xz
-# cal10n-build.tar.gz imported from https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-build.tar.xz
-Source1:        %{name}-build.tar.xz
+# cal10n-build.tar.gz provides build process for cal10-api and cal10n-ant-task
+Source1:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-build.tar.xz
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
@@ -76,7 +76,7 @@ EOF
 %build
 mkdir -p lib
 build-jar-repository -s lib \
-%if %{with tests}
+%if %{with_check}
     ant-antunit \
 %endif
     ant/ant
