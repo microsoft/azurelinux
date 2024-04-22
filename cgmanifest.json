@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "cal10n",
-          "version": "0.7.7",
-          "downloadUrl": "https://github.com/qos-ch/cal10n/archive/refs/tags/v_0.7.7.tar.gz"
+          "version": "0.8.1.10",
+          "downloadUrl": "https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-0.8.1.10.tar.xz"
         }
       }
     },

@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "build.xml-0.7.7.tar.xz": "ed3969c21254517f97dd6e62b4ea5fe7d2e38142b71ae6905e1a208243a16a6a",
-  "cal10n-0.7.7.tar.gz": "a778dd646277612f7bb5f65d6970938f80294ca775b8916fcc8e62abeeb2fa8f"
+  "cal10n-0.8.1.10.tar.xz": "6f7f946e2934648e4d13e7ace5a40582b87aed9e7b2bda558a1560c059246deb",
+  "cal10n-build.tar.xz": "4f28373731de625de39fdc9608f319a8e7e35dec8a2f92f1bb39a1b5ebcd3a77"
  }
 }
