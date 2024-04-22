@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 # Script that updates the pkggen_core_*.txt and toolchain_*.txt files from a toolchain archive tarball.
 
 import argparse
