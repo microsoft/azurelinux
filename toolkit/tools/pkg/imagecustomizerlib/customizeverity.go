@@ -88,7 +88,8 @@ func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error
 }
 
 func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
-	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string, rootHash string, grubCfgFullPath string,
+	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string,
+	corruptionOption *imagecustomizerapi.CorruptionOption, rootHash string, grubCfgFullPath string,
 ) error {
 	var err error
 
@@ -102,9 +103,14 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return err
 	}
 
+	formattedCorruptionOption, err := systemdFormatCorruptionOption(corruptionOption)
+	if err != nil {
+		return err
+	}
+
 	newArgs := fmt.Sprintf(
-		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=panic-on-corruption",
-		rootHash, formattedDataPartition, formattedHashPartition,
+		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s",
+		rootHash, formattedDataPartition, formattedHashPartition, formattedCorruptionOption,
 	)
 
 	// Read grub.cfg using the internal method
@@ -184,6 +190,25 @@ func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (stri
 		return fmt.Sprintf("%s=%s", "PARTUUID", id), nil
 	default:
 		return "", fmt.Errorf("invalid idType provided (%s)", string(idType))
+	}
+}
+
+func systemdFormatCorruptionOption(corruptionOption *imagecustomizerapi.CorruptionOption) (string, error) {
+	if corruptionOption == nil {
+		return "", nil
+	}
+
+	switch *corruptionOption {
+	case imagecustomizerapi.CorruptionOptionDefault:
+		return "", nil
+	case imagecustomizerapi.CorruptionOptionIgnore:
+		return "ignore-corruption", nil
+	case imagecustomizerapi.CorruptionOptionPanic:
+		return "panic-on-corruption", nil
+	case imagecustomizerapi.CorruptionOptionRestart:
+		return "restart-on-corruption", nil
+	default:
+		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(*corruptionOption))
 	}
 }
 
