@@ -1,36 +1,38 @@
 Summary:        Cross-platform, Python-agnostic binary package manager
 Name:           conda
-Version:        4.11.0
+Version:        24.1.2
 Release:        1%{?dist}
-License:        BSD and ASL 2.0 and LGPLv2+ and MIT
-# The conda code is BSD
-# progressbar is LGPLv2+
-# six is MIT/X11
-# adapters/ftp.py is ASL 2.0
+License:        BSD-3-Clause AND Apache-2.0
+# The conda code is BSD-3-Clause
+# adapters/ftp.py is Apache-2.0
 URL:            http://conda.pydata.org/docs/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/conda/conda/archive/%{version}/%{name}-%{version}.tar.gz
 # bash completion script moved to a separate project
-Source1:        https://raw.githubusercontent.com/tartansandal/conda-bash-completion/1.5/conda
+Source1:        https://raw.githubusercontent.com/tartansandal/conda-bash-completion/1.7/conda
 Patch0:         conda_sys_prefix.patch
-Patch1:         conda_gateways_disk_create.patch
-# Fix typo
-Patch2:         conda-memoize.patch
+# Use main entry point for conda and re-add conda-env entry point, no need to run conda init
+Patch1:         0001-Use-main-entry-point-for-conda-and-re-add-conda-env-.patch
 # Use system cpuinfo
 Patch3:         conda-cpuinfo.patch
 
-Patch10001:     0001-Fix-toolz-imports.patch
-Patch10003:     0003-Drop-fs-path-encoding-manipulation-under-python2.patch
 Patch10004:     0004-Do-not-try-to-run-usr-bin-python.patch
 Patch10005:     0005-Fix-failing-tests-in-test_api.py.patch
 Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
-Patch10007:     0001-Add-back-conda-and-conda_env-entry-point.patch
-Patch10008:     0002-Go-back-to-ruamel_yaml.patch
 
 BuildArch:      noarch
 
-BuildRequires:  bash-completion-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python3-trove-classifiers
+
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pip
+BuildRequires:  pkgconfig(bash-completion)
 %global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '/etc/bash_completion.d')
 BuildRequires:  sed
 
@@ -68,29 +70,39 @@ can only use conda to create and manage new environments.}
         python%{python3_pkgversion}-urllib3 >= 1.19.1
 %global py3_reqs %(c="%_py3_reqs"; echo "$c" | xargs)
 
+%package tests
+Summary:        conda tests
+
+%description tests
+Data for conda tests.  Set CONDA_TEST_DATA_DIR to
+%{_datadir}/conda/tests/data.
 
 %package -n python%{python3_pkgversion}-conda
 Summary:        %{summary}
 
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 BuildRequires:  %py3_reqs
 
 # For tests
 BuildRequires:  python3
 %if 0%{?with_check}
-BuildRequires:  python3-pip
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-pytest-cov
+BuildRequires:  python-unversioned-command
+BuildRequires:  python%{python3_pkgversion}-boto3
+BuildRequires:  python%{python3_pkgversion}-flask
+BuildRequires:  python%{python3_pkgversion}-jsonpatch
+BuildRequires:  python%{python3_pkgversion}-pytest-mock
+BuildRequires:  python%{python3_pkgversion}-pytest-rerunfailures
+BuildRequires:  python%{python3_pkgversion}-pytest-timeout
+BuildRequires:  python%{python3_pkgversion}-pytest-xprocess
 BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
 Requires:       %py3_reqs
+# Some versions in conda/_vendor/vendor.txt
 Provides:       bundled(python%{python3_pkgversion}-appdirs) = 1.2.0
-Provides:       bundled(python%{python3_pkgversion}-auxlib)
-Provides:       bundled(python%{python3_pkgversion}-boltons) = 18.0.0
-Provides:       bundled(python%{python3_pkgversion}-six) = 1.10.0
-Provides:       bundled(python%{python3_pkgversion}-toolz) = 0.8.2
+Provides:       bundled(python%{python3_pkgversion}-auxlib) = 0.0.43
+Provides:       bundled(python%{python3_pkgversion}-boltons) = 21.0.0
 
 %{?python_provide:%python_provide python%{python3_pkgversion}-conda}
 
@@ -99,42 +111,60 @@ Provides:       bundled(python%{python3_pkgversion}-toolz) = 0.8.2
 %prep
 %autosetup -p1
 
-sed -r -i 's/^(__version__ = ).*/\1"%{version}"/' conda/__init__.py
-# xdoctest not packaged
-sed -i -e '/xdoctest/d' setup.cfg
+# Do not restrict upper bound of ruamel-yaml
+sed -i -e '/ruamel.yaml/s/,<[0-9.]*//' pyproject.toml
+
+# pytest-split/xdoctest not packaged, store-duration not needed
+sed -i -e '/splitting-algorithm/d' -e '/store-durations/d' -e '/xdoctest/d' pyproject.toml
 
 # delete interpreter line, the user can always call the file
 # explicitly as python3 /usr/lib/python3.6/site-packages/conda/_vendor/appdirs.py
 # or so.
 sed -r -i '1 {/#![/]usr[/]bin[/]env/d}' conda/_vendor/appdirs.py
 
-rm conda/_vendor/cpuinfo.py
-rm conda/_vendor/toolz/[a-zA-Z]*
+# Use Fedora's cpuinfo since it supports more arches
+rm -r conda/_vendor/cpuinfo
+sed -i -e '/^dependencies = /a\ \ "py-cpuinfo",' pyproject.toml
 
 # Use system versions
-# TODO - urllib3 - results in test failures: https://github.com/conda/conda/issues/9512
-#rm -r conda/_vendor/{distro.py,frozendict.py,tqdm,urllib3}
-#find conda -name \*.py | xargs sed -i -e 's/^\( *\)from .*_vendor\.\(\(distro\|frozendict\|tqdm\|urllib3\).*\) import/\1from \2 import/'
-rm -r conda/_vendor/{distro.py,frozendict.py,tqdm}
-find conda -name \*.py | xargs sed -i -e 's/^\( *\)from .*_vendor\.\(\(distro\|frozendict\|tqdm\).*\) import/\1from \2 import/'
+rm -r conda/_vendor/{distro.py,frozendict}
+find conda -name \*.py | xargs sed -i -e 's/^\( *\)from .*_vendor\.\(\(distro\|frozendict\).*\) import/\1from \2 import/'
+sed -i -e '/^dependencies = /a\ \ "distro",' pyproject.toml
+sed -i -e '/^dependencies = /a\ \ "frozendict",' pyproject.toml
+
+# Unpackaged - use vendored version
+sed -i -e '/"boltons *>/d' pyproject.toml
+
+# Unpackaged - really only applicable for macOS/Windows?
+sed -i -e '/"truststore *>/d' pyproject.toml
 
 %ifnarch x86_64
+# Tests on 32-bit
+cp -a tests/data/conda_format_repo/linux-{64,32}
+sed -i -e s/linux-64/linux-32/ tests/data/conda_format_repo/linux-32/*json
 # Tests on non-x86_64
 cp -a tests/data/conda_format_repo/{linux-64,%{python3_platform}}
 sed -i -e s/linux-64/%{python3_platform}/ tests/data/conda_format_repo/%{python3_platform}/*json
 %endif
 
+# Do not run coverage in pytest
+sed -i -e '/"--cov/d' pyproject.toml
+
+%generate_buildrequires
+# When not testing, we don't need runtime dependencies.
+# Normally, we would still BuildRequire them to not accidentally build an uninstallable package,
+# but there is a runtime dependency loop with python3-conda-libmamba-solver.
+%pyproject_buildrequires %{!?with_tests:-R}
 
 %build
-# build conda executable
-%define py_setup setup.py
-%py3_build
+%pyproject_wheel
 
 %install
-# install conda executable
-%define py_setup setup.py
-%py3_install
+%pyproject_install
+%py3_shebang_fix %{buildroot}%{python3_sitelib}/conda/shell/bin/conda
+%pyproject_save_files conda*
 
+mkdir -p %{buildroot}%{_sysconfdir}/conda/condarc.d
 mkdir -p %{buildroot}%{_datadir}/conda/condarc.d
 cat >%{buildroot}%{_datadir}/conda/condarc.d/defaults.yaml <<EOF
 pkgs_dirs:
@@ -142,21 +172,28 @@ pkgs_dirs:
  - ~/.conda/pkgs
 EOF
 
+mv %{buildroot}%{python3_sitelib}/tests %{buildroot}%{_datadir}/conda/
+cp -rp tests/data %{buildroot}%{_datadir}/conda/tests/
+
 mkdir -p %{buildroot}%{_localstatedir}/cache/conda/pkgs/cache
 
+# install does not create the directory on EL7
 install -m 0644 -Dt %{buildroot}/etc/profile.d/ conda/shell/etc/profile.d/conda.{sh,csh}
-sed -r -i '1i CONDA_EXE=%{_bindir}/conda' %{buildroot}/etc/profile.d/conda.sh
+sed -r -i -e '1i [ -z "$CONDA_EXE" ] && CONDA_EXE=%{_bindir}/conda' \
+          -e '/PATH=.*condabin/s|PATH=|[ -d $(dirname "$CONDA_EXE")/condabin ] \&\& PATH=|' %{buildroot}/etc/profile.d/conda.sh
 sed -r -i -e '1i set _CONDA_EXE=%{_bindir}/conda\nset _CONDA_ROOT=' \
           -e 's/CONDA_PFX=.*/CONDA_PFX=/' %{buildroot}/etc/profile.d/conda.csh
-install -m 0644 -Dt %{buildroot}/etc/fish/conf.d/ conda/shell/etc/fish/conf.d/conda.fish
+install -m 0644 -Dt %{buildroot}%{_datadir}/fish/vendor_conf.d/ conda/shell/etc/fish/conf.d/conda.fish
 sed -r -i -e '1i set -gx CONDA_EXE "/usr/bin/conda"\nset _CONDA_ROOT "/usr"\nset _CONDA_EXE "/usr/bin/conda"\nset -gx CONDA_PYTHON_EXE "/usr/bin/python3"' \
-          %{buildroot}/etc/fish/conf.d/conda.fish
+          %{buildroot}%{_datadir}/fish/vendor_conf.d/conda.fish
 
 # Install bash completion script
 install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
-
 %check
+%if %{with tests}
+export PATH=%{buildroot}%{_bindir}:$PATH
+PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
 # Integration tests generally require network, so skip them.
 
@@ -167,81 +204,135 @@ install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 # test_cli.py::TestRun.test_run_returns_zero_errorlevel
 
 # test_ProgressiveFetchExtract_prefers_conda_v2_format, test_subdir_data_prefers_conda_to_tar_bz2,
-# test_use_only_tar_bz2 fail, but not with mock --enablerepo=local. Let's disable
+# test_use_only_tar_bz2 fail in F31 koji, but not with mock --enablerepo=local. Let's disable
 # them for now.
+# tests/env/test_create.py::test_create_update_remote_env_file requires network access
+# tests/cli/test_conda_argparse.py::test_list_through_python_api does not recognize /usr as a conda environment
+# tests/cli/test_main_{clean,info,list,list_reverse,rename}.py tests require network access
+# tests/cli/test_main_notices.py::test_notices_appear_once_when_running_decorated_commands needs a conda_build fixture that we remove
+# tests/cli/test_main_notices.py::test_notices_cannot_read_cache_files - TypeError: '<' not supported between instances of 'MagicMock' and 'int'
+# tests/cli/test_main_run.py require /usr/bin/conda to be installed
+# tests/cli/test_subcommands.py tests require network access
+# tests/cli/test_subcommands.py::test_rename seems to need an active environment
+# tests/test_misc.py::test_explicit_missing_cache_entries requires network access
 # tests/core/test_initialize.py tries to unlink /usr/bin/python3 and fails when python is a release candidate
 # tests/core/test_solve.py::test_cuda_fail_1 fails on non-x86_64
-
-# tests/base/test_context.py::ContextCustomRcTests::test_target_prefix 
-
-# The following fail trying to raise a pytest exception.
-# The tests change a file to read-only and expect an exception when trying to open the file for appending
-# The exception does occur for normal users but not for root 
-# Since root is required for pytest and build tools, skip:
-# tests/core/test_package_cache_data.py::test_instantiating_package_cache_when_both_tar_bz2_and_conda_exist_read_only \
-# tests/gateways/disk/test_delete.py::test_remove_file \
-# tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
-# tests/gateways/disk/test_permissions.py::test_make_writable \
-# tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
-# tests/gateways/disk/test_permissions.py::test_make_executable 
-
-mkdir /tmp
-export PATH=%{buildroot}%{_bindir}:$PATH
-PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
-
-pip3 install atomicwrites>=1.3.0 \
-    attrs>=19.1.0 \
-    ruamel.yaml>=0.11.14 \
-    more-itertools>=7.0.0 \
-    pluggy>=0.11.0 \
-    pytest>=5.4.0 \
-    pytest-cov>=2.7.1 \
-    pytest-timeout \
-    pytest-rerunfailures
-
-python%{python3_version} -m pytest -vv -m "not integration" \
+# tests/core/test_solve.py libmamba - some depsolving differences - TODO
+# tests/core/test_solve.py libmamba - some depsolving differences - TODO
+# tests/core/test_prefix_graph.py libmamba - some depsolving differences - TODO
+# tests/trust/test_signature_verification.py requires conda_content_trust - not yet packaged
+py.test-%{python3_version} -vv -m "not integration" \
     --deselect=tests/test_cli.py::TestJson::test_list \
-    --deselect=tests/test_cli.py::TestRun::test_run_returns_int \
-    --deselect=tests/test_cli.py::TestRun::test_run_returns_nonzero_errorlevel \
-    --deselect=tests/test_cli.py::TestRun::test_run_returns_zero_errorlevel \
+    --deselect=tests/test_cli.py::test_run_returns_int \
+    --deselect=tests/test_cli.py::test_run_returns_nonzero_errorlevel \
+    --deselect=tests/test_cli.py::test_run_returns_zero_errorlevel \
+    --deselect=tests/test_cli.py::test_run_readonly_env \
+    --deselect=tests/test_misc.py::test_explicit_missing_cache_entries \
+    --ignore=tests/env/specs/test_binstar.py \
+    --deselect=tests/env/test_create.py::test_create_update_remote_env_file \
+    --deselect='tests/cli/test_common.py::test_is_active_prefix[active_prefix-True]' \
+    --deselect=tests/cli/test_config.py::test_conda_config_describe \
+    --deselect=tests/cli/test_config.py::test_conda_config_validate \
+    --deselect=tests/cli/test_config.py::test_conda_config_validate_sslverify_truststore \
+    --deselect=tests/cli/test_conda_argparse.py::test_list_through_python_api \
+    --deselect=tests/cli/test_main_clean.py \
+    --deselect=tests/cli/test_main_info.py::test_info_python_output \
+    --deselect=tests/cli/test_main_info.py::test_info_conda_json \
+    --deselect=tests/cli/test_main_list.py::test_list \
+    --deselect=tests/cli/test_main_list.py::test_list_reverse \
+    --deselect=tests/cli/test_main_notices.py::test_notices_appear_once_when_running_decorated_commands \
+    --deselect=tests/cli/test_main_notices.py::test_notices_cannot_read_cache_files \
+    --deselect=tests/cli/test_main_remove.py::test_remove_all \
+    --deselect=tests/cli/test_main_remove.py::test_remove_all_keep_env \
+    --deselect=tests/cli/test_main_rename.py \
+    --deselect=tests/cli/test_main_run.py \
+    --deselect=tests/cli/test_subcommands.py::test_create[libmamba] \
+    --deselect=tests/cli/test_subcommands.py::test_env_create \
+    --deselect=tests/cli/test_subcommands.py::test_env_update \
+    --deselect=tests/cli/test_subcommands.py::test_init \
+    --deselect=tests/cli/test_subcommands.py::test_install \
+    --deselect=tests/cli/test_subcommands.py::test_list \
+    --deselect=tests/cli/test_subcommands.py::test_notices \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[remove] \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[uninstall] \
+    --deselect=tests/cli/test_subcommands.py::test_rename \
+    --deselect=tests/cli/test_subcommands.py::test_run \
+    --deselect=tests/cli/test_subcommands.py::test_search \
+    --deselect=tests/cli/test_subcommands.py::test_update[libmamba-update] \
+    --deselect=tests/cli/test_subcommands.py::test_update[libmamba-upgrade] \
+    --deselect=tests/cli/test_subcommands.py::test_update[update] \
+    --deselect=tests/cli/test_subcommands.py::test_update[upgrade] \
     --deselect=tests/core/test_package_cache_data.py::test_ProgressiveFetchExtract_prefers_conda_v2_format \
     --deselect=tests/core/test_subdir_data.py::test_subdir_data_prefers_conda_to_tar_bz2 \
     --deselect=tests/core/test_subdir_data.py::test_use_only_tar_bz2 \
     --deselect=tests/core/test_initialize.py \
     --deselect=tests/core/test_solve.py::test_cuda_fail_1 \
-    --deselect=tests/base/test_context.py::ContextCustomRcTests::test_target_prefix \
-    --deselect=tests/core/test_package_cache_data.py::test_instantiating_package_cache_when_both_tar_bz2_and_conda_exist_read_only \
-    --deselect=tests/gateways/disk/test_delete.py::test_remove_file \
-    --deselect=tests/gateways/disk/test_delete.py::test_remove_file_to_trash \
-    --deselect=tests/gateways/disk/test_permissions.py::test_make_writable \
-    --deselect=tests/gateways/disk/test_permissions.py::test_recursive_make_writable \
-    --deselect=tests/gateways/disk/test_permissions.py::test_make_executable \
-    --deselect=tests/gateways/test_subprocess.py::test_subprocess_call_with_live_stream 
-
+    --deselect=tests/core/test_solve.py::test_conda_downgrade[libmamba] \
+    --deselect=tests/core/test_solve.py::test_python2_update[libmamba] \
+    --deselect=tests/core/test_solve.py::test_update_deps_2[libmamba] \
+    --deselect=tests/core/test_solve.py::test_fast_update_with_update_modifier_not_set[libmamba] \
+    --deselect=tests/core/test_solve.py::test_timestamps_1[libmamba] \
+    --deselect=tests/core/test_solve.py::test_remove_with_constrained_dependencies[libmamba] \
+    --deselect=tests/gateways/test_jlap.py::test_download_and_hash \
+    --deselect=tests/gateways/test_jlap.py::test_jlap_fetch_ssl[True] \
+    --deselect=tests/gateways/test_jlap.py::test_jlap_fetch_ssl[False] \
+    --deselect=tests/test_plan.py::test_pinned_specs_conda_meta_pinned \
+    --deselect=tests/test_plan.py::test_pinned_specs_condarc \
+    --deselect=tests/test_plan.py::test_pinned_specs_all \
+    --deselect=tests/cli/test_subcommands.py::test_compare[libmamba] \
+    --deselect=tests/cli/test_subcommands.py::test_package[libmamba] \
+    --deselect=tests/cli/test_subcommands.py::test_remove[libmamba-remove] \
+    --deselect=tests/cli/test_subcommands.py::test_remove[libmamba-uninstall] \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[libmamba-remove] \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[libmamba-uninstall] \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[classic-remove] \
+    --deselect=tests/cli/test_subcommands.py::test_remove_all_json[classic-uninstall] \
+    --deselect=tests/cli/test_subcommands.py::test_update[classic-update] \
+    --deselect=tests/cli/test_subcommands.py::test_update[classic-upgrade] \
+    --deselect=tests/cli/test_subcommands.py::test_env_remove[libmamba] \
+    --deselect=tests/cli/test_subcommands.py::test_env_config_vars[libmamba] \
+    --deselect=tests/core/test_subdir_data.py::test_subdir_data_coverage \
+    --deselect=tests/models/test_prefix_graph.py::test_prefix_graph_1[libmamba] \
+    --deselect=tests/models/test_prefix_graph.py::test_prefix_graph_2[libmamba] \
+    --deselect=tests/models/test_prefix_graph.py::test_remove_youngest_descendant_nodes_with_specs[libmamba] \
+    --deselect=tests/models/test_prefix_graph.py::test_deep_cyclical_dependency[libmamba] \
+    --deselect=tests/plugins/test_pre_solves.py::test_pre_solve_invoked \
+    --deselect=tests/plugins/test_post_solves.py::test_post_solve_action_raises_exception \
+    --deselect=tests/plugins/test_post_solves.py::test_post_solve_invoked \
+    --deselect=tests/plugins/subcommands/doctor/test_cli.py::test_conda_doctor_with_test_environment \
+    --deselect=tests/core/test_prefix_data.py::test_get_environment_env_vars \
+    --deselect=tests/core/test_prefix_data.py::test_set_unset_environment_env_vars \
+    --deselect=tests/core/test_prefix_data.py::test_set_unset_environment_env_vars_no_exist \
+    --ignore=tests/trust \
+    conda tests
+%endif
 
 %files
+%{_sysconfdir}/conda/
 %{_bindir}/conda
 %{_bindir}/conda-env
 %{bash_completionsdir}/conda
-# TODO - better ownership/requires for fish
-%dir /etc/fish
-%dir /etc/fish/conf.d
-/etc/fish/conf.d/conda.fish
+# TODO - better ownership for fish/vendor_conf.d
+%dir %{_datadir}/fish/vendor_conf.d
+%{_datadir}/fish/vendor_conf.d/conda.fish
 /etc/profile.d/conda.sh
 /etc/profile.d/conda.csh
 
-%files -n python%{python3_pkgversion}-conda
-%license LICENSE.txt
-%doc CHANGELOG.md README.rst
-%{python3_sitelib}/conda/
-%{python3_sitelib}/conda_env/
-%{python3_sitelib}/*.egg-info
-%exclude %{python3_sitelib}/test_data/
-%{_localstatedir}/cache/conda/
-%{_datadir}/conda/
+%files tests
+%{_datadir}/conda/tests/
 
+%files -n python%{python3_pkgversion}-conda -f %pyproject_files
+%doc CHANGELOG.md README.md
+%doc %{python3_sitelib}/conda-%{version}.dist-info/licenses/AUTHORS.md
+%license %{python3_sitelib}/conda-%{version}.dist-info/licenses/LICENSE
+%{_localstatedir}/cache/conda/
+%dir %{_datadir}/conda/
+%{_datadir}/conda/condarc.d/
 
 %changelog
+* Mon Apr 22 2024 Andrew Phelps <anphel@microsoft.com> - 24.1.2-1
+- Upgrade to version 24.1.2 referencing Fedora 40 (license: MIT)
+
 * Fri Jan 28 2022 Rachel Menge <rachelmenge@microsoft.com> - 4.11.0-1
 - Update source to 4.11.0
 
