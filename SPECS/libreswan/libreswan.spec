@@ -26,7 +26,7 @@
 
 Summary:        Internet Key Exchange (IKEv1 and IKEv2) implementation for IPsec
 Name:           libreswan
-Version:        4.14
+Version:        4.15
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -174,7 +174,7 @@ certutil -N -d sql:$tmpdir --empty-password
 
 %files
 %license CREDITS COPYING LICENSE
-%doc CHANGES README* 
+%doc CHANGES README*
 %doc docs/*.* docs/examples
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/ipsec.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ipsec.secrets
@@ -194,6 +194,9 @@ certutil -N -d sql:$tmpdir --empty-password
 %doc %{_mandir}/*/*
 
 %changelog
+* Mon Apr 22 2024 Elaheh Dehghani <edehghani@microsoft.com> - 4.15-1
+- Upgrade to 4.15 to address CVE-2024-3653
+
 * Mon Apr 01 2024 Rohit Rawat <rohitrawat@microsoft.com> - 4.14-1
 - Upgrade to 4.14 to fix CVE-2024-2357
 
