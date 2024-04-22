@@ -23,17 +23,16 @@ Patch10006:     0006-shell-assume-shell-plugins-are-in-etc.patch
 
 BuildArch:      noarch
 
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  python3-trove-classifiers
-
-BuildRequires:  python3-hatch-vcs
-BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-pathspec
-BuildRequires:  python3-pluggy
-BuildRequires:  python3-hatchling
-BuildRequires:  python3-pip
 BuildRequires:  pkgconfig(bash-completion)
 %global bash_completionsdir %(pkg-config --variable=completionsdir bash-completion 2>/dev/null || echo '/etc/bash_completion.d')
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pip
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-trove-classifiers
 BuildRequires:  sed
 
 Requires:       python%{python3_pkgversion}-conda = %{version}-%{release}
@@ -87,14 +86,8 @@ BuildRequires:  %py3_reqs
 # For tests
 BuildRequires:  python3
 %if 0%{?with_check}
-BuildRequires:  python-unversioned-command
-BuildRequires:  python%{python3_pkgversion}-boto3
-BuildRequires:  python%{python3_pkgversion}-flask
 BuildRequires:  python%{python3_pkgversion}-jsonpatch
 BuildRequires:  python%{python3_pkgversion}-pytest-mock
-BuildRequires:  python%{python3_pkgversion}-pytest-rerunfailures
-BuildRequires:  python%{python3_pkgversion}-pytest-timeout
-BuildRequires:  python%{python3_pkgversion}-pytest-xprocess
 BuildRequires:  python%{python3_pkgversion}-responses
 %endif
 
@@ -139,9 +132,6 @@ sed -i -e '/"boltons *>/d' pyproject.toml
 sed -i -e '/"truststore *>/d' pyproject.toml
 
 %ifnarch x86_64
-# Tests on 32-bit
-cp -a tests/data/conda_format_repo/linux-{64,32}
-sed -i -e s/linux-64/linux-32/ tests/data/conda_format_repo/linux-32/*json
 # Tests on non-x86_64
 cp -a tests/data/conda_format_repo/{linux-64,%{python3_platform}}
 sed -i -e s/linux-64/%{python3_platform}/ tests/data/conda_format_repo/%{python3_platform}/*json
@@ -154,7 +144,7 @@ sed -i -e '/"--cov/d' pyproject.toml
 # When not testing, we don't need runtime dependencies.
 # Normally, we would still BuildRequire them to not accidentally build an uninstallable package,
 # but there is a runtime dependency loop with python3-conda-libmamba-solver.
-%pyproject_buildrequires %{!?with_tests:-R}
+%pyproject_buildrequires %{!?with_check:-R}
 
 %build
 %pyproject_wheel
@@ -191,7 +181,7 @@ sed -r -i -e '1i set -gx CONDA_EXE "/usr/bin/conda"\nset _CONDA_ROOT "/usr"\nset
 install -m 0644 -Dt %{buildroot}%{bash_completionsdir}/ %SOURCE1
 
 %check
-%if %{with tests}
+%if 0%{?with_check}
 export PATH=%{buildroot}%{_bindir}:$PATH
 PYTHONPATH=%{buildroot}%{python3_sitelib} conda info
 
