@@ -121,7 +121,7 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
-* Thu Apr 19 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-4
+* Fri Apr 19 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-4
 - Update dependency on pcre2
 
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 2.78.1-3
