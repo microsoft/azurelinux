@@ -402,6 +402,18 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 		}
 	}
 
+	if b.artifacts.bootx64EfiPath == "" {
+		return fmt.Errorf("failed to find the boot efi file (%s):\n"+
+			"this file is provided by the (shim) package",
+			bootx64Binary)
+	}
+
+	if b.artifacts.grubx64EfiPath == "" {
+		return fmt.Errorf("failed to find the grub efi file (%s or %s):\n"+
+			"this file is provided by either the (grub2-efi-binary) or the (grub2-efi-binary-noprefix) package",
+			grubx64Binary, grubx64NoPrefixBinary)
+	}
+
 	return nil
 }
 
