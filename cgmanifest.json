@@ -1247,8 +1247,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.19.1",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.19.1.tar.gz"
+          "version": "0.20.3",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.20.3.tar.gz"
         }
       }
     },
@@ -1729,6 +1729,16 @@
           "name": "cjose",
           "version": "0.6.1",
           "downloadUrl": "https://github.com/cisco/cjose/archive/0.6.1/cjose-0.6.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ck",
+          "version": "0.7.2",
+          "downloadUrl": "https://github.com/concurrencykit/ck/archive/0.7.2/ck-0.7.2.tar.gz"
         }
       }
     },
@@ -8591,8 +8601,8 @@
         "type": "other",
         "other": {
           "name": "libaec",
-          "version": "1.0.4",
-          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.0.4/libaec-v1.0.4.tar.gz"
+          "version": "1.1.3",
+          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.1.3/libaec-v1.1.3.tar.gz"
         }
       }
     },
@@ -8791,8 +8801,8 @@
         "type": "other",
         "other": {
           "name": "libcap-ng",
-          "version": "0.8.3",
-          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.3.tar.gz"
+          "version": "0.8.4",
+          "downloadUrl": "https://people.redhat.com/sgrubb/libcap-ng/libcap-ng-0.8.4.tar.gz"
         }
       }
     },
@@ -9510,16 +9520,6 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libgsystem",
-          "version": "2015.2",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/libgsystem/libgsystem-2015.2.tar.xz/e388e3ad3c2b527479cc8512f6ad9a37/libgsystem-2015.2.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libgta",
           "version": "1.2.1",
           "downloadUrl": "https://marlam.de/gta/releases/libgta-1.2.1.tar.xz"
@@ -9531,8 +9531,8 @@
         "type": "other",
         "other": {
           "name": "libgudev",
-          "version": "237",
-          "downloadUrl": "https://download.gnome.org/sources/libgudev/237/libgudev-237.tar.xz"
+          "version": "238",
+          "downloadUrl": "https://download.gnome.org/sources/libgudev/238/libgudev-238.tar.xz"
         }
       }
     },
@@ -11230,9 +11230,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracecmd",
+          "version": "1.5.1",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
           "version": "1.8.2",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtracefs",
+          "version": "1.8.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
         }
       }
     },
@@ -15413,8 +15433,8 @@
         "type": "other",
         "other": {
           "name": "ostree",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2022.1/libostree-2022.1.tar.xz"
+          "version": "2024.5",
+          "downloadUrl": "https://github.com/ostreedev/ostree/releases/download/v2024.5/libostree-2024.5.tar.xz"
         }
       }
     },
@@ -15655,16 +15675,6 @@
           "name": "pcp",
           "version": "5.1.1",
           "downloadUrl": "https://bintray.com/artifact/download/pcp/source/pcp-5.1.1.src.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "pcre",
-          "version": "8.45",
-          "downloadUrl": "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.tar.bz2"
         }
       }
     },
@@ -21143,8 +21153,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.7.0",
-          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.7.0.tar.gz"
+          "version": "3.9.0",
+          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.9.0.tar.gz"
         }
       }
     },
@@ -23062,9 +23072,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-mdurl",
-          "version": "0.1.2",
-          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
+          "name": "python-mccabe",
+          "version": "0.6.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
         }
       }
     },
@@ -23072,9 +23082,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-mccabe",
-          "version": "0.6.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
+          "name": "python-mdurl",
+          "version": "0.1.2",
+          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
         }
       }
     },
@@ -25614,8 +25624,8 @@
         "type": "other",
         "other": {
           "name": "rpm-ostree",
-          "version": "2022.1",
-          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2022.1/rpm-ostree-2022.1.tar.xz"
+          "version": "2024.4",
+          "downloadUrl": "https://github.com/coreos/rpm-ostree/releases/download/v2024.4/rpm-ostree-2024.4.tar.xz"
         }
       }
     },
@@ -27576,8 +27586,8 @@
         "type": "other",
         "other": {
           "name": "slf4j",
-          "version": "1.7.30",
-          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_1.7.30.tar.gz"
+          "version": "2.0.7",
+          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_2.0.7.tar.gz"
         }
       }
     },
@@ -28036,8 +28046,8 @@
         "type": "other",
         "other": {
           "name": "swig",
-          "version": "4.1.1",
-          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.1.1.tar.gz"
+          "version": "4.2.1",
+          "downloadUrl": "https://github.com/swig/swig/archive/refs/tags/v4.2.1.tar.gz"
         }
       }
     },
@@ -28076,8 +28086,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.0.tar.gz"
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.1.tar.gz"
         }
       }
     },
@@ -28598,6 +28608,16 @@
           "name": "tpm2-tss",
           "version": "4.0.1",
           "downloadUrl": "https://github.com/tpm2-software/tpm2-tss/releases/download/4.0.1/tpm2-tss-4.0.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "trace-cmd",
+          "version": "3.2",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v3.2.tar.gz"
         }
       }
     },
