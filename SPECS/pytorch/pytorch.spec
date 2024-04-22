@@ -12,6 +12,7 @@ Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
 Patch0:         CVE-2024-31580.patch
+Patch1:         CVE-2024-31583.patch
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -84,7 +85,7 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 
 %changelog
 * Mon Apr 22 2024 Dan Streetman <ddstreet@microsoft.com> - 2.0.0-4
-- patch CVE-2024-31580
+- patch CVE-2024-31580, CVE-2024-31583
 
 * Mon Dec 18 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.0-3
 - Set MAX_JOBS=8 to prevent build failure in ADO pipelines
