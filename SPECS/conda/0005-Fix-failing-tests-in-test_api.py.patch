@@ -1,21 +1,5 @@
-From 4bc8b4ec9579e7c015a6ad5b41031c850596e0fb Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
-Date: Fri, 21 Sep 2018 10:23:39 +0200
-Subject: [PATCH] Fix failing tests in test_api.py
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Based on commit 0722e2edc93ae818bddd18f23be5b18c3a2a1d55 by
-Kale Franz <kfranz@continuum.io>.
-
-Signed-off-by: Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
----
- tests/test_api.py | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
-
 diff --git a/tests/test_api.py b/tests/test_api.py
-index 3ca97be734..e866e82fd3 100644
+index dd6a7b9..c60d1a1 100644
 --- a/tests/test_api.py
 +++ b/tests/test_api.py
 @@ -224,7 +224,7 @@ def test_PackageCacheData_return_value_contract():
@@ -27,7 +11,7 @@ index 3ca97be734..e866e82fd3 100644
  
      first_writable_result = PackageCacheData.first_writable()
      assert isinstance(first_writable_result, PackageCacheData)
-@@ -269,20 +269,21 @@ def test_PrefixData_contract():
+@@ -265,13 +265,14 @@ def test_PrefixData_contract():
  def test_PrefixData_return_value_contract():
      pd = PrefixData(context.conda_prefix)
  
@@ -39,16 +23,17 @@ index 3ca97be734..e866e82fd3 100644
 +        get_result = pd.get(PackageRecord.from_objects(single_prefix_rec))
 +        assert isinstance(get_result, PrefixRecord)
  
--    query_result = pd.query('openssl')
+-    query_result = pd.query("openssl")
 -    assert isinstance(query_result, tuple)
 -    assert all(isinstance(prefix_rec, PrefixRecord) for prefix_rec in query_result)
-+        query_result = pd.query('openssl')
++        query_result = pd.query("openssl")
 +        assert isinstance(query_result, tuple)
 +        assert all(isinstance(prefix_rec, PrefixRecord) for prefix_rec in query_result)
  
      iter_records_result = pd.iter_records()
      assert isiterable(iter_records_result)
-     assert all(isinstance(prefix_rec, PrefixRecord) for prefix_rec in iter_records_result)
+@@ -280,7 +281,7 @@ def test_PrefixData_return_value_contract():
+     )
  
      is_writable_result = pd.is_writable
 -    assert is_writable_result is True or is_writable_result is False
@@ -56,5 +41,3 @@ index 3ca97be734..e866e82fd3 100644
  
      reload_result = pd.reload()
      assert isinstance(reload_result, PrefixData)
--- 
-2.19.2
