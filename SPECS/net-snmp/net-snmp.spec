@@ -13,6 +13,7 @@ Source1:        snmpd.service
 Source2:        snmptrapd.service
 BuildRequires:  openssl-devel
 BuildRequires:  perl
+BuildRequires:  perl-ExtUtils-MakeMaker
 BuildRequires:  systemd
 %if %{with_check}
 BuildRequires:  net-tools
