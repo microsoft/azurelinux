@@ -58,6 +58,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
+	err = copyAdditionalDirs(baseConfigPath, config.OS.AdditionalDirs, imageChroot)
+	if err != nil {
+		return err
+	}
+
 	err = AddOrUpdateUsers(config.OS.Users, baseConfigPath, imageChroot)
 	if err != nil {
 		return err
@@ -201,6 +206,22 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 				return err
 			}
 		}
+	}
+
+	return nil
+}
+
+func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
+	for _, dirConfigElement := range additionalDirs {
+		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
+
+		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
+
+		err := imageChroot.AddDirs(absSourceDir, dirConfigElement.DestinationPath)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	return nil

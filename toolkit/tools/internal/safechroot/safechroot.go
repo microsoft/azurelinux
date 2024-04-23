@@ -305,6 +305,11 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	return
 }
 
+// AddDirs copies each directory 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
+func (c *Chroot) AddDirs(src, dst string) (err error) {
+	return file.CopyDir(src, filepath.Join(c.rootDir, dst))
+}
+
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
 func (c *Chroot) AddFiles(filesToCopy ...FileToCopy) (err error) {
 	return AddFilesToDestination(c.rootDir, filesToCopy...)

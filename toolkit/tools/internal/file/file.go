@@ -108,11 +108,11 @@ func CopyDir(src, dst string) (err error) {
 
 	if !isDstExist {
 		// Get src dir info
-		fileInfo, err := os.Stat(src)
+		dirInfo, err := os.Stat(src)
 		if err != nil {
 			return fmt.Errorf("error getting file info: %w", err)
 		}
-		permissions := fileInfo.Mode().Perm()
+		permissions := dirInfo.Mode().Perm()
 
 		// Create dst dir
 		err = os.MkdirAll(dst, permissions)

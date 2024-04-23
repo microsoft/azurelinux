@@ -123,6 +123,7 @@ func TestRemoveDirectoryContentsNonExistent(t *testing.T) {
 	// Call the function to remove the contents of the directory
 	err = RemoveDirectoryContents(tempDir)
 	assert.Error(t, err)
+}
 
 func TestCopyDir(t *testing.T) {
 	workingDir, err := os.Getwd()
