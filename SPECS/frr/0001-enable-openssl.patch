@@ -8,8 +8,8 @@ index 0b7af18..0533e24 100644
  	lib/log_vty.c \
 -	lib/md5.c \
  	lib/memory.c \
- 	lib/mlag.c \
- 	lib/module.c \
+ 	lib/mgmt_be_client.c \
+ 	lib/mgmt_fe_client.c \
 @@ -64,7 +64,6 @@ lib_libfrr_la_SOURCES = \
  	lib/routemap_northbound.c \
  	lib/sbuf.c \
@@ -24,8 +24,8 @@ index 0b7af18..0533e24 100644
  	lib/log_vty.h \
 -	lib/md5.h \
  	lib/memory.h \
- 	lib/module.h \
- 	lib/monotime.h \
+ 	lib/mgmt.pb-c.h \
+ 	lib/mgmt_be_client.h \
 @@ -191,7 +190,6 @@ pkginclude_HEADERS += \
  	lib/route_opaque.h \
  	lib/sbuf.h \

@@ -2,8 +2,8 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        8.5.3
-Release:        2%{?dist}
+Version:        9.1
+Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,8 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
+Patch5:         0008-Add-FIPS_mode-compatibility-macro.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -38,6 +40,7 @@ BuildRequires:  pam-devel
 BuildRequires:  patch
 BuildRequires:  perl-XML-LibXML
 BuildRequires:  perl-generators
+BuildRequires:  protobuf-c-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx
 BuildRequires:  re2-devel
@@ -69,6 +72,8 @@ FRRouting is a fork of Quagga.
 
 %prep
 %autosetup -p1 -n %{name}-%{name}-%{version}
+# C++14 or later needed for abseil-cpp 20230125; string_view needs C++17:
+sed -r -i 's/(AX_CXX_COMPILE_STDCXX\(\[)11(\])/\117\2/' configure.ac
 
 %build
 autoreconf -ivf
@@ -95,8 +100,7 @@ autoreconf -ivf
     --disable-babeld \
     --with-moduledir=%{_libdir}/frr/modules \
     --with-crypto=openssl \
-    --enable-fpm \
-    --enable-grpc
+    --enable-fpm
 
 %make_build MAKEINFO="makeinfo --no-split" PYTHON=python3
 
