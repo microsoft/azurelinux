@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCorruptionOptionDefaultIsValid(t *testing.T) {
-	err := CorruptionOptionDefault.IsValid()
+func TestCorruptionOptionIoErrorIsValid(t *testing.T) {
+	err := CorruptionOptionIoError.IsValid()
 	assert.NoError(t, err)
 }
 

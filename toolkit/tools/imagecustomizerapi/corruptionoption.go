@@ -10,7 +10,7 @@ import (
 type CorruptionOption string
 
 const (
-	CorruptionOptionDefault CorruptionOption = ""
+	CorruptionOptionIoError CorruptionOption = "io-error"
 	CorruptionOptionIgnore  CorruptionOption = "ignore"
 	CorruptionOptionPanic   CorruptionOption = "panic"
 	CorruptionOptionRestart CorruptionOption = "restart"
@@ -18,7 +18,7 @@ const (
 
 func (c CorruptionOption) IsValid() error {
 	switch c {
-	case CorruptionOptionDefault, CorruptionOptionIgnore, CorruptionOptionPanic, CorruptionOptionRestart:
+	case CorruptionOptionIoError, CorruptionOptionIgnore, CorruptionOptionPanic, CorruptionOptionRestart:
 		// All good.
 		return nil
 

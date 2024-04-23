@@ -350,8 +350,8 @@ please refer to the [overlay type](#overlay-type) section.
 
 - `corruptionOption`: Optional. Specifies the behavior in case of detected
   corruption. This is configurable with the following options:
-  - `"fail"`: Default setting. Without specifying argument of corruption
-    behaviors, or giving an string `fail`, by default kernel fails the IO
+  - `io-error`: Default setting. Without specifying argument of corruption
+    behaviors, or giving an string `io-error`, by default kernel fails the IO
     operation with I/O error.
   - `ignore`: ignores the corruption and continues operation.
   - `panic`: causes the system to panic (print errors) and then try restarting

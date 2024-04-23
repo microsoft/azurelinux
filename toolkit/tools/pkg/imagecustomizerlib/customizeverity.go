@@ -199,7 +199,7 @@ func systemdFormatCorruptionOption(corruptionOption *imagecustomizerapi.Corrupti
 	}
 
 	switch *corruptionOption {
-	case imagecustomizerapi.CorruptionOptionDefault:
+	case imagecustomizerapi.CorruptionOptionIoError:
 		return "", nil
 	case imagecustomizerapi.CorruptionOptionIgnore:
 		return "ignore-corruption", nil
