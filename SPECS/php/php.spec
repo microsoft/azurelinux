@@ -7,8 +7,8 @@
 # Please preserve changelog entries
 #
 # API/ABI check
-%global apiver      20210902
-%global zendver     20210902
+%global apiver      20230831
+%global zendver     20230831
 %global pdover      20170320
 %define majmin %(echo %{version} | cut -d. -f1-2)
 
@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.22
-Release:        2%{?dist}
+Version:        8.3.4
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -68,7 +68,7 @@ Patch6:         php-8.0.0-embed.patch
 Patch8:         php-8.1.0-libdb.patch
 # Functional changes
 # Use system nikic/php-parser
-Patch41:        php-8.1.0-parser.patch
+Patch41:        php-8.3.3-parser.patch
 # use system tzdata
 Patch42:        php-8.1.0-systzdata-v22.patch
 # See http://bugs.php.net/53436
@@ -221,7 +221,7 @@ Provides:       php-exif
 Provides:       php-exif%{?_isa}
 Provides:       php-fileinfo
 Provides:       php-fileinfo%{?_isa}
-Provides:       bundled(libmagic) = 5.29
+Provides:       bundled(libmagic) = 5.43
 Provides:       php-filter
 Provides:       php-filter%{?_isa}
 Provides:       php-ftp
@@ -726,7 +726,6 @@ cp TSRM/LICENSE TSRM_LICENSE
 cp Zend/asm/LICENSE BOOST_LICENSE
 cp sapi/fpm/LICENSE fpm_LICENSE
 cp ext/mbstring/libmbfl/LICENSE libmbfl_LICENSE
-cp ext/fileinfo/libmagic/LICENSE libmagic_LICENSE
 cp ext/bcmath/libbcmath/LICENSE libbcmath_LICENSE
 cp ext/date/lib/LICENSE.rst timelib_LICENSE
 
@@ -1362,7 +1361,6 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %files common -f files.common
 %doc EXTENSIONS NEWS UPGRADING* README.REDIST.BINS *md docs
 %license LICENSE TSRM_LICENSE ZEND_LICENSE BOOST_LICENSE
-%license libmagic_LICENSE
 %license timelib_LICENSE
 %doc php.ini-*
 %config(noreplace) %{_sysconfdir}/php.ini
@@ -1515,6 +1513,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 8.3.4-1
+- Upgrade to version 8.3.4
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
