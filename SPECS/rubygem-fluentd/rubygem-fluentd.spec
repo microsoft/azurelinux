@@ -3,7 +3,7 @@
 Summary:        Fluentd event collector
 Name:           rubygem-%{gem_name}
 Version:        1.16.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ Requires:       rubygem-http_parser.rb < 0.9.0
 Requires:       rubygem-msgpack < 2.0.0
 Requires:       rubygem-rake < 14
 Requires:       rubygem-serverengine < 3.0.0
-Requires:       rubygem-sigdump > 0.2.5
+Requires:       rubygem-sigdump >= 0.2.5
 Requires:       rubygem-strptime < 1.0.0
 Requires:       rubygem-tzinfo < 3.0
 Requires:       rubygem-tzinfo-data > 1.0

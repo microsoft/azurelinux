@@ -7,7 +7,7 @@ TensorBoard is a suite of web applications for inspecting and understanding your
 Summary:        TensorBoard is a suite of web applications for inspecting and understanding your TensorFlow runs and graphs
 Name:           python-%{pypi_name}
 Version:        2.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,7 +41,6 @@ Requires:   python3-numpy
 Requires:   python3-protobuf
 Requires:   python3-requests
 Requires:   python3-setuptools
-Requires:   python3-tensorflow-estimator
 Requires:   python3-werkzeug
 Requires:   python3-wheel
 

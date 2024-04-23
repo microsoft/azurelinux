@@ -1,13 +1,12 @@
 Summary:        Patterns for the Ceph containers
 Name:           patterns-ceph-containers
 Version:        1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Metapackages
 URL:            http://en.opensuse.org/Patterns
-ExclusiveArch:  x86_64 aarch64 ppc64le s390x
 
 %description
 This is an internal package that is used to create the patterns as part
@@ -31,8 +30,8 @@ Requires:       ceph-mds
 Requires:       ceph-mgr
 Requires:       ceph-mgr-cephadm
 Requires:       ceph-mgr-dashboard
-Requires:       ceph-mgr-rook
-#Package currently not supported in mariner, keeping dependency for future reference.
+# Following two package currently not supported in Azure Linux; keeping dependency for future reference.
+#Requires:      ceph-mgr-rook
 #Requires:      ceph-mgr-diskprediction-local
 Requires:       ceph-mon
 Requires:       ceph-osd
