@@ -2588,8 +2588,8 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.2",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
+          "version": "4.4.3",
+          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.3/dhcp-4.4.3.tar.gz"
         }
       }
     },
