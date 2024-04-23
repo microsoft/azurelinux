@@ -521,7 +521,8 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = updateGrubConfig(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
-		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
+		rootHash, grubCfgFullPath)
 	if err != nil {
 		return err
 	}
