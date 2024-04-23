@@ -1,27 +1,30 @@
 %define debug_package %{nil}
 
-Summary:	Autoconf macro archive
-Name:		autoconf-archive
-Version:	2021.02.19
-Release:    1%{?dist}
-License:	GPLv3+
-URL:		https://www.gnu.org/software/autoconf-archive
-Group:		System Environment/Base
+Summary:        Autoconf macro archive
+Name:           autoconf-archive
+Version:        2023.02.20
+Release:        1%{?dist}
+License:        GPLv3+
+URL:            https://www.gnu.org/software/autoconf-archive
+Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:	https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 
-BuildArch:  noarch
-Requires:	autoconf
+BuildArch:      noarch
+Requires:       autoconf
 
 %description
 The package contains programs for producing shell scripts that can
 automatically configure source code.
+
 %prep
 %setup -q
+
 %build
 %configure
 make
+
 %install
 make install DESTDIR=%{buildroot} INSTALL="install -p"
 rm -rf %{buildroot}%{_infodir}
