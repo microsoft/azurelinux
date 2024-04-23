@@ -1,0 +1,33 @@
+From 46192c98e771f5120b62c6ab36dc1245424e7cd4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Thu, 28 Mar 2024 20:01:49 +0100
+Subject: [PATCH 41/41] getty: grant checkpoint_restore
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Since Linux 6.7 checkpoint-restore functionality is guareded via the
+capability CAP_CHECKPOINT_RESTORE, with a fallback to CAP_SYS_ADMIN.
+Grant the new capability while keeping the old one for backwards
+compatibility.
+
+Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+---
+ policy/modules/system/getty.te | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/policy/modules/system/getty.te b/policy/modules/system/getty.te
+index bbc83a807..a900226bf 100644
+--- a/policy/modules/system/getty.te
++++ b/policy/modules/system/getty.te
+@@ -34,6 +34,7 @@ files_tmp_file(getty_tmp_t)
+ # Use capabilities.
+ allow getty_t self:capability { chown dac_override fowner fsetid setgid sys_admin sys_resource sys_tty_config };
+ dontaudit getty_t self:capability sys_tty_config;
++allow getty_t self:capability2 checkpoint_restore;
+ allow getty_t self:process { getpgid getsession setpgid signal_perms };
+ allow getty_t self:fifo_file rw_fifo_file_perms;
+ 
+-- 
+2.44.0
+
