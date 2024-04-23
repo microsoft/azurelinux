@@ -59,6 +59,9 @@ gem install -V --local --force --install-dir %{buildroot}%{gemdir} --bindir %{bu
 %{gemdir}/specifications/fluentd-%{version}.gemspec
 
 %changelog
+* Wed Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.16.2-3
+- Modify `rubygem-sigdump` runtime version requirement
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 1.16.2-2
 - Update runtime rubygem required versions
 

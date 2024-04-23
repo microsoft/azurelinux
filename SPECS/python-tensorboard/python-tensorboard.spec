@@ -101,7 +101,7 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 
 %changelog
 * Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-4
-- Remove BR on python3-tf-nightly
+- Remove missing requirements `python3-tf-nightly` and `python3-tensorflow-estimator`
 
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax version requirements

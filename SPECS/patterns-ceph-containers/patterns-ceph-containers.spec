@@ -59,6 +59,10 @@ This provides the base for the Ceph, Rook, Ceph CSI driver packages and containe
 %files ceph_base
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.0-2
+- Remove requirement on `ceph-mgr-rook`
+- Remove non-applicable ExclusiveArch tags
+
 * Mon Oct 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
