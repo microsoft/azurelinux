@@ -1,6 +1,6 @@
 Summary:        YANG data modeling language library
 Name:           libyang
-Version:        2.1.111
+Version:        2.1.148
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
