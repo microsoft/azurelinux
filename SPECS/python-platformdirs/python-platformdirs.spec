@@ -14,6 +14,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/platformdirs/platformdirs
 Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+Patch0:         patch-version-import.patch
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
@@ -37,7 +38,7 @@ BuildRequires:  python3-devel
 %description -n python3-%{srcname} %{common_description}
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -p1 -n %{srcname}-%{version}
 
 
 
@@ -48,7 +49,6 @@ BuildRequires:  python3-devel
 %install
 %pyproject_install
 %pyproject_save_files %{srcname}
-
 
 %check
 %if 0%{?with_check}

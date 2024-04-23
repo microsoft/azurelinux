@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.25.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ BuildRequires:  python3-flit-core >= 3.8.0
 Requires:       python3
 Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
+Requires:       python3-filelock
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
