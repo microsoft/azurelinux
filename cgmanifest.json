@@ -785,8 +785,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2021.02.19",
-          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
+          "version": "2023.02.20",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2023.02.20.tar.xz"
         }
       }
     },
