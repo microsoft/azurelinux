@@ -19,7 +19,6 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  python3-six
 BuildRequires:  bazel
-BuildRequires:  python3-tf-nightly
 BuildRequires:  gcc
 BuildRequires:  build-essential
 BuildRequires:  protobuf
@@ -101,6 +100,9 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 %{python3_sitelib}/tensorboard_data_server*
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-4
+- Remove BR on python3-tf-nightly
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax version requirements
 
