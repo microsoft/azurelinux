@@ -195,9 +195,7 @@ func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (stri
 
 func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
 	switch corruptionOption {
-	case imagecustomizerapi.CorruptionOptionDefault:
-		return "", nil
-	case imagecustomizerapi.CorruptionOptionIoError:
+	case imagecustomizerapi.CorruptionOptionDefault, imagecustomizerapi.CorruptionOptionIoError:
 		return "", nil
 	case imagecustomizerapi.CorruptionOptionIgnore:
 		return "ignore-corruption", nil
