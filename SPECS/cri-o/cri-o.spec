@@ -58,10 +58,10 @@ Patch2:         CVE-2022-27651.patch
 Patch3:         CVE-2022-2995.patch
 Patch4:         CVE-2023-42821.patch
 Patch5:         CVE-2022-29526.patch
-patch6:         CVE-2021-44716.patch
-patch7:         CVE-2022-21698.patch
-patch8:         CVE-2023-44487.patch
-patch9:         CVE-2024-28180.patch
+Patch6:         CVE-2021-44716.patch
+Patch7:         CVE-2022-21698.patch
+Patch8:         CVE-2023-44487.patch
+Patch9:         CVE-2024-28180.patch
 BuildRequires:  btrfs-progs-devel
 BuildRequires:  device-mapper-devel
 BuildRequires:  fdupes
