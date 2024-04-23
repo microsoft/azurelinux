@@ -44,8 +44,6 @@ func TestVerityIsValidInvalidHashPartition(t *testing.T) {
 }
 
 func TestVerityIsValid(t *testing.T) {
-	panicOption := CorruptionOption("panic")
-
 	validVerity := Verity{
 		DataPartition: IdentifiedPartition{
 			IdType: "part-uuid",
@@ -55,7 +53,7 @@ func TestVerityIsValid(t *testing.T) {
 			IdType: "part-label",
 			Id:     "hash_partition",
 		},
-		CorruptionOption: &panicOption,
+		CorruptionOption: CorruptionOption("panic"),
 	}
 
 	err := validVerity.IsValid()
@@ -63,8 +61,6 @@ func TestVerityIsValid(t *testing.T) {
 }
 
 func TestVerityIsValidInvalidCorruptionOption(t *testing.T) {
-	badOption := CorruptionOption("bad")
-
 	invalidVerity := Verity{
 		DataPartition: IdentifiedPartition{
 			IdType: "part-uuid",
@@ -74,7 +70,7 @@ func TestVerityIsValidInvalidCorruptionOption(t *testing.T) {
 			IdType: "part-label",
 			Id:     "hash_partition",
 		},
-		CorruptionOption: &badOption,
+		CorruptionOption: CorruptionOption("bad"),
 	}
 
 	err := invalidVerity.IsValid()

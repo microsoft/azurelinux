@@ -89,7 +89,7 @@ func updateFstabForVerity(buildDir string, imageChroot *safechroot.Chroot) error
 
 func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartitionId string,
 	hashPartitionIdType imagecustomizerapi.IdType, hashPartitionId string,
-	corruptionOption *imagecustomizerapi.CorruptionOption, rootHash string, grubCfgFullPath string,
+	corruptionOption imagecustomizerapi.CorruptionOption, rootHash string, grubCfgFullPath string,
 ) error {
 	var err error
 
@@ -193,12 +193,10 @@ func systemdFormatPartitionId(idType imagecustomizerapi.IdType, id string) (stri
 	}
 }
 
-func systemdFormatCorruptionOption(corruptionOption *imagecustomizerapi.CorruptionOption) (string, error) {
-	if corruptionOption == nil {
+func systemdFormatCorruptionOption(corruptionOption imagecustomizerapi.CorruptionOption) (string, error) {
+	switch corruptionOption {
+	case imagecustomizerapi.CorruptionOptionDefault:
 		return "", nil
-	}
-
-	switch *corruptionOption {
 	case imagecustomizerapi.CorruptionOptionIoError:
 		return "", nil
 	case imagecustomizerapi.CorruptionOptionIgnore:
@@ -208,7 +206,7 @@ func systemdFormatCorruptionOption(corruptionOption *imagecustomizerapi.Corrupti
 	case imagecustomizerapi.CorruptionOptionRestart:
 		return "restart-on-corruption", nil
 	default:
-		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(*corruptionOption))
+		return "", fmt.Errorf("invalid corruptionOption provided (%s)", string(corruptionOption))
 	}
 }
 
