@@ -14133,8 +14133,8 @@
         "type": "other",
         "other": {
           "name": "net-snmp",
-          "version": "5.9.1",
-          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.1/net-snmp-5.9.1.tar.gz"
+          "version": "5.9.4",
+          "downloadUrl": "https://sourceforge.net/projects/net-snmp/files/net-snmp/5.9.4/net-snmp-5.9.4.tar.gz"
         }
       }
     },
