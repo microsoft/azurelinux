@@ -1967,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "4.11.0",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.11.0/conda-4.11.0.tar.gz"
+          "version": "24.1.2",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
         }
       }
     },
