@@ -1,0 +1,81 @@
+From ab520a3ad3eb891802366616b000288f647b2163 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Mon, 15 Apr 2024 16:32:43 -0700
+Subject: [PATCH] [kdump] Create AzureKDump class
+
+This change collects kdump information for Azure Linux.
+
+With this change, we will check the 'path' variable in /etc/kdump.conf
+to check where information is being dumped.
+
+If get_vm_core is set to true, collect the latest vm core created
+in the last 24 hours that is <= 2GB
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ sos/report/plugins/kdump.py | 47 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/sos/report/plugins/kdump.py b/sos/report/plugins/kdump.py
+index e31e9408f0..9440125642 100644
+--- a/sos/report/plugins/kdump.py
++++ b/sos/report/plugins/kdump.py
+@@ -8,7 +8,7 @@
+ 
+ import platform
+ from sos.report.plugins import Plugin, PluginOpt, RedHatPlugin, DebianPlugin, \
+-    UbuntuPlugin, CosPlugin
++    UbuntuPlugin, CosPlugin, AzurePlugin
+ 
+ 
+ class KDump(Plugin):
+@@ -124,4 +124,49 @@ def setup(self):
+         if self.get_option("collect-kdumps"):
+             self.add_copy_spec(["/var/kdump-*"])
+ 
++
++class AzureKDump(KDump, AzurePlugin):
++
++    files = ('/etc/kdump.conf',)
++    packages = ('kexec-tools',)
++
++    option_list = [
++        PluginOpt("get_vm_core", default=False, val_type=bool,
++                  desc="collect vm core")
++    ]
++
++    def read_kdump_conffile(self):
++        """ Parse /etc/kdump file """
++        path = "/var/crash"
++
++        kdump = '/etc/kdump.conf'
++        with open(kdump, 'r', encoding='UTF-8') as file:
++            for line in file:
++                if line.startswith("path"):
++                    path = line.split()[1]
++
++        return path
++
++    def setup(self):
++        super().setup()
++
++        self.add_copy_spec([
++            "/etc/kdump.conf",
++            "/usr/lib/udev/rules.d/*kexec.rules"
++        ])
++
++        try:
++            path = self.read_kdump_conffile()
++        except Exception:  # pylint: disable=broad-except
++            # set no filesystem and default path
++            path = "/var/crash"
++
++        self.add_cmd_output(f"ls -alhR {path}")
++        self.add_copy_spec(f"{path}/*/vmcore-dmesg.txt")
++        self.add_copy_spec(f"{path}/*/kexec-dmesg.log")
++
++        # collect the latest vmcore created in the last 24hrs <= 2GB
++        if self.get_option("get_vm_core"):
++            self.add_copy_spec(f"{path}/*/vmcore", sizelimit=2048, maxage=24)
++
+ # vim: set et ts=4 sw=4 :
