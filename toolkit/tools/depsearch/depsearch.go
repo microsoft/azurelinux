@@ -104,10 +104,10 @@ func main() {
 	}
 
 	if *reverseSearch {
-		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages...")
+		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages")
 		outputGraph, root, err = buildRequiresGraph(graph, nodeSet)
 	} else {
-		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages...")
+		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages")
 		outputGraph, root, err = buildDependsOnGraph(graph, nodeSet)
 	}
 

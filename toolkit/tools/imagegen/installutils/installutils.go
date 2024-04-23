@@ -1315,7 +1315,7 @@ func installGrubTemplateFile(assetFile, targetFile, installRoot, rootDevice, boo
 func CallGrubMkconfig(installChroot *safechroot.Chroot) (err error) {
 	squashErrors := false
 
-	ReportActionf("Running grub2-mkconfig...")
+	ReportActionf("Running grub2-mkconfig")
 	err = installChroot.UnsafeRun(func() error {
 		return shell.ExecuteLive(squashErrors, "grub2-mkconfig", "-o", GrubCfgFile)
 	})
@@ -1661,7 +1661,7 @@ func ProvisionUserSSHCerts(installChroot safechroot.ChrootInterface, username st
 		return
 	}
 	if !exists {
-		logger.Log.Debugf("File (%s) does not exist. Creating file...", authorizedKeysTempFile)
+		logger.Log.Debugf("File (%s) does not exist. Creating file", authorizedKeysTempFile)
 		err = file.Create(authorizedKeysTempFile, authorizedKeysTempFilePerms)
 		if err != nil {
 			logger.Log.Warnf("Failed to create (%s) file : %v", authorizedKeysTempFile, err)
@@ -2174,7 +2174,7 @@ func copyAdditionalFilesHelper(installChroot *safechroot.Chroot, additionalFiles
 // cleanupRpmDatabase removes RPM database if the image does not require a package manager.
 // rootPrefix is prepended to the RPM database path - useful when RPM database resides in a chroot and cleanupRpmDatabase can't be called from within the chroot.
 func cleanupRpmDatabase(rootPrefix string) (err error) {
-	logger.Log.Info("Attempting RPM database cleanup...")
+	logger.Log.Info("Attempting RPM database cleanup")
 	rpmDir := filepath.Join(rootPrefix, rpmDependenciesDirectory)
 	err = os.RemoveAll(rpmDir)
 	if err != nil {

@@ -46,7 +46,7 @@ func (abs *AzureBlobStorage) Upload(
 	}
 
 	uploadEndTime := time.Now()
-	logger.Log.Infof("  upload time: %s", uploadEndTime.Sub(uploadStartTime))
+	logger.Log.Infof("upload time: %s", uploadEndTime.Sub(uploadStartTime))
 
 	return nil
 }
@@ -61,7 +61,7 @@ func (abs *AzureBlobStorage) Download(
 
 	localFile, err := os.Create(localFileName)
 	if err != nil {
-		return fmt.Errorf("  failed to create local file for download:\n%w", err)
+		return fmt.Errorf("failed to create local file for download:\n%w", err)
 	}
 
 	defer func() {
@@ -81,7 +81,7 @@ func (abs *AzureBlobStorage) Download(
 	}
 
 	downloadEndTime := time.Now()
-	logger.Log.Infof("  download time: %v", downloadEndTime.Sub(downloadStartTime))
+	logger.Log.Infof("download time: %v", downloadEndTime.Sub(downloadStartTime))
 
 	return nil
 }
@@ -97,7 +97,7 @@ func (abs *AzureBlobStorage) Delete(
 		return fmt.Errorf("Failed to delete blob:\n%w", err)
 	}
 	deleteEndTime := time.Now()
-	logger.Log.Infof("  delete time: %v", deleteEndTime.Sub(deleteStartTime))
+	logger.Log.Infof("delete time: %v", deleteEndTime.Sub(deleteStartTime))
 
 	return nil
 }

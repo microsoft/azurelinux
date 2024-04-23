@@ -59,7 +59,7 @@ func CanSubGraph(pkgGraph *pkggraph.PkgGraph, node *pkggraph.PkgNode, useCachedI
 			} else {
 				logger.Log.Tracef("Path between %v and %v:", node, pkgNode)
 				for _, n := range paths[0] {
-					logger.Log.Tracef("  %v", n.(*pkggraph.PkgNode))
+					logger.Log.Tracef("%v", n.(*pkggraph.PkgNode))
 				}
 			}
 		}

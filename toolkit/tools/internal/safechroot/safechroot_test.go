@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 	var retVal int
 	if os.Geteuid() != 0 {
 		// We're not running as root; we need to skip all tests in this file.
-		logger.Log.Warn("safechroot tests must be run as root; skipping...")
+		logger.Log.Warn("safechroot tests must be run as root; skipping")
 		retVal = 0
 	} else {
 		// We're running as root; let's proceed with test setup and testing.

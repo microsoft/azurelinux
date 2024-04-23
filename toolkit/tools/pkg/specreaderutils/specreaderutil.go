@@ -174,12 +174,12 @@ func FindSpecFiles(specsDir string, specListSet map[string]bool) (specFiles []st
 	if len(specListSet) == 0 {
 		specSearch, err := filepath.Abs(filepath.Join(specsDir, "**/*.spec"))
 		if err != nil {
-			err = fmt.Errorf("invalid spec dir: (%s). Error:\n%w", specsDir, err)
+			err = fmt.Errorf("invalid spec dir: '%s'. Error:\n%w", specsDir, err)
 			return nil, err
 		}
 		specFiles, err = filepath.Glob(specSearch)
 		if err != nil {
-			err = fmt.Errorf("failed to find *.spec files. Check that (%s) is the correct directory. Error:\n%w", specsDir, err)
+			err = fmt.Errorf("failed to find *.spec files. Check that '%s' is the correct directory. Error:\n%w", specsDir, err)
 			return nil, err
 		}
 	} else {
@@ -641,7 +641,7 @@ func parseRichDependency(richDependency string) (versions []*pkgjson.PackageVer,
 // if the condition is not met.
 func minSliceLength(slice []string, minLength int) (err error) {
 	if len(slice) < minLength {
-		return fmt.Errorf("slice is not required length (minLength = (%d)) %+v", minLength, slice)
+		return fmt.Errorf("slice is not required length (minLength = %d) %+v", minLength, slice)
 	}
 	return
 }

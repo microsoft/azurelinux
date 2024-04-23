@@ -199,7 +199,7 @@ func main() {
 	}
 
 	if *useCcache {
-		logger.Log.Infof("  ccache is enabled. processing multi-package groups under (%s)...", *ccacheDir)
+		logger.Log.Infof("ccache is enabled. processing multi-package groups under (%s)", *ccacheDir)
 		ccacheManager, ccacheErr := ccachemanager.CreateManager(*ccacheDir, *ccacheConfig)
 		if ccacheErr == nil {
 			ccacheErr = ccacheManager.UploadMultiPkgGroupCCaches()
