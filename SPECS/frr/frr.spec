@@ -201,6 +201,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 9.1-1
+- Upgrade to version 9.1
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.5.3-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

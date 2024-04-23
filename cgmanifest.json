@@ -3910,8 +3910,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "8.5.3",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.5.3.tar.gz"
+          "version": "9.1",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-9.1.tar.gz"
         }
       }
     },
