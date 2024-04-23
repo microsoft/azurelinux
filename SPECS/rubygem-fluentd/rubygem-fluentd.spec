@@ -3,7 +3,7 @@
 Summary:        Fluentd event collector
 Name:           rubygem-%{gem_name}
 Version:        1.16.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,7 @@ Requires:       rubygem-http_parser.rb < 0.9.0
 Requires:       rubygem-msgpack < 2.0.0
 Requires:       rubygem-rake < 14
 Requires:       rubygem-serverengine < 3.0.0
-Requires:       rubygem-sigdump > 0.2.5
+Requires:       rubygem-sigdump >= 0.2.5
 Requires:       rubygem-strptime < 1.0.0
 Requires:       rubygem-tzinfo < 3.0
 Requires:       rubygem-tzinfo-data > 1.0
@@ -59,6 +59,9 @@ gem install -V --local --force --install-dir %{buildroot}%{gemdir} --bindir %{bu
 %{gemdir}/specifications/fluentd-%{version}.gemspec
 
 %changelog
+* Wed Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.16.2-3
+- Modify `rubygem-sigdump` runtime version requirement
+
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 1.16.2-2
 - Update runtime rubygem required versions
 

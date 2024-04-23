@@ -1,13 +1,12 @@
 Summary:        Patterns for the Ceph containers
 Name:           patterns-ceph-containers
 Version:        1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Metapackages
 URL:            http://en.opensuse.org/Patterns
-ExclusiveArch:  x86_64 aarch64 ppc64le s390x
 
 %description
 This is an internal package that is used to create the patterns as part
@@ -31,8 +30,8 @@ Requires:       ceph-mds
 Requires:       ceph-mgr
 Requires:       ceph-mgr-cephadm
 Requires:       ceph-mgr-dashboard
-Requires:       ceph-mgr-rook
-#Package currently not supported in mariner, keeping dependency for future reference.
+# Following two package currently not supported in Azure Linux; keeping dependency for future reference.
+#Requires:      ceph-mgr-rook
 #Requires:      ceph-mgr-diskprediction-local
 Requires:       ceph-mon
 Requires:       ceph-osd
@@ -60,6 +59,10 @@ This provides the base for the Ceph, Rook, Ceph CSI driver packages and containe
 %files ceph_base
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.0-2
+- Remove requirement on `ceph-mgr-rook`
+- Remove non-applicable ExclusiveArch tags
+
 * Mon Oct 04 2021 Max Brodeur-Urbas <maxbr@microsoft.com> - 1.0-1
 - Initial CBL-Mariner import from openSUSE Tumbleweed (license: same as "License" tag).
 - License Verified
