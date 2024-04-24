@@ -150,6 +150,7 @@ BuildRequires:  perl(IPC::Cmd)
 BuildRequires:  perl(File::Compare)
 BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(JSON)
+BuildRequires:  perl(lib)
 
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
@@ -164,6 +165,9 @@ BuildRequires:  xorriso
 # For generating the variable store template with the default certificates
 # enrolled.
 BuildRequires:  python3-virt-firmware >= 24.2
+BuildRequires:  python3-pefile
+
+chmod +x ./edk2-build.py
 
 # endif build_ovmf
 %endif
