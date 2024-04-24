@@ -165,8 +165,7 @@ BuildRequires:  xorriso
 # For generating the variable store template with the default certificates
 # enrolled.
 BuildRequires:  python3-virt-firmware >= 24.2
-
-chmod +x ./edk2-build.py
+BuildRequires:  python3-pefile
 
 # endif build_ovmf
 %endif
