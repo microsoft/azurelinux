@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.4.1
+Version:        1.4.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,10 +8,13 @@ Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  SymCrypt
+BuildRequires:  openssl-devel
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
+
+Requires:       SymCrypt
+Requires:       openssl
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
@@ -63,6 +66,10 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %changelog
+* Thu Apr 25 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.2-1
+- Support additional parameters in the SymCrypt provider required for TLS connections
+- Various bugfixes for TLS scenarios
+
 * Wed Apr 17 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.1-1
 - Update SymCrypt-OpenSSL to v1.4.1
 - Adds support for RSASSA-PSS keys, SP800-108 KDF
