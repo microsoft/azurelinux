@@ -81,8 +81,6 @@ cmake \
 
 %check
 %ctest3 -- -E valgrind
-# valgrind tests fail https://github.com/Cisco-Talos/clamav/issues/584
-%ctest3 -- -R valgrind || :
 
 %install
 %cmake_install
@@ -127,7 +125,7 @@ fi
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/systemd/system/*
-%{_libdir}/*.a
+%{_libdir}/lib%{name}*.a
 %{_bindir}/*
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
@@ -141,6 +139,9 @@ fi
 %changelog
 * Thu Apr 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
 - Upgrade to 1.3.1
+
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 0.105.2-5
+- Fix build break by adding BR for systemd
 
 * Fri Dec 08 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 0.105.2-4
 - Fix resetting of user and group settings on package update
