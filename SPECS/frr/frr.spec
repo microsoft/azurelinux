@@ -26,8 +26,6 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  groff
-BuildRequires:  grpc-devel
-BuildRequires:  grpc-plugins
 BuildRequires:  json-c-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
@@ -167,7 +165,7 @@ fi
 %systemd_preun frr.service
 
 %check
-%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools iniconfig
 #this should be temporary, the grpc test is just badly designed
 rm tests/lib/*grpc*
 %make_build check PYTHON=python3
@@ -203,6 +201,7 @@ rm tests/lib/*grpc*
 %changelog
 * Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 9.1-1
 - Upgrade to version 9.1
+- Remove `--enable-grpc`
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.5.3-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
