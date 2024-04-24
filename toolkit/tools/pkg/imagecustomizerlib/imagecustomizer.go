@@ -126,6 +126,15 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 	}
 
+	// Check if the partition is using DM_verity_hash file system type.
+	// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
+	// the verity hash device should not be assigned this type. We do not support customization on verity enabled base
+	// images at this time because such modifications would compromise the integrity and security mechanisms enforced by dm-verity.
+	err = isDmVerityEnabled(buildDirAbs, rawImageFile)
+	if err != nil {
+		return err
+	}
+
 	// Customize the partitions.
 	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
 	if err != nil {
@@ -512,12 +521,42 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	}
 
 	err = updateGrubConfig(config.OS.Verity.DataPartition.IdType, config.OS.Verity.DataPartition.Id,
-		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, rootHash, grubCfgFullPath)
+		config.OS.Verity.HashPartition.IdType, config.OS.Verity.HashPartition.Id, config.OS.Verity.CorruptionOption,
+		rootHash, grubCfgFullPath)
 	if err != nil {
 		return err
 	}
 
 	err = bootPartitionMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func isDmVerityEnabled(buildDir string, rawImageFile string) error {
+	imageConnection := NewImageConnection()
+	err := imageConnection.ConnectLoopback(rawImageFile)
+	if err != nil {
+		return err
+	}
+	defer imageConnection.Close()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	if err != nil {
+		return err
+	}
+
+	for i := range diskPartitions {
+		diskPartition := diskPartitions[i]
+
+		if diskPartition.FileSystemType == "DM_verity_hash" {
+			return fmt.Errorf("cannot customize base image that has dm-verity enabled")
+		}
+	}
+
+	err = imageConnection.CleanClose()
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,515 @@
+From 686b73cbb7ae5ab24d1f8ad69c608225d14c94e2 Mon Sep 17 00:00:00 2001
+From: Daniel Xu <dxu@dxuuu.xyz>
+Date: Tue, 12 Mar 2024 13:13:01 -0600
+Subject: [PATCH 1/5] Update CHANGELOG
+
+---
+ CHANGELOG.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index e699c473..c574ad3e 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -9,6 +9,8 @@ and this project adheres to
+ ## Unreleased
+ 
+ #### Added
++- Add LLVM 18 support
++  - [#3051](https://github.com/bpftrace/bpftrace/pull/3051)
+ #### Changed
+ #### Deprecated
+ #### Removed
+-- 
+2.33.8
+
+
+From 79e9282b4d2a87a3269d7fd2c595efa784fda7c4 Mon Sep 17 00:00:00 2001
+From: Wentao Zhang <wentao.zhang@windriver.com>
+Date: Tue, 15 Aug 2023 11:18:36 +0800
+Subject: [PATCH 2/5] replace python with python3 in the test
+
+"runtime:call" in ptest gets the following FAILED:
+python: No such file or directory
+replace python with python3 in the test scripts.
+
+$export BPFTRACE_RUNTIME_TEST_EXECUTABLE=/usr/bin
+$cd /usr/lib/bpftrace/ptest/tests
+$python3 runtime/engine/main.py --filter="call.*"
+***
+[ RUN      ] call.strftime_microsecond_extension_rollover
+[  FAILED  ] call.strftime_microsecond_extension_rollover
+	Command: /usr/bin/bpftrace -e 'BEGIN { printf("%s - %s\n", strftime
+    ("1%f", 1000000123000), strftime("1%f", 0)); exit(); }' | tail -n
+    +2 | xargs -I{} python -c "print({})"
+	Unclean exit code: 127
+	Output: __BPFTRACE_NOTIFY_PROBES_ATTACHED\nxargs: python: No such
+    file or directory\n
+***
+
+Signed-off-by: Wentao Zhang <wentao.zhang@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/runtime/call | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/runtime/call b/tests/runtime/call
+index 2d7d9fcd..c6dcdf12 100644
+--- a/tests/runtime/call
++++ b/tests/runtime/call
+@@ -378,13 +378,13 @@ TIMEOUT 5
+ #
+ # Note we add a `1` before the timestamp b/c leading zeros (eg `0123`) is invalid integer in python.
+ NAME strftime_microsecond_extension
+-RUN {{BPFTRACE}} -e 'BEGIN { printf("%s - %s\n", strftime("1%f", 1000123000), strftime("1%f", 0)); exit(); }' | tail -n +2 | xargs -I{} python -c "print({})"
++RUN {{BPFTRACE}} -e 'BEGIN { printf("%s - %s\n", strftime("1%f", 1000123000), strftime("1%f", 0)); exit(); }' | tail -n +2 | xargs -I{} python3 -c "print({})"
+ EXPECT 123
+ TIMEOUT 1
+ 
+ # Similar to above test but test that rolling over past 1s works as expected
+ NAME strftime_microsecond_extension_rollover
+-RUN {{BPFTRACE}} -e 'BEGIN { printf("%s - %s\n", strftime("1%f", 1000000123000), strftime("1%f", 0)); exit(); }' | tail -n +2 | xargs -I{} python -c "print({})"
++RUN {{BPFTRACE}} -e 'BEGIN { printf("%s - %s\n", strftime("1%f", 1000000123000), strftime("1%f", 0)); exit(); }' | tail -n +2 | xargs -I{} python3 -c "print({})"
+ EXPECT 123
+ TIMEOUT 1
+ 
+-- 
+2.33.8
+
+
+From 0cd1b0a341c3562a478c4f9a86fe3f765b5ec2bb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Feb 2024 10:32:27 -0800
+Subject: [PATCH 3/5] ast: Repace getInt8PtrTy with getPtrTy
+
+getPtrTy is added in LLVM-15 and is to be used instead of getInt8PtrTy
+which is gone in LLVM-18 onwards
+
+https://github.com/llvm/llvm-project/commit/7e0802aeb5b90
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ src/ast/irbuilderbpf.cpp        | 67 +++++++++++++++------------------
+ src/ast/irbuilderbpf.h          |  6 +++
+ src/ast/passes/codegen_llvm.cpp | 22 +++++------
+ 3 files changed, 48 insertions(+), 47 deletions(-)
+
+diff --git a/src/ast/irbuilderbpf.cpp b/src/ast/irbuilderbpf.cpp
+index 241ee74e..704f0a2b 100644
+--- a/src/ast/irbuilderbpf.cpp
++++ b/src/ast/irbuilderbpf.cpp
+@@ -350,7 +350,7 @@ CallInst *IRBuilderBPF::createMapLookup(int mapid,
+                                         Value *key,
+                                         const std::string &name)
+ {
+-  return createMapLookup(mapid, key, getInt8PtrTy(), name);
++  return createMapLookup(mapid, key, GET_PTR_TY(), name);
+ }
+ 
+ CallInst *IRBuilderBPF::createMapLookup(int mapid,
+@@ -378,7 +378,7 @@ CallInst *IRBuilderBPF::CreateGetJoinMap(BasicBlock *failure_callback,
+ {
+   return createGetScratchMap(bpftrace_.maps[MapManager::Type::Join].value()->id,
+                              "join",
+-                             getInt8PtrTy(),
++                             GET_PTR_TY(),
+                              loc,
+                              failure_callback);
+ }
+@@ -407,8 +407,8 @@ CallInst *IRBuilderBPF::createGetScratchMap(int mapid,
+   BasicBlock *lookup_merge_block = BasicBlock::Create(
+       module_.getContext(), "lookup_" + name + "_merge", parent);
+   Value *condition = CreateICmpNE(
+-      CreateIntCast(call, getInt8PtrTy(), true),
+-      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), getInt8PtrTy()),
++      CreateIntCast(call, GET_PTR_TY(), true),
++      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), GET_PTR_TY()),
+       "lookup_" + name + "_cond");
+   CreateCondBr(condition, lookup_merge_block, lookup_failure_block);
+ 
+@@ -428,7 +428,7 @@ Value *IRBuilderBPF::CreateMapLookupElem(Value *ctx,
+                                          Value *key,
+                                          const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   int mapid = bpftrace_.maps[map.ident].value()->id;
+   return CreateMapLookupElem(ctx, mapid, key, map.type, loc);
+ }
+@@ -439,7 +439,7 @@ Value *IRBuilderBPF::CreateMapLookupElem(Value *ctx,
+                                          SizedType &type,
+                                          const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   CallInst *call = createMapLookup(mapid, key);
+ 
+   // Check if result == 0
+@@ -450,8 +450,8 @@ Value *IRBuilderBPF::CreateMapLookupElem(Value *ctx,
+ 
+   AllocaInst *value = CreateAllocaBPF(type, "lookup_elem_val");
+   Value *condition = CreateICmpNE(
+-      CreateIntCast(call, getInt8PtrTy(), true),
+-      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), getInt8PtrTy()),
++      CreateIntCast(call, GET_PTR_TY(), true),
++      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), GET_PTR_TY()),
+       "map_lookup_cond");
+   CreateCondBr(condition, lookup_success_block, lookup_failure_block);
+ 
+@@ -494,7 +494,7 @@ void IRBuilderBPF::CreateMapUpdateElem(Value *ctx,
+ {
+   Value *map_ptr = CreateBpfPseudoCallId(map);
+ 
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(key->getType()->isPointerTy());
+   assert(val->getType()->isPointerTy());
+ 
+@@ -523,7 +523,7 @@ void IRBuilderBPF::CreateMapDeleteElem(Value *ctx,
+                                        Value *key,
+                                        const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(key->getType()->isPointerTy());
+   Value *map_ptr = CreateBpfPseudoCallId(map);
+ 
+@@ -586,7 +586,7 @@ void IRBuilderBPF::CreateProbeRead(Value *ctx,
+                                    AddrSpace as,
+                                    const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(size && size->getType()->getIntegerBitWidth() <= 32);
+   size = CreateIntCast(size, getInt32Ty(), false);
+ 
+@@ -625,7 +625,7 @@ CallInst *IRBuilderBPF::CreateProbeReadStr(Value *ctx,
+                                            AddrSpace as,
+                                            const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(size && size->getType()->isIntegerTy());
+   if ([[maybe_unused]] auto *dst_alloca = dyn_cast<AllocaInst>(dst))
+   {
+@@ -660,7 +660,7 @@ Value *IRBuilderBPF::CreateUSDTReadArgument(Value *ctx,
+                                             AddrSpace as,
+                                             const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   // Argument size must be 1, 2, 4, or 8. See
+   // https://sourceware.org/systemtap/wiki/UserSpaceProbeImplementation
+   int abs_size = std::abs(argument->size);
+@@ -766,7 +766,7 @@ Value *IRBuilderBPF::CreateUSDTReadArgument(Value *ctx,
+                                             AddrSpace as,
+                                             const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   struct bcc_usdt_argument argument;
+ 
+   void *usdt;
+@@ -1419,7 +1419,7 @@ CallInst *IRBuilderBPF::CreateGetStackId(Value *ctx,
+                                          StackType stack_type,
+                                          const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+ 
+   Value *map_ptr = CreateBpfPseudoCallId(
+       bpftrace_.maps[stack_type].value()->id);
+@@ -1432,9 +1432,7 @@ CallInst *IRBuilderBPF::CreateGetStackId(Value *ctx,
+   // long bpf_get_stackid(struct pt_regs *ctx, struct bpf_map *map, u64 flags)
+   // Return: >= 0 stackid on success or negative error
+   FunctionType *getstackid_func_type = FunctionType::get(
+-      getInt64Ty(),
+-      { getInt8PtrTy(), map_ptr->getType(), getInt64Ty() },
+-      false);
++      getInt64Ty(), { GET_PTR_TY(), map_ptr->getType(), getInt64Ty() }, false);
+   CallInst *call = CreateHelperCall(libbpf::BPF_FUNC_get_stackid,
+                                     getstackid_func_type,
+                                     { ctx, map_ptr, flags_val },
+@@ -1482,7 +1480,7 @@ void IRBuilderBPF::CreateOutput(Value *ctx,
+                                 size_t size,
+                                 const location *loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(data && data->getType()->isPointerTy());
+ 
+   if (bpftrace_.feature_->has_map_ringbuf())
+@@ -1551,8 +1549,8 @@ void IRBuilderBPF::CreateAtomicIncCounter(int mapid, uint32_t idx)
+                                                       parent);
+ 
+   Value *condition = CreateICmpNE(
+-      CreateIntCast(call, getInt8PtrTy(), true),
+-      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), getInt8PtrTy()),
++      CreateIntCast(call, GET_PTR_TY(), true),
++      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), GET_PTR_TY()),
+       "map_lookup_cond");
+   CreateCondBr(condition, lookup_success_block, lookup_failure_block);
+ 
+@@ -1609,8 +1607,8 @@ void IRBuilderBPF::CreateMapElemAdd(Value *ctx,
+ 
+   AllocaInst *value = CreateAllocaBPF(type, "lookup_elem_val");
+   Value *condition = CreateICmpNE(
+-      CreateIntCast(call, getInt8PtrTy(), true),
+-      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), getInt8PtrTy()),
++      CreateIntCast(call, GET_PTR_TY(), true),
++      ConstantExpr::getCast(Instruction::IntToPtr, getInt64(0), GET_PTR_TY()),
+       "map_lookup_cond");
+   CreateCondBr(condition, lookup_success_block, lookup_failure_block);
+ 
+@@ -1646,7 +1644,7 @@ void IRBuilderBPF::CreatePerfEventOutput(Value *ctx,
+   // long bpf_perf_event_output(struct pt_regs *ctx, struct bpf_map *map,
+   //                            u64 flags, void *data, u64 size)
+   FunctionType *perfoutput_func_type = FunctionType::get(getInt64Ty(),
+-                                                         { getInt8PtrTy(),
++                                                         { GET_PTR_TY(),
+                                                            map_ptr->getType(),
+                                                            getInt64Ty(),
+                                                            data->getType(),
+@@ -1690,7 +1688,7 @@ void IRBuilderBPF::CreateTracePrintk(Value *fmt_ptr,
+ 
+   // long bpf_trace_printk(const char *fmt, u32 fmt_size, ...)
+   FunctionType *traceprintk_func_type = FunctionType::get(
+-      getInt64Ty(), { getInt8PtrTy(), getInt32Ty() }, true);
++      getInt64Ty(), { GET_PTR_TY(), getInt32Ty() }, true);
+ 
+   CreateHelperCall(libbpf::BPF_FUNC_trace_printk,
+                    traceprintk_func_type,
+@@ -1721,7 +1719,7 @@ void IRBuilderBPF::CreateOverrideReturn(Value *ctx, Value *rc)
+   // long bpf_override_return(struct pt_regs *regs, u64 rc)
+   // Return: 0
+   FunctionType *override_func_type = FunctionType::get(
+-      getInt64Ty(), { getInt8PtrTy(), getInt64Ty() }, false);
++      getInt64Ty(), { GET_PTR_TY(), getInt64Ty() }, false);
+   PointerType *override_func_ptr_type = PointerType::get(override_func_type, 0);
+   Constant *override_func = ConstantExpr::getCast(Instruction::IntToPtr,
+       getInt64(libbpf::BPF_FUNC_override_return),
+@@ -1901,7 +1899,7 @@ void IRBuilderBPF::CreateHelperError(Value *ctx,
+                                      libbpf::bpf_func_id func_id,
+                                      const location &loc)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   assert(return_value && return_value->getType() == getInt32Ty());
+ 
+   if (bpftrace_.helper_check_level_ == 0 ||
+@@ -1941,7 +1939,7 @@ void IRBuilderBPF::CreateHelperErrorCond(Value *ctx,
+                                          const location &loc,
+                                          bool compare_zero)
+ {
+-  assert(ctx && ctx->getType() == getInt8PtrTy());
++  assert(ctx && ctx->getType() == GET_PTR_TY());
+   if (bpftrace_.helper_check_level_ == 0 ||
+       (bpftrace_.helper_check_level_ == 1 && return_zero_if_err(func_id)))
+     return;
+@@ -1977,7 +1975,7 @@ void IRBuilderBPF::CreatePath(Value *ctx,
+   // int bpf_d_path(struct path *path, char *buf, u32 sz)
+   // Return: 0 or error
+   FunctionType *d_path_func_type = FunctionType::get(
+-      getInt64Ty(), { getInt8PtrTy(), buf->getType(), getInt32Ty() }, false);
++      getInt64Ty(), { GET_PTR_TY(), buf->getType(), getInt32Ty() }, false);
+   CallInst *call = CreateHelperCall(
+       libbpf::bpf_func_id::BPF_FUNC_d_path,
+       d_path_func_type,
+@@ -1997,13 +1995,10 @@ void IRBuilderBPF::CreateSeqPrintf(Value *ctx,
+   // long bpf_seq_printf(struct seq_file *m, const char *fmt, __u32 fmt_size,
+   //                     const void *data, __u32 data_len)
+   // Return: 0 or error
+-  FunctionType *seq_printf_func_type = FunctionType::get(getInt64Ty(),
+-                                                         { getInt64Ty(),
+-                                                           getInt8PtrTy(),
+-                                                           getInt32Ty(),
+-                                                           getInt8PtrTy(),
+-                                                           getInt32Ty() },
+-                                                         false);
++  FunctionType *seq_printf_func_type = FunctionType::get(
++      getInt64Ty(),
++      { getInt64Ty(), GET_PTR_TY(), getInt32Ty(), GET_PTR_TY(), getInt32Ty() },
++      false);
+   PointerType *seq_printf_func_ptr_type = PointerType::get(seq_printf_func_type,
+                                                            0);
+   Constant *seq_printf_func = ConstantExpr::getCast(
+diff --git a/src/ast/irbuilderbpf.h b/src/ast/irbuilderbpf.h
+index 739aa75d..a5148b60 100644
+--- a/src/ast/irbuilderbpf.h
++++ b/src/ast/irbuilderbpf.h
+@@ -46,6 +46,12 @@
+   CreateAtomicRMW((op), (ptr), (val), (order))
+ #endif
+ 
++#if LLVM_VERSION_MAJOR >= 15
++#define GET_PTR_TY() getPtrTy()
++#else
++#define GET_PTR_TY() getInt8PtrTy()
++#endif
++
+ namespace bpftrace {
+ namespace ast {
+ 
+diff --git a/src/ast/passes/codegen_llvm.cpp b/src/ast/passes/codegen_llvm.cpp
+index c7adc426..0e00a14d 100644
+--- a/src/ast/passes/codegen_llvm.cpp
++++ b/src/ast/passes/codegen_llvm.cpp
+@@ -439,10 +439,10 @@ void CodegenLLVM::visit(Call &call)
+ 
+     AllocaInst *value = b_.CreateAllocaBPF(type, "lookup_elem_val");
+     Value *condition = b_.CreateICmpNE(
+-        b_.CreateIntCast(lookup, b_.getInt8PtrTy(), true),
++        b_.CreateIntCast(lookup, b_.GET_PTR_TY(), true),
+         ConstantExpr::getCast(Instruction::IntToPtr,
+                               b_.getInt64(0),
+-                              b_.getInt8PtrTy()),
++                              b_.GET_PTR_TY()),
+         "map_lookup_cond");
+     b_.CreateCondBr(condition, lookup_success_block, lookup_failure_block);
+ 
+@@ -496,10 +496,10 @@ void CodegenLLVM::visit(Call &call)
+ 
+     AllocaInst *value = b_.CreateAllocaBPF(type, "lookup_elem_val");
+     Value *condition = b_.CreateICmpNE(
+-        b_.CreateIntCast(lookup, b_.getInt8PtrTy(), true),
++        b_.CreateIntCast(lookup, b_.GET_PTR_TY(), true),
+         ConstantExpr::getCast(Instruction::IntToPtr,
+                               b_.getInt64(0),
+-                              b_.getInt8PtrTy()),
++                              b_.GET_PTR_TY()),
+         "map_lookup_cond");
+     b_.CreateCondBr(condition, lookup_success_block, lookup_failure_block);
+ 
+@@ -760,7 +760,7 @@ void CodegenLLVM::visit(Call &call)
+                                     ? Instruction::BitCast
+                                     : Instruction::IntToPtr,
+                                 expr_,
+-                                b_.getInt8PtrTy()),
++                                b_.GET_PTR_TY()),
+                   call.loc);
+     expr_ = buf;
+     expr_deleter_ = [this, buf]() { b_.CreateLifetimeEnd(buf); };
+@@ -1030,9 +1030,9 @@ void CodegenLLVM::visit(Call &call)
+ 
+       // and finally the seq_printf call
+       b_.CreateSeqPrintf(ctx_,
+-                         b_.CreateIntToPtr(fmt, b_.getInt8PtrTy()),
++                         b_.CreateIntToPtr(fmt, b_.GET_PTR_TY()),
+                          b_.getInt32(size),
+-                         b_.CreatePointerCast(data, b_.getInt8PtrTy()),
++                         b_.CreatePointerCast(data, b_.GET_PTR_TY()),
+                          b_.getInt32(data_size),
+                          call.loc);
+ 
+@@ -1066,7 +1066,7 @@ void CodegenLLVM::visit(Call &call)
+       values.push_back(expr_);
+     }
+ 
+-    b_.CreateTracePrintk(b_.CreateIntToPtr(fmt, b_.getInt8PtrTy()),
++    b_.CreateTracePrintk(b_.CreateIntToPtr(fmt, b_.GET_PTR_TY()),
+                          b_.getInt32(size),
+                          values,
+                          call.loc);
+@@ -2093,7 +2093,7 @@ void CodegenLLVM::visit(FieldAccess &acc)
+         // `is_data_loc` should only be set if field access is on `args` which
+         // has to be a ctx access
+         assert(type.IsCtxAccess());
+-        assert(ctx_->getType() == b_.getInt8PtrTy());
++        assert(ctx_->getType() == b_.GET_PTR_TY());
+         // Parser needs to have rewritten field to be a u64
+         assert(field.type.IsIntTy());
+         assert(field.type.GetIntBitWidth() == 64);
+@@ -2685,7 +2685,7 @@ void CodegenLLVM::visit(Probe &probe)
+ {
+   FunctionType *func_type = FunctionType::get(
+       b_.getInt64Ty(),
+-      {b_.getInt8PtrTy()}, // struct pt_regs *ctx
++      {b_.GET_PTR_TY()}, // struct pt_regs *ctx
+       false);
+ 
+   // Probe has at least one attach point (required by the parser)
+@@ -3880,7 +3880,7 @@ Function *CodegenLLVM::createMapLenCallback()
+   auto saved_ip = b_.saveIP();
+ 
+   std::array<llvm::Type *, 4> args = {
+-    b_.getInt8PtrTy(), b_.getInt8PtrTy(), b_.getInt8PtrTy(), b_.getInt8PtrTy()
++    b_.GET_PTR_TY(), b_.GET_PTR_TY(), b_.GET_PTR_TY(), b_.GET_PTR_TY()
+   };
+ 
+   FunctionType *callback_type = FunctionType::get(b_.getInt64Ty(), args, false);
+-- 
+2.33.8
+
+
+From be31e10702e1cb747da8729ec3162ed1dae65dc4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Feb 2024 10:40:21 -0800
+Subject: [PATCH 4/5] ast: Adjust to enum changes in llvm 18
+
+llvm 18 has change CodeGenOpt::Level/CodeGenFileType into enum classes via
+https://github.com/llvm/llvm-project/commit/0a1aa6cda2758b0926a95f87d39ffefb1cb90200
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ src/ast/passes/codegen_llvm.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/ast/passes/codegen_llvm.cpp b/src/ast/passes/codegen_llvm.cpp
+index 0e00a14d..f3aa091e 100644
+--- a/src/ast/passes/codegen_llvm.cpp
++++ b/src/ast/passes/codegen_llvm.cpp
+@@ -72,7 +72,11 @@ CodegenLLVM::CodegenLLVM(Node *root, BPFtrace &bpftrace)
+                                   Optional<Reloc::Model>()
+ #endif
+                                       ));
++#if LLVM_VERSION_MAJOR >= 18
++  target_machine_->setOptLevel(llvm::CodeGenOptLevel::Aggressive);
++#else
+   target_machine_->setOptLevel(llvm::CodeGenOpt::Aggressive);
++#endif
+ 
+   module_->setTargetTriple(LLVMTargetTriple);
+   module_->setDataLayout(target_machine_->createDataLayout());
+@@ -3617,7 +3621,9 @@ void CodegenLLVM::emit(raw_pwrite_stream &stream)
+ {
+   legacy::PassManager PM;
+ 
+-#if LLVM_VERSION_MAJOR >= 10
++#if LLVM_VERSION_MAJOR >= 18
++  auto type = CodeGenFileType::ObjectFile;
++#elif LLVM_VERSION_MAJOR >= 10
+   auto type = llvm::CGFT_ObjectFile;
+ #else
+   auto type = llvm::TargetMachine::CGFT_ObjectFile;
+-- 
+2.33.8
+
+
+From 802cb8a62aa4ff5a97e629b96ba9e069859511db Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 16 Feb 2024 10:14:41 -0800
+Subject: [PATCH 5/5] cmake: Bump max LLVM version to 18+
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 472068fc..fc6844de 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -139,7 +139,7 @@ else()
+ endif()
+ 
+ set(MIN_LLVM_MAJOR 6)
+-set(MAX_LLVM_MAJOR 17)
++set(MAX_LLVM_MAJOR 18)
+ 
+ if((${LLVM_VERSION_MAJOR} VERSION_LESS ${MIN_LLVM_MAJOR}) OR (${LLVM_VERSION_MAJOR} VERSION_GREATER ${MAX_LLVM_MAJOR}))
+   message(SEND_ERROR "Unsupported LLVM version found via ${LLVM_INCLUDE_DIRS}: ${LLVM_VERSION_MAJOR}")
+-- 
+2.33.8
+

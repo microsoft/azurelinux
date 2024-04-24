@@ -3,6 +3,8 @@
 
 name: CodeQL CBL-Mariner repository
 
+trigger: none
+
 resources:
   repositories:
     - repository: CBL-Mariner-Pipelines

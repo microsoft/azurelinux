@@ -1,0 +1,33 @@
+From 6a8303c5a8d6c887df50ca8668bd4163c18bb720 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Fri, 17 Feb 2023 00:00:17 +0100
+Subject: [PATCH] Report times for each unit test
+
+---
+ regressions/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/regressions/Makefile b/regressions/Makefile
+index c74b4fa..8e21d46 100644
+--- a/regressions/Makefile
++++ b/regressions/Makefile
+@@ -24,6 +24,7 @@ DIR=array	\
+     stack	\
+     swlock	\
+     tflock
++TIME=time
+ 
+ .PHONY: all clean check
+ 
+@@ -129,7 +130,7 @@ check: all
+ 	rc=0; 							\
+ 	for d in $(DIR) ; do					\
+ 		echo "----[ Testing $$d....";			\
+-		$(MAKE) -C ./ck_$$d/validate check || rc=1; 	\
++		$(TIME) $(MAKE) -C ./ck_$$d/validate check || rc=1; \
+ 		echo;						\
+ 	done; 							\
+ 	exit $$rc
+-- 
+2.39.1
+

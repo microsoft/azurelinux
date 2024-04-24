@@ -7,7 +7,7 @@ TensorBoard is a suite of web applications for inspecting and understanding your
 Summary:        TensorBoard is a suite of web applications for inspecting and understanding your TensorFlow runs and graphs
 Name:           python-%{pypi_name}
 Version:        2.11.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,7 +19,6 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 BuildRequires:  python3-six
 BuildRequires:  bazel
-BuildRequires:  python3-tf-nightly
 BuildRequires:  gcc
 BuildRequires:  build-essential
 BuildRequires:  protobuf
@@ -41,7 +40,6 @@ Requires:   python3-numpy
 Requires:   python3-protobuf
 Requires:   python3-requests
 Requires:   python3-setuptools
-Requires:   python3-tensorflow-estimator
 Requires:   python3-werkzeug
 Requires:   python3-wheel
 
@@ -102,6 +100,9 @@ mv %{pypi_name}-%{version}-*.whl pyproject-wheeldir/
 %{python3_sitelib}/tensorboard_data_server*
 
 %changelog
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-4
+- Remove missing requirements `python3-tf-nightly` and `python3-tensorflow-estimator`
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax version requirements
 

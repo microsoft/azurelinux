@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
@@ -434,8 +435,6 @@ func PopulateInstallRoot(installChroot *safechroot.Chroot, packagesToInstall []s
 		filesystemPkg = "filesystem"
 	)
 
-	defer stopGPGAgent(installChroot)
-
 	ReportAction("Initializing RPM Database")
 
 	installRoot := filepath.Join(rootMountPoint, installChroot.RootDir())
@@ -804,6 +803,56 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 			return file.Create(machineIDFile, machineIDFilePerms)
 		})
 	}
+	return
+}
+
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageIDFile(installChrootRootDir string, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChrootRootDir, "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChrootRootDir, imageIDFile)
+
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
+
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
+
 	return
 }
 
@@ -2713,27 +2762,4 @@ func KernelPackages(config configuration.Config) []*pkgjson.PackageVer {
 		}
 	}
 	return packageList
-}
-
-// stopGPGAgent stops gpg-agent and keyboxd if they are running inside the installChroot.
-//
-// It is possible that one of the packages or post-install scripts started a GPG agent.
-// e.g. when installing the azurelinux-repos SPEC, a GPG import occurs. This starts the gpg-agent process inside the chroot.
-// To be able to cleanly exit the setup chroot, we must stop it.
-func stopGPGAgent(installChroot *safechroot.Chroot) {
-	installChroot.UnsafeRun(func() error {
-		err := shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "gpg-agent")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop gpg-agent. This is expected if it is not installed: %s", err)
-		}
-
-		err = shell.ExecuteLiveWithCallback(logger.Log.Debug, logger.Log.Warn, false, "gpgconf", "--kill", "keyboxd")
-		if err != nil {
-			// This is non-fatal, as there is no guarantee the image has gpg agent started.
-			logger.Log.Warnf("Failed to stop keyboxd. This is expected if it is not installed: %s", err)
-		}
-
-		return nil
-	})
 }

@@ -1,0 +1,79 @@
+From ba5bad09f55959872022fa506d5ac06eafe3a314 Mon Sep 17 00:00:00 2001
+From: Paul Wouters <paul.wouters@aiven.io>
+Date: Tue, 5 Sep 2023 22:49:28 -0400
+Subject: [PATCH] pluto: check return code of libcap-ng functions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Avoids "error: ignoring return value of ‘capng_apply’ ..."
+---
+ include/pluto_constants.h           |  3 ++-
+ lib/libswan/pluto_exit_code_names.c |  1 +
+ programs/pluto/plutomain.c          | 15 ++++++++++++---
+ 3 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/include/pluto_constants.h b/include/pluto_constants.h
+index c642ad84bfd..e2c6ebab9bf 100644
+--- a/include/pluto_constants.h
++++ b/include/pluto_constants.h
+@@ -1022,7 +1022,8 @@ enum pluto_exit_code {
+ 	PLUTO_EXIT_UNBOUND_FAIL = 9,
+ 	PLUTO_EXIT_LOCK_FAIL = 10, /* historic value */
+ 	PLUTO_EXIT_SELINUX_FAIL = 11,
+-	PLUTO_EXIT_LEAVE_STATE = 12, /* leave kernel state and routes */
++	PLUTO_EXIT_CAPNG_FAIL = 12,
++	PLUTO_EXIT_LEAVE_STATE = 13, /* leave kernel state and routes */
+ 	/**/
+ 	PLUTO_EXIT_GIT_BISECT_CAN_NOT_TEST = 125,
+ 	PLUTO_EXIT_SHELL_COMMAND_NOT_FOUND = 126,
+diff --git a/lib/libswan/pluto_exit_code_names.c b/lib/libswan/pluto_exit_code_names.c
+index bb4b3284a5c..6d245d46425 100644
+--- a/lib/libswan/pluto_exit_code_names.c
++++ b/lib/libswan/pluto_exit_code_names.c
+@@ -46,6 +46,7 @@ static const char *pluto_exit_code_name[] = {
+ 	S(PLUTO_EXIT_UNBOUND_FAIL),
+ 	S(PLUTO_EXIT_LOCK_FAIL),
+ 	S(PLUTO_EXIT_SELINUX_FAIL),
++	S(PLUTO_EXIT_CAPNG_FAIL),
+ 	S(PLUTO_EXIT_LEAVE_STATE),
+ #undef S
+ };
+diff --git a/programs/pluto/plutomain.c b/programs/pluto/plutomain.c
+index 953937ec026..ad5e56c6743 100644
+--- a/programs/pluto/plutomain.c
++++ b/programs/pluto/plutomain.c
+@@ -1684,13 +1684,16 @@ int main(int argc, char **argv)
+ 	 */
+ 	capng_clear(CAPNG_SELECT_BOTH);
+ 
+-	capng_updatev(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
++	if (capng_updatev(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
+ 		CAP_NET_BIND_SERVICE, CAP_NET_ADMIN, CAP_NET_RAW,
+ 		CAP_IPC_LOCK, CAP_AUDIT_WRITE,
+ 		/* for google authenticator pam */
+ 		CAP_SETGID, CAP_SETUID,
+ 		CAP_DAC_READ_SEARCH,
+-		-1);
++		-1) != 0) {
++			fatal(PLUTO_EXIT_CAPNG_FAIL, logger,
++				"libcap-ng capng_updatev() failed");
++	}
+ 	/*
+ 	 * We need to retain some capabilities for our children (updown):
+ 	 * CAP_NET_ADMIN to change routes
+@@ -1701,7 +1704,13 @@ int main(int argc, char **argv)
+ 	 */
+ 	capng_updatev(CAPNG_ADD, CAPNG_BOUNDING_SET, CAP_NET_ADMIN, CAP_NET_RAW,
+ 			CAP_DAC_READ_SEARCH, -1);
+-	capng_apply(CAPNG_SELECT_BOTH);
++	int ret = capng_apply(CAPNG_SELECT_BOTH);
++	if (ret != CAPNG_NONE) {
++		fatal(PLUTO_EXIT_CAPNG_FAIL, logger,
++			"libcap-ng capng_apply failed to apply changes, err=%d. see: man capng_apply",
++			ret);
++	}
++
+ 	llog(RC_LOG, logger, "libcap-ng support [enabled]");
+ #else
+ 	llog(RC_LOG, logger, "libcap-ng support [disabled]");

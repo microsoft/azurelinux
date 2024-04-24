@@ -1,0 +1,26 @@
+From b5f226ef5dd81dec3b01f58e22c252a27a84e515 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Sun, 8 Oct 2023 19:51:26 -0600
+Subject: [PATCH] Use main entry point for conda and re-add conda-env entry
+ point, no need to run conda init
+
+---
+ pyproject.toml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2c897d3..1abe369 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -49,7 +49,8 @@ documentation = "https://docs.conda.io/projects/conda/en/stable/"
+ repository = "https://github.com/conda/conda"
+ 
+ [project.scripts]
+-conda = "conda.cli.main_pip:main"
++conda = "conda.cli.main:main"
++conda-env = "conda_env.cli.main:main"
+ 
+ [tool.hatch.version]
+ source = "vcs"
+-- 
+2.42.0
