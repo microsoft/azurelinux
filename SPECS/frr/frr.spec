@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,7 +16,6 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
-Patch5:         0008-Add-FIPS_mode-compatibility-macro.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -199,6 +198,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Apr 24 2024 Tobias Brick <tobiasb@microsoft.com> - 9.1-2
+- Remove FIPS_mode patch
+
 * Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 9.1-1
 - Upgrade to version 9.1
 - Remove `--enable-grpc`
