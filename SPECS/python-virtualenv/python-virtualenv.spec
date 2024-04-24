@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.25.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ BuildRequires:  python3-flit-core >= 3.8.0
 Requires:       python3
 Requires:       python3-platformdirs
 Requires:       python3-distlib < 1
+Requires:       python3-filelock
 Provides:       %{name}-doc = %{version}-%{release}
 
 %description -n python3-virtualenv
@@ -59,6 +60,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Wed Apr 24 2024 Andrew Phelps <anphel@microsoft.com> - 20.25.0-2
+- Add runtime requirement on python3-filelock
+
 * Fri Mar 22 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 20.25.0-1
 - Auto-upgrade to 20.25.0 - 3.0 package upgrade
 - Added patch to use python3-flit-core as build-backend rather than hatchling (which is not yet supported on Azure Linux)
