@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.3.1
+Version:        1.0.6
 Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -125,7 +125,6 @@ fi
 %{_libdir}/*.so.*
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/systemd/system/*
-%{_libdir}/lib%{name}*.a
 %{_bindir}/*
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
@@ -137,8 +136,8 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Thu Apr 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.3.1-1
-- Upgrade to 1.3.1
+* Thu Apr 18 2024 Betty Lakes <bettylakes@microsoft.com> - 1.0.6-1
+- Upgrade to version 1.0.6
 
 * Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 0.105.2-5
 - Fix build break by adding BR for systemd
