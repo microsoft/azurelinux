@@ -165,7 +165,6 @@ BuildRequires:  xorriso
 # For generating the variable store template with the default certificates
 # enrolled.
 BuildRequires:  python3-virt-firmware >= 24.2
-BuildRequires:  python3-pefile
 
 chmod +x ./edk2-build.py
 
