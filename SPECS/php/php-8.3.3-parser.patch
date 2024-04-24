@@ -1,0 +1,16 @@
+diff -up ./build/gen_stub.php.syslib ./build/gen_stub.php
+--- ./build/gen_stub.php.syslib	2020-06-25 08:11:51.782046813 +0200
++++ ./build/gen_stub.php	2020-06-25 08:13:11.188860368 +0200
+@@ -3265,6 +3265,12 @@ function initPhpParser() {
+     }
+ 
+     $isInitialized = true;
++
++    if (file_exists('/usr/share/php/PhpParser5/autoload.php')) {
++        require_once '/usr/share/php/PhpParser5/autoload.php';
++        return;
++    }
++
+     $version = "5.0.0";
+     $phpParserDir = __DIR__ . "/PHP-Parser-$version";
+     if (!is_dir($phpParserDir)) {
