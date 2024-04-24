@@ -145,7 +145,6 @@ BuildRequires:  binutils gcc git gcc-c++ make
 BuildRequires:  qemu-img
 
 # openssl configure
-BuildRequires:  perl
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(IPC::Cmd)
 BuildRequires:  perl(File::Compare)
