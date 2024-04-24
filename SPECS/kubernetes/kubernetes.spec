@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.4
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -267,6 +267,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Tue Apr 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.4-6
+- Use autopatch instead of individual patch
+
 * Mon Apr 08 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.4-5
 - Address CVE-2023-5408
 
