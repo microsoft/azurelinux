@@ -88,7 +88,7 @@
 /toolkit/scripts/toolchain/create_toolchain_in_container.sh @microsoft/cbl-mariner-admins
 
 # Modifications to the trusted CA certificates require admin approval.
-/SPECS/*ca-certificates*/*
+/SPECS/*ca-certificates*/* @microsoft/cbl-mariner-admins
 
 # Image Customizer
 /toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
