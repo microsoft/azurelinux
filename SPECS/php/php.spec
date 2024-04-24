@@ -70,7 +70,7 @@ Patch8:         php-8.1.0-libdb.patch
 # Use system nikic/php-parser
 Patch41:        php-8.3.3-parser.patch
 # use system tzdata
-Patch42:        php-8.1.0-systzdata-v22.patch
+Patch42:        php-8.3.0-systzdata-v24.patch
 # See http://bugs.php.net/53436
 Patch43:        php-7.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
