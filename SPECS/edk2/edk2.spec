@@ -359,6 +359,8 @@ cp -a -- \
 
 %build
 
+chmod +x ./edk2-build.py
+
 build_iso() {
   dir="$1"
   UEFI_SHELL_BINARY=${dir}/Shell.efi
