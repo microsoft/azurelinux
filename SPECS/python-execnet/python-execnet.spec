@@ -1,8 +1,8 @@
 %define pkgname execnet
 Summary:        Python execution distributor
 Name:           python-%{pkgname}
-Version:        1.9.0
-Release:        2%{?dist}
+Version:        2.1.1
+Release:        1%{?dist}
 License:        MIT
 URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
@@ -53,6 +53,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.1-1
+- Auto-upgrade to 2.1.1 - none
+
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
 - Freezing 'pytest' test dependency to version 7.1.3.
 
