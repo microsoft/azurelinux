@@ -91,7 +91,7 @@ func Copy(src, dst string) (err error) {
 
 // CopyDir copies src directory to dst, creating the dst directory if needed.
 // dst is assumed to be a directory and not a file. Will preserve permissions.
-func CopyDir(src, dst string) (err error) {
+func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -103,19 +103,20 @@ func CopyDir(src, dst string) (err error) {
 		}
 		if isDstDir {
 			logger.Log.Infof("destination (%s) already exists and is a directory", dst)
+			// Get dst dir info
+			dirInfo, err := os.Stat(dst)
+			if err != nil {
+				return fmt.Errorf("error getting dir info: %w", err)
+			}
+			// Set dirPermissions to the that of the exiting dst dir
+			dirPermissions = dirInfo.Mode().Perm()
+
 		}
 	}
 
 	if !isDstExist {
-		// Get src dir info
-		dirInfo, err := os.Stat(src)
-		if err != nil {
-			return fmt.Errorf("error getting file info: %w", err)
-		}
-		permissions := dirInfo.Mode().Perm()
-
 		// Create dst dir
-		err = os.MkdirAll(dst, permissions)
+		err = os.MkdirAll(dst, dirPermissions)
 		if err != nil {
 			return err
 		}
@@ -135,7 +136,7 @@ func CopyDir(src, dst string) (err error) {
 
 		if entry.IsDir() {
 			// If it's a directory, recursively copy it
-			if err := CopyDir(srcPath, dstPath); err != nil {
+			if err := CopyDir(srcPath, dstPath, childPermissions, childPermissions); err != nil {
 				return err
 			}
 		} else {
@@ -143,6 +144,11 @@ func CopyDir(src, dst string) (err error) {
 			if err := Copy(srcPath, dstPath); err != nil {
 				return err
 			}
+			// Set file permissions
+			if err := os.Chmod(dstPath, childPermissions); err != nil {
+				return fmt.Errorf("error setting file permissions: %w", err)
+			}
+
 		}
 	}
 

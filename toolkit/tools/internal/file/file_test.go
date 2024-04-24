@@ -5,6 +5,7 @@ package file
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -141,9 +142,13 @@ func TestCopyDir(t *testing.T) {
 	err = CreateTestFiles("testfile", src)
 	assert.NoError(t, err)
 
+	// Defining dst directory and child permissions
+	dstPermissions := fs.FileMode(0700)
+	childPermissions := fs.FileMode(0755)
+
 	// Defining dst directory and copying src into dst
 	dst := testDir + "/destination"
-	err = CopyDir(src, dst)
+	err = CopyDir(src, dst, dstPermissions, childPermissions)
 	assert.NoError(t, err)
 
 	// verifying the directories are equal

@@ -5,6 +5,7 @@ package safechroot
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -306,8 +307,8 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 }
 
 // AddDirs copies each directory 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
-func (c *Chroot) AddDirs(src, dst string) (err error) {
-	return file.CopyDir(src, filepath.Join(c.rootDir, dst))
+func (c *Chroot) AddDirs(src, dst string, dirPermissions, childPermissions fs.FileMode) (err error) {
+	return file.CopyDir(src, filepath.Join(c.rootDir, dst), dirPermissions, childPermissions)
 }
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.

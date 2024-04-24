@@ -217,7 +217,7 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 
 		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
 
-		err := imageChroot.AddDirs(absSourceDir, dirConfigElement.DestinationPath)
+		err := imageChroot.AddDirs(absSourceDir, dirConfigElement.DestinationPath, fs.FileMode(*dirConfigElement.Permissions), fs.FileMode(*dirConfigElement.ChildPermissions))
 		if err != nil {
 			return err
 		}
