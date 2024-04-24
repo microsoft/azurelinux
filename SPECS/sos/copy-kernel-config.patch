@@ -1,0 +1,33 @@
+From f4df6e9abad6601ad1d67821306be0117dbfab24 Mon Sep 17 00:00:00 2001
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Date: Thu, 21 Mar 2024 14:25:09 -0700
+Subject: [PATCH] [kernel] Copy the kernel config
+
+Signed-off-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ sos/report/plugins/kernel.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/sos/report/plugins/kernel.py b/sos/report/plugins/kernel.py
+index d09d1176e1..1503af2bc9 100644
+--- a/sos/report/plugins/kernel.py
++++ b/sos/report/plugins/kernel.py
+@@ -111,7 +111,7 @@ def setup(self):
+             "/proc/buddyinfo",
+             "/proc/slabinfo",
+             "/proc/zoneinfo",
+-            "/lib/modules/%s/modules.dep" % self.policy.kernel_version(),
++            f"/lib/modules/{self.policy.kernel_version()}/modules.dep",
+             "/etc/conf.modules",
+             "/etc/modules.conf",
+             "/etc/modprobe.conf",
+@@ -136,7 +136,8 @@ def setup(self):
+             "/sys/kernel/debug/extfrag/extfrag_index",
+             clocksource_path + "available_clocksource",
+             clocksource_path + "current_clocksource",
+-            "/proc/pressure/"
++            "/proc/pressure/",
++            f"/boot/config-{self.policy.kernel_version()}"
+         ])
+ 
+         if self.get_option("with-timer"):
