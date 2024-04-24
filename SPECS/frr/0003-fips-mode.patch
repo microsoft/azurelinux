@@ -3,8 +3,8 @@ index 631465f..e084ff3 100644
 --- a/ospfd/ospf_vty.c
 +++ b/ospfd/ospf_vty.c
 @@ -1136,6 +1136,11 @@ DEFUN (ospf_area_vlink,
- 
- 	if (argv_find(argv, argc, "message-digest", &idx)) {
+ 		vl_config.keychain = argv[idx+1]->arg;
+ 	} else if (argv_find(argv, argc, "message-digest", &idx)) {
  		/* authentication message-digest */
 +		if(FIPS_mode())
 +		{
@@ -41,7 +41,7 @@ index 631465f..e084ff3 100644
 +		}
  		SET_IF_PARAM(params, auth_type);
  		params->auth_type = OSPF_AUTH_CRYPTOGRAPHIC;
- 		return CMD_SUCCESS;
+ 		UNSET_IF_PARAM(params, keychain_name);
 @@ -6971,6 +6990,11 @@ DEFUN (ip_ospf_message_digest_key,
         "The OSPF password (key)\n"
         "Address of interface\n")
