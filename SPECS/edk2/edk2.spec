@@ -39,24 +39,12 @@ ExclusiveArch: x86_64
 
 %define DBXDATE        20230509
 
+%define build_ovmf 1
+%define build_aarch64 0
+%define build_riscv64 0
+
 # Undefine this to get *HUGE* (50MB+) verbose build logs
 %define silent --silent
- 
-%if %{defined rhel}
-%define build_ovmf 0
-%define build_aarch64 0
-%ifarch x86_64
-  %define build_ovmf 1
-%endif
-%ifarch aarch64
-  %define build_aarch64 1
-%endif
-%define build_riscv64 0
-%else
-%define build_ovmf 1
-%define build_aarch64 1
-%define build_riscv64 1
-%endif
  
 %global softfloat_version 20180726-gitb64af41
 %define cross %{defined fedora}
@@ -104,13 +92,10 @@ Source46: 51-edk2-ovmf-2m-raw-x64-nosb.json
 Source47: 60-edk2-ovmf-x64-amdsev.json
 Source48: 60-edk2-ovmf-x64-inteltdx.json
 
-Source50: 50-edk2-riscv-qcow2.json
-
 # https://gitlab.com/kraxel/edk2-build-config
 Source80: edk2-build.py
 Source81: edk2-build.fedora
 Source82: edk2-build.fedora.platforms
-Source83: edk2-build.rhel-9
 
 Source90: DBXUpdate-%{DBXDATE}.x64.bin
 Source91: DBXUpdate-%{DBXDATE}.ia32.bin
@@ -131,9 +116,6 @@ Patch0013: 0013-UefiCpuPkg-MpInitLib-fix-apic-mode-for-cpu-hotplug.patch
 Patch0014: 0014-CryptoPkg-CrtLib-add-stat.h.patch
 Patch0015: 0015-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
 Patch0016: 0016-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
-%if 0%{?fedora} >= 38 || 0%{?rhel} >= 10
-Patch0017: 0017-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
-%endif
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -173,15 +155,7 @@ BuildRequires:  python3-pefile
 # endif build_ovmf
 %endif
 
-%if %{cross}
-BuildRequires:  gcc-aarch64-linux-gnu
-BuildRequires:  gcc-arm-linux-gnu
-BuildRequires:  gcc-x86_64-linux-gnu
-BuildRequires:  gcc-riscv64-linux-gnu
-%endif
 
-
-	
 %package ovmf
 Summary:    UEFI firmware for x86_64 virtual machines
 BuildArch:  noarch
@@ -355,8 +329,7 @@ cp -a -- \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
    %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} \
    %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48} \
-   %{SOURCE50} \
-   %{SOURCE80} %{SOURCE81} %{SOURCE82} %{SOURCE83} \
+   %{SOURCE80} %{SOURCE81} %{SOURCE82} \
    %{SOURCE90} %{SOURCE91} \
    .
 
@@ -406,22 +379,6 @@ touch OvmfPkg/AmdSev/Grub/grub.efi   # dummy
 python3 CryptoPkg/Library/OpensslLib/configure.py
 
 %if %{build_ovmf}
-%if %{defined rhel}
-
-./edk2-build.py --config edk2-build.rhel-9 %{?silent} --release-date "$RELEASE_DATE" -m ovmf
-virt-fw-vars --input   RHEL-9/ovmf/OVMF_VARS.fd \
-             --output  RHEL-9/ovmf/OVMF_VARS.secboot.fd \
-             --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
-             --enroll-redhat --secure-boot
-virt-fw-vars --input   RHEL-9/ovmf/OVMF.inteltdx.fd \
-             --output  RHEL-9/ovmf/OVMF.inteltdx.secboot.fd \
-             --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
-             --enroll-redhat --secure-boot
-build_iso RHEL-9/ovmf
-cp DBXUpdate-%{DBXDATE}.x64.bin RHEL-9/ovmf
-
-%else
-
 ./edk2-build.py --config edk2-build.fedora %{?silent} --release-date "$RELEASE_DATE" -m ovmf
 ./edk2-build.py --config edk2-build.fedora.platforms %{?silent} -m x64
 virt-fw-vars --input   Fedora/ovmf/OVMF_VARS.fd \
@@ -479,9 +436,6 @@ done
 %endif
 
 %if %{build_aarch64}
-%if %{defined rhel}
-./edk2-build.py --config edk2-build.rhel-9 %{?silent} --release-date "$RELEASE_DATE" -m armvirt
-%else
 ./edk2-build.py --config edk2-build.fedora %{?silent} --release-date "$RELEASE_DATE" -m armvirt
 ./edk2-build.py --config edk2-build.fedora.platforms %{?silent} -m aa64
 virt-fw-vars --input   Fedora/aarch64/vars-template-pflash.raw \
@@ -527,9 +481,6 @@ install BaseTools/Scripts/GccBase.lds \
 
 # install firmware images
 mkdir -p %{buildroot}%{_datadir}/%{name}
-%if %{defined rhel}
-cp -av RHEL-9/* %{buildroot}%{_datadir}/%{name}
-%else
 cp -av Fedora/* %{buildroot}%{_datadir}/%{name}
 %endif
 
@@ -591,22 +542,10 @@ install -m 0644 \
         52-edk2-aarch64-verbose-qcow2.json \
         53-edk2-aarch64-verbose-raw.json \
         %{buildroot}%{_datadir}/qemu/firmware
-%if %{defined fedora}
 install -m 0644 \
         50-edk2-arm-verbose.json \
         %{buildroot}%{_datadir}/qemu/firmware
-%endif
-
 # endif build_aarch64
-%endif
-
-%if %{build_riscv64}
-
-install -m 0644 \
-        50-edk2-riscv-qcow2.json \
-        %{buildroot}%{_datadir}/qemu/firmware
-
-# endif build_riscv64
 %endif
 
 %if %{defined fedora}
