@@ -261,7 +261,7 @@ meson-1.3.1-1.azl3.noarch.rpm
 mpfr-4.2.1-1.azl3.x86_64.rpm
 mpfr-debuginfo-4.2.1-1.azl3.x86_64.rpm
 mpfr-devel-4.2.1-1.azl3.x86_64.rpm
-msopenjdk-17-17.0.9-1.x86_64.rpm
+msopenjdk-17-17.0.11-1.x86_64.rpm
 ncurses-6.4-2.azl3.x86_64.rpm
 ncurses-compat-6.4-2.azl3.x86_64.rpm
 ncurses-debuginfo-6.4-2.azl3.x86_64.rpm
