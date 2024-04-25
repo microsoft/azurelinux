@@ -53,6 +53,7 @@ rm distlib/*.exe
 
 %check
 export PYTHONHASHSEED=0
+pip3 install iniconfig
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
