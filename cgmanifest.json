@@ -22953,7 +22953,7 @@
         "type": "other",
         "other": {
           "name": "python-libclang",
-          "version": "14.0.6",
+          "version": "18.1.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
         }
       }
