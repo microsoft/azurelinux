@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "ocaml-4.13.1.tar.xz": "931d78dfad5bf938800c7a00eb647a27bbfe465a96a8eaae858ecbdb22e6fde8"
+  "ocaml-5.1.1.tar.gz": "57f7b382b3d71198413ede405d95ef3506f1cdc480cda1dca1e26b37cb090e17",
+  "macros.ocaml-rpm": "c63f72f1386f8ad999daa2dcd3ea203ef07e34bc795e11b70e725a5db7ab026f",
+  "ocaml_files.py": "b1649462b720fb401d491bd5cbe879870a9f50bd99608d6488fc235a0e5f11e3"
  }
 }
