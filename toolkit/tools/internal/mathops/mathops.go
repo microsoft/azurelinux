@@ -8,8 +8,10 @@ import (
 	"math"
 )
 
-var ErrOverflow = errors.New("integer overflow")
-var ErrUnderflow = errors.New("integer underflow")
+var (
+	ErrOverflow  = errors.New("integer overflow")
+	ErrUnderflow = errors.New("integer underflow")
+)
 
 // AddInts adds two integers and returns the result.
 // If the result overflows or underflows, an error is returned.
