@@ -21713,8 +21713,8 @@
         "type": "other",
         "other": {
           "name": "python-attrs",
-          "version": "21.4.0",
-          "downloadUrl": "https://github.com/python-attrs/attrs/archive/refs/tags/21.4.0.tar.gz"
+          "version": "23.2.0",
+          "downloadUrl": "https://github.com/python-attrs/attrs/archive/refs/tags/23.2.0.tar.gz"
         }
       }
     },

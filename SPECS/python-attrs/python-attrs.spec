@@ -1,18 +1,36 @@
+%global modname attrs
+
+%if 0%{?with_check}
+%bcond_with tests
+%else
+# Turn the tests off when bootstrapping Python, because pytest requires attrs
+%bcond_without tests
+%endif
+
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
-Version:        21.4.0
-Release:        2%{?dist}
+Version:        23.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
-Patch0:         fix-mypy-tests.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
-%if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-hatch-fancy-pypi-readme
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-hypothesis
+BuildRequires:  python3-sortedcontainers
+BuildRequires:  python-trove-classifiers
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 
@@ -27,24 +45,37 @@ Requires:       python3
 Attributes without boilerplate.
 
 %prep
-%autosetup -p1 -n attrs-%{version}
+%setup -q -n %{modname}-%{version}
+# Remove undesired/optional test dependency on pympler
+sed -i '/"pympler",/d' pyproject.toml
+
+# Remove tests-mypy extra from tests-no-zope extra
+sed -i "/attrs\[tests-mypy\]/d" pyproject.toml
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_tests:-x tests}
 
 %build
-%py3_build
-
+%pyproject_wheel
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files attr attrs
 
 %check
-pip3 install tox
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+pip3 install iniconfig
+%pyproject_check_import
+%if %{with tests}
+%pytest
+%endif
 
-%files -n python3-attrs
-%defattr(-,root,root,-)
-%license LICENSE
-%{python3_sitelib}/*
+%files -n python%{python3_pkgversion}-%{modname} -f %{pyproject_files}
+%license %{python3_sitelib}/%{modname}-%{version}.dist-info/licenses/LICENSE
+%doc README.md
 
 %changelog
+* Thu Apr 25 2024 Andrew Phelps <anphel@microsoft.com> - 23.2.0-1
+- Upgrade to 23.2.0 based on Fedora 40 (License: MIT)
+
 * Tue Jul 12 2022 Olivia Crain <oliviacrain@microsoft.com> - 21.4.0-2
 - Add upstream patch to fix mypy tests
 
