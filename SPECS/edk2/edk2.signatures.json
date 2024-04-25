@@ -11,7 +11,6 @@
   "50-edk2-ovmf-4m-qcow2-x64-nosb.json": "a97c1339a837d106ccb25132a68cdeaf13f2b7cff3d4c7411ce4457e75b68278",
   "50-edk2-ovmf-ia32-nosb.json": "b360162bd55df3b1cb4bfa8d0b7c2b46a7c7b492aabf6d0d57c3dbf3d8c7fd10",
   "50-edk2-ovmf-x64-microvm.json": "5136200cd26eff9387259b1ca0f352b64298283f990277ac7a1b7a94d87baa27",
-  "50-edk2-riscv-qcow2.json": "b91747d4c9e46b656105cf0b5e061df6f30f8db452c39bac1ae6e91bc3f90da1",
   "51-edk2-aarch64-raw.json": "7523b4dc263748fc8bee26e763aa94463222a8d2e8b738fdbde0d2b263ad562d",
   "51-edk2-ovmf-2m-raw-x64-nosb.json": "59aec29aa157bb0f7e5242ff0de9932367d5314d9ce8159b97360b6d44da58f2",
   "52-edk2-aarch64-verbose-qcow2.json": "3e217e801b876088658141e347e72608d275456967d763044f468a8ebf68d7b6",
@@ -29,7 +28,6 @@
   "openssl-rhel-db0287935122edceb91dcda8dfb53b4090734e22.tar.xz": "9fcc5b49513d6ae21c7ddc3d1bbb1f8973cfbe76f2392d10106a8cd435e3eb47",
   "softfloat-20180726-gitb64af41.tar.xz": "c7f2172357ca3022621b9464fd92bf2b462256bda3e019bf9a669fa6b5aeea91",
   "ovmf-whitepaper-c770f8c.txt": "842518adadaa837914dbb13a6628002fb7f7acca107c6d6f41815b399dc9f8b8",
-  "edk2-build.rhel-9": "53d3385d32ebc11e859f68d113d0e15a05445a34b7b86ddd8a89bb6bc5f3bddf",
   "README.experimental": "71ce0b179d0e1325723cc444e45f7eeb67cce4cc1b336f3c5f586de16a6a78fd"
  }
 }
