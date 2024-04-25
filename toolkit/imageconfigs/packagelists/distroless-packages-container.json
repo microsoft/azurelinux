@@ -1,5 +1,6 @@
 {
     "packages": [
-        "distroless-packages-base"
+        "distroless-packages-base",
+        "prebuilt-ca-certificates"
     ]
 }
