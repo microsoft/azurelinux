@@ -411,9 +411,11 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 
 	default:
 		// Append the kernel command-line args to the existing grub config.
-		err := addKernelCommandLine(config.OS.KernelCommandLine.ExtraCommandLine, imageConnection.Chroot())
-		if err != nil {
-			return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+		for _, kernelExtraArgument := range config.OS.KernelCommandLine.ExtraCommandLine {
+			err := addKernelCommandLine(kernelExtraArgument, imageConnection.Chroot())
+			if err != nil {
+				return fmt.Errorf("failed to add extra kernel command line:\n%w", err)
+			}
 		}
 	}
 

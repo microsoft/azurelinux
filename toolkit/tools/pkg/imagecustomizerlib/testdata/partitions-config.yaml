@@ -47,4 +47,6 @@ os:
   resetBootLoaderType: hard-reset
 
   kernelCommandLine:
-    extraCommandLine: console=tty0 console=ttyS0
+    extraCommandLine:
+    - console=tty0
+    - console=ttyS0
