@@ -1,17 +1,17 @@
-From f2b875e8201efed22267136096b1e5df97f99f84 Mon Sep 17 00:00:00 2001
+From 9966786a7389dc6621f2bc2dce7c690c5a38b67d Mon Sep 17 00:00:00 2001
 From: "Richard W.M. Jones" <rjones@redhat.com>
 Date: Tue, 29 May 2012 20:44:18 +0100
-Subject: [PATCH 2/4] configure: Allow user defined C compiler flags.
- 
+Subject: [PATCH 2/3] configure: Allow user defined C compiler flags.
+
 ---
- configure.ac | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
- 
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
 diff --git a/configure.ac b/configure.ac
-index 892a2a894f..e8f6cbc863 100644
+index 3698c7cbf..e2a3cbea0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -760,6 +760,10 @@ AS_CASE([$host],
+@@ -669,6 +669,10 @@ AS_CASE([$host],
        internal_cflags="$cc_warnings"],
      [common_cflags="-O"])])
  
@@ -19,25 +19,8 @@ index 892a2a894f..e8f6cbc863 100644
 +common_cflags="$common_cflags $CFLAGS"
 +cclibs="$cclibs $LDFLAGS"
 +
+ internal_cppflags="-DCAML_NAME_SPACE $internal_cppflags"
+ 
  # Enable SSE2 on x86 mingw to avoid using 80-bit registers.
- AS_CASE([$host],
-   [i686-*-mingw32*],
-@@ -2327,7 +2331,7 @@ AC_CONFIG_COMMANDS_PRE([
-       [mkexedebugflag="${mkexe_ldflags_prefix}${mkexedebugflag}"])
-     mkdll_ldflags=""
-     AS_IF([test -n "${LDFLAGS}"],
--      [for flag in ${LDFLAGS}; do
-+      [for flag in "${LDFLAGS}"; do
-         mkdll_ldflags="${mkdll_ldflags} ${mkexe_ldflags_prefix}${flag}"
-       done
-       mkdll_ldflags_exp="$mkdll_ldflags"])
-@@ -2353,7 +2357,7 @@ ${mkdll_ldflags}"
-   ],[
-     mkdll_ldflags='$(OC_DLL_LDFLAGS) $(LDFLAGS)'
-     mkdll_ldflags_exp="${oc_dll_ldflags}"
--    AS_IF([test -n ${LDFLAGS}],
-+    AS_IF([test -n "${LDFLAGS}"],
-       [mkdll_ldflags_exp="$mkdll_ldflags_exp $LDFLAGS"])
-     mkexe_ldflags="\$(OC_LDFLAGS) \$(LDFLAGS)"
-     mkexe_ldflags_exp="${oc_ldflags} ${LDFLAGS}"
 -- 
+2.32.0

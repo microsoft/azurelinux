@@ -1,7 +1,7 @@
 Summary:        A collection of modular and reusable compiler and toolchain technologies.
 Name:           llvm
 Version:        18.1.2
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        NCSA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,6 @@ BuildRequires:  libffi-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  ninja-build
 BuildRequires:  python3-devel
-BuildRequires:  binutils-devel
 Requires:       libxml2
 Provides:       %{name} = %{version}
 Provides:       %{name} = %{version}-%{release}
@@ -63,9 +62,6 @@ cmake -G Ninja                              \
 %install
 %ninja_install -C build
 
-mkdir -p %{buildroot}%{_libdir}/bfd-plugins/
-ln -s -t %{buildroot}%{_libdir}/bfd-plugins/ ../LLVMgold.so
-
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -89,8 +85,6 @@ ninja check-all
 %{_bindir}/*
 %{_libdir}/*.so
 %{_libdir}/*.so.*
-%{_libdir}/LLVMgold.so
-%{_libdir}/bfd-plugins/LLVMgold.so
 %dir %{_datadir}/opt-viewer
 %{_datadir}/opt-viewer/opt-diff.py
 %{_datadir}/opt-viewer/opt-stats.py
@@ -102,14 +96,9 @@ ninja check-all
 %files devel
 %{_libdir}/*.a
 %{_libdir}/cmake/*
-%{_libdir}/LLVMgold.so
-%{_libdir}/bfd-plugins/LLVMgold.so
 %{_includedir}/*
 
 %changelog
-* Fri Apr 5 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 18.1.2-2
-- Added LLVMgold.so files to the main and devel packages
-
 * Wed Apr 03 2024 Andrew Phelps <anphel@microsoft.com> - 18.1.2-1
 - Upgrade to version 18.1.2
 
