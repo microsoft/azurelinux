@@ -479,7 +479,6 @@ install BaseTools/Scripts/GccBase.lds \
 # install firmware images
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -av Fedora/* %{buildroot}%{_datadir}/%{name}
-%endif
 
 
 %if %{build_ovmf}
