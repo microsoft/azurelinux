@@ -431,8 +431,6 @@ for image in \
                 --bank sha256 --bank sha384 \
 		> "$pcr"
 done
-
-%endif
 %endif
 
 %if %{build_aarch64}
@@ -441,7 +439,6 @@ done
 virt-fw-vars --input   Fedora/aarch64/vars-template-pflash.raw \
              --output  Fedora/experimental/vars-template-secboot-testonly-pflash.raw \
              --enroll-redhat --secure-boot --distro-keys rhel
-%endif
 for raw in */aarch64/*.raw; do
     qcow2="${raw%.raw}.qcow2"
     qemu-img convert -f raw -O qcow2 -o cluster_size=4096 -S 4096 "$raw" "$qcow2"
