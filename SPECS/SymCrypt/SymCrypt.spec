@@ -2,7 +2,7 @@
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        103.4.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,7 +35,7 @@ A core cryptographic library written by Microsoft
 %define symcrypt_arch ARM64
 # Currently SymCrypt ARM64 build requires use of clang
 %define symcrypt_cc clang
-%define symcrypt_c_flags "-Wno-conditional-uninitialized"
+%define symcrypt_c_flags "-mno-outline-atomics -Wno-conditional-uninitialized"
 %define symcrypt_cxx clang++
 %endif
 
@@ -78,6 +78,9 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 %{_includedir}/*
 
 %changelog
+* Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-2
+- Disable outline atomics in aarch64 builds
+
 * Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-1
 - Update SymCrypt to v103.4.1 for SymCrypt-OpenSSL provider.
 
