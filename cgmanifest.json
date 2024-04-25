@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.105.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.2.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
         }
       }
     },
