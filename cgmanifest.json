@@ -13392,8 +13392,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm"
+          "version": "17.0.11-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm"
         }
       }
     },
@@ -13402,8 +13402,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm"
+          "version": "17.0.11-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm"
         }
       }
     },
