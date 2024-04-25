@@ -22954,7 +22954,7 @@
         "other": {
           "name": "python-libclang",
           "version": "18.1.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-18.1.1.tar.gz"
         }
       }
     },
