@@ -16,7 +16,7 @@ Source0:        https://git.savannah.gnu.org/cgit/grub.git/snapshot/grub-%{versi
 Source1:        https://git.savannah.gnu.org/cgit/gnulib.git/snapshot/gnulib-%{gnulibversion}.tar.gz
 Source2:        sbat.csv.in
 Source3:        macros.grub2
-#Patch0001:      revert-cflags-for-mkimage.patch
+Patch0001:      autoconfig-version-required.patch
 BuildRequires:  autoconf
 BuildRequires:  device-mapper-devel
 BuildRequires:  python3

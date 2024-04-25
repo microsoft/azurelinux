@@ -1,0 +1,11 @@
+--- configure.ac	2021-06-08 07:28:15.000000000 -0700
++++ mod.ac	2024-04-25 09:48:38.044514203 -0700
+@@ -49,7 +49,7 @@
+ program_prefix="${save_program_prefix}"
+ 
+ AM_INIT_AUTOMAKE([1.11])
+-AC_PREREQ(2.63)
++AC_PREREQ(2.64)
+ AC_CONFIG_SRCDIR([include/grub/dl.h])
+ AC_CONFIG_HEADER([config-util.h])
+ 
