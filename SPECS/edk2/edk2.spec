@@ -152,6 +152,8 @@ BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(JSON)
 BuildRequires:  perl(lib)
 
+BuildRequires: mkisofs
+
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
 BuildRequires:  nasm
