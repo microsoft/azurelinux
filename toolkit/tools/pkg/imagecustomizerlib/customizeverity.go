@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
@@ -116,41 +114,25 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		rootHash, formattedDataPartition, formattedHashPartition, formattedCorruptionOption,
 	)
 
-	// Read grub.cfg using the internal method
-	lines, err := file.ReadLines(grubCfgFullPath)
+	grub2Config, err := file.Read(grubCfgFullPath)
 	if err != nil {
-		return fmt.Errorf("failed to read grub config: %v", err)
+		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
-	var updatedLines []string
-	linuxLineRegex := regexp.MustCompile(`^linux .*rd.systemd.verity=(1|0).*`)
-	for _, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if linuxLineRegex.MatchString(trimmedLine) {
-			// Replace existing arguments
-			verityRegexPattern := `rd.systemd.verity=(1|0)` +
-				`( roothash=[^ ]*)?` +
-				`( systemd.verity_root_data=[^ ]*)?` +
-				`( systemd.verity_root_hash=[^ ]*)?` +
-				`( systemd.verity_root_options=[^ ]*)?`
-			verityRegex := regexp.MustCompile(verityRegexPattern)
-			newLinuxLine := verityRegex.ReplaceAllString(trimmedLine, newArgs)
-			updatedLines = append(updatedLines, newLinuxLine)
-		} else if strings.HasPrefix(trimmedLine, "linux ") {
-			// Append new arguments
-			updatedLines = append(updatedLines, line+" "+newArgs)
-		} else if strings.HasPrefix(trimmedLine, "set rootdevice=PARTUUID=") {
-			line = "set rootdevice=/dev/mapper/root"
-			updatedLines = append(updatedLines, line)
-		} else {
-			// Add other lines unchanged
-			updatedLines = append(updatedLines, line)
-		}
+	grub2Config, err = replaceKernelCommandLineArguments(grub2Config, []string{"rd.systemd.verity", "roothash",
+		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
+	if err != nil {
+		return fmt.Errorf("failed to set verity kernel command line args:\n%w", err)
 	}
 
-	err = file.WriteLines(updatedLines, grubCfgFullPath)
+	grub2Config, err = replaceSetCommandValue(grub2Config, "rootdevice", "/dev/mapper/root")
 	if err != nil {
-		return fmt.Errorf("failed to write updated grub config: %v", err)
+		return fmt.Errorf("failed to set verity root device:\n%w", err)
+	}
+
+	err = file.Write(grub2Config, grubCfgFullPath)
+	if err != nil {
+		return fmt.Errorf("failed to write updated grub config:\n%w", err)
 	}
 
 	return nil
