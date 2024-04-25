@@ -152,8 +152,6 @@ BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(JSON)
 BuildRequires:  perl(lib)
 
-BuildRequires: mkisofs
-
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
 BuildRequires:  nasm
@@ -163,6 +161,9 @@ BuildRequires:  nasm
 BuildRequires:  dosfstools
 BuildRequires:  mtools
 BuildRequires:  xorriso
+
+# For mkisofs.
+BuildRequires:  cdrkit
 
 # For generating the variable store template with the default certificates
 # enrolled.
