@@ -466,11 +466,11 @@ for image in \
 	pcr="${image}"
 	pcr="${pcr%.fd}"
 	pcr="${pcr%.qcow2}"
-	pcr="${pcr}.pcrlock"
+	pcr="${pcr}.pcr"
 	python3 /usr/share/doc/python3-virt-firmware/experimental/measure.py \
 		--image "$image" \
 		--version "%{name}-%{version}-%{release}" \
-                --no-shim --pcrlock \
+                --no-shim \
                 --bank sha256 --bank sha384 \
 		> "$pcr"
 done
@@ -677,7 +677,7 @@ done
 %{_datadir}/%{name}/ovmf/OVMF_CODE_4M.secboot.qcow2
 %{_datadir}/%{name}/ovmf/OVMF_VARS_4M.qcow2
 %{_datadir}/%{name}/ovmf/OVMF_VARS_4M.secboot.qcow2
-%{_datadir}/%{name}/ovmf/*.pcrlock
+%{_datadir}/%{name}/ovmf/*.pcr
 %endif
 # endif build_ovmf
 %endif
@@ -755,7 +755,7 @@ done
 %{_datadir}/%{name}/experimental/*.fd
 %{_datadir}/%{name}/experimental/*.raw
 %{_datadir}/%{name}/experimental/*.qcow2
-%{_datadir}/%{name}/experimental/*.pcrlock
+%{_datadir}/%{name}/experimental/*.pcr
 
 %files ovmf-xen
 %common_files
