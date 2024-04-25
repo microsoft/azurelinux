@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,10 @@ URL:            https://pytorch.org/
 Source0:        https://github.com/pytorch/pytorch/releases/download/v%{version}/%{name}-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarball.sh script to create a tarball of submodules during version updates.
 Source1:        %{name}-%{version}-submodules.tar.gz
+Patch0:         CVE-2024-31580.patch
+Patch1:         CVE-2024-31583.patch
+Patch2:         CVE-2024-27319.patch
+
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
@@ -55,7 +59,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1 -n %{name}-v%{version}
+%autosetup -a 1 -p 1 -n %{name}-v%{version}
 
 %build
 # Use MAX_JOBS=8 to prevent build failure in ADO pipelines
@@ -82,6 +86,9 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Mon Apr 22 2024 Dan Streetman <ddstreet@microsoft.com> - 2.0.0-4
+- patch CVE-2024-31580, CVE-2024-31583
+
 * Mon Dec 18 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.0.0-3
 - Set MAX_JOBS=8 to prevent build failure in ADO pipelines
 

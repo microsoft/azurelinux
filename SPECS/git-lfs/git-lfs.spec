@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 Summary:       Git extension for versioning large files
 Name:          git-lfs
-Version:       3.4.1
+Version:       3.5.1
 Release:       1%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
@@ -28,6 +28,7 @@ Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:       %{name}-%{version}-vendor.tar.gz
+Patch0:        CVE-2023-45288.patch
 
 BuildRequires: golang
 BuildRequires: which
@@ -41,10 +42,11 @@ Requires:      git
 Git LFS is a command line extension and specification for managing large files with Git
 
 %prep
-%autosetup
+%autosetup -N
 
 %build
 tar --no-same-owner -xf %{SOURCE1}
+%autopatch -p1 
 export GOPATH=%{our_gopath}
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor -modcacherw -ldflags=-linkmode=external"
 go generate ./commands
@@ -77,6 +79,10 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Tue Apr 23 2024 Muhammad Falak <mwani@microsoft.com> - 3.5.1-1
+- Bump version to 3.5.1 to address CVE-2023-39325
+- Introduce patch to address CVE-2023-45288
+
 * Thu Apr 18 2024 Andrew Phelps <anphel@microsoft.com> - 3.4.1-1
 - Bump version to 3.4.1 based on AZL3 spec
 - Add BR on asciidoctor & drop un-needed BR
