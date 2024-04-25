@@ -1,2 +1,3 @@
 distroless-packages-base
+prebuilt-ca-certificates
 prometheus-adapter
