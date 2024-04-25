@@ -15,23 +15,20 @@ type DirConfigList []DirConfig
 
 type DirConfig struct {
 	// The path in the target OS that the directory will be copied to.
-	SourcePath string `yaml:"SourcePath"`
+	SourcePath string `yaml:"sourcePath"`
 
 	// The path in the target OS that the directory will be copied to.
-	DestinationPath string `yaml:"DestinationPath"`
+	DestinationPath string `yaml:"destinationPath"`
 
-	// The permissions to set on the directory.
-	Permissions *DirPermissions `yaml:"Permissions"`
+	// The permissions to set on the top-level directory, given that it does not exist already.
+	// If directory being copied does exist on the image, the permissions will not be overridden with this value.
+	Permissions *DirPermissions `yaml:"permissions"`
 
 	// The permissions to set on the children of the directory.
-	ChildPermissions *DirPermissions `yaml:"ChildPermissions"`
+	ChildPermissions *DirPermissions `yaml:"childPermissions"`
 }
 
 func (l *DirConfigList) IsValid() (err error) {
-	if len(*l) <= 0 {
-		return fmt.Errorf("list is empty")
-	}
-
 	for i, dirConfig := range *l {
 		err = dirConfig.IsValid()
 		if err != nil {
@@ -45,23 +42,23 @@ func (l *DirConfigList) IsValid() (err error) {
 func (d *DirConfig) IsValid() (err error) {
 	// Paths
 	if d.SourcePath == "" {
-		return fmt.Errorf("invalid [SourcePath] value: empty string")
+		return fmt.Errorf("invalid [sourcePath] value: empty string")
 	}
 	if d.DestinationPath == "" {
-		return fmt.Errorf("invalid [DestinationPath] value: empty string")
+		return fmt.Errorf("invalid [destinationPath] value: empty string")
 	}
 
 	// Permissions
 	if d.Permissions != nil {
 		err = d.Permissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [Permissions] value: %w", err)
+			return fmt.Errorf("invalid [permissions] value: %w", err)
 		}
 	}
 	if d.ChildPermissions != nil {
 		err = d.ChildPermissions.IsValid()
 		if err != nil {
-			return fmt.Errorf("invalid [ChildPermissions] value: %w", err)
+			return fmt.Errorf("invalid [childPermissions] value: %w", err)
 		}
 	}
 

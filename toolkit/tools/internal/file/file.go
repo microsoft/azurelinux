@@ -90,7 +90,7 @@ func Copy(src, dst string) (err error) {
 }
 
 // CopyDir copies src directory to dst, creating the dst directory if needed.
-// dst is assumed to be a directory and not a file. Will preserve permissions.
+// dst is assumed to be a directory and not a file.
 func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
@@ -110,7 +110,6 @@ func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err
 			}
 			// Set dirPermissions to the that of the exiting dst dir
 			dirPermissions = dirInfo.Mode().Perm()
-
 		}
 	}
 
@@ -140,15 +139,10 @@ func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err
 				return err
 			}
 		} else {
-			// If it's a file, copy it
-			if err := Copy(srcPath, dstPath); err != nil {
+			// If it's a file, copy it and set file permissions
+			if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(childPermissions).Run(); err != nil {
 				return err
 			}
-			// Set file permissions
-			if err := os.Chmod(dstPath, childPermissions); err != nil {
-				return fmt.Errorf("error setting file permissions: %w", err)
-			}
-
 		}
 	}
 
