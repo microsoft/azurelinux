@@ -36,6 +36,9 @@ a minimal and fast API targetting the following uses:
 %prep
 %autosetup -n %{pkgname}-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
 %py3_build
 
