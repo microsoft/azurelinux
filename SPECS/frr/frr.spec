@@ -2,7 +2,7 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        8.5.3
+Version:        9.1
 Release:        2%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
@@ -16,6 +16,7 @@ Patch1:         0001-enable-openssl.patch
 Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -24,8 +25,6 @@ BuildRequires:  flex
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  groff
-BuildRequires:  grpc-devel
-BuildRequires:  grpc-plugins
 BuildRequires:  json-c-devel
 BuildRequires:  libcap-devel
 BuildRequires:  libtool
@@ -38,6 +37,7 @@ BuildRequires:  pam-devel
 BuildRequires:  patch
 BuildRequires:  perl-XML-LibXML
 BuildRequires:  perl-generators
+BuildRequires:  protobuf-c-devel
 BuildRequires:  python3-devel
 BuildRequires:  python3-sphinx
 BuildRequires:  re2-devel
@@ -69,6 +69,8 @@ FRRouting is a fork of Quagga.
 
 %prep
 %autosetup -p1 -n %{name}-%{name}-%{version}
+# C++14 or later needed for abseil-cpp 20230125; string_view needs C++17:
+sed -r -i 's/(AX_CXX_COMPILE_STDCXX\(\[)11(\])/\117\2/' configure.ac
 
 %build
 autoreconf -ivf
@@ -95,8 +97,7 @@ autoreconf -ivf
     --disable-babeld \
     --with-moduledir=%{_libdir}/frr/modules \
     --with-crypto=openssl \
-    --enable-fpm \
-    --enable-grpc
+    --enable-fpm
 
 %make_build MAKEINFO="makeinfo --no-split" PYTHON=python3
 
@@ -163,7 +164,7 @@ fi
 %systemd_preun frr.service
 
 %check
-%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools
+%{python3} -m pip install atomicwrites attrs docutils pluggy pygments six more-itertools iniconfig
 #this should be temporary, the grpc test is just badly designed
 rm tests/lib/*grpc*
 %make_build check PYTHON=python3
@@ -197,6 +198,13 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Wed Apr 24 2024 Tobias Brick <tobiasb@microsoft.com> - 9.1-2
+- Remove FIPS_mode patch
+
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 9.1-1
+- Upgrade to version 9.1
+- Remove `--enable-grpc`
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.5.3-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

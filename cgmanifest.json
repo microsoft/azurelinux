@@ -195,8 +195,8 @@
         "type": "other",
         "other": {
           "name": "annobin",
-          "version": "9.27",
-          "downloadUrl": "https://nickc.fedorapeople.org/annobin-9.27.tar.xz"
+          "version": "12.49",
+          "downloadUrl": "https://nickc.fedorapeople.org/annobin-12.49.tar.xz"
         }
       }
     },
@@ -785,8 +785,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2021.02.19",
-          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
+          "version": "2023.02.20",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2023.02.20.tar.xz"
         }
       }
     },
@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "cal10n",
-          "version": "0.7.7",
-          "downloadUrl": "https://github.com/qos-ch/cal10n/archive/refs/tags/v_0.7.7.tar.gz"
+          "version": "0.8.1.10",
+          "downloadUrl": "https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-0.8.1.10.tar.xz"
         }
       }
     },
@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "clamav",
-          "version": "0.105.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.2.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
         }
       }
     },
@@ -1967,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "4.11.0",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.11.0/conda-4.11.0.tar.gz"
+          "version": "24.1.2",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
         }
       }
     },
@@ -3910,8 +3910,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "8.5.3",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.5.3.tar.gz"
+          "version": "9.1",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-9.1.tar.gz"
         }
       }
     },
@@ -11971,8 +11971,8 @@
         "type": "other",
         "other": {
           "name": "libyang",
-          "version": "2.1.111",
-          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.111.tar.gz"
+          "version": "2.1.148",
+          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.148.tar.gz"
         }
       }
     },
@@ -13392,8 +13392,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm"
+          "version": "17.0.11-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm"
         }
       }
     },
@@ -13402,8 +13402,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm"
+          "version": "17.0.11-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm"
         }
       }
     },
@@ -14402,8 +14402,8 @@
         "type": "other",
         "other": {
           "name": "ocaml",
-          "version": "4.13.1",
-          "downloadUrl": "https://caml.inria.fr/pub/distrib/ocaml-4.13.1/ocaml-4.13.1.tar.xz"
+          "version": "5.1.1",
+          "downloadUrl": "https://github.com/ocaml/ocaml/archive/5.1.1/ocaml-5.1.1.tar.gz"
         }
       }
     },
@@ -20793,8 +20793,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.22",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.22.tar.xz"
+          "version": "8.3.4",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.4.tar.xz"
         }
       }
     },

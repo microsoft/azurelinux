@@ -348,6 +348,14 @@ please refer to the [overlay type](#overlay-type) section.
 - `hashPartition`: A partition used exclusively for storing a calculated hash
   tree.
 
+- `corruptionOption`: Optional. Specifies the behavior in case of detected
+  corruption. This is configurable with the following options:
+  - `io-error`: Default setting. Fails the I/O operation with an I/O error.
+  - `ignore`: ignores the corruption and continues operation.
+  - `panic`: causes the system to panic (print errors) and then try restarting
+    if corruption is detected.
+  - `restart`: attempts to restart the system upon detecting corruption.
+
 Example:
 
 ```yaml
@@ -359,6 +367,7 @@ os:
     hashPartition:
       idType: part-label
       Id: hash_partition
+    corruptionOption: panic
 ```
 
 ## fileConfig type
