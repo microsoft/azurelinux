@@ -129,7 +129,7 @@ SOURCE_URL         ?= https://cblmarinerstorage.blob.core.windows.net/sources/co
 ##help:var:PACKAGE_URL_LIST:<urls_list>=Space-separated list of URLs to download toolchain RPM packages from, used to populate the toolchain packages if `REBUILD_TOOLCHAIN=n'. The URLs will replace the default set of URLs. Print default list with 'make -s printvar-PACKAGE_URL_LIST'.
 PACKAGE_URL_LIST   ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/$(build_arch)
 PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/debuginfo/$(build_arch)
-PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/Microsoft/$(build_arch)
+PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/ms-oss/$(build_arch)
 REPO_LIST          ?=
 SRPM_URL_LIST      ?= https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/prod/base/srpms
 
@@ -163,7 +163,7 @@ else
    ifeq ($(USE_PREVIEW_REPO),y)
       override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/$(build_arch)
       override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/debuginfo/$(build_arch)
-      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/Microsoft/$(build_arch)
+      override PACKAGE_URL_LIST   += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/ms-oss/$(build_arch)
       override SRPM_URL_LIST      += https://packages.microsoft.com/azurelinux/$(RELEASE_MAJOR_ID)/preview/base/srpms
       ifneq ($(wildcard $(PREVIEW_REPO)),)
          override REPO_LIST += $(PREVIEW_REPO)
