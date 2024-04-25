@@ -43,7 +43,6 @@ between tools.
 
 rm distlib/*.exe
 
-
 %build
 %pyproject_wheel
 
@@ -57,7 +56,8 @@ pip3 install iniconfig
 # test_sequencer_basic test fails due to relying
 # on the ordering of the input, hence disabling it.
 # https://github.com/pypa/distlib/issues/161
-%pytest -k "not test_sequencer_basic"
+# test_is_writable depends on network access
+%pytest -k "not test_sequencer_basic and not test_is_writable"
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %pyproject_files
 %license LICENSE.txt
