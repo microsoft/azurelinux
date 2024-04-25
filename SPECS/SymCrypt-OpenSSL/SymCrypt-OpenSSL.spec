@@ -9,6 +9,7 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  openssl-devel
+BuildRequires:  SymCrypt
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  make
@@ -66,11 +67,11 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 %{_sysconfdir}/pki/tls/symcrypt_prov.cnf
 
 %changelog
-* Thu Apr 25 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.2-1
+* Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.2-1
 - Support additional parameters in the SymCrypt provider required for TLS connections
 - Various bugfixes for TLS scenarios
 
-* Wed Apr 17 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.1-1
+* Wed Apr 17 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.4.1-1
 - Update SymCrypt-OpenSSL to v1.4.1
 - Adds support for RSASSA-PSS keys, SP800-108 KDF
 - Fixes smoke test for check in OpenSSL 3.1
