@@ -10,6 +10,7 @@ import (
 type KernelExtraArguments string
 
 func (e KernelExtraArguments) IsValid() error {
+
 	err := validateKernelArgumentsFormat(string(e))
 	if err != nil {
 		return err

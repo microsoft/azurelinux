@@ -5,6 +5,7 @@ package imagecustomizerlib
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
@@ -194,8 +195,16 @@ func kernelCommandLineToImager(kernelCommandLine imagecustomizerapi.KernelComman
 		return configuration.KernelCommandLine{}, err
 	}
 
+	var args []string
+	for _, arg := range kernelCommandLine.ExtraCommandLine {
+		args = append(args, string(arg)) // Type conversion from KernelExtraArguments to string
+	}
+
+	// Now use strings.Join with the converted slice
+	kernelCommandLineString := strings.Join(args, " ")
+
 	imagerKernelCommandLine := configuration.KernelCommandLine{
-		ExtraCommandLine: string(kernelCommandLine.ExtraCommandLine),
+		ExtraCommandLine: kernelCommandLineString,
 		SELinux:          imagerSELinuxMode,
 		SELinuxPolicy:    "",
 	}

@@ -821,7 +821,13 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 		return
 	}
 
-	extraCommandLine = strings.TrimSpace(string(isoConfig.KernelCommandLine.ExtraCommandLine))
+	var cleanedArgs []string
+	for _, kernelExtraArgument := range isoConfig.KernelCommandLine.ExtraCommandLine {
+		cleanedArg := strings.TrimSpace(string(kernelExtraArgument))
+		cleanedArgs = append(cleanedArgs, cleanedArg)
+	}
+
+	extraCommandLine = strings.Join(cleanedArgs, " ")
 
 	additionalIsoFiles = []safechroot.FileToCopy{}
 
