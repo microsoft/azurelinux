@@ -13,7 +13,7 @@
 Summary:        A ZIP archive management extension
 Name:           php-pecl-zip
 Version:        1.22.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PHP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,8 +27,8 @@ BuildRequires:  pkg-config
 BuildRequires:  tzdata
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(libzip) >= 1.0.0
-Requires:       php(api) = 20210902-%{__isa_bits}
-Requires:       php(zend-abi) = 20210902-%{__isa_bits}
+Requires:       php(api) = 20230831-%{__isa_bits}
+Requires:       php(zend-abi) = 20230831-%{__isa_bits}
 Requires:       tzdata
 # Supposed to use these macros from SPECS/php/macros.php
 #Requires:     php(zend-abi) = %{php_zend_api}
@@ -154,6 +154,9 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 %endif
 
 %changelog
+* Thu Apr 25 2024 Andrew Phelps <anphel@microsoft.com> - 1.22.3-2
+- Update `php(abi)` and `php(zend-abi)` requires for php 8.3.4
+
 * Fri Mar 29 2024 Andrew Phelps <anphel@microsoft.com> - 1.22.3-1
 - Upgrade to version 1.22.3
 - Add tzdata BR and requires.
