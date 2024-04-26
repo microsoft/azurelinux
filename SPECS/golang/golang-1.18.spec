@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.18.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -91,7 +91,7 @@ mkdir -p %{buildroot}%{gopath}/src/code.google.com/p/
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
 cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
 export GOROOT=%{goroot}
-export GOPATH=%{_datadir}/gocode
+export GOPATH=$HOME/go
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOOS=linux
@@ -120,6 +120,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Apr 26 2024 Muhammad Falak <mwani@microsoft.com> - 1.18.8-4
+- Set GOPATH to $HOME/go
+
 * Mon Jan 23 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.18.8-3
 - Create spec file for golang 1.18
 

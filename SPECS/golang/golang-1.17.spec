@@ -13,7 +13,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.17.13
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -91,7 +91,7 @@ mkdir -p %{buildroot}%{gopath}/src/code.google.com/p/
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
 cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
 export GOROOT=%{goroot}
-export GOPATH=%{_datadir}/gocode
+export GOPATH=$HOME/go
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 export GOOS=linux
@@ -120,7 +120,10 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu Dec 15 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.18.8-2
+* Fri Apr 26 2024 Muhammad Falak <mwani@microsoft.com> - 1.17.13-3
+- Set GOPATH to $HOME/go
+
+* Thu Dec 15 2022 Daniel McIlvaney <damcilva@microsoft.com> - 1.17.13-2
 - Patch CVE-2022-41717
 
 * Fri Aug 19 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.17.13-1
