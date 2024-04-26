@@ -49,13 +49,12 @@ python3 setup.py install --skip-build --root=%{buildroot}
 %{python3_sitelib}/google/auth
 %{python3_sitelib}/google/oauth2
 %{python3_sitelib}/google_auth-%{version}*.egg-info
-%{python3_sitelib}/google_auth-%{version}*.pth
 
 %changelog
 * Thu Apr 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.29.0-1
 - Auto-upgrade to 2.29.0 - none
 
-* Thu Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.6.6-1
+* Wed Apr 27 2022 Mateusz Malisz <mamalisz@microsoft.com> - 2.6.6-1
 - Update to 2.6.6
 
 * Fri Aug 21 2020 Thomas Crain <thcrain@microsoft.com> - 1.20.1-1
