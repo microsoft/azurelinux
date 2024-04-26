@@ -154,7 +154,7 @@ func appendKernelCommandLineArguments(inputGrubCfgContent string, extraCommandLi
 
 	// Insert args at the end of the line.
 	insertPoint := insertAtToken.Loc.Start.Index
-	outputGrubCfgContent = inputGrubCfgContent[:insertPoint] + " " + extraCommandLine + inputGrubCfgContent[insertPoint:]
+	outputGrubCfgContent = inputGrubCfgContent[:insertPoint] + extraCommandLine + " " + inputGrubCfgContent[insertPoint:]
 	return outputGrubCfgContent, nil
 }
 
@@ -366,7 +366,7 @@ func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinuxMode, imageC
 }
 
 // Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
-func replaceKernelCommandLineArguments(grub2Config string, argsToRemove []string, newArg string) (string, error) {
+func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string, newArg string) (string, error) {
 	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
 	if err != nil {
 		return "", err
@@ -423,7 +423,7 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 		return "", fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
 	}
 
-	grub2Config, err := replaceKernelCommandLineArguments(grub2Config, []string{"security", "selinux", "enforcing"},
+	grub2Config, err := updateKernelCommandLineArguments(grub2Config, []string{"security", "selinux", "enforcing"},
 		newSELinuxArgs)
 	if err != nil {
 		return "", err

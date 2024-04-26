@@ -119,7 +119,7 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
-	grub2Config, err = replaceKernelCommandLineArguments(grub2Config, []string{"rd.systemd.verity", "roothash",
+	grub2Config, err = updateKernelCommandLineArguments(grub2Config, []string{"rd.systemd.verity", "roothash",
 		"systemd.verity_root_data", "systemd.verity_root_hash", "systemd.verity_root_options"}, newArgs)
 	if err != nil {
 		return fmt.Errorf("failed to set verity kernel command line args:\n%w", err)
