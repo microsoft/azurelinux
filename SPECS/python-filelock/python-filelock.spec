@@ -6,8 +6,8 @@ Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            https://github.com/benediktschmitt/py-filelock
-Source0:        https://github.com/benediktschmitt/py-%{srcname}/archive/v%{version}/py-%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+URL:            https://github.com/toxdev/filelock
+Source0:        https://github.com/toxdev/%{srcname}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description

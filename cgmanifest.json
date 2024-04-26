@@ -22364,7 +22364,7 @@
         "other": {
           "name": "python-filelock",
           "version": "3.13.4",
-          "downloadUrl": "https://github.com/benediktschmitt/py-filelock/archive/v3.13.4/py-filelock-3.13.4.tar.gz"
+          "downloadUrl": "https://github.com/tox-dev/filelock/archive/refs/tags/3.13.4.tar.gz"
         }
       }
     },
