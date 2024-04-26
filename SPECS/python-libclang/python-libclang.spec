@@ -1,7 +1,7 @@
 %global pypi_name libclang
 
 Summary:        Clang's python bindings
-Name:           python-%{pypi_name}
+Name:           python-libclang
 Version:        18.1.1
 Release:        1%{?dist}
 License:        ASL 2.0
@@ -39,7 +39,7 @@ This library makes it easier to install clang's python bindings.
 %changelog
 * Thu Apr 25 2024 Osama Esmail <osamaesmail@microsoft.com> - 18.1.1-1
 - Upgrading version for 3.0-dev
+- Using actual package name so auto-upgrader can read the spec
 
 * Mon Oct 17 2022 Riken Maharjan <rmaharjan@microsoft.com> - 14.0.6-1
 - Original version for CBL-Mariner. License Verified.
-
