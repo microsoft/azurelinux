@@ -1,6 +1,6 @@
 %global srcname filelock
 Summary:        A platform independent file lock
-Name:           python-%{srcname}
+Name:           python-filelock
 Version:        3.13.4
 Release:        1%{?dist}
 License:        Unlicense
@@ -73,6 +73,7 @@ python%{python3_version} test.py
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.13.4-1
 - Upgrading version for 3.0
+- Using literal package name so autoupgrader can do its thing.
 
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
 - Updating source URL.
