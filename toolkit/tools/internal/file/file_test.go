@@ -128,8 +128,8 @@ func TestRemoveDirectoryContentsNonExistent(t *testing.T) {
 
 func TestCopyDir(t *testing.T) {
 	workingDir, err := os.Getwd()
-	if err != nil {
-		logger.Log.Panicf("Failed to get working directory, error: %s", err)
+	if !assert.NoError(t, err) {
+		return
 	}
 	testDir := filepath.Join(workingDir, "testdata")
 
@@ -139,7 +139,7 @@ func TestCopyDir(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Adding test files into src directory
-	err = CreateTestFiles("testfile", src)
+	err = createTestFiles("testfile", src)
 	assert.NoError(t, err)
 
 	// Defining dst directory and child permissions
@@ -153,7 +153,7 @@ func TestCopyDir(t *testing.T) {
 	assert.NoError(t, err)
 
 	// verifying the directories are equal
-	equal, err := AreDirectoriesEqual(src, dst)
+	equal, err := areDirectoriesEqual(src, dst)
 	assert.NoError(t, err)
 	assert.True(t, equal)
 
@@ -162,7 +162,7 @@ func TestCopyDir(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func CreateTestFiles(filename string, outputDir string) error {
+func createTestFiles(filename string, outputDir string) error {
 	// Test data
 	testData := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
 
@@ -193,7 +193,7 @@ func CreateTestFiles(filename string, outputDir string) error {
 }
 
 // AreDirectoriesEqual checks if two directories are equal based on their files.
-func AreDirectoriesEqual(dir1, dir2 string) (bool, error) {
+func areDirectoriesEqual(dir1, dir2 string) (bool, error) {
 	files1, err := ListFiles(dir1)
 	if err != nil {
 		return false, err

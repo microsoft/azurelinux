@@ -19,6 +19,8 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
+const DEFAULT_FILE_PERMISSIONS = 0o755
+
 // IsDir check if a given file path is a directory.
 func IsDir(filePath string) (isDir bool, err error) {
 	info, err := os.Stat(filePath)
@@ -101,6 +103,9 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 		if err != nil {
 			return err
 		}
+		if !isDstDir {
+			return fmt.Errorf("destination exists but is not a directory (%s)", dst)
+		}
 		if isDstDir {
 			logger.Log.Infof("Destination (%s) already exists and is a directory", dst)
 			if mergedDirPermissions != nil {
@@ -120,7 +125,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 				return err
 			}
 		} else {
-			err = os.MkdirAll(dst, 0755)
+			err = os.MkdirAll(dst, DEFAULT_FILE_PERMISSIONS)
 			if err != nil {
 				return err
 			}
@@ -150,7 +155,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 					return err
 				}
 			} else {
-				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(0755).Run(); err != nil {
+				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(DEFAULT_FILE_PERMISSIONS).Run(); err != nil {
 					return err
 				}
 			}
