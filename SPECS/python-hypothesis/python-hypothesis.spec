@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/HypothesisWorks/hypothesis-python
-Source0:        https://files.pythonhosted.org/packages/24/05/d03211fc959ddf8c4a26d04957d9640a86a723f5d6a4359a4430cf5fa0b4/hypothesis-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/5a/30/eaf0f26a982bc3b9bdc701b6b289347275beb1ae50aea146cf443c32ce7c/hypothesis-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -48,7 +48,7 @@ and then generates simple and comprehensible examples that make your tests fail.
 
 %changelog
 * Thu Apr 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.100.1-1
-- Auto-upgrade to 6.100.1 - none
+- Auto-upgrade to 6.100.1
 
 * Tue Feb 15 2022 Nick Samson <nisamson@microsoft.com> - 6.36.2-1
 - Updated source URL, updated to 6.36.2
