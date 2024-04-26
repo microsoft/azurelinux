@@ -21,7 +21,7 @@ type DirConfig struct {
 	DestinationPath string `yaml:"destinationPath"`
 
 	// The permissions to set on all of the new directories being created on the target OS (including the top-level directory).
-	// Note: If this value is not specified in the config, the permissions for these directories will be set to 0777.
+	// Note: If this value is not specified in the config, the permissions for these directories will be set to 0755.
 	NewDirPermissions *FilePermissions `yaml:"newDirPermissions"`
 
 	// The permissions to set on the directories being copied that already do exist on the target OS (including the top-level directory).
@@ -29,7 +29,7 @@ type DirConfig struct {
 	MergedDirPermissions *FilePermissions `yaml:"mergedDirPermissions"`
 
 	// The permissions to set on the children file of the directory.
-	// Note: If this value is not specified in the config, the permissions for these directories will be set to 0777.
+	// Note: If this value is not specified in the config, the permissions for these directories will be set to 0755.
 	ChildFilePermissions *FilePermissions `yaml:"childFilePermissions"`
 }
 

@@ -102,7 +102,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 			return err
 		}
 		if isDstDir {
-			logger.Log.Infof("destination (%s) already exists and is a directory", dst)
+			logger.Log.Infof("Destination (%s) already exists and is a directory", dst)
 			if mergedDirPermissions != nil {
 				if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
 					return fmt.Errorf("error setting file permissions: %w", err)
@@ -112,7 +112,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 	}
 
 	if !isDstExist {
-		logger.Log.Infof("creating destination directory on chroot (%s)", dst)
+		logger.Log.Infof("Creating destination directory on chroot (%s)", dst)
 		// Create dst dir
 		if newDirPermissions != nil {
 			err = os.MkdirAll(dst, *newDirPermissions)
@@ -120,7 +120,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 				return err
 			}
 		} else {
-			err = os.MkdirAll(dst, 0777)
+			err = os.MkdirAll(dst, 0755)
 			if err != nil {
 				return err
 			}
@@ -150,7 +150,7 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 					return err
 				}
 			} else {
-				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(0777).Run(); err != nil {
+				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(0755).Run(); err != nil {
 					return err
 				}
 			}
