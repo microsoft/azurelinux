@@ -22673,8 +22673,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "21.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-21.3.0.tar.gz"
+          "version": "22.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-22.10.0.tar.gz"
         }
       }
     },
