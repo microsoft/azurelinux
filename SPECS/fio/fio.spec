@@ -1,7 +1,7 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
-Version:        3.30
-Release:        3%{?dist}
+Version:        3.37
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -173,6 +173,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %{_libdir}/fio/fio-rdma.so
 
 %changelog
+* Wed Apr 17 2024 Muhammad Falak <mwani@microsoft.com> - 3.37-1
+- Bump version to 3.37
+
 * Mon Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
 - Remove engine-pmemblk subpackage and BR on libpmemblk-devel
 
