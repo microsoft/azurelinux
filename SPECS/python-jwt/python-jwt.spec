@@ -16,7 +16,7 @@ means of representing signed content using JSON data structures, including
 claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
-Name:           python-%{pkgname}
+Name:           python-jwt
 Version:        2.8.0
 Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
@@ -72,6 +72,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
 - Updating to 2.8.0-1 for 3.0
+- Using literal package name so auto-upgrader can do its thing
 
 * Fri Sep 30 2022 Saul Paredes <saulparedes@microsoft.com> - 2.4.0-2
 - Updating to 2.4.0-2 to fix CVE-2022-39227 (no patch, false positive confusion with python-jwt. Scanning tool to be updated).
