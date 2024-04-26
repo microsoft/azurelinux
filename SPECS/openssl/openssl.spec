@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.1.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -91,6 +91,9 @@ BuildRequires: perl(Test::More)
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+
+Recommends: SymCrypt
+Recommends: SymCrypt-OpenSSL
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -356,6 +359,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-9
+- Add recommends on SymCrypt and SymCrypt-OpenSSL
+
 * Tue Apr 23 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-8
 - Add FIPS_mode patch back for compatibility
 
