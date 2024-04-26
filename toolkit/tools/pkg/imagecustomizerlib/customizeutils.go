@@ -214,10 +214,17 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
 	for _, dirConfigElement := range additionalDirs {
 		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
-
 		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
 
-		err := imageChroot.AddDirs(absSourceDir, dirConfigElement.DestinationPath, fs.FileMode(*dirConfigElement.Permissions), fs.FileMode(*dirConfigElement.ChildPermissions))
+		dirToCopy := safechroot.DirToCopy{
+			Src:                  absSourceDir,
+			Dest:                 dirConfigElement.DestinationPath,
+			NewDirPermissions:    (*fs.FileMode)(dirConfigElement.NewDirPermissions),
+			MergedDirPermissions: (*fs.FileMode)(dirConfigElement.MergedDirPermissions),
+			ChildFilePermissions: (*fs.FileMode)(dirConfigElement.ChildFilePermissions),
+		}
+
+		err := imageChroot.AddDirs(dirToCopy)
 		if err != nil {
 			return err
 		}

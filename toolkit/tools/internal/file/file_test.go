@@ -143,12 +143,13 @@ func TestCopyDir(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Defining dst directory and child permissions
-	dstPermissions := fs.FileMode(0700)
-	childPermissions := fs.FileMode(0755)
+	newDirPermissions := fs.FileMode(0755)
+	mergeDirPermissions := fs.FileMode(0755)
+	childFilePermissions := fs.FileMode(0755)
 
 	// Defining dst directory and copying src into dst
 	dst := testDir + "/destination"
-	err = CopyDir(src, dst, dstPermissions, childPermissions)
+	err = CopyDir(src, dst, &newDirPermissions, &mergeDirPermissions, &childFilePermissions)
 	assert.NoError(t, err)
 
 	// verifying the directories are equal

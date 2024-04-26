@@ -91,7 +91,7 @@ func Copy(src, dst string) (err error) {
 
 // CopyDir copies src directory to dst, creating the dst directory if needed.
 // dst is assumed to be a directory and not a file.
-func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err error) {
+func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFilePermissions *fs.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -103,23 +103,28 @@ func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err
 		}
 		if isDstDir {
 			logger.Log.Infof("destination (%s) already exists and is a directory", dst)
-			// Get dst dir info
-			dirInfo, err := os.Stat(dst)
-			if err != nil {
-				return fmt.Errorf("error getting dir info: %w", err)
+			if mergedDirPermissions != nil {
+				if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
+					return fmt.Errorf("error setting file permissions: %w", err)
+				}
 			}
-			// Set dirPermissions to the that of the exiting dst dir
-			dirPermissions = dirInfo.Mode().Perm()
 		}
 	}
 
 	if !isDstExist {
+		logger.Log.Infof("creating destination directory on chroot (%s)", dst)
 		// Create dst dir
-		err = os.MkdirAll(dst, dirPermissions)
-		if err != nil {
-			return err
+		if newDirPermissions != nil {
+			err = os.MkdirAll(dst, *newDirPermissions)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = os.MkdirAll(dst, 0777)
+			if err != nil {
+				return err
+			}
 		}
-
 	}
 
 	// Open the source directory
@@ -135,13 +140,19 @@ func CopyDir(src, dst string, dirPermissions, childPermissions fs.FileMode) (err
 
 		if entry.IsDir() {
 			// If it's a directory, recursively copy it
-			if err := CopyDir(srcPath, dstPath, childPermissions, childPermissions); err != nil {
+			if err := CopyDir(srcPath, dstPath, newDirPermissions, mergedDirPermissions, childFilePermissions); err != nil {
 				return err
 			}
 		} else {
 			// If it's a file, copy it and set file permissions
-			if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(childPermissions).Run(); err != nil {
-				return err
+			if childFilePermissions != nil {
+				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(*childFilePermissions).Run(); err != nil {
+					return err
+				}
+			} else {
+				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(0777).Run(); err != nil {
+					return err
+				}
 			}
 		}
 	}
