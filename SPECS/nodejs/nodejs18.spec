@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 9.8.1
+%define npm_version 10.5.0
 
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs18
