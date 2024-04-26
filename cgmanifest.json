@@ -22363,8 +22363,8 @@
         "type": "other",
         "other": {
           "name": "python-filelock",
-          "version": "3.0.12",
-          "downloadUrl": "https://github.com/benediktschmitt/py-filelock/archive/v3.0.12/py-filelock-3.0.12.tar.gz"
+          "version": "3.13.4",
+          "downloadUrl": "https://github.com/benediktschmitt/py-filelock/archive/v3.13.4/py-filelock-3.13.4.tar.gz"
         }
       }
     },

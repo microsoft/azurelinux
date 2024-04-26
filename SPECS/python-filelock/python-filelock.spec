@@ -1,8 +1,8 @@
 %global srcname filelock
 Summary:        A platform independent file lock
 Name:           python-%{srcname}
-Version:        3.0.12
-Release:        13%{?dist}
+Version:        3.13.4
+Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,6 +71,9 @@ python%{python3_version} test.py
 %{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
+* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.13.4-1
+- Upgrading version for 3.0
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
 - Updating source URL.
 
