@@ -47,8 +47,7 @@ ExclusiveArch: x86_64
 %define silent --silent
  
 %global softfloat_version 20180726-gitb64af41
-%define cross %{defined fedora}
-%define disable_werror %{defined fedora}
+%define disable_werror 1
 
 
 Name:       edk2
@@ -224,7 +223,6 @@ environment for the UEFI and PI specifications. This package contains sample
 64-bit UEFI firmware builds for QEMU and KVM.
 
 
-%if %{defined fedora}
 %package ovmf-ia32
 Summary:        Open Virtual Machine Firmware
 License:        Apache-2.0 AND BSD-2-Clause-Patent AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
@@ -290,8 +288,6 @@ BuildArch:      noarch
 This package provides tools that are needed to build EFI executables
 and ROMs using the GNU tools.  You do not need to install this package;
 you probably want to install edk2-tools only.
-# endif fedora
-%endif
 
 
 
@@ -504,14 +500,12 @@ install -m 0644 \
         60-edk2-ovmf-x64-amdsev.json \
         60-edk2-ovmf-x64-inteltdx.json \
         %{buildroot}%{_datadir}/qemu/firmware
-%if %{defined fedora}
 install -m 0644 \
         50-edk2-ovmf-x64-microvm.json \
         30-edk2-ovmf-ia32-sb-enrolled.json \
         40-edk2-ovmf-ia32-sb.json \
         50-edk2-ovmf-ia32-nosb.json \
         %{buildroot}%{_datadir}/qemu/firmware
-%endif
 
 # endif build_ovmf
 %endif
@@ -526,10 +520,8 @@ ln -s ../%{name}/aarch64/QEMU_EFI-silent-pflash.raw \
   %{buildroot}%{_datadir}/AAVMF/AAVMF_CODE.fd
 ln -s ../%{name}/aarch64/vars-template-pflash.raw \
   %{buildroot}%{_datadir}/AAVMF/AAVMF_VARS.fd
-%if %{defined fedora}
 ln -s ../%{name}/arm/QEMU_EFI-pflash.raw \
    %{buildroot}%{_datadir}/AAVMF/AAVMF32_CODE.fd
-%endif
 
 # json description files
 install -m 0644 \
@@ -544,7 +536,6 @@ install -m 0644 \
 # endif build_aarch64
 %endif
 
-%if %{defined fedora}
 
 # edk2-tools-python install
 cp -R BaseTools/Source/Python %{buildroot}%{_datadir}/%{name}/Python
@@ -605,7 +596,6 @@ done
 %{_datadir}/qemu/firmware/51-edk2-ovmf-2m-raw-x64-nosb.json
 %{_datadir}/qemu/firmware/60-edk2-ovmf-x64-amdsev.json
 %{_datadir}/qemu/firmware/60-edk2-ovmf-x64-inteltdx.json
-%if %{defined fedora}
 %{_datadir}/%{name}/ovmf/MICROVM.fd
 %{_datadir}/qemu/firmware/50-edk2-ovmf-x64-microvm.json
 %{_datadir}/%{name}/ovmf/OVMF_CODE_4M.qcow2
@@ -613,7 +603,6 @@ done
 %{_datadir}/%{name}/ovmf/OVMF_VARS_4M.qcow2
 %{_datadir}/%{name}/ovmf/OVMF_VARS_4M.secboot.qcow2
 %{_datadir}/%{name}/ovmf/*.pcr
-%endif
 # endif build_ovmf
 %endif
 
@@ -631,10 +620,8 @@ done
 %{_datadir}/%{name}/aarch64/QEMU_EFI.fd
 %{_datadir}/%{name}/aarch64/QEMU_EFI.silent.fd
 %{_datadir}/%{name}/aarch64/QEMU_VARS.fd
-%if %{defined fedora}
 %{_datadir}/%{name}/aarch64/BL32_AP_MM.fd
 %{_datadir}/%{name}/aarch64/QEMU_EFI.kernel.fd
-%endif
 %{_datadir}/qemu/firmware/50-edk2-aarch64-qcow2.json
 %{_datadir}/qemu/firmware/51-edk2-aarch64-raw.json
 %{_datadir}/qemu/firmware/52-edk2-aarch64-verbose-qcow2.json
@@ -666,7 +653,6 @@ done
 %doc BaseTools/UserManuals/*.rtf
 
 
-%if %{defined fedora}
 %if %{build_ovmf}
 %files ovmf-ia32
 %common_files
@@ -698,6 +684,7 @@ done
 %{_datadir}/%{name}/xen/*.fd
 %endif
 
+%if %{with arm}
 %files arm
 %common_files
 %dir %{_datadir}/AAVMF/
@@ -708,12 +695,15 @@ done
 %{_datadir}/%{name}/arm/QEMU_VARS.fd
 %{_datadir}/%{name}/arm/vars-template-pflash.raw
 %{_datadir}/qemu/firmware/50-edk2-arm-verbose.json
+%endif
 
+%if %{build_riscv64}
 %files riscv64
 %common_files
 %{_datadir}/%{name}/riscv/*.fd
 %{_datadir}/%{name}/riscv/*.qcow2
 %{_datadir}/qemu/firmware/50-edk2-riscv-qcow2.json
+%endif
 
 %files ext4
 %common_files
@@ -734,9 +724,6 @@ done
 %{_bindir}/UPT
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
-
-# endif fedora
-%endif
 
 
 %changelog
