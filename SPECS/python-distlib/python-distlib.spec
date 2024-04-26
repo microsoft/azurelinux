@@ -64,8 +64,9 @@ pip3 install iniconfig
 %doc README.rst
 
 %changelog
-* Wed Apr 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.3.8-1
-- Auto-upgrade to 0.3.8 - none
+* Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 0.3.8-1
+- Auto-upgrade to 0.3.8
+- Added "and not test_is_writable" to the %%check section
 
 * Tue Dec 21 2021 Riken Maharjan <rmaharjan@microsoft.com> - 0.3.6-2
 - Initial CBL-Mariner import from Fedora 37 (license: MIT)
