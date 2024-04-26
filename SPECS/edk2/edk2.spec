@@ -551,7 +551,6 @@ done
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
 
-%endif
 
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
