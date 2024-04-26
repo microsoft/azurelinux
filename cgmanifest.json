@@ -22163,8 +22163,8 @@
         "type": "other",
         "other": {
           "name": "python-distlib",
-          "version": "0.3.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.6.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.8.tar.gz"
         }
       }
     },
