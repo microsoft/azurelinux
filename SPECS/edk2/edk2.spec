@@ -241,6 +241,7 @@ BuildArch:      noarch
 EFI Development Kit II
 Open Virtual Machine Firmware (Xen build)
 
+%if %{with experimental}
 %package experimental
 Summary:        Open Virtual Machine Firmware, experimental builds
 License:        Apache-2.0 AND BSD-2-Clause-Patent AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
@@ -250,6 +251,7 @@ BuildArch:      noarch
 %description experimental
 EFI Development Kit II
 Open Virtual Machine Firmware (experimental builds)
+%endif
 
 %package arm
 Summary:        ARM Virtual Machine Firmware
@@ -398,7 +400,7 @@ build_iso Fedora/ovmf-ia32
 cp DBXUpdate-%{DBXDATE}.x64.bin Fedora/ovmf
 cp DBXUpdate-%{DBXDATE}.ia32.bin Fedora/ovmf-ia32
 
-for raw in */{ovmf,experimental}/*_4M*.fd; do
+for raw in */ovmf/*_4M*.fd; do
     qcow2="${raw%.fd}.qcow2"
     qemu-img convert -f raw -O qcow2 -o cluster_size=4096 -S 4096 "$raw" "$qcow2"
     rm -f "$raw"
@@ -668,6 +670,7 @@ done
 %{_datadir}/qemu/firmware/40-edk2-ovmf-ia32-sb.json
 %{_datadir}/qemu/firmware/50-edk2-ovmf-ia32-nosb.json
 
+%if %{with experimental}
 %files experimental
 %common_files
 %doc README.experimental
@@ -676,6 +679,7 @@ done
 %{_datadir}/%{name}/experimental/*.raw
 %{_datadir}/%{name}/experimental/*.qcow2
 %{_datadir}/%{name}/experimental/*.pcr
+%endif
 
 %files ovmf-xen
 %common_files
