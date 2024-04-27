@@ -14,10 +14,10 @@ import (
 type DirConfigList []DirConfig
 
 type DirConfig struct {
-	// The path in the target OS that the directory will be copied to.
+	// The absolute path to the source directory that will be copied.
 	SourcePath string `yaml:"sourcePath"`
 
-	// The path in the target OS that the directory will be copied to.
+	// The absolute path in the target OS that the directory will be copied to.
 	DestinationPath string `yaml:"destinationPath"`
 
 	// The permissions to set on all of the new directories being created on the target OS (including the top-level directory).

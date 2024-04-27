@@ -24,6 +24,8 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 4. Update hostname. ([hostname](#hostname-string))
 
 5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
+  
+5. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
 
 6. Add/update users. ([users](#users-user))
 
@@ -31,40 +33,40 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 8. Configure kernel modules. ([modules](#modules-module))
 
-9. Write the `/etc/mariner-customizer-release` file.
+10. Write the `/etc/mariner-customizer-release` file.
 
-10. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
     If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
-11. Update the SELinux mode.
+12. Update the SELinux mode.
 
-12. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
+13. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
     and update the grub config.
 
-13. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
+14. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
     and update the grub config.
 
-14. Regenerate the initramfs file (if needed).
+15. Regenerate the initramfs file (if needed).
 
-15. Run ([postCustomization](#postcustomization-script)) scripts.
+16. Run ([postCustomization](#postcustomization-script)) scripts.
 
-16. If SELinux is enabled, call `setfiles`.
+17. If SELinux is enabled, call `setfiles`.
 
-17. Delete `/etc/resolv.conf` file.
+18. Delete `/etc/resolv.conf` file.
 
-18. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
+19. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
 
-19. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
+20. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
     the file systems.
 
-20. If ([verity](#verity-type)) is specified, then create the hash tree and update the
+21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
     grub config.
 
-21. if the output format is set to `iso`, copy additional iso media files.
+22. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -97,90 +99,99 @@ os:
 
 ## Schema Overview
 
-- [config type](#config-type)
-  - [storage](#storage-storage)
-    - [bootType](#boottype-string)
-    - [disks](#disks-disk)
-      - [disk type](#disk-type)
-        - [partitionTableType](#partitiontabletype-string)
-        - [maxSize](#maxsize-uint64)
-        - [partitions](#partitions-partition)
-          - [partition type](#partition-type)
-            - [id](#id-string)
-            - [label](#label-string)
-            - [start](#start-uint64)
-            - [end](#end-uint64)
-            - [size](#size-uint64)
-            - [type](#partition-type-string)
-    - [fileSystems](#filesystems-filesystem)
-      - [fileSystem type](#filesystem-type)
-        - [deviceId](#deviceid-string)
-        - [type](#type-string)
-        - [mountPoint](#mountpoint-mountpoint)
-          - [mountPoint type](#mountpoint-type)
-            - [idType](#idtype-string)
-            - [options](#options-string)
-            - [path](#mountpoint-path)
-  - [iso](#iso-type)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
-        - [permissions](#permissions-string)
-    - [kernelCommandLine](#kernelcommandline-type)
-      - [extraCommandLine](#extracommandline-string)
-  - [os type](#os-type)
-    - [resetBootLoaderType](#resetbootloadertype-string)
-    - [hostname](#hostname-string)
-    - [kernelCommandLine](#kernelcommandline-type)
-      - [extraCommandLine](#extracommandline-string)
-    - [packages](#packages-packages)
-      - [packages type](#packages-type)
-        - [updateExistingPackages](#updateexistingpackages-bool)
-        - [installLists](#installlists-string)
-          - [packageList type](#packagelist-type)
-            - [packages](#packages-string)
-        - [install](#install-string)
-        - [removeLists](#removelists-string)
-          - [packageList type](#packagelist-type)
-            - [packages](#packages-string)
-        - [remove](#remove-string)
-        - [updateLists](#updatelists-string)
-        - [update](#update-string)
-    - [additionalFiles](#additionalfiles-mapstring-fileconfig)
-      - [fileConfig type](#fileconfig-type)
-        - [path](#fileconfig-path)
-        - [permissions](#permissions-string)
-    - [users](#users-user)
-      - [user type](#user-type)
-        - [name](#user-name)
-        - [uid](#uid-int)
-        - [passwordHashed](#passwordhashed-bool)
-        - [password](#password-string)
-        - [passwordPath](#passwordpath-string)
-        - [passwordExpiresDays](#passwordexpiresdays-int)
-        - [sshPublicKeyPaths](#sshpublickeypaths-string)
-        - [primaryGroup](#primarygroup-string)
-        - [secondaryGroups](#secondarygroups-string)
-        - [startupCommand](#startupcommand-string)
-    - [services](#services-type)
-      - [enable](#enable-string)
-      - [disable](#disable-string)
-    - [modules](#modules-module)
-      - [module type](#module-type)
-        - [name](#module-name)
-        - [loadMode](#loadmode-string)
-        - [options](#options-mapstring-string)
-    - [overlay type](#overlay-type)
-    - [verity type](#verity-type)
+- [Azure Linux Image Customizer configuration](#azure-linux-image-customizer-configuration)
+    - [Operation ordering](#operation-ordering)
+    - [/etc/resolv.conf](#etcresolvconf)
+    - [Replacing packages](#replacing-packages)
+  - [Schema Overview](#schema-overview)
+  - [Top-level](#top-level)
+  - [config type](#config-type)
+    - [storage \[storage\]](#storage-storage)
+    - [os \[os\]](#os-os)
+  - [disk type](#disk-type)
+    - [partitionTableType \[string\]](#partitiontabletype-string)
+    - [maxSize \[uint64\]](#maxsize-uint64)
+    - [partitions \[partition\[\]\]](#partitions-partition)
+  - [iso type](#iso-type)
+    - [kernelExtraCommandLine \[string\]](#kernelextracommandline-string)
+    - [additionalFiles](#additionalfiles)
+  - [overlay type](#overlay-type)
+  - [verity type](#verity-type)
+  - [fileConfig type](#fileconfig-type)
+    - [path \[string\]](#path-string)
+    - [permissions \[string\]](#permissions-string)
+  - [dirConfig type](#dirconfig-type)
+    - [sourcePath \[string\]](#sourcepath-string)
+    - [destinationPath \[string\]](#destinationpath-string)
+    - [newDirPermissions \[string\]](#newdirpermissions-string)
+    - [mergedDirPermissions \[string\]](#mergeddirpermissions-string)
+    - [childFilePermissions \[string\]](#childfilepermissions-string)
+  - [fileSystem type](#filesystem-type)
+    - [deviceId \[string\]](#deviceid-string)
+    - [type \[string\]](#type-string)
+    - [mountPoint \[mountPoint\]](#mountpoint-mountpoint)
+  - [kernelCommandLine type](#kernelcommandline-type)
+    - [extraCommandLine \[string\]](#extracommandline-string)
+    - [selinuxMode](#selinuxmode)
+  - [module type](#module-type)
+    - [name \[string\]](#name-string)
+    - [loadMode \[string\]](#loadmode-string)
+    - [options \[map\<string, string\>\]](#options-mapstring-string)
+  - [packageList type](#packagelist-type)
+    - [packages \[string\[\]\]](#packages-string)
+  - [packages type](#packages-type)
+    - [updateExistingPackages \[bool\]](#updateexistingpackages-bool)
+    - [installLists \[string\[\]\]](#installlists-string)
+    - [install \[string\[\]\]](#install-string)
+    - [removeLists \[string\[\]\]](#removelists-string)
+    - [remove \[string\[\]\]](#remove-string)
+    - [updateLists \[string\[\]\]](#updatelists-string)
+    - [update \[string\[\]\]](#update-string)
+  - [partition type](#partition-type)
+    - [id \[string\]](#id-string)
+    - [label \[string\]](#label-string)
+    - [start \[uint64\]](#start-uint64)
+    - [end \[uint64\]](#end-uint64)
+    - [size \[uint64\]](#size-uint64)
+    - [type \[string\]](#type-string-1)
+  - [mountPoint type](#mountpoint-type)
+    - [idType \[string\]](#idtype-string)
+    - [options \[string\]](#options-string)
+    - [path \[string\]](#path-string-1)
+  - [script type](#script-type)
+    - [path \[string\]](#path-string-2)
+    - [args \[string\]](#args-string)
   - [scripts type](#scripts-type)
-    - [postCustomization](#postcustomization-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
-    - [finalizeCustomization](#finalizecustomization-script)
-      - [script type](#script-type)
-        - [path](#script-path)
-        - [args](#args-string)
+    - [postCustomization \[script\[\]\]](#postcustomization-script)
+    - [finalizeCustomization \[script\[\]\]](#finalizecustomization-script)
+  - [services type](#services-type)
+    - [enable \[string\[\]\]](#enable-string)
+    - [disable \[string\[\]\]](#disable-string)
+  - [os type](#os-type)
+    - [resetBootLoaderType \[string\]](#resetbootloadertype-string)
+    - [hostname \[string\]](#hostname-string)
+    - [kernelCommandLine \[kernelCommandLine\]](#kernelcommandline-kernelcommandline)
+    - [packages packages](#packages-packages)
+    - [additionalFiles \[map\<string, fileConfig\[\]\>\]](#additionalfiles-mapstring-fileconfig)
+    - [additionalDirs \[dirConfig\[\]\]](#additionaldirs-dirconfig)
+    - [users \[user\]](#users-user)
+    - [modules \[module\[\]\]](#modules-module)
+    - [services \[services\]](#services-services)
+  - [user type](#user-type)
+    - [name \[string\]](#name-string-1)
+    - [uid \[int\]](#uid-int)
+    - [passwordHashed \[bool\]](#passwordhashed-bool)
+    - [password \[string\]](#password-string)
+    - [passwordPath \[string\]](#passwordpath-string)
+    - [PasswordExpiresDays \[int\]](#passwordexpiresdays-int)
+    - [sshPublicKeyPaths \[string\[\]\]](#sshpublickeypaths-string)
+    - [primaryGroup \[string\]](#primarygroup-string)
+    - [secondaryGroups \[string\[\]\]](#secondarygroups-string)
+    - [startupCommand \[string\]](#startupcommand-string)
+  - [storage type](#storage-type)
+    - [bootType \[string\]](#boottype-string)
+    - [disks \[disk\[\]\]](#disks-disk)
+    - [fileSystems \[fileSystem\[\]\]](#filesystems-filesystem)
 
 ## Top-level
 
@@ -407,6 +418,59 @@ os:
     files/a.txt:
     - path: /a.txt
       permissions: "664"
+```
+
+## dirConfig type
+
+Specifies options for placing a directory in the OS.
+
+Type is used by: [additionalDirs](#additionaldirs-dirconfig)
+
+<div id="dirconfig-path"></div>
+
+### sourcePath [string]
+
+The absolute path to the source directory that will be copied.
+
+### destinationPath [string]
+
+The absolute path in the target OS that the source directory will be copied to.
+
+Example:
+
+```yaml
+os:
+  additionalDirs:
+    - sourcePath: "home/files/targetDir"
+      destinationPath: "usr/project/targetDir"
+```
+
+### newDirPermissions [string]
+
+The permissions to set on all of the new directories being created on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
+
+### mergedDirPermissions [string]
+
+The permissions to set on the directories being copied that already do exist on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for this field will be the same as that of the pre-existing directory.
+
+### childFilePermissions [string]
+
+The permissions to set on the children file of the directory. **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
+
+Supported formats for permission values:
+
+- String containing an octal string. e.g. `"664"`
+
+Example:
+
+```yaml
+os:
+  additionalFiles:
+    - sourcePath: "home/files/targetDir"
+      destinationPath: "usr/project/targetDir"
+      newDirPermissions: 0644
+      mergedDirPermissions: 0777
+      childFilePermissions: 0644
 ```
 
 ## fileSystem type
@@ -994,6 +1058,28 @@ os:
     - /c1.txt
     - path: /c2.txt
       permissions: "664"
+```
+
+### additionalDirs [[dirConfig](#dirconfig-type)[]]
+
+Copy directories into the OS image.
+
+This property is a list of [dirConfig](#dirconfig-type) objects.
+
+Example:
+
+```yaml
+os:
+  additionalDirs:
+    # Copying directory with default permission options.
+    - sourcePath: "path/to/local/directory/"
+      destinationPath: "/path/to/destination/directory/"
+    # Copying directory with specific permission options.
+    - sourcePath: "path/to/local/directory/"
+      destinationPath: "/path/to/destination/directory/"
+      newDirPermissions: 0644
+      mergedDirPermissions: 0777
+      childFilePermissions: 0644
 ```
 
 ### users [[user](#user-type)]
