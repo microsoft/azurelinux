@@ -19,8 +19,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
-const DEFAULT_FILE_PERMISSIONS = 0o755
-
 // IsDir check if a given file path is a directory.
 func IsDir(filePath string) (isDir bool, err error) {
 	info, err := os.Stat(filePath)
@@ -93,7 +91,7 @@ func Copy(src, dst string) (err error) {
 
 // CopyDir copies src directory to dst, creating the dst directory if needed.
 // dst is assumed to be a directory and not a file.
-func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFilePermissions *fs.FileMode) (err error) {
+func CopyDir(src, dst string, newDirPermissions, childFilePermissions fs.FileMode, mergedDirPermissions *fs.FileMode) (err error) {
 	isDstExist, err := PathExists(dst)
 	if err != nil {
 		return err
@@ -106,12 +104,10 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 		if !isDstDir {
 			return fmt.Errorf("destination exists but is not a directory (%s)", dst)
 		}
-		if isDstDir {
-			logger.Log.Infof("Destination (%s) already exists and is a directory", dst)
-			if mergedDirPermissions != nil {
-				if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
-					return fmt.Errorf("error setting file permissions: %w", err)
-				}
+		logger.Log.Infof("Destination (%s) already exists and is a directory", dst)
+		if mergedDirPermissions != nil {
+			if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
+				return fmt.Errorf("error setting file permissions: %w", err)
 			}
 		}
 	}
@@ -119,17 +115,11 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 	if !isDstExist {
 		logger.Log.Infof("Creating destination directory on chroot (%s)", dst)
 		// Create dst dir
-		if newDirPermissions != nil {
-			err = os.MkdirAll(dst, *newDirPermissions)
-			if err != nil {
-				return err
-			}
-		} else {
-			err = os.MkdirAll(dst, DEFAULT_FILE_PERMISSIONS)
-			if err != nil {
-				return err
-			}
+		err = os.MkdirAll(dst, newDirPermissions)
+		if err != nil {
+			return err
 		}
+
 	}
 
 	// Open the source directory
@@ -145,19 +135,13 @@ func CopyDir(src, dst string, newDirPermissions, mergedDirPermissions, childFile
 
 		if entry.IsDir() {
 			// If it's a directory, recursively copy it
-			if err := CopyDir(srcPath, dstPath, newDirPermissions, mergedDirPermissions, childFilePermissions); err != nil {
+			if err := CopyDir(srcPath, dstPath, newDirPermissions, childFilePermissions, mergedDirPermissions); err != nil {
 				return err
 			}
 		} else {
 			// If it's a file, copy it and set file permissions
-			if childFilePermissions != nil {
-				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(*childFilePermissions).Run(); err != nil {
-					return err
-				}
-			} else {
-				if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(DEFAULT_FILE_PERMISSIONS).Run(); err != nil {
-					return err
-				}
+			if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(childFilePermissions).Run(); err != nil {
+				return err
 			}
 		}
 	}

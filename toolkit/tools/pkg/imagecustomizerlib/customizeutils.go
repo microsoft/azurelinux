@@ -26,6 +26,7 @@ import (
 const (
 	configDirMountPathInChroot = "/_imageconfigs"
 	resolveConfPath            = "/etc/resolv.conf"
+	DEFAULT_FILE_PERMISSIONS   = 0o755
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -212,25 +213,37 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 }
 
 func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
+	var (
+		newDirPermissionsValue    fs.FileMode
+		childFilePermissionsValue fs.FileMode
+	)
 	for _, dirConfigElement := range additionalDirs {
 		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
 		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
 
+		if dirConfigElement.NewDirPermissions == nil {
+			newDirPermissionsValue = DEFAULT_FILE_PERMISSIONS
+		} else {
+			newDirPermissionsValue = *(*fs.FileMode)(dirConfigElement.NewDirPermissions)
+		}
+		if dirConfigElement.ChildFilePermissions == nil {
+			childFilePermissionsValue = DEFAULT_FILE_PERMISSIONS
+		} else {
+			childFilePermissionsValue = *(*fs.FileMode)(dirConfigElement.ChildFilePermissions)
+		}
+		
 		dirToCopy := safechroot.DirToCopy{
 			Src:                  absSourceDir,
 			Dest:                 dirConfigElement.DestinationPath,
-			NewDirPermissions:    (*fs.FileMode)(dirConfigElement.NewDirPermissions),
+			NewDirPermissions:    newDirPermissionsValue,
+			ChildFilePermissions: childFilePermissionsValue,
 			MergedDirPermissions: (*fs.FileMode)(dirConfigElement.MergedDirPermissions),
-			ChildFilePermissions: (*fs.FileMode)(dirConfigElement.ChildFilePermissions),
 		}
-
 		err := imageChroot.AddDirs(dirToCopy)
 		if err != nil {
 			return err
 		}
-
 	}
-
 	return nil
 }
 

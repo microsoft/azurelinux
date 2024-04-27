@@ -149,7 +149,7 @@ func TestCopyDir(t *testing.T) {
 
 	// Defining dst directory and copying src into dst
 	dst := testDir + "/destination"
-	err = CopyDir(src, dst, &newDirPermissions, &mergeDirPermissions, &childFilePermissions)
+	err = CopyDir(src, dst, newDirPermissions, childFilePermissions, &mergeDirPermissions)
 	assert.NoError(t, err)
 
 	// verifying the directories are equal
