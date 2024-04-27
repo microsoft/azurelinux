@@ -221,6 +221,7 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
 		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
 
+		// Setting permissions values. They are set to a default value if they have not been specified.
 		if dirConfigElement.NewDirPermissions == nil {
 			newDirPermissionsValue = DEFAULT_FILE_PERMISSIONS
 		} else {
