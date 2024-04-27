@@ -123,9 +123,9 @@ os:
   - [dirConfig type](#dirconfig-type)
     - [sourcePath \[string\]](#sourcepath-string)
     - [destinationPath \[string\]](#destinationpath-string)
-    - [newDirPermissions \[string\]](#newdirpermissions-string)
-    - [mergedDirPermissions \[string\]](#mergeddirpermissions-string)
-    - [childFilePermissions \[string\]](#childfilepermissions-string)
+    - [newDirPermissions \[int\]](#newdirpermissions-int)
+    - [mergedDirPermissions \[int\]](#mergeddirpermissions-int)
+    - [childFilePermissions \[int\]](#childfilepermissions-int)
   - [fileSystem type](#filesystem-type)
     - [deviceId \[string\]](#deviceid-string)
     - [type \[string\]](#type-string)
@@ -445,21 +445,21 @@ os:
       destinationPath: "usr/project/targetDir"
 ```
 
-### newDirPermissions [string]
+### newDirPermissions [int]
 
 The permissions to set on all of the new directories being created on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
 
-### mergedDirPermissions [string]
+### mergedDirPermissions [int]
 
 The permissions to set on the directories being copied that already do exist on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for this field will be the same as that of the pre-existing directory.
 
-### childFilePermissions [string]
+### childFilePermissions [int]
 
 The permissions to set on the children file of the directory. **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
 
 Supported formats for permission values:
 
-- String containing an octal string. e.g. `"664"`
+- Int containing an octal value. e.g. `664`
 
 Example:
 
