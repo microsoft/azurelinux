@@ -206,6 +206,8 @@ function initialization {
 
     ROOT_FOLDER="$(git rev-parse --show-toplevel)"
     EULA_FILE_PATH="$ROOT_FOLDER/.pipelines/container_artifacts/data"
+    END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
+    echo "END_OF_LIFE_1_YEAR                    -> $END_OF_LIFE_1_YEAR"
 }
 
 function build_builder_image {
@@ -306,16 +308,31 @@ function docker_build_marinara {
     save_container_image "$MARINARA" "$MARINARA_IMAGE_NAME"
 }
 
+function oras_attach {
+    local image_name=$1
+    oras attach \
+        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+        "$image_name"
+}
+
 function publish_to_acr {
     local image=$1
     if [[ ! "$PUBLISH_TO_ACR" =~ [Tt]rue ]]; then
         echo "+++ Skip publishing to ACR"
         return
     fi
+    
+    echo "+++ az login into Azure ACR $ACR"
+    local oras_access_token
+    oras_access_token=$(az acr login --name "$ACR" --expose-token --output tsv --query accessToken)
+    oras login "$ACR.azurecr.io" \
+        --username "00000000-0000-0000-0000-000000000000" \
+        --password "$oras_access_token"
+
     echo "+++ Publish container $image"
-    echo "login into ACR: $ACR"
-    az acr login --name "$ACR"
     docker image push "$image"
+    oras_attach "$image"
 }
 
 function save_container_image {
