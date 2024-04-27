@@ -231,7 +231,7 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 		} else {
 			childFilePermissionsValue = *(*fs.FileMode)(dirConfigElement.ChildFilePermissions)
 		}
-		
+
 		dirToCopy := safechroot.DirToCopy{
 			Src:                  absSourceDir,
 			Dest:                 dirConfigElement.DestinationPath,
