@@ -152,6 +152,14 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
+     - [additionalDirs](#additionaldirs-dirconfig)
+        - [dirConfig](#dirconfig-type)
+           - [sourcePath](#dirconfig-sourcePath)
+           - [destinationPath](#dirconfig-destinationPath)
+           - [newDirPermissions](#newDirPermissions-string)
+           - [mergedDirPermissions](#mergedDirPermissions-string)
+           - [childFilePermissions](#childFilePermissions-string)
+           - [sourcePath](#dirconfig-sourcePath)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
@@ -417,11 +425,13 @@ Specifies options for placing a directory in the OS.
 
 Type is used by: [additionalDirs](#additionaldirs-dirconfig)
 
-<div id="dirconfig-path"></div>
+<div id="dirconfig-sourcePath"></div>
 
 ### sourcePath [string]
 
 The absolute path to the source directory that will be copied.
+
+<div id="dirconfig-destinationPath"></div>
 
 ### destinationPath [string]
 
@@ -460,7 +470,7 @@ Example:
 
 ```yaml
 os:
-  additionalFiles:
+  additionalDirss:
     - sourcePath: "home/files/targetDir"
       destinationPath: "usr/project/targetDir"
       newDirPermissions: "644"
