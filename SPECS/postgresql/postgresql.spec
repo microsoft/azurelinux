@@ -102,7 +102,7 @@ ln -sf  pg_waldump %{buildroot}%{_bindir}/pg_xlogdump
 popd
 
 # Installing locale information
-find_lang_bins ()
+find_lang_bins()
 {
     lstfile="$1"
     rm -f "$lstfile"
@@ -232,7 +232,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %changelog
 * Mon Apr 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.1-2
-- Enabling locale information.
+- Enabling locale information. Used Fedora 39 spec (license: MIT) for guidance.
 
 * Wed Dec 20 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 16.1-1
 - Upgrade to 16.1
