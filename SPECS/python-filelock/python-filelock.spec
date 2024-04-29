@@ -42,7 +42,7 @@ The lock includes a lock counter and is thread safe. This means, when locking
 the same lock object twice, it will not block.
 
 %prep
-%autosetup -p1 -n py-%{srcname}-%{version}
+%autosetup -p1
 
 %build
 %py3_build
