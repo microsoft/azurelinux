@@ -104,7 +104,7 @@ func CopyDir(src, dst string, newDirPermissions, childFilePermissions fs.FileMod
 		if !isDstDir {
 			return fmt.Errorf("destination exists but is not a directory (%s)", dst)
 		}
-		logger.Log.Infof("Destination (%s) already exists and is a directory", dst)
+		logger.Log.Debugf("Destination (%s) already exists and is a directory", dst)
 		if mergedDirPermissions != nil {
 			if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
 				return fmt.Errorf("error setting file permissions: %w", err)

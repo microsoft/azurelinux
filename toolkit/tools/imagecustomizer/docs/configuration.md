@@ -25,13 +25,13 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 
 5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
   
-5. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
+6. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
 
-6. Add/update users. ([users](#users-user))
+7. Add/update users. ([users](#users-user))
 
-7. Enable/disable services. ([services](#services-type))
+8. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([modules](#modules-module))
+9. Configure kernel modules. ([modules](#modules-module))
 
 10. Write the `/etc/mariner-customizer-release` file.
 
@@ -123,9 +123,9 @@ os:
   - [dirConfig type](#dirconfig-type)
     - [sourcePath \[string\]](#sourcepath-string)
     - [destinationPath \[string\]](#destinationpath-string)
-    - [newDirPermissions \[int\]](#newdirpermissions-int)
-    - [mergedDirPermissions \[int\]](#mergeddirpermissions-int)
-    - [childFilePermissions \[int\]](#childfilepermissions-int)
+    - [newDirPermissions \[string\]](#newdirpermissions-string)
+    - [mergedDirPermissions \[string\]](#mergeddirpermissions-string)
+    - [childFilePermissions \[string\]](#childfilepermissions-string)
   - [fileSystem type](#filesystem-type)
     - [deviceId \[string\]](#deviceid-string)
     - [type \[string\]](#type-string)
@@ -445,17 +445,17 @@ os:
       destinationPath: "usr/project/targetDir"
 ```
 
-### newDirPermissions [int]
+### newDirPermissions [string]
 
-The permissions to set on all of the new directories being created on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
+The permissions to set on all of the new directories being created on the target OS (including the top-level directory). Default value: `755`.
 
-### mergedDirPermissions [int]
+### mergedDirPermissions [string]
 
 The permissions to set on the directories being copied that already do exist on the target OS (including the top-level directory). **Note:** If this value is not specified in the config, the permissions for this field will be the same as that of the pre-existing directory.
 
-### childFilePermissions [int]
+### childFilePermissions [string]
 
-The permissions to set on the children file of the directory. **Note:** If this value is not specified in the config, the permissions for these directories will be set to `0755`.
+The permissions to set on the children file of the directory. Default value: `755`.
 
 Supported formats for permission values:
 
@@ -468,9 +468,9 @@ os:
   additionalFiles:
     - sourcePath: "home/files/targetDir"
       destinationPath: "usr/project/targetDir"
-      newDirPermissions: 0644
-      mergedDirPermissions: 0777
-      childFilePermissions: 0644
+      newDirPermissions: "644"
+      mergedDirPermissions: "777"
+      childFilePermissions: "644"
 ```
 
 ## fileSystem type

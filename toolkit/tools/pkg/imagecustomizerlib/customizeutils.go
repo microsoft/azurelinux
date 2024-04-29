@@ -26,7 +26,7 @@ import (
 const (
 	configDirMountPathInChroot = "/_imageconfigs"
 	resolveConfPath            = "/etc/resolv.conf"
-	DEFAULT_FILE_PERMISSIONS   = 0o755
+	defaultFilePermissions     = 0o755
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -223,12 +223,12 @@ func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi
 
 		// Setting permissions values. They are set to a default value if they have not been specified.
 		if dirConfigElement.NewDirPermissions == nil {
-			newDirPermissionsValue = DEFAULT_FILE_PERMISSIONS
+			newDirPermissionsValue = defaultFilePermissions
 		} else {
 			newDirPermissionsValue = *(*fs.FileMode)(dirConfigElement.NewDirPermissions)
 		}
 		if dirConfigElement.ChildFilePermissions == nil {
-			childFilePermissionsValue = DEFAULT_FILE_PERMISSIONS
+			childFilePermissionsValue = defaultFilePermissions
 		} else {
 			childFilePermissionsValue = *(*fs.FileMode)(dirConfigElement.ChildFilePermissions)
 		}
