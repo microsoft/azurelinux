@@ -241,7 +241,6 @@ BuildArch:      noarch
 EFI Development Kit II
 Open Virtual Machine Firmware (Xen build)
 
-%if %{with experimental}
 %package experimental
 Summary:        Open Virtual Machine Firmware, experimental builds
 License:        Apache-2.0 AND BSD-2-Clause-Patent AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
@@ -251,7 +250,6 @@ BuildArch:      noarch
 %description experimental
 EFI Development Kit II
 Open Virtual Machine Firmware (experimental builds)
-%endif
 
 %package arm
 Summary:        ARM Virtual Machine Firmware
