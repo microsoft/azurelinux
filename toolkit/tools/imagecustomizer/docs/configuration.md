@@ -159,7 +159,6 @@ os:
            - [newDirPermissions](#newDirPermissions-string)
            - [mergedDirPermissions](#mergedDirPermissions-string)
            - [childFilePermissions](#childFilePermissions-string)
-           - [sourcePath](#dirconfig-sourcePath)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
