@@ -262,7 +262,7 @@
                     "title": "SELinux Mode",
                     "description": "Provides information about whether SELinux mode is enforcing or permissive"
                 },
-                "computer_architecture": {
+                "architecture": {
                     "$id": "#/properties/system_info/properties/architecture",
                     "type": "string",
                     "title": "Architecture",
