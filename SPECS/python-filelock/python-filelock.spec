@@ -44,34 +44,38 @@ the same lock object twice, it will not block.
 %prep
 %autosetup -p1 -n %{srcname}-%{version}
 
-%build
-%py3_build
+%generate_buildrequires
+%pyproject_buildrequires -r
 
-make -C docs html man SPHINXBUILD=sphinx-build
-rm docs/build/html/.buildinfo
+%build
+%pyproject_wheel
+
+pushd docs
+PYTHONPATH=../src sphinx-build ./ html --color -b html -d doctrees
+rm html/.buildinfo
+popd
 
 %install
-%py3_install
-
-install -p -m0644 -D docs/build/man/py-%{srcname}.1 %{buildroot}%{_mandir}/man1/py-%{srcname}.1
+%pyproject_install
+%pyproject_save_files -l %{srcname}
 
 %check
-python%{python3_version} test.py
+%if %{with tests}
+%pytest
+%else
+%pyproject_check_import
+%endif
 
 %files doc
 %license LICENSE
 %doc docs/build/html
 
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE
+%files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
-%{python3_sitelib}/%{srcname}.py
-%{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info
-%{python3_sitelib}/__pycache__/%{srcname}*.py[co]
-%{_mandir}/man1/py-%{srcname}.1.gz
 
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.13.4-1
+- Lot of redoing to use pyproject
 - Upgrading version for 3.0
 - Using literal package name so autoupgrader can do its thing.
 - Updating package folder name in %%autosetup
