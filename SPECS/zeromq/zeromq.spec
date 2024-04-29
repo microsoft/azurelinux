@@ -2,7 +2,7 @@ Summary:        library for fast, message-based applications
 Name:           zeromq
 Version:        4.3.5
 Release:        1%{?dist}
-License:        LGPLv3+
+License:        MPLv2.0 AND BSD-3-Clause AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          System Environment/Libraries
@@ -60,6 +60,7 @@ make check
 %changelog
 * Mon Apr 29 2023 Andrew Phelps <anphel@microsoft.com> - 4.3.5-1
 - Upgrade to version 4.3.5
+- Update license
 
 * Thu Jun 03 2021 Nick Samson <nisamson@microsoft.com> - 4.3.4-1
 - Upgraded to 4.3.4 to address CVE-2021-20236, updated URL
