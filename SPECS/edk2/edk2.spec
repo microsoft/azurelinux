@@ -673,7 +673,6 @@ done
 %doc README.experimental
 %dir %{_datadir}/%{name}/experimental
 %{_datadir}/%{name}/experimental/*.fd
-%endif
 
 %files ovmf-xen
 %common_files
