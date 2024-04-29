@@ -1,7 +1,9 @@
+%define majorversion %(echo %{version} | cut -d. -f1)
+
 Summary:        PostgreSQL database engine
 Name:           postgresql
 Version:        16.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +12,7 @@ URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
 
 # Common libraries needed
+BuildRequires:  gettext >= 0.10.35
 BuildRequires:  krb5-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  openldap
@@ -71,6 +74,8 @@ developing applications that use postgresql.
 %build
 sed -i '/DEFAULT_PGSOCKET_DIR/s@/tmp@/run/postgresql@' src/include/pg_config_manual.h &&
 ./configure \
+    --enable-locale \
+    --enable-nls \
     --enable-thread-safety \
     --prefix=%{_prefix} \
     --with-ldap \
@@ -86,7 +91,7 @@ cd contrib && make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
-cd contrib && make install DESTDIR=%{buildroot}
+pushd contrib && make install DESTDIR=%{buildroot}
 
 # For postgresql 10+, commands are renamed
 # Ref: https://wiki.postgresql.org/wiki/New_in_postgres_10
@@ -94,6 +99,59 @@ ln -sf pg_receivewal %{buildroot}%{_bindir}/pg_receivexlog
 ln -sf pg_resetwal %{buildroot}%{_bindir}/pg_resetxlog
 ln -sf  pg_waldump %{buildroot}%{_bindir}/pg_xlogdump
 %{_fixperms} %{buildroot}/*
+popd
+
+# Installing locale information
+find_lang_bins ()
+{
+    lstfile="$1"
+    rm -f "$lstfile"
+    shift
+    for binary; do
+        versioned_binary="$binary"-%{majorversion}
+        %find_lang "$versioned_binary"
+        cat "$versioned_binary".lang >> "$lstfile"
+    done
+}
+
+default_lang_bins=(
+    "initdb"
+    "pg_amcheck"
+    "pg_archivecleanup"
+    "pg_basebackup"
+    "pg_checksums"
+    "pg_controldata"
+    "pg_ctl"
+    "pg_resetwal"
+    "pg_rewind"
+    "pg_test_fsync"
+    "pg_test_timing"
+    "pg_upgrade"
+    "pg_verifybackup"
+    "pg_waldump"
+    "postgres"
+)
+find_lang_bins default.lst "${default_lang_bins[@]}"
+
+lib_lang_bins=(
+    "pg_dump"
+    "psql"
+)
+find_lang_bins lib.lst "${lib_lang_bins[@]}"
+
+manual_lib_lang_bins=(
+    "ecpg"
+    "ecpglib6"
+    "libpq5"
+    "pg_config"
+)
+for binary in "${manual_lib_lang_bins[@]}"; do
+    find %{buildroot}%{_datadir}/locale -name "${binary}*.mo" | sed 's|%{buildroot}||' >> lib.lst
+done
+
+# Removing locales for binaries we don't provide
+find %{buildroot}%{_datadir}/locale -name "pgscripts*.mo" -delete
+find %{buildroot}%{_datadir}/locale -name "plpgsql*.mo" -delete
 
 %check
 sed -i '2219s/",/  ; EXIT_STATUS=$? ; sleep 5 ; exit $EXIT_STATUS",/g'  src/test/regress/pg_regress.c
@@ -102,7 +160,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 
 %ldconfig_scriptlets
 
-%files
+%files -f default.lst
 %defattr(-,root,root)
 %license COPYRIGHT
 %{_bindir}/initdb
@@ -134,7 +192,7 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %exclude %{_datadir}/postgresql/pg_service.conf.sample
 %exclude %{_datadir}/postgresql/psqlrc.sample
 
-%files libs
+%files libs -f lib.lst
 %{_bindir}/clusterdb
 %{_bindir}/createdb
 %{_bindir}/createuser
@@ -173,6 +231,9 @@ sudo -u nobody -s /bin/bash -c "PATH=$PATH make -k check"
 %{_libdir}/libpgtypes.a
 
 %changelog
+* Mon Apr 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 16.1-2
+- Enabling locale information.
+
 * Wed Dec 20 2023 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 16.1-1
 - Upgrade to 16.1
 - Removing postmaster since it is deprecated in v15 (https://www.postgresql.org/docs/15/app-postmaster.html)
