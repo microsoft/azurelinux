@@ -98,6 +98,9 @@ mv %{pypi_name}-*.whl pyproject-wheeldir/
 * Thu Apr 25 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.16.2-1
 - Upgrade tensorboard to 2.16.2.
 
+* Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-4
+- Remove missing requirements `python3-tf-nightly` and `python3-tensorflow-estimator`
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 2.11.0-3
 - Relax version requirements
 
