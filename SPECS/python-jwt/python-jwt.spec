@@ -49,6 +49,9 @@ BuildRequires:  python3-atomicwrites
 %autosetup -n %{srcname}-%{version}
 rm -rf %{eggname}.egg-info
 
+%generate_buildrequires
+%pyproject_buildrequires -t
+
 %build
 %py3_build
 
