@@ -135,6 +135,10 @@ This package contains command-line tools that facilitate using the library.
 %{_bindir}/*
 
 %changelog
+* Fri Apr 16 2024 Henry Li <lihl@microsoft.com> - 1.14.4-1
+- Upgrade to version 1.14.4
+- Add external specification of package versioning to build
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13.5-4
 - Bump release to rebuild with go 1.20.10
 
