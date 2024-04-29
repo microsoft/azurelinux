@@ -50,7 +50,7 @@ cross-glibc package.
 
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
-%patch0 -p1
+%patch 0 -p1
 
 %build
 make mrproper
@@ -85,4 +85,5 @@ done
 
 %changelog
 * Sun Apr 28 2024 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.7.1-1
-- Initial build. First version
+- Initial Azure Linux import from Photon (license: Apache2).
+- License verified
