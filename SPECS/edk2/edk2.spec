@@ -673,6 +673,11 @@ done
 %doc README.experimental
 %dir %{_datadir}/%{name}/experimental
 %{_datadir}/%{name}/experimental/*.fd
+%if %{build_aarch64}
+%{_datadir}/%{name}/experimental/*.raw
+%endif
+%{_datadir}/%{name}/experimental/*.qcow2
+%{_datadir}/%{name}/experimental/*.pcr
 
 %files ovmf-xen
 %common_files
