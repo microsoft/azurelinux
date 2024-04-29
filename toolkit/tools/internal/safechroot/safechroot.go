@@ -37,6 +37,15 @@ type FileToCopy struct {
 	NoDereference bool
 }
 
+// DirToCopy represents a directory to copy into a chroot using AddDirs. Dest is relative to the chroot directory.
+type DirToCopy struct {
+	Src                  string
+	Dest                 string
+	NewDirPermissions    os.FileMode
+	ChildFilePermissions os.FileMode
+	MergedDirPermissions *os.FileMode
+}
+
 // MountPoint represents a system mount point used by a Chroot.
 // It is guaranteed to be unmounted on application exit even on a SIGTERM so long as registerSIGTERMCleanup is invoked.
 // The fields of MountPoint mirror those of the `mount` syscall.
@@ -303,6 +312,11 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 	}
 
 	return
+}
+
+// AddDirs copies each directory 'Src' to the relative path chrootRootDir/'Dest' in the chroot.
+func (c *Chroot) AddDirs(dirToCopy DirToCopy) (err error) {
+	return file.CopyDir(dirToCopy.Src, filepath.Join(c.rootDir, dirToCopy.Dest), dirToCopy.NewDirPermissions, dirToCopy.ChildFilePermissions, dirToCopy.MergedDirPermissions)
 }
 
 // AddFiles copies each file 'Src' to the relative path chrootRootDir/'Dest' in the chroot.

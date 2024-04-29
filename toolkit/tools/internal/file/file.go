@@ -89,6 +89,66 @@ func Copy(src, dst string) (err error) {
 	return NewFileCopyBuilder(src, dst).Run()
 }
 
+// CopyDir copies src directory to dst, creating the dst directory if needed.
+// dst is assumed to be a directory and not a file.
+func CopyDir(src, dst string, newDirPermissions, childFilePermissions fs.FileMode, mergedDirPermissions *fs.FileMode) (err error) {
+	isDstExist, err := PathExists(dst)
+	if err != nil {
+		return err
+	}
+	if isDstExist {
+		isDstDir, err := IsDir(dst)
+		if err != nil {
+			return err
+		}
+		if !isDstDir {
+			return fmt.Errorf("destination exists but is not a directory (%s)", dst)
+		}
+		logger.Log.Debugf("Destination (%s) already exists and is a directory", dst)
+		if mergedDirPermissions != nil {
+			if err := os.Chmod(dst, *mergedDirPermissions); err != nil {
+				return fmt.Errorf("error setting file permissions: %w", err)
+			}
+		}
+	}
+
+	if !isDstExist {
+		logger.Log.Infof("Creating destination directory on chroot (%s)", dst)
+		// Create dst dir
+		err = os.MkdirAll(dst, newDirPermissions)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	// Open the source directory
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	// Iterate over the entries in the source directory
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			// If it's a directory, recursively copy it
+			if err := CopyDir(srcPath, dstPath, newDirPermissions, childFilePermissions, mergedDirPermissions); err != nil {
+				return err
+			}
+		} else {
+			// If it's a file, copy it and set file permissions
+			if err := NewFileCopyBuilder(srcPath, dstPath).SetFileMode(childFilePermissions).Run(); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 // Read reads a string from the file src.
 func Read(src string) (data string, err error) {
 	logger.Log.Debugf("Reading from (%s)", src)
