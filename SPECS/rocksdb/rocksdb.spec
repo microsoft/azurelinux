@@ -38,7 +38,7 @@ Development files for %{name}
 mkdir build
 cd build
 %ifarch x86_64
-PORTABLE_OPTION=x86-64-v3
+PORTABLE_OPTION=haswell
 %else
 PORTABLE_OPTION=1
 %endif
