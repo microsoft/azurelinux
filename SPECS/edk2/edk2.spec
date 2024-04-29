@@ -1,4 +1,4 @@
-%bcond_with experimental
+%bcond_without experimental
 %bcond_with arm
 
 Vendor:         Microsoft Corporation
@@ -241,6 +241,7 @@ BuildArch:      noarch
 EFI Development Kit II
 Open Virtual Machine Firmware (Xen build)
 
+%if %{with experimental}
 %package experimental
 Summary:        Open Virtual Machine Firmware, experimental builds
 License:        Apache-2.0 AND BSD-2-Clause-Patent AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
@@ -250,7 +251,9 @@ BuildArch:      noarch
 %description experimental
 EFI Development Kit II
 Open Virtual Machine Firmware (experimental builds)
+%endif
 
+%if %{with arm}
 %package arm
 Summary:        ARM Virtual Machine Firmware
 BuildArch:      noarch
@@ -258,7 +261,9 @@ License:        Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clau
 %description arm
 EFI Development Kit II
 ARMv7 UEFI Firmware
+%endif
 
+%if %{build_riscv64}
 %package riscv64
 Summary:        RISC-V Virtual Machine Firmware
 BuildArch:      noarch
@@ -270,6 +275,7 @@ Conflicts:  libvirt-daemon-driver-qemu < 9.7.0
 %description riscv64
 EFI Development Kit II
 RISC-V UEFI Firmware
+%endif
 
 %package ext4
 Summary:        Ext4 filesystem driver
@@ -475,10 +481,11 @@ install BaseTools/Scripts/GccBase.lds \
 # install firmware images
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -av Fedora/* %{buildroot}%{_datadir}/%{name}
-
+%if !%{with experimental}
+rm -rf %{buildroot}%{_datadir}/%{name}/experimental
+%endif
 
 %if %{build_ovmf}
-
 # compat symlinks
 mkdir -p %{buildroot}%{_datadir}/OVMF
 ln -s ../%{name}/ovmf/OVMF_CODE.fd         %{buildroot}%{_datadir}/OVMF/
@@ -506,12 +513,10 @@ install -m 0644 \
         40-edk2-ovmf-ia32-sb.json \
         50-edk2-ovmf-ia32-nosb.json \
         %{buildroot}%{_datadir}/qemu/firmware
-
 # endif build_ovmf
 %endif
 
 %if %{build_aarch64}
-
 # compat symlinks
 mkdir -p %{buildroot}%{_datadir}/AAVMF
 ln -s ../%{name}/aarch64/QEMU_EFI-pflash.raw \
@@ -536,7 +541,6 @@ install -m 0644 \
 # endif build_aarch64
 %endif
 
-
 # edk2-tools-python install
 cp -R BaseTools/Source/Python %{buildroot}%{_datadir}/%{name}/Python
 for i in build BPDG Ecc GenDepex GenFds GenPatchPcdTable PatchPcdValue TargetTool Trim UPT; do
@@ -551,7 +555,6 @@ done
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
 
-
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
     test -f "$file" || continue
@@ -563,6 +566,7 @@ done
   %%dir %%{_datadir}/%%{name}/ \
   %%dir %%{_datadir}/qemu \
   %%dir %%{_datadir}/qemu/firmware
+
 %if %{build_ovmf}
 %files ovmf
 %common_files
@@ -668,6 +672,7 @@ done
 %{_datadir}/qemu/firmware/40-edk2-ovmf-ia32-sb.json
 %{_datadir}/qemu/firmware/50-edk2-ovmf-ia32-nosb.json
 
+%if %{with experimental}
 %files experimental
 %common_files
 %doc README.experimental
@@ -677,6 +682,7 @@ done
 %{_datadir}/%{name}/experimental/*.raw
 %endif
 %{_datadir}/%{name}/experimental/*.pcr
+%endif
 
 %files ovmf-xen
 %common_files
