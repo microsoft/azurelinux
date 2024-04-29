@@ -56,7 +56,7 @@ PyTorch is a Python package that provides two high-level features:
 You can reuse your favorite Python packages such as NumPy, SciPy and Cython to extend PyTorch when needed.
 
 %prep
-%autosetup -a 1 -n %{name}-v%{version}
+%autosetup -n %{name}-v%{version}
 
 %build
 # Use MAX_JOBS=8 to prevent build failure in ADO pipelines
