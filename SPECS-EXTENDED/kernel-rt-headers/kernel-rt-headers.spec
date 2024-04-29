@@ -1,5 +1,3 @@
-%define mariner_version 3
-
 # This package doesn't contain any binaries, thus no debuginfo package is needed.
 %global debug_package %{nil}
 
@@ -23,7 +21,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{mariner_version}/%{version}.tar.gz#/kernel-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azl}/%{version}.tar.gz#/kernel-%{version}.tar.gz
 
 # When updating, make sure to grab the matching patch from
 # https://mirrors.edge.kernel.org/pub/linux/kernel/projects/rt/
@@ -49,7 +47,7 @@ cross-glibc package.
 %endif
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{mariner_version}-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azl}-%{version}
 %patch 0 -p1
 
 %build
