@@ -30,6 +30,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-hatchling
 BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-sphinx
