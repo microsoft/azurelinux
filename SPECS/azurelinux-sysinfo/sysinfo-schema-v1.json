@@ -283,7 +283,7 @@
             },
             "required": [
                 "selinux_mode",
-                "computer_architecture",
+                "architecture",
                 "system_manufacturer",                
                 "host_type"
             ],

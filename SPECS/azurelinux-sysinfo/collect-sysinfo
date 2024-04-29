@@ -168,7 +168,7 @@ def collect_resource_utilization():
 def collect_package_info():
     print("Collecting package info...")
     get_package_list = subprocess.run(
-        ["rpm", "-qa"], capture_output=True, text=True, check=True
+        ["rpm", "-qa"], capture_output=True, text=True
     )
 
     package_list = get_package_list.stdout.strip().splitlines()
@@ -185,7 +185,7 @@ def collect_cloud_init_info():
 
     # Collect cloud-init longest running processes
     result = subprocess.run(
-        ["cloud-init", "analyze", "blame"], capture_output=True, text=True, check=True
+        ["cloud-init", "analyze", "blame"], capture_output=True, text=True
     )
 
     lines = result.stdout.strip().splitlines()
@@ -204,7 +204,7 @@ def collect_cloud_init_info():
             process_list.append(process_info)
 
     get_hostname = subprocess.run(
-        ["hostname"], capture_output=True, text=True, check=True
+        ["hostname"], capture_output=True, text=True
     )
 
     cloud_init_info = {
@@ -217,13 +217,39 @@ def collect_cloud_init_info():
 
 def get_selinux_mode():
     return subprocess.run(
-        ["getenforce"], capture_output=True, text=True, check=True
+        ["getenforce"], capture_output=True, text=True
     ).stdout.strip()
 
+def get_system_manufacturer():
+    return subprocess.run(
+        ["cat", "/sys/devices/virtual/dmi/id/sys_vendor"], capture_output=True, text=True
+    ).stdout.strip()
+
+def get_host_type(sys_vendor):
+    if sys_vendor == "QEMU":
+        return "virtual"
+    return "physical"
+
+def get_architecture():
+    return subprocess.run(
+        ["uname", "-m"], capture_output=True, text=True
+    ).stdout.strip()
 
 def collect_system_info():
     print("Collecting system info...")
-    system_info = {"selinux_mode": get_selinux_mode()}
+
+    selinux_mode = get_selinux_mode()
+    architecture = get_architecture()
+    system_manufacturer = get_system_manufacturer()
+    host_type = get_host_type(system_manufacturer)
+
+    system_info = {
+        "selinux_mode": selinux_mode,
+        "architecture": architecture,
+        "system_manufacturer": system_manufacturer,
+        "host_type": host_type
+    } 
+
     return system_info
 
 
