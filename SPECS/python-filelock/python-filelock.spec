@@ -42,7 +42,7 @@ The lock includes a lock counter and is thread safe. This means, when locking
 the same lock object twice, it will not block.
 
 %prep
-%autosetup -p1
+%autosetup -p1 -n %{srcname}-%{version}
 
 %build
 %py3_build
@@ -74,6 +74,7 @@ python%{python3_version} test.py
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.13.4-1
 - Upgrading version for 3.0
 - Using literal package name so autoupgrader can do its thing.
+- Updating package folder name in %%autosetup
 
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
 - Updating source URL.
