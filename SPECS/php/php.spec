@@ -1516,7 +1516,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 %changelog
 * Mon Apr 29 2024 Gary Swalling <gaswal@microsoft.com> - 8.1.28-1
-- Upgrade to 8.1.28 to fix CVE-2024-1874, CVE-2024-2756, CVE-2024-2757, CVE-2024-3096
+- Upgrade to 8.1.28 to fix CVE-2024-2756, CVE-2024-3096
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
