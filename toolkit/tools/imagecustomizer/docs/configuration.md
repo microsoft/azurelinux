@@ -469,7 +469,7 @@ Example:
 
 ```yaml
 os:
-  additionalDirss:
+  additionalDirs:
     - sourcePath: "home/files/targetDir"
       destinationPath: "usr/project/targetDir"
       newDirPermissions: "644"
