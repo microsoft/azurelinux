@@ -54,12 +54,12 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = copyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
+	err = copyAdditionalDirs(baseConfigPath, config.OS.AdditionalDirs, imageChroot)
 	if err != nil {
 		return err
 	}
 
-	err = copyAdditionalDirs(baseConfigPath, config.OS.AdditionalDirs, imageChroot)
+	err = copyAdditionalFiles(baseConfigPath, config.OS.AdditionalFiles, imageChroot)
 	if err != nil {
 		return err
 	}
