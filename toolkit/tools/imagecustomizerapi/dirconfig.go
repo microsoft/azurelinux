@@ -14,7 +14,7 @@ import (
 type DirConfigList []DirConfig
 
 type DirConfig struct {
-	// The absolute path to the source directory that will be copied.
+	// The path to the source directory that will be copied (can be relative or absolute path).
 	SourcePath string `yaml:"sourcePath"`
 
 	// The absolute path in the target OS that the directory will be copied to.
