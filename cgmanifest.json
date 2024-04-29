@@ -24533,8 +24533,8 @@
         "type": "other",
         "other": {
           "name": "python-tensorboard",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/tensorboard/archive/refs/tags/2.11.0.tar.gz"
+          "version": "2.16.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
         }
       }
     },
