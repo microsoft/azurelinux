@@ -16,22 +16,21 @@ URL:            https://github.com/tensorflow/tensorboard
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch0:         0000-Use-system-package.patch
-BuildRequires:  python3-setuptools
-BuildRequires:  which
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-BuildRequires:  python3-absl-py
-BuildRequires:  git
-BuildRequires:  python3-six
-BuildRequires:  python3-numpy
 BuildRequires:  bazel
-BuildRequires:  gcc
 BuildRequires:  build-essential
+BuildRequires:  gcc
+BuildRequires:  git
+BuildRequires:  python3-absl-py
+BuildRequires:  python3-numpy
+BuildRequires:  python3-pip
 BuildRequires:  python3-protobuf
-BuildRequires:  zlib
-BuildRequires:  python3-virtualenv
-BuildRequires:  python3-werkzeug
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-six
+BuildRequires:  python3-virtualenv
+BuildRequires:  python3-wheel
+BuildRequires:  python3-werkzeug
+BuildRequires:  which
+BuildRequires:  zlib
 ExclusiveArch:  x86_64
 
 
