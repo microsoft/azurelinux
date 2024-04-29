@@ -262,18 +262,18 @@
                     "title": "SELinux Mode",
                     "description": "Provides information about whether SELinux mode is enforcing or permissive"
                 },
-                "system_manufacturer": {
-                    "$id": "#/properties/system_info/properties/system_manufacturer",
-                    "type": "string",
-                    "title": "System Manufacturer",
-                    "description": "Provides information about the system manufacturer"
-                },
                 "computer_architecture": {
                     "$id": "#/properties/system_info/properties/computer_architecture",
                     "type": "string",
                     "title": "Computer Architecture",
                     "description": "Provides information about the machine hardware"
                 },
+                "system_manufacturer": {
+                    "$id": "#/properties/system_info/properties/system_manufacturer",
+                    "type": "string",
+                    "title": "System Manufacturer",
+                    "description": "Provides information about the system manufacturer"
+                },                
                 "host_type": {
                     "$id": "#/properties/system_info/properties/host_type",
                     "type": "string",
@@ -283,8 +283,8 @@
             },
             "required": [
                 "selinux_mode",
-                "system_manufacturer",
                 "computer_architecture",
+                "system_manufacturer",                
                 "host_type"
             ],
             "additionalProperties": false
