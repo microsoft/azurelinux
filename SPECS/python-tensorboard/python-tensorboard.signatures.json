@@ -1,6 +1,5 @@
 {
     "Signatures": {
-     "python-tensorboard-2.11.0.tar.gz": "4045f3eca77ef335dcd70879ff9aecc2d2ba09e3fb5f39e501f868b4ab23c2b2",
-     "python-tensorboard-2.11.0-cache.tar.gz": "77b35869c63fc15b5cdeeff3dc6ac472e79a62739a69537bf60a38fa902b66a4"
+     "python-tensorboard-2.16.2.tar.gz": "9e69ad2243289a82500547271a213a4ee7a8be89fdebdd87372dac953e61b834"
     }
-   }
+}
