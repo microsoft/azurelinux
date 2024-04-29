@@ -676,7 +676,6 @@ done
 %if %{build_aarch64}
 %{_datadir}/%{name}/experimental/*.raw
 %endif
-%{_datadir}/%{name}/experimental/*.qcow2
 %{_datadir}/%{name}/experimental/*.pcr
 
 %files ovmf-xen
