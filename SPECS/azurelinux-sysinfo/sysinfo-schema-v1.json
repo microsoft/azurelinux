@@ -263,10 +263,10 @@
                     "description": "Provides information about whether SELinux mode is enforcing or permissive"
                 },
                 "computer_architecture": {
-                    "$id": "#/properties/system_info/properties/computer_architecture",
+                    "$id": "#/properties/system_info/properties/architecture",
                     "type": "string",
-                    "title": "Computer Architecture",
-                    "description": "Provides information about the machine hardware"
+                    "title": "Architecture",
+                    "description": "Provides information about the system architecture"
                 },
                 "system_manufacturer": {
                     "$id": "#/properties/system_info/properties/system_manufacturer",
