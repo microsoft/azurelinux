@@ -387,7 +387,7 @@ func downloadSingleDeltaRPM(realDependencyGraph *pkggraph.PkgGraph, buildNode *p
 		return err
 	}
 	if lookup == nil || lookup.RunNode == nil {
-		err = fmt.Errorf("failed to find run lookup (%v) in graph", lookup)
+		err = fmt.Errorf("failed to find run lookup %v in graph", lookup)
 		return err
 	}
 
@@ -474,7 +474,7 @@ func resolveSingleNode(cloner *rpmrepocloner.RpmRepoCloner, node *pkggraph.PkgNo
 	}
 
 	if len(resolvedPackages) == 0 {
-		return fmt.Errorf("failed to find any packages providing (%v)", node.VersionedPkg)
+		return fmt.Errorf("failed to find any packages providing %v", node.VersionedPkg)
 	}
 
 	preBuilt := false
@@ -525,22 +525,22 @@ func assignRPMPath(node *pkggraph.PkgNode, outDir string, resolvedPackages []str
 	chosenRPMPath := rpmPaths[0]
 	if len(rpmPaths) > 1 {
 		var resolvedRPMs []string
-		logger.Log.Debugf("Found (%d) candidates. Resolving", len(rpmPaths))
+		logger.Log.Debugf("Found %d candidates. Resolving", len(rpmPaths))
 
 		resolvedRPMs, err = rpm.ResolveCompetingPackages(*tmpDir, rpmPaths...)
 		if err != nil {
-			err = fmt.Errorf("failed to pick an RPM providing (%s) from the following RPMs (%v):\n%w", node.VersionedPkg.Name, rpmPaths, err)
+			err = fmt.Errorf("failed to pick an RPM providing (%s) from the following RPMs %v:\n%w", node.VersionedPkg.Name, rpmPaths, err)
 			return
 		}
 
 		resolvedRPMsCount := len(resolvedRPMs)
 		if resolvedRPMsCount == 0 {
-			err = fmt.Errorf("failed to pick an RPM providing (%s). No RPM can be installed from the following (%v)", node.VersionedPkg.Name, rpmPaths)
+			err = fmt.Errorf("failed to pick an RPM providing (%s). No RPM can be installed from the following %v", node.VersionedPkg.Name, rpmPaths)
 			return
 		}
 
 		if resolvedRPMsCount > 1 {
-			logger.Log.Warnf("Found (%d) candidates to provide (%s). Picking the first one", resolvedRPMsCount, node.VersionedPkg.Name)
+			logger.Log.Warnf("Found %d candidates to provide (%s). Picking the first one", resolvedRPMsCount, node.VersionedPkg.Name)
 		}
 
 		chosenRPMPath = rpmPackageToRPMPath(resolvedRPMs[0], outDir)
