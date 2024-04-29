@@ -32,8 +32,8 @@
 %global with_qdbm     0
 Summary:        PHP scripting language for creating dynamic web sites
 Name:           php
-Version:        8.1.22
-Release:        2%{?dist}
+Version:        8.1.28
+Release:        1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -1515,6 +1515,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
+* Mon Apr 29 2024 Gary Swalling <gaswal@microsoft.com> - 8.1.28-1
+- Upgrade to 8.1.28 to fix CVE-2024-1874, CVE-2024-2756, CVE-2024-2757, CVE-2024-3096
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 8.1.22-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

@@ -21105,7 +21105,7 @@
         "other": {
           "name": "php",
           "version": "8.1.22",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.22.tar.xz"
+          "downloadUrl": "https://www.php.net/distributions/php-8.1.28.tar.xz"
         }
       }
     },
