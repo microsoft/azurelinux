@@ -85,7 +85,7 @@
 
 Name:           samba
 Version:        4.12.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -798,6 +798,8 @@ and use CTDB instead.
 %prep
 xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n samba-%{version}%{pre_release} -p1
+# Remove `xsltproc` binary if installed. This is only used for docs, which we do not build
+rm -vf %{_bindir}/xsltproc
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -3436,6 +3438,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 17 2024 Andrew Phelps <anphel@microsoft.com> - 4.12.5-6
+- Fix build issue with docs by removing xsltproc
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.12.5-5
 - Fix build issue for systemd/systemd-bootstrap confusion
 - License verified
@@ -5894,4 +5899,3 @@ fi
 - Added a number of options to smb.conf file
 - Added smbadduser command (missed from all previous RPMs) - Doooh!
 - Added smbuser file and smb.conf file updates for username map
-

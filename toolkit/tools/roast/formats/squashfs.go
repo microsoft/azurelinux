@@ -4,7 +4,7 @@
 package formats
 
 import (
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 )
 
 // SquashFSType represents the squashfs format

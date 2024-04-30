@@ -1,8 +1,8 @@
 {
  "Signatures": {
+  "daemon.json": "532f2e930400baed129ed953b9ba0d5158fc443aecbff6f6513f58565696db5c",
   "docker.service": "b150b3ce0947a65c655ed09dfe4e48b7464c60542f9f9902330288bbf87af38e",
   "docker.socket": "51a06786cae46bc63b7314c25d0bd5bb2e676120d80874b99e35bf60d0b0ffa8",
-  "moby-engine-20.10.27.tar.gz": "e007811da7705f767ffb0b9a97ef04ec6a18f295c3b43cc595bd07443ddd2ba9",
-  "moby-libnetwork-20.10.27.tar.gz": "523bc0bbeb1651da3c236567843f524bbd162507f4445766da40aade7c37222a"
+  "moby-engine-24.0.9.tar.gz": "c498c4aa45d208d3af5fc9be3fb0d60f3fac6d710077c0557e217f7f80fd6c96"
  }
 }

@@ -15,20 +15,21 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/configuration"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/imagegen/diskutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/file"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/jsonutils"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/logger"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/packagerepo/repocloner"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/pkgjson"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/resources"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/retry"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/safechroot"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/shell"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/tdnf"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/timestamp"
-	"github.com/microsoft/CBL-Mariner/toolkit/tools/internal/userutils"
+	"github.com/google/uuid"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/configuration"
+	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/jsonutils"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkgjson"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/resources"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/tdnf"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/timestamp"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 )
 
 const (
@@ -751,6 +752,56 @@ func addMachineID(installChroot *safechroot.Chroot) (err error) {
 	err = installChroot.UnsafeRun(func() error {
 		return file.Create(machineIDFile, machineIDFilePerms)
 	})
+	return
+}
+
+// AddImageIDFile adds image-id file in the /etc directory of the install root.
+// The file contains the following fields:
+// BUILD_NUMBER: The build number of the image
+// IMAGE_BUILD_DATE: The date when the image is built in format YYYYMMDDHHMMSS
+// IMAGE_UUID: The UUID of the image
+func AddImageIDFile(installChrootRootDir string, buildNumber string) (err error) {
+	// Check if /etc directory exists and it does not, throw an error
+	_, err = os.Stat(filepath.Join(installChrootRootDir, "/etc"))
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = fmt.Errorf("directory /etc does not exist in the install root")
+		}
+		return
+	}
+
+	// If buildNumber is empty, then default to "local"
+	if buildNumber == "" {
+		buildNumber = "local"
+	}
+
+	const (
+		imageIDFile      = "/etc/image-id"
+		imageIDFilePerms = 0444
+	)
+
+	ReportAction("Creating image-id file")
+
+	// Get the current time in UTC and in format "YYYYMMDDHHMMSS"
+	imageBuildDate := time.Now().UTC().Format("20060102150405")
+
+	imageIDContent := fmt.Sprintf("BUILD_NUMBER=%s\nIMAGE_BUILD_DATE=%s\nIMAGE_UUID=%s\n", buildNumber, imageBuildDate, uuid.New().String())
+	imageIDFilePath := filepath.Join(installChrootRootDir, imageIDFile)
+
+	fileCreateErr := file.Create(imageIDFilePath, imageIDFilePerms)
+	if fileCreateErr != nil {
+		err = fmt.Errorf("failed to create image-id file: %v", fileCreateErr)
+		return
+	}
+
+	ReportAction(fmt.Sprintf("Writing following content to image-id file: %s", imageIDContent))
+
+	fileWriteErr := file.Write(imageIDContent, imageIDFilePath)
+	if fileWriteErr != nil {
+		err = fmt.Errorf("failed to write to image-id file: %v", fileWriteErr)
+		return
+	}
+
 	return
 }
 

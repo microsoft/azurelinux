@@ -84,7 +84,7 @@ mkdir -p %{buildroot}%{_datadir}/emacs/site-lisp/site-start.d
 %dir %{_datadir}/emacs/site-lisp/site-start.d
 
 %changelog
-* Wed Apr 02 2024 Betty Lakes <bettylakes@microsoft.com> - 29.3-1
+* Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 29.3-1
 - Upgrade to 29.3 to fix CVE-2024-30202, CVE-2024-30204, CVE-2024-30205
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 28.2-6
