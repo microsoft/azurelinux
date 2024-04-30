@@ -18,6 +18,7 @@ type OS struct {
 	SELinux             SELinux             `yaml:"selinux"`
 	KernelCommandLine   KernelCommandLine   `yaml:"kernelCommandLine"`
 	AdditionalFiles     AdditionalFilesMap  `yaml:"additionalFiles"`
+	AdditionalDirs      DirConfigList       `yaml:"additionalDirs"`
 	Users               []User              `yaml:"users"`
 	Services            Services            `yaml:"services"`
 	Modules             []Module            `yaml:"modules"`
@@ -51,6 +52,11 @@ func (s *OS) IsValid() error {
 	err = s.AdditionalFiles.IsValid()
 	if err != nil {
 		return fmt.Errorf("invalid additionalFiles: %w", err)
+	}
+
+	err = s.AdditionalDirs.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid additionalDirs: %w", err)
 	}
 
 	for i, user := range s.Users {

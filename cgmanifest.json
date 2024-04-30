@@ -3588,8 +3588,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.30",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
+          "version": "3.37",
+          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.37.tar.bz2"
         }
       }
     },
@@ -13392,8 +13392,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm"
+          "version": "17.0.11-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm"
         }
       }
     },
@@ -13402,8 +13402,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm"
+          "version": "17.0.11-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm"
         }
       }
     },
@@ -22163,8 +22163,8 @@
         "type": "other",
         "other": {
           "name": "python-distlib",
-          "version": "0.3.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.6.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.8.tar.gz"
         }
       }
     },
@@ -22483,8 +22483,8 @@
         "type": "other",
         "other": {
           "name": "python-google-auth",
-          "version": "2.6.6",
-          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.6.6.tar.gz"
+          "version": "2.29.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.29.0.tar.gz"
         }
       }
     },
@@ -22633,8 +22633,8 @@
         "type": "other",
         "other": {
           "name": "python-hypothesis",
-          "version": "6.36.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/24/05/d03211fc959ddf8c4a26d04957d9640a86a723f5d6a4359a4430cf5fa0b4/hypothesis-6.36.2.tar.gz"
+          "version": "6.100.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/5a/30/eaf0f26a982bc3b9bdc701b6b289347275beb1ae50aea146cf443c32ce7c/hypothesis-6.100.1.tar.gz"
         }
       }
     },
@@ -22673,8 +22673,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "21.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-21.3.0.tar.gz"
+          "version": "22.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-22.10.0.tar.gz"
         }
       }
     },
@@ -22953,8 +22953,8 @@
         "type": "other",
         "other": {
           "name": "python-libclang",
-          "version": "14.0.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+          "version": "18.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-18.1.1.tar.gz"
         }
       }
     },
@@ -24533,8 +24533,8 @@
         "type": "other",
         "other": {
           "name": "python-tensorboard",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/tensorboard/archive/refs/tags/2.11.0.tar.gz"
+          "version": "2.16.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
         }
       }
     },
@@ -27936,8 +27936,8 @@
         "type": "other",
         "other": {
           "name": "strace",
-          "version": "6.6",
-          "downloadUrl": "https://strace.io/files/6.6/strace-6.6.tar.xz"
+          "version": "6.8",
+          "downloadUrl": "https://strace.io/files/6.8/strace-6.8.tar.xz"
         }
       }
     },
@@ -28086,8 +28086,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.4.1",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.1.tar.gz"
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.2.tar.gz"
         }
       }
     },
