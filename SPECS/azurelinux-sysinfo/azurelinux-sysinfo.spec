@@ -64,6 +64,6 @@ fi
 * Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.
-- Original version for Azure Linux.
+- Original version for CBL-Mariner.
 
 
