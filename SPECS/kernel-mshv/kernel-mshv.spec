@@ -11,7 +11,7 @@
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
 Version:        5.15.126.mshv9
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -224,6 +224,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Tue Apr 30 2024 Cameron Baird <cameronbaird@microsoft.com> - 5.15.126.mshv9-4
+- Change config to produce hv, xen, virtio as modules 
+- to support dracut initramfs generation
+
 * Tue Apr 09 2024 Mitch Zhu <mitchzhu@microsoft.com> - 5.15.126.mshv9-3
 - Update to v5.15.126.mshv9
 - Add patch to fix python 3.12 build errors
