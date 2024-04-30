@@ -785,8 +785,8 @@
         "type": "other",
         "other": {
           "name": "autoconf-archive",
-          "version": "2021.02.19",
-          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2021.02.19.tar.xz"
+          "version": "2023.02.20",
+          "downloadUrl": "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2023.02.20.tar.xz"
         }
       }
     },
@@ -1247,8 +1247,8 @@
         "type": "other",
         "other": {
           "name": "bpftrace",
-          "version": "0.19.1",
-          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.19.1.tar.gz"
+          "version": "0.20.3",
+          "downloadUrl": "https://github.com/iovisor/bpftrace/archive/refs/tags/v0.20.3.tar.gz"
         }
       }
     },
@@ -1417,8 +1417,8 @@
         "type": "other",
         "other": {
           "name": "cal10n",
-          "version": "0.7.7",
-          "downloadUrl": "https://github.com/qos-ch/cal10n/archive/refs/tags/v_0.7.7.tar.gz"
+          "version": "0.8.1.10",
+          "downloadUrl": "https://code.opensuse.org/adrianSuSE/cal10n/blob/factory/f/cal10n-0.8.1.10.tar.xz"
         }
       }
     },
@@ -1736,9 +1736,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ck",
+          "version": "0.7.2",
+          "downloadUrl": "https://github.com/concurrencykit/ck/archive/0.7.2/ck-0.7.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "clamav",
-          "version": "0.105.2",
-          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-0.105.2.tar.gz"
+          "version": "1.0.6",
+          "downloadUrl": "https://github.com/Cisco-Talos/clamav/archive/refs/tags/clamav-1.0.6.tar.gz"
         }
       }
     },
@@ -1957,8 +1967,8 @@
         "type": "other",
         "other": {
           "name": "conda",
-          "version": "4.11.0",
-          "downloadUrl": "https://github.com/conda/conda/archive/4.11.0/conda-4.11.0.tar.gz"
+          "version": "24.1.2",
+          "downloadUrl": "https://github.com/conda/conda/archive/24.1.2/conda-24.1.2.tar.gz"
         }
       }
     },
@@ -3578,8 +3588,8 @@
         "type": "other",
         "other": {
           "name": "fio",
-          "version": "3.30",
-          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.30.tar.bz2"
+          "version": "3.37",
+          "downloadUrl": "https://brick.kernel.dk/snaps/fio-3.37.tar.bz2"
         }
       }
     },
@@ -3900,8 +3910,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "8.5.3",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-8.5.3.tar.gz"
+          "version": "9.1",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-9.1.tar.gz"
         }
       }
     },
@@ -8591,8 +8601,8 @@
         "type": "other",
         "other": {
           "name": "libaec",
-          "version": "1.0.4",
-          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.0.4/libaec-v1.0.4.tar.gz"
+          "version": "1.1.3",
+          "downloadUrl": "https://gitlab.dkrz.de/k202009/libaec/-/archive/v1.1.3/libaec-v1.1.3.tar.gz"
         }
       }
     },
@@ -11160,29 +11170,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "libtracecmd",
-          "version": "1.5.1",
-          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "libtirpc",
           "version": "1.3.4",
           "downloadUrl": "https://downloads.sourceforge.net/libtirpc/libtirpc-1.3.4.tar.bz2"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "libtracefs",
-          "version": "1.8.0",
-          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
         }
       }
     },
@@ -11240,9 +11230,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libtracecmd",
+          "version": "1.5.1",
+          "downloadUrl": "https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-libtracecmd-1.5.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libtraceevent",
           "version": "1.8.2",
           "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git/snapshot/libtraceevent-1.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "libtracefs",
+          "version": "1.8.0",
+          "downloadUrl": "https://git.kernel.org/pub/scm/libs/libtrace/libtracefs.git/snapshot/libtracefs-1.8.0.tar.gz"
         }
       }
     },
@@ -11961,8 +11971,8 @@
         "type": "other",
         "other": {
           "name": "libyang",
-          "version": "2.1.111",
-          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.111.tar.gz"
+          "version": "2.1.148",
+          "downloadUrl": "https://github.com/CESNET/libyang/archive/refs/tags/v2.1.148.tar.gz"
         }
       }
     },
@@ -13382,8 +13392,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.aarch64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/aarch64/msopenjdk-17-17.0.9-1.aarch64.rpm"
+          "version": "17.0.11-1.aarch64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/aarch64/msopenjdk-17-17.0.11-1.aarch64.rpm"
         }
       }
     },
@@ -13392,8 +13402,8 @@
         "type": "other",
         "other": {
           "name": "msopenjdk-17",
-          "version": "17.0.9-1.x86_64",
-          "downloadUrl": "https://packages.microsoft.com/cbl-mariner/2.0/prod/Microsoft/x86_64/msopenjdk-17-17.0.9-1.x86_64.rpm"
+          "version": "17.0.11-1.x86_64",
+          "downloadUrl": "https://packages.microsoft.com/azurelinux/3.0/preview/ms-oss/x86_64/msopenjdk-17-17.0.11-1.x86_64.rpm"
         }
       }
     },
@@ -20783,8 +20793,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.1.22",
-          "downloadUrl": "https://www.php.net/distributions/php-8.1.22.tar.xz"
+          "version": "8.3.4",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.4.tar.xz"
         }
       }
     },
@@ -22153,8 +22163,8 @@
         "type": "other",
         "other": {
           "name": "python-distlib",
-          "version": "0.3.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.6.tar.gz"
+          "version": "0.3.8",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/d/distlib/distlib-0.3.8.tar.gz"
         }
       }
     },
@@ -22473,8 +22483,8 @@
         "type": "other",
         "other": {
           "name": "python-google-auth",
-          "version": "2.6.6",
-          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.6.6.tar.gz"
+          "version": "2.29.0",
+          "downloadUrl": "https://pypi.python.org/packages/source/g/google-auth/google-auth-2.29.0.tar.gz"
         }
       }
     },
@@ -22623,8 +22633,8 @@
         "type": "other",
         "other": {
           "name": "python-hypothesis",
-          "version": "6.36.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/24/05/d03211fc959ddf8c4a26d04957d9640a86a723f5d6a4359a4430cf5fa0b4/hypothesis-6.36.2.tar.gz"
+          "version": "6.100.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/5a/30/eaf0f26a982bc3b9bdc701b6b289347275beb1ae50aea146cf443c32ce7c/hypothesis-6.100.1.tar.gz"
         }
       }
     },
@@ -22663,8 +22673,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "21.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-21.3.0.tar.gz"
+          "version": "22.10.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-22.10.0.tar.gz"
         }
       }
     },
@@ -22943,8 +22953,8 @@
         "type": "other",
         "other": {
           "name": "python-libclang",
-          "version": "14.0.6",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-14.0.6.tar.gz"
+          "version": "18.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/l/libclang/libclang-18.1.1.tar.gz"
         }
       }
     },
@@ -23062,9 +23072,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-mdurl",
-          "version": "0.1.2",
-          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
+          "name": "python-mccabe",
+          "version": "0.6.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
         }
       }
     },
@@ -23072,9 +23082,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-mccabe",
-          "version": "0.6.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
+          "name": "python-mdurl",
+          "version": "0.1.2",
+          "downloadUrl": "https://github.com/executablebooks/mdurl/archive/0.1.2/mdurl-0.1.2.tar.gz"
         }
       }
     },
@@ -24523,8 +24533,8 @@
         "type": "other",
         "other": {
           "name": "python-tensorboard",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/tensorboard/archive/refs/tags/2.11.0.tar.gz"
+          "version": "2.16.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
         }
       }
     },
@@ -27576,8 +27586,8 @@
         "type": "other",
         "other": {
           "name": "slf4j",
-          "version": "1.7.30",
-          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_1.7.30.tar.gz"
+          "version": "2.0.7",
+          "downloadUrl": "https://github.com/qos-ch/slf4j/archive/v_2.0.7.tar.gz"
         }
       }
     },
@@ -27926,8 +27936,8 @@
         "type": "other",
         "other": {
           "name": "strace",
-          "version": "6.6",
-          "downloadUrl": "https://strace.io/files/6.6/strace-6.6.tar.xz"
+          "version": "6.8",
+          "downloadUrl": "https://strace.io/files/6.8/strace-6.8.tar.xz"
         }
       }
     },
@@ -28076,8 +28086,8 @@
         "type": "other",
         "other": {
           "name": "SymCrypt-OpenSSL",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.0.tar.gz"
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.4.2.tar.gz"
         }
       }
     },

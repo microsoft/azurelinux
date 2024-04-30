@@ -16,9 +16,9 @@ index 5be3264..33abc1d 100644
  	snapcraft/helpers \
  	snapcraft/snap \
 -	babeld/Makefile \
+ 	mgmtd/Makefile \
  	bgpd/Makefile \
  	bgpd/rfp-example/librfp/Makefile \
- 	bgpd/rfp-example/rfptest/Makefile \
 @@ -193,7 +190,6 @@ EXTRA_DIST += \
  	fpm/Makefile \
  	grpc/Makefile \

@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        9%{?dist}
+Release:        12%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -127,10 +127,13 @@ Patch0001:      https://github.com/systemd/systemd/pull/26494.patch
 Patch0490:      use-bfq-scheduler.patch
 
 # Adjust upstream config to use our shared stack
-Patch0491:      fedora-use-system-auth-in-pam-systemd-user.patch
+# NOTE: the patch was based on the fedora patch, but renamed to
+# 'azurelinux-...' and modified for our 'system-*' pam files
+Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 
 # Patches for Azure Linux
-Patch0900: do-not-test-openssl-sm3.patch
+Patch0900:      do-not-test-openssl-sm3.patch
+Patch0901:      networkd-default-use-domains.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -300,8 +303,6 @@ Conflicts:      %{name}-standalone-shutdown < %{version}-%{release}^
 Provides:       %{name}-shutdown = %{version}-%{release}
 
 # Recommends to replace normal Requires deps for stuff that is dlopen()ed
-Recommends:     libidn2.so.0%{?elf_suffix}
-Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 Recommends:     libpcre2-8.so.0%{?elf_suffix}
 Recommends:     libpwquality.so.1%{?elf_suffix}
 Recommends:     libpwquality.so.1(LIBPWQUALITY_1.0)%{?elf_bits}
@@ -532,6 +533,8 @@ Requires:       %{name}%{_isa} = %{version}-%{release}
 License:        LGPL-2.1-or-later
 # https://src.fedoraproject.org/rpms/systemd/pull-request/34
 Obsoletes:      systemd < 246.6-2
+Recommends:     libidn2.so.0%{?elf_suffix}
+Recommends:     libidn2.so.0(IDN2_0.0.0)%{?elf_bits}
 
 %description networkd
 systemd-networkd is a system service that manages networks. It detects and
@@ -1189,6 +1192,15 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Apr 18 2024 Dan Streetman <ddstreet@microsoft.com> - 255-12
+- move libidn2 recommends from core package to systemd-networkd
+
+* Wed Apr 24 2024 Dan Streetman <ddstreet@microsoft.com> - 255-11
+- adjust pam.d/systemd-user file to include correct pam files
+
+* Mon Apr 15 2024 Henry Li <lihl@microsoft.com> - 255-10
+- Add patch to allow configurability of "UseDomains=" for networkd
+
 * Wed Mar 20 2024 Dan Streetman <ddstreet@microsoft.com> - 255-9
 - build dep the "bootstrap" macros because our maint scripts are broken without
   our rpm macros available during the build

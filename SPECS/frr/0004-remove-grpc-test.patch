@@ -3,8 +3,8 @@ index 7b5eaa4..5c82f69 100644
 --- a/tests/lib/subdir.am
 +++ b/tests/lib/subdir.am
 @@ -18,18 +18,6 @@ tests_lib_test_frrscript_SOURCES = tests/lib/test_frrscript.c
- EXTRA_DIST += tests/lib/test_frrscript.py
- 
+ 	test -e tests/lib/script1.lua || \
+ 	$(INSTALL_SCRIPT) $< tests/lib/script1.lua
  
 -##############################################################################
 -GRPC_TESTS_LDADD = staticd/libstatic.a grpc/libfrrgrpc_pb.la -lgrpc++ -lprotobuf $(ALL_TESTS_LDADD) $(LIBYANG_LIBS) -lm

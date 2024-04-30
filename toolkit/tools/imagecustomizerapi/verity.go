@@ -8,8 +8,9 @@ import (
 )
 
 type Verity struct {
-	DataPartition IdentifiedPartition `yaml:"dataPartition"`
-	HashPartition IdentifiedPartition `yaml:"hashPartition"`
+	DataPartition    IdentifiedPartition `yaml:"dataPartition"`
+	HashPartition    IdentifiedPartition `yaml:"hashPartition"`
+	CorruptionOption CorruptionOption    `yaml:"corruptionOption"`
 }
 
 func (v *Verity) IsValid() error {
@@ -19,6 +20,10 @@ func (v *Verity) IsValid() error {
 
 	if err := v.HashPartition.IsValid(); err != nil {
 		return fmt.Errorf("invalid hashPartition: %v", err)
+	}
+
+	if err := v.CorruptionOption.IsValid(); err != nil {
+		return fmt.Errorf("invalid corruptionOption: %v", err)
 	}
 
 	return nil

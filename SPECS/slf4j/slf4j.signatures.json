@@ -1,7 +1,6 @@
 {
  "Signatures": {
   "LICENSE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-  "build.xml.tar.bz2": "ddae17d67e1bbaf7f22546acc6e1005694ab067a36f5d8f26a67953d10c85e95",
-  "slf4j-1.7.30.tar.gz": "217519588d0dd1f85cee2357ca31afdd7c0a1a8a6963953b3bf455cf5174633e"
+  "slf4j-2.0.7.tar.gz": "bbceec6fb3d9da85ab4e65f3776fcb648a07019c11c6c6ac93d13f532a73d998"
  }
 }
