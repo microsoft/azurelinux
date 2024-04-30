@@ -325,9 +325,9 @@ func printSlice(pairList []mapPair, valueDescription string, maxResults int) {
 			break
 		}
 
-		logger.Log.Infof("%d: %s - %d %s", i+1, pair.key, len(pair.value), valueDescription)
+		logger.Log.Infof("%d: (%s) - %d (%s)", i+1, pair.key, len(pair.value), valueDescription)
 		for _, value := range pair.value {
-			logger.Log.Debugf("--> %s", value)
+			logger.Log.Debugf("--> (%s)", value)
 		}
 	}
 }
