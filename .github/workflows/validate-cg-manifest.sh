@@ -23,6 +23,7 @@ ignore_multiple_sources=" \
 
 # List of ignored specs due to no source tarball to scan.
 ignore_no_source_tarball=" \
+  azurelinux-sysinfo \
   ca-certificates \
   check-restart \
   core-packages \
