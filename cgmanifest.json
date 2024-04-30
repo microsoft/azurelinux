@@ -1807,8 +1807,8 @@
         "type": "other",
         "other": {
           "name": "cloud-init",
-          "version": "23.4.1",
-          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.4.1/+download/cloud-init-23.4.1.tar.gz"
+          "version": "23.3",
+          "downloadUrl": "https://launchpad.net/cloud-init/trunk/23.3.3/+download/cloud-init-23.3.tar.gz"
         }
       }
     },
@@ -2588,8 +2588,8 @@
         "type": "other",
         "other": {
           "name": "dhcp",
-          "version": "4.4.2",
-          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.2/dhcp-4.4.2.tar.gz"
+          "version": "4.4.3",
+          "downloadUrl": "ftp://ftp.isc.org/isc/dhcp/4.4.3/dhcp-4.4.3.tar.gz"
         }
       }
     },
@@ -4290,8 +4290,8 @@
         "type": "other",
         "other": {
           "name": "git-lfs",
-          "version": "3.1.4",
-          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.1.4.tar.gz"
+          "version": "3.5.1",
+          "downloadUrl": "https://github.com/git-lfs/git-lfs/archive/v3.5.1.tar.gz"
         }
       }
     },
@@ -13363,8 +13363,8 @@
         "type": "other",
         "other": {
           "name": "moby-cli",
-          "version": "20.10.27",
-          "downloadUrl": "https://github.com/docker/cli/archive/v20.10.27.tar.gz"
+          "version": "24.0.9",
+          "downloadUrl": "https://github.com/docker/cli/archive/v24.0.9.tar.gz"
         }
       }
     },
@@ -13403,8 +13403,8 @@
         "type": "other",
         "other": {
           "name": "moby-engine",
-          "version": "20.10.27",
-          "downloadUrl": "https://github.com/moby/moby/archive/v20.10.27.tar.gz"
+          "version": "24.0.9",
+          "downloadUrl": "https://github.com/moby/moby/archive/v24.0.9.tar.gz"
         }
       }
     },
@@ -27847,8 +27847,8 @@
         "type": "other",
         "other": {
           "name": "skopeo",
-          "version": "1.14.1",
-          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.14.1.tar.gz"
+          "version": "1.14.2",
+          "downloadUrl": "https://github.com/containers/skopeo/archive/refs/tags/v1.14.2.tar.gz"
         }
       }
     },

@@ -75,6 +75,32 @@ FILE_EXT='.txt'
 # TODO: We may need to update this value for Azure Linux 3.0.
 OS_VERSION_PREFIX="cbl-mariner-"
 DISTRO_IDENTIFIER="cm"
+END_OF_LIFE_1_YEAR=$(date -d "+1 year" "+%Y-%m-%dT%H:%M:%SZ")
+
+# Login to the container registry.
+# Also login ORAS to the container registry.
+# $1: container registry name
+function acr_login {
+    local container_registry=$1
+    local oras_access_token
+
+    echo "+++ az login into Azure ACR $container_registry"
+    oras_access_token=$(az acr login --name "$container_registry" --expose-token --output tsv --query accessToken)
+    oras login "$container_registry.azurecr.io" \
+        --username "00000000-0000-0000-0000-000000000000" \
+        --password "$oras_access_token"
+}
+
+# Attach the end-of-life annotation to the container image.
+# $1: image name
+function oras_attach {
+    local image_name=$1
+
+    oras attach \
+        --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
+        --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
+        "$image_name"
+}
 
 function create_multi_arch_tags {
     # $1: original container (without '-amd64' or '-arm64' extension in tag)
@@ -168,6 +194,7 @@ function create_multi_arch_tags {
     echo "+++ push $full_multiarch_tag tag"
     docker manifest push "$full_multiarch_tag"
     echo "+++ $full_multiarch_tag tag pushed successfully"
+    oras_attach "$full_multiarch_tag"
 
     # Save the multi-arch tag to a file.
     image_basename=${multiarch_name#*/}
@@ -233,8 +260,7 @@ do
         echo "Image name: $image_name"
         echo
         container_registry="${image_name%%.*}"
-        echo "+++ login into Azure ACR $container_registry"
-        az acr login --name "$container_registry"
+        acr_login "$container_registry"
 
         amd64_image=${image_name%-*}-amd64
         docker pull "$amd64_image"
@@ -246,9 +272,7 @@ do
         fi
 
         if [[ $container_registry != "$TARGET_ACR" ]]; then
-            echo "+++ login into Azure ACR $TARGET_ACR"
-            az acr login --name "$TARGET_ACR"
-
+            acr_login "$TARGET_ACR"
             echo "Retagging the images to $TARGET_ACR"
             # E.g., If container_registry is azurelinuxdevpreview and TARGET_ACR is azurelinuxpreview, then
             # azurelinuxdevpreview.azurecr.io/base/core:2.0 -> azurelinuxpreview.azurecr.io/base/core:2.0
@@ -258,6 +282,7 @@ do
             docker image tag "$amd64_image" "$amd64_retagged_image_name"
             docker rmi "$amd64_image"
             docker image push "$amd64_retagged_image_name"
+            oras_attach "$amd64_retagged_image_name"
 
             if [[ $ARCHITECTURE_TO_BUILD == *"ARM64"*  ]]; then
                 arm64_retagged_image_name=${arm64_image/"$container_registry"/"$TARGET_ACR"}
@@ -265,6 +290,7 @@ do
                 docker image tag "$arm64_image" "$arm64_retagged_image_name"
                 docker rmi "$arm64_image"
                 docker image push "$arm64_retagged_image_name"
+                oras_attach "$arm64_retagged_image_name"
             fi
 
             image_name=$amd64_retagged_image_name
