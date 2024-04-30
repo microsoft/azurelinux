@@ -221,7 +221,7 @@ Provides:       php-exif
 Provides:       php-exif%{?_isa}
 Provides:       php-fileinfo
 Provides:       php-fileinfo%{?_isa}
-Provides:       bundled(libmagic) = 5.29
+Provides:       bundled(libmagic) = 5.40
 Provides:       php-filter
 Provides:       php-filter%{?_isa}
 Provides:       php-ftp
