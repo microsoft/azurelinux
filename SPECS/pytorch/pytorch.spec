@@ -14,6 +14,7 @@ Source1:        %{name}-%{version}-submodules.tar.gz
 Patch0:         CVE-2024-31580.patch
 Patch1:         CVE-2024-31583.patch
 Patch2:         CVE-2024-27319.patch
+Patch3:         CVE-2024-31584.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
