@@ -42,7 +42,7 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
-12. Update the SELinux mode.
+12. Update the SELinux mode. [mode](#mode-string)
 
 13. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
     and update the grub config.
@@ -152,13 +152,13 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
-     - [additionalDirs](#additionaldirs-dirconfig)
-        - [dirConfig](#dirconfig-type)
-           - [sourcePath](#dirconfig-sourcePath)
-           - [destinationPath](#dirconfig-destinationPath)
-           - [newDirPermissions](#newDirPermissions-string)
-           - [mergedDirPermissions](#mergedDirPermissions-string)
-           - [childFilePermissions](#childFilePermissions-string)
+    - [additionalDirs](#additionaldirs-dirconfig)
+      - [dirConfig](#dirconfig-type)
+        - [sourcePath](#dirconfig-sourcePath)
+        - [destinationPath](#dirconfig-destinationPath)
+        - [newDirPermissions](#newdirpermissions-string)
+        - [mergedDirPermissions](#mergeddirpermissions-string)
+        - [childFilePermissions](#childfilepermissions-string)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
@@ -171,6 +171,8 @@ os:
         - [primaryGroup](#primarygroup-string)
         - [secondaryGroups](#secondarygroups-string)
         - [startupCommand](#startupcommand-string)
+    - [selinux](#selinux-type)
+      - [mode](#mode-string)
     - [services](#services-type)
       - [enable](#enable-string)
       - [disable](#disable-string)
@@ -517,64 +519,6 @@ If [resetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, 
 
 If [resetBootLoaderType](#resetbootloadertype-string) is not set, then the
 `extraCommandLine` value will be appended to the existing `grub.cfg` file.
-
-### selinuxMode
-
-Specifies the mode to set SELinux to.
-
-If this field is not specified, then the existing SELinux mode in the base image is
-maintained.
-Otherwise, the image is modified to match the requested SELinux mode.
-
-The Azure Linux Image Customizer tool can enable SELinux on a base image with SELinux
-disabled and it can disable SELinux on a base image that has SELinux enabled.
-However, using a base image that already has the required SELinux mode will speed-up the
-customization process.
-
-If SELinux is enabled, then all the file-systems that support SELinux will have their
-file labels updated/reset (using the `setfiles` command).
-
-Supported options:
-
-- `disabled`: Disables SELinux.
-
-- `permissive`: Enables SELinux but only logs access rule violations.
-
-- `enforcing`: Enables SELinux and enforces all the access rules.
-
-- `force-enforcing`: Enables SELinux and sets it to enforcing in the kernel
-  command-line.
-  This means that SELinux can't be set to `permissive` using the `/etc/selinux/config`
-  file.
-
-Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
-This package contains the default SELinux rules and is required for SELinux-enabled
-images to be functional.
-The Azure Linux Image Customizer tool will report an error if the package is missing from
-the image.
-
-Note: If you wish to apply additional SELinux policies on top of the base SELinux
-policy, then it is recommended to apply these new policies using
-([postInstallScripts](#postinstallscripts-script)).
-After applying the policies, you do not need to call `setfiles` manually since it will
-called automatically after the `postInstallScripts` are run.
-
-Example:
-
-```yaml
-os:
-  kernelCommandLine:
-    selinuxMode: enforcing
-
-  packagesInstall:
-  # Required packages for SELinux.
-  - selinux-policy
-  - selinux-policy-modules
-  
-  # Optional packages that contain useful SELinux utilities.
-  - setools-console
-  - policycoreutils-python-utils
-```
 
 ## module type
 
@@ -1110,6 +1054,18 @@ os:
     - name: vfio
 ```
 
+### selinux [[selinux](#selinux-type)]
+
+Options for configuring SELinux.
+
+Example:
+
+```yaml
+os:
+  selinux:
+    mode: permissive
+```
+
 ### services [[services](#services-type)]
 
 Options for configuring systemd services.
@@ -1283,6 +1239,66 @@ os:
   users:
   - name: test
     startupCommand: /sbin/nologin
+```
+
+## selinux type
+
+### mode [string]
+
+Specifies the mode to set SELinux to.
+
+If this field is not specified, then the existing SELinux mode in the base image is
+maintained.
+Otherwise, the image is modified to match the requested SELinux mode.
+
+The Azure Linux Image Customizer tool can enable SELinux on a base image with SELinux
+disabled and it can disable SELinux on a base image that has SELinux enabled.
+However, using a base image that already has the required SELinux mode will speed-up the
+customization process.
+
+If SELinux is enabled, then all the file-systems that support SELinux will have their
+file labels updated/reset (using the `setfiles` command).
+
+Supported options:
+
+- `disabled`: Disables SELinux.
+
+- `permissive`: Enables SELinux but only logs access rule violations.
+
+- `enforcing`: Enables SELinux and enforces all the access rules.
+
+- `force-enforcing`: Enables SELinux and sets it to enforcing in the kernel
+  command-line.
+  This means that SELinux can't be set to `permissive` using the `/etc/selinux/config`
+  file.
+
+Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
+This package contains the default SELinux rules and is required for SELinux-enabled
+images to be functional.
+The Azure Linux Image Customizer tool will report an error if the package is missing from
+the image.
+
+Note: If you wish to apply additional SELinux policies on top of the base SELinux
+policy, then it is recommended to apply these new policies using a
+([postCustomization](#postcustomization-script)) script.
+After applying the policies, you do not need to call `setfiles` manually since it will
+called automatically after the `postCustomization` scripts are run.
+
+Example:
+
+```yaml
+os:
+  selinux:
+    mode: enforcing
+
+  packagesInstall:
+  # Required packages for SELinux.
+  - selinux-policy
+  - selinux-policy-modules
+  
+  # Optional packages that contain useful SELinux utilities.
+  - setools-console
+  - policycoreutils-python-utils
 ```
 
 ## storage type
