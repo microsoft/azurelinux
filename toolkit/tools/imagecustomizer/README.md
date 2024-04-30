@@ -47,12 +47,14 @@ Disadvantages:
 3. Install prerequisites: `qemu-img`, `rpm`, `dd`, `lsblk`, `losetup`, `sfdisk`,
    `udevadm`, `flock`, `blkid`, `openssl`, `sed`, `createrepo`, `mksquashfs`,
    `genisoimage`, `mkfs`, `mkfs.ext4`, `mkfs.vfat`, `mkfs.xfs`, `fsck`, `e2fsck`,
-   `xfs_repair`, `zstd`.
+   `xfs_repair`, `resize2fs`, `zstd`, `veritysetup`.
 
    - For Ubuntu 22.04 images, run:
 
      ```bash
-     sudo apt -y install qemu-utils rpm coreutils util-linux mount fdisk udev openssl sed createrepo-c squashfs-tools genisoimage e2fsprogs dosfstools xfsprogs zstd
+     sudo apt -y install qemu-utils rpm coreutils util-linux mount fdisk udev openssl \
+        sed createrepo-c squashfs-tools genisoimage e2fsprogs dosfstools xfsprogs zstd \
+        cryptsetup-bin
      ```
 
 4. Run the Azure Linux Image Customizer tool.
