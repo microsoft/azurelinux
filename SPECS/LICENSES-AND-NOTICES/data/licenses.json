@@ -907,6 +907,7 @@
                 "mod_security",
                 "mod_security_crs",
                 "mod_wsgi",
+		"mosh",
                 "mokutil",
                 "moreutils",
                 "mpage",
