@@ -66,8 +66,8 @@ mount_volatile_persistent_volume() {
     else
         # Check if /etc/mdadm.conf exists.
         if [ -f "/etc/mdadm.conf" ]; then
-            mdadm --assemble ${_volume} || \
-                die "Failed to assemble RAID volume."
+            # Optionally wait for RAID to assemble if it's expected to be RAID.
+            wait_for_raid_assembly "${_volume}" || die "Failed to wait for RAID assembly."
         fi
 
         # Mount the specified persistent volume.
@@ -176,3 +176,21 @@ if [ -n "${overlayfs}" ]; then
 else
     echo "OverlayFS parameter not found in kernel cmdline, skipping mount_overlayfs."
 fi
+
+wait_for_raid_assembly() {
+    local raid_device=$1
+    local timeout=30  # Timeout in seconds
+    local elapsed=0
+
+    echo "Waiting for RAID assembly of ${raid_device}..."
+    while ! mdadm --detail "${raid_device}" &> /dev/null; do
+        sleep 1
+        ((elapsed++))
+        if [ ${elapsed} -ge ${timeout} ]; then
+            echo "Timeout waiting for RAID assembly."
+            return 1
+        fi
+    done
+    echo "RAID assembly completed."
+    return 0
+}

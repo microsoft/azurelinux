@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        16%{?dist}
+Release:        17%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -19,6 +19,7 @@ Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
 Source6:        defaults.conf
+Source7:        raid.conf
 
 Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
@@ -133,6 +134,7 @@ install -m 0644 dracut.conf.d/fips.conf.example %{buildroot}%{_sysconfdir}/dracu
 
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/dracut.conf.d/50-megaraid.conf
 install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.conf
+install -m 0644 %{SOURCE7} %{buildroot}%{_sysconfdir}/dracut.conf.d/10-raid.conf
 
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
@@ -209,6 +211,7 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %files overlayfs
 %dir %{dracutlibdir}/modules.d/20overlayfs
 %{dracutlibdir}/modules.d/20overlayfs/*
+%{_sysconfdir}/dracut.conf.d/10-raid.conf
 
 %{_bindir}/%{name}-catimages
 %dir /boot/%{name}
@@ -216,6 +219,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Tue Apr 30 2024 Lanze Liu <lanzeliu@microsoft.com> - 059-17
+- Ensure RAID module inclusion in initrd for RAID assembly
+
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
 - Remove x86-specific xen-acpi-processor driver from defaults
 
