@@ -1291,14 +1291,15 @@ os:
   selinux:
     mode: enforcing
 
-  packagesInstall:
-  # Required packages for SELinux.
-  - selinux-policy
-  - selinux-policy-modules
-  
-  # Optional packages that contain useful SELinux utilities.
-  - setools-console
-  - policycoreutils-python-utils
+  packages:
+    install:
+    # Required packages for SELinux.
+    - selinux-policy
+    - selinux-policy-modules
+    
+    # Optional packages that contain useful SELinux utilities.
+    - setools-console
+    - policycoreutils-python-utils
 ```
 
 ## storage type
