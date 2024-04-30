@@ -109,10 +109,13 @@ func updateGrubConfig(dataPartitionIdType imagecustomizerapi.IdType, dataPartiti
 		return err
 	}
 
-	newArgs := fmt.Sprintf(
-		"rd.systemd.verity=1 roothash=%s systemd.verity_root_data=%s systemd.verity_root_hash=%s systemd.verity_root_options=%s",
-		rootHash, formattedDataPartition, formattedHashPartition, formattedCorruptionOption,
-	)
+	newArgs := []string{
+		"rd.systemd.verity=1",
+		fmt.Sprintf("roothash=%s", rootHash),
+		fmt.Sprintf("systemd.verity_root_data=%s", formattedDataPartition),
+		fmt.Sprintf("systemd.verity_root_hash=%s", formattedHashPartition),
+		fmt.Sprintf("systemd.verity_root_options=%s", formattedCorruptionOption),
+	}
 
 	grub2Config, err := file.Read(grubCfgFullPath)
 	if err != nil {

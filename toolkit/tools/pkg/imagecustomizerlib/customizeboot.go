@@ -109,6 +109,8 @@ func findLinuxLine(inputGrubCfgContent string) ([]grub.Token, error) {
 
 // Overrides the path of the kernel binary of the linux command within a grub config file.
 func setLinuxPath(inputGrubCfgContent string, linuxPath string) (outputGrubCfgContent string, oldKernelPath string, err error) {
+	quotedLinuxPath := grub.QuoteString(linuxPath)
+
 	linuxLine, err := findLinuxLine(inputGrubCfgContent)
 	if err != nil {
 		return "", "", err
@@ -119,13 +121,15 @@ func setLinuxPath(inputGrubCfgContent string, linuxPath string) (outputGrubCfgCo
 	end := linuxFilePathToken.Loc.End.Index
 
 	oldKernelPath = inputGrubCfgContent[start:end]
-	outputGrubCfgContent = inputGrubCfgContent[:start] + linuxPath + inputGrubCfgContent[end:]
+	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedLinuxPath + inputGrubCfgContent[end:]
 
 	return outputGrubCfgContent, oldKernelPath, nil
 }
 
 // Overrides the path of the initramfs file of the initrd command within a grub config file.
 func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfgContent string, oldInitrdPath string, err error) {
+	quotedInitrdPath := grub.QuoteString(initrdPath)
+
 	line, err := findSingularGrubCommand(inputGrubCfgContent, "initrd")
 	if err != nil {
 		return "", "", err
@@ -140,7 +144,7 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 	end := initrdFilePathToken.Loc.End.Index
 
 	oldInitrdPath = inputGrubCfgContent[start:end]
-	outputGrubCfgContent = inputGrubCfgContent[:start] + initrdPath + inputGrubCfgContent[end:]
+	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedInitrdPath + inputGrubCfgContent[end:]
 
 	return outputGrubCfgContent, oldInitrdPath, nil
 }
@@ -285,6 +289,9 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 // Finds an existing kernel command-line arg and replaces its value.
 func replaceKernelCommandLineArgumentValue(inputGrubCfgContent string, name string, value string,
 ) (outputGrubCfgContent string, oldValue string, err error) {
+	newArg := fmt.Sprintf("%s=%s", name, value)
+	quotedNewArg := grub.QuoteString(newArg)
+
 	args, _, err := getLinuxCommandLineArgs(inputGrubCfgContent)
 	if err != nil {
 		return "", "", err
@@ -302,7 +309,7 @@ func replaceKernelCommandLineArgumentValue(inputGrubCfgContent string, name stri
 	start := arg.Token.Loc.Start.Index
 	end := arg.Token.Loc.End.Index
 
-	outputGrubCfgContent = fmt.Sprintf("%s%s=%s%s", inputGrubCfgContent[:start], name, value, inputGrubCfgContent[end:])
+	outputGrubCfgContent = inputGrubCfgContent[:start] + quotedNewArg + inputGrubCfgContent[end:]
 
 	return outputGrubCfgContent, oldValue, nil
 }
@@ -366,7 +373,9 @@ func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinuxMode, imageC
 }
 
 // Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
-func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string, newArg string) (string, error) {
+func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
+	newArgsQuoted := grubArgsToString(newArgs)
+
 	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
 	if err != nil {
 		return "", err
@@ -387,7 +396,7 @@ func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string,
 		}
 
 		// Insert the new arg at the location of the last arg.
-		grub2ConfigBuilder.WriteString(newArg)
+		grub2ConfigBuilder.WriteString(newArgsQuoted)
 	} else {
 		// Write out the grub config to the point where the new arg will be inserted.
 		insertAt := insertAtToken.Loc.Start.Index
@@ -395,7 +404,7 @@ func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string,
 		nextIndex = insertAt
 
 		// Insert the new arg.
-		grub2ConfigBuilder.WriteString(newArg)
+		grub2ConfigBuilder.WriteString(newArgsQuoted)
 		grub2ConfigBuilder.WriteString(" ")
 	}
 
@@ -406,18 +415,34 @@ func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string,
 	return grub2Config, nil
 }
 
+func grubArgsToString(args []string) string {
+	builder := strings.Builder{}
+	for i, arg := range args {
+		if i != 0 {
+			builder.WriteString(" ")
+		}
+
+		quotedArg := grub.QuoteString(arg)
+		builder.WriteString(quotedArg)
+	}
+
+	combinedString := builder.String()
+	return combinedString
+}
+
 // Update the SELinux kernel command-line args.
 func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
-	newSELinuxArgs := ""
+	newSELinuxArgs := []string(nil)
 	switch selinuxMode {
 	case imagecustomizerapi.SELinuxModeDisabled:
-		newSELinuxArgs = ""
+		newSELinuxArgs = nil
 
 	case imagecustomizerapi.SELinuxModeForceEnforcing:
-		newSELinuxArgs = installutils.CmdlineSELinuxForceEnforcing
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg}
 
 	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
-		newSELinuxArgs = installutils.CmdlineSELinuxSettings
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
+			installutils.CmdlineSELinuxEnforcingArg}
 
 	default:
 		return "", fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
@@ -434,6 +459,8 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 
 // Finds a set command that sets the variable with the provided name and then change the value that is set.
 func replaceSetCommandValue(grub2Config string, varName string, newValue string) (string, error) {
+	quotedNewValue := grub.QuoteString(newValue)
+
 	grubTokens, err := grub.TokenizeGrubConfig(grub2Config)
 	if err != nil {
 		return "", err
@@ -493,7 +520,7 @@ func replaceSetCommandValue(grub2Config string, varName string, newValue string)
 	argToken := setVarLine[1]
 	start := argToken.Loc.Start.Index
 	end := argToken.Loc.End.Index
-	grub2Config = fmt.Sprintf("%s%s=%s%s", grub2Config[:start], varName, newValue, grub2Config[end:])
+	grub2Config = fmt.Sprintf("%s%s=%s%s", grub2Config[:start], varName, quotedNewValue, grub2Config[end:])
 
 	return grub2Config, nil
 }

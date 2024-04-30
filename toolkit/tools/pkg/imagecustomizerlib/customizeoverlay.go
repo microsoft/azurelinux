@@ -67,7 +67,9 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 	concatenatedOverlays := strings.Join(overlayConfigs, " ")
 
 	// Construct the final cmdline argument
-	newArgs := fmt.Sprintf("rd.overlayfs=\"%s\"", concatenatedOverlays)
+	newArgs := []string{
+		fmt.Sprintf("rd.overlayfs=%s", concatenatedOverlays),
+	}
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
 
