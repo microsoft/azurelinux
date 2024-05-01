@@ -43,7 +43,6 @@ Summary:        Metapackage to install the set of packages inside a Kata confide
 Requires:       %{name} = %{version}-%{release}
 Requires:       cifs-utils
 Requires:       device-mapper
-Requires:       opa
 
 %description    coco
 
