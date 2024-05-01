@@ -9,7 +9,7 @@ Group:          Applications/System
 URL:            https://github.com/zchunk/zchunk
 Source0:        https://github.com/zchunk/zchunk/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2023-46228.patch
-Patch1:         0000-Zstd-1.5.1.patch
+Patch1:         0000-Zstd-1.5.1-fix.patch
 BuildRequires:  curl-devel
 BuildRequires:  meson
 BuildRequires:  openssl-devel
