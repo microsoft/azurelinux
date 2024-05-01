@@ -1,7 +1,7 @@
-From ea0ec39c85e21daa5b4f31884ee1e4a198c78fcd Mon Sep 17 00:00:00 2001
+From 30281eef6f03c852019e0d5c07429904815cac4e Mon Sep 17 00:00:00 2001
 From: Paolo Bonzini <pbonzini@redhat.com>
 Date: Tue, 21 Nov 2017 00:57:46 +0100
-Subject: [PATCH 07/14] OvmfPkg: silence DEBUG_VERBOSE (0x00400000) in
+Subject: [PATCH 07/17] OvmfPkg: silence DEBUG_VERBOSE (0x00400000) in
  QemuVideoDxe/QemuRamfbDxe (RH)
 
 Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
@@ -82,12 +82,12 @@ Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
  4 files changed, 32 insertions(+), 8 deletions(-)
 
 diff --git a/OvmfPkg/AmdSev/AmdSevX64.dsc b/OvmfPkg/AmdSev/AmdSevX64.dsc
-index ae3f9c75c4a4..c7d7add60d44 100644
+index 62d5b7d2c426..ce320efb735e 100644
 --- a/OvmfPkg/AmdSev/AmdSevX64.dsc
 +++ b/OvmfPkg/AmdSev/AmdSevX64.dsc
-@@ -682,8 +682,14 @@ [Components]
+@@ -691,8 +691,14 @@ [Components]
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
    MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
-   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
  
 -  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 -  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
@@ -103,20 +103,19 @@ index ae3f9c75c4a4..c7d7add60d44 100644
  
    #
 diff --git a/OvmfPkg/OvmfPkgIa32.dsc b/OvmfPkg/OvmfPkgIa32.dsc
-index bb3b0c1c96f3..30b843d2287a 100644
+index ae3b446ff277..7e07fbfd469e 100644
 --- a/OvmfPkg/OvmfPkgIa32.dsc
 +++ b/OvmfPkg/OvmfPkgIa32.dsc
-@@ -851,9 +851,15 @@ [Components]
-   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+@@ -828,8 +828,14 @@ [Components]
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
- !ifndef $(CSM_ENABLE)
 -  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
- !endif
--  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
@@ -125,20 +124,19 @@ index bb3b0c1c96f3..30b843d2287a 100644
  
    #
 diff --git a/OvmfPkg/OvmfPkgIa32X64.dsc b/OvmfPkg/OvmfPkgIa32X64.dsc
-index 19b968bd945d..2327c5c29611 100644
+index 4a547f28c0c5..f28c71a7a8bf 100644
 --- a/OvmfPkg/OvmfPkgIa32X64.dsc
 +++ b/OvmfPkg/OvmfPkgIa32X64.dsc
-@@ -864,9 +864,15 @@ [Components.X64]
-   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+@@ -842,8 +842,14 @@ [Components.X64]
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
- !ifndef $(CSM_ENABLE)
 -  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
- !endif
--  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
@@ -147,20 +145,19 @@ index 19b968bd945d..2327c5c29611 100644
  
    #
 diff --git a/OvmfPkg/OvmfPkgX64.dsc b/OvmfPkg/OvmfPkgX64.dsc
-index 876f2374a2cc..49b914c29f35 100644
+index 68bd1f6dcb15..680bdb5f4c02 100644
 --- a/OvmfPkg/OvmfPkgX64.dsc
 +++ b/OvmfPkg/OvmfPkgX64.dsc
-@@ -937,9 +937,15 @@ [Components]
-   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+@@ -910,8 +910,14 @@ [Components]
+   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
  
- !ifndef $(CSM_ENABLE)
 -  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+-  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 +  }
- !endif
--  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 +  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf {
 +    <PcdsFixedAtBuild>
 +      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
@@ -169,5 +166,5 @@ index 876f2374a2cc..49b914c29f35 100644
  
    #
 -- 
-2.39.2
+2.43.1
 

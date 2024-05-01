@@ -1,7 +1,7 @@
-From 84149154c873d3521bf0848d8473f2c09f3ccca0 Mon Sep 17 00:00:00 2001
+From 274c5af6a0c43eb21071791bd691ebdca77c0265 Mon Sep 17 00:00:00 2001
 From: Laszlo Ersek <lersek@redhat.com>
 Date: Tue, 25 Feb 2014 22:40:01 +0100
-Subject: [PATCH 03/14] MdeModulePkg: TerminalDxe: set xterm resolution on mode
+Subject: [PATCH 03/17] MdeModulePkg: TerminalDxe: set xterm resolution on mode
  change (RH only)
 
 Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
@@ -87,12 +87,12 @@ Signed-off-by: Laszlo Ersek <lersek@redhat.com>
  3 files changed, 35 insertions(+)
 
 diff --git a/MdeModulePkg/MdeModulePkg.dec b/MdeModulePkg/MdeModulePkg.dec
-index f33312fb3510..020f62fcc668 100644
+index 98b3acb703f5..49b5cde4c6cb 100644
 --- a/MdeModulePkg/MdeModulePkg.dec
 +++ b/MdeModulePkg/MdeModulePkg.dec
-@@ -2102,6 +2102,10 @@ [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-   # @Prompt The shared bit mask when Intel Tdx is enabled.
-   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
+@@ -2164,6 +2164,10 @@ [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+   # @Prompt The value is use for Usb Network rate limiting supported.
+   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
  
 +  ## Controls whether TerminalDxe outputs an XTerm resize sequence on terminal
 +  #  mode change.
@@ -176,5 +176,5 @@ index 7809869e7d49..496849458db4 100644
  
    Status = This->ClearScreen (This);
 -- 
-2.39.2
+2.43.1
 
