@@ -27,14 +27,15 @@ const (
 	grubCfg               = "grub.cfg"
 
 	searchCommandTemplate = "search --label %s --set root"
-	rootValueTemplate     = "live:LABEL=%s"
+	// rootValueTemplate     = "live:LABEL=%s"
+	rootValueTemplate = "live:/gmileka-workaround/rootfs.img"
 	// The names initrd.img and vmlinuz are expected by isomaker.
 	isoBootDir    = "boot"
 	isoInitrdPath = "/boot/initrd.img"
 	isoKernelPath = "/boot/vmlinuz"
 
 	// kernel arguments template
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsTemplate = " rd.shell rd.debug rd.live.debug=1 rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
@@ -213,7 +214,8 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	}
 
 	searchCommand := fmt.Sprintf(searchCommandTemplate, isomakerlib.DefaultVolumeId)
-	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	// rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	rootValue := rootValueTemplate
 
 	inputContentString, err = replaceSearchCommand(inputContentString, searchCommand)
 	if err != nil {
@@ -256,6 +258,11 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}
+
+	inputContentString = "set debug=all\n" + inputContentString
+	logger.Log.Debugf("---- debug start ----")
+	logger.Log.Debugf("\n" + inputContentString)
+	logger.Log.Debugf("---- debug end ----")
 
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {
