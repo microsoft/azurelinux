@@ -1,15 +1,20 @@
 #!/bin/bash
 
-inputVhdxImage=/home/george/git/linux-workspace/core-2.0.20240404.vhdx
-enlistmentDir=/home/george/git/CBL-Mariner-PXE
-configRoot=$enlistmentDir/toolkit/tools/imagecustomizer/pxe/config
+scriptPath=$(realpath ${BASH_SOURCE[0]})
+scriptDir=$(dirname "$scriptPath")
+
+# This file is needed to provide the kernel and the base for the new initrd.
+# The rootfs is irrelevant.
+inputVhdxImage=${1:-/home/george/temp/baremetal-core-2.0.20240430.vhdx}
+enlistmentDir=$scriptDir/../../../..
+
+micConfigDir=$enlistmentDir/toolkit/tools/imagecustomizer/pxe/config
+micConfig=$micConfigDir/mic-config-initrd-downloader.yaml
 
 isoBuildDir=$enlistmentDir/mic-build
 isoOutDir=$isoBuildDir/out
 imageCustomizerPath=$enlistmentDir/toolkit/out/tools/imagecustomizer
 
-scriptPath=$(realpath ${BASH_SOURCE[0]})
-scriptDir=$(dirname "$scriptPath")
 
 function echo_usage_and_exit() {
     echo "Usage: $0 inputImageFile inputConfigFile outputImageFile"
@@ -19,7 +24,7 @@ function echo_usage_and_exit() {
     echo "example:"
     echo
     echo "cd CBL-Mariner"
-    echo "$0 ./out/images/baremetal/core-2.0.20240119.1908.vhdx ./mic-config.yaml ./mic-out-image.iso"
+    echo "$0 /home/george/temp/baremetal-core-2.0.20240430.vhdx ./mic-config.yaml ./mic-out-image.iso"
     echo
 
     exit 2
@@ -42,7 +47,7 @@ function buildMic() {
    popd
 }
 
-function testMic() {
+function buildPxeIso() {
   local inputImage=$1
   local inputConfigFile=$2
   local outputFormat=$3
@@ -75,9 +80,9 @@ sudo rm -rf $isoBuildDir
 
 buildMic
 
-testMic \
+buildPxeIso \
    $inputVhdxImage \
-   $configRoot/mic-config-initrd-downloader.yaml \
+   $micConfig \
    "iso" \
    "initrd-with-downloader"
 
