@@ -234,7 +234,7 @@ function docker_build {
     pushd "$build_dir" > /dev/null
 
     echo "+++ Build image: $image_full_name"
-    docker build . \
+    docker buildx build . \
         --build-arg EULA="$EULA_FILE_NAME" \
         --build-arg BASE_IMAGE="$temp_image" \
         -t "$image_full_name" \
@@ -259,7 +259,7 @@ function docker_build_custom {
     pushd "$WORK_DIR" > /dev/null
 
     echo "+++ Build image: $image_full_name"
-    docker build . \
+    docker buildx build . \
         --build-arg BASE_IMAGE="$BASE_IMAGE_NAME" \
         --build-arg FINAL_IMAGE="$final_image_to_use" \
         --build-arg AZL_VERSION="$AZL_VERSION" \
@@ -290,7 +290,7 @@ function docker_build_marinara {
 
     sed -E "s|^FROM mcr\..*installer$|FROM $BASE_BUILDER as installer|g" -i "dockerfile-$MARINARA"
 
-    docker build . \
+    docker buildx build . \
         -t "$MARINARA_IMAGE_NAME" \
         -f dockerfile-$MARINARA \
         --build-arg AZL_VERSION="$AZL_VERSION" \
