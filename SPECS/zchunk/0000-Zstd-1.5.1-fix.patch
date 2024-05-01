@@ -1,0 +1,51 @@
+diff -urN zchunk-1.1.16/test/meson.build zchunk-1.1.16/test/meson.build
+--- zchunk-1.1.16/test/meson.build	2024-05-01 11:27:24.222901597 -0700
++++ zchunk-1.1.16/test/meson.build	2024-05-01 11:37:25.775139709 -0700
+@@ -214,7 +214,10 @@
+ )
+ 
+ if build_machine.endian() != 'big'
+-    check_sha = '4f07f865bb15624cf854aa369e14a3538ad9e9bf98e233036d37d2568e60b7cc'
++    check_sha = '7412757c744bcb17a112fedcbec6914d307bc4d2ab5936a2b6908a64a5c8c0ec'
++    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
++        check_sha = '4f07f865bb15624cf854aa369e14a3538ad9e9bf98e233036d37d2568e60b7cc'
++    endif
+     if zstd_dep.found() and zstd_dep.version().version_compare('<=1.4.9')
+         check_sha = 'eff3098803ba80f0c446d49f48188f89167d7f29cdc8a98c19f0ecfb4e2ee3c9'
+     endif
+@@ -251,7 +254,10 @@
+     )
+ 
+ 
+-    check_sha = '11d08d01c7877d51b84a0f97ebf651ca3304de10cdf207223df2dbc3295fa532'
++    check_sha = '25669f40abd98cc6a010173ad9891960ef56f12fad2ba95acb642ca11a98e96f'
++    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
++        check_sha = '11d08d01c7877d51b84a0f97ebf651ca3304de10cdf207223df2dbc3295fa532'
++    endif
+     if zstd_dep.found() and zstd_dep.version().version_compare('<=1.4.9')
+         check_sha = 'b86795ca14eb04b382d1c7f94501aa5d1a2ddb05a5351c0235d00edb954e9b66'
+     endif
+@@ -285,7 +291,10 @@
+         is_parallel: false
+     )
+ 
+-    check_sha = 'db42e903a2cf3b859835298272ff45bff6d2435d32fe7fda2bfe2815ab161994'
++    check_sha = 'f9057c70daf878ec93b86156ccabb4ce4549d409fe0446b4f88a0f88f916956b'
++    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
++        check_sha = 'db42e903a2cf3b859835298272ff45bff6d2435d32fe7fda2bfe2815ab161994'
++    endif
+     if zstd_dep.found() and zstd_dep.version().version_compare('<=1.4.9')
+         check_sha = 'c46929367cd3d05daaca3b44657726791b428fb2198f5e7e5367b5cc781307aa'
+     endif
+@@ -326,7 +335,10 @@
+         is_parallel: false
+     )
+ 
+-    check_sha = 'ee8df850bc4797e6696b966a74a459129b0f6d23dfb720d1cc8cba6f2b209dd2'
++    check_sha = 'ec068277d5277b2c7c3c45e25f5b23a0e7ef56fd4c0463db28255642850379ab'
++    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
++        check_sha = 'ee8df850bc4797e6696b966a74a459129b0f6d23dfb720d1cc8cba6f2b209dd2'
++    endif
+     if zstd_dep.found() and zstd_dep.version().version_compare('<=1.4.9')
+         check_sha = '5fc2449aeb51f6a898529fa4d53b04de6df6a352826f819dc2b39b153ddaa788'
+     endif
