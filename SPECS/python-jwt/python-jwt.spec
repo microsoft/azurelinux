@@ -37,7 +37,7 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
 %if 0%{?with_check}
-BuildRequires:  python3-pip
+BuildRequires:  python3-tox
 BuildRequires:  python3-atomicwrites
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}
@@ -59,7 +59,7 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 %check
-pip3 install tox
+# pip3 install tox
 %tox
 # pip3 install coverage[toml]==5.0.4 pytest==6.0.0
 # PATH=%{buildroot}%{_bindir}:${PATH} \
