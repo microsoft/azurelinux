@@ -1,0 +1,9 @@
+{
+    "Signatures": {
+     "collect-sysinfo": "b47df8a856c49e4bc02b36d1c3dd2825b75b9d8449b5dae8af401fc6818131c9",
+     "sysinfo-schema-v1.json": "67b541239416bd5f9a77a0799881f21c2e5eea686dc7a3ccaffe6bd7219a4798",
+     "azurelinux-sysinfo.service": "c719ab2238d0412b7ac6a793cd83e5be7879023161f86fb29d1c0ca18e70631c",
+     "sysinfo-selinuxpolicies.cil": "1f0df94a09f4db09093743339b6162735b6f1c81108cd3b857a6dbc729630400"
+    }
+}
+   
