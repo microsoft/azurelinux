@@ -35,7 +35,7 @@ const (
 	isoKernelPath = "/boot/vmlinuz"
 
 	// kernel arguments template
-	kernelArgsTemplate = " rd.shell rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
+	kernelArgsTemplate = " rd.shell rd.debug rd.live.debug=1 rd.live.image rd.live.dir=%s rd.live.squashimg=%s rd.live.overlay=1 rd.live.overlay.nouserconfirmprompt %s"
 	liveOSDir          = "liveos"
 	liveOSImage        = "rootfs.img"
 
@@ -258,6 +258,11 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}
+
+	inputContentString = "set debug=all\n" + inputContentString
+	logger.Log.Debugf("---- debug start ----")
+	logger.Log.Debugf("\n" + inputContentString)
+	logger.Log.Debugf("---- debug end ----")
 
 	err = os.WriteFile(grubCfgFileName, []byte(inputContentString), 0o644)
 	if err != nil {

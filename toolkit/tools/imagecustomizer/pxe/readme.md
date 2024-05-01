@@ -11,7 +11,15 @@ The boot flow is like this now:
 - trident daemon is launched and looks for its configuration under /run/initramfs/downloaded-artifacts/trident.yaml
 
 The implement this:
+- Download the base image from Azure Linux artifact feed from [here](https://dev.azure.com/mariner-org/mariner/_artifacts/feed/AzureLinuxArtifacts).
+  - If you download `baremetal_vhdx-2.0-stable`, the vhdx will be named `core-2.0.20240425.vhdx`.
+  - Let's copy the downloaded vhdx to `~/temp/core-2.0.20240425.vhdx`
 - Enlist in AzureLinux
+  ```bash
+  cd ~/git
+  git clone git@github.com:microsoft/azurelinux.git
+  cd azurelinux
+  ```
 - Checkout 3.0 dev
   - Use MIC to create an intermediate ISO.
     - it has trident and all its dependencies installed.
@@ -33,12 +41,10 @@ The implement this:
     sudo cp /mnt/trident-mos-testimage.iso/images/root.raw.zst $pxeIsoArtifactsDir
     sudo chown $USER:$USER $pxeIsoArtifactsDir/*
     ```
-  - Download the latest 2.0 Mariner vhdx to `~/temp/baremetal-core-2.0.20240430.vhdx`.
-    - This will be used to provide the kernel/base initrd. We will not use its rootfs.
   - Build the PXE ISO:
     ```bash
     $enlistmentDir/toolkit/tools/imagecustomizer/pxe/gen-pxe-iso.sh \
-        ~/temp/baremetal-core-2.0.20240430.vhdx
+        ~/temp/core-2.0.20240425.vhdx
     ```
   - Boot the generate iso on hyper-v to make sure it is usable.
   - Extract the artifacts from the generated iso:
