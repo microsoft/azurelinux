@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 )
 
 func customizePartitions(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -17,6 +18,8 @@ func customizePartitions(buildDir string, baseConfigPath string, config *imagecu
 		// So, just use the original disk.
 		return false, buildImageFile, nil
 	}
+
+	logger.Log.Infof("Customizing partitions")
 
 	newBuildImageFile := filepath.Join(buildDir, PartitionCustomizedImageName)
 
