@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        6.6.22.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,6 +145,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Mon Apr 29 2024 Sriram Nambakam <snambakam@microsoft.com> - 6.6.22.1-3
+- Remove CONFIG_NF_CONNTRACK_PROCFS
+- Remove CONFIG_TRACE_IRQFLAGS
+- Remove CONFIG_TRACE_IRQFLAGS_NMI
+- Remove CONFIG_IRQSOFF_TRACER
+- Remove CONFIG_PREEMPTIRQ_TRACEPOINTS
+
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 6.6.22.1-2
 - Change aarch64 config to produce hv, xen, virtio as modules 
 - to support dracut initramfs generation on arm64 VM systems
