@@ -1,3 +1,4 @@
 FROM mcr.microsoft.com/cbl-mariner/base/core:2.0
-RUN tdnf update -y && tdnf install -y sudo qemu-img rpm coreutils util-linux systemd openssl sed squashfs-tools dosfstools genisoimage
+RUN tdnf update -y && tdnf install -y sudo qemu-img rpm coreutils util-linux systemd openssl sed squashfs-tools dosfstools \
+   genisoimage qemu-utils mount fdisk createrepo-c e2fsprogs xfsprogs zstd cryptsetup-bin
 COPY . /
