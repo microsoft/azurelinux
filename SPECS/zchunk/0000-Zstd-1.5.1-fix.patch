@@ -6,7 +6,7 @@ diff -urN zchunk-1.1.16/test/meson.build zchunk-1.1.16/test/meson.build
  
  if build_machine.endian() != 'big'
 -    check_sha = '4f07f865bb15624cf854aa369e14a3538ad9e9bf98e233036d37d2568e60b7cc'
-+    check_sha = 'ac9d431f1f568d8921257fa17929c320f0cdcbff450d9f3c38c78c4f410ee788'
++    check_sha = '7412757c744bcb17a112fedcbec6914d307bc4d2ab5936a2b6908a64a5c8c0ec'
 +    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
 +        check_sha = '4f07f865bb15624cf854aa369e14a3538ad9e9bf98e233036d37d2568e60b7cc'
 +    endif
@@ -18,7 +18,7 @@ diff -urN zchunk-1.1.16/test/meson.build zchunk-1.1.16/test/meson.build
  
  
 -    check_sha = '11d08d01c7877d51b84a0f97ebf651ca3304de10cdf207223df2dbc3295fa532'
-+    check_sha = '35549b28b01c0a43d7389d4c40d5b750c73fb6c0c6701355ef709ef4a37df389'
++    check_sha = '25669f40abd98cc6a010173ad9891960ef56f12fad2ba95acb642ca11a98e96f'
 +    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
 +        check_sha = '11d08d01c7877d51b84a0f97ebf651ca3304de10cdf207223df2dbc3295fa532'
 +    endif
@@ -30,7 +30,7 @@ diff -urN zchunk-1.1.16/test/meson.build zchunk-1.1.16/test/meson.build
      )
  
 -    check_sha = 'db42e903a2cf3b859835298272ff45bff6d2435d32fe7fda2bfe2815ab161994'
-+    check_sha = '2580f66412adce1ed8d92abc09b0f64eb155155f61e21a8269a2c4a338857e51'
++    check_sha = 'f9057c70daf878ec93b86156ccabb4ce4549d409fe0446b4f88a0f88f916956b'
 +    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
 +        check_sha = 'db42e903a2cf3b859835298272ff45bff6d2435d32fe7fda2bfe2815ab161994'
 +    endif
@@ -42,7 +42,7 @@ diff -urN zchunk-1.1.16/test/meson.build zchunk-1.1.16/test/meson.build
      )
  
 -    check_sha = 'ee8df850bc4797e6696b966a74a459129b0f6d23dfb720d1cc8cba6f2b209dd2'
-+    check_sha = '863dc2bda721a32c26485eeb2223d5dabcf9ac517ecba8c7991fa0120d04c937'
++    check_sha = 'ec068277d5277b2c7c3c45e25f5b23a0e7ef56fd4c0463db28255642850379ab'
 +    if zstd_dep.found() and zstd_dep.version().version_compare('<=1.5.0')
 +        check_sha = 'ee8df850bc4797e6696b966a74a459129b0f6d23dfb720d1cc8cba6f2b209dd2'
 +    endif
