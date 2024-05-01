@@ -46,9 +46,6 @@ rel_dirname=`make_system_path_relative_to_its_root $dirname`
 version=`echo $basename | sed -e "s,^[^0-9]*-,,g"`
 linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
 
-initrd=`version_find_latest $initrd_list`
-initrd_basename=`basename $initrd`
-
 if [ x$dirname = x/ ]; then
     if [ -z "${prepare_root_cache}" ]; then
         prepare_root_cache="$(prepare_grub_to_access_device ${GRUB_DEVICE} | grub_add_tab)"
@@ -62,5 +59,11 @@ else
 fi
 
 printf '\t%s\n' "linux ${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
-printf '\t%s\n' "initrd ${rel_dirname}/${initrd_basename}"
+
+initrd=`version_find_latest $initrd_list`
+if [ ! -z "$initrd" ]; then
+    initrd_basename=`basename $initrd`
+    printf '\t%s\n' "initrd ${rel_dirname}/${initrd_basename}"
+fi
+
 printf '}\n'
