@@ -27,7 +27,7 @@ for _group in ${overlayfs}; do
     volume=$(expand_persistent_dev "$volume")
 
     if [[ "$volume" == "" ]]; then
-        
+        continue
     else
         wait_for_dev "$volume"
     fi
