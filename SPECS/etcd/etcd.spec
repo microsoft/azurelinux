@@ -1,7 +1,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.12
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -13,6 +13,7 @@ Source1:        etcd.service
 # In order to regenerate this tarball, download the source tarball and run:
 #   generate_source_tarball.sh --srcTarball <source_tarball> --pkgVersion %%{version} --outFolder .
 Source2:        %{name}-%{version}-vendor.tar.gz
+Patch0:         CVE-2023-45288.patch
 BuildRequires:  golang >= 1.20.13
 
 %description
@@ -29,7 +30,7 @@ The etcd-tools package contains the etcd-dump-db and etcd-dump-logs diagnostic
 tools.
 
 %prep
-%autosetup -p1
+%autosetup -N -p1
 tar --no-same-owner -xf %{SOURCE2}
 
 %build
@@ -40,6 +41,7 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input %{PATCH0}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -53,6 +55,7 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input %{PATCH0}
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
@@ -114,6 +117,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 3.5.12-2
+- Fix for CVE-2023-45288
+
 * Wed Mar 20 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.5.12-1
 - Upgrade to version 3.5.12 to patch CVE-2024-44487.
 

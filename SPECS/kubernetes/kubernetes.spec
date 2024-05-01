@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.28.4
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -21,6 +21,7 @@ Source1:        kubelet.service
 Patch0:         CVE-2024-21626.patch
 Patch1:         CVE-2023-48795.patch
 Patch2:         CVE-2023-5408.patch
+Patch3:         CVE-2023-45288.patch
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.35-6%{?dist}
 BuildRequires:  golang
@@ -267,6 +268,9 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.28.4-7
+- Fix for CVE-2023-45288
+
 * Tue Apr 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.4-6
 - Use autopatch instead of individual patch
 

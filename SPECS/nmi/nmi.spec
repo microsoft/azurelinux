@@ -2,7 +2,7 @@
 Summary:        Node Managed Identity
 Name:           nmi
 Version:        1.8.17
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Source0:        %{name}-%{version}.tar.gz
 #
 Source1:        %{name}-%{version}-vendor-v2.tar.gz
 Patch0:         modify-go-build-option.patch
+Patch1:         CVE-2023-45288.patch
 BuildRequires:  golang >= 1.15
 
 %description
@@ -33,9 +34,9 @@ NMI is the resource that is used when your pods look to use their identity.
 %prep
 %autosetup -c -N -n %{name}-%{version}
 pushd aad-pod-identity-%{version}
-%patch0 -p1
 # create vendor folder from the vendor tarball and set vendor mode
 tar -xf %{SOURCE1} --no-same-owner
+%autopatch -p1
 popd
 
 %build
@@ -61,6 +62,9 @@ popd
 %{_bindir}/%{name}
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.8.17-2
+- Fix for CVE-2023-45288
+
 * Thu Mar 07 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.17-1
 - Auto-upgrade to 1.8.17 - CVE-2022-41717
 

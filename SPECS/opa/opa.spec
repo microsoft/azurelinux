@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.63.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -20,6 +20,7 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         0001-Make-telemetry-opt-out.patch
 # Skip tests requiring network
 Patch1:         0001-Skip-tests-requiring-network.patch
+Patch2:         CVE-2023-45288.patch
 # Warn users about WebAssembly missing
 BuildRequires:  golang
 BuildRequires:  make
@@ -53,6 +54,9 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 0.63.0-2
+- Fix for CVE-2023-45288
+
 * Mon Apr 01 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.63.0-1
 - Auto-upgrade to 0.63.0 - CVE-2023-45142
 
