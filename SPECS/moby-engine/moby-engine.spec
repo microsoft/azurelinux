@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 24.0.9
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -89,6 +89,7 @@ install -p -m 755 ./bundles/dynbinary-daemon/dockerd %{buildroot}%{_bindir}/dock
 
 mkdir -p %{buildroot}%{_libexecdir}
 install -p -m 755 ./bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_libexecdir}/docker-proxy
+ln -s %{_libexecdir}/docker-proxy %{buildroot}/%{_bindir}/docker-proxy
 
 mkdir -p %{buildroot}%{_sysconfdir}/udev/rules.d
 install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_sysconfdir}/udev/rules.d/80-docker.rules
@@ -115,6 +116,8 @@ fi
 %files
 %license LICENSE NOTICE
 %{_bindir}/dockerd
+# docker-proxy symlink in bindir to fix back-compat
+%{_bindir}/docker-proxy
 %{_libexecdir}/docker-proxy
 %dir %{_sysconfdir}/docker
 %config(noreplace) %{_sysconfdir}/docker/daemon.json
@@ -122,6 +125,9 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Wed May 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-2
+- Symlink /usr/bin/docker-proxy to /usr/libexec/docker-proxy for back-compat
+
 * Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 24.0.9-1
 - Bump version to 24.X
 - Drop un-needed patches
