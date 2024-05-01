@@ -14413,8 +14413,8 @@
         "type": "other",
         "other": {
           "name": "nodejs18",
-          "version": "18.18.2",
-          "downloadUrl": "https://nodejs.org/download/release/v18.18.2/node-v18.18.2.tar.xz"
+          "version": "18.20.2",
+          "downloadUrl": "https://nodejs.org/download/release/v18.20.2/node-v18.20.2.tar.xz"
         }
       }
     },
