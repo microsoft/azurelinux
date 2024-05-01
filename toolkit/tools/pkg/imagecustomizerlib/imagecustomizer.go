@@ -538,11 +538,11 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 }
 
 func checkDmVerityEnabled(rawImageFile string) error {
-	logger.Log.Debugf("Check if dm-verity is enabled")
+	logger.Log.Debugf("Check if dm-verity is enabled in base image")
 
 	loopback, err := safeloopback.NewLoopback(rawImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to check if dm-verity is enabled:\n%w", err)
+		return fmt.Errorf("failed to check if dm-verity is enabled in base image:\n%w", err)
 	}
 	defer loopback.Close()
 
@@ -561,7 +561,7 @@ func checkDmVerityEnabled(rawImageFile string) error {
 
 	err = loopback.CleanClose()
 	if err != nil {
-		return fmt.Errorf("failed to check if dm-verity is enabled:\n%w", err)
+		return fmt.Errorf("failed to check if dm-verity is enabled in base image:\n%w", err)
 	}
 
 	return nil
