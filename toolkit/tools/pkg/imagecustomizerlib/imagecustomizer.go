@@ -130,7 +130,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
 	// the verity hash device should not be assigned this type. We do not support customization on verity enabled base
 	// images at this time because such modifications would compromise the integrity and security mechanisms enforced by dm-verity.
-	err = isDmVerityEnabled(buildDirAbs, rawImageFile)
+	err = checkDmVerityEnabled(rawImageFile)
 	if err != nil {
 		return err
 	}
@@ -377,6 +377,8 @@ func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, 
 func customizeImageHelper(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
 	rawImageFile string, rpmsSources []string, useBaseImageRpmRepos bool, partitionsCustomized bool,
 ) error {
+	logger.Log.Debugf("Customizing OS")
+
 	imageConnection, err := connectToExistingImage(rawImageFile, buildDir, "imageroot", true)
 	if err != nil {
 		return err
@@ -535,15 +537,16 @@ func customizeVerityImageHelper(buildDir string, baseConfigPath string, config *
 	return nil
 }
 
-func isDmVerityEnabled(buildDir string, rawImageFile string) error {
-	imageConnection := NewImageConnection()
-	err := imageConnection.ConnectLoopback(rawImageFile)
-	if err != nil {
-		return err
-	}
-	defer imageConnection.Close()
+func checkDmVerityEnabled(rawImageFile string) error {
+	logger.Log.Debugf("Check if dm-verity is enabled")
 
-	diskPartitions, err := diskutils.GetDiskPartitions(imageConnection.Loopback().DevicePath())
+	loopback, err := safeloopback.NewLoopback(rawImageFile)
+	if err != nil {
+		return fmt.Errorf("failed to check if dm-verity is enabled:\n%w", err)
+	}
+	defer loopback.Close()
+
+	diskPartitions, err := diskutils.GetDiskPartitions(loopback.DevicePath())
 	if err != nil {
 		return err
 	}
@@ -556,9 +559,9 @@ func isDmVerityEnabled(buildDir string, rawImageFile string) error {
 		}
 	}
 
-	err = imageConnection.CleanClose()
+	err = loopback.CleanClose()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to check if dm-verity is enabled:\n%w", err)
 	}
 
 	return nil
