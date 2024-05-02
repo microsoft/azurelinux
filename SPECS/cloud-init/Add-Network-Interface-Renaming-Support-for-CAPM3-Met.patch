@@ -15,11 +15,11 @@ interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
 specification. This is a temporary fix until the "name" attribute is added to
 the specification.
 ---
- cloudinit/sources/helpers/openstack.py | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ cloudinit/sources/helpers/openstack.py | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
-index 094c889ca..fee3b27f5 100644
+index 094c889ca..927e694a1 100644
 --- a/cloudinit/sources/helpers/openstack.py
 +++ b/cloudinit/sources/helpers/openstack.py
 @@ -602,6 +602,8 @@ def convert_net_json(network_json=None, known_macs=None):
@@ -31,7 +31,20 @@ index 094c889ca..fee3b27f5 100644
  
          link_mac_addr = None
          if link.get("ethernet_mac_address"):
-@@ -730,10 +732,15 @@ def convert_net_json(network_json=None, known_macs=None):
+@@ -720,8 +722,11 @@ def convert_net_json(network_json=None, known_macs=None):
+         config.append(cfg)
+         link_id_info[curinfo["id"]] = curinfo
+ 
++    # Since we are setting name to link_id_info[link_id]["id"] earlier in
++    # the function (when the name is absent), there can be no link without 
++    # a name that comes here. We should go through tap- interfaces again and see.
+     need_names = [
+-        d for d in config if d.get("type") == "physical" and "name" not in d
++        d for d in config if d.get("type") == "physical" and d["name"].startswith("tap")
+     ]
+ 
+     if need_names or link_updates:
+@@ -730,10 +735,15 @@ def convert_net_json(network_json=None, known_macs=None):
  
          # go through and fill out the link_id_info with names
          for _link_id, info in link_id_info.items():
@@ -51,4 +64,4 @@ index 094c889ca..fee3b27f5 100644
          for d in need_names:
              mac = d.get("mac_address")
 -- 
-2.25.1
+2.34.1
