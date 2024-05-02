@@ -1,13 +1,13 @@
 %global srcname filelock
 Summary:        A platform independent file lock
 Name:           python-filelock
-Version:        3.13.4
+Version:        3.14.0
 Release:        1%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/toxdev/filelock
-Source0:        https://github.com/toxdev/%{srcname}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 %description
@@ -80,7 +80,7 @@ popd
 %doc README.md
 
 %changelog
-* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.13.4-1
+* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
 - Lot of redoing to use pyproject
 - Upgrading version for 3.0
 - Using literal package name so autoupgrader can do its thing.
