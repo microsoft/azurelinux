@@ -22363,8 +22363,8 @@
         "type": "other",
         "other": {
           "name": "python-filelock",
-          "version": "3.13.4",
-          "downloadUrl": "https://github.com/tox-dev/filelock/archive/refs/tags/3.13.4.tar.gz"
+          "version": "3.14.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/filelock/filelock-3.14.0.tar.gz"
         }
       }
     },
