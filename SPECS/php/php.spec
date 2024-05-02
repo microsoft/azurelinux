@@ -386,7 +386,8 @@ Summary:        A PostgreSQL database module for PHP
 # All files licensed under PHP version 3.01
 License:        PHP
 BuildRequires:  krb5-devel
-BuildRequires:  libpq-devel
+# PostgreSQL provides libpq and obsoletes older versions (see postgresql.spec)
+BuildRequires:  postgresql-devel
 BuildRequires:  openssl-devel
 Requires:       php-pdo%{?_isa} = %{version}-%{release}
 Provides:       php_database
