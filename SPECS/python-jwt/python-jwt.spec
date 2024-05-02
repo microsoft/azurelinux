@@ -16,15 +16,15 @@ means of representing signed content using JSON data structures, including
 claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
-Name:           python-%{pkgname}
-Version:        2.4.0
-Release:        2%{?dist}
+Name:           python-jwt
+Version:        2.8.0
+Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/d8/6b/6287745054dbcccf75903630346be77d4715c594402cec7c2518032416c2/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/30/72/8259b2bccfe4673330cea843ab23f86858a419d8f1493f66d413a76c7e3b/PyJWT-2.8.0.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -37,8 +37,8 @@ BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
 %if 0%{?with_check}
-BuildRequires:  python3-pip
 BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-pip
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}
 
@@ -49,6 +49,9 @@ BuildRequires:  python3-atomicwrites
 %autosetup -n %{srcname}-%{version}
 rm -rf %{eggname}.egg-info
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
 %py3_build
 
@@ -56,10 +59,8 @@ rm -rf %{eggname}.egg-info
 %py3_install
 
 %check
-pip3 install coverage[toml]==5.0.4 pytest==6
-PATH=%{buildroot}%{_bindir}:${PATH} \
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    python%{python3_version} -m pytest -v
+pip3 install tox
+tox
 
 %if %{with python3}
 %files -n python3-%{pkgname}
@@ -70,6 +71,11 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %endif
 
 %changelog
+* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
+- Updating to 2.8.0-1 for 3.0
+- Using literal package name so auto-upgrader can do its thing
+- Adding buildrequires & replacing check section with simple tox command
+
 * Fri Sep 30 2022 Saul Paredes <saulparedes@microsoft.com> - 2.4.0-2
 - Updating to 2.4.0-2 to fix CVE-2022-39227 (no patch, false positive confusion with python-jwt. Scanning tool to be updated).
 
