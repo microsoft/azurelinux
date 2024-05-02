@@ -39,6 +39,7 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
+BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
