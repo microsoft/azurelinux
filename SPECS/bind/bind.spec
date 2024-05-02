@@ -10,7 +10,7 @@
 Summary:        Domain Name System software
 Name:           bind
 Version:        9.16.48
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -33,9 +33,6 @@ Source14:       setup-named-softhsm.sh
 Source15:       named-chroot.files
 Patch9:         bind-9.14-config-pkcs11.patch
 Patch10:        bind-9.10-dist-native-pkcs11.patch
-Patch11:        CVE-2022-38177.patch
-Patch12:        CVE-2022-38178.patch
-Patch13:        CVE-2022-2795.patch
 
 BuildRequires:  gcc
 BuildRequires:  json-c-devel
@@ -237,9 +234,6 @@ cp -r bin/dnssec{,-pkcs11}
 cp -r lib/dns{,-pkcs11}
 cp -r lib/ns{,-pkcs11}
 %patch10 -p1 -b .dist_pkcs11
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
 
 libtoolize -c -f; aclocal -I libtool.m4 --force; autoconf -f
 
@@ -619,9 +613,6 @@ fi;
 %{_mandir}/man8/named-nzd2nzf.8*
 
 %changelog
-* Tue Apr 30 2024 Elaine Zhao <elainezhao@microsoft.com> - 9.16.48-2
-- Fix CVE-2023-50387, CVE-2022-38178, CVE-2022-2795
-
 * Wed Feb 28 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.16.48-1
 - Auto-upgrade to 9.16.48 - Fix CVE-2023-50387
 
