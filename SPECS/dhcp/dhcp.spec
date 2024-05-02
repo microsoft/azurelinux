@@ -1,10 +1,13 @@
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0
 Url:            https://www.isc.org/dhcp/
 Source0:        ftp://ftp.isc.org/isc/dhcp/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2022-38177.patch
+Patch1:         CVE-2022-38178.patch
+Patch2:         CVE-2022-2795.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -169,6 +172,9 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 %{_mandir}/man8/dhclient.8.gz
 
 %changelog
+* Tue Apr 30 2024 Elaine Zhao <elainezhao@microsoft.com> - 4.4.3-2
+- Fix CVE-2023-50387, CVE-2022-38178, CVE-2022-2795
+
 * Tue Apr 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
 - Auto-upgrade to 4.4.3 - Fix for CVE-2022-2928 and CVE-2022-2929
 
