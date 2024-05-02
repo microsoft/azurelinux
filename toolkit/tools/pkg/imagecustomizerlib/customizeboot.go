@@ -438,11 +438,11 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 		newSELinuxArgs = nil
 
 	case imagecustomizerapi.SELinuxModeForceEnforcing:
-		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg}
-
-	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
 		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg,
 			installutils.CmdlineSELinuxEnforcingArg}
+
+	case imagecustomizerapi.SELinuxModePermissive, imagecustomizerapi.SELinuxModeEnforcing:
+		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg}
 
 	default:
 		return "", fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
