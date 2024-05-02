@@ -1,6 +1,6 @@
 Summary:        Package to deploy azurelinux-sysinfo service
 Name:           azurelinux-sysinfo
-Version:        %{azl}.0
+Version:        2.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -61,7 +61,7 @@ if rpm -q selinux-policy &> /dev/null; then
 fi
 
 %changelog
-* Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 3.0-1
+* Thu Apr 04 2024 Amrita Kohli <amritakohli@microsoft.com> - 2.0-1
 - License verified.
 - Implementation of package that deploys azurelinux-sysinfo service.
 - Original version for CBL-Mariner.
