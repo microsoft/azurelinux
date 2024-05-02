@@ -379,7 +379,7 @@ func WaitForLoopbackToDetach(devicePath string, diskPath string) error {
 	}
 
 	delay := 100 * time.Millisecond
-	attempts := 10
+	attempts := 8
 	for failures := 0; failures < attempts; failures++ {
 		stdout, _, err := shell.Execute("losetup", "--list", "--json", "--output", "NAME,BACK-FILE")
 		if err != nil {
