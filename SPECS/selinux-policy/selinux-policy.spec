@@ -47,7 +47,9 @@ Patch25:        0025-kernel-Exec-systemctl.patch
 Patch26:        0026-getty-grant-checkpoint_restore.patch
 Patch27:        0027-systemd-Add-basic-systemd-analyze-rules.patch
 Patch28:        0028-cloudinit-Add-support-for-cloud-init-growpart.patch
-Patch29:        0029-filesystem-memory.pressure-fixes.patch
+Patch29:        0029-filesystem-systemd-memory.pressure-fixes.patch
+Patch30:        0030-init-Add-homectl-dbus-access.patch
+Patch31:        0031-Temporary-workaround-for-memory.pressure-labeling-is.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
