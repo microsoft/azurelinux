@@ -38,6 +38,7 @@ BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
 %if 0%{?with_check}
 BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-pip
 %endif
 %{?python_provide:%python_provide python3-%{pkgname}}
 
