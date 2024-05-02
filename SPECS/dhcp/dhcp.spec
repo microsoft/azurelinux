@@ -43,7 +43,7 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%autosetup -p1
+%setup -n dhcp-%{version}
 pushd bind
 tar -xf bind.tar.gz
 ln -s bind-9* bind
