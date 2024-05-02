@@ -1,3 +1,5 @@
+%global DHCPVERSION 9.11.36
+
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3
@@ -42,6 +44,13 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 %prep
 %autosetup -p1
+pushd bind
+tar -xf bind.tar.gz
+ln -s bind-9* bind
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+popd
 
 %build
 CFLAGS="$CFLAGS \
