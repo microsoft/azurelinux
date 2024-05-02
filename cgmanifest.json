@@ -30488,6 +30488,15 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "xorg-x11-video-dummy",
+          "version": "0.4.1",
+          "downloadUrl": "https://www.x.org/archive/individual/driver/xf86-video-dummy-0.4.1.tar.xz"
+        }
+      }
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "xorg-x11-utils",
           "version": "7.5",
           "downloadUrl": "https://www.x.org/pub/individual/app/xdpyinfo-1.3.2.tar.bz2"
