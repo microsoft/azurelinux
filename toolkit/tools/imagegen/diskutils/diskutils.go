@@ -424,16 +424,18 @@ func WaitForDevicesToSettle() error {
 
 // CreatePartitions creates partitions on the specified disk according to the disk config
 func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryption configuration.RootEncryption,
-	readOnlyRootConfig configuration.ReadOnlyVerityRoot,
+	readOnlyRootConfig configuration.ReadOnlyVerityRoot, diskKnownToBeEmpty bool,
 ) (partDevPathMap map[string]string, partIDToFsTypeMap map[string]string, encryptedRoot EncryptedRootDevice, readOnlyRoot VerityDevice, err error) {
 	const timeoutInSeconds = "5"
 	partDevPathMap = make(map[string]string)
 	partIDToFsTypeMap = make(map[string]string)
 
 	// Clear any old partition table info to prevent errors during partition creation
-	_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)
-	if err != nil {
-		logger.Log.Warnf("Failed to clear partition table. Expected if the disk is blank: %v", stderr)
+	if !diskKnownToBeEmpty {
+		_, stderr, err := shell.Execute("sfdisk", "--delete", diskDevPath)
+		if err != nil {
+			logger.Log.Warnf("Failed to clear partition table. Expected if the disk is blank: %v", stderr)
+		}
 	}
 
 	// Create new partition table
@@ -444,7 +446,7 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		err = fmt.Errorf("failed to convert partition table type (%v) to parted argument:\n%w", partitionTableType, err)
 		return
 	}
-	_, stderr, err = shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
+	_, stderr, err := shell.Execute("flock", "--timeout", timeoutInSeconds, diskDevPath, "parted", diskDevPath, "--script", "mklabel", partedArgument)
 	if err != nil {
 		err = fmt.Errorf("failed to set partition table type using parted:\n%v\n%w", stderr, err)
 		return
