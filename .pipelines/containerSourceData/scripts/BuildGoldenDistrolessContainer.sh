@@ -22,7 +22,7 @@ function DockerBuild {
 
     # Create container
     echo "+++ Create container $containerName"
-    docker build . \
+    docker buildx build . \
         -t "$containerName" \
         -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
         --build-arg AZL_VERSION="$azureLinuxVersion" \
