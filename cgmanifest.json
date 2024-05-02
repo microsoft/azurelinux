@@ -2838,8 +2838,8 @@
         "type": "other",
         "other": {
           "name": "docker-buildx",
-          "version": "0.12.1",
-          "downloadUrl": "https://github.com/docker/buildx/archive/refs/tags/v0.12.1.tar.gz"
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/docker/buildx/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },
