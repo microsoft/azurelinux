@@ -74,6 +74,7 @@ tox
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
 - Updating to 2.8.0-1 for 3.0
 - Using literal package name so auto-upgrader can do its thing
+- Adding buildrequires & replacing check section with simple tox command
 
 * Fri Sep 30 2022 Saul Paredes <saulparedes@microsoft.com> - 2.4.0-2
 - Updating to 2.4.0-2 to fix CVE-2022-39227 (no patch, false positive confusion with python-jwt. Scanning tool to be updated).
