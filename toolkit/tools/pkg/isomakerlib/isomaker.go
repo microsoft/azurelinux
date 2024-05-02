@@ -200,7 +200,8 @@ func (im *IsoMaker) buildIsoImage() error {
 		// Directory to convert to an ISO.
 		im.buildDirPath)
 
-	return shell.ExecuteLive(false /*squashErrors*/, "mkisofs", mkisofsArgs...)
+	// Note: mkisofs has a noisy stderr.
+	return shell.ExecuteLive(true /*squashErrors*/, "mkisofs", mkisofsArgs...)
 }
 
 // prepareIsoBootLoaderFilesAndFolders copies the files required by the ISO's bootloader
@@ -249,7 +250,9 @@ func (im *IsoMaker) setUpIsoGrub2Bootloader() (err error) {
 		fmt.Sprintf("count=%d", numberOfBlocksToCopy), // Number of blocks to copy to the output file.
 	}
 	logger.Log.Debugf("Creating an empty '%s' file of %d bytes.", im.efiBootImgPath, blockSizeInBytes*numberOfBlocksToCopy)
-	err = shell.ExecuteLive(false /*squashErrors*/, "dd", ddArgs...)
+
+	// Note: dd has a noisy stderr.
+	err = shell.ExecuteLive(true /*squashErrors*/, "dd", ddArgs...)
 	if err != nil {
 		return err
 	}
