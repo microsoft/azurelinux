@@ -3,7 +3,7 @@
 Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
 Name:           docker-buildx
 # update "commit_hash" above when upgrading version
-Version:        0.12.1
+Version:        0.14.0
 Release:        1%{?dist}
 License:        ASL 2.0
 Group:          Tools/Container
@@ -44,6 +44,9 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.0-1
+- Auto-upgrade to 0.14.0 - address CVE-2024-23653
+
 * Tue Feb 27 2024 Henry Beberman <henry.beberman@microsoft.com> - 0.12.1-1
 - Rename package from moby-buildx to docker-buildx
 - Upgrade to version 0.12.1
