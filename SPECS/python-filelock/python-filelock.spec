@@ -31,6 +31,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 Summary:        %{summary}
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-hatchling
+BuildRequires:  python%{python3_pkgversion}-hatch-vcs
 BuildRequires:  python%{python3_pkgversion}-pathspec
 BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
