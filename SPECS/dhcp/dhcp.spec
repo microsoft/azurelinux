@@ -46,10 +46,11 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 %setup -n dhcp-%{version}
 pushd bind
 tar -xf bind.tar.gz
-ln -s bind-9* bind
+pushd bind-9*
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+popd
 popd
 
 %build
@@ -182,7 +183,7 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/dhclient/
 
 %changelog
 * Tue Apr 30 2024 Elaine Zhao <elainezhao@microsoft.com> - 4.4.3-2
-- Fix CVE-2023-50387, CVE-2022-38178, CVE-2022-2795
+- Fix CVE-2022-38177, CVE-2022-38178, CVE-2022-2795 for bundled bind
 
 * Tue Apr 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.4.3-1
 - Auto-upgrade to 4.4.3 - Fix for CVE-2022-2928 and CVE-2022-2929
