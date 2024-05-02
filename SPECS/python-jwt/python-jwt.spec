@@ -50,7 +50,6 @@ BuildRequires:  python3-pip
 rm -rf %{eggname}.egg-info
 
 %generate_buildrequires
-# %pyproject_buildrequires %{?with_check:-t}
 %pyproject_buildrequires
 
 %build
@@ -62,10 +61,6 @@ rm -rf %{eggname}.egg-info
 %check
 pip3 install tox
 tox
-# pip3 install coverage[toml]==5.0.4 pytest==6.0.0
-# PATH=%{buildroot}%{_bindir}:${PATH} \
-# PYTHONPATH=%{buildroot}%{python3_sitelib} \
-#     python%{python3_version} -m pytest -v
 
 %if %{with python3}
 %files -n python3-%{pkgname}
