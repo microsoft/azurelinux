@@ -1,9 +1,9 @@
-%global openssh_ver 9.5p1
+%global openssh_ver 9.7p1
 %global pam_ssh_agent_ver 0.10.3
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -261,6 +261,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu May 02 2024 Tobias Brick <tobiasb@microsoft.com> - 9.7p1-1
+- Upgrade to version 9.7p1
+
 * Fri Feb 02 2024 Dan Streetman <ddstreet@ieee.org> - 9.5p1-2
 - workaround "circular dependencies" from build tooling
 
