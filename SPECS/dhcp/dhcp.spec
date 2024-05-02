@@ -1,5 +1,3 @@
-%global DHCPVERSION 9.11.36
-
 Summary:        Dynamic host configuration protocol
 Name:           dhcp
 Version:        4.4.3
