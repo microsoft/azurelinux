@@ -251,7 +251,7 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Tok
 	return args, *insertAtToken, nil
 }
 
-// Filters a list of kernel command-line args to only those that match the provides list of names.
+// Filters a list of kernel command-line args to only those that match the provided list of names.
 func findMatchingCommandLineArgs(args []grubConfigLinuxArg, names []string) []grubConfigLinuxArg {
 	matching := []grubConfigLinuxArg(nil)
 

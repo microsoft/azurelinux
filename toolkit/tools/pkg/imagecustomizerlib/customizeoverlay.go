@@ -80,7 +80,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 
 	grub2Config, err = updateKernelCommandLineArguments(grub2Config, []string{"rd.overlayfs"}, newArgs)
 	if err != nil {
-		return fmt.Errorf("failed to set verity kernel command line args:\n%w", err)
+		return fmt.Errorf("failed to set overlay kernel command line args:\n%w", err)
 	}
 
 	err = file.Write(grub2Config, grubCfgPath)
