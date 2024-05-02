@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
-Version:        2.24.6
-Release:        2%{?dist}
+Version:        2.27.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,9 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.27.0-1
+- Auto-upgrade to 2.27.0 - address CVE-2024-23653
+
 * Wed Mar 20 2024 Henry Beberman <henry.beberman@microsoft.com> - 2.24.6-2
 - Correct license to ASL 2.0
 

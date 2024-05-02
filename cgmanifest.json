@@ -2858,8 +2858,8 @@
         "type": "other",
         "other": {
           "name": "docker-compose",
-          "version": "2.24.6",
-          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.24.6.tar.gz"
+          "version": "2.27.0",
+          "downloadUrl": "https://github.com/docker/compose/archive/refs/tags/v2.27.0.tar.gz"
         }
       }
     },
