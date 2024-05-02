@@ -61,7 +61,7 @@ rm -rf %{eggname}.egg-info
 
 %check
 pip3 install tox
-%tox
+tox
 # pip3 install coverage[toml]==5.0.4 pytest==6.0.0
 # PATH=%{buildroot}%{_bindir}:${PATH} \
 # PYTHONPATH=%{buildroot}%{python3_sitelib} \
