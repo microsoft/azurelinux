@@ -1,7 +1,7 @@
 {
- "Signatures": {
-  "net-snmp-5.9.1.tar.gz": "eb7fd4a44de6cddbffd9a92a85ad1309e5c1054fb9d5a7dd93079c8953f48c3f",
-  "snmpd.service": "5e17bf9f66f2b77e1a6c6dff7356cecb8ed488ce3df361738a72b4436096b694",
-  "snmptrapd.service": "ef3e3dbe80c8ab455b30cd83db23db136263c1295ce2f23dcc4a1a1b60799229"
- }
+  "Signatures": {
+    "snmpd.service": "5e17bf9f66f2b77e1a6c6dff7356cecb8ed488ce3df361738a72b4436096b694",
+    "snmptrapd.service": "ef3e3dbe80c8ab455b30cd83db23db136263c1295ce2f23dcc4a1a1b60799229",
+    "net-snmp-5.9.4.tar.gz": "8b4de01391e74e3c7014beb43961a2d6d6fa03acc34280b9585f4930745b0544"
+  }
 }
