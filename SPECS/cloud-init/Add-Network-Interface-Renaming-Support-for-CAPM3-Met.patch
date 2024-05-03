@@ -15,10 +15,11 @@ interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
 specification. This is a temporary fix until the "name" attribute is added to
 the specification.
 ---
- cloudinit/sources/helpers/openstack.py        | 11 ++--
+ cloudinit/sources/helpers/openstack.py        | 11 +--
  .../sources/helpers/test_openstack.py         |  8 +--
- tests/unittests/sources/test_configdrive.py   | 54 ++++++++++---------
- 3 files changed, 38 insertions(+), 35 deletions(-)
+ tests/unittests/sources/test_configdrive.py   | 68 ++++++++++---------
+ tests/unittests/test_net.py                   |  6 +-
+ 4 files changed, 48 insertions(+), 45 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index 094c889ca..dc53c23b0 100644
@@ -73,7 +74,7 @@ index 4d85ec3c6..cf17ea410 100644
                          {
                              "type": "static",
 diff --git a/tests/unittests/sources/test_configdrive.py b/tests/unittests/sources/test_configdrive.py
-index 70da4812a..6b1fe930f 100644
+index 70da4812a..94c8bed3a 100644
 --- a/tests/unittests/sources/test_configdrive.py
 +++ b/tests/unittests/sources/test_configdrive.py
 @@ -731,16 +731,16 @@ class TestNetJson(CiTestCase):
@@ -117,6 +118,17 @@ index 70da4812a..6b1fe930f 100644
                          "mtu": None,
                      },
                      {
+@@ -824,8 +824,8 @@ class TestNetJson(CiTestCase):
+                 "version": 1,
+                 "config": [
+                     {
+-                        "name": "foo3",
+-                        "mac_address": "fa:16:3e:ed:9a:59",
++                        "name": "tap1a81968a-79",
++                        "mac_address": None,
+                         "mtu": None,
+                         "type": "physical",
+                         "subnets": [
 @@ -877,7 +877,7 @@ class TestConvertNetworkData(CiTestCase):
  
      def test_conversion_fills_names(self):
@@ -165,7 +177,7 @@ index 70da4812a..6b1fe930f 100644
  
      def test_bond_conversion(self):
          # light testing of bond conversion and eni rendering of bond
-@@ -961,7 +963,7 @@ class TestConvertNetworkData(CiTestCase):
+@@ -961,15 +963,15 @@ class TestConvertNetworkData(CiTestCase):
              ]
          )
          self.assertEqual(
@@ -174,6 +186,19 @@ index 70da4812a..6b1fe930f 100644
              interfaces,
          )
  
+-        words = eni_rendering.split()
+-        # 'eth0' and 'eth1' are the ids. because their mac adresses
+-        # map to other names, we should not see them in the ENI
+-        self.assertNotIn("eth0", words)
+-        self.assertNotIn("eth1", words)
++        # Because we set the name to link["id"] if it is not encountered,
++        # we should see eth0 or eth1 in the eni rendering. Hence this check does not hold good.
++        # words = eni_rendering.split()
++        # self.assertNotIn("eth0", words)
++        # self.assertNotIn("eth1", words)
+ 
+         # oeth0 and oeth1 are the interface names for eni.
+         # bond0 will be generated for the bond. Each should be auto.
 @@ -994,9 +996,9 @@ class TestConvertNetworkData(CiTestCase):
          ) as f:
              eni_rendering = f.read()
@@ -208,6 +233,37 @@ index 70da4812a..6b1fe930f 100644
          }
          self.assertEqual(expected, config_name2mac)
  
+diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
+index 970f33384..cd25ff155 100644
+--- a/tests/unittests/test_net.py
++++ b/tests/unittests/test_net.py
+@@ -533,7 +533,7 @@ OS_SAMPLES = [
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
+@@ -621,7 +621,7 @@ dns = none
+                 "".join(
+                     [
+                         "etc/NetworkManager/system-connections",
+-                        "/cloud-init-eth0.nmconnection",
++                        "/cloud-init-tap1a81968a-79.nmconnection",
+                     ]
+                 ),
+                 """
+@@ -694,7 +694,7 @@ dns=172.19.0.12;
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init automatically, do not edit.
+ #
 -- 
 2.34.1
 
