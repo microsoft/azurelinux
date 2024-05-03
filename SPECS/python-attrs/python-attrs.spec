@@ -1,7 +1,7 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
 Version:        21.4.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
 Patch0:	        0001-add-version-limits.patch
+Patch1:         0001-Add-version-limit-to-pytest-dep.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
@@ -47,6 +48,9 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy'
 %{python3_sitelib}/*
 
 %changelog
+* May 03 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-5
+- Add version limit to pytest to fix failing tests
+
 * Mon Mar 04 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-4
 - Add version limit to pytest-mypy-plugins to fix test crash
 
