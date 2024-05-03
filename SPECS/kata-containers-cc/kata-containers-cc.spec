@@ -291,6 +291,7 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %changelog
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl1-1
 - Auto-upgrade to 3.2.0.azl1
+- Remove opa
 
 *   Wed Mar 13 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-3
 -   Specify correct virtiofsd dependency
