@@ -126,11 +126,11 @@ fi
 %{_unitdir}/*
 
 %changelog
-* Wed May 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-3
-- Symlink /usr/bin/docker-proxy to /usr/libexec/docker-proxy for back-compat
-
-* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 24.0.9-2
+* Fri May 03 2024 Chris Gunn <chrisgun@microsoft.com> - 24.0.9-3
 - Fix for CVE-2023-45288
+
+* Wed May 01 2024 Henry Beberman <henry.beberman@microsoft.com> - 24.0.9-2
+- Symlink /usr/bin/docker-proxy to /usr/libexec/docker-proxy for back-compat
 
 * Mon Mar 25 2024 Muhammad Falak <mwani@microsoft.com> - 24.0.9-1
 - Bump version to 24.X
