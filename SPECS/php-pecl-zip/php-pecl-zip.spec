@@ -13,7 +13,7 @@
 Summary:        A ZIP archive management extension
 Name:           php-pecl-zip
 Version:        1.21.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        PHP
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -26,8 +26,10 @@ BuildRequires:  php-pear
 BuildRequires:  pkg-config
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(libzip) >= 1.0.0
+BuildRequires:  tzdata
 Requires:       php(api) = 20210902-%{__isa_bits}
 Requires:       php(zend-abi) = 20210902-%{__isa_bits}
+Requires:       tzdata
 # Supposed to use these macros from SPECS/php/macros.php
 #Requires:     php(zend-abi) = %{php_zend_api}
 #Requires:     php(api) = %{php_core_api}
@@ -152,6 +154,9 @@ TEST_PHP_EXECUTABLE=%{_bindir}/zts-php \
 %endif
 
 %changelog
+* Thr May 02 2024 Gary Swalling <gaswal@microsoft.com> - 1.21.1-4
+- Add tzdata BR and requires to pass php test suite.
+
 * Fri Oct 28 2022 Osama Esmail <osamaesmail@microsoft.com> - 1.21.1-3
 - Initial CBL-Mariner import from Fedora 36 (license: MIT).
 - License verified.
