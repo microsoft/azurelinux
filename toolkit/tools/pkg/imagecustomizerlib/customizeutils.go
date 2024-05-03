@@ -106,9 +106,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		}
 	}
 
-	err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
-	if err != nil {
-		return err
+	if config.Scripts != nil {
+		err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = selinuxSetFiles(selinuxMode, imageChroot)
@@ -121,9 +123,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
-	if err != nil {
-		return err
+	if config.Scripts != nil {
+		err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -402,6 +406,9 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		if config.Storage == nil {
+			return fmt.Errorf("failed to configure bootloader. Missing 'storage' configuration.")
+		}
 		// Hard-reset the grub config.
 		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
 			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)

@@ -13,9 +13,10 @@ included on the iso media without the need to have anything pre-installed
 on the target machine. The rootfs is kept read-only and an overlay in memory
 is created so that processes can successfully write state.
 
-Customizations are made to the input rootfs as usual using MIC, and will
-naturally carry over into the LiveOS iso image. This includes customizations
-for kernel modules, dracut, and other early boot-time actions.
+Customizations are made to the input rootfs as usual using the Azure Linux
+Image Customizer, and will naturally carry over into the LiveOS iso image.
+This includes customizations for kernel modules, dracut, and other early
+boot-time actions.
 
 While converting the input full disk image into a LiveOS iso involves copying
 almost all the artifacts unchanged - some artifacts are changed as follows:
@@ -23,7 +24,7 @@ almost all the artifacts unchanged - some artifacts are changed as follows:
   follows:
   - the root is updated to the LiveOS root file system image.
   - the LiveOS dracut parameters are appended.
-  - the MIC user-specified new parameters are appended.
+  - the user-specified new parameters are appended.
   - SELinux is disabled.
 - `/etc/fstab` is dropped from the rootfs as it typically conflicts with the
   overlay setup required by the LiveOS.
@@ -82,11 +83,6 @@ iso:
     cloud-init-data/meta-data: /cloud-init-data/meta-data
   kernelCommandLine:
     ExtraCommandLine: "'ds=nocloud;s=file://run/initramfs/live/cloud-init-data'"
-os:
-  users:
-  - name: test
-    password: testpassword
-    primaryGroup: sudo
 ```
 
 #### Example 2
@@ -98,10 +94,6 @@ iso:
   kernelCommandLine:
     extraCommandLine: "'ds=nocloud;s=file://cloud-init-data'"
 os:
-  users:
-  - name: test
-    password: testpassword
-    primaryGroup: sudo
   additionalFiles:
     cloud-init-data/user-data: /cloud-init-data/user-data
     cloud-init-data/network-config: /cloud-init-data/network-config
@@ -113,7 +105,7 @@ os:
 ### Full Disk Image
 
 The input full disk image must satisfy the following requirements in order for
-MIC to be able to generate an iso image out of it:
+the Azure Linux Image Cuztomizer to be able to generate an iso image out of it:
 - File layout (after all partitions have been mounted):
   - `/boot/grub2/grub.cfg` must exist and is the 'main' grub configuration (not
     a redirection grub configuration file for example).
