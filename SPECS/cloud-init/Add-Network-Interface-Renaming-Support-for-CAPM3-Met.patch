@@ -15,14 +15,14 @@ interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
 specification. This is a temporary fix until the "name" attribute is added to
 the specification.
 ---
- cloudinit/sources/helpers/openstack.py | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ cloudinit/sources/helpers/openstack.py | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
-index 094c889ca..927e694a1 100644
+index 094c889ca..d76df40c3 100644
 --- a/cloudinit/sources/helpers/openstack.py
 +++ b/cloudinit/sources/helpers/openstack.py
-@@ -602,6 +602,8 @@ def convert_net_json(network_json=None, known_macs=None):
+@@ -602,12 +602,10 @@ def convert_net_json(network_json=None, known_macs=None):
          # to name guest devices with such ugly names.
          if "name" in link:
              cfg["name"] = link["name"]
@@ -30,8 +30,14 @@ index 094c889ca..927e694a1 100644
 +            cfg["name"] = link["id"]
  
          link_mac_addr = None
-         if link.get("ethernet_mac_address"):
-@@ -720,8 +722,11 @@ def convert_net_json(network_json=None, known_macs=None):
+-        if link.get("ethernet_mac_address"):
+-            link_mac_addr = link.get("ethernet_mac_address").lower()
+-            link_id_info[link["id"]] = link_mac_addr
+-
+         curinfo = {
+             "name": cfg.get("name"),
+             "mac": link_mac_addr,
+@@ -720,8 +718,11 @@ def convert_net_json(network_json=None, known_macs=None):
          config.append(cfg)
          link_id_info[curinfo["id"]] = curinfo
  
@@ -44,7 +50,7 @@ index 094c889ca..927e694a1 100644
      ]
  
      if need_names or link_updates:
-@@ -730,10 +735,15 @@ def convert_net_json(network_json=None, known_macs=None):
+@@ -730,10 +731,15 @@ def convert_net_json(network_json=None, known_macs=None):
  
          # go through and fill out the link_id_info with names
          for _link_id, info in link_id_info.items():
