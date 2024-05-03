@@ -6,7 +6,6 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -19,8 +18,11 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/isomakerlib"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -47,6 +49,10 @@ const (
 	dracutConfig = `add_dracutmodules+=" dmsquash-live "
 add_drivers+=" overlay "
 `
+	// the total size of a collection of files is multiplied by the
+	// expansionSafetyFactor to estimate a disk size sufficient to hold those
+	// files.
+	expansionSafetyFactor = 1.5
 )
 
 type IsoWorkingDirs struct {
@@ -927,24 +933,23 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecusto
 //     iso image.
 func extractIsoImageContents(buildDir string, isoImageFile string, isoExpansionFolder string) (err error) {
 
-	mountDir, err := ioutil.TempDir(buildDir, "tmp-iso-mount-")
+	mountDir, err := os.MkdirTemp(buildDir, "tmp-iso-mount-")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary mount folder for iso:\n%w", err)
 	}
 	defer os.RemoveAll(mountDir)
 
-	mountParams := []string{isoImageFile, mountDir}
-	err = shell.ExecuteLive(false, "mount", mountParams...)
+	loopDevice, err := safeloopback.NewLoopback(isoImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to mount iso:\n%w", err)
+		return fmt.Errorf("failed to create loop device for (%s):\n%w", isoImageFile, err)
 	}
-	defer func() {
-		unmountParams := []string{mountDir}
-		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
-		if cleanupErr != nil {
-			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, mountDir, cleanupErr)
-		}
-	}()
+	defer loopDevice.CleanClose()
+
+	mount, err := safemount.NewMount(loopDevice.DevicePath(), mountDir, "iso9660" /*fstype*/, unix.MS_RDONLY /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	if err != nil {
+		return err
+	}
+	defer mount.Close()
 
 	err = os.MkdirAll(isoExpansionFolder, os.ModePerm)
 	if err != nil {
@@ -1005,7 +1010,7 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 	isoBuilder.addCleanupDir(isoBuildDir)
 
 	// extract iso contents
-	isoExpansionFolder, err := ioutil.TempDir(buildDirAbs, "expanded-input-iso-")
+	isoExpansionFolder, err := os.MkdirTemp(buildDirAbs, "expanded-input-iso-")
 	if err != nil {
 		return isoBuilder, fmt.Errorf("failed to create a temporary iso expansion folder for iso:\n%w", err)
 	}
@@ -1135,46 +1140,27 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 //
 //   - returns the size in bytes.
 func getSizeOnDiskInBytes(rootDir string) (size uint64, err error) {
-	logger.Log.Debugf("Estimating disk size for (%s)", rootDir)
+	logger.Log.Debugf("Calculating total size for (%s)", rootDir)
 
-	duParams := []string{"-sh", rootDir}
-	duStdout, _, err := shell.Execute("du", duParams...)
+	duStdout, _, err := shell.Execute("du", "-s", rootDir)
 	if err != nil {
-		return 0, fmt.Errorf("failed to find the size of the specified folder (%s):\n%w", rootDir, err)
+		return 0, fmt.Errorf("failed find the size of the specified folder using 'du' for (%s):\n%w", rootDir, err)
 	}
 
 	// parse and get count and unit
-	diskSizeRegex := regexp.MustCompile(`^(\d+)([KMGT])?.*`)
+	diskSizeRegex := regexp.MustCompile(`^(\d+)\s+`)
 	matches := diskSizeRegex.FindStringSubmatch(duStdout)
-	if matches == nil || len(matches) < 3 {
-		return 0, fmt.Errorf("disk size (%s) has incorrect format. Expecting: ^[0-9]+[KMGT]?\t.* (e.g. 100M, 1G)", duStdout)
+	if matches == nil || len(matches) < 2 {
+		return 0, fmt.Errorf("failed to parse 'du -s' output (%s).", duStdout)
 	}
 
-	numString := matches[1]
-	unit := matches[2]
-	num, err := strconv.ParseUint(numString, 0, 10)
+	sizeInKbsString := matches[1]
+	sizeInKbs, err := strconv.ParseUint(sizeInKbsString, 10, 64)
 	if err != nil {
-		return 0, fmt.Errorf("failed to parse disk size (%s):\n%w", numString, err)
+		return 0, fmt.Errorf("failed to parse disk size (%d):\n%w", sizeInKbs, err)
 	}
-	logger.Log.Debugf("du returned=%d %s", num, unit)
 
-	// convert to bytes
-	multiplier := uint64(1)
-	switch unit {
-	case "K":
-		multiplier = diskutils.KiB
-	case "M":
-		multiplier = diskutils.MiB
-	case "G":
-		multiplier = diskutils.GiB
-	case "T":
-		multiplier = diskutils.TiB
-	case "":
-		return 0, fmt.Errorf("disk size (%s) must have a suffix (i.e. K, M, G, or T)", numString)
-	}
-	num *= multiplier
-
-	return num, nil
+	return sizeInKbs * diskutils.KiB, nil
 }
 
 // getDiskSizeEstimateInMBs
@@ -1200,15 +1186,16 @@ func getSizeOnDiskInBytes(rootDir string) (size uint64, err error) {
 // outputs:
 //
 //   - returns the size in mega bytes.
-func getDiskSizeEstimateInMBs(rootDir string, safetyFactor uint64) (size uint64, err error) {
+func getDiskSizeEstimateInMBs(rootDir string, safetyFactor float64) (size uint64, err error) {
 
 	sizeInBytes, err := getSizeOnDiskInBytes(rootDir)
 	if err != nil {
 		return 0, fmt.Errorf("failed to get folder size on disk while estimating total disk size:\n%w", err)
 	}
 
-	sizeInMBs := sizeInBytes/1024/1024 + 1
-	return sizeInMBs * safetyFactor, nil
+	sizeInMBs := sizeInBytes/diskutils.MiB + 1
+	estimatedSizeInMBs := uint64(float64(sizeInMBs) * safetyFactor)
+	return estimatedSizeInMBs, nil
 }
 
 // createWriteableImageFromSquashfs
@@ -1235,27 +1222,26 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 	logger.Log.Infof("Creating writeable image from squashfs (%s)", b.artifacts.squashfsImagePath)
 
 	// mount squash fs
-	squashMountDir, err := ioutil.TempDir(buildDir, "tmp-squashfs-mount-")
+	squashMountDir, err := os.MkdirTemp(buildDir, "tmp-squashfs-mount-")
 	if err != nil {
 		return fmt.Errorf("failed to create temporary mount folder for squashfs:\n%w", err)
 	}
 	defer os.RemoveAll(squashMountDir)
 
-	squashMountParams := []string{b.artifacts.squashfsImagePath, squashMountDir}
-	err = shell.ExecuteLive(false, "mount", squashMountParams...)
+	loopDevice, err := safeloopback.NewLoopback(b.artifacts.squashfsImagePath)
 	if err != nil {
-		return fmt.Errorf("failed to mount squashfs:\n%w", err)
+		return fmt.Errorf("failed to create loop device for (%s):\n%w", b.artifacts.squashfsImagePath, err)
 	}
-	defer func() {
-		unmountParams := []string{squashMountDir}
-		cleanupErr := shell.ExecuteLive(false, "umount", unmountParams...)
-		if cleanupErr != nil {
-			err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, squashMountDir, cleanupErr)
-		}
-	}()
+	defer loopDevice.CleanClose()
+
+	mount, err := safemount.NewMount(loopDevice.DevicePath(), squashMountDir, "squashfs" /*fstype*/, 0 /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	if err != nil {
+		return err
+	}
+	defer mount.Close()
 
 	// estimate the new disk size
-	safeDiskSizeMB, err := getDiskSizeEstimateInMBs(squashMountDir, 2 /*safety factor*/)
+	safeDiskSizeMB, err := getDiskSizeEstimateInMBs(squashMountDir, expansionSafetyFactor)
 	if err != nil {
 		return fmt.Errorf("failed to calculate the disk size of %s:\n%w", squashMountDir, err)
 	}
@@ -1263,12 +1249,11 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 	logger.Log.Debugf("safeDiskSizeMB = %d", safeDiskSizeMB)
 
 	// define a disk layout with a boot partition and a rootfs partition
-	var maxDiskSizeMB imagecustomizerapi.DiskSize
-	maxDiskSizeMB = imagecustomizerapi.DiskSize(safeDiskSizeMB * 1024 * 1024)
+	maxDiskSizeMB := imagecustomizerapi.DiskSize(safeDiskSizeMB * diskutils.MiB)
 	var bootPartitionStart imagecustomizerapi.DiskSize
-	bootPartitionStart = imagecustomizerapi.DiskSize(1 * 1024 * 1024)
+	bootPartitionStart = imagecustomizerapi.DiskSize(1 * diskutils.MiB)
 	var bootPartitionEnd imagecustomizerapi.DiskSize
-	bootPartitionEnd = imagecustomizerapi.DiskSize(9 * 1024 * 1024)
+	bootPartitionEnd = imagecustomizerapi.DiskSize(9 * diskutils.MiB)
 
 	diskConfig := imagecustomizerapi.Disk{
 		PartitionTableType: imagecustomizerapi.PartitionTableTypeGpt,
