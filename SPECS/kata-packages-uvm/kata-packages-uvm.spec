@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -95,6 +95,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Fri May 03 2024 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-4
+- Remove opa
+
 * Thu Apr 11 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.0-3
 - Add cifs-utils to the list of dependencies
 
