@@ -19,6 +19,8 @@ The ISC DHCP package contains both the client and server programs for DHCP. dhcl
 Summary:    Libraries for dhcp
 %description libs
 Libraries for the dhcp.
+Provides: bundled(bind-export-libs) = 9.16.33
+Provides: bundled(bind) = 9.16.33
 
 %package devel
 Summary:    Development Libraries and header files for dhcp
