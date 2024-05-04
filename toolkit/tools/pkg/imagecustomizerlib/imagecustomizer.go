@@ -49,7 +49,8 @@ type ImageCustomizerParameters struct {
 	buildDirAbs string
 
 	// input image
-	inputImageFile string
+	inputImageFile   string
+	inputImageFormat string
 
 	// configurations
 	configPath                  string
@@ -69,9 +70,6 @@ type ImageCustomizerParameters struct {
 	outputImageFile       string
 	outputImageDir        string
 	outputImageBase       string
-
-	// iso builder helper
-	isoBuilder *LiveOSIsoBuilder
 }
 
 func createImageCustomizerParameters(buildDir string,
@@ -92,13 +90,9 @@ func createImageCustomizerParameters(buildDir string,
 
 	ic.buildDirAbs = buildDirAbs
 
-	err = os.MkdirAll(ic.buildDirAbs, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
 	// input image
 	ic.inputImageFile = inputImageFile
+	ic.inputImageFormat = filepath.Ext(inputImageFile)
 
 	// configuration
 	ic.configPath = configPath
@@ -125,11 +119,6 @@ func createImageCustomizerParameters(buildDir string,
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	err = os.MkdirAll(ic.outputImageDir, os.ModePerm)
-	if err != nil {
-		return nil, err
 	}
 
 	return ic, nil
@@ -172,13 +161,6 @@ func cleanUp(ic *ImageCustomizerParameters) error {
 		allErrors = fmt.Errorf("failed to clean-up raw image file:\n%w", err)
 	}
 
-	if ic.isoBuilder != nil {
-		err = ic.isoBuilder.cleanUp()
-		if err != nil {
-			allErrors = fmt.Errorf("failed to clean-up iso builder:\n%w", err)
-		}
-	}
-
 	return allErrors
 }
 
@@ -196,7 +178,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
 		outputImageFormat, outputImageFile)
 	if err != nil {
-		return fmt.Errorf("failed to create image customizer:\n%w", err)
+		return fmt.Errorf("failed to create image customizer parameters object:\n%w", err)
 	}
 	defer func() {
 		cleanupErr := cleanUp(imageCustomizerParameters)
@@ -208,6 +190,17 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 			}
 		}
 	}()
+
+	// ensure build and output folders are created up front
+	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(imageCustomizerParameters.outputImageDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
 
 	isoBuilder, err := convertInputImageToWriteableFormat(imageCustomizerParameters)
 	if err != nil {
@@ -226,13 +219,9 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		}
 	}()
 
-	if imageCustomizerParameters.customizeOSPartitions {
-		err = customizeOSContents(imageCustomizerParameters)
-		if err != nil {
-			return fmt.Errorf("failed to customize raw image:\n%w", err)
-		}
-	} else {
-		logger.Log.Infof("Skipping customizing OS partitions because none is specified")
+	err = customizeOSContents(imageCustomizerParameters)
+	if err != nil {
+		return fmt.Errorf("failed to customize raw image:\n%w", err)
 	}
 
 	err = convertWriteableFormatToOutputImage(imageCustomizerParameters, isoBuilder)
@@ -245,44 +234,81 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 	return nil
 }
 
-func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (isoBuilder *LiveOSIsoBuilder, err error) {
-
+func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSIsoBuilder, error) {
 	logger.Log.Infof("Converting input image to a writeable format")
 
-	if filepath.Ext(ic.inputImageFile) == ".iso" {
+	if ic.inputImageFormat == ".iso" {
 
-		isoBuilder, err = createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
+		isoBuilder, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
 		if err != nil {
+			var cleanUpError error
 			if isoBuilder != nil {
-				isoBuilder.cleanUp()
+				cleanUpError = isoBuilder.cleanUp()
 			}
-			return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
+			if cleanUpError == nil {
+				return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
+			} else {
+				return nil, fmt.Errorf("failed to load input iso artifacts:\n%w\nclean-up error:\n%w", err, cleanUpError)
+			}
 		}
 
-		// If the input is a LiveOS iso and there are OS customizations are
+		// If the input is a LiveOS iso and there are OS customizations
 		// defined, we create a writeable disk image so that mic can modify
 		// it. If no OS customizations are defined, we can skip this step and
 		// just re-use the existing squashfs.
 		if ic.customizeOSPartitions {
+			var aggregateErr error
+
 			err = isoBuilder.createWriteableImageFromSquashfs(ic.buildDir, ic.rawImageFile)
 			if err != nil {
-				return isoBuilder, fmt.Errorf("failed to create writeable image:\n%w", err)
+				aggregateErr = errors.Join(aggregateErr, fmt.Errorf("failed to create writeable image:\n%w", err))
 			}
+
+			// From this point on, the customization code will do its job
+			// without even knowning that the writeable image came from an iso
+			// and all iso artifacts will need to be regenerated - so, no need
+			// to keep the state of the input iso around.
+			cleanUpError := isoBuilder.cleanUp()
+			if cleanUpError != nil {
+				aggregateErr = errors.Join(aggregateErr, fmt.Errorf("failed to clean-up iso builder object:\n%w", cleanUpError))
+			}
+
+			// delete the isoBuilder object
+			isoBuilder = nil
+
+			return nil, aggregateErr
+		} else {
+			return isoBuilder, nil
 		}
 	} else {
 		logger.Log.Infof("Creating raw base image: %s", ic.rawImageFile)
-		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
+		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 		}
 	}
 
-	return isoBuilder, nil
+	return nil, nil
 }
 
 func customizeOSContents(ic *ImageCustomizerParameters) error {
 
-	logger.Log.Infof("Customizing OS partitions")
+	// If the user has defined customizations, then should proceed as usual.
+	// However, there are no customizations, and the input is an iso, we
+	// should just return - but call out any command line switches that might
+	// have requested unsupported changes.
+	if !ic.customizeOSPartitions && ic.inputImageFormat == ".iso" {
+
+		if ic.enableShrinkFilesystems {
+			return fmt.Errorf("shrinking file systems is not supported when the input image is an iso.")
+		}
+
+		if ic.outputSplitPartitionsFormat != "" {
+			return fmt.Errorf("extracting partitions is not support when the input image is an iso.")
+		}
+
+		return nil
+	}
 
 	// Check if the partition is using DM_verity_hash file system type.
 	// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
@@ -366,7 +392,7 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, isoBuild
 			}
 		} else {
 			if isoBuilder == nil {
-				return fmt.Errorf("internal error: isoBuilder cannot be nul when the output format is .iso and there are not OS customizations.")
+				return fmt.Errorf("internal error: isoBuilder cannot be nil when the output format is .iso and there are no OS customizations.")
 			}
 			err := isoBuilder.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.outputImageDir, ic.outputImageBase)
 			if err != nil {

@@ -939,17 +939,17 @@ func extractIsoImageContents(buildDir string, isoImageFile string, isoExpansionF
 	}
 	defer os.RemoveAll(mountDir)
 
-	loopDevice, err := safeloopback.NewLoopback(isoImageFile)
+	isoImageLoopDevice, err := safeloopback.NewLoopback(isoImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to create loop device for (%s):\n%w", isoImageFile, err)
 	}
-	defer loopDevice.CleanClose()
+	defer isoImageLoopDevice.Close()
 
-	mount, err := safemount.NewMount(loopDevice.DevicePath(), mountDir, "iso9660" /*fstype*/, unix.MS_RDONLY /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	isoImageMount, err := safemount.NewMount(isoImageLoopDevice.DevicePath(), mountDir, "iso9660" /*fstype*/, unix.MS_RDONLY /*flags*/, "" /*data*/, false /*makeAndDelete*/)
 	if err != nil {
 		return err
 	}
-	defer mount.Close()
+	defer isoImageMount.Close()
 
 	err = os.MkdirAll(isoExpansionFolder, os.ModePerm)
 	if err != nil {
@@ -959,6 +959,16 @@ func extractIsoImageContents(buildDir string, isoImageFile string, isoExpansionF
 	err = copyPartitionFiles(mountDir+"/.", isoExpansionFolder)
 	if err != nil {
 		return fmt.Errorf("failed to copy iso image contents to a writeable folder (%s):\n%w", isoExpansionFolder, err)
+	}
+
+	err = isoImageMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = isoImageLoopDevice.CleanClose()
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -1228,17 +1238,17 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 	}
 	defer os.RemoveAll(squashMountDir)
 
-	loopDevice, err := safeloopback.NewLoopback(b.artifacts.squashfsImagePath)
+	squashfsLoopDevice, err := safeloopback.NewLoopback(b.artifacts.squashfsImagePath)
 	if err != nil {
 		return fmt.Errorf("failed to create loop device for (%s):\n%w", b.artifacts.squashfsImagePath, err)
 	}
-	defer loopDevice.CleanClose()
+	defer squashfsLoopDevice.Close()
 
-	mount, err := safemount.NewMount(loopDevice.DevicePath(), squashMountDir, "squashfs" /*fstype*/, 0 /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	isoImageMount, err := safemount.NewMount(squashfsLoopDevice.DevicePath(), squashMountDir, "squashfs" /*fstype*/, 0 /*flags*/, "" /*data*/, false /*makeAndDelete*/)
 	if err != nil {
 		return err
 	}
-	defer mount.Close()
+	defer isoImageMount.Close()
 
 	// estimate the new disk size
 	safeDiskSizeMB, err := getDiskSizeEstimateInMBs(squashMountDir, expansionSafetyFactor)
@@ -1303,6 +1313,16 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 	err = createNewImage(rawImageFile, diskConfig, fileSystemConfigs, buildDir, writeableChrootDir, installOSFunc)
 	if err != nil {
 		return fmt.Errorf("failed to copy squashfs into new writeable image (%s):\n%w", rawImageFile, err)
+	}
+
+	err = isoImageMount.CleanClose()
+	if err != nil {
+		return err
+	}
+
+	err = squashfsLoopDevice.CleanClose()
+	if err != nil {
+		return err
 	}
 
 	return nil
