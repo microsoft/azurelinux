@@ -310,17 +310,17 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 		return nil
 	}
 
+	if ic.config.OS == nil {
+		ic.config.OS = &imagecustomizerapi.OS{}
+	}
+
 	// Check if the partition is using DM_verity_hash file system type.
 	// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
 	// the verity hash device should not be assigned this type. We do not support customization on verity enabled base
 	// images at this time because such modifications would compromise the integrity and security mechanisms enforced by dm-verity.
-	err = checkDmVerityEnabled(ic.rawImageFile)
+	err := checkDmVerityEnabled(ic.rawImageFile)
 	if err != nil {
 		return err
-	}
-
-	if ic.config.OS == nil {
-		ic.config.OS = &imagecustomizerapi.OS{}
 	}
 
 	// Customize the partitions.
