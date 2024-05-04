@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
-Version:        2.4.4
-Release:        1%{?dist}
+Version:        2.4.0
+Release:        3%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -94,12 +94,6 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
-* Fri Mar 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-1
-- Upgrade to 2.4.4.
-
-* Tue Nov 21 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.3-1
-- Auto-upgrade to 2.4.3 - Azure Linux 3.0 - package upgrades
-
 * Tue Mar 21 2023 Muhammad Falak <mwani@microsoft.com> - 2.4.0-2
 - Add correct version for libgpg-error-devel as a BR
 
