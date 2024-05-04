@@ -852,6 +852,13 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 //     path to the folder where the mic configuration was loaded from.
 //     This path will be used to construct absolute paths for file references
 //     defined in the config.
+//   - 'inputIsoArtifacts'
+//     an optional LiveOSIsoBuilder that holds the state of the original input
+//     iso if one was provided. If present, this function will copy all files
+//     from the inputIsoArtifacts.artifacts.additionalFiles to the new iso
+//     if the destination is not already defined (for the new iso).
+//     This is used to carry over any files from a previously customized iso
+//     to the new one.
 //   - 'isoConfig'
 //     user provided configuration for the iso image.
 //   - 'rawImageFile':
@@ -865,7 +872,7 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 // outputs:
 //
 //	creates a LiveOS ISO image.
-func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecustomizerapi.Iso, rawImageFile, outputImageDir, outputImageBase string) (err error) {
+func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *LiveOSIsoBuilder, isoConfig *imagecustomizerapi.Iso, rawImageFile, outputImageDir, outputImageBase string) (err error) {
 
 	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
 	if err != nil {
@@ -903,6 +910,27 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, isoConfig *imagecusto
 	err = isoBuilder.prepareArtifactsFromFullImage(rawImageFile, extraCommandLine)
 	if err != nil {
 		return err
+	}
+
+	// If we started from an input iso (not an input vhd(x)/qcow), then there
+	// might be additional files that are not defined in the current user
+	// configuration. Below, we loop through the files we have captured so far
+	// and append any file that was in the input iso and is not included
+	// already. This also ensures that no file from the input iso overwrites
+	// a newer version that has just been created.
+	if inputIsoArtifacts != nil {
+		for inputSourceFile, inputTargetFile := range inputIsoArtifacts.artifacts.additionalFiles {
+			found := false
+			for _, targetFile := range isoBuilder.artifacts.additionalFiles {
+				if inputTargetFile == targetFile {
+					found = true
+					break
+				}
+			}
+			if !found {
+				isoBuilder.artifacts.additionalFiles[inputSourceFile] = inputTargetFile
+			}
+		}
 	}
 
 	err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
@@ -1302,10 +1330,32 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 
 	// populate the newly created disk image with content from the squash fs
 	installOSFunc := func(imageChroot *safechroot.Chroot) error {
-		// At the point when this copy will be executed, both the boot and the root
-		// partitions will be mounted, and the files of /boot/efi will land on the
-		// the boot partition, while the rest will be on the rootfs partition.
-		return copyPartitionFiles(squashMountDir+"/.", imageChroot.RootDir())
+		// At the point when this copy will be executed, both the boot and the
+		// root partitions will be mounted, and the files of /boot/efi will
+		// land on the the boot partition, while the rest will be on the rootfs
+		// partition.
+		err := copyPartitionFiles(squashMountDir+"/.", imageChroot.RootDir())
+		if err != nil {
+			return fmt.Errorf("failed to copy squashfs contents to a writeable disk:\n%w", err)
+		}
+
+		// In a vhd(s)/qcow->iso flow, grub.cfg can be modified by the use
+		// under the mic's os node, and then again later by the iso node.
+		// However, the second modification does not make it back into the
+		// squashfs since such customization is specific to the iso (live os
+		// configuration). Now, when we are creating a writeable image from an
+		// iso, we need to take the grub.cfg that in the iso (not the one in
+		// the squashfs), since it will have all previous user modifications
+		// and also the one actually used for booting.
+		sourceGrubCfgPath := b.artifacts.grubCfgPath
+		targetGrubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
+
+		err = file.Copy(sourceGrubCfgPath, targetGrubCfgPath)
+		if err != nil {
+			return fmt.Errorf("failed to copy the input iso grub.cfg to the writeable image:\n%w", err)
+		}
+
+		return err
 	}
 
 	// create the new raw disk image

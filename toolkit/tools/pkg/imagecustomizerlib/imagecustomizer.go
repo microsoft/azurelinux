@@ -202,13 +202,13 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return err
 	}
 
-	isoBuilder, err := convertInputImageToWriteableFormat(imageCustomizerParameters)
+	inputIsoArtifacts, err := convertInputImageToWriteableFormat(imageCustomizerParameters)
 	if err != nil {
 		return fmt.Errorf("failed to convert input image to a raw image:\n%w", err)
 	}
 	defer func() {
-		if isoBuilder != nil {
-			cleanupErr := isoBuilder.cleanUp()
+		if inputIsoArtifacts != nil {
+			cleanupErr := inputIsoArtifacts.cleanUp()
 			if cleanupErr != nil {
 				if err != nil {
 					err = fmt.Errorf("%w:\nfailed to clean-up iso builder state:\n%w", err, cleanupErr)
@@ -224,7 +224,7 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 		return fmt.Errorf("failed to customize raw image:\n%w", err)
 	}
 
-	err = convertWriteableFormatToOutputImage(imageCustomizerParameters, isoBuilder)
+	err = convertWriteableFormatToOutputImage(imageCustomizerParameters, inputIsoArtifacts)
 	if err != nil {
 		return fmt.Errorf("failed to convert customized raw image to output format:\n%w", err)
 	}
@@ -239,11 +239,11 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 
 	if ic.inputImageFormat == ".iso" {
 
-		isoBuilder, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
+		inputIsoArtifacts, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
 		if err != nil {
 			var cleanUpError error
-			if isoBuilder != nil {
-				cleanUpError = isoBuilder.cleanUp()
+			if inputIsoArtifacts != nil {
+				cleanUpError = inputIsoArtifacts.cleanUp()
 			}
 			if cleanUpError == nil {
 				return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
@@ -257,29 +257,13 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 		// it. If no OS customizations are defined, we can skip this step and
 		// just re-use the existing squashfs.
 		if ic.customizeOSPartitions {
-			var aggregateErr error
-
-			err = isoBuilder.createWriteableImageFromSquashfs(ic.buildDir, ic.rawImageFile)
+			err = inputIsoArtifacts.createWriteableImageFromSquashfs(ic.buildDir, ic.rawImageFile)
 			if err != nil {
-				aggregateErr = errors.Join(aggregateErr, fmt.Errorf("failed to create writeable image:\n%w", err))
+				return nil, fmt.Errorf("failed to create writeable image:\n%w", err)
 			}
-
-			// From this point on, the customization code will do its job
-			// without even knowning that the writeable image came from an iso
-			// and all iso artifacts will need to be regenerated - so, no need
-			// to keep the state of the input iso around.
-			cleanUpError := isoBuilder.cleanUp()
-			if cleanUpError != nil {
-				aggregateErr = errors.Join(aggregateErr, fmt.Errorf("failed to clean-up iso builder object:\n%w", cleanUpError))
-			}
-
-			// delete the isoBuilder object
-			isoBuilder = nil
-
-			return nil, aggregateErr
-		} else {
-			return isoBuilder, nil
 		}
+		return inputIsoArtifacts, nil
+
 	} else {
 		logger.Log.Infof("Creating raw base image: %s", ic.rawImageFile)
 		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
@@ -371,7 +355,7 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 	return nil
 }
 
-func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, isoBuilder *LiveOSIsoBuilder) error {
+func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIsoArtifacts *LiveOSIsoBuilder) error {
 
 	logger.Log.Infof("Converting customized OS partitions into the final image")
 
@@ -386,15 +370,12 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, isoBuild
 		}
 	case ImageFormatIso:
 		if ic.customizeOSPartitions {
-			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
+			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
 			}
 		} else {
-			if isoBuilder == nil {
-				return fmt.Errorf("internal error: isoBuilder cannot be nil when the output format is .iso and there are no OS customizations.")
-			}
-			err := isoBuilder.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.outputImageDir, ic.outputImageBase)
+			err := inputIsoArtifacts.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.outputImageDir, ic.outputImageBase)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
 			}
