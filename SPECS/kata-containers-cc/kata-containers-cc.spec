@@ -12,8 +12,8 @@
 %global debug_package %{nil}
 
 Name:         kata-containers-cc
-Version:      3.2.0.azl0
-Release:      3%{?dist}
+Version:      3.2.0.azl1
+Release:      1%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 Vendor:       Microsoft Corporation
@@ -65,7 +65,6 @@ Requires:       qemu-img
 Requires:       parted
 Requires:       curl
 Requires:       veritysetup
-Requires:       opa >= 0.50.2
 Requires:       kernel-uvm
 
 %description tools
@@ -176,7 +175,6 @@ pushd %{_builddir}/%{name}-%{version}/src/agent
 mkdir -p %{buildroot}%{osbuilder}/src/kata-opa
 cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-all.rego %{buildroot}%{osbuilder}/src/kata-opa/
 cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/allow-set-policy.rego %{buildroot}%{osbuilder}/src/kata-opa/
-cp -a %{_builddir}/%{name}-%{version}/src/kata-opa/kata-opa.service.in %{buildroot}%{osbuilder}/src/kata-opa/
 install -D -m 0755 kata-containers.target %{buildroot}%{osbuilder}/kata-containers.target
 install -D -m 0755 kata-agent.service.in  %{buildroot}%{osbuilder}/kata-agent.service.in
 install -D -m 0755 target/x86_64-unknown-linux-gnu/release/kata-agent %{buildroot}%{osbuilder}/kata-agent
@@ -267,7 +265,6 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %dir %{osbuilder}/src/kata-opa
 %{osbuilder}/src/kata-opa/allow-all.rego
 %{osbuilder}/src/kata-opa/allow-set-policy.rego
-%{osbuilder}/src/kata-opa/kata-opa.service.in
 
 %{osbuilder}/mariner-coco-build-uvm.sh
 %{osbuilder}/kata-containers.target
@@ -292,6 +289,10 @@ install -D -m 0755 %{_builddir}/%{name}-%{version}/tools/osbuilder/image-builder
 %exclude %{osbuilder}/tools/osbuilder/rootfs-builder/ubuntu
 
 %changelog
+* Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.0.azl1-1
+- Auto-upgrade to 3.2.0.azl1
+- Remove opa
+
 *   Wed Mar 13 2024 Aurelien Bombo <abombo@microsoft.com> - 3.2.0.azl0-3
 -   Specify correct virtiofsd dependency
 
