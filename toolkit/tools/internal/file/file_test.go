@@ -237,3 +237,15 @@ func ListFiles(dir string) ([]string, error) {
 
 	return files, nil
 }
+
+func TestCommandExists(t *testing.T) {
+	exists, err := CommandExists("ls")
+	assert.NoError(t, err)
+	assert.True(t, exists)
+}
+
+func TestCommandExistsMissing(t *testing.T) {
+	exists, err := CommandExists("contoso")
+	assert.NoError(t, err)
+	assert.False(t, exists)
+}
