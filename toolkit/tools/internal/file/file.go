@@ -432,7 +432,7 @@ func EnumerateDirFiles(dirPath string) (filePaths []string, err error) {
 }
 
 func CommandExists(name string) (bool, error) {
-	_, err := exec.LookPath("mkinitrd")
+	_, err := exec.LookPath(name)
 	if err != nil {
 		if errors.Is(err, exec.ErrNotFound) {
 			return false, nil
