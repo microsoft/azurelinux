@@ -51,6 +51,7 @@ type ImageCustomizerParameters struct {
 	// input image
 	inputImageFile   string
 	inputImageFormat string
+	inputIsIso       bool
 
 	// configurations
 	configPath                  string
@@ -66,6 +67,7 @@ type ImageCustomizerParameters struct {
 
 	// output image
 	outputImageFormat     string
+	outputIsIso           bool
 	qemuOutputImageFormat string
 	outputImageFile       string
 	outputImageDir        string
@@ -92,7 +94,8 @@ func createImageCustomizerParameters(buildDir string,
 
 	// input image
 	ic.inputImageFile = inputImageFile
-	ic.inputImageFormat = filepath.Ext(inputImageFile)
+	ic.inputImageFormat = strings.TrimLeft(filepath.Ext(inputImageFile), ".")
+	ic.inputIsIso = ic.inputImageFormat == ImageFormatIso
 
 	// configuration
 	ic.configPath = configPath
@@ -110,15 +113,45 @@ func createImageCustomizerParameters(buildDir string,
 
 	// output image
 	ic.outputImageFormat = outputImageFormat
+	ic.outputIsIso = ic.outputImageFormat == ImageFormatIso
 	ic.outputImageFile = outputImageFile
 	ic.outputImageBase = strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
 	ic.outputImageDir = filepath.Dir(outputImageFile)
 
-	if ic.outputImageFormat != "" && ic.outputImageFormat != ImageFormatIso {
+	if ic.outputImageFormat != "" && !ic.outputIsIso {
 		ic.qemuOutputImageFormat, err = toQemuImageFormat(ic.outputImageFormat)
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// If there are OS customizations, then we proceed as usual.
+	// If there are no OS customizations, and the input is an iso, we just
+	// return because this function is mainly about OS customizations.
+	// This function also supports shrinking/exporting partitions. While
+	// we could support those functions for input isos, we are choosing to
+	// not support them until there is an actual need/a future time.
+	// We explicitly inform the user of the lack of support here.
+	if !ic.customizeOSPartitions && ic.inputIsIso {
+
+		if ic.enableShrinkFilesystems {
+			return nil, fmt.Errorf("shrinking file systems is not supported when the input image is an iso image")
+		}
+
+		if ic.outputSplitPartitionsFormat != "" {
+			return nil, fmt.Errorf("extracting partitions is not supported when the input image is an iso image")
+		}
+	}
+
+	if ic.inputIsIso && !ic.outputIsIso {
+		return nil, fmt.Errorf("generating a non-iso image from an iso image is not supported")
+	}
+
+	// While defining a storage configuration can work when the input image is
+	// an iso, there is no obvious point of moving content between partitions
+	// where all partitions get collapsed into the squashfs at the end.
+	if ic.inputIsIso && config.Storage != nil {
+		return nil, fmt.Errorf("cannot customize storage when the input is an iso")
 	}
 
 	return ic, nil
@@ -153,15 +186,12 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 }
 
 func cleanUp(ic *ImageCustomizerParameters) error {
-
-	var allErrors error
-
 	err := file.RemoveFileIfExists(ic.rawImageFile)
 	if err != nil {
-		allErrors = fmt.Errorf("failed to clean-up raw image file:\n%w", err)
+		return err
 	}
 
-	return allErrors
+	return nil
 }
 
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
@@ -237,19 +267,11 @@ func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomi
 func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSIsoBuilder, error) {
 	logger.Log.Infof("Converting input image to a writeable format")
 
-	if ic.inputImageFormat == ".iso" {
+	if ic.inputIsIso {
 
 		inputIsoArtifacts, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
 		if err != nil {
-			var cleanUpError error
-			if inputIsoArtifacts != nil {
-				cleanUpError = inputIsoArtifacts.cleanUp()
-			}
-			if cleanUpError == nil {
-				return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
-			} else {
-				return nil, fmt.Errorf("failed to load input iso artifacts:\n%w\nclean-up error:\n%w", err, cleanUpError)
-			}
+			return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
 		}
 
 		// If the input is a LiveOS iso and there are OS customizations
@@ -276,24 +298,25 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 }
 
 func customizeOSContents(ic *ImageCustomizerParameters) error {
-
-	// If the user has defined customizations, then should proceed as usual.
-	// However, there are no customizations, and the input is an iso, we
-	// should just return - but call out any command line switches that might
-	// have requested unsupported changes.
-	if !ic.customizeOSPartitions && ic.inputImageFormat == ".iso" {
-
-		if ic.enableShrinkFilesystems {
-			return fmt.Errorf("shrinking file systems is not supported when the input image is an iso.")
-		}
-
-		if ic.outputSplitPartitionsFormat != "" {
-			return fmt.Errorf("extracting partitions is not support when the input image is an iso.")
-		}
-
+	// If there are OS customizations, then we proceed as usual.
+	// If there are no OS customizations, and the input is an iso, we just
+	// return because this function is mainly about OS customizations.
+	// This function also supports shrinking/exporting partitions. While
+	// we could support those functions for input isos, we are choosing to
+	// not support them until there is an actual need/a future time.
+	// We explicitly inform the user of the lack of support earlier during
+	// mic parameter validation (see createImageCustomizerParameters()).
+	if !ic.customizeOSPartitions && ic.inputIsIso {
 		return nil
 	}
 
+	// The code beyond this point assumes the OS object is always present. To
+	// change the code to check before every usage whether the OS object is
+	// present or not will lead to a messy mix of if statements that do not
+	// serve the readibility of the code. A simpler solution is to instantiate
+	// a default imagecustomizerapi.OS object if the passed in one is absent.
+	// Then the code afterwards knows how to handle the default values
+	// correctly, and thus it eliminates the need for many if statements.
 	if ic.config.OS == nil {
 		ic.config.OS = &imagecustomizerapi.OS{}
 	}

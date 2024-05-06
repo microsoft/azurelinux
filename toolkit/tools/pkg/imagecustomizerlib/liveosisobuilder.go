@@ -973,7 +973,8 @@ func extractIsoImageContents(buildDir string, isoImageFile string, isoExpansionF
 	}
 	defer isoImageLoopDevice.Close()
 
-	isoImageMount, err := safemount.NewMount(isoImageLoopDevice.DevicePath(), mountDir, "iso9660" /*fstype*/, unix.MS_RDONLY /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	isoImageMount, err := safemount.NewMount(isoImageLoopDevice.DevicePath(), mountDir,
+		"iso9660" /*fstype*/, unix.MS_RDONLY /*flags*/, "" /*data*/, false /*makeAndDelete*/)
 	if err != nil {
 		return err
 	}
@@ -1039,6 +1040,14 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 			isomakerBuildDir: filepath.Join(isoBuildDir, "isomaker-tmp"),
 		},
 	}
+	defer func() {
+		if err != nil {
+			cleanupErr := isoBuilder.cleanUp()
+			if cleanupErr != nil {
+				err = fmt.Errorf("%w:\nfailed to clean-up:\n%w", err, cleanupErr)
+			}
+		}
+	}()
 
 	// create iso build folder
 	err = os.MkdirAll(isoBuildDir, os.ModePerm)
@@ -1272,7 +1281,8 @@ func (b *LiveOSIsoBuilder) createWriteableImageFromSquashfs(buildDir, rawImageFi
 	}
 	defer squashfsLoopDevice.Close()
 
-	isoImageMount, err := safemount.NewMount(squashfsLoopDevice.DevicePath(), squashMountDir, "squashfs" /*fstype*/, 0 /*flags*/, "" /*data*/, false /*makeAndDelete*/)
+	isoImageMount, err := safemount.NewMount(squashfsLoopDevice.DevicePath(), squashMountDir,
+		"squashfs" /*fstype*/, 0 /*flags*/, "" /*data*/, false /*makeAndDelete*/)
 	if err != nil {
 		return err
 	}
