@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        8.5.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -20,7 +20,7 @@ Patch5:         CVE-2023-46752.patch
 Patch6:         CVE-2023-46753.patch
 Patch7:         CVE-2023-47235.patch
 Patch8:         CVE-2023-47234.patch
-Patch9:         CVE-2024-27913.patch
+Patch9:         CVE-2024-34088.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -202,6 +202,10 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Fri May 03 2024 Henry Beberman <henry.beberman@microsoft.com> - 8.5.3-6
+- Patch CVE-2024-34088
+- Remove CVE-2024-27913 patch since it's replaced by the CVE-2024-34088 patch
+
 * Fri Mar 15 2024 Yash Panchal <yashpanchal@microsoft.com> - 8.5.3-5
 - Patch CVE-2024-27913
 
