@@ -18,8 +18,7 @@ the specification.
  cloudinit/sources/helpers/openstack.py        | 11 +--
  .../sources/helpers/test_openstack.py         |  8 +--
  tests/unittests/sources/test_configdrive.py   | 68 ++++++++++---------
- tests/unittests/test_net.py                   |  6 +-
- 4 files changed, 48 insertions(+), 45 deletions(-)
+ 3 files changed, 45 insertions(+), 42 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index 094c889ca..dc53c23b0 100644
@@ -233,37 +232,5 @@ index 70da4812a..94c8bed3a 100644
          }
          self.assertEqual(expected, config_name2mac)
  
-diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index 970f33384..cd25ff155 100644
---- a/tests/unittests/test_net.py
-+++ b/tests/unittests/test_net.py
-@@ -533,7 +533,7 @@ OS_SAMPLES = [
-         },
-         "out_sysconfig_opensuse": [
-             (
--                "etc/sysconfig/network/ifcfg-eth0",
-+                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
-                 """
- # Created by cloud-init automatically, do not edit.
- #
-@@ -621,7 +621,7 @@ dns = none
-                 "".join(
-                     [
-                         "etc/NetworkManager/system-connections",
--                        "/cloud-init-eth0.nmconnection",
-+                        "/cloud-init-tap1a81968a-79.nmconnection",
-                     ]
-                 ),
-                 """
-@@ -694,7 +694,7 @@ dns=172.19.0.12;
-         },
-         "out_sysconfig_opensuse": [
-             (
--                "etc/sysconfig/network/ifcfg-eth0",
-+                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
-                 """
- # Created by cloud-init automatically, do not edit.
- #
 -- 
 2.34.1
-
