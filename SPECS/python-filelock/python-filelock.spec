@@ -50,7 +50,7 @@ the same lock object twice, it will not block.
 
 %install
 %pyproject_install
-%pyproject_save_files -l %{srcname}
+%pyproject_save_files %{srcname}
 
 %check
 %if %{with check}
