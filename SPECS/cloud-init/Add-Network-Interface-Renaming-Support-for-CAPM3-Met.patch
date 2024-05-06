@@ -18,8 +18,8 @@ the specification.
  cloudinit/sources/helpers/openstack.py        | 11 +--
  .../sources/helpers/test_openstack.py         |  8 +-
  tests/unittests/sources/test_configdrive.py   | 83 ++++++++++---------
- tests/unittests/test_net.py                   | 27 +++---
- 4 files changed, 67 insertions(+), 62 deletions(-)
+ tests/unittests/test_net.py                   | 32 +++----
+ 4 files changed, 67 insertions(+), 67 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index ebdeedd37..6d2810160 100644
@@ -252,10 +252,10 @@ index 83f4621b4..a7e20c1fb 100644
          self.assertEqual(expected, config_name2mac)
  
 diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index 5eab3b3c4..22e5cba97 100644
+index 5eab3b3c4..11b9e7a19 100644
 --- a/tests/unittests/test_net.py
 +++ b/tests/unittests/test_net.py
-@@ -534,7 +534,7 @@ OS_SAMPLES = [
+@@ -534,13 +534,12 @@ OS_SAMPLES = [
          },
          "out_sysconfig_opensuse": [
              (
@@ -264,7 +264,13 @@ index 5eab3b3c4..22e5cba97 100644
                  """
  # Created by cloud-init on instance boot automatically, do not edit.
  #
-@@ -574,13 +574,13 @@ dns = none
+ BOOTPROTO=static
+ IPADDR=172.19.1.34
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ STARTMODE=auto
+ """.lstrip(),
+@@ -574,15 +573,14 @@ dns = none
          ],
          "out_sysconfig_rhel": [
              (
@@ -278,9 +284,11 @@ index 5eab3b3c4..22e5cba97 100644
 -DEVICE=eth0
 +DEVICE=tap1a81968a-79
  GATEWAY=172.19.3.254
- HWADDR=fa:16:3e:ed:9a:59
+-HWADDR=fa:16:3e:ed:9a:59
  IPADDR=172.19.1.34
-@@ -623,23 +623,23 @@ dns = none
+ NETMASK=255.255.252.0
+ NM_CONTROLLED=no
+@@ -623,23 +621,23 @@ dns = none
                  "".join(
                      [
                          "etc/NetworkManager/system-connections",
@@ -308,7 +316,7 @@ index 5eab3b3c4..22e5cba97 100644
  
  [ipv4]
  method=manual
-@@ -695,14 +695,13 @@ route1=0.0.0.0/0,172.19.3.254
+@@ -695,14 +693,13 @@ route1=0.0.0.0/0,172.19.3.254
          },
          "out_sysconfig_opensuse": [
              (
@@ -324,7 +332,7 @@ index 5eab3b3c4..22e5cba97 100644
  NETMASK=255.255.252.0
  NETMASK1=255.255.255.0
  STARTMODE=auto
-@@ -737,13 +736,13 @@ dns = none
+@@ -737,15 +734,14 @@ dns = none
          ],
          "out_sysconfig_rhel": [
              (
@@ -338,9 +346,11 @@ index 5eab3b3c4..22e5cba97 100644
 -DEVICE=eth0
 +DEVICE=tap1a81968a-79
  GATEWAY=172.19.3.254
- HWADDR=fa:16:3e:ed:9a:59
+-HWADDR=fa:16:3e:ed:9a:59
  IPADDR=172.19.1.34
-@@ -852,7 +851,7 @@ dns = none
+ IPADDR1=10.0.0.10
+ NETMASK=255.255.252.0
+@@ -852,7 +848,7 @@ dns = none
          },
          "out_sysconfig_opensuse": [
              (
@@ -349,7 +359,15 @@ index 5eab3b3c4..22e5cba97 100644
                  """
  # Created by cloud-init on instance boot automatically, do not edit.
  #
-@@ -895,13 +894,13 @@ dns = none
+@@ -861,7 +857,6 @@ IPADDR=172.19.1.34
+ IPADDR6=2001:DB8::10/64
+ IPADDR6_1=2001:DB9::10/64
+ IPADDR6_2=2001:DB10::10/64
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ STARTMODE=auto
+ """.lstrip(),
+@@ -895,15 +890,14 @@ dns = none
          ],
          "out_sysconfig_rhel": [
              (
@@ -363,7 +381,9 @@ index 5eab3b3c4..22e5cba97 100644
 -DEVICE=eth0
 +DEVICE=tap1a81968a-79
  GATEWAY=172.19.3.254
- HWADDR=fa:16:3e:ed:9a:59
+-HWADDR=fa:16:3e:ed:9a:59
  IPADDR=172.19.1.34
+ IPV6ADDR=2001:DB8::10/64
+ IPV6ADDR_SECONDARIES="2001:DB9::10/64 2001:DB10::10/64"
 -- 
 2.34.1
