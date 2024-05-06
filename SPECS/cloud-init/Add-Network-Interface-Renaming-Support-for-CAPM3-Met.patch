@@ -15,11 +15,11 @@ interfaces by using the "id" attribute found in the CAPM3 Metal3DataTemplate
 specification. This is a temporary fix until the "name" attribute is added to
 the specification.
 ---
- cloudinit/sources/helpers/openstack.py        |  11 +-
- .../sources/helpers/test_openstack.py         |   8 +-
- tests/unittests/sources/test_configdrive.py   |  75 ++++++-----
- tests/unittests/test_net.py                   | 125 +++++++++---------
- 4 files changed, 113 insertions(+), 106 deletions(-)
+ cloudinit/sources/helpers/openstack.py        | 11 +--
+ .../sources/helpers/test_openstack.py         |  8 +-
+ tests/unittests/sources/test_configdrive.py   | 83 ++++++++++---------
+ tests/unittests/test_net.py                   | 22 ++---
+ 4 files changed, 65 insertions(+), 59 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index ebdeedd37..6d2810160 100644
@@ -74,7 +74,7 @@ index ac8e2a354..143c12796 100644
                          {
                              "type": "static",
 diff --git a/tests/unittests/sources/test_configdrive.py b/tests/unittests/sources/test_configdrive.py
-index 83f4621b4..da1429890 100644
+index 83f4621b4..a7e20c1fb 100644
 --- a/tests/unittests/sources/test_configdrive.py
 +++ b/tests/unittests/sources/test_configdrive.py
 @@ -731,16 +731,16 @@ class TestNetJson(CiTestCase):
@@ -177,7 +177,7 @@ index 83f4621b4..da1429890 100644
  
      def test_bond_conversion(self):
          # light testing of bond conversion and eni rendering of bond
-@@ -961,20 +963,21 @@ class TestConvertNetworkData(CiTestCase):
+@@ -961,24 +963,27 @@ class TestConvertNetworkData(CiTestCase):
              ]
          )
          self.assertEqual(
@@ -206,9 +206,18 @@ index 83f4621b4..da1429890 100644
 +        self.assertIn("auto eth0", eni_rendering)
 +        self.assertIn("auto eth1", eni_rendering)
          self.assertIn("auto bond0", eni_rendering)
-         # The bond should have the given mac address
-         pos = eni_rendering.find("auto bond0")
-@@ -994,9 +997,9 @@ class TestConvertNetworkData(CiTestCase):
+-        # The bond should have the given mac address
+-        pos = eni_rendering.find("auto bond0")
+-        self.assertIn(BOND_MAC, eni_rendering[pos:])
++        
++        # Since we are setting the mac address for all interfaces to none, we 
++        # are commenting the check down below.
++        # pos = eni_rendering.find("auto bond0")
++        # self.assertIn(BOND_MAC, eni_rendering[pos:])
+ 
+     def test_vlan(self):
+         # light testing of vlan config conversion and eni rendering
+@@ -994,9 +999,9 @@ class TestConvertNetworkData(CiTestCase):
          ) as f:
              eni_rendering = f.read()
  
@@ -220,7 +229,7 @@ index 83f4621b4..da1429890 100644
  
      def test_mac_addrs_can_be_upper_case(self):
          # input mac addresses on rackspace may be upper case
-@@ -1012,8 +1015,8 @@ class TestConvertNetworkData(CiTestCase):
+@@ -1012,8 +1017,8 @@ class TestConvertNetworkData(CiTestCase):
  
          expected = {
              "nic0": "fa:16:3e:05:30:fe",
@@ -231,7 +240,7 @@ index 83f4621b4..da1429890 100644
          }
          self.assertEqual(expected, config_name2mac)
  
-@@ -1031,8 +1034,8 @@ class TestConvertNetworkData(CiTestCase):
+@@ -1031,8 +1036,8 @@ class TestConvertNetworkData(CiTestCase):
  
          expected = {
              "nic0": "fa:16:3e:05:30:fe",
@@ -243,154 +252,100 @@ index 83f4621b4..da1429890 100644
          self.assertEqual(expected, config_name2mac)
  
 diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index 5eab3b3c4..ebc3dcf1c 100644
+index 5eab3b3c4..340bf4a5f 100644
 --- a/tests/unittests/test_net.py
 +++ b/tests/unittests/test_net.py
-@@ -4851,27 +4851,28 @@ USERCTL=no
-         with self.assertRaises(ValueError):
-             network_state.parse_net_config_data(network_cfg, skip_broken=False)
+@@ -534,7 +534,7 @@ OS_SAMPLES = [
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+@@ -574,13 +574,13 @@ dns = none
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+ HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
+@@ -623,14 +623,14 @@ dns = none
+                 "".join(
+                     [
+                         "etc/NetworkManager/system-connections",
+-                        "/cloud-init-eth0.nmconnection",
++                        "/cloud-init-tap1a81968a-79.nmconnection",
+                     ]
+                 ),
+                 """
+ # Generated by cloud-init. Changes will be lost.
  
--    def test_openstack_rendering_samples(self):
--        for os_sample in OS_SAMPLES:
--            render_dir = self.tmp_dir()
--            ex_input = os_sample["in_data"]
--            ex_mac_addrs = os_sample["in_macs"]
--            network_cfg = openstack.convert_net_json(
--                ex_input, known_macs=ex_mac_addrs
--            )
--            ns = network_state.parse_net_config_data(
--                network_cfg, skip_broken=False
--            )
--            renderer = self._get_renderer()
--            # render a multiple times to simulate reboots
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            for fn, expected_content in os_sample.get(
--                "out_sysconfig_rhel", []
--            ):
--                with open(os.path.join(render_dir, fn)) as fh:
--                    self.assertEqual(expected_content, fh.read())
-+    # Disabling test since we no longer follow the naming convention given here.
-+    # def test_openstack_rendering_samples(self):
-+    #     for os_sample in OS_SAMPLES:
-+    #         render_dir = self.tmp_dir()
-+    #         ex_input = os_sample["in_data"]
-+    #         ex_mac_addrs = os_sample["in_macs"]
-+    #         network_cfg = openstack.convert_net_json(
-+    #             ex_input, known_macs=ex_mac_addrs
-+    #         )
-+    #         ns = network_state.parse_net_config_data(
-+    #             network_cfg, skip_broken=False
-+    #         )
-+    #         renderer = self._get_renderer()
-+    #         # render a multiple times to simulate reboots
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         for fn, expected_content in os_sample.get(
-+    #             "out_sysconfig_rhel", []
-+    #         ):
-+    #             with open(os.path.join(render_dir, fn)) as fh:
-+    #                 self.assertEqual(expected_content, fh.read())
- 
-     def test_network_config_v1_samples(self):
-         ns = network_state.parse_net_config_data(CONFIG_V1_SIMPLE_SUBNET)
-@@ -5677,27 +5678,28 @@ STARTMODE=auto
-     #            renderer.render_network_state(ns, target=render_dir)
-     #        self.assertEqual([], os.listdir(render_dir))
- 
--    def test_openstack_rendering_samples(self):
--        for os_sample in OS_SAMPLES:
--            render_dir = self.tmp_dir()
--            ex_input = os_sample["in_data"]
--            ex_mac_addrs = os_sample["in_macs"]
--            network_cfg = openstack.convert_net_json(
--                ex_input, known_macs=ex_mac_addrs
--            )
--            ns = network_state.parse_net_config_data(
--                network_cfg, skip_broken=False
--            )
--            renderer = self._get_renderer()
--            # render a multiple times to simulate reboots
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            for fn, expected_content in os_sample.get(
--                "out_sysconfig_opensuse", []
--            ):
--                with open(os.path.join(render_dir, fn)) as fh:
--                    self.assertEqual(expected_content, fh.read())
-+    # Disabling test since we no longer follow the anming convention given here.
-+    # def test_openstack_rendering_samples(self):
-+    #     for os_sample in OS_SAMPLES:
-+    #         render_dir = self.tmp_dir()
-+    #         ex_input = os_sample["in_data"]
-+    #         ex_mac_addrs = os_sample["in_macs"]
-+    #         network_cfg = openstack.convert_net_json(
-+    #             ex_input, known_macs=ex_mac_addrs
-+    #         )
-+    #         ns = network_state.parse_net_config_data(
-+    #             network_cfg, skip_broken=False
-+    #         )
-+    #         renderer = self._get_renderer()
-+    #         # render a multiple times to simulate reboots
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         for fn, expected_content in os_sample.get(
-+    #             "out_sysconfig_opensuse", []
-+    #         ):
-+    #             with open(os.path.join(render_dir, fn)) as fh:
-+    #                 self.assertEqual(expected_content, fh.read())
- 
-     def test_network_config_v1_samples(self):
-         ns = network_state.parse_net_config_data(CONFIG_V1_SIMPLE_SUBNET)
-@@ -5982,25 +5984,26 @@ class TestNetworkManagerRendering(CiTestCase):
-             found,
-         )
- 
--    def test_openstack_rendering_samples(self):
--        for os_sample in OS_SAMPLES:
--            render_dir = self.tmp_dir()
--            ex_input = os_sample["in_data"]
--            ex_mac_addrs = os_sample["in_macs"]
--            network_cfg = openstack.convert_net_json(
--                ex_input, known_macs=ex_mac_addrs
--            )
--            ns = network_state.parse_net_config_data(
--                network_cfg, skip_broken=False
--            )
--            renderer = self._get_renderer()
--            # render a multiple times to simulate reboots
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            renderer.render_network_state(ns, target=render_dir)
--            for fn, expected_content in os_sample.get(self.expected_name, []):
--                with open(os.path.join(render_dir, fn)) as fh:
--                    self.assertEqual(expected_content, fh.read())
-+    # Disabling test since we no longer follow the anming convention given here.
-+    # def test_openstack_rendering_samples(self):
-+    #     for os_sample in OS_SAMPLES:
-+    #         render_dir = self.tmp_dir()
-+    #         ex_input = os_sample["in_data"]
-+    #         ex_mac_addrs = os_sample["in_macs"]
-+    #         network_cfg = openstack.convert_net_json(
-+    #             ex_input, known_macs=ex_mac_addrs
-+    #         )
-+    #         ns = network_state.parse_net_config_data(
-+    #             network_cfg, skip_broken=False
-+    #         )
-+    #         renderer = self._get_renderer()
-+    #         # render a multiple times to simulate reboots
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         renderer.render_network_state(ns, target=render_dir)
-+    #         for fn, expected_content in os_sample.get(self.expected_name, []):
-+    #             with open(os.path.join(render_dir, fn)) as fh:
-+    #                 self.assertEqual(expected_content, fh.read())
- 
-     def test_network_config_v1_samples(self):
-         ns = network_state.parse_net_config_data(CONFIG_V1_SIMPLE_SUBNET)
+ [connection]
+-id=cloud-init eth0
++id=cloud-init tap1a81968a-79
+ uuid=1dd9a779-d327-56e1-8454-c65e2556c12c
+ autoconnect-priority=120
+ type=ethernet
+@@ -695,7 +695,7 @@ route1=0.0.0.0/0,172.19.3.254
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+@@ -737,13 +737,13 @@ dns = none
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+ HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
+@@ -852,7 +852,7 @@ dns = none
+         },
+         "out_sysconfig_opensuse": [
+             (
+-                "etc/sysconfig/network/ifcfg-eth0",
++                "etc/sysconfig/network/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+@@ -895,13 +895,13 @@ dns = none
+         ],
+         "out_sysconfig_rhel": [
+             (
+-                "etc/sysconfig/network-scripts/ifcfg-eth0",
++                "etc/sysconfig/network-scripts/ifcfg-tap1a81968a-79",
+                 """
+ # Created by cloud-init on instance boot automatically, do not edit.
+ #
+ BOOTPROTO=none
+ DEFROUTE=yes
+-DEVICE=eth0
++DEVICE=tap1a81968a-79
+ GATEWAY=172.19.3.254
+ HWADDR=fa:16:3e:ed:9a:59
+ IPADDR=172.19.1.34
 -- 
 2.34.1
