@@ -57,6 +57,7 @@ the same lock object twice, it will not block.
 %build
 %pyproject_wheel
 
+ls .
 pushd docs
 PYTHONPATH=../src sphinx-build ./ html --color -b html -d doctrees
 rm html/.buildinfo
