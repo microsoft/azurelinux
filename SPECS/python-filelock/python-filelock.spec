@@ -32,6 +32,10 @@ BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 # BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 
+%if %{with check}
+BuildRequires:  python%{python3_pkgversion}-pytest
+%endif
+
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
 file locking mechanism for Python.
@@ -61,7 +65,7 @@ the same lock object twice, it will not block.
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
-%license LICENSE
+%license licenses
 
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
