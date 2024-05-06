@@ -53,7 +53,7 @@ the same lock object twice, it will not block.
 %pyproject_save_files -l %{srcname}
 
 %check
-%if %{with tests}
+%if %{with check}
 %pytest
 %else
 %pyproject_check_import
