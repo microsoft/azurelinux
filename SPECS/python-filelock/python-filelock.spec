@@ -17,15 +17,6 @@ file locking mechanism for Python.
 The lock includes a lock counter and is thread safe. This means, when locking
 the same lock object twice, it will not block.
 
-%package doc
-Summary:        Documentation for %{srcname}, %{summary}
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-sphinx
-BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
-
-%description doc
-%{summary}
-
 %package -n python%{python3_pkgversion}-%{srcname}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 Summary:        %{summary}
@@ -37,8 +28,8 @@ BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
-BuildRequires:  python%{python3_pkgversion}-sphinx
-BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
+# BuildRequires:  python%{python3_pkgversion}-sphinx
+# BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 
 %description -n python%{python3_pkgversion}-%{srcname}
@@ -57,12 +48,6 @@ the same lock object twice, it will not block.
 %build
 %pyproject_wheel
 
-ls .
-pushd docs
-PYTHONPATH=../src sphinx-build ./ html --color -b html -d doctrees
-rm html/.buildinfo
-popd
-
 %install
 %pyproject_install
 %pyproject_save_files -l %{srcname}
@@ -74,17 +59,14 @@ popd
 %pyproject_check_import
 %endif
 
-%files doc
-%license LICENSE
-%doc docs/build/html
-
 %files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
+%license LICENSE
 
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
 - Lot of redoing to use pyproject
-- Upgrading version for 3.0
+- Removing 'docs' subpackage since the new src doesn't include that folder
 - Using literal package name so autoupgrader can do its thing.
 - Updating package folder name in %%autosetup
 
