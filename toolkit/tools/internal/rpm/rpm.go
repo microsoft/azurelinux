@@ -337,6 +337,53 @@ func QueryPackage(packageFile, queryFormat string, defines map[string]string, ex
 	return executeRpmCommand(rpmProgram, args...)
 }
 
+// QueryPackageContents queries an RPM for its file contents. The results are split into several categories:
+// - allFilesAndDirectories: all files and directories in the package
+// - files: all files in the package (ie above minus directories)
+// - directories: all directories in the package (ie above minus files, symlinks etc.)
+// - documentFiles: all files marked as documentation (%doc)
+// - licenseFiles: all files marked as license (%license)
+func QueryPackageContents(packageFile string, defines map[string]string) (allFilesAndDirectories, files, directories, documentFiles, licenseFiles []string, err error) {
+	const (
+		queryFormat         = "%{FILENAMES}\n"
+		allFilesQueryFormat = "[%{FILEMODES:perms} %{FILENAMES}\n]"
+	)
+	allFilesWithPerms, err := QueryPackage(packageFile, allFilesQueryFormat, defines)
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package files:\n%w", err)
+	}
+	// Parse the output of the query to separarate directories. Output will be of the form:
+	// 	drwxr-xr-x /a/directory
+	// 	-rw-r--r-- /a/directory/a_file
+	// Any line that starts with a 'd' is a directory, everything else is a file (or symlink etc.).
+	for _, fileLine := range allFilesWithPerms {
+		fileSplit := strings.SplitN(fileLine, " ", 2)
+		if len(fileSplit) != 2 {
+			return nil, nil, nil, nil, nil, fmt.Errorf("failed to parse file output: %s", fileLine)
+		}
+		perms, filePath := fileSplit[0], fileSplit[1]
+		if strings.HasPrefix(perms, "d") {
+			directories = append(directories, filePath)
+		} else {
+			files = append(files, filePath)
+		}
+		allFilesAndDirectories = append(allFilesAndDirectories, filePath)
+	}
+
+	// rpm has dedicated tags for documentation and license files, so we can query them directly.
+	documentFiles, err = QueryPackage(packageFile, "", defines, "-d")
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package documentation files:\n%w", err)
+	}
+
+	licenseFiles, err = QueryPackage(packageFile, "", defines, "-L")
+	if err != nil {
+		return nil, nil, nil, nil, nil, fmt.Errorf("failed to query package license files:\n%w", err)
+	}
+
+	return allFilesAndDirectories, files, directories, documentFiles, licenseFiles, nil
+}
+
 // BuildRPMFromSRPM builds an RPM from the given SRPM file but does not run its '%check' section.
 func BuildRPMFromSRPM(srpmFile, outArch string, defines map[string]string) (err error) {
 	const squashErrors = true
