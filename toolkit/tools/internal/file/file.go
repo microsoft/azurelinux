@@ -13,6 +13,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
@@ -428,4 +429,15 @@ func EnumerateDirFiles(dirPath string) (filePaths []string, err error) {
 		return nil, fmt.Errorf("failed to enumerate files under %s:\n%w", dirPath, err)
 	}
 	return filePaths, nil
+}
+
+func CommandExists(name string) (bool, error) {
+	_, err := exec.LookPath("mkinitrd")
+	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
