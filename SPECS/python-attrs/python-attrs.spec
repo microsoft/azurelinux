@@ -40,6 +40,9 @@ Attributes without boilerplate.
 pip3 install tox
 # Skip mypy tests- effort required in keeping these tests green is not justifiable,
 # as we don't ship mypy and these tests are very sensitive to mypy upstream changes
+
+# Skip tests which fail due to python version changes from 3.9 to 3.12. These can be
+# removed when the package is updated to allow them to succeed.
 LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and not test_auto_attribs and not test_annotations_strings and not test_init_subclass_vanilla and not test_detects_setstate_getstate and not test_closure_cell_rewriting and not test_cls_static and not test_slots_super_property_get_shurtcut and not test_inheritance and not test_no_getstate_setstate'
 
 %files -n python3-attrs
