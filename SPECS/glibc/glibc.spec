@@ -323,7 +323,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.35-7
-- Fixup CVE-2023-4806 patch
+- Fixup CVE-2023-4806.patch and CVE-2023-5156.patch
 
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
 - Add patches for CVE-2023-4806 and CVE-2023-5156
