@@ -31,7 +31,9 @@ BuildRequires:  python%{python3_pkgversion}-setuptools_scm
 # BuildRequires:  python%{python3_pkgversion}-sphinx
 # BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
-
+%if %{with_check}
+BuildRequires:  python%{python3_pkgversion}-iniconfig
+%endif
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
 file locking mechanism for Python.
@@ -50,14 +52,11 @@ the same lock object twice, it will not block.
 
 %install
 %pyproject_install
-%pyproject_save_files -l %{srcname}
+%pyproject_save_files %{srcname}
 
 %check
-%if %{with tests}
+pip3 install iniconfig
 %pytest
-%else
-%pyproject_check_import
-%endif
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
@@ -69,6 +68,7 @@ the same lock object twice, it will not block.
 - Removing 'docs' subpackage since the new src doesn't include that folder
 - Using literal package name so autoupgrader can do its thing.
 - Updating package folder name in %%autosetup
+- Adding python-iniconfig in check section
 
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.0.12-13
 - Updating source URL.
