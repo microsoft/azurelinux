@@ -8190,6 +8190,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "kernel-rt-headers",
+          "version": "6.6.7.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.7.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "kernel-uvm",
           "version": "6.1.0.mshv16",
           "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/kernel-uvm-6.1.0.mshv16.tar.gz"

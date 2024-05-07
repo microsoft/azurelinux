@@ -2734,6 +2734,7 @@
                 "kernel-headers",
                 "kernel-mshv",
                 "kernel-rt",
+                "kernel-rt-headers",
                 "kernel-uvm",
                 "keyutils",
                 "kmod",
