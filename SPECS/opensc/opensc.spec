@@ -1,33 +1,37 @@
-%define opensc_module "OpenSC PKCS #11 Module"
-%define nssdb %{_sysconfdir}/pki/nssdb
-Summary:        Smart card library and applications
 Name:           opensc
-Version:        0.23.0
-Release:        1%{?dist}
-License:        LGPLv2+
+Version:        0.25.1
+Release:        3%{?dist}
+Summary:        Smart card library and applications
+
+License:        LGPL-2.1-or-later AND BSD-3-Clause
 Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-URL:            https://github.com/OpenSC/OpenSC
+URL:            https://github.com/OpenSC/OpenSC/wiki
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
-Patch1:         opensc-0.23.0-pinpad.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  bash-completion
-BuildRequires:  docbook-style-xsl
-BuildRequires:  libtool
-BuildRequires:  libxslt
-BuildRequires:  gcc
-BuildRequires:  openssl-devel
+Patch1:         opensc-0.19.0-pinpad.patch
+# File caching by default (#2000626)
+Patch8:         %{name}-0.22.0-file-cache.patch
+
+BuildRequires:  make
 BuildRequires:  pcsc-lite-devel
 BuildRequires:  readline-devel
+BuildRequires:  openssl-devel
+BuildRequires:  /usr/bin/xsltproc
+BuildRequires:  docbook-style-xsl
+BuildRequires:  autoconf automake libtool gcc
+BuildRequires:  bash-completion-devel
 BuildRequires:  zlib-devel
+# For tests
 %if 0%{?with_check}
 BuildRequires:  libcmocka-devel
 BuildRequires:  softhsm
-BuildRequires:  vim-extra
+BuildRequires:  openssl
 %endif
+Requires:       pcsc-lite-libs%{?_isa}
 Requires:       pcsc-lite
+Obsoletes:      mozilla-opensc-signer < 0.12.0
+Obsoletes:      opensc-devel < 0.12.0
+Obsoletes:      coolkey <= 1.1.0-36
 # The simclist is bundled in upstream
 Provides:       bundled(simclist) = 1.5
 
@@ -40,17 +44,34 @@ supporting this API (such as Mozilla Firefox and Thunderbird) can use it. On
 the card OpenSC implements the PKCS#15 standard and aims to be compatible with
 every software/card that does so, too.
 
+
 %prep
-%autosetup -p1
+%setup -q
+%patch 1 -p1 -b .pinpad
+%patch 8 -p1 -b .file-cache
+
+# The test-pkcs11-tool-allowed-mechanisms already works in Fedora
+sed -i -e '/XFAIL_TESTS/,$ {
+  s/XFAIL_TESTS.*/XFAIL_TESTS=test-pkcs11-tool-test-threads.sh test-pkcs11-tool-test.sh/
+  q
+}' tests/Makefile.am
+
 
 cp -p src/pkcs15init/README ./README.pkcs15init
 cp -p src/scconf/README.scconf .
-sed -i -e 's|/usr/local/towitoko/lib/|%{_libdir}/ctapi/|' etc/opensc.conf.example.in
+# No {_libdir} here to avoid multilib conflicts; it's just an example
+sed -i -e 's|/usr/local/towitoko/lib/|/usr/lib/ctapi/|' etc/opensc.conf.example.in
+
 
 %build
 autoreconf -fvi
-%configure \
-  --disable-static \
+%ifarch %{ix86}
+sed -i -e 's/opensc.conf/opensc-%{_arch}.conf/g' src/libopensc/Makefile.in
+%endif
+sed -i -e 's|"/lib /usr/lib\b|"/%{_lib} %{_libdir}|' configure # lib64 rpaths
+%set_build_flags
+CFLAGS="$CFLAGS -Wstrict-aliasing=2 -Wno-deprecated-declarations"
+%configure --disable-static \
   --disable-autostart-items \
   --disable-notify \
   --disable-assert \
@@ -58,49 +79,68 @@ autoreconf -fvi
 %if 0%{?with_check}
   --enable-cmocka \
 %endif
-  --enable-sm \
-  --with-pcsc-provider=libpcsclite.so.1 \
-  --with-completiondir="%{_sysconfdir}/bash_completion.d/"
+  --enable-sm
 %make_build
+
+
+%check
+make check
 
 %install
 %make_install
-install -Dpm 644 %{SOURCE1} %{buildroot}%{_datadir}/p11-kit/modules/opensc.module
+install -Dpm 644 %{SOURCE1} $RPM_BUILD_ROOT%{_datadir}/p11-kit/modules/opensc.module
 
+%ifarch %{ix86}
+# To avoid multilib issues, move these files on 32b intel architectures
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/opensc.conf
+install -Dpm 644 etc/opensc.conf $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
+rm -f $RPM_BUILD_ROOT%{_mandir}/man5/opensc.conf.5
+install -Dpm 644 doc/files/opensc.conf.5 $RPM_BUILD_ROOT%{_mandir}/man5/opensc-%{_arch}.conf.5
+# use NEWS file timestamp as reference for configuration file
+touch -r NEWS $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
+touch -r NEWS $RPM_BUILD_ROOT%{_mandir}/man5/opensc-%{_arch}.conf.5
+%else
 # For backward compatibility, symlink the old location to the new files
-ln -s %{_sysconfdir}/opensc.conf %{buildroot}%{_sysconfdir}/opensc-%{_arch}.conf
+ln -s opensc.conf $RPM_BUILD_ROOT%{_sysconfdir}/opensc-%{_arch}.conf
+%endif
 
-find %{buildroot} -type f -name '*.la' -print -delete
+find $RPM_BUILD_ROOT%{_libdir} -type f -name "*.la" | xargs rm
 
-rm -rf %{buildroot}%{_datadir}/doc/opensc
+rm -rf $RPM_BUILD_ROOT%{_datadir}/doc/opensc
 
 # Upstream considers libopensc API internal and no longer ships
 # public headers and pkgconfig files.
 # Remove the symlink as nothing is supposed to link against libopensc.
-rm -f %{buildroot}%{_libdir}/libopensc.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/libopensc.so
 # remove the .pc file so we do not confuse users #1673139
-rm -f %{buildroot}%{_libdir}/pkgconfig/*.pc
-rm -f %{buildroot}%{_libdir}/libsmm-local.so
+rm -f $RPM_BUILD_ROOT%{_libdir}/pkgconfig/*.pc
+rm -f $RPM_BUILD_ROOT%{_libdir}/libsmm-local.so
 
 # the npa-tool builds to nothing since we do not have OpenPACE library
 rm -rf %{buildroot}%{_bindir}/npa-tool
 rm -rf %{buildroot}%{_mandir}/man1/npa-tool.1*
 
+# the pkcs11-register is not applicable to Fedora/RHEL where we use p11-kit
+rm -rf %{buildroot}%{_bindir}/pkcs11-register
+rm -rf %{buildroot}%{_mandir}/man1/pkcs11-register.1*
+
 # Remove the notification files
 rm %{buildroot}%{_datadir}/applications/org.opensc.notify.desktop
 rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
-%check
-%make_build check
-
-%ldconfig_scriptlets
 
 %files
-%license COPYING
-%doc NEWS README*
-%{_sysconfdir}/bash_completion.d/
+%doc COPYING NEWS README*
+
+%{_datadir}/bash-completion/*
+
+%ifarch %{ix86}
+%{_mandir}/man5/opensc-%{_arch}.conf.5*
+%else
 %config(noreplace) %{_sysconfdir}/opensc.conf
 %{_mandir}/man5/opensc.conf.5*
+%endif
+
 %config(noreplace) %{_sysconfdir}/opensc-%{_arch}.conf
 # Co-owned with p11-kit so it is not hard dependency
 %dir %{_datadir}/p11-kit
@@ -126,20 +166,127 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 %{_bindir}/westcos-tool
 %{_bindir}/egk-tool
 %{_bindir}/goid-tool
-%{_bindir}/pkcs11-register
+%{_bindir}/dtrust-tool
 %{_libdir}/lib*.so.*
 %{_libdir}/opensc-pkcs11.so
 %{_libdir}/pkcs11-spy.so
 %{_libdir}/onepin-opensc-pkcs11.so
-%%dir %{_libdir}/pkcs11
+%dir %{_libdir}/pkcs11
 %{_libdir}/pkcs11/opensc-pkcs11.so
 %{_libdir}/pkcs11/onepin-opensc-pkcs11.so
 %{_libdir}/pkcs11/pkcs11-spy.so
 %{_datadir}/opensc/
-%{_mandir}/man1/*
-%{_mandir}/man5/*
+%{_mandir}/man1/cardos-tool.1*
+%{_mandir}/man1/cryptoflex-tool.1*
+%{_mandir}/man1/eidenv.1*
+%{_mandir}/man1/gids-tool.1*
+%{_mandir}/man1/goid-tool.1*
+%{_mandir}/man1/iasecc-tool.1*
+%{_mandir}/man1/netkey-tool.1*
+%{_mandir}/man1/openpgp-tool.1*
+%{_mandir}/man1/opensc-explorer.*
+%{_mandir}/man1/opensc-tool.1*
+%{_mandir}/man1/opensc-asn1.1*
+%{_mandir}/man1/piv-tool.1*
+%{_mandir}/man1/pkcs11-tool.1*
+%{_mandir}/man1/pkcs15-crypt.1*
+%{_mandir}/man1/pkcs15-init.1*
+%{_mandir}/man1/pkcs15-tool.1*
+%{_mandir}/man1/sc-hsm-tool.1*
+%{_mandir}/man1/westcos-tool.1*
+%{_mandir}/man1/dnie-tool.1*
+%{_mandir}/man1/egk-tool.1*
+%{_mandir}/man1/dtrust-tool.1*
+%{_mandir}/man5/pkcs15-profile.5*
+
 
 %changelog
+* Tu May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 0.25.1-3
+- Remove fedora and rhel macro usage
+- Fix absolute path for symbolic link to /etc/opensc.conf
+- license: GPLv2+ AND BSD
+
+* Tue Apr 16 2024 Veronika Hanulikova <vhanulik@redhat.com> - 0.25.1-2
+- Fix license identifier in spec file
+
+* Thu Apr 11 2024 Veronika Hanulikova <vhanulik@redhat.com> - 0.25.1-1
+- New upstream release (#2273708)
+
+* Thu Mar 07 2024 Veronika Hanulikova <vhanulik@redhat.com> - 0.25.0-1
+- New upstream release (#2265003), fixes CVE-2023-5992 and CVE-2024-1454 (#2263930)
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Dec 14 2023 Veronika Hanulikova <vhanulik@redhat.com> - 0.24.0-1
+- New upstream release (#2240701)
+
+* Tue Aug 08 2023 Veronika Hanulikova <vhanulik@redhat.com> - 0.23.0-5
+- Fix buffer overrun vulnerability (#2211088), fixes CVE-2023-2977
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.23.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Dec 02 2022 Jakub Jelen <jjelen@redhat.com> - 0.23.0-2
+- Remove needless configure option with hardcoded path to pcsclite
+- Fix import of RSA keys in pkcs11-tool (#2150010)
+
+* Wed Nov 30 2022 Jakub Jelen <jjelen@redhat.com> - 0.23.0-1
+- New upstream release (#2134076)
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.22.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 02 2022 Veronika Hanulikova <vhanulik@redhat.com> - 0.22.0-6
+- Remove unused definitions
+- Add support for itacns v1.1 (key length 2048)
+
+* Fri Feb 11 2022 Veronika Hanulikova <vhanulik@redhat.com> - 0.22.0-5
+- Fix usage of pointer after realloc
+- Initialize maybe-uninitialized variables
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.22.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Oct 11 2021 Jakub Jelen <jjelen@redhat.com> - 0.22.0-3
++ Use file caching by default
+- Detect empty cards in ESC
+- Build with OpenSSL 3.0
+- Remove unused source file
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 0.22.0-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Tue Aug 10 2021 Jakub Jelen <jjelen@redhat.com> - 0.22.0-1
+- New upstream release (#1955837)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Feb 25 2021 Jakub Jelen <jjelen@redhat.com> - 0.21.0-4
+- Couple of more issues of strict aliasing (#1930652)
+
+* Tue Feb 23 2021 Jakub Jelen <jjelen@redhat.com> - 0.21.0-3
+- Unbreak with gcc11 (#1930652)
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Nov 24 2020 Jakub Jelen <jjelen@redhat.com> - 0.21.0-1
+- New upstream release (#1884886)
+
+* Fri Oct 30 2020 Jeff Law <law@redhat.com> - 0.20.0-9
+- Fix potentially uninitialized array reference exposed by gcc-11
+
+* Wed Aug 19 2020 Igor Raits <ignatenkobrain@fedoraproject.org> - 0.20.0-8
+- Drop useless ldconfig scriptlets
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Thu Aug 31 2023 Henry Beberman <henry.beberman@microsoft.com> - 0.23.0-1
 - Upgrade to 0.23.0 to fix CVE-2021-34193
 - Update pinpad.patch to be compatible with 0.23.0
