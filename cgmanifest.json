@@ -3438,8 +3438,8 @@
         "type": "other",
         "other": {
           "name": "facter",
-          "version": "4.2.5",
-          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.5.gem"
+          "version": "4.2.13",
+          "downloadUrl": "https://downloads.puppetlabs.com/facter/facter-4.2.13.gem"
         }
       }
     },

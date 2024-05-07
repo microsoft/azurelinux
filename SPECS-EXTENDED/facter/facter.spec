@@ -11,7 +11,7 @@
 %global debug_package %{nil}
 
 Name:           facter
-Version:        4.2.5
+Version:        4.2.13
 Release:        2%{?dist}
 Summary:        Command and ruby library for gathering system information
 Vendor:		Microsoft Corporation
@@ -99,7 +99,10 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
 %files doc
 %doc %{gem_docdir}
 
-%changelog
+%changelogA
+* Tue May 07 2024 Andy Zaugg <azaugg@linkedin.com> 4.2.13-1
+- Bumped version to facter version which has Mariner Linux Support
+
 * Thu Dec 30 2021 Suresh Babu Chalamalasetty <schalam@microsoft.com> 4.2.5-2
 - Initial CBL-Mariner import from Fedora 35 (license: MIT)
 - License verified
