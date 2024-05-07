@@ -247,7 +247,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 * Fri Jan 10 2020 Jakub Jelen <jjelen@redhat.com> - 0.20.0-3
 - Drop the notification support for now
 
-* Fri Jan 10 2020 Jakub Jelen <jjelen@redhat.com> - 0.20.0-2
+* Thu Jan 09 2020 Jakub Jelen <jjelen@redhat.com> - 0.20.0-2
 - Cleanup spec file
 - Split notify support to separate subpackage
 
