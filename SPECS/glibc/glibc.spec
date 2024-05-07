@@ -30,6 +30,7 @@ Patch5:         glibc-2.34_pthread_cond_wait.patch
 Patch6:         CVE-2023-4911.patch
 Patch7:         CVE-2023-4806.patch
 Patch8:         CVE-2023-5156.patch
+Patch9:         get_nscd_addresses_fix_subscript_typos.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -324,6 +325,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %changelog
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.35-7
 - Fixup CVE-2023-4806.patch and CVE-2023-5156.patch
+- Backport typo fix for nscd
 
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
 - Add patches for CVE-2023-4806 and CVE-2023-5156
