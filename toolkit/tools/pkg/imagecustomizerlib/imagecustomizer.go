@@ -125,33 +125,33 @@ func createImageCustomizerParameters(buildDir string,
 		}
 	}
 
-	// If there are OS customizations, then we proceed as usual.
-	// If there are no OS customizations, and the input is an iso, we just
-	// return because this function is mainly about OS customizations.
-	// This function also supports shrinking/exporting partitions. While
-	// we could support those functions for input isos, we are choosing to
-	// not support them until there is an actual need/a future time.
-	// We explicitly inform the user of the lack of support here.
-	if !ic.customizeOSPartitions && ic.inputIsIso {
-
+	if ic.inputIsIso {
+		// When the input is an iso image, there's only one file system: the
+		// suqash file system and it has no empty space since it's a read-only
+		// file system. So, shrinking it does not make sense.
 		if ic.enableShrinkFilesystems {
 			return nil, fmt.Errorf("shrinking file systems is not supported when the input image is an iso image")
 		}
 
+		// While splitting out the partition for an input iso can mean write
+		// the squash file system out to a raw image, we are choosing to
+		// not implement this until there is a need.
 		if ic.outputSplitPartitionsFormat != "" {
 			return nil, fmt.Errorf("extracting partitions is not supported when the input image is an iso image")
 		}
-	}
 
-	if ic.inputIsIso && !ic.outputIsIso {
-		return nil, fmt.Errorf("generating a non-iso image from an iso image is not supported")
-	}
+		// While re-creating a disk image from the iso is technically possible,
+		// we are choosing to not implement it until there is a need.
+		if !ic.outputIsIso {
+			return nil, fmt.Errorf("generating a non-iso image from an iso image is not supported")
+		}
 
-	// While defining a storage configuration can work when the input image is
-	// an iso, there is no obvious point of moving content between partitions
-	// where all partitions get collapsed into the squashfs at the end.
-	if ic.inputIsIso && config.Storage != nil {
-		return nil, fmt.Errorf("cannot customize storage when the input is an iso")
+		// While defining a storage configuration can work when the input image is
+		// an iso, there is no obvious point of moving content between partitions
+		// where all partitions get collapsed into the squashfs at the end.
+		if config.Storage != nil {
+			return nil, fmt.Errorf("cannot customize storage when the input is an iso")
+		}
 	}
 
 	return ic, nil
