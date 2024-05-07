@@ -12,6 +12,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
 BuildRequires:  npth-devel >= 1.2
+BuildRequires:  glibc-iconv
 BuildRequires:  libassuan-devel >= 2.5.0
 BuildRequires:  libksba-devel >= 1.3.4
 BuildRequires:  libgcrypt-devel > 1.9.1
@@ -22,7 +23,7 @@ Requires:       libgpg-error >= 1.46
 Requires:       npth >= 1.2
 Requires:       libassuan >= 2.5.0
 Requires:       pinentry
-
+Patch0:         gnupg-2.4.0-tests-Fix-tests-gpgme-for-in-source-tree-builds.patch
 Provides:       gpg = %{version}-%{release}
 Provides:       gnupg = %{version}-%{release}
 Provides:       %{name}-smime = %{version}-%{release}
@@ -48,7 +49,7 @@ Requires: %{name} = %{version}-%{release}
 These are the additional language files of gnupg2
 
 %prep
-%autosetup -n gnupg-%{version}
+%autosetup -n gnupg-%{version} -p1
 
 %build
 %configure \

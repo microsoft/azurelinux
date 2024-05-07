@@ -1,0 +1,62 @@
+From 0486caf56f96a279c7fe381b2a49ec674d6e60e2 Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Wed, 21 Dec 2022 10:52:24 +0900
+Subject: tests: Fix tests/gpgme for in-source-tree builds.
+
+* tests/gpgme/Makefile.am: Don't use setup.scm/ dir.
+* tests/gpgme/all-tests.scm: Fix the name of the environment.
+
+--
+
+GnuPG-bug-id: 6313
+Fixes-commit: c19ea75f10d6278569619f90977ce7c820e9319d
+Signed-off-by: NIIBE Yutaka <gniibe@fsij.org>
+---
+ tests/gpgme/Makefile.in   | 5 ++---
+ tests/gpgme/all-tests.scm | 4 ++--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/tests/gpgme/Makefile.in b/tests/gpgme/Makefile.in
+--- a/tests/gpgme/Makefile.in	2022-12-16 11:49:34.000000000 -0500
++++ b/tests/gpgme/Makefile.in	2022-12-20 23:35:26.757302512 -0500
+@@ -614,8 +614,7 @@ check: xcheck
+ 
+ .PHONY: xcheck
+ xcheck:
+-	@$(MKDIR_P) setup.scm/tests \
+-	  tests/gpg lang/qt/tests lang/python/tests
++	@$(MKDIR_P) tests/gpg lang/qt/tests lang/python/tests
+ 	$(TESTS_ENVIRONMENT) $(abs_top_builddir)/tests/gpgscm/gpgscm$(EXEEXT) \
+ 	  $(abs_srcdir)/run-tests.scm $(TESTFLAGS) $(TESTS)
+ 
+@@ -624,7 +623,7 @@ xcheck:
+ all-local: $(required_pgms)
+ 
+ clean-local:
+-	-rm -rf setup.scm/tests tests/gpg lang/qt/tests lang/python/tests
++	-rm -rf tests lang
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+ # Otherwise a system limit (for SysV at least) may be exceeded.
+diff --git a/tests/gpgme/all-tests.scm b/tests/gpgme/all-tests.scm
+index 1746c4ee1..aef7d6a21 100644
+--- a/tests/gpgme/all-tests.scm
++++ b/tests/gpgme/all-tests.scm
+@@ -41,7 +41,7 @@
+     (test::scm
+      #f
+      #f
+-     (path-join "tests" "gpgme" "setup.scm" "tests" "gpg")
++     (path-join "tests" "gpgme" "tests" "gpg")
+      (in-srcdir "tests" "gpgme" "setup.scm")
+      "--" "tests" "gpg")))
+  (define setup-py
+@@ -49,7 +49,7 @@
+     (test::scm
+      #f
+      #f
+-     (path-join "tests" "gpgme" "setup.scm" "lang" "python" "tests")
++     (path-join "tests" "gpgme" "lang" "python" "tests")
+      (in-srcdir "tests" "gpgme" "setup.scm")
+      "--" "lang" "python" "tests")))
+ 
