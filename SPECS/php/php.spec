@@ -1514,9 +1514,9 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %dir %{_datadir}/php/preload
 
 %changelog
-* Fri May 03 2024 Gary Swalling <gaswal@microsoft.com> - 8.3.6-1
+* Tue May 07 2024 Gary Swalling <gaswal@microsoft.com> - 8.3.6-1
 - Upgrade to 8.3.6 to fix CVE-2024-2756, CVE-2024-2757, CVE-2024-3096
-- Update BuildRequires from libpq to postgresql
+- Update BuildRequires, libpq is now provided by postgresql
 
 * Tue Apr 23 2024 Andrew Phelps <anphel@microsoft.com> - 8.3.4-1
 - Upgrade to version 8.3.4
