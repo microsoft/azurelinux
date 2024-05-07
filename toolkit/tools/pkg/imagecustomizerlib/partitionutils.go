@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/installutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 )
@@ -31,12 +32,12 @@ func findPartitions(buildDir string, diskDevice string) ([]*safechroot.MountPoin
 
 	rootfsPartition, err := findRootfsPartition(diskPartitions, buildDir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to find rootfs partition:\n%w", err)
 	}
 
 	mountPoints, err := findMountsFromRootfs(rootfsPartition, diskPartitions, buildDir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read fstab entries from rootfs partition:\n%w", err)
 	}
 
 	return mountPoints, nil
@@ -116,13 +117,26 @@ func findBootPartitionFromEsp(efiSystemPartition *diskutils.PartitionInfo, diskP
 // While technically it is possible to place /etc on a different partition, doing so is fairly difficult and requires
 // a custom initramfs module.
 func findRootfsPartition(diskPartitions []diskutils.PartitionInfo, buildDir string) (*diskutils.PartitionInfo, error) {
+	logger.Log.Debugf("Searching for rootfs partition")
+
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	var rootfsPartitions []*diskutils.PartitionInfo
 	for i := range diskPartitions {
 		diskPartition := diskPartitions[i]
 
+		// Skip over disk entries.
 		if diskPartition.Type != "part" {
+			continue
+		}
+
+		// Skip over file-system types that can't be used for the rootfs partition.
+		switch diskPartition.FileSystemType {
+		case "ext2", "ext3", "ext4", "xfs":
+
+		default:
+			logger.Log.Debugf("Skip partition (%s) with unsupported rootfs filesystem type (%s)", diskPartition.Path,
+				diskPartition.FileSystemType)
 			continue
 		}
 
@@ -165,6 +179,8 @@ func findRootfsPartition(diskPartitions []diskutils.PartitionInfo, buildDir stri
 func findMountsFromRootfs(rootfsPartition *diskutils.PartitionInfo, diskPartitions []diskutils.PartitionInfo,
 	buildDir string,
 ) ([]*safechroot.MountPoint, error) {
+	logger.Log.Debugf("Reading fstab entries")
+
 	tmpDir := filepath.Join(buildDir, tmpParitionDirName)
 
 	// Temporarily mount the rootfs partition so that the fstab file can be read.

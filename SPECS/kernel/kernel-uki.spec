@@ -27,6 +27,7 @@ BuildRequires:  dracut
 BuildRequires:  binutils
 BuildRequires:  systemd-boot-unsigned
 BuildRequires:  systemd-udev
+BuildRequires:  system-release
 BuildRequires:  tpm2-tools
 BuildRequires:  cryptsetup
 BuildRequires:  device-mapper

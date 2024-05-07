@@ -53,6 +53,16 @@ def get_toolchain(cfg, build):
         return cfg['global']['tool']
     return 'GCC5'
 
+def get_hostarch():
+    mach = os.uname().machine
+    if mach == 'x86_64':
+        return 'X64'
+    if mach == 'aarch64':
+        return 'AARCH64'
+    if mach == 'riscv64':
+        return 'RISCV64'
+    return 'UNKNOWN'
+
 def get_version(cfg, silent = False):
     coredir = get_coredir(cfg)
     if version_override:
@@ -191,7 +201,10 @@ def build_one(cfg, build, jobs = None, silent = False, nologs = False):
     if jobs:
         cmdline += [ '-n', jobs ]
     for arch in b['arch'].split():
-        cmdline += [ '-a', arch ]
+        if arch == 'HOST':
+            cmdline += [ '-a', get_hostarch() ]
+        else:
+            cmdline += [ '-a', arch ]
     if 'opts' in b:
         for name in b['opts'].split():
             section = 'opts.' + name
@@ -337,7 +350,8 @@ def main():
     parser.add_argument('-j', '--jobs', dest = 'jobs', type = str,
                         help = 'allow up to JOBS parallel build jobs',
                         metavar = 'JOBS')
-    parser.add_argument('-m', '--match', dest = 'match', type = str,
+    parser.add_argument('-m', '--match', dest = 'match',
+                        type = str, action = 'append',
                         help = 'only run builds matching INCLUDE (substring)',
                         metavar = 'INCLUDE')
     parser.add_argument('-x', '--exclude', dest = 'exclude',
@@ -361,7 +375,8 @@ def main():
                         type = str, action = 'append', metavar = 'DIR',
                         help = 'location(s) of additional packages '
                         '(can be specified multiple times)')
-    parser.add_argument('-t', '--toolchain', dest = 'toolchain', type = str, metavar = 'NAME',
+    parser.add_argument('-t', '--toolchain', dest = 'toolchain',
+                        type = str, metavar = 'NAME',
                         help = 'tool chain to be used to build edk2')
     parser.add_argument('--version-override', dest = 'version_override',
                         type = str, metavar = 'VERSION',
@@ -408,9 +423,14 @@ def main():
     for build in cfg.sections():
         if not build.startswith('build.'):
             continue
-        if options.match and options.match not in build:
-            print(f'# skipping "{build}" (not matching "{options.match}")')
-            continue
+        if options.match:
+            matching = False
+            for item in options.match:
+                if item in build:
+                    matching = True
+            if not matching:
+                print(f'# skipping "{build}" (not matching "{"|".join(options.match)}")')
+                continue
         if options.exclude:
             exclude = False
             for item in options.exclude:

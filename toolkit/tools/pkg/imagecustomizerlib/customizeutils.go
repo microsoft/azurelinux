@@ -26,6 +26,7 @@ import (
 const (
 	configDirMountPathInChroot = "/_imageconfigs"
 	resolveConfPath            = "/etc/resolv.conf"
+	defaultFilePermissions     = 0o755
 )
 
 func doCustomizations(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config,
@@ -49,6 +50,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 	}
 
 	err = UpdateHostname(config.OS.Hostname, imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = copyAdditionalDirs(baseConfigPath, config.OS.AdditionalDirs, imageChroot)
 	if err != nil {
 		return err
 	}
@@ -132,7 +138,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 // Override the resolv.conf file, so that in-chroot processes can access the network.
 // For example, to install packages from packages.microsoft.com.
 func overrideResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Debugf("Overriding resolv.conf file")
+	logger.Log.Infof("Overriding resolv.conf file")
 
 	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
 
@@ -156,7 +162,7 @@ func overrideResolvConf(imageChroot *safechroot.Chroot) error {
 // Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
 // file. For example, systemd-resolved.
 func deleteResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Debugf("Deleting overridden resolv.conf file")
+	logger.Log.Infof("Deleting overridden resolv.conf file")
 
 	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
 
@@ -203,6 +209,36 @@ func copyAdditionalFiles(baseConfigPath string, additionalFiles imagecustomizera
 		}
 	}
 
+	return nil
+}
+
+func copyAdditionalDirs(baseConfigPath string, additionalDirs imagecustomizerapi.DirConfigList, imageChroot *safechroot.Chroot) error {
+	for _, dirConfigElement := range additionalDirs {
+		absSourceDir := file.GetAbsPathWithBase(baseConfigPath, dirConfigElement.SourcePath)
+		logger.Log.Infof("Copying %s into %s", absSourceDir, dirConfigElement.DestinationPath)
+
+		// Setting permissions values. They are set to a default value if they have not been specified.
+		newDirPermissionsValue := fs.FileMode(defaultFilePermissions)
+		if dirConfigElement.NewDirPermissions != nil {
+			newDirPermissionsValue = *(*fs.FileMode)(dirConfigElement.NewDirPermissions)
+		}
+		childFilePermissionsValue := fs.FileMode(defaultFilePermissions)
+		if dirConfigElement.ChildFilePermissions != nil {
+			childFilePermissionsValue = *(*fs.FileMode)(dirConfigElement.ChildFilePermissions)
+		}
+
+		dirToCopy := safechroot.DirToCopy{
+			Src:                  absSourceDir,
+			Dest:                 dirConfigElement.DestinationPath,
+			NewDirPermissions:    newDirPermissionsValue,
+			ChildFilePermissions: childFilePermissionsValue,
+			MergedDirPermissions: (*fs.FileMode)(dirConfigElement.MergedDirPermissions),
+		}
+		err := imageChroot.AddDirs(dirToCopy)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -402,6 +438,8 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		logger.Log.Infof("Resetting bootloader config")
+
 		// Hard-reset the grub config.
 		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
 			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
@@ -497,6 +535,8 @@ func selinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *sa
 		// So, no need to call setfiles.
 		return nil
 	}
+
+	logger.Log.Infof("Setting file SELinux labels")
 
 	// Get the list of mount points.
 	mountPointToFsTypeMap := make(map[string]string, 0)

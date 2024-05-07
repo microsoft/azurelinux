@@ -3,7 +3,7 @@
 Name:           rocksdb
 Summary:        A library that provides an embeddable, persistent key-value store for fast storage.
 Version:        8.9.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+ and ASL 2.0 and BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,12 @@ Development files for %{name}
 %build
 mkdir build
 cd build
-%cmake -DPORTABLE=1 ..
+%ifarch x86_64
+PORTABLE_OPTION=haswell
+%else
+PORTABLE_OPTION=1
+%endif
+%cmake -DPORTABLE=$PORTABLE_OPTION ..
 make %{?_smp_mflags}
 
 %install
@@ -58,16 +63,21 @@ make install DESTDIR=%{buildroot}
 %{_libdir}/pkgconfig/rocksdb.pc
 
 %changelog
+* Mon Apr 29 2024 Andrew Phelps <anphel@microsoft.com> - 8.9.1-2
+- Fix build issue with -march=x86-64-v3
+
 * Wed Dec 13 2023 Andrew Phelps <anphel@microsoft.com> - 8.9.1-1
 - Upgrade to 8.9.1
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 6.26.0-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
-*   Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 6.26.0-1
--   Update to version 6.26.0
-*   Thu Oct 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 6.7.3-2
--   Fixed 'Source0' URL.
--   License verified.
-*   Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 6.7.3-1
--   Original version for CBL-Mariner.
+* Thu Nov 11 2021 Andrew Phelps <anphel@microsoft.com> 6.26.0-1
+- Update to version 6.26.0
+
+* Thu Oct 08 2020 Pawel Winogrodzki <pawelwi@microsoft.com> 6.7.3-2
+- Fixed 'Source0' URL.
+- License verified.
+
+* Mon Mar 30 2020 Jonathan Chiu <jochi@microsoft.com> 6.7.3-1
+- Original version for CBL-Mariner.

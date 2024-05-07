@@ -11,6 +11,7 @@ import (
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -20,6 +21,8 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 	if overlays == nil {
 		return false, nil
 	}
+
+	logger.Log.Infof("Enable filesystem overlays")
 
 	// Integrate overlay dracut module and overlay driver into initramfs img.
 	overlayDracutModule := "overlayfs"

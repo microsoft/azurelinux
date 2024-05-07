@@ -473,6 +473,8 @@ func getGrub2ConfigFilePath(imageChroot *safechroot.Chroot) string {
 }
 
 func regenerateInitrd(imageChroot *safechroot.Chroot) error {
+	logger.Log.Infof("Regenerate initramfs file")
+
 	err := imageChroot.Run(func() error {
 		return shell.ExecuteLiveWithErr(1, "mkinitrd")
 	})

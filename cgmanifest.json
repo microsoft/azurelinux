@@ -3148,8 +3148,8 @@
         "type": "other",
         "other": {
           "name": "edk2",
-          "version": "20230301gitf80f052277c8",
-          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-f80f052277c8.tar.xz/sha512/af802257f010b63d973dc909b57ee845b7734e8d494b081050ba1f197349663b081e1f2edc5244726e2479ff6d16d79d0a6fceb00f4840b59982f10b79facf66/edk2-f80f052277c8.tar.xz"
+          "version": "20240223gitedc6681206c1",
+          "downloadUrl": "https://src.fedoraproject.org/repo/pkgs/edk2/edk2-edc6681206c1.tar.xz/sha512/6d86a0d0d0d929d8c84f8cfb2fc5f919fe66dbcea5e4b5ff1cee2f033245e7760943b50b0de80e22e4cea586c49d060d1212140c2848c7a3e61bea1fe2c110ca/edk2-edc6681206c1.tar.xz"
         }
       }
     },
@@ -24533,8 +24533,8 @@
         "type": "other",
         "other": {
           "name": "python-tensorboard",
-          "version": "2.11.0",
-          "downloadUrl": "https://github.com/tensorflow/tensorboard/archive/refs/tags/2.11.0.tar.gz"
+          "version": "2.16.2",
+          "downloadUrl": "https://cblmarinerstorage.blob.core.windows.net/sources/core/python-tensorboard-2.16.2.tar.gz"
         }
       }
     },

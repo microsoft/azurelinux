@@ -13,6 +13,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -23,6 +24,8 @@ func enableVerityPartition(buildDir string, verity *imagecustomizerapi.Verity, i
 	if verity == nil {
 		return false, nil
 	}
+
+	logger.Log.Infof("Enable verity")
 
 	// Integrate systemd veritysetup dracut module into initramfs img.
 	systemdVerityDracutModule := "systemd-veritysetup"
