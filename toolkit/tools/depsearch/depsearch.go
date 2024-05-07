@@ -4,20 +4,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
-	"sort"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/depsearch"
-	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
-	"gonum.org/v1/gonum/graph"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
