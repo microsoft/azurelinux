@@ -219,8 +219,8 @@ libksba-devel-1.6.4-1.azl3.aarch64.rpm
 libxslt-1.1.39-1.azl3.aarch64.rpm
 npth-1.6-4.azl3.aarch64.rpm
 pinentry-1.2.1-1.azl3.aarch64.rpm
-gnupg2-2.4.0-3.azl3.aarch64.rpm
-gnupg2-lang-2.4.0-3.azl3.aarch64.rpm
+gnupg2-2.4.0-2.azl3.aarch64.rpm
+gnupg2-lang-2.4.0-2.azl3.aarch64.rpm
 gpgme-1.23.2-2.azl3.aarch64.rpm
 azurelinux-repos-shared-3.0-2.azl3.noarch.rpm
 azurelinux-repos-3.0-2.azl3.noarch.rpm
