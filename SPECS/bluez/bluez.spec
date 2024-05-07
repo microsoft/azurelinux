@@ -1,7 +1,7 @@
 Summary:        Bluetooth utilities
 Name:           bluez
 Version:        5.63
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -25,6 +25,7 @@ Patch7:         0001-hog-Fix-read-order-of-attributes-rediffed.patch
 Patch8:         0002-hog-Add-input-queue-while-uhid-device-has-not-been-c-rediffed.patch
 Patch9:         CVE-2022-3563.patch
 Patch10:        CVE-2023-45866.patch
+Patch11:        CVE-2023-50229.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 # For printing
@@ -273,6 +274,9 @@ install emulator/btvirt %{buildroot}/%{_libexecdir}/bluetooth/
 %{_userunitdir}/obex.service
 
 %changelog
+* Fri May 03 2024 Henry Beberman <henry.beberman@microsoft.com> - 5.63-6
+- Add patch for CVE-2023-50229
+
 * Thu Dec 21 2023 Suresh Thelkar <sthelkar@microsoft.com> - 5.63-5
 - Add patch for CVE-2023-45866
 
