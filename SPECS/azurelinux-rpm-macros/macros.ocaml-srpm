@@ -13,3 +13,5 @@
 # This was removed in OCaml 4.09.
 # https://github.com/ocaml/ocaml/pull/2314
 %ocaml_native_profiling %{nil}
+
+%ocamldir %{_libdir}/ocaml

@@ -1,32 +1,31 @@
 Summary:        OCaml lightweight thread library
 Name:           ocaml-lwt
-Version:        5.4.1
-Release:        9%{?dist}
+Version:        5.7.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://ocsigen.org/lwt
 Source0:        https://github.com/ocsigen/lwt/archive/refs/tags/%{version}.tar.gz#/lwt-%{version}.tar.gz
+# Fix GCC 14 incompatibilites: https://github.com/ocsigen/lwt/pull/1004
+Patch0:         0001-Prepare-for-stricter-checking-in-GCC-14.patch
 
-BuildRequires:  dune
-BuildRequires:  glib2-devel
-BuildRequires:  libev-devel
-BuildRequires:  ocaml >= 4.02.0
-BuildRequires:  ocaml-bisect-ppx-devel
-BuildRequires:  ocaml-cppo
-BuildRequires:  ocaml-dune-devel
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-dune >= 1.8.0
+BuildRequires:  ocaml-dune-configurator-devel
 BuildRequires:  ocaml-findlib
-# lwt_luv dependencies.
-BuildRequires:  ocaml-luv-devel
-# lwt.unix dependencies
-BuildRequires:  ocaml-mmap-devel
+BuildRequires:  ocaml-cppo >= 1.1.0
 BuildRequires:  ocaml-ocplib-endian-devel
-# lwt_ppx dependencies.
-BuildRequires:  ocaml-ppxlib >= 0.16.0
+ 
 # lwt_react dependencies.
-BuildRequires:  ocaml-react-devel
-BuildRequires:  ocaml-result-devel
-BuildRequires:  ocaml-seq-devel
+BuildRequires:  ocaml-react-devel >= 1.0.0
+ 
+# lwt_ppx dependencies.
+BuildRequires:  ocaml-ppxlib-devel >= 0.30.0
+BuildRequires:  ocaml-ppx-let-devel
+ 
+# optional dependencies.
+BuildRequires:  libev-devel
 
 %description
 Lwt is a lightweight thread library for Objective Caml.  This library
@@ -34,41 +33,19 @@ is part of the Ocsigen project.
 
 %package        devel
 Summary:        Development files for %{name}
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       libev-devel%{?_isa}
-Requires:       ocaml-mmap-devel%{?_isa}
 Requires:       ocaml-ocplib-endian-devel%{?_isa}
-Requires:       ocaml-result-devel%{?_isa}
-Requires:       ocaml-seq-devel%{?_isa}
+Requires:       libev-devel%{?_isa}
+
+# This can be removed when F43 reaches EOL
+Obsoletes:      ocaml-lwt-luv-devel < 5.7.0
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-%package        luv
-Summary:        Libuv engine for lwt
-
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description    luv
-This package contains a libuv engine for lwt.
-
-%package        luv-devel
-Summary:        Development files for ocaml-lwt-luv
-
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-Requires:       %{name}-luv%{?_isa} = %{version}-%{release}
-Requires:       ocaml-luv-devel%{?_isa}
-Requires:       ocaml-result-devel%{?_isa}
-
-%description    luv-devel
-The %{name}-luv-devel package contains libraries and signature files for
-developing applications that use %{name}-luv.
-
 %package        react
 Summary:        Helpers for using React with Lwt
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    react
@@ -77,8 +54,8 @@ Helpers for using React with Lwt.
 %package        react-devel
 Summary:        Development files for ocaml-lwt-react
 
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       %{name}-react%{?_isa} = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       ocaml-react-devel%{?_isa}
 
 %description    react-devel
@@ -87,7 +64,6 @@ developing applications that use %{name}-react.
 
 %package        ppx
 Summary:        PPX syntax for Lwt
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    ppx
@@ -96,8 +72,8 @@ PPX syntax for Lwt, providing something similar to async/await from JavaScript.
 %package        ppx-devel
 Summary:        Development files for ocaml-lwt-ppx
 
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       %{name}-ppx%{?_isa} = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       ocaml-ppxlib-devel%{?_isa}
 
 %description    ppx-devel
@@ -105,7 +81,7 @@ The %{name}-ppx-devel package contains libraries and signature files for
 developing applications that use %{name}-ppx.
 
 %prep
-%autosetup -n lwt-%{version}
+%autosetup -n lwt-%{version} -p1
 
 # It looks like one test fails.
 # Actually, it looks like all the "mcast" tests fail in koji.
@@ -119,140 +95,47 @@ sed 's,test_mcast "mcast-nojoin-noloop" false false;,(*test_mcast "mcast-nojoin-
 # Enable libev and pthread.
 dune exec src/unix/config/discover.exe -- --save \
      --use-libev true --use-pthread true
-dune build --profile=release --verbose
-
-# Relink the stublib with RPM_LD_FLAGS
-cd _build/default/src/unix
-ocamlmklib -g -ldopt "$RPM_LD_FLAGS" -lev -lpthread -lm -o lwt_unix_stubs \
-  $(ar t liblwt_unix_stubs.a)
-cd -
+%dune_build
 
 %install
-dune install --profile=release --destdir %{buildroot}
+%dune_install -s
 
-# Remove spurious dune-installed documentation.
-rm -rf %{buildroot}/%{_prefix}/doc
+# Remove test-only directory
+rm -rf %{buildroot}%{ocamldir}/lwt_ppx_let
 
 %check
 # Disable this test on s390x.
 # https://bugzilla.redhat.com/show_bug.cgi?id=1826511
 %ifnarch s390x
-dune runtest --profile=release
+%dune_check
 %endif
 
-%files
+%files -f .ofiles-lwt
 %doc CHANGES README.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/lwt/
-%dir %{_libdir}/ocaml/lwt/unix/
-%{_libdir}/ocaml/lwt/META
-%{_libdir}/ocaml/lwt/dune-package
-%{_libdir}/ocaml/lwt/opam
-%{_libdir}/ocaml/lwt/*.cma
-%{_libdir}/ocaml/lwt/*.cmi
-%{_libdir}/ocaml/lwt/unix/*.cma
-%{_libdir}/ocaml/lwt/unix/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt/*.cmxs
-%{_libdir}/ocaml/lwt/unix/*.cmxs
-%endif
-%{_libdir}/ocaml/stublibs/*.so
 
-%files devel
-%doc CHANGES README.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt/*.a
-%{_libdir}/ocaml/lwt/*.cmxa
-%{_libdir}/ocaml/lwt/*.cmx
-%{_libdir}/ocaml/lwt/unix/*.a
-%{_libdir}/ocaml/lwt/unix/*.cmxa
-%{_libdir}/ocaml/lwt/unix/*.cmx
-%endif
-%{_libdir}/ocaml/lwt/*.cmt
-%{_libdir}/ocaml/lwt/*.cmti
-%{_libdir}/ocaml/lwt/*.ml
-%{_libdir}/ocaml/lwt/*.mli
-%{_libdir}/ocaml/lwt/unix/*.cmt
-%{_libdir}/ocaml/lwt/unix/*.cmti
-%{_libdir}/ocaml/lwt/unix/*.h
-%{_libdir}/ocaml/lwt/unix/*.ml
-%{_libdir}/ocaml/lwt/unix/*.mli
-
-%files luv
+%files devel -f .ofiles-lwt-devel
 %doc CHANGES README.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/lwt_luv/
-%{_libdir}/ocaml/lwt_luv/META
-%{_libdir}/ocaml/lwt_luv/dune-package
-%{_libdir}/ocaml/lwt_luv/opam
-%{_libdir}/ocaml/lwt_luv/*.cma
-%{_libdir}/ocaml/lwt_luv/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_luv/*.cmxs
-%endif
 
-%files luv-devel
-%doc CHANGES README.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_luv/*.a
-%{_libdir}/ocaml/lwt_luv/*.cmxa
-%{_libdir}/ocaml/lwt_luv/*.cmx
-%endif
-%{_libdir}/ocaml/lwt_luv/*.cmt
-%{_libdir}/ocaml/lwt_luv/*.cmti
-%{_libdir}/ocaml/lwt_luv/*.ml
-%{_libdir}/ocaml/lwt_luv/*.mli
-
-%files react
+%files react -f .ofiles-lwt_react
 %doc CHANGES README.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/lwt_react/
-%{_libdir}/ocaml/lwt_react/META
-%{_libdir}/ocaml/lwt_react/dune-package
-%{_libdir}/ocaml/lwt_react/opam
-%{_libdir}/ocaml/lwt_react/*.cma
-%{_libdir}/ocaml/lwt_react/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_react/*.cmxs
-%endif
 
-%files react-devel
+%files react-devel -f .ofiles-lwt_react-devel
 %doc CHANGES README.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_react/*.a
-%{_libdir}/ocaml/lwt_react/*.cmxa
-%{_libdir}/ocaml/lwt_react/*.cmx
-%endif
-%{_libdir}/ocaml/lwt_react/*.cmt
-%{_libdir}/ocaml/lwt_react/*.cmti
-%{_libdir}/ocaml/lwt_react/*.ml
-%{_libdir}/ocaml/lwt_react/*.mli
 
-%files ppx
-%dir %{_libdir}/ocaml/lwt_ppx/
-%{_libdir}/ocaml/lwt_ppx/META
-%{_libdir}/ocaml/lwt_ppx/dune-package
-%{_libdir}/ocaml/lwt_ppx/opam
-%{_libdir}/ocaml/lwt_ppx/ppx.exe
-%{_libdir}/ocaml/lwt_ppx/*.cma
-%{_libdir}/ocaml/lwt_ppx/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_ppx/*.cmxs
-%endif
-
-%files ppx-devel
+%files ppx -f .ofiles-lwt_ppx
 %doc CHANGES README.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/lwt_ppx/*.a
-%{_libdir}/ocaml/lwt_ppx/*.cmxa
-%{_libdir}/ocaml/lwt_ppx/*.cmx
-%endif
-%{_libdir}/ocaml/lwt_ppx/*.cmt
-%{_libdir}/ocaml/lwt_ppx/*.cmti
-%{_libdir}/ocaml/lwt_ppx/*.ml
-%{_libdir}/ocaml/lwt_ppx/*.mli
+
+%files ppx-devel -f .ofiles-lwt_ppx-devel
+%doc CHANGES README.md
+
 
 %changelog
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.7.0-1
+- Upgrade to 5.7.0
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.4.1-9
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 

@@ -16,23 +16,21 @@
 
 Summary:        Parsing and printing of S-expressions in canonical form
 Name:           ocaml-%{srcname}
-Version:        1.3.2
-Release:        4%{?dist}
+Version:        1.5.2
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocaml-dune/csexp
-Source0:        %{url}/releases/download/%{version}/%{srcname}-%{version}.tbz
-# Depend on Stdlib.Result instead of ocaml-result.  See comment above.
-# This patch is not appropriate for upstream, which needs to keep compatibility
-# with older OCaml versions.
-Patch0:         %{name}-result.patch
+Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
+# Fix an optimization annotation
+Patch0:         07eb898.patch
 
-BuildRequires:  ocaml >= 4.02.3
+BuildRequires:  ocaml >= 4.03.0
 %if %{with dune}
 BuildRequires:  ocaml-dune >= 1.11
-BuildRequires:  ocaml-odoc
-BuildRequires:  ocaml-result-devel >= 1.5
+%else
+BuildRequires:  ocaml-rpm-macros
 %endif
 
 %description
@@ -43,68 +41,47 @@ binary encoding of S-expressions.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-%if %{with dune}
-Requires:       ocaml-result-devel%{?_isa}
-%endif
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -N -n %{srcname}-%{version}
-%if %{without dune}
-%autopatch -p1
-%endif
+%autosetup -n %{srcname}-%{version} -p1
 
 %build
 %if %{with dune}
-dune build %{?_smp_mflags} --display=verbose @install
-dune build %{?_smp_mflags} @doc
+%dune_build
 %else
-OFLAGS="-strict-sequence -strict-formats -short-paths -keep-locs -g -opaque"
+OFLAGS="-w -40 -g"
 OCFLAGS="$OFLAGS -bin-annot"
 cd src
-ocamlc $OCFLAGS -output-obj csexp.mli
-ocamlc $OCFLAGS -a -o csexp.cma csexp.ml
+ocamlc $OCFLAGS -no-alias-deps -o csexp.cmi -c -intf csexp.mli
+ocamlc $OCFLAGS -intf-suffix .ml -no-alias-deps -o csexp.cmo -c -impl csexp.ml
+ocamlc $OFLAGS -a -o csexp.cma csexp.cmo
 %ifarch %{ocaml_native_compiler}
-ocamlopt $OFLAGS -ccopt "%{optflags}" -cclib "$RPM_LD_FLAGS" -a \
-  -o csexp.cmxa csexp.ml
-ocamlopt $OFLAGS -ccopt "%{optflags}" -cclib "$RPM_LD_FLAGS" -shared \
-  -o csexp.cmxs csexp.ml
+ocamlopt $OFLAGS -intf-suffix .ml -no-alias-deps -o csexp.cmx -c -impl csexp.ml
+ocamlopt $OFLAGS -a -o csexp.cmxa csexp.cmx
+ocamlopt $OFLAGS -shared -linkall -I . -o csexp.cmxs csexp.cmxa
 %endif
-cd -
 %endif
 
 %install
 %if %{with dune}
-dune install --destdir=%{buildroot}
-
-# We do not want the dune markers
-find _build/default/_doc/_html -name .dune-keep -delete
-
-# We do not want the ml files
-find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
-
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
-%endif
+%dune_install
 %else
 # Install without dune.  See comment at the top.
-mkdir -p %{buildroot}%{_libdir}/ocaml/%{srcname}
-cp -p src/csexp.{cma,cmi,cmt,cmti,mli} %{buildroot}%{_libdir}/ocaml/%{srcname}
+mkdir -p %{buildroot}%{ocamldir}/csexp
+cp -p src/csexp.{cma,cmi,cmt,cmti,mli} %{buildroot}%{ocamldir}/csexp
 %ifarch %{ocaml_native_compiler}
-cp -p src/csexp.{a,cmx,cmxa,cmxs} %{buildroot}%{_libdir}/ocaml/%{srcname}
+cp -p src/csexp.{a,cmx,cmxa,cmxs} %{buildroot}%{ocamldir}/csexp
 %endif
-cp -p csexp.opam %{buildroot}%{_libdir}/ocaml/%{srcname}/opam
+cp -p csexp.opam %{buildroot}%{ocamldir}/csexp/opam
 
-cat >> %{buildroot}%{_libdir}/ocaml/%{srcname}/META << EOF
+cat >> %{buildroot}%{ocamldir}/csexp/META << EOF
 version = "%{version}"
 description = "Parsing and printing of S-expressions in canonical form"
+requires = ""
 archive(byte) = "csexp.cma"
 %ifarch %{ocaml_native_compiler}
 archive(native) = "csexp.cmxa"
@@ -115,10 +92,31 @@ plugin(native) = "csexp.cmxs"
 %endif
 EOF
 
-cat >> %{buildroot}%{_libdir}/ocaml/%{srcname}/dune-package << EOF
-(lang dune 2.5)
+cat >> %{buildroot}%{ocamldir}/csexp/dune-package << EOF
+(lang dune 3.12)
 (name csexp)
 (version %{version})
+(sections (lib .) (libexec .) (doc ../../doc/csexp))
+(files
+ (lib
+  (META
+   csexp.a
+   csexp.cma
+   csexp.cmi
+   csexp.cmt
+   csexp.cmti
+   csexp.cmx
+%ifarch %{ocaml_native_compiler}
+   csexp.cmxa
+%endif
+   csexp.ml
+   csexp.mli
+   dune-package
+   opam))
+%ifarch %{ocaml_native_compiler}
+ (libexec (csexp.cmxs))
+%endif
+ (doc (CHANGES.md LICENSE.md README.md)))
 (library
  (name csexp)
  (kind normal)
@@ -137,40 +135,24 @@ cat >> %{buildroot}%{_libdir}/ocaml/%{srcname}/dune-package << EOF
  (modes byte)
 %endif
  (modules
-  (singleton (name Csexp) (obj_name csexp) (visibility public) (impl) (intf))))
+  (singleton
+   (obj_name csexp)
+   (visibility public)
+   (source (path Csexp) (intf (path csexp.mli)) (impl (path csexp.ml))))))
 EOF
+%ocaml_files
 %endif
 
-# Cannot do this until ocaml-ppx-expect is available.
-#%%if %%{with dune}
-#%%check
-#dune runtest
-#%%endif
-
-%files
+%files -f .ofiles
 %doc README.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/*.cma
-%{_libdir}/ocaml/%{srcname}/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*.cmxs
-%endif
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*.a
-%{_libdir}/ocaml/%{srcname}/*.cmx
-%{_libdir}/ocaml/%{srcname}/*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/*.cmt
-%{_libdir}/ocaml/%{srcname}/*.cmti
-%{_libdir}/ocaml/%{srcname}/*.mli
+%files devel -f .ofiles-devel
 
 %changelog
+* Tue Apr 30 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.5.2-4
+- Upgraded to 1.5.2.
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-4
 - Cleaning-up spec. License verified.
 

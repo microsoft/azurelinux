@@ -20,8 +20,8 @@
 
 Summary:        Tool for creating supermin appliances
 Name:           supermin
-Version:        5.2.2
-Release:        3%{?dist}
+Version:        5.3.4
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,7 +45,7 @@ BuildRequires:  findutils
 # into a /boot/<machine-id> subdirectory.  Read the
 # kernel-install script to understand why.
 BuildRequires:  grubby
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-findlib-devel
 BuildRequires:  rpm
 BuildRequires:  rpm-devel
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.3.4-1
+- Upgrade to version 5.3.4 to support building using ocaml 5.1.1
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 5.2.2-3
 - update to build dep latest glibc-static version
 

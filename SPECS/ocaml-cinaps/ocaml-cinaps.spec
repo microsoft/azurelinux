@@ -1,16 +1,13 @@
 %global srcname cinaps
 
-# TESTING NOTE: The ppx_jane module is needed to run the tests.  However,
-# ppx_jane transitively requires this module.  Therefore, we cannot run the
-# tests at all until we are able to add ppx_jane.
-%ifnarch %{ocaml_native_compiler}
-%global debug_package %{nil}
-%endif
+# This package is needed to build ppx_jane, but its tests require ppx_jane.
+# Break the dependency cycle here.
+%bcond_with test
 
 Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 Name:           ocaml-%{srcname}
 Version:        0.15.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,9 +15,13 @@ URL:            https://github.com/ocaml-ppx/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  help2man
-BuildRequires:  ocaml >= 4.04.0
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
 BuildRequires:  ocaml-re-devel >= 1.8.0
+
+%if %{with test}
+BuildRequires:  ocaml-ppx-jane-devel
+%endif
 
 %description
 Cinaps is a trivial Metaprogramming tool for OCaml using the OCaml
@@ -38,62 +39,41 @@ be used to generate static code that is independent of the system.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       ocaml-re-devel%{?_isa}
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n cinaps-%{version}
 
 %build
-dune build
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
-
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmxs
-%endif
+%dune_install
 
 # Generate the man page
 mkdir -p %{buildroot}%{_mandir}/man1
 help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
   %{buildroot}%{_mandir}/man1/cinaps.1
 
-%files
+%if %{with test}
+%check
+%dune_check
+%endif
+
+%files -f .ofiles
 %doc README.org
 %license LICENSE.md
-%{_bindir}/cinaps
 %{_mandir}/man1/cinaps.1*
-%dir %{_libdir}/ocaml/%{srcname}/
-%dir %{_libdir}/ocaml/%{srcname}/runtime/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cma
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmxs
-%endif
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.a
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmx
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmt
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.cmti
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.ml
-%{_libdir}/ocaml/%{srcname}/runtime/cinaps_runtime.mli
+%files devel -f .ofiles-devel
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.15.1-4
+- Rebuild with ocaml >= 5.1.1
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1-3
 - Cleaning-up spec. License verified.
 

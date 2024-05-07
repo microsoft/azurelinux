@@ -3,19 +3,34 @@
 # tests at all until we are able to add ppx_jane.
 %global srcname base
 
+# This package is needed to build ppx_jane, but its tests require ppx_jane.
+# Break the dependency cycle here.
+%bcond_with test
+
 Summary:        Jane Street standard library for OCaml
 Name:           ocaml-%{srcname}
-Version:        0.15.0
-Release:        2%{?dist}
+Version:        0.16.3
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://opensource.janestreet.com/base/
 Source0:        https://github.com/janestreet/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
-Patch0:         %{name}-ocaml413compat.patch
-BuildRequires:  ocaml >= 4.07.0
-BuildRequires:  ocaml-dune-devel >= 2.0.0
-BuildRequires:  ocaml-sexplib0-devel >= 0.15
+# Expose a dependency on the math library so RPM can see it
+Patch0:         %{name}-mathlib.patch
+
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-dune >= 2.0.0
+BuildRequires:  ocaml-dune-configurator-devel
+BuildRequires:  ocaml-sexplib0-devel >= 0.16
+
+%if %{with test}
+BuildRequires:  ocaml-num-devel
+BuildRequires:  ocaml-ppx-jane-devel
+BuildRequires:  ocaml-sexplib-devel
+BuildRequires:  ocaml-stdio-devel
+BuildRequires:  ocaml-uutf-devel
+%endif
 
 %description
 Base is a standard library for OCaml.  It provides a standard set of
@@ -37,82 +52,29 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version} -p1
+%autosetup -n base-%{version} -p1
 
 %build
-dune build %{?_smp_mflags}
-
-# TODO: Once odoc is available, BR it and run this to generate documentation:
-# dune build %{?_smp_mflags} @doc
-
-# Dune passes %%build_ldflags to ocamlmklib without -ldopt, resulting in
-# "Unknown option" warnings from ocamlmklib and a library that has not been
-# linked with the correct flags.  We can't add -ldopt ourselves, since that
-# breaks compilation of the cmxs files.  This seems to be a weakness of dune;
-# linker flags and libraries to be linked with have to be specified together,
-# and nothing takes care of separating them and adding ldopt as necessary.  We
-# relink manually to address the problem.
-pushd _build/default/src
-ocamlmklib -g -ldopt "%{build_ldflags}" -o base_stubs *.o
-cd ../hash_types/src
-ocamlmklib -g -ldopt "%{build_ldflags}" -o base_internalhash_types_stubs *.o
-popd
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
+%dune_install
 
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
+%if %{with test}
+%check
+%dune_check
 %endif
 
-%files
+%files -f .ofiles
 %doc CHANGES.md README.org ROADMAP.md
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%dir %{_libdir}/ocaml/%{srcname}/base_internalhash_types/
-%dir %{_libdir}/ocaml/%{srcname}/caml/
-%dir %{_libdir}/ocaml/%{srcname}/md5/
-%dir %{_libdir}/ocaml/%{srcname}/shadow_stdlib/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/*.cma
-%{_libdir}/ocaml/%{srcname}/*.cmi
-%{_libdir}/ocaml/%{srcname}/*.js
-%{_libdir}/ocaml/%{srcname}/*/*.cma
-%{_libdir}/ocaml/%{srcname}/*/*.cmi
-%{_libdir}/ocaml/%{srcname}/*/*.js
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*.cmxs
-%{_libdir}/ocaml/%{srcname}/*/*.cmxs
-%endif
-%{_libdir}/ocaml/stublibs/dllbase_stubs.so
-%{_libdir}/ocaml/stublibs/dllbase_internalhash_types_stubs.so
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*.a
-%{_libdir}/ocaml/%{srcname}/*.cmx
-%{_libdir}/ocaml/%{srcname}/*.cmxa
-%{_libdir}/ocaml/%{srcname}/*/*.a
-%{_libdir}/ocaml/%{srcname}/*/*.cmx
-%{_libdir}/ocaml/%{srcname}/*/*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/*.cmt
-%{_libdir}/ocaml/%{srcname}/*.cmti
-%{_libdir}/ocaml/%{srcname}/*.ml
-%{_libdir}/ocaml/%{srcname}/*.mli
-%{_libdir}/ocaml/%{srcname}/*/*.cmt
-%{_libdir}/ocaml/%{srcname}/*/*.cmti
-%{_libdir}/ocaml/%{srcname}/*/*.h
-%{_libdir}/ocaml/%{srcname}/*/*.ml
-%{_libdir}/ocaml/%{srcname}/*/*.mli
+%files devel -f .ofiles-devel
 
 %changelog
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.3-1
+- Upgrade to 0.16.3
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2
 - Cleaning-up spec. License verified.
 

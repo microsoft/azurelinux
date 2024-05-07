@@ -11,37 +11,20 @@
 
 Summary:        Unit test framework for OCaml
 Name:           ocaml-%{srcname}
-Version:        2.2.2
-Release:        6%{?dist}
+Version:        2.2.7
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ounit
-Source0:        %{url}/releases/download/v%{version}/%{srcname}-v%{version}.tbz
-# We neither need nor want the stdlib-shims package.  It is a forward
-# compatibility package for older OCaml installations.  Patch it out instead.
-# Upstream does not want this patch until stdlib-shims is obsolete.
-Patch0:         %{name}-stdlib-shims.patch
-# Enable ocaml 4.13 compatibility. Source: Fedora 35
-# https://src.fedoraproject.org/rpms/ocaml-ounit/blob/f35/f/ounit-v2.2.4-remove-Thread-kill.patch
-Patch1:         remove-thread-kill.patch
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-v%{version}.tar.gz
+# Remove seq and stdlib-shims downstream.  Not needed in Fedora.
+Patch0001:      0001-Remove-stdlib-shims.patch
 
-# I believe this is actually caused by a missing Requires in another
-# package (perhaps lwt?).  In any case without this the tests fail to
-# compile with:
-# /usr/bin/ld: cannot find -lev
-BuildRequires:  libev-devel
-BuildRequires:  ocaml >= 4.02.3
-BuildRequires:  ocaml-dune >= 1.11.0
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-dune >= 3.0
 BuildRequires:  ocaml-findlib
-BuildRequires:  ocaml-lwt-devel
-BuildRequires:  ocaml-mmap-devel
-BuildRequires:  ocaml-ocplib-endian-devel
-BuildRequires:  ocaml-result-devel
-
-%if %{with doc}
-BuildRequires:  ocaml-odoc
-%endif
+BuildRequires:  ocaml-lwt-devel >= 2.5.2
 
 # The ounit name is now just an alias for ounit2
 Provides:       %{name}2 = %{version}-%{release}
@@ -52,144 +35,83 @@ unit-tests for OCaml code.  It is loosely based on HUnit, a unit testing
 framework for Haskell.  It is similar to JUnit, and other xUnit testing
 frameworks.
 
+
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:       %{name}2-devel = %{version}-%{release}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %package        lwt
 Summary:        Helper functions for building Lwt tests using OUnit
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Provides:       %{name}2-lwt = %{version}-%{release}
+
 
 %description    lwt
 This package contains helper functions for building Lwt tests using
 OUnit.
 
+
 %package        lwt-devel
 Summary:        Development files for %{name}-lwt
-Requires:       %{name}-devel = %{version}-%{release}
-Requires:       %{name}-lwt = %{version}-%{release}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       %{name}-lwt%{?_isa} = %{version}-%{release}
 Requires:       ocaml-lwt-devel%{?_isa}
 Provides:       %{name}2-lwt-devel = %{version}-%{release}
+
 
 %description    lwt-devel
 The %{name}-lwt-devel package contains libraries and signature
 files for developing applications that use %{name}-lwt.
 
-%package        doc
-Summary:        Documentation for %{name}
-BuildArch:      noarch
-
-%description    doc
-Documentation for %{name}.
 
 %prep
-%autosetup -n %{srcname}-v%{version} -p1
+%autosetup -n ounit-%{version} -p1
+
 
 %build
-dune build %{?_smp_mflags}
-%if %{with doc}
-dune build %{?_smp_mflags} @doc
-%endif
+%dune_build
+
 
 %check
-dune runtest
+%dune_check
+
 
 %install
-dune install --destdir=%{buildroot}
+%dune_install -s
 
-%if %{with doc}
-# We do not want the dune markers
-find _build/default/_doc/_html -name .dune-keep -delete
-%endif
 
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
-%endif
-
-%files
+%files -f .ofiles-ounit2
 %doc CHANGES.md README.md
 %license LICENSE.txt
-%dir %{_libdir}/ocaml/%{srcname}/
-%dir %{_libdir}/ocaml/%{srcname}2/
-%dir %{_libdir}/ocaml/%{srcname}2/advanced/
-%dir %{_libdir}/ocaml/%{srcname}2/threads/
-%{_libdir}/ocaml/%{srcname}2/threads/.private/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}2/META
-%{_libdir}/ocaml/%{srcname}2/*.cma
-%{_libdir}/ocaml/%{srcname}2/*.cmi
-%{_libdir}/ocaml/%{srcname}2/*/*.cma
-%{_libdir}/ocaml/%{srcname}2/*/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}2/*.cmxs
-%{_libdir}/ocaml/%{srcname}2/*/*.cmxs
-%endif
+%dir %{ocamldir}/ounit/
+%{ocamldir}/ounit/META
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%{_libdir}/ocaml/%{srcname}2/dune-package
-%{_libdir}/ocaml/%{srcname}2/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}2/*.a
-%{_libdir}/ocaml/%{srcname}2/*.cmx
-%{_libdir}/ocaml/%{srcname}2/*.cmxa
-%{_libdir}/ocaml/%{srcname}2/*/*.a
-%{_libdir}/ocaml/%{srcname}2/*/*.cmx
-%{_libdir}/ocaml/%{srcname}2/*/*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}2/*.cmt
-%{_libdir}/ocaml/%{srcname}2/*.cmti
-%{_libdir}/ocaml/%{srcname}2/*.ml
-%{_libdir}/ocaml/%{srcname}2/*.mli
-%{_libdir}/ocaml/%{srcname}2/*/*.cmt
-%{_libdir}/ocaml/%{srcname}2/*/*.cmti
-%{_libdir}/ocaml/%{srcname}2/*/*.ml
-%{_libdir}/ocaml/%{srcname}2/*/*.mli
 
-%files lwt
-%dir %{_libdir}/ocaml/%{srcname}-lwt/
-%dir %{_libdir}/ocaml/%{srcname}2-lwt/
-%{_libdir}/ocaml/%{srcname}-lwt/META
-%{_libdir}/ocaml/%{srcname}2-lwt/META
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cma
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmxs
-%endif
+%files devel -f .ofiles-ounit2-devel
+%{ocamldir}/ounit/dune-package
+%{ocamldir}/ounit/opam
 
-%files lwt-devel
-%{_libdir}/ocaml/%{srcname}-lwt/dune-package
-%{_libdir}/ocaml/%{srcname}-lwt/opam
-%{_libdir}/ocaml/%{srcname}2-lwt/dune-package
-%{_libdir}/ocaml/%{srcname}2-lwt/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.a
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmx
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.cmt
-%{_libdir}/ocaml/%{srcname}2-lwt/oUnitLwt.ml
 
-%if %{with doc}
-%files doc
-%doc _build/default/_doc/_html/
-%doc _build/default/_doc/_mlds/
-%doc _build/default/_doc/_odoc/
-%license LICENSE.txt
-%endif
+%files lwt -f .ofiles-ounit2-lwt
+%dir %{ocamldir}/ounit-lwt/
+%{ocamldir}/ounit-lwt/META
+
+
+%files lwt-devel -f .ofiles-ounit2-lwt-devel
+%{ocamldir}/ounit-lwt/dune-package
+%{ocamldir}/ounit-lwt/opam
 
 %changelog
+* Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.2.7-1
+- Upgraded to 2.2.7
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-6
 - Cleaning-up spec. License verified.
 

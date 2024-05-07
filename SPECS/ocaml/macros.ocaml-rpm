@@ -4,7 +4,7 @@
 #     is placed in its own package.  This option requires the existence of opam
 #     *.install files in the build tree.
 # -n: suppress creation of a devel subpackage.
-%ocaml_files(sn) %{python3} /usr/lib/rpm/redhat/ocaml_files.py %{-s} %{-n} %{buildroot} %{ocamldir}
+%ocaml_files(sn) %{python3} /usr/lib/rpm/azl/ocaml_files.py %{-s} %{-n} %{buildroot} %{ocamldir}
 
 # Internal macro holding the common parts of ocaml_install and dune_install
 %ocaml_install_common(sn) %{expand:
@@ -19,7 +19,7 @@ rm -f ${mlis//.mli/.ml}
 #     is placed in its own package.
 # -n: suppress creation of a devel subpackage.
 %ocaml_install(sn) %{expand:
-%{python3} /usr/lib/rpm/redhat/ocaml_files.py -i %{-s} %{-n} %{buildroot} %{ocamldir}
+%{python3} /usr/lib/rpm/azl/ocaml_files.py -i %{-s} %{-n} %{buildroot} %{ocamldir}
 %ocaml_install_common %{-s} %{-n}}
 
 # Add smp_mflags to arguments if no -j release option is given.

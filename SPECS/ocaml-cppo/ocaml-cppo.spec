@@ -8,22 +8,18 @@
 
 Summary:        Equivalent of the C preprocessor for OCaml programs
 Name:           ocaml-cppo
-Version:        1.6.6
-Release:        5%{?dist}
+Version:        1.6.9
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocaml-community/cppo
-Source0:        https://github.com/ocaml-community/cppo/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 3.10.0
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune
 BuildRequires:  ocaml-findlib
-BuildRequires:  ocaml-ocamlbuild-devel
-
-%if !%{opt}
-Requires:       ocaml >= 3.10.0
-%endif
+BuildRequires:  ocaml-ocamlbuild
 
 %description
 Cppo is an equivalent of the C preprocessor targeted at the OCaml
@@ -39,28 +35,45 @@ The implementation of cppo relies on the standard library of OCaml and
 on the standard parsing tools Ocamllex and Ocamlyacc, which contribute
 to the robustness of cppo across OCaml versions.
 
+
+%package ocamlbuild
+Summary:        Preprocessing plugin for ocamlbuild
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-ocamlbuild%{?_isa}
+# There is no devel subpackage because this package IS for development purposes
+
+
+%description ocamlbuild
+This package contains a plugin for ocamlbuild that enables calling cppo
+at build time.  To use it, call ocamlbuild with the argument
+`-plugin-tag package(cppo_ocamlbuild)`.
+
 %prep
-%setup -q -n %{libname}-%{version}
-sed -i.add-debuginfo \
-    's/ocamlopt/ocamlopt -g/;s/ocamlc \(-[co]\)/ocamlc -g \1/' \
-    Makefile
+%autosetup -n cppo-%{version}
 
 %build
-make %{?_smp_mflags} all
+%dune_build
 
 %install
-install -d %{buildroot}%{_bindir}
-install -p _build/install/default/bin/cppo %{buildroot}%{_bindir}/
+%dune_install
 
 %check
-make test
+%dune_check
 
 %files
 %license LICENSE.md
-%doc Changes README.md
+%doc Changes.md README.md
 %{_bindir}/cppo
+%{_libdir}/ocaml/cppo
+
+
+%files ocamlbuild
+%{_libdir}/ocaml/cppo_ocamlbuild/
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.6.9-1
+- Upgrade to 1.6.9
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.6-5
 - Cleaning-up spec. License verified.
 

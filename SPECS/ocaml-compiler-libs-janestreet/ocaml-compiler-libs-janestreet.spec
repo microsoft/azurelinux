@@ -1,113 +1,54 @@
 %global srcname ocaml-compiler-libs
 
-%ifnarch %{ocaml_native_compiler}
+%ifarch %{ocaml_native_compiler}
+%undefine _debugsource_packages
+%else
 %global debug_package %{nil}
 %endif
-
-%bcond_with docs
 
 Summary:        OCaml compiler libraries repackaged
 Name:           %{srcname}-janestreet
 Version:        0.12.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/janestreet/%{srcname}
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.04.1
-BuildRequires:  ocaml-dune >= 1.5.1
-
-%if %{with docs}
-BuildRequires:  ocaml-odoc
-%endif
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-dune >= 2.8
 
 %description
 This package exposes the OCaml compiler libraries repackaged under
 the toplevel names Ocaml_common, Ocaml_bytecomp, Ocaml_optcomp, etc.
-
+ 
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-
+ 
 %description    devel
 The %{name}-devel package contains libraries and
 signature files for developing applications that use
 %{name}.
-
-%if %{with docs}
-%package        doc
-Summary:        Documentation for %{name}
-BuildArch:      noarch
-
-%description    doc
-Documentation for %{name}.
-%endif
-
+ 
 %prep
-%autosetup -n %{srcname}-%{version}
-
+%autosetup -n ocaml-compiler-libs-%{version}
+ 
 %build
-dune build %{?_smp_mflags}
-%if %{with docs}
-dune build %{?_smp_mflags} @doc
-%endif
-
+%dune_build
 %install
-dune install --destdir=%{buildroot}
-
-# We do not want the dune markers
-%if %{with docs}
-find _build/default/_doc/_html -name .dune-keep -delete
-%endif
-
-# We do not want the ml files
-find %{buildroot}%{_libdir}/ocaml -name \*.ml -delete
-
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-find %{buildroot}%{_libdir}/ocaml -name \*.cmxs -exec chmod a+x {} \+
-%endif
-
-%files
+%dune_install
+%files -f .ofiles
 %doc README.org
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%dir %{_libdir}/ocaml/%{srcname}/bytecomp/
-%dir %{_libdir}/ocaml/%{srcname}/common/
-%dir %{_libdir}/ocaml/%{srcname}/optcomp/
-%dir %{_libdir}/ocaml/%{srcname}/shadow/
-%dir %{_libdir}/ocaml/%{srcname}/toplevel/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/*/*.cma
-%{_libdir}/ocaml/%{srcname}/*/*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*/*.cmxs
-%endif
-
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/*/*.a
-%{_libdir}/ocaml/%{srcname}/*/*.cmx
-%{_libdir}/ocaml/%{srcname}/*/*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/*/*.cmt
-
-%if %{with docs}
-%files doc
-%doc _build/default/_doc/_html/
-%doc _build/default/_doc/_mlds/
-%doc _build/default/_doc/_odoc/
-%license LICENSE.md
-%endif
+ 
+%files devel -f .ofiles-devel
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.12.4-2
+- Rebuild for OCaml 5.1.1 and dune >= 2.8
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.4-1
 - Auto-upgrade to 0.12.4 - Azure Linux 3.0 - package upgrades
 

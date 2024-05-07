@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -123,7 +123,7 @@ BuildRequires:  ntfs-3g
 BuildRequires:  ntfs-3g-system-compression
 BuildRequires:  ntfsprogs
 # For language bindings.
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-augeas-devel
 BuildRequires:  ocaml-findlib-devel
 BuildRequires:  ocaml-gettext-devel
@@ -1146,6 +1146,10 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.52.0-2
+- Use ocaml >= 5.1.1
+- Rebuild for new version of supermin
+
 * Wed Mar 27 2024 BettyLakes <bettylakes@microsoft.com> - 1.52.0-1
 - Update to 1.52.0
 - Move to pcre2

@@ -20,7 +20,7 @@
   "macros.forge": "52cdffd48217cafe33afe47c625cd6aac6460848cd76de66fe61031c26beeaf4",
   "macros.mono-srpm": "a9201ae36fc482e966134e38f42412378e955faf296b214cb6dd63981af8bc49",
   "macros.nodejs-srpm": "b2515cc7fad3f14849cff8593b10543a3f73edccff4c3c6d0d2764dae19c38e8",
-  "macros.ocaml-srpm": "cd34e1d89cf45b1a76a8803a7fe3aefa6e5e6380e983a85d8dae4912ba360b3f",
+  "macros.ocaml-srpm": "c35c6db7ede8ea534212329d010920646f80368e1fbd0b9025e48ed0a85a09ce",
   "macros.openblas-srpm": "bd46ab2c99aa504d3fb09de1f071f0e19a9b2605772c1a738a32cfb0129d33b8",
   "macros.perl-srpm": "27f09c386944fc7478cdde55168bbc720d03ecd11ec60ae1133a42db6432e7f7",
   "macros.pybytecompile": "b07fbaa0f534bfee9706e343f4c1892d6903127e18f7561d0ad8445674658d26",

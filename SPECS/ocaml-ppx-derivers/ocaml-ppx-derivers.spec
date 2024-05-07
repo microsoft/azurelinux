@@ -1,7 +1,7 @@
 Summary:        Deriving plugin registry
 Name:           ocaml-ppx-derivers
 Version:        1.2.1
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,65 +10,52 @@ Source0:        https://github.com/ocaml-ppx/ppx_derivers/archive/%{version}/%{n
 
 BuildRequires:  ocaml
 BuildRequires:  ocaml-dune
-BuildRequires:  ocaml-findlib
 
 %description
 Ppx_derivers is a tiny package whose sole purpose is to allow
 ppx_deriving and ppx_type_conv to inter-operate gracefully when
 linked as part of the same ocaml-migrate-parsetree driver.
 
+
 %package        devel
 Summary:        Development files for %{name}
-
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %prep
-%setup -q -n ppx_derivers-%{version}
+%autosetup -n ppx_derivers-%{version}
+
 
 %build
-dune build @install
+%dune_build
+
 
 %install
-mkdir -p %{buildroot}%{_libdir}/ocaml
-dune install --destdir=%{buildroot} --verbose
+%dune_install
 
-# These files will be installed using the doc and license directives
-rm -r %{buildroot}%{_prefix}/doc
-
-# Makes *.cmxs executable such that they will be stripped.
-find %{buildroot} -name '*.cmxs' -exec chmod 0755 {} \;
 
 %check
-dune runtest
+%dune_check
 
-%files
+
+%files -f .ofiles
 %doc README.md CHANGES.md
 %license LICENSE.md
-%{_libdir}/ocaml/*
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/*/*.a
-%exclude %{_libdir}/ocaml/*/*.cmxa
-%exclude %{_libdir}/ocaml/*/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/*/*.mli
-%exclude %{_libdir}/ocaml/*/*.ml
 
-%files devel
+
+%files devel -f .ofiles-devel
 %doc README.md CHANGES.md
 %license LICENSE.md
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/*/*.a
-%{_libdir}/ocaml/*/*.cmxa
-%{_libdir}/ocaml/*/*.cmx
-%endif
-%{_libdir}/ocaml/*/*.mli
-%{_libdir}/ocaml/*/*.ml
 
 %changelog
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.1-20
+- Removing not needed build requirement and updating the build process
+
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-19
 - Cleaning-up spec. License verified.
 

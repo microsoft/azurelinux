@@ -4,7 +4,7 @@
 
 Summary:        Build tool for OCaml libraries and programs
 Name:           ocaml-ocamlbuild
-Version:        0.14.2
+Version:        0.14.3
 Release:        1%{?dist}
 License:        GPLv2 WITH exceptions
 Vendor:         Microsoft Corporation
@@ -12,38 +12,46 @@ Distribution:   Azure Linux
 URL:            https://github.com/ocaml/ocamlbuild
 Source0:        https://github.com/ocaml/ocamlbuild/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.04.0
+BuildRequires: make
+BuildRequires: ocaml >= 5.1.1
+BuildRequires: ocaml-rpm-macros
+BuildRequires: ncurses
+BuildRequires: asciidoc
+BuildRequires: python3-pygments
+
+# Ocamlbuild can invoke tput; see src/display.ml
+Requires:      ncurses
+
+# This can be removed when F42 reaches EOL
+Obsoletes:     %{name}-devel < 0.14.0-37
+Provides:      %{name}-devel = %{version}-%{release}
 
 %description
 OCamlbuild is a build tool for building OCaml libraries and programs.
 
-%package devel
-Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
-This package contains development files for %{name}.
-
 %package doc
-Summary:        Documentation for %{name}
-Requires:       %{name}%{?_isa} = %{version}-%{release}
+Summary:       Documentation for %{name}
+License:       CC0
+BuildArch:     noarch
 
 %description doc
 This package contains the manual for %{name}.
 
 %prep
-%setup -q -n ocamlbuild-%{version}
-
+%autosetup -n ocamlbuild-%{version}
 
 %build
 make configure \
   OCAMLBUILD_PREFIX=%{_prefix} \
   OCAMLBUILD_BINDIR=%{_bindir} \
   OCAMLBUILD_LIBDIR=%{_libdir}/ocaml \
+  OCAMLBUILD_MANDIR=%{_mandir} \
 %ifarch %{ocaml_native_compiler}
-  OCAML_NATIVE=true
+  OCAML_NATIVE=true \
+  OCAML_NATIVE_TOOLS=true
 %else
-  OCAML_NATIVE=false
+  OCAML_NATIVE=false \
+  OCAML_NATIVE_TOOLS=false
 %endif
 
 # Parallel builds fail.
@@ -56,15 +64,16 @@ make \
      OCAMLOPT="ocamlopt -g"
 %endif
 
+# Build the manual
+asciidoc manual/manual.adoc
+
 
 %install
-make install \
-     DESTDIR=%{buildroot} \
-     CHECK_IF_PREINSTALLED=false
+%make_install CHECK_IF_PREINSTALLED=false
 
 # The install copies ocamlbuild & ocamlbuild.{byte or native}.
 # Symlink them instead.
-pushd %{buildroot}%{_bindir}
+pushd $RPM_BUILD_ROOT/usr/bin
 %ifarch %{ocaml_native_compiler}
 ln -sf ocamlbuild.native ocamlbuild
 %else
@@ -72,47 +81,21 @@ ln -sf ocamlbuild.byte ocamlbuild
 %endif
 popd
 
-# Install the man page, which for some reason is not copied
-# in by the make install rule above.
-mkdir -p %{buildroot}%{_mandir}/man1/
-install -p -m 0644 man/ocamlbuild.1 %{buildroot}%{_mandir}/man1/
+%ocaml_files -n
 
-# Remove the META file.  It will be replaced by ocaml-ocamlfind (findlib).
-rm %{buildroot}%{_libdir}/ocaml/ocamlbuild/META
-
-%files
+%files -f .ofiles
 %doc Changes Readme.md VERSION
 %license LICENSE
-%{_bindir}/ocamlbuild
-%{_bindir}/ocamlbuild.byte
-%ifarch %{ocaml_native_compiler}
-%{_bindir}/ocamlbuild.native
-%endif
-%{_mandir}/man1/ocamlbuild.1*
-%{_libdir}/ocaml/ocamlbuild
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/ocamlbuild/*.a
-%exclude %{_libdir}/ocaml/ocamlbuild/*.o
-%exclude %{_libdir}/ocaml/ocamlbuild/*.cmx
-%exclude %{_libdir}/ocaml/ocamlbuild/*.cmxa
-%endif
-%exclude %{_libdir}/ocaml/ocamlbuild/*.mli
 
-%files devel
-%license LICENSE
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/ocamlbuild/*.a
-%{_libdir}/ocaml/ocamlbuild/*.o
-%{_libdir}/ocaml/ocamlbuild/*.cmx
-%{_libdir}/ocaml/ocamlbuild/*.cmxa
-%endif
-%{_libdir}/ocaml/ocamlbuild/*.mli
 
 %files doc
-%license LICENSE
-%doc manual/*
+%license manual/LICENSE
+%doc manual/manual.html
 
 %changelog
+* Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.14.3-1
+- Upgrade to 0.14.3
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.2-1
 - Auto-upgrade to 0.14.2 - Azure Linux 3.0 - package upgrades
 

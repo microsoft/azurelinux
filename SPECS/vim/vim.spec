@@ -2,13 +2,14 @@
 Summary:        Text editor
 Name:           vim
 Version:        9.0.2190
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.vim.org
 Source0:        https://github.com/%{name}/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source1:        macros.vim
 BuildRequires:  ncurses-devel
 BuildRequires:  python3-devel
 Requires(post): sed
@@ -41,6 +42,10 @@ echo '#define SYS_VIMRC_FILE "%{_sysconfdir}/vimrc"' >> src/feature.h
 %make_install
 ln -sv vim %{buildroot}%{_bindir}/vi
 install -vdm 755 %{buildroot}%{_sysconfdir}
+	
+mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d/
+install -p -m644 %{SOURCE1} %{buildroot}%{_rpmconfigdir}/macros.d/
+
 cat > %{buildroot}%{_sysconfdir}/vimrc << "EOF"
 " Begin %{_sysconfdir}/vimrc
 
@@ -200,6 +205,7 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
+%{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
 * Thu Mar 21 2024 Andy Zaugg <azaugg@linkedin.com> - 9.0.2190-2

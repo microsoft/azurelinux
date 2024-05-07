@@ -1,23 +1,45 @@
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
+%ifarch %{ocaml_native_compiler}
+%ifarch x86_64
+%global num_arch amd64
+%else
+%ifarch aarch64
+%global num_arch arm64
+%else
+%ifarch ppc64le
+%global num_arch power
+%else
+%global num_arch %{_arch}
+%endif
+%endif
+%endif
+%else
+%global num_arch none
+%endif
+
 Summary:        Legacy Num library for arbitrary-precision integer and rational arithmetic
 Name:           ocaml-num
-Version:        1.3
-Release:        2%{?dist}
+Version:        1.5
+Release:        1%{?dist}
 License:        LGPLv2+ WITH exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/ocaml/num
-Source0:        https://github.com/ocaml/num/archive/v%{version}/%{name}-%{version}.tar.gz#/num-%{version}.tar.gz
-# All patches since 1.3 was released.
-Patch1:         0001-Bump-version.patch
-Patch2:         0002-Fix-usage-of-bytes-vs-string.patch
-Patch3:         0003-Get-rid-of-Bytes.unsafe_of_string.patch
-# Downstream patches to add -g flag.
-Patch4:         0004-toplevel-Add-g-flag.patch
-Patch5:         0005-src-Add-g-flag-to-mklib.patch
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Downstream patch to add -g flag.
+Patch5:         0001-src-Add-g-flag-to-mklib.patch
 
 BuildRequires:  make
-BuildRequires:  ocaml
-BuildRequires:  ocaml-findlib-devel
+BuildRequires:  ocaml >= 5.1.1
+BuildRequires:  ocaml-compiler-libs
+BuildRequires:  ocaml-findlib
+BuildRequires:  ocaml-rpm-macros
+
+# Do not require ocaml-compiler-libs at runtime
+%global __ocaml_requires_opts -i Longident -i Topdirs
+
 
 %description
 This library implements arbitrary-precision arithmetic on big integers
@@ -31,59 +53,49 @@ library, and older applications that already use Num are encouraged to
 switch to Zarith. Zarith delivers much better performance than Num and
 has a nicer API.
 
+
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %prep
-%setup -q -n num-%{version}
-%autopatch -p1
+%autosetup -n num-%{version} -p1
+
 
 %build
-make %{?_smp_mflags} all
+make opam-modern PROFILE=release ARCH=%{num_arch} FLAMBDA=true
+
 
 %check
-make -j1 test
+make -j1 test PROFILE=release ARCH=%{num_arch} FLAMBDA=true
+
 
 %install
-export DESTDIR=%{buildroot}
 export OCAMLFIND_DESTDIR=%{buildroot}%{_libdir}/ocaml
-mkdir -p $OCAMLFIND_DESTDIR
 mkdir -p $OCAMLFIND_DESTDIR/stublibs
-make install
+%make_install ARCH=%{num_arch}
+%ocaml_files
 
-find $OCAMLFIND_DESTDIR -name '*.cmti' -delete
 
-%files
+%files -f .ofiles
 %doc Changelog README.md
 %license LICENSE
-%{_libdir}/ocaml/*.cmi
-%{_libdir}/ocaml/*.cma
-%{_libdir}/ocaml/*.cmxs
-%{_libdir}/ocaml/num
-%{_libdir}/ocaml/num-top
-%{_libdir}/ocaml/stublibs/dll*.so
-%ifarch %{ocaml_native_compiler}
-%exclude %{_libdir}/ocaml/*.a
-%exclude %{_libdir}/ocaml/*.cmxa
-%exclude %{_libdir}/ocaml/*.cmx
-%endif
-%exclude %{_libdir}/ocaml/*.mli
 
-%files devel
+
+%files devel -f .ofiles-devel
 %license LICENSE
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/*.a
-%{_libdir}/ocaml/*.cmxa
-%{_libdir}/ocaml/*.cmx
-%endif
-%{_libdir}/ocaml/*.mli
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.5-1
+- Upgrade to 1.5
+- use ocaml >= 5.1.1
+
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-2
 - Fixing source URL.
 

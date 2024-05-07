@@ -51,7 +51,7 @@ Distribution:   Azure Linux
 
 Name:           nbdkit
 Version:        1.35.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        NBD server
 
 License:        BSD
@@ -94,7 +94,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-boto3
 %endif
 %if 0%{?have_ocaml}
-BuildRequires:  ocaml >= 4.03
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-ocamldoc
 %endif
 %if %{with ruby}
@@ -1195,6 +1195,9 @@ export LIBGUESTFS_TRACE=1
 
 
 %changelog
+* Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.35.3-5
+- Upgraded ocaml dependency to 5.1.1
+
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 1.35.3-4
 - Wrap test dependencies in with_check if block
 

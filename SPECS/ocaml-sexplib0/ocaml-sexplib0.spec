@@ -7,16 +7,15 @@
 Summary:        Definition of S-expressions and some base converters
 Name:           ocaml-%{srcname}
 Version:        0.16.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/janestreet/sexplib0
 Source0:        %{url}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-BuildRequires:  ocaml >= 4.04.2
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
-BuildRequires:  ocaml-findlib
 
 %description
 This package contains a library with the definition of S-expressions and
@@ -31,49 +30,24 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n sexplib0-%{version}
 
 %build
-dune build %{?_smp_mflags}
-
-# TODO: Once odoc is available, BR it and run this to generate documentation:
-# dune build @doc
+%dune_build
 
 %install
-dune install --destdir=%{buildroot}
+%dune_install
 
-# We install the documentation with the doc macro
-rm -fr %{buildroot}%{_prefix}/doc
-
-%ifarch %{ocaml_native_compiler}
-# Add missing executable bits
-chmod a+x %{buildroot}%{_libdir}/ocaml/%{srcname}/%{srcname}.cmxs
-%endif
-
-%files
+%files -f .ofiles
 %license LICENSE.md
-%dir %{_libdir}/ocaml/%{srcname}/
-%{_libdir}/ocaml/%{srcname}/META
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cma
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmi
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxs
-%endif
 
-%files devel
-%{_libdir}/ocaml/%{srcname}/dune-package
-%{_libdir}/ocaml/%{srcname}/opam
-%ifarch %{ocaml_native_compiler}
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.a
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmx
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmxa
-%endif
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmt
-%{_libdir}/ocaml/%{srcname}/%{srcname}*.cmti
-%{_libdir}/ocaml/%{srcname}/*.ml
-%{_libdir}/ocaml/%{srcname}/*.mli
+%files devel -f .ofiles-devel
 
 %changelog
+* Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.16.0-2
+- Updated build requirements to use ocaml >= 5.1.1
+- Removed ocaml-findlib build req
+
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.16.0-1
 - Auto-upgrade to 0.16.0 - Azure Linux 3.0 - package upgrades
 

@@ -5,14 +5,12 @@ ExcludeArch: %{ix86}
 Summary:        OCaml bindings for Augeas configuration API
 Name:           ocaml-%{srcname}
 Version:        0.6
-Release:        32%{?dist}
+Release:        33%{?dist}
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://people.redhat.com/~rjones/augeas/files/
 Source0:        https://people.redhat.com/~rjones/%{srcname}/files/%{name}-%{version}.tar.gz
-Source1:        ocaml_files.py
-Source2:        macros.ocaml-rpm
  
 # Upstream patch to enable debuginfo.
 #Patch1:         0001-Use-ocamlopt-g-option.patch
@@ -20,9 +18,10 @@ Source2:        macros.ocaml-rpm
 #Patch2:         0002-caml_named_value-returns-const-value-pointer-in-OCam.patch
  
 BuildRequires:  make
-BuildRequires:  ocaml >= 3.09.0
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-findlib
 BuildRequires:  ocaml-ocamldoc
+BuildRequires:  ocaml-rpm-macros
 BuildRequires:  augeas-devel >= 0.1.0
  
  
@@ -46,9 +45,6 @@ developing applications that use %{name}.
  
 # Pass -g to ocamlmklib
 sed -i 's/ocamlmklib/& -g/' Makefile.in
-
-cp -v %{SOURCE1} %{_rpmconfigdir}/azl
-cp -v %{SOURCE2} %{_rpmmacrodir}/
  
 %build
 export CFLAGS="$CFLAGS -Wno-discarded-qualifiers"
@@ -99,6 +95,9 @@ ocamlfind install augeas META *.mli *.cma *.a augeas.cmi *.so
  
  
 %changelog
+* Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.6-33
+- Removing embedded macros file in favor of using one provided by the ocaml-rpm-macros package.
+
 * Fri Mar 29 2024 Betty Lakes <bettylakes@microsoft.com> - 0.6-32
 - Cleaning-up spec. License verified.
 - Initial Azure Linux import from Fedora 40 (license: MIT).
