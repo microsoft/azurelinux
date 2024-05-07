@@ -28,12 +28,15 @@ BuildRequires:  python%{python3_pkgversion}-pip
 BuildRequires:  python%{python3_pkgversion}-pluggy
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-setuptools_scm
-# BuildRequires:  python%{python3_pkgversion}-sphinx
-# BuildRequires:  python%{python3_pkgversion}-sphinx-theme-alabaster
 BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 %if %{with_check}
 BuildRequires:  python%{python3_pkgversion}-iniconfig
 %endif
+
+# %if %{with check}
+# BuildRequires:  python%{python3_pkgversion}-pytest
+# %endif
+
 %description -n python%{python3_pkgversion}-%{srcname}
 This package contains a single module, which implements a platform independent
 file locking mechanism for Python.
@@ -55,12 +58,16 @@ the same lock object twice, it will not block.
 %pyproject_save_files %{srcname}
 
 %check
+<<<<<<< HEAD
 pip3 install iniconfig
+=======
+%if %{with check}
+>>>>>>> 0b60e6d8a7e63bf6264cc92662b59a2b896e7b5a
 %pytest
 
 %files -n python%{python3_pkgversion}-%{srcname} -f %{pyproject_files}
 %doc README.md
-%license LICENSE
+%license licenses
 
 %changelog
 * Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 3.14.0-1
