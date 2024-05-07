@@ -51,7 +51,7 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 %{python3_sitelib}/*
 
 %changelog
-* May 03 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-5
+* Fri May 03 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-5
 - Add version limit to pytest to fix failing tests
 
 * Mon Mar 04 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-4
