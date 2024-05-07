@@ -5,7 +5,6 @@ package depsearch
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -20,8 +19,8 @@ import (
 
 const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
-	colorReset = "\033[0m"
-	colorRed   = "\033[31m"
+	colorReset        = "\033[0m"
+	colorRed          = "\033[31m"
 )
 
 var (
