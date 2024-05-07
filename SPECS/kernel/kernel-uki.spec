@@ -12,8 +12,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-uki
-Version:        6.6.22.1
-Release:        2%{?dist}
+Version:        6.6.29.1
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,9 @@ install -D -t %{buildroot}/lib/modules/%{kernelver} vmlinuz-uki.efi
 /lib/modules/%{kernelver}/vmlinuz-uki.efi
 
 %changelog
+* Tue May 07 2024 Thien Trung Vuong <tvuong@microsoft.com> - 6.6.29.1-3
+- Match kernel version and release
+
 * Thu Apr 25 2024 Dan Streetman <ddstreet@microsoft.com> - 6.6.22.1-2
 - initial package
 - The following lines are here solely to satisfy tooling.
