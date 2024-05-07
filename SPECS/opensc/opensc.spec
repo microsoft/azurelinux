@@ -26,6 +26,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libcmocka-devel
 BuildRequires:  softhsm
 BuildRequires:  openssl
+BuildRequires:  vim-extra
 %endif
 Requires:       pcsc-lite-libs%{?_isa}
 Requires:       pcsc-lite
