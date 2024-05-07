@@ -328,6 +328,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 * Tue May 07 2024 Harshit Gupta <guptaharshit@microsoft.com> - 2.35-7
 - Patch CVE-2024-33599, CVE-2024-33600, CVE-2024-33601 and CVE-2024-33602
 
+* Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
+- Add patches for CVE-2023-4806 and CVE-2023-5156
+
 * Tue Oct 03 2023 Mandeep Plaha <mandeepplaha@microsoft.com> - 2.35-5
 - Patch CVE-2023-4911
 
