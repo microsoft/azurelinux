@@ -2,6 +2,7 @@
  "Signatures": {
   "60-syslog-ng-journald.conf": "c4c875396276951b491e799e9cdb5a090b2ca82a754967c7f310888373e51c40",
   "syslog-ng-4.3.1.tar.gz": "999dbab62982c3cffba02c0be22c596ee1ce81d6954689dc9b3a6afeb513cce3",
-  "syslog-ng.service": "8cdd00693233eef334bc943efdce634008911796681c8fc3454346a3bb0111b2"
+  "syslog-ng.service": "8cdd00693233eef334bc943efdce634008911796681c8fc3454346a3bb0111b2",
+  "remove-hardcoded-python-module-versioning.patch": "1e4a9874db5f78334024008bb920050dccf37a237d133cd4d91c90d7d993506b"
  }
 }

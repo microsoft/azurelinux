@@ -1,5 +1,6 @@
 {
- "Signatures": {
-  "extra-cmake-modules-5.249.0.tar.gz": "350aa1b8109078318c3a54230fbf6ecff4cf186f0df7dfc32fd51a96b1bdac12"
- }
+  "Signatures": {
+    "clang-python-4.0.1.tar.gz": "f3b3b866edac22662ce7836997ab7b193647878f6307d9749708d9215cb6bec8",
+    "extra-cmake-modules-5.249.0.tar.gz": "350aa1b8109078318c3a54230fbf6ecff4cf186f0df7dfc32fd51a96b1bdac12"
+  }
 }

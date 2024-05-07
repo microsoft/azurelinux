@@ -1,5 +1,6 @@
 {
  "Signatures": {
+  "python-zstd-1.5.5.1-test-external.patch": "8d4049d09e9c7302281baccba8014cab9ff60d14a743c1890d882cbc830f2949",
   "zstd-1.5.5.1.tar.gz": "1ef980abf0e1e072b028d2d76ef95b476632651c96225cf30b619c6eef625672"
  }
 }
