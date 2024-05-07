@@ -198,7 +198,6 @@ func (t *grubConfigTokenizer) parseComment() error {
 	// Consume the '#' char.
 	t.scanner.Next()
 
-	sb := strings.Builder{}
 loop:
 	for {
 		c, eof := t.scanner.Peek()
@@ -211,7 +210,6 @@ loop:
 			break loop
 
 		default:
-			sb.WriteRune(c)
 			t.scanner.Next()
 		}
 	}

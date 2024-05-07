@@ -9,6 +9,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/grub/filescanner"
 )
 
+// The type of a token.
 type TokenType int
 
 const (
@@ -29,9 +30,11 @@ const (
 	// A newline.
 	NEWLINE
 	// A word.
+	// Words are a catch-all for all other types of (valid) strings within a grub.cfg file.
 	WORD
 )
 
+// The type of a subword.
 type SubWordType int
 
 const (
@@ -43,18 +46,20 @@ const (
 	STRING
 	// A variable expansion without double quotes (e.g. $a).
 	// These types of variable expansions can technically produce new words, when the value contains space characters.
-	// But there is no way to determine this without running the grub config "script".
+	// But there is no way to determine this without running the grub.cfg "script".
 	VAR_EXPANSION
 	// A variable expansion within double quotes (e.g. "$a").
 	// These type of variable expansions cannot produce new words.
 	QUOTED_VAR_EXPANSION
 )
 
+// The location of a token within the original grub.cfg file.
 type SourceLoc struct {
 	Start filescanner.SourceLoc
 	End   filescanner.SourceLoc
 }
 
+// A single syntactical element within the grub.cfg file.
 type Token struct {
 	// Loc is the source location of the token.
 	Loc SourceLoc
@@ -66,6 +71,7 @@ type Token struct {
 	SubWords []SubWord
 }
 
+// Tokens that have the WORD type, are split up into smaller subwords.
 type SubWord struct {
 	// Loc is the source location of the token.
 	Loc SourceLoc

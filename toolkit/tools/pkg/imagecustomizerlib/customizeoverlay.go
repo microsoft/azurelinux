@@ -78,7 +78,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
-	grub2Config, err = updateKernelCommandLineArguments(grub2Config, []string{"rd.overlayfs"}, newArgs)
+	grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"rd.overlayfs"}, newArgs)
 	if err != nil {
 		return fmt.Errorf("failed to set overlay kernel command line args:\n%w", err)
 	}

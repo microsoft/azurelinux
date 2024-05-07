@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 )
 
 var (
@@ -150,7 +151,7 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 }
 
 // Appends kernel command-line args to the linux command within a grub config file.
-func appendKernelCommandLineArguments(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
+func appendKernelCommandLineArgs(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
 	_, insertAtToken, err := getLinuxCommandLineArgs(inputGrubCfgContent)
 	if err != nil {
 		return "", err
@@ -176,8 +177,9 @@ type grubConfigLinuxArg struct {
 // Finds the linux command within a grub config and returns a list of kernel command-line arguments.
 //
 // Returns:
-// - args: A list of kernel command-line arguments.
-// - insertToken: A tokenizer token that represents an appropriate insert point for any new args.
+//   - args: A list of kernel command-line arguments.
+//   - insertToken: A token that represents an appropriate insert point for any new args.
+//     In Azure Linux 2.0, this is the $kernelopts token.
 func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Token, error) {
 	linuxLine, err := findLinuxLine(grub2Config)
 	if err != nil {
@@ -231,7 +233,8 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Tok
 		}
 
 		if hasVarExpansion {
-			// The arg string value isn't known because it contains a variable expansion.
+			// The arg string value isn't known in full because it contains a variable expansion.
+			// So, clear the value to avoid the value from being misinterpreted.
 			value = ""
 		}
 
@@ -255,13 +258,10 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Tok
 func findMatchingCommandLineArgs(args []grubConfigLinuxArg, names []string) []grubConfigLinuxArg {
 	matching := []grubConfigLinuxArg(nil)
 
-argsLoop:
 	for _, arg := range args {
-		for _, name := range names {
-			if arg.Name == name {
-				matching = append(matching, arg)
-				continue argsLoop
-			}
+		matchedName := sliceutils.ContainsValue(names, arg.Name)
+		if matchedName {
+			matching = append(matching, arg)
 		}
 	}
 
@@ -287,7 +287,7 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 }
 
 // Finds an existing kernel command-line arg and replaces its value.
-func replaceKernelCommandLineArgumentValue(inputGrubCfgContent string, name string, value string,
+func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, value string,
 ) (outputGrubCfgContent string, oldValue string, err error) {
 	newArg := fmt.Sprintf("%s=%s", name, value)
 	quotedNewArg := grub.QuoteString(newArg)
@@ -315,12 +315,12 @@ func replaceKernelCommandLineArgumentValue(inputGrubCfgContent string, name stri
 }
 
 // Inserts new kernel command-line args into the grub config file.
-func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
+func addKernelCommandLine(kernelExtraArgs imagecustomizerapi.KernelExtraArguments,
 	imageChroot *safechroot.Chroot,
 ) error {
 	var err error
 
-	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
+	extraCommandLine := strings.TrimSpace(string(kernelExtraArgs))
 	if extraCommandLine == "" {
 		// Nothing to do.
 		return nil
@@ -333,7 +333,7 @@ func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArg
 		return err
 	}
 
-	newGrub2ConfigFile, err := appendKernelCommandLineArguments(grub2ConfigFile, extraCommandLine)
+	newGrub2ConfigFile, err := appendKernelCommandLineArgs(grub2ConfigFile, extraCommandLine)
 	if err != nil {
 		return err
 	}
@@ -373,7 +373,7 @@ func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinuxMode, imageC
 }
 
 // Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
-func updateKernelCommandLineArguments(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
+func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
 	newArgsQuoted := grubArgsToString(newArgs)
 
 	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
@@ -448,7 +448,7 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 		return "", fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
 	}
 
-	grub2Config, err := updateKernelCommandLineArguments(grub2Config, []string{"security", "selinux", "enforcing"},
+	grub2Config, err := updateKernelCommandLineArgs(grub2Config, []string{"security", "selinux", "enforcing"},
 		newSELinuxArgs)
 	if err != nil {
 		return "", err
