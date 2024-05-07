@@ -4,13 +4,15 @@
 
 Summary:        User space components of the Ceph file system
 Name:           ceph
-Version:        16.2.10
-Release:        2%{?dist}
+Version:        18.2.1
+Release:        1%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-24032.patch
+Patch1:         CVE-2021-28361.patch
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -110,9 +112,12 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-sphinx
 BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
+BuildRequires:  python%{python3_pkgversion}-yaml
+BuildRequires:  PyYAML
 BuildRequires:  snappy-devel
 BuildRequires:  sudo
 BuildRequires:  systemd-devel
+BuildRequires:  sqlite-devel
 BuildRequires:  util-linux
 BuildRequires:  valgrind
 BuildRequires:  which
@@ -775,12 +780,6 @@ This package provides Ceph’s default alerts for Prometheus.
 %prep
 %autosetup -p1
 
-# Despite disabling diskprediction, some unpackaged files stick around
-# Delete directories to prevent these files from being built/installed later
-cd %{_topdir}/BUILD/%{name}-%{version}
-rm -rf ./src/pybind/mgr/diskprediction_local
-rm -rf ./src/pybind/mgr/diskprediction_cloud
-
 %build
 # LTO can be enabled as soon as the following GCC bug is fixed:
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200
@@ -847,6 +846,7 @@ ${CMAKE} .. \
     -DWITH_MANPAGE=ON \
     -DWITH_PYTHON3=%{python3_version} \
     -DWITH_MGR_DASHBOARD_FRONTEND=OFF \
+    -DWITH_SEASTAR=OFF\
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -937,7 +937,6 @@ chmod 0644 %{buildroot}%{_docdir}/ceph/sample.ceph.conf
 install -m 0644 -D COPYING %{buildroot}%{_docdir}/ceph/COPYING
 install -m 0644 -D etc/sysctl/90-ceph-osd.conf %{buildroot}%{_sysctldir}/90-ceph-osd.conf
 
-install -m 0755 src/cephadm/cephadm %{buildroot}%{_sbindir}/cephadm
 mkdir -p %{buildroot}%{_sharedstatedir}/cephadm
 chmod 0700 %{buildroot}%{_sharedstatedir}/cephadm
 mkdir -p %{buildroot}%{_sharedstatedir}/cephadm/.ssh
@@ -994,6 +993,8 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %dir %{_libdir}/ceph
 %dir %{_libdir}/ceph/erasure-code
 %{_libdir}/ceph/erasure-code/libec_*.so*
+%dir %{_libdir}/ceph/extblkdev
+%{_libdir}/ceph/extblkdev/libceph_*.so*
 %dir %{_libdir}/ceph/compressor
 %{_libdir}/ceph/compressor/libceph_*.so*
 %{_unitdir}/ceph-crash.service
@@ -1003,6 +1004,7 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %{_libdir}/libos_tp.so*
 %{_libdir}/libosd_tp.so*
 %endif
+%exclude %{_datadir}/ceph/mgr/diskprediction_local
 %config(noreplace) %{_sysconfdir}/logrotate.d/ceph
 %config(noreplace) %{_sysconfdir}/sysconfig/ceph
 %config(noreplace) %{_sysconfdir}/sudoers.d/ceph-smartctl
@@ -1010,7 +1012,6 @@ install -m 644 -D monitoring/ceph-mixin/prometheus_alerts.yml %{buildroot}/etc/p
 %dir %{python3_sitelib}/ceph_volume
 %{python3_sitelib}/ceph_volume/*
 %{python3_sitelib}/ceph_volume-*
-%{_mandir}/man8/ceph-deploy.8*
 %{_mandir}/man8/ceph-create-keys.8*
 %{_mandir}/man8/ceph-run.8*
 %{_mandir}/man8/crushtool.8*
@@ -1070,6 +1071,7 @@ exit 0
 %{_bindir}/ceph-authtool
 %{_bindir}/ceph-conf
 %{_bindir}/ceph-dencoder
+%{_bindir}/ceph-exporter
 %{_bindir}/ceph-rbdnamer
 %{_bindir}/ceph-syn
 %{_bindir}/cephfs-data-scan
@@ -1077,6 +1079,7 @@ exit 0
 %{_bindir}/cephfs-mirror
 %{_bindir}/cephfs-top
 %{_bindir}/cephfs-table-tool
+%{_bindir}/crushdiff
 %{_bindir}/rados
 %{_bindir}/radosgw-admin
 %{_bindir}/rbd
@@ -1090,6 +1093,8 @@ exit 0
 %{_bindir}/rbd-replay-prep
 %endif
 %{_bindir}/ceph-post-file
+%dir %{_libdir}/ceph/denc
+%{_libdir}/ceph/denc/denc-mod-*.so
 %{_tmpfilesdir}/ceph-common.conf
 %{_mandir}/man8/ceph-authtool.8*
 %{_mandir}/man8/ceph-conf.8*
@@ -1099,6 +1104,7 @@ exit 0
 %{_mandir}/man8/ceph-syn.8*
 %{_mandir}/man8/ceph-post-file.8*
 %{_mandir}/man8/ceph.8*
+%{_mandir}/man8/crushdiff.8*
 %{_mandir}/man8/mount.ceph.8*
 %{_mandir}/man8/rados.8*
 %{_mandir}/man8/radosgw-admin.8*
@@ -1185,6 +1191,7 @@ fi
 %{_unitdir}/ceph-mgr@.service
 %{_unitdir}/ceph-mgr.target
 %attr(750,ceph,ceph) %dir %{_localstatedir}/lib/ceph/mgr
+%exclude %{_datadir}/ceph/mgr/*
 
 %post mgr
 %systemd_post ceph-mgr@\*.service ceph-mgr.target
@@ -1419,11 +1426,14 @@ fi
 %{_bindir}/radosgw-token
 %{_bindir}/radosgw-es
 %{_bindir}/radosgw-object-expirer
+%{_bindir}/rgw-policy-check
+%{_bindir}/rgw-restore-bucket-index
 %{_bindir}/rgw-orphan-list
 %{_bindir}/rgw-gap-list
 %{_bindir}/rgw-gap-list-comparator
-%{_libdir}/libradosgw.so*
+%{_libdir}/librgw.so*
 %{_mandir}/man8/radosgw.8*
+%{_mandir}/man8/rgw-policy-check.8*
 %dir %{_localstatedir}/lib/ceph/radosgw
 %{_unitdir}/ceph-radosgw@.service
 %{_unitdir}/ceph-radosgw.target
@@ -1635,12 +1645,11 @@ fi
 %{_includedir}/cephfs/ceph_ll_client.h
 %{_libdir}/libcephfs.so
 %{_includedir}/cephfs/metrics/Types.h
+%{_includedir}/cephfs/types.h
 
 %files -n python%{python3_pkgversion}-cephfs
 %{python3_sitearch}/cephfs.cpython*.so
 %{python3_sitearch}/cephfs-*.egg-info
-%{python3_sitelib}/ceph_volume_client.py
-%{python3_sitelib}/__pycache__/ceph_volume_client.cpython*.py*
 
 %files -n python%{python3_pkgversion}-ceph-argparse
 %{python3_sitelib}/ceph_argparse.py
@@ -1803,6 +1812,10 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Thu May 09 2024 Henry Beberman <henry.beberman@microsoft.com> - 18.2.1-1
+- Upgrade to version 18.2.1 to resolve multiple CVEs
+- Patch CVE-2021-24032 and CVE-2021-28361
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
