@@ -32,7 +32,8 @@ Patch7:         CVE-2023-4806.patch
 Patch8:         CVE-2023-5156.patch
 Patch9:         CVE-2024-33599.patch
 Patch10:        CVE-2024-33600.patch
-Patch11:        CVE-2024-33601-2.patch
+Patch11:        CVE-2024-33601.patch
+Patch12:        CVE-2024-33602.nopatch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
