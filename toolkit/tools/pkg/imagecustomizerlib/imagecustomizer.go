@@ -43,6 +43,120 @@ var (
 	ToolVersion = ""
 )
 
+type ImageCustomizerParameters struct {
+	// build dirs
+	buildDir    string
+	buildDirAbs string
+
+	// input image
+	inputImageFile   string
+	inputImageFormat string
+	inputIsIso       bool
+
+	// configurations
+	configPath                  string
+	config                      *imagecustomizerapi.Config
+	customizeOSPartitions       bool
+	useBaseImageRpmRepos        bool
+	rpmsSources                 []string
+	enableShrinkFilesystems     bool
+	outputSplitPartitionsFormat string
+
+	// intermediate writeable image
+	rawImageFile string
+
+	// output image
+	outputImageFormat     string
+	outputIsIso           bool
+	qemuOutputImageFormat string
+	outputImageFile       string
+	outputImageDir        string
+	outputImageBase       string
+}
+
+func createImageCustomizerParameters(buildDir string,
+	inputImageFile string,
+	configPath string, config *imagecustomizerapi.Config,
+	useBaseImageRpmRepos bool, rpmsSources []string, enableShrinkFilesystems bool, outputSplitPartitionsFormat string,
+	outputImageFormat string, outputImageFile string) (*ImageCustomizerParameters, error) {
+
+	ic := &ImageCustomizerParameters{}
+
+	// working directories
+	ic.buildDir = buildDir
+
+	buildDirAbs, err := filepath.Abs(buildDir)
+	if err != nil {
+		return nil, err
+	}
+
+	ic.buildDirAbs = buildDirAbs
+
+	// input image
+	ic.inputImageFile = inputImageFile
+	ic.inputImageFormat = strings.TrimLeft(filepath.Ext(inputImageFile), ".")
+	ic.inputIsIso = ic.inputImageFormat == ImageFormatIso
+
+	// configuration
+	ic.configPath = configPath
+	ic.config = config
+	ic.customizeOSPartitions = (config.Storage != nil) || (config.OS != nil) || (config.Scripts != nil)
+
+	ic.useBaseImageRpmRepos = useBaseImageRpmRepos
+	ic.rpmsSources = rpmsSources
+
+	ic.enableShrinkFilesystems = enableShrinkFilesystems
+	ic.outputSplitPartitionsFormat = outputSplitPartitionsFormat
+
+	// intermediate writeable image
+	ic.rawImageFile = filepath.Join(buildDirAbs, BaseImageName)
+
+	// output image
+	ic.outputImageFormat = outputImageFormat
+	ic.outputIsIso = ic.outputImageFormat == ImageFormatIso
+	ic.outputImageFile = outputImageFile
+	ic.outputImageBase = strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
+	ic.outputImageDir = filepath.Dir(outputImageFile)
+
+	if ic.outputImageFormat != "" && !ic.outputIsIso {
+		ic.qemuOutputImageFormat, err = toQemuImageFormat(ic.outputImageFormat)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if ic.inputIsIso {
+		// When the input is an iso image, there's only one file system: the
+		// suqash file system and it has no empty space since it's a read-only
+		// file system. So, shrinking it does not make sense.
+		if ic.enableShrinkFilesystems {
+			return nil, fmt.Errorf("shrinking file systems is not supported when the input image is an iso image")
+		}
+
+		// While splitting out the partition for an input iso can mean write
+		// the squash file system out to a raw image, we are choosing to
+		// not implement this until there is a need.
+		if ic.outputSplitPartitionsFormat != "" {
+			return nil, fmt.Errorf("extracting partitions is not supported when the input image is an iso image")
+		}
+
+		// While re-creating a disk image from the iso is technically possible,
+		// we are choosing to not implement it until there is a need.
+		if !ic.outputIsIso {
+			return nil, fmt.Errorf("generating a non-iso image from an iso image is not supported")
+		}
+
+		// While defining a storage configuration can work when the input image is
+		// an iso, there is no obvious point of moving content between partitions
+		// where all partitions get collapsed into the squashfs at the end.
+		if config.Storage != nil {
+			return nil, fmt.Errorf("cannot customize storage when the input is an iso")
+		}
+	}
+
+	return ic, nil
+}
+
 func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string,
 	outputSplitPartitionsFormat string, useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
@@ -71,132 +185,225 @@ func CustomizeImageWithConfigFile(buildDir string, configFile string, imageFile 
 	return nil
 }
 
+func cleanUp(ic *ImageCustomizerParameters) error {
+	err := file.RemoveFileIfExists(ic.rawImageFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func CustomizeImage(buildDir string, baseConfigPath string, config *imagecustomizerapi.Config, imageFile string,
 	rpmsSources []string, outputImageFile string, outputImageFormat string, outputSplitPartitionsFormat string,
 	useBaseImageRpmRepos bool, enableShrinkFilesystems bool,
 ) error {
-	var err error
-	var qemuOutputImageFormat string
-
-	outputImageBase := strings.TrimSuffix(filepath.Base(outputImageFile), filepath.Ext(outputImageFile))
-	outputImageDir := filepath.Dir(outputImageFile)
-
-	// Validate 'outputImageFormat' value if specified.
-	if outputImageFormat != "" && outputImageFormat != ImageFormatIso {
-		qemuOutputImageFormat, err = toQemuImageFormat(outputImageFormat)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Validate config.
-	err = validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
+	err := validateConfig(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return fmt.Errorf("invalid image config:\n%w", err)
 	}
 
-	// Normalize 'buildDir' path.
-	buildDirAbs, err := filepath.Abs(buildDir)
+	imageCustomizerParameters, err := createImageCustomizerParameters(buildDir, imageFile,
+		baseConfigPath, config,
+		useBaseImageRpmRepos, rpmsSources, enableShrinkFilesystems, outputSplitPartitionsFormat,
+		outputImageFormat, outputImageFile)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create image customizer parameters object:\n%w", err)
 	}
-
-	// Create 'buildDir' directory.
-	err = os.MkdirAll(buildDirAbs, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	// Convert image file to raw format, so that a kernel loop device can be used to make changes to the image.
-	rawImageFile := filepath.Join(buildDirAbs, BaseImageName)
 	defer func() {
-		cleanupErr := file.RemoveFileIfExists(rawImageFile)
+		cleanupErr := cleanUp(imageCustomizerParameters)
 		if cleanupErr != nil {
 			if err != nil {
-				err = fmt.Errorf("%w:\nfailed to clean-up (%s): %w", err, rawImageFile, cleanupErr)
+				err = fmt.Errorf("%w:\nfailed to clean-up:\n%w", err, cleanupErr)
 			} else {
-				err = fmt.Errorf("failed to clean-up (%s): %w", rawImageFile, cleanupErr)
+				err = fmt.Errorf("failed to clean-up:\n%w", cleanupErr)
 			}
 		}
 	}()
 
-	logger.Log.Infof("Creating raw base image: %s", rawImageFile)
-	err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", imageFile, rawImageFile)
+	// ensure build and output folders are created up front
+	err = os.MkdirAll(imageCustomizerParameters.buildDirAbs, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("failed to convert image file to raw format:\n%w", err)
+		return err
+	}
+
+	err = os.MkdirAll(imageCustomizerParameters.outputImageDir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	inputIsoArtifacts, err := convertInputImageToWriteableFormat(imageCustomizerParameters)
+	if err != nil {
+		return fmt.Errorf("failed to convert input image to a raw image:\n%w", err)
+	}
+	defer func() {
+		if inputIsoArtifacts != nil {
+			cleanupErr := inputIsoArtifacts.cleanUp()
+			if cleanupErr != nil {
+				if err != nil {
+					err = fmt.Errorf("%w:\nfailed to clean-up iso builder state:\n%w", err, cleanupErr)
+				} else {
+					err = fmt.Errorf("failed to clean-up iso builder state:\n%w", cleanupErr)
+				}
+			}
+		}
+	}()
+
+	err = customizeOSContents(imageCustomizerParameters)
+	if err != nil {
+		return fmt.Errorf("failed to customize raw image:\n%w", err)
+	}
+
+	err = convertWriteableFormatToOutputImage(imageCustomizerParameters, inputIsoArtifacts)
+	if err != nil {
+		return fmt.Errorf("failed to convert customized raw image to output format:\n%w", err)
+	}
+
+	logger.Log.Infof("Success!")
+
+	return nil
+}
+
+func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSIsoBuilder, error) {
+	logger.Log.Infof("Converting input image to a writeable format")
+
+	if ic.inputIsIso {
+
+		inputIsoArtifacts, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
+		}
+
+		// If the input is a LiveOS iso and there are OS customizations
+		// defined, we create a writeable disk image so that mic can modify
+		// it. If no OS customizations are defined, we can skip this step and
+		// just re-use the existing squashfs.
+		if ic.customizeOSPartitions {
+			err = inputIsoArtifacts.createWriteableImageFromSquashfs(ic.buildDir, ic.rawImageFile)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create writeable image:\n%w", err)
+			}
+		}
+		return inputIsoArtifacts, nil
+
+	} else {
+		logger.Log.Infof("Creating raw base image: %s", ic.rawImageFile)
+		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert image file to raw format:\n%w", err)
+		}
+	}
+
+	return nil, nil
+}
+
+func customizeOSContents(ic *ImageCustomizerParameters) error {
+	// If there are OS customizations, then we proceed as usual.
+	// If there are no OS customizations, and the input is an iso, we just
+	// return because this function is mainly about OS customizations.
+	// This function also supports shrinking/exporting partitions. While
+	// we could support those functions for input isos, we are choosing to
+	// not support them until there is an actual need/a future time.
+	// We explicitly inform the user of the lack of support earlier during
+	// mic parameter validation (see createImageCustomizerParameters()).
+	if !ic.customizeOSPartitions && ic.inputIsIso {
+		return nil
+	}
+
+	// The code beyond this point assumes the OS object is always present. To
+	// change the code to check before every usage whether the OS object is
+	// present or not will lead to a messy mix of if statements that do not
+	// serve the readibility of the code. A simpler solution is to instantiate
+	// a default imagecustomizerapi.OS object if the passed in one is absent.
+	// Then the code afterwards knows how to handle the default values
+	// correctly, and thus it eliminates the need for many if statements.
+	if ic.config.OS == nil {
+		ic.config.OS = &imagecustomizerapi.OS{}
 	}
 
 	// Check if the partition is using DM_verity_hash file system type.
 	// The presence of this type indicates that dm-verity has been enabled on the base image. If dm-verity is not enabled,
 	// the verity hash device should not be assigned this type. We do not support customization on verity enabled base
 	// images at this time because such modifications would compromise the integrity and security mechanisms enforced by dm-verity.
-	err = checkDmVerityEnabled(rawImageFile)
+	err := checkDmVerityEnabled(ic.rawImageFile)
 	if err != nil {
 		return err
 	}
 
 	// Customize the partitions.
-	partitionsCustomized, rawImageFile, err := customizePartitions(buildDirAbs, baseConfigPath, config, rawImageFile)
+	partitionsCustomized, newRawImageFile, err := customizePartitions(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile)
 	if err != nil {
 		return err
 	}
+	ic.rawImageFile = newRawImageFile
 
 	// Customize the raw image file.
-	err = customizeImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos,
+	err = customizeImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos,
 		partitionsCustomized)
 	if err != nil {
 		return err
 	}
 
 	// Shrink the filesystems.
-	if enableShrinkFilesystems {
-		err = shrinkFilesystemsHelper(rawImageFile)
+	if ic.enableShrinkFilesystems {
+		err = shrinkFilesystemsHelper(ic.rawImageFile)
 		if err != nil {
 			return fmt.Errorf("failed to shrink filesystems:\n%w", err)
 		}
 	}
 
-	if config.OS.Verity != nil {
+	if ic.config.OS.Verity != nil {
 		// Customize image for dm-verity, setting up verity metadata and security features.
-		err = customizeVerityImageHelper(buildDirAbs, baseConfigPath, config, rawImageFile, rpmsSources, useBaseImageRpmRepos)
+		err = customizeVerityImageHelper(ic.buildDirAbs, ic.configPath, ic.config, ic.rawImageFile, ic.rpmsSources, ic.useBaseImageRpmRepos)
 		if err != nil {
 			return err
 		}
 	}
 
 	// Check file systems for corruption.
-	err = checkFileSystems(rawImageFile)
+	err = checkFileSystems(ic.rawImageFile)
 	if err != nil {
 		return fmt.Errorf("failed to check filesystems:\n%w", err)
 	}
 
-	// Create final output image file if requested.
-	switch outputImageFormat {
-	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
-		logger.Log.Infof("Writing: %s", outputImageFile)
-
-		os.MkdirAll(outputImageDir, os.ModePerm)
-		err = shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", qemuOutputImageFormat, rawImageFile, outputImageFile)
+	// If outputSplitPartitionsFormat is specified, extract the partition files.
+	if ic.outputSplitPartitionsFormat != "" {
+		logger.Log.Infof("Extracting partition files")
+		err = extractPartitionsHelper(ic.rawImageFile, ic.outputImageDir, ic.outputImageBase, ic.outputSplitPartitionsFormat)
 		if err != nil {
-			return fmt.Errorf("failed to convert image file to format: %s:\n%w", outputImageFormat, err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIsoArtifacts *LiveOSIsoBuilder) error {
+
+	logger.Log.Infof("Converting customized OS partitions into the final image")
+
+	// Create final output image file if requested.
+	switch ic.outputImageFormat {
+	case ImageFormatVhd, ImageFormatVhdx, ImageFormatQCow2, ImageFormatRaw:
+		logger.Log.Infof("Writing: %s", ic.outputImageFile)
+
+		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", ic.qemuOutputImageFormat, ic.rawImageFile, ic.outputImageFile)
+		if err != nil {
+			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
 		}
 	case ImageFormatIso:
-		err = createLiveOSIsoImage(buildDir, baseConfigPath, config.Iso, rawImageFile, outputImageDir, outputImageBase)
-		if err != nil {
-			return err
+		if ic.customizeOSPartitions {
+			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
+			if err != nil {
+				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
+			}
+		} else {
+			err := inputIsoArtifacts.createImageFromUnchangedOS(ic.configPath, ic.config.Iso, ic.outputImageDir, ic.outputImageBase)
+			if err != nil {
+				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
+			}
 		}
 	}
-
-	// If outputSplitPartitionsFormat is specified, extract the partition files.
-	if outputSplitPartitionsFormat != "" {
-		logger.Log.Infof("Extracting partition files")
-		err = extractPartitionsHelper(rawImageFile, outputImageDir, outputImageBase, outputSplitPartitionsFormat)
-		if err != nil {
-			return err
-		}
-	}
-
-	logger.Log.Infof("Success!")
 
 	return nil
 }
@@ -229,12 +436,12 @@ func validateConfig(baseConfigPath string, config *imagecustomizerapi.Config, rp
 		return err
 	}
 
-	err = validateSystemConfig(baseConfigPath, &config.OS, rpmsSources, useBaseImageRpmRepos)
+	err = validateSystemConfig(baseConfigPath, config.OS, rpmsSources, useBaseImageRpmRepos)
 	if err != nil {
 		return err
 	}
 
-	err = validateScripts(baseConfigPath, &config.Scripts)
+	err = validateScripts(baseConfigPath, config.Scripts)
 	if err != nil {
 		return err
 	}
@@ -278,6 +485,11 @@ func validateIsoConfig(baseConfigPath string, config *imagecustomizerapi.Iso) er
 func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 	rpmsSources []string, useBaseImageRpmRepos bool,
 ) error {
+
+	if config == nil {
+		return nil
+	}
+
 	var err error
 
 	err = validatePackageLists(baseConfigPath, config, rpmsSources, useBaseImageRpmRepos)
@@ -294,6 +506,11 @@ func validateSystemConfig(baseConfigPath string, config *imagecustomizerapi.OS,
 }
 
 func validateScripts(baseConfigPath string, scripts *imagecustomizerapi.Scripts) error {
+
+	if scripts == nil {
+		return nil
+	}
+
 	for i, script := range scripts.PostCustomization {
 		err := validateScript(baseConfigPath, &script)
 		if err != nil {
@@ -337,6 +554,11 @@ func validateScript(baseConfigPath string, script *imagecustomizerapi.Script) er
 func validatePackageLists(baseConfigPath string, config *imagecustomizerapi.OS, rpmsSources []string,
 	useBaseImageRpmRepos bool,
 ) error {
+
+	if config == nil {
+		return nil
+	}
+
 	allPackagesRemove, err := collectPackagesList(baseConfigPath, config.Packages.RemoveLists, config.Packages.Remove)
 	if err != nil {
 		return err
