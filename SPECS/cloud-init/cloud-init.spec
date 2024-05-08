@@ -5,7 +5,7 @@ Summary:        Cloud instance init scripts
 Name:           cloud-init
 Epoch:          1
 Version:        %{package_version}
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -15,6 +15,7 @@ Source0:        https://launchpad.net/cloud-init/trunk/%{upstream_version_group}
 Source1:        10-azure-kvp.cfg
 Patch0:         overrideDatasourceDetection.patch
 Patch1:         exec_cmd_error_handling.patch
+patch2:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
 BuildRequires:  dbus
@@ -150,6 +151,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Wed Apr 17 2024 Lanze Liu <lanzeliu@microsoft.com> - 1:23.3-3
+- Add patch to add network interface renaming support for CAPM3 Met.
+
 * Wed Apr 03 2024 Rachel Menge <rachelmenge@microsoft.com> - 1:23.3-2
 - Downgrade to 23.3 with release 2 to avoid collision with 23.3 in PMC
 - Add back overrideDatasourceDetection.patch
