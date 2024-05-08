@@ -1,0 +1,1 @@
+GRUB_CMDLINE_LINUX_DEFAULT="console=tty0 console=ttyS0 $kernelopts"
