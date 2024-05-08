@@ -28,23 +28,8 @@ Patch3:         CVE-2020-1751.nopatch
 Patch4:         CVE-2018-20796.nopatch
 Patch5:         glibc-2.34_pthread_cond_wait.patch
 Patch6:         CVE-2023-4911.patch
-Patch7:         CVE-2023-4806-prepatch0.patch
-Patch8:         CVE-2023-4806-prepatch1.patch
-Patch9:         CVE-2023-4806-prepatch2.patch
-Patch10:        CVE-2023-4806-prepatch3.patch
-Patch11:        CVE-2023-4806-prepatch4.patch
-Patch12:        CVE-2023-4806-prepatch5.patch
-Patch13:        CVE-2023-4806-prepatch6.patch
-Patch14:        CVE-2023-4806-prepatch7.patch
-Patch15:        CVE-2023-4806-prepatch8.patch
-Patch16:        CVE-2023-4806-prepatch9.patch
-Patch17:        CVE-2023-4806-prepatch10.patch
-Patch18:        CVE-2023-4806-prepatch11.patch
-Patch19:        CVE-2023-4806-prepatch12.patch
-Patch20:        CVE-2023-4806-prepatch13.patch
-Patch21:        CVE-2023-4806-prepatch14.patch
-Patch22:        CVE-2023-4806.patch
-Patch23:        CVE-2023-5156.patch
+Patch7:         CVE-2023-4806.patch
+Patch8:         CVE-2023-5156.patch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
@@ -338,7 +323,7 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 
 %changelog
 * Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 2.35-7
-- Add prepatches for CVE-2023-4806 to split into original commits
+- Fixup CVE-2023-4806 patch
 
 * Wed Oct 04 2023 Minghe Ren <mingheren@microsoft.com> - 2.35-6
 - Add patches for CVE-2023-4806 and CVE-2023-5156
