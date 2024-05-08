@@ -33,8 +33,8 @@ Patch8:         CVE-2023-5156.patch
 Patch9:         get_nscd_addresses_fix_subscript_typos.patch
 Patch10:        CVE-2024-33599.patch
 Patch11:        CVE-2024-33600.patch
+# This patch fixes both CVE-2024-33601 and CVE-2024-33602
 Patch12:        CVE-2024-33601.patch
-Patch13:        CVE-2024-33602.nopatch
 BuildRequires:  bison
 BuildRequires:  gawk
 BuildRequires:  gettext
