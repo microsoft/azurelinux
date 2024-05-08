@@ -6,7 +6,7 @@ methods for serializing/deserializing.}
 Summary:        C-style structs for Python
 Name:           python-%{srcname}
 Version:        5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,6 +39,7 @@ Requires:       python3
 %py3_install
 
 %check
+pip3 install iniconfig
 %pytest
 
 %files -n python3-%{srcname}
@@ -46,6 +47,8 @@ Requires:       python3
 %{python3_sitelib}/*
 
 %changelog
+* Tue May 07 2024 Sam Meluch <sammeluch@microsoft.com> - 5.2-2
+
 * Tue Mar 08 2022 Dallas Delaney <dadelan@microsoft.com> - 5.2-1
 - Original version for CBL-Mariner
 - License verified
