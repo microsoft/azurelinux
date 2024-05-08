@@ -266,7 +266,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 		return fmt.Errorf("failed to update all the initrd file path occurances in the iso grub.cfg:\n%w", err)
 	}
 
-	inputContentString, _, err = replaceKernelCommandLineArgumentValue(inputContentString, "root", rootValue)
+	inputContentString, _, err = replaceKernelCommandLineArgValue(inputContentString, "root", rootValue)
 	if err != nil {
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
 	}
@@ -278,7 +278,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(grubCfgFileName string, extraCommandLin
 
 	liveosKernelArgs := fmt.Sprintf(kernelArgsTemplate, liveOSDir, liveOSImage, extraCommandLine)
 
-	inputContentString, err = appendKernelCommandLineArguments(inputContentString, liveosKernelArgs)
+	inputContentString, err = appendKernelCommandLineArgs(inputContentString, liveosKernelArgs)
 	if err != nil {
 		return fmt.Errorf("failed to update the kernel arguments with the LiveOS configuration and user configuration in the iso grub.cfg:\n%w", err)
 	}

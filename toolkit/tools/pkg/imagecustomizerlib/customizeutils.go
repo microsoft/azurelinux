@@ -437,7 +437,7 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 ) error {
 	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
 
 	switch config.OS.ResetBootLoaderType {
@@ -476,7 +476,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
 		if err != nil {
-			return selinuxMode, err
+			return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
 		}
 	}
 
