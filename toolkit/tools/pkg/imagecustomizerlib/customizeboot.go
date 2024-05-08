@@ -33,7 +33,7 @@ const (
 // Looks for a command with the provided name and ensures there is only 1 such command.
 // Returns the line of the found command.
 func findSingularGrubCommand(inputGrubCfgContent string, commandName string) ([]grub.Token, error) {
-	grubTokens, err := grub.TokenizeGrubConfig(inputGrubCfgContent)
+	grubTokens, err := grub.TokenizeConfig(inputGrubCfgContent)
 	if err != nil {
 		return nil, err
 	}
@@ -461,7 +461,7 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 func replaceSetCommandValue(grub2Config string, varName string, newValue string) (string, error) {
 	quotedNewValue := grub.QuoteString(newValue)
 
-	grubTokens, err := grub.TokenizeGrubConfig(grub2Config)
+	grubTokens, err := grub.TokenizeConfig(grub2Config)
 	if err != nil {
 		return "", err
 	}

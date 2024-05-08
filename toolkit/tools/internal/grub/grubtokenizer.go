@@ -13,19 +13,21 @@ import (
 	"os"
 	"strings"
 
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/grub/filescanner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/filescanner"
 )
 
-func TokenizeGrubConfigFile(name string) ([]Token, error) {
+// TokenizeConfigFile parses a grub config file into tokens.
+func TokenizeConfigFile(name string) ([]Token, error) {
 	configContent, err := os.ReadFile(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read grub config file:\n%w", err)
 	}
 
-	return TokenizeGrubConfig(string(configContent))
+	return TokenizeConfig(string(configContent))
 }
 
-func TokenizeGrubConfig(configContent string) ([]Token, error) {
+// TokenizeConfig parses a grub config file's content into tokens.
+func TokenizeConfig(configContent string) ([]Token, error) {
 	scanner := filescanner.NewFileScanner(configContent)
 	tokenizer := grubConfigTokenizer{
 		scanner: scanner,

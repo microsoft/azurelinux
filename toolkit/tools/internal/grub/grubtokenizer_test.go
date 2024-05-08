@@ -39,7 +39,7 @@ func TestTokenizeGrubConfig(t *testing.T) {
 		testName := strings.TrimSuffix(testFile.Name(), ".test")
 
 		// Tokenize the test file.
-		tokens, err := TokenizeGrubConfigFile(filepath.Join(tokenTestsDir, testFile.Name()))
+		tokens, err := TokenizeConfigFile(filepath.Join(tokenTestsDir, testFile.Name()))
 
 		// Produce a string representation of the result.
 		actual := tokenGrubConfigResultString(tokens, err)
@@ -56,7 +56,7 @@ func TestTokenizeGrubConfig(t *testing.T) {
 	}
 }
 
-// Produce a string representation of the results of a TokenizeGrubConfigFile() call.
+// Produce a string representation of the results of a TokenizeConfigFile() call.
 // This allows the representation to be a lot more compact than the equivalent Go representation.
 func tokenGrubConfigResultString(tokens []Token, err error) string {
 	sb := strings.Builder{}

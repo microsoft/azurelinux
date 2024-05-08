@@ -36,7 +36,7 @@ func SplitTokensIntoLines(tokens []Token) [][]Token {
 	return lines
 }
 
-// Checks if a token is keyword.
+// IsTokenKeyword checks if a token is keyword.
 func IsTokenKeyword(token Token, keyword string) bool {
 	return token.Type == WORD &&
 		len(token.SubWords) == 1 &&
@@ -44,6 +44,7 @@ func IsTokenKeyword(token Token, keyword string) bool {
 		token.SubWords[0].Value == keyword
 }
 
+// FindCommandAll looks for all the lines that contain a command with the provided name.
 func FindCommandAll(lines [][]Token, command string) [][]Token {
 	commandLines := [][]Token(nil)
 
