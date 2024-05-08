@@ -262,7 +262,7 @@ include $(SCRIPTS_DIR)/pkggen.mk
 include $(SCRIPTS_DIR)/imggen.mk
 
 # Add make targets for sodiff to determine if additional packages are required to be recompiled:
-#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup
+#  sodiff-check, build-summary, build-package-summary, fake-built-packages-list, sodiff-setup, license-check, license-check-img, clean-license-check
 include $(SCRIPTS_DIR)/analysis.mk
 
 ##help:target:clean=Clean all built files.

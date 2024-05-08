@@ -1,0 +1,12 @@
+{
+    "_comment1": "This file is used to allow specific files to be omitted from the license check process.",
+    "_comment2": "Each PkgException entry is a {'PackageName' and 'IgnoredFilesRegexList'}",
+    "_comment3": "The 'PackageName' is the name of the (sub)package to which the exception applies.",
+    "_comment4": "The 'IgnoredFilesRegexList' is a list of regular expressions that match files to be omitted from the license check.",
+    "_comment5": "The 'GlobalExceptionsRegexList' is a list of regular expressions that match all packages.",
+
+    "PkgExceptions": [
+    ],
+    "GlobalExceptionsRegexList": [
+    ]
+}
