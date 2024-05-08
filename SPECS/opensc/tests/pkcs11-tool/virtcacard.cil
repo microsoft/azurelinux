@@ -1,0 +1,2 @@
+(allow pcscd_t node_t (tcp_socket (node_bind)))
+

@@ -1,0 +1,29 @@
+---
+# Tests for docker container
+- hosts: localhost
+  tags:
+    - container
+  # no compatible tests
+
+# Tests for classic environment and Atomic Host
+- hosts: localhost
+  tags:
+    - all
+    - classic
+    - atomic
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - pkcs11-tool
+    required_packages:
+    - softhsm           # software PKCS#11 module
+    - openssl           # openssl tools
+    - gnutls-utils      # p11tool
+    - opencryptoki-libs # opencryptoki
+    - opencryptoki
+    - opencryptoki-swtok
+    - libcacard
+    - softhsm
+    - nss-tools         # Handling NSS DB
+    - policycoreutils   # Loading custom selinux modules
+
