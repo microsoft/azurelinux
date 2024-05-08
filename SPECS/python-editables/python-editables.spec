@@ -10,8 +10,8 @@ Source:         %{url}/archive/%{version}/editables-%{version}.tar.gz
 BuildRequires:  python3-devel
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-flit-core
 %endif
+BuildRequires:  python3-flit-core
 BuildRequires:  python3-pip
 
 BuildArch:      noarch
