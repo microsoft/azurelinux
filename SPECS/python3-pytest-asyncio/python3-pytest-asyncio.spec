@@ -5,20 +5,21 @@
 %bcond_without  tests
 Summary:        Pytest support for asyncio
 Name:           python3-%{pypi_name}
-Version:        0.14.0
-Release:        3%{?dist}
+Version:        0.23.6
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pypi.python.org/pypi/pytest-asyncio
-Source0:        https://github.com/%{project_owner}/%{github_name}/archive/v%{version}/%{github_name}-%{version}.tar.gz
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
-%if 0%{?with_check}
-BuildRequires:  python3-async-generator >= 1.3
+BuildRequires:  python3-pytest
+BuildRequires:  python3-devel
 BuildRequires:  python3-pip
-%endif
+BuildRequires:  python3-wheel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-async-generator >= 1.3
 
 %description
 pytest-asyncio is an Apache2 licensed library, written in Python, for testing
@@ -29,17 +30,30 @@ slightly more difficult to test using normal testing tools. pytest-asyncio
 provides useful fixtures and markers to make testing easier.
 
 %prep
-%setup -q -n %{github_name}-%{version}
+%autosetup -n %{github_name}-%{version}
 
-# Don't treat all warnings as errors, there are DeprecationWarnings on 3.8
-sed -i '/filterwarnings = error/d' setup.cfg
+# disable code quality checks in "testing" extras
+sed -e '/coverage >=/d' \
+    -e '/mypy >=/d' \
+    -i setup.cfg
+
+%if %{defined el9}
+# EL9 has setuptools_scm 6.0.1 that works
+sed -e '/setuptools_scm/ s/>=6.2//' -i pyproject.toml
+%endif
+
+
+%generate_buildrequires
+# upstream also has tox that invokes make that invokes pytest...
+# we install the [testing] extra and will invoke pytest directly instead
+%pyproject_buildrequires %{?with_tests:-x testing}
 
 %build
-%py3_build
-
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files pytest_asyncio
 
 
 %if %{with tests}
@@ -65,10 +79,13 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %files
 %license LICENSE
 %doc README.rst
-%{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 %{python3_sitelib}/%{srcname}/
+%{python3_sitelib}/%{srcname}-%{version}.dist-info/*
 
 %changelog
+* Tue May 07 2024 Betty Lakes <bettylakes@microsoft.com> - 0.23.6-1
+- Upgrade to 0.23.6
+
 * Mon Jun 21 2021 Rachel Menge <rachelmenge@microsoft.com> - 0.14.0-3
 - Initial CBL-Mariner import from Fedora 34 (license: MIT)
 - License verified

@@ -25023,8 +25023,8 @@
         "type": "other",
         "other": {
           "name": "python3-pytest-asyncio",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/pytest-dev/pytest-asyncio/archive/v0.14.0/pytest-asyncio-0.14.0.tar.gz"
+          "version": "0.23.6",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pytest-asyncio/pytest-asyncio-0.23.6.tar.gz"
         }
       }
     },
