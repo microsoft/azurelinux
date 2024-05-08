@@ -81,7 +81,7 @@ then
   ln -s "$(which python3)" "%{_bindir}/python"
 fi
 
-pip3 install more-itertools pluggy pytest testpath tomli_w yaml
+pip3 install more-itertools pluggy pytest testpath tomli_w pyyaml
 
 # flit attempts to download list of classifiers from PyPI, but not if it's cached
 # test_invalid_classifier fails without the list
