@@ -1,5 +1,5 @@
 # The source directory.
-%global source_directory 5.2-stable
+%global source_directory 5.3-stable
 
 %ifnarch %{ocaml_native_compiler}
 %global __strip /bin/true

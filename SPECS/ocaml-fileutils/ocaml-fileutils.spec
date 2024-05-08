@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/gildor478/ocaml-fileutils
 # NOTE: the "_2" suffix was added to avoid conflicts with an older source tarball for the same version of the sources.
 #       Please remove it during a version update.
-Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Fedora does not need the stdlib-shims or seq forward compatibility packages
 Patch0:         ocaml-fileutils-0.6.4-forward-compat.patch
 # Given two distinct files with identical contents, the cmp function evaluates
