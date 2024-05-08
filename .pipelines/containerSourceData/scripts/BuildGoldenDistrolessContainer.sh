@@ -22,6 +22,7 @@ function DockerBuild {
 
     # Create container
     echo "+++ Create container $containerName"
+    export DOCKER_BUILDKIT=0
     docker build . \
         -t "$containerName" \
         -f "$marinaraSrcDir/dockerfiles/dockerfile-new-image" \
