@@ -166,7 +166,6 @@ func copyRepoFile(repoSrcPath string, chroot *safechroot.Chroot) (err error) {
 	err = chroot.AddFiles(chrootRepoFile...)
 	if err != nil {
 		return fmt.Errorf("failed to add files to chroot:\n%w", err)
-
 	}
 	return nil
 }
