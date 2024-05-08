@@ -45,7 +45,7 @@
 Summary:        Graph Visualization Tools
 Name:           graphviz
 Version:        2.42.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -102,7 +102,7 @@ BuildRequires:  DevIL-devel
 BuildRequires:  R-devel
 %endif
 %if %{OCAML}
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 5.1.1
 %endif
 %if %{QTAPPS}
 BuildRequires:  qt-devel
@@ -517,6 +517,9 @@ php --no-php-ini \
 %{_mandir}/man3/*.3tcl*
 
 %changelog
+* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.42.4-11
+- Rebuild with ocaml 5.1.1
+
 * Tue Feb 06 2024 Dan Streetman <ddstreet@ieee.org> - 2.42.4-10
 - add build dep gc-devel
 

@@ -8,7 +8,7 @@
 Summary:        Read and write Windows Registry binary hive files
 Name:           hivex
 Version:        1.3.23
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,7 +46,7 @@ BuildRequires:  rubygem(minitest)
 BuildRequires:  rubygem(rdoc)
 
 %if %{with ocaml}
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-findlib-devel
 %endif
 
@@ -244,6 +244,9 @@ fi
 %{ruby_vendorarchdir}/_hivex.so
 
 %changelog
+* Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.3.23-2
+- Rebuild with using ocaml 5.1.1
+
 * Fri Feb 16 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.3.23-1
 - Upgrate to 1.3.23.
 
