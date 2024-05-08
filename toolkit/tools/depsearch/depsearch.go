@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// depsearch analyzes the dependency graphs from a build, and can list either the packages which depend on a given search term,
+// or all the packages the searched packages depend on to build/run.
+
 package main
 
 import (
@@ -9,7 +12,6 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/exe"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/pkggraph"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/pkg/depsearch"
 
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -39,11 +41,6 @@ var (
 )
 
 func main() {
-	var (
-		outputGraph *pkggraph.PkgGraph
-		root        *pkggraph.PkgNode
-	)
-
 	app.Version(exe.ToolkitVersion)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
@@ -60,11 +57,13 @@ func main() {
 
 	// Only one of runtimeOnlyPlusBuild or runtimeOnly can be set
 	if *runtimeFilterLevel < -1 {
-		logger.Log.Fatalf("Invalid runtime filter level '%d', valid ranges are -1, >=0", *runtimeFilterLevel)
+		logger.Log.Fatalf("Invalid runtime filter level %d, valid ranges are -1, >=0", *runtimeFilterLevel)
 	}
 
 	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
-	depsearch.ConfigureFilterFiles(filterFile, filter)
+	err := depsearch.ConfigureFilterFiles(filterFile, *filter)
+	logger.PanicOnError(err)
+
 	if len(*filterFile) > 0 && (*filter || *printTree) {
 		logger.Log.Infof("Applying package filter from (%s)", *filterFile)
 	} else {
@@ -80,33 +79,13 @@ func main() {
 		logger.Log.Panicf("Failed to read DOT graph with error: %s", err)
 	}
 
-	// Generate a list of nodes to search from
-	nodeListPkg := depsearch.SearchForPkg(graph, pkgSearchList)
-	nodeListSpec := depsearch.SearchForSpec(graph, specSearchList)
-	nodeListGoal := depsearch.SearchForGoal(graph, goalSearchList)
+	outputGraph, root, err := depsearch.GetDependencyGraph(pkgSearchList, specSearchList, goalSearchList, graph, *reverseSearch)
+	logger.PanicOnError(err)
 
-	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
-	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
-
-	if len(nodeSet) == 0 {
-		logger.Log.Panicf("Could not find any nodes matching pkgs:[%s] or specs:[%s] or goals[%s]", *pkgsToSearch, *specsToSearch, *goalsToSearch)
-	} else {
-		logger.Log.Infof("Found %d nodes to consider", len(nodeSet))
-	}
-
-	if *reverseSearch {
-		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages")
-		outputGraph, root, err = depsearch.BuildRequiresGraph(graph, nodeSet)
-	} else {
-		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages")
-		outputGraph, root, err = depsearch.BuildDependsOnGraph(graph, nodeSet)
-	}
-
+	err = depsearch.PrintSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, *runtimeFilterLevel, root)
 	if err != nil {
-		logger.Log.Panicf("Failed to generate graph to run depsearch on: %s", err)
+		logger.Log.Fatalf("Failed to print:\n%s", err)
 	}
-
-	depsearch.PrintSpecs(outputGraph, *printTree, *filter, *filterFile, *printDuplicates, *verbosity, *maxDepth, *runtimeFilterLevel, root)
 
 	if len(*outputGraphFile) > 0 {
 		pkggraph.WriteDOTGraphFile(outputGraph, *outputGraphFile)

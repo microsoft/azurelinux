@@ -14,13 +14,12 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/scheduler/schedulerutils"
 
+	"github.com/fatih/color"
 	"gonum.org/v1/gonum/graph"
 )
 
 const (
 	defaultFilterPath = "./resources/manifests/package/toolchain_x86_64.txt"
-	colorReset        = "\033[0m"
-	colorRed          = "\033[31m"
 )
 
 var (
@@ -44,7 +43,38 @@ type treeSearch struct {
 	nodesVisited, nodesTotal int
 }
 
-func ConfigureFilterFiles(filterFile *string, filter *bool) {
+func GetDependencyGraph(pkgSearchList, specSearchList, goalSearchList []string, graph *pkggraph.PkgGraph, reverseSearch bool) (outputGraph *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
+	// Generate a list of nodes to search from
+	nodeListPkg := searchForPkg(graph, pkgSearchList)
+	nodeListSpec := searchForSpec(graph, specSearchList)
+	nodeListGoal := searchForGoal(graph, goalSearchList)
+
+	nodeLists := append(nodeListPkg, append(nodeListSpec, nodeListGoal...)...)
+	nodeSet := sliceutils.RemoveDuplicatesFromSlice(nodeLists)
+
+	if len(nodeSet) == 0 {
+		err = fmt.Errorf("failed to find nodes matching pkgs:(%v) or specs:(%v) or goals:(%v)", pkgSearchList, specSearchList, goalSearchList)
+		return
+	} else {
+		logger.Log.Infof("Found %d nodes to consider", len(nodeSet))
+	}
+
+	if reverseSearch {
+		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages")
+		outputGraph, root, err = buildRequiresGraph(graph, nodeSet)
+	} else {
+		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages")
+		outputGraph, root, err = buildDependsOnGraph(graph, nodeSet)
+	}
+
+	if err != nil {
+		err = fmt.Errorf("failed to generate graph to run depsearch on:\n%w", err)
+		return
+	}
+	return
+}
+
+func ConfigureFilterFiles(filterFile *string, filter bool) (err error) {
 	setDefault := false
 	if len(*filterFile) == 0 {
 		*filterFile = defaultFilterPath
@@ -52,7 +82,8 @@ func ConfigureFilterFiles(filterFile *string, filter *bool) {
 	}
 	isFile, err := file.PathExists(*filterFile)
 	if err != nil {
-		logger.Log.Panicf("Failed to query if filter file (%s) exists: %s", *filterFile, err)
+		err = fmt.Errorf("failed to query if filter file (%s) exists:\n%w", *filterFile, err)
+		return
 	}
 
 	// If we are just trying to use the default, its fine if its missing.
@@ -61,12 +92,14 @@ func ConfigureFilterFiles(filterFile *string, filter *bool) {
 		*filterFile = ""
 	}
 
-	if len(*filterFile) == 0 && *filter {
-		logger.Log.Panic("Must pass a --rpm-filter-file to use the filter function, consider './resources/manifests/package/toolchain_x86_64.txt'")
+	if len(*filterFile) == 0 && filter {
+		err = fmt.Errorf("Must pass a --rpm-filter-file to use the filter function, consider './resources/manifests/package/toolchain_x86_64.txt'")
+		return
 	}
+	return
 }
 
-func SearchForGoal(graph *pkggraph.PkgGraph, goals []string) (list []*pkggraph.PkgNode) {
+func searchForGoal(graph *pkggraph.PkgGraph, goals []string) (list []*pkggraph.PkgNode) {
 	for _, goal := range goals {
 		n := graph.FindGoalNode(goal)
 		if n != nil {
@@ -76,7 +109,7 @@ func SearchForGoal(graph *pkggraph.PkgGraph, goals []string) (list []*pkggraph.P
 	return
 }
 
-func SearchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph.PkgNode) {
+func searchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph.PkgNode) {
 	for _, n := range graph.AllPreferredRunNodes() {
 		nodeName := n.VersionedPkg.Name
 		for _, searchName := range packages {
@@ -88,7 +121,7 @@ func SearchForPkg(graph *pkggraph.PkgGraph, packages []string) (list []*pkggraph
 	return
 }
 
-func SearchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.PkgNode) {
+func searchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.PkgNode) {
 	for _, n := range graph.AllPreferredRunNodes() {
 		nodeSpec := n.SpecName()
 		for _, searchSpec := range specs {
@@ -100,7 +133,7 @@ func SearchForSpec(graph *pkggraph.PkgGraph, specs []string) (list []*pkggraph.P
 	return
 }
 
-func BuildRequiresGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode) (graphOut *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
+func buildRequiresGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode) (graphOut *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
 	// Make a copy of the graph
 	newGraph, err := graphIn.DeepCopy()
 	if err != nil {
@@ -117,7 +150,7 @@ func BuildRequiresGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode
 	return
 }
 
-func BuildDependsOnGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode) (graphOut *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
+func buildDependsOnGraph(graphIn *pkggraph.PkgGraph, nodeList []*pkggraph.PkgNode) (graphOut *pkggraph.PkgGraph, root *pkggraph.PkgNode, err error) {
 	// Make a copy of the graph
 	reversedGraph, err := graphIn.DeepCopy()
 	if err != nil {
@@ -185,7 +218,8 @@ func createSearch(g *pkggraph.PkgGraph, root *pkggraph.PkgNode) (t *treeSearch, 
 	//Calculate the number of nodes we might visit:
 	subGraph, err := g.CreateSubGraph(root)
 	if err != nil {
-		logger.Log.Fatalf("Failed to calculate number of nodes: %s", err)
+		err = fmt.Errorf("failed to calculate number of nodes:\n%w", err)
+		return
 	}
 
 	//This is the worst case possible number of searche to make
@@ -237,7 +271,7 @@ func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, 
 	if isFilteredFile(n.RpmPath, filterFile) {
 		// Highlight nodes that are in the filter file list in red, and add them to the list
 		if generateStrings {
-			lines = append(lines, "__"+colorRed+thisNode+colorReset)
+			lines = append(lines, fmt.Sprintf(color.RedString("%s"), thisNode))
 		}
 		if n.Type == pkggraph.TypeLocalRun {
 			// We only want to record run nodes for the purposes of listing packages in non-tree mode
@@ -314,10 +348,11 @@ func (t *treeSearch) treeNodeToString(n *pkggraph.PkgNode, depth, maxDepth int, 
 	return lines, hasNonToolchain
 }
 
-func PrintSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, printDuplicates bool, verbosity, maxDepth, runtimeFilterLevel int, root *pkggraph.PkgNode) {
+func PrintSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, printDuplicates bool, verbosity, maxDepth, runtimeFilterLevel int, root *pkggraph.PkgNode) (err error) {
 	t, err := createSearch(graph, root)
 	if err != nil {
-		logger.Log.Fatalf("Failed to start search: %s", err)
+		err = fmt.Errorf("failed to start search:\n%w", err)
+		return
 	}
 	// May as well use the tree searh to parse all the filtered packages etc, even if we are
 	//    just printing a list
@@ -347,4 +382,5 @@ func PrintSpecs(graph *pkggraph.PkgGraph, tree, filter bool, filterFile string, 
 			fmt.Println(l)
 		}
 	}
+	return
 }
