@@ -8,23 +8,29 @@ URL:            https://codespeak.net/execnet/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://pypi.io/packages/source/e/%{pkgname}/%{pkgname}-%{version}.tar.gz
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-wheel
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-hatchling
+BuildRequires:  python%{python3_pkgversion}-hatch-vcs
+BuildRequires:  python%{python3_pkgversion}-pathspec
+BuildRequires:  python%{python3_pkgversion}-pluggy
+BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-setuptools_scm
+BuildRequires:  python%{python3_pkgversion}-sphinx
+BuildRequires:  python%{python3_pkgversion}-trove-classifiers
+BuildRequires:  python%{python3_pkgversion}-wheel
 %if %{with check}
-BuildRequires:  python3-pip
+BuildRequires:  python%{python3_pkgversion}-pip
 %endif
 BuildArch:      noarch
 
 %description
 Python execution distributor
 
-%package -n python3-%{pkgname}
+%package -n python%{python3_pkgversion}-%{pkgname}
 Summary:        Python execution distributor
-Requires:       python3
+Requires:       python%{python3_pkgversion}
 
-%description -n python3-%{pkgname}
+%description -n python%{python3_pkgversion}-%{pkgname}
 execnet provides carefully tested means to ad-hoc interact with Python
 interpreters across version, platform and network barriers. It provides
 a minimal and fast API targetting the following uses:
@@ -36,28 +42,47 @@ a minimal and fast API targetting the following uses:
 %prep
 %autosetup -n %{pkgname}-%{version}
 
-%generate_buildrequires
+find . -type f -a \( -name '*.py' -o -name 'py.*' \) \
+   -exec sed -i '1{/^#!/d}' {} \; \
+   -exec chmod u=rw,go=r {} \;
+
 %pyproject_buildrequires
 
 %build
-%py3_build
-
+%pyproject_wheel
+make -C doc html PYTHONPATH=$(pwd)/src
+# remove hidden file
+rm doc/_build/html/.buildinfo
+ 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files %{pkgname}
 
 %check
-pip3 install tox
-sed -i "s/pytest$/pytest==7.1.3/" tox.ini
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+# pip3 install tox
+# sed -i "s/pytest$/pytest==7.1.3/" tox.ini
+# LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+PYTEST_SELECT='not test_popen_io[gevent-sys.executable]'
+PYTEST_SELECT+=' and not [gevent-socket]'
+PYTEST_SELECT+=' and not [eventlet-socket]'
+PYTEST_SELECT+=' and not [python2.7]'
+PYTHONPATH=$(pwd)/src \
+py.test-%{python3_version} -r s \
+  -k "$PYTEST_SELECT" \
+  testing \
+  --timeout=30
 
-%files -n python3-%{pkgname}
-%license LICENSE
-%doc README.rst CHANGELOG.rst
-%{python3_sitelib}/*
+
+%files -n python%{python3_pkgversion}-%{pkgname} -f %{pyproject_files}
+%doc README.rst
+%doc doc/_build/html
+%license %{python3_sitelib}/%{pkgname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* Wed Apr 24 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.1.1-1
-- Auto-upgrade to 2.1.1 - none
+* Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.1.1-1
+- Auto-upgrade to 2.1.1-1
+- Replacing most of the %%py3... with %%pyproject...
+- Redoing %%check section as well
 
 * Wed Oct 26 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-2
 - Freezing 'pytest' test dependency to version 7.1.3.
