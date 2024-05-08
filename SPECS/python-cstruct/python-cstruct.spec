@@ -48,6 +48,7 @@ pip3 install iniconfig
 
 %changelog
 * Tue May 07 2024 Sam Meluch <sammeluch@microsoft.com> - 5.2-2
+- Add missing iniconfig dependency for %check section
 
 * Tue Mar 08 2022 Dallas Delaney <dadelan@microsoft.com> - 5.2-1
 - Original version for CBL-Mariner
