@@ -1,15 +1,14 @@
-From 97edba1a35e1cc40b8b700aef75dd8904bcb2f33 Mon Sep 17 00:00:00 2001
-From: Maxwell Moyer-McKee <mamckee@microsoft.com>
-Date: Thu, 25 Jan 2024 16:48:47 -0800
-Subject: [PATCH] Load the symcrypt provider by default if fips flag or
- symcrypt_prov.cnf is present
+From c70a57cd0da56957a958ed8d7eb939a9734982aa Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 17 Apr 2024 21:47:50 +0000
+Subject: [PATCH] Force fips
 
 ---
- crypto/provider_conf.c | 44 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 43 insertions(+), 1 deletion(-)
+ crypto/provider_conf.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
-index 058fb58837..d4948555d7 100644
+index 6a8b88e..cb7a40a 100644
 --- a/crypto/provider_conf.c
 +++ b/crypto/provider_conf.c
 @@ -10,6 +10,8 @@
@@ -21,16 +20,16 @@ index 058fb58837..d4948555d7 100644
  #include <openssl/conf.h>
  #include <openssl/safestack.h>
  #include <openssl/provider.h>
-@@ -169,7 +171,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
+@@ -237,7 +239,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
          if (path != NULL)
              ossl_provider_set_module_path(prov, path);
  
 -        ok = provider_conf_params(prov, NULL, NULL, value, cnf);
 +        ok = cnf ? provider_conf_params(prov, NULL, NULL, value, cnf) : 1;
  
-         if (ok) {
+         if (ok == 1) {
              if (!ossl_provider_activate(prov, 1, 0)) {
-@@ -309,6 +311,42 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -420,6 +422,42 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
@@ -74,5 +73,5 @@ index 058fb58837..d4948555d7 100644
  }
  
 -- 
-2.34.1
+2.33.8
 
