@@ -20793,8 +20793,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.4",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.4.tar.xz"
+          "version": "8.3.6",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.6.tar.xz"
         }
       }
     },
