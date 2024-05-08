@@ -41,15 +41,13 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 
 
 %prep
-%setup -n dhcp-%{version}
-pushd bind
-tar -xf bind.tar.gz
-pushd bind-9*
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-popd
-popd
+%autosetup
+
+# Extracting bundled 'bind' to allow some of the patches to modify it.
+tar -C bind -xf bind.tar.gz
+ln -s bind/bind-9* bind_ln
+
+%autopatch -p1
 
 %build
 CFLAGS="$CFLAGS \
