@@ -203,7 +203,7 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 %changelog
 * Tue May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 0.25.1-3
-- Imported lastes fedora spec
+- Imported from fedora rawhide
 - Remove fedora and rhel macro usage
 - Fix absolute path for symbolic link to /etc/opensc.conf
 - license: GPLv2+ AND BSD
