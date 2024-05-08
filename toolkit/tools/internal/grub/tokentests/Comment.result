@@ -1,0 +1,12 @@
+Error:
+<nil>
+
+Tokens:
+WORD[1:1-1:2][0-1]
+  KEYWORD_STRING[1:1-1:2][0-1]("a")
+WORD[1:3-1:6][2-5]
+  KEYWORD_STRING[1:3-1:6][2-5]("b#c")
+NEWLINE[1:9-2:1][8-9]
+WORD[2:1-2:2][9-10]
+  KEYWORD_STRING[2:1-2:2][9-10]("e")
+NEWLINE[2:2-3:1][10-11]

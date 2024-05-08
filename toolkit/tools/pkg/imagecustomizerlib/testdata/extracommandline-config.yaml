@@ -1,0 +1,3 @@
+os:
+  kernelCommandLine:
+    extraCommandLine: console=tty0 console=ttyS0

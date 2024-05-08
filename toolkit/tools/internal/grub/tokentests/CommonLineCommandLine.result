@@ -1,0 +1,29 @@
+Error:
+<nil>
+
+Tokens:
+WORD[1:1-1:6][0-5]
+  KEYWORD_STRING[1:1-1:6][0-5]("linux")
+WORD[1:7-1:33][6-32]
+  VAR_EXPANSION[1:7-1:18][6-17]("bootprefix")
+  STRING[1:18-1:19][17-18]("/")
+  VAR_EXPANSION[1:19-1:33][18-32]("mariner_linux")
+WORD[1:34-1:43][33-42]
+  KEYWORD_STRING[1:34-1:43][33-42]("rd.auto=1")
+WORD[1:44-1:60][43-59]
+  KEYWORD_STRING[1:44-1:49][43-48]("root=")
+  VAR_EXPANSION[1:49-1:60][48-59]("rootdevice")
+WORD[1:61-1:77][60-76]
+  VAR_EXPANSION[1:61-1:77][60-76]("mariner_cmdline")
+WORD[1:78-1:96][77-95]
+  KEYWORD_STRING[1:78-1:96][77-95]("lockdown=integrity")
+WORD[1:97-1:138][96-137]
+  KEYWORD_STRING[1:97-1:138][96-137]("sysctl.kernel.unprivileged_bpf_disabled=1")
+WORD[1:139-1:155][138-154]
+  VAR_EXPANSION[1:139-1:155][138-154]("systemd_cmdline")
+WORD[1:156-1:168][155-167]
+  KEYWORD_STRING[1:156-1:168][155-167]("console=tty0")
+WORD[1:169-1:182][168-181]
+  KEYWORD_STRING[1:169-1:182][168-181]("console=ttyS0")
+WORD[1:183-1:194][182-193]
+  VAR_EXPANSION[1:183-1:194][182-193]("kernelopts")

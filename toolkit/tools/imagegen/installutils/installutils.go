@@ -41,12 +41,21 @@ const (
 	// NullDevice represents the /dev/null device used as a mount device for overlay images.
 	NullDevice = "/dev/null"
 
+	// CmdlineSELinuxSecurityArg is the "security" arg needed for enabling SELinux.
+	CmdlineSELinuxSecurityArg = "security=selinux"
+
+	// CmdlineSELinuxEnabledArg is the "selinux" arg needed for enabling SELinux.
+	CmdlineSELinuxEnabledArg = "selinux=1"
+
+	// CmdlineSELinuxEnforcingArg is the arg required for forcing SELinux to be in enforcing mode.
+	CmdlineSELinuxEnforcingArg = "enforcing=1"
+
 	// CmdlineSELinuxSettings is the kernel command-line args for enabling SELinux.
-	CmdlineSELinuxSettings = "security=selinux selinux=1"
+	CmdlineSELinuxSettings = CmdlineSELinuxSecurityArg + " " + CmdlineSELinuxEnabledArg
 
 	// CmdlineSELinuxForceEnforcing is the kernel command-line args for enabling SELinux and force it to be in
 	// enforcing mode.
-	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " enforcing=1"
+	CmdlineSELinuxForceEnforcing = CmdlineSELinuxSettings + " " + CmdlineSELinuxEnforcingArg
 
 	// SELinuxConfigFile is the file path of the SELinux config file.
 	SELinuxConfigFile = "/etc/selinux/config"
