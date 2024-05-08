@@ -91,7 +91,7 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 
 %changelog
 *   Mon May 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2024-03-04-1
--   Upgrate to latest LTS 2024-03-04
+-   Upgrade to latest LTS 2024-03-04
 
 *   Thu Jan 04 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 2023.08.07-1
 -   Upgrate to  2023.08.07-1
