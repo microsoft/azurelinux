@@ -59,6 +59,10 @@ function create_distroless_container {
     echo "+++ Clone marinara repo"
     git clone "https://github.com/microsoft/$marinara.git" "$WORK_DIR/$marinaraSrcDir"
 
+    pushd "$WORK_DIR/$marinaraSrcDir" > /dev/null
+    git checkout bfdeca86c0834c1ea9c27c9c4b3ae74eb23e815e
+    popd > /dev/null 
+
     # It is important to operate from the $WORK_DIR to ensure that docker can access the files.
     pushd "$WORK_DIR" > /dev/null
 
