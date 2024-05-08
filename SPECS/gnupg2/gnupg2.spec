@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,8 +51,15 @@ These are the additional language files of gnupg2
 %autosetup -n gnupg-%{version}
 
 %build
+# Prevent GnuPG from using keyboxd for storing keys.
+# It tends to cause unexpected hangs of GnuPG commands and tools depending on GnuPG.
+# For more details, see:
+# - https://discussion.fedoraproject.org/t/gpg-blocking-forever-cant-git-commit-as-a-result/96605/6
+# - https://bugzilla.redhat.com/show_bug.cgi?id=2249218
+# - https://dev.gnupg.org/T6838
 %configure \
-  --enable-gpg-is-gpg2
+  --enable-gpg-is-gpg2 \
+  --disable-keyboxd
 %make_build
 
 %install
@@ -94,6 +101,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Tue May 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-2
+- Disabled keyboxd.
+
 * Fri Mar 29 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.4.4-1
 - Upgrade to 2.4.4.
 
