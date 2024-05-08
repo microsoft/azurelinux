@@ -54,7 +54,7 @@ files for developing applications that use %{name}.
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.0-1
-- Initial Azure Linux import from Fedora (license MIT)
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
 %autochangelog
