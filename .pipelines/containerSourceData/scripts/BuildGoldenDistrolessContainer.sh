@@ -22,6 +22,11 @@ function DockerBuild {
 
     # Create container
     echo "+++ Create container $containerName"
+
+    # DOCKER_BUILDKIT=0 is set to avoid the unknown timeout error in the Azure DevOps pipeline.
+    # The error is likely caused by some BuildKit feature in version 24.0.9 of moby-engine.
+    # The error is not seen in the local environment.
+    # TODO: Remove this line once the issue is resolved.
     export DOCKER_BUILDKIT=0
     docker build . \
         -t "$containerName" \
