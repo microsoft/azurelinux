@@ -68,6 +68,7 @@ files for developing applications that use %{name}.
 %changelog
 * Mon May 06 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 5.0.1-12
 - Initial Azure Linux import from Fedora 41 (license: MIT)
+- License verified
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
