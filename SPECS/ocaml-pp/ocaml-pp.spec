@@ -156,7 +156,7 @@ EOF
 
 %changelog
 * Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.0-6
-- Initial Import from Fedora
+- Initial Azure Linux import from Fedora (license MIT)
 - License verified
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.0-6

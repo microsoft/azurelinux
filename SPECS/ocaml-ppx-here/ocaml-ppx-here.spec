@@ -55,7 +55,7 @@ sed -e 's,dummy\.ml\.pp,dummy.pp.ml,g' \
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-9
-- Initial Import from Fedora
+- Initial Azure Linux import from Fedora (license MIT)
 - License Verified
 
 * Mon Jan 29 2024 Richard W.M. Jones <rjones@redhat.com> - 0.16.0-9

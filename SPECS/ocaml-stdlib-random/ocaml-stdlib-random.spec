@@ -1,6 +1,6 @@
 Name:           ocaml-stdlib-random
 Version:        1.2.0
-Release:        %autorelease
+Release:        1%{?dist}
 Summary:        Versioned Random module from the OCaml standard library
 
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
@@ -54,7 +54,7 @@ files for developing applications that use %{name}.
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.0-1
-- Initial import from Fedora
+- Initial Azure Linux import from Fedora (license MIT)
 - License verified
 
 %autochangelog
