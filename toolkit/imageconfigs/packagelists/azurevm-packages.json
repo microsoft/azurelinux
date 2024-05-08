@@ -11,7 +11,7 @@
         "openssh-server",
         "python3",
         "rsyslog",
-        "sgx-backwards-compatability",
+        "sgx-backwards-compatibility",
         "WALinuxAgent",
         "wireless-regdb"
     ]

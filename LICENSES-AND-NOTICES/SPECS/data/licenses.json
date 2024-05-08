@@ -2389,7 +2389,7 @@
                 "rubygem-zip-zip",
                 "runc",
                 "sdbus-cpp",
-                "sgx-backwards-compatability",
+                "sgx-backwards-compatibility",
                 "shim",
                 "shim-unsigned",
                 "shim-unsigned-aarch64",
