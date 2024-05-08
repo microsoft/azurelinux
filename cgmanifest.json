@@ -28087,7 +28087,7 @@
         "other": {
           "name": "supermin",
           "version": "5.3.4",
-          "downloadUrl": "https://download.libguestfs.org/supermin/5.3-development//supermin-5.3.4.tar.gz"
+          "downloadUrl": "https://download.libguestfs.org/supermin/5.3-development/supermin-5.3.4.tar.gz"
         }
       }
     },
