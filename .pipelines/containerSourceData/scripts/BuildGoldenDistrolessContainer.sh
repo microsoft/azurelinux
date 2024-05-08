@@ -26,6 +26,7 @@ function DockerBuild {
     # DOCKER_BUILDKIT=0 is set to avoid the unknown timeout error in the Azure DevOps pipeline.
     # The error is likely caused by some BuildKit feature in version 24.0.9 of moby-engine.
     # The error is not seen in the local environment.
+    # Setting DOCKER_BUILDKIT=0 disables BuildKit and uses the legacy builder.
     # TODO: Remove this line once the issue is resolved.
     export DOCKER_BUILDKIT=0
     docker build . \
