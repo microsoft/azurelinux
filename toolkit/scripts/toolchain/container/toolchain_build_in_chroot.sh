@@ -163,15 +163,15 @@ rm -rf glibc-2.38
 
 touch /logs/status_glibc_complete
 
-echo Zlib-1.3
-tar xf zlib-1.3.tar.xz
-pushd zlib-1.3
+echo Zlib-1.3.1
+tar xf zlib-1.3.1.tar.xz
+pushd zlib-1.3.1
 ./configure --prefix=/usr
 make -j$(nproc)
 make install
 rm -fv /usr/lib/libz.a
 popd
-rm -rf zlib-1.3
+rm -rf zlib-1.3.1
 touch /logs/status_zlib_complete
 
 echo Bzip2-1.0.8
