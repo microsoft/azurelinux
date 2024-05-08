@@ -57,7 +57,7 @@
             },
             "AdditionalFiles": {
                 "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs",
-                "additionalfiles/qemu-guest-marker": "/etc/os-source"
+                "additionalfiles/os-source-qemu-guest": "/etc/os-source"
             },
             "FinalizeImageScripts": [
                 {

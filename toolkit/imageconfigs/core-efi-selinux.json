@@ -57,7 +57,7 @@
                 "default": "kernel"
             },
             "AdditionalFiles": {
-                "additionalfiles/core-selinux-marker": "/etc/os-source"
+                "additionalfiles/os-source-core-selinux": "/etc/os-source"
             },
             "Hostname": "azurelinux"
         }

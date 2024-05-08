@@ -59,7 +59,7 @@
             },
             "AdditionalFiles": {
                 "additionalconfigs/macros.excludedocs": "/usr/lib/rpm/macros.d/macros.excludedocs",
-                "additionalfiles/baremetal-marker": "/etc/os-source"
+                "additionalfiles/os-source-baremetal": "/etc/os-source"
             },
             "FinalizeImageScripts": [
                 {

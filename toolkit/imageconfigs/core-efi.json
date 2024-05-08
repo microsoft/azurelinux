@@ -53,7 +53,7 @@
                 "default": "kernel"
             },
             "AdditionalFiles": {
-                "additionalfiles/core-marker": "/etc/os-source"
+                "additionalfiles/os-source-core": "/etc/os-source"
             },
             "Hostname": "azurelinux"
         }
