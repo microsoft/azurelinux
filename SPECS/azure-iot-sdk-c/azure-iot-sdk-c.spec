@@ -6,7 +6,7 @@ Name:           azure-iot-sdk-c
 # For apt-get packages they fix the version number to 0.2.0 and increase the release number with each release.
 # Since we want to control the release number as thr distribution, this scheme is not applicable for us.
 # They also used to use a regular versioning scheme like 1.3.7 but they did not tag their latest LTS with a version like that.
-Version:        2024-03-04
+Version:        2024.03.04
 Release:        1%{?dist}
 License:        MIT
 Group:          Applications/File
