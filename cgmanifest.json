@@ -14613,7 +14613,7 @@
         "other": {
           "name": "ocaml-fileutils",
           "version": "0.6.4",
-          "downloadUrl": "https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/0.6.4.tar.gz"
+          "downloadUrl": "https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/v0.6.4.tar.gz"
         }
       }
     },
@@ -28087,7 +28087,7 @@
         "other": {
           "name": "supermin",
           "version": "5.3.4",
-          "downloadUrl": "https://download.libguestfs.org/supermin/5.2-stable/supermin-5.3.4.tar.gz"
+          "downloadUrl": "https://download.libguestfs.org/supermin/5.3-stable/supermin-5.3.4.tar.gz"
         }
       }
     },
