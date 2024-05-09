@@ -1,46 +1,60 @@
+%define fedora 41
+Version: 0.4.12
+Release: 8%{?dist}
+
 # Define the directory where the OpenSSL engines are installed
-%global enginesdir %{_libdir}/engines-1.1
-Summary:        A PKCS#11 engine for use with OpenSSL
+%global enginesdir %{_libdir}/engines-3
+
 Name:           openssl-pkcs11
-Version:        0.4.10
-Release:        10%{?dist}
+Summary:        A PKCS#11 engine for use with OpenSSL
 # The source code is LGPLv2+ except eng_back.c and eng_parse.c which are BSD
-License:        LGPLv2+ AND BSD
+# There are parts licensed with OpenSSL license too
+License:        LGPL-2.1-or-later AND BSD-2-Clause AND OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/OpenSC/libp11
 Source0:        https://github.com/OpenSC/libp11/releases/download/libp11-%{version}/libp11-%{version}.tar.gz
-Patch0:         openssl-pkcs11-0.4.10-various-bug-fixes.patch
-Patch1:         openssl-pkcs11-0.4.10-search-objects-in-all-matching-tokens.patch
-Patch2:         openssl-pkcs11-0.4.10-add-support-pin-source.patch
-Patch3:         openssl-pkcs11-0.4.10-set-rsa-flag-ext-pkey.patch
+
+# Downstream only for now to make RSA operations working in FIPS mode
 Patch4:         openssl-pkcs11-0.4.10-set-rsa-fips-method-flag.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
-BuildRequires:  libtool
+# unbreak operation when some other engine is present in openssl.cnf
+# https://github.com/OpenSC/libp11/pull/460
+# https://github.com/OpenSC/libp11/commit/feb22a66
+# 580c12b78b63d88010a6178d7c4c58186938c479
+# 74497e0fa5b69b15790d6697e1ebce13af842d4c
+Patch5:         openssl-pkcs11-ossl3.patch
+Patch6:         openssl-pkcs11-ec-copy.patch
+
+BuildRequires: make
+BuildRequires:  autoconf automake libtool
 BuildRequires:  openssl-devel
-BuildRequires:  openssl >= 1.0.2
+BuildRequires:  openssl >= 3.0.0
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(p11-kit-1)
-BuildRequires:  doxygen
 %if 0%{?with_check}
-BuildRequires:  procps-ng
-BuildRequires:  opensc
-BuildRequires:  softhsm
+# Needed for testsuite
+BuildRequires:  softhsm opensc procps-ng
 %endif
-Requires:       openssl-libs >= 1.0.2
+
+%if 0%{?fedora}
+BuildRequires:  doxygen
+%endif
+
 Requires:       p11-kit-trust
+Requires:       openssl-libs >= 3.0.0
 
 # Package renamed from libp11 to openssl-pkcs11 in release 0.4.7-4
 Provides:       libp11%{?_isa} = %{version}-%{release}
 Obsoletes:      libp11 < 0.4.7-4
-# The engine_pkcs11 subpackage is also provided
+# The engine_pkcs11 subpackage is also provided 
 Provides:       engine_pkcs11%{?_isa} = %{version}-%{release}
 Obsoletes:      engine_pkcs11 < 0.4.7-4
 
+%if 0%{?fedora}
 # The libp11-devel subpackage was removed in libp11-0.4.7-1, but not obsoleted
 # This Obsoletes prevents the conflict in updates by removing old libp11-devel
 Obsoletes:      libp11-devel < 0.4.7-4
+%endif
 
 %description -n openssl-pkcs11
 openssl-pkcs11 enables hardware security module (HSM), and smart card support in
@@ -50,7 +64,7 @@ optional and can be loaded by configuration file, command line or through the
 OpenSSL ENGINE API.
 
 # The libp11-devel subpackage was reintroduced in libp11-0.4.7-7 for Fedora
-
+%if 0%{?fedora}
 %package -n libp11-devel
 Summary:        Files for developing with libp11
 Requires:       %{name} = %{version}-%{release}
@@ -59,15 +73,19 @@ Requires:       %{name} = %{version}-%{release}
 The libp11-devel package contains libraries and header files for
 developing applications that use libp11.
 
+%endif
+
 %prep
 %autosetup -p 1 -n libp11-%{version}
 
 %build
 autoreconf -fvi
 export CFLAGS="%{optflags}"
-
+%if 0%{?fedora}
 %configure --disable-static --enable-api-doc --with-enginesdir=%{enginesdir}
-
+%else
+%configure --disable-static --with-enginesdir=%{enginesdir}
+%endif
 make V=1 %{?_smp_mflags}
 
 %install
@@ -78,11 +96,19 @@ make install DESTDIR=%{buildroot}
 rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{enginesdir}/*.la
 
+%if ! 0%{?fedora}
+## Remove development files
+rm -f %{buildroot}%{_libdir}/libp11.so
+rm -f %{buildroot}%{_libdir}/pkgconfig/libp11.pc
+rm -f %{buildroot}%{_includedir}/*.h
+%endif
+
 # Remove documentation automatically installed by make install
 rm -rf %{buildroot}%{_docdir}/libp11/
 
 %check
-make check %{?_smp_mflags} || { cat tests/*.log; false; }
+# to run tests use "--with check". They crash now in softhsm
+make check %{?_smp_mflags} || if [ $? -ne 0 ]; then cat tests/*.log; exit 1; fi;
 
 %ldconfig_scriptlets
 
@@ -92,13 +118,27 @@ make check %{?_smp_mflags} || { cat tests/*.log; false; }
 %{_libdir}/libp11.so.*
 %{enginesdir}/*.so
 
+%if 0%{?fedora}
 %files -n libp11-devel
 %doc examples/ doc/api.out/html/
 %{_libdir}/libp11.so
 %{_libdir}/pkgconfig/libp11.pc
 %{_includedir}/*.h
+%endif
 
 %changelog
+* Thu Feb 08 2024 Jakub Jelen <jjelen@redhat.com> - 0.4.12-8
+- Unbreak OpenSSL version detection for OpenSSL 3.1.x
+
+* Tue Feb 06 2024 Jakub Jelen <jjelen@redhat.com> - 0.4.12-7
+- Skip tests by default as they crash in broken SoftHSM (#2261431)
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.12-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
 * Tue Sep 26 2023 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.10-10
 - Removing 'exit' calls from the '%%check' section.
 
