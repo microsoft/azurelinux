@@ -16,7 +16,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.21.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -112,13 +112,10 @@ mkdir -p %{buildroot}%{gopath}/src/github.com/
 mkdir -p %{buildroot}%{gopath}/src/bitbucket.org/
 mkdir -p %{buildroot}%{gopath}/src/code.google.com/p/
 
+# This file is not necessary: recent Go toolsets have good defaults.
+# Keep the file, but leave it blank. This makes the upgrade path very simple.
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
 cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
-export GOROOT=%{goroot}
-export GOPATH=%{_datadir}/gocode
-export GOHOSTOS=linux
-export GOHOSTARCH=%{gohostarch}
-export GOOS=linux
 EOF
 
 %post -p /sbin/ldconfig
@@ -144,6 +141,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2
+- Remove explicit Go env variable defaults
+
 * Wed Apr 03 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-1
 - Bump version to 1.21.9-1
 
