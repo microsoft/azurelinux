@@ -9,7 +9,7 @@ Group:          System Environment/Base
 URL:            https://launchpad.net/cloud-init
 Source0:        https://github.com/canonical/%{name}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        10-azure-kvp.cfg
-Patch0:          0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
+Patch0:         0001-Add-new-distro-azurelinux-for-Microsoft-Azure-Linux.patch
 Patch1:         Add-Network-Interface-Renaming-Support-for-CAPM3-Met.patch
 %define cl_services cloud-config.service cloud-config.target cloud-final.service cloud-init.service cloud-init.target cloud-init-local.service
 BuildRequires:  automake
