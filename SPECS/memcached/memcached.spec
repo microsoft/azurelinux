@@ -6,7 +6,7 @@
 %bcond_with seccomp
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
-Version:        1.6.21
+Version:        1.6.27
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -119,6 +119,9 @@ exit 0
 %{_includedir}/memcached/*
 
 %changelog
+* Wed May 08 2024 Osama Esmail <osamaesmail@microsoft.com> - 1.6.27-1
+- Upgrading to 1.6.27
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.21-1
 - Auto-upgrade to 1.6.21 - Azure Linux 3.0 - package upgrades
 
