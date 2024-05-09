@@ -2429,9 +2429,7 @@
                 "libnvidia-container",
                 "mlnx-tools",
                 "mlx-bootctl",
-                "nvidia-container-runtime",
                 "nvidia-container-toolkit",
-                "nvidia-docker2",
                 "ofed-scripts",
                 "perftest"
             ]
