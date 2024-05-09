@@ -821,9 +821,9 @@ The manner in which the password is provided.
 
 Supported options:
 
-- `locked`: Password login is disabled for the user.
+- `locked`: Password login is disabled for the user. This is the default behavior.
 
-Disabled options:
+Options for debugging purposes only (disabled by default):
 
 - `plain-text`: The value is a plain-text password.
 
