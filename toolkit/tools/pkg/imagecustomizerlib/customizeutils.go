@@ -43,7 +43,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, &config.OS, imageChroot, rpmsSources,
+	err = addRemoveAndUpdatePackages(buildDir, baseConfigPath, config.OS, imageChroot, rpmsSources,
 		useBaseImageRpmRepos)
 	if err != nil {
 		return err
@@ -112,9 +112,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		}
 	}
 
-	err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
-	if err != nil {
-		return err
+	if config.Scripts != nil {
+		err = runScripts(baseConfigPath, config.Scripts.PostCustomization, imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = selinuxSetFiles(selinuxMode, imageChroot)
@@ -127,9 +129,11 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 		return err
 	}
 
-	err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
-	if err != nil {
-		return err
+	if config.Scripts != nil {
+		err = runScripts(baseConfigPath, config.Scripts.FinalizeCustomization, imageChroot)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -138,7 +142,7 @@ func doCustomizations(buildDir string, baseConfigPath string, config *imagecusto
 // Override the resolv.conf file, so that in-chroot processes can access the network.
 // For example, to install packages from packages.microsoft.com.
 func overrideResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Debugf("Overriding resolv.conf file")
+	logger.Log.Infof("Overriding resolv.conf file")
 
 	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
 
@@ -162,7 +166,7 @@ func overrideResolvConf(imageChroot *safechroot.Chroot) error {
 // Note: It is assumed that the image will have a process that runs on boot that will override the resolv.conf
 // file. For example, systemd-resolved.
 func deleteResolvConf(imageChroot *safechroot.Chroot) error {
-	logger.Log.Debugf("Deleting overridden resolv.conf file")
+	logger.Log.Infof("Deleting overridden resolv.conf file")
 
 	imageResolveConfPath := filepath.Join(imageChroot.RootDir(), resolveConfPath)
 
@@ -433,11 +437,16 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 ) error {
 	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
 
 	switch config.OS.ResetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
+		logger.Log.Infof("Resetting bootloader config")
+
+		if config.Storage == nil {
+			return fmt.Errorf("failed to configure bootloader. Missing 'storage' configuration.")
+		}
 		// Hard-reset the grub config.
 		err := configureDiskBootLoader(imageConnection, config.Storage.FileSystems,
 			config.Storage.BootType, config.OS.SELinux, config.OS.KernelCommandLine, currentSelinuxMode)
@@ -465,7 +474,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
 		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
 		if err != nil {
-			return selinuxMode, err
+			return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
 		}
 	}
 
@@ -533,6 +542,8 @@ func selinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *sa
 		// So, no need to call setfiles.
 		return nil
 	}
+
+	logger.Log.Infof("Setting file SELinux labels")
 
 	// Get the list of mount points.
 	mountPointToFsTypeMap := make(map[string]string, 0)

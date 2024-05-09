@@ -1,24 +1,19 @@
-From aa3aebf132959e7e44876042efaf9ff24ffe0f2b Mon Sep 17 00:00:00 2001
-From: rpm-build <rpm-build>
-Date: Mon, 31 Jul 2023 09:41:27 +0200
-Subject: [PATCH 09/35] 0009-Add-Kernel-FIPS-mode-flag-support.patch
+From 9a2bc8e076da32e2035090aa8a8e2d3a82b9af0b Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 17 Apr 2024 21:28:21 +0000
+Subject: [PATCH] Add Kernel FIPS mode flag support
 
-Patch-name: 0009-Add-Kernel-FIPS-mode-flag-support.patch
-Patch-id: 9
-Patch-status: |
-    # Add check to see if fips flag is enabled in kernel
-From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
 ---
  crypto/context.c            | 36 ++++++++++++++++++++++++++++++++++++
  include/internal/provider.h |  3 +++
  2 files changed, 39 insertions(+)
 
 diff --git a/crypto/context.c b/crypto/context.c
-index e294ea1512..51002ba79a 100644
+index 33d52a9..a9694e7 100644
 --- a/crypto/context.c
 +++ b/crypto/context.c
-@@ -16,6 +16,41 @@
- #include "internal/provider.h"
+@@ -17,6 +17,41 @@
+ #include "crypto/decoder.h"
  #include "crypto/context.h"
  
 +# include <sys/types.h>
@@ -59,7 +54,7 @@ index e294ea1512..51002ba79a 100644
  struct ossl_lib_ctx_st {
      CRYPTO_RWLOCK *lock, *rand_crngt_lock;
      OSSL_EX_DATA_GLOBAL global;
-@@ -336,6 +371,7 @@ static int default_context_inited = 0;
+@@ -368,6 +403,7 @@ static int default_context_inited = 0;
  
  DEFINE_RUN_ONCE_STATIC(default_context_do_init)
  {
@@ -68,7 +63,7 @@ index e294ea1512..51002ba79a 100644
          goto err;
  
 diff --git a/include/internal/provider.h b/include/internal/provider.h
-index 18937f84c7..1446bf7afb 100644
+index ab41d64..efb12ae 100644
 --- a/include/internal/provider.h
 +++ b/include/internal/provider.h
 @@ -112,6 +112,9 @@ int ossl_provider_init_as_child(OSSL_LIB_CTX *ctx,
@@ -82,5 +77,5 @@ index 18937f84c7..1446bf7afb 100644
  }
  # endif
 -- 
-2.41.0
+2.33.8
 
