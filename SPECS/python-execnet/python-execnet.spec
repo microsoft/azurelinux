@@ -20,6 +20,7 @@ BuildRequires:  python%{python3_pkgversion}-trove-classifiers
 BuildRequires:  python%{python3_pkgversion}-wheel
 %if %{with check}
 BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-pytest
 %endif
 BuildArch:      noarch
 
@@ -46,7 +47,7 @@ find . -type f -a \( -name '*.py' -o -name 'py.*' \) \
    -exec sed -i '1{/^#!/d}' {} \; \
    -exec chmod u=rw,go=r {} \;
 
-%pyproject_buildrequires
+%pyproject_buildrequires -t
 
 %build
 %pyproject_wheel
@@ -59,19 +60,9 @@ rm doc/_build/html/.buildinfo
 %pyproject_save_files %{pkgname}
 
 %check
-# pip3 install tox
+pip3 install tox iniconfig
 # sed -i "s/pytest$/pytest==7.1.3/" tox.ini
-# LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
-PYTEST_SELECT='not test_popen_io[gevent-sys.executable]'
-PYTEST_SELECT+=' and not [gevent-socket]'
-PYTEST_SELECT+=' and not [eventlet-socket]'
-PYTEST_SELECT+=' and not [python2.7]'
-PYTHONPATH=$(pwd)/src \
-py.test-%{python3_version} -r s \
-  -k "$PYTEST_SELECT" \
-  testing \
-  --timeout=30
-
+LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %files -n python%{python3_pkgversion}-%{pkgname} -f %{pyproject_files}
 %doc README.rst
