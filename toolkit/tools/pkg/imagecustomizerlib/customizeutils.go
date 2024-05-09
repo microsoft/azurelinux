@@ -298,25 +298,34 @@ func addOrUpdateUser(user imagecustomizerapi.User, baseConfigPath string, imageC
 
 	logger.Log.Infof("Adding/updating user (%s)", user.Name)
 
-	password := user.Password
-	if user.PasswordPath != "" {
-		// Read password from file.
-		passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.PasswordPath)
+	hashedPassword := ""
+	if user.Password != nil {
+		passwordIsFile := user.Password.Type == imagecustomizerapi.PasswordTypePlainTextFile ||
+			user.Password.Type == imagecustomizerapi.PasswordTypeHashedFile
 
-		passwordFileContents, err := os.ReadFile(passwordFullPath)
-		if err != nil {
-			return fmt.Errorf("failed to read password file (%s): %w", passwordFullPath, err)
+		passwordIsHashed := user.Password.Type == imagecustomizerapi.PasswordTypeHashed ||
+			user.Password.Type == imagecustomizerapi.PasswordTypeHashedFile
+
+		password := user.Password.Value
+		if passwordIsFile {
+			// Read password from file.
+			passwordFullPath := file.GetAbsPathWithBase(baseConfigPath, user.Password.Value)
+
+			passwordFileContents, err := os.ReadFile(passwordFullPath)
+			if err != nil {
+				return fmt.Errorf("failed to read password file (%s): %w", passwordFullPath, err)
+			}
+
+			password = string(passwordFileContents)
 		}
 
-		password = string(passwordFileContents)
-	}
-
-	// Hash the password.
-	hashedPassword := password
-	if !user.PasswordHashed {
-		hashedPassword, err = userutils.HashPassword(password)
-		if err != nil {
-			return err
+		hashedPassword = password
+		if !passwordIsHashed {
+			// Hash the password.
+			hashedPassword, err = userutils.HashPassword(password)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
