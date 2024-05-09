@@ -1,6 +1,6 @@
 Name:           python-editables
 Version:        0.5
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Editable installations
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -8,9 +8,12 @@ License:        MIT
 URL:            https://github.com/pfmoore/editables
 Source:         %{url}/archive/%{version}/editables-%{version}.tar.gz
 BuildRequires:  python3-devel
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
-BuildRequires:  python3-pip
+%endif
 BuildRequires:  python3-flit-core
+BuildRequires:  python3-pip
+
 BuildArch:      noarch
 
 %global common_description %{expand:
@@ -43,6 +46,7 @@ Summary:        %{summary}
 
 
 %check
+pip3 install iniconfig
 %pytest
 
 
@@ -51,6 +55,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 0.5-7
+- Add missing dependency for %check section
+
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.5-6
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License Verified.
