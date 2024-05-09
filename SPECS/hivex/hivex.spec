@@ -14,6 +14,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libguestfs.org/
 Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
+# Upstream patches to fix Ruby minitest support.
+# https://bugzilla.redhat.com/show_bug.cgi?id=2229653
+Patch:          0001-ruby-Replace-MiniTest-with-Minitest.patch
+Patch:          0002-ruby-Get-rid-of-old-Test-Unit-compatibility.patch
+# Another upstream patch, not required.
+Patch:          0003-build-Go-back-to-gettext-0.19.patch
 
 BuildRequires:  %{_bindir}/pod2html
 BuildRequires:  %{_bindir}/pod2man
@@ -246,6 +252,7 @@ fi
 %changelog
 * Wed May 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.3.23-2
 - Rebuild with using ocaml 5.1.1
+- Add patches for Ruby and gettext. Imported from Fedora 41
 
 * Fri Feb 16 2024 Yash Panchal <yashpanchal@microsoft.com> - 1.3.23-1
 - Upgrate to 1.3.23.
