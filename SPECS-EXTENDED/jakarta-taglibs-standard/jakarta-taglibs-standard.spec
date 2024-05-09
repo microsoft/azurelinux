@@ -14,7 +14,7 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -25,7 +25,7 @@ Release:        261%{?dist}
 Summary:        Open Source Implementation of the JSP Standard Tag Library
 License:        ASL 2.0
 Group:          Development/Libraries/Java
-Url:            http://tomcat.apache.org/taglibs/
+Url:            https://tomcat.apache.org/taglibs/
 # Need to switch to upstream's source tarball:
 # https://archive.apache.org/dist/jakarta/taglibs/standard/source/jakarta-taglibs-standard-1.1.1-src.tar.gz
 Source0:        %{_distro_sources_url}/jakarta-taglibs-standard-%{version}-src.tar.bz2

@@ -3545,7 +3545,7 @@ rm -f %{_sharedstatedir}/rhsm/cache/rhsm_icon.json
 - Merge pull request #979 from candlepin/csnyder/help_message_identity_force
   (jmrodri@nc.rr.com)
 - Use rhsm.baseurl for ostree urls as well. (alikins@redhat.com)
-- Handle Content.gpg="http://" as gpg-verify=false (alikins@redhat.com)
+- Handle Content.gpg="https://" as gpg-verify=false (alikins@redhat.com)
 - 1107810: Updates help message for identity --force. (csnyder@redhat.com)
 - Merge pull request #977 from candlepin/alikins/handle_no_origin (dgoodwin@rm-
   rf.ca)

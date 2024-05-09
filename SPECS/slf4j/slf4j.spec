@@ -25,7 +25,7 @@ Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://www.slf4j.org/
 Source0:        https://github.com/qos-ch/%{name}/archive/v_%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
+Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap
 Requires:       cal10n

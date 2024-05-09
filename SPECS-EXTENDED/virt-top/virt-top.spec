@@ -9,8 +9,8 @@ Release:        7%{?dist}
 Summary:        Utility like top(1) for displaying virtualization stats
 License:        GPLv2+
 
-URL:            http://people.redhat.com/~rjones/virt-top/
-Source0:        http://people.redhat.com/~rjones/virt-top/files/%{name}-%{version}.tar.gz
+URL:            https://people.redhat.com/~rjones/virt-top/
+Source0:        https://people.redhat.com/~rjones/virt-top/files/%{name}-%{version}.tar.gz
 
 # Post-process output of CSV file (RHBZ#665817, RHBZ#912020).
 Source1:        processcsv.py
@@ -361,7 +361,7 @@ install -m 0644 processcsv.py.1 $RPM_BUILD_ROOT%{_mandir}/man1/
 
 * Tue Nov 20 2007 Richard W.M. Jones <rjones@redhat.com> - 0.3.3.4-1
 - New upstream release 0.3.3.4.
-- Upstream website is now http://libvirt.org/ocaml/
+- Upstream website is now https://libvirt.org/ocaml/
 
 * Fri Oct 19 2007 Richard W.M. Jones <rjones@redhat.com> - 0.3.3.0-2
 - Mistake: BR is ocaml-calendar-devel.

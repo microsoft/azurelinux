@@ -221,7 +221,7 @@ make test
 - import into FC6
 
 * Thu May 18 2006 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.19-2
-- License: BSD (http://www.opensource.org/licenses/bsd-license.php).
+- License: BSD (https://www.opensource.org/licenses/bsd-license.php).
 
 * Sat May 13 2006 Jose Pedro Oliveira <jpo at di.uminho.pt> - 0.19-1
 - First build.

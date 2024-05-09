@@ -4,8 +4,8 @@ Name: hyphen-ml
 Summary: Malayalam hyphenation rules
 Version: 0.7.0
 Release: 17%{?dist}
-Source: http://download.savannah.gnu.org/releases/smc/hyphenation/patterns/%{name}-%{version}.tar.bz2
-URL: http://wiki.smc.org.in
+Source: https://download.savannah.gnu.org/releases/smc/hyphenation/patterns/%{name}-%{version}.tar.bz2
+URL: https://wiki.smc.org.in
 License: LGPLv3+
 BuildArch: noarch
 Requires: hyphen

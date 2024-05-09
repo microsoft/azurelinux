@@ -5,8 +5,8 @@ Summary:	Kerberos realm enrollment service
 License:	LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://cgit.freedesktop.org/realmd/realmd/
-Source0:	http://www.freedesktop.org/software/realmd/releases/realmd-%{version}.tar.gz
+URL:		https://cgit.freedesktop.org/realmd/realmd/
+Source0:	https://www.freedesktop.org/software/realmd/releases/realmd-%{version}.tar.gz
 
 Patch1:		0001-LDAP-don-t-close-LDAP-socket-twice.patch
 Patch2:		0001-service-Add-nss-and-pam-sssd.conf-services-after-joi.patch

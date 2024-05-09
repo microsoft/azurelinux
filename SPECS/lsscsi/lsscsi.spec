@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Hardware/Others.
 URL:            https://sg.danny.cz/scsi/lsscsi.html
-Source0:        http://sg.danny.cz/scsi/%{name}-%{version}.tar.xz
+Source0:        https://sg.danny.cz/scsi/%{name}-%{version}.tar.xz
 
 %description
 This lists the information about SCSI devices.

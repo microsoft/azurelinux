@@ -6,8 +6,8 @@ Release:       1%{?dist}
 Summary:       Library for connecting to mobile devices
 
 License:       LGPLv2+
-URL:           http://www.libimobiledevice.org/
-Source0:       http://www.libimobiledevice.org/downloads/%{name}-1.2.0.tar.bz2
+URL:           https://www.libimobiledevice.org/
+Source0:       https://www.libimobiledevice.org/downloads/%{name}-1.2.0.tar.bz2
 # Upstream patches, generated with:
 # git format-patch --stdout  344409e1d1ad917d377b256214c5411dda82e6b0...9b857fc42cdc4921e1e3f190c5ea907774e04758
 # b5a70e9aaf538dad0aba0b800b122955e8ac494b

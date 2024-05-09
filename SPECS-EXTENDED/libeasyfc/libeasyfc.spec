@@ -6,7 +6,7 @@ Release:	8%{?dist}
 Summary:	Easy configuration generator interface for fontconfig
 
 License:	LGPLv3+
-URL:		http://tagoh.bitbucket.org/libeasyfc/
+URL:		https://tagoh.bitbucket.org/libeasyfc/
 Source0:	https://bitbucket.org/tagoh/libeasyfc/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-freetype.patch
 Patch1:		%{name}-fix-config.patch

@@ -130,7 +130,7 @@ pip3 install .
 
 * Fri Dec 21 2018 Randy Barlow <bowlofeggs@fedoraproject.org> - 3.6.0-1
 - Update to 3.6.0.
-- http://flake8.pycqa.org/en/latest/release-notes/3.6.0.html
+- https://flake8.pycqa.org/en/latest/release-notes/3.6.0.html
 
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild

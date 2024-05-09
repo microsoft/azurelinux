@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://hisham.hm/htop/
+URL:            https://hisham.hm/htop/
 Source0:        https://github.com/htop-dev/htop/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  desktop-file-utils
 BuildRequires:  libtool

@@ -6,8 +6,8 @@ Release:       6%{?dist}
 Summary:       Sub Band Codec used by bluetooth A2DP
 
 License:       GPLv2 and LGPLv2+
-URL:           http://www.bluez.org
-Source0:       http://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
+URL:           https://www.bluez.org
+Source0:       https://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
 
 BuildRequires: gcc
 BuildRequires: libsndfile-devel

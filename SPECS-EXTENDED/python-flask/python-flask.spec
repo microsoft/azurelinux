@@ -9,7 +9,7 @@ Release:        4%{?dist}
 Summary:        A micro-framework for Python based on Werkzeug, Jinja 2 and good intentions
 
 License:        BSD
-URL:            http://flask.pocoo.org/
+URL:            https://flask.pocoo.org/
 Source0:        %{pypi_source}
 
 BuildArch:      noarch

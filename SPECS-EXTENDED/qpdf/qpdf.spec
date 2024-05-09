@@ -8,8 +8,8 @@ Release: 2%{?dist}
 # upstream uses ASL 2.0 now, but he allowed other to distribute qpdf under
 # old license (see README)
 License: (Artistic 2.0 or ASL 2.0) and MIT
-URL:     http://qpdf.sourceforge.net/
-Source0: http://downloads.sourceforge.net/sourceforge/qpdf/qpdf-%{version}.tar.gz
+URL:     https://qpdf.sourceforge.net/
+Source0: https://downloads.sourceforge.net/sourceforge/qpdf/qpdf-%{version}.tar.gz
 
 Patch0:  qpdf-doc.patch
 # zlib has optimalization for aarch64 now, which gives different output after

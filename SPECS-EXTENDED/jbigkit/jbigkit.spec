@@ -6,8 +6,8 @@ Release:        19%{?dist}
 Summary:        JBIG1 lossless image compression tools
 
 License:        GPLv2+
-URL:            http://www.cl.cam.ac.uk/~mgk25/jbigkit/
-Source0:        http://www.cl.cam.ac.uk/~mgk25/download/jbigkit-%{version}.tar.gz
+URL:            https://www.cl.cam.ac.uk/~mgk25/jbigkit/
+Source0:        https://www.cl.cam.ac.uk/~mgk25/download/jbigkit-%{version}.tar.gz
 Patch0:         jbigkit-2.1-shlib.patch
 Patch1:         jbigkit-2.0-warnings.patch
 Patch2:         jbigkit-ldflags.patch

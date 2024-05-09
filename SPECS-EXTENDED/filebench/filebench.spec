@@ -6,8 +6,8 @@ Release:        14%{?dist}
 Summary:        A model based file system workload generator
 
 License:        CDDL
-URL:            http://filebench.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://filebench.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        LICENSE
 Source2:        filebench.1
 Patch0:         make-dofile-global.patch

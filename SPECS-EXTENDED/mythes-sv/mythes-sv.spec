@@ -4,8 +4,8 @@ Name: mythes-sv
 Summary: Swedish thesaurus
 Version: 1.3
 Release: 18%{?dist}
-Source: http://extensions.services.openoffice.org/files/934/3/SwedishThesaurus.oxt
-URL: http://extensions.services.openoffice.org/project/SweThes
+Source: https://extensions.services.openoffice.org/files/934/3/SwedishThesaurus.oxt
+URL: https://extensions.services.openoffice.org/project/SweThes
 License: MIT
 BuildArch: noarch
 Requires: mythes

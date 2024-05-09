@@ -4,8 +4,8 @@ Release:	18%{?dist}
 License:	BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://nkf.osdn.jp/
-Source0:	http://iij.dl.osdn.jp/nkf/64158/%{name}-%{version}.tar.gz
+URL:		https://nkf.osdn.jp/
+Source0:	https://iij.dl.osdn.jp/nkf/64158/%{name}-%{version}.tar.gz
 ## snippet from the source code
 Source3:	nkf.copyright
 Source4:	nkf.1j

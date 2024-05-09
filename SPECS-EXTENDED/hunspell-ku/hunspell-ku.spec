@@ -4,9 +4,9 @@ Name: hunspell-ku
 Summary: Kurdish hunspell dictionaries
 Version: 0.21
 Release: 23%{?dist}
-#http://hunspell-ku.googlecode.com/files/ku_TR-021_source.zip ?
-Source0: http://downloads.sourceforge.net/myspellkurdish/ku_TR-021.zip
-#http://code.google.com/p/hunspell-ku/ ?
+#https://hunspell-ku.googlecode.com/files/ku_TR-021_source.zip ?
+Source0: https://downloads.sourceforge.net/myspellkurdish/ku_TR-021.zip
+#https://code.google.com/p/hunspell-ku/ ?
 URL: https://sourceforge.net/projects/myspellkurdish/
 License: GPLv3 or LGPLv3 or MPLv1.1
 BuildArch: noarch

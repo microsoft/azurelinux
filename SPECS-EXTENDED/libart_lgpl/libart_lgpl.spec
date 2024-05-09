@@ -4,8 +4,8 @@ Name: libart_lgpl
 Version: 2.3.21
 Release: 24%{?dist}
 Summary: Library of graphics routines used by libgnomecanvas
-URL: http://www.gnome.org/
-Source0: http://download.gnome.org/sources/libart_lgpl/2.3/%{name}-%{version}.tar.bz2
+URL: https://www.gnome.org/
+Source0: https://download.gnome.org/sources/libart_lgpl/2.3/%{name}-%{version}.tar.bz2
 #Fedora specific patch
 Patch0: libart-multilib.patch
 License: LGPLv2+

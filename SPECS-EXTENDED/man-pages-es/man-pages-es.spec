@@ -8,13 +8,13 @@ Release: 34%{?dist}
 # These man pages come under various copyrights.
 # All are freely distributable when the nroff source is included.
 License: GPL+ and GPLv2+ and LDP and IEEE
-URL: http://ditec.um.es/~piernas/manpages-es/
+URL: https://ditec.um.es/~piernas/manpages-es/
 %global extra_name %{name}-extra
 %global extra_ver 0.8a
 %global extra_pkg_name %{extra_name}-%{extra_ver}
 %global es_man_dir %{_mandir}/es
-Source0: http://ditec.um.es/~piernas/manpages-es/%{name}-%{version}.tar.bz2
-Source1: http://ditec.um.es/~piernas/manpages-es/%{extra_pkg_name}.tar.gz
+Source0: https://ditec.um.es/~piernas/manpages-es/%{name}-%{version}.tar.bz2
+Source1: https://ditec.um.es/~piernas/manpages-es/%{extra_pkg_name}.tar.gz
 
 BuildArch: noarch
 Summary(es): Páginas de manual en español
@@ -31,7 +31,7 @@ man-pages package. It is a beta release, so you can still find a lot
 of bugs.  Contributions are welcome. For any doubt or suggestion about
 this release, send an e-mail to Juan Piernas Canovas <piernas at
 ditec.um.es>. In order to collaborate with the project, please visit
-http://es.tldp.org.
+https://es.tldp.org.
 
 %description -l es
 Este archivo contiene la traducción al español del paquete man-pages
@@ -39,7 +39,7 @@ en inglés. Es una versión beta, por lo que todavía puede encontrar
 bastantes errores. Cualquier contribución será bienvenida. Para
 cualquier duda o sugerencia sobre esta versión, envíe un correo a Juan
 Piernas Cánovas (piernas en ditec.um.es). Si desea colaborar en el
-proyecto, por favor, visite http://es.tldp.org.
+proyecto, por favor, visite https://es.tldp.org.
 
 
 %package extra

@@ -6,8 +6,8 @@ Release:        24%{?dist}
 Summary:        SNMP support for Perl 5
 
 License:        Artistic 2.0
-URL:            http://code.google.com/p/snmp-session/
-Source0:        http://snmp-session.googlecode.com/files/SNMP_Session-%{version}.tar.gz
+URL:            https://code.google.com/p/snmp-session/
+Source0:        https://snmp-session.googlecode.com/files/SNMP_Session-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)

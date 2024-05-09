@@ -5,8 +5,8 @@ Summary: Estonian hunspell dictionaries
 %global upstreamid 20030606
 Version: 0.%{upstreamid}
 Release: 24%{?dist}
-Source: http://www.meso.ee/~jjpp/speller/ispell-et_%{upstreamid}.tar.gz
-URL: http://www.meso.ee/~jjpp/speller/
+Source: https://www.meso.ee/~jjpp/speller/ispell-et_%{upstreamid}.tar.gz
+URL: https://www.meso.ee/~jjpp/speller/
 License: LGPLv2+ and LPPL
 BuildArch: noarch
 

@@ -244,7 +244,7 @@ install -m 0755 csvtool.native $DESTDIR%{_bindir}/csvtool
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Wed Jan 05 2011 Richard W.M. Jones <rjones@redhat.com> - 1.1.7-8
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Wed Dec 30 2009 Richard W.M. Jones <rjones@redhat.com> - 1.1.7-7
 - Rebuild for OCaml 3.11.2.

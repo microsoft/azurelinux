@@ -26,9 +26,9 @@ Release:        3%{?dist}
 Summary:        Java API for working with compressed files and archivers
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/proper/commons-compress/
-Source0:        http://archive.apache.org/dist/commons/compress/source/%{short_name}-%{version}-src.tar.gz
-Source1:        http://archive.apache.org/dist/commons/compress/source/%{short_name}-%{version}-src.tar.gz.asc
+URL:            https://commons.apache.org/proper/commons-compress/
+Source0:        https://archive.apache.org/dist/commons/compress/source/%{short_name}-%{version}-src.tar.gz
+Source1:        https://archive.apache.org/dist/commons/compress/source/%{short_name}-%{version}-src.tar.gz.asc
 Source2:        %{name}-build.xml
 Patch0:         0001-Remove-Brotli-compressor.patch
 Patch1:         0002-Remove-ZSTD-compressor.patch

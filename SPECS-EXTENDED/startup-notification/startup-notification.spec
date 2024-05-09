@@ -4,9 +4,9 @@ Summary: Library for tracking application startup
 Name: startup-notification
 Version: 0.12
 Release: 20%{?dist}
-URL: http://www.freedesktop.org/software/startup-notification/
+URL: https://www.freedesktop.org/software/startup-notification/
 #VCS: git:git://git.freedesktop.org/git/startup-notification
-Source0: http://www.freedesktop.org/software/startup-notification/releases/%{name}-%{version}.tar.gz
+Source0: https://www.freedesktop.org/software/startup-notification/releases/%{name}-%{version}.tar.gz
 License: LGPLv2
 BuildRequires:  gcc
 BuildRequires: libX11-devel

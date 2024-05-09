@@ -7,7 +7,7 @@ Name: star
 Version: 1.6
 Release: 4%{?dist}
 License: CDDL
-URL: http://freecode.com/projects/star
+URL: https://freecode.com/projects/star
 Source: https://downloads.sourceforge.net/s-tar/%{name}-%{version}.tar.bz2
 
 

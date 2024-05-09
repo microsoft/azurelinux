@@ -5,8 +5,8 @@ Summary: Indonesian hyphenation rules
 %global upstreamid 20040812
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/hyph_id_ID.zip
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+Source: https://download.services.openoffice.org/contrib/dictionaries/hyph_id_ID.zip
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPL+
 BuildArch: noarch
 

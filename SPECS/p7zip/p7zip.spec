@@ -6,11 +6,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # Files under C/Compress/Lzma/ are dual LGPL or CPL
 License:        LGPLv2 and (LGPLv2+ or CPL)
-URL:            http://p7zip.sourceforge.net/
+URL:            https://p7zip.sourceforge.net/
 # RAR sources removed since their license is incompatible with the LGPL
-#Source: http://downloads.sf.net/p7zip/p7zip_%%{version}_src_all.tar.bz2
+#Source: https://downloads.sf.net/p7zip/p7zip_%%{version}_src_all.tar.bz2
 # export VERSION=15.14.1
-# wget http://downloads.sf.net/p7zip/p7zip_${VERSION}_src_all.tar.bz2
+# wget https://downloads.sf.net/p7zip/p7zip_${VERSION}_src_all.tar.bz2
 # tar xjvf p7zip_${VERSION}_src_all.tar.bz2
 # rm -rf p7zip_${VERSION}/CPP/7zip/{Archive,Compress,Crypto,QMAKE}/Rar*
 # rm p7zip_${VERSION}/DOC/unRarLicense.txt
@@ -47,7 +47,7 @@ BuildRequires:  yasm
 
 %description
 p7zip is a port of 7za.exe for Unix. 7-Zip is a file archiver with a very high
-compression ratio. The original version can be found at http://www.7-zip.org/.
+compression ratio. The original version can be found at https://www.7-zip.org/.
 
 
 %package plugins
@@ -212,7 +212,7 @@ make test
 * Sun Mar 27 2016 Sérgio Basto <sergio@serjux.com> - 15.14.1-1
 - Update to 15.14.1
 - Revert 7zFM build, upstream recomends not build it
-  http://sourceforge.net/p/p7zip/bugs/175/
+  https://sourceforge.net/p/p7zip/bugs/175/
 
 * Thu Mar 17 2016 Sérgio Basto <sergio@serjux.com> - 15.14-2
 - Fix non-executable-in-bin for p7zipForFilemanager.

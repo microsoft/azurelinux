@@ -25,10 +25,10 @@ Release:        10%{?dist}
 Summary:        Java XSLT processor
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-Url:            http://xalan.apache.org/index.html
-Source0:        http://www.apache.org/dist/xalan/xalan-j/source/xalan-j_%{cvs_version}-src.tar.gz
-Source1:        http://repo1.maven.org/maven2/xalan/xalan/%{version}/xalan-%{version}.pom
-Source2:        http://repo1.maven.org/maven2/xalan/serializer/%{version}/serializer-%{version}.pom
+Url:            https://xalan.apache.org/index.html
+Source0:        https://www.apache.org/dist/xalan/xalan-j/source/xalan-j_%{cvs_version}-src.tar.gz
+Source1:        https://repo1.maven.org/maven2/xalan/xalan/%{version}/xalan-%{version}.pom
+Source2:        https://repo1.maven.org/maven2/xalan/serializer/%{version}/serializer-%{version}.pom
 Source3:        xsltc-%{version}.pom
 Source4:        xalan-j2-serializer-MANIFEST.MF
 Source5:        xalan-j2-MANIFEST.MF

@@ -31,7 +31,7 @@ URL:            https://www.antlr.org/
 Source0:        %{_distro_sources_url}/antlr-%{version}.tar.bz2
 Source1:        %{name}-build.xml
 Source2:        %{name}-script
-Source3:        http://repo2.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+Source3:        https://repo2.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 Source1000:     antlr-rpmlintrc
 Patch0:         %{name}-jedit.patch
 Patch1:         gcc45fix.diff
@@ -275,7 +275,7 @@ find doc -type f | xargs chmod 0644
 * Wed Apr 30 2014 darin@darins.net
 - Set buildarch on SLE_11 or the python subpackage is packaged
   as noarch when they need be arch specific.
-  http://lists.opensuse.org/opensuse-packaging/2014-04/msg00055.html
+  https://lists.opensuse.org/opensuse-packaging/2014-04/msg00055.html
 * Tue Apr 29 2014 darin@darins.net
 - supporess bytecode version check on SLE
 - fix perms for SLES

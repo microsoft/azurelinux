@@ -5,7 +5,7 @@ Release: 2%{?dist}
 License: ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:     http://threadingbuildingblocks.org/
+URL:     https://threadingbuildingblocks.org/
 
 Source0: https://github.com/intel/tbb/archive/v%{version}/%{name}-%{version}.tar.gz
 # These three are downstream sources.

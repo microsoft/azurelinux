@@ -5,7 +5,7 @@ Name:		libxklavier
 Version:	5.4
 Release: 	16%{?dist}
 License:	LGPLv2+
-URL: http://www.freedesktop.org/wiki/Software/LibXklavier
+URL: https://www.freedesktop.org/wiki/Software/LibXklavier
 BuildRequires: libxml2-devel
 BuildRequires: libxkbfile-devel
 BuildRequires: libX11-devel
@@ -15,8 +15,8 @@ BuildRequires: glib2-devel >= 2.6.0
 BuildRequires: iso-codes-devel
 BuildRequires: gobject-introspection-devel
 Requires: iso-codes
-#Source: http://download.gnome.org/sources/libxklavier/5.3/%{name}-%{version}.tar.xz
-Source: http://people.freedesktop.org/~svu/libxklavier-5.4.tar.bz2
+#Source: https://download.gnome.org/sources/libxklavier/5.3/%{name}-%{version}.tar.xz
+Source: https://people.freedesktop.org/~svu/libxklavier-5.4.tar.bz2
 
 %description
 libxklavier is a library providing a high-level API for the X Keyboard

@@ -1,4 +1,4 @@
-# Fedora Review: http://bugzilla.redhat.com/204954
+# Fedora Review: https://bugzilla.redhat.com/204954
 Summary:        Open Fingerprint Architecture library
 Name:           libofa
 Version:        0.9.3
@@ -7,7 +7,7 @@ License:        GPL-2.0-only
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://code.google.com/p/musicip-libofa/
-# Source0:	http://musicip-libofa.googlecode.com/files/libofa-%{version}.tar.gz
+# Source0:	https://musicip-libofa.googlecode.com/files/libofa-%{version}.tar.gz
 Source0:        https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/musicip-libofa/libofa-%{version}.tar.gz
 Patch1:         libofa-0.9.3-gcc41.patch
 # Use Libs.private

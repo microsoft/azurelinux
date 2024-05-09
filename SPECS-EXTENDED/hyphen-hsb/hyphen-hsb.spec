@@ -5,10 +5,10 @@ Summary: Upper Sorbian hyphenation rules
 %global upstreamid 20110620
 Version: 0.%{upstreamid}
 Release: 17%{?dist}
-#Source0: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-hsb.tex?view=co
+#Source0: https://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-hsb.tex?view=co
 Source0: hyph-hsb.tex
 Source1: %{name}-LICENSE.txt
-URL: http://tug.org/tex-hyphen
+URL: https://tug.org/tex-hyphen
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

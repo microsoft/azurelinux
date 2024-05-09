@@ -5,7 +5,7 @@ Summary: Tok Pisin hunspell dictionaries
 Version: 0.07
 Release: 15%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/4824/3/hunspell-tpi-0.07.oxt
-URL: http://extensions.services.openoffice.org/en/project/tok-pisin-spell-checker
+URL: https://extensions.services.openoffice.org/en/project/tok-pisin-spell-checker
 License: GPLv3+
 BuildArch: noarch
 Requires: hunspell

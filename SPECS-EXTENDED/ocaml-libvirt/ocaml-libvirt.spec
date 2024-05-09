@@ -6,8 +6,8 @@ Release:        8%{?dist}
 Summary:        OCaml binding for libvirt
 License:        LGPLv2+
 
-URL:            http://libvirt.org/ocaml/
-Source0:        http://libvirt.org/sources/ocaml/%{name}-%{version}.tar.gz
+URL:            https://libvirt.org/ocaml/
+Source0:        https://libvirt.org/sources/ocaml/%{name}-%{version}.tar.gz
 
 # Fixes build with OCaml >= 4.09.
 # Upstream commit 75b13978f85b32c7a121aa289d8ebf41ba14ee5a.
@@ -275,7 +275,7 @@ make install-byte
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Wed Jan 05 2011 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.0-8
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Wed Dec 30 2009 Richard W.M. Jones <rjones@redhat.com> - 0.6.1.0-7
 - Rebuild for OCaml 3.11.2.
@@ -360,7 +360,7 @@ make install-byte
 
 * Tue Nov 20 2007 Richard W.M. Jones <rjones@redhat.com> - 0.3.3.4-1
 - New upstream release 0.3.3.4.
-- Upstream website is now http://libvirt.org/ocaml/
+- Upstream website is now https://libvirt.org/ocaml/
 
 * Fri Oct 19 2007 Richard W.M. Jones <rjones@redhat.com> - 0.3.3.0-2
 - Mistake: BR is ocaml-calendar-devel.

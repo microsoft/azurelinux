@@ -6,8 +6,8 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
-URL:            http://psmisc.sourceforge.net/
-Source0:        http://prdownloads.sourceforge.net/psmisc/%{name}-%{version}.tar.xz
+URL:            https://psmisc.sourceforge.net/
+Source0:        https://prdownloads.sourceforge.net/psmisc/%{name}-%{version}.tar.xz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 

@@ -24,7 +24,7 @@ Release:        2%{?dist}
 Summary:        Interfaces and Classes for use in compiling OSGi bundles
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://www.osgi.org
+URL:            https://www.osgi.org
 Source0:        https://osgi.org/download/r7/osgi.cmpn-%{version}.jar
 Source1:        %{name}-build.xml
 BuildRequires:  ant

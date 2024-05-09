@@ -25,7 +25,7 @@ Release:        1%{?dist}
 Summary:        Java framework for parsing command line parameters
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://jcommander.org/
+URL:            https://jcommander.org/
 Source0:        https://github.com/cbeust/%{short_name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Adapted from earlier version that still shipped poms. It uses kobalt for building now
 Source1:        %{name}.pom

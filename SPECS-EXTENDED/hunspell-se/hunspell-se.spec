@@ -4,8 +4,8 @@ Name: hunspell-se
 Summary: Northern Saami hunspell dictionaries
 Version: 1.0
 Release: 1%{?dist}
-Source: http://divvun.no/static_files/hunspell-se.tar.gz
-URL: http://www.divvun.no/index.html
+Source: https://divvun.no/static_files/hunspell-se.tar.gz
+URL: https://www.divvun.no/index.html
 License: GPLv3
 BuildArch: noarch
 

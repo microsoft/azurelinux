@@ -4,9 +4,9 @@ Name: mythes-fr
 Summary: French thesaurus
 Version: 2.3
 Release: 16%{?dist}
-Source0: http://www.dicollecte.org/download/fr/thesaurus-v%{version}.zip
+Source0: https://www.dicollecte.org/download/fr/thesaurus-v%{version}.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.dicollecte.org/home.php?prj=fr
+URL: https://www.dicollecte.org/home.php?prj=fr
 License: LGPLv2+
 BuildArch: noarch
 Requires: mythes

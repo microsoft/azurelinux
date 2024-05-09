@@ -5,7 +5,7 @@ Release: 5%{?dist}
 License: CPL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:     http://sourceforge.net/projects/iprdd/
+URL:     https://sourceforge.net/projects/iprdd/
 Source0: https://sourceforge.net/projects/iprdd/files/iprutils%20for%202.6%20kernels/2.4.17/%{name}-%{version}.tar.gz
 
 # missing man page

@@ -11,7 +11,7 @@ Release:        1%{?dist}
 License:        LGPLv2+ AND LGPLv2 AND GPLv2+ AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://aspell.net/
+URL:            https://aspell.net/
 Source:         https://ftp.gnu.org/gnu/aspell/aspell-%{version}.tar.gz
 Patch0:         aspell-0.60.7-fileconflict.patch
 Patch1:         aspell-0.60.7-pspell_conf.patch

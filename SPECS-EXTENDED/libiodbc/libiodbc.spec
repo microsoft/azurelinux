@@ -9,7 +9,7 @@ Name: libiodbc
 Version: 3.52.13
 Release: 4%{?dist}
 License: LGPLv2 or BSD
-URL: http://www.iodbc.org/
+URL: https://www.iodbc.org/
 Source0: https://github.com/openlink/iODBC/archive/v%{version}/%{name}-%{version}.tar.gz
 
 ## upstream patches

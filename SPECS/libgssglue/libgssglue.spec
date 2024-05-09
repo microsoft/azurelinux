@@ -3,11 +3,11 @@ Name:           libgssglue
 Version:        0.4
 Release:        6%{?dist}
 License:        BSD and MIT
-URL:            http://www.citi.umich.edu/projects/nfsv4/linux/
+URL:            https://www.citi.umich.edu/projects/nfsv4/linux/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://www.citi.umich.edu/projects/nfsv4/linux/libgssglue/%{name}-%{version}.tar.gz
+Source0:        https://www.citi.umich.edu/projects/nfsv4/linux/libgssglue/%{name}-%{version}.tar.gz
 
 %description
 This library exports a gssapi interface, but doesn't implement any gssapi mechanisms itself; instead it calls gssapi routines in other libraries, depending on the mechanism.

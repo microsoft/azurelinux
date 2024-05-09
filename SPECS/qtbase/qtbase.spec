@@ -1,4 +1,4 @@
-# See http://bugzilla.redhat.com/223663
+# See https://bugzilla.redhat.com/223663
 %global multilib_archs x86_64 %{ix86} %{?mips} ppc64 ppc s390x s390 sparc64 sparcv9
 %global multilib_basearchs x86_64 %{?mips64} ppc64 s390x sparc64
 
@@ -106,7 +106,7 @@ Patch65: qtbase-mysql.patch
 # filter plugin provides
 %global __provides_exclude_from ^%{_qt_plugindir}/.*\\.so$
 
-# http://bugzilla.redhat.com/1196359
+# https://bugzilla.redhat.com/1196359
 %global dbus -dbus-linked
 # xcb-sm
 %global egl 0
@@ -189,7 +189,7 @@ test -x configure || chmod +x configure
 %build
 ## FIXME/TODO:
 # * for %%ix86, add sse2 enabled builds for Qt6Gui, Qt6Core, QtNetwork, see also:
-#   http://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
+#   https://anonscm.debian.org/cgit/pkg-kde/qt/qtbase.git/tree/debian/rules (234-249)
 
 ## adjust $RPM_OPT_FLAGS
 # remove -fexceptions

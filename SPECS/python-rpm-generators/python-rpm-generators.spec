@@ -119,7 +119,7 @@ install -Dpm0755 -t %{buildroot}%{_rpmconfigdir} *.py
 - Switch bootsrapping macro to a bcond for modularity
 
 * Fri Oct 20 2017 Tomas Orsava <torsava@redhat.com> - 4.14.0-1
-- Rebase to rpm 4.14.0 final (http://rpm.org/wiki/Releases/4.14.0)
+- Rebase to rpm 4.14.0 final (https://rpm.org/wiki/Releases/4.14.0)
 - Re-synchronize version/release macros with the rpm Fedora package
 
 * Mon Sep 18 2017 Tomas Orsava <torsava@redhat.com> - 4.14.0-0.rc1.1

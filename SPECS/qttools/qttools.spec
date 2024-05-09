@@ -6,7 +6,7 @@ Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 
 License: LGPLv3 or LGPLv2
-Url:     http://www.qt.io
+Url:     https://www.qt.io
 %global majmin %(echo %{version} | cut -d. -f1-2)
 Source0: https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qttools-everywhere-src-%{version}.tar.xz
 

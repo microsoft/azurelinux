@@ -5,7 +5,7 @@ Version:        0.430
 Release:        2%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/List-MoreUtils/
+URL:            https://search.cpan.org/dist/List-MoreUtils/
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/List-MoreUtils-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

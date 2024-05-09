@@ -36,7 +36,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 # NOTE: It would be *awesome* if this file was maintained by the upstream
 # project, translated and installed into the right place during `make install`.
 #
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
+# See https://www.freedesktop.org/software/appstream/docs/ for more details.
 #
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
 cat > $RPM_BUILD_ROOT%{_datadir}/appdata/sayura.appdata.xml <<EOF

@@ -7,7 +7,7 @@ Release:        6%{?dist}
 License:        Unknown
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/J/JU/JUERD/DBIx-Simple-%{version}.tar.gz
-URL:            http://search.cpan.org/dist/DBIx-Simple/
+URL:            https://search.cpan.org/dist/DBIx-Simple/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch

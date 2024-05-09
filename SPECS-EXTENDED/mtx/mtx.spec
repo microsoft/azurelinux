@@ -5,13 +5,13 @@ Version: 1.3.12
 Release: 23%{?dist}
 Summary: SCSI media changer control program
 License: GPLv2
-Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# http://mtx.opensource-sw.net/bugs/view.php?id=9
+Source0: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+# https://mtx.opensource-sw.net/bugs/view.php?id=9
 Patch0: %{name}-1.3.12-destdir.patch
-# http://mtx.opensource-sw.net/bugs/view.php?id=13
+# https://mtx.opensource-sw.net/bugs/view.php?id=13
 # https://bugzilla.redhat.com/show_bug.cgi?id=538403
 Patch1: %{name}-1.3.12-argc.patch
-URL: http://mtx.sourceforge.net/
+URL: https://mtx.sourceforge.net/
 BuildRequires: gcc
 
 

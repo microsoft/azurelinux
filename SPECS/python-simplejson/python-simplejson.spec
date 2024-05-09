@@ -18,7 +18,7 @@ Summary:        Simple, fast, extensible JSON encoder/decoder for Python.
 Requires:       python3
 
 %description -n python3-simplejson
-simplejson is a simple, fast, complete, correct and extensible JSON <http://json.org> encoder and decoder for Python 2.5+ and Python 3.3+.
+simplejson is a simple, fast, complete, correct and extensible JSON <https://json.org> encoder and decoder for Python 2.5+ and Python 3.3+.
 It is pure Python code with no dependencies, but includes an optional C extension for a serious speed boost.
 
 %prep

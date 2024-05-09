@@ -7,7 +7,7 @@ Release:        1%{?dist}
 License:        EPL-1.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.kornshell.com/
+URL:            https://www.kornshell.com/
 Source0:        https://github.com/ksh93/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        kshcomp.conf
 Source2:        kshrc.rhs

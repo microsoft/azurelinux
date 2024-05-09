@@ -129,7 +129,7 @@ make test
 - Update version to 8.6.8.
 
 * Thu Jul 13 2017 Alexey Makhalov <amakhalov@vmware.com> - 8.6.6-2
-- Package more files (private headers, etc). Took install section fromFedora: http://pkgs.fedoraproject.org/cgit/rpms/tcl.git/tree/tcl.spec
+- Package more files (private headers, etc). Took install section fromFedora: https://pkgs.fedoraproject.org/cgit/rpms/tcl.git/tree/tcl.spec
 - Move init.tcl and other *.tck files to the main package
 
 * Wed Apr 12 2017 Xiaolin Li <xiaolinl@vmware.com> - 8.6.6-1

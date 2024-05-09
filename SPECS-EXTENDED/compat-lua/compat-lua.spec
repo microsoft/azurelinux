@@ -5,8 +5,8 @@ Version:        5.1.5
 Release:        17%{?dist}
 Summary:        Powerful light-weight programming language (compat version)
 License:        MIT
-URL:            http://www.lua.org/
-Source0:        http://www.lua.org/ftp/lua-%{version}.tar.gz
+URL:            https://www.lua.org/
+Source0:        https://www.lua.org/ftp/lua-%{version}.tar.gz
 Patch0:         lua-5.1.4-autotoolize.patch
 Patch1:         lua-5.1.4-lunatic.patch
 Patch2:         lua-5.1.4-idsize.patch

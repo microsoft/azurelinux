@@ -5,8 +5,8 @@ Summary: Friulian hunspell dictionaries
 %global upstreamid 20050912
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source: http://digilander.libero.it/paganf/coretors/myspell-fur-12092005.zip
-URL: http://digilander.libero.it/paganf/coretors/dizionaris.html
+Source: https://digilander.libero.it/paganf/coretors/myspell-fur-12092005.zip
+URL: https://digilander.libero.it/paganf/coretors/dizionaris.html
 License: GPLv2+
 BuildArch: noarch
 

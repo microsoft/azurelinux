@@ -13,7 +13,7 @@ Version:	3.12.1
 Release:	1%{?dist}
 
 License:	MIT
-URL:		http://github.com/rspec/rspec-mocks
+URL:		https://github.com/rspec/rspec-mocks
 Source0:	https://github.com/rspec/rspec-mocks/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)

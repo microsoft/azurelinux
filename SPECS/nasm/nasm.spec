@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.nasm.us
-Source0:        http://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
+Source0:        https://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.gz
 ExclusiveArch:  x86_64
 
 %description

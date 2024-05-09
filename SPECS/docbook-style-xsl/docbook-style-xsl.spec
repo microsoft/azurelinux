@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://www.docbook.org
-Source0:        http://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/docbook/docbook-xsl-%{version}.tar.bz2
 BuildRequires:  libxml2
 BuildRequires:  zip
 Requires:       docbook-dtd-xml
@@ -67,22 +67,22 @@ if [ ! -f %{_sysconfdir}/xml/catalog ]; then
 fi &&
 
 xmlcatalog --noout --add "rewriteSystem" \
-           "http://docbook.sourceforge.net/release/xsl/1.79.1" \
+           "https://docbook.sourceforge.net/release/xsl/1.79.1" \
            "%{_datadir}/xml/docbook/xsl-stylesheets-1.79.1" \
     %{_sysconfdir}/xml/catalog &&
 
 xmlcatalog --noout --add "rewriteURI" \
-           "http://docbook.sourceforge.net/release/xsl/1.79.1" \
+           "https://docbook.sourceforge.net/release/xsl/1.79.1" \
            "%{_datadir}/xml/docbook/xsl-stylesheets-1.79.1" \
     %{_sysconfdir}/xml/catalog &&
 
 xmlcatalog --noout --add "rewriteSystem" \
-           "http://docbook.sourceforge.net/release/xsl/current" \
+           "https://docbook.sourceforge.net/release/xsl/current" \
            "%{_datadir}/xml/docbook/xsl-stylesheets-1.79.1" \
     %{_sysconfdir}/xml/catalog &&
 
 xmlcatalog --noout --add "rewriteURI" \
-           "http://docbook.sourceforge.net/release/xsl/current" \
+           "https://docbook.sourceforge.net/release/xsl/current" \
            "%{_datadir}/xml/docbook/xsl-stylesheets-1.79.1" \
     %{_sysconfdir}/xml/catalog
 

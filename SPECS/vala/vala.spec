@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://wiki.gnome.org/Projects/Vala
-Source0:        http://download.gnome.org/sources/vala/%{majver}/vala-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/vala/%{majver}/vala-%{version}.tar.xz
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  bison

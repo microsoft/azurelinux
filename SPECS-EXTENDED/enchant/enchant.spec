@@ -5,8 +5,8 @@ Name: enchant
 Version: 1.6.0
 Release: 27%{?dist}
 License: LGPLv2+
-Source: http://www.abisource.com/downloads/enchant/%{version}/enchant-%{version}.tar.gz
-URL: http://www.abisource.com/
+Source: https://www.abisource.com/downloads/enchant/%{version}/enchant-%{version}.tar.gz
+URL: https://www.abisource.com/
 BuildRequires:  gcc-c++
 BuildRequires: glib2-devel >= 2.6.0
 BuildRequires: aspell-devel

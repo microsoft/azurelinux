@@ -5,7 +5,7 @@ Release:        41%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.hping.org/
+URL:            https://www.hping.org/
 Source0:        https://src.fedoraproject.org/lookaside/pkgs/hping3/hping3-20051105.tar.gz/ca4ea4e34bcc2162aedf25df8b2d1747/hping3-20051105.tar.gz
 Patch0:         hping3-include.patch
 Patch1:         hping3-bytesex.patch

@@ -4,8 +4,8 @@ Release:        4%{?dist}
 Summary:        Data compression library with very fast (de)compression
 Group:          System Environment/Libraries
 License:        GPLv2+
-URL:            http://www.oberhumer.com/opensource/lzo/
-Source0:        http://www.oberhumer.com/opensource/lzo/download/%{name}-%{version}.tar.gz
+URL:            https://www.oberhumer.com/opensource/lzo/
+Source0:        https://www.oberhumer.com/opensource/lzo/download/%{name}-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  zlib-devel

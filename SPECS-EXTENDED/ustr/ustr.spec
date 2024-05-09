@@ -32,8 +32,8 @@ Summary: String library, very low memory overhead, simple to import
 License: MIT or LGPLv2+ or BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.and.org/ustr/
-Source0: http://www.and.org/ustr/%{version}/%{name}-%{version}.tar.bz2
+URL: https://www.and.org/ustr/
+Source0: https://www.and.org/ustr/%{version}/%{name}-%{version}.tar.bz2
 Patch0: c99-inline.patch
 # BuildRequires: make gcc sed
 

@@ -5,8 +5,8 @@ Name:		iftop
 Version:	1.0
 Release:	1%{?dist}
 License:	GPLv2+
-URL:		http://www.ex-parrot.com/~pdw/%{name}/
-Source:		http://www.ex-parrot.com/~pdw/%{name}/download/%{name}-%{version}pre4.tar.gz
+URL:		https://www.ex-parrot.com/~pdw/%{name}/
+Source:		https://www.ex-parrot.com/~pdw/%{name}/download/%{name}-%{version}pre4.tar.gz
 Patch0:		iftop-1.0-ncursesw.patch
 Patch1:		iftop-1.0-git20181003.patch
 Patch2:		iftop-1.0-gcc10.patch

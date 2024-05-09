@@ -2,12 +2,12 @@ Summary:        Cross-platform path specification manipulation for Perl
 Name:           perl-Path-Class
 Version:        0.37
 Release:        9%{?dist}
-URL:            http://search.cpan.org/~kwilliams/Path-Class-0.37/
+URL:            https://search.cpan.org/~kwilliams/Path-Class-0.37/
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source:         http://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class-%{version}.tar.gz
+Source:         https://search.cpan.org/CPAN/authors/id/K/KW/KWILLIAMS/Path-Class-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0

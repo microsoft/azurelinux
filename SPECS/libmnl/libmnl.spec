@@ -3,11 +3,11 @@ Name:       libmnl
 Version:    1.0.5
 Release:        1%{?dist}
 License:    LGPLv2+
-URL:        http://netfilter.org/projects/libmnl
+URL:        https://netfilter.org/projects/libmnl
 Group:      System Environment/libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:     http://netfilter.org/projects/libmnl/files/%{name}-%{version}.tar.bz2
+Source0:     https://netfilter.org/projects/libmnl/files/%{name}-%{version}.tar.bz2
 Obsoletes:  libmnl-static
 
 %description

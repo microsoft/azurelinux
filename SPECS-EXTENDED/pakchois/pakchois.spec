@@ -5,8 +5,8 @@ Name: pakchois
 Version: 0.4
 Release: 23%{?dist}
 License: LGPLv2+
-URL: http://www.manyfish.co.uk/pakchois/
-Source0: http://www.manyfish.co.uk/pakchois/pakchois-%{version}.tar.gz
+URL: https://www.manyfish.co.uk/pakchois/
+Source0: https://www.manyfish.co.uk/pakchois/pakchois-%{version}.tar.gz
 Source1: %{name}-LICENSE.txt
 BuildRequires:  gcc
 BuildRequires: gettext

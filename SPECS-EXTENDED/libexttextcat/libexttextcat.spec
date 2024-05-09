@@ -7,7 +7,7 @@ Summary: Text categorization library
 
 License: BSD
 URL: https://wiki.documentfoundation.org/Libexttextcat
-Source: http://dev-www.libreoffice.org/src/libexttextcat/%{name}-%{version}.tar.xz
+Source: https://dev-www.libreoffice.org/src/libexttextcat/%{name}-%{version}.tar.xz
 
 BuildRequires: gcc
 

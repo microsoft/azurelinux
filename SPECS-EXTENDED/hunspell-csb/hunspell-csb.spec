@@ -5,8 +5,8 @@ Summary: Kashubian hunspell dictionaries
 %global upstreamid 20050311
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source: http://ftp.gnu.org/gnu/aspell/dict/csb/aspell6-csb-0.02-0.tar.bz2
-URL: http://borel.slu.edu/crubadan/apps.html
+Source: https://ftp.gnu.org/gnu/aspell/dict/csb/aspell6-csb-0.02-0.tar.bz2
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPLv2+
 BuildArch: noarch
 BuildRequires: aspell, hunspell-devel

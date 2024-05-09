@@ -14,7 +14,7 @@ Release:        1%{?dist}
 License:        Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://python-ldap.org/
+URL:            https://python-ldap.org/
 Source0:        https://files.pythonhosted.org/packages/source/p/%{name}/%{name}-%{version}%{?prerelease}.tar.gz
 
 # Test dependencies
@@ -63,7 +63,7 @@ sed -i 's,-Werror,-Wignore,g' tox.ini
 
 %check
 # don't download packages
-export PIP_INDEX_URL=http://host.invalid./
+export PIP_INDEX_URL=https://host.invalid./
 export PIP_NO_DEPS=yes
 TOXENV=py%{python3_version_nodots} LOGLEVEL=10 tox --sitepackages
 

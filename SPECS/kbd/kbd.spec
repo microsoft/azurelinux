@@ -6,8 +6,8 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
-URL:            http://ftp.altlinux.org/pub/people/legion/kbd
-Source0:        http://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
+URL:            https://ftp.altlinux.org/pub/people/legion/kbd
+Source0:        https://ftp.altlinux.org/pub/people/legion/kbd/%{name}-%{version}.tar.xz
 Patch0:         kbd-2.0.4-backspace-1.patch
 
 BuildRequires:  check >= 0.9.4

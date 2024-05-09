@@ -4,9 +4,9 @@ Name: hunspell-fr
 Summary: French hunspell dictionaries
 Version: 6.2
 Release: 6%{?dist}
-Source0: http://www.dicollecte.org/download/fr/hunspell-french-dictionaries-v%{version}.zip
+Source0: https://www.dicollecte.org/download/fr/hunspell-french-dictionaries-v%{version}.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.dicollecte.org/home.php?prj=fr
+URL: https://www.dicollecte.org/home.php?prj=fr
 License: MPLv2.0
 BuildArch: noarch
 
@@ -161,7 +161,7 @@ popd
 - latest version
 
 * Fri Dec 21 2007 Caolán McNamara <caolanm@redhat.com> - 2.0.5-1
-- project moved to http://dico.savant.free.fr and a new release
+- project moved to https://dico.savant.free.fr and a new release
 
 * Fri Aug 03 2007 Caolán McNamara <caolanm@redhat.com> - 0.20060915-2
 - clarify license version

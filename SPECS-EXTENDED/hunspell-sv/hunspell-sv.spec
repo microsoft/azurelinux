@@ -4,8 +4,8 @@ Name: hunspell-sv
 Summary: Swedish hunspell dictionaries
 Version: 2.28
 Release: 13%{?dist}
-Source: http://extensions.libreoffice.org/extension-center/swedish-spelling-dictionary-den-stora-svenska-ordlistan/releases/2.28/ooo_swedish_dict_2-28.oxt
-URL: http://dsso.se/
+Source: https://extensions.libreoffice.org/extension-center/swedish-spelling-dictionary-den-stora-svenska-ordlistan/releases/2.28/ooo_swedish_dict_2-28.oxt
+URL: https://dsso.se/
 License: LGPLv3
 BuildArch: noarch
 

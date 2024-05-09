@@ -8,7 +8,7 @@ Version:    2.2.12
 Release:    6%{?dist}
 # COPYING:                      GPLv3 text
 # doc/indent.info:              Verbatim (generated from doc/indent.texi)
-#   <http://lists.gnu.org/archive/html/bug-indent/2018-09/msg00008.html>
+#   <https://lists.gnu.org/archive/html/bug-indent/2018-09/msg00008.html>
 # doc/indent.texi:              Verbatim (or GPL?)
 # src/code_io.c:                BSD
 # src/globs.c:                  GPLv3+
@@ -30,18 +30,18 @@ Release:    6%{?dist}
 # intl/plural.c:                LGPLv2+ with exception
 # intl/vasnprintf.c:            LGPLv2+
 License:    GPLv3+ and BSD and Verbatim
-URL:        http://www.gnu.org/software/%{name}/
-Source:     http://ftpmirror.gnu.org/%{name}/%{name}-%{version}.tar.xz
+URL:        https://www.gnu.org/software/%{name}/
+Source:     https://ftpmirror.gnu.org/%{name}/%{name}-%{version}.tar.xz
 # Correct documentation, proposed to upstream
-# <http://lists.gnu.org/archive/html/bug-indent/2018-09/threads.html>
+# <https://lists.gnu.org/archive/html/bug-indent/2018-09/threads.html>
 Patch1:     indent-2.2.12-doc-Fix-dont-cuddle-else-short-option-and-index-remo.patch
 # Add AX_CC_FOR_BUILD m4 macro definition, copied from
-# <http://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=blob_plain;f=m4/ax_cc_for_build.m4>,
+# <https://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=blob_plain;f=m4/ax_cc_for_build.m4>,
 # license is "GPLv3+ with exception", proposed to upstream
-# <http://lists.gnu.org/archive/html/bug-indent/2018-09/threads.html>
+# <https://lists.gnu.org/archive/html/bug-indent/2018-09/threads.html>
 Patch2:     indent-2.2.12-Add-m4-ax_cc_for_build.m4-for-CC_FOR_BUILD.patch
 # Recognize binary integer literals, bug #1655319, submitted to the upstream
-# <http://lists.gnu.org/archive/html/bug-indent/2018-12/msg00000.html>
+# <https://lists.gnu.org/archive/html/bug-indent/2018-12/msg00000.html>
 Patch3:     indent-2.2.12-Recognize-binary-integer-literals.patch
 # Update config.sub to support aarch64, bug #925588
 BuildRequires:  autoconf

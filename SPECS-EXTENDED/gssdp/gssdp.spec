@@ -213,22 +213,22 @@ This package contains developer documentation for %{name}.
 
 * Tue Apr 26 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.15-1
 - 0.14.15 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.15.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.15.news
 
 * Thu Feb 11 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.14-1
 - 0.14.14 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.14.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.14.news
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.13-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
 * Mon Jan 4  2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.13-1
 - 0.14.13 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.13.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.13.news
 
 * Wed Nov 25 2015 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.12-1
 - 0.14.12 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.12.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.12.news
 - Use %%license
 
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.14.11-2
@@ -236,18 +236,18 @@ This package contains developer documentation for %{name}.
 
 * Tue Jan  6 2015 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.11-1
 - 0.14.11 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.11.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.11.news
 
 * Mon Aug 18 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.10-1
 - 0.14.10 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.10.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.10.news
 
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.14.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
 * Sun Jul 27 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.9-1
 - 0.14.9 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.9.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.9.news
 
 * Tue Jul 22 2014 Kalev Lember <kalevlember@gmail.com> - 0.14.8-4
 - Rebuilt for gobject-introspection 1.41.4
@@ -260,65 +260,65 @@ This package contains developer documentation for %{name}.
 
 * Sun May 25 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.8-1
 - 0.14.8 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.8.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.8.news
 
 * Tue Feb  4 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.7-1
 - 0.14.7 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.7.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.7.news
 
 * Sun Nov  3 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.6-1
 - 0.14.6 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.6.news
 
 * Mon Sep  9 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.5-1
 - 0.14.5 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.5.news
 
 * Tue Jul 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.4-1
 - 0.14.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.4.news
 
 * Thu May 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.3-1
 - 0.14.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.3.news
 
 * Tue Mar  5 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.2-1
 - 0.14.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.2.news
 
 * Sat Feb 23 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.1-1
 - 0.14.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.1.news
 
 * Wed Feb 20 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.14.0
 - 0.14.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.14/gssdp-0.14.0.news
 
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.13.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Sat Dec  1 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.13.2-1
 - 0.13.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.2.news
 
 * Mon Oct 29 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.13.1-1
 - 0.13.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.1.news
 
 * Sun Oct  7 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.13.0-1
 - 0.13.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.13/gssdp-0.13.0.news
 
 * Tue Aug 28 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12.2.1-2
 - Enable vala bindings
 
 * Tue Aug 21 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12.2.1-1
 - 0.12.2.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.2.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.2.1.news
 
 * Sun Aug 19 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12.2-1
 - 0.12.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.2.news
 
 * Thu Jul 19 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12.1-4
 - Split utils out to a sub package to reduce libs deps. RHBZ #840689
@@ -331,22 +331,22 @@ This package contains developer documentation for %{name}.
 
 * Sat Dec 10 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.12.1-1
 - 0.12.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.1.news
 
 * Tue Nov 08 2011 Adam Jackson <ajax@redhat.com> - 0.12.0-2
 - Rebuild to break bogus libpng dep
 
 * Fri Sep  2 2011 Zeeshan Ali <zeenix@redhat.com> - 0.12.0-1
 - 0.12.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.12/gssdp-0.12.0.news
 
 * Fri Aug  5 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.11.2-1
 - 0.11.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.11/gssdp-0.11.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.11/gssdp-0.11.2.news
 
 * Sun Jul 17 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.11.1-1
 - 0.11.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gssdp/0.11/gssdp-0.11.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gssdp/0.11/gssdp-0.11.1.news
 
 * Thu Jun 16 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.11.0-1
 - 0.11.0 release

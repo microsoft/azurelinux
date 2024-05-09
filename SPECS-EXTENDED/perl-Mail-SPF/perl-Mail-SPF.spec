@@ -43,7 +43,7 @@ BuildArch:      noarch
 
 %description
 Mail::SPF is an object-oriented implementation of Sender Policy Framework
-(SPF). See http://www.openspf.org for more information about SPF.
+(SPF). See https://www.openspf.org for more information about SPF.
 
 %prep
 %autosetup -n Mail-SPF-v%{version} -p0

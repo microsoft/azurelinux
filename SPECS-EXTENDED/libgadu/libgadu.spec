@@ -9,7 +9,7 @@ Summary:	A Gadu-gadu protocol compatible communications library
 License:	LGPLv2
 Source0:	https://github.com/wojtekka/libgadu/releases/download/%{version}%{?rcver}/libgadu-%{version}%{?rcver}.tar.gz
 Patch0:	libgadu-1.12.2-gcc10.patch
-URL:		http://libgadu.net/
+URL:		https://libgadu.net/
 BuildRequires:  gcc
 BuildRequires:	curl-devel
 BuildRequires:	doxygen
@@ -221,7 +221,7 @@ make check
 * Sun Mar 14 2010 Dominik Mierzejewski <rpm@greysector.net> 1.9.0-0.4.rc3
 - updated to 1.9.0-rc3
 - adds basic support for new GG protocol (UTF-8 and new status messages)
-- full upstream changelog (Polish only) http://toxygen.net/libgadu/releases/1.9.0-rc3.html
+- full upstream changelog (Polish only) https://toxygen.net/libgadu/releases/1.9.0-rc3.html
 - drop Requires: openssl-devel from -devel subpackage
 
 * Sun Dec 06 2009 Dominik Mierzejewski <rpm@greysector.net> 1.9.0-0.3.rc2

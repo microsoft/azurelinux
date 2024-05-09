@@ -9,7 +9,7 @@ Release:       1%{?dist}
 License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:   Azure Linux
-URL:           http://github.com/rtomayko/rdiscount
+URL:           https://github.com/rtomayko/rdiscount
 Source0:       https://github.com/davidfstr/rdiscount/archive/refs/tags/%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby
 

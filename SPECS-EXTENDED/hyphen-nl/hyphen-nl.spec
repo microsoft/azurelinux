@@ -5,9 +5,9 @@ Summary: Dutch hyphenation rules
 %global upstreamid 20050617
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_nl_NL.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_nl_NL.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPLv2
 BuildArch: noarch
 Requires: hyphen

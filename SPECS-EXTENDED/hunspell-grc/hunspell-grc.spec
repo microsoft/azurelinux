@@ -5,7 +5,7 @@ Summary: Ancient Greek hunspell dictionaries
 Version: 2.1.5
 Release: 21%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2313/1/grc.oxt
-URL: http://www.himeros.eu/
+URL: https://www.himeros.eu/
 License: GPL+ or LGPLv2+
 BuildArch: noarch
 

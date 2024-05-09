@@ -105,7 +105,7 @@ make test
 * Mon Apr 17 2017 Paul Howarth <paul@city-fan.org> - 1.44.3-1
 - Update to 1.443
   - Found another relative path require issue:
-    http://blogs.perl.org/users/ryan_voots/2017/04/trials-and-troubles-with-changing-inc.html
+    https://blogs.perl.org/users/ryan_voots/2017/04/trials-and-troubles-with-changing-inc.html
   - This is another attempt at avoiding failures from the v5.26 removal of . from @INC
 - Drop redundant Group: tag
 

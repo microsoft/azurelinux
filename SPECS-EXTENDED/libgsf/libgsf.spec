@@ -6,7 +6,7 @@ Version: 1.14.47
 Release: 2%{?dist}
 License: LGPLv2
 Source: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/1.14/%{name}-%{version}.tar.xz
-URL: http://www.gnome.org/projects/libgsf/
+URL: https://www.gnome.org/projects/libgsf/
 
 BuildRequires: bzip2-devel
 BuildRequires: chrpath

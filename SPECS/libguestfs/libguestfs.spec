@@ -275,7 +275,7 @@ Provides:       bundled(gnulib)
 
 %description
 Libguestfs is a library for accessing and modifying virtual machine
-disk images.  http://libguestfs.org
+disk images.  https://libguestfs.org
 
 It can be used to make batch configuration changes to guests, get disk
 used/free statistics (virt-df), perform backups and guest clones,
@@ -3841,7 +3841,7 @@ rm ocaml/html/.gitignore
 
 * Mon Jun 20 2011 Richard W.M. Jones <rjones@redhat.com> - 1:1.11.10-3
 - Temporarily stop setting CCFLAGS in perl subdirectory.
-  See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=628522
+  See: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=628522
 
 * Fri Jun 17 2011 Marcela Mašláňová <mmaslano@redhat.com> - 1:1.11.10-2
 - Perl mass rebuild
@@ -3966,7 +3966,7 @@ rm ocaml/html/.gitignore
 
 * Sun Feb  6 2011 Richard W.M. Jones <rjones@redhat.com> - 1:1.9.7-7
 - Rebuild against rpm-4.9.0-0.beta1.6.fc15 to fix OCaml deps.  See discussion:
-  http://lists.fedoraproject.org/pipermail/devel/2011-February/148398.html
+  https://lists.fedoraproject.org/pipermail/devel/2011-February/148398.html
 
 * Wed Feb  2 2011 Richard W.M. Jones <rjones@redhat.com> - 1:1.9.7-6
 - Add temporary non-upstream patch to fix /etc/mtab.

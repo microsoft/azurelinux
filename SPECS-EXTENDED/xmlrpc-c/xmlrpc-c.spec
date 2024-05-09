@@ -385,7 +385,7 @@ make -C examples/cpp clean
 * Fri Mar 24 2017 mpluskal@suse.com
 - Update to version 1.39.12:
   * For full list of changes see:
-    http://xmlrpc-c.sourceforge.net/change_super_stable.html
+    https://xmlrpc-c.sourceforge.net/change_super_stable.html
 - Drop upstreamed narrowing.patch
 - Add xmlrpc-c-no_return_nonvoid.patch
 

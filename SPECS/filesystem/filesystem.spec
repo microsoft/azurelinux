@@ -5,7 +5,7 @@ Release:      21%{?dist}
 License:      GPLv3
 Group:        System Environment/Base
 Vendor:       Microsoft Corporation
-URL:          http://www.linuxfromscratch.org
+URL:          https://www.linuxfromscratch.org
 Distribution:   Azure Linux
 
 %description
@@ -145,16 +145,16 @@ PROXY_ENABLED="no"
 
 # Some programs (e.g. wget) support proxies, if set in
 # the environment.
-# Example: HTTP_PROXY="http://proxy.provider.de:3128/"
+# Example: HTTP_PROXY="https://proxy.provider.de:3128/"
 HTTP_PROXY=""
 
 # Example: HTTPS_PROXY="https://proxy.provider.de:3128/"
 HTTPS_PROXY=""
 
-# Example: FTP_PROXY="http://proxy.provider.de:3128/"
+# Example: FTP_PROXY="https://proxy.provider.de:3128/"
 FTP_PROXY=""
 
-# Example: GOPHER_PROXY="http://proxy.provider.de:3128/"
+# Example: GOPHER_PROXY="https://proxy.provider.de:3128/"
 GOPHER_PROXY=""
 
 # Example: SOCKS_PROXY="socks://proxy.example.com:8080"

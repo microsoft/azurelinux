@@ -6,8 +6,8 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Networking
-URL:            http://sourceforge.net/projects/sshpass/
-Source0:        http://downloads.sourceforge.net/project/sshpass/%{name}/%{version}/%{name}-%{version}.tar.gz
+URL:            https://sourceforge.net/projects/sshpass/
+Source0:        https://downloads.sourceforge.net/project/sshpass/%{name}/%{version}/%{name}-%{version}.tar.gz
 Requires:       openssh
 
 %description

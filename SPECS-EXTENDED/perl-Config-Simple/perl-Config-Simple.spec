@@ -8,7 +8,7 @@ Summary:        Simple configuration file class
 #see README
 License:        GPL+ or Artistic
 URL:            https://metacpan.org/release/Config-Simple
-Source0:        http://cpan.org/authors/id/S/SH/SHERZODR/Config-Simple-%{version}.tar.gz
+Source0:        https://cpan.org/authors/id/S/SH/SHERZODR/Config-Simple-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  coreutils

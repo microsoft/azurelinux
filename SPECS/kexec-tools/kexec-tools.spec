@@ -13,7 +13,7 @@ Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/horms/kexec-tools
 
-Source0: http://kernel.org/pub/linux/utils/kernel/kexec/%{name}-%{version}.tar.xz
+Source0: https://kernel.org/pub/linux/utils/kernel/kexec/%{name}-%{version}.tar.xz
 Source1: kdumpctl
 Source2: kdump.sysconfig
 Source3: kdump.sysconfig.x86_64

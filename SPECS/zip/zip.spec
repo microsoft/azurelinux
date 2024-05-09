@@ -3,7 +3,7 @@ Name:           zip
 Version:        3.0
 Release:        6%{?dist}
 License:        BSD
-URL:            http://infozip.sourceforge.net/
+URL:            https://infozip.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/infozip/zip30.tar.gz
 Patch:          CVE-2018-13410.patch
 Group:          SystemUtilities

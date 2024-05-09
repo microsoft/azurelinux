@@ -5,7 +5,7 @@ Release: 38%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.gnu.org/software/rx/rx.html
+URL: https://www.gnu.org/software/rx/rx.html
 # Originally downloaded from ftp://ftp.gnu.org/gnu/rx/rx-1.5.tar.bz2
 # The FSF no longer offers this code.
 Source0: %{_distro_sources_url}/rx-%{version}.tar.bz2

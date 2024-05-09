@@ -7,8 +7,8 @@ Release:        20%{?dist}
 Summary:        RDF Application Framework
 
 License:        LGPLv2+ or ASL 2.0
-URL:            http://librdf.org/
-Source0:        http://download.librdf.org/source/%{name}-%{version}.tar.gz
+URL:            https://librdf.org/
+Source0:        https://download.librdf.org/source/%{name}-%{version}.tar.gz
 
 BuildRequires:  curl-devel
 BuildRequires:  gcc-c++

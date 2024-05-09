@@ -7,9 +7,9 @@ Summary:        Small, fast speech synthesis engine (text-to-speech)
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.speech.cs.cmu.edu/flite/
+URL:            https://www.speech.cs.cmu.edu/flite/
 
-Source0:        http://www.speech.cs.cmu.edu/flite/packed/%{name}-%{version}/%{name}-%{version}-release.tar.gz
+Source0:        https://www.speech.cs.cmu.edu/flite/packed/%{name}-%{version}/%{name}-%{version}-release.tar.gz
 Source1:        README-ALSA.txt
 Patch0:         flite-1.3-sharedlibs.patch
 Patch1:         flite-1.3-doc_texinfo.patch

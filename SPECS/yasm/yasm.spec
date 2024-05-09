@@ -148,20 +148,20 @@ make install DESTDIR=%{buildroot}
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
-* Sun Aug 15 2010 Matthias Saou <http://freshrpms.net/> 1.1.0-1
+* Sun Aug 15 2010 Matthias Saou <https://freshrpms.net/> 1.1.0-1
 - Update to 1.1.0 (#622240).
 
-* Thu Jul 29 2010 Matthias Saou <http://freshrpms.net/> 1.0.1-2
+* Thu Jul 29 2010 Matthias Saou <https://freshrpms.net/> 1.0.1-2
 - Provide static sub-package from devel (#609626).
 
-* Sun May 23 2010 Matthias Saou <http://freshrpms.net/> 1.0.1-1
+* Sun May 23 2010 Matthias Saou <https://freshrpms.net/> 1.0.1-1
 - Update to 1.0.1 (#593250).
 
-* Wed Apr 28 2010 Matthias Saou <http://freshrpms.net/> 1.0.0-1
+* Wed Apr 28 2010 Matthias Saou <https://freshrpms.net/> 1.0.0-1
 - Update to 1.0.0 (#580872).
 - Include new vsyasm binary.
 
-* Mon Dec  7 2009 Matthias Saou <http://freshrpms.net/> 0.8.0-1
+* Mon Dec  7 2009 Matthias Saou <https://freshrpms.net/> 0.8.0-1
 - Update to 0.8.0 (#523729).
 - Include new ytasm binary.
 
@@ -171,7 +171,7 @@ make install DESTDIR=%{buildroot}
 * Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
-* Wed Dec 24 2008 Matthias Saou <http://freshrpms.net/> 0.7.2-1
+* Wed Dec 24 2008 Matthias Saou <https://freshrpms.net/> 0.7.2-1
 - Update to 0.7.2.
 - Remove useless /sbin/ldconfig calls, as we don't ship any shared library.
 - Update summary.
@@ -180,43 +180,43 @@ make install DESTDIR=%{buildroot}
 - fix license tag so that it doesn't trigger a false positive on the check
   script.
 
-* Tue May 20 2008 Matthias Saou <http://freshrpms.net/> 0.7.1-1
+* Tue May 20 2008 Matthias Saou <https://freshrpms.net/> 0.7.1-1
 - Update to 0.7.1.
 
-* Tue May 13 2008 Matthias Saou <http://freshrpms.net/> 0.7.0-1
+* Tue May 13 2008 Matthias Saou <https://freshrpms.net/> 0.7.0-1
 - Update to 0.7.0.
 
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org>
 - Autorebuild for GCC 4.3
 
-* Mon Sep 24 2007 Matthias Saou <http://freshrpms.net/> 0.6.2-1
+* Mon Sep 24 2007 Matthias Saou <https://freshrpms.net/> 0.6.2-1
 - Update to 0.6.2.
 
-* Thu Aug 23 2007 Matthias Saou <http://freshrpms.net/> 0.6.1-3
+* Thu Aug 23 2007 Matthias Saou <https://freshrpms.net/> 0.6.1-3
 - Rebuild for new BuildID feature.
 
-* Fri Aug  3 2007 Matthias Saou <http://freshrpms.net/> 0.6.1-2
+* Fri Aug  3 2007 Matthias Saou <https://freshrpms.net/> 0.6.1-2
 - Update License field, it wasn't simply "BSD"...
 
-* Tue Jun 19 2007 Matthias Saou <http://freshrpms.net/> 0.6.1-1
+* Tue Jun 19 2007 Matthias Saou <https://freshrpms.net/> 0.6.1-1
 - Update to 0.6.1.
 
-* Sun Feb 25 2007 Matthias Saou <http://freshrpms.net/> 0.6.0-1
+* Sun Feb 25 2007 Matthias Saou <https://freshrpms.net/> 0.6.0-1
 - Update to 0.6.0.
 
-* Mon Aug 28 2006 Matthias Saou <http://freshrpms.net/> 0.5.0-2
+* Mon Aug 28 2006 Matthias Saou <https://freshrpms.net/> 0.5.0-2
 - FC6 rebuild.
 - Require the same release in the devel sub-package.
 
-* Fri Jul 14 2006 Matthias Saou <http://freshrpms.net/> 0.5.0-1
+* Fri Jul 14 2006 Matthias Saou <https://freshrpms.net/> 0.5.0-1
 - Update to 0.5.0.
 - Remove empty files from %%doc.
 - There are no more shared libraries, only a static one, so update %%files.
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 0.4.0-6
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 0.4.0-6
 - FC5 rebuild.
 
-* Thu Feb  9 2006 Matthias Saou <http://freshrpms.net/> 0.4.0-5
+* Thu Feb  9 2006 Matthias Saou <https://freshrpms.net/> 0.4.0-5
 - Rebuild for new gcc/glibc.
 
 * Sun May 22 2005 Jeremy Katz <katzj@redhat.com> - 0.4.0-4
@@ -228,5 +228,5 @@ make install DESTDIR=%{buildroot}
 * Mon Feb 14 2005 David Woodhouse <dwmw2@infradead.org> 0.4.0-2
 - Fix corruption in genmacro
 
-* Fri Jan 28 2005 Matthias Saou <http://freshrpms.net/> 0.4.0-1
+* Fri Jan 28 2005 Matthias Saou <https://freshrpms.net/> 0.4.0-1
 - Initial RPM release.

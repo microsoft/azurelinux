@@ -7,8 +7,8 @@ Version: 0.%{upstreamid}
 Release: 18%{?dist}
 # Following links are dead now
 # don't report any bugs
-Source: http://www.runasimipi.org/quh_BO-pack.zip
-URL: http://www.runasimipi.org/blanco-en.php?file=desarrollar-orto
+Source: https://www.runasimipi.org/quh_BO-pack.zip
+URL: https://www.runasimipi.org/blanco-en.php?file=desarrollar-orto
 License: GPLv2+
 BuildArch: noarch
 

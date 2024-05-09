@@ -462,7 +462,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/vino-server.desktop
 
 * Mon Apr 13 2009 Matthias Clasen <mclasen@redhat.com> - 2.26.1-1
 - Update to 2.26.1
-- See http://download.gnome.org/sources/vino/2.26/vino-2.26.1.news
+- See https://download.gnome.org/sources/vino/2.26/vino-2.26.1.news
 
 * Mon Mar 16 2009 Matthias Clasen <mclasen@redhat.com> - 2.26.0-1
 - Update to 2.26.0

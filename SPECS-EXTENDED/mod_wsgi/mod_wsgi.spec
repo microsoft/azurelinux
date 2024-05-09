@@ -324,7 +324,7 @@ ln -s %{_bindir}/mod_wsgi-express-2 $RPM_BUILD_ROOT%{_bindir}/mod_wsgi-express
 
 * Tue Dec 11 2012 Jan Kaluza <jkaluza@redhat.com> - 3.4-7
 - compile with -fno-strict-aliasing to workaround Python
-  bug http://www.python.org/dev/peps/pep-3123/
+  bug https://www.python.org/dev/peps/pep-3123/
 
 * Thu Nov 22 2012 Joe Orton <jorton@redhat.com> - 3.4-6
 - use _httpd_moddir macro

@@ -1070,7 +1070,7 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 * Fri Dec 28 2012 Richard W.M. Jones <rjones@redhat.com> - 1.9.1-15
 - Rebuild, see
-  http://lists.fedoraproject.org/pipermail/devel/2012-December/175685.html
+  https://lists.fedoraproject.org/pipermail/devel/2012-December/175685.html
 
 * Thu Dec 13 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 1.9.1-14
 - Tweak -fpic CFLAGS to fix FTBFS on ARM
@@ -1161,7 +1161,7 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 * Thu Feb  9 2012 Volker Fröhlich <volker27@gmx.at> - 1.7.3-13
 - Rebuild for Ruby 1.9
-  http://lists.fedoraproject.org/pipermail/ruby-sig/2012-January/000805.html
+  https://lists.fedoraproject.org/pipermail/ruby-sig/2012-January/000805.html
 
 * Tue Jan 10 2012 Volker Fröhlich <volker27@gmx.at> - 1.7.3-12
 - Remove FC10 specific patch0
@@ -1194,7 +1194,7 @@ ctest -E "autotest_osr|autotest_alg|autotest_gdrivers|autotest_gcore"
 
 * Fri Apr 22 2011 Volker Fröhlich <volker27@gmx.at> - 1.7.3-9
 - Patched spaces problem for Mapinfo files (mif)
-  (http://trac.osgeo.org/gdal/ticket/3694)
+  (https://trac.osgeo.org/gdal/ticket/3694)
 - Replaced all define macros with global
 - Corrected ruby_sitelib to ruby_sitearch
 - Use python_lib and ruby_sitearch instead of generating lists

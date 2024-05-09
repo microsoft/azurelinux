@@ -4,9 +4,9 @@ Name: hunspell-el
 Summary: Greek hunspell dictionaries
 Version: 0.9
 Release: 7%{?dist}
-Source0: http://ispell.math.upatras.gr/files/ooffice/el_GR-%{version}.zip
+Source0: https://ispell.math.upatras.gr/files/ooffice/el_GR-%{version}.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.elspell.gr/
+URL: https://www.elspell.gr/
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch
 

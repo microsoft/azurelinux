@@ -4,9 +4,9 @@ Name: hunspell-hu
 Summary: Hungarian hunspell dictionaries
 Version: 1.6.1
 Release: 18%{?dist}
-Source0: http://downloads.sourceforge.net/magyarispell/hu_HU-%{version}.tar.gz
+Source0: https://downloads.sourceforge.net/magyarispell/hu_HU-%{version}.tar.gz
 Source1: %{name}-LICENSE.txt
-URL: http://magyarispell.sourceforge.net
+URL: https://magyarispell.sourceforge.net
 License: LGPLv2+ or GPLv2+ or MPLv1.1
 BuildArch: noarch
 

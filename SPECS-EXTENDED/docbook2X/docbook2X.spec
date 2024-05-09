@@ -6,8 +6,8 @@ Release:        36%{?dist}
 Summary:        Convert docbook into man and Texinfo
 
 License:        MIT
-URL:            http://docbook2x.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/docbook2x/docbook2X-%{version}.tar.gz
+URL:            https://docbook2x.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/docbook2x/docbook2X-%{version}.tar.gz
 
 
 BuildRequires:  gcc

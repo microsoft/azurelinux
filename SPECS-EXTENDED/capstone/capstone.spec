@@ -6,7 +6,7 @@ Release:        4%{?dist}
 Summary:        A lightweight multi-platform, multi-architecture disassembly framework
 
 License:        BSD
-URL:            http://www.capstone-engine.org/
+URL:            https://www.capstone-engine.org/
 #               https://github.com/aquynh/capstone/releases
 Source0:        https://github.com/aquynh/capstone/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 

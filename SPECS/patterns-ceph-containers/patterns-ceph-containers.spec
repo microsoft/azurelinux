@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Metapackages
-URL:            http://en.opensuse.org/Patterns
+URL:            https://en.opensuse.org/Patterns
 
 %description
 This is an internal package that is used to create the patterns as part

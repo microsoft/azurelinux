@@ -13,7 +13,7 @@ Release:	5%{?dist}
 Summary:	IBM's TCG Software Stack (TSS) for TPM 2.0 and related utilities
 
 License:	BSD
-URL:		http://sourceforge.net/projects/ibmtpm20tss/
+URL:		https://sourceforge.net/projects/ibmtpm20tss/
 Source0:	https://sourceforge.net/projects/ibmtpm20tss/files/ibmtss%{version}.tar.gz
 Patch1: flags-fixup.patch
 Patch2: hash_generate.patch

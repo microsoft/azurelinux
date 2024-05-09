@@ -6,7 +6,7 @@ Version: 1.0.0
 Release: 15%{?dist}
 License:        GPLv2+
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git
-Source0: http://anishpatil.fedorapeople.org/or_in.%{version}.tar.gz
+Source0: https://anishpatil.fedorapeople.org/or_in.%{version}.tar.gz
 BuildRequires:  hunspell-devel
 Requires:       hunspell
 Supplements: (hunspell and langpacks-or)

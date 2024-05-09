@@ -5,7 +5,7 @@ Version:        2.4.4
 Release:        4%{?dist}
 Summary:        Analyzes Python code looking for bugs and signs of poor quality
 License:        GPLv2+
-URL:            http://www.pylint.org/
+URL:            https://www.pylint.org/
 Source0:        %{pypi_source}
 
 BuildArch:      noarch
@@ -340,7 +340,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 * Thu Jan 10 2013 Brian C. Lane <bcl@redhat.com> 0.26.0-1
 - Upstream 0.26.0
 - Add python3-pylint and python3-pylint-gui subpackages. Not ready to turn it
-  on yet due to this upstream bug: http://www.logilab.org/ticket/110213
+  on yet due to this upstream bug: https://www.logilab.org/ticket/110213
 
 * Fri Aug 03 2012 Brian C. Lane <bcl@redhat.com> 0.25.2-1
 - Upstream 0.25.2
@@ -379,7 +379,7 @@ export PYTHONPATH=%{buildroot}%{python3_sitelib}
 
 * Thu Jul 08 2010 Brian C. Lane <bcl@redhat.com> - 0.21.1-1
 - Upstream 0.21.1
-- Removed patch for 500272, fixed upstream - http://www.logilab.org/ticket/22962
+- Removed patch for 500272, fixed upstream - https://www.logilab.org/ticket/22962
 
 * Mon Apr 05 2010 Brian C. Lane <bcl@redhat.com> - 0.20.0-2
 - Added patch for bug 500272 (exception with --disable-msg-cat)

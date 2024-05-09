@@ -4,10 +4,10 @@ Name:           libbsd
 Version:        0.10.0
 Release:        3%{?dist}
 Summary:        Library providing BSD-compatible functions for portability
-URL:            http://libbsd.freedesktop.org/
+URL:            https://libbsd.freedesktop.org/
 License:        BSD and ISC and Copyright only and Public Domain
 
-Source0:        http://libbsd.freedesktop.org/releases/libbsd-%{version}.tar.xz
+Source0:        https://libbsd.freedesktop.org/releases/libbsd-%{version}.tar.xz
 Patch1:         %{name}-0.8.3-deprecated.patch
 Patch2:         %{name}-0.8.6-compat.patch
 
@@ -34,7 +34,7 @@ The libbsd-ctor static library is required if setproctitle() is to be used
 when libbsd is loaded via dlopen() from a threaded program.  This can be
 configured using "pkg-config --libs libbsd-ctor".
 # See the libbsd mailing list message by Guillem Jover on Jul 14 2013:
-#     http://lists.freedesktop.org/archives/libbsd/2013-July/000091.html
+#     https://lists.freedesktop.org/archives/libbsd/2013-July/000091.html
 
 %prep
 %setup -q

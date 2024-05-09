@@ -24,7 +24,7 @@ Release:        4%{?dist}
 Summary:        Java library for working with HTML
 License:        MIT
 Group:          Development/Libraries/Java
-URL:            http://jsoup.org/
+URL:            https://jsoup.org/
 # ./generate-tarball.sh
 # The sources contain non-free scraped web pages as test data
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz

@@ -37,7 +37,7 @@ autoreconf -ivf
 # WavPack "autodetects" CPU type to enable ASM code. However, the assembly code
 # for ARM is written for ARMv7 only and building WavPack for an ARM-non-v7
 # architecture will fail.
-# http://lists.busybox.net/pipermail/buildroot/2015-October/142117.html
+# https://lists.busybox.net/pipermail/buildroot/2015-October/142117.html
 %configure --disable-static \
 %ifarch armv3l armv4b armv4l armv4tl armv5tel armv5tejl armv6l armv6hl
     --disable-asm \

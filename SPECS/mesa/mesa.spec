@@ -71,7 +71,7 @@ Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.mesa3d.org
+URL:            https://www.mesa3d.org
 
 Source0:        https://archive.mesa3d.org/%{name}-%{version}.tar.xz
 # src/gallium/auxiliary/postprocess/pp_mlaa* have an ... interestingly worded license.

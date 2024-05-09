@@ -11,7 +11,7 @@ Release: 1%{?dist}
 License: JasPer-2.0
 Vendor:  Microsoft Corporation
 Distribution: Azure Linux
-URL:     http://www.ece.uvic.ca/~frodo/jasper/
+URL:     https://www.ece.uvic.ca/~frodo/jasper/
 Source0: https://github.com/jasper-software/%{name}/archive/refs/tags/version-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # architecture related patches

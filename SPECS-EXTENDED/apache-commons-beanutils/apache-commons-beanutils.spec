@@ -155,7 +155,7 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
   * BEANUTILS-495: DateConverterTestBase fails on M/d/yy in Java 9.
   * BEANUTILS-496: testGetDescriptorInvalidBoolean fails on Java 9.
   - Historical list of changes:
-    http://commons.apache.org/proper/commons-beanutils/changes-report.html
+    https://commons.apache.org/proper/commons-beanutils/changes-report.html
 - Refreshed patch jdk9.patch for this version update
 
 * Tue May 15 2018 fstrba@suse.com
@@ -182,9 +182,9 @@ cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
 - CVE-2014-3540:
   'class' property is exposed, potentially leading to RCE (bnc#885963)
 - for full changelog, see
-  * http://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.0/RELEASE-NOTES.txt
-  * http://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.1/RELEASE-NOTES.txt
-  * http://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.2/RELEASE-NOTES.txt
+  * https://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.0/RELEASE-NOTES.txt
+  * https://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.1/RELEASE-NOTES.txt
+  * https://commons.apache.org/proper/commons-beanutils/javadocs/v1.9.2/RELEASE-NOTES.txt
 
 * Mon Apr  2 2012 mvyskocil@suse.cz
 - update to 1.8.3 and rename to apache- to follow the upstream

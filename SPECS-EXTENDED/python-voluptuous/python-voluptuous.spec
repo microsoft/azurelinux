@@ -8,7 +8,7 @@ Version: 0.11.7
 Release: 4%{?dist}
 Summary: A Python data validation library
 License: BSD
-URL: http://github.com/alecthomas/voluptuous
+URL: https://github.com/alecthomas/voluptuous
 Source0: %{pypi_source}
 
 BuildArch: noarch

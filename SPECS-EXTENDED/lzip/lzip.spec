@@ -6,9 +6,9 @@ Release:        3%{?dist}
 Summary:        LZMA compressor with integrity checking
 
 License:        GPLv3+
-URL:            http://www.nongnu.org/lzip/lzip.html
-Source0:        http://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz
-Source1:        http://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz.sig
+URL:            https://www.nongnu.org/lzip/lzip.html
+Source0:        https://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz
+Source1:        https://download.savannah.gnu.org/releases/lzip/lzip-%{version}.tar.gz.sig
 BuildRequires:  gcc-c++
 
 %description
@@ -153,7 +153,7 @@ make check
 
 * Fri Aug 07 2009 Till Maas <opensource@till.name> - 1.7-2
 - Exclude lzdiff & lzgrep, they will become part of zutils:
-  http://www.nongnu.org/lzip/zutils.html
+  https://www.nongnu.org/lzip/zutils.html
   and fixes a conflict with xz-lzma-compat: Red Hat Bugzilla #515502
 - Use globbing for all manpages
 

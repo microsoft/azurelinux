@@ -3,7 +3,7 @@ Name:          ipvsadm
 Version:       1.31
 Release:       1%{?dist}
 License:       GPLv2
-URL:           http://www.kernel.org/
+URL:           https://www.kernel.org/
 Group:         System Environment/tools
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux

@@ -5,8 +5,8 @@ Release:        13%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://fmv.jku.at/picosat/
-Source0:        http://fmv.jku.at/picosat/%{name}-%{version}.tar.gz
+URL:            https://fmv.jku.at/picosat/
+Source0:        https://fmv.jku.at/picosat/%{name}-%{version}.tar.gz
 # Thanks to David Wheeler for the man page.
 Source1:        picosat.1
 # Man page link for picosat.trace

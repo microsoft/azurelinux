@@ -9,9 +9,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release source URLs
-Source0:        http://www.puimula.org/voikko-sources/suomi-malaga/suomi-malaga-%{version}.tar.gz
+Source0:        https://www.puimula.org/voikko-sources/suomi-malaga/suomi-malaga-%{version}.tar.gz
 # The usual format of testing release source URLs
-#Source0:        http://www.puimula.org/htp/testing/suomi-malaga-%{version}rc3.tar.gz
+#Source0:        https://www.puimula.org/htp/testing/suomi-malaga-%{version}rc3.tar.gz
 # Patch source: https://src.fedoraproject.org/rpms/malaga-suomi-voikko/blob/a482a6ed75da65c726598e6dffb44f24c36560e1/f/make-it-work-with-python3.patch
 Patch0:         make-it-work-with-python-3.patch
 BuildRequires:  malaga >= 7.8
@@ -206,7 +206,7 @@ make voikko-install DESTDIR=%{buildroot}%{_libdir}/voikko
 
 * Thu Nov 1 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 0.7.6-1
 - Require malaga >= 7.8 as per the latest Voikko release notes
-  (http://voikko.sourceforge.net/releases.html)
+  (https://voikko.sourceforge.net/releases.html)
 - Bump release for the initial Fedora build
 
 * Tue Oct 23 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 0.7.6-0.2

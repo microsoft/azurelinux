@@ -5,7 +5,7 @@ Release: 3%{?dist}
 License: MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://invisible-island.net/diffstat
+URL: https://invisible-island.net/diffstat
 Source0: ftp://ftp.invisible-island.net/pub/diffstat/%{name}-%{version}.tgz
 # Taken from diffstat.c.
 Source1: COPYING

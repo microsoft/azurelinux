@@ -24,8 +24,8 @@ Release:        2%{?dist}
 Summary:        Apache Maven parent POM
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://maven.apache.org
-Source0:        http://repo1.maven.org/maven2/org/apache/maven/%{name}/%{version}/%{name}-%{version}-source-release.zip
+URL:            https://maven.apache.org
+Source0:        https://repo1.maven.org/maven2/org/apache/maven/%{name}/%{version}/%{name}-%{version}-source-release.zip
 BuildRequires:  apache-parent
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip

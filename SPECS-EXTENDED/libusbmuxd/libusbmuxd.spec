@@ -6,7 +6,7 @@ Release:       3%{?dist}
 Summary:       Client library USB multiplex daemon for Apple's iOS devices
 
 License:       LGPLv2+
-URL:           http://www.libimobiledevice.org/
+URL:           https://www.libimobiledevice.org/
 Source0:       https://github.com/libimobiledevice/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc

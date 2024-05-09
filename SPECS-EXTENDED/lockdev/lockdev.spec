@@ -6,7 +6,7 @@ Distribution:   Azure Linux
 %global checkout 20111007git
 %global co_date  2011-10-07
 
-#http://lists.fedoraproject.org/pipermail/devel/2011-August/155358.html
+#https://lists.fedoraproject.org/pipermail/devel/2011-August/155358.html
 %global _hardened_build 1
 
 Summary: A library for locking devices
@@ -263,7 +263,7 @@ https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=NEWS;hb=HEAD
 - Renumbered patches and sources.
 
 * Thu Dec 03 2009 Jiri Popelka <jpopelka@redhat.com> - 1.0.1-20
-- Fixed pre section (http://fedoraproject.org/wiki/Packaging/UsersAndGroups)
+- Fixed pre section (https://fedoraproject.org/wiki/Packaging/UsersAndGroups)
 - Added back Buildroot to silence rpmlint's false positive
 
 * Tue Dec 01 2009 Jiri Popelka <jpopelka@redhat.com> - 1.0.1-19

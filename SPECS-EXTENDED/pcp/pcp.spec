@@ -335,7 +335,7 @@ License: LGPLv2+
 Summary: Performance Co-Pilot run-time configuration
 URL: https://pcp.io
 
-# http://fedoraproject.org/wiki/Packaging:Conflicts "Splitting Packages"
+# https://fedoraproject.org/wiki/Packaging:Conflicts "Splitting Packages"
 Conflicts: pcp-libs < 3.9
 
 %description conf
@@ -667,7 +667,7 @@ Requires: %{__python2}-pcp = %{version}-%{release}
 
 %description export-pcp2graphite
 Performance Co-Pilot (PCP) front-end tools for exporting metric values
-to graphite (http://graphite.readthedocs.org).
+to graphite (https://graphite.readthedocs.org).
 
 # pcp-export-pcp2influxdb
 #
@@ -2052,7 +2052,7 @@ BuildArch: noarch
 %endif
 Summary: Documentation and tutorial for the Performance Co-Pilot
 URL: https://pcp.io
-# http://fedoraproject.org/wiki/Packaging:Conflicts "Splitting Packages"
+# https://fedoraproject.org/wiki/Packaging:Conflicts "Splitting Packages"
 # (all man pages migrated to pcp-doc during great package split of '15)
 Conflicts: pcp-pmda-infiniband < 3.10.5
 

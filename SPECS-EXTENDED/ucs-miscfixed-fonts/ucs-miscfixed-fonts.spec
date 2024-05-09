@@ -11,8 +11,8 @@ Name: %{fontname}-fonts
 Version: 0.3
 Release: 23%{?dist}
 License: Public Domain
-URL: http://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html
-Source0: http://www.cl.cam.ac.uk/~mgk25/download/ucs-fonts.tar.gz
+URL: https://www.cl.cam.ac.uk/~mgk25/ucs-fonts.html
+Source0: https://www.cl.cam.ac.uk/~mgk25/download/ucs-fonts.tar.gz
 Source1: 66-ucs-miscfixed.conf
 BuildArch: noarch
 Summary: Selected set of bitmap fonts

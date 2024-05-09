@@ -301,7 +301,7 @@ EOF
 — Add a fontconfig dep to -devel so font autoprovides work (bz#485702)
 — Drop duplicated group declarations, rpm has been fixed (bz#470714)
 — Add partial templates for fonts subpackages of non-font source packages
-— Make them noarch (http://fedoraproject.org/wiki/Features/NoarchSubpackages)
+— Make them noarch (https://fedoraproject.org/wiki/Features/NoarchSubpackages)
 
 * Thu Feb 5 2009 Nicolas Mailhot <nim at fedoraproject dot org>
 - 1.18-1

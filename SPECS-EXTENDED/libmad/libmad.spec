@@ -6,8 +6,8 @@ Release:	30%{?dist}
 Summary:	MPEG audio decoder library
 
 License:	GPLv2+
-URL:		http://www.underbit.com/products/mad/
-Source0:	http://download.sourceforge.net/mad/%{name}-%{version}.tar.gz
+URL:		https://www.underbit.com/products/mad/
+Source0:	https://download.sourceforge.net/mad/%{name}-%{version}.tar.gz
 #Create the same header on multilibs arches
 Patch0:		libmad-0.15.1b-multiarch.patch
 Patch1:		libmad-0.15.1b-ppc.patch

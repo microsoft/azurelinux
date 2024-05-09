@@ -285,7 +285,7 @@ rm -f %{buildroot}%{_datadir}/X11/xkb/compiled
 
 * Wed Oct 05 2011 Peter Hutterer <peter.hutterer@redhat.com> 2.4.1-1
 - xkeyboard-config 2.4.1
-- change source URL from ftp.x.org to http://xorg.freedesktop.org, ftp takes
+- change source URL from ftp.x.org to https://xorg.freedesktop.org, ftp takes
   too long to update
 
 * Tue Jun 14 2011 Peter Hutterer <peter.hutterer@redhat.com> 2.3-2

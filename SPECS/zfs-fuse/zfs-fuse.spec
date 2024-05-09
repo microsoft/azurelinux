@@ -8,7 +8,7 @@ License:        CDDL
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/gordan-bobic/zfs-fuse
-Source00:       http://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source00:       https://github.com/gordan-bobic/zfs-fuse/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source01:       zfs-fuse.service
 Source02:       zfs-fuse.scrub
 Source03:       zfs-fuse.sysconfig
@@ -327,7 +327,7 @@ rm -rf %{_var}/lock/zfs
 - Updated to upstream version 0.6.0 STABLE
 
 * Mon Nov 30 2009 Uwe Kubosch <uwe@kubosch.no> - 0.6.0-3
-- Updated the home page URL to http://zfs-fuse.net/
+- Updated the home page URL to https://zfs-fuse.net/
 
 * Sat Nov 28 2009 Uwe Kubosch <uwe@kubosch.no> - 0.6.0-2
 - Corrected some KOJI build errors.
@@ -353,7 +353,7 @@ rm -rf %{_var}/lock/zfs
 
 * Sun Dec 28 2008 Uwe Kubosch <uwe@kubosch.no> - 0.5.0-6.20081221
 - Updated etc/init.d/zfs-fuse init script after feedback from Rudd-O at
-  http://groups.google.com/group/zfs-fuse/browse_thread/thread/da94aa803bceef52
+  https://groups.google.com/group/zfs-fuse/browse_thread/thread/da94aa803bceef52
 - Adds better wait at startup before mounting filesystems.
 - Add OOM kill protection.
 - Adds syncing of disks at shutdown.

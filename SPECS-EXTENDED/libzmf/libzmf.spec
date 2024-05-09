@@ -8,8 +8,8 @@ Release: 13%{?dist}
 Summary: A library for import of Zoner document formats
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libzmf
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libzmf
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

@@ -5079,7 +5079,7 @@ fi
 - add -gcc4 patch to compile with gcc 4.
 - remove the now obsolete -smbclient-kerberos.patch
 - Include four upstream patches from
-  http://samba.org/~jerry/patches/post-3.0.11/
+  https://samba.org/~jerry/patches/post-3.0.11/
   (Slightly modified the winbind_find_dc_v2 patch to apply easily with
   rpmbuild).
 

@@ -29,7 +29,7 @@ URL:            https://code.google.com/archive/p/jsr-305
 # There has been no official release yet.  This is a snapshot of the Subversion
 # repository as of 10 Sep 2013.  Use the following commands to generate the
 # tarball:
-#   svn export -r %{svn_revision} http://%{name}.googlecode.com/svn/trunk %{name}
+#   svn export -r %{svn_revision} https://%{name}.googlecode.com/svn/trunk %{name}
 #   tar -czvf %{name}-%{svn_date}svn.tgz %{name}
 # Source0:      https://storage.googleapis.com/google-code-archive-source/v2/code.google.com/jsr-305/source-archive.zip
 Source0:        %{_distro_sources_url}/jsr-305-%{svn_date}svn.tgz
@@ -170,7 +170,7 @@ cp -pr ri/javadoc/* %{buildroot}%{_javadocdir}/%{name}
 * Mon Nov 15 2010 mvyskocil@suse.cz
 - fix bnc#653551 - No license indicators in jsr-305 package
   * add license file with BSD license text
-    as written on http://code.google.com/p/jsr-305/
+    as written on https://code.google.com/p/jsr-305/
 
 * Wed Jun  3 2009 mvyskocil@suse.cz
 - Initial SUSE packaging based on jpp 5.0

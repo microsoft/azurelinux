@@ -12,7 +12,7 @@ Release:    6%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
 License:    GPLv2+
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
-Source0:    http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
+Source0:    https://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
 %if %snapshot
 Patch0:     ibus-libzhuyin-1.9.x-HEAD.patch
 %endif

@@ -6,8 +6,8 @@ Release:        13%{?dist}
 Summary:        RDF Query Library
 
 License:        LGPLv2+ or ASL 2.0
-URL:            http://librdf.org/rasqal/
-Source:         http://download.librdf.org/source/%{name}-%{version}.tar.gz
+URL:            https://librdf.org/rasqal/
+Source:         https://download.librdf.org/source/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  libxml2-devel

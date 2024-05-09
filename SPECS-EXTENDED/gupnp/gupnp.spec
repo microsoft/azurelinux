@@ -220,18 +220,18 @@ This package contains developer documentation for %{name}.
 
 * Tue Apr 26 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.17-1
 - 0.20.17 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.17.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.17.news
 
 * Thu Feb 11 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.16-1
 - 0.20.16 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.16.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.16.news
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.20.15-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
 * Mon Jan 4  2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.15-1
 - 0.20.15 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.15.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.15.news
 
 * Mon Dec 14 2015 Debarshi Ray <rishi@fedoraproject.org> - 0.20.14-4
 - GUPnPNetworkManager is never deallocated due to internal circular reference
@@ -250,7 +250,7 @@ This package contains developer documentation for %{name}.
 
 * Tue Jan  6 2015 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.13-1
 - 0.20.13 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.13.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.13.news
 
 * Sat Oct 11 2014 Dan Horák <dan[at]danny.cz> - 0.20.12-6
 - Disable tests, they fail with libsoup-2.48 (gnome#738365)
@@ -269,52 +269,52 @@ This package contains developer documentation for %{name}.
 
 * Sat May 31 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.12-1
 - 0.20.12 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.12.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.12.news
 - Re-add vala bindings to devel (RHBZ 1093204)
 
 * Tue May  6 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.11-1
 - 0.20.11 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.11.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.11.news
 
 * Tue Feb  4 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.10-1
 - 0.20.10 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.10.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.10.news
 
 * Sun Dec 15 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.9-1
 - 0.20.9 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.9.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.9.news
 
 * Sun Nov  3 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.8-1
 - 0.20.8 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.8.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.8.news
 
 * Wed Oct 16 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.7-1
 - 0.20.7 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.7.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.7.news
 
 * Mon Sep  9 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.6-1
 - 0.20.6 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.6.news
 
 * Wed Aug 21 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.5-1
 - 0.20.5 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.5.news
 
 * Tue Jul 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.4-1
 - 0.20.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.4.news
 
 * Thu May 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.3-1
 - 0.20.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.3.news
 
 * Sat Apr 13 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.2-1
 - 0.20.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.2.news
 
 * Tue Mar  5 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.1-1
 - 0.20.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.1.news
 
 * Thu Feb 21 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.0-2
 - Obsolete gupnp-vala
@@ -324,34 +324,34 @@ This package contains developer documentation for %{name}.
 
 * Thu Feb 21 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.20.0-1
 - 0.20.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.20/gupnp-0.20.0.news
 
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.19.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Sun Jan 13 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.19.4-1
 - 0.19.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.4.news
 
 * Thu Dec  6 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.19.3-1
 - 0.19.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.3.news
 
 * Sat Dec  1 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.19.2-1
 - 0.19.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.2.news
 
 * Mon Oct 29 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.19.1-1
 - 0.19.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.1.news
 
 * Sun Oct  7 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.19.0-1
 - 0.19.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.19/gupnp-0.19.0.news
 
 * Sun Aug 19 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.18.4-1
 - 0.18.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.4.news
 
 * Mon Aug 13 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.18.3-3
 - Use NetworkManager for connectivity detection
@@ -361,36 +361,36 @@ This package contains developer documentation for %{name}.
 
 * Sat May  5 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.18.3-1
 - 0.18.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.3.news
 
 * Thu Apr 26 2012 Zeeshan Ali <zeenix@redhat.com> - 0.18.2-2
 - Remove bogus dependency on libgdbus-devel.
 
 * Sun Mar 18 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.18.2-1
 - 0.18.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.2.news
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.18.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Sat Dec 10 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.18.1-1
 - 0.18.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.1.news
 
 * Mon Sep  5 2011 Zeeshan Ali <zeenix@redhat.com> - 0.18.0-2
 - Push a new release to build against latest gssdp.
 
 * Fri Sep  2 2011 Zeeshan Ali <zeenix@redhat.com> - 0.18.0-1
 - 0.18.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.18/gupnp-0.18.0.news
 
 * Fri Aug  5 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.17.2-1
 - 0.17.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.17/gupnp-0.17.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.17/gupnp-0.17.2.news
 
 * Sun Jul 17 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.17.1-1
 - 0.17.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp/0.17/gupnp-0.17.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp/0.17/gupnp-0.17.1.news
 
 * Thu Jun 16 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.17.0-1
 - 0.17.0 release

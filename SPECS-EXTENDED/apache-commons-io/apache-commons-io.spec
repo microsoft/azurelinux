@@ -141,7 +141,7 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 - Move from jpackage-utils to javapackage-tools
 * Wed Mar 20 2013 mmeister@suse.com
 - Added url as source.
-  Please see http://en.opensuse.org/SourceUrls
+  Please see https://en.opensuse.org/SourceUrls
 * Thu Oct 25 2012 mvyskocil@suse.com
 - update to the latest upstream version 2.4 (needed by fop 1.1)
   * many bugfixes, features and enhancenments, like

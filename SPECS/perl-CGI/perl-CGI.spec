@@ -7,7 +7,7 @@ Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEEJO/CGI-%{version}.tar.gz
-URL:            http://search.cpan.org/dist/CGI
+URL:            https://search.cpan.org/dist/CGI
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch

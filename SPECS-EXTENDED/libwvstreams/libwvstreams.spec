@@ -4,7 +4,7 @@ Name: libwvstreams
 Version: 4.6.1
 Release: 34%{?dist}
 Summary: WvStreams is a network programming library written in C++
-Source: http://wvstreams.googlecode.com/files/wvstreams-%{version}.tar.gz
+Source: https://wvstreams.googlecode.com/files/wvstreams-%{version}.tar.gz
 #fixed multilib issue (bug #192717)
 Patch1: wvstreams-4.6.1-multilib.patch
 #install-xplc target was missing

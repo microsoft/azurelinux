@@ -8,7 +8,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
-URL:            http://www.ohler.com/oj/
+URL:            https://www.ohler.com/oj/
 Source0:        https://github.com/ohler55/oj/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby
 Provides:       rubygem(%{gem_name}) = %{version}-%{release}

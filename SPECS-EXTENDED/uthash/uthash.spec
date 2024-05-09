@@ -19,7 +19,7 @@ Release:	9%{?dist}
 Summary:	A hash table for C structures
 
 License:	BSD
-URL:		http://troydhanson.github.io/%{name}
+URL:		https://troydhanson.github.io/%{name}
 Source0:	%{git_url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 %if (0%{?rhel} && 0%{?rhel} <= 6)

@@ -11,7 +11,7 @@ License:        BSD AND GPLv3+ AND MIT AND Public Domain AND FSFAP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
-URL:            http://www.canonware.com/jemalloc/
+URL:            https://www.canonware.com/jemalloc/
 Source0:        https://github.com/jemalloc/%{name}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
 %description

@@ -1,7 +1,7 @@
 %global date    20020801
 
 # W3C Software License for DTDs etc:
-# http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620#DTD
+# https://www.w3.org/Consortium/Legal/IPR-FAQ-20000620#DTD
 Name:           xhtml1-dtds
 Version:        1.0
 Release:        20020804%{?dist}
@@ -9,7 +9,7 @@ Summary:        XHTML 1.0 document type definitions
 License:        W3C
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.w3.org/TR/2002/REC-xhtml1-%{date}/
+URL:            https://www.w3.org/TR/2002/REC-xhtml1-%{date}/
 # Source0 generated with Source99, see comments in the script
 Source0:        %{_distro_sources_url}/%{name}-%{date}.tar.xz
 Source1:        %{name}.catalog.xml
@@ -68,8 +68,8 @@ xpkg delegatePublic "-//W3C//ENTITIES Latin 1 for XHTML"
 xpkg delegatePublic "-//W3C//ENTITIES Special for XHTML"
 xpkg delegatePublic "-//W3C//ENTITIES Symbols for XHTML"
 for i in xhtml1 2002/REC-xhtml1-%{date} ; do
-  xpkg delegateSystem http://www.w3.org/TR/$i/DTD/
-  xpkg delegateURI http://www.w3.org/TR/$i/DTD/
+  xpkg delegateSystem https://www.w3.org/TR/$i/DTD/
+  xpkg delegateURI https://www.w3.org/TR/$i/DTD/
 done
 ln -s %{name}-%{version}-%{release}.xml \
   $RPM_BUILD_ROOT%{_sysconfdir}/xml/%{name}.xml

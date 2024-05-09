@@ -24,8 +24,8 @@ Release:        3%{?dist}
 Summary:        Java getopt Implementation
 License:        GPLv2
 Group:          Development/Libraries/Java
-URL:            http://www.urbanophile.com/arenn/hacking/download.html
-Source0:        http://www.urbanophile.com/arenn/hacking/getopt/java-getopt-%{version}.tar.gz
+URL:            https://www.urbanophile.com/arenn/hacking/download.html
+Source0:        https://www.urbanophile.com/arenn/hacking/getopt/java-getopt-%{version}.tar.gz
 Patch0:         %{name}-java8compat.patch
 BuildRequires:  ant
 BuildRequires:  fdupes

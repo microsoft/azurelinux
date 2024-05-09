@@ -5,8 +5,8 @@ Summary: Indonesian hunspell dictionaries
 %global upstreamid 20040812
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/id_ID.zip
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries#Indonesian_.28Indonesia.29
+Source: https://download.services.openoffice.org/contrib/dictionaries/id_ID.zip
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries#Indonesian_.28Indonesia.29
 License: GPLv2
 BuildArch: noarch
 

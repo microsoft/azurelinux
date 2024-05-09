@@ -13,8 +13,8 @@ Summary: Serial Graph Partitioning and Fill-reducing Matrix Ordering
 License: ASL 2.0 and BSD and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:     http://glaros.dtc.umn.edu/gkhome/views/%{name}
-Source0: http://glaros.dtc.umn.edu/gkhome/fetch/sw/%{name}/%{name}-%{version}.tar.gz
+URL:     https://glaros.dtc.umn.edu/gkhome/views/%{name}
+Source0: https://glaros.dtc.umn.edu/gkhome/fetch/sw/%{name}/%{name}-%{version}.tar.gz
 
 ## This patch sets up libmetis soname of libmetis
 Patch0:  %{name}-libmetis.patch

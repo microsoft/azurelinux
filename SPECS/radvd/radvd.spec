@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        BSD WITH advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.litech.org/radvd/
+URL:            https://www.litech.org/radvd/
 Source0:        %{url}dist/%{name}-%{version}.tar.xz
 Source1:        radvd-tmpfs.conf
 ## https://github.com/reubenhwk/radvd/commit/6e45acbf3d64b9bd945adcb3de622fd7d059ceb9.patch

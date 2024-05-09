@@ -32,7 +32,7 @@ distribution, which results in a uniform name. But sadly not all
 uploads are created in this way.
 
 CPAN::DistnameInfo uses heuristics that have been learnt by
-http://search.cpan.org/ to extract the distribution name and version
+https://search.cpan.org/ to extract the distribution name and version
 from filenames and also report if the version is to be treated as a
 developer release.
 

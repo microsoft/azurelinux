@@ -24,8 +24,8 @@ Release:        2%{?dist}
 Summary:        Parent POM file for Apache projects
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://apache.org/
-Source0:        http://repo1.maven.org/maven2/org/apache/apache/%{version}/apache-%{version}-source-release.zip
+URL:            https://apache.org/
+Source0:        https://repo1.maven.org/maven2/org/apache/apache/%{version}/apache-%{version}-source-release.zip
 BuildRequires:  javapackages-local-bootstrap
 BuildRequires:  unzip
 BuildArch:      noarch

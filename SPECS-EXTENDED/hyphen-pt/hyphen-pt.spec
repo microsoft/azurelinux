@@ -5,9 +5,9 @@ Summary: Portuguese hyphenation rules
 %global upstreamid 20021021
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_pt_PT.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_pt_PT.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPL+
 BuildArch: noarch
 

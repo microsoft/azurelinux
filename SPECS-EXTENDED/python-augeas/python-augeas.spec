@@ -5,8 +5,8 @@ Version:	0.5.0
 Release:	20%{?dist}
 Summary:	Python bindings to augeas
 License:	LGPLv2+
-URL:		http://augeas.net/
-Source0:	http://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.gz
+URL:		https://augeas.net/
+Source0:	https://fedorahosted.org/released/%{name}/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 BuildRequires:	python3-setuptools

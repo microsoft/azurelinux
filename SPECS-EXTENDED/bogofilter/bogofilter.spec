@@ -5,8 +5,8 @@ Name: bogofilter
 Version: 1.2.5
 Release: 3%{?dist}
 License: GPLv2
-URL: http://bogofilter.sourceforge.net/
-Source0: http://downloads.sourceforge.net/bogofilter/bogofilter-%{version}.tar.xz
+URL: https://bogofilter.sourceforge.net/
+Source0: https://downloads.sourceforge.net/bogofilter/bogofilter-%{version}.tar.xz
 BuildRequires: gcc
 BuildRequires: flex libdb-devel gsl-devel
 BuildRequires: /usr/bin/iconv

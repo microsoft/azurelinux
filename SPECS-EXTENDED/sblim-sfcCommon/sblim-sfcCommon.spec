@@ -6,8 +6,8 @@ Release:	16%{?dist}
 Summary:	Common functions for SBLIM Small Footprint CIM Broker and CIM Client Library.
 
 License:	EPL
-URL:		http://sourceforge.net/projects/sblim/
-Source0:	http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+URL:		https://sourceforge.net/projects/sblim/
+Source0:	https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 
 BuildRequires:	sblim-cmpi-devel
 BuildRequires:	gcc gcc-c++

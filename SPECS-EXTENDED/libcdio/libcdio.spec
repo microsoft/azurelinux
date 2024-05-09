@@ -5,9 +5,9 @@ Version: 2.0.0
 Release: 8%{?dist}
 Summary: CD-ROM input and control library
 License: GPLv3+
-URL: http://www.gnu.org/software/libcdio/
-Source0: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz
-Source1: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz.sig
+URL: https://www.gnu.org/software/libcdio/
+Source0: https://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz
+Source1: https://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.gz.sig
 Source2: libcdio-no_date_footer.hml
 Source3: cdio_config.h
 BuildRequires: gcc gcc-c++

@@ -7,7 +7,7 @@ Release: 6%{?dist}
 # src/apps/bindx_test.C is GPLv2, I've asked upstream for clarification
 License: GPLv2 and LGPLv2+
 Group:   System Environment/Libraries
-URL:     http://lksctp.sourceforge.net
+URL:     https://lksctp.sourceforge.net
 
 Source0: https://github.com/sctp/lksctp-tools/archive/%{name}-%{version}.tar.gz
 Patch0: lksctp-tools-1.0.16-libdir.patch
@@ -233,7 +233,7 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 * Tue Jan 24 2006 Warren Togami <wtogami@redhat.com> 1.0.5-1
 - 1.0.5
 
-* Fri Nov 11 2005 Matthias Saou <http://freshrpms.net/> 1.0.4-1
+* Fri Nov 11 2005 Matthias Saou <https://freshrpms.net/> 1.0.4-1
 - Update to 1.0.4.
 - Update syntax patch.
 - Execute bootstrap if no configure script is found.

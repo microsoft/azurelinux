@@ -27,7 +27,7 @@ Release: 2%{?dist}
 
 # sipgen/parser.{c.h} is GPLv3+ with exceptions (bison)
 License: GPLv2 or GPLv3 and (GPLv3+ with exceptions)
-Url: http://www.riverbankcomputing.com/software/sip/intro 
+Url: https://www.riverbankcomputing.com/software/sip/intro 
 Source0: https://www.riverbankcomputing.com/static/Downloads/sip/%{version}/sip-%{version}%{?snap:.%{snap}}.tar.gz
 
 Source10: sip-wrapper.sh
@@ -795,7 +795,7 @@ install -D -p -m644 %{SOURCE1} %{buildroot}%{rpm_macros_dir}/macros.sip
 
 * Wed Aug 25 2010 Thomas Spura <tomspur@fedoraproject.org> - 4.10.5-3
 - rebuild with python3.2
-  http://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
+  https://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
 
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 4.10.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild

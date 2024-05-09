@@ -5,7 +5,7 @@ Release:        50%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.ossp.org/pkg/lib/uuid/
+URL:            https://www.ossp.org/pkg/lib/uuid/
 Source0:        ftp://ftp.ossp.org/pkg/lib/uuid/uuid-%{version}.tar.gz
 Patch0:         uuid-1.6.1-ossp.patch
 Patch1:         uuid-1.6.1-mkdir.patch
@@ -257,7 +257,7 @@ make check
 - describe -r in man page
 
 * Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> - 1.6.2-17
-- rebuild for http://fedoraproject.org/wiki/Features/Php55
+- rebuild for https://fedoraproject.org/wiki/Features/Php55
 
 * Fri Feb 15 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.6.2-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild

@@ -62,7 +62,7 @@ QT v4l2 test control and streaming test application.
 Summary:        Collection of video4linux support libraries 
 # Some of the decompression helpers are GPLv2, the rest is LGPLv2+
 License:        LGPLv2+ and GPLv2
-URL:            http://hansdegoede.livejournal.com/3636.html
+URL:            https://hansdegoede.livejournal.com/3636.html
 
 %description -n libv4l
 libv4l is a collection of libraries which adds a thin abstraction layer on
@@ -92,7 +92,7 @@ Libraries to control, scan and zap on Digital TV channels
 %package -n     libv4l-devel
 Summary:        Development files for libv4l
 License:        LGPLv2+
-URL:            http://hansdegoede.livejournal.com/3636.html
+URL:            https://hansdegoede.livejournal.com/3636.html
 Requires:       libv4l%{?_isa} = %{version}-%{release}
 
 %description -n libv4l-devel

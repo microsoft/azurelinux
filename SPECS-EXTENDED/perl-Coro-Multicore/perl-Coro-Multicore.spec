@@ -13,7 +13,7 @@ Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Coro-Multicore
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/Coro-Multicore-%{version}.tar.gz
 # Declare POD encoding, submitted to upstream,
-# <http://lists.schmorp.de/pipermail/anyevent/2015q4/000780.html>
+# <https://lists.schmorp.de/pipermail/anyevent/2015q4/000780.html>
 Patch0:         Coro-Multicore-0.02-Declare-POD-encoding.patch
 # Fix build failure on Perl 5.26.1 with enabled treads, CPAN RT#124131,
 # 1.05 provided a fix, but forgot to return a value from thread_proc().

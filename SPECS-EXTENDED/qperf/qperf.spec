@@ -5,8 +5,8 @@ Summary:        Measure socket and RDMA performance
 Version:        0.4.9
 Release:        18%{?dist}
 License:        GPLv2 or BSD
-Source:         http://www.openfabrics.org/downloads/%{name}/%{name}-%{version}.tar.gz
-Url:            http://www.openfabrics.org
+Source:         https://www.openfabrics.org/downloads/%{name}/%{name}-%{version}.tar.gz
+Url:            https://www.openfabrics.org
 BuildRequires:  gcc
 BuildRequires:  libibverbs-devel >= 1.2.0
 BuildRequires:  librdmacm-devel >= 1.0.21

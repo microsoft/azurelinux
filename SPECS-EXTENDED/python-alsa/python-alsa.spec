@@ -9,7 +9,7 @@ Release:	12%{?dist}
 License:	LGPLv2+
 Source0:	ftp://ftp.alsa-project.org/pub/pyalsa/pyalsa-%{version}.tar.bz2
 Source1:  %{name}-LICENSE.txt
-URL:		http://www.alsa-project.org/
+URL:		https://www.alsa-project.org/
 BuildRequires:	alsa-lib-devel >= %{version}
 BuildRequires:	python3-devel
 BuildRequires:	gcc
@@ -180,7 +180,7 @@ mv %{SOURCE1} ./LICENSE.txt
 
 * Fri Jan 04 2008 Andy Shevchenko <andy@smile.org.ua> 1.0.15-2
 - include egg-info to the files: catched from rawhide mass rebuild
-  (http://sunsite.mff.cuni.cz/rawhide20071220-gcc43/fails-even-with-41/python-alsa-1.0.15-1.fc8.log)
+  (https://sunsite.mff.cuni.cz/rawhide20071220-gcc43/fails-even-with-41/python-alsa-1.0.15-1.fc8.log)
 
 * Wed Oct 17 2007 Andy Shevchenko <andy@smile.org.ua> 1.0.15-1
 - update to relase 1.0.15

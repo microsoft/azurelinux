@@ -5,7 +5,7 @@ Version:        1.006002
 Release:        1%{?dist}
 License:        (GPL+ or Artistic) and Public Domain and (GPL+ or Artistic or CC-BY-SA)
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/Exporter-Tiny/
+URL:            https://search.cpan.org/dist/Exporter-Tiny/
 Source0:        https://cpan.metacpan.org/authors/id/T/TO/TOBYINK/Exporter-Tiny-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

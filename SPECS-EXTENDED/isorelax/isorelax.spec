@@ -30,7 +30,7 @@ Source0:        https://sourceforge.net/projects/iso-relax/files/package/2004_11
 Source1:        %{name}-build.xml
 Source2:        isorelax-maven-project.xml
 Source3:        isorelax-maven-project.xsd
-Source4:        http://repo2.maven.org/maven2/%{name}/%{name}/20030108/%{name}-20030108.pom
+Source4:        https://repo2.maven.org/maven2/%{name}/%{name}/20030108/%{name}-20030108.pom
 Patch0:         isorelax-java5-compatibility.patch
 BuildRequires:  ant
 BuildRequires:  java-devel

@@ -6,7 +6,7 @@ Summary: Farsi hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
 Source: ftp://ftp.gnu.org/gnu/aspell/dict/fa/aspell6-fa-0.11-0.tar.bz2
-URL: http://aspell.net/
+URL: https://aspell.net/
 License: GPLv2+
 BuildArch: noarch
 BuildRequires: aspell, hunspell-devel

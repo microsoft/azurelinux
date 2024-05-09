@@ -5,8 +5,8 @@ Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.sourceforge.net/projects/giflib/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://www.sourceforge.net/projects/giflib/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Move quantize.c back into libgif.so (#1750122)
 Patch0:         giflib_quantize.patch
 BuildRequires:  gcc

@@ -27,7 +27,7 @@ BuildArch:      noarch
 %description
 This module provide user-defined Unicode properties that deal with width
 status of East Asian characters, as specified in
-<http://www.unicode.org/unicode/reports/tr11/>.
+<https://www.unicode.org/unicode/reports/tr11/>.
 
 %prep
 %setup -q -n Unicode-EastAsianWidth-%{version}

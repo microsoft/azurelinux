@@ -24,7 +24,7 @@ Release:        2%{?dist}
 Summary:        Pure Java implementation of SSH2
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
-URL:            http://www.jcraft.com/jsch/
+URL:            https://www.jcraft.com/jsch/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.zip
 Source1:        https://repo1.maven.org/maven2/com/jcraft/%{name}/%{version}/%{name}-%{version}.pom
 Source2:        plugin.properties

@@ -80,7 +80,7 @@ This package contains shared lvm2 libraries for applications.
 Summary:        Device mapper utility
 License:        GPLv2, BSD 2-Clause AND LGPLv2.1
 Group:          System Environment/Base
-URL:            http://sources.redhat.com/dm
+URL:            https://sources.redhat.com/dm
 Requires:       device-mapper-libs
 
 %description -n device-mapper

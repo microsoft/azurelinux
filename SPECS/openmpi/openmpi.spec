@@ -85,7 +85,7 @@ several other projects (FT-MPI, LA-MPI, LAM/MPI, and PACX-MPI) in
 order to build the best MPI library available.  A completely new MPI-2
 compliant implementation, Open MPI offers advantages for system and
 software vendors, application developers, and computer science
-researchers. For more information, see http://www.open-mpi.org/ .
+researchers. For more information, see https://www.open-mpi.org/ .
 
 %package devel
 Summary:        Development files for openmpi

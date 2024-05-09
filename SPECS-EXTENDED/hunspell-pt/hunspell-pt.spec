@@ -5,10 +5,10 @@ Summary: Portuguese hunspell dictionaries
 %global upstreamid 20130125
 Version: 0.%{upstreamid}
 Release: 15%{?dist}
-Source0: http://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20130125.tar.gz
+Source0: https://natura.di.uminho.pt/download/sources/Dictionaries/hunspell/hunspell-pt_PT-20130125.tar.gz
 # Mark following Source1 as dead link
-Source1: http://pt-br.libreoffice.org/assets/ptBR20130317AOC.zip
-URL: http://www.broffice.org/verortografico/baixar
+Source1: https://pt-br.libreoffice.org/assets/ptBR20130317AOC.zip
+URL: https://www.broffice.org/verortografico/baixar
 # pt_BR dicts are under LGPLv3 or MPL, pt_PT under GPLv2 or LGPLv2 or MPLv1.1
 License: ((LGPLv3 or MPL) and LGPLv2) and (GPLv2 or LGPLv2 or MPLv1.1)
 BuildArch: noarch

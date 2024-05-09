@@ -64,7 +64,7 @@ nmap <F10> :q!<CR>
 " Use 4 space characters instead of tab for python files
 au BufEnter,BufNew *.py set tabstop=4 shiftwidth=4 expandtab
 " Move the swap file location to protect against CVE-2017-1000382
-" More information at http://security.cucumberlinux.com/security/details.php?id=120
+" More information at https://security.cucumberlinux.com/security/details.php?id=120
 if ! isdirectory("~/.vim/swap/")
         call system('install -d -m 700 ~/.vim/swap')
 endif

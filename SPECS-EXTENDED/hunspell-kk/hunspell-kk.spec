@@ -6,7 +6,7 @@ Version: 1.1
 Release: 19%{?dist}
 Source0: https://downloads.sourceforge.net/project/aoo-extensions/1172/12/dict-kk.oxt
 Source1: %{name}-LICENSE.txt
-URL: http://extensions.services.openoffice.org/project/dict-kk
+URL: https://extensions.services.openoffice.org/project/dict-kk
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch
 

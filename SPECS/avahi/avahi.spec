@@ -616,7 +616,7 @@ exit 0
 - avahi-libs should not require avahi, f20+ (#913168)
 
 * Thu Sep 26 2013 Rex Dieter <rdieter@fedoraproject.org> 0.6.31-20
-- conform to http://fedoraproject.org/wiki/Packaging/UsersAndGroups#Soft_static_allocation
+- conform to https://fedoraproject.org/wiki/Packaging/UsersAndGroups#Soft_static_allocation
 
 * Wed Sep 25 2013 Kalev Lember <kalevlember@gmail.com> - 0.6.31-19
 - Make sure the split up -devel package require avahi-devel
@@ -689,7 +689,7 @@ exit 0
 
 * Tue Nov 29 2011 Christian Krause <chkr@fedoraproject.org> - 0.6.30-6
 - Change paths for mono assemblies according to updated packaging
-  guidelines (http://fedoraproject.org/wiki/Packaging:Mono)
+  guidelines (https://fedoraproject.org/wiki/Packaging:Mono)
 
 * Mon Nov 14 2011 Adam Jackson <ajax@redhat.com> 0.6.30-5
 - Rebuild to break bogus libpng dep

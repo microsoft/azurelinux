@@ -25,7 +25,7 @@ Conflicts:      perl-libwww-perl < 6
 
 %description
 This module parses /robots.txt files as specified in "A Standard for Robot
-Exclusion", at <http://www.robotstxt.org/wc/norobots.html>. Webmasters can
+Exclusion", at <https://www.robotstxt.org/wc/norobots.html>. Webmasters can
 use the /robots.txt file to forbid conforming robots from accessing parts
 of their web site.
 

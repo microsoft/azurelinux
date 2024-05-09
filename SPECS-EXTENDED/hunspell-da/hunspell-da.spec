@@ -4,8 +4,8 @@ Name: hunspell-da
 Summary: Danish hunspell dictionaries
 Version: 1.7.42
 Release: 14%{?dist}
-Source: http://da.speling.org/filer/myspell-da-%{version}.tar.bz2
-URL: http://da.speling.org/
+Source: https://da.speling.org/filer/myspell-da-%{version}.tar.bz2
+URL: https://da.speling.org/
 License: GPLv2+
 BuildArch: noarch
 

@@ -13,14 +13,14 @@ Name:		fltk
 Version:	1.3.5
 Release:	4%{?dist}
 
-# see COPYING (or http://www.fltk.org/COPYING.php ) for exceptions details
+# see COPYING (or https://www.fltk.org/COPYING.php ) for exceptions details
 License:	LGPLv2+ with exceptions	
-URL:		http://www.fltk.org/
+URL:		https://www.fltk.org/
 
 %if "%{?snap:1}" == "1"
-Source0:        http://ftp.easysw.com/pub/fltk/snapshots/fltk-1.3.x-%{snap}.tar.bz2
+Source0:        https://ftp.easysw.com/pub/fltk/snapshots/fltk-1.3.x-%{snap}.tar.bz2
 %else
-Source0:        http://fltk.org/pub/%{name}/%{version}/%{name}-%{version}-source.tar.gz
+Source0:        https://fltk.org/pub/%{name}/%{version}/%{name}-%{version}-source.tar.gz
 %endif
 
 Source1:        fltk-config.sh

@@ -7,7 +7,7 @@ Summary: User Extensible Heap Manager
 Version: 1.10.0
 Release: 2%{?dist}
 License: BSD
-URL: http://memkind.github.io/memkind
+URL: https://memkind.github.io/memkind
 BuildRequires: automake libtool numactl-devel systemd gcc gcc-c++
 
 # x86_64 is the only arch memkind will build and work due to
@@ -17,7 +17,7 @@ BuildRequires: automake libtool numactl-devel systemd gcc gcc-c++
 # For further info check: 
 # - /lib/gcc/<target>/<version>/include/smmintrin.h
 # - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36095 
-# - http://en.wikipedia.org/wiki/SSE4
+# - https://en.wikipedia.org/wiki/SSE4
 ExclusiveArch: x86_64
 
 Source0: https://github.com/%{name}/%{name}/archive/%{gittag0}/%{name}-%{version}.tar.gz

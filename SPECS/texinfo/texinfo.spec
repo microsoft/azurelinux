@@ -7,7 +7,7 @@ URL:            https://www.gnu.org/software/texinfo/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Provides:       info = %{version}-%{release}
 Provides:       %{name}-tex = %{version}-%{release}
 BuildRequires:  perl
@@ -85,7 +85,7 @@ rm -rf %{buildroot}%{_infodir}
 - Initial CBL-Mariner import from Photon (license: Apache2).
 * Fri Nov 02 2018 Anish Swaminathan <anishs@vmware.com> 6.5-2
 - Fix texinfo issue with locales
-- http://lists.gnu.org/archive/html/bug-texinfo/2018-06/msg00029.html
+- https://lists.gnu.org/archive/html/bug-texinfo/2018-06/msg00029.html
 * Fri Sep 07 2018 Michelle Wang <michellew@vmware.com> 6.5-1
 - Update version to 6.5.
 * Fri May 05 2017 Xiaolin Li <xiaolinl@vmware.com> 6.3-3

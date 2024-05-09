@@ -3,8 +3,8 @@ Name:		which
 Version:	2.21
 Release:        8%{?dist}
 License:	GPLv3+
-URL:		http://savannah.gnu.org/projects/which
-Source0:	http://ftp.gnu.org/gnu/which/%{name}-%{version}.tar.gz
+URL:		https://savannah.gnu.org/projects/which
+Source0:	https://ftp.gnu.org/gnu/which/%{name}-%{version}.tar.gz
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

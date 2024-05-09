@@ -24,8 +24,8 @@ Release:        294%{?dist}
 Summary:        Java NFA regular expression engine
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 Group:          Development/Libraries/Java
-URL:            http://www.cacas.org/java/gnu/regexp/
-Source0:        http://ftp.frugalware.org/pub/other/sources/gnu.regexp/gnu.regexp-%{version}.tar.gz
+URL:            https://www.cacas.org/java/gnu/regexp/
+Source0:        https://ftp.frugalware.org/pub/other/sources/gnu.regexp/gnu.regexp-%{version}.tar.gz
 Source1:        %{name}.build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes

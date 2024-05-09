@@ -5,10 +5,10 @@ Name:       gnome-icon-theme
 Version:    3.12.0
 License:    CC-BY-SA or LGPLv3+
 Release:    16%{?dist}
-URL:        http://www.gnome.org
+URL:        https://www.gnome.org
 
 #VCS: git:git://git.gnome.org/gnome-icon-theme
-Source0: http://download.gnome.org/sources/gnome-icon-theme/3.12/%{name}-%{version}.tar.xz
+Source0: https://download.gnome.org/sources/gnome-icon-theme/3.12/%{name}-%{version}.tar.xz
 Source1: legacy-icon-mapping.xml
 
 BuildRequires:  gcc

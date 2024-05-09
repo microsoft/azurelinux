@@ -5,8 +5,8 @@ Summary: Malagasy hunspell dictionaries
 %global upstreamid 20050109
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/mg_MG.zip
-URL: http://borel.slu.edu/crubadan/apps.html
+Source: https://download.services.openoffice.org/contrib/dictionaries/mg_MG.zip
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPLv2+
 BuildArch: noarch
 

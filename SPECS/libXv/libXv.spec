@@ -9,14 +9,14 @@ Name:    libXv
 Version: 1.0.12
 Release: 1%{?dist}
 License: MIT
-URL: http://www.x.org
+URL: https://www.x.org
 
 %if 0%{?gitdate}
 Source0:    %{tarball}-%{gitdate}.tar.xz
 Source1:    make-git-snapshot.sh
 Source2:    commitid
 %else
-Source0: http://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
+Source0: https://xorg.freedesktop.org/archive/individual/lib/%{name}-%{version}.tar.xz
 %endif
 
 Requires: libX11 >= 1.5.99.902

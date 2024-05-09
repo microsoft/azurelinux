@@ -25,9 +25,9 @@ Release:        10%{?dist}
 Summary:        Provides classes to do asserts on XML
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
-URL:            http://xmlunit.sourceforge.net/
-Source0:        http://download.sourceforge.net/%{name}/%{name}-%{version}-src.zip
-Source1:        http://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+URL:            https://xmlunit.sourceforge.net/
+Source0:        https://download.sourceforge.net/%{name}/%{name}-%{version}-src.zip
+Source1:        https://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  fdupes

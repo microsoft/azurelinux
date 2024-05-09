@@ -10,7 +10,7 @@ Release:        3%{?dist}
 Summary:        Extremely memory-efficient C++ hash_map implementation
 
 License:        BSD
-URL:            http://code.google.com/p/sparsehash
+URL:            https://code.google.com/p/sparsehash
 Source0:        https://github.com/sparsehash/sparsehash/archive/sparsehash-%{version}.tar.gz
 
 BuildRequires:  gcc-c++

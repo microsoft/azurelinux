@@ -31,7 +31,7 @@ Requires:       jack-audio-connection-kit
 
 %description jack
 This plugin converts the ALSA API over JACK (Jack Audio Connection
-Kit, http://jackit.sf.net) API.  ALSA native applications can work
+Kit, https://jackit.sf.net) API.  ALSA native applications can work
 transparently together with jackd for both playback and capture.
 This plugin provides the PCM type "jack"
 %endif
@@ -108,7 +108,7 @@ License:        LGPLv2+
 
 %description arcamav
 This plugin exposes the controls for an Arcam AV amplifier
-(see: http://www.arcam.co.uk/) as an ALSA mixer device.
+(see: https://www.arcam.co.uk/) as an ALSA mixer device.
 
 %package speex
 Summary:        Rate Converter Plugin Using Speex Resampler

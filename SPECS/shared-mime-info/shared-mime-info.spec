@@ -552,7 +552,7 @@ update-mime-database -n %{_datadir}/mime &> /dev/null ||:
 * Tue Aug 21 2007 - Bastien Nocera <bnocera@redhat.com> - 0.22-2
 - Don't say that webcal files are handled by evolution-2.0, it can't
 - Disable vCard mapping as well, as evolution doesn't handle it
-  (See http://bugzilla.gnome.org/show_bug.cgi?id=309073)
+  (See https://bugzilla.gnome.org/show_bug.cgi?id=309073)
 
 * Mon Jul 30 2007 - Bastien Nocera <bnocera@redhat.com> - 0.22-1
 - Update to 0.22

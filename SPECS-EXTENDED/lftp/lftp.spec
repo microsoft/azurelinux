@@ -5,8 +5,8 @@ Name:		lftp
 Version:	4.9.2
 Release:	2%{?dist}
 License:	GPLv3+
-Source0:	http://lftp.yar.ru/ftp/%{name}-%{version}.tar.xz
-URL:		http://lftp.yar.ru/
+Source0:	https://lftp.yar.ru/ftp/%{name}-%{version}.tar.xz
+URL:		https://lftp.yar.ru/
 BuildRequires:	ncurses-devel, gnutls-devel, perl-generators, pkgconfig, readline-devel, gettext
 BuildRequires:	zlib-devel, gcc-c++
 BuildRequires: desktop-file-utils
@@ -549,7 +549,7 @@ desktop-file-install	\
   (and preferably contact the lftp package maintainer (me) first - thank you!)
   bug 171096 : 'mget files in lftp causes abort' (core dump actually)
   resulted from not doing so .
-  See http://lftp.yar.ru :
+  See https://lftp.yar.ru :
 	Recent events:2005-10-17: 
 	lftp-3.3.2 released. Fixed a coredump caused by double-free.
 

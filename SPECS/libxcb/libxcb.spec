@@ -8,7 +8,7 @@ Distribution:   Azure Linux
 URL:            https://xcb.freedesktop.org/
 Source0:        https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.gz
 # This is taken straight from the pthread-stubs source:
-# http://cgit.freedesktop.org/xcb/pthread-stubs/blob/?id=6900598192bacf5fd9a34619b11328f746a5956d
+# https://cgit.freedesktop.org/xcb/pthread-stubs/blob/?id=6900598192bacf5fd9a34619b11328f746a5956d
 # we don't need the library because glibc has working pthreads, but we need
 # the pkgconfig file so libs that link against libxcb know this...
 Source1:        pthread-stubs.pc.in

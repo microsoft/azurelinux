@@ -9,9 +9,9 @@ Release:        4%{?dist}
 Summary:        Hierarchical configuration system for Xfce
 
 License:        GPLv2
-URL:            http://www.xfce.org/
+URL:            https://www.xfce.org/
 #VCS git:git://git.xfce.org/xfce/xfconf
-Source0:        http://archive.xfce.org/src/xfce/%{name}/%{xfceversion}/%{name}-%{version}.tar.bz2
+Source0:        https://archive.xfce.org/src/xfce/%{name}/%{xfceversion}/%{name}-%{version}.tar.bz2
 
 BuildRequires:  glib2-devel
 BuildRequires:  perl(File::Find)

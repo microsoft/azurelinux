@@ -5,8 +5,8 @@ Version:        0.6.8
 Release:        46%{?dist}
 
 License:        LGPLv2+
-URL:            http://paps.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://paps.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        paps.convs
 Source2:	29-paps.conf
 BuildRequires:  pango-devel automake autoconf libtool doxygen cups-devel

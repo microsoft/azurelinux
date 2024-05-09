@@ -6,8 +6,8 @@ Release:        9%{?dist}
 Summary:        Free MP3 audio compressor
 
 License:        GPLv2+
-URL:            http://lame.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sourceforge/lame/%{name}-%{version}.tar.gz
+URL:            https://lame.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sourceforge/lame/%{name}-%{version}.tar.gz
 Patch1:         %{name}-noexecstack.patch
 Patch2:         libmp3lame-symbols.patch
 
@@ -51,7 +51,7 @@ This package development files for %{name}.
 sed -i -e 's/^\(\s*hardcode_libdir_flag_spec\s*=\).*/\1/' configure
 %ifarch %{ix86}
 export CFLAGS="$RPM_OPT_FLAGS -ffast-math"
-#From LFS:http://www.linuxfromscratch.org/blfs/view/svn/multimedia/lame.html
+#From LFS:https://www.linuxfromscratch.org/blfs/view/svn/multimedia/lame.html
 export ac_cv_header_xmmintrin_h=no
 %endif
 %configure \

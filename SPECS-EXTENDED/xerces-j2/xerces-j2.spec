@@ -26,13 +26,13 @@ Release:        5%{?dist}
 Summary:        Java XML parser
 License:        ASL 2.0 and Public Domain and W3C
 Group:          Development/Libraries/Java
-URL:            http://xerces.apache.org/xerces2-j/
+URL:            https://xerces.apache.org/xerces2-j/
 Source0:        https://archive.apache.org/dist/xerces/j/source/Xerces-J-src.%{version}.tar.gz
 Source1:        %{name}-version.sh
 Source2:        %{name}-constants.sh
 Source3:        %{name}-version.1
 Source4:        %{name}-constants.1
-Source5:        http://repo.maven.apache.org/maven2/xerces/xercesImpl/%{version}/xercesImpl-%{version}.pom
+Source5:        https://repo.maven.apache.org/maven2/xerces/xercesImpl/%{version}/xercesImpl-%{version}.pom
 # Patch the build so that it doesn't try to use bundled xml-commons source
 # Also remove the use of the special taglets and xjavac task
 Patch0:         %{name}-build.patch

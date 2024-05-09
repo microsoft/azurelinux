@@ -184,7 +184,7 @@ Patch201:       perl-5.16.3-Link-XS-modules-to-libperl.so-with-EU-MM-on-Linux.pa
 Patch202:       perl-5.36.0-Add-definition-of-OPTIMIZE-to-.ph-files.patch
 
 # Update some of the bundled modules
-# see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
+# see https://fedoraproject.org/wiki/Perl/perl.spec for instructions
 
 BuildRequires:  bash
 BuildRequires:  bzip2-devel
@@ -7314,7 +7314,7 @@ popd
 - Update perl(:MODULE_COMPAT)
 
 * Mon Sep 25 2017 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.26.1-400
-- 5.26.1 bump (see <http://search.cpan.org/dist/perl-5.26.1/pod/perldelta.pod>
+- 5.26.1 bump (see <https://search.cpan.org/dist/perl-5.26.1/pod/perldelta.pod>
   for release notes)
 
 * Tue Aug 22 2017 Petr Pisar <ppisar@redhat.com> - 4:5.26.0-399
@@ -7367,7 +7367,7 @@ popd
 - Stop providing old perl(MODULE_COMPAT_5.24.*)
 
 * Thu Jun 01 2017 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.26.0-392
-- 5.26.0 bump (see <http://search.cpan.org/dist/perl-5.26.0/pod/perldelta.pod>
+- 5.26.0 bump (see <https://search.cpan.org/dist/perl-5.26.0/pod/perldelta.pod>
   for release notes)
 - Update sub-packages
 - Update or remove patches
@@ -7413,7 +7413,7 @@ popd
 - Fix out-of-bound read in case of unmatched regexp backreference (RT#129377)
 
 * Mon Jan 16 2017 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.24.1-385
-- 5.24.1 bump (see <http://search.cpan.org/dist/perl-5.24.1/pod/perldelta.pod>
+- 5.24.1 bump (see <https://search.cpan.org/dist/perl-5.24.1/pod/perldelta.pod>
   for release notes)
 
 * Thu Jan 12 2017 Igor Gnatenko <ignatenko@redhat.com> - 4:5.24.0-384
@@ -7509,12 +7509,12 @@ popd
 - Update license tags
 
 * Wed May 11 2016 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.24.0-362
-- 5.24.0 bump (see <http://search.cpan.org/dist/perl-5.24.0/pod/perldelta.pod>
+- 5.24.0 bump (see <https://search.cpan.org/dist/perl-5.24.0/pod/perldelta.pod>
   for release notes)
 - Update sub-packages; Update or remove patches
 
 * Mon May 02 2016 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.22.6-361
-- 5.22.2 bump (see <http://search.cpan.org/dist/perl-5.22.2/pod/perldelta.pod>
+- 5.22.2 bump (see <https://search.cpan.org/dist/perl-5.22.2/pod/perldelta.pod>
   for release notes)
 
 * Mon Apr 18 2016 Petr Pisar <ppisar@redhat.com> - 4:5.22.1-360
@@ -7544,7 +7544,7 @@ popd
 - Remove bundled Math-BigInt (bug #1277203)
 
 * Mon Dec 14 2015 Jitka Plesnikova <jplesnik@redhat.com> - 5.22.1-354
-- 5.22.1 bump (see <http://search.cpan.org/dist/perl-5.22.1/pod/perldelta.pod>
+- 5.22.1 bump (see <https://search.cpan.org/dist/perl-5.22.1/pod/perldelta.pod>
   for release notes)
 
 * Tue Oct 20 2015 Petr Pisar <ppisar@redhat.com> - 4:5.22.0-353
@@ -7632,7 +7632,7 @@ popd
 - Move bin/encguess to perl-Encode
 
 * Mon Jun 01 2015 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.22.0-241
-- 5.22.0 bump (see <http://search.cpan.org/dist/perl-5.22.0/pod/perldelta.pod>
+- 5.22.0 bump (see <https://search.cpan.org/dist/perl-5.22.0/pod/perldelta.pod>
   for release notes)
 - Update sub-packages and erase the removed modules from the core
 - Clean patches, not needed with new version
@@ -7670,7 +7670,7 @@ popd
 - Update names of changed patches
 
 * Tue Feb 17 2015 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.20.2-320
-- 5.20.2 bump (see <http://search.cpan.org/dist/perl-5.20.2/pod/perldelta.pod>
+- 5.20.2 bump (see <https://search.cpan.org/dist/perl-5.20.2/pod/perldelta.pod>
   for release notes)
 - Regenerate a2p.c (BZ#1177672)
 
@@ -7729,7 +7729,7 @@ popd
 - Provide 5.20.0 MODULE_COMPAT
 
 * Mon Sep 15 2014 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.20.1-308
-- 5.20.1 bump (see <http://search.cpan.org/dist/perl-5.20.1/pod/perldelta.pod>
+- 5.20.1 bump (see <https://search.cpan.org/dist/perl-5.20.1/pod/perldelta.pod>
   for release notes)
 - Sub-package perl-ExtUtils-Miniperl (bug #1141222)
 
@@ -7797,7 +7797,7 @@ popd
 - Use upstream patch to fix a test failure in perl5db.t when TERM=vt100
 
 * Tue Dec 10 2013 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.18.2-291
-- 5.18.2 bump (see <http://search.cpan.org/dist/perl-5.18.2/pod/perldelta.pod>
+- 5.18.2 bump (see <https://search.cpan.org/dist/perl-5.18.2/pod/perldelta.pod>
   for release notes)
 
 * Mon Dec 02 2013 Petr Pisar <ppisar@redhat.com> - 4:5.18.1-290
@@ -7817,7 +7817,7 @@ popd
 - Fix using regexes with multiple code blocks (bug #982131)
 
 * Tue Aug 13 2013 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.18.1-287
-- 5.18.1 bump (see <http://search.cpan.org/dist/perl-5.18.1/pod/perldelta.pod>
+- 5.18.1 bump (see <https://search.cpan.org/dist/perl-5.18.1/pod/perldelta.pod>
   for release notes)
 - Disable macro %%{rebuild_from_scratch}
 - Fix regex seqfault 5.18 regression (bug #989921)
@@ -7929,7 +7929,7 @@ popd
 - Sub-package Time-Local (bug #922054)
 
 * Thu Mar 14 2013 Petr Pisar <ppisar@redhat.com> - 4:5.16.3-261
-- 5.16.3 bump (see <http://search.cpan.org/dist/perl-5.16.3/pod/perldelta.pod>
+- 5.16.3 bump (see <https://search.cpan.org/dist/perl-5.16.3/pod/perldelta.pod>
   for release notes)
 - Remove bundled autodie, B-Lint, CPANPLUS, Encode, File-CheckTree, IPC-Cmd,
   Params-Check, Text-Soundex, Thread-Queue
@@ -8000,7 +8000,7 @@ popd
 
 * Mon Nov 05 2012 Jitka Plesnikova <jplesnik@redhat.com> - 4:5.16.2-242
 - 5.16.2 bump (see
-  http://search.cpan.org/dist/perl-5.16.1/pod/perldelta.pod for release
+  https://search.cpan.org/dist/perl-5.16.1/pod/perldelta.pod for release
   notes)
 
 * Wed Oct 31 2012 Petr Pisar <ppisar@redhat.com> - 4:5.16.1-241
@@ -8052,7 +8052,7 @@ popd
 
 * Thu Aug 09 2012 Jitka Plesnikova <jplesnik@redhat.com> 4:5.16.1-228
 - 5.16.1 bump (see
-  http://search.cpan.org/dist/perl-5.16.1/pod/perldelta.pod for release
+  https://search.cpan.org/dist/perl-5.16.1/pod/perldelta.pod for release
   notes)
 - Fixed reopening by scalar handle (bug #834221)
 - Fixed tr/// multiple transliteration (bug #831679)
@@ -8595,7 +8595,7 @@ popd
 * Tue Apr  7 2009 Stepan Kasal <skasal@redhat.com> - 4:5.10.0-66
 - fix CGI::escape for all strings (#472571)
 - perl-CGI-t-util-58.patch: Do not distort lib/CGI/t/util-58.t
-  http://rt.perl.org/rt3/Ticket/Display.html?id=64502
+  https://rt.perl.org/rt3/Ticket/Display.html?id=64502
 
 * Fri Mar 27 2009 Stepan Kasal <skasal@redhat.com> - 4:5.10.0-65
 - Move the gargantuan Changes* collection to -devel (#492605)
@@ -8646,7 +8646,7 @@ popd
 - update IPC::Cmd to v 0.42
 
 * Mon Jan 19 2009 Marcela Mašláňová <mmaslano@redhat.com> - 4:5.10.0-54
-- 455410 http://rt.perl.org/rt3/Public/Bug/Display.html?id=54934
+- 455410 https://rt.perl.org/rt3/Public/Bug/Display.html?id=54934
   Attempt to free unreferenced scalar fiddling with the symbol table
   Keep the refcount of the globs generated by PerlIO::via balanced.
 
@@ -8658,7 +8658,7 @@ popd
 - add another source for binary files, which test untaring links
 
 * Fri Nov 28 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 4:5.10.0-51
-- to fix Fedora bz 473223, which is really perl bug #54186 (http://rt.perl.org/rt3//Public/Bug/Display.html?id=54186)
+- to fix Fedora bz 473223, which is really perl bug #54186 (https://rt.perl.org/rt3//Public/Bug/Display.html?id=54186)
   we apply Changes 33640, 33881, 33896, 33897
 
 * Mon Nov 24 2008 Marcela Mašláňová <mmaslano@redhat.com> - 4:5.10.0-50

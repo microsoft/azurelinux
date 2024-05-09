@@ -44,7 +44,7 @@ Requires:       perl(XML::LibXML) >= %{version}
 
 %description
 This module is a fast XSLT library, based on the Gnome libxslt engine
-that you can find at http://www.xmlsoft.org/XSLT/
+that you can find at https://www.xmlsoft.org/XSLT/
 
 %{?perl_default_filter}
 

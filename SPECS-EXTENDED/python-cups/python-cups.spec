@@ -8,7 +8,7 @@ Name:          python-cups
 Version:       2.0.1
 Release:       2%{?dist}
 # older URL, but still with useful information about pycups
-#URL:           http://cyberelk.net/tim/software/pycups/
+#URL:           https://cyberelk.net/tim/software/pycups/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:           https://github.com/OpenPrinting/pycups/

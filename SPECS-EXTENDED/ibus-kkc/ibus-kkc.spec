@@ -47,7 +47,7 @@ make %{?_smp_mflags}
 # NOTE: It would be *awesome* if this file was maintained by the upstream
 # project, translated and installed into the right place during `make install`.
 #
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
+# See https://www.freedesktop.org/software/appstream/docs/ for more details.
 #
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
 cat > $RPM_BUILD_ROOT%{_datadir}/appdata/kkc.appdata.xml <<EOF
@@ -74,7 +74,7 @@ cat > $RPM_BUILD_ROOT%{_datadir}/appdata/kkc.appdata.xml <<EOF
   <project_group>GNOME</project_group>
   <developer_name>The GNOME Project</developer_name>
   <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="donation">http://www.gnome.org/friends/</url>
+  <url type="donation">https://www.gnome.org/friends/</url>
   <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
   <update_contact><!-- upstream-contact_at_email.com --></update_contact>
 </component>

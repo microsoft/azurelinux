@@ -8,7 +8,7 @@ Version:        1.7.0
 Release:        9%{?dist}
 Summary:        Sphinx domain for documenting HTTP APIs
 License:        BSD
-URL:            http://packages.python.org/sphinxcontrib-httpdomain/
+URL:            https://packages.python.org/sphinxcontrib-httpdomain/
 Source0:        https://files.pythonhosted.org/packages/source/s/%{upstream_name}/%{upstream_name}-%{version}.tar.gz#/python-%{upstream_name}-%{version}.tar.gz
 # issue to be filed(?)
 Patch4:         0004-httpdomain-bump-domain-data-version.patch
@@ -101,19 +101,19 @@ rm -r *.egg-info
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
 * Mon Aug 15 2016 Dan Callaghan <dcallagh@redhat.com> - 1.5.0-1
-- upstream release 1.5.0: http://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-5-0
+- upstream release 1.5.0: https://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-5-0
 
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
 * Sun Sep 27 2015 Dan Callaghan <dcallagh@redhat.com> - 1.4.0-1
-- upstream release 1.4.0: http://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-4-0
+- upstream release 1.4.0: https://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-4-0
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
 * Tue Jan 20 2015 Dan Callaghan <dcallagh@redhat.com> - 1.3.0-1
-- upstream release 1.3.0: http://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-3-0
+- upstream release 1.3.0: https://pythonhosted.org/sphinxcontrib-httpdomain/#version-1-3-0
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.8-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild

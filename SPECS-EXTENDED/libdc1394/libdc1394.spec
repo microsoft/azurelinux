@@ -10,8 +10,8 @@ Name: libdc1394
 Version: 2.2.2
 Release: 15%{?dist}
 License: LGPLv2+
-URL: http://sourceforge.net/projects/libdc1394/
-Source: http://downloads.sourceforge.net/project/libdc1394/libdc1394-2/%{version}/libdc1394-%{version}.tar.gz
+URL: https://sourceforge.net/projects/libdc1394/
+Source: https://downloads.sourceforge.net/project/libdc1394/libdc1394-2/%{version}/libdc1394-%{version}.tar.gz
 ExcludeArch: s390 s390x
 
 BuildRequires:  gcc
@@ -232,7 +232,7 @@ done
 * Sat Apr 08 2006 Dries Verachtert <dries@ulyssis.org> - 2.0.0-0.1.pre5.2
 - Rebuild for Fedora Core 5.
 
-* Thu Dec  8 2005 Matthias Saou <http://freshrpms.net/> 2.0.0-0.1.pre5
+* Thu Dec  8 2005 Matthias Saou <https://freshrpms.net/> 2.0.0-0.1.pre5
 - Update to 2.0.0-pre5.
 - Add missing libraw1394-devel dependency to the devel package.
 

@@ -27,8 +27,8 @@ Release:        23%{?dist}
 Summary:        Simple regular expressions API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-Url:            http://jakarta.apache.org/%{name}/
-Source0:        http://www.apache.org/dist/jakarta/regexp/jakarta-regexp-%{version}.tar.gz
+Url:            https://jakarta.apache.org/%{name}/
+Source0:        https://www.apache.org/dist/jakarta/regexp/jakarta-regexp-%{version}.tar.gz
 Source1:        regexp-%{version}.pom
 BuildRequires:  ant
 BuildRequires:  ant >= 1.6
@@ -103,7 +103,7 @@ install -p -m 0644 %{SOURCE1} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 * Mon Nov  8 2010 mvyskocil@suse.cz
 - merge with regexp-1.5-1.jpp5.src.rpm
 - update to 1.5 bugfix and optimization release
-  http://jakarta.apache.org/regexp/changes.html
+  https://jakarta.apache.org/regexp/changes.html
 - ignore also jaxp-1.3-apis
 * Sun Jul 27 2008 coolo@suse.de
 - build with gcj to avoid bootstrapping problems with openjdk

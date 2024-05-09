@@ -27,7 +27,7 @@ Group:          Development/Libraries/Java
 URL:            https://www.osgi.org
 Source0:        https://repo1.maven.org/maven2/org/osgi/osgi.core/%{version}/osgi.core-%{version}-sources.jar
 Source1:        https://repo1.maven.org/maven2/org/osgi/osgi.core/%{version}/osgi.core-%{version}.pom
-Source2:        http://www.apache.org/licenses/LICENSE-2.0
+Source2:        https://www.apache.org/licenses/LICENSE-2.0
 Source3:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes

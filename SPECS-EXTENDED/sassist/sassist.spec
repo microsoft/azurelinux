@@ -6,7 +6,7 @@ Release:	5%{?dist}
 Summary:	Dell SupportAssist log collector
 
 License:	MIT
-URL:		http://www.dell.com/en-us/work/learn/supportassist
+URL:		https://www.dell.com/en-us/work/learn/supportassist
 Source0:	https://github.com/dell/sassist/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:	systemd

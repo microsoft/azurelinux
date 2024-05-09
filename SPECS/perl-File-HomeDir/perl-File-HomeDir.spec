@@ -4,7 +4,7 @@ Version:        1.006
 Release:        2%{?dist}
 License:        GPL+ OR Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/File-HomeDir/
+URL:            https://search.cpan.org/dist/File-HomeDir/
 Source0:        https://cpan.metacpan.org/authors/id/R/RE/REHSACK/File-HomeDir-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

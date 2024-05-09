@@ -10,7 +10,7 @@ URL:            https://github.com/gildor478/ocaml-fileutils
 #       Please remove it during a version update.
 Source0:        https://github.com/gildor478/ocaml-fileutils/archive/refs/tags/%{version}.tar.gz#/%{name}_2-%{version}.tar.gz
 # Set of files from previous sources location allowing us to drop dependency on "ocaml-oasis-devel", which is no longer available.
-# Previous sources used to be available under http://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
+# Previous sources used to be available under https://forge.ocamlcore.org/frs/download.php/1695/ocaml-fileutils-0.5.2.tar.gz.
 # Currently still available in Fedora's SRPMs.
 Source1:        %{name}-old-sources-build-files.tar.gz
 Patch1:         fileutils-0.5.2-fix-bytes.patch
@@ -255,7 +255,7 @@ make test
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Wed Jan 05 2011 Richard W.M. Jones <rjones@redhat.com> - 0.4.0-4
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Wed Dec 30 2009 Richard W.M. Jones <rjones@redhat.com> - 0.4.0-3
 - Rebuild for OCaml 3.11.2.

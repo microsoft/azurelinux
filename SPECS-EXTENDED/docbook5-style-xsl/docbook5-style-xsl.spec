@@ -6,7 +6,7 @@ Release: 11%{?dist}
 
 Summary: Norman Walsh's XSL stylesheets for DocBook 5.X
 
-# Package is licensed as MIT/X (http://wiki.docbook.org/topic/DocBookLicense),
+# Package is licensed as MIT/X (https://wiki.docbook.org/topic/DocBookLicense),
 # some .js files inside ./slides/ are either Public Domain or licensed under W3C
 License: MIT and Public Domain and W3C
 URL: https://github.com/docbook/xslt10-stylesheets
@@ -62,23 +62,23 @@ rm -rf $DESTDIR%{_datadir}/sgml/docbook/xsl-ns-stylesheets/install.sh
 %post
 CATALOG=%{_sysconfdir}/xml/catalog
 %{_bindir}/xmlcatalog --noout --add "rewriteSystem" \
- "http://cdn.docbook.org/release/xsl/%{version}" \
+ "https://cdn.docbook.org/release/xsl/%{version}" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 %{_bindir}/xmlcatalog --noout --add "rewriteURI" \
- "http://cdn.docbook.org/release/xsl/%{version}" \
+ "https://cdn.docbook.org/release/xsl/%{version}" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 %{_bindir}/xmlcatalog --noout --add "rewriteSystem" \
- "http://cdn.docbook.org/release/xsl/current/" \
+ "https://cdn.docbook.org/release/xsl/current/" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 %{_bindir}/xmlcatalog --noout --add "rewriteURI" \
- "http://cdn.docbook.org/release/xsl/current/" \
+ "https://cdn.docbook.org/release/xsl/current/" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 
 %{_bindir}/xmlcatalog --noout --add "rewriteSystem" \
- "http://docbook.sourceforge.net/release/xsl-ns/current" \
+ "https://docbook.sourceforge.net/release/xsl-ns/current" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 %{_bindir}/xmlcatalog --noout --add "rewriteURI" \
- "http://docbook.sourceforge.net/release/xsl-ns/current" \
+ "https://docbook.sourceforge.net/release/xsl-ns/current" \
  "file://%{_datadir}/sgml/docbook/xsl-ns-stylesheets-%{version}" $CATALOG
 
 %postun

@@ -6,7 +6,7 @@ License:        GPLv2+
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# Project's web page (http://cdrkit.org) is no longer online.
+# Project's web page (https://cdrkit.org) is no longer online.
 Source0:        https://src.fedoraproject.org/repo/pkgs/%{name}/%{name}-%{version}.tar.gz/efe08e2f3ca478486037b053acd512e9/%{name}-%{version}.tar.gz
 Patch0:         cdrkit-1.1.9-efi-boot.patch
 Patch1:         cdrkit-fix-format-security.patch

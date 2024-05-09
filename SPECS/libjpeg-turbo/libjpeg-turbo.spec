@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://sourceforge.net/projects/libjpeg-turbo
-Source0:        http://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/libjpeg-turbo/%{name}-%{version}.tar.gz
 BuildRequires:  cmake
 Provides:       libjpeg = 6b-47
 Provides:       turbojpeg = %{version}-%{release}

@@ -18,7 +18,7 @@ Summary: Easy, clean, reliable Python 2/3 compatibility
 Version: 0.18.3
 Release: 6%{?dist}
 License: MIT
-URL: http://python-future.org/
+URL: https://python-future.org/
 Source0: https://github.com/PythonCharmers/python-future/archive/refs/tags/v%{version}/python-%{name}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch: noarch
 

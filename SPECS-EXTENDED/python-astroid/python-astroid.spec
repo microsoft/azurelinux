@@ -337,7 +337,7 @@ rm -rf %{buildroot}%{python3_sitelib}/astroid/tests
 * Thu Jan 10 2013 Brian C. Lane <bcl@redhat.com> 0.24.1-1
 - Upstream v0.24.1
 - Add python3-logilab-astng subpackage to spec. Not ready to turn it on yet
-  due to this upstream bug: http://www.logilab.org/ticket/110213
+  due to this upstream bug: https://www.logilab.org/ticket/110213
 
 * Fri Aug 03 2012 Brian C. Lane <bcl@redhat.com> 0.24.0-1
 - Upstream v0.24.0

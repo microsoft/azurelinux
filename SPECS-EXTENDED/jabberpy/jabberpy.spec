@@ -8,8 +8,8 @@ Release:       2%{?dist}
 Summary:       Python xmlstream and jabber IM protocol libs
 
 License:       LGPLv2+
-URL:           http://sourceforge.net/projects/jabberpy/
-Source0:       http://downloads.sf.net/sourceforge/%{srcname}/%{srcname}-%{version}-0.tar.gz
+URL:           https://sourceforge.net/projects/jabberpy/
+Source0:       https://downloads.sf.net/sourceforge/%{srcname}/%{srcname}-%{version}-0.tar.gz
 Source1:       %{name}-LICENSE.txt
 Patch0:        jabberpy-no-init.patch
 Patch1:        jabberpy-clean-sockets.patch

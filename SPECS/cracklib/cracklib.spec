@@ -1,5 +1,5 @@
 %{!?python3_sitelib: %define python3_sitelib %(python3 -c "from distutils.sysconfig import get_python_lib;print(get_python_lib())")}
-# Got this spec from http://downloads.sourceforge.net/cracklib/cracklib-2.9.6.tar.gz
+# Got this spec from https://downloads.sourceforge.net/cracklib/cracklib-2.9.6.tar.gz
 
 Summary:          A password strength-checking library.
 Name:             cracklib

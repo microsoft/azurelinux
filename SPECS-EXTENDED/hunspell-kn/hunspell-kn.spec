@@ -5,7 +5,7 @@ Summary: Kannada hunspell dictionaries
 Version: 1.0.3
 Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2628/1/kannada.oxt
-URL: http://extensions.services.openoffice.org/project/kannada
+URL: https://extensions.services.openoffice.org/project/kannada
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch
 

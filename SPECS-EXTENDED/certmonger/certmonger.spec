@@ -17,9 +17,9 @@ Release:	2%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
 License:	GPLv3+
-URL:		http://pagure.io/certmonger/
-Source0:	http://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
-#Source1:	http://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
+URL:		https://pagure.io/certmonger/
+Source0:	https://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
+#Source1:	https://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
 
 BuildRequires:	autoconf
 BuildRequires:	automake

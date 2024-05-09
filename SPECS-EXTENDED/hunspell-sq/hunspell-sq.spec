@@ -4,8 +4,8 @@ Name: hunspell-sq
 Summary: Albanian hunspell dictionaries
 Version: 1.6.4
 Release: 17%{?dist}
-Source: http://www.shkenca.org/shkarkime/myspell-sq_AL-%{version}.zip
-URL: http://www.shkenca.org/k6i/albanian_dictionary_for_myspell_en.html
+Source: https://www.shkenca.org/shkarkime/myspell-sq_AL-%{version}.zip
+URL: https://www.shkenca.org/k6i/albanian_dictionary_for_myspell_en.html
 License: GPLv2+
 BuildArch: noarch
 

@@ -12,10 +12,10 @@ Release:        1%{?dist}
 Summary:        Serif font metric-compatible with Cambria font
 
 # License added in font as "otfinfo -i Caladea-Regular.ttf | grep License"
-# also from http://code.google.com/p/chromium/issues/detail?id=280557
+# also from https://code.google.com/p/chromium/issues/detail?id=280557
 License:        ASL 2.0
-URL:            http://code.google.com/p/chromium/issues/detail?id=168879
-Source0:        http://gsdview.appspot.com/chromeos-localmirror/distfiles/%{archivename}.tar.gz
+URL:            https://code.google.com/p/chromium/issues/detail?id=168879
+Source0:        https://gsdview.appspot.com/chromeos-localmirror/distfiles/%{archivename}.tar.gz
 Source1:        30-0-%{fontname}-fontconfig.conf
 Source2:        62-%{fontname}-fontconfig.conf
 Source3:        %{fontname}.metainfo.xml

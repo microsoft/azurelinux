@@ -6,8 +6,8 @@ Release: 2%{?dist}
 License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.opendap.org/
-Source0: http://www.opendap.org/pub/source/libdap-%{version}.tar.gz
+URL: https://www.opendap.org/
+Source0: https://www.opendap.org/pub/source/libdap-%{version}.tar.gz
 #Don't run HTTP tests - builders don't have network connections
 Patch0: libdap-offline.patch
 

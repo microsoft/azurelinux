@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 Group:          Development/Libraries/Java
 URL:            https://codehaus-plexus.github.io/plexus-utils/
 Source0:        https://github.com/codehaus-plexus/%{name}/archive/%{name}-%{version}.tar.gz
-Source1:        http://apache.org/licenses/LICENSE-2.0.txt
+Source1:        https://apache.org/licenses/LICENSE-2.0.txt
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap

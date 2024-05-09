@@ -7,8 +7,8 @@ Version:        0.4.0
 Release:        30%{?dist}
 Summary:        Abstraction library for audio visualisation plugins
 License:        LGPLv2+
-URL:            http://libvisual.sf.net
-Source0:        http://dl.sf.net/libvisual/libvisual-%{version}.tar.gz
+URL:            https://libvisual.sf.net
+Source0:        https://dl.sf.net/libvisual/libvisual-%{version}.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  xorg-x11-proto-devel
 # https://bugzilla.redhat.com/show_bug.cgi?id=435771

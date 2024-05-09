@@ -8,8 +8,8 @@ Version:          1.6.11
 Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
-URL:              http://www.gnu.org/software/freeipmi/
-Source0:          http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+URL:              https://www.gnu.org/software/freeipmi/
+Source0:          https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:          bmc-watchdog.service
 Source2:          ipmidetectd.service
 Source3:          ipmiseld.service
@@ -784,18 +784,18 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 
 * Wed Mar 30 2011 Jan Safranek <jsafrane@redhat.com> - 1.0.3-1
 - Updated to freeipmi-1.0.3, see announce at
-  http://lists.gnu.org/archive/html/freeipmi-users/2011-03/msg00017.html
+  https://lists.gnu.org/archive/html/freeipmi-users/2011-03/msg00017.html
 
 * Wed Feb 23 2011 Jan Safranek <jsafrane@redhat.com> - 1.0.2-1
 - Updated to freeipmi-1.0.2, see announce at
-  http://lists.gnu.org/archive/html/freeipmi-users/2011-02/msg00027.html
+  https://lists.gnu.org/archive/html/freeipmi-users/2011-02/msg00027.html
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Fri Jan 21 2011 Jan Safranek <jsafrane@redhat.com> - 1.0.1:1
 - Updated to freeipmi-1.0.1, see announce at
-  http://lists.gnu.org/archive/html/freeipmi-users/2011-01/msg00006.html
+  https://lists.gnu.org/archive/html/freeipmi-users/2011-01/msg00006.html
 - Configuration files moved from /etc/ to /etc/freeipmi/. Support legacy config
   files for backwards compatibility.
 - More detailed release information can be found in the NEWS file.

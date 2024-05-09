@@ -6,8 +6,8 @@ Release:        2%{?dist}
 Summary:        A voice compression format (DSP)
 
 License:        BSD
-URL:            http://www.speex.org/
-Source0:        http://downloads.xiph.org/releases/speex/%{name}-%{version}.tar.gz
+URL:            https://www.speex.org/
+Source0:        https://downloads.xiph.org/releases/speex/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 # speexdsp was split from speex in 1.2rc2. As speexdsp does not depend on

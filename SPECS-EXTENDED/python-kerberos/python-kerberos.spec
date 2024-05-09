@@ -23,7 +23,7 @@ BuildRequires:  gcc
 The goal is to avoid having to build a module that wraps the entire\
 Kerberos framework, and instead offer a limited set of functions that do what\
 is needed for client/server Kerberos authentication based on\
-<http://www.ietf.org/rfc/rfc4559.txt>.
+<https://www.ietf.org/rfc/rfc4559.txt>.
 
 %description
 %{desc}
@@ -99,7 +99,7 @@ install -m 644 $RPM_SOURCE_DIR/LICENSE LICENSE
 
 * Tue Jul 19 2016 Rob Crittenden <rcritten@redhat.com> - 1.2.5-1
 - Update to upstream 1.2.5. Fixes single bug,
-  http://www.calendarserver.org/changeset/15659
+  https://www.calendarserver.org/changeset/15659
 - Include LICENSE since upstream dropped it from the tarball
 
 * Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.4-3

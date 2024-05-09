@@ -5,7 +5,7 @@ Summary:        Unicode Text Segmentation Package
 License:        GPLv2+ or Artistic clarified
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://sf.net/projects/linefold/
+URL:            https://sf.net/projects/linefold/
 Source0:        https://github.com/hatukanezumi/sombok/archive/%{name}-%{version}.tar.gz
 
 BuildRequires:  libthai-devel

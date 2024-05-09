@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://sourceforge.net/projects/tboot/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:        create-drtm-policy.sh
 Source2:        README.md
 Patch0:         remove-s3-algo.patch

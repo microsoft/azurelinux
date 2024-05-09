@@ -351,18 +351,18 @@ exit 0
 
 * Tue Feb  7 2012 Paul Lindner <lindner@mirth.inuus.com> - 0:1.4.13-1
 - Upgrade to memcached 1.4.13
-- http://code.google.com/p/memcached/wiki/ReleaseNotes1413
-- http://code.google.com/p/memcached/wiki/ReleaseNotes1412
-- http://code.google.com/p/memcached/wiki/ReleaseNotes1411
+- https://code.google.com/p/memcached/wiki/ReleaseNotes1413
+- https://code.google.com/p/memcached/wiki/ReleaseNotes1412
+- https://code.google.com/p/memcached/wiki/ReleaseNotes1411
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0:1.4.10-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Wed Nov  9 2011 Paul Lindner <lindner@mirth.inuus.com> - 0:1.4.10-1
-- Upgrade to memcached 1.4.10 (http://code.google.com/p/memcached/wiki/ReleaseNotes1410)
+- Upgrade to memcached 1.4.10 (https://code.google.com/p/memcached/wiki/ReleaseNotes1410)
 
 * Tue Aug 16 2011 Paul Lindner <lindner@inuus.com> - 0:1.4.7-1
-- Upgrade to memcached 1.4.7 (http://code.google.com/p/memcached/wiki/ReleaseNotes147)
+- Upgrade to memcached 1.4.7 (https://code.google.com/p/memcached/wiki/ReleaseNotes147)
 - Fix some rpmlint errors/warnings.
 
 * Tue Aug  2 2011 Paul Lindner <lindner@inuus.com> - 0:1.4.6-1
@@ -389,13 +389,13 @@ exit 0
 - ensure a constant timestamp on the sysconfig file
 
 * Sun Apr  4 2010 Paul Lindner <lindner@inuus.com> - 0:1.4.5-1
-- Upgrade to upstream memcached-1.4.5 (http://code.google.com/p/memcached/wiki/ReleaseNotes145)
+- Upgrade to upstream memcached-1.4.5 (https://code.google.com/p/memcached/wiki/ReleaseNotes145)
 
 * Wed Jan 20 2010 Paul Lindner <lindner@inuus.com> - 0:1.4.4-2
 - Remove SELinux policies fixes Bugzilla 557073
 
 * Sat Nov 28 2009 Paul Lindner <lindner@inuus.com> - 0:1.4.4-1
-- Upgraded to upstream memcached-1.4.4 (http://code.google.com/p/memcached/wiki/ReleaseNotes144)
+- Upgraded to upstream memcached-1.4.4 (https://code.google.com/p/memcached/wiki/ReleaseNotes144)
 - Add explicit Epoch to fix issue with broken devel dependencies (resolves 542001)
 
 * Thu Nov 12 2009 Paul Lindner <lindner@inuus.com> - 1.4.3-1
@@ -412,7 +412,7 @@ exit 0
 
 * Sat Aug 29 2009 Paul Lindner <lindner@inuus.com> - 1.4.1-1
 - Upgrade to 1.4.1
-- http://code.google.com/p/memcached/wiki/ReleaseNotes141
+- https://code.google.com/p/memcached/wiki/ReleaseNotes141
 
 * Wed Apr 29 2009 Paul Lindner <lindner@inuus.com> - 1.2.8-1
 - Upgrade to memcached-1.2.8

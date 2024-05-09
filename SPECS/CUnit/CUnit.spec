@@ -7,7 +7,7 @@ Summary:        Unit testing framework for C
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        LGPLv2+
-URL:            http://cunit.sourceforge.net/
+URL:            https://cunit.sourceforge.net/
 #Source0:       https://downloads.sourceforge.net/cunit/%{name}-%{tarver}.tar.bz2
 Source0:        %{name}-%{version}.tar.bz2
 

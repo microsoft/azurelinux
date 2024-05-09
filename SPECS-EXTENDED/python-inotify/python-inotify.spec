@@ -8,7 +8,7 @@ Version:       0.9.6
 Release:       21%{?dist}
 License:       MIT
 URL:           https://github.com/seb-m/pyinotify
-Source0:       http://seb.dbzteam.org/pub/pyinotify/releases/pyinotify-%{version}.tar.gz
+Source0:       https://seb.dbzteam.org/pub/pyinotify/releases/pyinotify-%{version}.tar.gz
 Patch01:       pyinotify-0.9.6-epoint.patch
 BuildRequires: gmp-devel
 BuildRequires: python3-devel
@@ -156,7 +156,7 @@ sed -i '1c#! %{__python3}' python3/pyinotify.py
 
 * Wed Aug 25 2010 Thomas Spura <tomspur@fedoraproject.org> - 0.9.0-3
 - rebuild with python3.2
-  http://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
+  https://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
 
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 0.9.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild

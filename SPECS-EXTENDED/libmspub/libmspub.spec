@@ -8,8 +8,8 @@ Release: 12%{?dist}
 Summary: A library for import of Microsoft Publisher documents
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libmspub
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libmspub
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 Patch0: gcc10.patch
 

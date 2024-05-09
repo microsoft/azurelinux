@@ -15,8 +15,8 @@ Version: 1.2.4
 Release: 15%{?dist}
 Summary: Routing daemon
 License: GPLv2+
-URL: http://www.quagga.net
-Source0: http://download.savannah.gnu.org/releases/quagga/%{name}-%{version}.tar.gz
+URL: https://www.quagga.net
+Source0: https://download.savannah.gnu.org/releases/quagga/%{name}-%{version}.tar.gz
 Source1: quagga-filter-perl-requires.sh
 Source2: quagga-tmpfs.conf
 BuildRequires: perl-generators pkgconfig

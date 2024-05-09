@@ -23,7 +23,7 @@ Name: sendmail
 Version: 8.15.2
 Release: 46%{?dist}
 License: Sendmail
-URL: http://www.sendmail.org/
+URL: https://www.sendmail.org/
 
 Source0: ftp://ftp.sendmail.org/pub/sendmail/sendmail.%{version}.tar.gz
 # Systemd Service file

@@ -5,9 +5,9 @@ Summary: Welsh hunspell dictionaries
 %global upstreamid 20040425
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/cy_GB.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/cy_GB.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.e-gymraeg.co.uk/
+URL: https://www.e-gymraeg.co.uk/
 License: GPL+
 BuildArch: noarch
 

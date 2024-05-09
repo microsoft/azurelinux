@@ -12,8 +12,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://wordlist.sourceforge.net/
 Source0:        https://github.com/en-wl/wordlist/archive/refs/tags/rel-2020.12.07.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        http://download.services.openoffice.org/contrib/dictionaries/en_GB.zip
-#See http://mxr.mozilla.org/mozilla/source/extensions/spellcheck/locales/en-US/hunspell/mozilla_words.diff?raw=1
+Source1:        https://download.services.openoffice.org/contrib/dictionaries/en_GB.zip
+#See https://mxr.mozilla.org/mozilla/source/extensions/spellcheck/locales/en-US/hunspell/mozilla_words.diff?raw=1
 Patch0:         mozilla_words.patch
 Patch1:         en_GB-singleletters.patch
 Patch2:         en_GB.two_initial_caps.patch

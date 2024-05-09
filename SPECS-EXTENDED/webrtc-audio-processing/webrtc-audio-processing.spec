@@ -6,8 +6,8 @@ Release:        5%{?dist}
 Summary:        Library for echo cancellation
 
 License:        BSD and MIT
-URL:            http://www.freedesktop.org/software/pulseaudio/webrtc-audio-processing/
-Source0:        http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/%{name}-%{version}.tar.xz
+URL:            https://www.freedesktop.org/software/pulseaudio/webrtc-audio-processing/
+Source0:        https://freedesktop.org/software/pulseaudio/webrtc-audio-processing/%{name}-%{version}.tar.xz
 
 ## upstream patches
 

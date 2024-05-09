@@ -5,8 +5,8 @@ Name: libieee1284
 Version: 0.2.11
 Release: 33%{?dist}
 License: GPLv2+
-URL: http://cyberelk.net/tim/libieee1284/
-Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
+URL: https://cyberelk.net/tim/libieee1284/
+Source0: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.bz2
 Patch1: libieee1284-strict-aliasing.patch
 Patch2: libieee1284-aarch64.patch
 BuildRequires:  gcc

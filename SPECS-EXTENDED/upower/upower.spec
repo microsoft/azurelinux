@@ -6,7 +6,7 @@ Name:           upower
 Version:        0.99.11
 Release:        5%{?dist}
 License:        GPLv2+
-URL:            http://upower.freedesktop.org/
+URL:            https://upower.freedesktop.org/
 Source0:        https://gitlab.freedesktop.org/upower/upower/uploads/%{commit}/%{name}-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc

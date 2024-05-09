@@ -9,11 +9,11 @@ Version: 14.4.2.0
 Release: 33%{?dist}
 License: GPLv2+ and LGPLv2+ and MIT
 # Modified source tarball with libgsm license, without unlicensed liblpc10:
-# _Source: http://downloads.sourceforge.net/%%{name}/%%{name}-%%{version}.tar.gz
+# _Source: https://downloads.sourceforge.net/%%{name}/%%{name}-%%{version}.tar.gz
 # _Source: %%{name}/%%{name}-%%{version}.modified.tar.gz
 # _Source: %%{name}/%%{name}-14.4.2.modified.tar.bz2
 Source0: https://github.com/i386x/sox-downstream/archive/%{name}-%{version}.modified.tar.gz
-URL: http://sox.sourceforge.net/
+URL: https://sox.sourceforge.net/
 # 0000 - 0099: General:
 Patch0: sox-14.4.2-lsx_symbols.patch
 Patch1: sox-14.4.2-lpc10.patch

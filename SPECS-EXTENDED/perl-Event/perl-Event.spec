@@ -176,7 +176,7 @@ make test
 * Mon Dec 17 2012 Paul Howarth <paul@city-fan.org> - 1.21-1
 - Update to 1.21:
   - Silence some clang warnings
-    (http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2012-12/msg00424.html)
+    (https://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2012-12/msg00424.html)
 
 * Fri Jul 20 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.20-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild

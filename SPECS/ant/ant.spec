@@ -722,7 +722,7 @@ popd
 
 * Wed Mar 17 2010 mvyskocil@suse.cz
 - return back the /usr/share/ant/lib compat symlinks
-  http://lists.opensuse.org/opensuse-java/2010-03/msg00007.html
+  https://lists.opensuse.org/opensuse-java/2010-03/msg00007.html
 
 * Wed Jun 17 2009 mvyskocil@suse.cz
 - do not use Release number in Requires of subpackages
@@ -858,7 +858,7 @@ popd
   affect programs/scripts that called the launcher and which did not want to
   receive an error if Ant itself would not start
   * All .NET tasks are now deprecated in favor of the new .NET Antlib:
-  http://ant.apache.org/antlibs/dotnet/index.html
+  https://ant.apache.org/antlibs/dotnet/index.html
 
 * Fri Sep 22 2006 dbornkessel@suse.de
 - read in properties in /etc/ant.conf

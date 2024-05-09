@@ -38,7 +38,7 @@ BuildArch:      noarch
 
 %description
 This module converts between JSON (JavaScript Object Notation) and Perl
-data structure into each other. For JSON, see http://www.crockford.com/JSON/.
+data structure into each other. For JSON, see https://www.crockford.com/JSON/.
 
 %package tests
 Summary:        Tests for %{name}

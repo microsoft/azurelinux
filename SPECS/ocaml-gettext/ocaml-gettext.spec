@@ -354,7 +354,7 @@ rm -rf %{buildroot}%{_prefix}/doc
 - Add patch for compiling against camomile 0.8.
 
 * Wed Jan 05 2011 Richard W.M. Jones <rjones@redhat.com> - 0.3.3-4
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Mon Jan 11 2010 Richard W.M. Jones <rjones@redhat.com> - 0.3.3-3
 - Remove BR ocaml-camlidl.  No longer required to build this.

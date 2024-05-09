@@ -9,8 +9,8 @@ Name: rusers
 Version: 0.17
 Release: 96%{?dist}
 License: BSD
-Url: http://rstatd.sourceforge.net/
-Source: http://ftp.linux.org.uk/pub/linux/Networking/netkit/netkit-rusers-%{version}.tar.gz
+Url: https://rstatd.sourceforge.net/
+Source: https://ftp.linux.org.uk/pub/linux/Networking/netkit/netkit-rusers-%{version}.tar.gz
 Source1: rusersd.service
 Source2: rstatd.tar.gz
 Source3: rstatd.service

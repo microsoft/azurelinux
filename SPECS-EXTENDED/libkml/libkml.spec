@@ -13,7 +13,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/libkml/libkml
 Source0:        https://github.com/libkml/libkml/archive/%{version}/libkml-%{version}.tar.gz
 # TODO: Port to minizip-2.x, meanwhile bundle version 1.3.0
-# wget -O minizip-1.3.0.tar.gz http://sourceforge.net/projects/libkml-files/files/1.3.0/minizip.tar.gz/download
+# wget -O minizip-1.3.0.tar.gz https://sourceforge.net/projects/libkml-files/files/1.3.0/minizip.tar.gz/download
 Source1:        minizip-1.3.0.tar.gz
 ## See https://github.com/libkml/libkml/pull/239
 Patch0:         0001-Fix-build-failure-due-to-failure-to-convert-pointer-.patch

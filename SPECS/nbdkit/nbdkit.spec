@@ -57,7 +57,7 @@ Summary:        NBD server
 License:        BSD
 URL:            https://gitlab.com/nbdkit/nbdkit
 
-Source0:        http://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
+Source0:        https://libguestfs.org/download/nbdkit/%{source_directory}/%{name}-%{version}.tar.gz
 
 BuildRequires: make
 %if 0%{patches_touch_autotools}

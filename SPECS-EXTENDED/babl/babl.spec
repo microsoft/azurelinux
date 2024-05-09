@@ -28,7 +28,7 @@ Release:	3%{?dist}
 
 # The gggl codes contained in this package are under the GPL, with exceptions allowing their use under libraries covered under the LGPL
 License:	LGPLv3+ and GPLv3+
-URL:		http://www.gegl.org/babl/
+URL:		https://www.gegl.org/babl/
 Source0:	https://download.gimp.org/pub/babl/%{apiver}/%{name}-%{version}.tar.xz
 
 BuildRequires:	gcc

@@ -4,10 +4,10 @@ Name: mythes-bg
 Summary: Bulgarian thesaurus
 Version: 4.3
 Release: 18%{?dist}
-Source: http://downloads.sourceforge.net/sourceforge/bgoffice/OOo-thes-bg-%{version}.zip
+Source: https://downloads.sourceforge.net/sourceforge/bgoffice/OOo-thes-bg-%{version}.zip
 Requires: mythes
 Supplements: (mythes and langpacks-bg)
-URL: http://bgoffice.sourceforge.net/
+URL: https://bgoffice.sourceforge.net/
 BuildRequires: unzip
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch

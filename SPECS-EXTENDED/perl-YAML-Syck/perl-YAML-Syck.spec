@@ -225,7 +225,7 @@ make test
   - Fix for non-printable character detection
   - Quote if non-printable characters are present
   - Make sure that LoadBlessed=0 blocks all blessing
-  - Start listing primary repo as http://github.com/toddr/YAML-Syck
+  - Start listing primary repo as https://github.com/toddr/YAML-Syck
   - README refreshed via perldoc -t
 - Require perl(XSLoader) at runtime
 - Drop %%defattr, redundant since rpm 4.4

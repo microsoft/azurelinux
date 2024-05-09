@@ -5,9 +5,9 @@ Summary: Slovak hyphenation rules
 %global upstreamid 20031227
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_sk_SK.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_sk_SK.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPL+
 BuildArch: noarch
 

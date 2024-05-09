@@ -8,8 +8,8 @@ Summary:	Tools for configuring the console using X Window System key maps
 
 # For a breakdown of the licensing, see COPYRIGHT, copyright, copyright.fonts and copyright.xkb
 License:	GPLv2+ and MIT and Public Domain
-URL:		http://packages.debian.org/cs/sid/console-setup
-Source0:	http://ftp.de.debian.org/debian/pool/main/c/%{name}/%{name}_%{version}.tar.xz
+URL:		https://packages.debian.org/cs/sid/console-setup
+Source0:	https://ftp.de.debian.org/debian/pool/main/c/%{name}/%{name}_%{version}.tar.xz
 
 # Fixes installing paths to Fedora style
 Patch0:		console-setup-1.76-paths.patch

@@ -24,9 +24,9 @@ Source0:        https://www.lua.org/ftp/%{name}-%{version}.tar.gz
 # copied from doc/readme.html on 2014-07-18
 Source1:        mit.txt
 %if 0%{?bootstrap}
-Source2:        http://www.lua.org/ftp/lua-%{bootstrap_version}.tar.gz
+Source2:        https://www.lua.org/ftp/lua-%{bootstrap_version}.tar.gz
 %endif
-Source3:        http://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
+Source3:        https://www.lua.org/tests/lua-%{test_version}-tests.tar.gz
 # multilib
 Source4:        luaconf.h
 Patch0:         %{name}-5.4.0-beta-autotoolize.patch
@@ -472,7 +472,7 @@ popd
 - added Requires for pkgconfig BZ#193674
 
 * Mon May 29 2006 Michael J. Knox <michael[AT]knox.net.nz> - 5.1-3
-- added autotools patch from Petri Lehtinen, http://lua-users.org
+- added autotools patch from Petri Lehtinen, https://lua-users.org
 
 * Mon May 08 2006 Michael J. Knox <michael[AT]knox.net.nz> - 5.1-2
 - fixed x86_64 builds

@@ -9,8 +9,8 @@ Release:        2%{?dist}
 Summary:        Unicode Emoji Data Files
 
 License:        Unicode
-URL:            http://www.unicode.org/emoji/
-Source0:        http://www.unicode.org/copyright.html
+URL:            https://www.unicode.org/emoji/
+Source0:        https://www.unicode.org/copyright.html
 Source1:        https://www.unicode.org/Public/emoji/13.0/ReadMe.txt
 Source2:        https://www.unicode.org/Public/13.0.0/ucd/emoji/emoji-data.txt
 Source3:        https://www.unicode.org/Public/emoji/13.0/emoji-sequences.txt
@@ -22,7 +22,7 @@ BuildArch:      noarch
 %description
 Unicode Emoji Data Files are the machine-readable
 emoji data files associated with
-http://www.unicode.org/reports/tr51/index.html
+https://www.unicode.org/reports/tr51/index.html
 
 %prep
 %{nil}

@@ -5,7 +5,7 @@ Summary:        Cassandra is a highly scalable, eventually consistent, distribut
 Name:           cassandra
 Version:        4.0.10
 Release:        1%{?dist}
-URL:            http://cassandra.apache.org/
+URL:            https://cassandra.apache.org/
 License:        Apache License, Version 2.0
 Group:          Applications/System
 Vendor:         Microsoft Corporation

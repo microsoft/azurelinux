@@ -8,7 +8,7 @@ License:        MIT AND GPLv2.0 AND GPLv3.0 AND GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Shells
-URL:            http://zsh.sourceforge.net/
+URL:            https://zsh.sourceforge.net/
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.xz
 Source1:        zprofile.rhs
 Source2:        zshrc

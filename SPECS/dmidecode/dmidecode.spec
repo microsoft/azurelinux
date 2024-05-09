@@ -3,7 +3,7 @@ Name:		dmidecode
 Version:	3.5
 Release:    1%{?dist}
 License:	GPLv2+
-URL:		http://www.nongnu.org/dmidecode/
+URL:		https://www.nongnu.org/dmidecode/
 Group:		System Environment/Base
 Source0:	https://download.savannah.gnu.org/releases/dmidecode/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation

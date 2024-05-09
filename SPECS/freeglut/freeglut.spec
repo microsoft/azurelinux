@@ -5,7 +5,7 @@ Version:        3.4.0
 Release:        1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://freeglut.sourceforge.net
+URL:            https://freeglut.sourceforge.net
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # For the manpages
 Source1:        https://downloads.sourceforge.net/openglut/openglut-0.6.3-doc.tar.gz
@@ -304,7 +304,7 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 
 * Sun Mar 07 2004 Mike A. Harris <mharris@redhat.com> 2.2.0-10
 - Initial Red Hat packaging created by taking the ATrpms src.rpm package from
-  http://tinyurl.com/2goog as suggested in bugzilla bug (#107228)
+  https://tinyurl.com/2goog as suggested in bugzilla bug (#107228)
 - Bumped the Release field to "10" so our package is newer when people
   upgrade to it, as requested in bug (#107228)
 - Removed redundant version/release macros from top of specfile

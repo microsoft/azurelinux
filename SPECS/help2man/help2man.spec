@@ -222,7 +222,7 @@ make install DESTDIR=%{buildroot}
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
 * Mon May 18 2009 Ralf Corsépius <corsepiu@fedoraproject.org> - 1.36.4-4
-- Apply patch from http://bugs.gentoo.org/show_bug.cgi?id=237378#c6
+- Apply patch from https://bugs.gentoo.org/show_bug.cgi?id=237378#c6
   to address BZ #494089.
 
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.36.4-3

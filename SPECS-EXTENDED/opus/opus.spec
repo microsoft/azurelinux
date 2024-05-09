@@ -9,10 +9,10 @@ Summary:  An audio codec for use in low-delay speech and audio communication
 License:  BSD
 URL:      https://www.opus-codec.org/
 
-Source0:  http://downloads.xiph.org/releases/%{name}/%{name}-%{version}%{?candidate:-%{candidate}}.tar.gz
+Source0:  https://downloads.xiph.org/releases/%{name}/%{name}-%{version}%{?candidate:-%{candidate}}.tar.gz
 # This is the final IETF Working Group RFC
-Source1:  http://tools.ietf.org/rfc/rfc6716.txt 
-Source2:  http://tools.ietf.org/rfc/rfc8251.txt
+Source1:  https://tools.ietf.org/rfc/rfc6716.txt 
+Source2:  https://tools.ietf.org/rfc/rfc8251.txt
 
 BuildRequires: gcc
 BuildRequires: doxygen

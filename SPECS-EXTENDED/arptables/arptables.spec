@@ -6,8 +6,8 @@ Version: 0.0.5
 Release: 3%{?dist}
 License: GPLv2+
 
-URL:     http://ebtables.sourceforge.net/
-Source0: http://ftp.netfilter.org/pub/arptables/%{name}-%{version}.tar.gz
+URL:     https://ebtables.sourceforge.net/
+Source0: https://ftp.netfilter.org/pub/arptables/%{name}-%{version}.tar.gz
 Source1: arptables.service
 Source2: arptables-legacy-helper
 

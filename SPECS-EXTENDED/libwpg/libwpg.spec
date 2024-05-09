@@ -46,7 +46,7 @@ The %{name}-doc package contains API documentation for %{name}.
 %package tools
 Summary:        Tools to convert WordPerfect Graphics images to other formats
 # wpg2svgbatch.pl says "GPL", without specifying version, and points to
-# http://www.gnu.org/copyleft/gpl.html . I assume this means "any
+# https://www.gnu.org/copyleft/gpl.html . I assume this means "any
 # version".
 License:        (LGPL-2.0-or-later OR MPL-2.0) AND GPL+
 Requires:       %{name}%{?_isa} = %{version}-%{release}

@@ -26,12 +26,12 @@ License:        HPND
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Url:            http://www2.cs.tum.edu/projects/cup/
+Url:            https://www2.cs.tum.edu/projects/cup/
 # TODO the version of our 11a source is no longer published
 Source0:        %{_distro_sources_url}/develop.tar.bz2
 Source1:        java-cup-generated-files.tar.bz2
 Source2:        java-cup.license
-# From          http://www2.cs.tum.edu/projects/cup/
+# From          https://www2.cs.tum.edu/projects/cup/
 Patch1:         java-cup-no-classpath-in-manifest.patch
 Patch2:         java-cup-no-cup-no-jflex.patch
 Patch3:         java-cup-classpath.patch

@@ -930,7 +930,7 @@ make install DESTDIR=%{buildroot} libdir=%{_libdir}
 
 * Sat Jul 12 2003 Mike A. Harris <mharris@redhat.com> 0.88-1
 - Update MonitorsDB for new IBM monitors from upstream XFree86 bugzilla:
-  http://bugs.xfree86.org/cgi-bin/bugzilla/show_bug.cgi?id=459
+  https://bugs.xfree86.org/cgi-bin/bugzilla/show_bug.cgi?id=459
 
 * Mon Jun  9 2003 Bill Nottingham <notting@redhat.com> 0.87-1
 - fusion update

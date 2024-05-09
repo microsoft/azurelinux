@@ -532,7 +532,7 @@ $check_ok
 - Update rpminfo to version 2004-07-07-02.
 
 * Fri Aug 10 2007 Ville Skyttä <ville.skytta@iki.fi> - 6.1-1
-- Sync COPYING with http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+- Sync COPYING with https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 
 * Mon Aug  6 2007 Ville Skyttä <ville.skytta@iki.fi>
 - Work around #250990 in rpmls and rpmdev-extract.

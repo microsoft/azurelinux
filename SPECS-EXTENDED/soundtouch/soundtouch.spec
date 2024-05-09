@@ -5,7 +5,7 @@ Version:        2.1.1
 Release:        5%{?dist}
 Summary:        Audio Processing library for changing Tempo, Pitch and Playback Rates
 License:        LGPLv2+
-URL:            http://www.surina.net/soundtouch/
+URL:            https://www.surina.net/soundtouch/
 Source0:        https://gitlab.com/soundtouch/soundtouch/-/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  autoconf automake libtool

@@ -6,8 +6,8 @@ Release:        11%{?dist}
 Summary:        Yubikey management library and client
 
 License:        BSD
-URL:            http://opensource.yubico.com/yubico-c-client/
-Source0:	http://opensource.yubico.com/yubico-c-client/releases/ykclient-%{version}.tar.gz
+URL:            https://opensource.yubico.com/yubico-c-client/
+Source0:	https://opensource.yubico.com/yubico-c-client/releases/ykclient-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  curl-devel, chrpath, help2man

@@ -8,7 +8,7 @@ Release:    15%{?dist}
 Summary:    A small library for precise conversion between arbitrary bases
 
 License:    GPLv2+
-URL:        http://pypi.python.org/pypi/justbases
+URL:        https://pypi.python.org/pypi/justbases
 Source0:    https://pypi.io/packages/source/j/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 
 BuildArch:  noarch

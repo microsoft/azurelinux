@@ -5,9 +5,9 @@ Summary: Esperanto hunspell dictionaries
 %global upstreamid 20100218
 Version: 0.%{upstreamid}
 Release: 6%{?dist}
-Source0: http://www.esperantilo.org/literumilo-fontoj.tar.gz
+Source0: https://www.esperantilo.org/literumilo-fontoj.tar.gz
 Source1: %{name}-LICENSE.txt
-URL: http://www.esperantilo.org
+URL: https://www.esperantilo.org
 License: GPLv2+
 BuildArch: noarch
 

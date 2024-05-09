@@ -137,7 +137,7 @@ ln -s %{version} %{installdir}/%{ver_x}.%{ver_y}
 
 * Wed Mar 04 2015 T.C. Hollingsworth <tchollingsworth@gmail.com> - 2.1.3-1
 - new upstream release 2.1.3
-  http://blog.jquery.com/2014/12/18/jquery-1-11-2-and-2-1-3-released-safari-fail-safe-edition/
+  https://blog.jquery.com/2014/12/18/jquery-1-11-2-and-2-1-3-released-safari-fail-safe-edition/
 
 * Tue Oct 21 2014 T.C. Hollingsworth <tchollingsworth@gmail.com> - 2.1.1-4
 - drop unneccessary symlinks

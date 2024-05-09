@@ -5,7 +5,7 @@ Name:           libraw1394
 Version:        2.1.2
 Release:        12%{?dist}
 License:        LGPLv2+
-Source:         http://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.xz
+Source:         https://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.xz
 URL:            https://git.kernel.org/pub/scm/libs/ieee1394/libraw1394.git/about
 ExcludeArch:    s390 s390x
 BuildRequires:  gcc

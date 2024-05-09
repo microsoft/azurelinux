@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 #
 # Copyright (c) 2012-2019 Remi Collet
 # License: CC-BY-SA
-# http://creativecommons.org/licenses/by-sa/4.0/
+# https://creativecommons.org/licenses/by-sa/4.0/
 #
 # Please, preserve the changelog entries
 #

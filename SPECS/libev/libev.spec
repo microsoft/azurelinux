@@ -8,8 +8,8 @@ Release:        5%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://software.schmorp.de/pkg/libev.html
-Source0:        http://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
+URL:            https://software.schmorp.de/pkg/libev.html
+Source0:        https://dist.schmorp.de/libev/Attic/%{name}-%{version}.tar.gz
 
 BuildRequires:  autoconf
 BuildRequires:  automake

@@ -8,7 +8,7 @@ Release: 18%{?dist}
 Summary: Allows using distutils2-like setup.cfg files with setup.py
 License: BSD
 
-URL: http://pypi.python.org/pypi/d2to1
+URL: https://pypi.python.org/pypi/d2to1
 Source0: https://pypi.python.org/packages/source/d/%{srcname}/%{srcname}-%{version}.post1.tar.gz#/%{name}-%{version}.post1.tar.gz
 
 BuildArch: noarch

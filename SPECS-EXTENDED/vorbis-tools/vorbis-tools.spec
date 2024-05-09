@@ -7,8 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.xiph.org/
 Source:         https://ftp.osuosl.org/pub/xiph/releases/vorbis/%{name}-%{version}.tar.gz
-# http://lists.xiph.org/pipermail/vorbis-dev/2021-January/020538.html
-# http://lists.xiph.org/pipermail/vorbis-dev/2013-May/020336.html
+# https://lists.xiph.org/pipermail/vorbis-dev/2021-January/020538.html
+# https://lists.xiph.org/pipermail/vorbis-dev/2013-May/020336.html
 Patch0:         vorbis-tools-1.4.2-man-page.patch
 BuildRequires:  flac-devel
 BuildRequires:  gcc

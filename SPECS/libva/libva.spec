@@ -732,7 +732,7 @@ rm -rf `find %{buildroot}%{_libdir}/pkgconfig/libva*.pc | grep -v "glx"`
 - split the drivers into a separate package
 * Tue Aug  9 2011 kkhere.geo@gmail.com
 - new version 1.0.14
-  no NEWS released; changelog in git http://cgit.freedesktop.org/libva/
+  no NEWS released; changelog in git https://cgit.freedesktop.org/libva/
 * Tue May 31 2011 kkhere.geo@gmail.com
 - new version 1.0.13
   * cleans up licensing issue

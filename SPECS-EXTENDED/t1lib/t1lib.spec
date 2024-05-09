@@ -9,14 +9,14 @@ Summary:        PostScript Type 1 font rasterizer
 License:        LGPLv2+ AND GPLv2+
 URL:            https://t1lib.org/
 Source0:        %{_distro_sources_url}/t1lib-%{version}.tar.gz
-# Patch originally from Debian at http://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
+# Patch originally from Debian at https://ftp.de.debian.org/debian/pool/main/t/t1lib/t1lib_5.1.2-3.diff.gz
 Patch0:         t1lib_5.1.2-3.patch
 Patch1:         t1lib-5.1.2-segf.patch
 # Fixes CVE-2010-2642, CVE-2011-0433
-# http://bugzilla.redhat.com/show_bug.cgi?id=679732
+# https://bugzilla.redhat.com/show_bug.cgi?id=679732
 Patch2:         t1lib-5.1.2-afm-fix.patch
 # Fixes CVE-2011-0764, CVE-2011-1552, CVE-2011-1553, CVE-2011-1554
-# http://bugzilla.redhat.com/show_bug.cgi?id=692909
+# https://bugzilla.redhat.com/show_bug.cgi?id=692909
 Patch3:         t1lib-5.1.2-type1-inv-rw-fix.patch
 # Add aarch64 support
 # https://bugzilla.redhat.com/show_bug.cgi?id=926603

@@ -38,7 +38,7 @@ if [ ! -e /etc/xml/docbook ]; then
 fi &&
 xmlcatalog --noout --add "public" \
     "-//OASIS//DTD DocBook XML V4.5//EN" \
-    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" \
+    "https://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" \
     /etc/xml/docbook &&
 xmlcatalog --noout --add "public" \
     "-//OASIS//DTD DocBook XML CALS Table Model V4.5//EN" \
@@ -73,11 +73,11 @@ xmlcatalog --noout --add "public" \
     "file:///usr/share/xml/docbook/docbook-xml-4.5/dbgenent.mod" \
     /etc/xml/docbook &&
 xmlcatalog --noout --add "rewriteSystem" \
-    "http://www.oasis-open.org/docbook/xml/4.5" \
+    "https://www.oasis-open.org/docbook/xml/4.5" \
     "file:///usr/share/xml/docbook/docbook-xml-4.5" \
     /etc/xml/docbook &&
 xmlcatalog --noout --add "rewriteURI" \
-    "http://www.oasis-open.org/docbook/xml/4.5" \
+    "https://www.oasis-open.org/docbook/xml/4.5" \
     "file:///usr/share/xml/docbook/docbook-xml-4.5" \
     /etc/xml/docbook
 
@@ -93,11 +93,11 @@ xmlcatalog --noout --add "delegatePublic" \
     "file:///etc/xml/docbook" \
     /etc/xml/catalog &&
 xmlcatalog --noout --add "delegateSystem" \
-    "http://www.oasis-open.org/docbook/" \
+    "https://www.oasis-open.org/docbook/" \
     "file:///etc/xml/docbook" \
     /etc/xml/catalog &&
 xmlcatalog --noout --add "delegateURI" \
-    "http://www.oasis-open.org/docbook/" \
+    "https://www.oasis-open.org/docbook/" \
     "file:///etc/xml/docbook" \
     /etc/xml/catalog
 
@@ -105,22 +105,22 @@ for DTDVERSION in 4.1.2 4.2 4.3 4.4
 do
   xmlcatalog --noout --add "public" \
     "-//OASIS//DTD DocBook XML V$DTDVERSION//EN" \
-    "http://www.oasis-open.org/docbook/xml/$DTDVERSION/docbookx.dtd" \
+    "https://www.oasis-open.org/docbook/xml/$DTDVERSION/docbookx.dtd" \
     /etc/xml/docbook
   xmlcatalog --noout --add "rewriteSystem" \
-    "http://www.oasis-open.org/docbook/xml/$DTDVERSION" \
+    "https://www.oasis-open.org/docbook/xml/$DTDVERSION" \
     "file:///usr/share/xml/docbook/docbook-xml-4.5" \
     /etc/xml/docbook
   xmlcatalog --noout --add "rewriteURI" \
-    "http://www.oasis-open.org/docbook/xml/$DTDVERSION" \
+    "https://www.oasis-open.org/docbook/xml/$DTDVERSION" \
     "file:///usr/share/xml/docbook/docbook-xml-4.5" \
     /etc/xml/docbook
   xmlcatalog --noout --add "delegateSystem" \
-    "http://www.oasis-open.org/docbook/xml/$DTDVERSION/" \
+    "https://www.oasis-open.org/docbook/xml/$DTDVERSION/" \
     "file:///etc/xml/docbook" \
     /etc/xml/catalog
   xmlcatalog --noout --add "delegateURI" \
-    "http://www.oasis-open.org/docbook/xml/$DTDVERSION/" \
+    "https://www.oasis-open.org/docbook/xml/$DTDVERSION/" \
     "file:///etc/xml/docbook" \
     /etc/xml/catalog
 done
@@ -138,7 +138,7 @@ if [ $1 -eq 0 ] ; then
         for DTDVERSION in 4.1.2 4.2 4.3 4.4 %{version}
         do
             xmlcatalog --noout --del \
-            "http://www.oasis-open.org/docbook/xml/$DTDVERSION/docbookx.dtd" /etc/xml/docbook
+            "https://www.oasis-open.org/docbook/xml/$DTDVERSION/docbookx.dtd" /etc/xml/docbook
         done
 
         for file in `find /usr/share/xml/docbook/%{name}-%{version}/*.dtd -printf "%f\n"`

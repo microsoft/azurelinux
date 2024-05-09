@@ -3,11 +3,11 @@ Name:           mpfr
 Version:        4.2.1
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.mpfr.org
+URL:            https://www.mpfr.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.xz
+Source0:        https://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.xz
 Requires:       gmp
 
 %description

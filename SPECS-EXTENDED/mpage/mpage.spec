@@ -5,7 +5,7 @@ Name: mpage
 Version: 2.5.7
 Release: 10%{?dist}
 License: GPLv2+
-Url: http://www.mesa.nl/pub/mpage/
+Url: https://www.mesa.nl/pub/mpage/
 Source: ftp://ftp.mesa.nl/pub/mpage/mpage-%{version}.tgz
 Patch0: mpage25-config.patch
 BuildRequires: gcc

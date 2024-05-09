@@ -6,9 +6,9 @@ Summary: Maori hyphenation rules
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
 # Source is dead now
-# Source: http://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
+# Source: https://packages.papakupu.maori.nz/hunspell-hyphen/hunspell-hyphen-mi-0.1.%%{upstreamid}-beta.tar.gz
 Source: %{_distro_sources_url}/hunspell-hyphen-mi-0.1.%{upstreamid}-beta.tar.gz
-URL: http://papakupu.maori.nz/
+URL: https://papakupu.maori.nz/
 License: GPLv3+
 BuildArch: noarch
 

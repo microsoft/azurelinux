@@ -5,8 +5,8 @@ Summary: Tagalog hunspell dictionaries
 %global upstreamid 20050109
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/tl_PH.zip
-URL: http://borel.slu.edu/crubadan/apps.html
+Source: https://download.services.openoffice.org/contrib/dictionaries/tl_PH.zip
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPLv2+
 BuildArch: noarch
 

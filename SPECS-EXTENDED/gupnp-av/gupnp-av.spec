@@ -6,8 +6,8 @@ Release:       4%{?dist}
 Summary:       A collection of helpers for building UPnP AV applications
 
 License:       LGPLv2+
-URL:           http://www.gupnp.org/
-Source0:       http://download.gnome.org/sources/gupnp-av/0.12/%{name}-%{version}.tar.xz
+URL:           https://www.gupnp.org/
+Source0:       https://download.gnome.org/sources/gupnp-av/0.12/%{name}-%{version}.tar.xz
 
 BuildRequires: glib2-devel
 BuildRequires: gtk-doc
@@ -121,7 +121,7 @@ make check %{?_smp_mflags} V=1
 
 * Thu Feb 11 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.8-1
 - 0.12.8 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.8.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.8.news
 - Use %%license
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.7-3
@@ -132,7 +132,7 @@ make check %{?_smp_mflags} V=1
 
 * Tue Jan  6 2015 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.7-1
 - 0.12.7 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.7.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.7.news
 
 * Wed Sep 10 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.6-5
 - Build vala bindings
@@ -148,78 +148,78 @@ make check %{?_smp_mflags} V=1
 
 * Wed Jun 11 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.6-1
 - 0.12.6 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.6.news
 
 * Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.12.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
 * Tue Feb  4 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.5-1
 - 0.12.5 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.5.news
 
 * Mon Nov 18 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.4-1
 - 0.12.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.4.news
 
 * Wed Oct 16 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.3-1
 - 0.12.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.3.news
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.12.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
 * Thu May 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.2-1
 - 0.12.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.2.news
 
 * Sun May 12 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.1-2
 - Move xsd files to main rpm (RHBZ 962166)
 
 * Tue Mar 19 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.1-1
 - 0.12.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.1.news
 
 * Thu Feb 21 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.12.0-1
 - 0.12.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.12/gupnp-av-0.12.0.news
 
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.11.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Fri Dec 14 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.11.6-1
 - 0.11.6 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.6.news
 
 * Thu Dec  6 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.11.5-1
 - 0.11.5 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.5.news
 
 * Sat Dec  1 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.11.4-1
 - 0.11.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.4.news
 
 * Mon Nov 19 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.11.3-1
 - 0.11.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.3.news
 
 * Mon Oct 29 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.11.2-1
 - 0.11.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.2.news
 
 * Sun Oct  7 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.11.0-1
 - 0.11.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.11/gupnp-av-0.11.0.news
 
 * Sun Aug 19 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.10.3-1
 - 0.10.3 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.3.news
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.10.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Sat Apr 21 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.10.2-1
 - 0.10.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.2.news
 
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.10.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
@@ -229,11 +229,11 @@ make check %{?_smp_mflags} V=1
 
 * Mon Sep  5 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.10.1-1
 - 0.10.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.1.news
 
 * Fri Sep  2 2011 Zeeshan Ali <zeenix@redhat.com> - 0.10.0-1
 - 0.10.0 release
-- http://ftp.acc.umu.se/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.0.news
+- https://ftp.acc.umu.se/pub/GNOME/sources/gupnp-av/0.10/gupnp-av-0.10.0.news
 
 * Thu Jun 16 2011 Peter Robinson <pbrobinson@gmail.com> - 0.9.1-1
 - 0.9.1 release

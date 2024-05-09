@@ -157,7 +157,7 @@ make %{?_smp_mflags}
 # truncate NEWS
 awk '/^Overview of Changes/ { seen+=1 }
 { if (seen < 2) print }
-{ if (seen == 2) { print "For older news, see http://git.gnome.org/cgit/gtk+/plain/NEWS"; exit } }' NEWS > tmp; mv tmp NEWS
+{ if (seen == 2) { print "For older news, see https://git.gnome.org/cgit/gtk+/plain/NEWS"; exit } }' NEWS > tmp; mv tmp NEWS
 
 %install
 # Deriving /etc/gtk-2.0/$host location
@@ -1751,7 +1751,7 @@ gtk-query-immodules-2.0-%{__isa_bits} --update-cache
 - XFlush() rather than XSync() at the end of process_all_updates()
   (big remote X anaconda speedup)
 - Add patch to fix frequent Red Hat 9 crash
-  http://bugzilla.gnome.org/show_bug.cgi?id=105745
+  https://bugzilla.gnome.org/show_bug.cgi?id=105745
 
 * Mon Jun  9 2003 Owen Taylor <otaylor@redhat.com>
 - Version 2.2.2

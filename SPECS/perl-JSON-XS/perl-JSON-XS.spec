@@ -5,7 +5,7 @@ Version:        4.03
 Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/JSON-XS/
+URL:            https://search.cpan.org/dist/JSON-XS/
 Source0:        https://cpan.metacpan.org/authors/id/M/ML/MLEHMANN/JSON-XS-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

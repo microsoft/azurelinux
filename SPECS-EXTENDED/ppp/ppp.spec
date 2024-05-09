@@ -7,7 +7,7 @@ Version: 2.4.7
 Release: 36%{?dist}
 Summary: The Point-to-Point Protocol daemon
 License: BSD and LGPLv2+ and GPLv2+ and Public Domain
-URL:     http://www.samba.org/ppp
+URL:     https://www.samba.org/ppp
 
 Source0: ftp://ftp.samba.org/pub/ppp/ppp-%{version}.tar.gz
 Source1: ppp-pam.conf

@@ -11,27 +11,27 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.oasis-open.org/docbook/
 Source0:        https://www.oasis-open.org/docbook/sgml/3.0/docbk30.zip
-Source1:        http://www.oasis-open.org/docbook/sgml/3.1/docbk31.zip
-Source2:        http://www.oasis-open.org/docbook/sgml/4.0/docbk40.zip
-Source3:        http://www.oasis-open.org/docbook/sgml/4.1/docbk41.zip
-Source4:        http://www.oasis-open.org/docbook/xml/4.1.2/docbkx412.zip
-Source5:        http://www.oasis-open.org/docbook/sgml/4.2/docbook-4.2.zip
-Source6:        http://www.oasis-open.org/docbook/xml/4.2/docbook-xml-4.2.zip
-Source7:        http://www.docbook.org/sgml/4.3/docbook-4.3.zip
-Source8:        http://www.docbook.org/xml/4.3/docbook-xml-4.3.zip
-Source9:        http://www.docbook.org/sgml/4.4/docbook-4.4.zip
-Source10:       http://www.docbook.org/xml/4.4/docbook-xml-4.4.zip
-Source11:       http://www.docbook.org/sgml/4.5/docbook-4.5.zip
-Source12:       http://www.docbook.org/xml/4.5/docbook-xml-4.5.zip
-Source13:       http://www.docbook.org/rng/4.2/docbook-rng-4.2.zip
-Source14:       http://www.docbook.org/rng/4.3/docbook-rng-4.3.zip
-Source15:       http://www.docbook.org/rng/4.4/docbook-rng-4.4.zip
-#compressed from http://www.docbook.org/rng/4.5/ upstream archive unavailable
+Source1:        https://www.oasis-open.org/docbook/sgml/3.1/docbk31.zip
+Source2:        https://www.oasis-open.org/docbook/sgml/4.0/docbk40.zip
+Source3:        https://www.oasis-open.org/docbook/sgml/4.1/docbk41.zip
+Source4:        https://www.oasis-open.org/docbook/xml/4.1.2/docbkx412.zip
+Source5:        https://www.oasis-open.org/docbook/sgml/4.2/docbook-4.2.zip
+Source6:        https://www.oasis-open.org/docbook/xml/4.2/docbook-xml-4.2.zip
+Source7:        https://www.docbook.org/sgml/4.3/docbook-4.3.zip
+Source8:        https://www.docbook.org/xml/4.3/docbook-xml-4.3.zip
+Source9:        https://www.docbook.org/sgml/4.4/docbook-4.4.zip
+Source10:       https://www.docbook.org/xml/4.4/docbook-xml-4.4.zip
+Source11:       https://www.docbook.org/sgml/4.5/docbook-4.5.zip
+Source12:       https://www.docbook.org/xml/4.5/docbook-xml-4.5.zip
+Source13:       https://www.docbook.org/rng/4.2/docbook-rng-4.2.zip
+Source14:       https://www.docbook.org/rng/4.3/docbook-rng-4.3.zip
+Source15:       https://www.docbook.org/rng/4.4/docbook-rng-4.4.zip
+#compressed from https://www.docbook.org/rng/4.5/ upstream archive unavailable
 Source16:       docbook-rng-4.5.zip
-Source17:       http://www.docbook.org/xsd/4.2/docbook-xsd-4.2.zip
-Source18:       http://www.docbook.org/xsd/4.3/docbook-xsd-4.3.zip
-Source19:       http://www.docbook.org/xsd/4.4/docbook-xsd-4.4.zip
-#compressed from http://www.docbook.org/xsd/4.5/ upstream archive unavailable
+Source17:       https://www.docbook.org/xsd/4.2/docbook-xsd-4.2.zip
+Source18:       https://www.docbook.org/xsd/4.3/docbook-xsd-4.3.zip
+Source19:       https://www.docbook.org/xsd/4.4/docbook-xsd-4.4.zip
+#compressed from https://www.docbook.org/xsd/4.5/ upstream archive unavailable
 Source20:       docbook-xsd-4.5.zip
 #license file
 Source21:       LICENSE.PTR
@@ -354,7 +354,7 @@ do
       ent/iso-cyr2.ent	ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN
 ENDENT
     for f in System URI; do
-      $catcmd --add rewrite$f "http://www.oasis-open.org/docbook/xml/$ver" \
+      $catcmd --add rewrite$f "https://www.oasis-open.org/docbook/xml/$ver" \
 	$sgmldir $xmlcatalog
     done
   fi

@@ -11,7 +11,7 @@ Summary:        Fixtures, reusable state for writing clean tests and more
 
 License:        ASL 2.0 or BSD
 URL:            https://launchpad.net/python-fixtures
-Source0:        http://pypi.python.org/packages/source/f/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
+Source0:        https://pypi.python.org/packages/source/f/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
 

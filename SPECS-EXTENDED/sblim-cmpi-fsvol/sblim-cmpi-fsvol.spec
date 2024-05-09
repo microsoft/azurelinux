@@ -7,8 +7,8 @@ Name:           sblim-cmpi-fsvol
 Version:        1.5.1
 Release:        27%{?dist}
 License:        EPL
-URL:            http://sourceforge.net/projects/sblim/
-Source0:        http://downloads.sourceforge.net/project/sblim/providers/%{name}/%{version}/%{name}-%{version}.tar.bz2
+URL:            https://sourceforge.net/projects/sblim/
+Source0:        https://downloads.sourceforge.net/project/sblim/providers/%{name}/%{version}/%{name}-%{version}.tar.bz2
 Patch0:         sblim-cmpi-fsvol-1.5.0-ext4-support.patch
 # Patch1: bz921487, backported from upstream
 Patch1:         sblim-cmpi-fsvol-1.5.1-mounted-fs-shown-as-disabled.patch

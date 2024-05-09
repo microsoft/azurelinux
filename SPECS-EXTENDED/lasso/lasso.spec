@@ -41,8 +41,8 @@ Name: lasso
 Version: 2.8.0
 Release: 1%{?dist}
 License: GPLv2+
-URL: http://lasso.entrouvert.org/
-Source: http://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
+URL: https://lasso.entrouvert.org/
+Source: https://dev.entrouvert.org/lasso/lasso-%{version}.tar.gz
 
 BuildRequires: autoconf
 BuildRequires: automake

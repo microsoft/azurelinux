@@ -3,8 +3,8 @@ Name:		    hdparm
 Version:	    9.65
 Release:        1%{?dist}
 License:	    BSD
-URL:		    http://sourceforge.net/projects/%{name}/
-Source0:	    http://downloads.sourceforge.net/hdparm/%{name}-%{version}.tar.gz
+URL:		    https://sourceforge.net/projects/%{name}/
+Source0:	    https://downloads.sourceforge.net/hdparm/%{name}-%{version}.tar.gz
 Group:		    Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

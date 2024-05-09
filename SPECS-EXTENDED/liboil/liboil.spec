@@ -6,8 +6,8 @@ Version: 0.3.16
 Release: 22%{?dist}
 # See COPYING which details everything, various BSD licenses apply
 License: BSD
-URL: http://liboil.freedesktop.org/
-Source: http://liboil.freedesktop.org/download/%{name}-%{version}.tar.gz
+URL: https://liboil.freedesktop.org/
+Source: https://liboil.freedesktop.org/download/%{name}-%{version}.tar.gz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=435771
 Patch4: liboil-0.3.13-disable-ppc64-opts.patch
@@ -173,7 +173,7 @@ rm -f %{buildroot}%{_libdir}/*.a
 
 * Fri Sep 07 2007 - Bastien Nocera <bnocera@redhat.com> - 0.3.12-11
 - Revert the previous commit, it's still broken, see:
-  http://koji.fedoraproject.org/koji/taskinfo?taskID=151172
+  https://koji.fedoraproject.org/koji/taskinfo?taskID=151172
 
 * Thu Aug 30 2007 - David Woodhouse <dwmw2@infradead.org> - 0.3.12-10
 - Re-enable explicit Altivec but don't let the compiler use it automatically
@@ -197,7 +197,7 @@ rm -f %{buildroot}%{_libdir}/*.a
 - Add upstream patch to not crash on PPC machines without Altivec
   (#252179)
 
-* Sun Aug  5 2007 Matthias Saou <http://freshrpms.net/> 0.3.12-4
+* Sun Aug  5 2007 Matthias Saou <https://freshrpms.net/> 0.3.12-4
 - Update License field.
 - Remove standard gcc-c++ build requirement.
 - Spec file cleanup, only consistency changes.
@@ -225,23 +225,23 @@ rm -f %{buildroot}%{_libdir}/*.a
 * Mon Mar 27 2006 Ray Strode <rstrode@redhat.com> 0.3.8-2
 - Update to 0.3.8 (bug 186930)
 
-* Tue Mar 21 2006 Matthias Saou <http://freshrpms.net/> 0.3.7.1-1
+* Tue Mar 21 2006 Matthias Saou <https://freshrpms.net/> 0.3.7.1-1
 - Update to today's CVS code which should fix the PPC build issue.
 - Include new oil-bugreport tool in the devel package.
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 0.3.7-3
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 0.3.7-3
 - FC5 rebuild (well, try at least since PPC fixes are required).
 
-* Thu Feb  9 2006 Matthias Saou <http://freshrpms.net/> 0.3.7-2
+* Thu Feb  9 2006 Matthias Saou <https://freshrpms.net/> 0.3.7-2
 - Rebuild for new gcc/glibc.
 
-* Fri Feb  3 2006 Matthias Saou <http://freshrpms.net/> 0.3.7-1
+* Fri Feb  3 2006 Matthias Saou <https://freshrpms.net/> 0.3.7-1
 - Update to 0.3.7.
 
-* Wed Dec 14 2005 Matthias Saou <http://freshrpms.net/> 0.3.6-1
+* Wed Dec 14 2005 Matthias Saou <https://freshrpms.net/> 0.3.6-1
 - Update to 0.3.6.
 
-* Mon Nov 14 2005 Matthias Saou <http://freshrpms.net/> 0.3.5-3
+* Mon Nov 14 2005 Matthias Saou <https://freshrpms.net/> 0.3.5-3
 - Sync spec files across branches.
 - Parallel make seems to have worked for 0.3.5 on devel, but just in case...
 
@@ -251,17 +251,17 @@ rm -f %{buildroot}%{_libdir}/*.a
 * Sat Nov 12 2005 Thomas Vander Stichele <thomas at apestaart dot org> 0.3.5-1
 - Update to 0.3.5.
 
-* Wed Oct 12 2005 Matthias Saou <http://freshrpms.net/> 0.3.3-3
+* Wed Oct 12 2005 Matthias Saou <https://freshrpms.net/> 0.3.3-3
 - Add patch to disable unrecognized "-fasm-blocks" gcc option on PPC.
 
-* Tue Oct  4 2005 Matthias Saou <http://freshrpms.net/> 0.3.3-2
+* Tue Oct  4 2005 Matthias Saou <https://freshrpms.net/> 0.3.3-2
 - Update to 0.3.3.
 - Update liboil-0.3.3-gccoptfixes.patch.
 
 * Thu Jun 16 2005 Thomas Vander Stichele <thomas at apestaart dot org> 0.3.2-2
 - Disable parallel make
 
-* Wed May 25 2005 Matthias Saou <http://freshrpms.net/> 0.3.2-1
+* Wed May 25 2005 Matthias Saou <https://freshrpms.net/> 0.3.2-1
 - Update to 0.3.2.
 - Change ldconfig calls to be the program.
 - Include new gtk-doc files in the devel package.
@@ -277,12 +277,12 @@ rm -f %{buildroot}%{_libdir}/*.a
 * Fri Apr  7 2005 Michael Schwendt <mschwendt[AT]users.sf.net>
 - rebuilt
 
-* Fri Jan 28 2005 Matthias Saou <http://freshrpms.net/> 0.3.0-1
+* Fri Jan 28 2005 Matthias Saou <https://freshrpms.net/> 0.3.0-1
 - Update to 0.3.0.
 
-* Wed Nov 24 2004 Matthias Saou <http://freshrpms.net/> 0.2.2-1
+* Wed Nov 24 2004 Matthias Saou <https://freshrpms.net/> 0.2.2-1
 - Update to 0.2.2.
 
-* Thu Nov  4 2004 Matthias Saou <http://freshrpms.net/> 0.2.0-1
+* Thu Nov  4 2004 Matthias Saou <https://freshrpms.net/> 0.2.0-1
 - Initial RPM release.
 

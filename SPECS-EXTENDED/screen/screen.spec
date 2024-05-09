@@ -236,7 +236,7 @@ rm -f %{buildroot}%{_infodir}/dir
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
 * Mon Jun 23 2014 Rex Dieter <rdieter@fedoraproject.org> 4.2.1-3
-- comply with http://fedoraproject.org/wiki/Packaging:Tmpfiles.d (#1112016)
+- comply with https://fedoraproject.org/wiki/Packaging:Tmpfiles.d (#1112016)
 
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild

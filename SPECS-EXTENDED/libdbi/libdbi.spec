@@ -5,12 +5,12 @@ Name: libdbi
 Version: 0.9.0
 Release: 16%{?dist}
 License: LGPLv2+
-URL: http://libdbi.sourceforge.net/
+URL: https://libdbi.sourceforge.net/
 
-Source: http://prdownloads.sourceforge.net/libdbi/%{name}-%{version}.tar.gz
+Source: https://prdownloads.sourceforge.net/libdbi/%{name}-%{version}.tar.gz
 
 # add support for aarch64 to the shipped old automake files
-# -> fixed in upstream (see http://sourceforge.net/p/libdbi/mailman/message/31868578/)
+# -> fixed in upstream (see https://sourceforge.net/p/libdbi/mailman/message/31868578/)
 #    but upstream haven't realeased new version yet
 Patch1: libdbi-aarch64.patch
 

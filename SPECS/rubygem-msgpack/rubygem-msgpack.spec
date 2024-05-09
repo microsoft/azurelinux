@@ -8,7 +8,7 @@ License:        Apache 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
-URL:            http://msgpack.org/
+URL:            https://msgpack.org/
 Source0:        https://github.com/msgpack/msgpack-ruby/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-ruby-%{version}.tar.gz
 BuildRequires:  git
 BuildRequires:  ruby

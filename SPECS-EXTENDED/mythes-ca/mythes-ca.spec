@@ -4,8 +4,8 @@ Name: mythes-ca
 Summary: Catalan thesaurus
 Version: 1.5.0
 Release: 21%{?dist}
-Source: http://www.softcatala.org/diccionaris/actualitzacions/sinonims/thesaurus-ca.oxt
-URL: http://www.softcatala.org/wiki/Projectes/Openthesaurus-ca
+Source: https://www.softcatala.org/diccionaris/actualitzacions/sinonims/thesaurus-ca.oxt
+URL: https://www.softcatala.org/wiki/Projectes/Openthesaurus-ca
 License: GPL+
 BuildArch: noarch
 Requires: mythes

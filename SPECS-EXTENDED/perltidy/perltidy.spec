@@ -5,7 +5,7 @@ Summary:	Tool for indenting and re-formatting Perl scripts
 License:	GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://perltidy.sourceforge.net/
+URL:		https://perltidy.sourceforge.net/
 Source0:	https://cpan.metacpan.org/modules/by-module/Perl/Perl-Tidy-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build

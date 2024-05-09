@@ -7,7 +7,7 @@ Release:	13%{?dist}
 Summary:	Open source Implementation of WS-Management
 
 License:	BSD
-URL:		http://www.openwsman.org/
+URL:		https://www.openwsman.org/
 Source0:	https://github.com/Openwsman/openwsman/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # help2man generated manpage for openwsmand binary
 Source1:	openwsmand.8.gz

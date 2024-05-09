@@ -6,8 +6,8 @@ Version:        1.42
 Release:        2%{?dist}
 # The Click license is an MIT variant.
 License:        MIT
-URL:            http://www.lcdf.org/~eddietwo/type/
-Source0:        http://www.lcdf.org/~eddietwo/type/t1utils-%{version}.tar.gz
+URL:            https://www.lcdf.org/~eddietwo/type/
+Source0:        https://www.lcdf.org/~eddietwo/type/t1utils-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description

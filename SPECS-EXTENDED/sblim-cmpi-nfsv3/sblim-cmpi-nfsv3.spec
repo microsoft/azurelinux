@@ -7,8 +7,8 @@ Name:           sblim-cmpi-nfsv3
 Version:        1.1.1
 Release:        23%{?dist}
 License:        EPL
-URL:            http://sourceforge.net/projects/sblim/
-Source0:        http://downloads.sourceforge.net/project/sblim/providers/%{name}/%{version}/%{name}-%{version}.tar.bz2
+URL:            https://sourceforge.net/projects/sblim/
+Source0:        https://downloads.sourceforge.net/project/sblim/providers/%{name}/%{version}/%{name}-%{version}.tar.bz2
 
 #Patch0: remove version from docdir
 Patch0:         sblim-cmpi-nfsv3-1.1.1-docdir.patch

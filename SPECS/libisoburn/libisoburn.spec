@@ -48,7 +48,7 @@ developing applications that use libisoburn.
 %package -n xorriso
 Summary:        ISO-9660 and Rock Ridge image manipulation tool
 Group:          Applications/Archiving
-URL:            http://scdbackup.sourceforge.net/xorriso_eng.html
+URL:            https://scdbackup.sourceforge.net/xorriso_eng.html
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description -n xorriso

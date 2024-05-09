@@ -18,7 +18,7 @@ BuildRequires:  xmlto
 The SELinux CIL Compiler is a compiler that converts the CIL language as
 described on the CIL design wiki into a kernel binary policy file.
 Please see the CIL Design Wiki at:
-http://github.com/SELinuxProject/cil/wiki/
+https://github.com/SELinuxProject/cil/wiki/
 for more information about the goals and features on the CIL language.
 
 %prep

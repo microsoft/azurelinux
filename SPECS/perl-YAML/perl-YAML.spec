@@ -5,7 +5,7 @@ Version:        1.30
 Release:        2%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/YAML/
+URL:            https://search.cpan.org/dist/YAML/
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TINITA/YAML-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,7 +50,7 @@ Provides:       perl(YAML::Warning)
 
 %description
 The YAML.pm module implements a YAML Loader and Dumper based on the
-YAML 1.0 specification. http://www.yaml.org/spec/
+YAML 1.0 specification. https://www.yaml.org/spec/
 YAML is a generic data serialization language that is optimized for
 human readability. It can be used to express the data structures of
 most modern programming languages, including Perl.

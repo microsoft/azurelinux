@@ -3,11 +3,11 @@ Name:		ltrace
 Version:	0.7.3
 Release:        8%{?dist}
 License:	GPLv2+
-URL:		http://www.ltrace.org/
+URL:		https://www.ltrace.org/
 Group:		Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:	http://www.ltrace.org/%{name}_%{version}.orig.tar.bz2
+Source0:	https://www.ltrace.org/%{name}_%{version}.orig.tar.bz2
 Patch0:		Move-get_hfa_type-from-IA64-backend-to-type.c-name-i.patch
 Patch1:		Set-child-stack-alignment-in-trace-clone.c.patch
 Patch2:		Implement-aarch64-support.patch

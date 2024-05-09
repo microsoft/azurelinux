@@ -5,8 +5,8 @@ Release:        24%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://oldhome.schmorp.de/marc/liblzf.html
-Source0:        http://dist.schmorp.de/liblzf/liblzf-%{version}.tar.gz
+URL:            https://oldhome.schmorp.de/marc/liblzf.html
+Source0:        https://dist.schmorp.de/liblzf/liblzf-%{version}.tar.gz
 # Adds autoconf and in particular support for building shared libraries.
 # 7th Feb 2011 - Mail sent upstream to author. Awaiting conclusion.
 Patch0:         liblzf-%{version}-autoconf-20140314.patch

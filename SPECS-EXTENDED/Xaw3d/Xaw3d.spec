@@ -13,7 +13,7 @@ Patch10: Xaw3d-1.6.1-fontset.patch
 Patch11: Xaw3d-1.6.1-hsbar.patch
 
 License: MIT
-URL: http://xorg.freedesktop.org/
+URL: https://xorg.freedesktop.org/
 
 BuildRequires: libXmu-devel
 BuildRequires: libXt-devel
@@ -179,11 +179,11 @@ rm -r $RPM_BUILD_ROOT%{_docdir}
 
 * Mon Nov 8 2010 Hans de Goede <hdegoede@redhat.com> - 1.5E-17
 - Also apply the Xaw3d-1.5E-secure, Xaw3d-1.5E-thumb and Xaw3d-1.5E-cast
-  (replacing xaw3d.patch) patches from http://gitorious.org/xaw3d (#587349)
+  (replacing xaw3d.patch) patches from https://gitorious.org/xaw3d (#587349)
 - Apply accidentally not applied Xaw3d-1.5E-lex.patch
 
 * Mon Nov 8 2010 Orion Poplawski <orion@cora.nwra.com> - 1.5E-16
-- Add patches from http://gitorious.org/xaw3d
+- Add patches from https://gitorious.org/xaw3d
 
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5E-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild

@@ -8,7 +8,7 @@ Version:	1.2.2
 Release:	6%{?dist}
 
 License:	GPLv2+
-URL:		http://irssi.org/
+URL:		https://irssi.org/
 Source0:	https://github.com/%{name}/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
 Source1:	irssi-config.h
 BuildRequires:	ncurses-devel openssl-devel zlib-devel

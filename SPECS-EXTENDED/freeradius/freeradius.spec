@@ -306,7 +306,7 @@ cat >> $RPM_BUILD_ROOT/%{docdir}/REDHAT << EOF
 Red Hat, RHEL, Fedora, and CentOS specific information can be found on the
 FreeRADIUS Wiki in the Red Hat FAQ.
 
-http://wiki.freeradius.org/guide/Red-Hat-FAQ
+https://wiki.freeradius.org/guide/Red-Hat-FAQ
 
 Please reference that document.
 
@@ -1520,7 +1520,7 @@ EOF
     See raddb/modules/redis and raddb/modules/rediswho
   * Add "key" to rlm_fastusers.  Closes bug #126.
   * Added scripts/radtee from original software at
-    http://horde.net/~jwm/software/misc/comparison-tee
+    https://horde.net/~jwm/software/misc/comparison-tee
   * Updated radmin "man" page for new commands.
   * radsniff now prints the hex decoding of the packet (-x -x -x)
   * mschap module now reloads its configuration on HUP
@@ -2060,7 +2060,7 @@ EOF
     * Added "delete_mppe_keys" configuration option to rlm_wimax.
       Apparently some WiMAX clients misbehave when they see those keys.
     * Added experimental rlm_ruby from
-      http://github.com/Antti/freeradius-server/tree/master
+      https://github.com/Antti/freeradius-server/tree/master
     * Add Tunnel attributes to ldap.attrmap
     * Enable virtual servers to be reloaded on HUP.  For now, only
       the "authorize", "authenticate", etc. processing sections are

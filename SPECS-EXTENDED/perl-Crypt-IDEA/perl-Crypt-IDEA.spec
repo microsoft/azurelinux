@@ -34,7 +34,7 @@ Requires:	perl(:MODULE_COMPAT_%(eval "`perl -V:version`"; echo $version))
 This perl extension is an implementation of the IDEA block cipher algorithm.
 The module implements the Crypt::BlockCipher interface.
 
-This implementation is copyright Systemics Ltd (http://www.systemics.com/).
+This implementation is copyright Systemics Ltd (https://www.systemics.com/).
 
 %prep
 %setup -q -n Crypt-IDEA-%{version}
@@ -173,7 +173,7 @@ make test
 * Thu Nov 27 2008 Paul Howarth <paul@city-fan.org> 1.08-1
 - Update to 1.08
 - Clean up for submission to RPM Fusion
-  (http://bugzilla.rpmfusion.org/show_bug.cgi?id=195)
+  (https://bugzilla.rpmfusion.org/show_bug.cgi?id=195)
 
 * Fri Dec  2 2005 Paul Howarth <paul@city-fan.org> 1.02-1
 - Initial build

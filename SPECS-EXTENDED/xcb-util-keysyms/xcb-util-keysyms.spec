@@ -5,8 +5,8 @@ Version:	0.4.0
 Release:	14%{?dist}
 Summary:	Standard X key constants and keycodes conversion on top of libxcb
 License:	MIT
-URL:		http://xcb.freedesktop.org
-Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
+URL:		https://xcb.freedesktop.org
+Source0:	https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
 Source1:  %{name}-LICENSE.txt
 BuildRequires:  gcc
 BuildRequires:	pkgconfig(xcb-util) >= 0.3.8

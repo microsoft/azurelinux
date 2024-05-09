@@ -4,7 +4,7 @@ Version:        2.1.3
 Release:        1%{?dist}
 License:        GPLv2+
 Group:          Applications/Internet
-Url:            http://traceroute.sourceforge.net
+Url:            https://traceroute.sourceforge.net
 Source0:        https://sourceforge.net/projects/traceroute/files/traceroute/traceroute-%{version}/traceroute-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

@@ -104,7 +104,7 @@ for developing applications that use %{name}.
 # NOTE: It would be *awesome* if this file was maintained by the upstream
 # project, translated and installed into the right place during `make install`.
 #
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
+# See https://www.freedesktop.org/software/appstream/docs/ for more details.
 #
 mkdir -p %{buildroot}%{_datadir}/appdata
 cat > %{buildroot}%{_datadir}/appdata/gstreamer-base.appdata.xml <<EOF
@@ -132,10 +132,10 @@ cat > %{buildroot}%{_datadir}/appdata/gstreamer-base.appdata.xml <<EOF
     <keyword>Vorbis</keyword>
   </keywords>
   <compulsory_for_desktop>GNOME</compulsory_for_desktop>
-  <url type="homepage">http://gstreamer.freedesktop.org/</url>
+  <url type="homepage">https://gstreamer.freedesktop.org/</url>
   <url type="bugtracker">https://bugzilla.gnome.org/enter_bug.cgi?product=GStreamer</url>
-  <url type="donation">http://www.gnome.org/friends/</url>
-  <url type="help">http://gstreamer.freedesktop.org/documentation/</url>
+  <url type="donation">https://www.gnome.org/friends/</url>
+  <url type="help">https://gstreamer.freedesktop.org/documentation/</url>
   <update_contact><!-- upstream-contact_at_email.com --></update_contact>
 </component>
 EOF

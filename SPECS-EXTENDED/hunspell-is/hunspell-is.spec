@@ -6,7 +6,7 @@ Summary: Icelandic hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 19%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2829/1/icelandic-dict-2009-08-23.oxt
-URL: http://extensions.services.openoffice.org/project/dict-is
+URL: https://extensions.services.openoffice.org/project/dict-is
 License: GPLv2+
 BuildArch: noarch
 

@@ -47,15 +47,15 @@ Source30:   https://www.x.org/pub/individual/font/font-winitzki-cyrillic-1.0.3.t
 Source31:   https://www.x.org/pub/individual/font/font-xfree86-type1-1.0.4.tar.bz2
 
 # Luxi fonts are under a bad license
-# http://www.x.org/pub/individual/font/font-bh-ttf-1.0.0.tar.bz2
-# http://www.x.org/pub/individual/font/font-bh-type1-1.0.0.tar.bz2
+# https://www.x.org/pub/individual/font/font-bh-ttf-1.0.0.tar.bz2
+# https://www.x.org/pub/individual/font/font-bh-type1-1.0.0.tar.bz2
 
 # IBM refused to relicense ibm-type1 fonts with permission to modify
-# http://www.x.org/pub/individual/font/font-ibm-type1-1.0.0.tar.bz2
+# https://www.x.org/pub/individual/font/font-ibm-type1-1.0.0.tar.bz2
 
 # Meltho Syrian fonts (misc-meltho) have a bad license, upstream did not respond
 # to request for relicensing
-# http://www.x.org/pub/individual/font/font-misc-meltho-1.0.0.tar.bz2
+# https://www.x.org/pub/individual/font/font-misc-meltho-1.0.0.tar.bz2
 
 BuildRequires:  bdftopcf
 BuildRequires:  font-util >= 1.1.0

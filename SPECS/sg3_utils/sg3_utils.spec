@@ -6,7 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Tools.
-URL:            http://sg.danny.cz/sg/sg3_utils.html
+URL:            https://sg.danny.cz/sg/sg3_utils.html
 Source0:        https://github.com/hreinecke/sg3_utils/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Provides:       sg_utils.
 Provides:       %{name}-libs

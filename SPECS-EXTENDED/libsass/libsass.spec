@@ -6,7 +6,7 @@ Summary:        C/C++ port of the Sass CSS precompiler
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://sass-lang.com/libsass
+URL:            https://sass-lang.com/libsass
 Source0:        https://github.com/sass/libsass/archive/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  automake

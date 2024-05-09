@@ -6,7 +6,7 @@ License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.open-mpi.org/projects/hwloc/
-Source0:        http://www.open-mpi.org/software/hwloc/v2.9/downloads/%{name}-%{version}.tar.bz2
+Source0:        https://www.open-mpi.org/software/hwloc/v2.9/downloads/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 # C++ only for hwloc-hello-cpp test:
 BuildRequires:  gcc-c++
@@ -381,7 +381,7 @@ LD_LIBRARY_PATH=$PWD/hwloc/.libs make check
 - fix build on s390(x) where numactl is missing
 
 * Sat Jan  1 2011 Jirka Hladky <hladky.jiri@gmail.com> - 1.1-0
-- 1.1 rel# Patch to the 1.1 fix 2967 http://www.open-mpi.org/software/hwloc/nightly/v1.1/hwloc-1.1rc6r2967.tar.bz2
+- 1.1 rel# Patch to the 1.1 fix 2967 https://www.open-mpi.org/software/hwloc/nightly/v1.1/hwloc-1.1rc6r2967.tar.bz2
 - Fix hwloc_bitmap_to_ulong right after allocating the bitmap.
 - Fix the minimum width of NUMA nodes, caches and the legend in the graphical lstopo output.
 - Cleanup error management in hwloc-gather-topology.sh.

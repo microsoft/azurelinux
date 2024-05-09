@@ -5,13 +5,13 @@ Name:           hardening-check
 Version:        2.6
 Release:        2%{?dist}
 License:        GPLv2+
-URL:            http://packages.debian.org/hardening-wrapper
+URL:            https://packages.debian.org/hardening-wrapper
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch
 
-Source0:        http://ftp.debian.org/debian/pool/main/h/hardening-wrapper/hardening-wrapper_%{version}.tar.xz
+Source0:        https://ftp.debian.org/debian/pool/main/h/hardening-wrapper/hardening-wrapper_%{version}.tar.xz
 
 Requires:	binutils
 

@@ -9,8 +9,8 @@ Release:   4%{?dist}
 License:   LGPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:       http://people.freedesktop.org/~hughsient/appstream-glib/
-Source0:   http://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
+URL:       https://people.freedesktop.org/~hughsient/appstream-glib/
+Source0:   https://people.freedesktop.org/~hughsient/appstream-glib/releases/appstream-glib-%{version}.tar.xz
 
 BuildRequires: glib2-devel >= %{glib2_version}
 BuildRequires: docbook-utils

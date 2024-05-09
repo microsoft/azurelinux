@@ -6,7 +6,7 @@
 %global base_description \
 OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD \
 version. The project is supported by the Lab of Parallel Software and \
-Computational Science, ISCAS. http://www.rdcps.ac.cn
+Computational Science, ISCAS. https://www.rdcps.ac.cn
 %bcond_with system_lapack
 Summary:        An optimized BLAS library based on GotoBLAS2
 # DO NOT "CLEAN UP" OR MODIFY THIS SPEC FILE WITHOUT ASKING THE

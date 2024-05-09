@@ -5,7 +5,7 @@ Name: cscope
 Version: 15.9
 Release: 8%{?dist}
 Source0: https://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.tar.gz
-URL: http://cscope.sourceforge.net
+URL: https://cscope.sourceforge.net
 License: BSD and GPLv2+
 BuildRequires:  gcc
 BuildRequires: pkgconfig ncurses-devel flex bison m4

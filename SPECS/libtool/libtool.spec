@@ -3,11 +3,11 @@ Name:           libtool
 Version:        2.4.7
 Release:        1%{?dist}
 License:        GPLv2
-URL:            http://www.gnu.org/software/libtool
+URL:            https://www.gnu.org/software/libtool
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://ftp.gnu.org/gnu/libtool/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/libtool/%{name}-%{version}.tar.xz
 %description
 It wraps the complexity of using shared libraries in a
 consistent, portable interface.

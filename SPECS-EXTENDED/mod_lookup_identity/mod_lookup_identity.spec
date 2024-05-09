@@ -12,8 +12,8 @@ Name: mod_lookup_identity
 Version: 1.0.0
 Release: 12%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_lookup_identity/
-Source0: http://www.adelton.com/apache/mod_lookup_identity/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_lookup_identity/
+Source0: https://www.adelton.com/apache/mod_lookup_identity/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: dbus-devel

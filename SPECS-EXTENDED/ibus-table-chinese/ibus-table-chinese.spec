@@ -229,16 +229,16 @@ Obsoletes:      ibus-table-wu < 1.3
 
 %description wu
 Wu pronunciation input method.
-URL: http://input.foruto.com/wu/
+URL: https://input.foruto.com/wu/
 
 %description -l zh_CN wu
 上海吳语注音输入法。
-URL: http://input.foruto.com/wu/
+URL: https://input.foruto.com/wu/
 
 %description -l zh_TW wu
 上海吳語注音輸入法以現代吳語中有代表性的上海吳語（又稱上海話、滬語）的讀音、詞語為基礎。
 本輸入法適用於母語為上海話的用戶，也能作為學習上海話的輔助工具。
-URL: http://input.foruto.com/wu/
+URL: https://input.foruto.com/wu/
 
 %package wubi-haifeng
 Summary: Haifeng Wubi input method
@@ -324,7 +324,7 @@ make install DESTDIR=%{buildroot}
 # NOTE: It would be *awesome* if these files were maintained by the upstream
 # project, translated and installed into the right place during `make install`.
 #
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
+# See https://www.freedesktop.org/software/appstream/docs/ for more details.
 #
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
 cat > $RPM_BUILD_ROOT%{_datadir}/appdata/stroke5.appdata.xml <<EOF
@@ -375,7 +375,7 @@ cat > $RPM_BUILD_ROOT%{_datadir}/appdata/wubi-haifeng86.appdata.xml <<EOF
       out on a traditional keyboard.
     </p>
   </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
+  <url type="homepage">https://code.google.com/p/ibus/</url>
   <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
   <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
   <languages>
@@ -404,7 +404,7 @@ cat > $RPM_BUILD_ROOT%{_datadir}/appdata/wubi-jidian86.appdata.xml <<EOF
       out on a traditional keyboard.
     </p>
   </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
+  <url type="homepage">https://code.google.com/p/ibus/</url>
   <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
   <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
   <languages>
@@ -433,7 +433,7 @@ cat > $RPM_BUILD_ROOT%{_datadir}/appdata/cantonyale.appdata.xml <<EOF
       out on a traditional keyboard.
     </p>
   </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
+  <url type="homepage">https://code.google.com/p/ibus/</url>
   <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
   <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
   <languages>

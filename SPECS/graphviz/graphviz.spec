@@ -1000,7 +1000,7 @@ php --no-php-ini \
   Resolves: rhbz#925487
 
 * Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> - 2.30.1-3
-- rebuild for http://fedoraproject.org/wiki/Features/Php55
+- rebuild for https://fedoraproject.org/wiki/Features/Php55
 - add explicit BuildRequires: perl-Carp (workaround)
 
 * Thu Mar 14 2013 V�t Ondruch <vondruch@redhat.com> - 2.30.1-2
@@ -1025,7 +1025,7 @@ php --no-php-ini \
 
 * Wed Jan  9 2013 Jaroslav �karvada <jskarvad@redhat.com> - 2.28.0-26
 - Rebuilt with -fno-strict-overflow to workaround the overflow problem
-  (upstream ticket: http://www.graphviz.org/mantisbt/view.php?id=2244)
+  (upstream ticket: https://www.graphviz.org/mantisbt/view.php?id=2244)
 - The dot_builtins was removed rather then excluded to fix the dangling
   symlinks problem in debuginfo
 

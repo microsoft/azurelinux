@@ -25,9 +25,9 @@ Release:        14%{?dist}
 Summary:        Feature rich package for accessing resources via HTTP
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://hc.apache.org/httpclient-3.x/
-Source0:        http://www.apache.org/dist/httpcomponents/commons-httpclient/source/%{short_name}-%{version}-src.tar.gz
-Source1:        http://repo.maven.apache.org/maven2/%{short_name}/%{short_name}/%{version}/%{short_name}-%{version}.pom
+URL:            https://hc.apache.org/httpclient-3.x/
+Source0:        https://www.apache.org/dist/httpcomponents/commons-httpclient/source/%{short_name}-%{version}-src.tar.gz
+Source1:        https://repo.maven.apache.org/maven2/%{short_name}/%{short_name}/%{version}/%{short_name}-%{version}.pom
 Patch0:         %{name}-disablecryptotests.patch
 # Add OSGi MANIFEST.MF bits
 Patch1:         %{name}-addosgimanifest.patch

@@ -6,7 +6,7 @@ Version: 1.8.0
 Release: 6%{?dist}
 Source0: https://downloads.sourceforge.net/project/ispell-uk/spell-uk/%{version}/dict-uk_UA-%{version}.oxt
 Source1: %{name}-LICENSE.txt
-URL: http://sourceforge.net/projects/ispell-uk
+URL: https://sourceforge.net/projects/ispell-uk
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch
 

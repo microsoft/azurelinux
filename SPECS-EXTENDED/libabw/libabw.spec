@@ -9,7 +9,7 @@ Summary: A library for import of AbiWord files
 
 License: MPLv2.0
 URL: https://wiki.documentfoundation.org/DLP/Libraries/libabw
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

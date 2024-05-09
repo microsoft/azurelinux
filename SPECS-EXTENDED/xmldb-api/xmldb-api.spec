@@ -14,7 +14,7 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -25,7 +25,7 @@ Version:        0.1
 Release:        29%{?dist}
 Summary:        XML:DB API for Java
 License:        Apache-1.1
-Url:            http://xmldb-org.sourceforge.net
+Url:            https://xmldb-org.sourceforge.net
 # cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org login
 # cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org export -D 2004-10-10 xapi
 Source0:        %{_distro_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2

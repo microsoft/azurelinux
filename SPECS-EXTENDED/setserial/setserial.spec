@@ -15,7 +15,7 @@ Patch3: setserial-2.17-spelling.patch
 Patch4: setserial-hayesesp.patch
 Patch5: setserial-aarch64.patch
 License: GPL+
-URL: http://setserial.sourceforge.net/
+URL: https://setserial.sourceforge.net/
 ExcludeArch: s390 s390x
 
 BuildRequires: gcc

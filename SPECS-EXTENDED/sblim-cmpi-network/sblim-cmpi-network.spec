@@ -8,8 +8,8 @@ Release:        26%{?dist}
 Summary:        SBLIM Network Instrumentation
 
 License:        EPL
-URL:            http://sblim.wiki.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+URL:            https://sblim.wiki.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 
 Patch0:         sblim-cmpi-network-1.4.0-network-devices-arbitrary-names-support.patch
 # Patch1: remove version from docdir

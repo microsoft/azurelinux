@@ -9,7 +9,7 @@ Release:	4%{?dist}
 Summary:	C++ bindings for libpmemobj
 # Note: tests/external/libcxx is dual licensed using University of Illinois "BSD-Like" license and the MIT license. It's used only during development/testing and is NOT part of the binary RPM.
 License:	BSD
-URL:		http://pmem.io/pmdk/cpp_obj/
+URL:		https://pmem.io/pmdk/cpp_obj/
 
 Source0:	https://github.com/pmem/%{name}/archive/%{upstreamversion}.tar.gz#/%{name}-%{upstreamversion}.tar.gz
 

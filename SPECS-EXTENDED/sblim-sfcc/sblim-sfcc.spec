@@ -11,8 +11,8 @@ Name: sblim-sfcc
 Version: 2.2.8
 Release: 15%{?dist}
 License: EPL-1.0
-URL: http://www.sblim.org
-Source0: http://downloads.sourceforge.net/project/sblim/%{name}/%{name}-%{version}.tar.bz2
+URL: https://www.sblim.org
+Source0: https://downloads.sourceforge.net/project/sblim/%{name}/%{name}-%{version}.tar.bz2
 # Patch0: fixes docdir name and removes install of COPYING with license
 #   which is included through %%license
 Patch0: sblim-sfcc-2.2.8-docdir-license.patch

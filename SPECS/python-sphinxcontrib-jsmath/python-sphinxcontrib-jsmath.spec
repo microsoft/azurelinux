@@ -10,7 +10,7 @@ Release:        17%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://sphinx-doc.org/
+URL:            https://sphinx-doc.org/
 Source0:        %{pypi_source}
 Patch0:         test_jsmath_path_fix.patch
 

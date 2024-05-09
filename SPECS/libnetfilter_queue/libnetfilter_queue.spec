@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.netfilter.org/projects/libnetfilter_queue/index.html
-Source0:        http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
+Source0:        https://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
 BuildRequires:  kernel-headers
 BuildRequires:  libmnl-devel
 BuildRequires:  libnfnetlink-devel

@@ -5,7 +5,7 @@ Version:        2.2.4
 Release:        5%{?dist}
 Summary:        A command-line utility for converting Markdown files into HTML
 License:        BSD
-URL:            http://www.pell.portland.or.us/~orc/Code/%{name}
+URL:            https://www.pell.portland.or.us/~orc/Code/%{name}
 Source0:        %{url}/%{name}-%{version}.tar.bz2
 Patch0:         discount-dont-run-ldconfig.patch
 

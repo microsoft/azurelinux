@@ -5,7 +5,7 @@ Name: libXScrnSaver
 Version: 1.2.3
 Release: 6%{?dist}
 License: MIT
-URL: http://www.x.org
+URL: https://www.x.org
 
 Source0: https://www.x.org/pub/individual/lib/%{name}-%{version}.tar.bz2
 

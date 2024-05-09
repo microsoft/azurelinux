@@ -24,7 +24,7 @@ Release:        3%{?dist}
 Summary:        A library for instantiating Java objects
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://objenesis.org/
+URL:            https://objenesis.org/
 Source0:        https://github.com/easymock/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  fdupes
 BuildRequires:  java-devel >= 1.8
@@ -84,7 +84,7 @@ jar cf %{name}-%{version}.jar -C main/build/classes .
 touch manifest.txt
 echo "Automatic-Module-Name: org.objenesis" >> manifest.txt  
 echo "Bundle-Description: A library for instantiating Java objects" >> manifest.txt
-echo "Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt" >> manifest.txt
+echo "Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt" >> manifest.txt
 echo "Bundle-Name: Objenesis" >> manifest.txt
 echo "Bundle-SymbolicName: org.objenesis" >> manifest.txt
 echo "Bundle-Version: %{version}" >> manifest.txt

@@ -214,7 +214,7 @@ install -pm 644 NEWS README.md %{buildroot}%{_pkgdocdir}
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Sat May 12 2012 Brendan Jones <brendan.jones.it@gmail.com> - 0.2.0-3
-- Temporarily remove tests - http://dev.drobilla.net/ticket/832 
+- Temporarily remove tests - https://dev.drobilla.net/ticket/832 
 
 * Fri Apr 20 2012 Brendan Jones <brendan.jones.it@gmail.com> - 0.2.0-2
 - Correct spelling and add missing build requires 

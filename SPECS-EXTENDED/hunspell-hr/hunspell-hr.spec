@@ -5,9 +5,9 @@ Summary: Croatian hunspell dictionaries
 %global upstreamid 20040608
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source0: http://cvs.linux.hr/spell/myspell/hr_HR.zip
+Source0: https://cvs.linux.hr/spell/myspell/hr_HR.zip
 Source1: %{name}-LICENSE.txt
-URL: http://cvs.linux.hr/spell/
+URL: https://cvs.linux.hr/spell/
 License: LGPLv2+ or SISSL
 BuildArch: noarch
 

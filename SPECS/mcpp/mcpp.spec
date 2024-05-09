@@ -6,10 +6,10 @@ Release:        28%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://mcpp.sourceforge.net/
+URL:            https://mcpp.sourceforge.net/
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         mcpp-manual.html.patch
-# Extracted from http://www.zeroc.com/download/Ice/3.4/ThirdParty-Sources-3.4.2.tar.gz
+# Extracted from https://www.zeroc.com/download/Ice/3.4/ThirdParty-Sources-3.4.2.tar.gz
 # Also responsible for fixing CVE-2019-14274
 Patch1:         patch.mcpp.2.7.2
 # https://bugzilla.redhat.com/show_bug.cgi?id=948860

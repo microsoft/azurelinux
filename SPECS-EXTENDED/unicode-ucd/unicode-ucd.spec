@@ -1,6 +1,6 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# for other future directories from http://www.unicode.org/Public
+# for other future directories from https://www.unicode.org/Public
 %global unicodedir %{_datadir}/unicode
 %global ucddir %{unicodedir}/ucd
 
@@ -11,12 +11,12 @@ Summary:        Unicode Character Database
 
 # https://fedoraproject.org/wiki/Licensing/MIT#Modern_Style_without_sublicense_.28Unicode.29
 License:        MIT
-URL:            http://www.unicode.org/ucd/
-Source0:        http://www.unicode.org/Public/zipped/%{version}/UCD.zip
-# http://www.unicode.org/terms_of_use.html referenced in ReadMe.txt redirects to:
-# curl http://www.unicode.org/copyright.html | dos2unix > copyright.html
-Source1:        http://www.unicode.org/copyright.html
-Source2:        http://www.unicode.org/Public/zipped/%{version}/Unihan.zip
+URL:            https://www.unicode.org/ucd/
+Source0:        https://www.unicode.org/Public/zipped/%{version}/UCD.zip
+# https://www.unicode.org/terms_of_use.html referenced in ReadMe.txt redirects to:
+# curl https://www.unicode.org/copyright.html | dos2unix > copyright.html
+Source1:        https://www.unicode.org/copyright.html
+Source2:        https://www.unicode.org/Public/zipped/%{version}/Unihan.zip
 BuildArch:      noarch
 
 %description

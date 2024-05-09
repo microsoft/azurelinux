@@ -5,8 +5,8 @@ Version:		0.6.4
 Release:		2%{?dist}
 Summary:		Utility to receive RAS error tracings
 License:		GPLv2
-URL:			http://git.infradead.org/users/mchehab/rasdaemon.git
-Source0:		http://www.infradead.org/~mchehab/rasdaemon/%{name}-%{version}.tar.bz2
+URL:			https://git.infradead.org/users/mchehab/rasdaemon.git
+Source0:		https://www.infradead.org/~mchehab/rasdaemon/%{name}-%{version}.tar.bz2
 
 ExcludeArch:		s390 s390x
 BuildRequires:		gcc

@@ -7,8 +7,8 @@ Version: 2.0.15
 Release: 28%{?dist}
 
 License: GPLv2+ or LGPLv2+ or ASL 2.0
-Source:  http://download.librdf.org/source/raptor2-%{version}.tar.gz
-URL:     http://librdf.org/raptor/
+Source:  https://download.librdf.org/source/raptor2-%{version}.tar.gz
+URL:     https://librdf.org/raptor/
 
 ## upstream patches
 # https://github.com/dajobe/raptor/commit/590681e546cd9aa18d57dc2ea1858cb734a3863f

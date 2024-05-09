@@ -6,13 +6,13 @@ Name:    xdg-utils
 Version: 1.1.3
 Release: 7%{?dist}
 
-URL:     http://portland.freedesktop.org/ 
+URL:     https://portland.freedesktop.org/ 
 %if 0%{?snap:1}
 Source0: xdg-utils-%{version}-%{snap}.tar.gz
 %else
 # at least until freedesktop folks move over to release dir
 Source0:  https://people.freedesktop.org/~rdieter/xdg-utils/xdg-utils-%{version}.tar.gz
-#Source0: http://portland.freedesktop.org/download/xdg-utils-%{version}%{?prerelease:-%{prerelease}}.tar.gz
+#Source0: https://portland.freedesktop.org/download/xdg-utils-%{version}%{?prerelease:-%{prerelease}}.tar.gz
 %endif
 Source1: xdg-utils-git_checkout.sh
 License: MIT 
@@ -22,7 +22,7 @@ Patch1: 0001-open-for-post-1.1.3-development.patch
 Patch2: 0002-xdg-open-better-pcmanfm-check-BR106636-BR106161.patch
 
 # make sure BuildArch comes *after* patches, to ensure %%autosetup works right
-# http://bugzilla.redhat.com/1084309
+# https://bugzilla.redhat.com/1084309
 BuildArch: noarch
 
 BuildRequires: gawk

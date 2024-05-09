@@ -10,7 +10,7 @@ Patch2: 0002-Install-docs-into-subdirs.patch
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.qhull.org
+URL: https://www.qhull.org
 
 BuildRequires: gcc
 BuildRequires: gcc-c++

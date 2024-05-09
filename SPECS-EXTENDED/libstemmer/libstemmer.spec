@@ -6,13 +6,13 @@ Release:	15%{?dist}
 Summary:	C stemming algorithm library
 # The site and project is no longer being actively maintained. 
 # The code is available on Github - https://github.com/snowballstem/snowball
-URL:		http://snowball.tartarus.org
+URL:		https://snowball.tartarus.org
 # The licence is specified on website
-# http://snowball.tartarus.org/license.php
+# https://snowball.tartarus.org/license.php
 # There is a pull request to include it into source code
 # https://github.com/snowballstem/snowball/issues/10
 License:	BSD
-Source0:	http://snowball.tartarus.org/dist/%{name}_c.tgz
+Source0:	https://snowball.tartarus.org/dist/%{name}_c.tgz
 Source1:	Notice.txt
 Source2:	BSD.txt
 

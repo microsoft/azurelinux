@@ -7,8 +7,8 @@ Version: 5.03
 Release: 4%{?dist}
 # Multiple man pages are distributed under different licenses.
 License: GPL+ and BSD and MIT and GFDL
-URL: http://sourceforge.net/projects/man-pages-ru/
-Source: http://sourceforge.net/projects/man-pages-ru/files/man-pages-ru_%{mpr_version}.tar.bz2
+URL: https://sourceforge.net/projects/man-pages-ru/
+Source: https://sourceforge.net/projects/man-pages-ru/files/man-pages-ru_%{mpr_version}.tar.bz2
 
 Requires: man-pages-reader
 Supplements: (man-pages and langpacks-ru)

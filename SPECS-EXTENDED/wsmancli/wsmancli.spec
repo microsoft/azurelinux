@@ -4,7 +4,7 @@ Name:           wsmancli
 Version:        2.6.0
 Release:        13%{?dist}
 License:        BSD
-Url:            http://www.openwsman.org/
+Url:            https://www.openwsman.org/
 Source0:        https://github.com/Openwsman/wsmancli/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        COPYING
 Source2:        README

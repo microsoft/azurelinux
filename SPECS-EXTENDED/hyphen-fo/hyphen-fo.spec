@@ -5,9 +5,9 @@ Summary: Faroese hyphenation rules
 %global upstreamid 20040420
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source0: http://fo.speling.org/filer/hyph_fo_FO-20040420a.zip
+Source0: https://fo.speling.org/filer/hyph_fo_FO-20040420a.zip
 Source1: %{name}-LICENSE.txt
-URL: http://fo.speling.org/
+URL: https://fo.speling.org/
 License: GPL+
 BuildArch: noarch
 Requires: hyphen

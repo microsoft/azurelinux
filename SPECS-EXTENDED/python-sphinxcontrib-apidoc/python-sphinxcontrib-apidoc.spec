@@ -9,7 +9,7 @@ Release:        15%{?dist}
 Summary:        A Sphinx extension for running 'sphinx-apidoc' on each build
 
 License:        BSD
-URL:            http://www.sphinx-doc.org/
+URL:            https://www.sphinx-doc.org/
 Source0:        https://files.pythonhosted.org/packages/source/s/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 

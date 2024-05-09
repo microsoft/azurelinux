@@ -7,8 +7,8 @@ Summary: 	A script to handle icon names in desktop icon themes
 
 License:	GPLv2
 BuildArch:	noarch
-URL:		http://tango.freedesktop.org/Standard_Icon_Naming_Specification
-Source0:	http://tango.freedesktop.org/releases/%{name}-%{version}.tar.bz2
+URL:		https://tango.freedesktop.org/Standard_Icon_Naming_Specification
+Source0:	https://tango.freedesktop.org/releases/%{name}-%{version}.tar.bz2
 
 BuildRequires:	perl-generators
 BuildRequires:	perl(XML::Simple)

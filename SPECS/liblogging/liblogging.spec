@@ -6,7 +6,7 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
-URL:            http://www.liblogging.org/
+URL:            https://www.liblogging.org/
 Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 

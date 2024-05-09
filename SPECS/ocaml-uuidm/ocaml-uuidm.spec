@@ -24,7 +24,7 @@ BuildRequires:  ocaml-topkg-devel
 %description
 Uuidm is an OCaml module implementing 128 bit universally unique
 identifiers, versions 3, 5 (named based with MD5, SHA-1 hashing) and 4
-(random based); see RFC 4122: http://tools.ietf.org/html/rfc4122.
+(random based); see RFC 4122: https://tools.ietf.org/html/rfc4122.
 
 %package        devel
 Summary:        Development files for %{name}

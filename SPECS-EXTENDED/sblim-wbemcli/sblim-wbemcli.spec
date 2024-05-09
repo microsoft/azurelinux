@@ -7,7 +7,7 @@ Summary:        SBLIM WBEM Command Line Interface
 
 License:        EPL-1.0
 URL:            https://sourceforge.net/projects/sblim/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Patch0:         sblim-wbemcli-1.5.1-gcc43.patch
 Patch1:         sblim-wbemcli-1.6.2-https-segfaults.patch
 Patch2:         sblim-wbemcli-1.6.1-ssl-proto-option.patch

@@ -5,8 +5,8 @@ License:      GPLv2+
 Version:      1.6
 Release:      10%{?dist}
 Summary:      Serial-over-lan (sol) client for Intel AMT
-URL:          http://www.kraxel.org/blog/linux/amtterm/
-Source:       http://www.kraxel.org/releases/%{name}/%{name}-%{version}.tar.gz
+URL:          https://www.kraxel.org/blog/linux/amtterm/
+Source:       https://www.kraxel.org/releases/%{name}/%{name}-%{version}.tar.gz
 Requires:     xdg-utils
 
 BuildRequires:  gcc

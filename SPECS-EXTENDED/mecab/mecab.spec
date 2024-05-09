@@ -13,7 +13,7 @@ Summary:	Yet Another Part-of-Speech and Morphological Analyzer
 
 License:	BSD or LGPLv2+ or GPL+
 URL:		https://sourceforge.net/projects/mecab
-Source0:	http://mecab.googlecode.com/files/%{name}-%{version}.tar.gz
+Source0:	https://mecab.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRequires:	gcc-c++
 

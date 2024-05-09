@@ -13,7 +13,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libguestfs.org/
-Source0:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
+Source0:        https://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz
 
 BuildRequires:  %{_bindir}/pod2html
 BuildRequires:  %{_bindir}/pod2man

@@ -6,7 +6,7 @@ License:        GPLv2 AND LGPLv2 AND BSD AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
-URL:            http://e2fsprogs.sourceforge.net
+URL:            https://e2fsprogs.sourceforge.net
 Source0:        https://prdownloads.sourceforge.net/e2fsprogs/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox

@@ -6,9 +6,9 @@ Summary: Russian thesaurus
 Version: 0.%{upstreamid}
 Release: 24%{?dist}
 # Below source link is dead now
-# Source: http://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
+# Source: https://download.i-rs.ru/pub/openoffice/dict/thes_ru_RU_v2.zip
 Source: %{_distro_sources_url}/thes_ru_RU_v2.zip
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 BuildRequires: unzip
 License: LGPLv2+
 BuildArch: noarch

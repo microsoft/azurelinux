@@ -4,8 +4,8 @@ Version:        2013
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/Canary-Stability/
-Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-%{version}.tar.gz
+URL:            https://search.cpan.org/dist/Canary-Stability/
+Source0:        https://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Canary-Stability-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch

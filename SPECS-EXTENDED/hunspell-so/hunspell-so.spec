@@ -5,7 +5,7 @@ Summary: Somali hunspell dictionaries
 Version: 1.0.2
 Release: 18%{?dist}
 Source: https://ayera.dl.sourceforge.net/project/aoo-extensions/2727/2/dict-so.oxt
-URL: http://www.opensourcesomalia.org/index.php?page=hingaad-saxe
+URL: https://www.opensourcesomalia.org/index.php?page=hingaad-saxe
 License: GPLv2+
 BuildArch: noarch
 Requires: hunspell

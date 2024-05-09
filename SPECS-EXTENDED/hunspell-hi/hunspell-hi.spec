@@ -4,7 +4,7 @@ Name: hunspell-hi
 Summary: Hindi hunspell dictionaries
 Version: 1.0.0
 Release: 15%{?dist}
-Source:  http://anishpatil.fedorapeople.org/hi_in.%{version}.tar.gz
+Source:  https://anishpatil.fedorapeople.org/hi_in.%{version}.tar.gz
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git
 License: GPLv2+
 BuildArch: noarch

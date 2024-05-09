@@ -72,7 +72,7 @@ tools for the GTK+3 build of %{name}.
 sed -i.addvar configure.ac \
 	-e '\@LIBINDICATOR_LIBS@s|\$LIBM| \$LIBM|'
 
-# http://bazaar.launchpad.net/~indicator-applet-developers/libindicator/trunk.12.10/view/head:/autogen.sh
+# https://bazaar.launchpad.net/~indicator-applet-developers/libindicator/trunk.12.10/view/head:/autogen.sh
 cat > autogen.sh <<EOF
 #!/bin/sh
 

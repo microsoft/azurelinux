@@ -4,7 +4,7 @@ Name: dyninst
 Release: 14%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.dyninst.org
+URL: https://www.dyninst.org
 Version: 10.1.0
 ExclusiveArch: %{ix86} x86_64 ppc64le aarch64
 

@@ -26,8 +26,8 @@ Release:        4%{?dist}
 Summary:        Base64 encoder/decoder Java library
 License:        EPL-1.0 OR LGPL-2.1-or-later OR GPL-2.0-or-later OR Apache-2.0 OR BSD-2-Clause
 Group:          Development/Libraries/Java
-URL:            http://www.source-code.biz/%{name}/java/
-Source0:        http://repo2.maven.org/maven2/biz/source_code/%{name}/%{long_ver}/%{name}-%{long_ver}-distribution.zip
+URL:            https://www.source-code.biz/%{name}/java/
+Source0:        https://repo2.maven.org/maven2/biz/source_code/%{name}/%{long_ver}/%{name}-%{long_ver}-distribution.zip
 Source1:        %{name}-LICENSE.txt
 # Remove hardcoded source and target versions, so that we can specify them on command-line
 Patch0:         %{name}-sourcetarget.patch

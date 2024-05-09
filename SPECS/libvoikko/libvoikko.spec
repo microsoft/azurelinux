@@ -7,9 +7,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://voikko.puimula.org
 # The usual format of stable release URLs
-Source0:        http://www.puimula.org/voikko-sources/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://www.puimula.org/voikko-sources/%{name}/%{name}-%{version}.tar.gz
 # The usual format of test release URLs
-#Source0:        http://www.puimula.org/htp/testing/%%{name}-%%{version}rc1.tar.gz
+#Source0:        https://www.puimula.org/htp/testing/%%{name}-%%{version}rc1.tar.gz
 BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
 # Require the Finnish morphology because Finnish is currently the only language
@@ -377,7 +377,7 @@ install -pm 0644 python/libvoikko.py %{buildroot}%{python3_sitelib}/
 * Tue Dec 04 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 1.6-1
 - libvoikko 1.6
 - Add versioned BuildRequires and Requires as per the Voikko release notes
-  at http://voikko.sourceforge.net/releases.html
+  at https://voikko.sourceforge.net/releases.html
 
 * Mon Dec 03 2007 - Ville-Pekka Vainio <vpivaini AT cs.helsinki.fi> 1.6-0.4.rc4
 - Upstream released a new release candidate

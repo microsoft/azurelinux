@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-# Fedora review: http://bugzilla.redhat.com/166008
+# Fedora review: https://bugzilla.redhat.com/166008
 
 
 %define _with_devel 1
@@ -26,7 +26,7 @@ Name:	 uw-imap
 Version: 2007f
 Release: 26%{?dist}
 
-# See LICENSE.txt, http://www.apache.org/licenses/LICENSE-2.0
+# See LICENSE.txt, https://www.apache.org/licenses/LICENSE-2.0
 License: ASL 2.0 
 URL:	 https://github.com/uw-imap/imap
 # Source0: https://github.com/uw-imap/imap/archive/refs/tags/imap-2007f_upstream.tar.gz
@@ -64,7 +64,7 @@ Source34: ipop3-xinetd
 Source35: pop3s-xinetd
 
 Patch1: imap-2007-paths.patch
-# See http://bugzilla.redhat.com/229781 , http://bugzilla.redhat.com/127271
+# See https://bugzilla.redhat.com/229781 , https://bugzilla.redhat.com/127271
 Patch2: imap-2004a-doc.patch
 Patch5: imap-2007e-overflow.patch
 Patch9: imap-2007e-shared.patch
@@ -634,7 +634,7 @@ done
 
 * Fri Jan 28 2005 Rex Dieter <rexdieter[AT]users.sf.net> 1:2004-0.fdr.10.c1
 - imap-2004c1 security release:
-  http://www.kb.cert.org/vuls/id/702777
+  https://www.kb.cert.org/vuls/id/702777
 
 * Thu Jan 20 2005 Rex Dieter <rexdieter[AT]users.sf.net> 1:2004-0.fdr.9.c
 - imap2004c

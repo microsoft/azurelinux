@@ -12,7 +12,7 @@ Distribution:   Azure Linux
 URL:            https://taglib.github.io/
 # The snapshot tarballs generated with the following script:
 Source1:        taglib-snapshot.sh
-# http://bugzilla.redhat.com/343241
+# https://bugzilla.redhat.com/343241
 Patch102:       taglib-1.13.1-multilib.patch
 
 BuildRequires:  cmake
@@ -23,7 +23,7 @@ BuildRequires:  zlib-devel
 %if 0%{?snap:1}
 Source0:        taglib-%{version}-%{snap}.tar.gz
 %else
-Source0:        http://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
+Source0:        https://taglib.github.io/releases/taglib-%{version}%{?beta}.tar.gz
 %endif
 %if %{with tests}
 BuildRequires:  cppunit-devel

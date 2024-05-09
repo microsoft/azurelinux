@@ -8,11 +8,11 @@ Distribution:   Azure Linux
 
 Name: sblim-sfcb
 Summary: Small Footprint CIM Broker
-URL: http://sblim.wiki.sourceforge.net/
+URL: https://sblim.wiki.sourceforge.net/
 Version: 1.4.9
 Release: 20%{?dist}
 License: EPL-1.0
-Source0: http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+Source0: https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Source1: sfcb.service
 # Missing man pages
 Source2: sfcbdump.1.gz
@@ -402,7 +402,7 @@ fi;
 
 * Wed Oct 08 2008 <ratliff@austin.ibm.com> - 1.3.2-1
 - updated upstream version and added CFLAGS to configure to work 
-- around http://sources.redhat.com/bugzilla/show_bug.cgi?id=6545
+- around https://sources.redhat.com/bugzilla/show_bug.cgi?id=6545
 
 * Fri Aug 08 2008 <ratliff@austin.ibm.com> - 1.3.0-1
 - updated buildrequires to require libcurl-devel rather than curl-devel

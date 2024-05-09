@@ -4,8 +4,8 @@ Name: hunspell-ht
 Summary: Haitian Creole hunspell dictionaries
 Version: 0.06
 Release: 18%{?dist}
-Source: http://extensions.services.openoffice.org/files/3247/3/%{name}-%{version}.oxt
-URL: http://kok.logipam.org/
+Source: https://extensions.services.openoffice.org/files/3247/3/%{name}-%{version}.oxt
+URL: https://kok.logipam.org/
 License: GPLv3+
 BuildArch: noarch
 

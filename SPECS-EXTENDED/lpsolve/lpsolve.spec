@@ -4,8 +4,8 @@ Name:      lpsolve
 Summary:   A Mixed Integer Linear Programming (MILP) solver
 Version:   5.5.2.0
 Release:   26%{?dist}
-Source:    http://downloads.sourceforge.net/lpsolve/lp_solve_%{version}_source.tar.gz
-URL:       http://sourceforge.net/projects/lpsolve
+Source:    https://downloads.sourceforge.net/lpsolve/lp_solve_%{version}_source.tar.gz
+URL:       https://sourceforge.net/projects/lpsolve
 License:   LGPLv2+
 
 BuildRequires: gcc-c++

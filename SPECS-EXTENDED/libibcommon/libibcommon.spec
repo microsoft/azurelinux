@@ -5,8 +5,8 @@ Name: libibcommon
 Version: 1.2.0
 Release: 21%{?dist}
 License: GPLv2 or BSD
-Source: http://www.openfabrics.org/downloads/management/%{name}-%{version}.tar.gz
-Url: http://openfabrics.org/
+Source: https://www.openfabrics.org/downloads/management/%{name}-%{version}.tar.gz
+Url: https://openfabrics.org/
 BuildRequires: libtool, automake, autoconf
 ExcludeArch: s390 s390x
 

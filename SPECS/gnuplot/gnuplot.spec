@@ -3,11 +3,11 @@ Name:           gnuplot
 Version:        5.4.8
 Release:        1%{?dist}
 License:        Gnuplot
-URL:            http://www.gnuplot.info/
+URL:            https://www.gnuplot.info/
 Group:          Applications
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %description
 Gnuplot is a portable command-line driven graphing utility for Linux, OS/2, MS Windows, OSX, VMS, and many other platforms. The source code is copyrighted but freely distributed (i.e., you don't have to pay for it). It was originally created to allow scientists and students to visualize mathematical functions and data interactively, but has grown to support many non-interactive uses such as web scripting. It is also used as a plotting engine by third-party applications like Octave. Gnuplot has been supported and under active development since 1986.

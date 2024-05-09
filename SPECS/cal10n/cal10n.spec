@@ -21,7 +21,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
-URL:            http://cal10n.qos.ch
+URL:            https://cal10n.qos.ch
 Source0:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-%{version}.tar.xz
 # cal10n-build.tar.gz provides build process for cal10-api and cal10n-ant-task
 Source1:        https://code.opensuse.org/adrianSuSE/%{name}/blob/factory/f/%{name}-build.tar.xz
@@ -69,7 +69,7 @@ The documentation under Creative Commons Attribution-NonCommercial-ShareAlike
 2.5 License is not suitable for Linux distributors, so it has been removed.
 
 You may find the online version at
-http://cal10n.qos.ch/manual.html
+https://cal10n.qos.ch/manual.html
 
 EOF
 
@@ -154,8 +154,8 @@ done
 * Thu Dec 25 2014 p.drouand@gmail.com
 - Update to version 0.7.7
   + Correctly read escaped ':', '#', '!', '=' characters. The behavior
-  is documented in the Properties javadocs (http://tinyurl.com/bprdgnk).
-  This fixes CAL-37 (http://jira.qos.ch/browse/CAL-37)
+  is documented in the Properties javadocs (https://tinyurl.com/bprdgnk).
+  This fixes CAL-37 (https://jira.qos.ch/browse/CAL-37)
 - Update build.xml.tar.bz2, rename it to build.xml-$VERSION and
   recompress it in xz format
 - Add a requirement to xz

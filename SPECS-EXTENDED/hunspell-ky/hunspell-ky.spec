@@ -5,8 +5,8 @@ Summary: Kirghiz hunspell dictionaries
 %global upstreamid 20090415
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source: http://ftp.gnu.org/gnu/aspell/dict/ky/aspell6-ky-0.01-0.tar.bz2
-URL: http://borel.slu.edu/crubadan/
+Source: https://ftp.gnu.org/gnu/aspell/dict/ky/aspell6-ky-0.01-0.tar.bz2
+URL: https://borel.slu.edu/crubadan/
 License: GPLv2+
 BuildArch: noarch
 BuildRequires: aspell, hunspell-devel

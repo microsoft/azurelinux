@@ -6,15 +6,15 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://omxil.sourceforge.net
-Source0:        http://downloads.sourceforge.net/omxil/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/omxil/%{name}-%{version}.tar.gz
 #https://sourceforge.net/tracker/?func=detail&aid=3477869&group_id=160680&atid=816817
 Patch0:         libomxil-bellagio-0.9.3-fix_Werror.patch
 Patch1:         libomxil-bellagio-0.9.3-unused.patch
 #https://sourceforge.net/tracker/?func=detail&aid=3477871&group_id=160680&atid=816817
 Patch2:         libomxil-bellagio-0.9.3-nodoc.patch
-Patch3:         http://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-dynamicloader-linking.patch
-Patch4:         http://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-parallel-build.patch
-Patch5:         http://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-segfault-on-removeFromWaitResource.patch
+Patch3:         https://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-dynamicloader-linking.patch
+Patch4:         https://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-parallel-build.patch
+Patch5:         https://git.buildroot.net/buildroot/plain/package/multimedia/bellagio/bellagio-0.9.3-segfault-on-removeFromWaitResource.patch
 Patch6:         omxil_version.patch
 Patch7:         libomxil-bellagio-0.9.3-memcpy.patch
 Patch8:         libomxil-bellagio-0.9.3-valgrind_register.patch

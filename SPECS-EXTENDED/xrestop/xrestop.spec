@@ -5,8 +5,8 @@ Name:           xrestop
 Version:        0.4
 Release:        27%{?dist}
 License:        GPLv2+
-URL:            http://www.freedesktop.org/Software/xrestop
-Source0:        http://downloads.yoctoproject.org/releases/%{name}/%{name}-%{version}.tar.gz
+URL:            https://www.freedesktop.org/Software/xrestop
+Source0:        https://downloads.yoctoproject.org/releases/%{name}/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: ncurses-devel

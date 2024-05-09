@@ -6,7 +6,7 @@ License:        BSD AND BSD WITH advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://sourceforge.net/projects/openrdate
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:         openrdate_sysctl.patch
 BuildRequires:  gcc
 BuildRequires:  make

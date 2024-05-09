@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        GPLv2+ and GPLv3+ and MIT
 Url:            https://www.hboehm.info/gc/
 Source0:        https://www.hboehm.info/gc/gc_source/%{name}-%{version}.tar.gz
-Source1:        http://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.6.tar.gz
+Source1:        https://www.ivmaisoft.com/_bin/atomic_ops/libatomic_ops-7.6.6.tar.gz
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

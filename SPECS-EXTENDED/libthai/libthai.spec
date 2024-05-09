@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: ftp://linux.thai.net/pub/thailinux/software/libthai/libthai-%{version}.tar.xz
 Patch0: libthai-0.1.9-multilib.patch
-URL: http://linux.thai.net
+URL: https://linux.thai.net
 
 BuildRequires: gcc
 BuildRequires: pkgconfig(datrie-0.2)

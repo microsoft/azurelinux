@@ -5,8 +5,8 @@ Name:          sdparm
 Version:       1.11
 Release:       2%{?dist}
 License:       BSD
-URL:           http://sg.danny.cz/sg/sdparm.html
-Source0:       http://sg.danny.cz/sg/p/sdparm-%{version}.tgz
+URL:           https://sg.danny.cz/sg/sdparm.html
+Source0:       https://sg.danny.cz/sg/p/sdparm-%{version}.tgz
 BuildRequires: gcc
 BuildRequires: sg3_utils-devel
 

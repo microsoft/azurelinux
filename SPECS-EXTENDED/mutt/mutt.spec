@@ -37,7 +37,7 @@ License:        GPLv2+ AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.mutt.org
-# hg snapshot created from http://dev.mutt.org/hg/mutt
+# hg snapshot created from https://dev.mutt.org/hg/mutt
 Source:         ftp://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
 Source1:        mutt_ldap_query
 Patch1:         mutt-1.10.0-muttrc.patch

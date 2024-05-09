@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.nano-editor.org/
-Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
+Source0:        https://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
 BuildRequires:  ncurses-devel
 Requires:       ncurses
 

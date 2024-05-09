@@ -7,7 +7,7 @@ URL:		https://github.com/rpm-software-management/popt
 Group:		Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:	http://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
+Source0:	https://ftp.rpm.org/popt/releases/popt-1.x/%{name}-%{version}.tar.gz
 %description
 The popt package contains the popt libraries which are used by
 some programs to parse command-line options.

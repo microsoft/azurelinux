@@ -6,8 +6,8 @@ License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Tools
-URL:            http://itstool.org
-Source0:        http://files.itstool.org/itstool/%{name}-%{version}.tar.bz2
+URL:            https://itstool.org
+Source0:        https://files.itstool.org/itstool/%{name}-%{version}.tar.bz2
 
 BuildRequires:  docbook-dtd-xml >= 4.5
 BuildRequires:  libxml2

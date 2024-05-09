@@ -5,7 +5,7 @@ Summary: Asturian hunspell dictionaries
 Version: 2.0
 Release: 5%{?dist}
 Source: https://extensions.libreoffice.org/extensions/correutor-ortograficu-dasturianu/2.0/@@download/file/ort_ast_20190216_1129.oxt
-URL: http://softastur.org/
+URL: https://softastur.org/
 License: GPL+ or LGPLv2+
 BuildArch: noarch
 

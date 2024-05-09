@@ -6,10 +6,10 @@ Release: 17%{?dist}
 Summary: A helper program to download firmware into FX and FX2 EZ-USB devices
 
 License: GPLv2+
-URL: http://linux-hotplug.sourceforge.net/
+URL: https://linux-hotplug.sourceforge.net/
 Source0: %{_distro_sources_url}/fxload-%{version}-noa3load.tar.gz
 # The above file is derived from:
-# http://downloads.sourceforge.net/project/linux-hotplug/fxload/2008_10_13/fxload-2008_10_13.tar.gz
+# https://downloads.sourceforge.net/project/linux-hotplug/fxload/2008_10_13/fxload-2008_10_13.tar.gz
 # This file contains code that is copyright Cypress Semiconductor Inc,
 # and cannot be distributed. Therefore we use this script to remove the
 # copyright code before shipping it. Download the upstream tarball and

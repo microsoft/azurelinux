@@ -7,12 +7,12 @@ Version:	1.1.28
 Release:	2%{?dist}
 Summary:	Library and tools for handling papersize
 License:	GPLv2
-URL:		http://packages.qa.debian.org/libp/libpaper.html
-Source0:	http://ftp.debian.org/debian/pool/main/libp/libpaper/%{name}_%{version}.tar.gz
+URL:		https://packages.qa.debian.org/libp/libpaper.html
+Source0:	https://ftp.debian.org/debian/pool/main/libp/libpaper/%{name}_%{version}.tar.gz
 
 
 # Filed upstream as:
-# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=481213
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=481213
 Patch2:		libpaper-useglibcfallback.patch
 # Memory leak
 Patch3:   libpaper-file-leak.patch

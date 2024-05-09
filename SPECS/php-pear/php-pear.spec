@@ -19,7 +19,7 @@ License:        BSD AND LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://pear.php.net/package/PEAR
-Source0:        http://download.pear.php.net/package/PEAR-%{version}.tgz
+Source0:        https://download.pear.php.net/package/PEAR-%{version}.tgz
 # wget https://raw.githubusercontent.com/pear/pear-core/stable/install-pear.php
 Source1:        install-pear.php
 Source3:        cleanup.php
@@ -632,7 +632,7 @@ fi
 
 * Mon Feb 28 2011 Remi Collet <Fedora@FamilleCollet.com> 1:1.9.2-1
 - update to 1.9.2 (bug + security fix)
-  http://pear.php.net/advisory-20110228.txt
+  https://pear.php.net/advisory-20110228.txt
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:1.9.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild

@@ -10,7 +10,7 @@ License:        GPLv3+
 URL:            https://www.freedesktop.org/wiki/Software/AccountsService/
 
 #VCS: git:git://git.freedesktop.org/accountsservice
-Source0:        http://www.freedesktop.org/software/accountsservice/accountsservice-%{version}.tar.xz
+Source0:        https://www.freedesktop.org/software/accountsservice/accountsservice-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  gettext-devel

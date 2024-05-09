@@ -24,8 +24,8 @@ License:        Public Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://tukaani.org/xz/java.html
-Source:         http://tukaani.org/xz/xz-java-%{version}.zip
+URL:            https://tukaani.org/xz/java.html
+Source:         https://tukaani.org/xz/xz-java-%{version}.zip
 Patch0:         xz-java-source-version.patch
 BuildRequires:  ant
 BuildRequires:  fdupes

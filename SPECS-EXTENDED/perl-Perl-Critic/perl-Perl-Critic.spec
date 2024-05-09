@@ -422,7 +422,7 @@ LC_ALL=en_US ./Build test
 - Update to 1.121
   - Added new themes based on CERT guidelines
   - The source code repository for Perl-Critic has been moved to GitHub at
-    http://github.com/Perl-Critc/Perl-Critic; all tickets from the RT queue
+    https://github.com/Perl-Critc/Perl-Critic; all tickets from the RT queue
     have also been moved there - please use GitHub for submitting any new bugs
     or corresponding about existing ones
   - The change log was reformatted to comply with CPAN::Changes::Spec

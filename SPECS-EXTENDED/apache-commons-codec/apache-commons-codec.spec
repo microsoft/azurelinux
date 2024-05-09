@@ -28,9 +28,9 @@ Release:        2%{?dist}
 Summary:        Apache Commons Codec Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/codec/
-Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
-Source2:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz.asc
+URL:            https://commons.apache.org/codec/
+Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source2:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz.asc
 Source1:        %{name}-build.xml
 # Data in DoubleMetaphoneTest.java originally has an inadmissible license.
 # The author gives MIT in e-mail communication.

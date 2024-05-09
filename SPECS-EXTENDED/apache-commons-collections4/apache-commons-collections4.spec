@@ -27,8 +27,8 @@ Release:        2%{?dist}
 Summary:        Extension of the Java Collections Framework
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/proper/commons-collections/
-Source0:        http://archive.apache.org/dist/commons/collections/source/commons-collections4-%{version}-src.tar.gz
+URL:            https://commons.apache.org/proper/commons-collections/
+Source0:        https://archive.apache.org/dist/commons/collections/source/commons-collections4-%{version}-src.tar.gz
 Patch0:         commons-collections4-4.1-jdk11.patch
 Patch1:         commons-collections4-4.1-bundle.patch
 Patch2:         commons-collections4-4.1-javadoc.patch

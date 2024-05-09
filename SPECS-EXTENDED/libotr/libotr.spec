@@ -6,8 +6,8 @@ Name: libotr
 Version: 4.1.1
 Release: 10%{?dist}
 License: GPLv2 and LGPLv2
-Source0: http://otr.cypherpunks.ca/%{name}-%{version}.tar.gz
-Url: http://otr.cypherpunks.ca/
+Source0: https://otr.cypherpunks.ca/%{name}-%{version}.tar.gz
+Url: https://otr.cypherpunks.ca/
 Provides: libotr-toolkit = %{version}
 Obsoletes: libotr-toolkit < %{version}
 Requires: libgcrypt >= 1.2.0

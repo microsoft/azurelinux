@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://augeas.net
-Source0:        http://download.augeas.net/ruby/%{name}-%{version}.tgz
+Source0:        https://download.augeas.net/ruby/%{name}-%{version}.tgz
 
 BuildRequires:  augeas-devel >= 1.0.0
 BuildRequires:  gcc

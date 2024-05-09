@@ -28,7 +28,7 @@ Requires(postun): systemd
 
 %description
 A small and lightweight implementation of the XDG Sound Theme Specification
-(http://0pointer.de/public/sound-theme-spec.html).
+(https://0pointer.de/public/sound-theme-spec.html).
 
 %package gtk2
 Summary:        Gtk+ 2.x Bindings for libcanberra

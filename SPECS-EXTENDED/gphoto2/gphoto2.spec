@@ -5,8 +5,8 @@ Version:        2.5.27
 Release:        2%{?dist}
 Summary:        Software for accessing digital cameras
 License:        GPLv2+
-Url:            http://www.gphoto.org/
-Source0:        http://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.bz2
+Url:            https://www.gphoto.org/
+Source0:        https://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.bz2
 
 BuildRequires:  gcc
 BuildRequires:  make

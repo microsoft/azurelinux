@@ -24,11 +24,11 @@ Release:        6%{?dist}
 Summary:        XML Pull Parser
 License:        Apache-1.1
 Group:          Development/Libraries/Java
-Url:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
-Source0:        http://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{version}_src.tgz
-Source1:        http://central.maven.org/maven2/xpp3/xpp3/%{version}/xpp3-%{version}.pom
-Source2:        http://central.maven.org/maven2/xpp3/xpp3_min/%{version}/xpp3_min-%{version}.pom
-Source3:        http://central.maven.org/maven2/xpp3/xpp3_xpath/%{version}/xpp3_xpath-%{version}.pom
+Url:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/mxp1/index.html
+Source0:        https://www.extreme.indiana.edu/dist/java-repository/xpp3/distributions/xpp3-%{version}_src.tgz
+Source1:        https://central.maven.org/maven2/xpp3/xpp3/%{version}/xpp3-%{version}.pom
+Source2:        https://central.maven.org/maven2/xpp3/xpp3_min/%{version}/xpp3_min-%{version}.pom
+Source3:        https://central.maven.org/maven2/xpp3/xpp3_xpath/%{version}/xpp3_xpath-%{version}.pom
 Source4:        %{name}-%{version}-OSGI-MANIFEST.MF
 Patch0:         xpp3-sourcetarget.patch
 BuildRequires:  ant >= 1.6

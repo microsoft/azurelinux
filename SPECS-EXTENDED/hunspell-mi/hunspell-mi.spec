@@ -5,7 +5,7 @@ Summary: Maori hunspell dictionaries
 %global upstreamid 20080630
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/mi_NZ.zip
+Source: https://download.services.openoffice.org/contrib/dictionaries/mi_NZ.zip
 URL: https://wiki.openoffice.org/wiki/Dictionaries
 License: GPLv3+
 BuildArch: noarch

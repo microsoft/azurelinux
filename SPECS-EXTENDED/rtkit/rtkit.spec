@@ -6,7 +6,7 @@ Release:          24%{?dist}
 Summary:          Realtime Policy and Watchdog Daemon
 # The daemon itself is GPLv3+, the reference implementation for the client BSD
 License:          GPLv3+ and BSD
-URL:              http://git.0pointer.net/rtkit.git/
+URL:              https://git.0pointer.net/rtkit.git/
 Requires:         dbus
 Requires:         polkit
 BuildRequires:    systemd
@@ -14,7 +14,7 @@ BuildRequires:    dbus-devel >= 1.2
 BuildRequires:    libcap-devel
 BuildRequires:    polkit-devel
 BuildRequires:    autoconf automake libtool
-Source0:          http://0pointer.de/public/%{name}-%{version}.tar.xz
+Source0:          https://0pointer.de/public/%{name}-%{version}.tar.xz
 Patch1:           rtkit-mq_getattr.patch
 Patch2:           0001-SECURITY-Pass-uid-of-caller-to-polkit.patch
 Patch3:           rtkit-controlgroup.patch

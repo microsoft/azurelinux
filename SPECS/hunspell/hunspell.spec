@@ -194,7 +194,7 @@ mkdir %{buildroot}/%{_datadir}/myspell
 
 * Thu Oct 16 2014 maciek <maciek@corsair.lan> - 1.3.3-4
 - Resolves: rhbz#915448, UTF-8 handling patch from
-  http://debbugs.gnu.org/cgi/bugreport.cgi?bug=7781#31
+  https://debbugs.gnu.org/cgi/bugreport.cgi?bug=7781#31
 
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
@@ -440,7 +440,7 @@ mkdir %{buildroot}/%{_datadir}/myspell
 
 * Fri Jun 29 2007 Caolán McNamara <caolanm@redhat.com> - 1.1.5.3-5
 - fix memory leak
-  http://sourceforge.net/tracker/index.php?func=detail&aid=1745263&group_id=143754&atid=756395
+  https://sourceforge.net/tracker/index.php?func=detail&aid=1745263&group_id=143754&atid=756395
 
 * Wed Jun 06 2007 Caolán McNamara <caolanm@redhat.com> - 1.1.5.3-4
 - Resolves: rhbz#212984 discovered problem with missing wordchars

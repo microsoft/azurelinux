@@ -5,8 +5,8 @@ Name: libglade2
 Version: 2.6.4
 Release: 24%{?dist}
 License: LGPLv2+
-Source: http://download.gnome.org/sources/libglade/2.6/libglade-%{version}.tar.bz2
-URL: http://www.gnome.org
+Source: https://download.gnome.org/sources/libglade/2.6/libglade-%{version}.tar.bz2
+URL: https://www.gnome.org
 
 Requires: xml-common
 BuildRequires: libxml2-devel 
@@ -16,9 +16,9 @@ BuildRequires: pango-devel
 BuildRequires: libtool
 BuildRequires: gettext-devel
 
-# http://bugzilla.gnome.org/show_bug.cgi?id=121025
+# https://bugzilla.gnome.org/show_bug.cgi?id=121025
 Patch1: libglade-2.0.1-nowarning.patch
-# http://bugzilla.gnome.org/show_bug.cgi?id=510736
+# https://bugzilla.gnome.org/show_bug.cgi?id=510736
 Patch2: libglade-secondary.patch
 
 %description

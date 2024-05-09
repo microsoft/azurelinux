@@ -286,7 +286,7 @@ make check -k || (cat test-suite.log && false)
 - upgrade to 0.80.1
 - remove dependency on Pyrex and libxml2
 - some API breakage,
-  please see http://dbus.freedesktop.org/doc/dbus-python/NEWS.html
+  please see https://dbus.freedesktop.org/doc/dbus-python/NEWS.html
   for notes on changes
 
 * Wed Jan  3 2007 David Zeuthen <davidz@redhat.com> - 0.70-9%{?dist}

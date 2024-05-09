@@ -7,9 +7,9 @@ Summary:        An audio codec for use in low-delay speech and audio communicati
 
 License:        BSD
 # Files without license header are confirmed to be BSD. Will be fixed in later release
-# http://lists.xiph.org/pipermail/celt-dev/2009-February/000063.html
+# https://lists.xiph.org/pipermail/celt-dev/2009-February/000063.html
 URL:            https://gitlab.xiph.org/xiph/celt
-Source0:        http://downloads.us.xiph.org/releases/celt/celt-%{version}.tar.gz
+Source0:        https://downloads.us.xiph.org/releases/celt/celt-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires: libogg-devel

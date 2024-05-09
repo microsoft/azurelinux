@@ -5,8 +5,8 @@ Version:	0.3.9
 Release:	16%{?dist}
 Summary:	Convenience functions for the Render extension
 License:	MIT
-URL:		http://xcb.freedesktop.org
-Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
+URL:		https://xcb.freedesktop.org
+Source0:	https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 BuildRequires:	pkgconfig(xcb-util) >= 0.3.8
 BuildRequires:	m4

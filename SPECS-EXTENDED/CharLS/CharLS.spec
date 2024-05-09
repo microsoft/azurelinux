@@ -155,7 +155,7 @@ popd
 
 * Thu Feb 3 2011 Mario Ceresa mrceresa@gmail.com CharLS 1.0-1
 - Update to new version
-- Applied patch to fix bug http://charls.codeplex.com/workitem/7823
+- Applied patch to fix bug https://charls.codeplex.com/workitem/7823
 
 * Wed Feb 17 2010 Mario Ceresa mrceresa@gmail.com CharLS 1.0-0.1.b
 - Changed name schema to comply with pre-release packages

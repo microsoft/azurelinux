@@ -215,7 +215,7 @@ make docs -C %{__cmake_builddir}
 
 * Tue Oct 13 2015 Devrim GUNDUZ <devrim@gunduz.org> - 3.5.0-1
 - Update to 3.5.0, per changes described at:
-  http://trac.osgeo.org/geos/browser/tags/3.5.0/NEWS
+  https://trac.osgeo.org/geos/browser/tags/3.5.0/NEWS
 - Add swig as BR to python subpackage, as it does not build without that.
 
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.4.2-6
@@ -235,7 +235,7 @@ make docs -C %{__cmake_builddir}
 
 * Wed Sep 11 2013 Devrim GUNDUZ <devrim@gunduz.org> - 3.4.2-1
 - Update to 3.4.2, per changes described in:
-  http://trac.osgeo.org/geos/browser/tags/3.4.2/NEWS
+  https://trac.osgeo.org/geos/browser/tags/3.4.2/NEWS
 - Remove Patch2, it is now in upstream.
 - Disable ruby bindings
 - Remove all conditionals -- no more RHEL 4!
@@ -248,15 +248,15 @@ make docs -C %{__cmake_builddir}
 
 * Wed Mar 6 2013 Devrim GUNDUZ <devrim@gunduz.org> - 3.3.8-1
 - Update to 3.3.8, per changes described in:
-  http://trac.osgeo.org/geos/browser/tags/3.3.8/NEWS
+  https://trac.osgeo.org/geos/browser/tags/3.3.8/NEWS
 
 * Fri Jan 25 2013 Devrim GUNDUZ <devrim@gunduz.org> - 3.3.7-1
 - Update to 3.3.7, per changes described in:
-  http://trac.osgeo.org/geos/browser/tags/3.3.7/NEWS
+  https://trac.osgeo.org/geos/browser/tags/3.3.7/NEWS
 
 * Fri Nov 16 2012 Devrim GUNDUZ <devrim@gunduz.org> - 3.3.6-1
 - Update to 3.3.6, per changes described in:
-  http://trac.osgeo.org/geos/browser/tags/3.3.6/NEWS
+  https://trac.osgeo.org/geos/browser/tags/3.3.6/NEWS
 
 * Tue Nov 13 2012 Devrim GUNDUZ <devrim@gunduz.org> - 3.3.5-1
 - Update to 3.3.5

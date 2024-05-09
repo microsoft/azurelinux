@@ -7,7 +7,7 @@ Group:          Development/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/CPAN-Meta-Check
-Source0:        http://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
+Source0:        https://cpan.metacpan.org/authors/id/L/LE/LEONT/CPAN-Meta-Check-%{version}.tar.gz 
 BuildArch:      noarch
 # Build
 BuildRequires:  make

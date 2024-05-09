@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Utilities/Libraries
 URL:            https://www.nongnu.org/libunwind/
-Source0:        http://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
+Source0:        https://download.savannah.gnu.org/releases/%{name}/%{name}-%{version}.tar.gz
 
 %description
 Portable and efficient C programming interface (API) to determine the call-chain of a program. The API additionally provides the means to manipulate the preserved (callee-saved) state of each call-frame and to resume execution at any point in the call-chain (non-local goto). The API supports both local (same-process) and remote (across-process) operation. As such, the API is useful in a number of applications.

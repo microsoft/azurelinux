@@ -7,8 +7,8 @@ Summary:        This implements a number of functions found in -lmail on SysV sy
 
 # regarding license please see file COPYRIGHT
 License:        GPLv2+ and LGPLv2+
-URL:            http://packages.qa.debian.org/libl/liblockfile.html
-Source0:        http://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_%{version}.orig.tar.gz
+URL:            https://packages.qa.debian.org/libl/liblockfile.html
+Source0:        https://ftp.de.debian.org/debian/pool/main/libl/liblockfile/liblockfile_%{version}.orig.tar.gz
 
 BuildRequires:  gcc
 

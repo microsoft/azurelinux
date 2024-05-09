@@ -12,8 +12,8 @@ Name: mod_intercept_form_submit
 Version: 1.1.0
 Release: 12%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_intercept_form_submit/
-Source0: http://www.adelton.com/apache/mod_intercept_form_submit/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_intercept_form_submit/
+Source0: https://www.adelton.com/apache/mod_intercept_form_submit/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pkgconfig

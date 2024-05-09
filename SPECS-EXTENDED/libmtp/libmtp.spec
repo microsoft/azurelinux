@@ -7,7 +7,7 @@ Name:           libmtp
 Version:        1.1.18
 Release:        2%{?dist}
 Summary:        Software library for MTP media players
-URL:            http://libmtp.sourceforge.net/
+URL:            https://libmtp.sourceforge.net/
 
 Source0:        https://download.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 License:        LGPLv2+

@@ -5,8 +5,8 @@ Version:        0.7.4
 Release:        18%{?dist}
 Summary:        A tool can monitor network traffic and bandwidth usage in real time
 License:        GPLv2+
-URL:            http://www.roland-riegel.de/nload/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://www.roland-riegel.de/nload/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  ncurses-devel

@@ -25,8 +25,8 @@ Release:        29%{?dist}
 Summary:        XML Pull Parser
 License:        Apache-1.1
 Group:          Development/Libraries/Java
-Url:            http://www.extreme.indiana.edu/xgws/xsoap/xpp/
-Source0:        http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2
+Url:            https://www.extreme.indiana.edu/xgws/xsoap/xpp/
+Source0:        https://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/PullParser2.1.10.tar.bz2
 Patch0:         xpp2-build_xml.patch
 Patch1:         xpp2-enum.patch
 BuildRequires:  ant >= 1.6

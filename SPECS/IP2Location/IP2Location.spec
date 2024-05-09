@@ -219,7 +219,7 @@ install -p data/IPV6-COUNTRY.BIN %{buildroot}%{_datadir}/%{name}/IPV6-COUNTRY.SA
 - add Developers_Guide.txt to doc/devel
 - change group of base package to System Environment/Libraries
 - add check/post/postuninstall section
-- migrate some settings from http://www.ip2location.com/rpm/ip2location-c.spec
+- migrate some settings from https://www.ip2location.com/rpm/ip2location-c.spec
 
 * Fri Apr 17 2015 Peter Bieringer <pb@bieringer.de> - 7.0.1-3
 - update to 7.0.1

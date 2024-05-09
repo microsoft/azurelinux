@@ -5,7 +5,7 @@ Version:		2.0.11
 Release:		7%{?dist}
 Summary:		Ethernet Bridge frame table administration tool
 License:		GPLv2+
-URL:			http://ebtables.sourceforge.net/
+URL:			https://ebtables.sourceforge.net/
 
 Source0:		https://netfilter.org/pub/ebtables/%{name}-%{version}.tar.gz
 Source1:		ebtables-legacy-save

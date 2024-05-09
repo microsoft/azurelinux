@@ -15,8 +15,8 @@ Release:        52%{?dist}
 Summary:        Free Korean TrueType fonts
 
 License:        Baekmuk
-URL:            http://kldp.net/projects/baekmuk/
-Source0:        http://kldp.net/baekmuk/release/865-%{archivename}.tar.gz#/%{archivename}.tar.gz
+URL:            https://kldp.net/projects/baekmuk/
+Source0:        https://kldp.net/baekmuk/release/865-%{archivename}.tar.gz#/%{archivename}.tar.gz
 Source3:        baekmuk-ttf-batang.conf
 Source4:        baekmuk-ttf-dotum.conf
 Source5:        baekmuk-ttf-gulim.conf

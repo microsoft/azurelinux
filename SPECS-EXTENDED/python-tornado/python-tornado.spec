@@ -8,7 +8,7 @@ Release:        1%{?dist}
 Summary:        Scalable, non-blocking web server and tools
 
 License:        ASL 2.0
-URL:            http://www.tornadoweb.org
+URL:            https://www.tornadoweb.org
 Source0:        https://github.com/tornadoweb/%{srcname}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 
 # Do not turn DeprecationWarning in tornado module into Exception

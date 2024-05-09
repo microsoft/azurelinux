@@ -10,7 +10,7 @@ URL:            https://developer.gnome.org/glibmm/stable/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://ftp.gnome.org/pub/GNOME/sources/glibmm/%{BaseVersion}/glibmm-%{version}.tar.xz
+Source0:        https://ftp.gnome.org/pub/GNOME/sources/glibmm/%{BaseVersion}/glibmm-%{version}.tar.xz
 BuildRequires:  doxygen
 BuildRequires:  gcc-c++
 BuildRequires:  glib-devel 

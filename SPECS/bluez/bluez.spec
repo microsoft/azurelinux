@@ -5,8 +5,8 @@ Release:        4%{?dist}
 License:        GPLv2+ AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.bluez.org/
-Source0:        http://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
+URL:            https://www.bluez.org/
+Source0:        https://www.kernel.org/pub/linux/bluetooth/%{name}-%{version}.tar.xz
 Source1:        bluez.gitignore
 # https://github.com/hadess/bluez/commits/obex-5.46
 Patch1:         0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch

@@ -5,7 +5,7 @@ Version:        0.10.5
 Release:        2%{?dist}
 Summary:        A library implementing the SSH protocol
 License:        LGPLv2+
-URL:            http://www.libssh.org
+URL:            https://www.libssh.org
 
 Source0:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz
 Source1:        https://www.libssh.org/files/0.10/%{name}-%{version}.tar.xz.asc

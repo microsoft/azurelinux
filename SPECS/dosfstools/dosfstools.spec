@@ -3,7 +3,7 @@ Name:		dosfstools
 Version:	4.2
 Release:    1%{?dist}
 License:	GPLv3+
-URL:		http://github.com/dosfstools/dosfstools
+URL:		https://github.com/dosfstools/dosfstools
 Group:		Filesystem Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

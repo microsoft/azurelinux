@@ -6,8 +6,8 @@ Release: 4%{?dist}
 Summary: RELAX NG schemas for all Mallard versions
 
 License: MIT
-URL:     http://projectmallard.org/download/
-Source0: http://projectmallard.org/download/%{name}-%{version}.tar.bz2
+URL:     https://projectmallard.org/download/
+Source0: https://projectmallard.org/download/%{name}-%{version}.tar.bz2
 
 BuildArch:        noarch
 Requires(post):   /usr/bin/xmlcatalog

@@ -7,7 +7,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/General Libraries
-URL:            http://xmlsoft.org/libxslt/
+URL:            https://xmlsoft.org/libxslt/
 Source0:        https://download.gnome.org/sources/libxslt/%{majminorver}/%{name}-%{version}.tar.xz
 BuildRequires:  libgcrypt-devel
 BuildRequires:  libxml2-devel

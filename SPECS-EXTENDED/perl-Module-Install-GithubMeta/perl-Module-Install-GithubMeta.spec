@@ -37,7 +37,7 @@ Requires:      perl(Module::Install) >= 0.85
 
 %description
 Module::Install::GithubMeta is a Module::Install extension
-to include GitHub (http://github.com) meta information in
+to include GitHub (https://github.com) meta information in
 'META.yml'.  It automatically detects if the distribution 
 directory is under 'git' version control and whether the 
 'origin' is a GitHub repository; if so, it will set the

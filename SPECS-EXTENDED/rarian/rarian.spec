@@ -6,8 +6,8 @@ Version: 0.8.1
 Release: 25%{?dist}
 License: LGPLv2+
 Summary: Documentation meta-data library
-URL: http://rarian.freedesktop.org/
-Source: http://download.gnome.org/sources/rarian/0.8/rarian-%{version}.tar.bz2
+URL: https://rarian.freedesktop.org/
+Source: https://download.gnome.org/sources/rarian/0.8/rarian-%{version}.tar.bz2
 Source1: scrollkeeper-omf.dtd
 
 ### Patch ###
@@ -83,10 +83,10 @@ rm -rf %buildroot%{_libdir}/librarian.la
 # Add OMF DTD to XML catalog.
 CATALOG=/etc/xml/catalog
 /usr/bin/xmlcatalog --noout --add "rewriteSystem" \
-  "http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd" \
+  "https://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd" \
   "/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd" $CATALOG >& /dev/null || :
 /usr/bin/xmlcatalog --noout --add "rewriteURI" \
-  "http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd" \
+  "https://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd" \
   "/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd" $CATALOG >& /dev/null || :
 
 %postun compat

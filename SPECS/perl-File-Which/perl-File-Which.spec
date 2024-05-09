@@ -6,7 +6,7 @@ License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/File-Which/
+URL:            https://search.cpan.org/dist/File-Which/
 Source0:        https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  perl >= 5.28.0

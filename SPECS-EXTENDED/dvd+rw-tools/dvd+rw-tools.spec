@@ -5,9 +5,9 @@ Version:	7.1
 Release:	33%{?dist}
 Summary:	Toolchain to master DVD+RW/+R media
 License:	GPLv2
-URL:		http://fy.chalmers.se/~appro/linux/DVD+RW/
+URL:		https://fy.chalmers.se/~appro/linux/DVD+RW/
 
-Source:		http://fy.chalmers.se/~appro/linux/DVD+RW/tools/dvd+rw-tools-%{version}.tar.gz
+Source:		https://fy.chalmers.se/~appro/linux/DVD+RW/tools/dvd+rw-tools-%{version}.tar.gz
 Source1:	index.html
 Patch1:		dvd+rw-tools-7.0.manpatch
 Patch2:		dvd+rw-tools-7.0-wexit.patch
@@ -28,7 +28,7 @@ BuildRequires:	kernel-headers m4
 
 %description
 Collection of tools to master DVD+RW/+R media. For further
-information see http://fy.chalmers.se/~appro/linux/DVD+RW/.
+information see https://fy.chalmers.se/~appro/linux/DVD+RW/.
 
 %prep
 %setup -q
@@ -184,7 +184,7 @@ make WARN="-DDEFAULT_BUF_SIZE_MB=16 -DRLIMIT_MEMLOCK" %{?_smp_mflags}
 - added a patch to fix a reload problem on some drives, 
   after a successful burn
 
-* Fri Aug 31 2007 Matthias Saou <http://freshrpms.net/> 7.0-7
+* Fri Aug 31 2007 Matthias Saou <https://freshrpms.net/> 7.0-7
 - Minor spec file cleanups (tabs vs. spaces, etc.).
 - Use install instead of cp for the html file to avoid umask differences.
 

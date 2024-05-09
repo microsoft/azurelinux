@@ -57,7 +57,7 @@ chmod -R u+w $RPM_BUILD_ROOT/*
 
 
 %check
-# http://rt.cpan.org/NoAuth/Bug.html?id=3910
+# https://rt.cpan.org/NoAuth/Bug.html?id=3910
 # Need File::Slurper to run tests, not packaged as of 2015-09-08
 PERL_HASH_SEED=0 make test
 
@@ -220,7 +220,7 @@ PERL_HASH_SEED=0 make test
 - Bring up to date with current fedora.us Perl spec template.
 
 * Fri Nov 21 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:0.17-0.fdr.2
-- Add workaround for http://rt.cpan.org/NoAuth/Bug.html?id=3910.
+- Add workaround for https://rt.cpan.org/NoAuth/Bug.html?id=3910.
 
 * Sun Oct 12 2003 Ville Skyttä <ville.skytta at iki.fi> - 0:0.17-0.fdr.1
 - First build.

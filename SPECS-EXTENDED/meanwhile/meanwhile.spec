@@ -5,7 +5,7 @@ Version:        1.1.0
 Release:        31%{?dist}
 Summary:        Lotus Sametime Community Client library
 License:        GPLv2+
-URL:            http://%{name}.sourceforge.net
+URL:            https://%{name}.sourceforge.net
 
 # The source for this package was pulled from upstream's vcs.  Use the following commands to generate the tarball:
 
@@ -164,7 +164,7 @@ rm -rf %{buildroot}%{_datadir}/doc/%{name}-doc-%{version}/
 
 * Tue Mar 26 2013 Simone Caronni <negativo17@gmail.com> - 1.1.0-9
 - Added patches for file transfer and status time workaround:
-  http://www.lilotux.net/~mikael/pub/meanwhile/
+  https://www.lilotux.net/~mikael/pub/meanwhile/
 - Spec file formatting.
 
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.0-8

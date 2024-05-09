@@ -5,7 +5,7 @@ Release:        13%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.khronos.org/registry/cl/
+URL:            https://www.khronos.org/registry/cl/
 BuildArch:      noarch
 
 %description
@@ -15,7 +15,7 @@ This package provides some directories required by packages which use OpenCL.
 
 %install
 # ICD Loader Vendor Enumeration
-# http://www.khronos.org/registry/cl/extensions/khr/cl_khr_icd.txt
+# https://www.khronos.org/registry/cl/extensions/khr/cl_khr_icd.txt
 mkdir -p %{buildroot}/%{_sysconfdir}/OpenCL/vendors/
 
 %files

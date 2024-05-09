@@ -8,7 +8,7 @@ Summary:	Rules for polkit to add compatibility with pklocalauthority
 # the binary package.
 License:	LGPLv2+
 URL:		https://pagure.io/polkit-pkla-compat
-Source0:	http://releases.pagure.org/polkit-pkla-compat/polkit-pkla-compat-%{version}.tar.xz
+Source0:	https://releases.pagure.org/polkit-pkla-compat/polkit-pkla-compat-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:	docbook-style-xsl, libxslt, glib2-devel, polkit-devel

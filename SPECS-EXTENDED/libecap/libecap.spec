@@ -5,8 +5,8 @@ Version:    1.0.1
 Release:    7%{?dist}
 Summary:    Squid interface for embedded adaptation modules
 License:    BSD
-URL:        http://www.e-cap.org/
-Source0:    http://www.measurement-factory.com/tmp/ecap/%{name}-%{version}.tar.gz
+URL:        https://www.e-cap.org/
+Source0:    https://www.measurement-factory.com/tmp/ecap/%{name}-%{version}.tar.gz
 Source1:    autoconf.h
 
 BuildRequires:  gcc

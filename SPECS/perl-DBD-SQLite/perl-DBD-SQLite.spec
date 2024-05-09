@@ -5,7 +5,7 @@ Version:        1.74
 Release:        1%{?dist}
 Group:          Development/Libraries
 License:        (GPL+ or Artistic) and Public Domain
-URL:            http://search.cpan.org/dist/DBD-SQLite/
+URL:            https://search.cpan.org/dist/DBD-SQLite/
 Source0:        https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/DBD-SQLite-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,7 +36,7 @@ Provides:       perl(DBD::SQLite::VirtualTable::PerlData::Cursor) = %{version}-%
 
 %description
 SQLite is a public domain RDBMS database engine that you can find at
-http://www.hwaci.com/sw/sqlite/.
+https://www.hwaci.com/sw/sqlite/.
 
 This module provides a SQLite RDBMS module that uses the system SQLite
 libraries.

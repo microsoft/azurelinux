@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://heasarc.gsfc.nasa.gov/fitsio/
-Source0:        http://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
+Source0:        https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/%{name}-%{version}.tar.gz
 # Remove soname version check
 Patch1:         cfitsio-noversioncheck.patch
 # Some rearrangements in pkg-config file

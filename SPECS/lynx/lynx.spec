@@ -222,7 +222,7 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
   * improved HTML interpretation
   * improved handling and display of character sets
   * Full list of changes and improvements:
-    http://lynx.isc.org/lynx2.8.8/features.html
+    https://lynx.isc.org/lynx2.8.8/features.html
 - packaging changes:
   * fix self-obsoletion of lynxssl
   * removed patches:
@@ -425,7 +425,7 @@ chmod ogu-x scripts/conf.mingw.sh scripts/config.djgpp.sh
 
 * Fri Jul 27 2001 ke@suse.de
 - update message files from
-  http://www.iro.umontreal.ca/contrib/po/maint/lynx/ ; packed as
+  https://www.iro.umontreal.ca/contrib/po/maint/lynx/ ; packed as
   po.tar.bz2.
   Fix [#8662].
 

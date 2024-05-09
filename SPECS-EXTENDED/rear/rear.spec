@@ -13,7 +13,7 @@ Release: 7%{?dist}
 License: GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://relax-and-recover.org/
+URL: https://relax-and-recover.org/
 
 # as GitHub stopped with download section we need to go back to Sourceforge for downloads
 Source: https://sourceforge.net/projects/rear/files/rear/%{version}/rear-%{version}.tar.gz

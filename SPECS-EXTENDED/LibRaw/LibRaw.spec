@@ -11,7 +11,7 @@ Name: LibRaw
 Version: 0.19.5
 Release: 5%{?dist}
 License: BSD and (CDDL or LGPLv2)
-URL: http://www.libraw.org
+URL: https://www.libraw.org
 
 BuildRequires: gcc-c++
 BuildRequires: pkgconfig(lcms2)
@@ -19,7 +19,7 @@ BuildRequires: pkgconfig(jasper)
 BuildRequires: pkgconfig(libjpeg)
 BuildRequires: autoconf automake libtool
 
-Source0: http://www.libraw.org/data/%{name}-%{version}.tar.gz
+Source0: https://www.libraw.org/data/%{name}-%{version}.tar.gz
 Patch0:  LibRaw-0.6.0-pkgconfig.patch
 Patch1:  CVE-2020-15503.patch
 Provides: bundled(dcraw) = 9.25

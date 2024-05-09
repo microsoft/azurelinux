@@ -11,8 +11,8 @@ Version:	2.3.9
 Release:	21%{?dist}
 Summary:	FastCGI interface module for Apache 2
 License:	ASL 2.0
-URL:		http://httpd.apache.org/mod_fcgid/
-Source0:	http://www.apache.org/dist/httpd/mod_fcgid/mod_fcgid-%{version}.tar.bz2
+URL:		https://httpd.apache.org/mod_fcgid/
+Source0:	https://www.apache.org/dist/httpd/mod_fcgid/mod_fcgid-%{version}.tar.bz2
 Source1:	fcgid.conf
 Source2:	mod_fcgid-2.1-README.RPM
 Source3:	mod_fcgid-2.1-README.SELinux

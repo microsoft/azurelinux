@@ -4,8 +4,8 @@ Version:        1.40
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
-Source:         http://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
+URL:            https://search.cpan.org/~ether/JSON-Any-1.39/lib/JSON/Any.pm
+Source:         https://search.cpan.org/CPAN/authors/id/E/ET/ETHER/JSON-Any-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch

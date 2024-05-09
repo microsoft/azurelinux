@@ -24,7 +24,7 @@ BuildArch:      noarch
 This is the database of printers, printer drivers, and driver options
 for Foomatic.
 
-The site http://www.openprinting.org/ is based on this database.
+The site https://www.openprinting.org/ is based on this database.
 
 %package filesystem
 Summary:        Directory layout for the foomatic package

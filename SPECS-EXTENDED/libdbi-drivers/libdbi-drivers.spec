@@ -5,9 +5,9 @@ Name: libdbi-drivers
 Version: 0.9.0
 Release: 16%{?dist}
 License: LGPLv2+
-URL: http://libdbi-drivers.sourceforge.net/
+URL: https://libdbi-drivers.sourceforge.net/
 
-Source: http://prdownloads.sourceforge.net/libdbi-drivers/%{name}-%{version}.tar.gz
+Source: https://prdownloads.sourceforge.net/libdbi-drivers/%{name}-%{version}.tar.gz
 # old automake does not offer aarch64
 Patch1: libdbi-drivers-aarch64.patch
 

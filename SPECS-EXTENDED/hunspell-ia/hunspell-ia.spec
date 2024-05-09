@@ -5,9 +5,9 @@ Summary: Interlingua hunspell dictionaries
 %global upstreamid 20050226
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source0: http://download.savannah.gnu.org/releases/interlingua/ia_myspell.zip
+Source0: https://download.savannah.gnu.org/releases/interlingua/ia_myspell.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries#Interlingua_.28x-register.29
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries#Interlingua_.28x-register.29
 License: LGPLv2+
 BuildArch: noarch
 

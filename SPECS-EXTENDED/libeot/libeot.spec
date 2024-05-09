@@ -7,7 +7,7 @@ License: MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: https://github.com/umanwizard/libeot
-Source: http://dev-www.libreoffice.org/src/%{name}-%{version}.tar.bz2
+Source: https://dev-www.libreoffice.org/src/%{name}-%{version}.tar.bz2
 
 BuildRequires: gcc
 

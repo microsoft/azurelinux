@@ -6,10 +6,10 @@ License:        DMIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://openjade.sourceforge.net/
-Source:         http://download.sourceforge.net/openjade/openjade-%{version}.tar.gz
+Source:         https://download.sourceforge.net/openjade/openjade-%{version}.tar.gz
 #config.sub and config.guess from upstream sources (Mar 25th 2013).
-#http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
-#http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD
+#https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD
+#https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD
 #I can't get them from autoreconf, because of the very strange openjade structure of config files
 Source2:        config.guess
 Source3:        config.sub
@@ -197,7 +197,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*.so $RPM_BUILD_ROOT%{_libdir}/*.la
 
 * Fri Feb 27 2009 Ondrej Vasik <ovasik@redhat.com> 1.3.2-34
 - disable parallel build (culprit of build failure)
-  - http://bugs.gentoo.org/181651
+  - https://bugs.gentoo.org/181651
 
 * Thu Feb 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.2-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild

@@ -7,8 +7,8 @@ Version: 1.2.6
 Release: 26%{?dist}
 
 License: BSD 
-URL: 	 http://www.musepack.net/
-Source0: http://files.musepack.net/source/libmpcdec-%{version}.tar.bz2
+URL: 	 https://www.musepack.net/
+Source0: https://files.musepack.net/source/libmpcdec-%{version}.tar.bz2
 
 BuildRequires:  gcc-c++
 BuildRequires: gcc
@@ -165,7 +165,7 @@ rm -fv $RPM_BUILD_ROOT%{_libdir}/lib*.la
 - changed license to BSD
 - updated the spec to use autotools
 
-* Fri Nov 26 2004 Matthias Saou <http://freshrpms.net/> 1.0.2-1
+* Fri Nov 26 2004 Matthias Saou <https://freshrpms.net/> 1.0.2-1
 - Initial RPM release.
 - Include the mandatory copy of the LGPL (there is none in the sources...).
 

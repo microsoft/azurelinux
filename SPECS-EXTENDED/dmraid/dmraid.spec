@@ -11,7 +11,7 @@ Name: dmraid
 Version: 1.0.0.rc16
 Release: 46%{?dist}
 License: GPLv2+
-URL: http://people.redhat.com/heinzm/sw/dmraid
+URL: https://people.redhat.com/heinzm/sw/dmraid
 
 BuildRequires: device-mapper-devel >= 1.02.02-2
 BuildRequires: device-mapper-event-devel

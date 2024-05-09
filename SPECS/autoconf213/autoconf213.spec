@@ -3,7 +3,7 @@ Name:       autoconf213
 Version:    2.13
 Release:    49%{?dist}
 License:    GPLv2+
-URL:        http://www.gnu.org/software/autoconf/
+URL:        https://www.gnu.org/software/autoconf/
 Source:     https://ftp.gnu.org/gnu/autoconf/autoconf-%{version}.tar.gz
 Patch0:     autoconf-2.13-versioning.patch
 Patch1:     autoconf213-destdir.patch

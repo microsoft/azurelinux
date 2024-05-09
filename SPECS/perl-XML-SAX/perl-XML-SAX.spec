@@ -8,7 +8,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/XML-SAX
 # Original source
-# http://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz
+# https://www.cpan.org/authors/id/G/GR/GRANTM/XML-SAX-%%{version}.tar.gz
 #
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # !!! Attention XML-SAX contains patented code that cannot ship !!!
@@ -86,7 +86,7 @@ touch $RPM_BUILD_ROOT%{perl_vendorlib}/XML/SAX/ParserDetails.ini
 %check
 make test
 
-# See http://rhn.redhat.com/errata/RHBA-2010-0008.html regarding these scriptlets
+# See https://rhn.redhat.com/errata/RHBA-2010-0008.html regarding these scriptlets
 # perl-XML-LibXML-1.58-6 is in EL 5.8 and possibly later EL-5 releases
 %post
 if [ ! -f "%{perl_vendorlib}/XML/SAX/ParserDetails.ini" ] ; then
@@ -265,7 +265,7 @@ rm -rf "%{perl_vendorlib}/XML/SAX/ParserDetails.ini.backup" || :
 * Thu Nov 12 2009 Marcela Mašláňová <mmaslano@redhat.com> - 0.96-6
 - post scriptlet needs to check whether the file is installed. When it isn't,
  then it's needed call for adding PurePerl parser
- http://perl-xml.sourceforge.net/faq/#parserdetails.ini
+ https://perl-xml.sourceforge.net/faq/#parserdetails.ini
 
 * Mon Oct 19 2009 Stepan Kasal <skasal@redhat.com> - 0.96-5
 - use the filtering macros

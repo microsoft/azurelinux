@@ -7,8 +7,8 @@ Summary: A base library for writing document import filters
 
 # src/lib/RVNGOLEStream.{h,cpp} are BSD
 License: (LGPLv2+ or MPLv2.0) and BSD
-URL: http://sourceforge.net/p/libwpd/wiki/librevenge/
-Source: http://downloads.sourceforge.net/libwpd/%{name}-%{version}.tar.xz
+URL: https://sourceforge.net/p/libwpd/wiki/librevenge/
+Source: https://downloads.sourceforge.net/libwpd/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

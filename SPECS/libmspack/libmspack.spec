@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.cabextract.org.uk/libmspack/
-Source0:        http://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
+Source0:        https://www.cabextract.org.uk/libmspack/%{name}-%{version}.tar.gz
 
 %description
 A library that provides compression and decompression of file formats used by Microsoft

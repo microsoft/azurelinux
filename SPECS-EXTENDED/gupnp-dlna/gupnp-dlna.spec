@@ -166,7 +166,7 @@ Contains developer documentation for %{name}.
 
 * Thu Feb 11 2016 Peter Robinson <pbrobinson@fedoraproject.org> 0.10.4-1
 - 0.10.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.4.news
 
 * Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
@@ -195,54 +195,54 @@ Contains developer documentation for %{name}.
 
 * Thu May 30 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.10.2-1
 - 0.10.2 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.2.news
 
 * Wed Apr 10 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.10.1-1
 - 0.10.1 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.1.news
 
 * Thu Feb 21 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.10.0-1
 - 0.10.0 release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.10/gupnp-dlna-0.10.0.news
 
 * Thu Feb 14 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.5-1
 - 0.9.5 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.5.news
 
 * Sun Jan 27 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.4-1
 - 0.9.4 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.4.news
 
 * Sun Jan 13 2013 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.3-1
 - 0.9.3 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.3.news
 
 * Fri Dec 14 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.2-1
 - 0.9.2 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.2.news
 
 * Thu Dec  6 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.1-1
 - 0.9.1 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.1.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.1.news
 
 * Sat Dec  1 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.9.0-1
 - 0.9.0 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.9/gupnp-dlna-0.9.0.news
 
 * Wed Nov 21 2012 Peter Robinson <pbrobinson@fedoraproject.org> 0.7.0-1
 - 0.7.0 devel release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.7/gupnp-dlna-0.7.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.7/gupnp-dlna-0.7.0.news
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.6.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
 * Sun Mar 18 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.6-1
 - 0.6.6 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.6.news
 
 * Mon Feb 13 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.5-1
 - 0.6.5 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.5.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.5.news
 
 * Mon Jan 23 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.4-3
 - Enable introspection support - RHBZ 784125
@@ -252,15 +252,15 @@ Contains developer documentation for %{name}.
 
 * Thu Oct 20 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.4-1
 - 0.6.4 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.4.news
 
 * Fri Sep  2 2011 Zeeshan Ali <zeenix@redhat.com> - 0.6.3-1
 - 0.6.3 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.3.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.3.news
 
 * Sun Jul 17 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.2-1
 - 0.6.2 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/gupnp-dlna/0.6/gupnp-dlna-0.6.2.news
 
 * Sun Apr 10 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 0.6.1-1
 - 0.6.1 stable release

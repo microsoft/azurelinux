@@ -7,7 +7,7 @@ Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2412/1/dict-be-official.oxt
 Source1: %{name}-LICENSE.txt
 Source2: hyphen-be-LICENSE.txt
-URL: http://extensions.services.openoffice.org/project/dict-be-official
+URL: https://extensions.services.openoffice.org/project/dict-be-official
 License: GPL+
 BuildArch: noarch
 
