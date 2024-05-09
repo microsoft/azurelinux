@@ -5,11 +5,9 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
-	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
@@ -35,7 +33,7 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 	overlaysDereference := *overlays
 	err = updateGrubConfigForOverlay(imageChroot, overlaysDereference)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to update grub config for filesystem overlays:\n%w", err)
 	}
 
 	return true, nil
@@ -71,21 +69,19 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 		fmt.Sprintf("rd.overlayfs=%s", concatenatedOverlays),
 	}
 
-	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
-
-	grub2Config, err := file.Read(grubCfgPath)
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
 	if err != nil {
-		return fmt.Errorf("failed to read grub config:\n%w", err)
+		return err
 	}
 
-	grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"rd.overlayfs"}, newArgs)
+	err = bootCustomizer.UpdateKernelCommandLineArgs(defaultGrubCmdlineLinux, []string{"rd.overlayfs"}, newArgs)
 	if err != nil {
-		return fmt.Errorf("failed to set overlay kernel command line args:\n%w", err)
+		return err
 	}
 
-	err = file.Write(grub2Config, grubCfgPath)
+	err = bootCustomizer.WriteToFile(imageChroot)
 	if err != nil {
-		return fmt.Errorf("failed to write updated grub config:\n%w", err)
+		return err
 	}
 
 	return nil

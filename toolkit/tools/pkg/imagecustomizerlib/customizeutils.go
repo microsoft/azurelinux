@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -436,7 +437,12 @@ func addCustomizerRelease(imageChroot *safechroot.Chroot, toolVersion string, bu
 
 func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, imageConnection *ImageConnection,
 ) error {
-	currentSelinuxMode, err := getCurrentSELinuxMode(imageConnection.Chroot())
+	bootCustomizer, err := NewBootCustomizer(imageConnection.Chroot())
+	if err != nil {
+		return err
+	}
+
+	currentSelinuxMode, err := bootCustomizer.GetSELinuxMode(imageConnection.Chroot())
 	if err != nil {
 		return fmt.Errorf("failed to get existing SELinux mode:\n%w", err)
 	}
@@ -466,18 +472,59 @@ func handleBootLoader(baseConfigPath string, config *imagecustomizerapi.Config, 
 	return nil
 }
 
+// Inserts new kernel command-line args into the grub config file.
+func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArguments,
+	imageChroot *safechroot.Chroot,
+) error {
+	var err error
+
+	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
+	if extraCommandLine == "" {
+		// Nothing to do.
+		return nil
+	}
+
+	logger.Log.Infof("Setting KernelCommandLine.ExtraCommandLine")
+
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.AddKernelCommandLine(extraCommandLine)
+	if err != nil {
+		return err
+	}
+
+	err = bootCustomizer.WriteToFile(imageChroot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderType imagecustomizerapi.ResetBootLoaderType,
 	imageChroot *safechroot.Chroot,
 ) (imagecustomizerapi.SELinuxMode, error) {
 	var err error
 
-	// Resolve the default SELinux mode.
-	if selinuxMode == imagecustomizerapi.SELinuxModeDefault {
-		selinuxMode, err = getCurrentSELinuxMode(imageChroot)
-		if err != nil {
-			return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
-		}
+	bootCustomizer, err := NewBootCustomizer(imageChroot)
+	if err != nil {
+		return selinuxMode, err
 	}
+
+	currentSELinuxMode, err := bootCustomizer.GetSELinuxMode(imageChroot)
+	if err != nil {
+		return selinuxMode, fmt.Errorf("failed to get current SELinux mode:\n%w", err)
+	}
+
+	if selinuxMode == imagecustomizerapi.SELinuxModeDefault || selinuxMode == currentSELinuxMode {
+		// Don't need to change the configured SELinux mode.
+		return currentSELinuxMode, nil
+	}
+
+	logger.Log.Infof("Configuring SELinux mode")
 
 	switch resetBootLoaderType {
 	case imagecustomizerapi.ResetBootLoaderTypeHard:
@@ -486,14 +533,19 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 
 	default:
 		// Update the SELinux kernel command-line args.
-		err := updateSELinuxCommandLine(selinuxMode, imageChroot)
+		err := bootCustomizer.UpdateSELinuxCommandLine(selinuxMode)
 		if err != nil {
-			return selinuxMode, fmt.Errorf("failed to update SELinux args in grub.cfg:\n%w", err)
+			return selinuxMode, err
+		}
+
+		err = bootCustomizer.WriteToFile(imageChroot)
+		if err != nil {
+			return selinuxMode, err
 		}
 	}
 
 	if selinuxMode != imagecustomizerapi.SELinuxModeDisabled {
-		err = updateSELinuxMode(selinuxMode, imageChroot)
+		err = updateSELinuxModeInConfigFile(selinuxMode, imageChroot)
 		if err != nil {
 			return selinuxMode, err
 		}
@@ -502,7 +554,7 @@ func handleSELinux(selinuxMode imagecustomizerapi.SELinuxMode, resetBootLoaderTy
 	return selinuxMode, nil
 }
 
-func updateSELinuxMode(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
+func updateSELinuxModeInConfigFile(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
 	if selinuxMode == imagecustomizerapi.SELinuxModeDisabled {
 		// SELinux is disabled in the kernel command line.
 		// So, no need to update the SELinux config file.
