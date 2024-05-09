@@ -144,7 +144,7 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
-* Thu May 9 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 1:23.3-3
+* Thu May 9 2024 Sharath Srikanth Chellappa <sharathsr@microsoft.com> - 23.4.3-2
 - Add patch to add network interface renaming support for CAPM3 Met.
 
 * Mon Feb 26 2024 Dan Streetman <ddstreet@microsoft.com> - 23.4.3-1
