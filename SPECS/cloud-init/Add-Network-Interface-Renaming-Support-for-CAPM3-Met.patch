@@ -17,9 +17,9 @@ the specification.
 ---
  cloudinit/sources/helpers/openstack.py        | 11 +--
  .../sources/helpers/test_openstack.py         |  8 +-
- tests/unittests/sources/test_configdrive.py   | 80 ++++++++++---------
- tests/unittests/test_net.py                   | 79 ++++++------------
- 4 files changed, 77 insertions(+), 101 deletions(-)
+ tests/unittests/sources/test_configdrive.py   | 84 ++++++++++---------
+ tests/unittests/test_net.py                   | 80 ++++++------------
+ 4 files changed, 79 insertions(+), 104 deletions(-)
 
 diff --git a/cloudinit/sources/helpers/openstack.py b/cloudinit/sources/helpers/openstack.py
 index d2260baa0..f995ce4b1 100644
@@ -74,7 +74,7 @@ index ac8e2a354..143c12796 100644
                          {
                              "type": "static",
 diff --git a/tests/unittests/sources/test_configdrive.py b/tests/unittests/sources/test_configdrive.py
-index 70da4812a..462733a98 100644
+index 70da4812a..e0afa2936 100644
 --- a/tests/unittests/sources/test_configdrive.py
 +++ b/tests/unittests/sources/test_configdrive.py
 @@ -731,16 +731,16 @@ class TestNetJson(CiTestCase):
@@ -177,7 +177,7 @@ index 70da4812a..462733a98 100644
  
      def test_bond_conversion(self):
          # light testing of bond conversion and eni rendering of bond
-@@ -961,22 +963,24 @@ class TestConvertNetworkData(CiTestCase):
+@@ -961,24 +963,26 @@ class TestConvertNetworkData(CiTestCase):
              ]
          )
          self.assertEqual(
@@ -207,12 +207,16 @@ index 70da4812a..462733a98 100644
 +        self.assertIn("auto eth1", eni_rendering)
          self.assertIn("auto bond0", eni_rendering)
 -        # The bond should have the given mac address
+-        pos = eni_rendering.find("auto bond0")
+-        self.assertIn(BOND_MAC, eni_rendering[pos:])
 +
 +        # Since we are setting the mac address for all interfaces to none, we 
 +        # are commenting the check down below.
-         pos = eni_rendering.find("auto bond0")
-         self.assertIn(BOND_MAC, eni_rendering[pos:])
++        # pos = eni_rendering.find("auto bond0")
++        # self.assertIn(BOND_MAC, eni_rendering[pos:])
  
+     def test_vlan(self):
+         # light testing of vlan config conversion and eni rendering
 @@ -994,9 +998,9 @@ class TestConvertNetworkData(CiTestCase):
          ) as f:
              eni_rendering = f.read()
@@ -248,10 +252,10 @@ index 70da4812a..462733a98 100644
          self.assertEqual(expected, config_name2mac)
  
 diff --git a/tests/unittests/test_net.py b/tests/unittests/test_net.py
-index c5509536a..45439007f 100644
+index c5509536a..eb14c5db3 100644
 --- a/tests/unittests/test_net.py
 +++ b/tests/unittests/test_net.py
-@@ -534,7 +534,7 @@ OS_SAMPLES = [
+@@ -534,13 +534,12 @@ OS_SAMPLES = [
          },
          "out_sysconfig_opensuse": [
              (
@@ -260,7 +264,13 @@ index c5509536a..45439007f 100644
                  """
  # Created by cloud-init automatically, do not edit.
  #
-@@ -564,25 +564,20 @@ dns = none
+ BOOTPROTO=static
+ IPADDR=172.19.1.34
+-LLADDR=fa:16:3e:ed:9a:59
+ NETMASK=255.255.252.0
+ STARTMODE=auto
+ """.lstrip(),
+@@ -564,25 +563,20 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -290,7 +300,7 @@ index c5509536a..45439007f 100644
  IPADDR=172.19.1.34
  NETMASK=255.255.252.0
  NM_CONTROLLED=no
-@@ -610,12 +605,8 @@ dns = none
+@@ -610,12 +604,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
@@ -305,7 +315,7 @@ index c5509536a..45439007f 100644
              ),
          ],
          "expected_network_manager": [
-@@ -623,23 +614,23 @@ dns = none
+@@ -623,23 +613,23 @@ dns = none
                  "".join(
                      [
                          "etc/NetworkManager/system-connections",
@@ -320,7 +330,7 @@ index c5509536a..45439007f 100644
 -id=cloud-init eth0
 -uuid=1dd9a779-d327-56e1-8454-c65e2556c12c
 +id=cloud-init tap1a81968a-79
-+uuid=2e85b264-dffb-5635-9b6c-616838eb113
++uuid=2e85b264-dffb-5635-9b6c-616838eb1130
  autoconnect-priority=120
  type=ethernet
 +interface-name=tap1a81968a-79
@@ -333,7 +343,7 @@ index c5509536a..45439007f 100644
  
  [ipv4]
  method=manual
-@@ -695,14 +686,13 @@ route1=0.0.0.0/0,172.19.3.254
+@@ -695,14 +685,13 @@ route1=0.0.0.0/0,172.19.3.254
          },
          "out_sysconfig_opensuse": [
              (
@@ -349,7 +359,7 @@ index c5509536a..45439007f 100644
  NETMASK=255.255.252.0
  NETMASK1=255.255.255.0
  STARTMODE=auto
-@@ -727,25 +717,20 @@ dns = none
+@@ -727,25 +716,20 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -379,7 +389,7 @@ index c5509536a..45439007f 100644
  IPADDR=172.19.1.34
  IPADDR1=10.0.0.10
  NETMASK=255.255.252.0
-@@ -775,12 +760,8 @@ dns = none
+@@ -775,12 +759,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
@@ -394,7 +404,7 @@ index c5509536a..45439007f 100644
              ),
          ],
      },
-@@ -852,7 +833,7 @@ dns = none
+@@ -852,7 +832,7 @@ dns = none
          },
          "out_sysconfig_opensuse": [
              (
@@ -403,7 +413,7 @@ index c5509536a..45439007f 100644
                  """
  # Created by cloud-init automatically, do not edit.
  #
-@@ -861,7 +842,6 @@ IPADDR=172.19.1.34
+@@ -861,7 +841,6 @@ IPADDR=172.19.1.34
  IPADDR6=2001:DB8::10/64
  IPADDR6_1=2001:DB9::10/64
  IPADDR6_2=2001:DB10::10/64
@@ -411,7 +421,7 @@ index c5509536a..45439007f 100644
  NETMASK=255.255.252.0
  STARTMODE=auto
  """.lstrip(),
-@@ -885,25 +865,20 @@ dns = none
+@@ -885,25 +864,20 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/85-persistent-net-cloud-init.rules",
@@ -441,7 +451,7 @@ index c5509536a..45439007f 100644
  IPADDR=172.19.1.34
  IPV6ADDR=2001:DB8::10/64
  IPV6ADDR_SECONDARIES="2001:DB9::10/64 2001:DB10::10/64"
-@@ -937,12 +912,8 @@ dns = none
+@@ -937,12 +911,8 @@ dns = none
              ),
              (
                  "etc/udev/rules.d/70-persistent-net.rules",
