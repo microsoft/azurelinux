@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safeloopback"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -35,6 +36,9 @@ const (
 
 	BaseImageName                = "image.raw"
 	PartitionCustomizedImageName = "image2.raw"
+
+	diskFreeWarnThresholdBytes   = 500 * diskutils.MiB
+	diskFreeWarnThresholdPercent = 0.05
 )
 
 var (
@@ -610,6 +614,11 @@ func customizeImageHelper(buildDir string, baseConfigPath string, config *imagec
 	// Do the actual customizations.
 	err = doCustomizations(buildDir, baseConfigPath, config, imageConnection, rpmsSources,
 		useBaseImageRpmRepos, partitionsCustomized)
+
+	// Out of disk space errors can be difficult to diagnose.
+	// So, warn about any partitions with low free space.
+	warnOnLowFreeSpace(buildDir, imageConnection)
+
 	if err != nil {
 		return err
 	}
@@ -787,4 +796,71 @@ func checkDmVerityEnabled(rawImageFile string) error {
 	}
 
 	return nil
+}
+
+func warnOnLowFreeSpace(buildDir string, imageConnection *ImageConnection) {
+	logger.Log.Debugf("Checking disk space")
+
+	imageChroot := imageConnection.Chroot()
+
+	// Check all of the customized OS's partitions.
+	for _, mountPoint := range getNonSpecialChrootMountPoints(imageConnection.Chroot()) {
+		fullPath := filepath.Join(imageChroot.RootDir(), mountPoint.GetTarget())
+		warnOnPathLowFreeSpace(fullPath, mountPoint.GetTarget())
+	}
+
+	// Check the partition that contains the build directory.
+	warnOnPathLowFreeSpace(buildDir, "host:"+buildDir)
+}
+
+func warnOnPathLowFreeSpace(path string, name string) {
+	var stat unix.Statfs_t
+	err := unix.Statfs(path, &stat)
+	if err != nil {
+		logger.Log.Warnf("Failed to read disk space usage (%s)", path)
+		return
+	}
+
+	totalBytes := stat.Frsize * int64(stat.Blocks)
+	freeBytes := stat.Frsize * int64(stat.Bfree)
+	usedBytes := totalBytes - freeBytes
+	percentUsed := float64(usedBytes) / float64(totalBytes)
+	percentFree := 1 - percentUsed
+
+	logger.Log.Debugf("Disk space %.f%% (%s) on (%s)", percentUsed*100,
+		humanReadableDiskSizeRatio(usedBytes, totalBytes), name)
+
+	if percentFree <= diskFreeWarnThresholdPercent && freeBytes <= diskFreeWarnThresholdBytes {
+		logger.Log.Warnf("Low free disk space %.f%% (%s) on (%s)", percentFree*100,
+			humanReadableDiskSize(freeBytes), name)
+	}
+}
+
+func humanReadableDiskSize(size int64) string {
+	unitSize, unitName := humanReadableUnitSizeAndName(size)
+	return fmt.Sprintf("%.f %s", float64(size)/float64(unitSize), unitName)
+}
+
+func humanReadableDiskSizeRatio(size int64, total int64) string {
+	unitSize, unitName := humanReadableUnitSizeAndName(total)
+	return fmt.Sprintf("%.f/%.f %s", float64(size)/float64(unitSize), float64(total)/float64(unitSize), unitName)
+}
+
+func humanReadableUnitSizeAndName(size int64) (int64, string) {
+	switch {
+	case size >= diskutils.TiB:
+		return diskutils.TiB, "TiB"
+
+	case size >= diskutils.GiB:
+		return diskutils.GiB, "GiB"
+
+	case size >= diskutils.MiB:
+		return diskutils.MiB, "MiB"
+
+	case size >= diskutils.KiB:
+		return diskutils.KiB, "KiB"
+
+	default:
+		return 1, "B"
+	}
 }
