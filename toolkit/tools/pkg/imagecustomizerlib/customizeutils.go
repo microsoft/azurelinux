@@ -19,6 +19,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safemount"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/sliceutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/userutils"
 	"golang.org/x/sys/unix"
 )
@@ -549,13 +550,7 @@ func selinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *sa
 
 	// Get the list of mount points.
 	mountPointToFsTypeMap := make(map[string]string, 0)
-	for _, mountPoint := range imageChroot.GetMountPoints() {
-		switch mountPoint.GetTarget() {
-		case "/dev", "/proc", "/sys", "/run", "/dev/pts":
-			// Skip special directories.
-			continue
-		}
-
+	for _, mountPoint := range getNonSpecialChrootMountPoints(imageChroot) {
 		mountPointToFsTypeMap[mountPoint.GetTarget()] = mountPoint.GetFSType()
 	}
 
@@ -566,4 +561,19 @@ func selinuxSetFiles(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *sa
 	}
 
 	return nil
+}
+
+func getNonSpecialChrootMountPoints(imageChroot *safechroot.Chroot) []*safechroot.MountPoint {
+	return sliceutils.FindMatches(imageChroot.GetMountPoints(),
+		func(mountPoint *safechroot.MountPoint) bool {
+			switch mountPoint.GetTarget() {
+			case "/dev", "/proc", "/sys", "/run", "/dev/pts":
+				// Skip special directories.
+				return false
+
+			default:
+				return true
+			}
+		},
+	)
 }
