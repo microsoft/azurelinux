@@ -118,6 +118,7 @@ BuildRequires:  snappy-devel
 BuildRequires:  sudo
 BuildRequires:  systemd-devel
 BuildRequires:  sqlite-devel
+BuildRequires:  thrift-devel
 BuildRequires:  util-linux
 BuildRequires:  valgrind
 BuildRequires:  which

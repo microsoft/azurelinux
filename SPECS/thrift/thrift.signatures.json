@@ -1,0 +1,7 @@
+{
+    "Signatures": {
+     "bootstrap.sh": "ad4d6eb9fcd1bdc068dd98966516a32db760223a2b9ec9527bc6ac50240d6de5",
+     "libthrift-0.15.0.pom": "18975af7be5790578a9570f5716fce49c769bff05fab8ad6829c768c2120208b",
+     "thrift-0.15.0.tar.gz": "d5883566d161f8f6ddd4e21f3a9e3e6b8272799d054820f1c25b11e86718f86b"
+    }
+}

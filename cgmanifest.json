@@ -28716,6 +28716,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "thrift",
+          "version": "0.15.0",
+          "downloadUrl": "https://archive.apache.org/dist/thrift/0.15.0/thrift-0.15.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "tidy",
           "version": "5.8.0",
           "downloadUrl": "https://github.com/htacg/tidy-html5/archive/5.8.0.tar.gz"
