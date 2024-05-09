@@ -131,6 +131,7 @@ make check || {
 %changelog
 * Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.3.4-1
 - Upgrade to version 5.3.4 to support building using ocaml 5.1.1
+- Fixed patch for the test suite
 
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 5.2.2-3
 - update to build dep latest glibc-static version
