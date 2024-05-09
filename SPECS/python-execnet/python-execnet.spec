@@ -71,7 +71,7 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 
 %changelog
 * Wed Apr 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.1.1-1
-- Auto-upgrade to 2.1.1-1
+- Auto-upgrade to 2.1.1
 - Replacing most of the %%py3... with %%pyproject...
 - Redoing %%check section as well
 
