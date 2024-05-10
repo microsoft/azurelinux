@@ -423,12 +423,12 @@ func IsALicenseFile(pkgName, licenseFilePath string) bool {
 		}
 	}
 
-	return checkFilePath(licenseFilePath, licenseNamesFuzzy) && !IsASkippedLicenseFile(licenseFilePath)
+	return checkFilePath(pkgName, licenseFilePath, licenseNamesFuzzy) && !IsASkippedLicenseFile(pkgName, licenseFilePath)
 }
 
 // IsASkippedLicenseFile checks if a file is a known non-license file.
-func IsASkippedLicenseFile(licenseFilePath string) bool {
-	return checkFilePath(licenseFilePath, licenseNamesSkip)
+func IsASkippedLicenseFile(pkgName, licenseFilePath string) bool {
+	return checkFilePath(pkgName, licenseFilePath, licenseNamesSkip)
 }
 
 // checkFilePath checks if a file path matches any of the given names. Any leading common path is stripped before
@@ -437,19 +437,19 @@ func IsASkippedLicenseFile(licenseFilePath string) bool {
 func checkFilePath(pkgName, licenseFilePath string, licenseFilesMatches []string) bool {
 	// For each path, strip the prefix plus package name if it exists
 	// i.e. "/usr/share/licenses/<pkg>/file/path" -> "file/path"
+	// Those paths would always match since they contain "license" in the name.
 	strippedPath := filepath.Clean(licenseFilePath)
 	pkgPrefix := filepath.Join(licensePrefix, pkgName)
-	if strings.HasPrefix(licenseFilePath, pkgPrefix) {
-		strippedPath = strings.TrimPrefix(licenseFilePath, pkgPrefix)             // Remove the license prefix
+	if strings.HasPrefix(licenseFilePath, licensePrefix) {
+		strippedPath = strings.TrimPrefix(licenseFilePath, pkgPrefix)             // Remove the license + pkg prefix
+		strippedPath = strings.TrimPrefix(strippedPath, licensePrefix)            // Remove the license prefix
 		strippedPath = strings.TrimPrefix(strippedPath, string(os.PathSeparator)) // Remove the leading path separator if it exists
-		components := strings.Split(strippedPath, string(os.PathSeparator))
 
 		// Rebuild the path without the 1st component
-		if len(components) <= 1 {
+		if len(strippedPath) == 0 {
 			// It was just the license directory
 			return false
 		}
-		strippedPath = filepath.Join(components[1:]...)
 	}
 
 	for _, name := range licenseFilesMatches {
