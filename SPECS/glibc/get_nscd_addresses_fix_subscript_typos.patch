@@ -1,0 +1,41 @@
+Imported for CBL-Mariner by Rachel Menge <rachelmenge@microsoft.com>
+This patch resolves a typo which affected name resolution
+when using nscd
+
+From 227c9035872fc9e9e2cf56ec8f89219747ee19bc Mon Sep 17 00:00:00 2001
+From: =?utf8?q?J=C3=B6rg=20Sonnenberger?= <joerg@bec.de>
+Date: Mon, 26 Sep 2022 13:59:16 -0400
+Subject: [PATCH] get_nscd_addresses: Fix subscript typos [BZ #29605]
+
+Fix the subscript on air->family, which was accidentally set to COUNT
+when it should have remained as I.
+
+Resolves: BZ #29605
+
+Reviewed-by: Siddhesh Poyarekar <siddhesh@sourceware.org>
+(cherry picked from commit c9226c03da0276593a0918eaa9a14835183343e8)
+---
+ sysdeps/posix/getaddrinfo.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/sysdeps/posix/getaddrinfo.c b/sysdeps/posix/getaddrinfo.c
+index bcff909b2f..5cda9bb072 100644
+--- a/sysdeps/posix/getaddrinfo.c
++++ b/sysdeps/posix/getaddrinfo.c
+@@ -540,11 +540,11 @@ get_nscd_addresses (const char *name, const struct addrinfo *req,
+ 	  at[count].addr[2] = htonl (0xffff);
+ 	}
+       else if (req->ai_family == AF_UNSPEC
+-	       || air->family[count] == req->ai_family)
++	       || air->family[i] == req->ai_family)
+ 	{
+-	  at[count].family = air->family[count];
++	  at[count].family = air->family[i];
+ 	  memcpy (at[count].addr, addrs, size);
+-	  if (air->family[count] == AF_INET6)
++	  if (air->family[i] == AF_INET6)
+ 	    res->got_ipv6 = true;
+ 	}
+       at[count].next = at + count + 1;
+-- 
+2.39.3
