@@ -10331,8 +10331,8 @@
         "type": "other",
         "other": {
           "name": "libnvidia-container",
-          "version": "1.13.5",
-          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.13.5.tar.gz"
+          "version": "1.14.4",
+          "downloadUrl": "https://github.com/NVIDIA/libnvidia-container/archive/v1.14.4.tar.gz"
         }
       }
     },
@@ -14291,29 +14291,9 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "nvidia-container-runtime",
-          "version": "3.13.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-container-runtime/archive/v3.13.0.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
           "name": "nvidia-container-toolkit",
           "version": "1.14.4",
           "downloadUrl": "https://github.com/NVIDIA/nvidia-container-toolkit/archive/v1.14.4.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nvidia-docker2",
-          "version": "2.10.0",
-          "downloadUrl": "https://github.com/NVIDIA/nvidia-docker/archive/v2.10.0.tar.gz"
         }
       }
     },
@@ -15253,8 +15233,8 @@
         "type": "other",
         "other": {
           "name": "openssl-pkcs11",
-          "version": "0.4.10",
-          "downloadUrl": "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.10/libp11-0.4.10.tar.gz"
+          "version": "0.4.12",
+          "downloadUrl": "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.12/libp11-0.4.12.tar.gz"
         }
       }
     },
@@ -21853,8 +21833,8 @@
         "type": "other",
         "other": {
           "name": "python-chardet",
-          "version": "4.0.0",
-          "downloadUrl": "https://github.com/chardet/chardet/archive/refs/tags/4.0.0.tar.gz"
+          "version": "5.2.0",
+          "downloadUrl": "https://github.com/chardet/chardet/archive/refs/tags/5.2.0.tar.gz"
         }
       }
     },

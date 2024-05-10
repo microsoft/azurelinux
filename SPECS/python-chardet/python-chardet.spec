@@ -1,6 +1,6 @@
 Summary:        A Universal Character Encoding Detector in Python
 Name:           python-chardet
-Version:        4.0.0
+Version:        5.2.0
 Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
@@ -9,6 +9,9 @@ Group:          Development/Languages/Python
 URL:            https://github.com/chardet/chardet
 #Source0:       https://github.com/chardet/chardet/archive/refs/tags/%{version}.tar.gz
 Source0:        chardet-%{version}.tar.gz
+# Hand-written for Fedora in groff_man(7) format based on --help output
+Source1:        chardetect.1
+
 BuildArch:      noarch
 
 %description
@@ -21,6 +24,9 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildRequires:  pyproject-rpm-macros
 Requires:       python3
 %if 0%{?with_check}
 BuildRequires:  python3-pytest
@@ -32,22 +38,36 @@ chardet is a universal character encoding detector in Python.
 %prep
 %autosetup -n chardet-%{version}
 
+# Since pdflatex cannot handle Unicode inputs in general:
+echo "latex_engine = 'xelatex'" >> docs/conf.py
+
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files chardet
+install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 '%{SOURCE1}'
 
 %check
-# TODO
+# We cannot run the upstream tests because they would require data files with
+# problematic license status.
+%pyproject_check_import
 
 %files -n python3-chardet
 %defattr(-,root,root,-)
 %license LICENSE
 %{python3_sitelib}/*
 %{_bindir}/chardetect
+%{_mandir}/man1/chardetect.1*
 
 %changelog
+* Thu May 09 2024 Betty Lakes <bettylakes@microsoft.com> - 5.2.0-1
+- Upgrade to 5.2.0
+
 * Thu Feb 10 2022 Nick Samson <nisamson@microsoft.com> - 4.0.0-1
 - Updated to 4.0.0, updated source URL.
 
