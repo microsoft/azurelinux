@@ -1,0 +1,45 @@
+From 6c80408c8644a0add1907b0593eb83f90d6247b1 Mon Sep 17 00:00:00 2001
+From: Antonio Alvarez Feijoo <antonio.feijoo@suse.com>
+Date: Mon, 14 Aug 2023 12:28:11 +0200
+Subject: [PATCH] fix(dracut.sh): remove microcode check based on
+ CONFIG_MICROCODE_[AMD|INTEL]
+
+`CONFIG_MICROCODE_AMD` and `CONFIG_MICROCODE_INTEL` are hidden since
+https://lore.kernel.org/all/20230810160805.081212701@linutronix.de/, therefore
+this check is wrong and early microcode is always disabled.
+---
+ dracut.sh | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/dracut.sh b/dracut.sh
+index e0abdb3b0..3b292910f 100755
+--- a/dracut.sh
++++ b/dracut.sh
+@@ -1561,23 +1561,20 @@ fi
+ 
+ if [[ $early_microcode == yes ]]; then
+     if [[ $hostonly ]]; then
+-        if [[ $(get_cpu_vendor) == "AMD" ]]; then
+-            check_kernel_config CONFIG_MICROCODE_AMD || unset early_microcode
+-        elif [[ $(get_cpu_vendor) == "Intel" ]]; then
+-            check_kernel_config CONFIG_MICROCODE_INTEL || unset early_microcode
++        if [[ $(get_cpu_vendor) == "AMD" || $(get_cpu_vendor) == "Intel" ]]; then
++            check_kernel_config CONFIG_MICROCODE || unset early_microcode
+         else
+             unset early_microcode
+         fi
+     else
+-        ! check_kernel_config CONFIG_MICROCODE_AMD \
+-            && ! check_kernel_config CONFIG_MICROCODE_INTEL \
++        ! check_kernel_config CONFIG_MICROCODE \
+             && unset early_microcode
+     fi
+     # Do not complain on non-x86 architectures as it makes no sense
+     case "${DRACUT_ARCH:-$(uname -m)}" in
+         x86_64 | i?86)
+             [[ $early_microcode != yes ]] \
+-                && dwarn "Disabling early microcode, because kernel does not support it. CONFIG_MICROCODE_[AMD|INTEL]!=y"
++                && dwarn "Disabling early microcode, because kernel does not support it. CONFIG_MICROCODE!=y"
+             ;;
+         *) ;;
+     esac
