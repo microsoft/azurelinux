@@ -43,7 +43,7 @@ Requires:       openssl-libs >= 3.0.0
 # Package renamed from libp11 to openssl-pkcs11 in release 0.4.7-4
 Provides:       libp11%{?_isa} = %{version}-%{release}
 Obsoletes:      libp11 < 0.4.7-4
-# The engine_pkcs11 subpackage is also provided 
+# The engine_pkcs11 subpackage is also provided
 Provides:       engine_pkcs11%{?_isa} = %{version}-%{release}
 Obsoletes:      engine_pkcs11 < 0.4.7-4
 
