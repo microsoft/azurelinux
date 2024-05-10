@@ -21803,8 +21803,8 @@
         "type": "other",
         "other": {
           "name": "python-cachetools",
-          "version": "5.0.0",
-          "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.0.0.tar.gz"
+          "version": "5.3.3",
+          "downloadUrl": "https://pypi.python.org/packages/source/c/cachetools/cachetools-5.3.3.tar.gz"
         }
       }
     },
