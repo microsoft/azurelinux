@@ -3,6 +3,7 @@
 # Gnulib does not produce source tarball releases, and grub's bootstrap.conf
 # bakes in a specific commit id to pull (GNULIB_REVISION).
 %global gnulibversion 9f48fb992a3d7e96610c4ce8be969cff2d61a01b
+%undefine distro_module_ldflags
 Summary:        GRand Unified Bootloader
 Name:           grub2
 Version:        2.12
