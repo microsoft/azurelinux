@@ -28,3 +28,7 @@ COPY $EULA .
 
 COPY --from=builder /staging/etc/ /etc/
 COPY --from=builder --chown=${USER_UID}:${USER_GID} /staging/home/ /home/
+
+FROM scratch
+
+COPY --from=final / /
