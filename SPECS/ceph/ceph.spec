@@ -114,6 +114,7 @@ BuildRequires:  python%{python3_pkgversion}-sphinxcontrib-websupport
 BuildRequires:  python%{python3_pkgversion}-xml
 BuildRequires:  python%{python3_pkgversion}-yaml
 BuildRequires:  PyYAML
+BuildRequires:  re2-devel
 BuildRequires:  snappy-devel
 BuildRequires:  sudo
 BuildRequires:  systemd-devel
