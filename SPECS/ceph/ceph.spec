@@ -838,6 +838,7 @@ env | sort
 mkdir build
 cd build
 CMAKE=cmake
+# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 ${CMAKE} .. \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
