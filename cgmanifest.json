@@ -24873,8 +24873,8 @@
         "type": "other",
         "other": {
           "name": "python-wheel",
-          "version": "0.33.6",
-          "downloadUrl": "https://github.com/pypa/wheel/archive/0.33.6/wheel-0.33.6.tar.gz"
+          "version": "0.43.0",
+          "downloadUrl": "https://github.com/pypa/wheel/archive/0.43.0/wheel-0.43.0.tar.gz"
         }
       }
     },
