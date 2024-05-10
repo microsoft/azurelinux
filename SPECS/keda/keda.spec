@@ -1,7 +1,7 @@
 Summary:        Kubernetes-based Event Driven Autoscaling
 Name:           keda
-Version:        2.4.0
-Release:        15%{?dist}
+Version:        2.14.0
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,25 +36,33 @@ It provides event driven scale for any container running in Kubernetes
 tar -xf %{SOURCE1} --no-same-owner
 export LDFLAGS="-X=github.com/kedacore/keda/v2/version.GitCommit= -X=github.com/kedacore/keda/v2/version.Version=main"
 
-go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda main.go
+go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda cmd/operator/main.go
 
 gofmt -l -w -s .
 go vet ./...
 
-go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda-adapter adapter/main.go
+go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda-adapter cmd/adapter/main.go
+
+go build -ldflags "$LDFLAGS" -mod=vendor -v -o bin/keda-admission-webhooks cmd/webhooks/main.go
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 cp ./bin/keda %{buildroot}%{_bindir}
 cp ./bin/keda-adapter %{buildroot}%{_bindir}
+cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 
 %files
 %defattr(-,root,root)
 %license LICENSE
 %{_bindir}/%{name}
 %{_bindir}/%{name}-adapter
+%{_bindir}/%{name}-admission-webhooks
 
 %changelog
+* Mon May 06 2024 Sean Dougherty <sdougherty@microsoft.com> - 2.14.0-1
+- Upgrade to 2.14.0 for Azure Linux 3.0
+- Added keda-admission-webhooks binary, added to KEDA in v2.10.0
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.0-15
 - Bump release to rebuild with go 1.20.10
 

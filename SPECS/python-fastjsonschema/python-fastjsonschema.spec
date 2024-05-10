@@ -5,7 +5,7 @@ The main purpose is to have a really fast implementation.}
 Summary:        Fastest Python implementation of JSON schema
 Name:           python-fastjsonschema
 Version:        2.19.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ Summary:        %{summary}
 %pyproject_save_files fastjsonschema
 
 %check
+pip3 install iniconfig
 %pytest -m "not benchmark"
 
 %files -n python3-fastjsonschema -f %{pyproject_files}
@@ -44,6 +45,9 @@ Summary:        %{summary}
 %doc README.rst
 
 %changelog
+* Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 2.19.1-3
+- Add pip install iniconfig to check section
+
 * Fri Mar 29 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.19.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.

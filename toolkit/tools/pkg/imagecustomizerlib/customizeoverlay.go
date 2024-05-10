@@ -6,11 +6,11 @@ package imagecustomizerlib
 import (
 	"fmt"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/safechroot"
 )
 
@@ -20,6 +20,8 @@ func enableOverlays(overlays *[]imagecustomizerapi.Overlay, imageChroot *safechr
 	if overlays == nil {
 		return false, nil
 	}
+
+	logger.Log.Infof("Enable filesystem overlays")
 
 	// Integrate overlay dracut module and overlay driver into initramfs img.
 	overlayDracutModule := "overlayfs"
@@ -65,43 +67,25 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 	concatenatedOverlays := strings.Join(overlayConfigs, " ")
 
 	// Construct the final cmdline argument
-	newArgs := fmt.Sprintf("rd.overlayfs=\"%s\"", concatenatedOverlays)
+	newArgs := []string{
+		fmt.Sprintf("rd.overlayfs=%s", concatenatedOverlays),
+	}
 
 	grubCfgPath := filepath.Join(imageChroot.RootDir(), "boot/grub2/grub.cfg")
-	lines, err := file.ReadLines(grubCfgPath)
+
+	grub2Config, err := file.Read(grubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to read grub config: %w", err)
+		return fmt.Errorf("failed to read grub config:\n%w", err)
 	}
 
-	var updatedLines []string
-	linuxLineRegex, err := regexp.Compile(`^linux .*rd.overlayfs=.*`)
+	grub2Config, err = updateKernelCommandLineArgs(grub2Config, []string{"rd.overlayfs"}, newArgs)
 	if err != nil {
-		return fmt.Errorf("failed to compile regex: %w", err)
-	}
-	for _, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
-		if linuxLineRegex.MatchString(trimmedLine) {
-			// Replace existing arguments for overlays.
-			overlayRegexPattern := `rd.overlayfs=[^ ]*`
-			overlayRegex, err := regexp.Compile(overlayRegexPattern)
-			if err != nil {
-				return fmt.Errorf("failed to compile overlay regex: %w", err)
-			}
-			newLinuxLine := overlayRegex.ReplaceAllString(trimmedLine, newArgs)
-			updatedLines = append(updatedLines, newLinuxLine)
-		} else if strings.HasPrefix(trimmedLine, "linux ") {
-			// Append new overlay arguments if no existing overlay arguments are found.
-			updatedLines = append(updatedLines, line+" "+newArgs)
-		} else {
-			// Add other lines unchanged.
-			updatedLines = append(updatedLines, line)
-		}
+		return fmt.Errorf("failed to set overlay kernel command line args:\n%w", err)
 	}
 
-	// Write the updated lines back to grub.cfg
-	err = file.WriteLines(updatedLines, grubCfgPath)
+	err = file.Write(grub2Config, grubCfgPath)
 	if err != nil {
-		return fmt.Errorf("failed to write updated grub config: %w", err)
+		return fmt.Errorf("failed to write updated grub config:\n%w", err)
 	}
 
 	return nil

@@ -1,13 +1,8 @@
-From 2e8388e06eafb703aeb315498915bf079561bdb5 Mon Sep 17 00:00:00 2001
-From: Dmitry Belyavskiy <dbelyavs@redhat.com>
-Date: Mon, 21 Aug 2023 13:07:07 +0200
-Subject: [PATCH 23/48] 0049-Allow-disabling-of-SHA1-signatures.patch
+From c9b7adde284700285d808de8beac134860912fb1 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Thu, 18 Apr 2024 17:21:32 +0000
+Subject: [PATCH] Allow disabling of SHA1 signatures
 
-Patch-name: 0049-Allow-disabling-of-SHA1-signatures.patch
-Patch-id: 49
-Patch-status: |
-    # Selectively disallow SHA1 signatures rhbz#2070977
-From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
 ---
  crypto/context.c                              | 14 ++++
  crypto/evp/evp_cnf.c                          | 13 +++
@@ -27,10 +22,10 @@ From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
  15 files changed, 209 insertions(+), 9 deletions(-)
 
 diff --git a/crypto/context.c b/crypto/context.c
-index 51002ba79a..e697974c9d 100644
+index a9694e7..f561242 100644
 --- a/crypto/context.c
 +++ b/crypto/context.c
-@@ -78,6 +78,8 @@ struct ossl_lib_ctx_st {
+@@ -83,6 +83,8 @@ struct ossl_lib_ctx_st {
      void *fips_prov;
  #endif
  
@@ -39,7 +34,7 @@ index 51002ba79a..e697974c9d 100644
      unsigned int ischild:1;
  };
  
-@@ -206,6 +208,10 @@ static int context_init(OSSL_LIB_CTX *ctx)
+@@ -223,6 +225,10 @@ static int context_init(OSSL_LIB_CTX *ctx)
          goto err;
  #endif
  
@@ -50,7 +45,7 @@ index 51002ba79a..e697974c9d 100644
      /* Low priority. */
  #ifndef FIPS_MODULE
      ctx->child_provider = ossl_child_prov_ctx_new(ctx);
-@@ -334,6 +340,11 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
+@@ -366,6 +372,11 @@ static void context_deinit_objs(OSSL_LIB_CTX *ctx)
      }
  #endif
  
@@ -62,7 +57,7 @@ index 51002ba79a..e697974c9d 100644
      /* Low priority. */
  #ifndef FIPS_MODULE
      if (ctx->child_provider != NULL) {
-@@ -625,6 +636,9 @@ void *ossl_lib_ctx_get_data(OSSL_LIB_CTX *ctx, int index)
+@@ -663,6 +674,9 @@ void *ossl_lib_ctx_get_data(OSSL_LIB_CTX *ctx, int index)
          return ctx->fips_prov;
  #endif
  
@@ -73,7 +68,7 @@ index 51002ba79a..e697974c9d 100644
          return NULL;
      }
 diff --git a/crypto/evp/evp_cnf.c b/crypto/evp/evp_cnf.c
-index 0e7fe64cf9..b9d3b6d226 100644
+index 0e7fe64..b9d3b6d 100644
 --- a/crypto/evp/evp_cnf.c
 +++ b/crypto/evp/evp_cnf.c
 @@ -10,6 +10,7 @@
@@ -104,7 +99,7 @@ index 0e7fe64cf9..b9d3b6d226 100644
              ERR_raise_data(ERR_LIB_EVP, EVP_R_UNKNOWN_OPTION,
                             "name=%s, value=%s", oval->name, oval->value);
 diff --git a/crypto/evp/m_sigver.c b/crypto/evp/m_sigver.c
-index 630d339c35..6e4e9f5ae7 100644
+index 3a979f4..01e6828 100644
 --- a/crypto/evp/m_sigver.c
 +++ b/crypto/evp/m_sigver.c
 @@ -15,6 +15,73 @@
@@ -181,7 +176,7 @@ index 630d339c35..6e4e9f5ae7 100644
  
  #ifndef FIPS_MODULE
  
-@@ -251,6 +318,18 @@ static int do_sigver_init(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx,
+@@ -253,6 +320,18 @@ static int do_sigver_init(EVP_MD_CTX *ctx, EVP_PKEY_CTX **pctx,
          }
      }
  
@@ -201,7 +196,7 @@ index 630d339c35..6e4e9f5ae7 100644
          if (signature->digest_verify_init == NULL) {
              ERR_raise(ERR_LIB_EVP, EVP_R_INITIALIZATION_ERROR);
 diff --git a/crypto/evp/pmeth_lib.c b/crypto/evp/pmeth_lib.c
-index ce6e1a1ccb..003926247b 100644
+index c4b9615..57eda1f 100644
 --- a/crypto/evp/pmeth_lib.c
 +++ b/crypto/evp/pmeth_lib.c
 @@ -33,6 +33,7 @@
@@ -212,7 +207,7 @@ index ce6e1a1ccb..003926247b 100644
  #include "evp_local.h"
  
  #ifndef FIPS_MODULE
-@@ -958,6 +959,20 @@ static int evp_pkey_ctx_set_md(EVP_PKEY_CTX *ctx, const EVP_MD *md,
+@@ -933,6 +934,20 @@ static int evp_pkey_ctx_set_md(EVP_PKEY_CTX *ctx, const EVP_MD *md,
          return -2;
      }
  
@@ -234,10 +229,10 @@ index ce6e1a1ccb..003926247b 100644
          return EVP_PKEY_CTX_ctrl(ctx, -1, op, ctrl, 0, (void *)(md));
  
 diff --git a/doc/man5/config.pod b/doc/man5/config.pod
-index bd05736220..ed34ff4b9c 100644
+index 8b3bf20..4d9254f 100644
 --- a/doc/man5/config.pod
 +++ b/doc/man5/config.pod
-@@ -304,6 +304,19 @@ Within the algorithm properties section, the following names have meaning:
+@@ -307,6 +307,19 @@ Within the algorithm properties section, the following names have meaning:
  The value may be anything that is acceptable as a property query
  string for EVP_set_default_properties().
  
@@ -258,32 +253,32 @@ index bd05736220..ed34ff4b9c 100644
  
  The value is a boolean that can be B<yes> or B<no>.  If the value is
 diff --git a/include/crypto/context.h b/include/crypto/context.h
-index cc06c71be8..e9f74a414d 100644
+index 7369a73..55b7423 100644
 --- a/include/crypto/context.h
 +++ b/include/crypto/context.h
-@@ -39,3 +39,6 @@ void ossl_rand_crng_ctx_free(void *);
- void ossl_thread_event_ctx_free(void *);
- void ossl_fips_prov_ossl_ctx_free(void *);
- void ossl_release_default_drbg_ctx(void);
+@@ -46,3 +46,6 @@ void ossl_release_default_drbg_ctx(void);
+ #if defined(OPENSSL_THREADS)
+ void ossl_threads_ctx_free(void *);
+ #endif
 +
 +void *ossl_ctx_legacy_digest_signatures_new(OSSL_LIB_CTX *);
 +void ossl_ctx_legacy_digest_signatures_free(void *);
 diff --git a/include/internal/cryptlib.h b/include/internal/cryptlib.h
-index ac50eb3bbd..3b115cc7df 100644
+index 64851fd..aa8ed67 100644
 --- a/include/internal/cryptlib.h
 +++ b/include/internal/cryptlib.h
-@@ -168,7 +168,8 @@ typedef struct ossl_ex_data_global_st {
- # define OSSL_LIB_CTX_PROVIDER_CONF_INDEX           16
- # define OSSL_LIB_CTX_BIO_CORE_INDEX                17
+@@ -117,7 +117,8 @@ typedef struct ossl_ex_data_global_st {
  # define OSSL_LIB_CTX_CHILD_PROVIDER_INDEX          18
--# define OSSL_LIB_CTX_MAX_INDEXES                   19
-+# define OSSL_LIB_CTX_LEGACY_DIGEST_SIGNATURES_INDEX 19
-+# define OSSL_LIB_CTX_MAX_INDEXES                   20
+ # define OSSL_LIB_CTX_THREAD_INDEX                  19
+ # define OSSL_LIB_CTX_DECODER_CACHE_INDEX           20
+-# define OSSL_LIB_CTX_MAX_INDEXES                   20
++# define OSSL_LIB_CTX_LEGACY_DIGEST_SIGNATURES_INDEX 21
++# define OSSL_LIB_CTX_MAX_INDEXES                   22
  
  OSSL_LIB_CTX *ossl_lib_ctx_get_concrete(OSSL_LIB_CTX *ctx);
  int ossl_lib_ctx_is_default(OSSL_LIB_CTX *ctx);
 diff --git a/include/internal/sslconf.h b/include/internal/sslconf.h
-index fd7f7e3331..05464b0655 100644
+index fd7f7e3..05464b0 100644
 --- a/include/internal/sslconf.h
 +++ b/include/internal/sslconf.h
 @@ -18,4 +18,8 @@ int conf_ssl_name_find(const char *name, size_t *idx);
@@ -296,7 +291,7 @@ index fd7f7e3331..05464b0655 100644
 +                                                  int loadconfig);
  #endif
 diff --git a/providers/common/securitycheck.c b/providers/common/securitycheck.c
-index 699ada7c52..e534ad0a5f 100644
+index 0d3acdb..fe694c4 100644
 --- a/providers/common/securitycheck.c
 +++ b/providers/common/securitycheck.c
 @@ -19,6 +19,7 @@
@@ -307,7 +302,7 @@ index 699ada7c52..e534ad0a5f 100644
  
  /*
   * FIPS requires a minimum security strength of 112 bits (for encryption or
-@@ -235,6 +236,15 @@ int ossl_digest_get_approved_nid_with_sha1(OSSL_LIB_CTX *ctx, const EVP_MD *md,
+@@ -243,6 +244,15 @@ int ossl_digest_get_approved_nid_with_sha1(OSSL_LIB_CTX *ctx, const EVP_MD *md,
              mdnid = -1; /* disallowed by security checks */
      }
  # endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
@@ -323,7 +318,7 @@ index 699ada7c52..e534ad0a5f 100644
      return mdnid;
  }
  
-@@ -244,5 +254,15 @@ int ossl_digest_is_allowed(OSSL_LIB_CTX *ctx, const EVP_MD *md)
+@@ -252,5 +262,15 @@ int ossl_digest_is_allowed(OSSL_LIB_CTX *ctx, const EVP_MD *md)
      if (ossl_securitycheck_enabled(ctx))
          return ossl_digest_get_approved_nid(md) != NID_undef;
  # endif /* OPENSSL_NO_FIPS_SECURITYCHECKS */
@@ -340,7 +335,7 @@ index 699ada7c52..e534ad0a5f 100644
      return 1;
  }
 diff --git a/providers/common/securitycheck_default.c b/providers/common/securitycheck_default.c
-index 246323493e..2ca7a59f39 100644
+index 2463234..2ca7a59 100644
 --- a/providers/common/securitycheck_default.c
 +++ b/providers/common/securitycheck_default.c
 @@ -15,6 +15,7 @@
@@ -377,10 +372,10 @@ index 246323493e..2ca7a59f39 100644
      return mdnid;
  }
 diff --git a/providers/implementations/signature/dsa_sig.c b/providers/implementations/signature/dsa_sig.c
-index 70d0ea5d24..3c482e0181 100644
+index b89a0f6..e0c26a1 100644
 --- a/providers/implementations/signature/dsa_sig.c
 +++ b/providers/implementations/signature/dsa_sig.c
-@@ -123,12 +123,17 @@ static int dsa_setup_md(PROV_DSA_CTX *ctx,
+@@ -125,12 +125,17 @@ static int dsa_setup_md(PROV_DSA_CTX *ctx,
          mdprops = ctx->propq;
  
      if (mdname != NULL) {
@@ -402,10 +397,10 @@ index 70d0ea5d24..3c482e0181 100644
          if (md == NULL || md_nid < 0) {
              if (md == NULL)
 diff --git a/providers/implementations/signature/ecdsa_sig.c b/providers/implementations/signature/ecdsa_sig.c
-index ebeb30e002..c874f87bd5 100644
+index fe65ed8..191580b 100644
 --- a/providers/implementations/signature/ecdsa_sig.c
 +++ b/providers/implementations/signature/ecdsa_sig.c
-@@ -237,7 +237,11 @@ static int ecdsa_setup_md(PROV_ECDSA_CTX *ctx, const char *mdname,
+@@ -247,7 +247,11 @@ static int ecdsa_setup_md(PROV_ECDSA_CTX *ctx, const char *mdname,
                         "%s could not be fetched", mdname);
          return 0;
      }
@@ -418,7 +413,7 @@ index ebeb30e002..c874f87bd5 100644
                                                      sha1_allowed);
      if (md_nid < 0) {
 diff --git a/providers/implementations/signature/rsa_sig.c b/providers/implementations/signature/rsa_sig.c
-index 2a5504d104..5f3a029566 100644
+index 76db37d..2391909 100644
 --- a/providers/implementations/signature/rsa_sig.c
 +++ b/providers/implementations/signature/rsa_sig.c
 @@ -25,6 +25,7 @@
@@ -437,7 +432,7 @@ index 2a5504d104..5f3a029566 100644
  
  static OSSL_FUNC_signature_newctx_fn rsa_newctx;
  static OSSL_FUNC_signature_sign_init_fn rsa_sign_init;
-@@ -302,10 +304,15 @@ static int rsa_setup_md(PROV_RSA_CTX *ctx, const char *mdname,
+@@ -301,10 +303,15 @@ static int rsa_setup_md(PROV_RSA_CTX *ctx, const char *mdname,
  
      if (mdname != NULL) {
          EVP_MD *md = EVP_MD_fetch(ctx->libctx, mdname, mdprops);
@@ -455,7 +450,7 @@ index 2a5504d104..5f3a029566 100644
  
          if (md == NULL
              || md_nid <= 0
-@@ -1396,8 +1403,15 @@ static int rsa_set_ctx_params(void *vprsactx, const OSSL_PARAM params[])
+@@ -1366,8 +1373,15 @@ static int rsa_set_ctx_params(void *vprsactx, const OSSL_PARAM params[])
      prsactx->pad_mode = pad_mode;
  
      if (prsactx->md == NULL && pmdname == NULL
@@ -473,7 +468,7 @@ index 2a5504d104..5f3a029566 100644
      if (pmgf1mdname != NULL
          && !rsa_setup_mgf1_md(prsactx, pmgf1mdname, pmgf1mdprops))
 diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
-index e6f4bcc045..8bc550ea5b 100644
+index e9aa078..b4969f5 100644
 --- a/ssl/t1_lib.c
 +++ b/ssl/t1_lib.c
 @@ -20,6 +20,7 @@
@@ -484,21 +479,23 @@ index e6f4bcc045..8bc550ea5b 100644
  #include "internal/nelem.h"
  #include "internal/sizes.h"
  #include "internal/tlsgroups.h"
-@@ -1151,11 +1152,13 @@ int ssl_setup_sig_algs(SSL_CTX *ctx)
-         = OPENSSL_malloc(sizeof(*lu) * OSSL_NELEM(sigalg_lookup_tbl));
+@@ -1514,6 +1515,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
+     uint16_t *tls12_sigalgs_list = NULL;
      EVP_PKEY *tmpkey = EVP_PKEY_new();
      int ret = 0;
 +    int ldsigs_allowed;
  
-     if (cache == NULL || tmpkey == NULL)
+     if (ctx == NULL)
+         goto err;
+@@ -1529,6 +1531,7 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
          goto err;
  
      ERR_set_mark();
 +    ldsigs_allowed = ossl_ctx_legacy_digest_signatures_allowed(ctx->libctx, 0);
+     /* First fill cache and tls12_sigalgs list from legacy algorithm list */
      for (i = 0, lu = sigalg_lookup_tbl;
           i < OSSL_NELEM(sigalg_lookup_tbl); lu++, i++) {
-         EVP_PKEY_CTX *pctx;
-@@ -1175,6 +1178,11 @@ int ssl_setup_sig_algs(SSL_CTX *ctx)
+@@ -1550,6 +1553,11 @@ int ssl_setup_sigalgs(SSL_CTX *ctx)
              cache[i].enabled = 0;
              continue;
          }
@@ -511,14 +508,15 @@ index e6f4bcc045..8bc550ea5b 100644
          if (!EVP_PKEY_set_type(tmpkey, lu->sig)) {
              cache[i].enabled = 0;
 diff --git a/util/libcrypto.num b/util/libcrypto.num
-index 9cb8a4dda2..feb660d030 100644
+index 7581369..8590276 100644
 --- a/util/libcrypto.num
 +++ b/util/libcrypto.num
-@@ -5436,2 +5436,4 @@ EVP_CIPHER_CTX_dup                      5563	3_1_0	EXIST::FUNCTION:
- BN_are_coprime                          5564	3_1_0	EXIST::FUNCTION:
- OSSL_CMP_MSG_update_recipNonce          5565	3_0_9	EXIST::FUNCTION:CMP
+@@ -5548,3 +5548,5 @@ X509_STORE_get1_objects                 5675	3_3_0	EXIST::FUNCTION:
+ OPENSSL_LH_set_thunks                   5676	3_3_0	EXIST::FUNCTION:
+ OPENSSL_LH_doall_arg_thunk              5677	3_3_0	EXIST::FUNCTION:
+ OSSL_HTTP_REQ_CTX_set_max_response_hdr_lines 5678	3_3_0	EXIST::FUNCTION:HTTP
 +ossl_ctx_legacy_digest_signatures_allowed ?	3_0_1	EXIST::FUNCTION:
 +ossl_ctx_legacy_digest_signatures_allowed_set ?	3_0_1	EXIST::FUNCTION:
 -- 
-2.41.0
+2.33.8
 
