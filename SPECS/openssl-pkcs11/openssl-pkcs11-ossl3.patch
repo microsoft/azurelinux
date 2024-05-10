@@ -1,0 +1,293 @@
+From 6efcf3c52db1857aaa18741a509741519b0c5775 Mon Sep 17 00:00:00 2001
+From: Doug Engert <deengert@gmail.com>
+Date: Fri, 29 Jul 2022 17:54:42 -0500
+Subject: [PATCH 1/3] Deffer initializing crypto routines in PKCS11 engine
+ until needed
+
+Fixes:#456
+
+bind_helper in eng_font.c is split into bind_helper and bind_helper2
+The calls to ENGINE_set_RSA, ENGINE_set_EC, ENGINE_set_ECDH and
+ENGINE_set_pkey_meths are moved to bind_helper2.
+
+bind_helper2 is called from load_pubkey and load_privkey.
+
+This in effect gets around the problem OpenSSL 3.0.x has when
+it loads the pkcs11 engine from openssl.cnf, and then tries to use it
+as a default provider even when no engine was specified on
+the command line.
+
+ On branch deffer_init_crypto
+ Changes to be committed:
+	modified:   eng_front.c
+---
+ src/eng_front.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/src/eng_front.c b/src/eng_front.c
+index 3a3c8910..bfc35025 100644
+--- a/src/eng_front.c
++++ b/src/eng_front.c
+@@ -82,6 +82,8 @@ static const ENGINE_CMD_DEFN engine_cmd_defns[] = {
+ 	{0, NULL, NULL, 0}
+ };
+ 
++static int bind_helper2(ENGINE *e);
++
+ static ENGINE_CTX *get_ctx(ENGINE *engine)
+ {
+ 	ENGINE_CTX *ctx;
+@@ -174,6 +176,7 @@ static EVP_PKEY *load_pubkey(ENGINE *engine, const char *s_key_id,
+ 	ctx = get_ctx(engine);
+ 	if (!ctx)
+ 		return 0;
++	bind_helper2(engine);
+ 	return ctx_load_pubkey(ctx, s_key_id, ui_method, callback_data);
+ }
+ 
+@@ -186,6 +189,7 @@ static EVP_PKEY *load_privkey(ENGINE *engine, const char *s_key_id,
+ 	ctx = get_ctx(engine);
+ 	if (!ctx)
+ 		return 0;
++	bind_helper2(engine);
+ 	pkey = ctx_load_privkey(ctx, s_key_id, ui_method, callback_data);
+ #ifdef EVP_F_EVP_PKEY_SET1_ENGINE
+ 	/* EVP_PKEY_set1_engine() is required for OpenSSL 1.1.x,
+@@ -219,6 +223,25 @@ static int bind_helper(ENGINE *e)
+ 			!ENGINE_set_ctrl_function(e, engine_ctrl) ||
+ 			!ENGINE_set_cmd_defns(e, engine_cmd_defns) ||
+ 			!ENGINE_set_name(e, PKCS11_ENGINE_NAME) ||
++
++			!ENGINE_set_load_pubkey_function(e, load_pubkey) ||
++			!ENGINE_set_load_privkey_function(e, load_privkey)) {
++		return 0;
++	} else {
++		ERR_load_ENG_strings();
++		return 1;
++	}
++}
++
++/*
++ * With OpenSSL 3.x, engines might be used because defined in openssl.cnf
++ * which will cause problems
++ * only add engine routines after a call to load keys
++ */
++
++static int bind_helper2(ENGINE *e)
++{
++	if (
+ #ifndef OPENSSL_NO_RSA
+ 			!ENGINE_set_RSA(e, PKCS11_get_rsa_method()) ||
+ #endif
+@@ -235,12 +258,9 @@ static int bind_helper(ENGINE *e)
+ 			!ENGINE_set_ECDH(e, PKCS11_get_ecdh_method()) ||
+ #endif
+ #endif /* OPENSSL_VERSION_NUMBER */
+-			!ENGINE_set_pkey_meths(e, PKCS11_pkey_meths) ||
+-			!ENGINE_set_load_pubkey_function(e, load_pubkey) ||
+-			!ENGINE_set_load_privkey_function(e, load_privkey)) {
++			!ENGINE_set_pkey_meths(e, PKCS11_pkey_meths)) {
+ 		return 0;
+ 	} else {
+-		ERR_load_ENG_strings();
+ 		return 1;
+ 	}
+ }
+
+From d06388774ca3846c61354835fc0fef34013db91e Mon Sep 17 00:00:00 2001
+From: Doug Engert <deengert@gmail.com>
+Date: Tue, 2 Aug 2022 19:36:02 -0500
+Subject: [PATCH 2/3] Suggested changes
+
+rename bind_helper2 to bind_helper_methods
+
+remove blank line
+
+ On branch deffer_init_crypto
+ Changes to be committed:
+	modified:   eng_front.c
+---
+ src/eng_front.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/src/eng_front.c b/src/eng_front.c
+index bfc35025..556b170e 100644
+--- a/src/eng_front.c
++++ b/src/eng_front.c
+@@ -82,7 +82,7 @@ static const ENGINE_CMD_DEFN engine_cmd_defns[] = {
+ 	{0, NULL, NULL, 0}
+ };
+ 
+-static int bind_helper2(ENGINE *e);
++static int bind_helper_methods(ENGINE *e);
+ 
+ static ENGINE_CTX *get_ctx(ENGINE *engine)
+ {
+@@ -176,7 +176,7 @@ static EVP_PKEY *load_pubkey(ENGINE *engine, const char *s_key_id,
+ 	ctx = get_ctx(engine);
+ 	if (!ctx)
+ 		return 0;
+-	bind_helper2(engine);
++	bind_helper_methods(engine);
+ 	return ctx_load_pubkey(ctx, s_key_id, ui_method, callback_data);
+ }
+ 
+@@ -189,7 +189,7 @@ static EVP_PKEY *load_privkey(ENGINE *engine, const char *s_key_id,
+ 	ctx = get_ctx(engine);
+ 	if (!ctx)
+ 		return 0;
+-	bind_helper2(engine);
++	bind_helper_methods(engine);
+ 	pkey = ctx_load_privkey(ctx, s_key_id, ui_method, callback_data);
+ #ifdef EVP_F_EVP_PKEY_SET1_ENGINE
+ 	/* EVP_PKEY_set1_engine() is required for OpenSSL 1.1.x,
+@@ -223,7 +223,6 @@ static int bind_helper(ENGINE *e)
+ 			!ENGINE_set_ctrl_function(e, engine_ctrl) ||
+ 			!ENGINE_set_cmd_defns(e, engine_cmd_defns) ||
+ 			!ENGINE_set_name(e, PKCS11_ENGINE_NAME) ||
+-
+ 			!ENGINE_set_load_pubkey_function(e, load_pubkey) ||
+ 			!ENGINE_set_load_privkey_function(e, load_privkey)) {
+ 		return 0;
+@@ -239,7 +238,7 @@ static int bind_helper(ENGINE *e)
+  * only add engine routines after a call to load keys
+  */
+ 
+-static int bind_helper2(ENGINE *e)
++static int bind_helper_methods(ENGINE *e)
+ {
+ 	if (
+ #ifndef OPENSSL_NO_RSA
+
+From 83c0091f5b07cf2be8036974695873fa82cf76e8 Mon Sep 17 00:00:00 2001
+From: Doug Engert <deengert@gmail.com>
+Date: Fri, 5 Aug 2022 20:47:24 -0500
+Subject: [PATCH 3/3] Fix test for $OSTYPE in test scripts
+
+$OSTYPE varies by shell and OS. Replace "if" by case.
+
+ On branch deffer_init_crypto
+ Changes to be committed:
+	modified:   pkcs11-uri-without-token.softhsm
+	modified:   search-all-matching-tokens.softhsm
+---
+ tests/pkcs11-uri-without-token.softhsm   | 13 ++++++++-----
+ tests/search-all-matching-tokens.softhsm | 14 +++++++++-----
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
+diff --git a/tests/pkcs11-uri-without-token.softhsm b/tests/pkcs11-uri-without-token.softhsm
+index 8833fa8b..da95ebfe 100755
+--- a/tests/pkcs11-uri-without-token.softhsm
++++ b/tests/pkcs11-uri-without-token.softhsm
+@@ -29,11 +29,14 @@ common_init
+ 
+ echo "Detected system: ${OSTYPE}"
+ 
+-if [[ "${OSTYPE}" == "darwin"* ]]; then
+-    SHARED_EXT=.dylib
+-else
+-    SHARED_EXT=.so
+-fi
++case "${OSTYPE}" in
++    darwin* )
++	SHARED_EXT=.dylib
++	;;
++    *)
++	SHARED_EXT=.so
++	;;
++esac
+ 
+ sed -e "s|@MODULE_PATH@|${MODULE}|g" -e \
+     "s|@ENGINE_PATH@|../src/.libs/pkcs11${SHARED_EXT}|g" \
+diff --git a/tests/search-all-matching-tokens.softhsm b/tests/search-all-matching-tokens.softhsm
+index 915e7c67..3cd26a66 100755
+--- a/tests/search-all-matching-tokens.softhsm
++++ b/tests/search-all-matching-tokens.softhsm
+@@ -45,11 +45,15 @@ create_devices $NUM_DEVICES $PIN $PUK "libp11-test" "label"
+ 
+ echo "Detected system: ${OSTYPE}"
+ 
+-if [[ "${OSTYPE}" == "darwin"* ]]; then
+-    SHARED_EXT=.dylib
+-else
+-    SHARED_EXT=.so
+-fi
++
++case "${OSTYPE}" in
++    darwin* )
++	SHARED_EXT=.dylib
++	;;
++    *)
++	SHARED_EXT=.so
++	;;
++esac
+ 
+ sed -e "s|@MODULE_PATH@|${MODULE}|g" -e \
+     "s|@ENGINE_PATH@|../src/.libs/pkcs11${SHARED_EXT}|g" \
+
+From feb22a666ca361adb6f454bcb541281f8e9615f8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20Trojnara?= <Michal.Trojnara@stunnel.org>
+Date: Sat, 6 Aug 2022 23:14:55 +0200
+Subject: [PATCH] Also bind helper methods in engine_ctrl()
+
+---
+ src/eng_front.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/eng_front.c b/src/eng_front.c
+index 556b170..fd6940f 100644
+--- a/src/eng_front.c
++++ b/src/eng_front.c
+@@ -209,6 +209,7 @@ static int engine_ctrl(ENGINE *engine, int cmd, long i, void *p, void (*f) ())
+ 	ctx = get_ctx(engine);
+ 	if (!ctx)
+ 		return 0;
++	bind_helper_methods(engine);
+ 	return ctx_engine_ctrl(ctx, cmd, i, p, f);
+ }
+ 
+
+commit 580c12b78b63d88010a6178d7c4c58186938c479
+Author: Dominique Leuenberger <dimstar@opensuse.org>
+Date:   Tue Jun 6 14:27:46 2023 +0200
+
+    Detect openSSL 3.1; compatible to openSSL 3.0
+
+diff --git a/configure.ac b/configure.ac
+index d6b0ee9..b96979d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -33,7 +33,7 @@ AC_C_BIGENDIAN
+ # issues with applications linking to new openssl, old libp11, and vice versa
+ case "`$PKG_CONFIG --modversion --silence-errors libcrypto || \
+ 	$PKG_CONFIG --modversion openssl`" in
+-	3.0.*) # Predicted engines directory prefix for OpenSSL 3.x
++	3.1.*|3.0.*) # Predicted engines directory prefix for OpenSSL 3.x
+ 	    LIBP11_LT_OLDEST="3"
+ 	    debian_ssl_prefix="openssl-3.0.0";;
+ 	1.1.*) # Predicted engines directory prefix for OpenSSL 1.1.x
+
+commit 74497e0fa5b69b15790d6697e1ebce13af842d4c
+Author: Mike Gilbert <floppym@gentoo.org>
+Date:   Thu Jul 13 13:52:54 2023 -0400
+
+    configure: treat all openssl-3.x releases the same
+    
+    OpenSSL's soversion will not change for any 3.x minor release.
+    
+    https://www.openssl.org/policies/general/versioning-policy.html
+
+diff --git a/configure.ac b/configure.ac
+index b96979d..c344e84 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -33,7 +33,7 @@ AC_C_BIGENDIAN
+ # issues with applications linking to new openssl, old libp11, and vice versa
+ case "`$PKG_CONFIG --modversion --silence-errors libcrypto || \
+ 	$PKG_CONFIG --modversion openssl`" in
+-	3.1.*|3.0.*) # Predicted engines directory prefix for OpenSSL 3.x
++	3.*) # Predicted engines directory prefix for OpenSSL 3.x
+ 	    LIBP11_LT_OLDEST="3"
+ 	    debian_ssl_prefix="openssl-3.0.0";;
+ 	1.1.*) # Predicted engines directory prefix for OpenSSL 1.1.x
+

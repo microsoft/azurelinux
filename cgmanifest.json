@@ -15233,8 +15233,8 @@
         "type": "other",
         "other": {
           "name": "openssl-pkcs11",
-          "version": "0.4.10",
-          "downloadUrl": "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.10/libp11-0.4.10.tar.gz"
+          "version": "0.4.12",
+          "downloadUrl": "https://github.com/OpenSC/libp11/releases/download/libp11-0.4.12/libp11-0.4.12.tar.gz"
         }
       }
     },
