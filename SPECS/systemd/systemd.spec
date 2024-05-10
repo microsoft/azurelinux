@@ -857,7 +857,9 @@ install -Dm0644 10-timeout-abort.conf.user %{buildroot}%{user_unit_dir}/service.
 # https://fedoraproject.org/wiki/Changes/IncreaseVmMaxMapCount
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE17}
 
+%if 0%{?azl}
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/sysctl.d/ %{SOURCE18}
+%endif
 
 sed -i 's|#!/usr/bin/env python3|#!%{__python3}|' %{buildroot}/usr/lib/systemd/tests/run-unit-tests.py
 
