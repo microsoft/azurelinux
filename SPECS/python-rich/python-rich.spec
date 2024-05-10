@@ -1,6 +1,6 @@
 Name:           python-rich
 Version:        13.7.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Render rich text and beautiful formatting in the terminal
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,7 +29,7 @@ code, tracebacks, and more — out of the box.
 %package -n     python3-rich
 Summary:        %{summary}
 Requires:       python3-markdown-it-py
-Requires:       python3-Pygments
+Requires:       python3-pygments
 Requires:       python3-typing-extensions
 # This was previously misnamed, remove the obsolete in Fedora 38, EPEL 10
 Obsoletes:      python-rich < 10.16.1-2
@@ -59,6 +59,9 @@ code, tracebacks, and more — out of the box.
 %doc README.md
 
 %changelog
+* Fri May 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-3
+- Fix pygments name in Requires.
+
 * Mon Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
