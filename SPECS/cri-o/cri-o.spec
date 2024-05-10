@@ -217,6 +217,7 @@ mkdir -p /opt/cni/bin
 %changelog
 * Thu May 09 2024 Henry Li <lihl@microsoft.com> - 1.22.3-1
 - Upgrade to 1.22.3 to resolve CVE-2022-0811
+- Update patch CVE-2022-1708
 
 * Fri Apr 26 2024 Dallas Delaney <dadelan@microsoft.com> - 1.21.7-3
 - Apply patch to fix CVE-2024-21626 and update patch for CVE-2023-44487
