@@ -19,7 +19,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        0.59.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -38,7 +38,7 @@ Patch5:         Hp-volume-pod-should-respect-blockdevices.patch
 Patch6:         CVE-2022-41723.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-6%{?dist}
+BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -215,6 +215,9 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-16
+- Bump release to rebuild against glibc 2.35-7
+
 * Wed Mar 13 2024 Archana Choudhary <archana1@microsoft.com> - 0.59.0-15
 - Add patch for CVE-2022-41723
 
