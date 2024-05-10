@@ -69,7 +69,7 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
-* Fri May 10 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-2.cm2
+* Fri May 10 2024 Archana Choudhary <archana1@microsoft.com> - 1.0.1-2
 - Update version for consistency with hvloader spec
 
 * Thu Jan 04 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.0.1-1
