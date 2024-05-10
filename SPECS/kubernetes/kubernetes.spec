@@ -23,7 +23,7 @@ Patch1:         CVE-2023-48795.patch
 Patch2:         CVE-2023-5408.patch
 Patch3:         CVE-2023-45288.patch
 BuildRequires:  flex-devel
-BuildRequires:  glibc-static >= 2.35-6%{?dist}
+BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
 BuildRequires:  rsync
 BuildRequires:  systemd-devel
@@ -268,8 +268,13 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+<<<<<<< HEAD
 * Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.28.4-7
 - Fix for CVE-2023-45288
+=======
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.28.4-7
+- Bump release to rebuild against glibc 2.35-7
+>>>>>>> 7f1808f15 (glibc: Fix nscd breakage and patch CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2024-33602 (#9051))
 
 * Tue Apr 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.4-6
 - Use autopatch instead of individual patch
@@ -458,5 +463,3 @@ fi
 
 * Wed Dec 02 2020 Nicolas Guibourge <nicolasg@microsoft.com> - 1.19.1-1
 - Original version for CBL-Mariner
-
-

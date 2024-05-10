@@ -39,7 +39,7 @@ Patch6:         CVE-2022-41723.patch
 Patch7:         CVE-2023-45288.patch
 %global debug_package %{nil}
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.35-6%{?dist}
+BuildRequires:  glibc-static >= 2.35-7%{?dist}
 BuildRequires:  golang
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -216,8 +216,13 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-16
 - Fix for CVE-2023-45288
+=======
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-16
+- Bump release to rebuild against glibc 2.35-7
+>>>>>>> 7f1808f15 (glibc: Fix nscd breakage and patch CVE-2024-33599, CVE-2024-33600, CVE-2024-33601, CVE-2024-33602 (#9051))
 
 * Wed Mar 13 2024 Archana Choudhary <archana1@microsoft.com> - 0.59.0-15
 - Add patch for CVE-2022-41723
