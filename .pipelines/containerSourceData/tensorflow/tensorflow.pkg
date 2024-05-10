@@ -6,5 +6,6 @@ python3-pip
 python3-setuptools
 python3-tensorboard-data-server
 python3-tensorboard-plugin-wit
+python3-pygments
 python3-tensorflow
 which
