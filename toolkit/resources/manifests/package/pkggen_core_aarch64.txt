@@ -4,7 +4,7 @@ glibc-2.35-7.cm2.aarch64.rpm
 glibc-devel-2.35-7.cm2.aarch64.rpm
 glibc-i18n-2.35-7.cm2.aarch64.rpm
 glibc-iconv-2.35-7.cm2.aarch64.rpm
-glibc-lang-2.35-7.cm2.aarch64.rpms
+glibc-lang-2.35-7.cm2.aarch64.rpm
 glibc-nscd-2.35-7.cm2.aarch64.rpm
 glibc-tools-2.35-7.cm2.aarch64.rpm
 zlib-1.2.13-2.cm2.aarch64.rpm
