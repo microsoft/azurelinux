@@ -268,11 +268,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.28.4-8
-- Bump release to rebuild against glibc 2.35-7
-
-* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.28.4-7
+* Thu Apr 18 2024 Chris Gunn <chrisgun@microsoft.com> - 1.28.4-8
 - Fix for CVE-2023-45288
+
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 1.28.4-7
+- Bump release to rebuild against glibc 2.35-7
 
 * Tue Apr 24 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 1.28.4-6
 - Use autopatch instead of individual patch

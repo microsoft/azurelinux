@@ -216,11 +216,11 @@ install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-v
 %{_bindir}/virt-tests
 
 %changelog
-* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-17
-- Bump release to rebuild against glibc 2.35-7
-
-* Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-16
+* Thu Apr 18 2024 chrisgun@microsoft.com <chrisgun@microsoft.com> - 0.59.0-17
 - Fix for CVE-2023-45288
+
+* Mon May 06 2024 Rachel Menge <rachelmenge@microsoft.com> - 0.59.0-16
+- Bump release to rebuild against glibc 2.35-7
 
 * Wed Mar 13 2024 Archana Choudhary <archana1@microsoft.com> - 0.59.0-15
 - Add patch for CVE-2022-41723
