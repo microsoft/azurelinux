@@ -16,7 +16,6 @@ installkernel() {
 }
 
 install() {
-    inst_hook cmdline 20 "$moddir/overlayfs-parse.sh"
+    inst "grep"
     inst_hook pre-pivot 10 "$moddir/overlayfs-mount.sh"
-    dracut_need_initqueue
 }

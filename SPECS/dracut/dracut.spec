@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        059
-Release:        17%{?dist}
+Release:        16%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -19,7 +19,6 @@ Source3:        megaraid.conf
 Source4:        20overlayfs/module-setup.sh
 Source5:        20overlayfs/overlayfs-mount.sh
 Source6:        defaults.conf
-Source7:        20overlayfs/overlayfs-parse.sh
 
 Patch:          fix-functions-Avoid-calling-grep-with-PCRE-P.patch
 # allow-liveos-overlay-no-user-confirmation-prompt.patch has been introduced by
@@ -138,7 +137,6 @@ install -m 0644 %{SOURCE6} %{buildroot}%{_sysconfdir}/dracut.conf.d/00-defaults.
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE4} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 install -p -m 0755 %{SOURCE5} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
-install -p -m 0755 %{SOURCE7} %{buildroot}%{dracutlibdir}/modules.d/20overlayfs/
 
 touch %{buildroot}%{_var}/opt/%{name}/log/%{name}.log
 ln -srv %{buildroot}%{_var}/opt/%{name}/log/%{name}.log %{buildroot}%{_var}/log/
@@ -218,9 +216,6 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
-* Wed May 01 2024 Lanze Liu <lanzeliu@microsoft.com> - 059-17
-- Add overlayfs-parse.sh in overlayfs sub-package
-
 * Wed Mar 27 2024 Cameron Baird <cameronbaird@microsoft.com> - 059-16
 - Remove x86-specific xen-acpi-processor driver from defaults
 
