@@ -828,6 +828,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | TARGET_ARCH                   |                                                                                                        | The architecture of the machine that will run the package binaries.
 | USE_CCACHE                    | n                                                                                                      | Use ccache automatically to speed up repeat package builds.
 | MAX_CPU                       |                                                                                                        | Max number of CPUs used for package building. Use 0 for unlimited. Overrides `%_smp_ncpus_max` macro.
+| BUILD_TOOLS_NONPROD           | n                                                                                                      | Enables non-production features in the go build tools.
 
 ---
 

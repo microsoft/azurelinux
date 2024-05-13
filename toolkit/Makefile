@@ -71,6 +71,7 @@ RESOLVE_CYCLES_FROM_UPSTREAM         ?= n
 IGNORE_VERSION_TO_RESOLVE_SELFDEP    ?= n
 CACHED_PACKAGES_ARCHIVE              ?=
 USE_CCACHE                           ?= n
+BUILD_TOOLS_NONPROD                  ?= n
 
 # Tracing & Profiling support: https://go.dev/doc/diagnostics
 ENABLE_CPU_PROFILE              ?= n
