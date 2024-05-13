@@ -44,7 +44,7 @@ The ISC DHCP Client, dhclient, provides a means for configuring one or more netw
 %setup -q -n dhcp-%{version}
 
 # Extracting bundled 'bind' to allow some of the patches to modify it.
-tar -C bind -xf bind.tar.gz
+tar -C bind -xf bind/bind.tar.gz
 ln -s bind/bind-9* bind_ln
 
 %autopatch -p1
