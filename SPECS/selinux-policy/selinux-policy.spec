@@ -50,6 +50,7 @@ Patch28:        0028-cloudinit-Add-support-for-cloud-init-growpart.patch
 Patch29:        0029-filesystem-systemd-memory.pressure-fixes.patch
 Patch30:        0030-init-Add-homectl-dbus-access.patch
 Patch31:        0031-Temporary-workaround-for-memory.pressure-labeling-is.patch
+Patch32:        0032-rpm-Fixes-from-various-post-scripts.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
 BuildRequires:  m4
@@ -333,10 +334,11 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
-* Tue Apr 09 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
-- Add mising rules for systemd-analyze.
-- Enable cloud-init-growpart support by default.
-- Add fixes for systemd memory pressure feature.
+* Tue May 14 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-3
+- Fix systemd-analyze issues.
+- Add selinux-policy-modules to selinux.json package list since it has rules for cloud-init
+- Add fixes and new systemd access to memory.pressure
+- Remove redirections in %post to make it easier to debug issues
 
 * Mon Mar 25 2024 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-2
 - Add fixes from BVTs
