@@ -1,0 +1,11 @@
+--- a/grub-core/net/tftp.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/net/tftp.c	2024-05-13 12:11:41.323253419 -0700
+@@ -370,7 +370,7 @@
+     }
+ 
+   data->sock = grub_net_udp_open (addr,
+-				  port ? port : TFTP_SERVER_PORT, tftp_receive,
++				  TFTP_SERVER_PORT, tftp_receive,
+ 				  file);
+   if (!data->sock)
+     {
