@@ -19,6 +19,9 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-poetry
 BuildRequires:  python3-setuptools
+%if %0{?with_check}
+BuildRequires:  python3-markdown-it-py
+%endif
 
 %description
 Rich is a Python library for rich text and beautiful formatting in the terminal.

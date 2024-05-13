@@ -9,6 +9,8 @@ URL:            https://github.com/html5lib/html5lib-python
 Source:         %{pypi_source html5lib}
 # Fix compatibility with pytest 6
 Patch0:         %{url}/pull/506.patch
+# fix compatability with python 3.12
+Patch1:         ptest-python-3.12-fix.patch
 
 BuildArch:      noarch
 

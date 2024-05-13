@@ -1,0 +1,164 @@
+From 4a87368b71090f1432df6302f178c4babfcec93f Mon Sep 17 00:00:00 2001
+From: Christian Clauss <cclauss@me.com>
+Date: Wed, 10 Jan 2024 15:13:40 +0100
+Subject: [PATCH] GitHub Actions: python: ["3.8", "3.9", "3.10", "3.11",
+ "3.12"] (#575)
+
+---
+ .appveyor.yml                       | 30 +++++++++++++++++------------
+ .github/workflows/python-tox.yml    | 19 ++++++++----------
+ html5lib/tests/tokenizer.py         |  4 +++-
+ html5lib/tests/tree_construction.py |  4 +++-
+ requirements-test.txt               |  3 ++-
+ 5 files changed, 34 insertions(+), 26 deletions(-)
+
+diff --git a/.appveyor.yml b/.appveyor.yml
+index 7661aa63..e6f7bf48 100644
+--- a/.appveyor.yml
++++ b/.appveyor.yml
+@@ -1,23 +1,29 @@
+-image: Visual Studio 2019
++# appveyor.yml - https://www.appveyor.com/docs/lang/python
++# https://www.appveyor.com/docs/windows-images-software/#visual-studio-2022
++---
++image: Visual Studio 2022
+ environment:
+-  global:
+-    PATH: "C:\\Python27\\Scripts\\;%PATH%"
+   matrix:
+-    - TOXENV: py27-base
+-    - TOXENV: py27-optional
+-    - TOXENV: py35-base
+-    - TOXENV: py35-optional
+-    - TOXENV: py36-base
+-    - TOXENV: py36-optional
++    - PY_PYTHON: 2.7
++      TOXENV: py27-base
++    - PY_PYTHON: 2.7
++      TOXENV: py27-optional
++    - PY_PYTHON: 3.7
++      TOXENV: py37-base
++    - PY_PYTHON: 3.7
++      TOXENV: py37-optional
+ 
+ install:
+   - git submodule update --init --recursive
+-  - python -m pip install tox
++  - py --list
++  - py -VV
++  - py -m pip install --upgrade pip
++  - py -m pip install tox
+ 
+ build: off
+ 
+ test_script:
+-  - tox
++  - py -m tox
+ 
+ after_test:
+-  - python debug-info.py
++  - py debug-info.py
+diff --git a/.github/workflows/python-tox.yml b/.github/workflows/python-tox.yml
+index cfcc42e6..5ed83175 100644
+--- a/.github/workflows/python-tox.yml
++++ b/.github/workflows/python-tox.yml
+@@ -7,30 +7,27 @@ jobs:
+     strategy:
+       fail-fast: false
+       matrix:
+-        # 2.7, 3.5, and 3.6 run on Windows via AppVeyor
+-        python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
++        # 2.7 and 3.7 run on Windows via AppVeyor
++        python: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+         os: [ubuntu-latest, windows-latest]
+         deps: [base, optional]
+         include:
+           - python: "pypy-2.7"
+             os: ubuntu-latest
+             deps: base
+-          - python: "pypy-3.8"
++          - python: "pypy-3.10"
+             os: ubuntu-latest
+             deps: base
+-          - python: "2.7"
+-            os: ubuntu-latest
+-            deps: oldest
+-          - python: "3.7"
++          - python: "3.8"
+             os: ubuntu-latest
+             deps: oldest
+     runs-on: ${{ matrix.os }}
+     steps:
+-      - uses: actions/checkout@v3
++      - uses: actions/checkout@v4
+         with:
+           submodules: true
+       - if: ${{ matrix.deps == 'base' }}
+-        uses: actions/setup-python@v4
++        uses: actions/setup-python@v5
+         with:
+           python-version: ${{ matrix.python }}
+           cache: pip
+@@ -38,7 +35,7 @@ jobs:
+             requirements.txt
+             requirements-test.txt
+       - if: ${{ matrix.deps == 'optional' }}
+-        uses: actions/setup-python@v4
++        uses: actions/setup-python@v5
+         with:
+           python-version: ${{ matrix.python }}
+           cache: pip
+@@ -47,7 +44,7 @@ jobs:
+             requirements-optional.txt
+             requirements-test.txt
+       - if: ${{ matrix.deps == 'oldest' }}
+-        uses: actions/setup-python@v4
++        uses: actions/setup-python@v5
+         with:
+           python-version: ${{ matrix.python }}
+           cache: pip
+diff --git a/html5lib/tests/tokenizer.py b/html5lib/tests/tokenizer.py
+index cc9897a4..b49d2e6e 100644
+--- a/html5lib/tests/tokenizer.py
++++ b/html5lib/tests/tokenizer.py
+@@ -246,7 +246,9 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++        pytest_ver = getattr(pytest, "version_tuple", ())
++        filter_args = (excinfo,) if pytest_ver >= (7, 4, 0) else ()
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,
+diff --git a/html5lib/tests/tree_construction.py b/html5lib/tests/tree_construction.py
+index fb0657bf..363b48c2 100644
+--- a/html5lib/tests/tree_construction.py
++++ b/html5lib/tests/tree_construction.py
+@@ -135,7 +135,9 @@ def runtest(self):
+     def repr_failure(self, excinfo):
+         traceback = excinfo.traceback
+         ntraceback = traceback.cut(path=__file__)
+-        excinfo.traceback = ntraceback.filter()
++        pytest_ver = getattr(pytest, "version_tuple", ())
++        filter_args = (excinfo,) if pytest_ver >= (7, 4, 0) else ()
++        excinfo.traceback = ntraceback.filter(*filter_args)
+ 
+         return excinfo.getrepr(funcargs=True,
+                                showlocals=False,
+diff --git a/requirements-test.txt b/requirements-test.txt
+index 27866e59..39913ee4 100644
+--- a/requirements-test.txt
++++ b/requirements-test.txt
+@@ -3,8 +3,9 @@
+ flake8==3.9.2 ; python_version < '3.6'
+ flake8>=5.0.4; python_version >= '3.6'
+ pytest>=4.6.10,<5 ; python_version < '3'
+-pytest>=5.4.2,<7 ; python_version >= '3'
++pytest>=5.4.2,<8 ; python_version >= '3'
+ coverage>=5.1,<6
+ pytest-expect>=1.1.0,<2
+ mock>=3.0.5,<4 ; python_version < '3.6'
+ mock>=4.0.2,<5 ; python_version >= '3.6'
++setuptools; python_version >= '3.12'
