@@ -9,7 +9,7 @@
 Summary:        Programmable system-wide instrumentation system
 Name:           systemtap
 Version:        4.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -365,6 +365,10 @@ fi
 %{_mandir}/man8/systemtap-service.8*
 
 %changelog
+* Mon May 13 2024 Brian Fjeldstad <bfjelds@microsoft.com> - 4.5-4
+- Ensure that stapio is installed
+- Cherry-pick changes from upstream 4.6 to allow stp files to build
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 4.5-3
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
