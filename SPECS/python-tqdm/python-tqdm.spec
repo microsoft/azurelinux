@@ -31,7 +31,7 @@ BuildRequires:  python3-wheel
 Python 3 version.
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{srcname}-%{version} -p1
 
 %build
 %py3_build
