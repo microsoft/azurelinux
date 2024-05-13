@@ -22283,8 +22283,8 @@
         "type": "other",
         "other": {
           "name": "python-execnet",
-          "version": "1.9.0",
-          "downloadUrl": "https://pypi.io/packages/source/e/execnet/execnet-1.9.0.tar.gz"
+          "version": "2.1.1",
+          "downloadUrl": "https://pypi.io/packages/source/e/execnet/execnet-2.1.1.tar.gz"
         }
       }
     },
