@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 check() {
     return 0
@@ -14,5 +16,6 @@ installkernel() {
 }
 
 install() {
+    inst "grep"
     inst_hook pre-pivot 10 "$moddir/overlayfs-mount.sh"
 }

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 
 # Description: This script is designed to mount a DM-Verity root filesystem and
 # set up OverlayFS. It is driven by kernel parameters and is invoked during the
@@ -64,9 +66,10 @@ mount_volatile_persistent_volume() {
         mount -t tmpfs tmpfs -o ${OVERLAY_MNT_OPTS} "${_overlay_mount}" || \
             die "Failed to create overlay tmpfs at ${_overlay_mount}"
     else
-        # Check if /etc/mdadm.conf exists.
-        if [ -f "/etc/mdadm.conf" ]; then
-            mdadm --assemble ${_volume} || \
+        # Check if the specified Overlay RAID volume is present in the system.
+        if mdadm --examine --scan | grep -qs "${_volume}"; then
+            # If the specified Overlay RAID volume is found, attempt to assemble it.
+            mdadm --assemble "${_volume}" || \
                 die "Failed to assemble RAID volume."
         fi
 
