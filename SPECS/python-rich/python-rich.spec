@@ -19,7 +19,7 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
 BuildRequires:  python3-poetry
 BuildRequires:  python3-setuptools
-%if %0{?with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-markdown-it-py
 %endif
 
