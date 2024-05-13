@@ -5,12 +5,16 @@
 Summary:        User space components of the Ceph file system
 Name:           ceph
 Version:        16.2.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2 and LGPLv3 and CC-BY-SA and GPLv2 and Boost and BSD and MIT and Public Domain and GPLv3 and ASL-2.0
 URL:            https://ceph.io/
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Source0:        https://download.ceph.com/tarballs/%{name}-%{version}.tar.gz
+Patch0:         CVE-2021-24032.patch
+Patch1:         CVE-2021-28361.patch
+Patch2:         CVE-2022-3650.patch
+Patch3:         CVE-2022-3854.patch
 
 #
 # Copyright (C) 2004-2019 The Ceph Project Developers. See COPYING file
@@ -834,6 +838,7 @@ env | sort
 mkdir build
 cd build
 CMAKE=cmake
+# WITH_SEASTAR is explicitly disabled to prevent numerous vendored CVEs
 ${CMAKE} .. \
     -DCMAKE_INSTALL_PREFIX=%{_prefix} \
     -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
@@ -847,6 +852,7 @@ ${CMAKE} .. \
     -DWITH_MANPAGE=ON \
     -DWITH_PYTHON3=%{python3_version} \
     -DWITH_MGR_DASHBOARD_FRONTEND=OFF \
+    -DWITH_SEASTAR=OFF \
 %if 0%{without mgr_diskprediction}
     -DMGR_DISABLED_MODULES=diskprediction_local\
 %endif
@@ -1803,6 +1809,10 @@ exit 0
 %config %{_sysconfdir}/prometheus/ceph/ceph_default_alerts.yml
 
 %changelog
+* Fri May 10 2024 Henry Beberman <henry.beberman@microsoft.com> - 16.2.10-3
+- Patch CVE-2021-24032, CVE-2021-28361, CVE-2022-3650, CVE-2022-3854
+- Explicitly disable seastar to ensure disputed uncompiled CVEs dont get enabled.
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 16.2.10-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
