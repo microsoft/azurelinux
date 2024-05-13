@@ -1,7 +1,7 @@
 Summary:        WebSocket client for python
 Name:           python-websocket-client
 Version:        1.6.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,7 +46,8 @@ WebSocket client for python3
 %check
 pip3 install \
     more-itertools \
-    pluggy
+    pluggy \
+    iniconfig
 # do not execute 'echo-server' test since it requires python websockets
 # which do not work well from a chroot
 pytest3 -vv websocket/tests -k "not echo-server"
@@ -58,6 +59,9 @@ pytest3 -vv websocket/tests -k "not echo-server"
 %{_bindir}/wsdump
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 1.6.2-2
+- Add missing iniconfig dependency to check section
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.2-1
 - Auto-upgrade to 1.6.2 - Azure Linux 3.0 - package upgrades
 

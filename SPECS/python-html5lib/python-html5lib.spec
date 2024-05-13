@@ -1,7 +1,7 @@
 Summary:        A python based HTML parser/tokenizer
 Name:           python-html5lib
 Version:        1.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,7 +59,7 @@ sed -i 's/from mock import/from unittest.mock import/' html5lib/tests/test_meta.
 %pyproject_save_files html5lib
 
 %check
-pip3 install more-itertools umsgpack webencodings
+pip3 install more-itertools umsgpack webencodings iniconfig
 # Disabling broken tests, see: https://github.com/html5lib/html5lib-python/issues/433
 %pytest -k "not test_parser_encoding and not test_prescan_encoding"
 
@@ -67,6 +67,9 @@ pip3 install more-itertools umsgpack webencodings
 %doc CHANGES.rst README.rst
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 1.1-11
+- Add missing iniconfig dependency to check section
+
 * Mon Mar 04 2024 Andrew Phelps <anphel@microsoft.com> - 1.1-10
 - Correct usage of %%pyproject_extras_subpkg macro
 

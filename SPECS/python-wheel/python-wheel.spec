@@ -3,7 +3,7 @@
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.33.6
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ install -p dist/%{python_wheelname} -t %{buildroot}%{python_wheeldir}
 
 %check
 rm setup.cfg
-%{python3} -m pip install pluggy more-itertools
+%{python3} -m pip install pluggy more-itertools iniconfig
 PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 
 %files -n python3-%{pypi_name}
@@ -102,6 +102,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test3 -v --ignore build
 %endif
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 0.33.6-8
+- Add missing iniconfig dependency to check section
+
 * Thu Mar 03 2022 Bala <balakumaran.kannan@microsoft.com> - 0.33.6-7
 - BR multiple python3 modules for PTest
 - pip3 install additional modules which not available as RPM

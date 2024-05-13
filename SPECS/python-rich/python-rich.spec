@@ -1,6 +1,6 @@
 Name:           python-rich
 Version:        13.7.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Render rich text and beautiful formatting in the terminal
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,6 +51,7 @@ code, tracebacks, and more — out of the box.
 
 %check
 # add below to make sure initial build will catch runtime import errors
+pip3 install iniconfig
 %pyproject_check_import
 %pytest -vv
 
@@ -59,6 +60,9 @@ code, tracebacks, and more — out of the box.
 %doc README.md
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 13.7.1-4 
+- Add missing iniconfig dependency to check section
+
 * Fri May 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-3
 - Fix pygments name in Requires.
 
