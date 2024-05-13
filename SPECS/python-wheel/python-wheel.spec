@@ -1,5 +1,6 @@
 # The function of bootstrap is that it disables the wheel subpackage
 %bcond_with bootstrap
+%bcond main_python 1
 Summary:        Built-package format for Python
 Name:           python-%{pypi_name}
 Version:        0.43.0
@@ -54,7 +55,6 @@ Summary:        The Python wheel module packaged as a wheel
 A Python wheel of wheel to use with virtualenv.
 %endif
 
-
 %prep
 %autosetup -n %{pypi_name}-%{version} -p1
 
@@ -89,21 +89,22 @@ ln -s %{pypi_name}-3 %{buildroot}%{_bindir}/%{pypi_name}
 mkdir -p %{buildroot}%{python_wheel_dir}
 install -p %{_pyproject_wheeldir}/%{python_wheel_name} -t %{buildroot}%{python_wheel_dir}
 
-
 %check
+pip3 install iniconfig
 # Smoke test
 %{py3_test_envvars} wheel-%{python3_version} version
 %py3_check_import wheel
-
-%if %{with tests}
 %pytest -v --ignore build
-%endif
 
 %files -n python3-%{pypi_name}
 %license LICENSE.txt
 %doc README.rst
 %{_bindir}/%{pypi_name}-%{python3_version}
 %{python3_sitelib}/%{pypi_name}*
+%if %{with main_python}
+%{_bindir}/%{pypi_name}
+%{_bindir}/%{pypi_name}-3
+%endif
 
 %if %{without bootstrap}
 %files wheel
