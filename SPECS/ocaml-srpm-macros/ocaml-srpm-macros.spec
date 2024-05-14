@@ -44,7 +44,7 @@ install -m 0644 %{SOURCE0} $RPM_BUILD_ROOT%{rpmmacrodir}/macros.ocaml-srpm
  
 %changelog
 * Tue May 14 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9-3
-- Initial import from Fedora 41 (License: MIT)
+- Initial Azure Linux import from Fedora 41 (license: MIT)
 - License verified
 
 * Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 9-3
