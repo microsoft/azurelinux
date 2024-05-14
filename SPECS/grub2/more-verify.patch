@@ -1,0 +1,56 @@
+--- grub-2.12/grub-core/kern/efi/sb.c	2023-12-20 07:54:46.000000000 -0800
++++ sb.c	2024-05-14 10:42:48.305190671 -0700
+@@ -129,7 +129,7 @@
+ 			 void **context __attribute__ ((unused)),
+ 			 enum grub_verify_flags *flags)
+ {
+-  *flags = GRUB_VERIFY_FLAGS_NONE;
++  *flags = GRUB_VERIFY_FLAGS_SKIP_VERIFICATION;
+ 
+   switch (type & GRUB_FILE_TYPE_MASK)
+     {
+@@ -141,42 +141,11 @@
+     case GRUB_FILE_TYPE_PLAN9_KERNEL:
+     case GRUB_FILE_TYPE_EFI_CHAINLOADED_IMAGE:
+       *flags = GRUB_VERIFY_FLAGS_SINGLE_CHUNK;
+-      return GRUB_ERR_NONE;
+ 
+-    /* Files that do not affect secureboot state. */
+-    case GRUB_FILE_TYPE_NONE:
+-    case GRUB_FILE_TYPE_LOOPBACK:
+-    case GRUB_FILE_TYPE_LINUX_INITRD:
+-    case GRUB_FILE_TYPE_OPENBSD_RAMDISK:
+-    case GRUB_FILE_TYPE_XNU_RAMDISK:
+-    case GRUB_FILE_TYPE_SIGNATURE:
+-    case GRUB_FILE_TYPE_PUBLIC_KEY:
+-    case GRUB_FILE_TYPE_PUBLIC_KEY_TRUST:
+-    case GRUB_FILE_TYPE_PRINT_BLOCKLIST:
+-    case GRUB_FILE_TYPE_TESTLOAD:
+-    case GRUB_FILE_TYPE_GET_SIZE:
+-    case GRUB_FILE_TYPE_ZFS_ENCRYPTION_KEY:
+-    case GRUB_FILE_TYPE_CAT:
+-    case GRUB_FILE_TYPE_HEXCAT:
+-    case GRUB_FILE_TYPE_CMP:
+-    case GRUB_FILE_TYPE_HASHLIST:
+-    case GRUB_FILE_TYPE_TO_HASH:
+-    case GRUB_FILE_TYPE_KEYBOARD_LAYOUT:
+-    case GRUB_FILE_TYPE_PIXMAP:
+-    case GRUB_FILE_TYPE_GRUB_MODULE_LIST:
+-    case GRUB_FILE_TYPE_CONFIG:
+-    case GRUB_FILE_TYPE_THEME:
+-    case GRUB_FILE_TYPE_GETTEXT_CATALOG:
+-    case GRUB_FILE_TYPE_FS_SEARCH:
+-    case GRUB_FILE_TYPE_LOADENV:
+-    case GRUB_FILE_TYPE_SAVEENV:
+-    case GRUB_FILE_TYPE_VERIFY_SIGNATURE:
+-      *flags = GRUB_VERIFY_FLAGS_SKIP_VERIFICATION;
+-      return GRUB_ERR_NONE;
++      /* Fall through. */
+ 
+-    /* Other files. */
+     default:
+-      return grub_error (GRUB_ERR_ACCESS_DENIED, N_("prohibited by secure boot policy"));
++      return GRUB_ERR_NONE;
+     }
+ }
+ 
