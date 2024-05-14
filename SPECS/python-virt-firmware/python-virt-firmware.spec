@@ -11,22 +11,23 @@ Distribution:   Azure Linux
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
 ## END: Set by rpmautospec
 
-%global pypi_version 23.5
+%global pypi_version 24.4
 
 Name:           python-virt-firmware
 Version:        %{pypi_version}
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Tools for virtual machine firmware volumes
 
-License:        GPLv2
+License:        GPL-2.0-only
 URL:            https://pypi.org/project/virt-firmware/
-Source0:        https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-%{pypi_version}.tar.gz#/python-virt-firmware-%{pypi_version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/ea/8d/b3417567c9b532879357fb2b6b6fc50a6b0b311f95b16b4845054852e062/virt-firmware-%{pypi_version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3dist(cryptography)
 BuildRequires:  python3dist(setuptools)
 BuildRequires:  make help2man
+BuildRequires:  systemd systemd-rpm-macros
 
 %description
 Tools for ovmf / armvirt firmware volumes This is a small collection of tools
@@ -38,20 +39,16 @@ to enroll secure boot certificates.
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-virt-firmware}
 Provides:       virt-firmware
+Conflicts:      python3-virt-firmware-peutils < 23.9
+Obsoletes:      python3-virt-firmware-peutils < 23.9
 Requires:       python3dist(cryptography)
 Requires:       python3dist(setuptools)
+Requires:       python3dist(pefile)
 %description -n python3-virt-firmware
 Tools for ovmf / armvirt firmware volumes This is a small collection of tools
 for edk2 firmware images. They support decoding and printing the content of
 firmware volumes. Variable stores (OVMF_VARS.fd) can be modified, for example
 to enroll secure boot certificates.
-
-%package -n     python3-virt-firmware-peutils
-Summary:        %{summary} - peutils
-Requires:       python3dist(pefile)
-Conflicts:      python3-virt-firmware < 1.6
-%description -n python3-virt-firmware-peutils
-Some utilities to inspect efi (pe) binaries.
 
 %if %{with tests}
 %package -n     python3-virt-firmware-tests
@@ -89,15 +86,17 @@ cp -ar tests %{buildroot}%{_datadir}/%{name}
 %{_bindir}/virt-fw-vars
 %{_bindir}/virt-fw-sigdb
 %{_bindir}/migrate-vars
-%{_mandir}/man1/virt-*.1*
-%{python3_sitelib}/virt/firmware
-%{python3_sitelib}/virt_firmware-%{pypi_version}-py%{python3_version}.egg-info
-
-%files -n python3-virt-firmware-peutils
-%{python3_sitelib}/virt/peutils
 %{_bindir}/pe-dumpinfo
 %{_bindir}/pe-listsigs
 %{_bindir}/pe-addsigs
+%{_bindir}/pe-inspect
+%{_mandir}/man1/virt-*.1*
+%{_mandir}/man1/kernel-bootcfg.1*
+%{_mandir}/man1/uefi-boot-menu.1*
+%{_mandir}/man1/pe-*.1*
+%{python3_sitelib}/virt/firmware
+%{python3_sitelib}/virt/peutils
+%{python3_sitelib}/virt_firmware-%{pypi_version}-py%{python3_version}.egg-info
 
 %if %{with tests}
 %files -n python3-virt-firmware-tests
@@ -105,6 +104,9 @@ cp -ar tests %{buildroot}%{_datadir}/%{name}
 %endif
 
 %changelog
+* Mon May 13 2024 Elaine Zhao <elainezhao@microsoft.com> - 24.4-1
+- update to version 24.4
+
 * Fri Jun 02 2023 Vince Perri <viperri@microsoft.com> - 23.5-2
 - License verified.
 - Initial CBL-Mariner import from Fedora 39 (license: MIT).
