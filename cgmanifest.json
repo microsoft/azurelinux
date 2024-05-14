@@ -21953,8 +21953,8 @@
         "type": "other",
         "other": {
           "name": "python-constantly",
-          "version": "15.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/95/f1/207a0a478c4bb34b1b49d5915e2db574cadc415c9ac3a7ef17e29b2e8951/constantly-15.1.0.tar.gz"
+          "version": "23.10.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4d/6f/cb2a94494ff74aa9528a36c5b1422756330a75a8367bf20bd63171fc324d/constantly-23.10.4.tar.gz"
         }
       }
     },
@@ -24765,6 +24765,16 @@
           "name": "python-vcversioner",
           "version": "2.16.0.0",
           "downloadUrl": "https://pypi.python.org/packages/source/v/vcversioner/vcversioner-2.16.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-versioneer",
+          "version": "0.29",
+          "downloadUrl": "https://files.pythonhosted.org/packages/32/d7/854e45d2b03e1a8ee2aa6429dd396d002ce71e5d88b77551b2fb249cb382/versioneer-0.29.tar.gz"
         }
       }
     },
