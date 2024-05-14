@@ -10,7 +10,8 @@ Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
 
 BuildArch:      noarch
 
-Patch0:          3229.patch
+Patch0:         3229.patch
+Patch1:         ptest-warning.patch 
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-attrs
@@ -69,7 +70,7 @@ pip3 install iniconfig
 * Fri May 10 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-3
 - Fix pygments name in Requires.
 
-* Mon Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
+* Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 13.7.1-2
 - Initial Azure Linux import from Fedora 41 (license: MIT).
 - License verified.
 
