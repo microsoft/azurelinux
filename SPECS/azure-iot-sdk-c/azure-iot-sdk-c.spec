@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 #           --owner=0 --group=0 --numeric-owner \
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %{name}-%{version}.tar.gz %{name}
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/Azure/azure-iot-sdk-c/archive/refs/tags/LTS_03_2024.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  build-essential
@@ -90,8 +90,8 @@ install -p -m 755 provisioning_client/tools/tpm_device_provision/tpm_device_prov
 /usr/cmake/*
 
 %changelog
-*   Mon May 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2024-03-04-1
--   Upgrade to latest LTS 2024-03-04
+*   Mon May 06 2024 Nicolas Guibourge <nicolasg@microsoft.com> - 2024.03.04-1
+-   Upgrade to LTS_03_2024
 
 *   Thu Jan 04 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 2023.08.07-1
 -   Upgrate to  2023.08.07-1
