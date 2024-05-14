@@ -24772,7 +24772,7 @@
       "component": {
         "type": "other",
         "other": {
-          "name": "python-virt-firmware",
+          "name": "virt-firmware",
           "version": "24.4",
           "downloadUrl": "https://files.pythonhosted.org/packages/ea/8d/b3417567c9b532879357fb2b6b6fc50a6b0b311f95b16b4845054852e062/virt-firmware-24.4.tar.gz"
         }
