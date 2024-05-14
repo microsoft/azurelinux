@@ -74,7 +74,7 @@ func updateGrubConfigForOverlay(imageChroot *safechroot.Chroot, overlays []image
 		return err
 	}
 
-	err = bootCustomizer.UpdateKernelCommandLineArgs(defaultGrubCmdlineLinux, []string{"rd.overlayfs"}, newArgs)
+	err = bootCustomizer.UpdateKernelCommandLineArgs(defaultGrubFileCmdlineLinux, []string{"rd.overlayfs"}, newArgs)
 	if err != nil {
 		return err
 	}

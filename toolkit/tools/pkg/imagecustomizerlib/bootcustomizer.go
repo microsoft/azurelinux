@@ -17,7 +17,7 @@ type BootCustomizer struct {
 	grubCfgContent string
 
 	// The contents of the /etc/default/grub file.
-	defaultGrubContent string
+	defaultGrubFileContent string
 
 	// Whether or not the image is using grub-mkconfig.
 	isGrubMkconfig bool
@@ -29,7 +29,7 @@ func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) 
 		return nil, err
 	}
 
-	defaultGrubContent, err := readDefaultGrubFile(imageChroot)
+	defaultGrubFileContent, err := readDefaultGrubFile(imageChroot)
 	if err != nil {
 		return nil, err
 	}
@@ -37,9 +37,9 @@ func NewBootCustomizer(imageChroot *safechroot.Chroot) (*BootCustomizer, error) 
 	isGrubMkconfig := isGrubMkconfigConfig(grubCfgContent)
 
 	b := &BootCustomizer{
-		grubCfgContent:     grubCfgContent,
-		defaultGrubContent: defaultGrubContent,
-		isGrubMkconfig:     isGrubMkconfig,
+		grubCfgContent:         grubCfgContent,
+		defaultGrubFileContent: defaultGrubFileContent,
+		isGrubMkconfig:         isGrubMkconfig,
 	}
 	return b, nil
 }
@@ -52,12 +52,12 @@ func (b *BootCustomizer) AddKernelCommandLine(extraCommandLine string) error {
 	}
 
 	if b.isGrubMkconfig {
-		defaultGrubContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubContent, extraCommandLine)
+		defaultGrubFileContent, err := addExtraCommandLineToDefaultGrubFile(b.defaultGrubFileContent, extraCommandLine)
 		if err != nil {
 			return err
 		}
 
-		b.defaultGrubContent = defaultGrubContent
+		b.defaultGrubFileContent = defaultGrubFileContent
 	} else {
 		// Add the args directly to the /boot/grub2/grub.cfg file.
 		grubCfgContent, err := appendKernelCommandLineArgs(b.grubCfgContent, extraCommandLine)
@@ -78,7 +78,7 @@ func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecu
 
 	// Get the SELinux kernel command-line args.
 	if b.isGrubMkconfig {
-		_, args, _, err = getGrubDefaultLinuxArgs(b.defaultGrubContent, defaultGrubVarCmdlineForSELinux)
+		_, args, _, err = getGrubDefaultFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarCmdlineForSELinux)
 		if err != nil {
 			return "", err
 		}
@@ -113,7 +113,7 @@ func (b *BootCustomizer) UpdateSELinuxCommandLine(selinuxMode imagecustomizerapi
 		return err
 	}
 
-	err = b.UpdateKernelCommandLineArgs(defaultGrubVarCmdlineForSELinux, selinuxArgNames, newSELinuxArgs)
+	err = b.UpdateKernelCommandLineArgs(defaultGrubFileVarCmdlineForSELinux, selinuxArgNames, newSELinuxArgs)
 	if err != nil {
 		return err
 	}
@@ -121,17 +121,17 @@ func (b *BootCustomizer) UpdateSELinuxCommandLine(selinuxMode imagecustomizerapi
 	return nil
 }
 
-func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubVarName string, argsToRemove []string,
+func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName string, argsToRemove []string,
 	newArgs []string,
 ) error {
 	if b.isGrubMkconfig {
-		defaultGrubContent, err := updateDefaultGrubKernelCommandLineArgs(b.defaultGrubContent,
-			defaultGrubVarName, argsToRemove, newArgs)
+		defaultGrubFileContent, err := updateDefaultGrubFileKernelCommandLineArgs(b.defaultGrubFileContent,
+			defaultGrubFileVarName, argsToRemove, newArgs)
 		if err != nil {
 			return err
 		}
 
-		b.defaultGrubContent = defaultGrubContent
+		b.defaultGrubFileContent = defaultGrubFileContent
 	} else {
 		grubCfgContent, err := updateKernelCommandLineArgs(b.grubCfgContent, argsToRemove, newArgs)
 		if err != nil {
@@ -147,7 +147,7 @@ func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubVarName string, 
 func (b *BootCustomizer) WriteToFile(imageChroot *safechroot.Chroot) error {
 	if b.isGrubMkconfig {
 		// Update /etc/defaukt/grub file.
-		err := writeDefaultGrubFile(b.defaultGrubContent, imageChroot)
+		err := writeDefaultGrubFile(b.defaultGrubFileContent, imageChroot)
 		if err != nil {
 			return err
 		}
