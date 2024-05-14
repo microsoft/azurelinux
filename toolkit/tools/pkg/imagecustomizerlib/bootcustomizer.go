@@ -78,7 +78,7 @@ func (b *BootCustomizer) GetSELinuxMode(imageChroot *safechroot.Chroot) (imagecu
 
 	// Get the SELinux kernel command-line args.
 	if b.isGrubMkconfig {
-		_, args, _, err = getGrubDefaultFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarCmdlineForSELinux)
+		_, args, _, err = getDefaultGrubFileLinuxArgs(b.defaultGrubFileContent, defaultGrubFileVarNameCmdlineForSELinux)
 		if err != nil {
 			return "", err
 		}
@@ -113,7 +113,7 @@ func (b *BootCustomizer) UpdateSELinuxCommandLine(selinuxMode imagecustomizerapi
 		return err
 	}
 
-	err = b.UpdateKernelCommandLineArgs(defaultGrubFileVarCmdlineForSELinux, selinuxArgNames, newSELinuxArgs)
+	err = b.UpdateKernelCommandLineArgs(defaultGrubFileVarNameCmdlineForSELinux, selinuxArgNames, newSELinuxArgs)
 	if err != nil {
 		return err
 	}
@@ -121,8 +121,8 @@ func (b *BootCustomizer) UpdateSELinuxCommandLine(selinuxMode imagecustomizerapi
 	return nil
 }
 
-func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName string, argsToRemove []string,
-	newArgs []string,
+func (b *BootCustomizer) UpdateKernelCommandLineArgs(defaultGrubFileVarName defaultGrubFileVarName,
+	argsToRemove []string, newArgs []string,
 ) error {
 	if b.isGrubMkconfig {
 		defaultGrubFileContent, err := updateDefaultGrubFileKernelCommandLineArgs(b.defaultGrubFileContent,
