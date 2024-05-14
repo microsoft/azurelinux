@@ -23673,8 +23673,8 @@
         "type": "other",
         "other": {
           "name": "python-pygments",
-          "version": "2.5.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/Pygments/Pygments-2.5.2.tar.gz"
+          "version": "2.18.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/P/Pygments/Pygments-2.18.0.tar.gz"
         }
       }
     },
