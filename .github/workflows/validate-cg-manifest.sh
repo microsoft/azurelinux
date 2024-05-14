@@ -52,6 +52,7 @@ ignore_no_source_tarball=" \
   sgx-backwards-compatability \
   verity-read-only-root \
   web-assets \
+  ocaml-srpm-macros \
   "
 
 # Specs where cgmanifest validation has known issues checking URLs.
