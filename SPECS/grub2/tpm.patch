@@ -1,0 +1,23 @@
+--- a/grub-core/commands/tpm.c	2023-12-20 07:54:46.000000000 -0800
++++ b/grub-core/commands/tpm.c	2024-05-14 14:55:41.882681831 -0700
+@@ -96,20 +96,10 @@
+ 
+ GRUB_MOD_INIT (tpm)
+ {
+-  /*
+-   * Even though this now calls ibmvtpm's grub_tpm_present() from GRUB_MOD_INIT(),
+-   * it does seem to call it late enough in the initialization sequence so
+-   * that whatever discovered "device nodes" before this GRUB_MOD_INIT() is
+-   * called, enables the ibmvtpm driver to see the device nodes.
+-   */
+-  if (!grub_tpm_present())
+-    return;
+   grub_verifier_register (&grub_tpm_verifier);
+ }
+ 
+ GRUB_MOD_FINI (tpm)
+ {
+-  if (!grub_tpm_present())
+-    return;
+   grub_verifier_unregister (&grub_tpm_verifier);
+ }
