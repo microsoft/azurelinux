@@ -2395,7 +2395,7 @@
                 "rubygem-zip-zip",
                 "runc",
                 "sdbus-cpp",
-                "sgx-backwards-compatability",
+                "sgx-backwards-compatibility",
                 "shim",
                 "shim-unsigned",
                 "shim-unsigned-aarch64",
@@ -2435,9 +2435,7 @@
                 "libnvidia-container",
                 "mlnx-tools",
                 "mlx-bootctl",
-                "nvidia-container-runtime",
                 "nvidia-container-toolkit",
-                "nvidia-docker2",
                 "ofed-scripts",
                 "perftest"
             ]

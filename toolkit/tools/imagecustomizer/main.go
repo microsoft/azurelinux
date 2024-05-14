@@ -62,7 +62,7 @@ func main() {
 
 	err = customizeImage()
 	if err != nil {
-		log.Fatalf("image customization failed: %v", err)
+		log.Fatalf("image customization failed:\n%v", err)
 	}
 }
 

@@ -1,0 +1,36 @@
+
+experimental edk2 builds
+------------------------
+
+OVMF.stateless.fd
+OVMF.stateless.secboot.fd
+OVMF.stateless.secboot.pcr
+
+  Stateless (== no persistent uefi variables) ovmf build.  Has secure
+  boot support, the 'secboot' variant has secure boot enabled.  Does
+  not require SMM support.
+
+OVMF_CODE.4m.secboot.strictnx.fd
+
+  OVMF build with strict NX configuration (using r-x for code, rw- for
+  data).  Known to not work with some grub and linux kernel versions
+  because they use the wrong memory type for allocations and run into
+  NX faults.  Useful for bootloader development and CI.
+
+QEMU_EFI.strictnx.fd
+QEMU_EFI-strictnx-pflash.raw
+
+  ArmVirt build with strict NX configuration (see above for details).
+
+QEMU_EFI.secboot.testonly.fd
+QEMU_EFI-secboot-testonly-pflash.raw
+vars-template-secboot-testonly-pflash.raw
+
+  ArmVirt build with secure boot support.
+
+  Exposes the secure boot APIs, so they can be used for development /
+  testing / CI.
+
+  The EFI variable store is NOT protected, therefore the build is NOT
+  suitable for production use.
+

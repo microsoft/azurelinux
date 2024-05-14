@@ -8,8 +8,8 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.1.4
-Release: 8%{?dist}
+Version: 3.3.0
+Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://www.openssl.org/source/openssl-%{version}.tar.gz
@@ -59,10 +59,8 @@ Patch35:  0035-speed-skip-unavailable-dgst.patch
 Patch49:  0049-Allow-disabling-of-SHA1-signatures.patch
 # # Support SHA1 in TLS in LEGACY crypto-policy (which is SECLEVEL=1)
 Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
-# # https://github.com/openssl/openssl/pull/13817
-Patch79:  0079-RSA-PKCS15-implicit-rejection.patch
-# See notes in the patch for details, but this patch will not be needed if
-# the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
+# # See notes in the patch for details, but this patch will not be needed if
+# # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 
 License: Apache-2.0
@@ -91,6 +89,9 @@ BuildRequires: perl(Test::More)
 %endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+
+Recommends: SymCrypt
+Recommends: SymCrypt-OpenSSL
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -337,6 +338,7 @@ install -m644 %{SOURCE9} \
 %{_libdir}/*.so
 %{_mandir}/man3/*
 %{_libdir}/pkgconfig/*.pc
+%{_libdir}/cmake/OpenSSL/*.cmake
 
 %files static
 %{_libdir}/*.a
@@ -356,6 +358,12 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-1
+- Upgrade to 3.3.0
+
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-9
+- Add recommends on SymCrypt and SymCrypt-OpenSSL
+
 * Tue Apr 23 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-8
 - Add FIPS_mode patch back for compatibility
 

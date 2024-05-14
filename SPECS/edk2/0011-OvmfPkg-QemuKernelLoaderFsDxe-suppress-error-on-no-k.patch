@@ -1,0 +1,84 @@
+From 0328cfd1969da00e95a8671cfda9a8ed846fdd07 Mon Sep 17 00:00:00 2001
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed, 24 Jun 2020 11:31:36 +0200
+Subject: [PATCH 11/17] OvmfPkg/QemuKernelLoaderFsDxe: suppress error on no
+ "-kernel" in silent aa64 build (RH)
+
+Notes about the RHEL-8.3/20200603-ca407c7246bf [edk2-stable202005] ->
+RHEL-8.5/20210520-e1999b264f1f [edk2-stable202105] rebase:
+
+- Remove obsolete commit message tags related to downstream patch
+  management: Message-id, Patchwork-id, O-Subject, Acked-by, From,
+  RH-Acked-by, RH-Author (RHBZ#1846481).
+
+Bugzilla: 1844682
+
+If the "-kernel" QEMU option is not used, then QemuKernelLoaderFsDxe
+should return EFI_NOT_FOUND, so that the DXE Core can unload it. However,
+the associated error message, logged by the DXE Core to the serial
+console, is not desired in the silent edk2-aarch64 build, given that the
+absence of "-kernel" is nothing out of the ordinary. Therefore, return
+success and stay resident. The wasted guest RAM still gets freed after
+ExitBootServices().
+
+(Inspired by RHEL-8.1.0 commit aaaedc1e2cfd.)
+
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Miroslav Rezanina <mrezanin@redhat.com>
+(cherry picked from commit 9adcdf493ebbd11efb74e2905ab5f6c8996e096d)
+---
+ .../QemuKernelLoaderFsDxe.inf                  |  1 +
+ .../QemuKernelLoaderFsDxe.c                    | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf b/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
+index 7b35adb8e034..e0331c6e2cbc 100644
+--- a/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
++++ b/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
+@@ -28,6 +28,7 @@ [LibraryClasses]
+   BaseLib
+   BaseMemoryLib
+   DebugLib
++  DebugPrintErrorLevelLib
+   DevicePathLib
+   MemoryAllocationLib
+   QemuFwCfgLib
+diff --git a/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.c b/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.c
+index 3c12085f6c1e..e473c0b57345 100644
+--- a/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.c
++++ b/OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.c
+@@ -19,6 +19,7 @@
+ #include <Library/BaseMemoryLib.h>
+ #include <Library/BlobVerifierLib.h>
+ #include <Library/DebugLib.h>
++#include <Library/DebugPrintErrorLevelLib.h>
+ #include <Library/DevicePathLib.h>
+ #include <Library/MemoryAllocationLib.h>
+ #include <Library/QemuFwCfgLib.h>
+@@ -1081,6 +1082,23 @@ QemuKernelLoaderFsDxeEntrypoint (
+ 
+   if (KernelBlob->Data == NULL) {
+     Status = EFI_NOT_FOUND;
++ #if defined (MDE_CPU_AARCH64)
++    //
++    // RHBZ#1844682
++    //
++    // If the "-kernel" QEMU option is not being used, this platform DXE driver
++    // should return EFI_NOT_FOUND, so that the DXE Core can unload it.
++    // However, the associated error message, logged by the DXE Core to the
++    // serial console, is not desired in the silent edk2-aarch64 build, given
++    // that the absence of "-kernel" is nothing out of the ordinary. Therefore,
++    // return success and stay resident. The wasted guest RAM still gets freed
++    // after ExitBootServices().
++    //
++    if (GetDebugPrintErrorLevel () == DEBUG_ERROR) {
++      Status = EFI_SUCCESS;
++    }
++
++ #endif
+     goto FreeBlobs;
+   }
+ 
+-- 
+2.43.1
+

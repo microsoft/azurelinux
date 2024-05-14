@@ -1,0 +1,7 @@
+Error:
+failed to parse (tokenize) grub config file:
+unexpected end-of-file while parsing variable expansion (1:5)
+
+Tokens:
+WORD[1:1-1:5][0-4]
+  KEYWORD_STRING[1:1-1:2][0-1]("a")

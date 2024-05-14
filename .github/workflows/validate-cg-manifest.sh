@@ -49,7 +49,7 @@ ignore_no_source_tarball=" \
   pyproject-rpm-macros \
   python-rpm-generators \
   qt-rpm-macros \
-  sgx-backwards-compatability \
+  sgx-backwards-compatibility \
   verity-read-only-root \
   web-assets \
   ocaml-srpm-macros \

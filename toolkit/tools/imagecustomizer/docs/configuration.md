@@ -24,47 +24,49 @@ The Azure Linux Image Customizer is configured using a YAML (or JSON) file.
 4. Update hostname. ([hostname](#hostname-string))
 
 5. Copy additional files. ([additionalFiles](#additionalfiles-mapstring-fileconfig))
+  
+6. Copy additional directories. ([additionalDirs](#additionaldirs-dirconfig))
 
-6. Add/update users. ([users](#users-user))
+7. Add/update users. ([users](#users-user))
 
-7. Enable/disable services. ([services](#services-type))
+8. Enable/disable services. ([services](#services-type))
 
-8. Configure kernel modules. ([modules](#modules-module))
+9. Configure kernel modules. ([modules](#modules-module))
 
-9. Write the `/etc/mariner-customizer-release` file.
+10. Write the `/etc/mariner-customizer-release` file.
 
-10. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
+11. If [resetBootLoaderType](#resetbootloadertype-string) is set to `hard-reset`, then
     reset the boot-loader.
 
     If [resetBootLoaderType](#resetbootloadertype-string) is not set, then
     append the [extraCommandLine](#extracommandline-string) value to the existing
     `grub.cfg` file.
 
-11. Update the SELinux mode.
+12. Update the SELinux mode. [mode](#mode-string)
 
-12. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
+13. If ([overlays](#overlay-type)) are specified, then add the overlays dracut module
     and update the grub config.
 
-13. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
+14. If ([verity](#verity-type)) is specified, then add the dm-verity dracut driver
     and update the grub config.
 
-14. Regenerate the initramfs file (if needed).
+15. Regenerate the initramfs file (if needed).
 
-15. Run ([postCustomization](#postcustomization-script)) scripts.
+16. Run ([postCustomization](#postcustomization-script)) scripts.
 
-16. If SELinux is enabled, call `setfiles`.
+17. If SELinux is enabled, call `setfiles`.
 
-17. Delete `/etc/resolv.conf` file.
+18. Delete `/etc/resolv.conf` file.
 
-18. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
+19. Run finalize image scripts. ([finalizeCustomization](#finalizecustomization-script))
 
-19. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
+20. If [--shrink-filesystems](./cli.md#shrink-filesystems) is specified, then shrink
     the file systems.
 
-20. If ([verity](#verity-type)) is specified, then create the hash tree and update the
+21. If ([verity](#verity-type)) is specified, then create the hash tree and update the
     grub config.
 
-21. if the output format is set to `iso`, copy additional iso media files.
+22. if the output format is set to `iso`, copy additional iso media files.
 ([iso](#iso-type))
 
 ### /etc/resolv.conf
@@ -150,18 +152,28 @@ os:
       - [fileConfig type](#fileconfig-type)
         - [path](#fileconfig-path)
         - [permissions](#permissions-string)
+    - [additionalDirs](#additionaldirs-dirconfig)
+      - [dirConfig](#dirconfig-type)
+        - [sourcePath](#dirconfig-sourcePath)
+        - [destinationPath](#dirconfig-destinationPath)
+        - [newDirPermissions](#newdirpermissions-string)
+        - [mergedDirPermissions](#mergeddirpermissions-string)
+        - [childFilePermissions](#childfilepermissions-string)
     - [users](#users-user)
       - [user type](#user-type)
         - [name](#user-name)
         - [uid](#uid-int)
-        - [passwordHashed](#passwordhashed-bool)
-        - [password](#password-string)
-        - [passwordPath](#passwordpath-string)
+        - [password](#password-password)
+          - [password type](#password-type)
+            - [type](#password-type-type)
+            - [value](#password-type-value)
         - [passwordExpiresDays](#passwordexpiresdays-int)
         - [sshPublicKeyPaths](#sshpublickeypaths-string)
         - [primaryGroup](#primarygroup-string)
         - [secondaryGroups](#secondarygroups-string)
         - [startupCommand](#startupcommand-string)
+    - [selinux](#selinux-type)
+      - [mode](#mode-string)
     - [services](#services-type)
       - [enable](#enable-string)
       - [disable](#disable-string)
@@ -409,6 +421,65 @@ os:
       permissions: "664"
 ```
 
+## dirConfig type
+
+Specifies options for placing a directory in the OS.
+
+Type is used by: [additionalDirs](#additionaldirs-dirconfig)
+
+<div id="dirconfig-sourcePath"></div>
+
+### sourcePath [string]
+
+The absolute path to the source directory that will be copied.
+
+<div id="dirconfig-destinationPath"></div>
+
+### destinationPath [string]
+
+The absolute path in the target OS that the source directory will be copied to.
+
+Example:
+
+```yaml
+os:
+  additionalDirs:
+    - sourcePath: "home/files/targetDir"
+      destinationPath: "usr/project/targetDir"
+```
+
+### newDirPermissions [string]
+
+The permissions to set on all of the new directories being created on the target OS
+(including the top-level directory). Default value: `755`.
+
+### mergedDirPermissions [string]
+
+The permissions to set on the directories being copied that already do exist on the
+target OS (including the top-level directory). **Note:** If this value is not specified
+in the config, the permissions for this field will be the same as that of the
+pre-existing directory.
+
+### childFilePermissions [string]
+
+The permissions to set on the children file of the directory. Default value: `755`.
+
+Supported formats for permission values:
+
+- String containing an octal value. e.g. `664`
+
+Example:
+
+```yaml
+os:
+  additionalDirs:
+    - sourcePath: "home/files/targetDir"
+      destinationPath: "usr/project/targetDir"
+      newDirPermissions: "644"
+      mergedDirPermissions: "777"
+      childFilePermissions: "644"
+```
+
 ## fileSystem type
 
 Specifies the mount options for a partition.
@@ -449,64 +520,6 @@ If [resetBootLoaderType](#resetbootloadertype-string) is set to `"hard-reset"`, 
 
 If [resetBootLoaderType](#resetbootloadertype-string) is not set, then the
 `extraCommandLine` value will be appended to the existing `grub.cfg` file.
-
-### selinuxMode
-
-Specifies the mode to set SELinux to.
-
-If this field is not specified, then the existing SELinux mode in the base image is
-maintained.
-Otherwise, the image is modified to match the requested SELinux mode.
-
-The Azure Linux Image Customizer tool can enable SELinux on a base image with SELinux
-disabled and it can disable SELinux on a base image that has SELinux enabled.
-However, using a base image that already has the required SELinux mode will speed-up the
-customization process.
-
-If SELinux is enabled, then all the file-systems that support SELinux will have their
-file labels updated/reset (using the `setfiles` command).
-
-Supported options:
-
-- `disabled`: Disables SELinux.
-
-- `permissive`: Enables SELinux but only logs access rule violations.
-
-- `enforcing`: Enables SELinux and enforces all the access rules.
-
-- `force-enforcing`: Enables SELinux and sets it to enforcing in the kernel
-  command-line.
-  This means that SELinux can't be set to `permissive` using the `/etc/selinux/config`
-  file.
-
-Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
-This package contains the default SELinux rules and is required for SELinux-enabled
-images to be functional.
-The Azure Linux Image Customizer tool will report an error if the package is missing from
-the image.
-
-Note: If you wish to apply additional SELinux policies on top of the base SELinux
-policy, then it is recommended to apply these new policies using
-([postInstallScripts](#postinstallscripts-script)).
-After applying the policies, you do not need to call `setfiles` manually since it will
-called automatically after the `postInstallScripts` are run.
-
-Example:
-
-```yaml
-os:
-  kernelCommandLine:
-    selinuxMode: enforcing
-
-  packagesInstall:
-  # Required packages for SELinux.
-  - selinux-policy
-  - selinux-policy-modules
-  
-  # Optional packages that contain useful SELinux utilities.
-  - setools-console
-  - policycoreutils-python-utils
-```
 
 ## module type
 
@@ -777,6 +790,57 @@ Supported options:
 
   For further details, see: https://en.wikipedia.org/wiki/BIOS_boot_partition
 
+## password type
+
+Specifies a password for a user.
+
+WARNING: Passwords should not be used in images used in production.
+
+This feature is intended for debugging purposes only.
+As such, this feature has been disabled in official builds of the Image Customizer tool.
+
+Instead of using passwords, you should use an authentication system that relies on
+cryptographic keys.
+For example, SSH with Microsoft Entra ID authentication.
+
+Example:
+
+```yaml
+os:
+  users:
+  - name: test
+    password:
+      type: locked
+```
+
+<div id="password-type-type"></div>
+
+### type [string]
+
+The manner in which the password is provided.
+
+Supported options:
+
+- `locked`: Password login is disabled for the user. This is the default behavior.
+
+Options for debugging purposes only (disabled by default):
+
+- `plain-text`: The value is a plain-text password.
+
+- `hashed`: The value is a password that has been pre-hashed.
+  (For example, by using `openssl passwd`.)
+
+- `plain-text-file`: The value is a path to a file containing a plain-text password.
+
+- `hashed-file`: The value is a path to a file containing a pre-hashed password.
+
+<div id="password-type-value"></div>
+
+### value [string]
+
+The password's value.
+The meaning of this value depends on the type property.
+
 ## mountPoint type
 
 ### idType [string]
@@ -996,6 +1060,28 @@ os:
       permissions: "664"
 ```
 
+### additionalDirs [[dirConfig](#dirconfig-type)[]]
+
+Copy directories into the OS image.
+
+This property is a list of [dirConfig](#dirconfig-type) objects.
+
+Example:
+
+```yaml
+os:
+  additionalDirs:
+    # Copying directory with default permission options.
+    - sourcePath: "path/to/local/directory/"
+      destinationPath: "/path/to/destination/directory/"
+    # Copying directory with specific permission options.
+    - sourcePath: "path/to/local/directory/"
+      destinationPath: "/path/to/destination/directory/"
+      newDirPermissions: 0644
+      mergedDirPermissions: 0777
+      childFilePermissions: 0644
+```
+
 ### users [[user](#user-type)]
 
 Used to add and/or update user accounts.
@@ -1018,6 +1104,18 @@ Example:
 os:
   modules:
     - name: vfio
+```
+
+### selinux [[selinux](#selinux-type)]
+
+Options for configuring SELinux.
+
+Example:
+
+```yaml
+os:
+  selinux:
+    mode: permissive
 ```
 
 ### services [[services](#services-type)]
@@ -1067,61 +1165,11 @@ os:
     uid: 1000
 ```
 
-### passwordHashed [bool]
+### password [[password](#password-type)]
 
-Default: `false`.
+Specifies the user's password.
 
-When set to true, specifies that the password provided by either `password` or
-`passwordPath` has already been hashed and may be copied directly into the
-`/etc/shadow` file.
-
-Example:
-
-```yaml
-os:
-  users:
-  - name: test
-    # Generated by:
-    #   PASSWORD="password"
-    #   SALT=$(tr -dc "A-Za-z0-9" < /dev/urandom 2> /dev/null | head -c 12)
-    #   openssl passwd -6 -salt "$SALT" "$PASSWORD"
-    password: "$6$XH9YwqAMPohT$YQ0fqon.KOXz9AfjP5LE6VHifnNcsIgxmeX/iM5VF1GpFJTOpnTY.UGVRA.Xb8gYdVFqkYnnpJwlaIU1LhNHB/"
-    passwordHashed: true
-```
-
-Note: Modern GPUs have gotten incredibly good at brute forcing hashed passwords.
-While hashing passwords is still considered best practice, unless the password is
-incredibly strong (32+ randomly generated characters), then it is recommended
-that you treat a hashed password with the same care as a plain-text password.
-
-### password [string]
-
-Sets the user's password.
-
-Use of this property is strongly discouraged, except when debugging.
-
-Example:
-
-```yaml
-os:
-  users:
-  - name: test
-    password: testpassword
-```
-
-### passwordPath [string]
-
-Sets the user's password.
-The password is read from the file path specified.
-
-Example:
-
-```yaml
-os:
-  users:
-  - name: test
-    passwordPath: test-password.txt
-```
+WARNING: Passwords should not be used in images used in production.
 
 ### PasswordExpiresDays [int]
 
@@ -1144,6 +1192,9 @@ os:
 
 File paths to SSH public key files.
 These public keys will be copied into the user's `~/.ssh/authorized_keys` file.
+
+Note: It is preferable to use Microsoft Entra ID for SSH authentication, instead of
+individual public keys.
 
 Example:
 
@@ -1193,6 +1244,67 @@ os:
   users:
   - name: test
     startupCommand: /sbin/nologin
+```
+
+## selinux type
+
+### mode [string]
+
+Specifies the mode to set SELinux to.
+
+If this field is not specified, then the existing SELinux mode in the base image is
+maintained.
+Otherwise, the image is modified to match the requested SELinux mode.
+
+The Azure Linux Image Customizer tool can enable SELinux on a base image with SELinux
+disabled and it can disable SELinux on a base image that has SELinux enabled.
+However, using a base image that already has the required SELinux mode will speed-up the
+customization process.
+
+If SELinux is enabled, then all the file-systems that support SELinux will have their
+file labels updated/reset (using the `setfiles` command).
+
+Supported options:
+
+- `disabled`: Disables SELinux.
+
+- `permissive`: Enables SELinux but only logs access rule violations.
+
+- `enforcing`: Enables SELinux and enforces all the access rules.
+
+- `force-enforcing`: Enables SELinux and sets it to enforcing in the kernel
+  command-line.
+  This means that SELinux can't be set to `permissive` using the `/etc/selinux/config`
+  file.
+
+Note: For images with SELinux enabled, the `selinux-policy` package must be installed.
+This package contains the default SELinux rules and is required for SELinux-enabled
+images to be functional.
+The Azure Linux Image Customizer tool will report an error if the package is missing from
+the image.
+
+Note: If you wish to apply additional SELinux policies on top of the base SELinux
+policy, then it is recommended to apply these new policies using a
+([postCustomization](#postcustomization-script)) script.
+After applying the policies, you do not need to call `setfiles` manually since it will
+called automatically after the `postCustomization` scripts are run.
+
+Example:
+
+```yaml
+os:
+  selinux:
+    mode: enforcing
+
+  packages:
+    install:
+    # Required packages for SELinux.
+    - selinux-policy
+    - selinux-policy-modules
+    
+    # Optional packages that contain useful SELinux utilities.
+    - setools-console
+    - policycoreutils-python-utils
 ```
 
 ## storage type

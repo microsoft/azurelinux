@@ -128,7 +128,7 @@ func connectToImage(buildDir string, imageFilePath string, mounts []mountPoint) 
 
 func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/a.txt": {{Path: "/a.txt"}},
 			},
@@ -138,7 +138,7 @@ func TestValidateConfigValidAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files/missing_a.txt": {{Path: "/a.txt"}},
 			},
@@ -148,7 +148,7 @@ func TestValidateConfigMissingAdditionalFiles(t *testing.T) {
 
 func TestValidateConfigdditionalFilesIsDir(t *testing.T) {
 	err := validateConfig(testDir, &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			AdditionalFiles: imagecustomizerapi.AdditionalFilesMap{
 				"files": {{Path: "/a.txt"}},
 			},
@@ -204,7 +204,7 @@ func TestCustomizeImageKernelCommandLineAdd(t *testing.T) {
 
 	// Customize image.
 	config := &imagecustomizerapi.Config{
-		OS: imagecustomizerapi.OS{
+		OS: &imagecustomizerapi.OS{
 			KernelCommandLine: imagecustomizerapi.KernelCommandLine{
 				ExtraCommandLine: "console=tty0 console=ttyS0",
 			},

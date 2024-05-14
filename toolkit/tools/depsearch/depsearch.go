@@ -64,7 +64,7 @@ func main() {
 	}
 
 	if !(*maxDepth == -1 || *maxDepth >= 1) {
-		logger.Log.Fatalf("Invalid max depth '%d', valid ranges are -1, >=1", *maxDepth)
+		logger.Log.Fatalf("Invalid max depth %d, valid ranges are -1, >=1", *maxDepth)
 	}
 
 	// Only one of runtimeOnlyPlusBuild or runtimeOnly can be set
@@ -75,9 +75,9 @@ func main() {
 	// We can color the entries when using --tree, or limit the output in all modes with --rpm-filter
 	configureFilterFiles(filterFile, filter)
 	if len(*filterFile) > 0 && (*filter || *printTree) {
-		logger.Log.Infof("Applying package filter from '%s'", *filterFile)
+		logger.Log.Infof("Applying package filter from (%s)", *filterFile)
 	} else {
-		logger.Log.Infof("Filter file '%s' not applicable here", *filterFile)
+		logger.Log.Infof("Filter file (%s) not applicable here", *filterFile)
 	}
 
 	pkgSearchList := exe.ParseListArgument(*pkgsToSearch)
@@ -104,10 +104,10 @@ func main() {
 	}
 
 	if *reverseSearch {
-		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages...")
+		logger.Log.Infof("Reversed search will list all the dependencies of the provided packages")
 		outputGraph, root, err = buildRequiresGraph(graph, nodeSet)
 	} else {
-		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages...")
+		logger.Log.Infof("Forward search will list all dependants which rely on any of the provided packages")
 		outputGraph, root, err = buildDependsOnGraph(graph, nodeSet)
 	}
 
@@ -130,12 +130,12 @@ func configureFilterFiles(filterFile *string, filter *bool) {
 	}
 	isFile, err := file.PathExists(*filterFile)
 	if err != nil {
-		logger.Log.Panicf("Failed to query if filter file ('%s') exists: %s", *filterFile, err)
+		logger.Log.Panicf("Failed to query if filter file (%s) exists: %s", *filterFile, err)
 	}
 
 	// If we are just trying to use the default, its fine if its missing.
 	if !isFile && setDefault {
-		logger.Log.Warnf("Default toolchain filter file ('%s') not found, setting to ''", *filterFile)
+		logger.Log.Warnf("Default toolchain filter file (%s) not found, setting to ''", *filterFile)
 		*filterFile = ""
 	}
 
@@ -248,7 +248,7 @@ func isFilteredFile(path, filterFile string) bool {
 		if len(reservedFiles) == 0 {
 			reservedFileList, err := schedulerutils.ReadReservedFilesList(filterFile)
 			if err != nil {
-				logger.Log.Fatalf("Failed to load filter file '%s': %s", filterFile, err)
+				logger.Log.Fatalf("Failed to load filter file (%s): %s", filterFile, err)
 			}
 			reservedFiles = sliceutils.SliceToSet[string](reservedFileList)
 		}

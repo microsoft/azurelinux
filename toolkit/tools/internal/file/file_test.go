@@ -4,6 +4,8 @@
 package file
 
 import (
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -122,4 +124,128 @@ func TestRemoveDirectoryContentsNonExistent(t *testing.T) {
 	// Call the function to remove the contents of the directory
 	err = RemoveDirectoryContents(tempDir)
 	assert.Error(t, err)
+}
+
+func TestCopyDir(t *testing.T) {
+	workingDir, err := os.Getwd()
+	if !assert.NoError(t, err) {
+		return
+	}
+	testDir := filepath.Join(workingDir, "testdata")
+
+	// Defining and creating src directory
+	src := testDir + "/source"
+	err = os.MkdirAll(src, os.ModePerm)
+	assert.NoError(t, err)
+
+	// Adding test files into src directory
+	err = createTestFiles("testfile", src)
+	assert.NoError(t, err)
+
+	// Defining dst directory and child permissions
+	newDirPermissions := fs.FileMode(0755)
+	mergeDirPermissions := fs.FileMode(0755)
+	childFilePermissions := fs.FileMode(0755)
+
+	// Defining dst directory and copying src into dst
+	dst := testDir + "/destination"
+	err = CopyDir(src, dst, newDirPermissions, childFilePermissions, &mergeDirPermissions)
+	assert.NoError(t, err)
+
+	// verifying the directories are equal
+	equal, err := areDirectoriesEqual(src, dst)
+	assert.NoError(t, err)
+	assert.True(t, equal)
+
+	// Removing all test files and directories
+	err = os.RemoveAll(testDir)
+	assert.NoError(t, err)
+}
+
+func createTestFiles(filename string, outputDir string) error {
+	// Test data
+	testData := []byte{0x01, 0x02, 0x03, 0x04, 0x05}
+
+	// Test file names
+	outputFilepath1 := fmt.Sprintf("%s/%s.txt", outputDir, filename+"1")
+	outputFilepath2 := fmt.Sprintf("%s/%s.txt", outputDir, filename+"2")
+	err := os.MkdirAll(outputDir+"/innerTestDir", os.ModePerm)
+	if err != nil {
+		return err
+	}
+	outputFilepath3 := fmt.Sprintf("%s/innerTestDir/%s.txt", outputDir, filename+"3")
+
+	// Write data to files
+	err = os.WriteFile(outputFilepath1, testData, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(outputFilepath2, testData, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(outputFilepath3, testData, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	logger.Log.Infof("Test files created: %s, %s, %s,", outputFilepath1, outputFilepath2, outputFilepath3)
+	return nil
+}
+
+// AreDirectoriesEqual checks if two directories are equal based on their files.
+func areDirectoriesEqual(dir1, dir2 string) (bool, error) {
+	files1, err := ListFiles(dir1)
+	if err != nil {
+		return false, err
+	}
+
+	files2, err := ListFiles(dir2)
+	if err != nil {
+		return false, err
+	}
+
+	if len(files1) != len(files2) {
+		return false, nil
+	}
+
+	for i, file1 := range files1 {
+		if file1 != files2[i] {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+// ListFiles lists all files in a directory.
+func ListFiles(dir string) ([]string, error) {
+	var files []string
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			files = append(files, info.Name())
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func TestCommandExists(t *testing.T) {
+	exists, err := CommandExists("ls")
+	assert.NoError(t, err)
+	assert.True(t, exists)
+}
+
+func TestCommandExistsMissing(t *testing.T) {
+	exists, err := CommandExists("contoso")
+	assert.NoError(t, err)
+	assert.False(t, exists)
 }

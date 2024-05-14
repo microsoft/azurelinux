@@ -1,8 +1,8 @@
 %global bootstrap_compiler_version 1.19.12-1
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_revision  2
-%global ms_go_buildid   20240320.5
+%global ms_go_revision  1
+%global ms_go_buildid   20240403.5
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -15,8 +15,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.21.8
-Release:        1%{?dist}
+Version:        1.21.9
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -112,13 +112,10 @@ mkdir -p %{buildroot}%{gopath}/src/github.com/
 mkdir -p %{buildroot}%{gopath}/src/bitbucket.org/
 mkdir -p %{buildroot}%{gopath}/src/code.google.com/p/
 
+# This file is not necessary: recent Go toolsets have good defaults.
+# Keep the file, but leave it blank. This makes the upgrade path very simple.
 install -vdm755 %{buildroot}%{_sysconfdir}/profile.d
 cat >> %{buildroot}%{_sysconfdir}/profile.d/go-exports.sh <<- "EOF"
-export GOROOT=%{goroot}
-export GOPATH=%{_datadir}/gocode
-export GOHOSTOS=linux
-export GOHOSTARCH=%{gohostarch}
-export GOOS=linux
 EOF
 
 %post -p /sbin/ldconfig
@@ -144,6 +141,12 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed May 08 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-2
+- Remove explicit Go env variable defaults
+
+* Wed Apr 03 2024 Davis Goodin <dagood@microsoft.com> - 1.21.9-1
+- Bump version to 1.21.9-1
+
 * Thu Mar 21 2024 Davis Goodin <dagood@microsoft.com> - 1.21.8-1
 - Bump version to 1.21.8-1, build version to 1.21.8-2
 

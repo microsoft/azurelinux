@@ -1,0 +1,7 @@
+linux $bootprefix/$mariner_linux console=tty0 console=ttyS0 intel_iommu=on iommu=pt \
+    processor.max_cstate=1 intel_idle.max_cstate=0 msr.allow_writes=on \
+      default_hugepagesz=1G hugepagesz=1G hugepages=40 skew_tick=1 nohz=on \
+      nohz_full=2-31,34-63 rcu_nocbs=2-31,34-63 systemd.cpu_affinity=0,1,32,33 \
+      rcu_nocb_poll nmi_watchdog=0 idle=poll kthread_cpus=0,1,32,33 \
+      irqaffinity=0,1,32,33 isolcpus=nohz,domain,managed_irq,2-31,34-63 \
+      tsc=reliable iomem=relaxed nosoftlockup net.ifnames=1 audit=0 rd.luks=0

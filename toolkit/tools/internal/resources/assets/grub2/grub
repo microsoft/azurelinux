@@ -3,7 +3,7 @@ GRUB_DISTRIBUTOR="AzureLinux"
 GRUB_DISABLE_SUBMENU=y
 GRUB_TERMINAL_OUTPUT="console"
 GRUB_CMDLINE_LINUX="{{.LuksUUID}} {{.LVM}} {{.IMAPolicy}} {{.ReadOnlyVerityRoot}} {{.SELinux}} {{.FIPS}} rd.auto=1 net.ifnames=0 lockdown=integrity {{.CGroup}}"
-GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} $kernelopts"
+GRUB_CMDLINE_LINUX_DEFAULT="{{.ExtraCommandLine}} \$kernelopts"
     
 # =============================notice===============================
 # IMPORTANT: package and feature-specific behaviors are defined in
