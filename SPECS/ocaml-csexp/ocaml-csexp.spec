@@ -151,6 +151,7 @@ EOF
 
 %changelog
 * Tue Apr 30 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.5.2-4
+- Converted spec file to match with Fedora 41.
 - Upgraded to 1.5.2.
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3.2-4

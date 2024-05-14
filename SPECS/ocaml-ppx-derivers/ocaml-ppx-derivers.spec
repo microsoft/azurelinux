@@ -54,6 +54,7 @@ developing applications that use %{name}.
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.2.1-20
+- Converted spec file to match with Fedora 41.
 - Removing not needed build requirement and updating the build process
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2.1-19

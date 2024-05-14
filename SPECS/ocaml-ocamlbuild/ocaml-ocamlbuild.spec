@@ -94,6 +94,7 @@ popd
 
 %changelog
 * Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.14.3-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 0.14.3
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.14.2-1

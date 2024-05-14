@@ -1,9 +1,5 @@
 %global srcname cinaps
 
-# This package is needed to build ppx_jane, but its tests require ppx_jane.
-# Break the dependency cycle here.
-%bcond_with test
-
 Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 Name:           ocaml-%{srcname}
 Version:        0.15.1
@@ -19,7 +15,7 @@ BuildRequires:  ocaml >= 5.1.1
 BuildRequires:  ocaml-dune >= 2.0.0
 BuildRequires:  ocaml-re-devel >= 1.8.0
 
-%if %{with test}
+%if %{with_check}
 BuildRequires:  ocaml-ppx-jane-devel
 %endif
 
@@ -45,7 +41,7 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n cinaps-%{version}
+%autosetup -n %{srcname}-%{version}
 
 %build
 %dune_build
@@ -58,7 +54,7 @@ mkdir -p %{buildroot}%{_mandir}/man1
 help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
   %{buildroot}%{_mandir}/man1/cinaps.1
 
-%if %{with test}
+%if %{with_check}
 %check
 %dune_check
 %endif
@@ -72,6 +68,7 @@ help2man -N --version-string=%{version} %{buildroot}%{_bindir}/cinaps > \
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.15.1-4
+- Converted spec file to match with Fedora 41.
 - Rebuild with ocaml >= 5.1.1
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.1-3

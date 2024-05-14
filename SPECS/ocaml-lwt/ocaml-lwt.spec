@@ -134,6 +134,7 @@ rm -rf %{buildroot}%{ocamldir}/lwt_ppx_let
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.7.0-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 5.7.0
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 5.4.1-9

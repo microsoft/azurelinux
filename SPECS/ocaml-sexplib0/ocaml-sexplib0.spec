@@ -45,6 +45,7 @@ developing applications that use %{name}.
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.16.0-2
+- Converted spec file to match with Fedora 41.
 - Updated build requirements to use ocaml >= 5.1.1
 - Removed ocaml-findlib build req
 

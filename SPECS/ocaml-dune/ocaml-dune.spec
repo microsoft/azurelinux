@@ -487,6 +487,7 @@ cd -
 
 %changelog
 * Fri Apr 26 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 3.15.2-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to version 3.15.2
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.8.5-3

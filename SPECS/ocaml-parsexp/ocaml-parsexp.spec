@@ -69,6 +69,7 @@ developing applications that use %{name}.
 
 %changelog
 * Thu May 02 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.16.0-1
+- Converted spec file to match with Fedora 41.
 - Upgraded to version 0.16.0
 
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1

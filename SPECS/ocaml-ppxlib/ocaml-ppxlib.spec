@@ -76,6 +76,7 @@ signature files for developing applications that use
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.31.0-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 0.31.0
 
 * Fri May 19 2023 Olivia Crain <oliviacrain@microsoft.com> - 0.24.0-3

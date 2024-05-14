@@ -47,6 +47,7 @@ signature files for developing applications that use
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 0.12.4-2
+- Converted spec file to match with Fedora 41.
 - Rebuild for OCaml 5.1.1 and dune >= 2.8
 
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.4-1

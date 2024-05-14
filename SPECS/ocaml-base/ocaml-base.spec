@@ -3,10 +3,6 @@
 # tests at all until we are able to add ppx_jane.
 %global srcname base
 
-# This package is needed to build ppx_jane, but its tests require ppx_jane.
-# Break the dependency cycle here.
-%bcond_with test
-
 Summary:        Jane Street standard library for OCaml
 Name:           ocaml-%{srcname}
 Version:        0.16.3
@@ -24,7 +20,7 @@ BuildRequires:  ocaml-dune >= 2.0.0
 BuildRequires:  ocaml-dune-configurator-devel
 BuildRequires:  ocaml-sexplib0-devel >= 0.16
 
-%if %{with test}
+%if %{with_check}
 BuildRequires:  ocaml-num-devel
 BuildRequires:  ocaml-ppx-jane-devel
 BuildRequires:  ocaml-sexplib-devel
@@ -52,7 +48,7 @@ The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
 %prep
-%autosetup -n base-%{version} -p1
+%autosetup -n %{srcname}-%{version} -p1
 
 %build
 %dune_build
@@ -60,7 +56,7 @@ developing applications that use %{name}.
 %install
 %dune_install
 
-%if %{with test}
+%if %{with_check}
 %check
 %dune_check
 %endif
@@ -73,6 +69,7 @@ developing applications that use %{name}.
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.3-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 0.16.3
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.15.0-2

@@ -101,6 +101,7 @@ sed -i '\@%{_datadir}@d' .ofiles
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 2.0.0-1
+- Converted spec file to match with Fedora 41.
 - Upgraded to version 2.0.0
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.2-9

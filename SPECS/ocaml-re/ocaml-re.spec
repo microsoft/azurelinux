@@ -61,7 +61,8 @@ sed -i 's/oUnit/ounit2/' lib_test/fort_unit/dune
 
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsft.com> - 1.11.0-1
-- Upgrade to 1.11.0 for
+- Converted spec file to match with Fedora 41.
+- Upgrade to 1.11.0
 - Use ocaml >= 5.1.1 to build
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.0-21

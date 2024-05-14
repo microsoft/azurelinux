@@ -86,6 +86,7 @@ cp -p vim/syntax/sexplib.vim %{buildroot}%{vimfiles_root}/syntax
 
 %changelog
 * Wed May 01 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.16.0-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 0.16.0
 
 * Tue Jan 18 2022 Thomas Crain <thcrain@microsoft.com> - 0.15.0-1

@@ -106,6 +106,7 @@ sed -i '/ocamlfind\.conf/d' .ofiles
 
 %changelog
 * Thu Apr 25 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.9.6-1
+- Converted spec file to match with Fedora 41.
 - Upgrading to version 1.9.6
 
 * Wed Mar 30 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.8.1-16

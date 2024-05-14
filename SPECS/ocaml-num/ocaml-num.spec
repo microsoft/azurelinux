@@ -94,6 +94,7 @@ mkdir -p $OCAMLFIND_DESTDIR/stublibs
 %changelog
 * Fri May 03 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.5-1
 - Upgrade to 1.5
+- Converted spec file to match with Fedora 41.
 - use ocaml >= 5.1.1
 
 * Fri Apr 29 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.3-2

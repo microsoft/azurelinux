@@ -64,6 +64,7 @@ developing applications that use %{name}.
 
 %changelog
 * Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.6.4-1
+- Converted spec file to match with Fedora 41.
 - Upgrade to 0.6.4
 - Use ocaml 5.1.1 to build
 

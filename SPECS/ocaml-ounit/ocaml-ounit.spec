@@ -110,6 +110,7 @@ files for developing applications that use %{name}-lwt.
 
 %changelog
 * Mon Apr 29 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.2.7-1
+- Converted spec file to match with Fedora 41.
 - Upgraded to 2.2.7
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.2.2-6

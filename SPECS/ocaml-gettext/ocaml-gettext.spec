@@ -137,7 +137,7 @@ cat .ofiles-gettext-stub-devel >> .ofiles-gettext-devel
 
 %changelog
 * Tue May 07 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 0.4.2-3
-- Update build requirements and build process
+- Converted spec file to match with Fedora 41.
 - Use ocaml 5.1.1 to build
 
 * Thu Mar 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.4.2-2

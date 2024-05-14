@@ -90,8 +90,6 @@ install -p -m 0644 %SOURCE2 %{buildroot}%{site_lisp}
 echo "(setq source-directory \"%{_datadir}/emacs/%{version}/\")" \
  >> %{buildroot}%{site_lisp}/site-start.el
 
-mkdir -p %{buildroot}%{site_lisp}/site-start.d
-
 #
 # Create file lists
 #
@@ -104,10 +102,6 @@ rm -f *-filelist {common,el}-*-files
     \( -type f -name '*.elc' -fprint $TOPDIR/common-lisp-none-elc-files \) -o \( -type d -fprintf $TOPDIR/common-lisp-dir-files "%%%%dir %%p\n" \) -o \( -name '*.el.gz' -fprint $TOPDIR/el-bytecomped-files -o -fprint $TOPDIR/common-not-comped-files \)
  
 )
-
-# Put the lists together after filtering  ./usr to /usr
-sed -i -e "s|\.%{_prefix}|%{_prefix}|" *-files
-grep -vhE '%{site_lisp}(|/(default\.el|site-start\.d|site-start\.el))$' {common,el}-*-files > common-filelist
 
 %files
 %defattr(-,root,root)
