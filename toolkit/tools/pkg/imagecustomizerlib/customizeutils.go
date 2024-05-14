@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagecustomizerapi"
@@ -478,8 +477,7 @@ func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArg
 ) error {
 	var err error
 
-	extraCommandLine := strings.TrimSpace(string(kernelExtraArguments))
-	if extraCommandLine == "" {
+	if kernelExtraArguments == "" {
 		// Nothing to do.
 		return nil
 	}
@@ -491,7 +489,7 @@ func addKernelCommandLine(kernelExtraArguments imagecustomizerapi.KernelExtraArg
 		return err
 	}
 
-	err = bootCustomizer.AddKernelCommandLine(extraCommandLine)
+	err = bootCustomizer.AddKernelCommandLine(string(kernelExtraArguments))
 	if err != nil {
 		return err
 	}

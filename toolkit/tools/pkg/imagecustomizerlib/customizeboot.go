@@ -202,6 +202,8 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, err
 	return args, insertAt, nil
 }
 
+// Takes a tokenized grub.cfg file and looks for an appropriate place to insert new args.
+// Specifically, it looks for the index of the $kernelopts args.
 func findCommandLineInsertAt(argTokens []grub.Token) (int, error) {
 	insertAtTokens := []grub.Token(nil)
 	for i := range argTokens {
@@ -232,6 +234,7 @@ func findCommandLineInsertAt(argTokens []grub.Token) (int, error) {
 	return insertAt, nil
 }
 
+// Takes a tokenized grub.cfg file and makes a best effort to extract the kernel command-line args.
 func parseCommandLineArgs(argTokens []grub.Token) ([]grubConfigLinuxArg, error) {
 	args := []grubConfigLinuxArg(nil)
 
@@ -318,6 +321,15 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 }
 
 // Finds an existing kernel command-line arg and replaces its value.
+//
+// Params:
+// - inputGrubCfgContent: The string contents of the grub.cfg file.
+// - name: The name of the command-line arg to replace.
+// - value: The value to set the command-line arg to.
+//
+// Returns:
+// - outputGrubCfgContent: The new string contents of the grub.cfg file.
+// - oldValue: The previous value of the arg.
 func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, value string,
 ) (outputGrubCfgContent string, oldValue string, err error) {
 	newArg := fmt.Sprintf("%s=%s", name, value)
@@ -346,6 +358,14 @@ func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, v
 }
 
 // Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
+//
+// Params:
+// - grub2Config: The string contents of the grub.cfg file.
+// - argsToRemove: A list of arg names to remove from the command-line args.
+// - newArgs: A list of new arg values to add to the command-line args.
+//
+// Output:
+// - grub2Config: The new string contents of the grub.cfg file.
 func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
 	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
 	if err != nil {
@@ -398,6 +418,8 @@ func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, 
 	return value, nil
 }
 
+// Takes a list of unescaped and unquoted kernel command-line args and combines them into a single string with
+// appropriate quoting for a grub.cfg file.
 func grubArgsToString(args []string) string {
 	builder := strings.Builder{}
 	for i, arg := range args {
@@ -413,6 +435,7 @@ func grubArgsToString(args []string) string {
 	return combinedString
 }
 
+// Converts an SELinux mode into the list of required command-line args for that mode.
 func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, error) {
 	newSELinuxArgs := []string(nil)
 	switch selinuxMode {
@@ -516,6 +539,9 @@ func replaceSetCommandValue(grub2Config string, varName string, newValue string)
 	return grub2Config, nil
 }
 
+// Takes a list of kernel command-line args and calculates the SELinux mode that is set.
+// If the command-line args delegate the SELinux mode to the /etc/selinux/config file, then SELinuxModeDefault ("") is
+// returned.
 func getSELinuxModeFromLinuxArgs(args []grubConfigLinuxArg) (imagecustomizerapi.SELinuxMode, error) {
 	// Try to find any existing SELinux args.
 	securityValue, err := findKernelCommandLineArgValue(args, "security")
@@ -548,6 +574,7 @@ func getSELinuxModeFromLinuxArgs(args []grubConfigLinuxArg) (imagecustomizerapi.
 	return imagecustomizerapi.SELinuxModeDefault, nil
 }
 
+// Gets the SELinux mode set by the /etc/selinux/config file.
 func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
 	selinuxConfigFilePath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 
@@ -582,6 +609,7 @@ func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomiz
 	}
 }
 
+// Reads the /boot/grub2/grub.cfg file.
 func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
 	logger.Log.Debugf("Reading grub.cfg file")
 
@@ -596,6 +624,7 @@ func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
 	return grub2Config, nil
 }
 
+// Writes the /boot/grub2/grub.cfg file.
 func writeGrub2ConfigFile(grub2Config string, imageChroot *safechroot.Chroot) error {
 	logger.Log.Debugf("Writing grub.cfg file")
 
@@ -614,6 +643,7 @@ func getGrub2ConfigFilePath(imageChroot *safechroot.Chroot) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubCfgFile)
 }
 
+// Regenerates the initramfs file.
 func regenerateInitrd(imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Regenerate initramfs file")
 
