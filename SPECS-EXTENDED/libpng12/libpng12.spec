@@ -5,7 +5,7 @@ Name: libpng12
 Version: 1.2.57
 Release: 16%{?dist}
 License: zlib
-URL: http://www.libpng.org/pub/png/
+URL: https://www.libpng.org/pub/png/
 
 Source0: https://downloads.sourceforge.net/project/libpng/%{name}/older-releases/%{version}/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 

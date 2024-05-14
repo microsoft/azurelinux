@@ -12,7 +12,7 @@
 \
 This allows you to write CommonMark inside of Docutils & Sphinx projects.\
 \
-Documentation is available on Read the Docs: http://recommonmark.readthedocs.org
+Documentation is available on Read the Docs: https://recommonmark.readthedocs.org
 
 Name:           python-%{github_name}
 Version:        0.6.0

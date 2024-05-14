@@ -4,7 +4,7 @@ Name: hunspell-br
 Summary: Breton hunspell dictionaries
 Version: 0.15
 Release: 7%{?dist}
-URL: http://www.drouizig.org/
+URL: https://www.drouizig.org/
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2207/7/dict-br-0.15.oxt
 License: LGPLv2+
 BuildArch: noarch

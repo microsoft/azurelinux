@@ -25,8 +25,8 @@ License:        Apache-2.0
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://xerces.apache.org/xml-commons/components/resolver/
-Source0:        http://www.apache.org/dist/xerces/xml-commons/%{name}-%{version}.tar.gz
+URL:            https://xerces.apache.org/xml-commons/components/resolver/
+Source0:        https://www.apache.org/dist/xerces/xml-commons/%{name}-%{version}.tar.gz
 Source1:        %{name}-pom.xml
 Source2:        %{name}-resolver.1
 Source3:        %{name}-xparse.1

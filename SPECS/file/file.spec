@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.darwinsys.com/file
-Source0:        http://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
+Source0:        https://ftp.astron.com/pub/file/%{name}-%{version}.tar.gz
 Requires:       %{name}-libs = %{version}-%{release}
 Conflicts:      toybox
 

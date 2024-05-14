@@ -13,13 +13,13 @@ Release:	39%{?dist}
 # - RSA license: src\CLucene\util\MD5Digester.cpp
 # - BSD license: cmake/MacroCheckGccVisibility.cmake, MacroEnsureVersion.cmake, and src/core/util/Compress.cpp
 License:	(ASL 2.0 or LGPLv2+) and BSD and RSA
-URL:		http://www.sourceforge.net/projects/clucene
+URL:		https://www.sourceforge.net/projects/clucene
 %if 0%{?snap}
 #  git archive e8e3d20f20da5ee3e37d347207b01890829a5475 --prefix=clucene-core-2.3.3.4/ | xz -9 > ../clucene-core-2.3.3.4-e8e3d20.tar.xz
 Source0:	%{_distro_sources_url}/clucene-core-2.3.3.4-%{git_short}.tar.xz
 
 %else
-Source0:	http://downloads.sourceforge.net/clucene/clucene-core-%{version}.tar.gz
+Source0:	https://downloads.sourceforge.net/clucene/clucene-core-%{version}.tar.gz
 %endif
 
 BuildRequires:	boost-devel
@@ -46,7 +46,7 @@ Patch53: clucene-core-2.3.3.4-usleep.patch
 
 %description
 CLucene is a C++ port of the popular Apache Lucene search engine
-(http://lucene.apache.org/java). 
+(https://lucene.apache.org/java). 
 CLucene aims to be a high-speed alternative to Java Lucene, its API is very
 similar to that of the Java version. CLucene has recently been brought up to
 date with Lucene 2.3.2. It contains most of the same functionality as the Java version.
@@ -57,7 +57,7 @@ Provides:	clucene = %{version}-%{release}
 #Requires: %{name} = %{version}-%{release}
 %description core
 CLucene is a C++ port of the popular Apache Lucene search engine
-(http://lucene.apache.org/java).
+(https://lucene.apache.org/java).
 CLucene aims to be a high-speed alternative to Java Lucene, its API is very
 similar to that of the Java version. CLucene has recently been brought up to
 date with Lucene 2.3.2. It contains most of the same functionality as the Java version.

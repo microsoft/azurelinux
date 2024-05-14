@@ -8,11 +8,11 @@ Name:      tn5250
 Version:   0.17.4
 Release:   26%{?dist}
 License:   LGPLv2+
-Source:    http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source:    https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:   xt5250.desktop
 # https://github.com/sharkcz/tn5250/tree/fedora
 Patch0:    tn5250-0.17.4-fedora.patch
-URL:       http://tn5250.sourceforge.net/
+URL:       https://tn5250.sourceforge.net/
 Requires:  dialog
 Requires:  xterm
 Requires:  hicolor-icon-theme

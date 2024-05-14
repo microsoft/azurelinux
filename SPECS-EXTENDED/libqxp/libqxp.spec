@@ -8,8 +8,8 @@ Release: 7%{?dist}
 Summary: Library for import of QuarkXPress documents
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libqxp
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libqxp
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

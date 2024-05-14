@@ -20,9 +20,9 @@ Summary:	IPA dictionary for MeCab
 
 License:	mecab-ipadic
 URL:		https://sourceforge.net/projects/mecab
-Source0:	http://downloads.sourceforge.net/mecab/%{name}-%{majorver}-%{date}.tar.gz
-#Source2:	http://www.icot.or.jp/ARCHIVE/terms-and-conditions-for-IFS-J.html
-Source2:	http://www.jipdec.or.jp/icot/ARCHIVE/terms-and-conditions-for-IFS-J.html
+Source0:	https://downloads.sourceforge.net/mecab/%{name}-%{majorver}-%{date}.tar.gz
+#Source2:	https://www.icot.or.jp/ARCHIVE/terms-and-conditions-for-IFS-J.html
+Source2:	https://www.jipdec.or.jp/icot/ARCHIVE/terms-and-conditions-for-IFS-J.html
 Source3:	LICENSE.Fedora
 
 BuildRequires:	mecab-devel >= %{mecabver}

@@ -6,7 +6,7 @@ Version: 3.1.0
 Release: 11%{?dist}
 License: ASL 2.0
 Source0: https://github.com/jmacd/xdelta-devel/releases/download/v%{version}/xdelta3-%{version}.tar.gz
-URL: http://xdelta.org/
+URL: https://xdelta.org/
 
 # for testsuite
 BuildRequires:  gcc, gcc-c++
@@ -17,7 +17,7 @@ BuildRequires: sudo
 %endif
 
 # Man page day fixes
-# ~> proposal: http://code.google.com/p/xdelta/issues/detail?id=158
+# ~> proposal: https://code.google.com/p/xdelta/issues/detail?id=158
 # ~> private #958492
 Patch1: xdelta-3.0.6-man-page-day.patch
 

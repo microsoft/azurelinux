@@ -6,8 +6,8 @@ Release:       20%{?dist}
 Summary:       Daemon for communicating with Apple's iOS devices
 # All code is dual licenses as GPLv3+ or GPLv2+, except libusbmuxd which is LGPLv2+.
 License:       GPLv3+ or GPLv2+
-URL:           http://www.libimobiledevice.org/
-Source0:       http://www.libimobiledevice.org/downloads/%{name}-%{version}.tar.bz2
+URL:           https://www.libimobiledevice.org/
+Source0:       https://www.libimobiledevice.org/downloads/%{name}-%{version}.tar.bz2
 
 BuildRequires: gcc
 BuildRequires: libimobiledevice-devel

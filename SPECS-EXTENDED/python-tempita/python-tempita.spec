@@ -7,7 +7,7 @@ Release:        1%{?dist}
 Summary:        A very small text templating language
 
 License:        MIT
-URL:            http://pythonpaste.org/tempita/
+URL:            https://pythonpaste.org/tempita/
 Source0:        https://pypi.python.org/packages/source/T/Tempita/Tempita-%{version}.tar.gz
 Source1:        %{name}-LICENSE.txt
 Patch0001:      0001-Fix-SyntaxError-multiple-exception-types-must-be-par.patch
@@ -28,8 +28,8 @@ Summary:        A very small text templating language
 # Without one of these there's no aes implementation which means there's no way to
 # have encrypted cookies.  This is a reduction in features over the python2 version.
 # Currently there's no working python3 port for either:
-# http://allmydata.org/trac/pycryptopp/ticket/35
-# http://lists.dlitz.net/pipermail/pycrypto/2010q2/000253.html
+# https://allmydata.org/trac/pycryptopp/ticket/35
+# https://lists.dlitz.net/pipermail/pycrypto/2010q2/000253.html
 #%if 0%{?fedora}
 #Requires: python3-pycryptopp
 #%else
@@ -160,7 +160,7 @@ sed -i '/use_2to3/d' setup.py
 
 * Wed Aug 25 2010 Thomas Spura <tomspur@fedoraproject.org> - 0.4-6
 - rebuild with python3.2
-  http://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
+  https://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
 
 * Tue Aug  3 2010 Kyle VanderBeek <kylev@kylev.com> - 0.4-5
 - Add python3-tempita subpackage.

@@ -8,8 +8,8 @@ Release: 4%{?dist}
 Summary: A library for import of Microsoft Visio diagrams
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libvisio
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libvisio
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

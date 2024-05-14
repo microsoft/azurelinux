@@ -3,7 +3,7 @@ Name:           libevent
 Version:        2.1.12
 Release:        1%{?dist}
 License:        BSD
-URL:            http://libevent.org 
+URL:            https://libevent.org 
 Source0:        https://github.com/%{name}/%{name}/releases/download/release-%{version}-stable/%{name}-%{version}-stable.tar.gz
 Group:          System/Library
 Vendor:         Microsoft Corporation

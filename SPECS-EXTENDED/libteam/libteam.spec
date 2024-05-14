@@ -5,8 +5,8 @@ Summary: Library for controlling team network device
 License: LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.libteam.org
-Source: http://www.libteam.org/files/libteam-%{version}.tar.gz
+URL: https://www.libteam.org
+Source: https://www.libteam.org/files/libteam-%{version}.tar.gz
 
 BuildRequires: gcc
 BuildRequires: jansson-devel

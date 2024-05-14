@@ -6,7 +6,7 @@ License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/react
-Source0:        http://erratique.ch/software/react/releases/react-%{version}.tbz
+Source0:        https://erratique.ch/software/react/releases/react-%{version}.tbz
 
 BuildRequires:  ocaml >= 4.01.0
 BuildRequires:  ocaml-findlib-devel

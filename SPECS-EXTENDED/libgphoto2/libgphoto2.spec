@@ -11,9 +11,9 @@ Release:        2%{?dist}
 Summary:        Library for accessing digital cameras
 # GPLV2+ for the main lib (due to exif.c) and most plugins, some plugins GPLv2
 License:        GPLv2+ and GPLv2
-URL:            http://www.gphoto.org/
+URL:            https://www.gphoto.org/
 
-Source0:        http://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/gphoto/%{name}-%{version}.tar.bz2
 Patch1:         gphoto2-pkgcfg.patch
 Patch2:         gphoto2-device-return.patch
 
@@ -400,7 +400,7 @@ rm -rf %{buildroot}%{_datadir}/libgphoto2_port/*/vcamera/
 - update storage patch
 
 * Sun Aug 09 2009 David Zeuthen <davidz@redhat.com> 2.4.6-3
-- Add patch from http://sourceforge.net/tracker/?func=detail&aid=2801117&group_id=8874&atid=308874
+- Add patch from https://sourceforge.net/tracker/?func=detail&aid=2801117&group_id=8874&atid=308874
   and generate generic udev rules for device identification (ID_GPHOTO2* properties)
 
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.4.6-2

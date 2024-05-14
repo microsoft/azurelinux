@@ -6,9 +6,9 @@ Summary: Editor/admin tool for GConf
 Name: gconf-editor
 Version: 3.0.1
 Release: 20%{?dist}
-URL: http://www.gnome.org
+URL: https://www.gnome.org
 #VCS: git:git://git.gnome.org/gconf-editor
-Source0: http://download.gnome.org/sources/gconf-editor/3.0/%{name}-%{version}.tar.xz
+Source0: https://download.gnome.org/sources/gconf-editor/3.0/%{name}-%{version}.tar.xz
 License: GPLv2+ and GFDL
 
 Requires(pre): GConf2 >= %{gconf2_version}

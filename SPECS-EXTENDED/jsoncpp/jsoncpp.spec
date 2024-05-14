@@ -26,7 +26,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  python3-devel
 
 %description
-%{name} is an implementation of a JSON (http://json.org) reader and writer in
+%{name} is an implementation of a JSON (https://json.org) reader and writer in
 C++. JSON (JavaScript Object Notation) is a lightweight data-interchange format.
 It is easy for humans to read and write. It is easy for machines to parse and
 generate.

@@ -5,10 +5,10 @@ Summary: Icelandic hyphenation rules
 %global upstreamid 20030920
 Version: 0.%{upstreamid}
 Release: 24%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_is_IS.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_is_IS.zip
 Source1: hyphen-is-LICENSE.txt
 Patch0: hyphen-is-lppl-license-fix.patch
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPLv2+ or SISSL
 BuildArch: noarch
 

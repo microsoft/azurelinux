@@ -34,7 +34,7 @@ Distribution:   Azure Linux
 %endif
 
 # main (empty) package
-# http://www.rpm.org/max-rpm/s1-rpm-subpack-spec-file-changes.html
+# https://www.rpm.org/max-rpm/s1-rpm-subpack-spec-file-changes.html
 
 Name: kronosnet
 Summary: Multipoint-to-Multipoint VPN daemon

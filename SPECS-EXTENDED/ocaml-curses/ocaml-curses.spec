@@ -8,8 +8,8 @@ Release:        13%{?dist}
 Summary:        OCaml bindings for ncurses
 License:        LGPLv2+
 
-URL:            http://savannah.nongnu.org/projects/ocaml-tmk/
-Source0:        http://download.savannah.gnu.org/releases/ocaml-tmk/%{name}-%{version}.tar.gz
+URL:            https://savannah.nongnu.org/projects/ocaml-tmk/
+Source0:        https://download.savannah.gnu.org/releases/ocaml-tmk/%{name}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.00.1
 BuildRequires:  ocaml-findlib-devel >= 1.3.3-3
@@ -242,7 +242,7 @@ ocamlfind install curses META *.cmi *.cma *.a *.so *.mli
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Thu Jan 06 2011 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-9
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Wed Dec 30 2009 Richard W.M. Jones <rjones@redhat.com> - 1.0.3-8
 - Rebuild for OCaml 3.11.2.

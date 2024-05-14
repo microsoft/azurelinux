@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://libxmlplusplus.sourceforge.net/
+URL:            https://libxmlplusplus.sourceforge.net/
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/%{name}/%{majver}/%{name}-%{version}.tar.xz
 BuildRequires:  glibmm-devel
 BuildRequires:  libxml2-devel

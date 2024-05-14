@@ -27,8 +27,8 @@ Release:        17%{?dist}
 Summary:        Apache Commons Lang Package
 License:        ASL 2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/%{base_name}
-Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+URL:            https://commons.apache.org/%{base_name}
+Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Patch0:         fix_StopWatchTest_for_slow_systems.patch
 Patch1:         0002-Fix-FastDateFormat-for-Java-7-behaviour.patch
 Patch2:         commons-lang-bundle-manifest.patch
@@ -155,8 +155,8 @@ cp -pr target/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 - Depend on junit not junit4
 * Fri Sep  6 2013 mvyskocil@suse.com
 - update to 2.6 (bugfix release)
-  * see http://commons.apache.org/proper/commons-lang/release-notes/RELEASE-NOTES-2.6.txt
-  * see http://commons.apache.org/proper/commons-lang/release-notes/RELEASE-NOTES-2.5.txt
+  * see https://commons.apache.org/proper/commons-lang/release-notes/RELEASE-NOTES-2.6.txt
+  * see https://commons.apache.org/proper/commons-lang/release-notes/RELEASE-NOTES-2.5.txt
 - use new add_maven_depmap macro
 - drop jakarta-commons-lang-build.patch
 * Wed Jan 27 2010 mvyskocil@suse.cz

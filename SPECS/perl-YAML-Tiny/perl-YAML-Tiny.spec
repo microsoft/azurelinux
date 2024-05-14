@@ -5,7 +5,7 @@ Version:        1.74
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/YAML-Tiny/
+URL:            https://search.cpan.org/dist/YAML-Tiny/
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/YAML-Tiny-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

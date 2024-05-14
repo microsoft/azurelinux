@@ -7,7 +7,7 @@ URL:            https://pagure.io/xmlto
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://releases.pagure.org/xmlto/%{name}-%{version}.tar.gz
+Source0:        https://releases.pagure.org/xmlto/%{name}-%{version}.tar.gz
 BuildRequires:  docbook-style-xsl
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  libxslt-devel

@@ -7,7 +7,7 @@ Name:           sblim-cmpi-syslog
 Version:        0.9.0
 Release:        20%{?dist}
 License:        EPL
-URL:            http://sourceforge.net/projects/sblim/
+URL:            https://sourceforge.net/projects/sblim/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 #  cvs -z3 -d:pserver:anonymous@sblim.cvs.sourceforge.net:/cvsroot/sblim co -P cmpi-syslog

@@ -10,7 +10,7 @@ License:	GPLv2
 Source0:	https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Patch0:		libtnc-1.25-bootstrap.patch
 Patch1:		libtnc-1.25-syserror.patch
-URL:		http://libtnc.sourceforge.net/
+URL:		https://libtnc.sourceforge.net/
 BuildRequires:  gcc
 BuildRequires:  make
 BuildRequires:	perl-devel

@@ -7,7 +7,7 @@ Summary:	Toolkit for CMPI indication providers
 
 License:	EPL-1.0
 URL:		https://sourceforge.net/projects/sblim/
-Source0:	http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+Source0:	https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 BuildRequires:	sblim-cmpi-devel 
 BuildRequires:	gcc gcc-c++
 

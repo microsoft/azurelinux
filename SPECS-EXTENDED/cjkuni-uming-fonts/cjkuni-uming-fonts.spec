@@ -19,8 +19,8 @@ Release:        65%{?dist}
 Summary:        Chinese Unicode TrueType font in Ming face
 
 License:        Arphic
-URL:            http://www.freedesktop.org/wiki/Software/CJKUnifonts
-Source0:        http://ftp.debian.org/debian/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_%{version}.orig.tar.gz
+URL:            https://www.freedesktop.org/wiki/Software/CJKUnifonts
+Source0:        https://ftp.debian.org/debian/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_%{version}.orig.tar.gz
 Source1:        %{name}-fontconfig.conf
 Source3:        %{fontconf3}
 

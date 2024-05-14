@@ -8,7 +8,7 @@ Version: 0.17
 Release: 81%{?dist}
 License: BSD
 Source0: ftp://ftp.uk.linux.org/pub/linux/Networking/netkit/netkit-telnet-%{version}.tar.gz
-Url: http://web.archive.org/web/20070819111735/www.hcs.harvard.edu/~dholland/computers/old-netkit.html
+Url: https://web.archive.org/web/20070819111735/www.hcs.harvard.edu/~dholland/computers/old-netkit.html
 # telnet-client tarball is snapshot of the OpenBSD client telnet
 Source2: telnet-client.tar.gz
 Source4: telnet.wmconfig

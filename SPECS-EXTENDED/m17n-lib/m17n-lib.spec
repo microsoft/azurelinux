@@ -9,8 +9,8 @@ Release:        8%{?dist}
 Summary:        Multilingual text library
 
 License:        LGPLv2+
-URL:            http://www.nongnu.org/m17n/
-Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+URL:            https://www.nongnu.org/m17n/
+Source0:        https://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 Patch0:         %{name}-1.8.0-multilib.patch
 Patch1:         Fix-segmentation-fault-when-using-ibus-m17n-with-vi-telex-in-gedit-in-wayland.patch
 

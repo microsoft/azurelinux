@@ -5,9 +5,9 @@ Summary: Interlingua hyphenation rules
 %global upstreamid 20050628
 Version: 0.%{upstreamid}
 Release: 20%{?dist}
-Source0: http://www.ctan.org/get/language/hyphenation/iahyphen.tex
+Source0: https://www.ctan.org/get/language/hyphenation/iahyphen.tex
 Source1: %{name}-LICENSE.txt
-URL: http://www.ctan.org/tex-archive/help/Catalogue/entries/iahyphen.html
+URL: https://www.ctan.org/tex-archive/help/Catalogue/entries/iahyphen.html
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

@@ -71,7 +71,7 @@ Patch8:         php-8.1.0-libdb.patch
 Patch41:        php-8.3.3-parser.patch
 # use system tzdata
 Patch42:        php-8.3.0-systzdata-v24.patch
-# See http://bugs.php.net/53436
+# See https://bugs.php.net/53436
 Patch43:        php-7.4.0-phpize.patch
 # Use -lldap_r for OpenLDAP
 Patch45:        php-7.4.0-ldap_r.patch
@@ -1544,29 +1544,29 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - License verified.
 
 * Wed Sep 28 2022 Remi Collet <remi@remirepo.net> - 8.1.11-1
-- Update to 8.1.11 - http://www.php.net/releases/8_1_11.php
+- Update to 8.1.11 - https://www.php.net/releases/8_1_11.php
 
 * Thu Sep  8 2022 Remi Collet <remi@remirepo.net> - 8.1.10-1
-- Update to 8.1.10 - http://www.php.net/releases/8_1_10.php
+- Update to 8.1.10 - https://www.php.net/releases/8_1_10.php
 
 * Tue Aug  2 2022 Remi Collet <remi@remirepo.net> - 8.1.9-1
-- Update to 8.1.9 - http://www.php.net/releases/8_1_9.php
+- Update to 8.1.9 - https://www.php.net/releases/8_1_9.php
 
 * Wed Jul  6 2022 Remi Collet <remi@remirepo.net> - 8.1.8-1
-- Update to 8.1.8 - http://www.php.net/releases/8_1_8.php
+- Update to 8.1.8 - https://www.php.net/releases/8_1_8.php
 
 * Wed Jun  8 2022 Remi Collet <remi@remirepo.net> - 8.1.7-1
-- Update to 8.1.7 - http://www.php.net/releases/8_1_7.php
+- Update to 8.1.7 - https://www.php.net/releases/8_1_7.php
 - add upstream patch to initialize pcre before mbstring
 
 * Wed May 11 2022 Remi Collet <remi@remirepo.net> - 8.1.6-1
-- Update to 8.1.6 - http://www.php.net/releases/8_1_6.php
+- Update to 8.1.6 - https://www.php.net/releases/8_1_6.php
 
 * Wed Apr 13 2022 Remi Collet <remi@remirepo.net> - 8.1.5-1
-- Update to 8.1.5 - http://www.php.net/releases/8_1_5.php
+- Update to 8.1.5 - https://www.php.net/releases/8_1_5.php
 
 * Wed Mar 16 2022 Remi Collet <remi@remirepo.net> - 8.1.4-1
-- Update to 8.1.4 - http://www.php.net/releases/8_1_4.php
+- Update to 8.1.4 - https://www.php.net/releases/8_1_4.php
 
 * Thu Mar  3 2022 Remi Collet <remi@remirepo.net> - 8.1.4~RC1-1
 - update to 8.1.4RC1
@@ -1575,13 +1575,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - retrieve tzdata version #2056611
 
 * Wed Feb 16 2022 Remi Collet <remi@remirepo.net> - 8.1.3-1
-- Update to 8.1.3 - http://www.php.net/releases/8_1_3.php
+- Update to 8.1.3 - https://www.php.net/releases/8_1_3.php
 
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.1.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
 * Wed Jan 19 2022 Remi Collet <remi@remirepo.net> - 8.1.2-1
-- Update to 8.1.2 - http://www.php.net/releases/8_1_2.php
+- Update to 8.1.2 - https://www.php.net/releases/8_1_2.php
 
 * Sat Jan 08 2022 Miro Hrončok <mhroncok@redhat.com> - 8.1.2~RC1-2
 - Rebuilt for https://fedoraproject.org/wiki/Changes/LIBFFI34
@@ -1590,7 +1590,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 8.1.2RC1
 
 * Wed Dec 15 2021 Remi Collet <remi@remirepo.net> - 8.1.1-1
-- Update to 8.1.1 - http://www.php.net/releases/8_1_1.php
+- Update to 8.1.1 - https://www.php.net/releases/8_1_1.php
 
 * Thu Dec  2 2021 Remi Collet <remi@remirepo.net> - 8.1.1~RC1-1
 - update to 8.1.1RC1
@@ -1609,7 +1609,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - dba: enable qdbm backend
 
 * Tue Oct 19 2021 Remi Collet <remi@remirepo.net> - 8.0.12-1
-- Update to 8.0.12 - http://www.php.net/releases/8_0_12.php
+- Update to 8.0.12 - https://www.php.net/releases/8_0_12.php
 
 * Mon Oct 18 2021 Remi Collet <remi@remirepo.net> - 8.0.12~RC1-2
 - build using system libxcrypt
@@ -1618,7 +1618,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 8.0.12RC1
 
 * Wed Sep 22 2021 Remi Collet <remi@remirepo.net> - 8.0.11-1
-- Update to 8.0.11 - http://www.php.net/releases/8_0_11.php
+- Update to 8.0.11 - https://www.php.net/releases/8_0_11.php
 
 * Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 8.0.11~RC1-4
 - Rebuilt with OpenSSL 3.0.0
@@ -1633,7 +1633,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 8.0.11RC1
 
 * Thu Aug 26 2021 Remi Collet <remi@remirepo.net> - 8.0.10-1
-- Update to 8.0.10 - http://www.php.net/releases/8_0_10.php
+- Update to 8.0.10 - https://www.php.net/releases/8_0_10.php
 
 * Wed Aug 11 2021 Remi Collet <remi@remirepo.net> - 8.0.10~RC1-3
 - phar: switch to sha256 signature by default, backported from 8.1
@@ -1650,7 +1650,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - add upstream patch for https://bugs.php.net/81325 segfault in simplexml
 
 * Thu Jul 29 2021 Remi Collet <remi@remirepo.net> - 8.0.9-1
-- Update to 8.0.9 - http://www.php.net/releases/8_0_9.php
+- Update to 8.0.9 - https://www.php.net/releases/8_0_9.php
 
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.9~RC1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
@@ -1659,13 +1659,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 8.0.9RC1
 
 * Tue Jun 29 2021 Remi Collet <remi@remirepo.net> - 8.0.8-1
-- Update to 8.0.8 - http://www.php.net/releases/8_0_8.php
+- Update to 8.0.8 - https://www.php.net/releases/8_0_8.php
 
 * Tue Jun 15 2021 Remi Collet <remi@remirepo.net> - 8.0.8~RC1-1
 - update to 8.0.8RC1
 
 * Wed Jun  2 2021 Remi Collet <remi@remirepo.net> - 8.0.7-1
-- Update to 8.0.7 - http://www.php.net/releases/8_0_7.php
+- Update to 8.0.7 - https://www.php.net/releases/8_0_7.php
 
 * Thu May 27 2021 Remi Collet <remi@remirepo.net> - 8.0.7~RC1-2
 - fix snmp extension for net-snmp without DES
@@ -1683,10 +1683,10 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - get rid of inet_ntoa and inet_aton calls
 
 * Wed May  5 2021 Remi Collet <remi@remirepo.net> - 8.0.6-1
-- Update to 8.0.6 - http://www.php.net/releases/8_0_6.php
+- Update to 8.0.6 - https://www.php.net/releases/8_0_6.php
 
 * Tue Apr 27 2021 Remi Collet <remi@remirepo.net> - 8.0.5-1
-- Update to 8.0.5 - http://www.php.net/releases/8_0_5.php
+- Update to 8.0.5 - https://www.php.net/releases/8_0_5.php
 
 * Tue Apr 13 2021 Remi Collet <remi@remirepo.net> - 8.0.5~RC1-1
 - update to 8.0.5RC1
@@ -1702,14 +1702,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - clean conditions
 
 * Thu Mar  4 2021 Remi Collet <remi@remirepo.net> - 8.0.3-1
-- Update to 8.0.3 - http://www.php.net/releases/8_0_3.php
+- Update to 8.0.3 - https://www.php.net/releases/8_0_3.php
 - see https://fedoraproject.org/wiki/Changes/php80
 - drop xmlrpc extension
 - drop json subpackage, extension always there
 - enchant: use libenchant-2 instead of libenchant
 
 * Tue Mar  2 2021 Remi Collet <remi@remirepo.net> - 7.4.16-1
-- Update to 7.4.16 - http://www.php.net/releases/7_4_16.php
+- Update to 7.4.16 - https://www.php.net/releases/7_4_16.php
 
 * Wed Feb 24 2021 Remi Collet <remi@remirepo.net> - 7.4.15-3
 - drop php-imap, fix #1929640
@@ -1718,7 +1718,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - rebuild for libpq ABI fix rhbz#1908268
 
 * Tue Feb  2 2021 Remi Collet <remi@remirepo.net> - 7.4.15-1
-- Update to 7.4.15 - http://www.php.net/releases/7_4_15.php
+- Update to 7.4.15 - https://www.php.net/releases/7_4_15.php
 - add upstream patch for https://bugs.php.net/80682
   fix opcache doesn't honour pcre.jit option
 
@@ -1729,7 +1729,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.4.15RC2
 
 * Tue Jan  5 2021 Remi Collet <remi@remirepo.net> - 7.4.14-1
-- Update to 7.4.14 - http://www.php.net/releases/7_4_14.php
+- Update to 7.4.14 - https://www.php.net/releases/7_4_14.php
 
 * Wed Dec 16 2020 Remi Collet <remi@remirepo.net> - 7.4.14~RC1-1
 - update to 7.4.14RC1
@@ -1739,19 +1739,19 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
   https://fedoraproject.org/wiki/Changes/Remove_make_from_BuildRoot
 
 * Tue Nov 24 2020 Remi Collet <remi@remirepo.net> - 7.4.13-1
-- Update to 7.4.13 - http://www.php.net/releases/7_4_13.php
+- Update to 7.4.13 - https://www.php.net/releases/7_4_13.php
 
 * Thu Nov 12 2020 Remi Collet <remi@remirepo.net> - 7.4.13~RC1-1
 - update to 7.4.13RC1
 
 * Tue Oct 27 2020 Remi Collet <remi@remirepo.net> - 7.4.12-1
-- Update to 7.4.12 - http://www.php.net/releases/7_4_12.php
+- Update to 7.4.12 - https://www.php.net/releases/7_4_12.php
 
 * Tue Oct 13 2020 Remi Collet <remi@remirepo.net> - 7.4.12~RC1-1
 - update to 7.4.12RC1
 
 * Tue Sep 29 2020 Remi Collet <remi@remirepo.net> - 7.4.11-1
-- Update to 7.4.11 - http://www.php.net/releases/7_4_11.php
+- Update to 7.4.11 - https://www.php.net/releases/7_4_11.php
 
 * Tue Sep 15 2020 Remi Collet <remi@remirepo.net> - 7.4.11~RC1-1
 - update to 7.4.11RC1
@@ -1760,7 +1760,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuilt for new net-snmp release
 
 * Tue Sep  1 2020 Remi Collet <remi@remirepo.net> - 7.4.10-1
-- Update to 7.4.10 - http://www.php.net/releases/7_4_10.php
+- Update to 7.4.10 - https://www.php.net/releases/7_4_10.php
 
 * Thu Aug 27 2020 Josef Řídký <jridky@redhat.com> - 7.4.10~RC1-2
 - Rebuilt for new net-snmp release
@@ -1769,7 +1769,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.4.10RC1
 
 * Mon Aug 10 2020 Remi Collet <remi@remirepo.net> - 7.4.9-1
-- Update to 7.4.9 - http://www.php.net/releases/7_4_9.php
+- Update to 7.4.9 - https://www.php.net/releases/7_4_9.php
 
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 7.4.9~RC1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
@@ -1782,11 +1782,11 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Thu Jul  9 2020 Remi Collet <remi@remirepo.net> - 7.4.8-2
-- Update to 7.4.8 - http://www.php.net/releases/7_4_8.php
+- Update to 7.4.8 - https://www.php.net/releases/7_4_8.php
   rebuild from new sources
 
 * Tue Jul  7 2020 Remi Collet <remi@remirepo.net> - 7.4.8-1
-- Update to 7.4.8 - http://www.php.net/releases/7_4_8.php
+- Update to 7.4.8 - https://www.php.net/releases/7_4_8.php
 
 * Mon Jul  6 2020 Remi Collet <remi@remirepo.net> - 7.4.8~RC1-3
 - display build system and provider in phpinfo (from 8.0)
@@ -1803,7 +1803,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
   https://fedoraproject.org/wiki/Changes/drop_mod_php
 
 * Tue Jun  9 2020 Remi Collet <remi@remirepo.net> - 7.4.7-1
-- Update to 7.4.7 - http://www.php.net/releases/7_4_7.php
+- Update to 7.4.7 - https://www.php.net/releases/7_4_7.php
 
 * Mon Jun  8 2020 Remi Collet <remi@remirepo.net> - 7.4.7~RC1-4
 - rewrite conditional using bcond_with and bcond_without
@@ -1818,7 +1818,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuild for ICU 67
 
 * Tue May 12 2020 Remi Collet <remi@remirepo.net> - 7.4.6-1
-- Update to 7.4.6 - http://www.php.net/releases/7_4_6.php
+- Update to 7.4.6 - https://www.php.net/releases/7_4_6.php
 
 * Wed Apr 29 2020 Remi Collet <remi@remirepo.net> - 7.4.6~RC1-1
 - update to 7.4.6RC1
@@ -1829,19 +1829,19 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - run FPM tests
 
 * Tue Apr 14 2020 Remi Collet <remi@remirepo.net> - 7.4.5-1
-- Update to 7.4.5 - http://www.php.net/releases/7_4_5.php
+- Update to 7.4.5 - https://www.php.net/releases/7_4_5.php
 
 * Tue Mar 31 2020 Remi Collet <remi@remirepo.net> - 7.4.5~RC1-1
 - update to 7.4.5RC1
 
 * Tue Mar 17 2020 Remi Collet <remi@remirepo.net> - 7.4.4-1
-- Update to 7.4.4 - http://www.php.net/releases/7_4_4.php
+- Update to 7.4.4 - https://www.php.net/releases/7_4_4.php
 
 * Tue Mar  3 2020 Remi Collet <remi@remirepo.net> - 7.4.4~RC1-1
 - update to 7.4.4RC1
 
 * Tue Feb 18 2020 Remi Collet <remi@remirepo.net> - 7.4.3-1
-- Update to 7.4.3 - http://www.php.net/releases/7_4_3.php
+- Update to 7.4.3 - https://www.php.net/releases/7_4_3.php
 
 * Tue Feb  4 2020 Remi Collet <remi@remirepo.net> - 7.4.3~RC1-1
 - update to 7.4.3RC1
@@ -1850,13 +1850,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
 * Tue Jan 21 2020 Remi Collet <remi@remirepo.net> - 7.4.2-1
-- Update to 7.4.2 - http://www.php.net/releases/7_4_2.php
+- Update to 7.4.2 - https://www.php.net/releases/7_4_2.php
 
 * Tue Jan  7 2020 Remi Collet <remi@remirepo.net> - 7.4.2~RC1-1
 - update to 7.4.2RC1
 
 * Wed Dec 18 2019 Remi Collet <remi@remirepo.net> - 7.4.1-1
-- Update to 7.4.1 - http://www.php.net/releases/7_4_1.php
+- Update to 7.4.1 - https://www.php.net/releases/7_4_1.php
 
 * Wed Dec 11 2019 Remi Collet <remi@remirepo.net> - 7.4.1~RC1-1
 - update to 7.4.1RC1
@@ -1894,7 +1894,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - add upstream patch to fix aarch64 build
 
 * Tue Sep 24 2019 Remi Collet <remi@remirepo.net> - 7.3.10-1
-- Update to 7.3.10 - http://www.php.net/releases/7_3_10.php
+- Update to 7.3.10 - https://www.php.net/releases/7_3_10.php
 
 * Wed Sep 11 2019 Remi Collet <remi@remirepo.net> - 7.3.10~RC1-2
 - update to 7.3.10RC1 (new tag)
@@ -1903,7 +1903,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.3.10RC1
 
 * Wed Aug 28 2019 Remi Collet <remi@remirepo.net> - 7.3.9-1
-- Update to 7.3.9 - http://www.php.net/releases/7_3_9.php
+- Update to 7.3.9 - https://www.php.net/releases/7_3_9.php
 - add tarball signature check
 
 * Tue Aug 20 2019 Petr Pisar <ppisar@redhat.com> - 7.3.9~RC1-2
@@ -1913,7 +1913,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.3.9RC1
 
 * Tue Jul 30 2019 Remi Collet <remi@remirepo.net> - 7.3.8-1
-- Update to 7.3.8 - http://www.php.net/releases/7_3_8.php
+- Update to 7.3.8 - https://www.php.net/releases/7_3_8.php
 
 * Tue Jul 16 2019 Remi Collet <remi@remirepo.net> - 7.3.8~RC1-1
 - update to 7.3.8RC1
@@ -1922,7 +1922,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
   (json, mbstring, opcache, pdo, xml)
 
 * Wed Jul  3 2019 Remi Collet <remi@remirepo.net> - 7.3.7-2
-- Update to 7.3.7 - http://www.php.net/releases/7_3_7.php
+- Update to 7.3.7 - https://www.php.net/releases/7_3_7.php
 - disable opcache.huge_code_pages in default configuration
 
 * Thu Jun 20 2019 Remi Collet <remi@remirepo.net> - 7.3.7~RC3-1
@@ -1935,7 +1935,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.3.7RC1
 
 * Tue May 28 2019 Remi Collet <remi@remirepo.net> - 7.3.6-1
-- Update to 7.3.6 - http://www.php.net/releases/7_3_6.php
+- Update to 7.3.6 - https://www.php.net/releases/7_3_6.php
 
 * Wed May 15 2019 Remi Collet <remi@remirepo.net> - 7.3.6~RC1-2
 - update to 7.3.6RC1 (new tag)
@@ -1944,13 +1944,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.3.6RC1
 
 * Wed May  1 2019 Remi Collet <remi@remirepo.net> - 7.3.5-1
-- Update to 7.3.5 - http://www.php.net/releases/7_3_5.php
+- Update to 7.3.5 - https://www.php.net/releases/7_3_5.php
 
 * Tue Apr 16 2019 Remi Collet <remi@remirepo.net> - 7.3.5~RC1-1
 - update to 7.3.5RC1
 
 * Tue Apr  2 2019 Remi Collet <remi@remirepo.net> - 7.3.4-1
-- Update to 7.3.4 - http://www.php.net/releases/7_3_4.php
+- Update to 7.3.4 - https://www.php.net/releases/7_3_4.php
 
 * Thu Mar 21 2019 Remi Collet <remi@remirepo.net> - 7.3.4~RC1-3
 - update to 7.3.4RC1 new tag
@@ -1967,7 +1967,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - rebuild for libargon2 new soname
 
 * Wed Mar  6 2019 Remi Collet <remi@remirepo.net> - 7.3.3-1
-- Update to 7.3.3 - http://www.php.net/releases/7_3_3.php
+- Update to 7.3.3 - https://www.php.net/releases/7_3_3.php
 - add upstream patch for OpenSSL 1.1.1b
 
 * Tue Feb 19 2019 Remi Collet <remi@remirepo.net> - 7.3.3~RC1-1
@@ -1975,7 +1975,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - adapt systzdata patch (v18)
 
 * Wed Feb  6 2019 Remi Collet <remi@remirepo.net> - 7.3.2-1
-- Update to 7.3.2 - http://www.php.net/releases/7_3_2.php
+- Update to 7.3.2 - https://www.php.net/releases/7_3_2.php
 
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 7.3.2~RC1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
@@ -1991,7 +1991,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuilt for libcrypt.so.2 (#1666033)
 
 * Tue Jan  8 2019 Remi Collet <remi@remirepo.net> - 7.3.1-1
-- Update to 7.3.1 - http://www.php.net/releases/7_3_1.php
+- Update to 7.3.1 - https://www.php.net/releases/7_3_1.php
 
 * Tue Dec 18 2018 Remi Collet <remi@remirepo.net> - 7.3.1-0.1.RC1
 - update to 7.3.1RC1
@@ -2025,19 +2025,19 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.2.11RC1
 
 * Tue Sep 11 2018 Remi Collet <remi@remirepo.net> - 7.2.10-1
-- Update to 7.2.10 - http://www.php.net/releases/7_2_10.php
+- Update to 7.2.10 - https://www.php.net/releases/7_2_10.php
 
 * Tue Aug 28 2018 Remi Collet <remi@remirepo.net> - 7.2.10~RC1-1
 - update to 7.2.10RC1
 
 * Thu Aug 16 2018 Remi Collet <remi@remirepo.net> - 7.2.9-1
-- Update to 7.2.9 - http://www.php.net/releases/7_2_9.php
+- Update to 7.2.9 - https://www.php.net/releases/7_2_9.php
 
 * Tue Jul 24 2018 Adam Williamson <awilliam@redhat.com> - 7.2.8-2
 - Rebuild for new net-snmp
 
 * Tue Jul 17 2018 Remi Collet <remi@remirepo.net> - 7.2.8-1
-- Update to 7.2.8 - http://www.php.net/releases/7_2_8.php
+- Update to 7.2.8 - https://www.php.net/releases/7_2_8.php
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 7.2.8~RC1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
@@ -2052,14 +2052,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.2.8RC1
 
 * Wed Jun 20 2018 Remi Collet <remi@remirepo.net> - 7.2.7-1
-- Update to 7.2.7 - http://www.php.net/releases/7_2_7.php
+- Update to 7.2.7 - https://www.php.net/releases/7_2_7.php
 - drop -mstackrealign option, workaround to #1593144
 
 * Wed Jun  6 2018 Remi Collet <remi@remirepo.net> - 7.2.7~RC1-1
 - update to 7.2.7RC1
 
 * Wed May 23 2018 Remi Collet <remi@remirepo.net> - 7.2.6-1
-- Update to 7.2.6 - http://www.php.net/releases/7_2_6.php
+- Update to 7.2.6 - https://www.php.net/releases/7_2_6.php
 
 * Sun May 13 2018 Remi Collet <remi@remirepo.net> - 7.2.6~RC1-1
 - update to 7.2.6RC1
@@ -2068,7 +2068,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuild for ICU 61.1
 
 * Tue Apr 24 2018 Remi Collet <remi@remirepo.net> - 7.2.5-1
-- Update to 7.2.5 - http://www.php.net/releases/7_2_5.php
+- Update to 7.2.5 - https://www.php.net/releases/7_2_5.php
 
 * Wed Apr 11 2018 Remi Collet <remi@remirepo.net> - 7.2.5~RC1-1
 - update to 7.2.5RC1
@@ -2080,7 +2080,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuild against oniguruma 6.8.1
 
 * Tue Mar 27 2018 Remi Collet <remi@remirepo.net> - 7.2.4-1
-- Update to 7.2.4 - http://www.php.net/releases/7_2_4.php
+- Update to 7.2.4 - https://www.php.net/releases/7_2_4.php
 - FPM: update default pool configuration for process.dumpable
 
 * Wed Mar 21 2018 Remi Collet <remi@remirepo.net> - 7.2.4~RC1-3
@@ -2094,7 +2094,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - update to 7.2.4RC1
 
 * Wed Feb 28 2018 Remi Collet <remi@remirepo.net> - 7.2.3-1
-- Update to 7.2.3 - http://www.php.net/releases/7_2_3.php
+- Update to 7.2.3 - https://www.php.net/releases/7_2_3.php
 - FPM: revert pid file removal
 
 * Wed Feb 21 2018 Remi Collet <remi@remirepo.net> - 7.2.3~RC1-4
@@ -2117,7 +2117,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
 * Tue Jan 30 2018 Remi Collet <remi@remirepo.net> - 7.2.2-1
-- Update to 7.2.2 - http://www.php.net/releases/7_2_2.php
+- Update to 7.2.2 - https://www.php.net/releases/7_2_2.php
 
 * Mon Jan 29 2018 Remi Collet <rcollet@redhat.com> - 7.2.2~RC1-3
 - disable interbase, imap, pdo_dblib and sodium on rhel
@@ -2133,7 +2133,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - define SOURCE_DATE_EPOCH for reproducible build
 
 * Wed Jan  3 2018 Remi Collet <remi@remirepo.net> - 7.2.1-1
-- Update to 7.2.1 - http://www.php.net/releases/7_2_1.php
+- Update to 7.2.1 - https://www.php.net/releases/7_2_1.php
 
 * Wed Dec 13 2017 Remi Collet <remi@remirepo.net> - 7.2.1~RC1-1
 - update to 7.2.1RC1
@@ -2170,7 +2170,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - refresh configuration files from upstream
 
 * Wed Sep 27 2017 Remi Collet <remi@fedoraproject.org> - 7.1.10-1
-- Update to 7.1.10 - http://www.php.net/releases/7_1_10.php
+- Update to 7.1.10 - https://www.php.net/releases/7_1_10.php
 
 * Mon Sep 25 2017 Remi Collet <remi@fedoraproject.org> - 7.1.10~RC1-2
 - php now requires php-fpm and start it with httpd / nginx
@@ -2182,14 +2182,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Automatically load OpenSSL configuration file, from PHP 7.2
 
 * Wed Aug 30 2017 Remi Collet <remi@fedoraproject.org> - 7.1.9-1
-- Update to 7.1.9 - http://www.php.net/releases/7_1_9.php
+- Update to 7.1.9 - https://www.php.net/releases/7_1_9.php
 
 * Wed Aug 16 2017 Remi Collet <remi@fedoraproject.org> - 7.1.9~RC1-1
 - Update to 7.1.9RC1
 - php-fpm: drop unneeded "pid" from default configuration
 
 * Wed Aug  2 2017 Remi Collet <remi@fedoraproject.org> - 7.1.8-1
-- Update to 7.1.8 - http://www.php.net/releases/7_1_8.php
+- Update to 7.1.8 - https://www.php.net/releases/7_1_8.php
 
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.8~RC1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
@@ -2201,20 +2201,20 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - disable httpd MPM check
 
 * Thu Jul  6 2017 Remi Collet <remi@fedoraproject.org> - 7.1.7-1
-- Update to 7.1.7 - http://www.php.net/releases/7_1_7.php
+- Update to 7.1.7 - https://www.php.net/releases/7_1_7.php
 
 * Wed Jun 21 2017 Remi Collet <remi@fedoraproject.org> - 7.1.7~RC1-1
 - Update to 7.1.7RC1
 
 * Wed Jun  7 2017 Remi Collet <remi@fedoraproject.org> - 7.1.6-1
-- Update to 7.1.6 - http://www.php.net/releases/7_1_6.php
+- Update to 7.1.6 - https://www.php.net/releases/7_1_6.php
 - add upstream security patches for oniguruma
 
 * Wed May 24 2017 Remi Collet <remi@fedoraproject.org> - 7.1.6~RC1-1
 - Update to 7.1.6RC1
 
 * Tue May  9 2017 Remi Collet <remi@fedoraproject.org> - 7.1.5-1
-- Update to 7.1.5 - http://www.php.net/releases/7_1_5.php
+- Update to 7.1.5 - https://www.php.net/releases/7_1_5.php
 
 * Sat May  6 2017 Remi Collet <remi@fedoraproject.org> - 7.1.5-0.3.RC1
 - enable PHP execution of .phar files, see #1117140
@@ -2226,7 +2226,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Update to 7.1.5RC1
 
 * Tue Apr 11 2017 Remi Collet <remi@fedoraproject.org> - 7.1.4-1
-- Update to 7.1.4 - http://www.php.net/releases/7_1_4.php
+- Update to 7.1.4 - https://www.php.net/releases/7_1_4.php
 
 * Wed Mar 29 2017 Remi Collet <remi@fedoraproject.org> - 7.1.4-0.1.RC1
 - Update to 7.1.4RC1
@@ -2238,13 +2238,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - remove %%attr, see #1432372
 
 * Wed Mar 15 2017 Remi Collet <remi@fedoraproject.org> - 7.1.3-1
-- Update to 7.1.3 - http://www.php.net/releases/7_1_3.php
+- Update to 7.1.3 - https://www.php.net/releases/7_1_3.php
 
 * Tue Feb 28 2017 Remi Collet <remi@fedoraproject.org> 7.1.3-0.1.RC1
 - Update to 7.1.3RC1
 
 * Wed Feb 15 2017 Remi Collet <remi@fedoraproject.org> - 7.1.2-1
-- Update to 7.1.2 - http://www.php.net/releases/7_1_2.php
+- Update to 7.1.2 - https://www.php.net/releases/7_1_2.php
 
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.2-0.2.RC1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
@@ -2256,13 +2256,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Update to 7.1.2RC1
 
 * Wed Jan 18 2017 Remi Collet <remi@fedoraproject.org> 7.1.1-1
-- Update to 7.1.1 - http://www.php.net/releases/7_1_1.php
+- Update to 7.1.1 - https://www.php.net/releases/7_1_1.php
 
 * Fri Jan  6 2017 Remi Collet <remi@fedoraproject.org> 7.1.1-0.1.RC1
 - Update to 7.1.1RC1
 
 * Thu Dec  1 2016 Remi Collet <remi@fedoraproject.org> 7.1.0-1
-- Update to 7.1.0 - http://www.php.net/releases/7_1_0.php
+- Update to 7.1.0 - https://www.php.net/releases/7_1_0.php
 
 * Fri Nov 25 2016 Remi Collet <remi@fedoraproject.org> 7.1.0-0.3.RC6
 - disable pcre.jit everywhere as it raise AVC #1398474
@@ -2270,7 +2270,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> 7.1.0-0.2.RC6
 - re-enable interbase sub package
-  see http://bugzilla.redhat.com/1394750 sub package inconsistency
+  see https://bugzilla.redhat.com/1394750 sub package inconsistency
 - add patch to fix firebird include path (using fb_config)
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> 7.1.0-0.1.RC6
@@ -2285,19 +2285,19 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - Update to 7.0.12RC1
 
 * Wed Sep 14 2016 Remi Collet <remi@fedoraproject.org> 7.0.11-1
-- Update to 7.0.11 - http://www.php.net/releases/7_0_11.php
+- Update to 7.0.11 - https://www.php.net/releases/7_0_11.php
 
 * Fri Sep  2 2016 Remi Collet <remi@fedoraproject.org> 7.0.11-0.1.RC1
 - Update to 7.0.11RC1
 
 * Thu Sep  1 2016 Remi Collet <remi@fedoraproject.org> 7.0.10-1
-- Update to 7.0.10 - http://www.php.net/releases/7_0_10.php
+- Update to 7.0.10 - https://www.php.net/releases/7_0_10.php
 
 * Wed Aug  3 2016 Remi Collet <remi@fedoraproject.org> 7.0.10-0.1.RC1
 - Update to 7.0.10RC1
 
 * Wed Jul 20 2016 Remi Collet <remi@fedoraproject.org> 7.0.9-1
-- Update to 7.0.9 - http://www.php.net/releases/7_0_9.php
+- Update to 7.0.9 - https://www.php.net/releases/7_0_9.php
 - wddx: add upstream patch for https://bugs.php.net/72564
 
 * Wed Jul  6 2016 Remi Collet <remi@fedoraproject.org> 7.0.9-0.1.RC1
@@ -2307,13 +2307,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - own tests/doc directories for pecl packages #1351345
 
 * Wed Jun 22 2016 Remi Collet <remi@fedoraproject.org> 7.0.8-1
-- Update to 7.0.8 - http://www.php.net/releases/7_0_8.php
+- Update to 7.0.8 - https://www.php.net/releases/7_0_8.php
 - https://fedoraproject.org/wiki/Changes/php70
 - drop ereg, mysql, mssql extensions
 - add json extension
 
 * Wed Jun 22 2016 Remi Collet <remi@fedoraproject.org> 5.6.23-1
-- Update to 5.6.23 - http://www.php.net/releases/5_6_23.php
+- Update to 5.6.23 - https://www.php.net/releases/5_6_23.php
 
 * Thu Jun  9 2016 Remi Collet <remi@fedoraproject.org> 5.6.23-0.1.RC1
 - update to 5.6.23RC1
@@ -2322,14 +2322,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - drop unneeded option --with-vpx-dir, fix FTBFS, thanks Koschei
 
 * Thu May 26 2016 Remi Collet <remi@fedoraproject.org> 5.6.22-1
-- Update to 5.6.22 - http://www.php.net/releases/5_6_22.php
+- Update to 5.6.22 - https://www.php.net/releases/5_6_22.php
 
 * Thu May 12 2016 Remi Collet <remi@fedoraproject.org> 5.6.22-0.1.RC1
 - update to 5.6.22RC1
 
 * Thu Apr 28 2016 Remi Collet <remi@fedoraproject.org> 5.6.21-1
 - Update to 5.6.21
-  http://www.php.net/releases/5_6_21.php
+  https://www.php.net/releases/5_6_21.php
 
 * Mon Apr 18 2016 Remi Collet <remi@fedoraproject.org> 5.6.21-0.2.RC1
 - rebuild for ICU 57.1
@@ -2342,14 +2342,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Mar 31 2016 Remi Collet <remi@fedoraproject.org> 5.6.20-1
 - Update to 5.6.20
-  http://www.php.net/releases/5_6_20.php
+  https://www.php.net/releases/5_6_20.php
 
 * Thu Mar 17 2016 Remi Collet <remi@fedoraproject.org> 5.6.20-0.1.RC1
 - update to 5.6.20RC1
 
 * Thu Mar  3 2016 Remi Collet <remi@fedoraproject.org> 5.6.19-1
 - Update to 5.6.19
-  http://www.php.net/releases/5_6_19.php
+  https://www.php.net/releases/5_6_19.php
 
 * Thu Feb 18 2016 Remi Collet <remi@fedoraproject.org> 5.6.19-0.1.RC1
 - update to 5.6.19RC1
@@ -2359,14 +2359,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Wed Feb  3 2016 Remi Collet <remi@fedoraproject.org> 5.6.18-1
 - Update to 5.6.18
-  http://www.php.net/releases/5_6_18.php
+  https://www.php.net/releases/5_6_18.php
 
 * Thu Jan 21 2016 Remi Collet <remi@fedoraproject.org> 5.6.18-0.1.RC1
 - update to 5.6.18RC1
 
 * Thu Jan  7 2016 Remi Collet <remi@fedoraproject.org> 5.6.17-1
 - Update to 5.6.17
-  http://www.php.net/releases/5_6_17.php
+  https://www.php.net/releases/5_6_17.php
 
 * Thu Dec 10 2015 Remi Collet <remi@fedoraproject.org> 5.6.17-0.1.RC1
 - update to 5.6.17RC1
@@ -2376,7 +2376,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Nov 26 2015 Remi Collet <remi@fedoraproject.org> 5.6.16-1
 - Update to 5.6.16
-  http://www.php.net/releases/5_6_16.php
+  https://www.php.net/releases/5_6_16.php
 
 * Wed Nov 18 2015 Rex Dieter <rdieter@fedoraproject.org> 5.6.16-0.2.RC2
 - rebuild (tidy)
@@ -2386,7 +2386,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Oct 29 2015 Remi Collet <remi@fedoraproject.org> 5.6.15-1
 - Update to 5.6.15
-  http://www.php.net/releases/5_6_15.php
+  https://www.php.net/releases/5_6_15.php
 - php-config: reports all built sapis
 
 * Thu Oct 15 2015 Remi Collet <remi@fedoraproject.org> 5.6.15-0.1.RC1
@@ -2394,7 +2394,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Wed Sep 30 2015 Remi Collet <remi@fedoraproject.org> 5.6.14-1
 - Update to 5.6.14
-  http://www.php.net/releases/5_6_14.php
+  https://www.php.net/releases/5_6_14.php
 - php-fpm: enable http authorization headers
 
 * Thu Sep 17 2015 Remi Collet <remi@fedoraproject.org> 5.6.14-0.1.RC1
@@ -2402,11 +2402,11 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Sep  3 2015 Remi Collet <remi@fedoraproject.org> 5.6.13-1
 - Update to 5.6.13
-  http://www.php.net/releases/5_6_13.php
+  https://www.php.net/releases/5_6_13.php
 
 * Thu Aug  6 2015 Remi Collet <remi@fedoraproject.org> 5.6.12-1
 - Update to 5.6.12
-  http://www.php.net/releases/5_6_12.php
+  https://www.php.net/releases/5_6_12.php
 
 * Fri Jul 24 2015 Remi Collet <remi@fedoraproject.org> 5.6.12-0.1.RC1
 - update to 5.6.12RC1
@@ -2416,7 +2416,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Sun Jul 12 2015 Remi Collet <remi@fedoraproject.org> 5.6.11-1
 - Update to 5.6.11
-  http://www.php.net/releases/5_6_11.php
+  https://www.php.net/releases/5_6_11.php
 
 * Thu Jun 25 2015 Remi Collet <remi@fedoraproject.org> 5.6.11-0.1.RC1
 - update to 5.6.11RC1
@@ -2427,7 +2427,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Jun 11 2015 Remi Collet <remi@fedoraproject.org> 5.6.10-1
 - Update to 5.6.10
-  http://www.php.net/releases/5_6_10.php
+  https://www.php.net/releases/5_6_10.php
 - add explicit spec license (implicit by FPCA)
 
 * Thu May 28 2015 Remi Collet <remi@fedoraproject.org> 5.6.10-0.1.RC1
@@ -2436,7 +2436,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri May 15 2015 Remi Collet <remi@fedoraproject.org> 5.6.9-1
 - Update to 5.6.9
-  http://www.php.net/releases/5_6_9.php
+  https://www.php.net/releases/5_6_9.php
 
 * Thu Apr 30 2015 Remi Collet <remi@fedoraproject.org> 5.6.9-0.1.RC1
 - update to 5.6.9RC1
@@ -2444,7 +2444,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Apr 16 2015 Remi Collet <remi@fedoraproject.org> 5.6.8-1
 - Update to 5.6.8
-  http://www.php.net/releases/5_6_8.php
+  https://www.php.net/releases/5_6_8.php
 
 * Fri Apr 10 2015 Remi Collet <remi@fedoraproject.org> 5.6.8-0.3.RC1
 - add upstream patch to drop SSLv3 tests
@@ -2457,14 +2457,14 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri Mar 20 2015 Remi Collet <remi@fedoraproject.org> 5.6.7-2
 - Update to 5.6.7
-  http://www.php.net/releases/5_6_7.php
+  https://www.php.net/releases/5_6_7.php
 
 * Sun Mar  8 2015 Remi Collet <remi@fedoraproject.org> 5.6.7-1
 - update to 5.6.7RC1
 
 * Thu Feb 19 2015 Remi Collet <remi@fedoraproject.org> 5.6.6-1
 - Update to 5.6.6
-  http://www.php.net/releases/5_6_6.php
+  https://www.php.net/releases/5_6_6.php
 
 * Thu Feb  5 2015 Remi Collet <rcollet@redhat.com> 5.6.6-0.1.RC1
 - php 5.6.6RC1 for Koschei
@@ -2474,7 +2474,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Jan 22 2015 Remi Collet <remi@fedoraproject.org> 5.6.5-1
 - Update to 5.6.5
-  http://www.php.net/releases/5_6_5.php
+  https://www.php.net/releases/5_6_5.php
 - drop deprecated php-fpm EnvironmentFile
 
 * Fri Jan  9 2015 Remi Collet <remi@fedoraproject.org> 5.6.5-0.1.RC1
@@ -2484,12 +2484,12 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Wed Dec 17 2014 Remi Collet <remi@fedoraproject.org> 5.6.4-2
 - Update to 5.6.4 (real)
-  http://www.php.net/releases/5_6_4.php
+  https://www.php.net/releases/5_6_4.php
 - php-xmlrpc requires php-xml
 
 * Wed Dec 10 2014 Remi Collet <remi@fedoraproject.org> 5.6.4-1
 - Update to 5.6.4
-  http://www.php.net/releases/5_6_4.php
+  https://www.php.net/releases/5_6_4.php
 
 * Fri Nov 28 2014 Remi Collet <rcollet@redhat.com> 5.6.4-0.1.RC1
 - php 5.6.4RC1
@@ -2512,7 +2512,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Nov 13 2014 Remi Collet <remi@fedoraproject.org> 5.6.3-1
 - Update to PHP 5.6.3
-  http://php.net/releases/5_6_3.php
+  https://php.net/releases/5_6_3.php
 
 * Fri Oct 31 2014 Remi Collet <rcollet@redhat.com> 5.6.3-0.2.RC1
 - php 5.6.3RC1 (refreshed, phpdbg changes reverted)
@@ -2526,13 +2526,13 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Oct 16 2014 Remi Collet <remi@fedoraproject.org> 5.6.1-1
 - Update to PHP 5.6.2
-  http://php.net/releases/5_6_2.php
+  https://php.net/releases/5_6_2.php
 
 * Fri Oct  3 2014 Remi Collet <remi@fedoraproject.org> 5.6.1-1
 - Update to PHP 5.6.1
-  http://php.net/releases/5_6_1.php
+  https://php.net/releases/5_6_1.php
 - use default system cipher list by Fedora policy
-  http://fedoraproject.org/wiki/Changes/CryptoPolicy
+  https://fedoraproject.org/wiki/Changes/CryptoPolicy
 
 * Wed Sep 24 2014 Remi Collet <rcollet@redhat.com> 5.6.1-0.2.RC1
 - provides nginx configuration (see #1142298)
@@ -2542,7 +2542,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Aug 28 2014 Remi Collet <remi@fedoraproject.org> 5.6.0-1
 - PHP 5.6.0 is GA
-  http://php.net/releases/5_6_0.php
+  https://php.net/releases/5_6_0.php
 - fix ZTS man pages, upstream patch for 67878
 - provides php(httpd)
 
@@ -2587,12 +2587,12 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri May 30 2014 Remi Collet <rcollet@redhat.com> 5.5.13-1
 - Update to 5.5.13
-  http://www.php.net/releases/5_5_13.php
+  https://www.php.net/releases/5_5_13.php
 - sync php.ini with upstream php.ini-production
 
 * Sat May  3 2014 Remi Collet <rcollet@redhat.com> 5.5.12-1
 - Update to 5.5.12
-  http://www.php.net/releases/5_5_12.php
+  https://www.php.net/releases/5_5_12.php
 - php-fpm: change default unix socket permission CVE-2014-0185
 
 * Wed Apr 23 2014 Remi Collet <rcollet@redhat.com> 5.5.11-2
@@ -2602,11 +2602,11 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Apr  3 2014 Remi Collet <rcollet@redhat.com> 5.5.11-1
 - Update to 5.5.11
-  http://www.php.net/ChangeLog-5.php#5.5.11
+  https://www.php.net/ChangeLog-5.php#5.5.11
 
 * Thu Mar  6 2014 Remi Collet <rcollet@redhat.com> 5.5.10-1
 - Update to 5.5.10
-  http://www.php.net/ChangeLog-5.php#5.5.10
+  https://www.php.net/ChangeLog-5.php#5.5.10
 - php-fpm should own /var/lib/php/session and wsdlcache
 - fix pcre test results with libpcre < 8.34
 
@@ -2618,7 +2618,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Tue Feb 11 2014 Remi Collet <remi@fedoraproject.org> 5.5.9-1
 - Update to 5.5.9
-  http://www.php.net/ChangeLog-5.php#5.5.9
+  https://www.php.net/ChangeLog-5.php#5.5.9
 - Install macros to /usr/lib/rpm/macros.d
 
 * Thu Jan 23 2014 Joe Orton <jorton@redhat.com> - 5.5.8-2
@@ -2729,7 +2729,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri Mar 22 2013 Remi Collet <rcollet@redhat.com> 5.5.0-0.1.beta1
 - update to 5.5.0beta1
-  http://fedoraproject.org/wiki/Features/Php55
+  https://fedoraproject.org/wiki/Features/Php55
 - new Zend OPcache extension in php-opccache new sub-package
 - don't display XFAIL tests in report
 - use xz compressed tarball
@@ -2880,7 +2880,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 - most failed tests explained (i386, x86_64)
 
 * Wed Sep 19 2012 Remi Collet <rcollet@redhat.com> 5.4.7-6
-- fix for http://bugs.php.net/63126 (#783967)
+- fix for https://bugs.php.net/63126 (#783967)
 
 * Wed Sep 19 2012 Remi Collet <rcollet@redhat.com> 5.4.7-5
 - patch to ensure we use latest libdb (not libdb4)
@@ -2897,7 +2897,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri Sep 14 2012 Remi Collet <remi@fedoraproject.org> 5.4.7-1
 - update to 5.4.7
-  http://www.php.net/releases/5_4_7.php
+  https://www.php.net/releases/5_4_7.php
 - php-fpm: don't daemonize
 
 * Mon Aug 20 2012 Remi Collet <remi@fedoraproject.org> 5.4.6-2
@@ -2999,11 +2999,11 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Tue Aug 23 2011 Remi Collet <remi@fedoraproject.org> 5.3.8-1
 - update to 5.3.8
-  http://www.php.net/ChangeLog-5.php#5.3.8
+  https://www.php.net/ChangeLog-5.php#5.3.8
 
 * Thu Aug 18 2011 Remi Collet <remi@fedoraproject.org> 5.3.7-1
 - update to 5.3.7
-  http://www.php.net/ChangeLog-5.php#5.3.7
+  https://www.php.net/ChangeLog-5.php#5.3.7
 - merge php-zts into php (#698084)
 
 * Tue Jul 12 2011 Joe Orton <jorton@redhat.com> - 5.3.6-4
@@ -3017,7 +3017,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Thu Mar 17 2011 Remi Collet <Fedora@famillecollet.com> 5.3.6-1
 - update to 5.3.6
-  http://www.php.net/ChangeLog-5.php#5.3.6
+  https://www.php.net/ChangeLog-5.php#5.3.6
 - fix php-pdo arch specific requires
 
 * Tue Mar 15 2011 Joe Orton <jorton@redhat.com> - 5.3.5-6
@@ -3038,7 +3038,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Fri Jan 07 2011 Remi Collet <Fedora@famillecollet.com> 5.3.5-1
 - update to 5.3.5
-  http://www.php.net/ChangeLog-5.php#5.3.5
+  https://www.php.net/ChangeLog-5.php#5.3.5
 - clean duplicate configure options
 
 * Tue Dec 28 2010 Remi Collet <rpms@famillecollet.com> 5.3.4-2
@@ -3050,7 +3050,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 * Sat Dec 11 2010 Remi Collet <Fedora@famillecollet.com> 5.3.4-1
 - update to 5.3.4
-  http://www.php.net/ChangeLog-5.php#5.3.4
+  https://www.php.net/ChangeLog-5.php#5.3.4
 - move phpize to php-cli (see #657812)
 
 * Wed Dec  1 2010 Remi Collet <Fedora@famillecollet.com> 5.3.3-5
@@ -3078,7 +3078,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 * Sat Mar 06 2010 Remi Collet <Fedora@famillecollet.com> 5.3.2-1
 - PHP 5.3.2 Released!
 - remove mime_magic option (now provided by fileinfo, by emu)
-- add patch for http://bugs.php.net/50578
+- add patch for https://bugs.php.net/50578
 - remove patch for libedit (upstream)
 - add runselftest option to allow build without test suite
 

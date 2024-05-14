@@ -570,7 +570,7 @@ invoking the appropriate config tool (or by hardcoding the old value for
 
 * Wed Aug 25 2010 Thomas Spura <tomspur@fedoraproject.org> - 2.0.45-6
 - rebuild with python3.2
-  http://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
+  https://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
 
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 2.0.45-5
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild

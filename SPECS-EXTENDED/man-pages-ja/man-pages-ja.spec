@@ -32,9 +32,9 @@ Release: 3%{?dist}
 License: BSD and GFDL and GPL+ and GPLv2+ and MIT and Copyright only and IEEE and ISC and GPLv2 and LGPLv2 and LGPLv2+ with exceptions and AML and Public Domain and LGPLv2+ and Artistic clarified and (GPLv2+ or Artistic) and GPLv3+ and Sendmail and BSD with advertising and GPLv2 with exceptions and xinetd
 BuildArch: noarch
 BuildRequires: perl(Env), perl(Encode)
-URL: http://linuxjm.osdn.jp/
+URL: https://linuxjm.osdn.jp/
 
-Source: http://linuxjm.osdn.jp/%{name}-%{version}.tar.gz
+Source: https://linuxjm.osdn.jp/%{name}-%{version}.tar.gz
 Source1: %{name}-rpm.pl
 Source2: %{name}-tail.1
 Source3: %{name}-echo.1

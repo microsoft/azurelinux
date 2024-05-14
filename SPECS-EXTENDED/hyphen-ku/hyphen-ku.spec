@@ -6,7 +6,7 @@ Version: 1.71.2
 Release: 19%{?dist}
 Source0: https://downloads.sourceforge.net/project/aoo-extensions/2445/12/kitandin.oxt
 Source1: %{name}-LICENSE.txt
-URL: http://extensions.services.openoffice.org/project/kitandin
+URL: https://extensions.services.openoffice.org/project/kitandin
 License: GPLv2+ or LGPLv2+
 BuildArch: noarch
 Requires: hyphen

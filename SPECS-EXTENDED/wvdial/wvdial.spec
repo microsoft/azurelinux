@@ -5,9 +5,9 @@ Name: wvdial
 Version: 1.61
 Release: 25%{?dist}
 License: LGPLv2+
-URL: http://alumnit.ca/wiki/?WvDial
-#Old location for <1.61 was http://alumnit.ca/download/wvdial-%%{version}.tar.gz
-Source0: http://wvstreams.googlecode.com/files/wvdial-%{version}.tar.gz
+URL: https://alumnit.ca/wiki/?WvDial
+#Old location for <1.61 was https://alumnit.ca/download/wvdial-%%{version}.tar.gz
+Source0: https://wvstreams.googlecode.com/files/wvdial-%{version}.tar.gz
 
 #allow specifying the remotename at startup-time
 Patch1: wvdial-1.60-remotename.patch

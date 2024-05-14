@@ -11,7 +11,7 @@ BuildArch: 		noarch
 #Actually - there is no homepage of this project, on that URL
 #page you could get complete ISO 8879 listing as was on the
 #old page - only part of it is included in sgml-common package.
-URL: 			http://www.w3.org/2003/entities/
+URL: 			https://www.w3.org/2003/entities/
 Vendor: 		Microsoft Corporation
 Distribution:   Azure Linux
 Source0: 		https://sourceware.org/ftp/docbook-tools/new-trials/SOURCES/%{name}-%{version}.tgz
@@ -82,12 +82,12 @@ XMLCATALOG=%{buildroot}%{_sysconfdir}/xml/catalog
 for type in system uri ; do
 	for path in 2001 %{xmlxsdver} ; do
 		%{_bindir}/xmlcatalog --noout --add $type \
-			"http://www.w3.org/$path/xml.xsd" \
+			"https://www.w3.org/$path/xml.xsd" \
 			"file://%{_datadir}/xml/xml.xsd" $XMLCATALOG
 	done
 	# Add xmldsig-core-schema.xsd to catalog
 	%{_bindir}/xmlcatalog --noout --add $type \
-		"http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" \
+		"https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" \
 		"file://%{_datadir}/xml/xmldsig-core-schema.xsd" $XMLCATALOG
 done
 # Now put the common DocBook entries in it
@@ -101,10 +101,10 @@ done
 	"ISO 8879:1986" \
 	"file://%{_sysconfdir}/sgml/docbook/xmlcatalog" $XMLCATALOG
 %{_bindir}/xmlcatalog --noout --add "delegateSystem" \
-	"http://www.oasis-open.org/docbook/" \
+	"https://www.oasis-open.org/docbook/" \
 	"file://%{_sysconfdir}/sgml/docbook/xmlcatalog" $XMLCATALOG
 %{_bindir}/xmlcatalog --noout --add "delegateURI" \
-	"http://www.oasis-open.org/docbook/" \
+	"https://www.oasis-open.org/docbook/" \
 	"file://%{_sysconfdir}/sgml/docbook/xmlcatalog" $XMLCATALOG
 for public in "-//W3C//DTD XMLSchema 200102//EN" "-//W3C//DTD XMLSCHEMA 200102//EN" ; do
 	%{_bindir}/xmlcatalog --noout --add "public" \
@@ -112,7 +112,7 @@ for public in "-//W3C//DTD XMLSchema 200102//EN" "-//W3C//DTD XMLSCHEMA 200102//
 		"file://%{_datadir}/xml/XMLSchema.dtd" $XMLCATALOG
 done
 %{_bindir}/xmlcatalog --noout --add "system" \
-	"http://www.w3.org/2001/XMLSchema.dtd" \
+	"https://www.w3.org/2001/XMLSchema.dtd" \
 	"file://%{_datadir}/xml/XMLSchema.dtd" $XMLCATALOG
 
 # Also create the common DocBook catalog
@@ -144,12 +144,12 @@ if [ $1 -gt 1 ] && [ -e %{_sysconfdir}/xml/catalog ]; then
 	for type in system uri ; do
 		for path in 2001 %{xmlxsdver} ; do
 			%{_bindir}/xmlcatalog --noout --add $type \
-				"http://www.w3.org/$path/xml.xsd" \
+				"https://www.w3.org/$path/xml.xsd" \
 				"file://%{_datadir}/xml/xml.xsd" \
 				%{_sysconfdir}/xml/catalog
 		done
 		%{_bindir}/xmlcatalog --noout --add $type \
-			"http://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" \
+			"https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" \
 			"file://%{_datadir}/xml/xmldsig-core-schema.xsd" %{_sysconfdir}/xml/catalog
 	done
 	for public in "-//W3C//DTD XMLSchema 200102//EN" "-//W3C//DTD XMLSCHEMA 200102//EN" ; do

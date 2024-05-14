@@ -28,7 +28,7 @@ Distribution:   Azure Linux
 URL:            https://github.com/libguestfs/supermin
 Source0:        https://download.libguestfs.org/supermin/%{source_directory}/%{name}-%{version}.tar.gz
 # For automatic RPM dependency generation.
-# See: http://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
+# See: https://www.rpm.org/wiki/PackagerDocs/DependencyGenerator
 Source3:        supermin.attr
 Source4:        supermin-find-requires
 Patch0:         %{name}-azurelinux.patch

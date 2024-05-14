@@ -6,8 +6,8 @@ Version:        20190922
 Release:        3%{?dist}
 
 License:        GPLv3+
-URL:            http://www.gnu.org/software/parallel/
-Source0:        http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
+URL:            https://www.gnu.org/software/parallel/
+Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
 
 BuildArch:      noarch
 

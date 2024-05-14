@@ -317,7 +317,7 @@ that are needed to write applications that use libpeas.
 
 * Wed Sep 19 2012 Bastien Nocera <bnocera@redhat.com> 1.5.0-1
 - Disable vala, as it was disabled upstream:
-http://git.gnome.org/browse/libpeas/commit/?id=1031aaeeef282ab2bb65cb6ae48fa4abff453c4d
+https://git.gnome.org/browse/libpeas/commit/?id=1031aaeeef282ab2bb65cb6ae48fa4abff453c4d
 
 * Wed Jul 18 2012 Ignacio Casal Quinteiro <icq@gnome.org> - 1.5.0-1
 - Update to 1.5.0

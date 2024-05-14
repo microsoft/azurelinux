@@ -144,7 +144,7 @@ install -m644 cdparanoia.1.jp $JAPN_MANDIR/cdparanoia.1
 
 * Thu Mar 21 2013 mmeister@suse.com
 - Added url as source.
-  Please see http://en.opensuse.org/SourceUrls
+  Please see https://en.opensuse.org/SourceUrls
 
 * Sun Jul 15 2012 coolo@suse.com
 - own directories for japanese man pages, no need to buildrequire man

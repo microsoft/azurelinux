@@ -106,7 +106,7 @@ BuildRequires:  python%{python3_other_pkgversion}-setuptools
 
 * Wed Aug 16 2017 Aurelien Bompard <abompard@fedoraproject.org> - 0.1.11-7
 - Build for Python3 on EPEL:
-  http://fedoraproject.org/wiki/PackagingDrafts:Python3EPEL
+  https://fedoraproject.org/wiki/PackagingDrafts:Python3EPEL
 - Modernize the spec a bit (build and install macros, no explicit buildroot)
 
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.11-6

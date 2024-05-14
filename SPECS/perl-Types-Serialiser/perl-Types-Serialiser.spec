@@ -5,8 +5,8 @@ Version:	1.01
 Release:    1%{?dist}
 License:	GPL+ or Artistic
 Group:		Development/Libraries
-URL:		http://search.cpan.org/dist/Types-Serialiser/
-Source0:	http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz
+URL:		https://search.cpan.org/dist/Types-Serialiser/
+Source0:	https://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/Types-Serialiser-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:	noarch

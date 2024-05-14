@@ -5,8 +5,8 @@ Summary: Slovak thesaurus
 %global upstreamid 20130130
 Version: 0.%{upstreamid}
 Release: 16%{?dist}
-Source: http://www.sk-spell.sk.cx/thesaurus/download/OOo-Thesaurus2-sk_SK.zip
-URL: http://www.sk-spell.sk.cx/thesaurus/
+Source: https://www.sk-spell.sk.cx/thesaurus/download/OOo-Thesaurus2-sk_SK.zip
+URL: https://www.sk-spell.sk.cx/thesaurus/
 License: MIT
 BuildArch: noarch
 Requires: mythes

@@ -5,8 +5,8 @@ Release:        19%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://rigaux.org/hexedit.html
-Source:         http://rigaux.org/%{name}-%{version}.src.tgz
+URL:            https://rigaux.org/hexedit.html
+Source:         https://rigaux.org/%{name}-%{version}.src.tgz
 Patch1:         hexedit-1.2.13-config.patch
 # Document --color option.  Sent upstream 2013-04-05.
 Patch2:         hexedit-man-page-color.patch

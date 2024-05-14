@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 # The site does NOT have an HTTPS cert available.
-URL:            http://www.libpng.org/
+URL:            https://www.libpng.org/
 Source0:        https://downloads.sourceforge.net/libpng/%{name}-%{version}.tar.xz
 
 %description

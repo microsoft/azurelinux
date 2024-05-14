@@ -6,8 +6,8 @@ License:        GPL2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Internet
-URL:            http://www.dest-unreach.org/socat
-Source0:        http://www.dest-unreach.org/socat/download/%{name}-%{version}.tar.gz
+URL:            https://www.dest-unreach.org/socat
+Source0:        https://www.dest-unreach.org/socat/download/%{name}-%{version}.tar.gz
 
 %description
 Socat is a command line based utility that establishes two bidirectional byte streams and transfers data between them. Because the streams can be constructed from a large set of different types of data sinks and sources (see address types), and because lots of address options may be applied to the streams, socat can be used for many different purposes.

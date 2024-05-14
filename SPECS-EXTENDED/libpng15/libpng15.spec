@@ -5,7 +5,7 @@ Name: libpng15
 Version: 1.5.30
 Release: 15%{?dist}
 License: zlib
-URL: http://www.libpng.org/pub/png/
+URL: https://www.libpng.org/pub/png/
 
 Source0: https://downloads.sourceforge.net/project/libpng/%{name}/%{version}/libpng-%{version}.tar.xz#/%{name}-%{version}.tar.xz
 

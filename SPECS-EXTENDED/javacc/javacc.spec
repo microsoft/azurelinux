@@ -24,7 +24,7 @@ Version:        7.0.4
 Release:        3%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
-URL:            http://javacc.org
+URL:            https://javacc.org
 Source0:        https://github.com/javacc/javacc/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildRequires:  ant
 BuildArch:      noarch

@@ -13,8 +13,8 @@ Version:		5.2.1
 Release:		10%{?dist}
 Summary:		Subroutines to solve sparse linear systems
 License:		BSD and GPLv2+
-URL:			http://crd-legacy.lbl.gov/~xiaoye/SuperLU/
-Source0:		http://crd-legacy.lbl.gov/~xiaoye/SuperLU/%{genname}_%{version}.tar.gz#/%{genname}-%{version}.tar.gz
+URL:			https://crd-legacy.lbl.gov/~xiaoye/SuperLU/
+Source0:		https://crd-legacy.lbl.gov/~xiaoye/SuperLU/%{genname}_%{version}.tar.gz#/%{genname}-%{version}.tar.gz
 Patch0:			%{genname}-cmake-includedir.patch
 Patch1:			%{genname}-removemc64.patch
 

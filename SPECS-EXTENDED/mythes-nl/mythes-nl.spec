@@ -5,8 +5,8 @@ Summary: Dutch thesaurus
 %global upstreamid 20130131
 Version: 0.%{upstreamid}
 Release: 14%{?dist}
-Source: http://data.opentaal.org/opentaalbank/thesaurus/download/thes_nl.oxt
-URL: http://data.opentaal.org/opentaalbank/thesaurus
+Source: https://data.opentaal.org/opentaalbank/thesaurus/download/thes_nl.oxt
+URL: https://data.opentaal.org/opentaalbank/thesaurus
 License: BSD or CC-BY
 BuildArch: noarch
 Requires: mythes

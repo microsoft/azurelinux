@@ -498,7 +498,7 @@ make test
 * Fri Oct 28 2016 Paul Howarth <paul@city-fan.org> - 3.0220-1
 - Update to 3.0220
   - Add comprehensive JSON decode spectests from
-    http://seriot.ch/parsing_json.html (GH#72)
+    https://seriot.ch/parsing_json.html (GH#72)
   - Decode with BOM (UTF-8, UTF-16, or UTF-32); for now only UTF-8, the others
     error
   - Fixed detection of final \0 as illegal non-whitespace garbage; fixes

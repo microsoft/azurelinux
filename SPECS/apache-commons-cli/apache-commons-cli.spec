@@ -23,8 +23,8 @@ License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/%{base_name}/
-Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/commons-cli-%{version}-src.tar.gz
+URL:            https://commons.apache.org/%{base_name}/
+Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/commons-cli-%{version}-src.tar.gz
 BuildRequires:  fdupes
 BuildRequires:  javapackages-bootstrap
 BuildRequires:  javapackages-local-bootstrap

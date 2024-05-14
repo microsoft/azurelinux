@@ -5,7 +5,7 @@ Release:        1%{?dist}
 License:        BSD-3-Clause AND Apache-2.0
 # The conda code is BSD-3-Clause
 # adapters/ftp.py is Apache-2.0
-URL:            http://conda.pydata.org/docs/
+URL:            https://conda.pydata.org/docs/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/conda/conda/archive/%{version}/%{name}-%{version}.tar.gz

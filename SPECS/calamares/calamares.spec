@@ -690,7 +690,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 
 * Sat Jan 10 2015 Kevin Kofler <Kevin@tigcc.ticalc.org> - 0.17.0-6.20150105gitfe44633e0ca52
 - New snapshot, improves the partitioning interface and updates translations
-- Point URL to http://calamares.io/
+- Point URL to https://calamares.io/
 - default-settings patch: Enable the packages module, make it remove calamares
 - desktop-file patch: Remove the NoDisplay=true line, unneeded with the above
 - Requires: dnf or yum depending on the Fedora version, for the packages module
@@ -756,7 +756,7 @@ install -p -m 644 %{SOURCE53} %{buildroot}%{_sysconfdir}/calamares/azl-eula
 * Wed Nov 05 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 0-0.9.20141104gitb9af5b7d544a7
 - New snapshot, creates sddm.conf if missing (calamares#132), adds translations
 - Use and customize the new upstream .desktop file
-- Point URL to the new http://calamares.github.io/ page
+- Point URL to the new https://calamares.github.io/ page
 
 * Tue Oct 28 2014 Kevin Kofler <Kevin@tigcc.ticalc.org> - 0-0.8.20141028git10ca85338db00
 - New snapshot, fixes FTBFS in Rawhide (Qt 5.4.0 beta) (calamares#125)

@@ -23,9 +23,9 @@ Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://commons.apache.org/%{base_name}
-Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
-Source4:        http://central.maven.org/maven2/%{short_name}/%{short_name}-api/1.1/%{short_name}-api-1.1.pom
+URL:            https://commons.apache.org/%{base_name}
+Source0:        https://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source4:        https://central.maven.org/maven2/%{short_name}/%{short_name}-api/1.1/%{short_name}-api-1.1.pom
 Patch0:         commons-logging-1.1.3-src-junit.diff
 Patch1:         commons-logging-1.2-sourcetarget.patch
 Patch2:         commons-logging-manifests.patch
@@ -179,7 +179,7 @@ install -pm 644 tmp.pom %{buildroot}/%{_mavenpomdir}/%{short_name}-adapters-%{ve
 
 * Sun Jan 24 2016 p.drouand@gmail.com
 - Update to version 1.2
-  see http://commons.apache.org/proper/commons-logging/changes-report.html
+  see https://commons.apache.org/proper/commons-logging/changes-report.html
   or RELEASE-NOTES.txt for details
 
 * Wed Mar 25 2015 tchvatal@suse.com
@@ -210,7 +210,7 @@ install -pm 644 tmp.pom %{buildroot}/%{_mavenpomdir}/%{short_name}-adapters-%{ve
 
 * Tue Aug 27 2013 mvyskocil@suse.com
 - update to 1.1.3 (bugfix release)
-  see http://commons.apache.org/proper/commons-logging/changes-report.html
+  see https://commons.apache.org/proper/commons-logging/changes-report.html
   or RELEASE-NOTES.txt for details
 - add gpg verification
 - use new add_maven_depmap from javapackages-tools

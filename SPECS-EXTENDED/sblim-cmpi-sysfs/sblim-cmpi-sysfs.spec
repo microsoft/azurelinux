@@ -8,14 +8,14 @@ Release:        24%{?dist}
 Summary:        SBLIM sysfs instrumentation
 
 License:        EPL
-URL:            http://sblim.wiki.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+URL:            https://sblim.wiki.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 
 # Patch0: already upstream,
-#         see http://sourceforge.net/tracker/index.php?func=detail&aid=2818227&group_id=128809&atid=712784
+#         see https://sourceforge.net/tracker/index.php?func=detail&aid=2818227&group_id=128809&atid=712784
 Patch0:         sblim-cmpi-sysfs-1.2.0-provider-segfault.patch
 # Patch1: issue reported upstream, patch not accepted yet,
-#         see http://sourceforge.net/tracker/index.php?func=detail&aid=2818223&group_id=128809&atid=712784
+#         see https://sourceforge.net/tracker/index.php?func=detail&aid=2818223&group_id=128809&atid=712784
 Patch1:         sblim-cmpi-sysfs-1.2.0-sysfs-links.patch
 # Patch2: remove version from docdir
 Patch2:         sblim-cmpi-sysfs-1.2.0-docdir.patch

@@ -14,7 +14,7 @@ ExcludeArch:   %{ix86} %{arm}
 # git clone https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git
 # cd trace-cmd
 # git archive --prefix=trace-cmd-%%{version}/ -o trace-cmd-v%%{version}.tar.gz %%{git_commit}
-URL:           http://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
+URL:           https://git.kernel.org/?p=linux/kernel/git/rostedt/trace-cmd.git;a=summary
 Source0:       https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/trace-cmd-v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:       trace-cmd.conf
 Source2:       trace-cmd.service

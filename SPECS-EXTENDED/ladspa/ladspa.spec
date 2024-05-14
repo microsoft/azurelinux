@@ -7,8 +7,8 @@ Summary:        Linux Audio Developer's Simple Plug-in API, examples and tools
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.ladspa.org/
-Source:         http://www.ladspa.org/download/%{name}_sdk_%{version}.tgz
+URL:            https://www.ladspa.org/
+Source:         https://www.ladspa.org/download/%{name}_sdk_%{version}.tgz
 Patch1:         ladspa-1.13-plugindir.patch
 
 BuildRequires:  perl-interpreter

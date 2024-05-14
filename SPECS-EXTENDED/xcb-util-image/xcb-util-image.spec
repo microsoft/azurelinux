@@ -5,8 +5,8 @@ Version:	0.4.0
 Release:	15%{?dist}
 Summary:	Port of Xlib's XImage and XShmImage functions on top of libxcb
 License:	MIT
-URL:		http://xcb.freedesktop.org
-Source0:	http://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
+URL:		https://xcb.freedesktop.org
+Source0:	https://xcb.freedesktop.org/dist/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 BuildRequires:	pkgconfig(xcb-util) >= 0.3.8
 BuildRequires:	m4

@@ -5,7 +5,7 @@ Summary: Khmer hunspell dictionaries
 Version: 1.82
 Release: 6%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2250/6/sbbic-khmer-spelling-checker-1.82.oxt
-URL: http://www.sbbic.org/
+URL: https://www.sbbic.org/
 License: GPLv3
 BuildArch: noarch
 

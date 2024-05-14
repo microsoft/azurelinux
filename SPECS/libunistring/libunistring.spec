@@ -3,8 +3,8 @@ Name:           libunistring
 Version:        1.1
 Release:        1%{?dist}
 License:        LGPLv3+
-Url:            http://www.gnu.org/software/libunistring/
-Source0:        http://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
+Url:            https://www.gnu.org/software/libunistring/
+Source0:        https://ftp.gnu.org/gnu/libunistring/%{name}-%{version}.tar.xz
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

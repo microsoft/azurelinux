@@ -269,7 +269,7 @@ make test TEST_FILES="xt/*.t"
 * Fri Jan 11 2013 Paul Howarth <paul@city-fan.org> - 1.38-1
 - Update to 1.38:
   - Add application/vnd.ms-excel.template.macroEnabled.12 and five related
-    from http://filext.com/faq/office_mime_types.php (CPAN RT#82616)
+    from https://filext.com/faq/office_mime_types.php (CPAN RT#82616)
 
 * Fri Dec 21 2012 Paul Howarth <paul@city-fan.org> - 1.37-1
 - Update to 1.37:

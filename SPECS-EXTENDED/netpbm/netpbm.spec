@@ -6,7 +6,7 @@ Release:         6%{?dist}
 License:         BSD and GPLv2 and IJG and MIT and Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://netpbm.sourceforge.net/
+URL: https://netpbm.sourceforge.net/
 # Source0 is prepared by
 # svn checkout https://svn.code.sf.net/p/netpbm/code/advanced netpbm-%%{version}
 # svn checkout https://svn.code.sf.net/p/netpbm/code/userguide netpbm-%%{version}/userguide

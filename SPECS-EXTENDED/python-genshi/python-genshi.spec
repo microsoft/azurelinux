@@ -11,7 +11,7 @@ Release:        4%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
 
 License:        BSD
-URL:            http://genshi.edgewall.org/
+URL:            https://genshi.edgewall.org/
 
 Source0:        %pypi_source
 
@@ -206,7 +206,7 @@ rm %{buildroot}%{python3_sitelib}/genshi/*.c
 
 * Sun Aug 22 2010 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.6-1
 - Version 0.6
-- http://svn.edgewall.org/repos/genshi/tags/0.6.0/
+- https://svn.edgewall.org/repos/genshi/tags/0.6.0/
 - (Apr 22 2010, from branches/stable/0.6.x)
 -
 -  * Support for Python 2.3 has been dropped.
@@ -264,7 +264,7 @@ rm %{buildroot}%{python3_sitelib}/genshi/*.c
 
 * Tue Oct  7 2008 Jeffrey C. Ollie <jeff@ocjtech.us> - 0.5.1-1
 - Version 0.5.1
-- http://svn.edgewall.org/repos/genshi/tags/0.5.1/
+- https://svn.edgewall.org/repos/genshi/tags/0.5.1/
 - (Jul 9 2008, from branches/stable/0.5.x)
 - 
 -  * Fix problem with nested match templates not being applied when buffering

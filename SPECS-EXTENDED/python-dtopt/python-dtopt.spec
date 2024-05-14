@@ -7,8 +7,8 @@ Version:        0.1
 Release:        36%{?dist}
 License:        MIT
 
-URL:            http://pypi.python.org/pypi/dtopt/
-Source0:        http://pypi.python.org/packages/source/d/dtopt/dtopt-%{version}.tar.gz
+URL:            https://pypi.python.org/pypi/dtopt/
+Source0:        https://pypi.python.org/packages/source/d/dtopt/dtopt-%{version}.tar.gz
 
 BuildArch:      noarch
 

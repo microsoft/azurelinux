@@ -15,11 +15,11 @@ Version: 3.2.6
 Release: 31%{?dist}
 License: GPLv2+
 #VCS: git:git://git.gnome.org/gconf
-Source0: http://download.gnome.org/sources/GConf/3.2/GConf-%{version}.tar.xz
+Source0: https://download.gnome.org/sources/GConf/3.2/GConf-%{version}.tar.xz
 Source1: macros.gconf2
-URL: http://projects.gnome.org/gconf/
+URL: https://projects.gnome.org/gconf/
 
-# http://bugzilla.gnome.org/show_bug.cgi?id=568845
+# https://bugzilla.gnome.org/show_bug.cgi?id=568845
 Patch0: GConf-gettext.patch
 
 # https://bugzilla.gnome.org/show_bug.cgi?id=671490
@@ -477,8 +477,8 @@ fi
 
 * Fri May 15 2009 Matthias Clasen  <mclasen@redhat.com> - 2.26.2-1
 - Update to 2.26.2
-- See http://download.gnome.org/sources/GConf/2.26/GConf-2.26.1.news
-- See http://download.gnome.org/sources/GConf/2.26/GConf-2.26.2.news
+- See https://download.gnome.org/sources/GConf/2.26/GConf-2.26.1.news
+- See https://download.gnome.org/sources/GConf/2.26/GConf-2.26.2.news
 
 * Mon Apr 27 2009 Matthias Clasen  <mclasen@redhat.com> - 2.26.0-3
 - Support client-side translations

@@ -25,42 +25,42 @@ Release:        40%{?dist}
 Summary:        Geronimo J2EE server J2EE specifications
 License:        ASL 2.0
 Group:          Development/Languages/Java
-URL:            http://geronimo.apache.org
+URL:            https://geronimo.apache.org
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # STEPS TO CREATE THE SOURCE FILE
 # mkdir geronimo-specs-1.2
 # cd geronimo-specs-1.2
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-activation_1.0.2_spec-1.2/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-activation_1.1_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-annotation_1.0_spec-1.1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ejb_2.1_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ejb_3.0_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-el_1.0_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-interceptor_3.0_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-connector_1.5_spec-1.1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-deployment_1.1_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-jacc_1.0_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-management_1.0_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-management_1.1_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jacc_1.1_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-javaee-deployment_1.1MR3_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jpa_3.0_spec-1.1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jsp_2.0_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jsp_2.1_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jta_1.0.1B_spec-1.1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jta_1.1_spec-1.1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-qname_1.1_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-servlet_2.4_spec-1.1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-servlet_2.5_spec-1.1/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-stax-api_1.0_spec-1.0/
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ws-metadata_2.0_spec-1.1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-activation_1.0.2_spec-1.2/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-activation_1.1_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-annotation_1.0_spec-1.1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ejb_2.1_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ejb_3.0_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-el_1.0_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-interceptor_3.0_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-connector_1.5_spec-1.1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-deployment_1.1_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-jacc_1.0_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-management_1.0_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-j2ee-management_1.1_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jacc_1.1_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-javaee-deployment_1.1MR3_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jpa_3.0_spec-1.1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jsp_2.0_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jsp_2.1_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jta_1.0.1B_spec-1.1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-jta_1.1_spec-1.1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-qname_1.1_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-servlet_2.4_spec-1.1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-servlet_2.5_spec-1.1/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-stax-api_1.0_spec-1.0/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/tags/geronimo-ws-metadata_2.0_spec-1.1.1/
 # # AS WELL AS
-# svn export http://svn.apache.org/repos/asf/geronimo/specs/trunk/geronimo-jaspi_1.0_spec/
+# svn export https://svn.apache.org/repos/asf/geronimo/specs/trunk/geronimo-jaspi_1.0_spec/
 # # AND
-# curl -O http://svn.apache.org/repos/asf/geronimo/specs/trunk/pom.xml
-# curl -O http://svn.apache.org/repos/asf/geronimo/specs/trunk/LICENSE.txt
-# curl -O http://svn.apache.org/repos/asf/geronimo/specs/trunk/NOTICE.txt
-# curl -O http://svn.apache.org/repos/asf/geronimo/specs/trunk/README.txt
+# curl -O https://svn.apache.org/repos/asf/geronimo/specs/trunk/pom.xml
+# curl -O https://svn.apache.org/repos/asf/geronimo/specs/trunk/LICENSE.txt
+# curl -O https://svn.apache.org/repos/asf/geronimo/specs/trunk/NOTICE.txt
+# curl -O https://svn.apache.org/repos/asf/geronimo/specs/trunk/README.txt
 # cd ..
 # tar --sort=name \
 #     --mtime="2021-04-26 00:00Z" \
@@ -837,7 +837,7 @@ install -m 0644 geronimo-ws-metadata_2.0_spec-1.1.1/pom.xml \
   * bugfix release and update release
   * JPA support.
   * CA - Certificate Authority capabilities, you can now issue certificates in
-    reply to CSRs. See http://cwiki.apache.org/GMOxDOC12/certification-authority.html
+    reply to CSRs. See https://cwiki.apache.org/GMOxDOC12/certification-authority.html
 - synchronized specfile with jpackage 5.0
   * mavenized
   * obsoleted geronimo-specs-j2ee-management-pom.patch,

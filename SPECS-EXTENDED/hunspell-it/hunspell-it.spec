@@ -4,8 +4,8 @@ Name: hunspell-it
 Summary: Italian hunspell dictionaries
 Version: 2.4
 Release: 1%{?dist}
-Source: http://downloads.sourceforge.net/sourceforge/linguistico/italiano_2_4_2007_09_01.zip
-URL: http://linguistico.sourceforge.net
+Source: https://downloads.sourceforge.net/sourceforge/linguistico/italiano_2_4_2007_09_01.zip
+URL: https://linguistico.sourceforge.net
 License: GPLv3+
 BuildArch: noarch
 Requires: hunspell

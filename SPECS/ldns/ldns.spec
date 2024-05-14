@@ -36,8 +36,8 @@ License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
-Url:            http://www.nlnetlabs.nl/%{name}/
-Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
+Url:            https://www.nlnetlabs.nl/%{name}/
+Source0:        https://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar.gz
 
 Patch1:         ldns-swig-4.2.patch
 
@@ -522,7 +522,7 @@ rm -rf doc/man
 - Fix for losing nameserver when it drops UDP fragments in
   ldns_resolver_send_pkt [Willem Toorop <willem@NLnetLabs.nl>]
 - Added ldnsx module (to be merged into ldns soon)
-  http://git.xelerance.com/cgi-bin/gitweb.cgi?p=ldnsx.git;a=summary
+  https://git.xelerance.com/cgi-bin/gitweb.cgi?p=ldnsx.git;a=summary
 
 * Wed Jun 08 2011 Paul Wouters <paul@xelerance.com> - 1.6.10-1
 - Upodated to 1.6.10

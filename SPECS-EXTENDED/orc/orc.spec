@@ -6,8 +6,8 @@ Release:	4%{?dist}
 Summary:	The Oil Run-time Compiler
 
 License:	BSD
-URL:		http://cgit.freedesktop.org/gstreamer/orc/
-Source0:	http://gstreamer.freedesktop.org/src/orc/%{name}-%{version}.tar.xz
+URL:		https://cgit.freedesktop.org/gstreamer/orc/
+Source0:	https://gstreamer.freedesktop.org/src/orc/%{name}-%{version}.tar.xz
 
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:	meson >= 0.47.0

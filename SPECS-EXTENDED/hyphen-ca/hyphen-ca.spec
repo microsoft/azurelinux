@@ -5,7 +5,7 @@ Summary: Catalan hyphenation rules
 Version: 0.9.3
 Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/2010/7/hyph-ca.oxt
-URL: http://extensions.services.openoffice.org/project/ca_hyph
+URL: https://extensions.services.openoffice.org/project/ca_hyph
 License: GPLv3
 BuildArch: noarch
 

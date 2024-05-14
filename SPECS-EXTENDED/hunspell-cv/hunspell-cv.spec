@@ -4,8 +4,8 @@ Name: hunspell-cv
 Summary: Chuvash hunspell dictionaries
 Version: 1.06
 Release: 6%{?dist}
-Source: http://hunspell.chv.su/files/Chuvash_Spell-1.06.oxt
-URL: http://hunspell.chv.su/download.shtml
+Source: https://hunspell.chv.su/files/Chuvash_Spell-1.06.oxt
+URL: https://hunspell.chv.su/download.shtml
 License: GPLv3+ or LGPLv3+ or MPLv1.1
 BuildArch: noarch
 Requires: hunspell

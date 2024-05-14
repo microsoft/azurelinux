@@ -7,9 +7,9 @@ Version: 0.%{upstreamid}
 Release: 22%{?dist}
 # Following link is not working and is dead
 # do not report any bugs for this
-Source0: http://www.it46.se/downloads/openoffice/dictionary/dictionary_myspell_sw_TZ_1.1.tar.gz
+Source0: https://www.it46.se/downloads/openoffice/dictionary/dictionary_myspell_sw_TZ_1.1.tar.gz
 Source1: %{name}-LICENSE.txt
-URL: http://www.it46.se
+URL: https://www.it46.se
 License: LGPLv2+
 BuildArch: noarch
 BuildRequires: hunspell-devel

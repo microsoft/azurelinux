@@ -5,7 +5,7 @@ Summary: Malay hunspell dictionaries
 %global upstreamid 20050117
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/ms_MY.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/ms_MY.zip
 Source1: %{name}-LICENSE.txt
 URL: https://wiki.openoffice.org/wiki/Dictionaries
 # affix file is under GPL+

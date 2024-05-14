@@ -11,7 +11,7 @@ URL:            https://metacpan.org/release/XML-Grove
 Source0:        https://cpan.metacpan.org/authors/id/K/KM/KMACLEOD/XML-Grove-%{cpan_version}.tar.gz#/perl-XML-Grove-%{cpan_version}.tar.gz
 Patch1:         perl-XML-Grove-test.patch
 # Patch is based on upstream changes
-# see http://perl-xml.cvs.sourceforge.net/perl-xml/XML-Grove/COPYING?revision=1.2&view=markup
+# see https://perl-xml.cvs.sourceforge.net/perl-xml/XML-Grove/COPYING?revision=1.2&view=markup
 Patch2:         perl-XML-Grove-fix-COPYING.patch
 
 BuildArch:      noarch
@@ -208,7 +208,7 @@ make test
 
 * Sun Jul 20 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0.46alpha-32
 - fix license tag with upstream confirmation
-  see: http://perl-xml.cvs.sourceforge.net/perl-xml/XML-Grove/COPYING?revision=1.2&view=markup
+  see: https://perl-xml.cvs.sourceforge.net/perl-xml/XML-Grove/COPYING?revision=1.2&view=markup
 
 * Wed Mar  5 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0.46alpha-31
 - rebuild for new perl

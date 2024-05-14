@@ -14,7 +14,7 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -25,8 +25,8 @@ Release:        285%{?dist}
 Summary:        A Lexical Analyzer Generator for Java
 License:        MIT
 Group:          Development/Libraries/Java
-Url:            http://www.cs.princeton.edu/~appel/modern/java/JLex/
-Source0:        http://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java
+Url:            https://www.cs.princeton.edu/~appel/modern/java/JLex/
+Source0:        https://www.cs.princeton.edu/~appel/modern/java/JLex/Archive/1.2.5/Main.java
 Source1:        %{name}-%{version}.build.xml
 Patch0:         %{name}-%{version}.static.patch
 BuildRequires:  ant

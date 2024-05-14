@@ -559,7 +559,7 @@ rm $RPM_BUILD_ROOT%{_libdir}/gnome-keyring/devel/*.la
 
 * Sun Apr 12 2009 Matthias Clasen <mclasen@redhat.com> - 2.26.1-1
 - Update to 2.26.1
-- See http://download.gnome.org/sources/gnome-keyring/2.26/gnome-keyring-2.26.1.news
+- See https://download.gnome.org/sources/gnome-keyring/2.26/gnome-keyring-2.26.1.news
 
 * Wed Apr  8 2009 Matthias Clasen <mclasen@redhat.com> - 2.26.0-4
 - Fix service activation

@@ -19,8 +19,8 @@ Provides: crtools = %{version}-%{release}
 Obsoletes: crtools <= 1.0-2
 Summary: Tool for Checkpoint/Restore in User-space
 License: GPLv2
-URL: http://criu.org/
-Source0: http://download.openvz.org/criu/criu-%{version}.tar.bz2
+URL: https://criu.org/
+Source0: https://download.openvz.org/criu/criu-%{version}.tar.bz2
 
 Patch0: unifying_struct_names.patch
 

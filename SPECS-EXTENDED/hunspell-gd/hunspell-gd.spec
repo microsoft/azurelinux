@@ -4,8 +4,8 @@ Name: hunspell-gd
 Summary: Scots Gaelic hunspell dictionaries
 Version: 2.6
 Release: 15%{?dist}
-Source: http://downloads.sourceforge.net/project/aoo-extensions/4587/8/hunspell-gd-2.6.oxt
-URL: http://extensions.services.openoffice.org/en/project/faclair-afb
+Source: https://downloads.sourceforge.net/project/aoo-extensions/4587/8/hunspell-gd-2.6.oxt
+URL: https://extensions.services.openoffice.org/en/project/faclair-afb
 License: GPLv2+ and GPLv3+
 BuildArch: noarch
 

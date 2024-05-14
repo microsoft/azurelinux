@@ -26,7 +26,7 @@ Release:        3%{?dist}
 Summary:        Code Generation Library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://cglib.sourceforge.net/
+URL:            https://cglib.sourceforge.net/
 Source0:        https://github.com/cglib/cglib/archive/%{tarball_name}.tar.gz
 Source1:        %{name}-%{version}-build.tar.xz
 BuildRequires:  ant >= 1.6

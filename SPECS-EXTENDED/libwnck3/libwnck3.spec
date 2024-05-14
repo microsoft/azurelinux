@@ -6,8 +6,8 @@ Summary: Window Navigator Construction Kit
 Name: libwnck3
 Version: 3.36.0
 Release: 3%{?dist}
-URL: http://download.gnome.org/sources/%{source_name}/
-Source0: http://download.gnome.org/sources/%{source_name}/3.36/%{source_name}-%{version}.tar.xz
+URL: https://download.gnome.org/sources/%{source_name}/
+Source0: https://download.gnome.org/sources/%{source_name}/3.36/%{source_name}-%{version}.tar.xz
 License: GPLv2
 
 BuildRequires: %{_bindir}/xsltproc

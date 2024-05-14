@@ -8,7 +8,7 @@ Release: 11%{?dist}
 
 License: GPLv2+
 URL:     https://www.gnu.org/software/libsigsegv/
-Source0: http://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
+Source0: https://ftp.gnu.org/gnu/libsigsegv/libsigsegv-%{version}.tar.gz
 Patch0: configure.patch
 
 BuildRequires: automake libtool

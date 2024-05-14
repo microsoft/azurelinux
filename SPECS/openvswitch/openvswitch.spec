@@ -26,7 +26,7 @@ Vendor:            Microsoft Corporation
 Distribution:      Azure Linux
 Group:             System Environment/Daemons
 URL:               https://www.openvswitch.org/
-Source0:           http://openvswitch.org/releases/%{name}-%{version}.tar.gz
+Source0:           https://openvswitch.org/releases/%{name}-%{version}.tar.gz
 Source1:           openvswitch.sysusers
 
 # ovs-patches

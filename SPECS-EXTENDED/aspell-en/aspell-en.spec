@@ -8,7 +8,7 @@ Name: aspell-%{lang}
 Version: 2019.10.06
 Release: 4%{?dist}
 License: MIT and BSD
-URL: http://aspell.net/
+URL: https://aspell.net/
 Source: ftp://ftp.gnu.org/gnu/aspell/dict/%{lang}/aspell%{aspellversion}-%{lang}-%{version}-%{langrelease}.tar.bz2
 Buildrequires: aspell >= 0.60
 Requires: aspell >= 0.60

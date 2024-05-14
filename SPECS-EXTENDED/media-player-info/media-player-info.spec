@@ -6,8 +6,8 @@ Release:        7%{?dist}
 Summary:        Data files describing media player capabilities
 
 License:        BSD
-URL:            http://www.freedesktop.org/wiki/Software/media-player-info
-Source0:        http://www.freedesktop.org/software/media-player-info/%{name}-%{version}.tar.gz
+URL:            https://www.freedesktop.org/wiki/Software/media-player-info
+Source0:        https://www.freedesktop.org/software/media-player-info/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  pkgconfig(udev)

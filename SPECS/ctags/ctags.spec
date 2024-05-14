@@ -167,9 +167,9 @@ make check
 * Thu Jun 13 2013 John Dennis <jdennis@redhat.com> - 5.8-11
 - add ctags-5.8-memmove.patch
   bug #284 absoluteFilename uses strcpy on overlapping strings 
-  http://sourceforge.net/p/ctags/bugs/284/  
+  https://sourceforge.net/p/ctags/bugs/284/  
   The bug was fixed upstream on 2012-03-26 in the following commit
-  http://sourceforge.net/p/ctags/code/782/
+  https://sourceforge.net/p/ctags/code/782/
   ctags-5.8-memmove.patch simply adds the same patch as the above commit.
 
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.8-10

@@ -8,8 +8,8 @@ Version:        3.75
 Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/common-sense
-Source0:        http://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
+URL:            https://search.cpan.org/dist/common-sense
+Source0:        https://search.cpan.org/CPAN/authors/id/M/ML/MLEHMANN/common-sense-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0

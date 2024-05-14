@@ -6,7 +6,7 @@ Summary: Serbian hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 15%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1572/10/dict-sr.oxt
-URL: http://extensions.services.openoffice.org/project/dict-sr
+URL: https://extensions.services.openoffice.org/project/dict-sr
 License: LGPLv3
 BuildArch: noarch
 Requires: hunspell

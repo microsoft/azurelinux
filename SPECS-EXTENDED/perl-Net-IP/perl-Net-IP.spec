@@ -3,7 +3,7 @@ Summary:        Perl module for manipulation of IPv4 and IPv6 addresses
 Name:           perl-Net-IP
 Version:        1.26
 Release:        32%{?dist}
-# Some ambiguity here, see http://rt.cpan.org/Ticket/Display.html?id=28689
+# Some ambiguity here, see https://rt.cpan.org/Ticket/Display.html?id=28689
 # HPND (MIT-like) for the IP.pm itself, and "like Perl itself" for all the other
 # scripts included.
 License:        HPND AND (GPL-1.0-or-later OR Artistic-1.0-Perl)
@@ -225,7 +225,7 @@ PERL5LIB=%{buildroot}%{perl_vendorlib} ./iptab
 - disable tests due to upstream bug 50114
 
 * Fri Feb  1 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.25-6
-- Work around http://rt.perl.org/rt3//Public/Bug/Display.html?id=50114
+- Work around https://rt.perl.org/rt3//Public/Bug/Display.html?id=50114
 
 * Thu Jan 31 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 1.25-5
 - rebuild for new perl

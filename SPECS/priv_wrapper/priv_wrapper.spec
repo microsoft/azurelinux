@@ -6,7 +6,7 @@ Release:        5%{?dist}
 
 Summary:        A library to disable resource limits and other privilege dropping
 License:        GPLv3+
-Url:            http://cwrap.org/
+Url:            https://cwrap.org/
 
 Source0:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz
 Source1:        https://ftp.samba.org/pub/cwrap/%{name}-%{version}.tar.gz.asc

@@ -5,8 +5,8 @@ Version:        0.4.2
 Release:        15%{?dist}
 Summary:        LiquidRescale library
 License:        GPLv3
-URL:            http://liquidrescale.wikidot.com/
-Source0:        http://liblqr.wikidot.com/local--files/en:download-page/%{name}-%{version}.tar.bz2
+URL:            https://liquidrescale.wikidot.com/
+Source0:        https://liblqr.wikidot.com/local--files/en:download-page/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc
 BuildRequires:  glib2-devel
 

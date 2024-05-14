@@ -8,8 +8,8 @@ Release:        23%{?dist}
 Summary:        SBLIM testsuite
 
 License:        EPL
-URL:            http://sblim.wiki.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+URL:            https://sblim.wiki.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 BuildArch:      noarch
 BuildRequires:      perl-generators
 

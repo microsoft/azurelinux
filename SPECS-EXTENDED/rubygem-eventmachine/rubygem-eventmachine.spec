@@ -9,7 +9,7 @@ Summary:       Ruby/EventMachine library
 License:       MIT
 Vendor:	       Microsoft Corporation
 Distribution:   Azure Linux
-URL:           http://rubyeventmachine.com
+URL:           https://rubyeventmachine.com
 Source0:       https://github.com/eventmachine/eventmachine/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby
 BuildRequires: gcc-c++

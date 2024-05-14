@@ -8,8 +8,8 @@ Release: 9%{?dist}
 Summary: A library for import of Adobe PageMaker documents
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libpagemaker
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libpagemaker
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

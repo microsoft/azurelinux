@@ -8,8 +8,8 @@ Release: 2%{?dist}
 Summary: A library for import of many old Mac document formats
 
 License: LGPLv2+ or MPLv2.0
-URL: http://sourceforge.net/projects/libmwaw/
-Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
+URL: https://sourceforge.net/projects/libmwaw/
+Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: doxygen
 BuildRequires: gcc-c++

@@ -31,7 +31,7 @@ converter. A plugin can be created for any trace format to allow its conversion
 to/from another trace format.
 
 The main format expected to be converted to/from is the Common Trace
-Format (CTF). See http://www.efficios.com/ctf.
+Format (CTF). See https://www.efficios.com/ctf.
 
 
 %package -n lib%{name}

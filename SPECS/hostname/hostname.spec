@@ -6,7 +6,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://packages.qa.debian.org/h/hostname.html
-Source0:        http://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://ftp.de.debian.org/debian/pool/main/h/hostname/hostname_%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        gpl-2.0.txt
 Source2:        nis-domainname
 Source3:        nis-domainname.service

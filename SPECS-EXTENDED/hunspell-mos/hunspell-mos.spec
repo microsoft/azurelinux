@@ -5,8 +5,8 @@ Summary: Mossi hunspell dictionaries
 %global upstreamid 20101130
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source: http://www.abcburkina.net/ancien/documents/lingu/DicoMoore.zip
-URL: http://www.abcburkina.net/content/view/377/48/lang,fr
+Source: https://www.abcburkina.net/ancien/documents/lingu/DicoMoore.zip
+URL: https://www.abcburkina.net/content/view/377/48/lang,fr
 License: LGPLv3
 BuildArch: noarch
 Requires: hunspell

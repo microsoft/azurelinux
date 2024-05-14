@@ -6,8 +6,8 @@ Release:        15%{?dist}
 Summary:        OAuth library functions
 
 License:        MIT
-URL:            http://liboauth.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:            https://liboauth.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 %if 0%{?el5}
 %endif
 

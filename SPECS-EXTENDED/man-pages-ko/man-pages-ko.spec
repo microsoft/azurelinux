@@ -6,10 +6,10 @@ Version: 20050219
 Release: 39%{?dist}
 License: Copyright only
 #Vendor: Korean Manpage Project Team.
-URL: http://man.kldp.org/
-Source0: http://kldp.net/frs/download.php/1918/%{name}-%{version}.tar.gz
+URL: https://man.kldp.org/
+Source0: https://kldp.net/frs/download.php/1918/%{name}-%{version}.tar.gz
 # The original version of the copyright text is on the upstream wiki:
-# http://man.kldp.org/wiki/ManPageCopyright
+# https://man.kldp.org/wiki/ManPageCopyright
 Source1: Man_Page_Copyright
 # Patch for utf-8 conversion (original patch includes euc-kr and iso-8859-1)
 Patch0: %{name}-%{version}.patch
@@ -21,13 +21,13 @@ Supplements: (man-pages and langpacks-ko)
 %description
 Korean translation of the official manpages from LDP and
 another useful manpages from various packages. It's done
-by the Korean Manpage Project <http://man.kldp.org> which
+by the Korean Manpage Project <https://man.kldp.org> which
 is maintained by Korean Manpage Project Team.
 
 %description -l ko
 한글 Manpage 프로젝트에서 비롯된 한글 Manpages.
 이는 한글 Manpage 프로젝트 팀이 관리하는 한글 Manpage
-프로젝트 <http://man.kldp.org>에 의한 것입니다.
+프로젝트 <https://man.kldp.org>에 의한 것입니다.
 
 %prep
 %setup -q -c %{name}-%{version}

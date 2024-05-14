@@ -12,7 +12,7 @@ Name: acpid
 Version: 2.0.32
 Release: 3%{?dist}
 License: GPLv2+
-Source: http://downloads.sourceforge.net/acpid2/%{name}-%{version}.tar.xz
+Source: https://downloads.sourceforge.net/acpid2/%{name}-%{version}.tar.xz
 Source2: acpid.video.conf
 Source3: acpid.power.conf
 Source4: acpid.power.sh
@@ -22,7 +22,7 @@ Source7: acpid.socket
 # https://sourceforge.net/p/acpid2/tickets/14/
 Patch0: acpid-2.0.32-kacpimon-dynamic-connections.patch
 ExclusiveArch: ia64 x86_64 %{ix86} %{arm} aarch64
-URL: http://sourceforge.net/projects/acpid2/
+URL: https://sourceforge.net/projects/acpid2/
 BuildRequires: systemd, gcc
 Requires(post): systemd
 Requires(preun): systemd

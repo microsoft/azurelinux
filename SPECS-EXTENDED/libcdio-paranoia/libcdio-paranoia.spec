@@ -5,8 +5,8 @@ Version: 10.2+2.0.0
 Release: 5%{?dist}
 Summary: CD paranoia on top of libcdio
 License: GPLv3+
-URL: http://www.gnu.org/software/libcdio/
-Source0: http://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-%{version}.tar.bz2
+URL: https://www.gnu.org/software/libcdio/
+Source0: https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-%{version}.tar.bz2
 Patch0: libcdio-paranoia-manpage.patch
 BuildRequires: gcc
 BuildRequires: pkgconfig

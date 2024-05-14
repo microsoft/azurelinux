@@ -5,9 +5,9 @@ Version:	0.16
 Release:	3%{?dist}
 Summary:	Proxy configuration dæmon
 License:	GPLv2
-URL:		http://connman.net/
+URL:		https://connman.net/
 
-Source0:	http://www.kernel.org/pub/linux/network/connman/pacrunner-%{version}.tar.xz
+Source0:	https://www.kernel.org/pub/linux/network/connman/pacrunner-%{version}.tar.xz
 
 BuildRequires:  gcc-c++
 BuildRequires:  gcc

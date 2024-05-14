@@ -57,15 +57,15 @@ Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.postfix.org
+URL:            https://www.postfix.org
 Source0:        ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
 Source1:        postfix-etc-init.d-postfix
 Source2:        postfix.service
 Source3:        README-Postfix-SASL-RedHat.txt
 Source4:        postfix.aliasesdb
 Source5:        postfix-chroot-update
-# Postfix Log Entry Summarizer: http://jimsun.linxnet.com/postfix_contrib.html
-Source53:       http://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
+# Postfix Log Entry Summarizer: https://jimsun.linxnet.com/postfix_contrib.html
+Source53:       https://jimsun.linxnet.com/downloads/pflogsumm-%{pflogsumm_ver}.tar.gz
 # Sources >= 100 are config files
 Source100:      postfix-sasl.conf
 Source101:      postfix-pam.conf

@@ -15,10 +15,10 @@ License: GPLv2+ or Artistic
 # Source: ftp://ftp.procmail.org/pub/procmail/procmail-%{version}.tar.gz
 # The original source doesn't seem to be available anymore, using mirror
 Source: ftp://ftp.ucsb.edu/pub/mirrors/procmail/procmail-%{version}.tar.gz
-# Source2: http://www.linux.org.uk/~telsa/BitsAndPieces/procmailrc
+# Source2: https://www.linux.org.uk/~telsa/BitsAndPieces/procmailrc
 # The Telsa config file doesn't seem to be available anymore, using local copy
 Source2: procmailrc
-URL: http://www.procmail.org
+URL: https://www.procmail.org
 Patch0: procmail-3.22-rhconfig.patch
 Patch1: procmail-3.15.1-man.patch
 Patch2: procmail_3.22-8.debian.patch

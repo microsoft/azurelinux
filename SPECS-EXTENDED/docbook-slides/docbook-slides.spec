@@ -6,13 +6,13 @@ Name: docbook-slides
 Version: 3.4.0
 Release: 25%{?dist}
 License: MIT
-URL: http://sourceforge.net/projects/docbook
-Source0: http://downloads.sourceforge.net/docbook/%{name}-%{version}.tar.gz
+URL: https://sourceforge.net/projects/docbook
+Source0: https://downloads.sourceforge.net/docbook/%{name}-%{version}.tar.gz
 Source1: %{name}.xml
 Source2: %{name}.cat
 Source3: %{name}.README.redhat
 #tests update and buildtools could be downloaded at upstream svn ... e.g.
-#http://docbook.svn.sourceforge.net/viewvc/docbook/trunk/slides/tests/
+#https://docbook.svn.sourceforge.net/viewvc/docbook/trunk/slides/tests/
 Source4: %{name}-tests.tar.gz
 BuildArch: noarch
 Requires: docbook-dtds
@@ -93,10 +93,10 @@ then
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
 
         %{_bindir}/xmlcatalog --noout --add "delegateSystem" \
-                "http://docbook.sourceforge.net/release/slides" \
+                "https://docbook.sourceforge.net/release/slides" \
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
         %{_bindir}/xmlcatalog --noout --add "delegateURI" \
-                "http://docbook.sourceforge.net/release/slides" \
+                "https://docbook.sourceforge.net/release/slides" \
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
 fi
 ####################################################################

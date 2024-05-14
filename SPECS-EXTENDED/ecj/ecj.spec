@@ -27,9 +27,9 @@ Summary:        Eclipse Compiler for Java
 License:        EPL-2.0
 Group:          Development/Libraries/Java
 URL:            https://www.eclipse.org
-Source0:        http://download.eclipse.org/eclipse/downloads/drops4/%{qualifier}/ecjsrc-%{version}.jar
+Source0:        https://download.eclipse.org/eclipse/downloads/drops4/%{qualifier}/ecjsrc-%{version}.jar
 # Jdk10 sources to build Java API stubs for newer JDKs
-# wget http://hg.openjdk.java.net/jdk-updates/jdk10u/archive/45b1d041a4ef.tar.bz2 -O jdk10u.tar.bz2
+# wget https://hg.openjdk.java.net/jdk-updates/jdk10u/archive/45b1d041a4ef.tar.bz2 -O jdk10u.tar.bz2
 # tar xf jdk10u.tar.bz2 && rm jdk10u.tar.bz2
 # mv jdk10u-45b1d041a4ef/src/java.compiler/share/classes java10api-src && rm -rf jdk10u-45b1d041a4ef
 # tar cJf java10api-src.tar.xz java10api-src && rm -rf java10api-src

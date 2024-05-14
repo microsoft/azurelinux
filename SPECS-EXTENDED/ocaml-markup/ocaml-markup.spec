@@ -14,7 +14,7 @@ Release:        5%{?dist}
 Summary:        Error-recovering streaming HTML5 and XML parsers for OCaml
 
 License:        MIT
-URL:            http://aantron.github.io/markup.ml/
+URL:            https://aantron.github.io/markup.ml/
 Source0:        https://github.com/aantron/markup.ml/archive/%{version}/%{srcname}-%{version}.tar.gz
 
 BuildRequires:  ocaml >= 4.02.0

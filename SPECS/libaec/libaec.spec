@@ -23,7 +23,7 @@ Libaec implements Golomb Rice coding as defined in the Space Data
 System Standard documents 121.0-B-2 and 120.0-G-2.
 
 Libaec includes a free drop-in replacement for the SZIP
-library (http://www.hdfgroup.org/doc_resource/SZIP).
+library (https://www.hdfgroup.org/doc_resource/SZIP).
 
 %package devel
 Summary:        Devel package for libaec (Adaptive Entropy Coding library)

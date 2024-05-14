@@ -7,7 +7,7 @@ Summary:        SBLIM CMPI Base Providers
 
 License:        EPL-1.0
 URL:            https://sourceforge.net/projects/sblim/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Patch0:         sblim-cmpi-base-1.6.0-missing-fclose.patch
 Patch1:         sblim-cmpi-base-1.6.0-methods-enable.patch
 Patch2:         sblim-cmpi-base-1.6.1-double-fclose.patch

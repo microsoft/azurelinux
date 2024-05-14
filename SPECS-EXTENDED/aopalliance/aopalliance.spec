@@ -24,12 +24,12 @@ Release:        4%{?dist}
 Summary:        Java/J2EE AOP standards
 License:        Public Domain
 Group:          Development/Libraries/Java
-URL:            http://aopalliance.sourceforge.net/
+URL:            https://aopalliance.sourceforge.net/
 # cvs -d:pserver:anonymous@aopalliance.cvs.sourceforge.net:/cvsroot/aopalliance login
 # password empty
 # cvs -z3 -d:pserver:anonymous@aopalliance.cvs.sourceforge.net:/cvsroot/aopalliance export -r HEAD aopalliance
 Source0:        %{_distro_sources_url}/aopalliance-src.tar.gz
-Source1:        http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+Source1:        https://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
 Source2:        %{name}-MANIFEST.MF
 Source3:        %{name}-LICENSE.txt 
 BuildRequires:  ant

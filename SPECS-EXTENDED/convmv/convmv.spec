@@ -6,8 +6,8 @@ Version: 2.05
 Release: 7%{?dist}
 
 License: GPLv2 or GPLv3
-URL: http://j3e.de/linux/convmv
-Source0: http://j3e.de/linux/convmv/convmv-%{version}.tar.gz
+URL: https://j3e.de/linux/convmv
+Source0: https://j3e.de/linux/convmv/convmv-%{version}.tar.gz
 Patch0: convmv-2.0-preserve-timestamps.patch
 BuildArch: noarch
 BuildRequires: perl-generators

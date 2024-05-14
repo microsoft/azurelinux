@@ -27,7 +27,7 @@ Summary:        Commons Collections Package
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            https://commons.apache.org/proper/commons-collections
-Source0:        http://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source0:        https://www.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        commons-collections-testframework.pom
 Patch0:         jakarta-commons-collections-javadoc-nonet.patch
 Patch1:         commons-collections-3.2-build_xml.patch

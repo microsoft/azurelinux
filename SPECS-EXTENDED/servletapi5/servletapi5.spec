@@ -14,7 +14,7 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -26,7 +26,7 @@ Release:        290%{?dist}
 Summary:        Java servlet and JSP implementation classes
 License:        ASL 1.1
 Group:          Development/Libraries/Java
-Url:            http://jakarta.apache.org/tomcat/
+Url:            https://jakarta.apache.org/tomcat/
 Source0:        %{_distro_sources_url}/%{full_name}-5-src.tar.gz
 #!BuildIgnore:  xml-commons xml-commons-resolver xerces-j2 xml-commons-apis
 #!BuildIgnore:  xml-commons-jaxp-1.3-apis

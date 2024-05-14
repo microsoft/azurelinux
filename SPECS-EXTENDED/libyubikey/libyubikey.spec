@@ -6,8 +6,8 @@ Release:        14%{?dist}
 Summary:        C library for decrypting and parsing Yubikey One-time passwords
 
 License:        BSD
-URL:            http://opensource.yubico.com/yubico-c
-Source0:        http://opensource.yubico.com/yubico-c/releases/%{name}-%{version}.tar.gz
+URL:            https://opensource.yubico.com/yubico-c
+Source0:        https://opensource.yubico.com/yubico-c/releases/%{name}-%{version}.tar.gz
 BuildRequires:  gcc
 
 %description

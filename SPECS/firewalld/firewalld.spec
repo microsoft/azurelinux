@@ -447,7 +447,7 @@ fi
 
 * Fri Jun  9 2017 Thomas Woerner <twoerner@redhat.com> - 0.4.4.5-1
 - Rebase to firewalld-0.4.4.5
-  http://www.firewalld.org/2017/06/firewalld-0-4-4-5-release
+  https://www.firewalld.org/2017/06/firewalld-0-4-4-5-release
   - Fix build from spec
   - Fix –remove-service-from-zone option (RHBZ#1438127)
   - Support sctp and dccp in ports, source-ports, forward-ports, helpers and
@@ -469,7 +469,7 @@ fi
 
 * Mon Mar 27 2017 Thomas Woerner <twoerner@redhat.com> - 0.4.4.4-1
 - Rebase to firewalld-0.4.4.4
-  http://www.firewalld.org/2017/03/firewalld-0-4-4-4-release
+  https://www.firewalld.org/2017/03/firewalld-0-4-4-4-release
 - Drop references to fedorahosted.org from spec file and Makefile.am, use
   archive from github
 - Fix inconsistent ordering of rules in INPUT_ZONE_SOURCE (issue#166)
@@ -485,7 +485,7 @@ fi
 
 * Fri Feb 10 2017 Thomas Woerner <twoerner@redhat.com> - 0.4.4.3-1
 - Rebase to firewalld-0.4.4.3
-  http://www.firewalld.org/2017/02/firewalld-0-4-4-3-release
+  https://www.firewalld.org/2017/02/firewalld-0-4-4-3-release
 - Speed up of large file loading
 - Support for more ipset types
 - Speed up of adding or removing entries for ipsets from files

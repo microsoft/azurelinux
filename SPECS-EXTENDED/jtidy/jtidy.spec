@@ -31,8 +31,8 @@ Release:        32%{?dist}
 Summary:        HTML syntax checker and pretty printer
 License:        BSD
 Group:          Development/Libraries/Java
-URL:            http://jtidy.sourceforge.net/
-# svn export -r813 http://svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
+URL:            https://jtidy.sourceforge.net/
+# svn export -r813 https://svn.sourceforge.net/svnroot/jtidy/trunk/jtidy/ jtidy
 # # bnc#501764
 # rm jtidy/src/config/clover.license
 Source0:        %{_distro_sources_url}/jtidy-r813.tar.bz2

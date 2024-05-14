@@ -8,8 +8,8 @@ Release: 7%{?dist}
 Summary: A library for import of Macromedia/Adobe FreeHand documents
 
 License: MPLv2.0
-URL: http://wiki.documentfoundation.org/DLP/Libraries/libfreehand
-Source: http://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
+URL: https://wiki.documentfoundation.org/DLP/Libraries/libfreehand
+Source: https://dev-www.libreoffice.org/src/%{name}/%{name}-%{version}.tar.xz
 
 BuildRequires: boost-devel
 BuildRequires: doxygen

@@ -6,7 +6,7 @@ Release:        1%{?dist}
 License:        GPL+ or Artistic
 Group:          Development/Libraries
 Source0:        https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/Module-ScanDeps-%{version}.tar.gz
-URL:            http://search.cpan.org/dist/Module-ScanDeps/
+URL:            https://search.cpan.org/dist/Module-ScanDeps/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildArch:      noarch

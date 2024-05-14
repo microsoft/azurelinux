@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://libpipeline.nongnu.org
-Source0:        http://download.savannah.gnu.org/releases/libpipeline/%{name}-%{version}.tar.gz
+Source0:        https://download.savannah.gnu.org/releases/libpipeline/%{name}-%{version}.tar.gz
 %if 0%{?with_check}
 BuildRequires:  check
 %endif

@@ -24,7 +24,7 @@ Release:        5%{?dist}
 Summary:        Re-implementation of zlib in pure Java
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
-URL:            http://www.jcraft.com/jzlib/
+URL:            https://www.jcraft.com/jzlib/
 Source0:        https://github.com/ymnk/jzlib/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}_build.xml
 # This patch is sent upstream: https://github.com/ymnk/jzlib/pull/15

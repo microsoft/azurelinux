@@ -300,36 +300,36 @@ export LDFLAGS="-lzopfli ${LDFLAGS-}"
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.15-10
 - Autorebuild for GCC 4.3
 
-* Wed Aug 22 2007 Matthias Saou <http://freshrpms.net/> 1.15-9
+* Wed Aug 22 2007 Matthias Saou <https://freshrpms.net/> 1.15-9
 - Rebuild for new BuildID feature.
 
-* Fri Aug  3 2007 Matthias Saou <http://freshrpms.net/> 1.15-8
+* Fri Aug  3 2007 Matthias Saou <https://freshrpms.net/> 1.15-8
 - Update License field.
 - Remove dist tag, since the package will seldom change.
 
-* Thu Mar 29 2007 Matthias Saou <http://freshrpms.net/> 1.15-7
+* Thu Mar 29 2007 Matthias Saou <https://freshrpms.net/> 1.15-7
 - Switch to using DESTDIR install method.
 
-* Thu Mar 29 2007 Matthias Saou <http://freshrpms.net/> 1.15-6
+* Thu Mar 29 2007 Matthias Saou <https://freshrpms.net/> 1.15-6
 - Switch to use downloads.sf.net source URL.
 - Tweak defattr.
 
-* Mon Aug 28 2006 Matthias Saou <http://freshrpms.net/> 1.15-5
+* Mon Aug 28 2006 Matthias Saou <https://freshrpms.net/> 1.15-5
 - FC6 rebuild, remove gcc-c++ build requirement (it's a default).
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 1.15-4
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 1.15-4
 - FC5 rebuild.
 
-* Wed Feb  8 2006 Matthias Saou <http://freshrpms.net/> 1.15-3
+* Wed Feb  8 2006 Matthias Saou <https://freshrpms.net/> 1.15-3
 - Rebuild for new gcc/glibc.
 
-* Tue Jan 24 2006 Matthias Saou <http://freshrpms.net/> 1.15-2
+* Tue Jan 24 2006 Matthias Saou <https://freshrpms.net/> 1.15-2
 - Rebuild for FC5.
 
-* Wed Nov  2 2005 Matthias Saou <http://freshrpms.net/> 1.15-1
+* Wed Nov  2 2005 Matthias Saou <https://freshrpms.net/> 1.15-1
 - Update to 1.15, includes 64bit fixes.
 
-* Fri May 27 2005 Matthias Saou <http://freshrpms.net/> 1.14-5
+* Fri May 27 2005 Matthias Saou <https://freshrpms.net/> 1.14-5
 - Update 64bit patch to a cleaner approach as Ralf suggested.
 
 * Thu May 26 2005 Jeremy Katz <katzj@redhat.com> - 1.14-4
@@ -341,27 +341,27 @@ export LDFLAGS="-lzopfli ${LDFLAGS-}"
 * Thu Apr  7 2005 Michael Schwendt <mschwendt[AT]users.sf.net> 1.14-2
 - rebuilt
 
-* Wed Feb 23 2005 Matthias Saou <http://freshrpms.net/> 1.14-1
+* Wed Feb 23 2005 Matthias Saou <https://freshrpms.net/> 1.14-1
 - Update to 1.14.
 
-* Mon Nov 29 2004 Matthias Saou <http://freshrpms.net/> 1.13-1
+* Mon Nov 29 2004 Matthias Saou <https://freshrpms.net/> 1.13-1
 - Update to 1.13.
 
-* Tue Nov  2 2004 Matthias Saou <http://freshrpms.net/> 1.12-1
+* Tue Nov  2 2004 Matthias Saou <https://freshrpms.net/> 1.12-1
 - Update to 1.12.
 
-* Tue Aug 24 2004 Matthias Saou <http://freshrpms.net/> 1.11-1
+* Tue Aug 24 2004 Matthias Saou <https://freshrpms.net/> 1.11-1
 - Update to 1.11.
 
-* Mon May 17 2004 Matthias Saou <http://freshrpms.net/> 1.10-1
+* Mon May 17 2004 Matthias Saou <https://freshrpms.net/> 1.10-1
 - Update to 1.10.
 
-* Mon Nov  3 2003 Matthias Saou <http://freshrpms.net/> 1.7-2
+* Mon Nov  3 2003 Matthias Saou <https://freshrpms.net/> 1.7-2
 - Rebuild for Fedora Core 1.
 - Added missing build dependencies, thanks to mach.
 
-* Tue Aug 26 2003 Matthias Saou <http://freshrpms.net/>
+* Tue Aug 26 2003 Matthias Saou <https://freshrpms.net/>
 - Update to 1.7.
 
-* Thu May 22 2003 Matthias Saou <http://freshrpms.net/>
+* Thu May 22 2003 Matthias Saou <https://freshrpms.net/>
 - Initial RPM release.

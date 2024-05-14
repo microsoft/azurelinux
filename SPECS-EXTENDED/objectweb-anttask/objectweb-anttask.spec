@@ -14,7 +14,7 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
@@ -24,7 +24,7 @@ Release:        267%{?dist}
 Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
-Url:            http://forge.objectweb.org/projects/monolog/
+Url:            https://forge.objectweb.org/projects/monolog/
 Source0:        %{_distro_sources_url}/ow_util_ant_tasks_1.2.zip
 Source1:        %{name}-LICENSE.txt
 Patch1:         objectweb-anttask-ant17.patch

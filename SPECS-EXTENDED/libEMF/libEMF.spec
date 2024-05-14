@@ -6,7 +6,7 @@ Release:	2%{?dist}
 License:	LGPLv2+ and GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://libemf.sourceforge.net/
+URL:		https://libemf.sourceforge.net/
 Source0:	https://downloads.sourceforge.net/project/libemf/libemf/%{version}/libemf-%{version}.tar.gz
 BuildRequires:	gcc-c++
 

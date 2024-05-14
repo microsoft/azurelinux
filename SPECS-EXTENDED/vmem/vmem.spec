@@ -11,7 +11,7 @@ Summary:	Volatile Memory Development Kit
 License:	BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://pmem.io/vmem
+URL:		https://pmem.io/vmem
 
 Source0:	https://github.com/pmem/vmem/archive/%{upstreamversion}.tar.gz#/%{name}-%{version}.tar.gz
 

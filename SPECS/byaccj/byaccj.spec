@@ -12,7 +12,7 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 %global jpp_release 3
@@ -25,8 +25,8 @@ License:        Public Domain
 Group:          Development/Libraries/Java
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Url:            http://byaccj.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/%{name}/%{name}%{version}_src.tar.gz
+Url:            https://byaccj.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/%{name}/%{name}%{version}_src.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       man-pages
 

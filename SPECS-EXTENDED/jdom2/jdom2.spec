@@ -6,7 +6,7 @@ Release:        29%{?dist}
 License:        JDOM
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.jdom.org/
+URL:            https://www.jdom.org/
 # ./generate-tarball.sh
 Source0:        https://github.com/hunterhacker/jdom/archive/JDOM-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Remove bundled jars that might not have clear licensing

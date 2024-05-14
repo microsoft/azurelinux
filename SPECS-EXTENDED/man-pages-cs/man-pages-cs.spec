@@ -7,8 +7,8 @@ Release: 31%{?dist}
 # GPLv3 .. coreutils/
 # BSD and MIT and Public Domain  .. openssh/
 License: BSD and GPLv2 and GPLv3 and MIT and Public Domain
-URL: http://tropikhajma.sweb.cz/man-pages-cs/
-Source: http://tropikhajma.sweb.cz/%{name}/%{name}-%{version}.tar.lzma
+URL: https://tropikhajma.sweb.cz/man-pages-cs/
+Source: https://tropikhajma.sweb.cz/%{name}/%{name}-%{version}.tar.lzma
 
 Patch1:  man-pages-cs-01.patch
 Patch2:  man-pages-cs-02.patch

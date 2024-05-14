@@ -5,8 +5,8 @@ Name:		libopenraw
 Version:	0.1.3
 Release:	8%{?dist}
 License:	LGPLv3+
-URL:		http://libopenraw.freedesktop.org
-Source0:	http://libopenraw.freedesktop.org/download/%{name}-%{version}.tar.bz2
+URL:		https://libopenraw.freedesktop.org
+Source0:	https://libopenraw.freedesktop.org/download/%{name}-%{version}.tar.bz2
 
 BuildRequires:  boost-devel
 BuildRequires:  gcc-c++

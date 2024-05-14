@@ -116,7 +116,7 @@ make tests
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.13.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
-* Mon Jul 12 2010 Matthias Saou <http://freshrpms.net/> 0.13.5-1
+* Mon Jul 12 2010 Matthias Saou <https://freshrpms.net/> 0.13.5-1
 - Update to 0.13.5.
 - Update URL to the one used in the included spec file.
 
@@ -129,18 +129,18 @@ make tests
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 0.12.3-2
 - Autorebuild for GCC 4.3
 
-* Thu Sep 13 2007 Matthias Saou <http://freshrpms.net/> 0.12.3-1
+* Thu Sep 13 2007 Matthias Saou <https://freshrpms.net/> 0.12.3-1
 - Update to 0.12.3.
 
-* Thu Aug 23 2007 Matthias Saou <http://freshrpms.net/> 0.12.2-1
+* Thu Aug 23 2007 Matthias Saou <https://freshrpms.net/> 0.12.2-1
 - Update to 0.12.2.
 - Update URL location.
 
-* Wed Jun 20 2007 Matthias Saou <http://freshrpms.net/> 0.12.1-2
+* Wed Jun 20 2007 Matthias Saou <https://freshrpms.net/> 0.12.1-2
 - Fix license tag to "Public Domain".
 - Update description with most recent text from the website.
 
-* Wed Jun 20 2007 Matthias Saou <http://freshrpms.net/> 0.12.1-1
+* Wed Jun 20 2007 Matthias Saou <https://freshrpms.net/> 0.12.1-1
 - Spec file changes.
 
 * Wed May 23 2007 Dag Wieers <dag@wieers.com> - 0.12.1-1

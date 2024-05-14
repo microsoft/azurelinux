@@ -98,7 +98,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))" AUTOMATED_TESTING=1
     char in print'
   - Move xt/pod.t to xt/author/pod.t
   - Adopt new repo structure: see
-    http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html
+    https://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html
   - Move require 5.008001 from Tiny.pm into Makefile.PL
 
 * Sun Jun 02 2019 Jitka Plesnikova <jplesnik@redhat.com> - 2.23-15

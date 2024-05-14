@@ -5,8 +5,8 @@ Version:        1.20200108
 Release:        3%{?dist}
 Summary:        Object Oriented Authentication-Results Headers
 License:        GPL+ or Artistic
-URL:            http://search.cpan.org/dist/Mail-AuthenticationResults/
-Source0:        http://www.cpan.org/modules/by-module/Mail/Mail-AuthenticationResults-%{version}.tar.gz
+URL:            https://search.cpan.org/dist/Mail-AuthenticationResults/
+Source0:        https://www.cpan.org/modules/by-module/Mail/Mail-AuthenticationResults-%{version}.tar.gz
 BuildArch:      noarch
 
 BuildRequires:  perl >= 0:5.008

@@ -15,7 +15,7 @@ Summary:        Package maintenance system for Debian Linux
 # lib/compat/obstack.h, lib/compat/gettext.h,lib/compat/obstack.c - LGPLv2+
 License:        GPLv2 and GPLv2+ and LGPLv2+ and Public Domain and BSD
 URL:            https://tracker.debian.org/pkg/dpkg
-Source0:        http://ftp.debian.org/debian/pool/main/d/dpkg/%{name}_%{version}.tar.xz
+Source0:        https://ftp.debian.org/debian/pool/main/d/dpkg/%{name}_%{version}.tar.xz
 # https://lists.debian.org/debian-dpkg/2017/08/msg00002.html
 # The problem is that your compiler gives a different triplet than the
 # one used by dpkg itself
@@ -206,7 +206,7 @@ mkdir -p %{buildroot}/%{pkgconfdir}/origins
 # Prepare "vendor" files for dpkg-vendor
 cat <<EOF > %{buildroot}/%{pkgconfdir}/origins/fedora
 Vendor: Fedora
-Vendor-URL: http://www.fedoraproject.org/
+Vendor-URL: https://www.fedoraproject.org/
 Bugs: https://bugzilla.redhat.com
 EOF
 %if 0%{?fedora}

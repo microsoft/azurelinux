@@ -5,8 +5,8 @@ Summary: English thesaurus
 Version: 3.0
 Release: 34%{?dist}
 # https source does not exist
-Source: http://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz#/%{name}-%{version}.tgz
-URL: http://www.danielnaber.de/wn2ooo/
+Source: https://www.danielnaber.de/wn2ooo/wn2ooo20050723.tgz#/%{name}-%{version}.tgz
+URL: https://www.danielnaber.de/wn2ooo/
 BuildRequires: python3-devel
 BuildRequires: perl-interpreter
 BuildRequires: wordnet = %{version}

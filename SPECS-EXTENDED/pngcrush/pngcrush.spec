@@ -8,8 +8,8 @@ Name:           pngcrush
 Version:        1.8.13
 Release:        11%{?dist}
 License:        zlib
-URL:            http://pmt.sourceforge.net/%{name}/
-Source0:        http://downloads.sourceforge.net/pmt/%{name}-%{version}-nolib.tar.xz
+URL:            https://pmt.sourceforge.net/%{name}/
+Source0:        https://downloads.sourceforge.net/pmt/%{name}-%{version}-nolib.tar.xz
 # from Debian sid.
 Source1:        %{name}.sgml
 BuildRequires:  docbook-utils

@@ -5,7 +5,7 @@ Version: 1.19.11
 Release: 23%{?dist}
 Summary: A text mode system configuration tool
 License: GPLv2+
-Url: http://git.fedorahosted.org/git/?p=setuptool.git
+Url: https://git.fedorahosted.org/git/?p=setuptool.git
 Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 BuildRequires: newt-devel
 BuildRequires: gettext

@@ -5,8 +5,8 @@ Release: 4%{?dist}
 License: GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://cyberelk.net/tim/patchutils/
-Source0: http://cyberelk.net/tim/data/patchutils/stable/%{name}-%{version}.tar.xz
+URL: https://cyberelk.net/tim/patchutils/
+Source0: https://cyberelk.net/tim/data/patchutils/stable/%{name}-%{version}.tar.xz
 Obsoletes: interdiff <= 0.0.10
 Provides: interdiff = 0.0.11
 Requires: patch

@@ -5,9 +5,9 @@ Summary: Danish hyphenation rules
 %global upstreamid 20070903
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_da_DK.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_da_DK.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 Patch0: hyphen-da-lppl-license-fix.patch
 License: LGPLv2+
 BuildArch: noarch

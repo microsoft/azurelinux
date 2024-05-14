@@ -4,8 +4,8 @@ Name: hunspell-wa
 Summary: Walloon hunspell dictionaries
 Version: 0.4.17
 Release: 14%{?dist}
-Source0: http://chanae.walon.org/walon/aspell-wa-%{version}.tar.bz2
-URL: http://chanae.walon.org/walon/aspell.php
+Source0: https://chanae.walon.org/walon/aspell-wa-%{version}.tar.bz2
+URL: https://chanae.walon.org/walon/aspell.php
 License: LGPLv2+
 BuildArch: noarch
 Patch0: hunspell-wa-0.4.15-buildfix.patch

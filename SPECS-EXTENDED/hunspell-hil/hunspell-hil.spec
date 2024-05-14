@@ -5,7 +5,7 @@ Summary: Hiligaynon hunspell dictionaries
 Version: 0.14
 Release: 20%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/108895/litreoir_hiligaynon-%{version}-tb+fx+sm.xpi
-URL: http://extensions.services.openoffice.org/project/hunspell-hil
+URL: https://extensions.services.openoffice.org/project/hunspell-hil
 License: GPLv2+
 BuildArch: noarch
 

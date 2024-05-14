@@ -8,8 +8,8 @@ Name: x3270
 Version: 3.6ga10
 Release: 2%{?dist}
 License: BSD
-URL: http://x3270.sourceforge.net/
-Source0: http://downloads.sourceforge.net/%{name}/suite3270-%{version}-src.tgz
+URL: https://x3270.sourceforge.net/
+Source0: https://downloads.sourceforge.net/%{name}/suite3270-%{version}-src.tgz
 Source1: x3270.png
 Source2: x3270.desktop
 Patch0: x3270-3.5-paths.patch

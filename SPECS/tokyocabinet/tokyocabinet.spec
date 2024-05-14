@@ -5,8 +5,8 @@ Release:        18%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://fallabs.com/tokyocabinet/
-Source:         http://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz 
+URL:            https://fallabs.com/tokyocabinet/
+Source:         https://fallabs.com/tokyocabinet/tokyocabinet-%{version}.tar.gz 
 Patch0:         tokyocabinet-fedora.patch
 Patch1:         tokyocabinet-manhelp.patch
 BuildRequires:  autoconf

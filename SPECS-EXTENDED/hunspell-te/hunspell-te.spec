@@ -7,7 +7,7 @@ Release: 15%{?dist}
 ##Upstream is unresponsive so unable to verify license version
 License:        GPL+
 URL:            https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git
-Source0:        http://anishpatil.fedorapeople.org/te_in.%{version}.tar.gz
+Source0:        https://anishpatil.fedorapeople.org/te_in.%{version}.tar.gz
 BuildArch:      noarch
 
 Requires:       hunspell

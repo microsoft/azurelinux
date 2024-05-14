@@ -35,7 +35,7 @@ Requires:       hypervkvpd = %{version}-%{release}
 Requires:       hypervvssd = %{version}-%{release}
 # Hyper-V is available only on x86 architectures
 # The base empty (a.k.a. virtual) package can not be noarch
-# due to http://www.rpm.org/ticket/78
+# due to https://www.rpm.org/ticket/78
 
 %description
 Suite of daemons that are needed when Linux guest

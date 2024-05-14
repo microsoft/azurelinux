@@ -12,8 +12,8 @@ Name: mod_authnz_pam
 Version: 1.2.1
 Release: 2%{?dist}
 License: ASL 2.0
-URL: http://www.adelton.com/apache/mod_authnz_pam/
-Source0: http://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
+URL: https://www.adelton.com/apache/mod_authnz_pam/
+Source0: https://www.adelton.com/apache/mod_authnz_pam/%{name}-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: httpd-devel
 BuildRequires: pam-devel

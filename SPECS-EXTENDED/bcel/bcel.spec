@@ -24,10 +24,10 @@ Release:        37%{?dist}
 Summary:        Byte Code Engineering Library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/proper/commons-bcel/
-Source0:        http://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz
-Source1:        http://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz.asc
-Source2:        http://repo.maven.apache.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+URL:            https://commons.apache.org/proper/commons-bcel/
+Source0:        https://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz
+Source1:        https://archive.apache.org/dist/commons/bcel/source/%{name}-%{version}-src.tar.gz.asc
+Source2:        https://repo.maven.apache.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 Source3:        bcel.keyring
 Patch0:         bcel-5.2-encoding.patch
 BuildRequires:  ant

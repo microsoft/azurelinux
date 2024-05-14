@@ -6,7 +6,7 @@ License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://sourceforge.net/projects/mac-robber/
-Source0:        http://downloads.sourceforge.net/mac-robber/mac-robber-%{version}.tar.gz
+Source0:        https://downloads.sourceforge.net/mac-robber/mac-robber-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make

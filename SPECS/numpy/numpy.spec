@@ -10,7 +10,7 @@ Release:        2%{?dist}
 License:        BSD AND Python AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.numpy.org/
+URL:            https://www.numpy.org/
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://numpy.org/doc/%{majmin}/numpy-html.zip#/numpy-html-%{version}.zip
 
@@ -824,7 +824,7 @@ python3 runtests.py --no-build -- -ra -k 'not test_ppc64_ibm_double_double128'
 
 * Fri Feb 23 2007 Jarod Wilson <jwilson@redhat.com> 1.0.1-3
 - Fix up cpuinfo bug (#229753). Upstream bug/change:
-  http://projects.scipy.org/scipy/scipy/ticket/349
+  https://projects.scipy.org/scipy/scipy/ticket/349
 
 * Thu Jan 04 2007 Jarod Wilson <jwilson@redhat.com> 1.0.1-2
 - Per discussion w/Jose Matos, Obsolete/Provide f2py, as the

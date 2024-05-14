@@ -5,9 +5,9 @@ Summary: Lithuanian hyphenation rules
 %global upstreamid 20100531
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source0: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-lt.tex?view=co#/hyph-lt.tex
+Source0: https://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-lt.tex?view=co#/hyph-lt.tex
 Source1: %{name}-LICENSE.txt
-URL: http://tug.org/tex-hyphen
+URL: https://tug.org/tex-hyphen
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

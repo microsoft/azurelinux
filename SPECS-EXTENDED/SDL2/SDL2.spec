@@ -410,7 +410,7 @@ install -p -m 644 %{SOURCE2} %{buildroot}%{_includedir}/SDL2/SDL_revision.h
 
 * Tue Aug 13 2013 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 2.0.0-2
 - SDL2 is released. Announce:
-- http://lists.libsdl.org/pipermail/sdl-libsdl.org/2013-August/089854.html
+- https://lists.libsdl.org/pipermail/sdl-libsdl.org/2013-August/089854.html
 
 * Sat Aug 10 2013 Igor Gnatenko <i.gnatenko.brain@gmail.com> - 2.0.0-1.rc4
 - Update to latest SDL2 (08.08.2013)

@@ -6,8 +6,8 @@ Release:	16%{?dist}
 Summary:	A Library for handling OpenType Font
 
 License:	LGPLv2+
-URL:            http://www.nongnu.org/m17n/
-Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+URL:            https://www.nongnu.org/m17n/
+Source0:        https://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 
 BuildRequires:	gcc chrpath freetype-devel
 Requires:	freetype

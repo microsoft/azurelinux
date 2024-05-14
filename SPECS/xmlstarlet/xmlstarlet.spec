@@ -5,14 +5,14 @@ Name:           xmlstarlet
 Version:        1.6.1
 Release:        16%{?dist}
 License:        MIT
-URL:            http://xmlstar.sourceforge.net/
+URL:            https://xmlstar.sourceforge.net/
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://downloads.sourceforge.net/project/xmlstar/%{name}/%{version}/%{name}-%{version}.tar.gz
 
 # https://sourceforge.net/p/xmlstar/bugs/109/
 Patch0:         xmlstarlet-1.6.1-nogit.patch
-# http://sourceforge.net/tracker/?func=detail&aid=3266898&group_id=66612&atid=515106
+# https://sourceforge.net/tracker/?func=detail&aid=3266898&group_id=66612&atid=515106
 
 BuildRequires:  gcc
 BuildRequires:  xmlto

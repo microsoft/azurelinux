@@ -7,7 +7,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.atoptool.nl
-Source0:        http://www.atoptool.nl/download/%{name}-%{version}.tar.gz
+Source0:        https://www.atoptool.nl/download/%{name}-%{version}.tar.gz
 Source1:        atop.d
 
 Patch0:         atop-sysconfig.patch
@@ -35,9 +35,9 @@ performance-monitors:
    - Watch deviations only
    - Accumulated process activity per user
    - Accumulated process activity per program
-For more informations: http://www.atcomputing.nl/Tools/atop
+For more informations: https://www.atcomputing.nl/Tools/atop
 The package does not make use of the patches available at
-http://www.atcomputing.nl/Tools/atop/kernpatch.html
+https://www.atcomputing.nl/Tools/atop/kernpatch.html
 
 %prep
 %setup -q

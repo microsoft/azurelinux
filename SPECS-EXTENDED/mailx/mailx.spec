@@ -11,7 +11,7 @@ Release: 36%{?dist}
 # MPLv1.1 .. nss.c, nsserr.c
 # RSA .. md5.h, md5.c
 License: BSD with advertising and MIT and MPLv1.1 and RSA
-URL: http://heirloom.sourceforge.net/mailx.html
+URL: https://heirloom.sourceforge.net/mailx.html
 # Mailx's upstream provides only the CVS method of downloading source code.
 # Use get-upstream-tarball.sh script to download current version of mailx.
 Source0: %{_distro_sources_url}/mailx-%{version}.tar.xz

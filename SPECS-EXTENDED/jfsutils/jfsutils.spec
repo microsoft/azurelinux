@@ -6,11 +6,11 @@ Summary: Utilities for managing the JFS filesystem
 Name: jfsutils
 Version: 1.1.15
 Release: 18%{?dist}
-Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Patch0: jfsutils-1.1.15_stdint.patch
 Patch1: jfsutils_format-security_ftbs.patch
 Patch2: jfsutils_sysmacros.patch
-URL: http://jfs.sourceforge.net/
+URL: https://jfs.sourceforge.net/
 License: GPLv2+
 Buildrequires: libuuid-devel
 

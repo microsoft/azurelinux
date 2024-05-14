@@ -15,7 +15,7 @@ URL:            https://gitlab.com/nbdkit/libnbd
 Source0:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz
 
 %if !0%{?azl}
-Source1:        http://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz.sig
+Source1:        https://libguestfs.org/download/libnbd/%{source_directory}/%{name}-%{version}.tar.gz.sig
 # Keyring used to verify tarball signature.  This contains the single
 # key from here:
 # https://pgp.key-server.io/pks/lookup?search=rjones%40redhat.com&fingerprint=on&op=vindex

@@ -5,9 +5,9 @@ Summary: Slovenian hyphenation rules
 %global upstreamid 20070127
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_sl_SI.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_sl_SI.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPLv2+
 BuildArch: noarch
 Requires: hyphen

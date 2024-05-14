@@ -5,14 +5,14 @@ Name: enscript
 Version: 1.6.6
 Release: 25%{?dist}
 License: GPLv3+
-URL: http://www.gnu.org/software/enscript
+URL: https://www.gnu.org/software/enscript
 # Tarball exists nowhere. You have to obtain it via:
 # $ git clone git://git.savannah.gnu.org/enscript.git
 # $ git archive --format=tar --prefix=%%{name}-%%{version}/ v%%{version} | gzip > %%{name}-%%{version}.tar.gz
 Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
-#http://neugierig.org/software/ruby/ruby-enscript.tar.gz
+#https://neugierig.org/software/ruby/ruby-enscript.tar.gz
 Source1: %{_distro_sources_url}/%{name}-ruby-1.6.4.tar.gz
-#http://home.raxnet.net/downloads/viewcvs/php.st
+#https://home.raxnet.net/downloads/viewcvs/php.st
 Source2: enscript-php-1.6.4.st
 
 # RH #61294
@@ -29,7 +29,7 @@ Patch15: enscript-bufpos-crash.patch
 # 1664367 - adding support for 2 other encodings, enscript cannot print f.e. euro symbol
 # without it
 # rhbz: https://bugzilla.redhat.com/show_bug.cgi?id=1664367
-# upstream patch: http://lists.gnu.org/archive/html/bug-enscript/2018-04/msg00008.html
+# upstream patch: https://lists.gnu.org/archive/html/bug-enscript/2018-04/msg00008.html
 Patch16: 0001-enscript-newencodings.patch
 # enscript bundles some gnulib source files, so some issues or CVEs in gnulib can be
 # present in enscript

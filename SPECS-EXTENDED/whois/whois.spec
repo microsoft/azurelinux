@@ -10,7 +10,7 @@ License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.linux.it/~md/software/
-Source0:        http://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
+Source0:        https://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
 BuildRequires:  coreutils
 BuildRequires:  gcc
 BuildRequires:  gettext

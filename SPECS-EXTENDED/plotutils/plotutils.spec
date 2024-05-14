@@ -8,7 +8,7 @@ Summary:   GNU vector and raster graphics utilities and libraries
 # libxmi is GPLv2+
 # rest is GPLv3+
 License:   GPLv2+ and GPLv3+
-URL:       http://www.gnu.org/software/plotutils/
+URL:       https://www.gnu.org/software/plotutils/
 Source0:   ftp://ftp.gnu.org/gnu/plotutils/plotutils-%{version}.tar.gz
 Patch0:    plotutils-2.6-png15.patch
 Patch1:    plotutils-aarch64.patch

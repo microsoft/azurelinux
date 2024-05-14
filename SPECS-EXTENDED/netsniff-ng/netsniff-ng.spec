@@ -5,8 +5,8 @@ Release:        13%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://netsniff-ng.org/
-Source0:        http://www.netsniff-ng.org/pub/%{name}/%{name}-%{version}.tar.xz
+URL:            https://netsniff-ng.org/
+Source0:        https://www.netsniff-ng.org/pub/%{name}/%{name}-%{version}.tar.xz
 BuildRequires:  make
 BuildRequires:  gcc
 BuildRequires:  ncurses-devel

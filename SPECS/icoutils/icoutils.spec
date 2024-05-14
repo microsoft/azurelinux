@@ -6,7 +6,7 @@ License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.nongnu.org/icoutils/
-Source0:        http://savannah.nongnu.org/download/%{name}/%{name}-%{version}.tar.bz2
+Source0:        https://savannah.nongnu.org/download/%{name}/%{name}-%{version}.tar.bz2
 # Possible security fix, at minimum it's a DoS.
 # Upstream commit d72956a6de228c91d1fc48fd15448fadea9ab6cf
 Patch1:         0001-wrestool-Fix-get_resource_id_quoted-to-return-heap-a.patch
@@ -177,7 +177,7 @@ make install DESTDIR=%{buildroot}
 - Rebuild for new libpng
 
 * Mon May 16 2011 Martin Gieseking <martin.gieseking@uos.de> - 0.29.1-3
-- fixed http://bugzilla.redhat.com/show_bug.cgi?id=701855
+- fixed https://bugzilla.redhat.com/show_bug.cgi?id=701855
 - minor spec cleanup
 
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.29.1-2

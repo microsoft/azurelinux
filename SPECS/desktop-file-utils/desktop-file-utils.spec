@@ -15,7 +15,7 @@ BuildRequires:  meson
 .desktop files are used to describe an application for inclusion in
 GNOME or KDE menus.  This package contains desktop-file-validate which
 checks whether a .desktop file complies with the specification at
-http://www.freedesktop.org/standards/, and desktop-file-install
+https://www.freedesktop.org/standards/, and desktop-file-install
 which installs a desktop file to the standard directory, optionally
 fixing it up in the process.
 

@@ -57,7 +57,7 @@ make DESTDIR=${RPM_BUILD_ROOT} install INSTALL="install -p"
 # NOTE: It would be *awesome* if this file was maintained by the upstream
 # project, translated and installed into the right place during `make install`.
 #
-# See http://www.freedesktop.org/software/appstream/docs/ for more details.
+# See https://www.freedesktop.org/software/appstream/docs/ for more details.
 #
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/appdata
 cat > $RPM_BUILD_ROOT%{_datadir}/appdata/hangul.appdata.xml <<EOF
@@ -77,12 +77,12 @@ cat > $RPM_BUILD_ROOT%{_datadir}/appdata/hangul.appdata.xml <<EOF
       out on a traditional keyboard.
     </p>
   </description>
-  <url type="homepage">http://code.google.com/p/ibus/</url>
+  <url type="homepage">https://code.google.com/p/ibus/</url>
   <compulsory_for_desktop>GNOME</compulsory_for_desktop>
   <project_group>GNOME</project_group>
   <developer_name>The GNOME Project</developer_name>
   <url type="bugtracker">https://code.google.com/p/ibus/issues/list</url>
-  <url type="donation">http://www.gnome.org/friends/</url>
+  <url type="donation">https://www.gnome.org/friends/</url>
   <url type="help">https://code.google.com/p/ibus/wiki/FAQ</url>
   <update_contact><!-- upstream-contact_at_email.com --></update_contact>
 </component>

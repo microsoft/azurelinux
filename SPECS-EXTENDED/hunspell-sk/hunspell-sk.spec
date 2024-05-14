@@ -5,8 +5,8 @@ Summary: Slovak hunspell dictionaries
 %global upstreamid 20110228
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source: http://www.sk-spell.sk.cx/files/hunspell-sk-%{upstreamid}.zip
-URL: http://www.sk-spell.sk.cx/
+Source: https://www.sk-spell.sk.cx/files/hunspell-sk-%{upstreamid}.zip
+URL: https://www.sk-spell.sk.cx/
 License: LGPLv2 or GPLv2 or MPLv1.1
 BuildArch: noarch
 

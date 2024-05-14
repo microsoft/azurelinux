@@ -6,8 +6,8 @@ Release:        3%{?dist}
 License:        MirOS AND ISC AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.mirbsd.org/mksh.htm
-Source0:        http://www.mirbsd.org/MirOS/dist/mir/%{name}/%{name}-R%{version}.tgz
+URL:            https://www.mirbsd.org/mksh.htm
+Source0:        https://www.mirbsd.org/MirOS/dist/mir/%{name}/%{name}-R%{version}.tgz
 Source1:        dot-mkshrc
 Source2:        rtchecks.expected
 BuildRequires:  ed

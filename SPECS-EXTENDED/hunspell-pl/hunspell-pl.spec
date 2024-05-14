@@ -5,7 +5,7 @@ Summary: Polish hunspell dictionaries
 %global upstreamid 20180707
 Version: 0.%{upstreamid}
 Release: 6%{?dist}
-Source0: http://sjp.pl/slownik/ort/sjp-myspell-pl-%{upstreamid}.zip
+Source0: https://sjp.pl/slownik/ort/sjp-myspell-pl-%{upstreamid}.zip
 Source1: %{name}-LICENSE.txt
 URL: https://sjp.pl/slownik/ort/
 License: LGPLv2.1 or GPLv2 or MPLv1.1 or ASL 2.0 or CC-BY-SA

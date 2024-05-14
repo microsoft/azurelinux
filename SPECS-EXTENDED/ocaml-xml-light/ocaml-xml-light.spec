@@ -11,7 +11,7 @@ Release:        3%{?dist}
 Summary:        Minimal XML parser and printer for OCaml
 
 License:        LGPLv2.1
-URL:            http://tech.motion-twin.com/xmllight.html
+URL:            https://tech.motion-twin.com/xmllight.html
 
 # Upstream does not have releases (or rather, it did up to version 2.2
 # and then they stopped).  Use the SVN repository here:
@@ -20,7 +20,7 @@ URL:            http://tech.motion-twin.com/xmllight.html
 # To prepare a source release:
 # (1) Adjust 'svnrev' above to the latest release.
 # (2) Check out the sources:
-#       svn checkout http://ocamllibs.googlecode.com/svn/trunk/ ocamllibs
+#       svn checkout https://ocamllibs.googlecode.com/svn/trunk/ ocamllibs
 # (3) Create a tarball:
 #       cd ocamllibs/xml-light/
 #       tar -zcf /tmp/xml-light-NNN.tar.gz --xform='s,^\.,xml-light-NNN,' .
@@ -269,7 +269,7 @@ ocamlfind install xml-light META *.mli *.cmi *.cma \
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Thu Jan 06 2011 Richard W.M. Jones <rjones@redhat.com> - 2.2.cvs20070817-15
-- Rebuild for OCaml 3.12 (http://fedoraproject.org/wiki/Features/OCaml3.12).
+- Rebuild for OCaml 3.12 (https://fedoraproject.org/wiki/Features/OCaml3.12).
 
 * Wed Dec 30 2009 Richard W.M. Jones <rjones@redhat.com> - 2.2.cvs20070817-14
 - Rebuild for OCaml 3.11.2.

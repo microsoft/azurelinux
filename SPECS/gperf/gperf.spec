@@ -3,8 +3,8 @@ Name:		gperf
 Version:	3.1
 Release:        5%{?dist}
 License:	GPLv3+
-URL:		http://freedesktop.org/wiki/Software/%{name}l/
-Source0:	http://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
+URL:		https://freedesktop.org/wiki/Software/%{name}l/
+Source0:	https://ftp.gnu.org/gnu/gperf/%{name}-%{version}.tar.gz
 Group:		Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

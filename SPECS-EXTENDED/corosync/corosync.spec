@@ -21,8 +21,8 @@ Summary: The Corosync Cluster Engine and Application Programming Interfaces
 Version: 3.0.4
 Release: 3%{?dist}
 License: BSD
-URL: http://corosync.github.io/corosync/
-Source0: http://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz
+URL: https://corosync.github.io/corosync/
+Source0: https://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?gittarver}.tar.gz
 
 # Runtime bits
 # The automatic dependency overridden in favor of explicit version lock

@@ -5,8 +5,8 @@ Name: efax
 Version: 0.9a
 Release: 34%{?dist}
 License: GPLv2+
-Url: http://www.cce.com/efax/
-Source: http://www.cce.com/efax/download/%{name}-%{version}-001114.tar.gz
+Url: https://www.cce.com/efax/
+Source: https://www.cce.com/efax/download/%{name}-%{version}-001114.tar.gz
 Source1: logrotate-efax
 Patch0: efax-0.9-config.patch
 Patch1: efax-0.9-numlines.patch

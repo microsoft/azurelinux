@@ -10,8 +10,8 @@ Release:        16%{?dist}
 Summary:        Java CIM Client library
 
 License:        EPL
-URL:            http://sourceforge.net/projects/sblim/
-Source0:        http://downloads.sourceforge.net/project/sblim/%{name}/%{version}/%{name}-%{version}-src.zip
+URL:            https://sourceforge.net/projects/sblim/
+Source0:        https://downloads.sourceforge.net/project/sblim/%{name}/%{version}/%{name}-%{version}-src.zip
 Patch0:         sblim-cim-client2-2.2.5-fix-for-java-11-openjdk.patch
 
 BuildArch:      noarch
@@ -27,9 +27,9 @@ Requires:       jpackage-utils >= 1.5.32
 The purpose of this package is to provide a CIM Client Class Library for Java
 applications. It complies to the DMTF standard CIM Operations over HTTP and
 intends to be compatible with JCP JSR48 once it becomes available. To learn
-more about DMTF visit http://www.dmtf.org.
+more about DMTF visit https://www.dmtf.org.
 More infos about the Java Community Process and JSR48 can be found at
-http://www.jcp.org and http://www.jcp.org/en/jsr/detail?id=48.
+https://www.jcp.org and https://www.jcp.org/en/jsr/detail?id=48.
 
 %package javadoc
 Summary:        Javadoc for %{name}

@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://www.netfilter.org/projects/iptables
-Source0:        http://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.xz
+Source0:        https://www.netfilter.org/projects/iptables/files/%{name}-%{version}.tar.xz
 Source1:        iptables.service
 Source2:        iptables
 Source3:        iptables.stop

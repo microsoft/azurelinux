@@ -7,7 +7,7 @@ Version:        3.26.0
 Release:        3%{?dist}
 Summary:        Pure-ruby colorizer based on pygments
 License:        MIT and BSD
-URL:            http://rouge.jneen.net/
+URL:            https://rouge.jneen.net/
 Source0:        https://github.com/rouge-ruby/rouge/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires:  ruby(release)
 BuildRequires:  rubygems-devel

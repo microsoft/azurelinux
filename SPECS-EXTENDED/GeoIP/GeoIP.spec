@@ -8,7 +8,7 @@ Version:	1.6.12
 Release:	8%{?dist}
 Summary:	Library for country/city/organization to IP address or hostname mapping
 License:	LGPLv2+
-URL:		http://www.maxmind.com/app/c
+URL:		https://www.maxmind.com/app/c
 Source0:	https://github.com/maxmind/geoip-api-c/releases/download/v%{version}/GeoIP-%{version}.tar.gz
 BuildRequires:	coreutils
 BuildRequires:	gcc
@@ -185,7 +185,7 @@ rm -f %{buildroot}%{_libdir}/*.la
 
 * Thu Apr 23 2015 Paul Howarth <paul@city-fan.org> - 1.6.5-2
 - Work around problems with old GeoIP-data package in CentOS 5 Extras
-  repo (http://bugs.centos.org/view.php?id=8488) by requiring
+  repo (https://bugs.centos.org/view.php?id=8488) by requiring
   GeoIP-GeoLite-data rather than the virtual GeoIP-data for EL-5 builds only
 
 * Mon Mar  2 2015 Paul Howarth <paul@city-fan.org> - 1.6.5-1

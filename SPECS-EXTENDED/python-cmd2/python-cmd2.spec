@@ -36,7 +36,7 @@ Drop-in replacement adds several features for command-prompt tools:\
 Usable without modification anywhere cmd is used; simply import cmd2.Cmd\
 in place of cmd.Cmd.\
 \
-See docs at http://packages.python.org/cmd2/
+See docs at https://packages.python.org/cmd2/
 
 %description %_description
 
@@ -76,7 +76,7 @@ Drop-in replacement adds several features for command-prompt tools:
 Usable without modification anywhere cmd is used; simply import cmd2.Cmd
 in place of cmd.Cmd.
 
-See docs at http://packages.python.org/cmd2/
+See docs at https://packages.python.org/cmd2/
 
 %prep
 %setup -q -n %{modname}-%{version}

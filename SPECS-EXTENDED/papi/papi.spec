@@ -13,8 +13,8 @@ License: BSD
 Requires: papi-libs = %{version}-%{release}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://icl.cs.utk.edu/papi/
-Source0: http://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
+URL: https://icl.cs.utk.edu/papi/
+Source0: https://icl.cs.utk.edu/projects/papi/downloads/%{name}-%{version}.tar.gz
 BuildRequires: autoconf
 BuildRequires: doxygen
 BuildRequires: ncurses-devel

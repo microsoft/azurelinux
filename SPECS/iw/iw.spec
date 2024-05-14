@@ -6,8 +6,8 @@ Release:        1%{?dist}
 Summary:        A nl80211 based wireless configuration tool
 
 License:        ISC
-URL:            http://wireless.kernel.org/en/users/Documentation/iw
-Source0:        http://www.kernel.org/pub/software/network/iw/iw-%{version}.tar.xz
+URL:            https://wireless.kernel.org/en/users/Documentation/iw
+Source0:        https://www.kernel.org/pub/software/network/iw/iw-%{version}.tar.xz
 
 BuildRequires:  gcc
 BuildRequires:  kernel-headers >= 2.6.24 

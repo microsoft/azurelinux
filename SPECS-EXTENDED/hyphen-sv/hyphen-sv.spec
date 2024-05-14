@@ -6,7 +6,7 @@ Version: 1.00.1
 Release: 23%{?dist}
 Source0: https://downloads.sourceforge.net/project/aoo-extensions/1966/4/hyph_sv_se.oxt
 Source1: %{name}-LICENSE.txt
-URL: http://extensions.services.openoffice.org/node/1968
+URL: https://extensions.services.openoffice.org/node/1968
 License: LGPLv2+ or GPLv2+
 BuildArch: noarch
 Requires: hyphen

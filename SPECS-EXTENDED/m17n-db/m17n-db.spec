@@ -5,11 +5,11 @@ Summary:    Multilingualization datafiles for m17n-lib
 Version:    1.8.0
 Release:    10%{?dist}
 License:    LGPLv2+
-URL:        http://www.nongnu.org/m17n
+URL:        https://www.nongnu.org/m17n
 
-Source0:    http://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+Source0:    https://download-mirror.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
 ## Till the Inscript2 gets upstreamed in m17n-db, use this source
-Source1:    http://releases.pagure.org/inscript2/inscript2-20160423.tar.gz
+Source1:    https://releases.pagure.org/inscript2/inscript2-20160423.tar.gz
 # Following is awaiting for upstream commit
 Source2:    https://raw.githubusercontent.com/gnuman/m17n-inglish-mims/master/minglish/minglish.mim
 Source3:    https://github.com/mike-fabian/m17n-db-sayura/archive/1.0.0.tar.gz#/m17n-db-sayura-1.0.0.tar.gz

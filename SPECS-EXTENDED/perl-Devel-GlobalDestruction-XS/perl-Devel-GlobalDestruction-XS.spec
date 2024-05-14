@@ -6,7 +6,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:	Faster implementation of the Devel::GlobalDestruction API
 URL:		https://metacpan.org/release/Devel-GlobalDestruction-XS
-Source0:	http://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-XS-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/H/HA/HAARG/Devel-GlobalDestruction-XS-%{version}.tar.gz
 # Build (perl-devel split from main perl package at F-7)
 BuildRequires:	coreutils
 BuildRequires:	findutils

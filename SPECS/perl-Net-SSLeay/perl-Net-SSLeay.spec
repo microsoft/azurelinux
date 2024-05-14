@@ -38,7 +38,7 @@ Provides:       perl(Net::SSLeay) = %{version}-%{release}
 Provides:       perl(Net::SSLeay::Handle) = %{version}-%{release}
 
 %description
-Net::SSLeay module contains perl bindings to openssl (http://www.openssl.org) library.
+Net::SSLeay module contains perl bindings to openssl (https://www.openssl.org) library.
 
 Net::SSLeay module basically comprise of:
 * High level functions for accessing web servers (by using HTTP/HTTPS)

@@ -7,7 +7,7 @@ Version:	5.2.2
 Release:	3%{?dist}
 Summary:	Python client library for PostgreSQL
 
-URL:		http://www.pygresql.org/
+URL:		https://www.pygresql.org/
 License:	PostgreSQL
 
 Source0:	https://github.com/PyGreSQL/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
@@ -133,7 +133,7 @@ EOF
 
 * Mon Jul 30 2018 Pavel Raiskup <praiskup@redhat.com> - 5.0.6-1
 - rebase to the latest upstream version, per release notes:
-  http://www.pygresql.org/contents/changelog.html
+  https://www.pygresql.org/contents/changelog.html
 
 * Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
@@ -143,7 +143,7 @@ EOF
 
 * Thu May 03 2018 Pavel Raiskup <praiskup@redhat.com> - 5.0.5-1
 - Rebase to upstream version 5.0.5 per online changelog:
-  changelog http://www.pygresql.org/changelog.html
+  changelog https://www.pygresql.org/changelog.html
 
 * Fri Apr 13 2018 Pavel Raiskup <praiskup@redhat.com> - 5.0.4-4
 - test against postgresql-test-rpm-macros
@@ -161,7 +161,7 @@ EOF
 
 * Wed Aug 16 2017 Pavel Raiskup <praiskup@redhat.com> - 5.0.4-1
 - Rebase to upstream version 5.0.4 per rhbz#1475595
-  See changelog http://www.pygresql.org/changelog.html
+  See changelog https://www.pygresql.org/changelog.html
 
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
@@ -180,18 +180,18 @@ EOF
 
 * Mon Dec 12 2016 Pavel Raiskup <praiskup@redhat.com> - 5.0.3-1
 - rhbz#1403519, rebase per upstream changelog
-  http://www.pygresql.org/contents/changelog.html
+  https://www.pygresql.org/contents/changelog.html
 
 * Wed Oct 05 2016 Pavel Raiskup <praiskup@redhat.com> - 5.0.2-2
 - run tests through postgresql-setup 5.0, packaged in postgresql-devel
 
 * Wed Sep 21 2016 Petr Kubat <pkubat@redhat.com> - 5.0.2-1
 - Rebase to upstream version 5.0.2 per #1376292
-  See changelog http://www.pygresql.org/changelog.html
+  See changelog https://www.pygresql.org/changelog.html
 
 * Mon Aug 29 2016 Petr Kubat <pkubat@redhat.com> - 5.0.1-1
 - Rebase to upstream version 5.0.1 per #1370775
-  See changelog http://www.pygresql.org/changelog.html
+  See changelog https://www.pygresql.org/changelog.html
 
 * Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.0-4
 - https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
@@ -226,7 +226,7 @@ EOF
 
 * Wed Mar 12 2014 Jozef Mlich <jmlich@redhat.com> - 4.1.1-1
 - Rebase to 4.1.1.
-  See changelog http://www.pygresql.org/changelog.html
+  See changelog https://www.pygresql.org/changelog.html
   Resolves: #1071940
 
 * Fri Aug 02 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.0-8

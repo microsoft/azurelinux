@@ -7,8 +7,8 @@ Name: portreserve
 Version: 0.0.5
 Release: 24%{?dist}
 License: GPLv2+
-URL: http://cyberelk.net/tim/portreserve/
-Source0: http://cyberelk.net/tim/data/portreserve/stable/%{name}-%{version}.tar.bz2
+URL: https://cyberelk.net/tim/portreserve/
+Source0: https://cyberelk.net/tim/data/portreserve/stable/%{name}-%{version}.tar.bz2
 Source1: portreserve.service
 Patch1: portreserve-pid-file.patch
 Requires(post): systemd-units

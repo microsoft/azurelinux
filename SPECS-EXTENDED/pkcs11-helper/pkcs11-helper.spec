@@ -6,8 +6,8 @@ Release:        11%{?dist}
 Summary:        A library for using PKCS#11 providers
 
 License:        GPLv2 or BSD
-URL:            http://www.opensc-project.org/opensc/wiki/pkcs11-helper
-Source0:        http://downloads.sourceforge.net/opensc/pkcs11-helper-%{version}.tar.bz2
+URL:            https://www.opensc-project.org/opensc/wiki/pkcs11-helper
+Source0:        https://downloads.sourceforge.net/opensc/pkcs11-helper-%{version}.tar.bz2
 Patch2:         pkcs11-helper-rfc7512.patch
 
 BuildRequires:  gcc

@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 # digip.org now redirects to https://github.com/akheron/jansson
-URL:            http://www.digip.org/jansson
+URL:            https://www.digip.org/jansson
 Source0:        https://github.com/akheron/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 %description

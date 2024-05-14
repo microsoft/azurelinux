@@ -4,8 +4,8 @@ Name: hyphen-ro
 Summary: Romanian hyphenation rules
 Version: 3.3.6
 Release: 18%{?dist}
-Source: http://downloads.sourceforge.net/rospell/hyph_ro_RO.3.3.6.zip
-URL: http://rospell.sourceforge.net/
+Source: https://downloads.sourceforge.net/rospell/hyph_ro_RO.3.3.6.zip
+URL: https://rospell.sourceforge.net/
 License: GPLv2+
 BuildArch: noarch
 

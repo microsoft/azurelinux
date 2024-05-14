@@ -41,10 +41,10 @@ Release:        10%{?dist}
 License:        GPLv3+ AND GFDL AND FSFULLR AND GPLV2+ AND MIT AND FSFAP
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.gnu.org/software/%{name}/
+URL:            https://www.gnu.org/software/%{name}/
 Source:         ftp://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 # Fix measuring time when a clock experiences a jump, bug #1004416,
-# <http://lists.gnu.org/archive/html/bug-gnu-utils/2013-09/msg00003.html>
+# <https://lists.gnu.org/archive/html/bug-gnu-utils/2013-09/msg00003.html>
 Patch0:         time-1.8-Prefer-clock_gettime-CLOCK_MONOTONIC.patch
 # Fix info directory entry
 Patch1:         time-1.9-Improve-info-directory-index-entry-description.patch

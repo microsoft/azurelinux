@@ -25,7 +25,7 @@ Release:        96%{?dist}
 Summary:        Java Design Quality Metrics
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
-URL:            http://www.clarkware.com/
+URL:            https://www.clarkware.com/
 Source0:        %{url}software/%{name}-%{version}.tar.bz2
 Source1:        https://repo1.maven.org/maven2/jdepend/%{name}/%{version}/%{name}-%{version}.pom
 Patch0:         jdepend-target16.patch

@@ -5,7 +5,7 @@ Summary: Irish thesaurus
 %global upstreamid 20071001
 Version: 0.%{upstreamid}
 Release: 24%{?dist}
-Source: http://download.services.openoffice.org/contrib/dictionaries/thes_ga_IE_v2.zip
+Source: https://download.services.openoffice.org/contrib/dictionaries/thes_ga_IE_v2.zip
 URL: https://cadhan.com/lsg/index-en.html
 BuildRequires: unzip
 License: GFDL

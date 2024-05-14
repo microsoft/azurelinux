@@ -25,7 +25,7 @@ Summary:        Java plugin based web server
 License:        ASL 2.0
 Group:          Development/Libraries/Java
 URL:            https://geronimo.apache.org/xbean/
-Source0:        http://repo2.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
+Source0:        https://repo2.maven.org/maven2/org/apache/%{name}/%{name}/%{version}/%{name}-%{version}-source-release.zip
 Patch1:         0001-Remove-unused-import.patch
 # Fix dependency on xbean-asm4-shaded to original objectweb-asm
 Patch2:         0002-Unbundle-ASM.patch

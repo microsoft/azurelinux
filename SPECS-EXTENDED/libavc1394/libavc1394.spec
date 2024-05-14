@@ -5,7 +5,7 @@ Name:           libavc1394
 Version:        0.5.4
 Release:        13%{?dist}
 License:        GPLv2+ and LGPLv2+
-URL:            http://sourceforge.net/projects/libavc1394/
+URL:            https://sourceforge.net/projects/libavc1394/
 Source:         https://sourceforge.net/projects/libavc1394/files/libavc1394/libavc1394-%{version}.tar.gz
 Patch1:         libavc1394-%{version}-librom.patch
 BuildRequires:  libraw1394-devel
@@ -183,7 +183,7 @@ chrpath -d $RPM_BUILD_ROOT%{_bindir}/*
 * Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 - rebuilt
 
-* Thu Nov 10 2005 Matthias Saou <http://freshrpms.net/> 0.5.1-1
+* Thu Nov 10 2005 Matthias Saou <https://freshrpms.net/> 0.5.1-1
 - Update to 0.5.1.
 - Update librom patch to still apply cleanly.
 

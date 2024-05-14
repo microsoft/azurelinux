@@ -6,9 +6,9 @@ Summary: Hungarian hyphenation rules
 Version: 0.%{upstreamid}
 Release: 26%{?dist}
 # Source URL is dead now
-# Source: http://download.github.com/nagybence-huhyphn-aa3fc85.tar.gz
+# Source: https://download.github.com/nagybence-huhyphn-aa3fc85.tar.gz
 Source: %{_distro_sources_url}/nagybence-huhyphn-aa3fc85.tar.gz
-URL: http://www.tipogral.hu/
+URL: https://www.tipogral.hu/
 License: GPLv2
 BuildArch: noarch
 Requires: hyphen

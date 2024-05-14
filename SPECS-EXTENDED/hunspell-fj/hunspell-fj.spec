@@ -4,9 +4,9 @@ Name: hunspell-fj
 Summary: Fijian hunspell dictionaries
 Version: 1.2
 Release: 20%{?dist}
-#Source: http://www.foss.usp.ac.fj/OOo_fj/OOo_fj_FJ.zip
+#Source: https://www.foss.usp.ac.fj/OOo_fj/OOo_fj_FJ.zip
 Source: https://addons.mozilla.org/firefox/downloads/file/84397/fijian_spelling_dictionary-%{version}-fx+tb+sm.xpi
-URL: http://www.iosn.net/pacific-islands/usp-microgrants/fijian-spellchecker
+URL: https://www.iosn.net/pacific-islands/usp-microgrants/fijian-spellchecker
 License: LGPLv2+ or GPLv2+ or MPLv1.1
 BuildArch: noarch
 BuildRequires: hunspell-devel

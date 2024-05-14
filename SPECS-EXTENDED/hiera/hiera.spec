@@ -6,7 +6,7 @@ License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/puppetlabs/hiera
-Source0:        http://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
+Source0:        https://downloads.puppetlabs.com/hiera/%{name}-%{version}.tar.gz
 # Use /etc/puppet rather than /etc/puppetlabs/puppet
 Patch0:         fix-puppetlab-paths.patch
 

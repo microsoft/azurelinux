@@ -5,8 +5,8 @@ Version:        1.7.13
 Release:        16%{?dist}
 Summary:        Converts text files between MSDOS and Unix file formats
 License:        GPLv2
-URL:            http://www.thefreecountry.com/tofrodos/
-Source0:        http://tofrodos.sourceforge.net/download/tofrodos-%{version}.tar.gz
+URL:            https://www.thefreecountry.com/tofrodos/
+Source0:        https://tofrodos.sourceforge.net/download/tofrodos-%{version}.tar.gz
 
 BuildRequires:	gcc
 

@@ -6,8 +6,8 @@ Release:        23%{?dist}
 Summary:        A simple library for managing C++ modules (plug-ins)
 
 License:        LGPLv2+
-URL:            http://code.google.com/p/libmodman/
-Source0:        http://libmodman.googlecode.com/files/%{name}-%{version}.tar.gz
+URL:            https://code.google.com/p/libmodman/
+Source0:        https://libmodman.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
 BuildRequires:  cmake

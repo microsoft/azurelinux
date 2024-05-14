@@ -8,8 +8,8 @@ Summary:        Library for manipulating Macintosh icns files
 # libicns, icns2png and icontainer2icns are under LGPLv2+
 # png2icns is under GPLv2+
 License:        LGPLv2+ and GPLv2+
-URL:            http://icns.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/icns/%{name}-%{version}.tar.gz
+URL:            https://icns.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/icns/%{name}-%{version}.tar.gz
 # Fix compiling with gcc6
 # Patch is already in upstream git
 Patch0:         %{name}-0.8.1-gcc6.patch

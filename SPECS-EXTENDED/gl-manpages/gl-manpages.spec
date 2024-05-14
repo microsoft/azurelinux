@@ -14,8 +14,8 @@ License:        MIT and Open Publication
 URL:            https://github.com/KhronosGroup/OpenGL-Refpages
 Source0:        https://github.com/KhronosGroup/OpenGL-Refpages/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 # FIXME: Bundle mathml and the Oasis dbmathl until they are packaged
-Source2:        http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
-Source3:        http://www.w3.org/Math/DTD/mathml2.tgz
+Source2:        https://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd
+Source3:        https://www.w3.org/Math/DTD/mathml2.tgz
 # FIXME  These are the old gl-manpages source which 
 # still have some manpages that khronos doesn't. 
 # Ship until somebody in the know helps figuring whats what.
@@ -42,9 +42,9 @@ tar xjf %{SOURCE4}
 export BD=`pwd`
 xmlcatalog --create --noout \
 	--add public "-//W3C//DTD MathML 2.0//EN" "file://$BD/mathml2/mathml2.dtd" \
-	--add system "http://www.w3.org/TR/MathML2/dtd/mathml2.dtd" "file://$BD/mathml2/mathml2.dtd" \
+	--add system "https://www.w3.org/TR/MathML2/dtd/mathml2.dtd" "file://$BD/mathml2/mathml2.dtd" \
 	--add public "-//OASIS//DTD DocBook MathML Module V1.1b1//EN" "file://$BD/mathml2/dbmathml.dtd" \
-	--add system "http://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd" "file://$BD/mathml2/dbmathml.dtd" \
+	--add system "https://www.oasis-open.org/docbook/xml/mathml/1.1CR1/dbmathml.dtd" "file://$BD/mathml2/dbmathml.dtd" \
 	mathml2.cat
 export XML_CATALOG_FILES="$BD/mathml2.cat /etc/xml/catalog"
 make

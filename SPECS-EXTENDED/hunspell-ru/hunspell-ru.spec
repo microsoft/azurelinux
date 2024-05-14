@@ -5,9 +5,9 @@ Summary: Russian hunspell dictionaries
 Version: 0.99g5
 Release: 19%{?dist}
 # Upstream source is gone now and recent alternative don't have license
-# Source: http://releases.mozilla.org/pub/mozilla.org/addons/3703/russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi
+# Source: https://releases.mozilla.org/pub/mozilla.org/addons/3703/russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi
 Source: russian_spellchecking_dictionary-0.4.4-fx+tb+sm.xpi
-URL: http://scon155.phys.msu.su/eng/lebedev.html
+URL: https://scon155.phys.msu.su/eng/lebedev.html
 License: BSD
 BuildArch: noarch
 

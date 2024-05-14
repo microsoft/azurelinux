@@ -5,8 +5,8 @@ Version:	3.0.2
 Release:	4%{?dist}
 License:	zlib
 Summary:	Library to provide abstract access to various archives
-URL:		http://www.icculus.org/physfs/
-Source0:	http://www.icculus.org/physfs/downloads/physfs-%{version}.tar.bz2
+URL:		https://www.icculus.org/physfs/
+Source0:	https://www.icculus.org/physfs/downloads/physfs-%{version}.tar.bz2
 BuildRequires:  gcc-c++
 BuildRequires:	doxygen, readline-devel, libtool, cmake
 # Only needed to build a test program.

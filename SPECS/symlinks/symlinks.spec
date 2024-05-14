@@ -7,9 +7,9 @@ Release:        8%{?dist}
 License:        Copyright only
 URL:            https://ibiblio.org/pub/Linux/utils/file/
 # Upstream maintainer provided tarball, ibiblio no longer allowing uploads
-# Upstream Source0: http://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
+# Upstream Source0: https://ibiblio.org/pub/Linux/utils/file/%{name}-%{version}.tar.gz
 Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
-# Taken from http://packages.debian.org/changelogs/pool/main/s/symlinks/symlinks_1.2-4.2/symlinks.copyright
+# Taken from https://packages.debian.org/changelogs/pool/main/s/symlinks/symlinks_1.2-4.2/symlinks.copyright
 Source1:        symlinks-LICENSE.txt
 BuildRequires:  gcc
 

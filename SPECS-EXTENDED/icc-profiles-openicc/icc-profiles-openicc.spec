@@ -6,8 +6,8 @@ Release:        19%{?dist}
 Summary:        The OpenICC profiles
 
 License:        zlib
-URL:            http://www.freedesktop.org/wiki/OpenIcc
-Source0:        http://downloads.sourceforge.net/project/openicc/OpenICC-Profiles/%{name}-%{version}.tar.bz2
+URL:            https://www.freedesktop.org/wiki/OpenIcc
+Source0:        https://downloads.sourceforge.net/project/openicc/OpenICC-Profiles/%{name}-%{version}.tar.bz2
 
 BuildArch:      noarch
 

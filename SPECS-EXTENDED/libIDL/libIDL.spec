@@ -4,8 +4,8 @@ Version: 0.8.14
 Release: 23%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://ftp.gnome.org/pub/gnome/sources/libIDL/0.8/
-Source: http://download.gnome.org/sources/libIDL/0.8/%{name}-%{version}.tar.bz2
+URL: https://ftp.gnome.org/pub/gnome/sources/libIDL/0.8/
+Source: https://download.gnome.org/sources/libIDL/0.8/%{name}-%{version}.tar.bz2
 Patch0: libIDL-0.8.6-multilib.patch
 License: LGPLv2+
 BuildRequires:  gcc

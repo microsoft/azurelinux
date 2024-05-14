@@ -399,7 +399,7 @@ chrpath --delete %{buildroot}/%{_libdir}/libcogl-pango.so
 
 * Tue Jan 17 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 1.9.4-1
 - Update to 1.9.4
-- http://ftp.gnome.org/pub/GNOME/sources/cogl/1.9/cogl-1.9.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/cogl/1.9/cogl-1.9.4.news
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.9.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
@@ -419,12 +419,12 @@ chrpath --delete %{buildroot}/%{_libdir}/libcogl-pango.so
 
 * Mon Oct 17 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8.2-1
 - 1.8.2 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/cogl/1.8/cogl-1.8.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/cogl/1.8/cogl-1.8.2.news
 - Enable gdk-pixbuf2 support - Fixes RHBZ # 738092
 
 * Mon Sep 19 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8.0-1
 - 1.8.0 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/cogl/1.8/cogl-1.8.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/cogl/1.8/cogl-1.8.0.news
 
 * Mon Sep  5 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.7.8-1
 - Update to 1.7.8

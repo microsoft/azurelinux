@@ -13,7 +13,7 @@ Summary:        DNS toolkit for Python
 
 # The entire package is licensed with both licenses, see LICENSE file
 License:        ISC and MIT
-URL:            http://www.dnspython.org
+URL:            https://www.dnspython.org
 
 #Source0:       https://github.com/rthalley/%{pypi_name}/archive/v%{version}%{rctag}/%{pypi_name}-%{version}%{rctag}.tar.gz
 Source0:        https://github.com/rthalley/%{pypi_name}/archive/v%{version}%{rctag}/%{name}-%{version}%{rctag}.tar.gz
@@ -242,7 +242,7 @@ find examples -type f | xargs chmod a-x
 * Mon Mar 28 2011 Jeffrey C. Ollie <jeff@ocjtech.us> - 1.9.4-1
 -
 - dnspython 1.9.4 has been released and is available at
-- http://www.dnspython.org/kits/1.9.4/
+- https://www.dnspython.org/kits/1.9.4/
 -
 - There is no new functionality in this release; just a few bug fixes
 - in RRSIG and SIG code.

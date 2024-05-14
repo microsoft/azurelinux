@@ -3,10 +3,10 @@ Summary: Character set analyzer and detector
 Version: 1.19
 Release: 6%{?dist}
 License: GPLv2
-Source: http://dl.cihar.com/enca/enca-%{version}.tar.xz
+Source: https://dl.cihar.com/enca/enca-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://cihar.com/software/enca
+URL: https://cihar.com/software/enca
 
 BuildRequires: gcc
 

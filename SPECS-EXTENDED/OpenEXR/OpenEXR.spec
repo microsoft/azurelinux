@@ -8,7 +8,7 @@ Version: 2.3.0
 Release: 6%{?dist}
 
 License: BSD
-URL:	 http://www.openexr.com/
+URL:	 https://www.openexr.com/
 Source0: https://github.com/%{project}/%{project}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 # fix tests for big endian arches

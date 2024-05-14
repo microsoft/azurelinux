@@ -9,7 +9,7 @@ Summary:        C++ mathematics library for graphics programming
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://glm.g-truc.net/
+URL:            https://glm.g-truc.net/
 Source0:        https://github.com/g-truc/glm/releases/download/%{version}/%{name}-%{version}.zip
 Patch0:         glm-0.9.9.6-install.patch
 Patch1:         glm-0.9.9.6-noarch.patch

@@ -6,8 +6,8 @@ Version: 0.04
 Release: 21%{?dist}
 # Following links are dead now
 # Please don't report any bugs for it
-Source: http://borel.slu.edu/obair/%{name}-%{version}.oxt
-URL: http://borel.slu.edu/crubadan/apps.html
+Source: https://borel.slu.edu/obair/%{name}-%{version}.oxt
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPLv3+
 BuildArch: noarch
 Requires: hunspell

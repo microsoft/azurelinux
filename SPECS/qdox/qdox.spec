@@ -161,14 +161,14 @@ cp -aL target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}
 * Fri Nov 30 2012 cobexer@gmail.com
 - update to 1.12.1
   * bugfix release, see
-  * http://jira.codehaus.org/browse/QDOX/fixforversion/18944
+  * https://jira.codehaus.org/browse/QDOX/fixforversion/18944
 * Wed Nov 28 2012 mvyskocil@suse.com
 - require saxon9 for build
 * Wed Oct 24 2012 mvyskocil@suse.com
 - update to 1.12
   * needed for the fop 1.1 update
   * mostly bugfix release, see
-  * http://qdox.codehaus.org/changes-report.html
+  * https://qdox.codehaus.org/changes-report.html
 - disabled tests as they tends to randomly fails
 * Tue May  5 2009 mvyskocil@suse.cz
 - Initial build in SUSE. Version 1.6.1 from jpp 5.0

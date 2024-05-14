@@ -28,7 +28,7 @@ and cytoolz offers a C API that is accessible to other projects developed in
 Cython. Since toolz is able to process very large (potentially infinite) data
 sets, the performance increase gained by using cytoolz can be significant.
 
-See the PyToolz documentation at http://toolz.readthedocs.org.
+See the PyToolz documentation at https://toolz.readthedocs.org.
 
 %package -n python%{python3_pkgversion}-%{srcname}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
@@ -60,7 +60,7 @@ and cytoolz offers a C API that is accessible to other projects developed in
 Cython. Since toolz is able to process very large (potentially infinite) data
 sets, the performance increase gained by using cytoolz can be significant.
 
-See the PyToolz documentation at http://toolz.readthedocs.org.
+See the PyToolz documentation at https://toolz.readthedocs.org.
 
 %prep
 %setup -q -n %{srcname}-%{version}

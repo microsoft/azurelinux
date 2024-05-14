@@ -3,7 +3,7 @@ Name:           gdbm
 Version:        1.23
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/gdbm
+URL:            https://www.gnu.org/software/gdbm
 Group:          Applications/Databases
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

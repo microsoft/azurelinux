@@ -39,7 +39,7 @@ This is a Perl extension to XML::Parser. It adds a new 'Style' to
 XML::Parser, called 'DOM', that allows XML::Parser to build an Object
 Oriented data structure with a DOM Level 1 compliant interface. For a
 description of the DOM (Document Object Model), see
-<http://www.w3.org/DOM/>.
+<https://www.w3.org/DOM/>.
 
 
 %prep

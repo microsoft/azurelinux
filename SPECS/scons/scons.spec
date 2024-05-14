@@ -4,7 +4,7 @@ Release:        1%{?dist}
 Summary:        An Open Source software construction tool
 Group:          Development/Tools
 License:        MIT
-URL:            http://scons.org
+URL:            https://scons.org
 Source0:        https://sourceforge.net/projects/%{name}/files/%{name}/%{version}/SCons-%{version}.tar.gz/download#/%{name}-%{version}.tar.gz
 Patch0:         0001-Remove-unnecessary-build-deps.patch
 Vendor:         Microsoft Corporation

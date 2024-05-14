@@ -4,8 +4,8 @@ Name: hunspell-ca
 Summary: Catalan hunspell dictionaries
 Version: 2.3
 Release: 16%{?dist}
-Source: http://www.softcatala.org/diccionaris/actualitzacions/OOo/catalan.oxt
-URL: http://www.softcatala.org/wiki/Projectes/Corrector_ortogràfic
+Source: https://www.softcatala.org/diccionaris/actualitzacions/OOo/catalan.oxt
+URL: https://www.softcatala.org/wiki/Projectes/Corrector_ortogràfic
 License: GPLv2+
 BuildArch: noarch
 

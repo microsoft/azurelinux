@@ -8,8 +8,8 @@ Release:        24%{?dist}
 Summary:        SBLIM params instrumentation
 
 License:        EPL
-URL:            http://sblim.wiki.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
+URL:            https://sblim.wiki.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Patch0:         sblim-cmpi-params-1.2.4-no-abi-params.patch
 # Patch1: remove version from docdir
 Patch1:         sblim-cmpi-params-1.3.0-docdir.patch

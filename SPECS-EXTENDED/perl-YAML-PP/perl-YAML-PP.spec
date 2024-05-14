@@ -85,7 +85,7 @@ Suggests:       perl(YAML::XS)
 
 %description
 YAML::PP is a modern, modular YAML processor.
-It aims to support YAML 1.2 and YAML 1.1. See http://yaml.org/.
+It aims to support YAML 1.2 and YAML 1.1. See https://yaml.org/.
 
 %package tests
 Summary:        Tests for %{name}

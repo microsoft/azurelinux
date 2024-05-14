@@ -6,8 +6,8 @@ Release:	27%{?dist}
 Summary:	ASCII to Unicode transliteration library with multiple backends
 
 License:	GPLv3+
-URL:		http://github.com/ueno/libtranslit
-Source0:	http://du-a.org/files/libtranslit/%{name}-%{version}.tar.gz
+URL:		https://github.com/ueno/libtranslit
+Source0:	https://du-a.org/files/libtranslit/%{name}-%{version}.tar.gz
 
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	intltool

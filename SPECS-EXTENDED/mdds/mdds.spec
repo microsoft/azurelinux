@@ -12,7 +12,7 @@ Summary: A collection of multi-dimensional data structures and indexing algorith
 
 License: MIT
 URL: https://gitlab.com/mdds/mdds
-Source0: http://kohei.us/files/%{name}/src/%{name}-%{version}.tar.bz2
+Source0: https://kohei.us/files/%{name}/src/%{name}-%{version}.tar.bz2
 
 BuildRequires: boost-devel
 BuildRequires: gcc-c++

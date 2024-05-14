@@ -5,9 +5,9 @@ Summary: Nepali hunspell dictionaries
 Version: 20080425
 Release: 22%{?dist}
 # Upstream Source and URL is down now, please don't report FTBFS bugs
-Source0: http://nepalinux.org/downloads/ne_NP_dict.zip
+Source0: https://nepalinux.org/downloads/ne_NP_dict.zip
 Source1: %{name}-LICENSE.txt
-URL: http://nepalinux.org/downloads
+URL: https://nepalinux.org/downloads
 # License is given in README_ne_NP.txt file
 License: LGPLv2
 BuildArch: noarch

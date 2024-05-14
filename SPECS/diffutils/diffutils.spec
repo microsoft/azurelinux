@@ -3,7 +3,7 @@ Name:           diffutils
 Version:        3.10
 Release:        1%{?dist}
 License:        GPLv3+
-URL:            http://www.gnu.org/software/diffutils
+URL:            https://www.gnu.org/software/diffutils
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

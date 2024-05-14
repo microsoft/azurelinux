@@ -3,7 +3,7 @@ Name:           sysstat
 Version:        12.7.4
 Release:        2%{?dist}
 License:        GPL-2.0-only
-URL:            http://sebastien.godard.pagesperso-orange.fr/
+URL:            https://sebastien.godard.pagesperso-orange.fr/
 Group:          Development/Debuggers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

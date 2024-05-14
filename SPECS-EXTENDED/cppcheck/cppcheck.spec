@@ -8,7 +8,7 @@ Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://cppcheck.wiki.sourceforge.net/
+URL:            https://cppcheck.wiki.sourceforge.net/
 Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Fix location of translations

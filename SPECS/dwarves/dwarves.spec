@@ -388,7 +388,7 @@ rm -Rf %{buildroot}
 
 * Sun Dec  9 2007 Arnaldo Carvalho de Melo <acme@redhat.com> - 1.3-2
 - c6c71398cd2481e219ea3ef63f32c6479ba4f08f
-- SPEC file adjustments to follow http://fedoraproject.org/wiki/Packaging/cmake
+- SPEC file adjustments to follow https://fedoraproject.org/wiki/Packaging/cmake
 
 * Sat Dec  8 2007 Arnaldo Carvalho de Melo <acme@redhat.com> - 1.3-1
 - c4ee21aa122f51f2601893b2118b7f7902d2f410

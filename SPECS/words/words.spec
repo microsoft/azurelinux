@@ -8,7 +8,7 @@ License:       Public Domain
 URL:           https://en.wikipedia.org/wiki/Moby_Project
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
-Source0:       https://web.archive.org/web/20060527013227/http://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z#/%{name}-%{version}.tar.Z
+Source0:       https://web.archive.org/web/20060527013227/https://www.dcs.shef.ac.uk/research/ilash/Moby/mwords.tar.Z#/%{name}-%{version}.tar.Z
 Source1:       LICENSE
 BuildArch:     noarch
 BuildRequires: dos2unix

@@ -5,8 +5,8 @@ Summary:        Implementation of Double-Array structure for representing trie
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://linux.thai.net/projects/datrie
-Source0:        http://linux.thai.net/pub/thailinux/software/libthai/%{name}-%{version}.tar.xz
+URL:            https://linux.thai.net/projects/datrie
+Source0:        https://linux.thai.net/pub/thailinux/software/libthai/%{name}-%{version}.tar.xz
 Patch0:         libdatrie-fixes-docs.patch
 BuildRequires:  autoconf, automake, libtool
 
@@ -18,7 +18,7 @@ time complexity for searching. Comparably as efficient as hashing, trie also
 provides flexibility on incremental matching and key spelling manipulation. 
 This makes it ideal for lexical analyzers, as well as spelling dictionaries.
 
-Details of the implementation: http://linux.thai.net/~thep/datrie/datrie.html
+Details of the implementation: https://linux.thai.net/~thep/datrie/datrie.html
 
 %package        devel
 Summary:        Development files for %{name}

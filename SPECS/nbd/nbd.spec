@@ -118,7 +118,7 @@ install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 - Update to 3.17
 
 * Sat Mar 10 2018 Robin Lee <cheeselee@fedoraproject.org> - 3.16.2-3
-- BR gcc for http://fedoraproject.org/wiki/Changes/Remove_GCC_from_BuildRoot
+- BR gcc for https://fedoraproject.org/wiki/Changes/Remove_GCC_from_BuildRoot
 
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.16.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild

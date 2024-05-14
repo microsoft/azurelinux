@@ -12,8 +12,8 @@ Release:	17%{?dist}
 Summary:	Japanese Proportional Gothic-typeface OpenType font by IPA
 
 License:	IPA
-URL:		http://ossipedia.ipa.go.jp/ipafont/
-Source0:	http://info.openlab.ipa.go.jp/ipafont/fontdata/%{archivename}.zip
+URL:		https://ossipedia.ipa.go.jp/ipafont/
+Source0:	https://info.openlab.ipa.go.jp/ipafont/fontdata/%{archivename}.zip
 Source1:	%{name}-fontconfig.conf
 
 BuildArch:	noarch

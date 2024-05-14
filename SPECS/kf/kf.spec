@@ -3,7 +3,7 @@ Version:      5.249.0
 Release:      1%{?dist}
 Summary:      Filesystem and RPM macros for KDE Frameworks 5
 License:      BSD
-URL:          http://www.kde.org
+URL:          https://www.kde.org
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
 

@@ -6,8 +6,8 @@ Release:        33%{?dist}
 Summary:        ID3 tag manipulation library
 
 License:        GPLv2+
-URL:            http://www.underbit.com/products/mad/
-Source0:        http://downloads.sourceforge.net/mad/%{name}-%{version}.tar.gz
+URL:            https://www.underbit.com/products/mad/
+Source0:        https://downloads.sourceforge.net/mad/%{name}-%{version}.tar.gz
 Patch0:         libid3tag-0.15.1b-fix_overflow.patch
 Patch1:         libid3tag-0.15.1b-id3v1-zero-padding.patch
 Patch2:         libid3tag-0.15.1b-handle-unknown-encoding.patch

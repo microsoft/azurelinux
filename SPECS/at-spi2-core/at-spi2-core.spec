@@ -7,7 +7,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://gitlab.gnome.org/GNOME/at-spi2-core
-Source0:        http://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/%{name}/%{majmin}/%{name}-%{version}.tar.xz
 # https://gitlab.gnome.org/GNOME/at-spi2-core/-/issues/25
 Patch0:         fix-login-screen-a11y.patch
 BuildRequires:  dbus-devel

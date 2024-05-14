@@ -427,7 +427,7 @@ certutil -N -d sql:$tmpdir --empty-password
 - Updated to 3.16 (see https://download.libreswan.org/CHANGES)
 
 * Tue Aug 11 2015 Paul Wouters <pwouters@redhat.com> - 3.15-1
-- Updated to 3.15 (see http://download.libreswan.org/CHANGES)
+- Updated to 3.15 (see https://download.libreswan.org/CHANGES)
 - Resolves: rhbz#CVE-2015-3240 IKE daemon restart when receiving a bad DH gx
 - NSS database creation moved from spec file to service file
 - Run CAVS tests on package build

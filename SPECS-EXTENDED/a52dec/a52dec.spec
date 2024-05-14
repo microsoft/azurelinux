@@ -5,7 +5,7 @@ Name:       a52dec
 Version:    0.7.4
 Release:    38%{?dist}
 License:    GPLv2
-URL:        http://liba52.sourceforge.net
+URL:        https://liba52.sourceforge.net
 Source0:    %{url}/files/%{name}-%{version}.tar.gz
 Patch0:     a52dec-configure-optflags.patch
 Patch1:     a52dec-0.7.4-rpath64.patch

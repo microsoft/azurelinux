@@ -25,7 +25,7 @@ Patch1:         0032-cmake-modules-BuildBoost.cmake.patch
 #
 # This file is under the GNU Lesser General Public License, version 2.1
 #
-# Please submit bugfixes or comments via http://tracker.ceph.com/
+# Please submit bugfixes or comments via https://tracker.ceph.com/
 #
 
 #################################################################################
@@ -397,7 +397,7 @@ Requires:       python%{python3_pkgversion}-werkzeug
 %description mgr-dashboard
 ceph-mgr-dashboard is a manager module, providing a web-based application
 to monitor and manage many aspects of a Ceph cluster and related components.
-See the Dashboard documentation at http://docs.ceph.com/ for details and a
+See the Dashboard documentation at https://docs.ceph.com/ for details and a
 detailed feature overview.
 
 %if %{with mgr_diskprediction}

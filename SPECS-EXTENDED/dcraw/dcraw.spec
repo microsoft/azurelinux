@@ -5,8 +5,8 @@ Name: dcraw
 Version: 9.28.0
 Release: 10%{?dist}
 License: GPLv2+
-URL: http://www.dechifro.org/dcraw/
-Source0: http://www.dechifro.org/dcraw/archive/dcraw-%{version}.tar.gz
+URL: https://www.dechifro.org/dcraw/
+Source0: https://www.dechifro.org/dcraw/archive/dcraw-%{version}.tar.gz
 Patch0: dcraw-9.21-lcms2-error-reporting.patch
 Patch1: dcraw-CVE-2018-5801.patch
 Patch2: dcraw-CVE-2017-13735.patch

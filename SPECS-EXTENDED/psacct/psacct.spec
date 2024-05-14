@@ -8,7 +8,7 @@ Release: 8%{?dist}
 License: GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.gnu.org/software/acct/
+URL: https://www.gnu.org/software/acct/
 
 Source: ftp://ftp.gnu.org/pub/gnu/acct/acct-%{version}.tar.gz
 Source1: psacct.service

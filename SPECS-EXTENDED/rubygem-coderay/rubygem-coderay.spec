@@ -7,7 +7,7 @@ Version: 1.1.3
 Release: 1%{?dist}
 Summary: Fast syntax highlighting for selected languages
 License: MIT
-URL: http://coderay.rubychan.de
+URL: https://coderay.rubychan.de
 Source0: https://github.com/rubychan/coderay/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel

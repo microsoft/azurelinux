@@ -211,7 +211,7 @@ echo ====================TESTING END=====================
 - Update to the 20070509 release.
 - Related: #225632
 
-* Wed Sep 12 2007 Matthias Saou <http://freshrpms.net/> 1.9.20050813-2
+* Wed Sep 12 2007 Matthias Saou <https://freshrpms.net/> 1.9.20050813-2
 - Update summary.
 - Remove useless doc copying in install section.
 - Add NOTES and NO_WARRANTY docs.

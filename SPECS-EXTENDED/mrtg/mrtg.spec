@@ -9,9 +9,9 @@ Summary:   Multi Router Traffic Grapher
 Name:      mrtg
 Version:   2.17.7
 Release:   6%{?dist}
-URL:       http://oss.oetiker.ch/mrtg/
-Source0:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz
-Source1:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz.md5
+URL:       https://oss.oetiker.ch/mrtg/
+Source0:   https://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz
+Source1:   https://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz.md5
 # Source2: configuration file example
 Source2:   mrtg.cfg
 # Source3: script for filtering out false perl requires

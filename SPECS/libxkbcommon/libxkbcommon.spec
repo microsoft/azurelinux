@@ -3,7 +3,7 @@ Version:        1.6.0
 Release:        2%{?dist}
 Summary:        X.Org X11 XKB parsing library
 License:        MIT AND X11 AND MIT-CMU
-URL:            http://www.x.org
+URL:            https://www.x.org
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 

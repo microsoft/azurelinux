@@ -9,7 +9,7 @@ Release:        2%{?dist}
 License:        BSD OR GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://software.schmorp.de/pkg/libecb.html
+URL:            https://software.schmorp.de/pkg/libecb.html
 # Below link points to the correct revision of the sources but doesn't give tarballs with reproducible hashes.
 # How to re-build this file for CBL-Mariner in a reproducible way:
 #   1. cvs -d :pserver:anonymous@cvs.schmorp.de/schmorpforge export -r rxvt-unicode-rel-%%{underscore_version} %%{name}
@@ -25,7 +25,7 @@ URL:            http://software.schmorp.de/pkg/libecb.html
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source0:        http://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-%{underscore_version}#/%{name}-%{version}.tar.gz
+Source0:        https://cvs.schmorp.de/libecb/?view=tar&pathrev=rxvt-unicode-rel-%{underscore_version}#/%{name}-%{version}.tar.gz
 
 BuildRequires:  coreutils
 BuildRequires:  perl-podlators

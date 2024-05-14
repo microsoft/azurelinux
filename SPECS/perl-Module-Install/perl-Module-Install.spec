@@ -10,7 +10,7 @@ License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/Module-Install/
+URL:            https://search.cpan.org/dist/Module-Install/
 Source0:        https://cpan.metacpan.org/authors/id/E/ET/ETHER/Module-Install-%{version}.tar.gz
 Source1:        LICENSE.PTR
 BuildArch:      noarch

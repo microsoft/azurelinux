@@ -6,7 +6,7 @@ Summary: Maltese hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 6%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/5039/0/dict-mt-2011-04-14.oxt
-URL: http://linux.org.mt/node/62
+URL: https://linux.org.mt/node/62
 License: LGPLv2+
 BuildArch: noarch
 BuildRequires: hunspell-devel

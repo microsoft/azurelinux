@@ -4,7 +4,7 @@ Release:    2%{?dist}
 Summary:    Userspace programs for btrfs
 Group:      System Environment/Base
 License:    GPLv2+
-URL:        http://btrfs.wiki.kernel.org/index.php/Main_Page
+URL:        https://btrfs.wiki.kernel.org/index.php/Main_Page
 Source0:    https://www.kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/%{name}-v%{version}.tar.xz#/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

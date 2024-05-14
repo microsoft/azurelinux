@@ -31,7 +31,7 @@ Source0:        %{_distro_sources_url}/%{name}-%{base_version}.tar.xz
 # These manifests based on the ones shipped by eclipse.org
 Source1:        MANIFEST.MF
 Source2:        MANIFEST-TCK.MF
-Source3:        http://www.apache.org/licenses/LICENSE-2.0.txt
+Source3:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildRequires:  fdupes
 BuildRequires:  java-devel > 1.6
 BuildRequires:  javapackages-local-bootstrap

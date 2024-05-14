@@ -6,7 +6,7 @@ Version: 4.08
 Release: 11%{?dist}
 # inherit the license tags from the man-pages package
 License: GPL+ and GPLv2 and GPLv2+ and LGPLv2+ and GPLv3+ and BSD and MIT and Copyright only and IEEE
-URL: http://www.pluto.linux.it/ildp/man/
+URL: https://www.pluto.linux.it/ildp/man/
 %global extra_name %{name}-extra
 %global extra_ver 0.5.0
 # The tarball of the new 3.15 version has a slighly strange file name, not

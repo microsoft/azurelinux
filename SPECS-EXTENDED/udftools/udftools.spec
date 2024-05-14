@@ -5,8 +5,8 @@ Name: udftools
 Version: 2.1
 Release: 6%{?dist}
 License: GPLv2+
-URL: http://sourceforge.net/projects/linux-udf/
-#Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL: https://sourceforge.net/projects/linux-udf/
+#Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source: https://github.com/pali/udftools/releases/tag/%{version}/udftools-%{version}.tar.gz
 #old versions at Source: https://sourceforge.net/projects/linux-udf/files/%{name}/%{version}/%{name}-%{version}.tar.gz
 Source2: wrudf.1
@@ -169,25 +169,25 @@ Resolves: rhbz#926671
 - added more bigendian patches
 - changed license tag
 
-* Mon Aug 28 2006 Matthias Saou <http://freshrpms.net/> 1.0.0b3-7
+* Mon Aug 28 2006 Matthias Saou <https://freshrpms.net/> 1.0.0b3-7
 - FC6 rebuild.
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 1.0.0b3-6
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 1.0.0b3-6
 - Add ncurses-devel build requirement, since it's not pulled in anymore.
 - Add patch to fix as many trivial warnings as possible. Some stuff seems to
   still not be 64bit clean, though.
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 1.0.0b3-5
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 1.0.0b3-5
 - FC5 rebuild.
 
-* Thu Feb  9 2006 Matthias Saou <http://freshrpms.net/> 1.0.0b3-4
+* Thu Feb  9 2006 Matthias Saou <https://freshrpms.net/> 1.0.0b3-4
 - Rebuild for new gcc/glibc.
 - Exclude the static library... there isn't even a header file.
 
-* Tue May  3 2005 Matthias Saou <http://freshrpms.net/> 1.0.0b3-3
+* Tue May  3 2005 Matthias Saou <https://freshrpms.net/> 1.0.0b3-3
 - Include patches to fix big endian issue and gcc4 compile.
 
-* Mon Feb  7 2005 Matthias Saou <http://freshrpms.net/> 1.0.0b3-1
+* Mon Feb  7 2005 Matthias Saou <https://freshrpms.net/> 1.0.0b3-1
 - Initial RPM release, based on spec file from John Treacy.
 - Exclude .la file.
 - Remove unneeded /sbin/ldconfig calls (only a static lib for now).

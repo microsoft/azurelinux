@@ -141,7 +141,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
     when deleting a field on a .dbf without records.  Fixes
     https://github.com/OSGeo/gdal/issues/863
   * safileio.c: remove duplicate test. Patch by Jaroslav Fojtik.
-    Fixes http://bugzilla.maptools.org/show_bug.cgi?id=2744
+    Fixes https://bugzilla.maptools.org/show_bug.cgi?id=2744
 - Rebase rpmlint-errors.patch for current version.
 - Drop proj4 Requires and BuildRequires: functionality dropped by
   upstream.

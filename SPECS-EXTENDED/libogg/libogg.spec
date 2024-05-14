@@ -5,9 +5,9 @@ Name:           libogg
 Version:        1.3.4
 Release:        4%{?dist}
 License:        BSD
-URL:            http://www.xiph.org/
+URL:            https://www.xiph.org/
 
-Source:         http://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
+Source:         https://downloads.xiph.org/releases/ogg/%{name}-%{version}.tar.xz
 
 BuildRequires:  gcc
 

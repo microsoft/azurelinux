@@ -17,7 +17,7 @@ Requires: libtevent%{?_isa} >= %{tevent_version}
 License: LGPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://ldb.samba.org/
+URL: https://ldb.samba.org/
 Source0: https://www.samba.org/ftp/ldb/ldb-%{version}.tar.gz
 Source1: https://www.samba.org/ftp/ldb/ldb-%{version}.tar.asc
 # gpg2 --no-default-keyring --keyring ./ldb.keyring --recv-keys 9147A339719518EE9011BCB54793916113084025

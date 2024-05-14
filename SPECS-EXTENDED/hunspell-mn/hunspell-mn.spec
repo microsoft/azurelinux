@@ -9,7 +9,7 @@ Release: 21%{?dist}
 # gives below Source URL
 Source0: https://downloads.sourceforge.net/project/aoo-extensions/1408/0/dict-mn_0.06-5.oxt 
 Source1: %{name}-LICENSE.txt
-URL: http://mnspell.openmn.org
+URL: https://mnspell.openmn.org
 License: GPLv2
 BuildArch: noarch
 

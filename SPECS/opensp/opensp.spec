@@ -6,7 +6,7 @@ License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://openjade.sourceforge.net/
-Source:         http://download.sourceforge.net/openjade/OpenSP-%{version}.tar.gz
+Source:         https://download.sourceforge.net/openjade/OpenSP-%{version}.tar.gz
 Patch0:         opensp-multilib.patch
 Patch1:         opensp-nodeids.patch
 Patch2:         opensp-sigsegv.patch

@@ -9,8 +9,8 @@ Release:        15%{?dist}
 Summary:        Extended widget set for Tk
 
 License:        TCL
-URL:            http://tcllib.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/tcllib/bwidget-%{version}.tar.gz
+URL:            https://tcllib.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/tcllib/bwidget-%{version}.tar.gz
 
 BuildArch:      noarch
 Requires:       tcl(abi) = 8.6 tk

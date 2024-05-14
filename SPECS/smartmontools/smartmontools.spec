@@ -5,8 +5,8 @@ Release:	1%{?dist}
 License:	MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://smartmontools.sourceforge.net/
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:		https://smartmontools.sourceforge.net/
+Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source2:	smartmontools.sysconf
 Source4:	smartdnotify
 #semi-automatic update of drivedb.h

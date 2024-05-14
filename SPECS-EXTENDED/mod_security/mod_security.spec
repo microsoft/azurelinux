@@ -14,7 +14,7 @@ Name: mod_security
 Version: 2.9.4
 Release: 1%{?dist}
 License: ASL 2.0
-URL: http://www.modsecurity.org/
+URL: https://www.modsecurity.org/
 Source: https://github.com/SpiderLabs/ModSecurity/releases/download/v%{version}/modsecurity-%{version}.tar.gz
 Source1: mod_security.conf
 Source2: 10-mod_security.conf

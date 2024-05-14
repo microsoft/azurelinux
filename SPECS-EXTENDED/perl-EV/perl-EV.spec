@@ -29,9 +29,9 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`%{_bindir}/perl -V:version`"; echo 
 
 %description
 This module provides an interface to libev
-(<http://software.schmorp.de/pkg/libev.html>). While the included documentation
+(<https://software.schmorp.de/pkg/libev.html>). While the included documentation
 is comprehensive, one might also consult the documentation of libev itself
-(<http://cvs.schmorp.de/libev/ev.html>) for more subtle details on watcher
+(<https://cvs.schmorp.de/libev/ev.html>) for more subtle details on watcher
 semantics or some discussion on the available backends, or how to force a
 specific backend with "LIBEV_FLAGS", or just about in any case because it has
 much more detailed information.
@@ -230,7 +230,7 @@ PERL_CANARY_STABILITY_NOPROMPT=1 %{_bindir}/perl Makefile.PL INSTALLDIRS=vendor 
 
 * Thu Apr 07 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-4
 - Readded the header file to the main package, as per guidelines:
-      -> http://fedoraproject.org/wiki/Packaging/Perl#.h_files_in_module_packages
+      -> https://fedoraproject.org/wiki/Packaging/Perl#.h_files_in_module_packages
 
 * Tue Mar 08 2011 Mathieu Bridon <bochecha@fedoraproject.org> - 4.03-3
 - Some more fixes as part of the review process:

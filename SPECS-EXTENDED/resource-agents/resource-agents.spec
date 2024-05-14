@@ -118,7 +118,7 @@ The Linux Director Daemon (ldirectord) was written by Jacob Rief.
 ldirectord is a stand alone daemon for monitoring the services on real
 servers. Currently, HTTP, HTTPS, and FTP services are supported.
 ldirectord is simple to install and works with Pacemaker
-(http://clusterlabs.org/).
+(https://clusterlabs.org/).
 
 See 'ldirectord -h' and linux-ha/doc/ldirectord for more information.
 %endif

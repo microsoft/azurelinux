@@ -141,7 +141,7 @@ chrpath --delete %{buildroot}%{_libdir}/ocaml/stublibs/*.so
 find %{buildroot} -type f -name "*.la" -delete -print
 
 # Remove .cmt and .cmti files, for now.  We could package them later.
-# See also: http://www.ocamlpro.com/blog/2012/08/20/ocamlpro-and-4.00.0.html
+# See also: https://www.ocamlpro.com/blog/2012/08/20/ocamlpro-and-4.00.0.html
 find %{buildroot} \( -name '*.cmt' -o -name '*.cmti' \) -a -delete -print
 
 %check
@@ -504,7 +504,7 @@ make -j1 all
 * Sat Aug 30 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-1
 - New upstream OCaml 4.02.0 final.
 - Add patch for ocaml-camlimages
-  (see http://caml.inria.fr/mantis/view.php?id=6517)
+  (see https://caml.inria.fr/mantis/view.php?id=6517)
 
 * Fri Aug 22 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-0.11.gitc48fc015
 - Rebase on top of OCaml 4.02+rc1 (same as git commit c48fc015).
@@ -514,7 +514,7 @@ make -j1 all
 
 * Fri Aug 08 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-0.9
 - Add fix for Coq build issue:
-  http://caml.inria.fr/mantis/view.php?id=6507
+  https://caml.inria.fr/mantis/view.php?id=6507
 
 * Fri Aug 01 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-0.8
 - Rebase on top of 4.02.0 beta commit 10e45753.
@@ -529,7 +529,7 @@ make -j1 all
 * Tue Jul 15 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-0.5
 - Disable CSE optimization which is broken on armv7hl and aarch64.
 - Fix broken caml_callback2 on aarch64
-  http://caml.inria.fr/mantis/view.php?id=6489
+  https://caml.inria.fr/mantis/view.php?id=6489
 
 * Sat Jul 12 2014 Richard W.M. Jones <rjones@redhat.com> - 4.02.0-0.1
 - Update to 4.02.0-beta1 + patches from the upstream 4.02 branch.
@@ -576,7 +576,7 @@ make -j1 all
 
 * Mon Mar 24 2014 Richard W.M. Jones <rjones@redhat.com> - 4.01.0-10
 - Include a fix for aarch64 relocation problems
-  http://caml.inria.fr/mantis/view.php?id=6283
+  https://caml.inria.fr/mantis/view.php?id=6283
 
 * Wed Jan  8 2014 Richard W.M. Jones <rjones@redhat.com> - 4.01.0-8
 - Don't use ifarch around Patch lines, as it means the patch files
@@ -584,7 +584,7 @@ make -j1 all
 
 * Mon Jan  6 2014 Richard W.M. Jones <rjones@redhat.com> - 4.01.0-7
 - Work around gcc stack alignment issues, see
-  http://caml.inria.fr/mantis/view.php?id=5700
+  https://caml.inria.fr/mantis/view.php?id=5700
 
 * Tue Dec 31 2013 Richard W.M. Jones <rjones@redhat.com> - 4.01.0-6
 - Add aarch64 (arm64) code generator.
@@ -686,7 +686,7 @@ make -j1 all
 
 * Tue May 29 2012 Richard W.M. Jones <rjones@redhat.com> 3.12.1-6
 - Move patches to external git repo:
-  http://git.fedorahosted.org/git/?p=fedora-ocaml.git
+  https://git.fedorahosted.org/git/?p=fedora-ocaml.git
   There should be no change introduced here.
 
 * Tue May 15 2012 Karsten Hopp <karsten@redhat.com> 3.12.1-4
@@ -730,7 +730,7 @@ make -j1 all
 
 * Tue Jan  4 2011 Richard W.M. Jones <rjones@redhat.com> - 3.12.0-1
 - New upstream version 3.12.0.
-  http://fedoraproject.org/wiki/Features/OCaml3.12
+  https://fedoraproject.org/wiki/Features/OCaml3.12
 - Remove ppc64 support patch.
 - Rebase rpath removal patch.
 - ocamlobjinfo is now an official tool, so no need to compile it by hand.

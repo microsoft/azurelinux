@@ -5,9 +5,9 @@ Summary: Polish hyphenation rules
 %global upstreamid 20060726
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_pl_PL.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_pl_PL.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPLv2+
 BuildArch: noarch
 Requires: hyphen

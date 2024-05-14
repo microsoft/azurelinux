@@ -5,7 +5,7 @@ Release:        19%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://lloyd.github.com/yajl/
+URL:            https://lloyd.github.com/yajl/
 #
 # NB, upstream does not provide pre-built tar.gz downloads. Instead
 # they make you use the 'on the fly' generated tar.gz from GITHub's

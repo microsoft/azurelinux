@@ -4,10 +4,10 @@ Name: sound-theme-freedesktop
 Version: 0.8
 Release: 16%{?dist}
 Summary: freedesktop.org sound theme
-Source0: http://people.freedesktop.org/~mccann/dist/sound-theme-freedesktop-%{version}.tar.bz2
+Source0: https://people.freedesktop.org/~mccann/dist/sound-theme-freedesktop-%{version}.tar.bz2
 # For details on the licenses used, see CREDITS
 License:  CC-BY-SA and CC-BY and GPLv2+
-Url: http://www.freedesktop.org/wiki/Specifications/sound-theme-spec
+Url: https://www.freedesktop.org/wiki/Specifications/sound-theme-spec
 BuildArch: noarch
 BuildRequires:  gcc
 BuildRequires:  perl(File::Find)
@@ -18,7 +18,7 @@ Requires(postun): coreutils
 
 %description
 The default freedesktop.org sound theme following the XDG theming
-specification.  (http://0pointer.de/public/sound-theme-spec.html).
+specification.  (https://0pointer.de/public/sound-theme-spec.html).
 
 %prep
 %setup -q

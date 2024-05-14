@@ -20,7 +20,7 @@ poking around to writing web and GUI applications.\
 \
 WBEM, or Web Based Enterprise Management is a manageability protocol, like\
 SNMP, standardized by the Distributed Management Task Force (DMTF) available\
-at http://www.dmtf.org/standards/wbem.\
+at https://www.dmtf.org/standards/wbem.\
 \
 It also provides a Python provider interface, and is the fastest and\
 easiest way to write providers on the planet.

@@ -7,9 +7,9 @@ Name: openobex
 Version: 1.7.2
 Release: 12%{?dist}
 License: GPLv2+ and LGPLv2+
-URL: http://openobex.sourceforge.net
+URL: https://openobex.sourceforge.net
 # git clone https://git.gitorious.org/openobex/mainline.git
-Source: http://downloads.sourceforge.net/%{name}/%{name}-%{version}-Source.tar.gz
+Source: https://downloads.sourceforge.net/%{name}/%{name}-%{version}-Source.tar.gz
 Patch0:  openobex-apps-flush.patch
 Patch1:  openobex-1.7-obex_push.patch
 Patch2:  openobex-1.7-udev_rule.patch

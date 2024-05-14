@@ -1,16 +1,16 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 
-# Fedora package review: http://bugzilla.redhat.com/718395
+# Fedora package review: https://bugzilla.redhat.com/718395
 
 Summary: Library for accessing MusicBrainz servers
 Name: libmusicbrainz5
 Version: 5.1.0
 Release: 15%{?dist}
 License: LGPLv2
-URL: http://www.musicbrainz.org/
+URL: https://www.musicbrainz.org/
 Source0: https://github.com/metabrainz/libmusicbrainz/releases/download/release-5.1.0/libmusicbrainz-%{version}.tar.gz
-# Filed upstream as http://tickets.musicbrainz.org/browse/LMB-41
+# Filed upstream as https://tickets.musicbrainz.org/browse/LMB-41
 Patch0: doxygen.patch
 Patch1: 0001-Don-t-emit-errors-unless-compiled-for-debug.patch
 BuildRequires:  gcc

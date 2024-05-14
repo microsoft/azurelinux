@@ -198,7 +198,7 @@ make test
 
 * Mon Oct 06 2008 Ralf Corsepius <corsepiu@fedoraproject.org> - 0.20-6
 - Add Hook-LexWrap-0.20-cpan-rt-38892.diff to fix
-  http://rt.cpan.org/Public/Bug/Display.html?id=38892
+  https://rt.cpan.org/Public/Bug/Display.html?id=38892
   (Bugs shows while building rt3).
 
 * Wed Feb 27 2008 Tom "spot" Callaway <tcallawa@redhat.com> - 0.20-5

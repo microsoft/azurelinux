@@ -12,7 +12,7 @@ Summary:        Intelligent phonetic input method library for Traditional Chines
 Summary(zh_TW): %{name_zh_TW}
 
 License:        LGPLv2+
-URL:            http://chewing.csie.net/
+URL:            https://chewing.csie.net/
 Source0:        https://github.com/chewing/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # https://github.com/chewing/libchewing/pull/310
 Patch0:         0001-chewing.py-supports-platforms-with-64bit-pointer.patch

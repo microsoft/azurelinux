@@ -309,7 +309,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 
 * Fri Feb 24 2012 Ding-Yi Chen <dchen at redhat.com> - 0.7.2-1
 - Upstream update to 0.7.2
-  Which may fixed http://code.google.com/p/httplib2/issues/detail?id=62
+  Which may fixed https://code.google.com/p/httplib2/issues/detail?id=62
   Note this version uses fedora's cert file bundle instead of httplib2
   default.
 
@@ -318,14 +318,14 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} pytest -k "not test_unknown_server \
 
 * Fri Jul 29 2011 Ding-Yi Chen <dchen at redhat.com>  - 0.4.0-5.el6
 - Apply that address python-httplib2 (GoogleCode Hosted) issue 39
-  http://code.google.com/p/httplib2/issues/detail?id=39
+  https://code.google.com/p/httplib2/issues/detail?id=39
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.6.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Wed Aug 25 2010 Thomas Spura <tomspur@fedoraproject.org> - 0.6.0-4
 - rebuild with python3.2
-  http://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
+  https://lists.fedoraproject.org/pipermail/devel/2010-August/141368.html
 
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 0.6.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild

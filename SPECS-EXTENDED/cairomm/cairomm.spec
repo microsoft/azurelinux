@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.cairographics.org
-Source:         http://www.cairographics.org/releases/%{name}-%{version}.tar.gz
+Source:         https://www.cairographics.org/releases/%{name}-%{version}.tar.gz
 %global apiver 1.0
 %global cairo_version 1.10.0
 %global libsigc_version 2.5.1

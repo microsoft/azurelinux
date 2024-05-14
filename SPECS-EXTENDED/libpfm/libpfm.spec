@@ -17,8 +17,8 @@ Summary:	Library to encode performance events for use by perf tool
 License:	MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:		http://perfmon2.sourceforge.net/
-Source0:	http://sourceforge.net/projects/perfmon2/files/libpfm4/%{name}-%{version}.tar.gz
+URL:		https://perfmon2.sourceforge.net/
+Source0:	https://sourceforge.net/projects/perfmon2/files/libpfm4/%{name}-%{version}.tar.gz
 Patch2:		libpfm-python3-setup.patch
 
 BuildRequires:	gcc

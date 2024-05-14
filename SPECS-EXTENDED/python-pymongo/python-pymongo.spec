@@ -139,7 +139,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 * Tue Jun 04 2019 Randy Barlow <bowlofeggs@fedoraproject.org> - 3.8.0-1
 - Update to 3.8.0 (#1686670).
-- http://api.mongodb.com/python/3.8.0/changelog.html
+- https://api.mongodb.com/python/3.8.0/changelog.html
 
 * Tue Mar 26 2019 Randy Barlow <bowlofeggs@fedoraproject.org> - 3.7.2-2
 - Drop build dependency on mongodb-server, since it is no longer shipped in Fedora.
@@ -147,7 +147,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 * Thu Feb 28 2019 Yatin Karel <ykarel@redhat.com> - 3.7.2-1
 - Update to 3.7.2
-- http://api.mongodb.com/python/3.7.2/changelog.html
+- https://api.mongodb.com/python/3.7.2/changelog.html
 
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 3.7.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
@@ -164,7 +164,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 * Mon Jul 30 2018 Randy Barlow <bowlofeggs@fedoraproject.org> - 3.7.1-1
 - Update to 3.7.1 (#1601651).
-- http://api.mongodb.com/python/3.7.1/changelog.html
+- https://api.mongodb.com/python/3.7.1/changelog.html
 
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 3.6.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
@@ -174,7 +174,7 @@ chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
 
 * Sat Mar 10 2018 Randy Barlow <bowlofeggs@fedoraproject.org> - 3.6.1-1
 - Update to 3.6.1 (#1550757).
-- http://api.mongodb.com/python/3.6.1/changelog.html
+- https://api.mongodb.com/python/3.6.1/changelog.html
 
 * Tue Feb 27 2018 Iryna Shcherbina <ishcherb@redhat.com> - 3.6.0-2
 - Update Python 2 dependency declarations to new packaging standards

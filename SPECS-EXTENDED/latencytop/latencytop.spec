@@ -6,8 +6,8 @@ Release:        27%{?dist}
 Summary:        System latency monitor (with GUI)
 
 License:        GPLv2
-URL:            http://www.latencytop.org/
-Source0:        http://www.latencytop.org/download/%{name}-%{version}.tar.gz
+URL:            https://www.latencytop.org/
+Source0:        https://www.latencytop.org/download/%{name}-%{version}.tar.gz
 Source1:        %{name}-LICENSE.txt
 Patch0:         latencytop-Makefile-fixes.patch
 Patch1:         latencytop-Makefile-default-to-no-gtk.patch

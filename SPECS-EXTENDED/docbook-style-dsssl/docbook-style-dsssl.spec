@@ -6,7 +6,7 @@ License:        MIT WITH Advertising
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://docbook.sourceforge.net/
-Source0:        http://prdownloads.sourceforge.net/docbook/docbook-dsssl-%{version}.tar.gz
+Source0:        https://prdownloads.sourceforge.net/docbook/docbook-dsssl-%{version}.tar.gz
 Source1:        %{name}.Makefile
 #license file
 Source2:        LICENSE.PTR

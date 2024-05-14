@@ -8,8 +8,8 @@ Release:	3%{?dist}
 Summary:	USB Modeswitch gets mobile broadband cards in operational mode
 Summary(de):	USB Modeswitch aktiviert UMTS-Karten
 License:	GPLv2+
-URL:		http://www.draisberghof.de/usb_modeswitch/
-Source0:	http://www.draisberghof.de/usb_modeswitch/%{source_name}-%{version}.tar.bz2
+URL:		https://www.draisberghof.de/usb_modeswitch/
+Source0:	https://www.draisberghof.de/usb_modeswitch/%{source_name}-%{version}.tar.bz2
 BuildArch:	noarch
 BuildRequires:	systemd
 Requires:	systemd

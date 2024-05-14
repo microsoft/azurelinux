@@ -9,7 +9,7 @@ Name: libdmx
 Version: 1.1.4
 Release: 8%{?dist}
 License: MIT
-URL: http://www.x.org
+URL: https://www.x.org
 
 %if 0%{?gitdate}
 Source0:    %{tarball}-%{gitdate}.tar.bz2

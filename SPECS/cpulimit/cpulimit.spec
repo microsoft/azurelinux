@@ -41,7 +41,7 @@ to keep laptops cool in the face of CPU-hungry processes and for limiting
 virtual machines.
 
 LimitCPU is the direct child of CPUlimit, a creation of Angelo Marletta,
-which can be found at http://cpulimit.sourceforge.net
+which can be found at https://cpulimit.sourceforge.net
 
 %prep
 %autosetup -p1

@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://oss.oracle.com/berkeley-db.html
-Source0:        http://download.oracle.com/berkeley-db/db-%{version}.tar.gz
+Source0:        https://download.oracle.com/berkeley-db/db-%{version}.tar.gz
 Patch0:         CVE-2019-2708.patch
 Obsoletes:      db
 

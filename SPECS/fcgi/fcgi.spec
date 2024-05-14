@@ -3,7 +3,7 @@ Name:           fcgi
 Version:        2.4.0
 Release:        7%{?dist}
 License:        OML
-# NOTE: below is an archive of FastCGI. The original project web page (http://www.fastcgi.com) is no longer online.
+# NOTE: below is an archive of FastCGI. The original project web page (https://www.fastcgi.com) is no longer online.
 URL:            https://fastcgi-archives.github.io
 Source0:        https://src.fedoraproject.org/lookaside/extras/%{name}/%{name}-%{version}.tar.gz/d15060a813b91383a9f3c66faf84867e/%{name}-%{version}.tar.gz
 Patch0:         fcgi-EOF.patch

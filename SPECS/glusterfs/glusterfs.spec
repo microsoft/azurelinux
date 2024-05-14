@@ -1671,7 +1671,7 @@ exit 0
 - 3.8.1 GA
 
 * Mon Jun 27 2016  Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 3.8.0-3
-- 3.8.0 GA, http://review.gluster.org/#/c/14779/
+- 3.8.0 GA, https://review.gluster.org/#/c/14779/
 
 * Wed Jun 22 2016  Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 3.8.0-2
 - 3.8.0 GA, rebuild after userspace-rcu SONAME bump
@@ -2281,107 +2281,107 @@ exit 0
 * Thu Sep 17 2009 Peter Lemenkov <lemenkov@gmail.com> 2.0.6-2
 - Rebuilt with new fuse
 
-* Sat Sep 12 2009 Matthias Saou <http://freshrpms.net/> 2.0.6-1
+* Sat Sep 12 2009 Matthias Saou <https://freshrpms.net/> 2.0.6-1
 - Update to 2.0.6.
 - No longer default to disable the client on RHEL5 (#522192).
 - Update spec file URLs.
 
-* Mon Jul 27 2009 Matthias Saou <http://freshrpms.net/> 2.0.4-1
+* Mon Jul 27 2009 Matthias Saou <https://freshrpms.net/> 2.0.4-1
 - Update to 2.0.4.
 
-* Thu Jun 11 2009 Matthias Saou <http://freshrpms.net/> 2.0.1-2
+* Thu Jun 11 2009 Matthias Saou <https://freshrpms.net/> 2.0.1-2
 - Remove libglusterfs/src/y.tab.c to fix koji F11/devel builds.
 
-* Sat May 16 2009 Matthias Saou <http://freshrpms.net/> 2.0.1-1
+* Sat May 16 2009 Matthias Saou <https://freshrpms.net/> 2.0.1-1
 - Update to 2.0.1.
 
-* Thu May  7 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-1
+* Thu May  7 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-1
 - Update to 2.0.0 final.
 
-* Wed Apr 29 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-0.3.rc8
+* Wed Apr 29 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-0.3.rc8
 - Move glusterfsd to common, since the client has a symlink to it.
 
-* Fri Apr 24 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-0.2.rc8
+* Fri Apr 24 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-0.2.rc8
 - Update to 2.0.0rc8.
 
-* Sun Apr 12 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-0.2.rc7
+* Sun Apr 12 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-0.2.rc7
 - Update glusterfsd init script to the new style init.
 - Update files to match the new default vol file names.
 - Include logrotate for glusterfsd, use a pid file by default.
 - Include logrotate for glusterfs, using killall for lack of anything better.
 
-* Sat Apr 11 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-0.1.rc7
+* Sat Apr 11 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-0.1.rc7
 - Update to 2.0.0rc7.
 - Rename "libs" to "common" and move the binary, man page and log dir there.
 
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org>
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
-* Mon Feb 16 2009 Matthias Saou <http://freshrpms.net/> 2.0.0-0.1.rc1
+* Mon Feb 16 2009 Matthias Saou <https://freshrpms.net/> 2.0.0-0.1.rc1
 - Update to 2.0.0rc1.
 - Include new libglusterfsclient.h.
 
-* Mon Feb 16 2009 Matthias Saou <http://freshrpms.net/> 1.3.12-1
+* Mon Feb 16 2009 Matthias Saou <https://freshrpms.net/> 1.3.12-1
 - Update to 1.3.12.
 - Remove no longer needed ocreat patch.
 
-* Thu Jul 17 2008 Matthias Saou <http://freshrpms.net/> 1.3.10-1
+* Thu Jul 17 2008 Matthias Saou <https://freshrpms.net/> 1.3.10-1
 - Update to 1.3.10.
 - Remove mount patch, it's been included upstream now.
 
-* Fri May 16 2008 Matthias Saou <http://freshrpms.net/> 1.3.9-1
+* Fri May 16 2008 Matthias Saou <https://freshrpms.net/> 1.3.9-1
 - Update to 1.3.9.
 
-* Fri May  9 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-1
+* Fri May  9 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-1
 - Update to 1.3.8 final.
 
-* Wed Apr 23 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.10
+* Wed Apr 23 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.10
 - Include short patch to include fixes from latest TLA 751.
 
-* Tue Apr 22 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.9
+* Tue Apr 22 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.9
 - Update to 1.3.8pre6.
 - Include glusterfs binary in both the client and server packages, now that
   glusterfsd is a symlink to it instead of a separate binary.
 
-* Sun Feb  3 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.8
+* Sun Feb  3 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.8
 - Add python version check and disable bindings for version < 2.4.
 
-* Sun Feb  3 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.7
+* Sun Feb  3 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.7
 - Add --without client rpmbuild option, make it the default for RHEL (no fuse).
   (I hope "rhel" is the proper default macro name, couldn't find it...)
 
-* Wed Jan 30 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.6
+* Wed Jan 30 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.6
 - Add --without ibverbs rpmbuild option to the package.
 
-* Mon Jan 14 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.5
+* Mon Jan 14 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.5
 - Update to current TLA again, patch-636 which fixes the known segfaults.
 
-* Thu Jan 10 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.4
+* Thu Jan 10 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.4
 - Downgrade to glusterfs--mainline--2.5--patch-628 which is more stable.
 
-* Tue Jan  8 2008 Matthias Saou <http://freshrpms.net/> 1.3.8-0.3
+* Tue Jan  8 2008 Matthias Saou <https://freshrpms.net/> 1.3.8-0.3
 - Update to current TLA snapshot.
 - Include umount.glusterfs wrapper script (really needed? dunno).
 - Include patch to mount wrapper to avoid multiple identical mounts.
 
-* Sun Dec 30 2007 Matthias Saou <http://freshrpms.net/> 1.3.8-0.1
+* Sun Dec 30 2007 Matthias Saou <https://freshrpms.net/> 1.3.8-0.1
 - Update to current TLA snapshot, which includes "volume-name=" fstab option.
 
-* Mon Dec  3 2007 Matthias Saou <http://freshrpms.net/> 1.3.7-6
+* Mon Dec  3 2007 Matthias Saou <https://freshrpms.net/> 1.3.7-6
 - Re-add the /var/log/glusterfs directory in the client sub-package (required).
 - Include custom patch to support vol= in fstab for -n glusterfs client option.
 
-* Mon Nov 26 2007 Matthias Saou <http://freshrpms.net/> 1.3.7-4
+* Mon Nov 26 2007 Matthias Saou <https://freshrpms.net/> 1.3.7-4
 - Re-enable libibverbs.
 - Check and update License field to GPLv3+.
 - Add glusterfs-common obsoletes, to provide upgrade path from old packages.
 - Include patch to add mode to O_CREATE opens.
 
-* Thu Nov 22 2007 Matthias Saou <http://freshrpms.net/> 1.3.7-3
+* Thu Nov 22 2007 Matthias Saou <https://freshrpms.net/> 1.3.7-3
 - Remove Makefile* files from examples.
 - Include RHEL/Fedora type init script, since the included ones don't do.
 
-* Wed Nov 21 2007 Matthias Saou <http://freshrpms.net/> 1.3.7-1
+* Wed Nov 21 2007 Matthias Saou <https://freshrpms.net/> 1.3.7-1
 - Major spec file cleanup.
 - Add missing %%clean section.
 - Fix ldconfig calls (weren't set for the proper sub-package).

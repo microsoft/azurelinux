@@ -6,8 +6,8 @@ Release:        2%{?dist}
 Summary:        Dumps information about the CPU(s)
 
 License:        GPLv2+
-URL:            http://www.etallen.com/cpuid.html
-Source0:        http://www.etallen.com/%{name}/%{name}-%{version}.src.tar.gz
+URL:            https://www.etallen.com/cpuid.html
+Source0:        https://www.etallen.com/%{name}/%{name}-%{version}.src.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  perl-podlators

@@ -5,9 +5,9 @@ Summary: Italian hyphenation rules
 %global upstreamid 20071127
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_it_IT.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_it_IT.zip
 Source1: hyphen-it-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: LGPLv2+
 BuildArch: noarch
 Requires: hyphen
@@ -28,7 +28,7 @@ chmod -x *
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/hyphen
 cp -p hyph_it_IT.dic $RPM_BUILD_ROOT/%{_datadir}/hyphen
 pushd $RPM_BUILD_ROOT/%{_datadir}/hyphen/
-#http://extensions.services.openoffice.org/project/dict-la uses the it_IT for Latin
+#https://extensions.services.openoffice.org/project/dict-la uses the it_IT for Latin
 #so we'll do the same
 it_IT_aliases="it_CH la_VA"
 for lang in $it_IT_aliases; do

@@ -6,8 +6,8 @@ Release:	16%{?dist}
 Summary:	Optimized MPEG Audio Layer 2 encoding library based on tooLAME
 # build-scripts/install-sh is MIT/X11, build-scripts/{libtool.m4, ltmain.sh} are GPLv2+
 License:	LGPLv2+
-URL:		http://www.twolame.org/
-Source:		http://downloads.sourceforge.net/twolame/%{name}-%{version}.tar.gz
+URL:		https://www.twolame.org/
+Source:		https://downloads.sourceforge.net/twolame/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:	libsndfile-devel

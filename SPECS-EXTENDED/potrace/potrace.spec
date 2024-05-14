@@ -6,11 +6,11 @@ Release:	3%{?dist}
 Summary:	Transform bitmaps into vector graphics
 # README defines license as GPLv2+
 License:	GPLv2+
-URL:		http://potrace.sourceforge.net
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+URL:		https://potrace.sourceforge.net
+Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Documentation
-Source1:	http://potrace.sourceforge.net/potrace.pdf
-Source2:	http://potrace.sourceforge.net/potracelib.pdf
+Source1:	https://potrace.sourceforge.net/potrace.pdf
+Source2:	https://potrace.sourceforge.net/potracelib.pdf
 
 BuildRequires:	gcc
 BuildRequires:	zlib-devel

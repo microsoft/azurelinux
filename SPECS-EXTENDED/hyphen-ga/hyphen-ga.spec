@@ -5,9 +5,9 @@ Summary: Irish hyphenation rules
 %global upstreamid 20040220
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_ga_IE.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_ga_IE.zip
 Source1: %{name}-LICENSE.txt
-URL: http://borel.slu.edu/fleiscin/index.html
+URL: https://borel.slu.edu/fleiscin/index.html
 License: GPL+
 BuildArch: noarch
 Requires: hyphen

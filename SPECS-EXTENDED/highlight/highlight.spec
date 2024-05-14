@@ -5,8 +5,8 @@ Summary:        Universal source code to formatted text converter
 Version:        3.54
 Release:        3%{?dist}
 License:        GPLv3
-URL:            http://www.andre-simon.de/
-Source0:        http://www.andre-simon.de/zip/%{name}-%{version}.tar.bz2
+URL:            https://www.andre-simon.de/
+Source0:        https://www.andre-simon.de/zip/%{name}-%{version}.tar.bz2
 BuildRequires:  gcc-c++
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  lua-devel, boost-devel

@@ -6,8 +6,8 @@ License:        GPLv2+
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://people.redhat.com/~rjones/virt-what/
-Source0:        http://people.redhat.com/~rjones/virt-what/files/%{name}-%{version}.tar.gz
+URL:            https://people.redhat.com/~rjones/virt-what/
+Source0:        https://people.redhat.com/~rjones/virt-what/files/%{name}-%{version}.tar.gz
 
 BuildRequires:  git
 

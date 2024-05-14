@@ -26,14 +26,14 @@ Release:        40%{?dist}
 Summary:        Streaming API for XML
 License:        ASL 2.0
 Group:          Development/Libraries/Java
-URL:            http://stax.codehaus.org/Home
-# http://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
+URL:            https://stax.codehaus.org/Home
+# https://dist.codehaus.org/stax/distributions/stax-src-%{version}.zip
 Source0:        %{_distro_sources_url}/stax-src-%{version}.zip
-# http://dist.codehaus.org/stax/jars/stax-%{version}.pom
+# https://dist.codehaus.org/stax/jars/stax-%{version}.pom
 Source1:        stax-%{version}.pom
-# http://dist.codehaus.org/stax/jars/stax-api-%{apiver}.pom
+# https://dist.codehaus.org/stax/jars/stax-api-%{apiver}.pom
 Source2:        stax-api-%{apiver}.pom
-Source10:       http://apache.org/licenses/LICENSE-2.0.txt
+Source10:       https://apache.org/licenses/LICENSE-2.0.txt
 Patch0:         bea-stax-target8.patch
 Patch2:         bea-stax-gcj-build.patch
 BuildRequires:  ant

@@ -6,7 +6,7 @@ Version: 3.0.0
 Release: 6%{?dist}
 Source0: https://addons.mozilla.org/firefox/downloads/file/499875/frysk_wurdboek-%{version}-tb+fx+sm.xpi
 Source1: %{name}-LICENSE.txt
-URL: http://www.mozilla-nl.org/projecten/frysk
+URL: https://www.mozilla-nl.org/projecten/frysk
 License: GPLv3+
 BuildArch: noarch
 

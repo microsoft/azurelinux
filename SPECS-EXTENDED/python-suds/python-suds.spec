@@ -224,7 +224,7 @@ Summary:        %{summary}
 - Fixed Tickets: #207, #207, #209, #210, #212, #214, #215
 
 * Mon Dec 08 2008 jortel <jortel@redhat.com> - 0.3.4-1
-- Static (automatic) Import.bind('http://schemas.xmlsoap.org/soap/encoding/')
+- Static (automatic) Import.bind('https://schemas.xmlsoap.org/soap/encoding/')
 - Basic ws-security with {{{UsernameToken}}} and clear-text password only.
 - Add support for ''sparse'' soap headers via passing dictionary
 - Add support for arbitrary user defined soap headers

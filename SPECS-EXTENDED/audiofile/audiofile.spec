@@ -7,8 +7,8 @@ Version: 0.3.6
 Release: 27%{?dist}
 # library is LGPL / the two programs GPL / see README
 License: LGPLv2+ and GPLv2+
-Source: http://audiofile.68k.org/%{name}-%{version}.tar.gz
-URL: http://audiofile.68k.org/
+Source: https://audiofile.68k.org/%{name}-%{version}.tar.gz
+URL: https://audiofile.68k.org/
 BuildRequires:  gcc-c++
 BuildRequires: libtool
 BuildRequires: alsa-lib-devel

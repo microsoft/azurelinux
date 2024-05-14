@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://rpm.org
-Source0:        http://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
+Source0:        https://ftp.rpm.org/releases/%{name}-%(echo %{version} | cut -d'.' -f1-2).x/%{name}-%{version}.tar.bz2
 Patch0:         remove-docs-from-makefile.patch
 Patch1:         define-RPM_LD_FLAGS.patch
 Patch2:         fix_RPM_GNUC_DEPRECATED_headers.patch

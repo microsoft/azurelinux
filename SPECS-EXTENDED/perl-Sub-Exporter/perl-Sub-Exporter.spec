@@ -16,7 +16,7 @@ License:	GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:		https://metacpan.org/release/Sub-Exporter
-Source0:	http://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Exporter-%{version}.tar.gz
+Source0:	https://cpan.metacpan.org/authors/id/R/RJ/RJBS/Sub-Exporter-%{version}.tar.gz
 BuildArch:	noarch
 # Build
 BuildRequires:	coreutils

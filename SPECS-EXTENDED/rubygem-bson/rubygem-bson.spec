@@ -11,7 +11,7 @@ License: ASL 2.0
 # Keep the URL, while different URL is used in the upstream gemspec file.
 # Because there is a basic explanation about the bson
 # that is a beneficial for Fedora user.
-URL: http://bsonspec.org
+URL: https://bsonspec.org
 Source0: https://github.com/mongodb/%{gem_name}-ruby/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 Requires: rubygem(bigdecimal)
 BuildRequires: ruby(release)

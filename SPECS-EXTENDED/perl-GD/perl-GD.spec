@@ -312,7 +312,7 @@ make test TEST_VERBOSE=1
 
 * Sat Jun 18 2011 Iain Arnell <iarnell@gmail.com> 2.44-8
 - patch to avoid issue with ExtUtils::MakeMaker and CCFLAGS
-  see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=628522
+  see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=628522
 - clean up spec for modern rpmbuild
 - use perl_default_filter
 

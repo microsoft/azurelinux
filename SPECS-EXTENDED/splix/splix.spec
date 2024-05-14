@@ -7,7 +7,7 @@ Name: splix
 Version: 2.0.1
 Release: 3%{?dist}
 License: GPLv2
-URL: http://splix.sourceforge.net/
+URL: https://splix.sourceforge.net/
 
 # This is a SVN snapshot downloaded via 'Download Snapshot' from
 # https://sourceforge.net/p/splix/code/315/tree/

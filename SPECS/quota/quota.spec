@@ -50,7 +50,7 @@ Summary:    System administration tools for monitoring users' disk usage
 License:        GPLv2 and GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://sourceforge.net/projects/linuxquota/
+URL:            https://sourceforge.net/projects/linuxquota/
 Source0:        https://downloads.sourceforge.net/project/linuxquota/quota-tools/%{version}/%{name}-%{version}.tar.gz
 Source1:        quota_nld.service
 Source2:        quota_nld.sysconfig

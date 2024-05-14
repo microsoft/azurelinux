@@ -55,7 +55,7 @@ Version:    %{GITDATE}git%{GITCOMMIT}
 Release:    1%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
-URL:        http://www.tianocore.org
+URL:        https://www.tianocore.org
 
 # The source tarball is created using following commands:
 # COMMIT=bb1bba3d7767
@@ -170,7 +170,7 @@ Provides:   bundled(openssl) = %{OPENSSL_VER}
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
 
 # URL taken from the Maintainers.txt file.
-URL:        http://www.tianocore.org/ovmf/
+URL:        https://www.tianocore.org/ovmf/
 
 %description ovmf
 OVMF (Open Virtual Machine Firmware) is a project to enable UEFI support for

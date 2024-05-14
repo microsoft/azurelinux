@@ -7,8 +7,8 @@ Release:        16%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://projects.camlcity.org/projects/findlib.html
-Source0:        http://download.camlcity.org/download/findlib-%{version}.tar.gz
+URL:            https://projects.camlcity.org/projects/findlib.html
+Source0:        https://download.camlcity.org/download/findlib-%{version}.tar.gz
 Patch0:         bytes-lib-detection.patch
 
 BuildRequires:  gawk

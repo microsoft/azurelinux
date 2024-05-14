@@ -26,7 +26,7 @@ License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            https://github.com/codehaus-plexus/plexus-pom
 Source0:        https://github.com/codehaus-plexus/plexus-pom/archive/plexus-%{version}.tar.gz
-Source1:        http://www.apache.org/licenses/LICENSE-2.0.txt
+Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildRequires:  javapackages-local-bootstrap
 BuildArch:      noarch
 

@@ -9,8 +9,8 @@ Release:	3%{?dist}
 Summary:	Utilities for managing NILFS v2 filesystems
 
 License:	GPLv2+
-URL:		http://nilfs.sourceforge.net
-Source0:	http://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
+URL:		https://nilfs.sourceforge.net
+Source0:	https://nilfs.sourceforge.net/download/%{name}-%{version}.tar.bz2
 BuildRequires:	gcc, libuuid-devel, libmount-devel
 
 %description

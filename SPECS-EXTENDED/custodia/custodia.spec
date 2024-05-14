@@ -132,7 +132,7 @@ Sub-package with python custodia modules
 
 %check
 # don't download packages
-export PIP_INDEX_URL=http://host.invalid./
+export PIP_INDEX_URL=https://host.invalid./
 # Don't try to download dnspython3. The package is provided by python%{python3_pkgversion}-dns
 export PIP_NO_DEPS=yes
 # Ignore all install packages to enforce installation of sdist. Otherwise tox

@@ -428,7 +428,7 @@ GEM_HOME="%{buildroot}%{gem_dir}" %{buildroot}%{_bindir}/facter
 - Rebuild for FC6
 
 * Sun Aug 27 2006 Ville Skyttä <scop@fedoraproject.org> 1.3.3-2
-- http://fedoraproject.org/wiki/Extras/Schedule/FC6MassRebuild
+- https://fedoraproject.org/wiki/Extras/Schedule/FC6MassRebuild
 
 * Wed Jul 12 2006 David Lutterkort <lutter@fedoraproject.org> 1.3.3-1
 - auto-import facter-1.3.3-1 on branch devel from facter-1.3.3-1.src.rpm

@@ -228,7 +228,7 @@ Related: rhbz#1915747
 * Thu Dec  9 2010 Hans de Goede <hdegoede@redhat.com> 0.13.59-2
 - Fix broken zzip/_config.h which causes apps using zziplib to fail to compile
 
-* Sat Dec  4 2010 Matthias Saou <http://freshrpms.net/> 0.13.59-1
+* Sat Dec  4 2010 Matthias Saou <https://freshrpms.net/> 0.13.59-1
 - Update to 0.13.59.
 - Remove no longer needed 'open' patch.
 - Rebase the multilib patch, still required.
@@ -240,53 +240,53 @@ Related: rhbz#1915747
 * Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.13.49-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
-* Mon Dec 22 2008 Matthias Saou <http://freshrpms.net/> 0.13.49-6
+* Mon Dec 22 2008 Matthias Saou <https://freshrpms.net/> 0.13.49-6
 - Patch _config.h to make it identical for 32bit and 64bit archs (#343521).
 
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org>
 - Autorebuild for GCC 4.3
 
-* Wed Aug  8 2007 Matthias Saou <http://freshrpms.net/> 0.13.49-4
+* Wed Aug  8 2007 Matthias Saou <https://freshrpms.net/> 0.13.49-4
 - Include patch to fix fd.open calls with recent glibc.
 - Disable _smp_mflags since the docs fail to build.
 
-* Fri Aug  3 2007 Matthias Saou <http://freshrpms.net/> 0.13.49-3
+* Fri Aug  3 2007 Matthias Saou <https://freshrpms.net/> 0.13.49-3
 - Update License field.
 
-* Tue Jun 19 2007 Matthias Saou <http://freshrpms.net/> 0.13.49-2
+* Tue Jun 19 2007 Matthias Saou <https://freshrpms.net/> 0.13.49-2
 - Disable static lib build instead of excluding it later.
 - Remove rpath on 64bit archs.
 - Switch to using DESTDIR install method.
 
-* Mon Mar 26 2007 Matthias Saou <http://freshrpms.net/> 0.13.49-1
+* Mon Mar 26 2007 Matthias Saou <https://freshrpms.net/> 0.13.49-1
 - Update to 0.13.49 to fix CVE-2007-1614 (rhbz #233700).
 - Include new man3 pages to the devel sub-package.
 
-* Mon Aug 28 2006 Matthias Saou <http://freshrpms.net/> 0.13.47-1
+* Mon Aug 28 2006 Matthias Saou <https://freshrpms.net/> 0.13.47-1
 - Update to 0.13.47.
 - FC6 rebuild.
 
-* Mon Jul 24 2006 Matthias Saou <http://freshrpms.net/> 0.13.45-3
+* Mon Jul 24 2006 Matthias Saou <https://freshrpms.net/> 0.13.45-3
 - Split off -utils sub-package (#199467). Could have been plain "zzip"?
 - Have sub-packages require exact release too.
 - Build require automake to make the aclocal-1.9 check happy.
 - Use --enable-frame-pointer otherwise -g gets removed from the CFLAGS.
 
-* Mon Mar  6 2006 Matthias Saou <http://freshrpms.net/> 0.13.45-2
+* Mon Mar  6 2006 Matthias Saou <https://freshrpms.net/> 0.13.45-2
 - FC5 rebuild.
 
-* Thu Feb  9 2006 Matthias Saou <http://freshrpms.net/> 0.13.45-1
+* Thu Feb  9 2006 Matthias Saou <https://freshrpms.net/> 0.13.45-1
 - Update to 0.13.45.
 - Exclude static library.
 
 * Sun May 22 2005 Jeremy Katz <katzj@redhat.com> - 0.13.38-2
 - rebuild on all arches
 
-* Tue Apr  5 2005 Matthias Saou <http://freshrpms.net/> 0.13.38-1
+* Tue Apr  5 2005 Matthias Saou <https://freshrpms.net/> 0.13.38-1
 - Update to 0.13.38, fixes gcc4 compile issues (Adrian Reber).
 
-* Tue Nov 16 2004 Matthias Saou <http://freshrpms.net/> 0.13.36-2
+* Tue Nov 16 2004 Matthias Saou <https://freshrpms.net/> 0.13.36-2
 - Bump release to provide Extras upgrade path.
 
-* Tue Jun  8 2004 Matthias Saou <http://freshrpms.net/> 0.13.36-1
+* Tue Jun  8 2004 Matthias Saou <https://freshrpms.net/> 0.13.36-1
 - Initial RPM release.

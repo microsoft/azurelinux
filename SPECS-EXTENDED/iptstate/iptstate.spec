@@ -6,7 +6,7 @@ Source: https://github.com/jaymzh/iptstate/releases/download/v%{version}/iptstat
 Patch0: iptstate-2.1-man8.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://www.phildev.net/iptstate/
+URL: https://www.phildev.net/iptstate/
 License: zlib
 Requires: iptables
 BuildRequires:  gcc-c++

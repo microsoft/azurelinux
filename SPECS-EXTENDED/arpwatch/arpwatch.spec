@@ -8,7 +8,7 @@ Version: 2.1a15
 Release: 51%{?dist}
 Summary: Network monitoring tools for tracking IP addresses on a network
 License: BSD with advertising
-URL: http://ee.lbl.gov/
+URL: https://ee.lbl.gov/
 Requires(pre): shadow-utils
 Requires(post): systemd
 Requires(preun): systemd
@@ -21,7 +21,7 @@ Source0: ftp://ftp.ee.lbl.gov/arpwatch-%{version}.tar.gz
 Source1: arpwatch.service
 Source2: %{name}-LICENSE.txt
 # created by:
-# wget -O- http://standards.ieee.org/regauth/oui/oui.txt | \
+# wget -O- https://standards.ieee.org/regauth/oui/oui.txt | \
 # iconv -f iso8859-1 -t utf8 | massagevendor | bzip2
 Source3: ethercodes-20110707.dat.bz2
 Patch1: arpwatch-2.1a4-fhs.patch

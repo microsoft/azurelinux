@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.midnight-commander.org
-Source0:        http://ftp.midnight-commander.org/%{name}-%{version}.tar.xz
+Source0:        https://ftp.midnight-commander.org/%{name}-%{version}.tar.xz
 Patch0:         disable-extfs-test.patch
 BuildRequires:  glib-devel
 BuildRequires:  pcre2-devel

@@ -5,7 +5,7 @@ Summary: Chichewa hunspell dictionaries
 Version: 0.01
 Release: 19%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/4052/0/hunspell-chichewa-ny-dict-%{version}.oxt
-URL: http://extensions.services.openoffice.org/en/project/chicspell
+URL: https://extensions.services.openoffice.org/en/project/chicspell
 License: GPLv3+
 BuildArch: noarch
 BuildRequires: hunspell-devel

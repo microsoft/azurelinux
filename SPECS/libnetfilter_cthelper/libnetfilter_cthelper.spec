@@ -3,11 +3,11 @@ Name:       libnetfilter_cthelper
 Version:    1.0.1
 Release:    1%{?dist}
 License:    GPLv2
-URL:        http://www.netfilter.org/projects/libnetfilter_cthelper/index.html
+URL:        https://www.netfilter.org/projects/libnetfilter_cthelper/index.html
 Group:      System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:    http://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
+Source0:    https://www.netfilter.org/projects/%{name}/files/%{name}-%{version}.tar.bz2
 BuildRequires:  libmnl-devel
 BuildRequires:  kernel-headers
 

@@ -6,7 +6,7 @@ License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://augeas.net/
-Source0:        http://download.augeas.net/%{name}-%{version}.tar.gz
+Source0:        https://download.augeas.net/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  libselinux-devel

@@ -4,12 +4,12 @@ Name:		libkeepalive
 Version:	0.3
 Release:	13%{?dist}
 Summary:	Enable TCP keepalive in dynamic binaries
-URL:		http://libkeepalive.sourceforge.net/
+URL:		https://libkeepalive.sourceforge.net/
 
 BuildRequires:	gcc
 
 License:	MIT
-Source0:	http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+Source0:	https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 # All patches sent to the upstream maintainer directly via email.
 Patch1:		0001-Add-vim-modelines-to-source-files.patch

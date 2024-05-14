@@ -5,7 +5,7 @@ Release: 50%{?dist}
 Summary: Shell scripts for managing DocBook documents
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: http://sources.redhat.com/docbook-tools/
+URL: https://sources.redhat.com/docbook-tools/
 
 License: GPLv2+
 
@@ -26,7 +26,7 @@ Source0: ftp://sources.redhat.com/pub/docbook-tools/new-trials/SOURCES/%{name}-%
 Source1: db2html
 Source2: gdp-both.dsl
 #We will ship newer version of docbook2man-spec.pl for better handling of docbook2man conversion
-#You could check it at http://sourceforge.net/projects/docbook2x/
+#You could check it at https://sourceforge.net/projects/docbook2x/
 Source3: docbook2man-spec.pl
 
 Obsoletes: stylesheets < %{version}-%{release}

@@ -5,12 +5,12 @@ Name:           libiec61883
 Version:        1.2.0
 Release:        24%{?dist}
 License:        LGPLv2+
-Source:         http://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.gz
+Source:         https://www.kernel.org/pub/linux/libs/ieee1394/%{name}-%{version}.tar.gz
 # Fedora specific patches.
 
 Patch0:         libiec61883-1.2.0-installtests.patch
 Patch1:         libiec61883-channel-allocation-without-local-node-rw.patch
-URL:            http://ieee1394.wiki.kernel.org/index.php/Libraries#libiec61883
+URL:            https://ieee1394.wiki.kernel.org/index.php/Libraries#libiec61883
 ExcludeArch:    s390 s390x
 
 BuildRequires:  gcc

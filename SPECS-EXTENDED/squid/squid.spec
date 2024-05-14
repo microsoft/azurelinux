@@ -7,8 +7,8 @@ Epoch:          7
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.squid-cache.org
-Source0:        http://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
+URL:            https://www.squid-cache.org
+Source0:        https://www.squid-cache.org/Versions/v5/squid-%{version}.tar.xz
 Source1:        squid.logrotate
 Source2:        squid.sysconfig
 Source3:        squid.pam
@@ -1652,7 +1652,7 @@ fi
 
 * Tue Dec 21 1999 Bernhard Rosenkraenzer <bero@redhat.com>
 - Fix compliance with ftp RFCs
-  (http://www.wu-ftpd.org/broken-clients.html)
+  (https://www.wu-ftpd.org/broken-clients.html)
 - Work around a bug in some versions of autoconf
 - BuildPrereq sgml-tools - we're using sgml2html
 

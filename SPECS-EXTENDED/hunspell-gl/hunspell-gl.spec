@@ -7,7 +7,7 @@ Version: 0.%{upstreamid}
 Release: 21%{?dist}
 Source0: https://downloads.sourceforge.net/project/aoo-extensions/800/2/corrector_ooo3.oxt
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.mancomun.org/index.php/Corrector_ortogr%C3%A1fico_para_OpenOffice.org#Descrici.C3.B3n
+URL: https://wiki.mancomun.org/index.php/Corrector_ortogr%C3%A1fico_para_OpenOffice.org#Descrici.C3.B3n
 License: GPLv2
 BuildArch: noarch
 

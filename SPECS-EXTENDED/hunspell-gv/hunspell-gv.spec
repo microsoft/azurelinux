@@ -5,8 +5,8 @@ Summary: Manx hunspell dictionaries
 %global upstreamid 20040505
 Version: 0.%{upstreamid}
 Release: 22%{?dist}
-Source: http://ftp.gnu.org/gnu/aspell/dict/gv/aspell-gv-0.50-0.tar.bz2
-URL: http://borel.slu.edu/crubadan/apps.html
+Source: https://ftp.gnu.org/gnu/aspell/dict/gv/aspell-gv-0.50-0.tar.bz2
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPL+
 BuildArch: noarch
 BuildRequires: aspell, hunspell-devel

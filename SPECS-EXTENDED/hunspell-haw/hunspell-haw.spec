@@ -5,7 +5,7 @@ Summary: Hawaiian hunspell dictionaries
 Version: 0.03
 Release: 6%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/248540/hawaiian_spell_checker-%{version}-tb+fx+fn+sm.xpi
-URL: http://borel.slu.edu/crubadan/
+URL: https://borel.slu.edu/crubadan/
 License: GPLv2+
 BuildArch: noarch
 Requires: hunspell

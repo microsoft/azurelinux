@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2013-2022 Remi Collet
 # License: CC-BY-SA
-# http://creativecommons.org/licenses/by-sa/4.0/
+# https://creativecommons.org/licenses/by-sa/4.0/
 #
 # Please, preserve the changelog entries
 #

@@ -8,7 +8,7 @@ Release:  4%{?dist}
 Summary:  Library for manipulating Apple Binary and XML Property Lists
 
 License:  LGPLv2+
-URL:      http://www.libimobiledevice.org/
+URL:      https://www.libimobiledevice.org/
 Source0:  https://github.com/libimobiledevice/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires: chrpath

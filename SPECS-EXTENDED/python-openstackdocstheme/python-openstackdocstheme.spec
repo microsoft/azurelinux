@@ -11,7 +11,7 @@ Release:        8%{?dist}
 Summary:        OpenStack Docs Theme
 
 License:        ASL 2.0
-URL:            http://docs.openstack.org/
+URL:            https://docs.openstack.org/
 Source0:        https://pypi.io/packages/source/o/%{pypi_name}/%{pypi_name}-%{version}.tar.gz#/python-%{pypi_name}-%{version}.tar.gz
 Patch0001:      0001-Remove-all-Google-Analytics-tracking.patch
 BuildArch:      noarch

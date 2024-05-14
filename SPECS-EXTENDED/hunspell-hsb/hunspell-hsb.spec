@@ -5,7 +5,7 @@ Summary: Upper Sorbian hunspell dictionaries
 Version: 0.20060327.3
 Release: 17%{?dist}
 Source: https://addons.mozilla.org/firefox/downloads/file/113003/upper_sorbian_spelling_dictionary-0.0.20060327.3-tb+fx+sm.xpi
-URL: http://sorbzilla.de/
+URL: https://sorbzilla.de/
 License: GPLv2+
 BuildArch: noarch
 

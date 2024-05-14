@@ -298,7 +298,7 @@ cd pyaff
 
 * Thu Dec 16 2010 Nicolas Chauvet <kwizart@gmail.com> - 3.6.4-1
 - Update to 3.6.4
-- Disable libewf support - http://afflib.org/archives/75
+- Disable libewf support - https://afflib.org/archives/75
 
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 3.5.12-2
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild

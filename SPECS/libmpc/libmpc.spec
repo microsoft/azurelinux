@@ -3,7 +3,7 @@ Name:           libmpc
 Version:        1.3.1
 Release:        1%{?dist}
 License:        LGPLv3+
-URL:            http://www.multiprecision.org
+URL:            https://www.multiprecision.org
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

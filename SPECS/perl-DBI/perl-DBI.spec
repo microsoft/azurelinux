@@ -8,7 +8,7 @@ Version:        1.643
 Release:        2%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
-URL:            http://dbi.perl.org/
+URL:            https://dbi.perl.org/
 # The source tarball must be repackaged to remove the DBI/FAQ.pm, since the
 # license is not a FSF free license.
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz

@@ -5,12 +5,12 @@ Name: lrzsz
 Version: 0.12.20
 Release: 50%{?dist}
 License: GPLv2+
-Source: http://www.ohse.de/uwe/releases/%{name}-%{version}.tar.gz
+Source: https://www.ohse.de/uwe/releases/%{name}-%{version}.tar.gz
 Patch1: lrzsz-0.12.20-glibc21.patch
 Patch2: lrzsz-0.12.20.patch
 Patch3: lrzsz-0.12.20-man.patch
 Patch4: lrzsz-0.12.20-aarch64.patch
-Url: http://www.ohse.de/uwe/software/lrzsz.html
+Url: https://www.ohse.de/uwe/software/lrzsz.html
 BuildRequires: gcc gettext
 
 %description

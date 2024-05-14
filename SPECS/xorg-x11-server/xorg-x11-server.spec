@@ -31,7 +31,7 @@ Source1:        gitignore
 Source4:        10-quirks.conf
 Source10:       xserver.pamd
 # The xvfb-run script is used by other packages to enable ptests on display-less machines.
-Source20:  http://svn.exactcode.de/t2/trunk/package/xorg/xorg-server/xvfb-run.sh
+Source20:  https://svn.exactcode.de/t2/trunk/package/xorg/xorg-server/xvfb-run.sh
 # For requires generation in drivers
 Source30:       xserver-sdk-abi-requires.release
 Source31:       xserver-sdk-abi-requires.git

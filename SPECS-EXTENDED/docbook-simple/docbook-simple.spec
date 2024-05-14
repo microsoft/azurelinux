@@ -5,8 +5,8 @@ Version: 1.1
 Release: 25%{?dist}
 Summary: Simplified DocBook is a small subset of the DocBook XML DTD
 License: Freely redistributable without restriction
-URL: http://www.oasis-open.org/docbook/xml/simple/
-Source0: http://www.docbook.org/xml/simple/1.1/%{name}-%{version}.zip
+URL: https://www.oasis-open.org/docbook/xml/simple/
+Source0: https://www.docbook.org/xml/simple/1.1/%{name}-%{version}.zip
 Source1: %{name}.README.redhat
 Source2: %{name}.xml
 Source3: %{name}.cat
@@ -32,7 +32,7 @@ viewable in online browsers if styled with CSS. (it's XML not SGML).
 # splatter the files into a version-numbered directory
 %setup -q -c -n %{version}
 
-# see http://rpm-devel.colug.net/max-rpm/s1-rpm-inside-macros.html
+# see https://rpm-devel.colug.net/max-rpm/s1-rpm-inside-macros.html
 # setup -c creates the dir then changes to it to expand SOURCE0
 
 %build
@@ -93,12 +93,12 @@ then
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
 
         %{_bindir}/xmlcatalog --noout --add "delegateURI" \
-                "http://www.oasis-open.org/docbook/xml/simple/1.1/" \
+                "https://www.oasis-open.org/docbook/xml/simple/1.1/" \
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
 
   # Next line because some resolvers misinterpret uri entries
         %{_bindir}/xmlcatalog --noout --add "delegateSystem" \
-                "http://www.oasis-open.org/docbook/xml/simple/1.1/" \
+                "https://www.oasis-open.org/docbook/xml/simple/1.1/" \
                 "file://$PKG_XML_CATALOG" $ROOT_XML_CATALOG
 fi
 

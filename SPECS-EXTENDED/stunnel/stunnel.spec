@@ -9,7 +9,7 @@ Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.stunnel.org/
+URL:            https://www.stunnel.org/
 Source0:        https://www.stunnel.org/downloads/stunnel-%{version}.tar.gz
 Source2:        Certificate-Creation
 Source3:        sfinger.xinetd

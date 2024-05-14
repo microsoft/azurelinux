@@ -8,7 +8,7 @@ Summary: Turkmen hyphenation rules
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
 Source: https://github.com/hyphenation/tex-hyphen/blob/%{upstream_commit}/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-tk.tex
-URL: http://tug.org/tex-hyphen
+URL: https://tug.org/tex-hyphen
 License: Public Domain
 BuildArch: noarch
 BuildRequires: hyphen-devel

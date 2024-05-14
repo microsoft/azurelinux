@@ -9,7 +9,7 @@ Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.voidspace.org.uk/python/mock/
+URL:            https://www.voidspace.org.uk/python/mock/
 Source0:        https://pypi.python.org/packages/source/m/%{mod_name}/%{mod_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools

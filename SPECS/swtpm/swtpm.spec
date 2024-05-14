@@ -14,7 +14,7 @@ Name:           swtpm
 Version:        0.8.1
 Release:        4%{?dist}
 License:        BSD-3-Clause
-Url:            http://github.com/stefanberger/swtpm
+Url:            https://github.com/stefanberger/swtpm
 Source0:        %{url}/archive/%{gitcommit}/%{name}-%{gitshortcommit}.tar.gz
 
 BuildRequires:  make

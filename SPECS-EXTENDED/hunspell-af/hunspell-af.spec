@@ -6,8 +6,8 @@ Summary: Afrikaans hunspell dictionary
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
 # Following URL is dead now
-Source: http://downloads.translate.org.za/spellchecker/afrikaans/myspell-af_ZA-0.%{upstreamid}.zip
-URL: http://www.translate.org.za/
+Source: https://downloads.translate.org.za/spellchecker/afrikaans/myspell-af_ZA-0.%{upstreamid}.zip
+URL: https://www.translate.org.za/
 License: LGPLv2+
 BuildArch: noarch
 

@@ -5,9 +5,9 @@ Summary: Farsi hyphenation rules
 %global upstreamid 20130404
 Version: 0.%{upstreamid}
 Release: 14%{?dist}
-Source0: http://mirrors.ctan.org/language/hyphenation/fahyph.zip
+Source0: https://mirrors.ctan.org/language/hyphenation/fahyph.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.ctan.org/tex-archive/language/hyphenation/fahyph
+URL: https://www.ctan.org/tex-archive/language/hyphenation/fahyph
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

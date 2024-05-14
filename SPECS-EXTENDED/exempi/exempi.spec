@@ -3,7 +3,7 @@ Name:		exempi
 Version:	2.6.1
 Release:	2%{?dist}
 License:	BSD
-URL:		http://libopenraw.freedesktop.org/wiki/Exempi
+URL:		https://libopenraw.freedesktop.org/wiki/Exempi
 Source0:	https://gitlab.freedesktop.org/libopenraw/%{name}/-/archive/%{version}/%{name}-%{version}.tar.bz2
 Patch0:		exempi-e23c213-typeinfos.patch
 BuildRequires:	gcc-c++

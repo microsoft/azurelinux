@@ -27,8 +27,8 @@ Release:        3%{?dist}
 Summary:        Internet protocol suite Java library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-URL:            http://commons.apache.org/%{base_name}/
-Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+URL:            https://commons.apache.org/%{base_name}/
+Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes

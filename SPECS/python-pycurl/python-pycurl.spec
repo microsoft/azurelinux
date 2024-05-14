@@ -6,7 +6,7 @@ License:        LGPLv2+ OR MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
-URL:            http://pycurl.sourceforge.net/
+URL:            https://pycurl.sourceforge.net/
 Source0:        https://pypi.io/packages/source/p/pycurl/pycurl-%{version}.tar.gz
 #Patch0:         skip-incompatible-libcurl-tests.patch
 

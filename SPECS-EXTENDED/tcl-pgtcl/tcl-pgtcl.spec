@@ -7,14 +7,14 @@ Version:	2.1.1
 Release:	12%{?dist}
 Summary:	A Tcl client library for PostgreSQL
 
-URL:		http://sourceforge.net/projects/pgtclng/
+URL:		https://sourceforge.net/projects/pgtclng/
 # The PostgreSQL license is very similar to other MIT licenses, but the OSI
 # recognizes it as an independent license, so we do as well.
 License: PostgreSQL
 
-Source0:	http://downloads.sourceforge.net/pgtclng/pgtcl%{version}.tar.gz
+Source0:	https://downloads.sourceforge.net/pgtclng/pgtcl%{version}.tar.gz
 # Note that for some reason docs are date-labeled not version-labeled
-Source1:	http://downloads.sourceforge.net/pgtclng/pgtcldocs-%{docs_hash}.zip
+Source1:	https://downloads.sourceforge.net/pgtclng/pgtcldocs-%{docs_hash}.zip
 
 Patch1:		pgtcl-no-rpath.patch
 
@@ -106,7 +106,7 @@ rm -f $RPM_BUILD_ROOT%{_includedir}/libpgtcl.h
 
 * Sun Oct 12 2014 Pavel Raiskup <praiskup@redhat.com> - 2.1.1-1
 - rebase to recent upstream release (#1144394), per release notes:
-  http://sourceforge.net/projects/pgtclng/files/pgtclng/2.1.1/
+  https://sourceforge.net/projects/pgtclng/files/pgtclng/2.1.1/
 
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.1.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
@@ -119,7 +119,7 @@ rm -f $RPM_BUILD_ROOT%{_includedir}/libpgtcl.h
 
 * Wed May 07 2014 Pavel Raiskup <praiskup@redhat.com> - 2.1.0-1
 - rebase to recent upstream relase (#1094731), per release notes:
-  http://sourceforge.net/projects/pgtclng/files/pgtclng/2.1.0/
+  https://sourceforge.net/projects/pgtclng/files/pgtclng/2.1.0/
 - spec cleanup per fedora-review
 
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.0-4

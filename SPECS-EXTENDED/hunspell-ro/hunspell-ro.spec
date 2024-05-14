@@ -4,8 +4,8 @@ Name: hunspell-ro
 Summary: Romanian hunspell dictionaries
 Version: 3.3.7
 Release: 17%{?dist}
-Source: http://downloads.sourceforge.net/rospell/ro_RO.%{version}.zip
-URL: http://rospell.sourceforge.net/
+Source: https://downloads.sourceforge.net/rospell/ro_RO.%{version}.zip
+URL: https://rospell.sourceforge.net/
 License: GPLv2+ or LGPLv2+ or MPLv1.1
 BuildArch: noarch
 

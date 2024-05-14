@@ -8,7 +8,7 @@ Release:        12%{?dist}
 Summary:        Library for handling computation with address ranges in bytes
 
 License:        GPLv2+
-URL:            http://pypi.python.org/pypi/justbytes
+URL:            https://pypi.python.org/pypi/justbytes
 Source0:        https://pypi.io/packages/source/%(n=%{srcname}; echo ${n:0:1})/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch

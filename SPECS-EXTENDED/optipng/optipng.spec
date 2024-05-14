@@ -6,8 +6,8 @@ Release:        7%{?dist}
 Summary:        PNG optimizer and converter
 
 License:        zlib
-URL:            http://optipng.sourceforge.net/
-Source0:        http://downloads.sourceforge.net/optipng/%{name}-%{version}.tar.gz
+URL:            https://optipng.sourceforge.net/
+Source0:        https://downloads.sourceforge.net/optipng/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  zlib-devel libpng-devel

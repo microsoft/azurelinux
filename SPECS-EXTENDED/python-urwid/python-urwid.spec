@@ -10,7 +10,7 @@ Release:       2%{?dist}
 Summary:       Console user interface library
 
 License:       LGPLv2+
-URL:           http://excess.org/urwid/
+URL:           https://excess.org/urwid/
 Source0:       %{pypi_source urwid}
 
 %global _description\
@@ -118,7 +118,7 @@ PYTHON=%{__python3} %{__python3} setup.py test || :
 
 * Sat Aug 19 2017 Petr Viktorin <pviktori@redhat.com> - 1.3.1-1
 - Update to upstream bugfix release 1.3.1
-  See http://urwid.org/changelog.html#urwid-1-3-1
+  See https://urwid.org/changelog.html#urwid-1-3-1
 
 * Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 1.3.0-11
 - Python 2 binary package renamed to python2-urwid

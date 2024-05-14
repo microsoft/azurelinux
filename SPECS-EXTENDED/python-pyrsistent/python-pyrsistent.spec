@@ -20,7 +20,7 @@ Summary:        Persistent/Functional/Immutable data structures
 Version:        0.17.3
 Release:        2%{?dist}
 License:        MIT
-URL:            http://github.com/tobgu/pyrsistent/
+URL:            https://github.com/tobgu/pyrsistent/
 Vendor:         Microsoft
 Distribution:   Azure Linux
 Source0:        https://files.pythonhosted.org/packages/source/p/%{pypi_name}/%{pypi_name}-%{version}.tar.gz

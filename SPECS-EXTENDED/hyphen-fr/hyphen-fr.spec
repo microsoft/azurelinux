@@ -4,9 +4,9 @@ Name: hyphen-fr
 Summary: French hyphenation rules
 Version: 3.0
 Release: 6%{?dist}
-Source0: http://www.dicollecte.org/download/fr/hyph-fr-v3.0.zip
+Source0: https://www.dicollecte.org/download/fr/hyph-fr-v3.0.zip
 Source1: %{name}-LICENSE.txt
-URL: http://www.dicollecte.org/download.php?prj=fr
+URL: https://www.dicollecte.org/download.php?prj=fr
 License: LGPLv2+
 BuildArch: noarch
 

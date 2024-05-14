@@ -5,7 +5,7 @@ Name: bcache-tools
 Version: 1.1
 Release: 3%{?dist}
 License: GPLv2
-URL: http://bcache.evilpiepirate.org/
+URL: https://bcache.evilpiepirate.org/
 VCS: git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # git clone git://git.kernel.org/pub/scm/linux/kernel/git/colyli/bcache-tools.git
 # cd bcache-tools/
@@ -15,11 +15,11 @@ Source0: %{_distro_sources_url}/%{name}-%{version}.tar.gz
 # git clone https://gist.github.com/6343451.git
 # cd 6343451/
 # git archive --format=tar --prefix=bcache-status-20140220/ 6d278f9886ab5f64bd896080b1b543ba7ef6c7a6 | gzip > ../bcache-status-20140220.tar.gz
-# see also http://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
+# see also https://article.gmane.org/gmane.linux.kernel.bcache.devel/1951
 Source1: %{_distro_sources_url}/bcache-status-20140220.tar.gz
 # bcache status not provided as a true package, so this is a self maintained
 # man page for it
-# http://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
+# https://article.gmane.org/gmane.linux.kernel.bcache.devel/1946
 Patch0: %{name}-status-20160804-man.patch
 # Process commandline arguments
 Patch1: %{name}-1.1-cmdline.patch

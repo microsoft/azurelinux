@@ -17,7 +17,7 @@ Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:            http://www.freedesktop.org/wiki/Software/PulseAudio
+URL:            https://www.freedesktop.org/wiki/Software/PulseAudio
 Source0:        https://freedesktop.org/software/%{name}/releases/%{name}-%{version}.tar.gz
 # revert upstream commit to rely solely on autospawn for autostart, instead
 # include a fallback to manual launch when autospawn fails, like when
@@ -981,7 +981,7 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 
 * Tue Jun  4 2013 Peter Robinson <pbrobinson@fedoraproject.org> 4.0-1
 - New 4.0 stable release
-- http://www.freedesktop.org/wiki/Software/PulseAudio/Notes/4.0/
+- https://www.freedesktop.org/wiki/Software/PulseAudio/Notes/4.0/
 
 * Thu May 30 2013 Rex Dieter <rdieter@fedoraproject.org> 3.99.2-2
 - [RFE] Build with libcap (#969232)

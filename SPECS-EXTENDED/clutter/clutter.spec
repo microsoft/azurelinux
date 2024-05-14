@@ -520,7 +520,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Wed Jan 25 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 1.9.8-1
 - 1.9.8 release
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.8.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.8.news
 - Back to tar file releases
 
 * Sat Jan 21 2012 Matthias Clasen <mclasen@redhat.com> - 1.9.7-0.1.20120121
@@ -528,12 +528,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Thu Jan 19 2012 Matthias Clasen <mclasen@redhat.com> - 1.9.6-1
 - 1.9.6 release
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.6.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.6.news
 - Should work with gnome-shell again
 
 * Wed Jan 18 2012 Peter Robinson <pbrobinson@fedoraproject.org> - 1.9.4-1
 - 1.9.4 release
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.4.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.9/clutter-1.9.4.news
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.9.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
@@ -546,15 +546,15 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Oct 17 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8.2-1
 - 1.8.2 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.8/clutter-1.8.2.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.8/clutter-1.8.2.news
 
 * Mon Sep 19 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8.0-1
 - 1.8.0 stable release
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.8/clutter-1.8.0.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.8/clutter-1.8.0.news
 
 * Mon Sep 12 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.7.90-1
 - Update to 1.7.90
-- http://ftp.gnome.org/pub/GNOME/sources/clutter/1.7/clutter-1.7.90.news
+- https://ftp.gnome.org/pub/GNOME/sources/clutter/1.7/clutter-1.7.90.news
 
 * Mon Sep  5 2011 Peter Robinson <pbrobinson@fedoraproject.org> - 1.7.14-1
 - Update to 1.7.14
@@ -636,12 +636,12 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 * Mon Nov 22 2010 Dan Williams <dcbw@redhat.com> - 1.4.0-4
 - Add a patch cherry-picked from upstream for
-  http://bugzilla.clutter-project.org/attachment.cgi?id=2366
+  https://bugzilla.clutter-project.org/attachment.cgi?id=2366
   (gnome-shell/mutter hang when gnome-settings-daemon restarts)
 
 * Tue Oct  5 2010 Owen Taylor <otaylor@redhat.com> - 1.4.0-3
 - Add a patch cherry-picked from upstream for
-  http://bugzilla.clutter-project.org/show_bug.cgi?id=2324
+  https://bugzilla.clutter-project.org/show_bug.cgi?id=2324
   (gnome-shell crashes on root background changes)
 
 * Wed Sep 29 2010 jkeating - 1.4.0-2

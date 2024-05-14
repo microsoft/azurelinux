@@ -8,9 +8,9 @@ Release: 73%{?dist}
 # copyrighted work in rdist to be relicensed to the same BSD as the rest of
 # rdist. This is done in Patch15. Documentation of this is in Source3.
 License: BSD
-Source0: http://www.MagniComp.com/download/rdist/rdist-%{version}.tar.gz
-Source1: http://people.redhat.com/pknirsch/src/rdist-v1.1.tar.bz2
-# http://www.magnicomp.com/rdist/rdist-eu-license.shtml
+Source0: https://www.MagniComp.com/download/rdist/rdist-%{version}.tar.gz
+Source1: https://people.redhat.com/pknirsch/src/rdist-v1.1.tar.bz2
+# https://www.magnicomp.com/rdist/rdist-eu-license.shtml
 Source2: rdist-eu-license.txt
 Source3: rdist-licensing-email.txt
 Patch0: rdist-6.1.5-linux.patch
@@ -29,7 +29,7 @@ Patch12: rdist-6.1.5-stat64.patch
 Patch13: rdist-6.1.5-re_args.patch
 Patch14: rdist-6.1.5-fix-msgsndnotify-loop.patch
 Patch15: rdist-6.1.5-license-fix.patch
-URL: http://www.MagniComp.com/rdist
+URL: https://www.MagniComp.com/rdist
 BuildRequires: byacc bison gcc
 
 %description

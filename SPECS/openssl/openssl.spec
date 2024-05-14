@@ -64,7 +64,7 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 
 License: Apache-2.0
-URL: http://www.openssl.org/
+URL: https://www.openssl.org/
 
 BuildRequires: %{_bindir}/cmp
 BuildRequires: %{_bindir}/pod2man

@@ -12,7 +12,7 @@ BuildArch:      noarch
 
 %description
 jsonschema is JSON Schema validator currently based on
-http://tools.ietf.org/html/draft-zyp-json-schema-03
+https://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %package -n     python3-jsonschema
 Summary:        An implementation of JSON Schema validation for Python
@@ -39,7 +39,7 @@ Requires:       python3
 
 %description -n python3-jsonschema
 jsonschema is JSON Schema validator currently based on
-http://tools.ietf.org/html/draft-zyp-json-schema-03
+https://tools.ietf.org/html/draft-zyp-json-schema-03
 
 %pyproject_extras_subpkg -n python3-jsonschema format format-nongpl
 

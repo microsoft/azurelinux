@@ -5,9 +5,9 @@ Summary: Mongolian hyphenation rules
 %global upstreamid 20100531
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source0: http://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-mn-cyrl.tex?view=co#/hyph-mn-cyrl.tex
+Source0: https://tug.org/svn/texhyphen/trunk/hyph-utf8/tex/generic/hyph-utf8/patterns/tex/hyph-mn-cyrl.tex?view=co#/hyph-mn-cyrl.tex
 Source1: %{name}-LICENSE.txt
-URL: http://www.ctan.org/tex-archive/help/Catalogue/entries/mnhyphn.html
+URL: https://www.ctan.org/tex-archive/help/Catalogue/entries/mnhyphn.html
 License: LPPL
 BuildArch: noarch
 BuildRequires: hyphen-devel

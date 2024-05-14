@@ -6,8 +6,8 @@ Version: 0.6
 Release: 21%{?dist}
 ## Note that upstream is dead and there is no download link available
 ## so please don't report FTBFS bugs for this package.
-Source0: http://www-user.uni-bremen.de/~kmashrab/uzbek-word-list/uzbek-wordlist-%{version}.tar.bz2
-URL: http://www-user.uni-bremen.de/~kmashrab/uzbek-word-list
+Source0: https://www-user.uni-bremen.de/~kmashrab/uzbek-word-list/uzbek-wordlist-%{version}.tar.bz2
+URL: https://www-user.uni-bremen.de/~kmashrab/uzbek-word-list
 License: GPLv2+
 BuildArch: noarch
 

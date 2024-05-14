@@ -5,8 +5,8 @@ Summary: Shuswap hunspell dictionaries
 %global upstreamid 20090828
 Version: 0.%{upstreamid}
 Release: 18%{?dist}
-Source: http://secpewt.sd73.bc.ca/hunspell/hunspell-shs-ca.tar.gz
-URL: http://secpewt.sd73.bc.ca/wordlist
+Source: https://secpewt.sd73.bc.ca/hunspell/hunspell-shs-ca.tar.gz
+URL: https://secpewt.sd73.bc.ca/wordlist
 License: GPLv2+
 BuildArch: noarch
 BuildRequires: hunspell-devel

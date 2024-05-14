@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/System
 URL:            https://www.gnu.org/software/gmp
-Source0:        http://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
+Source0:        https://ftp.gnu.org/gnu/gmp/%{name}-%{version}.tar.xz
 
 %description
 The GMP package contains math libraries. These have useful functions

@@ -6,7 +6,7 @@ Summary: Latin hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 16%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1141/3/dict-la_2013-03-31.oxt
-URL: http://extensions.services.openoffice.org/project/dict-la
+URL: https://extensions.services.openoffice.org/project/dict-la
 License: GPLv2+
 BuildArch: noarch
 

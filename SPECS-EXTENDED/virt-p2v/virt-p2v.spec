@@ -18,8 +18,8 @@ License:       GPLv2+ and LGPLv2+
 ExclusiveArch: x86_64
 
 # Source and patches.
-URL:           http://libguestfs.org/
-Source0:       http://download.libguestfs.org/%{name}/%{name}-%{version}.tar.gz
+URL:           https://libguestfs.org/
+Source0:       https://download.libguestfs.org/%{name}/%{name}-%{version}.tar.gz
 
 # Basic build requirements.
 BuildRequires: gcc

@@ -15,7 +15,7 @@ Name:       xorg-x11-utils
 Version:    7.5
 Release:    35%{?dist}
 License:    MIT
-URL:        http://www.x.org
+URL:        https://www.x.org
 
 Source0:    https://www.x.org/pub/individual/app/xdpyinfo-%{xdpyinfo}.tar.bz2
 Source1:    https://www.x.org/pub/individual/app/xev-%{xev}.tar.bz2

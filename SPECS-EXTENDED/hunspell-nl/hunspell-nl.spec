@@ -4,10 +4,10 @@ Name: hunspell-nl
 Summary: Dutch hunspell dictionaries
 Version: 2.10
 Release: 17%{?dist}
-#http://www.opentaal.org/bestanden/doc_download/20-woordenlijst-v-210g-voor-openofficeorg-3
+#https://www.opentaal.org/bestanden/doc_download/20-woordenlijst-v-210g-voor-openofficeorg-3
 #annoying click through makes direct link apparently impossible
 Source: OpenTaal-210G-LO.oxt
-URL: http://www.opentaal.org/english.php
+URL: https://www.opentaal.org/english.php
 License: BSD or CC-BY
 BuildArch: noarch
 

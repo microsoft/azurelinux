@@ -9,7 +9,7 @@ License:        LGPLv2
 URL:            https://github.com/pixelb/ps_mem
 
 Source0:        https://raw.githubusercontent.com/pixelb/ps_mem/c80287d/ps_mem.py
-Source1:        http://www.gnu.org/licenses/lgpl-2.1.txt
+Source1:        https://www.gnu.org/licenses/lgpl-2.1.txt
 Source2:        ps_mem.1
 
 BuildArch:      noarch

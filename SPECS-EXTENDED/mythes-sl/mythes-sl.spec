@@ -5,8 +5,8 @@ Summary: Slovenian thesaurus
 %global upstreamid 20130130
 Version: 0.%{upstreamid}
 Release: 16%{?dist}
-Source: http://88.200.20.8:85/download/thes_sl_SI_v2.zip
-URL: http://www.tezaver.si/
+Source: https://88.200.20.8:85/download/thes_sl_SI_v2.zip
+URL: https://www.tezaver.si/
 License: LGPLv2+
 BuildArch: noarch
 Requires: mythes

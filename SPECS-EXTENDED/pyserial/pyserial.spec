@@ -6,7 +6,7 @@ Version: 3.4
 Release: 8%{?dist}
 Source0: %pypi_source
 License: Python
-URL: http://pypi.python.org/pypi/pyserial
+URL: https://pypi.python.org/pypi/pyserial
 BuildRequires: python3-devel
 BuildArch: noarch
 

@@ -6,7 +6,7 @@ Summary: Azerbaijani hunspell dictionaries
 Version: 0.%{upstreamid}
 Release: 23%{?dist}
 Source: ftp://ftp.gnu.org/gnu/aspell/dict/az/aspell6-az-0.02-0.tar.bz2
-URL: http://borel.slu.edu/crubadan/apps.html
+URL: https://borel.slu.edu/crubadan/apps.html
 License: GPLv2+
 BuildArch: noarch
 BuildRequires: aspell, hunspell-devel

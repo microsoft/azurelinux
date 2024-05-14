@@ -1293,7 +1293,7 @@ make check
 - Disable nut plugin (#1071919)
 
 * Tue Jan 28 2014 Ruben Kerkhof <ruben@rubenkerkhof.com> 5.4.1-1
-- Upstream released new version: http://collectd.org/news.shtml#news95
+- Upstream released new version: https://collectd.org/news.shtml#news95
 
 * Thu Jan 23 2014 Kevin Fenzi <kevin@scrye.com> 5.4.0-3
 - Rebuild for new libdbi
@@ -1304,7 +1304,7 @@ make check
 
 * Sun Sep 15 2013 Ruben Kerkhof <ruben@rubenkerkhof.com> 5.4.0-1
 - Update to 5.4.0
-  http://mailman.verplant.org/pipermail/collectd/2013-August/005906.html
+  https://mailman.verplant.org/pipermail/collectd/2013-August/005906.html
 - Enable new cgroups, statsd and lvm plugins
 
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.3.0-5
@@ -1321,7 +1321,7 @@ make check
 
 * Sat Apr 27 2013 Ruben Kerkhof <ruben@rubenkerkhof.com> 5.3.0-1
 - update to 5.3.0
-  http://mailman.verplant.org/pipermail/collectd/2013-April/005749.html
+  https://mailman.verplant.org/pipermail/collectd/2013-April/005749.html
 - enable all plugins we can enable
 - filter plugins from Provides
 - use new systemd macros (#850062)
@@ -1329,12 +1329,12 @@ make check
 
 * Mon Apr 22 2013 Alan Pevec <apevec@redhat.com> 5.2.2-1
 - update to 5.2.2
-  http://mailman.verplant.org/pipermail/collectd/2013-April/005749.html
+  https://mailman.verplant.org/pipermail/collectd/2013-April/005749.html
 - build with PIE flags rhbz#954322
 
 * Mon Feb 04 2013 Alan Pevec <apevec@redhat.com> 5.2.1-1
 - update to 5.2.1
-  http://mailman.verplant.org/pipermail/collectd/2013-January/005577.html
+  https://mailman.verplant.org/pipermail/collectd/2013-January/005577.html
 
 * Mon Nov 26 2012 Alan Pevec <apevec@redhat.com> 5.2.0-1
 - update to 5.2.0 from Steve Traylen rhbz#877721
@@ -1347,7 +1347,7 @@ make check
 
 * Mon Nov 19 2012 Alan Pevec <apevec@redhat.com> 5.0.5-1
 - new upstream version 5.0.5
-  http://mailman.verplant.org/pipermail/collectd/2012-November/005465.html
+  https://mailman.verplant.org/pipermail/collectd/2012-November/005465.html
 
 * Mon Sep 17 2012 Alan Pevec <apevec@redhat.com> 5.0.4-1
 - New upstream release, version bump to 5 (#743894) from Andrew Elwell
@@ -1360,18 +1360,18 @@ make check
 
 * Tue Apr 03 2012 Alan Pevec <apevec@redhat.com> 4.10.7-1
 - new upstream release 4.10.7
-  http://mailman.verplant.org/pipermail/collectd/2012-April/005045.html
+  https://mailman.verplant.org/pipermail/collectd/2012-April/005045.html
 
 * Wed Feb 29 2012 Alan Pevec <apevec@redhat.com> 4.10.6-1
 - new upstream release 4.10.6
-  http://mailman.verplant.org/pipermail/collectd/2012-February/004932.html
+  https://mailman.verplant.org/pipermail/collectd/2012-February/004932.html
 
 * Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.10.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Mon Nov 28 2011 Alan Pevec <apevec@redhat.com> 4.10.4-1
 - new upstream version 4.10.4
-  http://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
+  https://mailman.verplant.org/pipermail/collectd/2011-October/004777.html
 - collectd-web config file DataDir value wrong rhbz#719809
 - Python plugin doesn't work rhbz#739593
 - Add systemd service file. (thanks Paul P. Komkoff Jr) rhbz#754460
@@ -1399,7 +1399,7 @@ make check
 
 * Tue Mar 29 2011 Alan Pevec <apevec@redhat.com> 4.10.3-1
 - new upstream version 4.10.3
-  http://collectd.org/news.shtml#news87
+  https://collectd.org/news.shtml#news87
 - disable nut 2.6 which fails collectd check:
   libupsclient  . . . . no (symbol upscli_connect not found)
 
@@ -1414,12 +1414,12 @@ make check
 
 * Thu Dec 16 2010 Alan Pevec <apevec@redhat.com> 4.10.2-1
 - New upstream version 4.10.2
-- http://collectd.org/news.shtml#news86
+- https://collectd.org/news.shtml#news86
 - explicitly disable/enable all plugins, fixes FTBFS bz#660936
 
 * Thu Nov 04 2010 Alan Pevec <apevec@redhat.com> 4.10.1-1
 - New upstream version 4.10.1
-  http://collectd.org/news.shtml#news85
+  https://collectd.org/news.shtml#news85
 
 * Sat Oct 30 2010 Richard W.M. Jones <rjones@redhat.com> 4.10.0-3
 - Bump and rebuild for updated libnetsnmp.so.
@@ -1432,7 +1432,7 @@ make check
 
 * Tue Jun 08 2010 Alan Pevec <apevec@redhat.com> 4.9.2-1
 - New upstream version 4.9.2
-  http://collectd.org/news.shtml#news83
+  https://collectd.org/news.shtml#news83
 
 * Thu Apr 29 2010 Marcela Maslanova <mmaslano@redhat.com> - 4.9.1-3
 - Mass rebuild with perl-5.12.0
@@ -1442,11 +1442,11 @@ make check
 
 * Mon Mar 08 2010 Lubomir Rintel <lkundrak@v3.sl> 4.9.1-1
 - New upstream version 4.9.1
-  http://collectd.org/news.shtml#news81
+  https://collectd.org/news.shtml#news81
 
 * Tue Feb 16 2010 Alan Pevec <apevec@redhat.com> 4.8.3-1
 - New upstream version 4.8.3
-  http://collectd.org/news.shtml#news81
+  https://collectd.org/news.shtml#news81
 - FTBFS bz#564943 - system libiptc is not usable and owniptc fails to compile:
   add a patch from upstream iptables.git to fix owniptc compilation
 
@@ -1469,7 +1469,7 @@ make check
 - collectd does not re-connect to libvirtd, bz# 480997
 - fix unpackaged files https://bugzilla.redhat.com/show_bug.cgi?id=516276#c4
 - New upstream version 4.6.4
-  http://collectd.org/news.shtml#news69
+  https://collectd.org/news.shtml#news69
 
 * Fri Aug 21 2009 Tomas Mraz <tmraz@redhat.com> - 4.6.2-5
 - rebuilt with new openssl
@@ -1483,7 +1483,7 @@ make check
 
 * Wed May 20 2009 Alan Pevec <apevec@redhat.com> 4.6.2-1
 - New upstream version 4.6.2
-  http://collectd.org/news.shtml#news64
+  https://collectd.org/news.shtml#news64
 
 * Tue Mar 03 2009 Alan Pevec <apevec@redhat.com> 4.5.3-2
 - patch for strict-aliasing issue in liboping.c
@@ -1507,7 +1507,7 @@ make check
 
 * Wed Oct 22 2008 Alan Pevec <apevec@redhat.com> 4.5.1-1
 - New upstream version 4.5.1, bz# 470943
-  http://collectd.org/news.shtml#news59
+  https://collectd.org/news.shtml#news59
 - enable Network UPS Tools (nut) plugin, bz# 465729
 - enable postgresql plugin
 - spec cleanup, bz# 473641

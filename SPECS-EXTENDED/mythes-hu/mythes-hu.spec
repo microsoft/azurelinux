@@ -6,7 +6,7 @@ Summary: Hungarian thesaurus
 Version: 0.%{upstreamid}
 Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/1283/9/dict-hu.oxt
-URL: http://extensions.services.openoffice.org/project/hu_dicts
+URL: https://extensions.services.openoffice.org/project/hu_dicts
 #bundled but unused spell-checking stuff is under GPLv2+ or LGPLv2+ or MPLv1.1
 #base for bundled but unused hyphenation stuff is under GPLv2
 #additional patch to unused hyphenation stuff is MPL/GPL/LGPL

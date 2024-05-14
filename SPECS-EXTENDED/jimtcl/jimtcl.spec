@@ -6,7 +6,7 @@ Release:        5%{?dist}
 Summary:        A small embeddable Tcl interpreter
 
 License:        BSD
-URL:            http://jim.tcl.tk
+URL:            https://jim.tcl.tk
 Source0:        https://github.com/msteveb/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0:         jimtcl-fix_doc_paths.patch
 

@@ -105,7 +105,7 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
   - Explicitly escape { and } in a regexp because unescaped { issues a warning
     now and will become a fatal error in Perl 5.32
   - Adopt new repo structure, see:
-    http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html
+    https://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html
 - Drop legacy Group: tag
 - Simplify find command using -delete
 

@@ -5,7 +5,7 @@ Summary: Yiddish hunspell dictionaries
 Version: 1.1
 Release: 20%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3975/1/%{name}-%{version}.oxt
-URL: http://extensions.services.openoffice.org/en/project/dict-yi
+URL: https://extensions.services.openoffice.org/en/project/dict-yi
 License: LGPLv2+ or GPLv2+ or MPLv1.1
 BuildArch: noarch
 

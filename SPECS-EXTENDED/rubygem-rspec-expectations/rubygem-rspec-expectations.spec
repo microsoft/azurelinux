@@ -15,7 +15,7 @@ Version:	%{majorver}
 Release:	1%{?dist}
 
 License:	MIT
-URL:		http://github.com/rspec/rspec-expectations
+URL:		https://github.com/rspec/rspec-expectations
 Source0:	https://github.com/rspec/rspec-expectations/archive/refs/tags/v%{version}.tar.gz#/rubygem-%{gem_name}-%{version}.tar.gz
 
 #BuildRequires:	ruby(release)

@@ -6,7 +6,7 @@ Name:           GeoIP-GeoLite-data
 # No further releases of IPv4 GeoLite Legacy databases will be made from April 2018.
 Version:        2018.06
 Release:        12%{?dist}
-# License specified at http://dev.maxmind.com/geoip/legacy/geolite/#License
+# License specified at https://dev.maxmind.com/geoip/legacy/geolite/#License
 License:        CC-BY-SA
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -31,7 +31,7 @@ The GeoLite databases are free IP geolocation databases. This package contains
 a database that maps IPv4 addresses to countries.
 
 This product includes GeoLite data created by MaxMind, available from
-http://www.maxmind.com/
+https://www.maxmind.com/
 
 %package extra
 Summary:        Free GeoLite IP geolocation databases
@@ -43,7 +43,7 @@ databases that map IPv6 addresses to countries, plus IPv4 and IPv6 addresses
 to cities and autonomous system numbers.
 
 This product includes GeoLite data created by MaxMind, available from
-http://www.maxmind.com/
+https://www.maxmind.com/
 
 %prep
 %setup -q -T -c

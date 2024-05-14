@@ -5,7 +5,7 @@ Version:        1.33
 Release:        1%{?dist}
 License:        GPLv3+
 Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/libintl-perl/
+URL:            https://search.cpan.org/dist/libintl-perl/
 Source:         https://cpan.metacpan.org/authors/id/G/GU/GUIDO/libintl-perl-%{version}.tar.gz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux

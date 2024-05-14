@@ -6,7 +6,7 @@ License:        Artistic 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Mojolicious
-Source0:        http://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/S/SR/SRI/Mojolicious-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  coreutils
@@ -94,7 +94,7 @@ Requires:       perl(Time::Local) >= 1.2
 %{?perl_default_filter}
 # EV is just one supported reactor backend, Mojo can use others, and
 # ithreads-based code actually cannot use EV:
-# http://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#What-does-the-error-EV-does-not-work-with-ithreads-mean
+# https://mojolicio.us/perldoc/Mojolicious/Guides/FAQ#What-does-the-error-EV-does-not-work-with-ithreads-mean
 %global __requires_exclude %{?__requires_exclude:%{__requires_exclude}|}perl\\(VMS|perl\\(Win32|perl\\(EV
 # Remove under-specified dependencies
 %global __requires_exclude %{__requires_exclude}|^perl\\((IO::Socket::IP|JSON::PP|Time::Local)\\)$
@@ -1171,22 +1171,22 @@ mv README.md lib/Mojolicious/
 
 * Thu Nov  4 2010 Yanko Kaneti <yaneti@declera.com> 0.999935-1
 - Latest upstream release.
-  http://search.cpan.org/src/KRAIH/Mojolicious-0.999935/Changes
+  https://search.cpan.org/src/KRAIH/Mojolicious-0.999935/Changes
 
 * Thu Aug 19 2010 Yanko Kaneti <yaneti@declera.com> 0.999929-1
 - Latest upstream release.
-  http://search.cpan.org/src/KRAIH/Mojolicious-0.999929/Changes
+  https://search.cpan.org/src/KRAIH/Mojolicious-0.999929/Changes
 
 * Mon Aug 16 2010 Yanko Kaneti <yaneti@declera.com> 0.999927-1
 - Latest upstream release.
-  http://search.cpan.org/src/KRAIH/Mojolicious-0.999927/Changes
+  https://search.cpan.org/src/KRAIH/Mojolicious-0.999927/Changes
 
 * Tue Jun 22 2010 Petr Pisar <ppisar@redhat.com> 0.999926-2
 - Rebuild against perl-5.12
 
 * Wed Jun 16 2010 Yanko Kaneti <yaneti@declera.com> 0.999926-1
 - Latest upstream release.
-  http://search.cpan.org/src/KRAIH/Mojolicious-0.999926/Changes
+  https://search.cpan.org/src/KRAIH/Mojolicious-0.999926/Changes
 
 * Fri Jun 11 2010 Yanko Kaneti <yaneti@declera.com> 0.999925-3
 - Actually include the examples.

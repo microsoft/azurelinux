@@ -10,7 +10,7 @@ Release:	1%{?dist}
 Summary:	PTP implementation for Linux
 
 License:	GPLv2+
-URL:		http://linuxptp.sourceforge.net/
+URL:		https://linuxptp.sourceforge.net/
 
 Source0:	https://sourceforge.net/projects/%{name}/files/v3.1/%{name}-%{version}.tgz
 Source1:	phc2sys.service

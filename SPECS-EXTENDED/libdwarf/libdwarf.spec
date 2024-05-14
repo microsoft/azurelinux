@@ -6,15 +6,15 @@ Summary:       Library to access the DWARF Debugging file format
 License:       LGPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL:           http://www.prevanders.net/dwarf.html
-Source0:       http://www.prevanders.net/%{name}-%{version}.tar.gz
+URL:           https://www.prevanders.net/dwarf.html
+Source0:       https://www.prevanders.net/%{name}-%{version}.tar.gz
 
 BuildRequires: gcc binutils-devel elfutils-libelf-devel dos2unix
 
 %description
 Library to access the DWARF debugging file format which supports
 source level debugging of a number of procedural languages, such as C, C++,
-and Fortran.  Please see http://www.dwarfstd.org for DWARF specification.
+and Fortran.  Please see https://www.dwarfstd.org for DWARF specification.
 
 %package devel
 Summary:       Library and header files of libdwarf

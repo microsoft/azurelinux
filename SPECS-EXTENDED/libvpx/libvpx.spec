@@ -14,7 +14,7 @@ Source0:		https://github.com/webmproject/libvpx/archive/v%{version}.tar.gz#/%{na
 Source1:		vpx_config.h
 # Thanks to debian.
 Source2:		libvpx.ver
-URL:			http://www.webmproject.org/code/
+URL:			https://www.webmproject.org/code/
 BuildRequires:		gcc
 BuildRequires:		gcc-c++
 %ifarch %{ix86} x86_64

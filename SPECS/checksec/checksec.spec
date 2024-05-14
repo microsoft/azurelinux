@@ -36,7 +36,7 @@ to exploit software vulnerabilities reliably. Mitigations such as RELRO,
 NoExecute (NX), Stack Canaries, Address Space Layout Randomization (ASLR) and
 Position Independent Executables (PIE) have made reliably exploiting any
 vulnerabilities that do exist far more challenging. The checksec script is
-designed to test what *standard* Linux OS and PaX (http://pax.grsecurity.net/)
+designed to test what *standard* Linux OS and PaX (https://pax.grsecurity.net/)
 security features are being used.
 
 As of version 1.3 the script also lists the status of various Linux kernel

@@ -25,7 +25,7 @@ BuildArch: noarch
 Requires: python3-rhnlib
 
 %description
-rhnlib is a collection of python modules used by the Spacewalk (http://spacewalk.redhat.com) software.
+rhnlib is a collection of python modules used by the Spacewalk (https://spacewalk.redhat.com) software.
 
 
 %if 0%{?build_py3}
@@ -43,7 +43,7 @@ Conflicts: rhnclient < 0.10
 Conflicts: spacewalk-proxy < 1.3.6
 
 %description -n python3-rhnlib
-rhnlib is a collection of python modules used by the Spacewalk (http://spacewalk.redhat.com) software.
+rhnlib is a collection of python modules used by the Spacewalk (https://spacewalk.redhat.com) software.
 %endif
 
 %prep

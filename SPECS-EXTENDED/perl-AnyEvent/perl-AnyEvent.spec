@@ -538,7 +538,7 @@ make test
 
 * Thu Feb 10 2011 Nicolas Chauvet <kwizart@gmail.com> - 5.27-4
 - Rewritten to new filtering rules
- http://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering#Perl
+ https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering#Perl
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 5.27-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild

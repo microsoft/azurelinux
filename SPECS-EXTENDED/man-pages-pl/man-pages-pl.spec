@@ -6,8 +6,8 @@ Version: 0.7
 Release: 11%{?dist}
 # Multiple man pages are distributed under different licenses.
 License: GPL+ and BSD and MIT and GFDL
-URL: http://sourceforge.net/projects/manpages-pl/
-Source: http://sourceforge.net/projects/manpages-pl/files/manpages-pl-%{version}.tar.bz2
+URL: https://sourceforge.net/projects/manpages-pl/
+Source: https://sourceforge.net/projects/manpages-pl/files/manpages-pl-%{version}.tar.bz2
 
 Requires: man-pages-reader
 Supplements: (man-pages and langpacks-pl)

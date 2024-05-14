@@ -5,9 +5,9 @@ Summary: Ukrainian hyphenation rules
 %global upstreamid 20030903
 Version: 0.%{upstreamid}
 Release: 21%{?dist}
-Source0: http://download.services.openoffice.org/contrib/dictionaries/hyph_uk_UA.zip
+Source0: https://download.services.openoffice.org/contrib/dictionaries/hyph_uk_UA.zip
 Source1: %{name}-LICENSE.txt
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries
+URL: https://wiki.services.openoffice.org/wiki/Dictionaries
 License: GPLv2+
 BuildArch: noarch
 

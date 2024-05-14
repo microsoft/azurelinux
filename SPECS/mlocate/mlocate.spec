@@ -4,7 +4,7 @@ Release:        6%{?dist}
 Summary:        An utility for finding files by name.
 License:        GPLv2
 URL:            https://pagure.io/mlocate
-Source0:        http://releases.pagure.org/mlocate/%{name}-%{version}.tar.xz
+Source0:        https://releases.pagure.org/mlocate/%{name}-%{version}.tar.xz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File

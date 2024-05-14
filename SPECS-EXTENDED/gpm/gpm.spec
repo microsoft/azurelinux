@@ -5,14 +5,14 @@ Name: gpm
 Version: 1.20.7
 Release: 24%{?dist}
 License: GPLv2
-URL: http://www.nico.schottelius.org/software/gpm/
-#URL2 : http://freecode.com/projects/gpm
+URL: https://www.nico.schottelius.org/software/gpm/
+#URL2 : https://freecode.com/projects/gpm
 
 # The upstream source contains PDF docs with unclear licensing,
 # and that's why we need to remove them and recreate the tarball
 #
 # 1.] mkdir docs-removal && cd docs-removal
-# 2.] wget http://www.nico.schottelius.org/software/gpm/archives/%{name}-%{version}.tar.lzma
+# 2.] wget https://www.nico.schottelius.org/software/gpm/archives/%{name}-%{version}.tar.lzma
 # 3.] tar xf %{name}-%{version}.tar.lzma
 # 4.] rm -rf %{name}-%{version}/doc/specs
 # 5.] tar cJf %{name}-%{version}.tar.xz %{name}-%{version}

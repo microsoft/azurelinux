@@ -3,11 +3,11 @@ Name:           tree
 Version:        1.8.0
 Release:        2%{?dist}
 License:        GPLv2+
-URL:            http://mama.indstate.edu/users/ice/tree/
+URL:            https://mama.indstate.edu/users/ice/tree/
 Group:          Applications
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        http://mama.indstate.edu/users/ice/tree/src/tree-%{version}.tgz
+Source0:        https://mama.indstate.edu/users/ice/tree/src/tree-%{version}.tgz
 
 %description
 Tree is a recursive directory listing command that produces a depth indented listing of files, which is colorized ala dircolors if the LS_COLORS environment variable is set and output is to tty. Tree has been ported and reported to work under the following operating systems: Linux, FreeBSD, OS X, Solaris, HP/UX, Cygwin, HP Nonstop and OS/2.

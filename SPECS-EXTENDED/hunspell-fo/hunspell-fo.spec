@@ -4,8 +4,8 @@ Name: hunspell-fo
 Summary: Faroese hunspell dictionaries
 Version: 0.4.2
 Release: 13%{?dist}
-Source: http://fo.speling.org/filer/myspell-fo-%{version}.tar.bz2
-URL: http://fo.speling.org/
+Source: https://fo.speling.org/filer/myspell-fo-%{version}.tar.bz2
+URL: https://fo.speling.org/
 License: GPLv2+
 BuildArch: noarch
 

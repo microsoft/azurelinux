@@ -38,13 +38,13 @@ Distribution:   Azure Linux
 %global update 0
 
 Name:           cim-schema
-Url:            http://www.dmtf.org/
+Url:            https://www.dmtf.org/
 Summary:        Common Information Model (CIM) Schema
 Version:        %{major}.%{minor}.%{update}
 Release:        11%{?dist}
 License:        DMTF
-Source0:        http://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-MOFs.zip
-Source1:        http://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-Doc.zip
+Source0:        https://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-MOFs.zip
+Source1:        https://www.dmtf.org/standards/cim/cim_schema_v%{major}%{minor}%{update}/cim_schema_%{version}Experimental-Doc.zip
 Source2:        LICENSE
 BuildArch:      noarch
 
@@ -63,7 +63,7 @@ provides the actual model descriptions.
 
 Authors:
 --------
-    DTMF <http://www.dmtf.org/about/contact>
+    DTMF <https://www.dmtf.org/about/contact>
 
 %description docs
 Common Information Model (CIM) schema documentation.

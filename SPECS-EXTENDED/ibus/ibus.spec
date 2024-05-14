@@ -1158,7 +1158,7 @@ dconf update || :
 - Added ibus-435880-surrounding-text.patch
   Fixes Bug 435880 - ibus-gtk requires surrounding-text support
 - Added ibus-xx-workaround-gtk3.patch
-  Workaround for f14 http://koji.fedoraproject.org/koji/taskinfo?taskID=2516604
+  Workaround for f14 https://koji.fedoraproject.org/koji/taskinfo?taskID=2516604
 
 * Mon Aug 23 2010 Takao Fujiwara <tfujiwar@redhat.com> - 1.3.7-1
 - Updated to 1.3.7

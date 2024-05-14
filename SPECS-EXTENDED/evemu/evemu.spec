@@ -13,14 +13,14 @@ Release:        14%{?dist}
 Summary:        Event Device Query and Emulation Program
 
 License:        GPLv3+
-URL:            http://www.freedesktop.org/wiki/Evemu
+URL:            https://www.freedesktop.org/wiki/Evemu
 
 %if 0%{?gitdate}
 Source0:        %{name}-%{gitdate}.tar.bz2
 Source1:        make-git-snapshot.sh
 Source2:        commitid
 %else
-Source0:        http://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
+Source0:        https://www.freedesktop.org/software/%{name}/%{name}-%{version}.tar.xz
 %endif
 
 BuildRequires:  automake libtool gcc gcc-c++

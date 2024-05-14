@@ -25,9 +25,9 @@ Release:        297%{?dist}
 Summary:        Full regular expressions API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
-Url:            http://jakarta.apache.org/oro/
-Source0:        http://archive.apache.org/dist/jakarta/oro/%{full_name}-%{version}.tar.gz
-Source1:        http://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+Url:            https://jakarta.apache.org/oro/
+Source0:        https://archive.apache.org/dist/jakarta/oro/%{full_name}-%{version}.tar.gz
+Source1:        https://repo1.maven.org/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  javapackages-local-bootstrap
