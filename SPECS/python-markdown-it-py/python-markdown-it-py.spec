@@ -19,7 +19,8 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-flit-core
 %if 0%{?with_check}
-BuildRequires: python3-pytest
+BuildRequires:  python3-pytest
+BuildRequires:  python3-mdurl
 %endif
 BuildArch:      noarch
 # The plugins extras creates a bootstrap loop

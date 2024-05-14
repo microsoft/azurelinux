@@ -42,6 +42,7 @@ sed -i "s/pytest-cov//" tests/requirements.txt
 
 
 %check
+pip3 install iniconfig
 %pytest
 
 

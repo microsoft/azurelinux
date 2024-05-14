@@ -37,7 +37,7 @@ JMESPath (pronounced “james path”) allows you to declaratively specify how t
 ln -sfv jp.py %{buildroot}%{_bindir}/jp.py-%{python3_version}
 
 %check
-pip3 install nose mock
+pip3 install nose mock iniconfig
 %python3 setup.py test
 
 %files -n python3-jmespath
