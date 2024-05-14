@@ -1031,6 +1031,7 @@
                 "ocaml-seq",
                 "ocaml-sexplib",
                 "ocaml-sexplib0",
+                "ocaml-srpm-macros",
                 "ocaml-stdio",
                 "ocaml-stdlib-random",
                 "ocaml-topkg",

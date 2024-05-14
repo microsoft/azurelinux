@@ -165,6 +165,7 @@ texinfo-7.0.3-1.azl3.aarch64.rpm
 gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-1.azl3.noarch.rpm
 automake-1.16.5-1.azl3.noarch.rpm
+ocaml-srpm-macros-9-13.azl3.noarch.rpm
 openssl-3.1.4-8.azl3.aarch64.rpm
 openssl-devel-3.1.4-8.azl3.aarch64.rpm
 openssl-libs-3.1.4-8.azl3.aarch64.rpm
