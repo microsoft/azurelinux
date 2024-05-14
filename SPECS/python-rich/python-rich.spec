@@ -55,7 +55,7 @@ code, tracebacks, and more — out of the box.
 
 %check
 # add below to make sure initial build will catch runtime import errors
-pip3 install iniconfig
+pip3 install iniconfig pygments
 %pyproject_check_import
 %pytest -vv
 
