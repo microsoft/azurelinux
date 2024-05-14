@@ -1,7 +1,7 @@
 Summary:        Query Language for JSON
 Name:           python-jmespath
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
 %endif
 BuildArch:      noarch
 

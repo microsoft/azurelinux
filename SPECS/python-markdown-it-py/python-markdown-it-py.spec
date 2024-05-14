@@ -55,6 +55,7 @@ sed -i '/"pytest-cov",/d' pyproject.toml
 %pyproject_save_files markdown_it
 
 %check
+pip3 install iniconfig
 %pytest tests/
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}

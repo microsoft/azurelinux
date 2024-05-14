@@ -3,7 +3,7 @@
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
 Version:        3.5.2
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -27,9 +27,6 @@ BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-tidy
 BuildRequires:  python%{python3_pkgversion}-wheel
 BuildRequires:  python%{python3_pkgversion}-zipp
-%if 0%{?with_check}
-BuildRequires: python3-pytest
-%endif
 Requires:       python%{python3_pkgversion}-importlib-metadata
 
 %description -n python%{python3_pkgversion}-%{pkgname}
@@ -64,9 +61,6 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
-* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 3.5.2-2
-- Add missing dep on pytest for check section
-
 * Fri Feb 16 2024 Andrew Phelps <anphel@microsoft.com> - 3.5.2-1
 - Upgrade to version 3.5.2
 - Add BR for python3-pip and python3-wheel

@@ -3,7 +3,7 @@ URL utilities for markdown-it parser.}
 Summary:        Markdown URL utilities
 Name:           python-mdurl
 Version:        0.1.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,9 @@ Source0:        %{url}/archive/%{version}/mdurl-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-flit-core
+%if 0%{?with_check}
+BuildRequires: python3-pytest
+%endif
 BuildArch:      noarch
 
 %description %{_description}
@@ -47,6 +50,9 @@ sed -i "s/pytest-cov//" tests/requirements.txt
 %license LICENSE
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 0.1.2-8
+- Add missing dep on pytest for check section
+
 * Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 0.1.2-7
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License verified

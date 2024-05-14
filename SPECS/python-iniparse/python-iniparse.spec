@@ -1,7 +1,7 @@
 Summary:        Python Module for Accessing and Modifying Configuration Data in INI files
 Name:           python-iniparse
 Version:        0.5
-Release:        2%{?dist}
+Release:        1%{?dist}
 License:        MIT OR Python
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,9 +18,6 @@ Summary:        Python Module for Accessing and Modifying Configuration Data in 
 BuildRequires:  python3-devel
 BuildRequires:  python3-six
 BuildRequires:  python3-test
-%if 0%{?with_check}
-BuildRequires: python3-pytest
-%endif
 Requires:       python3
 Requires:       python3-pycparser
 Requires:       python3-six
@@ -54,9 +51,6 @@ mv %{buildroot}%{_docdir}/iniparse-%{version} %{buildroot}%{_docdir}/%{name}-%{v
 %{python3_sitelib}/*
 
 %changelog
-* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 0.5-2
-- Add missing dep on pytest for check section
-
 * Thu Mar 03 2022 Nick Samson <nisamson@microsoft.com> - 0.5-1
 - Updated to 0.5
 - Removed unnecessary compatibility patch
