@@ -22,7 +22,7 @@ Version:        12.49
 Release:        1%{?dist}
 License:        GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 URL:            https://sourceware.org/annobin/
 Source:         https://nickc.fedorapeople.org/%{annobin_sources}
 Requires:       %{name}-plugin-clang
@@ -215,7 +215,7 @@ Installs an annobin plugin that can be used by Clang.
 %{!?clang_plugin_dir:%global clang_plugin_dir %{_libdir}/clang/plugins}
 #---------------------------------------------------------------------------------
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 
 %prep
 if [ -z "%{gcc_vr}" ]; then
