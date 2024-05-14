@@ -1,0 +1,275 @@
+From 71b69dfb7df3d912e66bab87fbb1f21f83504967 Mon Sep 17 00:00:00 2001
+From: David Lord <davidism@gmail.com>
+Date: Thu, 2 May 2024 11:55:52 -0700
+Subject: [PATCH 1/2] restrict debugger trusted hosts
+
+Add a list of `trusted_hosts` to the `DebuggedApplication` middleware. It defaults to only allowing `localhost`, `.localhost` subdomains, and `127.0.0.1`. `run_simple(use_debugger=True)` adds its `hostname` argument to the trusted list as well. The middleware can be used directly to further modify the trusted list in less common development scenarios.
+
+The debugger UI uses the full `document.location` instead of only `document.location.pathname`.
+
+Either of these fixes on their own mitigates the reported vulnerability.
+---
+ CHANGES.rst                           |  5 ++++
+ docs/debug.rst                        | 35 +++++++++++++++++++++++----
+ src/werkzeug/debug/__init__.py        | 10 ++++++++
+ src/werkzeug/debug/shared/debugger.js |  4 +--
+ src/werkzeug/serving.py               |  3 +++
+ 5 files changed, 50 insertions(+), 7 deletions(-)
+
+diff --git a/CHANGES.rst b/CHANGES.rst
+index 5658080c3..4d0081e93 100644
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -5,6 +5,11 @@ Version 3.0.3
+ 
+ Unreleased
+ 
++-   Only allow ``localhost``, ``.localhost``, ``127.0.0.1``, or the specified
++    hostname when running the dev server, to make debugger requests. Additional
++    hosts can be added by using the debugger middleware directly. The debugger
++    UI makes requests using the full URL rather than only the path.
++    :ghsa:`2g68-c3qc-8985`
+ -   Make reloader more robust when ``""`` is in ``sys.path``. :pr:`2823`
+ -   Better TLS cert format with ``adhoc`` dev certs. :pr:`2891`
+ -   Inform Python < 3.12 how to handle ``itms-services`` URIs correctly, rather
+diff --git a/docs/debug.rst b/docs/debug.rst
+index 25a9f0b2d..d842135a7 100644
+--- a/docs/debug.rst
++++ b/docs/debug.rst
+@@ -16,7 +16,8 @@ interactive debug console to execute code in any frame.
+     The debugger allows the execution of arbitrary code which makes it a
+     major security risk. **The debugger must never be used on production
+     machines. We cannot stress this enough. Do not enable the debugger
+-    in production.**
++    in production.** Production means anything that is not development,
++    and anything that is publicly accessible.
+ 
+ .. note::
+ 
+@@ -72,10 +73,9 @@ argument to get a detailed list of all the attributes it has.
+ Debugger PIN
+ ------------
+ 
+-Starting with Werkzeug 0.11 the debug console is protected by a PIN.
+-This is a security helper to make it less likely for the debugger to be
+-exploited if you forget to disable it when deploying to production. The
+-PIN based authentication is enabled by default.
++The debug console is protected by a PIN. This is a security helper to make it
++less likely for the debugger to be exploited if you forget to disable it when
++deploying to production. The PIN based authentication is enabled by default.
+ 
+ The first time a console is opened, a dialog will prompt for a PIN that
+ is printed to the command line. The PIN is generated in a stable way
+@@ -92,6 +92,31 @@ intended to make it harder for an attacker to exploit the debugger.
+ Never enable the debugger in production.**
+ 
+ 
++Allowed Hosts
++-------------
++
++The debug console will only be served if the request comes from a trusted host.
++If a request comes from a browser page that is not served on a trusted URL, a
++400 error will be returned.
++
++By default, ``localhost``, any ``.localhost`` subdomain, and ``127.0.0.1`` are
++trusted. ``run_simple`` will trust its ``hostname`` argument as well. To change
++this further, use the debug middleware directly rather than through
++``use_debugger=True``.
++
++.. code-block:: python
++
++    if os.environ.get("USE_DEBUGGER") in {"1", "true"}:
++        app = DebuggedApplication(app, evalex=True)
++        app.trusted_hosts = [...]
++
++    run_simple("localhost", 8080, app)
++
++**This feature is not meant to entirely secure the debugger. It is
++intended to make it harder for an attacker to exploit the debugger.
++Never enable the debugger in production.**
++
++
+ Pasting Errors
+ --------------
+ 
+diff --git a/src/werkzeug/debug/__init__.py b/src/werkzeug/debug/__init__.py
+index a55480aa3..cda1fa2e7 100644
+--- a/src/werkzeug/debug/__init__.py
++++ b/src/werkzeug/debug/__init__.py
+@@ -298,6 +298,14 @@ def __init__(
+         else:
+             self.pin = None
+ 
++        self.trusted_hosts: list[str] = [".localhost", "127.0.0.1"]
++        """List of domains to allow requests to the debugger from. A leading dot
++        allows all subdomains. This only allows ``".localhost"`` domains by
++        default.
++
++        .. versionadded:: 3.0.3
++        """
++
+     @property
+     def pin(self) -> str | None:
+         if not hasattr(self, "_pin"):
+@@ -506,6 +514,8 @@ def __call__(
+         # form data!  Otherwise the application won't have access to that data
+         # any more!
+         request = Request(environ)
++        request.trusted_hosts = self.trusted_hosts
++        assert request.host  # will raise 400 error if not trusted
+         response = self.debug_application
+         if request.args.get("__debugger__") == "yes":
+             cmd = request.args.get("cmd")
+diff --git a/src/werkzeug/debug/shared/debugger.js b/src/werkzeug/debug/shared/debugger.js
+index f463e9c77..18c658344 100644
+--- a/src/werkzeug/debug/shared/debugger.js
++++ b/src/werkzeug/debug/shared/debugger.js
+@@ -48,7 +48,7 @@ function initPinBox() {
+       btn.disabled = true;
+ 
+       fetch(
+-        `${document.location.pathname}?__debugger__=yes&cmd=pinauth&pin=${pin}&s=${encodedSecret}`
++        `${document.location}?__debugger__=yes&cmd=pinauth&pin=${pin}&s=${encodedSecret}`
+       )
+         .then((res) => res.json())
+         .then(({auth, exhausted}) => {
+@@ -79,7 +79,7 @@ function promptForPin() {
+   if (!EVALEX_TRUSTED) {
+     const encodedSecret = encodeURIComponent(SECRET);
+     fetch(
+-      `${document.location.pathname}?__debugger__=yes&cmd=printpin&s=${encodedSecret}`
++      `${document.location}?__debugger__=yes&cmd=printpin&s=${encodedSecret}`
+     );
+     const pinPrompt = document.getElementsByClassName("pin-prompt")[0];
+     fadeIn(pinPrompt);
+diff --git a/src/werkzeug/serving.py b/src/werkzeug/serving.py
+index 7f6ea922e..859f9aacb 100644
+--- a/src/werkzeug/serving.py
++++ b/src/werkzeug/serving.py
+@@ -1072,6 +1072,9 @@ def run_simple(
+         from .debug import DebuggedApplication
+ 
+         application = DebuggedApplication(application, evalex=use_evalex)
++        # Allow the specified hostname to use the debugger, in addition to
++        # localhost domains.
++        application.trusted_hosts.append(hostname)
+ 
+     if not is_running_from_reloader():
+         fd = None
+
+From 890b6b62634fa61224222aee31081c61b054ff01 Mon Sep 17 00:00:00 2001
+From: David Lord <davidism@gmail.com>
+Date: Fri, 3 May 2024 14:49:43 -0700
+Subject: [PATCH 2/2] only require trusted host for evalex
+
+---
+ src/werkzeug/debug/__init__.py | 25 ++++++++++++++++++++-----
+ src/werkzeug/sansio/utils.py   |  2 +-
+ 2 files changed, 21 insertions(+), 6 deletions(-)
+
+diff --git a/src/werkzeug/debug/__init__.py b/src/werkzeug/debug/__init__.py
+index cda1fa2e7..6bef30fbc 100644
+--- a/src/werkzeug/debug/__init__.py
++++ b/src/werkzeug/debug/__init__.py
+@@ -19,7 +19,9 @@
+ 
+ from .._internal import _log
+ from ..exceptions import NotFound
++from ..exceptions import SecurityError
+ from ..http import parse_cookie
++from ..sansio.utils import host_is_trusted
+ from ..security import gen_salt
+ from ..utils import send_file
+ from ..wrappers.request import Request
+@@ -352,7 +354,7 @@ def debug_application(
+ 
+             is_trusted = bool(self.check_pin_trust(environ))
+             html = tb.render_debugger_html(
+-                evalex=self.evalex,
++                evalex=self.evalex and self.check_host_trust(environ),
+                 secret=self.secret,
+                 evalex_trusted=is_trusted,
+             )
+@@ -380,6 +382,9 @@ def execute_command(  # type: ignore[return]
+         frame: DebugFrameSummary | _ConsoleFrame,
+     ) -> Response:
+         """Execute a command in a console."""
++        if not self.check_host_trust(request.environ):
++            return SecurityError()  # type: ignore[return-value]
++
+         contexts = self.frame_contexts.get(id(frame), [])
+ 
+         with ExitStack() as exit_stack:
+@@ -390,6 +395,9 @@ def execute_command(  # type: ignore[return]
+ 
+     def display_console(self, request: Request) -> Response:
+         """Display a standalone shell."""
++        if not self.check_host_trust(request.environ):
++            return SecurityError()  # type: ignore[return-value]
++
+         if 0 not in self.frames:
+             if self.console_init_func is None:
+                 ns = {}
+@@ -442,12 +450,18 @@ def check_pin_trust(self, environ: WSGIEnvironment) -> bool | None:
+             return None
+         return (time.time() - PIN_TIME) < ts
+ 
++    def check_host_trust(self, environ: WSGIEnvironment) -> bool:
++        return host_is_trusted(environ.get("HTTP_HOST"), self.trusted_hosts)
++
+     def _fail_pin_auth(self) -> None:
+         time.sleep(5.0 if self._failed_pin_auth > 5 else 0.5)
+         self._failed_pin_auth += 1
+ 
+     def pin_auth(self, request: Request) -> Response:
+         """Authenticates with the pin."""
++        if not self.check_host_trust(request.environ):
++            return SecurityError()  # type: ignore[return-value]
++
+         exhausted = False
+         auth = False
+         trust = self.check_pin_trust(request.environ)
+@@ -497,8 +511,11 @@ def pin_auth(self, request: Request) -> Response:
+             rv.delete_cookie(self.pin_cookie_name)
+         return rv
+ 
+-    def log_pin_request(self) -> Response:
++    def log_pin_request(self, request: Request) -> Response:
+         """Log the pin if needed."""
++        if not self.check_host_trust(request.environ):
++            return SecurityError()  # type: ignore[return-value]
++
+         if self.pin_logging and self.pin is not None:
+             _log(
+                 "info", " * To enable the debugger you need to enter the security pin:"
+@@ -514,8 +531,6 @@ def __call__(
+         # form data!  Otherwise the application won't have access to that data
+         # any more!
+         request = Request(environ)
+-        request.trusted_hosts = self.trusted_hosts
+-        assert request.host  # will raise 400 error if not trusted
+         response = self.debug_application
+         if request.args.get("__debugger__") == "yes":
+             cmd = request.args.get("cmd")
+@@ -527,7 +542,7 @@ def __call__(
+             elif cmd == "pinauth" and secret == self.secret:
+                 response = self.pin_auth(request)  # type: ignore
+             elif cmd == "printpin" and secret == self.secret:
+-                response = self.log_pin_request()  # type: ignore
++                response = self.log_pin_request(request)  # type: ignore
+             elif (
+                 self.evalex
+                 and cmd is not None
+diff --git a/src/werkzeug/sansio/utils.py b/src/werkzeug/sansio/utils.py
+index 48ec1bfa0..14fa0ac88 100644
+--- a/src/werkzeug/sansio/utils.py
++++ b/src/werkzeug/sansio/utils.py
+@@ -8,7 +8,7 @@
+ from ..urls import uri_to_iri
+ 
+ 
+-def host_is_trusted(hostname: str, trusted_list: t.Iterable[str]) -> bool:
++def host_is_trusted(hostname: str | None, trusted_list: t.Iterable[str]) -> bool:
+     """Check if a host matches a list of trusted names.
+ 
+     :param hostname: The name to check.

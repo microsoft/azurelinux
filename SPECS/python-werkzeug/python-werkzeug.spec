@@ -18,6 +18,7 @@ Patch0:         0001-enable-tests-in-rpm-env.patch
 # and are excluded.
 Patch1:         0002-disable-stat-test.patch
 Patch2:         CVE-2023-46136.patch
+Patch3:         CVE-2024-34069.patch
 BuildArch:      noarch
 
 %description
