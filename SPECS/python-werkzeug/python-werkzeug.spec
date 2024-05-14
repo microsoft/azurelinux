@@ -1,7 +1,7 @@
 Summary:        The Swiss Army knife of Python web development
 Name:           python-werkzeug
 Version:        2.3.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -71,6 +71,9 @@ pip3 install -r requirements/tests.txt
 %license LICENSE.rst
 
 %changelog
+* Tue May 14 2024 Jonathan Behrens <jbehrens@microsoft.com> - 2.3.7-2
+- Patch CVE-2024-34069
+
 * Mon Nov 06 2023 Nick Samson <nisamson@microsoft.com> - 2.3.7-1
 - Upgraded to version 2.3.7
 - Migrated to pyproject build
