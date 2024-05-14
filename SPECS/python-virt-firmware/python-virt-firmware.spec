@@ -91,9 +91,6 @@ cp -ar tests %{buildroot}%{_datadir}/%{name}
 %{_bindir}/pe-addsigs
 %{_bindir}/pe-inspect
 %{_mandir}/man1/virt-*.1*
-%{_mandir}/man1/kernel-bootcfg.1*
-%{_mandir}/man1/uefi-boot-menu.1*
-%{_mandir}/man1/pe-*.1*
 %{python3_sitelib}/virt/firmware
 %{python3_sitelib}/virt/peutils
 %{python3_sitelib}/virt_firmware-%{pypi_version}-py%{python3_version}.egg-info
