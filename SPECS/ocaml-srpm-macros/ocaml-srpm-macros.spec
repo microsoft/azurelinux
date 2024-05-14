@@ -15,7 +15,7 @@ License:        GPL-2.0-or-later
 # NB. This package MUST NOT Require anything (except for dependencies
 # that RPM itself generates).
 Vendor:         Microsoft Corporation
-Distribution:   Mariner
+Distribution:   Azure Linux
 Source0:        macros.ocaml-srpm
 BuildArch:      noarch
 
