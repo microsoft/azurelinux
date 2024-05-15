@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        4%{?dist}
+Release:        5%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -30,6 +30,7 @@ Source11:       50-noxattr.conf
 # when the overlay of the liveos is backed by ram. This allows the machine to
 # boot without being blocked on user input in such a scenario.
 Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
+Patch:          add-livenet-download-service.patch
 Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
@@ -288,6 +289,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Fri Sept 30 2024 George Mileka <gmileka@microsoft.com> - 102-5
+- Augment livenet module with a download daemon.
+
 * Mon Aug 19 2024 Cameron Baird <cameronbaird@microsoft.com> - 102-4
 - Drop 0002-disable-xattr.patch
 - Introduce dracut-noxattr subpackage to expose this behavior as an option

@@ -30,10 +30,14 @@ const (
 	grubx64Binary         = "grubx64.efi"
 	grubx64NoPrefixBinary = "grubx64-noprefix.efi"
 
-	isoGrubCfg = "grub.cfg"
+	isoGrubCfg     = "grub.cfg"
+	pxeGrubCfg     = "grub-pxe.cfg"
+	pxeGrubCfgDir  = "/boot/grub2"
+	pxeKernelsArgs = " ip=dhcp rd.live.azldownloader=enable "
 
-	searchCommandTemplate = "search --label %s --set root"
-	rootValueTemplate     = "live:LABEL=%s"
+	searchCommandTemplate   = "search --label %s --set root"
+	rootValueLiveOSTemplate = "live:LABEL=%s"
+	rootValuePxeTemplate    = "live:%s"
 
 	isoBootDir    = "boot"
 	initrdImage   = "initrd.img"
@@ -55,7 +59,7 @@ const (
 	// customizations.
 	savedConfigsFileName = "saved-configs.yaml"
 
-	dracutConfig = `add_dracutmodules+=" dmsquash-live "
+	dracutConfig = `add_dracutmodules+=" dmsquash-live livenet "
 add_drivers+=" overlay "
 hostonly="no"
 `
@@ -64,6 +68,69 @@ hostonly="no"
 	// files.
 	expansionSafetyFactor = 1.5
 )
+
+type SavedConfigs struct {
+	Iso imagecustomizerapi.Iso `yaml:"iso"`
+	Pxe imagecustomizerapi.Pxe `yaml:"pxe"`
+}
+
+func (c *SavedConfigs) IsValid() (err error) {
+	err = c.Iso.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid 'iso' field:\n%w", err)
+	}
+
+	err = c.Pxe.IsValid()
+	if err != nil {
+		return fmt.Errorf("invalid 'pxe' field:\n%w", err)
+	}
+
+	return nil
+}
+
+func (c *SavedConfigs) IsEmpty() bool {
+	isoConfigEmpty := c.Iso.KernelCommandLine.ExtraCommandLine == ""
+	pxeConfigEmpty := c.Pxe.IsoImageUrl == ""
+	return isoConfigEmpty && pxeConfigEmpty
+}
+
+func (c *SavedConfigs) persistSavedConfigs(savedConfigsFilePath string) (err error) {
+	if c.IsEmpty() {
+		return nil
+	}
+
+	err = os.MkdirAll(filepath.Dir(savedConfigsFilePath), os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory for (%s):\n%w", savedConfigsFilePath, err)
+	}
+
+	err = imagecustomizerapi.MarshalYamlFile(savedConfigsFilePath, c)
+	if err != nil {
+		return fmt.Errorf("failed to save configs to (%s):\n%w", savedConfigsFilePath, err)
+	}
+
+	return nil
+}
+
+func loadSavedConfigs(savedConfigsFilePath string) (exists bool, savedConfigs *SavedConfigs, err error) {
+
+	exists, err = file.PathExists(savedConfigsFilePath)
+	if err != nil {
+		return false, nil, fmt.Errorf("failed to check if (%s) exists:\n%w", savedConfigsFilePath, err)
+	}
+
+	if !exists {
+		return false, nil, nil
+	}
+
+	savedConfigs = &SavedConfigs{}
+	err = imagecustomizerapi.UnmarshalYamlFile(savedConfigsFilePath, savedConfigs)
+	if err != nil {
+		return true, nil, fmt.Errorf("failed to saved arguments  file (%s):\n%w", savedConfigsFilePath, err)
+	}
+
+	return true, savedConfigs, nil
+}
 
 type IsoWorkingDirs struct {
 	// 'isoBuildDir' is where intermediate files will be placed during the
@@ -84,6 +151,7 @@ type IsoArtifacts struct {
 	bootx64EfiPath       string
 	grubx64EfiPath       string
 	isoGrubCfgPath       string
+	pxeGrubCfgPath       string
 	savedConfigsFilePath string
 	vmlinuzPath          string
 	initrdImagePath      string
@@ -242,16 +310,18 @@ func (b *LiveOSIsoBuilder) prepareRootfsForDracut(writeableRootfsDir string) err
 	return nil
 }
 
-func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.KernelExtraArguments) (mergedConfigs *SavedConfigs, err error) {
+func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.KernelExtraArguments,
+	newPxeIsoImageUrl string) (mergedConfigs *SavedConfigs, err error) {
 	mergedConfigs = &SavedConfigs{}
 	mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = newKernelArgs
+	mergedConfigs.Pxe.IsoImageUrl = newPxeIsoImageUrl
 
-	savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
+	exists, savedConfigs, err := loadSavedConfigs(savedConfigsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load saved configurations (%s):\n%w", savedConfigsFilePath, err)
 	}
 
-	if savedConfigs != nil && !savedConfigs.IsEmpty() {
+	if exists {
 		// do we have kernel arguments from a previous run?
 		if savedConfigs.Iso.KernelCommandLine.ExtraCommandLine != "" {
 			// If yes, add them before the new kernel arguments.
@@ -259,14 +329,20 @@ func mergeConfigs(savedConfigsFilePath string, newKernelArgs imagecustomizerapi.
 			newArgs := strings.TrimSpace(string(newKernelArgs))
 			mergedConfigs.Iso.KernelCommandLine.ExtraCommandLine = imagecustomizerapi.KernelExtraArguments(savedArgs + " " + newArgs)
 		}
+
+		// if the PXE iso image url is not set, set it to the value from the previous run.
+		if newPxeIsoImageUrl == "" && savedConfigs.Pxe.IsoImageUrl != "" {
+			mergedConfigs.Pxe.IsoImageUrl = savedConfigs.Pxe.IsoImageUrl
+		}
 	}
 
 	return mergedConfigs, nil
 }
 
-func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, grubCfgFileName string, extraCommandLine imagecustomizerapi.KernelExtraArguments) error {
+func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, isoGrubCfgFileName string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
+	pxeGrubCfgFileName string, pxeIsoImageUrl string, outputImageBase string) error {
 
-	inputContentString, err := file.Read(grubCfgFileName)
+	inputContentString, err := file.Read(isoGrubCfgFileName)
 	if err != nil {
 		return err
 	}
@@ -312,7 +388,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, grubCfgFil
 		}
 	}
 
-	rootValue := fmt.Sprintf(rootValueTemplate, isomakerlib.DefaultVolumeId)
+	rootValue := fmt.Sprintf(rootValueLiveOSTemplate, isomakerlib.DefaultVolumeId)
 	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
 	if err != nil {
 		return fmt.Errorf("failed to update the root kernel argument in the iso grub.cfg:\n%w", err)
@@ -324,7 +400,7 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, grubCfgFil
 		return fmt.Errorf("failed to set SELinux mode:\n%w", err)
 	}
 
-	mergedConfigs, err := mergeConfigs(savedConfigsFilePath, extraCommandLine)
+	mergedConfigs, err := mergeConfigs(savedConfigsFilePath, extraCommandLine, pxeIsoImageUrl)
 	if err != nil {
 		return fmt.Errorf("failed to combine additional kernel command line parameters:\n%w", err)
 	}
@@ -343,9 +419,72 @@ func (b *LiveOSIsoBuilder) updateGrubCfg(savedConfigsFilePath string, grubCfgFil
 		return fmt.Errorf("failed to save iso configs:\n%w", err)
 	}
 
-	err = file.Write(inputContentString, grubCfgFileName)
+	err = file.Write(inputContentString, isoGrubCfgFileName)
 	if err != nil {
-		return fmt.Errorf("failed to write %s:\n%w", grubCfgFileName, err)
+		return fmt.Errorf("failed to write %s:\n%w", isoGrubCfgFileName, err)
+	}
+
+	err = generatePxeGrubCfg(inputContentString, mergedConfigs.Pxe.IsoImageUrl, outputImageBase, pxeGrubCfgFileName)
+	if err != nil {
+		return fmt.Errorf("failed to create grub configuration for PXE booting.\n%w", err)
+	}
+
+	return nil
+}
+
+// generatePxeGrubCfg
+//
+// given the content of the iso grub.cfg, this function derives the PXE
+// equivalent.
+//
+// inputs:
+//   - inputContentString:
+//     iso grub.cfg content.
+//   - pxeIsoImageUrl:
+//     url to the iso image to download at boot time. This can be a url
+//     containing the full file name or just the folder. If it is only the
+//     folder, the function will append the outputImageBase.iso to it.
+//     For example: http://192.168.0.1/liveos/my-iso.Iso or
+//     http://192.168.0.1/liveos
+//   - outputImageBase:
+//     the generated iso name. This value will be used only if the pxeIsoImageUrl
+//     parameter does not specify a full iso name.
+//   - pxeGrubCfgFileName:
+//     path of file to hold the PXE grub configuration.
+//
+// returns:
+//   - error: nil if successful, otherwise an error object.
+//
+// generates:
+//   - grub configuration file for PXE booting.
+func generatePxeGrubCfg(inputContentString string, pxeIsoImageUrl string, outputImageBase string, pxeGrubCfgFileName string) error {
+
+	// remove 'search' commands from PXE grub.cfg because it is not needed.
+	inputContentString, err := removeCommandAll(inputContentString, "search")
+	if err != nil {
+		return fmt.Errorf("failed to remove the 'search' commands from PXE grub.cfg:\n%w", err)
+	}
+
+	// If the specified URL is not a full path to an iso, append the generated
+	// iso file name to it.
+	if filepath.Ext(pxeIsoImageUrl) != ".iso" {
+		pxeIsoImageUrl = strings.TrimSuffix(pxeIsoImageUrl, "/") + "/" + outputImageBase + ".iso"
+	}
+	rootValue := fmt.Sprintf(rootValuePxeTemplate, pxeIsoImageUrl)
+	inputContentString, _, err = replaceKernelCommandLineArgValueAll(inputContentString, "root", rootValue, true /*allowMultiple*/)
+	if err != nil {
+		return fmt.Errorf("failed to update the root kernel argument with the PXE iso image url in the PXE grub.cfg:\n%w", err)
+	}
+
+	inputContentString, err = appendKernelCommandLineArgsAll(inputContentString, pxeKernelsArgs,
+		true /*allowMultiple*/, false /*requireKernelOpts*/)
+	if err != nil {
+		return fmt.Errorf("failed to append the kernel arguments (%s) in the PXE grub.cfg:\n%w", pxeKernelsArgs, err)
+	}
+
+	err = file.Write(inputContentString, pxeGrubCfgFileName)
+	if err != nil {
+		return fmt.Errorf("failed to write %s:\n%w", pxeGrubCfgFileName, err)
 	}
 
 	return nil
@@ -479,6 +618,8 @@ func (b *LiveOSIsoBuilder) extractBootDirFiles(writeableRootfsDir string) error 
 				targetPath = filepath.Join(b.workingDirs.isoArtifactsDir, "EFI/BOOT", isoGrubCfg)
 			}
 			b.artifacts.isoGrubCfgPath = targetPath
+			// We will place the pxe grub config next to the iso grub config.
+			b.artifacts.pxeGrubCfgPath = filepath.Join(filepath.Dir(b.artifacts.isoGrubCfgPath), pxeGrubCfg)
 			// grub.cfg is passed as a parameter to isomaker.
 			scheduleAdditionalFile = false
 		}
@@ -586,12 +727,16 @@ func (b *LiveOSIsoBuilder) findKernelVersion(writeableRootfsDir string) error {
 //     the initrd image.
 //   - 'extraCommandLine':
 //     extra kernel command line arguments to add to grub.
+//   - 'pxeIsoImageUrl':
+//     url to the iso image or the folder holding it.
+//   - 'outputImageBase':
+//     output image iso name.
 //
 // outputs
 //   - customized writeableRootfsDir (new files, deleted files, etc)
 //   - extracted artifacts
 func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, writeableRootfsDir string,
-	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments) error {
+	isoMakerArtifactsStagingDir string, extraCommandLine imagecustomizerapi.KernelExtraArguments, pxeIsoImageUrl string, outputImageBase string) error {
 
 	logger.Log.Debugf("Creating LiveOS squashfs image")
 
@@ -612,11 +757,11 @@ func (b *LiveOSIsoBuilder) prepareLiveOSDir(inputSavedConfigsFilePath string, wr
 	if exists {
 		err = file.Copy(inputSavedConfigsFilePath, b.artifacts.savedConfigsFilePath)
 		if err != nil {
-			return fmt.Errorf("failed to copy (%s) to (%s):\n%w", inputSavedConfigsFilePath, b.artifacts.savedConfigsFilePath, err)
+			return fmt.Errorf("failed to saved arguments file:\n%w", err)
 		}
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine)
+	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine, b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
@@ -747,13 +892,18 @@ func (b *LiveOSIsoBuilder) generateInitrdImage(rootfsSourceDir, artifactsSourceD
 //     partition and a rootfs partition).
 //   - 'extraCommandLine':
 //     extra kernel command line arguments to add to grub.
+//   - 'pxeIsoImageUrl':
+//     url to the iso image or the folder holding it.
+//   - 'outputImageBase':
+//     output image iso name.
 //
 // outputs:
 //   - all the extracted/generated artifacts will be placed in the
 //     `LiveOSIsoBuilder.workingDirs.isoArtifactsDir` folder.
 //   - the paths to individual artifaces are found in the
 //     `LiveOSIsoBuilder.artifacts` data structure.
-func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePath string, rawImageFile string, extraCommandLine imagecustomizerapi.KernelExtraArguments) error {
+func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePath string, rawImageFile string, extraCommandLine imagecustomizerapi.KernelExtraArguments,
+	pxeIsoImageUrl string, outputImageBase string) error {
 
 	logger.Log.Infof("Preparing iso artifacts")
 
@@ -771,7 +921,7 @@ func (b *LiveOSIsoBuilder) prepareArtifactsFromFullImage(inputSavedConfigsFilePa
 	}
 
 	isoMakerArtifactsStagingDir := "/boot-staging"
-	err = b.prepareLiveOSDir(inputSavedConfigsFilePath, writeableRootfsDir, isoMakerArtifactsStagingDir, extraCommandLine)
+	err = b.prepareLiveOSDir(inputSavedConfigsFilePath, writeableRootfsDir, isoMakerArtifactsStagingDir, extraCommandLine, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to convert rootfs folder to a LiveOS folder:\n%w", err)
 	}
@@ -862,6 +1012,19 @@ func (b *LiveOSIsoBuilder) createIsoImage(additionalIsoFiles []safechroot.FileTo
 		fileToCopy := safechroot.FileToCopy{
 			Src:  b.artifacts.savedConfigsFilePath,
 			Dest: filepath.Join("/", savedConfigsDir, savedConfigsFileName),
+		}
+		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
+	}
+
+	// Add the grub-pxe.cfg file
+	exists, err = file.PathExists(b.artifacts.pxeGrubCfgPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to check if (%s) exists:\n%w", b.artifacts.pxeGrubCfgPath, err)
+	}
+	if exists {
+		fileToCopy := safechroot.FileToCopy{
+			Src:  b.artifacts.pxeGrubCfgPath,
+			Dest: filepath.Join("/", pxeGrubCfgDir, pxeGrubCfg),
 		}
 		additionalIsoFiles = append(additionalIsoFiles, fileToCopy)
 	}
@@ -962,6 +1125,8 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 //     to the new one.
 //   - 'isoConfig'
 //     user provided configuration for the iso image.
+//   - 'pxeConfig'
+//     user provided configuration for the PXE flow.
 //   - 'rawImageFile':
 //     path to an existing raw full disk image (has boot + rootfs partitions).
 //   - 'outputImageDir':
@@ -969,16 +1134,24 @@ func micIsoConfigToIsoMakerConfig(baseConfigPath string, isoConfig *imagecustomi
 //   - 'outputImageBase':
 //     base name of the image to generate. The generated name will be on the
 //     form: {outputImageDir}/{outputImageBase}.iso
+//   - 'outputPXEArtifactsDir'
+//     optional directory path where the PXE artifacts will be exported to if
+//     specified.
 //
 // outputs:
 //
 //	creates a LiveOS ISO image.
 func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *LiveOSIsoBuilder, isoConfig *imagecustomizerapi.Iso,
-	rawImageFile, outputImageDir, outputImageBase string) (err error) {
+	pxeConfig *imagecustomizerapi.Pxe, rawImageFile, outputImageDir, outputImageBase string, outputPXEArtifactsDir string) (err error) {
 
 	additionalIsoFiles, extraCommandLine, err := micIsoConfigToIsoMakerConfig(baseConfigPath, isoConfig)
 	if err != nil {
 		return fmt.Errorf("failed to convert iso configuration to isomaker format:\n%w", err)
+	}
+
+	pxeIsoImageUrl := ""
+	if pxeConfig != nil {
+		pxeIsoImageUrl = pxeConfig.IsoImageUrl
 	}
 
 	isoBuildDir := filepath.Join(buildDir, "tmp")
@@ -1021,7 +1194,7 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		inputSavedConfigsFilePath = inputIsoArtifacts.artifacts.savedConfigsFilePath
 	}
 
-	err = isoBuilder.prepareArtifactsFromFullImage(inputSavedConfigsFilePath, rawImageFile, extraCommandLine)
+	err = isoBuilder.prepareArtifactsFromFullImage(inputSavedConfigsFilePath, rawImageFile, extraCommandLine, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return err
 	}
@@ -1048,7 +1221,12 @@ func createLiveOSIsoImage(buildDir, baseConfigPath string, inputIsoArtifacts *Li
 		}
 	}
 
-	_, err = isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	isoImagePath, err := isoBuilder.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	if err != nil {
+		return err
+	}
+
+	err = populatePXEArtifactsDir(isoImagePath, isoBuilder.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
 	if err != nil {
 		return err
 	}
@@ -1221,6 +1399,8 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 			scheduleAdditionalFile = false
 		case isoGrubCfg:
 			isoBuilder.artifacts.isoGrubCfgPath = isoFile
+			// We will place the pxe grub config next to the iso grub config.
+			isoBuilder.artifacts.pxeGrubCfgPath = filepath.Join(filepath.Dir(isoBuilder.artifacts.isoGrubCfgPath), pxeGrubCfg)
 			// grub.cfg is passed as a parameter to isomaker.
 			scheduleAdditionalFile = false
 		case liveOSImage:
@@ -1267,16 +1447,22 @@ func createIsoBuilderFromIsoImage(buildDir string, buildDirAbs string, isoImageF
 //     relative paths.
 //   - 'isoConfig'
 //     user provided configuration for the iso image.
+//   - 'pxeConfig'
+//     user provided configuration for the PXE flow.
 //   - 'outputImageDir':
 //     path to a folder where the generated iso will be placed.
 //   - 'outputImageBase':
 //     base name of the image to generate. The generated name will be on the
 //     form: {outputImageDir}/{outputImageBase}.iso
+//   - 'outputPXEArtifactsDir'
+//     optional directory path where the PXE artifacts will be exported to if
+//     specified.
 //
 // outputs:
 //
 //   - creates an iso image.
-func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, outputImageDir string, outputImageBase string) error {
+func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, isoConfig *imagecustomizerapi.Iso, pxeConfig *imagecustomizerapi.Pxe,
+	outputImageDir string, outputImageBase string, outputPXEArtifactsDir string) error {
 
 	logger.Log.Infof("Creating LiveOS iso image using unchanged OS partitions")
 
@@ -1285,14 +1471,84 @@ func (b *LiveOSIsoBuilder) createImageFromUnchangedOS(baseConfigPath string, iso
 		return fmt.Errorf("failed to convert iso configuration to isomaker configuration format:\n%w", err)
 	}
 
-	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine)
+	pxeIsoImageUrl := ""
+	if pxeConfig != nil {
+		pxeIsoImageUrl = pxeConfig.IsoImageUrl
+	}
+
+	err = b.updateGrubCfg(b.artifacts.savedConfigsFilePath, b.artifacts.isoGrubCfgPath, extraCommandLine, b.artifacts.pxeGrubCfgPath, pxeIsoImageUrl, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to update grub.cfg:\n%w", err)
 	}
 
-	_, err = b.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
+	isoImagePath, err := b.createIsoImage(additionalIsoFiles, outputImageDir, outputImageBase)
 	if err != nil {
 		return fmt.Errorf("failed to create iso image:\n%w", err)
+	}
+
+	err = populatePXEArtifactsDir(isoImagePath, b.workingDirs.isoBuildDir, outputPXEArtifactsDir, outputImageBase)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// populatePXEArtifactsDir
+//
+//   - This function takes in an liveos iso, and extracts its artifacts unto a
+//     folder for easier copying to a PXE server later by the user.
+//   - It also renames the liveos iso grub-pxe.cfg to grub.cfg.
+//
+// inputs:
+//
+//   - 'isoImagePath':
+//     path to a liveos iso image.
+//   - 'buildDir'
+//     path to a directory to hold intermediate files.
+//   - 'outputPXEArtifactsDir'
+//     path to the output directory where the extract artifacts will be saved to.
+//   - 'outputImageBase':
+//     base name of the image to generate. The generated name will be on the
+//     form: {outputImageDir}/{outputImageBase}.iso
+//
+// outputs:
+//
+//   - creates a folder with PXE artifacts.
+func populatePXEArtifactsDir(isoImagePath string, buildDir string, outputPXEArtifactsDir string, outputImageBase string) error {
+
+	if outputPXEArtifactsDir == "" {
+		return nil
+	}
+
+	logger.Log.Infof("Copying PXE artifacts to (%s)", outputPXEArtifactsDir)
+
+	err := os.RemoveAll(outputPXEArtifactsDir)
+	if err != nil {
+		return fmt.Errorf("failed to remove (%s):\n%w", outputPXEArtifactsDir, err)
+	}
+
+	err = extractIsoImageContents(buildDir, isoImagePath, outputPXEArtifactsDir)
+	if err != nil {
+		return err
+	}
+
+	isoGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub.cfg")
+	pxeGrubCfg := filepath.Join(outputPXEArtifactsDir, "boot/grub2/grub-pxe.cfg")
+	err = file.Copy(pxeGrubCfg, isoGrubCfg)
+	if err != nil {
+		return fmt.Errorf("failed to copy (%s) to (%s) while populating the PXE artifacts directory:\n%w", pxeGrubCfg, isoGrubCfg, err)
+	}
+
+	err = os.RemoveAll(pxeGrubCfg)
+	if err != nil {
+		return fmt.Errorf("failed to remove file (%s):\n%w", pxeGrubCfg, err)
+	}
+
+	artifactsIsoImagePath := filepath.Join(outputPXEArtifactsDir, outputImageBase+".iso")
+	err = file.Copy(isoImagePath, artifactsIsoImagePath)
+	if err != nil {
+		return fmt.Errorf("failed to copy (%s) while populating the PXE artifacts directory:\n%w", isoImagePath, err)
 	}
 
 	return nil
