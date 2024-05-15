@@ -873,6 +873,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | RPMS_DIR                      | `$(OUT_DIR)`/RPMS                                                                                      | Directory to place RPMs in
 | SRPMS_DIR                     | `$(OUT_DIR)`/SRPMS                                                                                     | Directory to place SRPMs in
 | IMAGES_DIR                    | `$(OUT_DIR)`/images                                                                                    | Directory to place images in
+| PRECACHER_SNAPSHOT            | `$(OUT_DIR)`/rpms_snapshot.json                                                                        | Location of snapshot file for the pre-cacher
 
 ---
 
