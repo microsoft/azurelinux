@@ -13,14 +13,14 @@ Group:          Applications/System
 URL:            https://github.com/cloud-hypervisor/cloud-hypervisor
 Source0:        https://github.com/cloud-hypervisor/cloud-hypervisor/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 %if 0%{?using_vendored_crates}
-# Note: the %%{name}-%%{version}-cargo.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
+# Note: the %%{name}-%%{version}-vendor.tar.gz file contains a cache created by capturing the contents downloaded into $CARGO_HOME.
 # To update the cache and config.toml run:
 #   tar -xf %{name}-%{version}.tar.gz
 #   cd %{name}-%{version}
 #   cargo vendor > config.toml
-#   tar -czf %{name}-%{version}-cargo.tar.gz vendor/
-# rename the tarball to %{name}-%{version}-cargo.tar.gz when updating version
-Source1:        %{name}-%{version}-cargo.tar.gz
+#   tar -czf %{name}-%{version}-vendor.tar.gz vendor/
+# rename the tarball to %{name}-%{version}-vendor.tar.gz when updating version
+Source1:        %{name}-%{version}-vendor.tar.gz
 Source2:        config.toml
 Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2023-50711-vmm-sys-util.patch
@@ -164,6 +164,7 @@ cargo build --release --target=%{rust_musl_target} --package vhost_user_block %{
 %changelog
 * Tue May 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 38.0.72-1
 - Auto-upgrade to 38.0.72
+- Update vendor tarball name
 
 * Mon Jan 15 2024 Sindhu Karri <lakarri@microsoft.com> - 32.0-3
 - Patch CVE-2023-50711 in vendor/vmm-sys-util, vendor/vhost, vendor/versionize
