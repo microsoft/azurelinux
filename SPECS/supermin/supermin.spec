@@ -21,7 +21,7 @@
 Summary:        Tool for creating supermin appliances
 Name:           supermin
 Version:        5.2.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -54,7 +54,7 @@ BuildRequires:  systemd-udev
 %if %{with dietlibc}
 BuildRequires:  dietlibc-devel
 %else
-BuildRequires:  glibc-static >= 2.38-3%{?dist}
+BuildRequires:  glibc-static >= 2.38-4%{?dist}
 %endif
 
 %if 0%{?with_check}
@@ -129,6 +129,9 @@ make check || {
 %{_rpmconfigdir}/supermin-find-requires
 
 %changelog
+* Mon May 13 2024 Chris Co <chrco@microsoft.com> - 5.2.2-4
+- Update to build dep latest glibc-static version
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 5.2.2-3
 - update to build dep latest glibc-static version
 
