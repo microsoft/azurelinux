@@ -4,10 +4,13 @@
 # Don't depend on bash by default
 %define __requires_exclude ^/(bin|usr/bin).*$
 
+# Enable frame pointers for package
+%define _include_frame_pointers 1
+
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -324,6 +327,9 @@ grep "^FAIL: nptl/tst-eintr1" tests.sum >/dev/null && n=$((n+1)) ||:
 %defattr(-,root,root)
 
 %changelog
+* Fri May 10 2024 Chris Co <chrco@microsoft.com> - 2.38-4
+- Enable frame pointers compiler flag
+
 * Mon Mar 11 2024 Dan Streetman <ddstreet@microsoft.com> - 2.38-3
 - provide C.utf8 locale
 
