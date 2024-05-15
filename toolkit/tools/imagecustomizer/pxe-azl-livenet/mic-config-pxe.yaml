@@ -1,12 +1,4 @@
 os:
-  users:
-  - name: test
-    password: testpassword
-    primaryGroup: sudo
-  packages:
-    install:
-    - util-linux
-    - grep
   additionalFiles:
     artifacts/90azl-livenet/liveos-artifacts-download.service: /etc/systemd/system/liveos-artifacts-download.service
     artifacts/90azl-livenet/liveos-artifacts-download.sh: /usr/local/bin/liveos-artifacts-download.sh
