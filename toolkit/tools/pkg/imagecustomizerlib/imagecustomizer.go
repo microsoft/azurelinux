@@ -272,7 +272,6 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 	logger.Log.Infof("Converting input image to a writeable format")
 
 	if ic.inputIsIso {
-
 		inputIsoArtifacts, err := createIsoBuilderFromIsoImage(ic.buildDir, ic.buildDirAbs, ic.inputImageFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load input iso artifacts:\n%w", err)
@@ -288,17 +287,17 @@ func convertInputImageToWriteableFormat(ic *ImageCustomizerParameters) (*LiveOSI
 				return nil, fmt.Errorf("failed to create writeable image:\n%w", err)
 			}
 		}
-		return inputIsoArtifacts, nil
 
+		return inputIsoArtifacts, nil
 	} else {
 		logger.Log.Infof("Creating raw base image: %s", ic.rawImageFile)
 		err := shell.ExecuteLiveWithErr(1, "qemu-img", "convert", "-O", "raw", ic.inputImageFile, ic.rawImageFile)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert image file to raw format:\n%w", err)
 		}
-	}
 
-	return nil, nil
+		return nil, nil
+	}
 }
 
 func customizeOSContents(ic *ImageCustomizerParameters) error {
@@ -383,7 +382,6 @@ func customizeOSContents(ic *ImageCustomizerParameters) error {
 }
 
 func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIsoArtifacts *LiveOSIsoBuilder) error {
-
 	logger.Log.Infof("Converting customized OS partitions into the final image")
 
 	// Create final output image file if requested.
@@ -395,8 +393,9 @@ func convertWriteableFormatToOutputImage(ic *ImageCustomizerParameters, inputIso
 		if err != nil {
 			return fmt.Errorf("failed to convert image file to format: %s:\n%w", ic.outputImageFormat, err)
 		}
+
 	case ImageFormatIso:
-		if ic.customizeOSPartitions {
+		if ic.customizeOSPartitions || inputIsoArtifacts == nil {
 			err := createLiveOSIsoImage(ic.buildDir, ic.configPath, inputIsoArtifacts, ic.config.Iso, ic.rawImageFile, ic.outputImageDir, ic.outputImageBase)
 			if err != nil {
 				return fmt.Errorf("failed to create LiveOS iso image:\n%w", err)
