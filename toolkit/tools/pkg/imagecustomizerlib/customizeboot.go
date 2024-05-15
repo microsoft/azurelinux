@@ -5,7 +5,6 @@ package imagecustomizerlib
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -21,6 +20,8 @@ import (
 )
 
 var (
+	selinuxArgNames = []string{"security", "selinux", "enforcing"}
+
 	// Finds the SELinux mode line in the /etc/selinux/config file.
 	selinuxConfigModeRegex = regexp.MustCompile(`(?m)^SELINUX=(\w+)$`)
 )
@@ -152,14 +153,13 @@ func setInitrdPath(inputGrubCfgContent string, initrdPath string) (outputGrubCfg
 
 // Appends kernel command-line args to the linux command within a grub config file.
 func appendKernelCommandLineArgs(inputGrubCfgContent string, extraCommandLine string) (outputGrubCfgContent string, err error) {
-	_, insertAtToken, err := getLinuxCommandLineArgs(inputGrubCfgContent)
+	_, insertAt, err := getLinuxCommandLineArgs(inputGrubCfgContent)
 	if err != nil {
 		return "", err
 	}
 
 	// Insert args at the end of the line.
-	insertPoint := insertAtToken.Loc.Start.Index
-	outputGrubCfgContent = inputGrubCfgContent[:insertPoint] + extraCommandLine + " " + inputGrubCfgContent[insertPoint:]
+	outputGrubCfgContent = inputGrubCfgContent[:insertAt] + extraCommandLine + " " + inputGrubCfgContent[insertAt:]
 	return outputGrubCfgContent, nil
 }
 
@@ -178,33 +178,71 @@ type grubConfigLinuxArg struct {
 //
 // Returns:
 //   - args: A list of kernel command-line arguments.
-//   - insertToken: A token that represents an appropriate insert point for any new args.
-//     In Azure Linux 2.0, this is the $kernelopts token.
-func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Token, error) {
+//   - insertAt: An index that represents an appropriate insert point for any new args.
+//     For Azure Linux 2.0 images, this points to the index of the $kernelopts token.
+func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, int, error) {
 	linuxLine, err := findLinuxLine(grub2Config)
 	if err != nil {
-		return nil, grub.Token{}, err
+		return nil, 0, err
 	}
 
 	// Skip the "linux" command and the kernel binary path arg.
 	argTokens := linuxLine[2:]
 
-	args := []grubConfigLinuxArg(nil)
-	insertAtToken := (*grub.Token)(nil)
+	insertAt, err := findCommandLineInsertAt(argTokens)
+	if err != nil {
+		return nil, 0, err
+	}
 
+	args, err := parseCommandLineArgs(argTokens)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return args, insertAt, nil
+}
+
+// Takes a tokenized grub.cfg file and looks for an appropriate place to insert new args.
+// Specifically, it looks for the index of the $kernelopts args.
+func findCommandLineInsertAt(argTokens []grub.Token) (int, error) {
+	insertAtTokens := []grub.Token(nil)
 	for i := range argTokens {
 		argToken := argTokens[i]
 		if argToken.Type != grub.WORD {
-			return nil, grub.Token{}, fmt.Errorf("unexpected token (%s) in grub config linux command",
+			return 0, fmt.Errorf("unexpected token (%s) in grub config linux command",
 				grub.TokenTypeString(argToken.Type))
 		}
 
 		if len(argToken.SubWords) == 1 &&
 			argToken.SubWords[0].Type == grub.VAR_EXPANSION &&
-			argToken.SubWords[0].Value == "kernelopts" {
+			argToken.SubWords[0].Value == grubKernelOpts {
 			// Found the $kernelopts arg.
 			// Any new args to be inserted, will be inserted immediately before this token.
-			insertAtToken = &argToken
+			insertAtTokens = append(insertAtTokens, argToken)
+		}
+	}
+
+	if len(insertAtTokens) < 1 {
+		return 0, fmt.Errorf("failed to find $%s in linux command line", grubKernelOpts)
+	}
+	if len(insertAtTokens) > 1 {
+		return 0, fmt.Errorf("too many $%s tokens found in linux command line", grubKernelOpts)
+	}
+
+	insertAtToken := insertAtTokens[0]
+	insertAt := insertAtToken.Loc.Start.Index
+	return insertAt, nil
+}
+
+// Takes a tokenized grub.cfg file and makes a best effort to extract the kernel command-line args.
+func parseCommandLineArgs(argTokens []grub.Token) ([]grubConfigLinuxArg, error) {
+	args := []grubConfigLinuxArg(nil)
+
+	for i := range argTokens {
+		argToken := argTokens[i]
+		if argToken.Type != grub.WORD {
+			return nil, fmt.Errorf("unexpected token (%s) in grub config linux command",
+				grub.TokenTypeString(argToken.Type))
 		}
 
 		hasVarExpansion := false
@@ -247,11 +285,7 @@ func getLinuxCommandLineArgs(grub2Config string) ([]grubConfigLinuxArg, grub.Tok
 		args = append(args, arg)
 	}
 
-	if insertAtToken == nil {
-		return nil, grub.Token{}, fmt.Errorf("failed to find $kernelopts in linux command line")
-	}
-
-	return args, *insertAtToken, nil
+	return args, nil
 }
 
 // Filters a list of kernel command-line args to only those that match the provided list of names.
@@ -287,6 +321,15 @@ func findKernelCommandLineArgValue(args []grubConfigLinuxArg, name string) (stri
 }
 
 // Finds an existing kernel command-line arg and replaces its value.
+//
+// Params:
+// - inputGrubCfgContent: The string contents of the grub.cfg file.
+// - name: The name of the command-line arg to replace.
+// - value: The value to set the command-line arg to.
+//
+// Returns:
+// - outputGrubCfgContent: The new string contents of the grub.cfg file.
+// - oldValue: The previous value of the arg.
 func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, value string,
 ) (outputGrubCfgContent string, oldValue string, err error) {
 	newArg := fmt.Sprintf("%s=%s", name, value)
@@ -314,76 +357,36 @@ func replaceKernelCommandLineArgValue(inputGrubCfgContent string, name string, v
 	return outputGrubCfgContent, oldValue, nil
 }
 
-// Inserts new kernel command-line args into the grub config file.
-func addKernelCommandLine(kernelExtraArgs imagecustomizerapi.KernelExtraArguments,
-	imageChroot *safechroot.Chroot,
-) error {
-	var err error
-
-	extraCommandLine := strings.TrimSpace(string(kernelExtraArgs))
-	if extraCommandLine == "" {
-		// Nothing to do.
-		return nil
-	}
-
-	logger.Log.Infof("Setting KernelCommandLine.ExtraCommandLine")
-
-	grub2ConfigFile, err := readGrub2ConfigFile(imageChroot)
-	if err != nil {
-		return err
-	}
-
-	newGrub2ConfigFile, err := appendKernelCommandLineArgs(grub2ConfigFile, extraCommandLine)
-	if err != nil {
-		return err
-	}
-
-	// Update grub.cfg file.
-	err = writeGrub2ConfigFile(newGrub2ConfigFile, imageChroot)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Updates the kernel command-line args with the new SELinux mode.
-//
-// See, installutils.setGrubCfgSELinux()
-func updateSELinuxCommandLine(selinuxMode imagecustomizerapi.SELinuxMode, imageChroot *safechroot.Chroot) error {
-	logger.Log.Infof("Updating SELinux kernel command-line args")
-
-	grub2Config, err := readGrub2ConfigFile(imageChroot)
-	if err != nil {
-		return err
-	}
-
-	newGrub2Config, err := updateSELinuxCommandLineHelper(grub2Config, selinuxMode)
-	if err != nil {
-		return err
-	}
-
-	// Update grub.cfg file.
-	err = writeGrub2ConfigFile(newGrub2Config, imageChroot)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Finds all the kernel command-line args that match the provided names, then insert replacement arg(s).
+//
+// Params:
+// - grub2Config: The string contents of the grub.cfg file.
+// - argsToRemove: A list of arg names to remove from the command-line args.
+// - newArgs: A list of new arg values to add to the command-line args.
+//
+// Output:
+// - grub2Config: The new string contents of the grub.cfg file.
 func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newArgs []string) (string, error) {
-	newArgsQuoted := grubArgsToString(newArgs)
-
 	args, insertAtToken, err := getLinuxCommandLineArgs(grub2Config)
 	if err != nil {
 		return "", err
 	}
 
+	grub2Config, err = updateKernelCommandLineArgsHelper(grub2Config, args, insertAtToken, argsToRemove, newArgs)
+	if err != nil {
+		return "", err
+	}
+
+	return grub2Config, nil
+}
+
+func updateKernelCommandLineArgsHelper(value string, args []grubConfigLinuxArg, insertAt int,
+	argsToRemove []string, newArgs []string,
+) (string, error) {
+	newArgsQuoted := grubArgsToString(newArgs)
 	foundArgs := findMatchingCommandLineArgs(args, argsToRemove)
 
-	grub2ConfigBuilder := strings.Builder{}
+	builder := strings.Builder{}
 	nextIndex := 0
 
 	if len(foundArgs) > 0 {
@@ -391,30 +394,32 @@ func updateKernelCommandLineArgs(grub2Config string, argsToRemove []string, newA
 		for _, arg := range foundArgs {
 			start := arg.Token.Loc.Start.Index
 			end := arg.Token.Loc.End.Index
-			grub2ConfigBuilder.WriteString(grub2Config[nextIndex:start])
+			builder.WriteString(value[nextIndex:start])
 			nextIndex = end
 		}
 
 		// Insert the new arg at the location of the last arg.
-		grub2ConfigBuilder.WriteString(newArgsQuoted)
+		builder.WriteString(newArgsQuoted)
 	} else {
 		// Write out the grub config to the point where the new arg will be inserted.
-		insertAt := insertAtToken.Loc.Start.Index
-		grub2ConfigBuilder.WriteString(grub2Config[nextIndex:insertAt])
+		builder.WriteString(value[nextIndex:insertAt])
 		nextIndex = insertAt
 
 		// Insert the new arg.
-		grub2ConfigBuilder.WriteString(newArgsQuoted)
-		grub2ConfigBuilder.WriteString(" ")
+		builder.WriteString(" ")
+		builder.WriteString(newArgsQuoted)
+		builder.WriteString(" ")
 	}
 
 	// Write out the remainder of the grub config.
-	grub2ConfigBuilder.WriteString(grub2Config[nextIndex:])
+	builder.WriteString(value[nextIndex:])
 
-	grub2Config = grub2ConfigBuilder.String()
-	return grub2Config, nil
+	value = builder.String()
+	return value, nil
 }
 
+// Takes a list of unescaped and unquoted kernel command-line args and combines them into a single string with
+// appropriate quoting for a grub.cfg file.
 func grubArgsToString(args []string) string {
 	builder := strings.Builder{}
 	for i, arg := range args {
@@ -430,8 +435,8 @@ func grubArgsToString(args []string) string {
 	return combinedString
 }
 
-// Update the SELinux kernel command-line args.
-func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
+// Converts an SELinux mode into the list of required command-line args for that mode.
+func selinuxModeToArgs(selinuxMode imagecustomizerapi.SELinuxMode) ([]string, error) {
 	newSELinuxArgs := []string(nil)
 	switch selinuxMode {
 	case imagecustomizerapi.SELinuxModeDisabled:
@@ -445,11 +450,20 @@ func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomi
 		newSELinuxArgs = []string{installutils.CmdlineSELinuxSecurityArg, installutils.CmdlineSELinuxEnabledArg}
 
 	default:
-		return "", fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
+		return nil, fmt.Errorf("unknown SELinux mode (%s)", selinuxMode)
 	}
 
-	grub2Config, err := updateKernelCommandLineArgs(grub2Config, []string{"security", "selinux", "enforcing"},
-		newSELinuxArgs)
+	return newSELinuxArgs, nil
+}
+
+// Update the SELinux kernel command-line args.
+func updateSELinuxCommandLineHelper(grub2Config string, selinuxMode imagecustomizerapi.SELinuxMode) (string, error) {
+	newSELinuxArgs, err := selinuxModeToArgs(selinuxMode)
+	if err != nil {
+		return "", err
+	}
+
+	grub2Config, err = updateKernelCommandLineArgs(grub2Config, selinuxArgNames, newSELinuxArgs)
 	if err != nil {
 		return "", err
 	}
@@ -525,20 +539,10 @@ func replaceSetCommandValue(grub2Config string, varName string, newValue string)
 	return grub2Config, nil
 }
 
-// Gets the current SELinux mode of an image.
-func getCurrentSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
-	logger.Log.Debugf("Get existing SELinux mode")
-
-	grub2Config, err := readGrub2ConfigFile(imageChroot)
-	if err != nil {
-		return imagecustomizerapi.SELinuxModeDefault, err
-	}
-
-	args, _, err := getLinuxCommandLineArgs(grub2Config)
-	if err != nil {
-		return "", err
-	}
-
+// Takes a list of kernel command-line args and calculates the SELinux mode that is set.
+// If the command-line args delegate the SELinux mode to the /etc/selinux/config file, then SELinuxModeDefault ("") is
+// returned.
+func getSELinuxModeFromLinuxArgs(args []grubConfigLinuxArg) (imagecustomizerapi.SELinuxMode, error) {
 	// Try to find any existing SELinux args.
 	securityValue, err := findKernelCommandLineArgValue(args, "security")
 	if err != nil {
@@ -565,14 +569,12 @@ func getCurrentSELinuxMode(imageChroot *safechroot.Chroot) (imagecustomizerapi.S
 		return imagecustomizerapi.SELinuxModeForceEnforcing, nil
 	}
 
-	selinuxMode, err := getSELinuxModeFromConfigFile(imageChroot)
-	if err != nil {
-		return imagecustomizerapi.SELinuxModeDefault, err
-	}
-
-	return selinuxMode, nil
+	// The SELinux mode has been left up to the /etc/selinux/config file.
+	// Signal this by returning the default ("") value.
+	return imagecustomizerapi.SELinuxModeDefault, nil
 }
 
+// Gets the SELinux mode set by the /etc/selinux/config file.
 func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomizerapi.SELinuxMode, error) {
 	selinuxConfigFilePath := filepath.Join(imageChroot.RootDir(), installutils.SELinuxConfigFile)
 
@@ -607,6 +609,7 @@ func getSELinuxModeFromConfigFile(imageChroot *safechroot.Chroot) (imagecustomiz
 	}
 }
 
+// Reads the /boot/grub2/grub.cfg file.
 func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
 	logger.Log.Debugf("Reading grub.cfg file")
 
@@ -615,21 +618,22 @@ func readGrub2ConfigFile(imageChroot *safechroot.Chroot) (string, error) {
 	// Read the existing grub.cfg file.
 	grub2Config, err := file.Read(grub2ConfigFilePath)
 	if err != nil {
-		return "", fmt.Errorf("failed to read existing grub2 config file (%s):\n%w", installutils.GrubCfgFile, err)
+		return "", fmt.Errorf("failed to read grub2 config file (%s):\n%w", installutils.GrubCfgFile, err)
 	}
 
 	return grub2Config, nil
 }
 
+// Writes the /boot/grub2/grub.cfg file.
 func writeGrub2ConfigFile(grub2Config string, imageChroot *safechroot.Chroot) error {
 	logger.Log.Debugf("Writing grub.cfg file")
 
 	grub2ConfigFilePath := getGrub2ConfigFilePath(imageChroot)
 
 	// Update grub.cfg file.
-	err := os.WriteFile(grub2ConfigFilePath, []byte(grub2Config), 0)
+	err := file.Write(grub2Config, grub2ConfigFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to write new grub2 config file (%s):\n%w", installutils.GrubCfgFile, err)
+		return fmt.Errorf("failed to write grub2 config file (%s):\n%w", installutils.GrubCfgFile, err)
 	}
 
 	return nil
@@ -639,6 +643,7 @@ func getGrub2ConfigFilePath(imageChroot *safechroot.Chroot) string {
 	return filepath.Join(imageChroot.RootDir(), installutils.GrubCfgFile)
 }
 
+// Regenerates the initramfs file.
 func regenerateInitrd(imageChroot *safechroot.Chroot) error {
 	logger.Log.Infof("Regenerate initramfs file")
 

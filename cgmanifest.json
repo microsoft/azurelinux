@@ -21953,8 +21953,8 @@
         "type": "other",
         "other": {
           "name": "python-constantly",
-          "version": "15.1.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/95/f1/207a0a478c4bb34b1b49d5915e2db574cadc415c9ac3a7ef17e29b2e8951/constantly-15.1.0.tar.gz"
+          "version": "23.10.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/4d/6f/cb2a94494ff74aa9528a36c5b1422756330a75a8367bf20bd63171fc324d/constantly-23.10.4.tar.gz"
         }
       }
     },
@@ -24772,9 +24772,19 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-versioneer",
+          "version": "0.29",
+          "downloadUrl": "https://files.pythonhosted.org/packages/32/d7/854e45d2b03e1a8ee2aa6429dd396d002ce71e5d88b77551b2fb249cb382/versioneer-0.29.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-virt-firmware",
-          "version": "23.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/c2/f8/204dc513d2d3f0f3d3aead03600f7db1b763cf02998ad7b35e7ac5ef6849/virt-firmware-23.5.tar.gz"
+          "version": "24.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/ea/8d/b3417567c9b532879357fb2b6b6fc50a6b0b311f95b16b4845054852e062/virt-firmware-24.4.tar.gz"
         }
       }
     },
@@ -24873,8 +24883,8 @@
         "type": "other",
         "other": {
           "name": "python-wheel",
-          "version": "0.33.6",
-          "downloadUrl": "https://github.com/pypa/wheel/archive/0.33.6/wheel-0.33.6.tar.gz"
+          "version": "0.43.0",
+          "downloadUrl": "https://github.com/pypa/wheel/archive/0.43.0/wheel-0.43.0.tar.gz"
         }
       }
     },
