@@ -31,12 +31,12 @@ SRPMS.  It does not pull in any other OCaml dependencies.
 
 
 %install
-mkdir -p %{buildroot}%{rpmmacrodir}
-install -m 0644 %{SOURCE0} %{buildroot}%{rpmmacrodir}/macros.ocaml-srpm
+mkdir -p %{buildroot}%{_rpmmacrodir}
+install -m 0644 %{SOURCE0} %{buildroot}%{_rpmmacrodir}/macros.ocaml-srpm
 
 
 %files
-%{rpmmacrodir}/macros.ocaml-srpm
+%{_rpmmacrodir}/macros.ocaml-srpm
 
 %changelog
 * Tue May 14 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 9-3

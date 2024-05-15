@@ -21,7 +21,7 @@ Source5:        macros.check
 Source6:        macros.openblas-srpm
 Source7:        macros.nodejs-srpm
 Source8:        macros.mono-srpm
-Source9:       macros.perl-srpm
+Source9:        macros.perl-srpm
 Source10:       gpgverify
 Source11:       macros.forge
 Source12:       common.lua
