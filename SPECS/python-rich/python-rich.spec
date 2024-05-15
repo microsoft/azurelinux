@@ -11,7 +11,10 @@ Source0:        %{url}/archive/v%{version}/rich-%{version}.tar.gz
 BuildArch:      noarch
 
 Patch0:         3229.patch
-Patch1:         ptest-warning.patch 
+Patch1:         ptest-warning.patch
+# This patch modifies the tests to set the OLD_PYGMENTS version
+# to the current one in Azure Linux, 2.5.2. Once python-pygments
+# version is updated >= 2.14.0, this patch can be removed.
 Patch2:         0001-Skip-tests-for-mariner.patch
 
 BuildRequires:  pyproject-rpm-macros
