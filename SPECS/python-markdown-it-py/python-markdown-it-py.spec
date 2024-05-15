@@ -9,7 +9,7 @@ High speed & safe by default
 Summary:        Python port of markdown-it
 Name:           python-%{pypi_name}
 Version:        3.0.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,10 @@ Source0:        %{url}/archive/v%{version}/%{pypi_name}-%{version}.tar.gz
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-flit-core
+%if 0%{?with_check}
+BuildRequires:  python3-pytest
+BuildRequires:  python3-mdurl
+%endif
 BuildArch:      noarch
 # The plugins extras creates a bootstrap loop
 %bcond plugins 1
@@ -52,6 +56,7 @@ sed -i '/"pytest-cov",/d' pyproject.toml
 %pyproject_save_files markdown_it
 
 %check
+pip3 install iniconfig linkify-it-py pytest-regressions
 %pytest tests/
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
@@ -60,6 +65,9 @@ sed -i '/"pytest-cov",/d' pyproject.toml
 %{_bindir}/markdown-it
 
 %changelog
+* Mon May 13 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0.0-6
+- Add missing dep on pytest for check section
+
 * Thu Mar 28 2024 Riken Maharjan <rmaharjan@microsoft.com> - 3.0.0-5
 - Initial Azure Linux import from Fedora 40 (license: MIT)
 - License verified
