@@ -241,6 +241,13 @@ function get_packages_to_install {
     echo "Packages to install           -> $PACKAGES_TO_INSTALL"
 }
 
+function get_component_name {
+    echo "+++ Get Component name"
+    componentFilePath="$CONTAINER_SRC_DIR/$IMAGE/$COMPONENT"
+    COMPONENT=$(cat "$componentFilePath")
+    echo "Component name                -> $COMPONENT"
+}
+
 function prepare_docker_directory {
     echo "+++ Prepare docker directory"
     # Get additional required files for the container build from CBL-Mariner repo.
@@ -394,6 +401,7 @@ print_inputs
 validate_inputs
 initialization
 prepare_dockerfile
+get_component_name
 get_packages_to_install
 prepare_docker_directory
 docker_build
